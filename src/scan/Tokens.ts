@@ -1,3 +1,5 @@
+/// <reference path="../lang/LangExtensions.ts" />
+
 module chevrotain.scan.tokens {
 
     import lang = chevrotain.typescript.lang.extensions;

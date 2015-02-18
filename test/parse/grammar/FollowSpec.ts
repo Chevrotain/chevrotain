@@ -1,3 +1,12 @@
+/// <reference path="Samples.ts" />
+/// <reference path="../../../src/parse/grammar/Follow.ts" />
+/// <reference path="../../../src/scan/Tokens.ts" />
+/// <reference path="../../../src/parse/grammar/GAst.ts" />
+/// <reference path="../../utils/Matchers.ts" />
+/// <reference path="../../../libs/lodash.d.ts" />
+/// <reference path="../../../libs/jasmine.d.ts" />
+
+
 module chevrotain.parse.grammar.follow.spec {
 
     import t = test.parser.grammar.samples;

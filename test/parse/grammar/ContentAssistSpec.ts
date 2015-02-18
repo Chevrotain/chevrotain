@@ -1,3 +1,11 @@
+/// <reference path="Samples.ts" />
+/// <reference path="../../../src/parse/grammar/Interpreter2.ts" />
+/// <reference path="../../../src/parse/grammar/Path.ts" />
+/// <reference path="../../utils/Matchers.ts" />
+/// <reference path="../../../libs/jasmine.d.ts" />
+
+
+// TODO: rename file to interpreterSpec
 module chevrotain.parse.grammar.interpreter.spec {
 
     import t = test.parser.grammar.samples;

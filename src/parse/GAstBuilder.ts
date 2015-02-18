@@ -1,3 +1,10 @@
+/// <reference path="../scan/Tokens.ts" />
+/// <reference path="../text/Range.ts" />
+/// <reference path="../parse/grammar/GAst.ts" />
+/// <reference path="../../libs/lodash.d.ts" />
+/// <reference path="../../libs/hashtable.d.ts" />
+
+
 // module for building the GAst representation of the parserImpel
 module chevrotain.parse.gast.builder {
 

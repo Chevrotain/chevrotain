@@ -1,3 +1,6 @@
+/// <reference path="../../src/parse/Recognizer.ts" />
+/// <reference path="../../src/scan/Tokens.ts" />
+
 module chevrotain.examples.json {
 
     import recog = chevrotain.parse.infra.recognizer;

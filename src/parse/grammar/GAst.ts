@@ -1,3 +1,6 @@
+/// <reference path="../../scan/Tokens.ts" />
+/// <reference path="../../../libs/lodash.d.ts" />
+
 module chevrotain.parse.grammar.gast {
 
     import tok = chevrotain.scan.tokens;

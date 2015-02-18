@@ -1,3 +1,10 @@
+/// <reference path="grammar/Samples.ts" />
+/// <reference path="../../src/text/Range.ts" />
+/// <reference path="../../src/parse/GAstBuilder.ts" />
+/// <reference path="../utils/Matchers.ts" />
+/// <reference path="../../libs/lodash.d.ts" />
+/// <reference path="../../libs/jasmine.d.ts" />
+
 module chevrotain.parse.grammar.gast.builder.spec {
 
     import r = chevrotain.text.range;

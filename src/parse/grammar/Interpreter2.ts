@@ -1,3 +1,10 @@
+/// <reference path="../../scan/Tokens.ts" />
+/// <reference path="../../parse/grammar/GAst.ts" />
+/// <reference path="../../parse/grammar/Rest.ts" />
+/// <reference path="../../parse/grammar/First.ts" />
+/// <reference path="../../parse/grammar/Path.ts" />
+/// <reference path="../../../libs/lodash.d.ts" />
+
 module chevrotain.parse.grammar.interpreter {
 
     import t = chevrotain.scan.tokens;

@@ -1,6 +1,5 @@
-/**
- * extracting the Content Assist Parser api to avoid cyclic dependencies among ts files.
- */
+/// <reference path="../../scan/Tokens.ts" />
+
 module chevrotain.parse.grammar.path {
 
     import tok = chevrotain.scan.tokens;

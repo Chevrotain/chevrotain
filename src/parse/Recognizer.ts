@@ -1,3 +1,11 @@
+/// <reference path="../scan/Tokens.ts" />
+/// <reference path="../parse/grammar/GAst.ts" />
+/// <reference path="../parse/Constants.ts" />
+/// <reference path="../parse/grammar/Interpreter2.ts" />
+
+/// <reference path="../../libs/lodash.d.ts" />
+/// <reference path="../../libs/hashtable.d.ts" />
+
 module chevrotain.parse.infra.recognizer {
 
     import tok = chevrotain.scan.tokens;

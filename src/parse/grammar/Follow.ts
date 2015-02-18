@@ -1,3 +1,10 @@
+/// <reference path="../../scan/Tokens.ts" />
+/// <reference path="../../parse/grammar/GAst.ts" />
+/// <reference path="../../parse/grammar/Rest.ts" />
+/// <reference path="../../parse/grammar/First.ts" />
+/// <reference path="../../parse/Constants.ts" />
+/// <reference path="../../../libs/hashtable.d.ts" />
+
 module chevrotain.parse.grammar.follow {
 
     import t = chevrotain.scan.tokens;

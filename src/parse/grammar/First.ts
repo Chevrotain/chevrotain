@@ -1,3 +1,6 @@
+/// <reference path="GAst.ts" />
+/// <reference path="../../../libs/lodash.d.ts" />
+
 module chevrotain.parse.grammar.first {
 
     import gast = chevrotain.parse.grammar.gast;

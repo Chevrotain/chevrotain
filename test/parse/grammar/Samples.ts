@@ -1,3 +1,6 @@
+/// <reference path="../../../src/scan/Tokens.ts" />
+/// <reference path="../../../src/parse/grammar/GAst.ts" />
+
 module test.parser.grammar.samples {
 
     import t = chevrotain.scan.tokens;

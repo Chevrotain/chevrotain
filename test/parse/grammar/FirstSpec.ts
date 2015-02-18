@@ -1,3 +1,8 @@
+/// <reference path="../../../src/parse/grammar/Follow.ts" />
+/// <reference path="../../../libs/jasmine.d.ts" />
+/// <reference path="Samples.ts" />
+/// <reference path="../../utils/Matchers.ts" />
+
 module chevrotain.parse.grammar.first.spec {
 
     import t = test.parser.grammar.samples;
