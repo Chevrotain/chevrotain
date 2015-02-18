@@ -74,7 +74,7 @@ var specIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecs.ts');
 var coreSpecUtilsIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecsUtils.ts');
 var allSrcsIncludes = coreIncludes.concat(coreSpecUtilsIncludes, specIncludes);
 
-//validateAllSpecsHaveBeenIncluded(specIncludes);
+validateAllSpecsHaveBeenIncluded(specIncludes);
 
 module.exports = function (config) {
     "use strict";
