@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="KARMA COVERAGE FireFox" type="JavaScriptTestRunnerKarma" factoryName="Karma" folderName="FireFox" singleton="false" config-file="$PROJECT_DIR$/karma.conf.js">
+  <configuration default="false" name="KARMA COVERAGE FireFox" type="JavaScriptTestRunnerKarma" factoryName="Karma" singleton="false" config-file="$PROJECT_DIR$/karma.conf.js">
     <envs>
       <env name="COVERAGE" value="true" />
       <env name="FIREFOX" value="true" />
