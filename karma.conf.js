@@ -43,7 +43,7 @@ function validateAllSpecsHaveBeenIncluded(actualSpecsIncludes) {
     }
 }
 
-var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test).+\.ts)/g;
+var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test|examples).+\.ts)/g;
 
 function getCapturingGroups(targetStr, regex, i) {
     var references = [];
@@ -72,7 +72,10 @@ function getIncludesFromTsRefsFile(fileName) {
 var coreIncludes = getIncludesFromTsRefsFile('./build/chevrotain.ts');
 var specIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecs.ts');
 var coreSpecUtilsIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecsUtils.ts');
-var allSrcsIncludes = coreIncludes.concat(coreSpecUtilsIncludes, specIncludes);
+var examples = getIncludesFromTsRefsFile('./build/chevrotainExamples.ts');
+var examplesSpecs = getIncludesFromTsRefsFile('./build/chevrotainExamplesSpecs.ts');
+
+var allSrcsIncludes = coreIncludes.concat(coreSpecUtilsIncludes, specIncludes, examples, examplesSpecs);
 
 validateAllSpecsHaveBeenIncluded(specIncludes);
 

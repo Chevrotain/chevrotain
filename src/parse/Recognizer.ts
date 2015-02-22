@@ -110,6 +110,10 @@ module chevrotain.parse.infra.recognizer {
             this.inputIdx = -1;
         }
 
+        isAtEndOfInput():boolean {
+            return this.LA(1) instanceof EOF;
+        }
+
         SAVE_ERROR(error:Error):Error {
             if (isRecognitionException(error)) {
                 this.errors.push(error);

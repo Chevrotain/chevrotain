@@ -8,15 +8,42 @@ module chevrotain.examples.json {
 
     export class StringTok extends tok.Token {}
     export class NumberTok extends tok.Token {}
-    export class TrueTok extends tok.Token {}
-    export class FalseTok extends tok.Token {}
-    export class NullTok extends tok.Token {}
-    export class LCurlyTok extends tok.Token {}
-    export class RCurlyTok extends tok.Token {}
-    export class LSquareTok extends tok.Token {}
-    export class RSquareTok extends tok.Token {}
-    export class CommaTok extends tok.Token {}
-    export class SemiColonTok extends tok.Token {}
+
+    export class TrueTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "true") }
+    }
+
+    export class FalseTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "false") }
+    }
+
+    export class NullTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "null") }
+    }
+
+    export class LCurlyTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "{") }
+    }
+
+    export class RCurlyTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "}") }
+    }
+
+    export class LSquareTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "[") }
+    }
+
+    export class RSquareTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "]") }
+    }
+
+    export class CommaTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ",") }
+    }
+
+    export class ColonTok extends tok.Token {
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ":") }
+    }
 
 
     export class JsonParser extends recog.BaseRecognizer {
@@ -35,7 +62,7 @@ module chevrotain.examples.json {
 
         objectItem():void {
             this.CONSUME(StringTok);
-            this.CONSUME(SemiColonTok);
+            this.CONSUME(ColonTok);
             this.value();
         }
 

@@ -1,0 +1,1 @@
+/// <reference path="../examples/jsonParserOnly/JsonParserSpec.ts" />
