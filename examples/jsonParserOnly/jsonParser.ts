@@ -6,18 +6,25 @@ module chevrotain.examples.json {
     import recog = chevrotain.parse.infra.recognizer;
     import tok = chevrotain.scan.tokens;
 
+    // DOCS: all Tokens must be defined as subclass of chevrotain.scan.tokens.Token
     export class StringTok extends tok.Token {}
     export class NumberTok extends tok.Token {}
 
-    export class TrueTok extends tok.Token {
+
+    // DOCS: additional hierarchies may be defined for categorization purposes, for example
+    //       when implementing Syntax highlighting being able to easily identify all the keywords with a simple
+    //       "instanceof?" could be convenient.
+    export class Keyword extends tok.Token {}
+
+    export class TrueTok extends Keyword {
         constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "true") }
     }
 
-    export class FalseTok extends tok.Token {
+    export class FalseTok extends Keyword {
         constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "false") }
     }
 
-    export class NullTok extends tok.Token {
+    export class NullTok extends Keyword {
         constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "null") }
     }
 
