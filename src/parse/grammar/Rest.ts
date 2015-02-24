@@ -11,14 +11,30 @@ module chevrotain.parse.grammar.rest {
             _.forEach(prod.definition, (subProd:gast.IProduction, index)=> {
                 var currRest = _.drop(prod.definition, index + 1);
 
-                if (subProd instanceof g.ProdRef) { this.walkProdRef(<g.ProdRef>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.Terminal) { this.walkTerminal(<g.Terminal>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.TOP_LEVEL) { this.walkTopLevel(<g.TOP_LEVEL>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.FLAT) { this.walkFlat(<g.FLAT>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.OPTION) { this.walkOption(<g.OPTION>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.AT_LEAST_ONE) { this.walkAtLeastOne(<g.AT_LEAST_ONE>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.MANY) { this.walkMany(<g.MANY>subProd, currRest, prevRest);}
-                else if (subProd instanceof g.OR) { this.walkOr(<g.OR>subProd, currRest, prevRest);}
+                if (subProd instanceof g.ProdRef) {
+                    this.walkProdRef(<g.ProdRef>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.Terminal) {
+                    this.walkTerminal(<g.Terminal>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.TOP_LEVEL) {
+                    this.walkTopLevel(<g.TOP_LEVEL>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.FLAT) {
+                    this.walkFlat(<g.FLAT>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.OPTION) {
+                    this.walkOption(<g.OPTION>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.AT_LEAST_ONE) {
+                    this.walkAtLeastOne(<g.AT_LEAST_ONE>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.MANY) {
+                    this.walkMany(<g.MANY>subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.OR) {
+                    this.walkOr(<g.OR>subProd, currRest, prevRest)
+                }
 
                 else {throw Error("non exhaustive match"); }
             });

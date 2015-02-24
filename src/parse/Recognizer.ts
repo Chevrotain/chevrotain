@@ -220,6 +220,7 @@ module chevrotain.parse.infra.recognizer {
                 if (cases[i].WHEN.call(this)) {
                     oneValidCaseFound = true;
                     var res = cases[i].THEN_DO();
+                    // TODO: why return the complex object?
                     return {tree: res, matched: true};
                 }
             }
@@ -313,7 +314,18 @@ module chevrotain.parse.infra.recognizer {
         }
 
         CONSUME(tokType:Function):tok.Token {
-            throw Error("must use COMSUME1/2/3... to indicate the occurrence inside the parent rule");
+            // The basic indexless consume is not supported because that index/occurrence number must be provided
+            // to allow the parser to "know" its position. for example: take a simple qualifiedName rule.
+            //
+            // this.CONSUME1(IdentTok)); <-- first Ident
+            // this.MANY(isQualifiedNamePart, ()=> {
+            //    this.CONSUME1(DotTok);
+            //    this.CONSUME2(IdentTok);   <-- ident 2...n
+            // })
+            //
+            // the behavior for recovering from a mismatched Token may be different depending if we are trying to consume
+            // the first or the second occurrence of IdentTok. because the position in the grammar is different...
+            throw Error("must use COMSUME1/2/3... to indicate the occurrence of the specific Token inside the current rule");
         }
 
         CONSUME1(tokType:Function):tok.Token {
@@ -332,6 +344,12 @@ module chevrotain.parse.infra.recognizer {
             return this.consume_internal(tokType, 4);
         }
 
+        /**
+         *  This is an "empty" wrapper that has no meaning in runtime, it is only used to create an easy to identify
+         *  textual mark for the purpose of making the "self" parsing of the implemented grammar rules easier.
+         */
+        // TODO: can this limitation be removed? if we know all the parsing rules names (or mark them in one way or another)
+        // can the self parsing itself be done in a more dynamic manner taking into account this information (rules names) ?
         SUBRULE<T>(res:T):T {
             return res;
         }
@@ -510,9 +528,8 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-
         /**
-         * must override this in actual Recognize implementations.
+         * must override this in actual Recognizer implementations.
          * This is because each grammar has its own productions and these should probably be static
          * as they only need to be computed once.
          */
@@ -522,7 +539,7 @@ module chevrotain.parse.infra.recognizer {
 
         /*
          * Returns an "imaginary" Token to insert when Single Token Insertion is done
-         * Override this if you require special behaivor in your grammar
+         * Override this if you require special behavior in your grammar
          * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
          */
         getTokenToInsert(tokType:Function):tok.Token {

@@ -5,8 +5,7 @@
 
 module chevrotain.examples.json.spec {
 
-    describe("The Grammar Ast first model", function () {
-        "use strict";
+    describe("Simple json parser example", function () {
 
         it("can parse a simple Json", function () {
             // { 'name':'shahar', 'age':32 }

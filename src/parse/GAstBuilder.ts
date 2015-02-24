@@ -30,9 +30,9 @@ module chevrotain.parse.gast.builder {
         type:ProdType;
     }
 
-    // CONSUME1(tok.LCurlyTok)
-    var terminalRegEx = /this\s*.\s*CONSUME(\d)\s*\(\s*tok\s*.\s*(\w+)/;
-    var terminalRegGlobal = /this\s*.\s*CONSUME\d\s*\(\s*tok\s*.\s*\w+/g;
+    // CONSUME1([ns1.ns2.ns3.]LCurlyTok)
+    var terminalRegEx = /this\s*.\s*CONSUME(\d)\s*\(\s*(?:[a-zA-Z0-9]+\s*\.\s*)*([a-zA-Z0-9]+)/;
+    var terminalRegGlobal = /this\s*.\s*CONSUME\d\s*\(\s*(?:[a-zA-Z0-9]+\s*\.\s*)*(?:[a-zA-Z0-9]+)/g;
 
     // note that there is an optional underscore '_' before the 'this'
     // typescript adds this when generating code for arrow function ()=>{...}
