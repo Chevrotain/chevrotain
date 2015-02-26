@@ -1,1 +1,0 @@
-find ./src/ ./test/ ./examples/ ./libs/ -name "*.ts" | xargs tsc -w -t ES5 --sourcemap --outDir gen
