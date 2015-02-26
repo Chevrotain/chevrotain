@@ -287,10 +287,6 @@ module chevrotain.parse.infra.recognizer {
             this.FOLLOW_STACK = [];
         }
 
-        public getInruleFollowSet():IHashtable<string, Function[]> {
-            return new Hashtable<string, Function[]>();
-        }
-
         public getResyncFollowSet():IHashtable<string, Function[]> {
             return new Hashtable<string, Function[]>();
         }
@@ -501,31 +497,21 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-
-        private calculateInRuleFollowsByFullContext = true;
-
         getFollowsForInRuleRecovery(tokType:Function, tokIdxInRule):Function[] {
-            if (this.calculateInRuleFollowsByFullContext) {
-                var pathRuleStack:string[] = _.clone(this.RULE_STACK);
-                var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK);
-                var grammarPath:any = {
-                    ruleStack: pathRuleStack,
-                    occurrenceStack: pathOccurrenceStack,
-                    lastTok: tokType,
-                    lastTokOccurrence: tokIdxInRule
-                };
+            var pathRuleStack:string[] = _.clone(this.RULE_STACK);
+            var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK);
+            var grammarPath:any = {
+                ruleStack: pathRuleStack,
+                occurrenceStack: pathOccurrenceStack,
+                lastTok: tokType,
+                lastTokOccurrence: tokIdxInRule
+            };
 
-                var topRuleName = _.first(pathRuleStack);
-                var gastProductions = this.getGAstProductions();
-                var topProduction = gastProductions.get(topRuleName);
-                var follows = new interp.NextPossibleTokensWalker(topProduction, grammarPath).startWalking();
-                return follows;
-            }
-            else {
-                var followName = tok.getTokName(tokType) + tokIdxInRule + IN + _.last(this.RULE_STACK);
-                var preComputedFollows = this.getInruleFollowSet().get(followName);
-                return _.isArray(preComputedFollows) ? preComputedFollows : [];
-            }
+            var topRuleName = _.first(pathRuleStack);
+            var gastProductions = this.getGAstProductions();
+            var topProduction = gastProductions.get(topRuleName);
+            var follows = new interp.NextPossibleTokensWalker(topProduction, grammarPath).startWalking();
+            return follows;
         }
 
         /**

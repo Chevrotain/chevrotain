@@ -33,7 +33,6 @@ module chevrotain.examples.recovery.sql {
         static followsCalcFlag = false;
 
         public static GRAMMAR_PRODUCTIONS = new Hashtable<string, gast.TOP_LEVEL>();
-        private static INRULE_FOLLOW_SETS = new Hashtable<string, Function[]>();
         private static RESYNC_FOLLOW_SETS = new Hashtable<string, Function[]>();
 
         constructor(input:tok.Token[] = []) {
@@ -57,8 +56,6 @@ module chevrotain.examples.recovery.sql {
 
         static computeFollows():void {
             var allFollows = follows.computeAllProdsFollows(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS.values());
-            // TODO: remove the INRULE FOLLOW SET if the new dynamic IN RULE follow calculation proves successful
-            DDLExampleRecoveryParser.INRULE_FOLLOW_SETS = allFollows.inRuleFollows;
             // TODO: can dynamic calculation of the FOLLOW set be used to improve resync recovery?
             DDLExampleRecoveryParser.RESYNC_FOLLOW_SETS = allFollows.reSyncFollows;
         }
@@ -71,10 +68,6 @@ module chevrotain.examples.recovery.sql {
             }
 
             return super.RULE(ruleName, consumer, invalidRet, doReSync);
-        }
-
-        public getInruleFollowSet():IHashtable<string, Function[]> {
-            return DDLExampleRecoveryParser.INRULE_FOLLOW_SETS;
         }
 
         public getResyncFollowSet():IHashtable<string, Function[]> {
