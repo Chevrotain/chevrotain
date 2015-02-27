@@ -1,7 +1,9 @@
+/// <reference path="../lang/LangExtensions.ts" />
 /// <reference path="../scan/Tokens.ts" />
 /// <reference path="../parse/grammar/GAst.ts" />
 /// <reference path="../parse/Constants.ts" />
 /// <reference path="../parse/grammar/Interpreter2.ts" />
+/// <reference path="../parse/grammar/Follow.ts" />
 
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/hashtable.d.ts" />
@@ -12,6 +14,9 @@ module chevrotain.parse.infra.recognizer {
     import gast = chevrotain.parse.grammar.gast;
     import IN = chevrotain.parse.constants.IN;
     import interp = chevrotain.parse.grammar.interpreter;
+    import lang = chevrotain.typescript.lang.extensions;
+    import gastBuilder = chevrotain.parse.gast.builder;
+    import follows = chevrotain.parse.grammar.follow;
 
     export interface RecognitionException extends Error {
         token:tok.Token
@@ -276,19 +281,63 @@ module chevrotain.parse.infra.recognizer {
     // 2. CHECK FOLLOW_SET have everything it should and nothing it should not
     export class BaseErrorRecoveryRecognizer extends BaseRecognizer {
 
+        private static CLASS_TO_SELF_ANALYSIS_DONE = new Hashtable<string, boolean>();
+
+        // todo: once IDEA supports TypeScript 1.4 use typeAliases to do something like:
+        // new Hashtable<ClassName, IHashtable<RuleName, gast.TOP_LEVEL>>();
+        private static CLASS_TO_GRAMMAR_PRODUCTIONS = new Hashtable<string, IHashtable<string, gast.TOP_LEVEL>>();
+
+        static getProductionsForClass(classInstance:any):IHashtable<string, gast.TOP_LEVEL> {
+            var className = lang.classNameFromInstance(classInstance);
+            if (!BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.containsKey(className)) {
+                BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.put(className, new Hashtable<string, gast.TOP_LEVEL>());
+            }
+            return BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.get(className);
+        }
+
+        private static CLASS_TO_RESYNC_FOLLOW_SETS = new Hashtable<string, IHashtable<string, Function[]>>();
+
+        static getResyncFollowsForClass(classInstance:any):IHashtable<string, Function[]> {
+            var className = lang.classNameFromInstance(classInstance);
+            if (!BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.containsKey(className)) {
+                BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, new Hashtable<string, Function[]>());
+            }
+            return BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.get(className);
+        }
+
+        static setResyncFollowsForClass(classInstance:any, followSet:IHashtable<string, Function[]>):void {
+            var className = lang.classNameFromInstance(classInstance);
+            BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet);
+        }
+
+        static performSelfAnalysis(classInstance:any){
+            var className = lang.classNameFromInstance(classInstance);
+            // this information only needs to be computed once
+            if (!BaseErrorRecoveryRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
+                var grammarProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(classInstance);
+                var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions);
+                refResolver.resolveRefs();
+                var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
+                // TODO: can dynamic calculation of the FOLLOW set be used to improve resync recovery?
+                BaseErrorRecoveryRecognizer.setResyncFollowsForClass(classInstance, allFollows);
+                BaseErrorRecoveryRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
+            }
+        }
+
         public RULE_STACK:string[] = [];
         public RULE_OCCURRENCE_STACK:number[] = [];
         public FOLLOW_STACK:Function[][] = [];
+
+        constructor(input:tok.Token[], public tokensMap:gastBuilder.ITerminalNameToConstructor) {
+            super(input);
+        }
+
 
         reset():void {
             super.reset();
             this.RULE_STACK = [];
             this.RULE_OCCURRENCE_STACK = [];
             this.FOLLOW_STACK = [];
-        }
-
-        public getResyncFollowSet():IHashtable<string, Function[]> {
-            return new Hashtable<string, Function[]>();
         }
 
         saveRecogState():IErrorRecoveryRecogState {
@@ -514,13 +563,8 @@ module chevrotain.parse.infra.recognizer {
             return follows;
         }
 
-        /**
-         * must override this in actual Recognizer implementations.
-         * This is because each grammar has its own productions and these should probably be static
-         * as they only need to be computed once.
-         */
         getGAstProductions():IHashtable<string, gast.TOP_LEVEL> {
-            return new Hashtable<string, gast.TOP_LEVEL>();
+            return BaseErrorRecoveryRecognizer.getProductionsForClass(this);
         }
 
         /*
@@ -642,8 +686,12 @@ module chevrotain.parse.infra.recognizer {
 
         RULE<T>(ruleName:string, consumer:()=>T, invalidRet:()=>T, doReSync = true):(idxInCallingRule:number,
                                                                                      isEntryPoint?:boolean)=>T {
-
             this.validateRuleName(ruleName);
+            var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this);
+            // only build the gast representation once
+            if (!(parserClassProductions.containsKey(ruleName))) {
+                parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(consumer.toString(), ruleName, this.tokensMap));
+            }
 
             var wrappedGrammarRule = function (idxInCallingRule:number = 1, isEntryPoint?:boolean) {
                 // state update
@@ -653,7 +701,9 @@ module chevrotain.parse.infra.recognizer {
                     this.FOLLOW_STACK.push([EOF]);
                 } else {
                     var followName = ruleName + idxInCallingRule + IN + _.last(this.RULE_STACK);
-                    var followSet = this.getResyncFollowSet().get(followName);
+                    // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
+                    // multiple structures on each rule invocations to find it...
+                    var followSet = BaseErrorRecoveryRecognizer.getResyncFollowsForClass(this).get(followName);
                     if (!followSet) {
                         // always insert an empty set if we have no other information
                         // this will maintain the valid structure of the FOLLOW_STACK and at worse will cause

@@ -50,7 +50,7 @@ module chevrotain.parse.grammar.follow.spec {
 
         it("can compute all follows for a set of top level productions", function () {
             var actual = computeAllProdsFollows([samples.actionDec]);
-            expect(actual.entries().length).toBe(10);
+            expect(actual.entries().length).toBe(3);
         });
 
 

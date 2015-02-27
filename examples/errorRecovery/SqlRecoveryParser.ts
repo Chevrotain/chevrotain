@@ -31,40 +31,17 @@ module chevrotain.examples.recovery.sql {
         // flags to only compute this extra information once
         static self_analysis_done = false;
 
-        public static GRAMMAR_PRODUCTIONS = new Hashtable<string, gast.TOP_LEVEL>();
         private static RESYNC_FOLLOW_SETS = new Hashtable<string, Function[]>();
 
         constructor(input:tok.Token[] = []) {
-            super(input);
-
-            // this information only needs to be computed once
-            if (!DDLExampleRecoveryParser.self_analysis_done) {
-                var refResolver = new gastBuilder.GastRefResolverVisitor(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS);
-                refResolver.resolveRefs();
-                var allFollows = follows.computeAllProdsFollows(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS.values());
-                // TODO: can dynamic calculation of the FOLLOW set be used to improve resync recovery?
-                DDLExampleRecoveryParser.RESYNC_FOLLOW_SETS = allFollows;
-                DDLExampleRecoveryParser.self_analysis_done = true;
-            }
-        }
-
-        RULE<T>(ruleName:string, consumer:()=>T, invalidRet:()=>T, doReSync = true):(idxInCallingRule:number,
-                                                                                     isEntryPoint?:boolean)=>T {
-            // only build the gast representation once
-            if (!(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS.get(ruleName))) {
-                DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS.put(ruleName, gastBuilder.buildTopProduction(consumer.toString(), ruleName, <any>chevrotain.examples.recovery.sql));
-            }
-
-            return super.RULE(ruleName, consumer, invalidRet, doReSync);
-        }
-
-        public getResyncFollowSet():IHashtable<string, Function[]> {
-            return DDLExampleRecoveryParser.RESYNC_FOLLOW_SETS;
-        }
-
-        getGAstProductions():IHashtable<string, gast.TOP_LEVEL> {
-            // overriding to allow "polymorphic" access to static property from the superclass
-            return DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS;
+            // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined
+            //       it is mandatory to provide this map to be able to perform self analysis and allow the framework to "understand" the implemented
+            //       grammar.
+            super(input, <any>chevrotain.examples.recovery.sql);
+            // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
+            //       The typescript compiler places the constructor body last after initializations in the class's body
+            //       which is why place the call here meets the criteria.
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this);
         }
 
         // DOCS: the invocation to RULE(...) is what wraps our parsing implementation method with the error recovery re-sync behavior.
