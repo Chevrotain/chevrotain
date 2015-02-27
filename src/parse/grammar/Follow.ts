@@ -13,31 +13,6 @@ module chevrotain.parse.grammar.follow {
     import f = chevrotain.parse.grammar.first;
     import IN = chevrotain.parse.constants.IN;
 
-    // This InRuleFollowsWalker computes all of the follows required for single token insertion
-    // (terminals only) for a single grammar production. This Walker does not skip reference production
-    export class InRuleFollowsWalker extends r.RestWalker {
-        public follows = new Hashtable<string, Function[]>();
-
-        constructor(private topProd:g.TOP_LEVEL) {super();}
-
-        startWalking():IHashtable<string, Function[]> {
-            this.walk(this.topProd);
-            return this.follows;
-        }
-
-        walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            var followName = buildInProdFollowPrefix(terminal) + this.topProd.name;
-            var fullRest = currRest.concat(prevRest);
-            var restProd = new g.FLAT(fullRest);
-            var t_in_topProd_follows = f.first(restProd);
-            this.follows.put(followName, t_in_topProd_follows);
-        }
-
-        walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            // do nothing(useful)! just like the government
-        }
-    }
-
     // This ResyncFollowsWalker computes all of the follows required for RESYNC
     // (skipping reference production).
     export class ResyncFollowsWalker extends r.RestWalker {
@@ -66,22 +41,14 @@ module chevrotain.parse.grammar.follow {
         }
     }
 
-    export interface AllFollows {
-        inRuleFollows:IHashtable<string, Function[]>;
-        reSyncFollows:IHashtable<string, Function[]>;
-    }
-
-    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):AllFollows {
-        var inRuleFollows = new Hashtable<string, Function[]>();
+    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):IHashtable<string, Function[]> {
         var reSyncFollows = new Hashtable<string, Function[]>();
 
         _.forEach(topProductions, (topProd)=> {
-            var currTermFollow = new InRuleFollowsWalker(topProd).startWalking();
             var currRefsFollow = new ResyncFollowsWalker(topProd).startWalking();
-            inRuleFollows.putAll(currTermFollow);
             reSyncFollows.putAll(currRefsFollow);
         });
-        return {inRuleFollows: inRuleFollows, reSyncFollows: reSyncFollows};
+        return reSyncFollows;
     }
 
     export function buildBetweenProdsFollowPrefix(inner:g.TOP_LEVEL, occurenceInParent:number):string {

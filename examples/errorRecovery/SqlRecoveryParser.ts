@@ -29,8 +29,7 @@ module chevrotain.examples.recovery.sql {
         // TODO: perhaps all these dealing with the GAST/FOLLOWS information can be hidden from the implementers.
         // instead the BaseErrorRecoveryRecognizer can save the information using the constructor name as the key (transparently)
         // flags to only compute this extra information once
-        static gastRefsCalcFlag = false;
-        static followsCalcFlag = false;
+        static self_analysis_done = false;
 
         public static GRAMMAR_PRODUCTIONS = new Hashtable<string, gast.TOP_LEVEL>();
         private static RESYNC_FOLLOW_SETS = new Hashtable<string, Function[]>();
@@ -39,25 +38,14 @@ module chevrotain.examples.recovery.sql {
             super(input);
 
             // this information only needs to be computed once
-            if (!DDLExampleRecoveryParser.gastRefsCalcFlag) {
-                DDLExampleRecoveryParser.computeGastRefs();
-                DDLExampleRecoveryParser.gastRefsCalcFlag = true;
+            if (!DDLExampleRecoveryParser.self_analysis_done) {
+                var refResolver = new gastBuilder.GastRefResolverVisitor(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS);
+                refResolver.resolveRefs();
+                var allFollows = follows.computeAllProdsFollows(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS.values());
+                // TODO: can dynamic calculation of the FOLLOW set be used to improve resync recovery?
+                DDLExampleRecoveryParser.RESYNC_FOLLOW_SETS = allFollows;
+                DDLExampleRecoveryParser.self_analysis_done = true;
             }
-            if (!DDLExampleRecoveryParser.followsCalcFlag) {
-                DDLExampleRecoveryParser.computeFollows();
-                DDLExampleRecoveryParser.followsCalcFlag = true;
-            }
-        }
-
-        static computeGastRefs():void {
-            var refResolver = new gastBuilder.GastRefResolverVisitor(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS);
-            refResolver.resolveRefs();
-        }
-
-        static computeFollows():void {
-            var allFollows = follows.computeAllProdsFollows(DDLExampleRecoveryParser.GRAMMAR_PRODUCTIONS.values());
-            // TODO: can dynamic calculation of the FOLLOW set be used to improve resync recovery?
-            DDLExampleRecoveryParser.RESYNC_FOLLOW_SETS = allFollows.reSyncFollows;
         }
 
         RULE<T>(ruleName:string, consumer:()=>T, invalidRet:()=>T, doReSync = true):(idxInCallingRule:number,
