@@ -8,7 +8,7 @@ module chevrotain.typescript.lang.extensions {
     var hasNativeName = typeof (<any>(function f() {})).name !== "undefined";
 
     export function classNameFromInstance(instance:any):string {
-        return functionName(instance["constructor"]);
+        return functionName(instance.constructor);
     }
 
     export function functionName(func:Function):string {

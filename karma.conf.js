@@ -102,14 +102,6 @@ module.exports = function (config) {
         excludes.push('**/*.map');
     }
 
-    browsers = ['Chrome'];
-    if (process.env.FIREFOX) {
-        browsers = ['Firefox']
-    }
-    else if (process.env.CANARY) {
-        browsers = ['ChromeCanary'];
-    }
-
     config.set({
 
         // base path, that will be used to resolve files and exclude
@@ -162,7 +154,7 @@ module.exports = function (config) {
         // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
         // - PhantomJS
         // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-        browsers: browsers,
+        browsers: ['Chrome'],
 
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout: 10000000,

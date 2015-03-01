@@ -14,7 +14,7 @@ module chevrotain.parse.grammar.gast {
 
         accept(visitor:GAstVisitor):void {
             visitor.visit(this);
-            _.forEach(this.definition, (prod)=> {
+            _.forEach(this.definition, (prod) => {
                 prod.accept(visitor);
             });
         }
@@ -23,7 +23,7 @@ module chevrotain.parse.grammar.gast {
     export class ProdRef extends AbstractProduction {
         constructor(public refProdName:string,
                     public ref:TOP_LEVEL = null,
-                    public occurrenceInParent:number = 1) {super([]);}
+                    public occurrenceInParent:number = 1) { super([]); }
 
         set definition(definition:IProduction[]) {
             // immutable
@@ -44,27 +44,27 @@ module chevrotain.parse.grammar.gast {
 
     /* tslint:disable:class-name */
     export class TOP_LEVEL extends AbstractProduction {
-        constructor(public name:string, definition:IProduction[]) {super(definition);}
+        constructor(public name:string, definition:IProduction[]) { super(definition); }
     }
 
     export class FLAT extends AbstractProduction {
-        constructor(definition:IProduction[]) {super(definition);}
+        constructor(definition:IProduction[]) { super(definition); }
     }
 
     export class OPTION extends AbstractProduction {
-        constructor(definition:IProduction[]) {super(definition);}
+        constructor(definition:IProduction[]) { super(definition); }
     }
 
     export class AT_LEAST_ONE extends AbstractProduction {
-        constructor(definition:IProduction[]) {super(definition);}
+        constructor(definition:IProduction[]) { super(definition); }
     }
 
     export class MANY extends AbstractProduction {
-        constructor(definition:IProduction[]) {super(definition);}
+        constructor(definition:IProduction[]) { super(definition); }
     }
 
     export class OR extends AbstractProduction {
-        constructor(definition:IProduction[]) {super(definition);}
+        constructor(definition:IProduction[]) { super(definition); }
     }
     /* tslint:enable:class-name */
 
@@ -96,12 +96,12 @@ module chevrotain.parse.grammar.gast {
         // may be indirectly optional ((A?B?C?) | (D?E?F?))
         if (prod instanceof OR) {
             // for OR its enough for just one of the alternatives to be optional
-            return _.some((<OR>prod).definition, (subProd:IProduction)=> {
+            return _.some((<OR>prod).definition, (subProd:IProduction) => {
                 return isOptionalProd(subProd);
             });
         }
         else if (prod instanceof AbstractProduction) {
-            return _.every((<AbstractProduction>prod).definition, (subProd:IProduction)=> {
+            return _.every((<AbstractProduction>prod).definition, (subProd:IProduction) => {
                 return isOptionalProd(subProd);
             });
         }

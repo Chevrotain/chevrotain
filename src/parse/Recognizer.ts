@@ -24,7 +24,11 @@ module chevrotain.parse.infra.recognizer {
 
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
-        var recognitionExceptions = ['MismatchedTokenException', 'NoViableAltException', 'EarlyExitException', 'NotAllInputParsedException'];
+        var recognitionExceptions = [
+            "MismatchedTokenException",
+            "NoViableAltException",
+            "EarlyExitException",
+            "NotAllInputParsedException"];
         // can't do instanceof on hacked custom js exceptions
         return _.contains(recognitionExceptions, error.name);
     }
@@ -67,13 +71,13 @@ module chevrotain.parse.infra.recognizer {
     export class EOF extends tok.VirtualToken {}
 
     export interface IManyOrCase {
-        WHEN:()=>boolean;
-        THEN_DO:()=>void;
+        WHEN:() => boolean;
+        THEN_DO:() => void;
     }
 
     export interface IOrCase<T> {
-        WHEN:()=>boolean;
-        THEN_DO:()=>T;
+        WHEN:() => boolean;
+        THEN_DO:() => T;
     }
 
     export interface IOrRetType<T> {
@@ -136,7 +140,8 @@ module chevrotain.parse.infra.recognizer {
         // skips a token and returns the next token
         SKIP_TOKEN():tok.Token {
             // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
-            // input[45] which is the 46th item and no longer exists, so in this case the largest valid input index is 43 (input.length - 2 )
+            // input[45] which is the 46th item and no longer exists,
+            // so in this case the largest valid input index is 43 (input.length - 2 )
             if (this.inputIdx <= this.input.length - 2) {
                 this.inputIdx++;
                 return this.NEXT_TOKEN();
@@ -146,7 +151,7 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-        IS_ONE_OF_ALTERNATIVES_LOOK_AHEAD(tokTypes:Function[][]):()=>boolean {
+        IS_ONE_OF_ALTERNATIVES_LOOK_AHEAD(tokTypes:Function[][]):() => boolean {
             return () => {
                 return _.find(tokTypes, (altTokenSeq) => {
                         return _.every(altTokenSeq, (currToken:any, i) => {
@@ -178,7 +183,7 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-        BACKTRACK<T>(grammarRule:(idx:number)=>T, isValid:(T)=>boolean):()=>boolean {
+        BACKTRACK<T>(grammarRule:(idx:number) => T, isValid:(T) => boolean):() => boolean {
             return () => {
                 // save org state
                 this.isBackTrackingStack.push(1);
@@ -211,7 +216,7 @@ module chevrotain.parse.infra.recognizer {
             this.inputIdx = newState.inputIdx;
         }
 
-        OPTION(condition:()=>boolean, action:()=>void):boolean {
+        OPTION(condition:() => boolean, action:() => void):boolean {
             if (condition.call(this)) {
                 action.call(this);
                 return true;
@@ -232,11 +237,12 @@ module chevrotain.parse.infra.recognizer {
 
             if (!oneValidCaseFound) {
                 var foundToken = this.NEXT_TOKEN().image;
-                throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes + " but found '" + foundToken + "'", this.NEXT_TOKEN()));
+                throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
+                " but found '" + foundToken + "'", this.NEXT_TOKEN()));
             }
         }
 
-        MANY(lookAheadFunc:()=>boolean, consume:()=>void):void {
+        MANY(lookAheadFunc:() => boolean, consume:() => void):void {
             while (lookAheadFunc.call(this)) {
                 consume.call(this);
             }
@@ -256,7 +262,7 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-        AT_LEAST_ONE(lookAheadFunc:()=>boolean, consume:()=>void, errMsg:string):void {
+        AT_LEAST_ONE(lookAheadFunc:() => boolean, consume:() => void, errMsg:string):void {
             if (lookAheadFunc.call(this)) {
                 consume.call(this);
                 this.MANY(lookAheadFunc, consume);
@@ -310,7 +316,7 @@ module chevrotain.parse.infra.recognizer {
             BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet);
         }
 
-        static performSelfAnalysis(classInstance:any){
+        static performSelfAnalysis(classInstance:any) {
             var className = lang.classNameFromInstance(classInstance);
             // this information only needs to be computed once
             if (!BaseErrorRecoveryRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
@@ -345,9 +351,9 @@ module chevrotain.parse.infra.recognizer {
             var savedRuleStack = _.clone(this.RULE_STACK);
             var savedFollowStack = _.clone(this.FOLLOW_STACK);
             return {
-                errors: baseState.errors,
-                inputIdx: baseState.inputIdx,
-                RULE_STACK: savedRuleStack,
+                errors:       baseState.errors,
+                inputIdx:     baseState.inputIdx,
+                RULE_STACK:   savedRuleStack,
                 FOLLOW_STACK: savedFollowStack
             };
         }
@@ -363,7 +369,7 @@ module chevrotain.parse.infra.recognizer {
             // to allow the parser to "know" its position. for example: take a simple qualifiedName rule.
             //
             // this.CONSUME1(IdentTok)); <-- first Ident
-            // this.MANY(isQualifiedNamePart, ()=> {
+            // this.MANY(isQualifiedNamePart, () => {
             //    this.CONSUME1(DotTok);
             //    this.CONSUME2(IdentTok);   <-- ident 2...n
             // })
@@ -401,8 +407,8 @@ module chevrotain.parse.infra.recognizer {
 
         // TODO: can the 2 optional parameters for special 'preemptive' resync recovery into the next item of the 'MANY'
         // be computed automatically?
-        MANY(lookAheadFunc:()=>boolean,
-             consume:()=>void,
+        MANY(lookAheadFunc:() => boolean,
+             consume:() => void,
              expectTokAfterLastMatch?:Function,
              nextTokIdx?:number):void {
             super.MANY(lookAheadFunc, consume);
@@ -413,8 +419,8 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-        AT_LEAST_ONE(lookAheadFunc:()=>boolean,
-                     consume:()=>void,
+        AT_LEAST_ONE(lookAheadFunc:() => boolean,
+                     consume:() => void,
                      errMsg:string,
                      expectTokAfterLastMatch?:Function,
                      nextTokIdx?:number):void {
@@ -438,11 +444,11 @@ module chevrotain.parse.infra.recognizer {
                     arguments,
                     // the lookahead Func for trying preemptive in repetition recovery in MANY_OR is
                     // performed by trying all the OR cases lookaheads one by one
-                    ()=> {
-                        var allLookAheadFuncs = _.map(cases, (singleCase:IManyOrCase)=> {
+                    () => {
+                        var allLookAheadFuncs = _.map(cases, (singleCase:IManyOrCase) => {
                             return singleCase.WHEN;
                         });
-                        return _.find(allLookAheadFuncs, (singleLookAheadFunc)=> {
+                        return _.find(allLookAheadFuncs, (singleLookAheadFunc) => {
                                 return singleLookAheadFunc();
                             }) !== undefined;
                     },
@@ -452,7 +458,7 @@ module chevrotain.parse.infra.recognizer {
 
         tryInRepetitionRecovery(grammarRule:Function,
                                 grammarRuleArgs:IArguments,
-                                lookAheadFunc:()=>boolean,
+                                lookAheadFunc:() => boolean,
                                 expectedTokType:Function):void {
             var reSyncTokType = this.findReSyncTokenType();
             var orgInputIdx = this.inputIdx;
@@ -464,7 +470,8 @@ module chevrotain.parse.infra.recognizer {
                     // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
                     // the error that would have been thrown
                     var expectedTokName = tok.getTokName(expectedTokType);
-                    var msg = "Expecting token of type -->" + expectedTokName + "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
+                    var msg = "Expecting token of type -->" + expectedTokName +
+                        "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
                     this.SAVE_ERROR(new MismatchedTokenException(msg, nextTokenWithoutResync));
 
                     // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
@@ -550,9 +557,9 @@ module chevrotain.parse.infra.recognizer {
             var pathRuleStack:string[] = _.clone(this.RULE_STACK);
             var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK);
             var grammarPath:any = {
-                ruleStack: pathRuleStack,
-                occurrenceStack: pathOccurrenceStack,
-                lastTok: tokType,
+                ruleStack:         pathRuleStack,
+                occurrenceStack:   pathOccurrenceStack,
+                lastTok:           tokType,
                 lastTokOccurrence: tokIdxInRule
             };
 
@@ -620,7 +627,7 @@ module chevrotain.parse.infra.recognizer {
             }
 
             var mismatchedTok = this.NEXT_TOKEN();
-            var isMisMatchedTokInFollows = _.find(follows, (possibleFollowsTokType:Function)=> {
+            var isMisMatchedTokInFollows = _.find(follows, (possibleFollowsTokType:Function) => {
                     return mismatchedTok instanceof possibleFollowsTokType;
                 }) !== undefined;
 
@@ -679,13 +686,13 @@ module chevrotain.parse.infra.recognizer {
             this.definedRulesNames.push(ruleFuncName);
         }
 
-        RULE_NO_RESYNC<T>(ruleName:string, consumer:()=>T, invalidRet:()=>T):(idxInCallingRule:number,
-                                                                              isEntryPoint?:boolean)=>T {
+        RULE_NO_RESYNC<T>(ruleName:string, consumer:() => T, invalidRet:() => T):(idxInCallingRule:number,
+                                                                                  isEntryPoint?:boolean) => T {
             return this.RULE(ruleName, consumer, invalidRet, false);
         }
 
-        RULE<T>(ruleName:string, consumer:()=>T, invalidRet:()=>T, doReSync = true):(idxInCallingRule:number,
-                                                                                     isEntryPoint?:boolean)=>T {
+        RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
+                                                                                         isEntryPoint?:boolean) => T {
             this.validateRuleName(ruleName);
             var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this);
             // only build the gast representation once
@@ -756,7 +763,7 @@ module chevrotain.parse.infra.recognizer {
                     }
                 }
             };
-            var ruleNamePropName = 'ruleName';
+            var ruleNamePropName = "ruleName";
             wrappedGrammarRule[ruleNamePropName] = ruleName;
             return wrappedGrammarRule;
         }

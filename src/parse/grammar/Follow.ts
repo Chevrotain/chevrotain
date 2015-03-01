@@ -18,7 +18,7 @@ module chevrotain.parse.grammar.follow {
     export class ResyncFollowsWalker extends r.RestWalker {
         public follows = new Hashtable<string, Function[]>();
 
-        constructor(private topProd:g.TOP_LEVEL) {super();}
+        constructor(private topProd:g.TOP_LEVEL) { super(); }
 
         startWalking():IHashtable<string, Function[]> {
             this.walk(this.topProd);
@@ -44,7 +44,7 @@ module chevrotain.parse.grammar.follow {
     export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):IHashtable<string, Function[]> {
         var reSyncFollows = new Hashtable<string, Function[]>();
 
-        _.forEach(topProductions, (topProd)=> {
+        _.forEach(topProductions, (topProd) => {
             var currRefsFollow = new ResyncFollowsWalker(topProd).startWalking();
             reSyncFollows.putAll(currRefsFollow);
         });

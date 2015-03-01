@@ -19,13 +19,13 @@ module chevrotain.parse.grammar.interpreter {
         private ruleStack:string[];
         private occurrenceStack:number[];
 
-        private nextTerminalName = '';
+        private nextTerminalName = "";
         private nextTerminalOccurrence = 0;
-        private nextProductionName = '';
+        private nextProductionName = "";
         private nextProductionOccurrence = 0;
         private found = false;
 
-        constructor(private topProd:g.TOP_LEVEL, private path:p.IGrammarPath) {super();}
+        constructor(private topProd:g.TOP_LEVEL, private path:p.IGrammarPath) {super(); }
 
         startWalking():Function[] {
 
@@ -91,7 +91,7 @@ module chevrotain.parse.grammar.interpreter {
 
                 // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
                 // really seeking is the last Terminal...
-                this.nextProductionName = '';
+                this.nextProductionName = "";
                 this.nextProductionOccurrence = 0;
             }
             else {

@@ -6,11 +6,11 @@ module chevrotain.parse.tree {
     import tok = chevrotain.scan.tokens;
 
     export class ParseTree {
-        getImage():string { return this.payload.image;}
+        getImage():string { return this.payload.image; }
 
-        getLine():number { return this.payload.startLine;}
+        getLine():number { return this.payload.startLine; }
 
-        getColumn():number { return this.payload.startColumn;}
+        getColumn():number { return this.payload.startColumn; }
 
         constructor(public payload:tok.Token = tok.NONE_TOKEN(), public children:ParseTree[] = []) {}
     }

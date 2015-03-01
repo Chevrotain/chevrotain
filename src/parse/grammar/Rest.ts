@@ -8,32 +8,32 @@ module chevrotain.parse.grammar.rest {
     export class RestWalker {
 
         walk(prod:g.AbstractProduction, prevRest:gast.IProduction[] = []):void {
-            _.forEach(prod.definition, (subProd:gast.IProduction, index)=> {
+            _.forEach(prod.definition, (subProd:gast.IProduction, index) => {
                 var currRest = _.drop(prod.definition, index + 1);
 
                 if (subProd instanceof g.ProdRef) {
-                    this.walkProdRef(<g.ProdRef>subProd, currRest, prevRest)
+                    this.walkProdRef(<g.ProdRef>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.Terminal) {
-                    this.walkTerminal(<g.Terminal>subProd, currRest, prevRest)
+                    this.walkTerminal(<g.Terminal>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.TOP_LEVEL) {
-                    this.walkTopLevel(<g.TOP_LEVEL>subProd, currRest, prevRest)
+                    this.walkTopLevel(<g.TOP_LEVEL>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.FLAT) {
-                    this.walkFlat(<g.FLAT>subProd, currRest, prevRest)
+                    this.walkFlat(<g.FLAT>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.OPTION) {
-                    this.walkOption(<g.OPTION>subProd, currRest, prevRest)
+                    this.walkOption(<g.OPTION>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.AT_LEAST_ONE) {
-                    this.walkAtLeastOne(<g.AT_LEAST_ONE>subProd, currRest, prevRest)
+                    this.walkAtLeastOne(<g.AT_LEAST_ONE>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.MANY) {
-                    this.walkMany(<g.MANY>subProd, currRest, prevRest)
+                    this.walkMany(<g.MANY>subProd, currRest, prevRest);
                 }
                 else if (subProd instanceof g.OR) {
-                    this.walkOr(<g.OR>subProd, currRest, prevRest)
+                    this.walkOr(<g.OR>subProd, currRest, prevRest);
                 }
 
                 else {throw Error("non exhaustive match"); }

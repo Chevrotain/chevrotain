@@ -118,10 +118,10 @@ module chevrotain.parse.gast.builder {
                                                                   topLevelRange:r.IRange,
                                                                   allRanges:IProdRange[]):T {
         var secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges);
-        var secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng)=> {return prodRng.range.start;});
+        var secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start; });
 
         var definition:gast.IProduction[] = [];
-        _.forEach(secondLevelInOrder, (prodRng)=> {
+        _.forEach(secondLevelInOrder, (prodRng) => {
             definition.push(buildProdGast(prodRng, allRanges));
         });
 
@@ -132,7 +132,7 @@ module chevrotain.parse.gast.builder {
     }
 
     export function getDirectlyContainedRanges(y:r.IRange, prodRanges:IProdRange[]):IProdRange[] {
-        return _.filter(prodRanges, (x:IProdRange)=> {
+        return _.filter(prodRanges, (x:IProdRange) => {
             var isXDescendantOfY = y.strictlyContainsOtherRange(x.range);
             var xDoesNotHaveAnyAncestorWhichIsDecendantOfY = _.every(prodRanges, (maybeAnotherParent:IProdRange) => {
                 var isParentOfX = maybeAnotherParent.range.strictlyContainsOtherRange(x.range);
@@ -187,7 +187,8 @@ module chevrotain.parse.gast.builder {
 
     export function createOrRanges(text):IProdRange[] {
         var orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegEx);
-        // have to split up the OR cases into separate FLAT productions (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
+        // have to split up the OR cases into separate FLAT productions
+        // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
         var orSubPartsRanges = createOrPartRanges(orRanges);
         return _.union(orRanges, orSubPartsRanges);
     }
@@ -201,14 +202,15 @@ module chevrotain.parse.gast.builder {
             // so we adjust the OR to 'end' just before the MANY
             innerOr.range.end = innerOr.range.end - 1;
         });
-        // have to split up the OR cases into separate FLAT productions (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
+        // have to split up the OR cases into separate FLAT productions
+        // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
         var orSubPartsRanges = createOrPartRanges(orInManyRanges);
         return _.union(manyRanges, orInManyRanges, orSubPartsRanges);
     }
 
-    var findClosingCurly:(start:number, text:string)=>number = <any>_.partial(findClosingOffset, "{", "}");
+    var findClosingCurly:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "{", "}");
 
-    var findClosingParen:(start:number, text:string)=>number = <any>_.partial(findClosingOffset, "(", ")");
+    var findClosingParen:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "(", ")");
 
     export function createOrPartRanges(orRanges:IProdRange[]):IProdRange[] {
         var orPartRanges:IProdRange[] = [];
@@ -216,16 +218,16 @@ module chevrotain.parse.gast.builder {
             var currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly);
             var currOrRangeStart = orRange.range.start;
             // fix offsets as we are working on a subset of the text
-            _.forEach(currOrParts, (orPart)=> {
+            _.forEach(currOrParts, (orPart) => {
                 orPart.range.start += currOrRangeStart;
                 orPart.range.end += currOrRangeStart;
             });
             orPartRanges = _.union(orPartRanges, currOrParts);
         });
 
-        var uniqueOrPartRanges = _.uniq(orPartRanges, (prodRange:IProdRange)=> {
-            // using '~' as a seperator for the identify function as its not a valid char in javascript
-            return prodRange.type + '~' + prodRange.range.start + '~' + prodRange.range.end + '~' + prodRange.text;
+        var uniqueOrPartRanges = _.uniq(orPartRanges, (prodRange:IProdRange) => {
+            // using "~" as a separator for the identify function as its not a valid char in javascript
+            return prodRange.type + "~" + prodRange.range.start + "~" + prodRange.range.end + "~" + prodRange.text;
         });
 
         return uniqueOrPartRanges;
@@ -293,10 +295,10 @@ module chevrotain.parse.gast.builder {
 
     export class GastRefResolverVisitor extends gast.GAstVisitor {
 
-        constructor(private nameToProd:IHashtable<string, gast.TOP_LEVEL>) {super();}
+        constructor(private nameToProd:IHashtable<string, gast.TOP_LEVEL>) { super(); }
 
         public resolveRefs():void {
-            _.forEach(this.nameToProd.values(), (prod)=> {
+            _.forEach(this.nameToProd.values(), (prod) => {
                 prod.accept(this);
             });
         }

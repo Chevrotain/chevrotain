@@ -6,7 +6,7 @@ module chevrotain.scan.tokens {
 
     export function getTokName(tokType:Function):string {
         var tokTypeName = lang.functionName(tokType);
-        return tokTypeName.replace('Tok', "");
+        return tokTypeName.replace("Tok", "");
     }
 
     export class Token {
@@ -17,7 +17,7 @@ module chevrotain.scan.tokens {
     }
 
     export class VirtualToken extends Token {
-        constructor() {super(-1, -1, "");}
+        constructor() {super(-1, -1, ""); }
     }
 
     export function INVALID_LINE():number {
