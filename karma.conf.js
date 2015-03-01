@@ -82,18 +82,6 @@ validateAllSpecsHaveBeenIncluded(specIncludes);
 module.exports = function (config) {
     "use strict";
 
-    var browsers;
-
-    var preProcessors;
-    if (process.env.COVERAGE) {
-        preProcessors = {
-            'gen/src/**/*.js': ['coverage']
-        }
-    }
-    else {
-        preProcessors = {}
-    }
-
     var excludes = [];
 
     // run mode, avoid errors from issues with map files syntax
@@ -128,9 +116,7 @@ module.exports = function (config) {
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-        reporters: ['progress', 'coverage'],
-
-        preprocessors: preProcessors,
+        reporters: ['progress'],
 
         // web server port
         port: 9979,
