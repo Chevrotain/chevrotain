@@ -3,8 +3,8 @@
 
 module test.parser.grammar.samples {
 
-    import t = chevrotain.scan.tokens;
-    import gast = chevrotain.parse.grammar.gast;
+    import t = chevrotain.scan.tokens
+    import gast = chevrotain.parse.grammar.gast
 
     export class IdentTok extends t.Token {}
     export class DotTok extends t.Token {}
@@ -28,44 +28,44 @@ module test.parser.grammar.samples {
     export class KeyTok extends t.Token {}
     export class ElementTok extends t.Token {}
 
-    export var qualifiedName = new gast.TOP_LEVEL('qualifiedName', [
+    export var qualifiedName = new gast.TOP_LEVEL("qualifiedName", [
         new gast.Terminal(IdentTok),
         new gast.MANY([
             new gast.Terminal(DotTok),
             new gast.Terminal(IdentTok, 2)
         ])
-    ]);
+    ])
 
-    export var ParamSpec = new gast.TOP_LEVEL('ParamSpec', [
+    export var ParamSpec = new gast.TOP_LEVEL("ParamSpec", [
         new gast.Terminal(IdentTok),
         new gast.Terminal(ColonTok),
-        new gast.ProdRef('qualifiedName', qualifiedName),
+        new gast.ProdRef("qualifiedName", qualifiedName),
         new gast.OPTION([
             new gast.Terminal(LSquareTok),
             new gast.Terminal(RSquareTok)
         ])
-    ]);
+    ])
 
-    export var actionDec = new gast.TOP_LEVEL('actionDec', [
+    export var actionDec = new gast.TOP_LEVEL("actionDec", [
         new gast.Terminal(ActionTok),
         new gast.Terminal(IdentTok),
         new gast.Terminal(LParenTok),
         new gast.OPTION([
-            new gast.ProdRef('ParamSpec', ParamSpec),
+            new gast.ProdRef("ParamSpec", ParamSpec),
             new gast.MANY([
                 new gast.Terminal(CommaTok),
-                new gast.ProdRef('ParamSpec', ParamSpec, 2)
+                new gast.ProdRef("ParamSpec", ParamSpec, 2)
             ])
         ]),
         new gast.Terminal(RParenTok),
         new gast.OPTION([
             new gast.Terminal(ColonTok),
-            new gast.ProdRef('qualifiedName', qualifiedName)
+            new gast.ProdRef("qualifiedName", qualifiedName)
         ]),
         new gast.Terminal(SemicolonTok)
-    ]);
+    ])
 
-    export var cardinality = new gast.TOP_LEVEL('cardinality', [
+    export var cardinality = new gast.TOP_LEVEL("cardinality", [
         new gast.Terminal(LSquareTok),
         new gast.Terminal(UnsignedIntegerLiteralTok),
         new gast.Terminal(DotDotTok),
@@ -74,21 +74,21 @@ module test.parser.grammar.samples {
             new gast.Terminal(AsteriskTok)
         ]),
         new gast.Terminal(RSquareTok)
-    ]);
+    ])
 
-    export var assignedTypeSpec = new gast.TOP_LEVEL('assignedTypeSpec', [
+    export var assignedTypeSpec = new gast.TOP_LEVEL("assignedTypeSpec", [
         new gast.Terminal(ColonTok),
-        new gast.ProdRef('assignedType', null),
+        new gast.ProdRef("assignedType", null),
 
         new gast.OPTION([
-            new gast.ProdRef('enumClause', null)
+            new gast.ProdRef("enumClause", null)
         ]),
 
         new gast.OPTION([
             new gast.Terminal(DefaultTok),
-            new gast.ProdRef('expression', null)
+            new gast.ProdRef("expression", null)
         ])
-    ]);
+    ])
 
 
 }

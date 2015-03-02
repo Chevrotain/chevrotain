@@ -26,15 +26,13 @@ module.exports = function(grunt) {
                 configuration: grunt.file.readJSON("tslint.json")
             },
             files:   {
-                src: ['src/**/*.ts', 'examples/**/*.ts']
+                src: ['src/**/*.ts', 'examples/**/*.ts', 'test/**/*.ts']
             }
         },
 
         ts: {
             default: {
                 src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts"],
-                watch:  "src", //  TODO: the grunt-ts plugin only supports watching a single directory,
-                               // this means the code needs to be moved to a single directory...
                 outDir: "gen"
             },
             options: {
