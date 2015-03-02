@@ -40,7 +40,7 @@ module.exports = function(grunt) {
             },
             options: {
                 target: "ES5",
-                fast:   "watch"
+                fast:   "never"
 
             }
         }

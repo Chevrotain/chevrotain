@@ -16,6 +16,7 @@
 
 /.tscache
 /.tscache/*
+/src/parse/.baseDir.ts
 
 
 
