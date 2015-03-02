@@ -3,8 +3,8 @@
 
 module chevrotain.examples.json {
 
-    import recog = chevrotain.parse.infra.recognizer;
-    import tok = chevrotain.scan.tokens;
+    import recog = chevrotain.parse.infra.recognizer
+    import tok = chevrotain.scan.tokens
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.scan.tokens.Token
     export class StringTok extends tok.Token {}
@@ -56,88 +56,88 @@ module chevrotain.examples.json {
     export class JsonParser extends recog.BaseRecognizer {
 
         object():void {
-            this.CONSUME(LCurlyTok);
-            this.OPTION(isString, ()=> {
-                this.objectItem();
-                this.MANY(isAdditionalItem, ()=> {
-                    this.CONSUME(CommaTok);
-                    this.objectItem();
-                });
-            });
-            this.CONSUME(RCurlyTok);
+            this.CONSUME(LCurlyTok)
+            this.OPTION(isString, () => {
+                this.objectItem()
+                this.MANY(isAdditionalItem, () => {
+                    this.CONSUME(CommaTok)
+                    this.objectItem()
+                })
+            })
+            this.CONSUME(RCurlyTok)
         }
 
         objectItem():void {
-            this.CONSUME(StringTok);
-            this.CONSUME(ColonTok);
-            this.value();
+            this.CONSUME(StringTok)
+            this.CONSUME(ColonTok)
+            this.value()
         }
 
         array():void {
-            this.CONSUME(LSquareTok);
-            this.OPTION(isString, ()=> {
-                this.value();
-                this.MANY(isAdditionalItem, ()=> {
-                    this.value();
-                });
-            });
-            this.CONSUME(RSquareTok);
+            this.CONSUME(LSquareTok)
+            this.OPTION(isString, () => {
+                this.value()
+                this.MANY(isAdditionalItem, () => {
+                    this.value()
+                })
+            })
+            this.CONSUME(RSquareTok)
         }
 
         value():void {
             this.OR(
                 [
                     // @formatter:off
-                    {WHEN: isString, THEN_DO: ()=> {
+                    {WHEN: isString, THEN_DO: () => {
                         this.CONSUME(StringTok)}},
-                    {WHEN: isNumber, THEN_DO: ()=> {
+                    {WHEN: isNumber, THEN_DO: () => {
                         this.CONSUME(NumberTok)}},
-                    {WHEN: isObject, THEN_DO: ()=> {
+                    {WHEN: isObject, THEN_DO: () => {
                         this.object()}},
-                    {WHEN: isArray, THEN_DO: ()=> {
+                    {WHEN: isArray, THEN_DO: () => {
                         this.array()}},
-                    {WHEN: isTrue, THEN_DO: ()=> {
+                    {WHEN: isTrue, THEN_DO: () => {
                         this.CONSUME(TrueTok)}},
-                    {WHEN: isFalse, THEN_DO: ()=> {
+                    {WHEN: isFalse, THEN_DO: () => {
                         this.CONSUME(FalseTok)}},
-                    {WHEN: isNull, THEN_DO: ()=> {
+                    {WHEN: isNull, THEN_DO: () => {
                         this.CONSUME(NullTok)}}
                     // @formatter:off
 
-                ], 'add error message')
+                ], "a value")
         }
     }
 
     function isString():boolean {
-        return this.NEXT_TOKEN() instanceof StringTok;
+        return this.NEXT_TOKEN() instanceof StringTok
     }
 
     function isAdditionalItem():boolean {
-        return this.NEXT_TOKEN() instanceof CommaTok;
+        return this.NEXT_TOKEN() instanceof CommaTok
     }
 
     function isNumber():boolean {
-        return this.NEXT_TOKEN() instanceof NumberTok;
+        return this.NEXT_TOKEN() instanceof NumberTok
     }
 
     function isObject():boolean {
-        return this.NEXT_TOKEN() instanceof LCurlyTok;
+        return this.NEXT_TOKEN() instanceof LCurlyTok
     }
 
     function isArray():boolean {
-        return this.NEXT_TOKEN() instanceof LSquareTok;
+        return this.NEXT_TOKEN() instanceof LSquareTok
     }
 
     function isTrue():boolean {
-        return this.NEXT_TOKEN() instanceof TrueTok;
+        return this.NEXT_TOKEN() instanceof TrueTok
     }
 
     function isFalse():boolean {
-        return this.NEXT_TOKEN() instanceof FalseTok;
+        return this.NEXT_TOKEN() instanceof FalseTok
     }
 
     function isNull():boolean {
-        return this.NEXT_TOKEN() instanceof NullTok;
+        return this.NEXT_TOKEN() instanceof NullTok
     }
 
 }

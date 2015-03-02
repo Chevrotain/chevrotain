@@ -4,14 +4,13 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         karma: {
-            options: {
+            options:  {
                 configFile: 'karma.conf.js',
                 singleRun:  true
             },
-            unit:    {
+            default:  {
                 browsers: ['Chrome', 'Firefox', 'IE']
             },
-
             coverage: {
                 browsers:      ['Chrome'],
                 preprocessors: {'gen/src/**/*.js': ['coverage']},
@@ -27,7 +26,7 @@ module.exports = function(grunt) {
                 configuration: grunt.file.readJSON("tslint.json")
             },
             files:   {
-                src: ['src/**/*.ts']
+                src: ['src/**/*.ts', 'examples/**/*.ts']
             }
         },
 

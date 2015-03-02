@@ -3,7 +3,7 @@
 
 module chevrotain.parse.grammar.gast {
 
-    import tok = chevrotain.scan.tokens;
+    import tok = chevrotain.scan.tokens
 
     export interface IProduction {
         accept(visitor:GAstVisitor):void
@@ -13,17 +13,17 @@ module chevrotain.parse.grammar.gast {
         constructor(public definition:IProduction[]) {}
 
         accept(visitor:GAstVisitor):void {
-            visitor.visit(this);
+            visitor.visit(this)
             _.forEach(this.definition, (prod) => {
-                prod.accept(visitor);
-            });
+                prod.accept(visitor)
+            })
         }
     }
 
     export class ProdRef extends AbstractProduction {
         constructor(public refProdName:string,
                     public ref:TOP_LEVEL = null,
-                    public occurrenceInParent:number = 1) { super([]); }
+                    public occurrenceInParent:number = 1) { super([]) }
 
         set definition(definition:IProduction[]) {
             // immutable
@@ -31,40 +31,40 @@ module chevrotain.parse.grammar.gast {
 
         get definition():IProduction[] {
             if (this.ref != null) {
-                return this.ref.definition;
+                return this.ref.definition
             }
-            return [];
+            return []
         }
 
         accept(visitor:GAstVisitor):void {
-            visitor.visit(this);
+            visitor.visit(this)
             // don't visit children of a reference, we will get cyclic infinite loops if we do so
         }
     }
 
     /* tslint:disable:class-name */
     export class TOP_LEVEL extends AbstractProduction {
-        constructor(public name:string, definition:IProduction[]) { super(definition); }
+        constructor(public name:string, definition:IProduction[]) { super(definition) }
     }
 
     export class FLAT extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition); }
+        constructor(definition:IProduction[]) { super(definition) }
     }
 
     export class OPTION extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition); }
+        constructor(definition:IProduction[]) { super(definition) }
     }
 
     export class AT_LEAST_ONE extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition); }
+        constructor(definition:IProduction[]) { super(definition) }
     }
 
     export class MANY extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition); }
+        constructor(definition:IProduction[]) { super(definition) }
     }
 
     export class OR extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition); }
+        constructor(definition:IProduction[]) { super(definition) }
     }
     /* tslint:enable:class-name */
 
@@ -72,7 +72,7 @@ module chevrotain.parse.grammar.gast {
         constructor(public terminalType:Function, public occurrenceInParent:number = 1) {}
 
         accept(visitor:GAstVisitor):void {
-            visitor.visit(this);
+            visitor.visit(this)
         }
     }
 
@@ -82,13 +82,13 @@ module chevrotain.parse.grammar.gast {
             prod instanceof MANY ||
             prod instanceof AT_LEAST_ONE ||
             prod instanceof Terminal ||
-            prod instanceof TOP_LEVEL;
+            prod instanceof TOP_LEVEL
     }
 
     export function isOptionalProd(prod:IProduction):boolean {
-        var isDirectlyOptional = prod instanceof OPTION || prod instanceof MANY;
+        var isDirectlyOptional = prod instanceof OPTION || prod instanceof MANY
         if (isDirectlyOptional) {
-            return true;
+            return true
         }
 
         // note that this can cause infinite loop if one optional empty TOP production has a cyclic dependency with another
@@ -97,21 +97,21 @@ module chevrotain.parse.grammar.gast {
         if (prod instanceof OR) {
             // for OR its enough for just one of the alternatives to be optional
             return _.some((<OR>prod).definition, (subProd:IProduction) => {
-                return isOptionalProd(subProd);
-            });
+                return isOptionalProd(subProd)
+            })
         }
         else if (prod instanceof AbstractProduction) {
             return _.every((<AbstractProduction>prod).definition, (subProd:IProduction) => {
-                return isOptionalProd(subProd);
-            });
+                return isOptionalProd(subProd)
+            })
         }
         else {
-            return false;
+            return false
         }
     }
 
     export function isBranchingProd(prod:IProduction):boolean {
-        return prod instanceof OR;
+        return prod instanceof OR
     }
 
 
@@ -120,25 +120,25 @@ module chevrotain.parse.grammar.gast {
 
         public visit(node:IProduction) {
             if (node instanceof ProdRef) {
-                this.visitProdRef(<ProdRef>node);
+                this.visitProdRef(<ProdRef>node)
             }
             else if (node instanceof FLAT) {
-                this.visitFLAT(<FLAT>node);
+                this.visitFLAT(<FLAT>node)
             }
             else if (node instanceof OPTION) {
-                this.visitOPTION(<OPTION>node);
+                this.visitOPTION(<OPTION>node)
             }
             else if (node instanceof AT_LEAST_ONE) {
-                this.visitAT_LEAST_ONE(<AT_LEAST_ONE>node);
+                this.visitAT_LEAST_ONE(<AT_LEAST_ONE>node)
             }
             else if (node instanceof MANY) {
-                this.visitMANY(<MANY>node);
+                this.visitMANY(<MANY>node)
             }
             else if (node instanceof OR) {
-                this.visitOR(<OR>node);
+                this.visitOR(<OR>node)
             }
             else if (node instanceof Terminal) {
-                this.visitTerminal(<Terminal>node);
+                this.visitTerminal(<Terminal>node)
             }
         }
 
@@ -172,19 +172,19 @@ module chevrotain.parse.grammar.gast {
     }
 
     export class TerminalCollector extends gast.GAstVisitor {
-        constructor(public terminals:Terminal[] = []) { super(); }
+        constructor(public terminals:Terminal[] = []) { super() }
 
         public  visitTerminal(node:Terminal):void {
-            this.terminals.push(node);
+            this.terminals.push(node)
         }
 
     }
 
     export class ProdRefCollector extends gast.GAstVisitor {
-        constructor(public prodRefs:ProdRef[] = []) { super(); }
+        constructor(public prodRefs:ProdRef[] = []) { super() }
 
         public  visitProdRef(node:ProdRef):void {
-            this.prodRefs.push(node);
+            this.prodRefs.push(node)
         }
 
     }

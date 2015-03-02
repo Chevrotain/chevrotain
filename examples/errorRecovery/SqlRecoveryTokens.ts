@@ -2,7 +2,7 @@
 
 module chevrotain.examples.recovery.sql {
 
-    import tok = chevrotain.scan.tokens;
+    import tok = chevrotain.scan.tokens
 
 
     export class IdentTok extends tok.Token {}
@@ -51,13 +51,15 @@ module chevrotain.examples.recovery.sql {
     }
 
     export class SemiColonTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ";") }
+        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "") }
     }
 
     export class DotTok extends tok.Token {
         constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ".") }
     }
 
+
+    /* tslint:disable:class-name */
     // virtual tokens for Building the parseTree, these just give a "type/specification/categorization" to a ParseTree
     export class STATEMENTS extends tok.VirtualToken {}
     export class CREATE_STMT extends tok.VirtualToken {}
@@ -77,4 +79,5 @@ module chevrotain.examples.recovery.sql {
     export class INVALID_INSERT_STMT extends INSERT_STMT {}
     export class INVALID_DELETE_STMT extends DELETE_STMT {}
     export class INVALID_QUALIFIED_NAME extends QUALIFIED_NAME {}
+    /* tslint:enable:class-name */
 }
