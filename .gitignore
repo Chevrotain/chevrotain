@@ -1,22 +1,16 @@
 /coverage/
-/coverage/*
 
-/.idea/watcherTasks.xml
 /.idea/workspace.xml
-/.idea/tasks.xml
-/.idea/dictionaries/*
 /node_modules
-/node_modules/*
-
-/watch
-/watch/*
 
 /gen
-/gen/*
+
+/release
 
 /.tscache
-/.tscache/*
 /src/parse/.baseDir.ts
+/bower_components
+
 
 
 

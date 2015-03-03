@@ -1,8 +1,9 @@
 /*global module process */
 
+var _ = require('lodash');
 var fs = require('fs');
 var wrench = require('wrench');
-var _ = require('lodash');
+
 
 function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
@@ -70,14 +71,17 @@ function getIncludesFromTsRefsFile(fileName) {
 
 
 var coreIncludes = getIncludesFromTsRefsFile('./build/chevrotain.ts');
-var specIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecs.ts');
-var coreSpecUtilsIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecsUtils.ts');
-var examples = getIncludesFromTsRefsFile('./build/chevrotainExamples.ts');
-var examplesSpecs = getIncludesFromTsRefsFile('./build/chevrotainExamplesSpecs.ts');
 
-var allSrcsIncludes = coreIncludes.concat(coreSpecUtilsIncludes, specIncludes, examples, examplesSpecs);
+// TODO: the list of specs/utils/examples/... needs to be built by reading the directory.
+// in a similar way to how it is done in the grunt build.
+//var specIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecs.ts');
+//var coreSpecUtilsIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecsUtils.ts');
+//var examples = getIncludesFromTsRefsFile('./build/chevrotainExamples.ts');
+//var examplesSpecs = getIncludesFromTsRefsFile('./build/chevrotainExamplesSpecs.ts');
 
-validateAllSpecsHaveBeenIncluded(specIncludes);
+var allSrcsIncludes = [] //oreIncludes.concat(coreSpecUtilsIncludes, specIncludes, examples, examplesSpecs);
+
+//validateAllSpecsHaveBeenIncluded(specIncludes);
 
 module.exports = function (config) {
     "use strict";
@@ -99,7 +103,7 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
 
         // list of files / patterns to load in the browser
-        files: ['libs/*.js'].concat(
+        files: ['bower_components/lodash/lodash.js', 'libs/*.js'].concat(
             // all production code
             allSrcsIncludes,
             [

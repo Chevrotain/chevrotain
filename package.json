@@ -6,9 +6,13 @@
   },
   "devDependencies": {
     "grunt-cli": "~0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-concat": "^0.5.1",
     "grunt-karma": "~0.10.1",
     "grunt-ts": "~3.0.0",
     "grunt-tslint": "~2.0.0",
+    "grunt-umd": "~2.3.2",
+    "jshashtable": "~0.1.0",
     "karma": "~0.12.31",
     "karma-chrome-launcher": "~0.1.7",
     "karma-coverage": "0.2.5",

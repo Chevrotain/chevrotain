@@ -26,13 +26,6 @@ module chevrotain.examples.recovery.sql {
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
     export class DDLExampleRecoveryParser extends recog.BaseErrorRecoveryRecognizer {
 
-        // TODO: perhaps all these dealing with the GAST/FOLLOWS information can be hidden from the implementers.
-        // instead the BaseErrorRecoveryRecognizer can save the information using the constructor name as the key (transparently)
-        // flags to only compute this extra information once
-        static self_analysis_done = false
-
-        private static RESYNC_FOLLOW_SETS = new Hashtable<string, Function[]>()
-
         constructor(input:tok.Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
             //       it is mandatory to provide this map to be able to perform self analysis

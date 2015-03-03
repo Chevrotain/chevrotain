@@ -692,7 +692,9 @@ module chevrotain.parse.infra.recognizer {
         }
 
         RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
+
                                                                                          isEntryPoint?:boolean) => T {
+            // TODO: unique per parser impel
             this.validateRuleName(ruleName)
             var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this)
             // only build the gast representation once
