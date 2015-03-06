@@ -1,14 +1,8 @@
 
 BUILD/RELEASE/HIGH PRIORITY
-1. replace jshashtable with hashtable
-   https://www.npmjs.com/package/hashtable as it supports umd and is both on bower and npm.
 
-2. remove .js from libs, load the relevant js files from node_modules instead
-
-3. compile specs + examples + examples specs as individual files and (aggregate)? them + umd + dependencies to chevrotain
-   * probably need to run in all 3 manners amd/node/globals to properly test...
-
-4. coverage as part of build? find a plugin that puts a low bound on coverage?
+* use jasmine_node and jasmine_node coverage
+  ** need to wrap specs in umd too.
 
 5. finish readme.md
 
@@ -19,6 +13,13 @@ BUILD/RELEASE/HIGH PRIORITY
 BLOCKED:
 * travis integration for CI (needs to be on github first)
 
+QUALITY
+* example that uses back tracking
+* improve code quality to 90%
+* improve code quality to 92.5%
+* improve code quality to 95%
+* improve code quality to 97.5%
+* improve code quality to 100%
 
 FEATURES:
 * DSL for lookahead

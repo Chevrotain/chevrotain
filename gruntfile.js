@@ -8,23 +8,25 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         karma: {
-            options:  {
+            options:   {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
-                browsers: ['Chrome', 'Firefox', 'IE']
+                browsers:   ['Chrome', 'Firefox', 'IE']
             },
-            dev_build:  {
-            },
-            coverage: {
+            dev_build: {},
+            coverage_release:  {
+                options: {
+                    files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js']
+                },
                 browsers:      ['Chrome'],
-                preprocessors: {'gen/src/**/*.js': ['coverage']},
+                preprocessors: {'release/chevrotain.js': ['coverage']},
                 reporters:     ['progress', 'coverage']
             },
 
             // TODO: modify the files loaded to the aggregated output of the release compiler
-            release:  {
-                options : {
-                    files: ['libs/jshashtable-3.0.js', 'bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js']
+            release:   {
+                options: {
+                    files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js']
                 }
             }
         },
@@ -39,19 +41,19 @@ module.exports = function(grunt) {
         },
 
         ts: {
-            options: {
+            options:   {
                 target: "ES5",
                 fast:   "never"
 
             },
-            dev_build:   {
+            dev_build: {
                 src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!release/**/*.ts"],
                 outDir: "gen"
             },
 
             release: {
                 files:   {
-                    'release/Chevrotain.js': ['build/chevrotain.ts'],
+                    'release/chevrotain.js': ['build/chevrotain.ts'],
                     // this is the same as the 'build' process, all .ts --> .js in gen directory
                     // in a later step those files will be aggregated into separate components
                     'release/tsc':           ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!release/**/*.ts"]
@@ -59,7 +61,7 @@ module.exports = function(grunt) {
                 options: {
                     declaration:    true,
                     removeComments: false,
-                    sourceMap: false // due to UMD and concat generated headers the original source map will be invalid.
+                    sourceMap:      false // due to UMD and concat generated headers the original source map will be invalid.
                 }
             }
         },
@@ -68,6 +70,7 @@ module.exports = function(grunt) {
             release: {
                 options: {
                     src:            'release/chevrotain.js',
+                    template:       'scripts/umd.hbs',
                     objectToExport: 'chevrotain',
                     amdModuleId:    'chevrotain',
                     globalAlias:    'chevrotain',
@@ -83,8 +86,8 @@ module.exports = function(grunt) {
         },
 
         clean:  {
-            dev_build:   ["src/gen"],
-            release: ["release"]
+            dev_build: ["src/gen"],
+            release:   ["release"]
         },
         concat: {
             options: {
