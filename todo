@@ -29,6 +29,7 @@ FEATURES:
 
 EXAMPLES:
 * html with live diagrams (maybe firas can help?)
+* back tracking example (also needed for coverage)
 
 BUGS:
 * fix rule name validation to take into account the parser constructor name.

@@ -11,7 +11,7 @@ module.exports = function(grunt) {
             options:   {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
-                browsers:   ['Chrome', 'Firefox', 'IE']
+                browsers:   ['Chrome']
             },
             dev_build: {},
             coverage_release:  {
@@ -26,7 +26,8 @@ module.exports = function(grunt) {
             // TODO: modify the files loaded to the aggregated output of the release compiler
             release:   {
                 options: {
-                    files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js']
+                    files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js'],
+                    browsers:   ['Chrome', 'Firefox', 'IE']
                 }
             }
         },
