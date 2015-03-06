@@ -92,7 +92,16 @@ module.exports = function(grunt) {
         concat: {
             options: {
                 banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
+
+                process: function fixTSModulePatternForCoverage(src, filePath) {
+                    // prefix (lang = chevrotain.lang || (chevrotain.lang = {})); with /* istanbul ignore next */
+                    var fixed2PartsModules = src.replace(
+                        /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{\}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
+                    var fixedAllModulesPattern = fixed2PartsModules.replace(
+                        /(\(chevrotain \|\| \(chevrotain = \{\}\)\);)/g, "/* istanbul ignore next */ $1")
+                    return fixedAllModulesPattern
+                }
             },
             release: {
                 files: {
