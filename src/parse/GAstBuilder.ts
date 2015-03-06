@@ -1,8 +1,8 @@
 /// <reference path="../scan/Tokens.ts" />
 /// <reference path="../text/Range.ts" />
+/// <reference path="../lang/LangExtensions.ts" />
 /// <reference path="../parse/grammar/GAst.ts" />
 /// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/hashtable.d.ts" />
 
 
 // module for building the GAst representation of the parserImpel
@@ -11,6 +11,7 @@ module chevrotain.parse.gast.builder {
     import tok = chevrotain.scan.tokens
     import r = chevrotain.text.range
     import gast = chevrotain.parse.grammar.gast
+    import lang = chevrotain.lang.extensions;
 
     export enum ProdType {
         TOP_LEVEL,
@@ -295,7 +296,7 @@ module chevrotain.parse.gast.builder {
 
     export class GastRefResolverVisitor extends gast.GAstVisitor {
 
-        constructor(private nameToProd:IHashtable<string, gast.TOP_LEVEL>) { super() }
+        constructor(private nameToProd:lang.Hashtable<gast.TOP_LEVEL>) { super() }
 
         public resolveRefs():void {
             _.forEach(this.nameToProd.values(), (prod) => {

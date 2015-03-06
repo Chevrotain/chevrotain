@@ -3,7 +3,7 @@
 /// <reference path="../../parse/grammar/Rest.ts" />
 /// <reference path="../../parse/grammar/First.ts" />
 /// <reference path="../../parse/Constants.ts" />
-/// <reference path="../../../libs/hashtable.d.ts" />
+/// <reference path="../../lang/LangExtensions.ts" />
 
 module chevrotain.parse.grammar.follow {
 
@@ -12,15 +12,16 @@ module chevrotain.parse.grammar.follow {
     import r = chevrotain.parse.grammar.rest
     import f = chevrotain.parse.grammar.first
     import IN = chevrotain.parse.constants.IN
+    import lang = chevrotain.lang.extensions
 
     // This ResyncFollowsWalker computes all of the follows required for RESYNC
     // (skipping reference production).
     export class ResyncFollowsWalker extends r.RestWalker {
-        public follows = new Hashtable<string, Function[]>()
+        public follows = new lang.Hashtable<Function[]>()
 
         constructor(private topProd:g.TOP_LEVEL) { super() }
 
-        startWalking():IHashtable<string, Function[]> {
+        startWalking():lang.Hashtable<Function[]> {
             this.walk(this.topProd)
             return this.follows
         }
@@ -41,8 +42,8 @@ module chevrotain.parse.grammar.follow {
         }
     }
 
-    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):IHashtable<string, Function[]> {
-        var reSyncFollows = new Hashtable<string, Function[]>()
+    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):lang.Hashtable<Function[]> {
+        var reSyncFollows = new lang.Hashtable<Function[]>()
 
         _.forEach(topProductions, (topProd) => {
             var currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()

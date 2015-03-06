@@ -1,4 +1,6 @@
-module chevrotain.typescript.lang.extensions {
+/// <reference path="../../libs/lodash.d.ts" />
+
+module chevrotain.lang.extensions {
 
     export function startsWith(src, target):boolean {
         return src.slice(0, target.length) === target
@@ -36,6 +38,45 @@ module chevrotain.typescript.lang.extensions {
                 Object.defineProperty(derivedCtor.prototype, name, basePropDescriptor)
             }
         })
+    }
+
+    /**
+     * simple Hashtable between a string and some generic value
+     * this should be removed once typescript supports ES6 style Hashtable
+     */
+    export class Hashtable<V> {
+
+        private _state = {}
+
+        keys():string[] {
+            return _.keys(this._state)
+        }
+
+        values():V[] {
+            return _.values(this._state)
+        }
+
+        put(key:string, value:V):void {
+            this._state[key] = value
+        }
+
+        putAll(other:Hashtable<V>):void {
+            this._state = _.assign(this._state, other._state)
+        }
+
+        get(key:string):V {
+            // avoid edge case with a key called "hasOwnProperty"
+            if (Object.prototype.hasOwnProperty.call(this._state, key)) {
+                return this._state[key]
+            }
+
+            return undefined
+        }
+
+        containsKey(key:string):boolean {
+            return _.has(this._state, key)
+        }
+
     }
 
 }

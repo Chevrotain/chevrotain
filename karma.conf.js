@@ -3,46 +3,8 @@
 var _ = require('lodash');
 var fs = require('fs');
 var wrench = require('wrench');
+var specsFiles = require('./scripts/findSpecs')("gen/test/")
 
-
-function endsWith(str, suffix) {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-}
-
-function validateAllSpecsHaveBeenIncluded(actualSpecsIncludes) {
-    allFileInGenTest = wrench.readdirSyncRecursive('gen/test');
-
-    var specWithLowerCase = allFileInGenTest.filter(function (item) {
-        return endsWith(item, 'spec.js');
-    });
-
-    if (specWithLowerCase.length > 0) {
-        console.log(specWithLowerCase);
-        throw new Error("some Specification files have been named with a lowerCase 'spec' instead of 'Spec', this may cause problems in linux");
-    }
-
-    var expectedSpecs = allFileInGenTest.filter(function (item) {
-        return endsWith(item, 'Spec.js');
-    });
-
-    expectedSpecs = expectedSpecs.map(function (item) {
-        return  "gen/test/" + item
-    });
-
-    expectedSpecs = expectedSpecs.map(function (item) {
-        return item.replace(/\\/g, '/');
-    });
-
-    var inActualButNotInExpected = _.difference(actualSpecsIncludes, expectedSpecs);
-    var inExpectedButNotInActual = _.difference(expectedSpecs, actualSpecsIncludes);
-
-    if (!_.isEmpty(inActualButNotInExpected) || !_.isEmpty(inExpectedButNotInActual)) {
-        console.log("mismatch between spec includes from .ts specs ref file and contents of gen directory\n" +
-            "you may need to clean the gen directory or add a missing include to the .ts specs ref file",
-            inActualButNotInExpected, inExpectedButNotInActual);
-        throw new Errors("SPEC INCLUDES MISMATCH!");
-    }
-}
 
 var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test|examples).+\.ts)/g;
 
@@ -72,14 +34,7 @@ function getIncludesFromTsRefsFile(fileName) {
 
 var coreIncludes = getIncludesFromTsRefsFile('./build/chevrotain.ts');
 
-// TODO: the list of specs/utils/examples/... needs to be built by reading the directory.
-// in a similar way to how it is done in the grunt build.
-//var specIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecs.ts');
-//var coreSpecUtilsIncludes = getIncludesFromTsRefsFile('./build/chevrotainSpecsUtils.ts');
-//var examples = getIncludesFromTsRefsFile('./build/chevrotainExamples.ts');
-//var examplesSpecs = getIncludesFromTsRefsFile('./build/chevrotainExamplesSpecs.ts');
-
-var allSrcsIncludes = [] //oreIncludes.concat(coreSpecUtilsIncludes, specIncludes, examples, examplesSpecs);
+var allSrcsIncludes = coreIncludes.concat(specsFiles)
 
 //validateAllSpecsHaveBeenIncluded(specIncludes);
 

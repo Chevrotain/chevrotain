@@ -38,8 +38,8 @@ module chevrotain.parse.grammar.follow.spec {
 
         it("can compute the follows for Top level production ref in ActionDec", function () {
             var actual:any = new ResyncFollowsWalker(samples.actionDec).startWalking()
-            var actualPairs = actual.entries()
-            expect(actualPairs.length).toBe(3)
+            var actualFollowNames = actual.keys()
+            expect(actualFollowNames.length).toBe(3)
             expect(actual.get("ParamSpec1_IN_actionDec").length).toBe(2)
             matchers.arrayEqualityNoOrder(actual.get("ParamSpec1_IN_actionDec"), [t.CommaTok, t.RParenTok])
             expect(actual.get("ParamSpec2_IN_actionDec").length).toBe(2)
@@ -50,7 +50,7 @@ module chevrotain.parse.grammar.follow.spec {
 
         it("can compute all follows for a set of top level productions", function () {
             var actual = computeAllProdsFollows([samples.actionDec])
-            expect(actual.entries().length).toBe(3)
+            expect(actual.keys().length).toBe(3)
         })
 
 

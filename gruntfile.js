@@ -1,21 +1,6 @@
 var wrench = require('wrench')
 var _ = require('lodash')
-
-var testFolderContents = wrench.readdirSyncRecursive('test');
-var testFolderJSContents = _.map(testFolderContents, function(currItem) {
-    var tsToJs = currItem.replace(".ts", ".js")
-    var toLinuxSlash = tsToJs.replace(/\\/g, "/")
-    return "release/tsc/test/" + toLinuxSlash
-})
-
-var testFolderFiles = _.filter(testFolderJSContents, function(currItem) {
-    return _.endsWith(currItem, ".js")
-})
-
-var specsInTestFolder = _.filter(testFolderJSContents, function(currFileOrDir) {
-    return _.endsWith(currFileOrDir, 'Spec.js')
-})
-var utilsInTestFolder = _.difference(testFolderFiles, specsInTestFolder)
+var specsFiles = require('./scripts/findSpecs')("release/tsc/test/")
 
 module.exports = function(grunt) {
 
@@ -49,7 +34,7 @@ module.exports = function(grunt) {
                 configuration: grunt.file.readJSON("tslint.json")
             },
             files:   {
-                src: ['src/**/*.ts', 'examples/**/*.ts', 'test/**/*.ts']
+                src: ['src/**/*.ts', 'test/**/*.ts']
             }
         },
 
@@ -87,11 +72,11 @@ module.exports = function(grunt) {
                     amdModuleId:    'chevrotain',
                     globalAlias:    'chevrotain',
                     deps:           {
-                        'default': ['_', 'Hashtable'],
+                        'default': ['_'],
                         // TODO: replace with https://github.com/flesler/hashmap as it also has UMD and can be used with AMD
-                        amd:       ['lodash', 'jshashtable'],
-                        cjs:       ['lodash', 'jshashtable'],
-                        global:    ['_', 'Hashtable']
+                        amd:       ['lodash'],
+                        cjs:       ['lodash'],
+                        global:    ['_']
                     }
                 }
             }
@@ -109,7 +94,7 @@ module.exports = function(grunt) {
             release: {
                 files: {
                     'release/chevrotain.js':      ['release/chevrotain.js'],
-                    'release/chevrotainSpecs.js': utilsInTestFolder.concat(specsInTestFolder)
+                    'release/chevrotainSpecs.js': specsFiles
                 }
             }
         }

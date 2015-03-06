@@ -2,7 +2,7 @@
 
 module chevrotain.scan.tokens {
 
-    import lang = chevrotain.typescript.lang.extensions
+    import lang = chevrotain.lang.extensions
 
     export function getTokName(tokType:Function):string {
         var tokTypeName = lang.functionName(tokType)

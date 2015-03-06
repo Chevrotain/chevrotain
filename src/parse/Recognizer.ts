@@ -6,7 +6,6 @@
 /// <reference path="../parse/grammar/Follow.ts" />
 
 /// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/hashtable.d.ts" />
 
 module chevrotain.parse.infra.recognizer {
 
@@ -14,7 +13,7 @@ module chevrotain.parse.infra.recognizer {
     import gast = chevrotain.parse.grammar.gast
     import IN = chevrotain.parse.constants.IN
     import interp = chevrotain.parse.grammar.interpreter
-    import lang = chevrotain.typescript.lang.extensions
+    import lang = chevrotain.lang.extensions
     import gastBuilder = chevrotain.parse.gast.builder
     import follows = chevrotain.parse.grammar.follow
 
@@ -287,31 +286,31 @@ module chevrotain.parse.infra.recognizer {
     // 2. CHECK FOLLOW_SET have everything it should and nothing it should not
     export class BaseErrorRecoveryRecognizer extends BaseRecognizer {
 
-        private static CLASS_TO_SELF_ANALYSIS_DONE = new Hashtable<string, boolean>()
+        private static CLASS_TO_SELF_ANALYSIS_DONE = new lang.Hashtable<boolean>()
 
         // todo: once IDEA supports TypeScript 1.4 use typeAliases to do something like:
         // new Hashtable<ClassName, IHashtable<RuleName, gast.TOP_LEVEL>>()
-        private static CLASS_TO_GRAMMAR_PRODUCTIONS = new Hashtable<string, IHashtable<string, gast.TOP_LEVEL>>()
+        private static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.Hashtable<lang.Hashtable<gast.TOP_LEVEL>>()
 
-        static getProductionsForClass(classInstance:any):IHashtable<string, gast.TOP_LEVEL> {
+        static getProductionsForClass(classInstance:any):lang.Hashtable<gast.TOP_LEVEL> {
             var className = lang.classNameFromInstance(classInstance)
             if (!BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.containsKey(className)) {
-                BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.put(className, new Hashtable<string, gast.TOP_LEVEL>())
+                BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.put(className, new lang.Hashtable<gast.TOP_LEVEL>())
             }
             return BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.get(className)
         }
 
-        private static CLASS_TO_RESYNC_FOLLOW_SETS = new Hashtable<string, IHashtable<string, Function[]>>()
+        private static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.Hashtable<lang.Hashtable<Function[]>>()
 
-        static getResyncFollowsForClass(classInstance:any):IHashtable<string, Function[]> {
+        static getResyncFollowsForClass(classInstance:any):lang.Hashtable<Function[]> {
             var className = lang.classNameFromInstance(classInstance)
             if (!BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.containsKey(className)) {
-                BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, new Hashtable<string, Function[]>())
+                BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, new lang.Hashtable<Function[]>())
             }
             return BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.get(className)
         }
 
-        static setResyncFollowsForClass(classInstance:any, followSet:IHashtable<string, Function[]>):void {
+        static setResyncFollowsForClass(classInstance:any, followSet:lang.Hashtable<Function[]>):void {
             var className = lang.classNameFromInstance(classInstance)
             BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
         }
@@ -570,7 +569,7 @@ module chevrotain.parse.infra.recognizer {
             return follows
         }
 
-        getGAstProductions():IHashtable<string, gast.TOP_LEVEL> {
+        getGAstProductions():lang.Hashtable<gast.TOP_LEVEL> {
             return BaseErrorRecoveryRecognizer.getProductionsForClass(this)
         }
 
