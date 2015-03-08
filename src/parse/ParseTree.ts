@@ -12,20 +12,7 @@ module chevrotain.parse.tree {
 
         getColumn():number { return this.payload.startColumn }
 
-        constructor(public payload:tok.Token = tok.NONE_TOKEN(), public children:ParseTree[] = []) {}
+        constructor(public payload:tok.Token, public children:ParseTree[] = []) {}
     }
-
-    export function getAllTokensFromParseTree(tree:ParseTree):tok.Token[] {
-        var allPayloads = getAllTokensFromParseTreeInternal(tree)
-        return _.flatten<tok.Token>(allPayloads)
-    }
-
-    function getAllTokensFromParseTreeInternal(tree:ParseTree):any {
-        var myPayload = tree.payload
-        var childrenPayloadsArrs = _.map(tree.children, getAllTokensFromParseTreeInternal)
-
-        return [myPayload, childrenPayloadsArrs]
-    }
-
 }
 

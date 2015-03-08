@@ -134,9 +134,9 @@ module chevrotain.parse.gast.builder {
 
     export function getDirectlyContainedRanges(y:r.IRange, prodRanges:IProdRange[]):IProdRange[] {
         return _.filter(prodRanges, (x:IProdRange) => {
-            var isXDescendantOfY = y.strictlyContainsOtherRange(x.range)
+            var isXDescendantOfY = y.strictlyContainsRange(x.range)
             var xDoesNotHaveAnyAncestorWhichIsDecendantOfY = _.every(prodRanges, (maybeAnotherParent:IProdRange) => {
-                var isParentOfX = maybeAnotherParent.range.strictlyContainsOtherRange(x.range)
+                var isParentOfX = maybeAnotherParent.range.strictlyContainsRange(x.range)
                 var isChildOfY = maybeAnotherParent.range.isStrictlyContainedInRange(y)
                 return !(isParentOfX && isChildOfY)
             })

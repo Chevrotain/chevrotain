@@ -7,88 +7,44 @@ module chevrotain.text.range {
 
         contains(num:number):boolean
 
-        isContainedInRange(other:IRange):boolean
-
-        isStrictlyContainedInRange(other:IRange):boolean
-
         containsRange(other:IRange):boolean
 
-        strictlyContainsOtherRange(other:IRange):boolean
+        isContainedInRange(other:IRange):boolean
 
-        overlapsOtherRange(other:IRange):boolean
+        strictlyContainsRange(other:IRange):boolean
 
-        equals(other:IRange):boolean
-
-        size():number
-
+        isStrictlyContainedInRange(other:IRange):boolean
     }
 
     export class Range implements IRange {
 
-        private _start
-        get start():number {
-            return this._start
-        }
-
-        set start(newStart:number) {
-            this._start = newStart
-        }
-
-        private _end
-        get end():number {
-            return this._end
-        }
-
-        set end(newEnd:number) {
-            this._end = newEnd
-        }
-
-        constructor(start:number, end:number) {
+        // TODO: use const?/final properties for immutable ranges? TS 1.5?
+        constructor(public start:number, public end:number) {
             if (!isValidRange(start, end)) {
-                throw Error("INVALID RANGE")
+                throw new Error("INVALID RANGE")
             }
-            this._start = start
-            this._end = end
         }
 
         contains(num:number):boolean {
             return this.start <= num && this.end >= num
         }
 
-        isContainedInRange(other:IRange):boolean {
-            return other.containsRange(this)
-        }
-
-        isStrictlyContainedInRange(other:IRange):boolean {
-            return this.start > other.start && this.end < other.end
-        }
-
         containsRange(other:IRange):boolean {
             return this.start <= other.start && this.end >= other.end
         }
 
-        strictlyContainsOtherRange(other:IRange):boolean {
+        isContainedInRange(other:IRange):boolean {
+            return other.containsRange(this)
+        }
+
+        strictlyContainsRange(other:IRange):boolean {
             return this.start < other.start && this.end > other.end
         }
 
-        overlapsOtherRange(other:IRange):boolean {
-            return this.start <= other.start && this.end >= other.start ||
-                this.start <= other.end && this.end >= other.end ||
-                this.containsRange(other) || other.containsRange(this)
+        isStrictlyContainedInRange(other:IRange):boolean {
+            return other.strictlyContainsRange(this)
         }
 
-        equals(other:IRange):boolean {
-            return this.start === other.start &&
-                this.end === other.end
-        }
-
-        size():number {
-            return this.end - this.start + 1
-        }
-    }
-
-    export function INVALID_OFFSET():number {
-        return -1
     }
 
     export function isValidRange(start:number, end:number):boolean {
