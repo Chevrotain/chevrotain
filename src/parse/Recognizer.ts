@@ -182,13 +182,22 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-        BACKTRACK<T>(grammarRule:(idx:number) => T, isValid:(T) => boolean):() => boolean {
+
+        /**
+         *
+         * @param grammarRule the rule to try and parse in backtracking mode
+         * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was succesfully or not
+         * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
+         */
+        BACKTRACK<T>(grammarRule:() => T, isValid:(T) => boolean):() => boolean {
             return () => {
                 // save org state
                 this.isBackTrackingStack.push(1)
                 var orgState = this.saveRecogState()
                 try {
-                    var ruleResult = grammarRule.call(this, 1)
+                    // TODO: override in BaseErrorRecoveryRecognizer and add the call index?
+                    // or maybe it does not matter because in backtracking error recovery is turned off
+                    var ruleResult = grammarRule.call(this)
                     return isValid(ruleResult)
                 } catch (e) {
                     if (isRecognitionException(e)) {
