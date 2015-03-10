@@ -28,11 +28,11 @@ module chevrotain.examples.backtracking.spec {
             ])
 
             var parser = new BackTrackingParser(input)
-            var result = parser.statement()
+            var result = parser.statement(1, true)
 
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
-            expect(result).toBe(StatementType.WITH_EQUALS)
+            expect(result).toBe(RET_TYPE.WITH_EQUALS)
         })
 
         it("can parse an element with Default and a very long qualified name", function () {
@@ -43,11 +43,11 @@ module chevrotain.examples.backtracking.spec {
             ])
 
             var parser = new BackTrackingParser(input)
-            var result = parser.statement()
+            var result = parser.statement(1, true)
 
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
-            expect(result).toBe(StatementType.WITH_DEFAULT)
+            expect(result).toBe(RET_TYPE.WITH_DEFAULT)
         })
 
 

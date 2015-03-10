@@ -150,16 +150,6 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
-        IS_ONE_OF_ALTERNATIVES_LOOK_AHEAD(tokTypes:Function[][]):() => boolean {
-            return () => {
-                return _.find(tokTypes, (altTokenSeq) => {
-                        return _.every(altTokenSeq, (currToken:any, i) => {
-                            return this.LA(i + 1) instanceof currToken
-                        }, this)
-                    }, this) !== undefined
-            }
-        }
-
         CONSUME(tokType:Function):tok.Token {
             var nextToken = this.NEXT_TOKEN()
             if (this.NEXT_TOKEN() instanceof tokType) {
@@ -189,7 +179,7 @@ module chevrotain.parse.infra.recognizer {
          * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was succesfully or not
          * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
          */
-        BACKTRACK<T>(grammarRule:() => T, isValid:(T) => boolean):() => boolean {
+        BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
             return () => {
                 // save org state
                 this.isBackTrackingStack.push(1)
@@ -780,4 +770,5 @@ module chevrotain.parse.infra.recognizer {
             return wrappedGrammarRule
         }
     }
+
 }

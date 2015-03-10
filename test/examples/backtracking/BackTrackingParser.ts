@@ -12,7 +12,15 @@ module chevrotain.examples.backtracking {
     import recog = chevrotain.parse.infra.recognizer
     import tok = chevrotain.scan.tokens
 
-    export enum StatementType {WITH_DEFAULT, WITH_EQUALS}
+    export enum RET_TYPE {
+        WITH_DEFAULT,
+        WITH_EQUALS,
+        QUALIFED_NAME,
+        INVALID_WITH_DEFAULT,
+        INVALID_WITH_EQUALS,
+        INVALID_STATEMENT,
+        INVALID_FQN
+    }
 
     export class NumberTok extends tok.Token {}
     export class ElementTok extends tok.Token {
@@ -42,59 +50,80 @@ module chevrotain.examples.backtracking {
     export class IdentTok extends tok.Token {}
 
 
-    export class BackTrackingParser extends recog.BaseRecognizer {
+    // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
+    // that needs to be tested too.
+    export class BackTrackingParser extends recog.BaseErrorRecoveryRecognizer {
+
+        constructor(input:tok.Token[] = []) {
+            // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
+            //       it is mandatory to provide this map to be able to perform self analysis
+            //       and allow the framework to "understand" the implemented grammar.
+            super(input, <any>chevrotain.examples.backtracking)
+            // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
+            //       The typescript compiler places the constructor body last after initializations in the class's body
+            //       which is why place the call here meets the criteria.
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
 
 
-        public statement():StatementType {
-            var statementTypeFound:StatementType = undefined;
+        public statement = this.RULE("statement", this.parseStatement, INVALID(RET_TYPE.INVALID_STATEMENT))
+        public withEqualsStatement = this.RULE("withEqualsStatement", this.parseWithEqualsStatement, INVALID(RET_TYPE.INVALID_WITH_EQUALS))
+        public withDefaultStatement = this.RULE("withDefaultStatement",
+            this.parseWithDefaultStatement, INVALID(RET_TYPE.INVALID_WITH_DEFAULT))
+        // DOCs: example for a rule which will never try re-sync recovery as it is defined with 'RULE_NO_RESYNC'
+        public qualifiedName = this.RULE_NO_RESYNC("qualifiedName", this.parseQualifiedName, INVALID(RET_TYPE.INVALID_FQN))
+
+        private parseStatement():RET_TYPE {
+            var statementTypeFound:RET_TYPE = undefined;
             this.OR(
                 [
                     // both statements have the same prefix which may be of "infinite" length, this means there is no K for which
                     // we can build an LL(K) parser that can distinguish the two alternatives as a negative example
                     // would be to simply create a qualifiedName with a length of k+1.
                     {
-                        WHEN:    this.BACKTRACK(this.withEqualsStatement, (result) => { return result === StatementType.WITH_EQUALS }),
-                        THEN_DO: () => { statementTypeFound = this.withEqualsStatement() }
+                        WHEN:    this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
+                        THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement(1)) }
                     },
                     {
-                        WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === StatementType.WITH_DEFAULT }),
-                        THEN_DO: () => { statementTypeFound = this.withDefaultStatement() }
+                        WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
+                        THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement(1)) }
                     },
                 ], " a statement")
 
             return statementTypeFound
         }
 
-        public withEqualsStatement():StatementType {
-            this.CONSUME(ElementTok)
-            this.CONSUME(IdentTok)
-            this.CONSUME(ColonTok)
-            this.qualifiedName() // this rule creates the no fixed look ahead issue
-            this.CONSUME(EqualsTok)
-            this.CONSUME(NumberTok)
-            this.CONSUME(SemiColonTok)
+        private parseWithEqualsStatement():RET_TYPE {
+            this.CONSUME1(ElementTok)
+            this.CONSUME1(IdentTok)
+            this.CONSUME1(ColonTok)
+            this.SUBRULE(this.qualifiedName(1)) // this rule creates the no fixed look ahead issue
+            this.CONSUME1(EqualsTok)
+            this.CONSUME1(NumberTok)
+            this.CONSUME1(SemiColonTok)
 
-            return StatementType.WITH_EQUALS
+            return RET_TYPE.WITH_EQUALS
         }
 
-        public withDefaultStatement():StatementType {
-            this.CONSUME(ElementTok)
-            this.CONSUME(IdentTok)
-            this.CONSUME(ColonTok)
-            this.qualifiedName() // this rule creates the no fixed look ahead issue
-            this.CONSUME(DefaultTok)
-            this.CONSUME(NumberTok)
-            this.CONSUME(SemiColonTok)
+        private parseWithDefaultStatement():RET_TYPE {
+            this.CONSUME1(ElementTok)
+            this.CONSUME1(IdentTok)
+            this.CONSUME1(ColonTok)
+            this.SUBRULE(this.qualifiedName(1)) // this rule creates the no fixed look ahead issue
+            this.CONSUME1(DefaultTok)
+            this.CONSUME1(NumberTok)
+            this.CONSUME1(SemiColonTok)
 
-            return StatementType.WITH_DEFAULT
+            return RET_TYPE.WITH_DEFAULT
         }
 
-        public qualifiedName():void {
-            this.CONSUME(IdentTok)
+        private parseQualifiedName():RET_TYPE {
+            this.CONSUME1(IdentTok)
             this.MANY(isQualifiedNamePart, () => {
-                this.CONSUME(DotTok)
-                this.CONSUME(IdentTok)
+                this.CONSUME1(DotTok)
+                this.CONSUME2(IdentTok)
             })
+            return RET_TYPE.QUALIFED_NAME
         }
 
     }
@@ -103,5 +132,9 @@ module chevrotain.examples.backtracking {
         return this.NEXT_TOKEN() instanceof  DotTok
     }
 
+
+    export function INVALID(stmtType:RET_TYPE):() => RET_TYPE {
+        return () => {return stmtType}
+    }
 
 }
