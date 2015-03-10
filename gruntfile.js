@@ -96,7 +96,7 @@ module.exports = function(grunt) {
                 '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
 
                 process: function fixTSModulePatternForCoverage(src, filePath) {
-                    // prefix (lang = chevrotain.lang || (chevrotain.lang = {})); with /* istanbul ignore next */
+                    // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
                     var fixed2PartsModules = src.replace(
                         /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{\}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
                     var fixedAllModulesPattern = fixed2PartsModules.replace(

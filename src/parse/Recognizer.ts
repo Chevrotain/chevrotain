@@ -674,6 +674,8 @@ module chevrotain.parse.infra.recognizer {
             }
         }
 
+        // Not worth the hassle to support Unicode characters in rule names...
+        private ruleNamePattern = /^[a-zA-Z_]\w*$/
         private definedRulesNames:string[] = []
 
         /**
@@ -681,16 +683,16 @@ module chevrotain.parse.infra.recognizer {
          * @throws Grammar validation errors if the name is invalid
          */
         private validateRuleName(ruleFuncName:string):void {
-            if (ruleFuncName.length < 1) {
-                throw Error("INVALID GRAMMAR RULE FUNCTION NAME must be at least 6 chars long --> " + ruleFuncName)
-            }
-            if (_.contains(this.definedRulesNames, ruleFuncName)) {
-                throw Error("CAN'T HAVE TWO RULES WITH THE SAME NAME" + ruleFuncName)
+            if (!ruleFuncName.match(this.ruleNamePattern)) {
+                throw Error("Invalid Grammar rule name --> " + ruleFuncName +
+                " it must match the pattern: " + this.ruleNamePattern.toString())
             }
 
-            if (ruleFuncName.indexOf("_") !== -1) {
-                throw Error("CAN'T USE UNDERSCORE '_' IN RULE NAME" + ruleFuncName)
+            if ((_.contains(this.definedRulesNames, ruleFuncName))) {
+                throw Error("Duplicate definition, rule: " + ruleFuncName +
+                " is already defined in the grammar: " + lang.classNameFromInstance(this))
             }
+
             this.definedRulesNames.push(ruleFuncName)
         }
 
@@ -699,10 +701,10 @@ module chevrotain.parse.infra.recognizer {
             return this.RULE(ruleName, consumer, invalidRet, false)
         }
 
-        RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
 
+        RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
                                                                                          isEntryPoint?:boolean) => T {
-            // TODO: unique per parser impel
+
             this.validateRuleName(ruleName)
             var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this)
             // only build the gast representation once
