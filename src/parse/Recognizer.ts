@@ -759,8 +759,12 @@ module chevrotain.parse.infra.recognizer {
                     var maxInputIdx = this.input.length - 1
                     if (isEntryPoint && this.inputIdx < maxInputIdx) {
                         var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
-                        this.SAVE_ERROR(
-                            new NotAllInputParsedException(
+
+                        // TODO: this error can only be detected when using an ErrorRecoveryRecognizer
+                        // what about a base recognizer? it can happen in that case too.
+                        // not we just save the error and not throw an exception because while there is indeed redundant
+                        // input, it does not mean that the none redudant input has not been parsed succesfully
+                        this.SAVE_ERROR(new NotAllInputParsedException(
                                 "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
                     }
                 }

@@ -124,6 +124,44 @@ module chevrotain.examples.recovery.sql.spec {
             expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
         }
 
+
+        it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", function () {
+            var input:any = _.flatten([
+                // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
+                new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1)])
+            var parser = new DDLExampleRecoveryParser(input)
+
+            parser.ddl(1, true)
+            expect(parser.errors.length).toBe(1)
+            expect(parser.errors[0]).toEqual(jasmine.any(recog.NotAllInputParsedException))
+        })
+
+        it("can use the same parser instance to parse multiple inputs", function () {
+            var input1:any = _.flatten([
+                // CREATE TABLE schema2.Persons;
+                new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
+            var parser = new DDLExampleRecoveryParser(input1)
+            parser.ddl(1, true)
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+
+
+            var input2:any = _.flatten([
+                // DELETE (31, "SHAHAR") FROM schema2.Persons
+                new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
+            // the parser is being reset instead of creating a new instance for each new input
+            parser.reset();
+            parser.input = input2
+            var ptResult = parser.ddl(1, true)
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+            // verify returned ParseTree
+            expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
+            expect(ptResult.children.length).toBe(1)
+            expect(ptResult.children[0].payload).toEqual(jasmine.any(DELETE_STMT))
+            expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
+        })
+
     })
 
 }

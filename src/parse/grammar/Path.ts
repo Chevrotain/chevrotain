@@ -20,14 +20,4 @@ module chevrotain.parse.grammar.path {
     export function NO_PATH_FOUND():IGrammarPath {
         return invalidContentAssistPath
     }
-
-    export function ContentAssistPathFoundException(message:string, path:IGrammarPath) {
-        this.name = "ContentAssistPathFoundException"
-        this.message = message
-        this.path = path
-    }
-
-    // must use the "Error.prototype" instead of "new Error"
-    // because the stack trace points to where "new Error" was invoked"
-    ContentAssistPathFoundException.prototype = Error.prototype
 }

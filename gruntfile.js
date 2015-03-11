@@ -87,7 +87,7 @@ module.exports = function(grunt) {
         },
 
         clean:  {
-            dev_build: ["src/gen"],
+            dev_build: ["gen"],
             release:   ["release"]
         },
         concat: {
@@ -120,7 +120,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
 
-    grunt.registerTask('release', ['clean:release', 'ts:release', 'tslint', 'umd:release', 'concat:release', 'karma:release'])
+    grunt.registerTask('release', ['clean:release', 'ts:release', 'tslint', 'umd:release', 'concat:release', 'karma:coverage_release'])
     grunt.registerTask('dev_build', ['clean:dev_build', 'ts:dev_build', 'tslint', 'karma:dev_build'])
 
 }

@@ -1,7 +1,9 @@
 /// <reference path="JsonParser.ts" />
 /// <reference path="../../../src/scan/Tokens.ts" />
+/// <reference path="../../../src/parse/Recognizer.ts" />
 /// <reference path="../../../libs/jasmine.d.ts" />
 
+var recog = chevrotain.parse.infra.recognizer
 
 module chevrotain.examples.json.spec {
 
@@ -31,6 +33,14 @@ module chevrotain.examples.json.spec {
             parser.objectItem()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
+
+        it("will encounter an NoViableAltException when none of the alternatives match", function () {
+            var input = [new ColonTok(1, 8)]
+            var parser = new JsonParser(input)
+
+            expect(() => parser.value()).toThrow(new recog.NoViableAltException("expecting: a value but found ':'", input[0]))
         })
 
     })
