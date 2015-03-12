@@ -501,7 +501,7 @@ module chevrotain.parse.infra.recognizer {
                 return false
             }
 
-            // if we can perform inRule recovery (single token insertion or deletion) we always prefer that recovery algorithim
+            // if we can perform inRule recovery (single token insertion or deletion) we always prefer that recovery algorithm
             // because if it works, it makes the least amount of changes to the input stream (greedy algorithm)
             //noinspection RedundantIfStatementJS
             if (this.canPerformInRuleRecovery(expectTokAfterLastMatch,

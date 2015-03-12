@@ -171,23 +171,5 @@ module chevrotain.parse.grammar.gast {
         }
     }
 
-    export class TerminalCollector extends gast.GAstVisitor {
-        constructor(public terminals:Terminal[] = []) { super() }
-
-        public  visitTerminal(node:Terminal):void {
-            this.terminals.push(node)
-        }
-
-    }
-
-    export class ProdRefCollector extends gast.GAstVisitor {
-        constructor(public prodRefs:ProdRef[] = []) { super() }
-
-        public  visitProdRef(node:ProdRef):void {
-            this.prodRefs.push(node)
-        }
-
-    }
-
 }
 

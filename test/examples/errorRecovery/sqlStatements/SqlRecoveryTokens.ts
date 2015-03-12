@@ -1,4 +1,4 @@
-/// <reference path="../../../src/scan/Tokens.ts" />
+/// <reference path="../../../../src/scan/Tokens.ts" />
 
 module chevrotain.examples.recovery.sql {
 
@@ -15,47 +15,48 @@ module chevrotain.examples.recovery.sql {
     export class Keyword extends tok.Token {}
 
     export class CreateTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "CREATE") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "CREATE") }
     }
 
     export class TableTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "TABLE") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "TABLE") }
     }
 
     export class InsertTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "INSERT") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "INSERT") }
     }
 
     export class IntoTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "INTO") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "INTO") }
     }
 
     export class DeleteTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "DELETE") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "DELETE") }
     }
 
     export class FromTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "FROM") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "FROM") }
     }
 
     export class LParenTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "(") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "(") }
     }
 
     export class RParenTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ")") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ")") }
     }
 
+
     export class CommaTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ",") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ",") }
     }
 
     export class SemiColonTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ";") }
     }
 
     export class DotTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ".") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ".") }
     }
 
 
