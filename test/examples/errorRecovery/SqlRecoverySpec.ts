@@ -106,7 +106,7 @@ module chevrotain.examples.recovery.sql.spec {
             expect(ptResult.children[0].payload).toEqual(jasmine.any(CREATE_STMT))
             expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_CREATE_STMT))
             // but the second one is marked as invalid
-            expect(ptResult.children[1].payload).toEqual(jasmine.any(INVALID_STATEMENT))
+            expect(ptResult.children[1].payload).toEqual(jasmine.any(INVALID_INSERT_STMT))
             // yet the third one is still valid!, we recovered and continued parsing.
             expect(ptResult.children[2].payload).toEqual(jasmine.any(DELETE_STMT))
             expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))

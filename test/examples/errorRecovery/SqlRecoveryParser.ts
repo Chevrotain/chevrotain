@@ -22,7 +22,6 @@ module chevrotain.examples.recovery.sql {
     import follows = chevrotain.parse.grammar.follow
 
 
-
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
     export class DDLExampleRecoveryParser extends recog.BaseErrorRecoveryRecognizer {
 
@@ -42,8 +41,6 @@ module chevrotain.examples.recovery.sql {
         // note that when one parsing rule calls another (via SUBRULE) the invoked rule is the one defined here,
         // without the "parse" prefix.
         public ddl = this.RULE("ddl", this.parseDdl, INVALID(INVALID_DDL))
-        // TODO: is RULE_NO_RESYNC applicable here?
-        public statement = this.RULE("statement", this.parseStatement, INVALID(INVALID_STATEMENT))
         // DOCS: a specific return type has been provided in case of re-sync recovery.
         public createStmt = this.RULE("createStmt", this.parseCreateStmt, INVALID(INVALID_CREATE_STMT))
         public insertStmt = this.RULE("insertStmt", this.parseInsertStmt, INVALID(INVALID_INSERT_STMT))
@@ -58,34 +55,23 @@ module chevrotain.examples.recovery.sql {
         private parseDdl():pt.ParseTree {
             var stmts = []
 
-            this.MANY(isStatement, () => {
-                // DOCS: note the usage of the SUBRULE wrapper, it does not actually do anything but it is needed
-                // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
-                stmts.push(this.SUBRULE(this.statement(1)))
-            })
-
-            return PT(new STATEMENTS(), stmts)
-        }
-
-        private parseStatement():pt.ParseTree {
-            var stmt:pt.ParseTree = null
-
-            this.OR(
+            this.MANY_OR(
                 [
                     // @formatter:off
                     {WHEN: isCreate, THEN_DO: () => {
                         // DOCS: note how the invocation of another parseRule also adds the occurrence index
                         //       if we had another invocation of this.createStmt inside this rule, we would have had to use
                         //       "this.createStmt(2)" and the next one this.createStmt(3) ...
-                        stmt = this.SUBRULE(this.createStmt(1))}},
+                        stmts.push(this.SUBRULE(this.createStmt(1)))}},
                     {WHEN: isInsert, THEN_DO: () => {
-                        stmt = this.SUBRULE(this.insertStmt(1))}},
+                        stmts.push(this.SUBRULE(this.insertStmt(1)))}},
                     {WHEN: isDelete, THEN_DO: () => {
-                        stmt = this.SUBRULE(this.deleteStmt(1))}}
+                        // DOCS: note the usage of the SUBRULE wrapper, it does not actually do anything but it is needed
+                        // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
+                        stmts.push(this.SUBRULE(this.deleteStmt(1)))}},
                 // @formatter:on
-                ], " a statement")
-
-            return stmt
+                ])
+            return PT(new STATEMENTS(), stmts)
         }
 
         private parseCreateStmt():pt.ParseTree {

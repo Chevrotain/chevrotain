@@ -74,7 +74,6 @@ module chevrotain.examples.recovery.sql {
     // defining them as subclasses of the "valid" virtual tokens can making handling of invalid input easier in whatever
     // component which consumes the output ParseTree in order to build some Ast or other data structure.
     export class INVALID_DDL extends tok.VirtualToken {}
-    export class INVALID_STATEMENT extends tok.VirtualToken {}
     export class INVALID_CREATE_STMT extends CREATE_STMT {}
     export class INVALID_INSERT_STMT extends INSERT_STMT {}
     export class INVALID_DELETE_STMT extends DELETE_STMT {}
