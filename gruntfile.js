@@ -101,7 +101,8 @@ module.exports = function(grunt) {
                         /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{\}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
                     var fixedAllModulesPattern = fixed2PartsModules.replace(
                         /(\(chevrotain \|\| \(chevrotain = \{\}\)\);)/g, "/* istanbul ignore next */ $1")
-                    return fixedAllModulesPattern
+                    var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];", "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
+                    return fixedTypeScriptExtends
                 }
             },
             release: {
