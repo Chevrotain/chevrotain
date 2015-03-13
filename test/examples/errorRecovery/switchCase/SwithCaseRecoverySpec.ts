@@ -43,7 +43,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             })
         })
 
-        it("can perform re-sync recovery to the next repetition", function () {
+        it("can perform re-sync recovery to the next case stmt", function () {
             var input = [
                 // switch (name) {
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok(1, 1, "name"), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -81,6 +81,36 @@ module chevrotain.examples.recovery.switchcase.spec {
             // we have re-synced to the end of the input therefore all the input has been "parsed"
             expect(parser.isAtEndOfInput()).toBe(true)
             expect(parseResult).toEqual({})
+        })
+
+
+        it("can perform re-sync recovery to the next case stmt even if the unexpected tokens are between valid case stmts", function () {
+            var input = [
+                // switch (name) {
+                new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok(1, 1, "name"), new RParenTok(1, 1), new LCurlyTok(1, 1),
+                // case "Terry" : return 2;
+                new CaseTok(1, 1), new StringTok(1, 1, "Terry"), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "2"), new SemiColonTok(1, 1),
+                // case "Robert" : return 4;
+                new CaseTok(1, 1), new StringTok(1, 1, "Robert"), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "4"), new SemiColonTok(1, 1),
+                // "ima" "aba" "bamba" <-- these three strings do not belong here, but instead of failing everything
+                // we should still get a valid output as these tokens will be ignored and the parser will re-sync to the next case stmt
+                new StringTok(1, 1, "ima"), new StringTok(1, 1, "aba"), new StringTok(1, 1, "bamba"),
+                // case "Brandon" : return 6;
+                new CaseTok(1, 1), new StringTok(1, 1, "Brandon"), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "6"), new SemiColonTok(1, 1),
+
+                new RCurlyTok(1, 1)
+            ]
+
+            var parser = new SwitchCaseRecoveryParser(input)
+            var parseResult = parser.switchStmt(1, true)
+            expect(parser.errors.length).toBe(1)
+            expect(parser.isAtEndOfInput()).toBe(true)
+
+            expect(parseResult).toEqual({
+                "Terry":   2,
+                "Robert":  4,
+                "Brandon": 6
+            })
         })
 
     })
