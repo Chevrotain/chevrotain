@@ -92,8 +92,7 @@ module chevrotain.parse.gast.builder {
                 return buildRefProd(prodRange)
             case ProdType.TERMINAL:
                 return buildTerminalProd(prodRange)
-            default:
-            { throw Error("None exhaustive match") }
+            default: throw Error("non exhaustive match")
         }
     }
 

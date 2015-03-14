@@ -99,10 +99,25 @@ module.exports = function(grunt) {
                     // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
                     var fixed2PartsModules = src.replace(
                         /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{\}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
+
                     var fixedAllModulesPattern = fixed2PartsModules.replace(
                         /(\(chevrotain \|\| \(chevrotain = \{\}\)\);)/g, "/* istanbul ignore next */ $1")
-                    var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];", "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
-                    return fixedTypeScriptExtends
+
+                    var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];",
+                        "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
+
+                    // TODO: try to remove this with typescript 1.5+. this replace is done in the grunt file due to bug in tsc 1.4.1
+                    // TODO: that in certain situations removes the comments.
+                    // very little point in testing this, this is a pattern matching functionality missing in typescript/javascript
+                    // if the code reaches that point it will go "boom" which is the purpose, the going boom part is not part
+                    // of the contract, it just makes sure we fail fast if we supply invalid arguments.
+                    var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(default\s*:\s*throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
+                        "/* istanbul ignore next */ $1")
+
+                    fixedNoneExhaustive = fixedNoneExhaustive.replace(/(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
+                        "/* istanbul ignore next */ $1")
+
+                    return fixedNoneExhaustive
                 }
             },
             release: {

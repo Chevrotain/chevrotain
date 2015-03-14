@@ -35,7 +35,6 @@ module chevrotain.parse.grammar.rest {
                 else if (subProd instanceof g.OR) {
                     this.walkOr(<g.OR>subProd, currRest, prevRest)
                 }
-
                 else {throw Error("non exhaustive match") }
             })
         }

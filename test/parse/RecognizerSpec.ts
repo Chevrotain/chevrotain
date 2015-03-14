@@ -70,20 +70,31 @@ module chevrotain.parse.infra.recognizer.spec {
             // see: http://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
         })
 
-        it("invoking an OPTION will return true/false depending if it succeded or not", function () {
+        it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
             var parser = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
 
-            var successfulOption = parser.OPTION(function() { return this.NEXT_TOKEN() instanceof IntToken }, () => {
+            var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
                 parser.CONSUME(IntToken)
             })
             expect(successfulOption).toBe(true)
 
-            var failedOption = parser.OPTION(function() {
+            var failedOption = parser.OPTION(function () {
                 // this lookahead should fail because the first token has been consumed and
                 // now the next one is a PlusTok
                 return this.NEXT_TOKEN() instanceof IntToken
             }, () => { parser.CONSUME(IntToken) })
             expect(failedOption).toBe(false)
+        })
+
+        it("will return false if a RecognitionException is thrown during " +
+        "backtracking and rethrow any other kind of Exception", function () {
+            var parser = new recog.BaseRecognizer([])
+            var backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
+            expect(() => backTrackingThrows()).toThrow(Error("division by zero, boom"))
+
+            var throwExceptionFunc = () => { throw new recog.NotAllInputParsedException("sad sad panda", new PlusTok(1, 1)) }
+            var backTrackingFalse = parser.BACKTRACK(() => { throwExceptionFunc() }, () => { return true })
+            expect(backTrackingFalse()).toBe(false)
         })
     })
 

@@ -278,7 +278,13 @@ module chevrotain.parse.infra.recognizer {
 
     InRuleRecoveryException.prototype = Error.prototype
 
-    export interface IFollowSet {}
+    function getFromNestedHashTable(classInstance:any, hashTable:lang.Hashtable<any>) {
+        var className = lang.classNameFromInstance(classInstance)
+        if (!hashTable.containsKey(className)) {
+            hashTable.put(className, new lang.Hashtable<any>())
+        }
+        return hashTable.get(className)
+    }
 
     // 1. check follow set name
     // 2. check RULE name
@@ -292,21 +298,13 @@ module chevrotain.parse.infra.recognizer {
         private static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.Hashtable<lang.Hashtable<gast.TOP_LEVEL>>()
 
         static getProductionsForClass(classInstance:any):lang.Hashtable<gast.TOP_LEVEL> {
-            var className = lang.classNameFromInstance(classInstance)
-            if (!BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.containsKey(className)) {
-                BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.put(className, new lang.Hashtable<gast.TOP_LEVEL>())
-            }
-            return BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS.get(className)
+            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS)
         }
 
         private static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.Hashtable<lang.Hashtable<Function[]>>()
 
         static getResyncFollowsForClass(classInstance:any):lang.Hashtable<Function[]> {
-            var className = lang.classNameFromInstance(classInstance)
-            if (!BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.containsKey(className)) {
-                BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, new lang.Hashtable<Function[]>())
-            }
-            return BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.get(className)
+            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS)
         }
 
         static setResyncFollowsForClass(classInstance:any, followSet:lang.Hashtable<Function[]>):void {
