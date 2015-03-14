@@ -17,11 +17,11 @@ module chevrotain.parse.grammar.follow {
     // This ResyncFollowsWalker computes all of the follows required for RESYNC
     // (skipping reference production).
     export class ResyncFollowsWalker extends r.RestWalker {
-        public follows = new lang.Hashtable<Function[]>()
+        public follows = new lang.HashTable<Function[]>()
 
         constructor(private topProd:g.TOP_LEVEL) { super() }
 
-        startWalking():lang.Hashtable<Function[]> {
+        startWalking():lang.HashTable<Function[]> {
             this.walk(this.topProd)
             return this.follows
         }
@@ -42,8 +42,8 @@ module chevrotain.parse.grammar.follow {
         }
     }
 
-    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):lang.Hashtable<Function[]> {
-        var reSyncFollows = new lang.Hashtable<Function[]>()
+    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):lang.HashTable<Function[]> {
+        var reSyncFollows = new lang.HashTable<Function[]>()
 
         _.forEach(topProductions, (topProd) => {
             var currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()

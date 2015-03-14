@@ -100,7 +100,7 @@ module chevrotain.parse.gast.builder {
         var reResult = refRegEx.exec(prodRange.text)
         var refProdName = reResult[1]
         var refOccurrence = parseInt(reResult[2], 10)
-        return new gast.ProdRef(refProdName, null, refOccurrence)
+        return new gast.ProdRef(refProdName, undefined, refOccurrence)
     }
 
     function buildTerminalProd(prodRange:IProdRange):gast.Terminal {
@@ -295,7 +295,7 @@ module chevrotain.parse.gast.builder {
 
     export class GastRefResolverVisitor extends gast.GAstVisitor {
 
-        constructor(private nameToProd:lang.Hashtable<gast.TOP_LEVEL>) { super() }
+        constructor(private nameToProd:lang.HashTable<gast.TOP_LEVEL>) { super() }
 
         public resolveRefs():void {
             _.forEach(this.nameToProd.values(), (prod) => {

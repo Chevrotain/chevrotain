@@ -278,10 +278,10 @@ module chevrotain.parse.infra.recognizer {
 
     InRuleRecoveryException.prototype = Error.prototype
 
-    function getFromNestedHashTable(classInstance:any, hashTable:lang.Hashtable<any>) {
+    function getFromNestedHashTable(classInstance:any, hashTable:lang.HashTable<any>) {
         var className = lang.classNameFromInstance(classInstance)
         if (!hashTable.containsKey(className)) {
-            hashTable.put(className, new lang.Hashtable<any>())
+            hashTable.put(className, new lang.HashTable<any>())
         }
         return hashTable.get(className)
     }
@@ -291,23 +291,23 @@ module chevrotain.parse.infra.recognizer {
     // 2. CHECK FOLLOW_SET have everything it should and nothing it should not
     export class BaseErrorRecoveryRecognizer extends BaseRecognizer {
 
-        private static CLASS_TO_SELF_ANALYSIS_DONE = new lang.Hashtable<boolean>()
+        private static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
 
         // todo: once IDEA supports TypeScript 1.4 use typeAliases to do something like:
-        // new Hashtable<ClassName, IHashtable<RuleName, gast.TOP_LEVEL>>()
-        private static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.Hashtable<lang.Hashtable<gast.TOP_LEVEL>>()
+        // new HashTable<ClassName, IHashtable<RuleName, gast.TOP_LEVEL>>()
+        private static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
 
-        static getProductionsForClass(classInstance:any):lang.Hashtable<gast.TOP_LEVEL> {
+        static getProductionsForClass(classInstance:any):lang.HashTable<gast.TOP_LEVEL> {
             return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS)
         }
 
-        private static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.Hashtable<lang.Hashtable<Function[]>>()
+        private static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.HashTable<lang.HashTable<Function[]>>()
 
-        static getResyncFollowsForClass(classInstance:any):lang.Hashtable<Function[]> {
+        static getResyncFollowsForClass(classInstance:any):lang.HashTable<Function[]> {
             return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS)
         }
 
-        static setResyncFollowsForClass(classInstance:any, followSet:lang.Hashtable<Function[]>):void {
+        static setResyncFollowsForClass(classInstance:any, followSet:lang.HashTable<Function[]>):void {
             var className = lang.classNameFromInstance(classInstance)
             BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
         }
@@ -566,7 +566,7 @@ module chevrotain.parse.infra.recognizer {
             return follows
         }
 
-        getGAstProductions():lang.Hashtable<gast.TOP_LEVEL> {
+        getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
             return BaseErrorRecoveryRecognizer.getProductionsForClass(this)
         }
 

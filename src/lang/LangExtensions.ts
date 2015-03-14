@@ -34,7 +34,7 @@ module chevrotain.lang.extensions {
      * simple Hashtable between a string and some generic value
      * this should be removed once typescript supports ES6 style Hashtable
      */
-    export class Hashtable<V> {
+    export class HashTable<V> {
 
         private _state = {}
 
@@ -50,7 +50,7 @@ module chevrotain.lang.extensions {
             this._state[key] = value
         }
 
-        putAll(other:Hashtable<V>):void {
+        putAll(other:HashTable<V>):void {
             this._state = _.assign(this._state, other._state)
         }
 

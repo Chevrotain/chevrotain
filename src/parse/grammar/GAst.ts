@@ -22,7 +22,7 @@ module chevrotain.parse.grammar.gast {
 
     export class ProdRef extends AbstractProduction {
         constructor(public refProdName:string,
-                    public ref:TOP_LEVEL = null,
+                    public ref:TOP_LEVEL = undefined,
                     public occurrenceInParent:number = 1) { super([]) }
 
         set definition(definition:IProduction[]) {
@@ -30,7 +30,7 @@ module chevrotain.parse.grammar.gast {
         }
 
         get definition():IProduction[] {
-            if (this.ref != null) {
+            if (this.ref !== undefined) {
                 return this.ref.definition
             }
             return []
@@ -142,6 +142,7 @@ module chevrotain.parse.grammar.gast {
             }
         }
 
+        /* istanbul ignore next */ // this is an "Abstract" method that does nothing, testing it is pointless.
         public  visitProdRef(node:ProdRef):void {
 
         }

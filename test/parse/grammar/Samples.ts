@@ -78,15 +78,15 @@ module test.parser.grammar.samples {
 
     export var assignedTypeSpec = new gast.TOP_LEVEL("assignedTypeSpec", [
         new gast.Terminal(ColonTok),
-        new gast.ProdRef("assignedType", null),
+        new gast.ProdRef("assignedType"),
 
         new gast.OPTION([
-            new gast.ProdRef("enumClause", null)
+            new gast.ProdRef("enumClause")
         ]),
 
         new gast.OPTION([
             new gast.Terminal(DefaultTok),
-            new gast.ProdRef("expression", null)
+            new gast.ProdRef("expression")
         ])
     ])
 

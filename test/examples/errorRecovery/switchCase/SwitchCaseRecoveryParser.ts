@@ -100,7 +100,9 @@ module chevrotain.examples.recovery.switchcase {
             this.CONSUME1(ColonTok)
             this.CONSUME1(ReturnTok)
             valueTok = this.CONSUME1(IntTok)
-            this.CONSUME1(SemiColonTok)
+            this.OPTION(isSemiColon, () => {
+                this.CONSUME1(SemiColonTok)
+            })
 
             key = keyTok.image
             value = parseInt(valueTok.image, 10)
@@ -120,11 +122,14 @@ module chevrotain.examples.recovery.switchcase {
                 return retObj
             }
         }
-
     }
 
     function isCaseStmt() {
         return this.NEXT_TOKEN() instanceof CaseTok
+    }
+
+    function isSemiColon() {
+        return this.NEXT_TOKEN() instanceof SemiColonTok
     }
 
 }
