@@ -325,6 +325,24 @@ module chevrotain.parse.grammar.interpreter.spec {
             matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok, t.LSquareTok])
         })
 
+        it("will fail if we try to compute the next token for an INVALID PATH", function () {
+            var walker = new NextPossibleTokensWalker(samples.ParamSpec, path.NO_PATH_FOUND())
+            expect(() => walker.startWalking()).toThrow(Error("Can't walk an INVALID path!"))
+        })
+
+        it("will fail if we try to compute the next token starting from a rule that does not match the path", function () {
+            var caPath:p.IGrammarPath = {
+                ruleStack:         ["I_WILL_FAIL_THE_WALKER",
+                    "qualifiedName"
+                ],
+                occurrenceStack:   [1, 1],
+                lastTok:           t.IdentTok,
+                lastTokOccurrence: 2
+            }
+
+            var walker = new NextPossibleTokensWalker(samples.ParamSpec, caPath)
+            expect(() => walker.startWalking()).toThrow(Error("The path does not start with the walker's top Rule!"))
+        })
     })
 
 }
