@@ -17,9 +17,6 @@ module chevrotain.parse.grammar.rest {
                 else if (subProd instanceof g.Terminal) {
                     this.walkTerminal(<g.Terminal>subProd, currRest, prevRest)
                 }
-                else if (subProd instanceof g.TOP_LEVEL) {
-                    this.walkTopLevel(<g.TOP_LEVEL>subProd, currRest, prevRest)
-                }
                 else if (subProd instanceof g.FLAT) {
                     this.walkFlat(<g.FLAT>subProd, currRest, prevRest)
                 }
@@ -41,20 +38,16 @@ module chevrotain.parse.grammar.rest {
 
         // override this either with an empty impel to ignore terminals
         // or implement relevant logic to compute "things" once a terminal has been found
+        /* istanbul ignore next */
         walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             throw Error("unimplemented Abstract Error")
         }
 
         // override this either with an empty impel to ignore references to other productions
         // or implement an expansion of other production references
+        /* istanbul ignore next */
         walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             throw Error("unimplemented Abstract Error")
-        }
-
-        walkTopLevel(topProd:g.TOP_LEVEL, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            // top level is just a special case of a flat production...
-            var fullOrRest = currRest.concat(prevRest)
-            this.walk(topProd, fullOrRest)
         }
 
         walkFlat(flatProd:g.FLAT, currRest:g.IProduction[], prevRest:g.IProduction[]):void {

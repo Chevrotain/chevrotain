@@ -67,7 +67,7 @@ module chevrotain.parse.grammar.interpreter {
                 var fullRest = currRest.concat(prevRest)
                 var restProd = new g.FLAT(fullRest)
                 // yey we know what comes after the path and can now compute it's FIRST
-                this.possibleTokTypes = f.first(restProd, true)
+                this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
         }
