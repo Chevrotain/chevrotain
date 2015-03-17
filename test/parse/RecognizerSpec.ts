@@ -24,7 +24,7 @@ module chevrotain.parse.infra.recognizer.spec {
 
     describe("The BaseErrorRecoveryRecognizer", function () {
 
-        it("it can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
+        it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
             var parser = new recog.BaseErrorRecoveryRecognizer([], <any>chevrotain.parse.grammar.gast.builder.spec);
             parser.reset()
             var testInput = [new IntToken(1, 1, "1"), new PlusTok(1, 1),
@@ -41,17 +41,38 @@ module chevrotain.parse.infra.recognizer.spec {
             expect(parser.CONSUME1(IntToken)).toBe(testInput[4])
             expect(parser.NEXT_TOKEN()).toEqual(jasmine.any(recog.EOF))
         })
+
+        it("does not allow duplicate grammar rule names", function () {
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined);
+            parser.validateRuleName("bamba") // first time with a valid name.
+            expect(() => parser.validateRuleName("bamba")).toThrow(
+                Error("Duplicate definition, rule: bamba is already defined in the grammar: BaseErrorRecoveryRecognizer"))
+        })
+
+        it("only allows a subset of ECMAScript identifiers as rulenames", function () {
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined);
+            expect(() => parser.validateRuleName("1baa")).toThrow()
+            expect(() => parser.validateRuleName("שלום")).toThrow()
+            expect(() => parser.validateRuleName("$bamba")).toThrow()
+        })
+
+
+        it("will not perform inRepetition recovery while in backtracking mode", function () {
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined)
+            parser.isBackTrackingStack.push(1)
+            expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
+        })
     })
 
     describe("The BaseRecognizer", function () {
 
-        it("it can be initialized without supplying an input vector", function () {
+        it("can be initialized without supplying an input vector", function () {
             var parser = new recog.BaseRecognizer()
             expect(parser.input).toBeDefined()
             expect(parser.input).toEqual(jasmine.any(Array))
         })
 
-        it("it can only SAVE_ERROR for recognition exceptions", function () {
+        it("can only SAVE_ERROR for recognition exceptions", function () {
             var parser = new recog.BaseRecognizer()
             expect(() => parser.SAVE_ERROR(new Error("I am some random Error"))).
                 toThrow(Error("trying to save an Error which is not a RecognitionException"))

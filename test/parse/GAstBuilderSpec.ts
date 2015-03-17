@@ -11,6 +11,7 @@ module chevrotain.parse.grammar.gast.builder.spec {
     import b = chevrotain.parse.gast.builder
     import tok = test.parser.grammar.samples
     import matchers = test.matchers
+    import lang = chevrotain.lang.extensions
 
     describe("The GAst Builder module", function () {
         "use strict"
@@ -188,6 +189,11 @@ module chevrotain.parse.grammar.gast.builder.spec {
             expect(actual).toBe("\nhello world")
         })
 
+        it("can detect missing closing parenthesis in a string", function () {
+            var input = " ((()))" // the input is assumed to start right after an opening parenthesis
+            expect(() => b.findClosingOffset("(", ")", 0, input)).toThrow(new Error("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS"))
+        })
+
         it("can find the direct 'childs' of another Production from an IProd representation", function () {
             var allProdRanges:b.IProdRange[] = [
                 {range: new r.Range(1, 10), text: "1.1", type: b.ProdType.TERMINAL},
@@ -221,19 +227,30 @@ module chevrotain.parse.grammar.gast.builder.spec {
             b.terminalNameToConstructor = <any>tok
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.CONSUME2(tok.IdentTok)",
-                type: b.ProdType.TERMINAL
+                text:  "this.CONSUME2(tok.IdentTok)",
+                type:  b.ProdType.TERMINAL
             }, [])
             expect(actual).toEqual(jasmine.any(gast.Terminal))
             expect((<gast.Terminal>actual).occurrenceInParent).toBe(2)
             expect((<gast.Terminal>actual).terminalType).toBe(tok.IdentTok)
         })
 
+        it("will fail building a terminal if it cannot find it's constructor", function () {
+            b.terminalNameToConstructor = {}
+            var buildMissingTerminal = () => b.buildProdGast({
+                range: new r.Range(1, 2),
+                text:  "this.CONSUME2(tok.IdentTok)",
+                type:  b.ProdType.TERMINAL
+            }, [])
+
+            expect(buildMissingTerminal).toThrow(Error("Terminal Token name: " + "IdentTok" + " not found"))
+        })
+
         it("can build a Ref Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.SUBRULE(this.bamba(1))",
-                type: b.ProdType.REF
+                text:  "this.SUBRULE(this.bamba(1))",
+                type:  b.ProdType.REF
             }, [])
             expect(actual).toEqual(jasmine.any(gast.ProdRef))
             expect((<gast.ProdRef>actual).occurrenceInParent).toBe(1)
@@ -255,8 +272,8 @@ module chevrotain.parse.grammar.gast.builder.spec {
         it("can build an AT_LEAST_ONE Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.AT_LEAST_ONE(...)",
-                type: b.ProdType.AT_LEAST_ONE
+                text:  "this.AT_LEAST_ONE(...)",
+                type:  b.ProdType.AT_LEAST_ONE
             }, [])
             expect(actual).toEqual(jasmine.any(gast.AT_LEAST_ONE))
             expect((<gast.AT_LEAST_ONE>actual).definition.length).toBe(0)
@@ -265,8 +282,8 @@ module chevrotain.parse.grammar.gast.builder.spec {
         it("can build an OPTION Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.OPTION(...)",
-                type: b.ProdType.OPTION
+                text:  "this.OPTION(...)",
+                type:  b.ProdType.OPTION
             }, [])
             expect(actual).toEqual(jasmine.any(gast.OPTION))
             expect((<gast.OPTION>actual).definition.length).toBe(0)
@@ -388,7 +405,19 @@ module chevrotain.parse.grammar.gast.builder.spec {
             })
             expect(allOrRanges.length).toBe(2)
         })
+    })
 
+
+    describe("The RefResolverVisitor", function () {
+
+        it("will fail when trying to resolve a ref to a grammar rule that does not exist", function () {
+            var ref = new gast.ProdRef("missingRule")
+            var topLevel = new gast.TOP_LEVEL("TOP", [ref])
+            var topLevelRules = new lang.HashTable<gast.TOP_LEVEL>()
+            topLevelRules.put("TOP", topLevel)
+            var resolver = new b.GastRefResolverVisitor(topLevelRules);
+            expect(() => resolver.resolveRefs()).toThrow(Error("Invalid grammar, reference to rule which is not defined --> missingRule"))
+        })
     })
 
 }

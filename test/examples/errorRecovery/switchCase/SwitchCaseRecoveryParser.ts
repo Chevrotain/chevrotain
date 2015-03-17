@@ -61,8 +61,23 @@ module chevrotain.examples.recovery.switchcase {
         }
 
         public switchStmt = this.RULE("switchStmt", this.parseSwitchStmt, () => { return {} })
-        private caseStmt = this.RULE("caseStmt", this.parseCaseStmt, this.INVALID())
+        public caseStmt = this.RULE("caseStmt", this.parseCaseStmt, this.INVALID())
 
+
+        // DOCS: in this example we avoid automatic missing token insertion for tokens that have additional semantic meaning.
+        //       to understand this first consider the positive case, which tokens can we safely insert?
+        //       a missing colon / semicolon ? yes a missing parenthesis ? yes
+        //       but what about a missing StringToken? if we insert one, what will be its string value?
+        //       an empty string? in the grammar this could lead to an empty key in the created object...
+        //       what about a string with some random value? this could still lead to duplicate keys in the returned parse result
+        private tokTypesThatCannotBeInsertedInRecovery = [IdentTok, StringTok, IntTok]
+
+
+        // DOCS: overriding this method allows us to customize the logic for which tokens may not be automaticaly inserted
+        // during error recovery.
+        public canTokenTypeBeInsertedInRecovery(tokType:Function) {
+            return !_.contains(this.tokTypesThatCannotBeInsertedInRecovery, tokType)
+        }
 
         public parseSwitchStmt():RetType {
             // house keeping so the invalid property names will not be dependent on
