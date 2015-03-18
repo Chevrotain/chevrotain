@@ -56,8 +56,13 @@ module chevrotain.parse.infra.recognizer.spec {
             expect(() => parser.validateRuleName("$bamba")).toThrow()
         })
 
-
         it("will not perform inRepetition recovery while in backtracking mode", function () {
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined)
+            parser.isBackTrackingStack.push(1)
+            expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
+        })
+
+        it("will rethrow and expose none InRuleRecoveryException while performing in rule recovery", function () {
             var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined)
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)

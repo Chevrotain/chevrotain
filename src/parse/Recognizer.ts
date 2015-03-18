@@ -376,19 +376,19 @@ module chevrotain.parse.infra.recognizer {
         }
 
         CONSUME1(tokType:Function):tok.Token {
-            return this.consume_internal(tokType, 1)
+            return this.consumeInternal(tokType, 1)
         }
 
         CONSUME2(tokType:Function):tok.Token {
-            return this.consume_internal(tokType, 2)
+            return this.consumeInternal(tokType, 2)
         }
 
         CONSUME3(tokType:Function):tok.Token {
-            return this.consume_internal(tokType, 3)
+            return this.consumeInternal(tokType, 3)
         }
 
         CONSUME4(tokType:Function):tok.Token {
-            return this.consume_internal(tokType, 4)
+            return this.consumeInternal(tokType, 4)
         }
 
         /**
@@ -522,7 +522,7 @@ module chevrotain.parse.infra.recognizer {
          *
          * @returns the consumed Token
          */
-        public consume_internal(tokType:Function, idx:number):tok.Token {
+        public consumeInternal(tokType:Function, idx:number):tok.Token {
             try {
                 return super.CONSUME(tokType)
             } catch (eFromConsumption) {
@@ -533,10 +533,18 @@ module chevrotain.parse.infra.recognizer {
                     try {
                         return this.tryInRuleRecovery(tokType, follows)
                     } catch (eFromInRuleRecovery) {
+                        /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
+                        // it is only needed for the else branch but in tsc 1.4.1 comments
+                        // between if and else seem to get swallowed and disappear.
                         if (eFromConsumption instanceof InRuleRecoveryException) {
                             // throw the original error in order to trigger reSync error recovery
                             throw eFromConsumption
                         }
+                        // this is not part of the contract, just a workaround javascript weak error handling
+                        // for a test to reach this code one would have to extend the BaseErrorRecoveryParser
+                        // and override some of the recovery code to be faulty (example: throw undefined is not a function error)
+                        // this is not a useful use case that needs to be tested...
+                        /* istanbul ignore next */
                         else {
                             // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
                             throw eFromInRuleRecovery
@@ -731,7 +739,7 @@ module chevrotain.parse.infra.recognizer {
                     // reSync with EOF and just output some INVALID ParseTree
                     // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
                     // path is really the most valid one
-                    var reSyncEnabled = (isFirstInvokedRule || doReSync) && _.isEmpty(this.isBackTrackingStack)
+                    var reSyncEnabled = (isFirstInvokedRule || doReSync) && !this.isBackTracking()
 
                     if (reSyncEnabled && isRecognitionException(e)) {
                         var reSyncTokType = this.findReSyncTokenType()

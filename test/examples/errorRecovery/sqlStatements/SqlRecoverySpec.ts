@@ -112,6 +112,40 @@ module chevrotain.examples.recovery.sql.spec {
             expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
         })
 
+        it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", function () {
+            // (32, "SHAHAR" ( <-- wrong parenthesis
+            var badShahar32Record = [
+                new LParenTok(1, 1), new IntTok(1, 9, "32"), new CommaTok(1, 1), new StringTok(1, 1, "\"SHAHAR\""), new LParenTok(1, 1)]
+
+            var input:any = _.flatten([
+                // CREATE TABLE schema2.Persons
+                new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+                // issues:
+                // 1. FromTok instead of IntoTok so this rule also includes a bug
+                // 2. using the bad/invalid record Token.
+                new InsertTok(1, 1), badShahar32Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+                // DELETE (31, "SHAHAR") FROM schema2.Persons
+                new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            ])
+
+            var parser = new DDLExampleRecoveryParser(input)
+            var ptResult = parser.ddl(1, true)
+            // one error encountered
+            expect(parser.errors.length).toBe(1)
+            // yet the whole input has been parsed
+            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
+            // 3 statements found
+            expect(ptResult.children.length).toBe(3)
+            expect(ptResult.children[0].payload).toEqual(jasmine.any(CREATE_STMT))
+            expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_CREATE_STMT))
+            // but the second one is marked as invalid, this means we kept trying to re-sync to an "higher" rule
+            expect(ptResult.children[1].payload).toEqual(jasmine.any(INVALID_INSERT_STMT))
+            // yet the third one is still valid!, we recovered and continued parsing.
+            expect(ptResult.children[2].payload).toEqual(jasmine.any(DELETE_STMT))
+            expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
+        })
+
         function assertAllThreeStatementsPresentAndValid(ptResult:pt.ParseTree):void {
             expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
             // 3 statements found

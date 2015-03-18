@@ -134,8 +134,32 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parseResult = parser.switchStmt(1, true)
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
-
             expect(parseResult).toEqual({})
+        })
+
+        it("can perform single token deletion recovery", function () {
+            var input = [
+                // switch (name) {
+                new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok(1, 1, "name"), new RParenTok(1, 1), new LCurlyTok(1, 1),
+                // case "Terry" : return 2;
+                new CaseTok(1, 1), new StringTok(1, 1, "Terry"), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "2"), new SemiColonTok(1, 1),
+                // case "Robert" : return 4;
+                new CaseTok(1, 1), new StringTok(1, 1, "Robert"), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "4"), new SemiColonTok(1, 1),
+                // case "Brandon" : return 6;
+                new CaseTok(1, 1), new StringTok(1, 1, "Brandon"), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "6"), new SemiColonTok(1, 1),
+                new SemiColonTok(1, 1), // <-- the redundant token to be deleted
+                new RCurlyTok(1, 1)
+            ]
+
+            var parser = new SwitchCaseRecoveryParser(input)
+            var parseResult = parser.switchStmt(1, true)
+            expect(parser.errors.length).toBe(1)
+            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parseResult).toEqual({
+                "Terry":   2,
+                "Robert":  4,
+                "Brandon": 6
+            })
         })
 
         it("will perform single token insertion for a missing colon", function () {
