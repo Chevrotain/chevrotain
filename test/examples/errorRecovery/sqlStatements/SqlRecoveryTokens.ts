@@ -46,7 +46,6 @@ module chevrotain.examples.recovery.sql {
         constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ")") }
     }
 
-
     export class CommaTok extends tok.Token {
         constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ",") }
     }

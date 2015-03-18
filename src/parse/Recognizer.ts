@@ -329,11 +329,16 @@ module chevrotain.parse.infra.recognizer {
         public RULE_STACK:string[] = []
         public RULE_OCCURRENCE_STACK:number[] = []
         public FOLLOW_STACK:Function[][] = []
+        public tokensMap:gastBuilder.ITerminalNameToConstructor = undefined
 
-        constructor(input:tok.Token[], public tokensMap:gastBuilder.ITerminalNameToConstructor) {
+        constructor(input:tok.Token[], tokensMap:gastBuilder.ITerminalNameToConstructor) {
             super(input)
+            this.tokensMap = _.clone(tokensMap)
+            // always add EOF to the tokenNames -> constructors map. it is usefull to assure all the input has been
+            // parsed with a clear error message ("expecting EOF but found ...")
+            this.tokensMap[lang.functionName(EOF)] = EOF
+            // TODO: test that EOF does not already exist in the map?
         }
-
 
         reset():void {
             super.reset()

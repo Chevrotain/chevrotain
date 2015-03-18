@@ -44,6 +44,44 @@ module chevrotain.parse.infra.recognizer.spec {
 
     }
 
+
+    class ManyRepetitionRecovery extends BaseErrorRecoveryRecognizer {
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.parse.infra.recognizer.spec)
+            // the invalid part is that we forgot to call the self analysis
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
+
+        private parseQualifiedName():string[] {
+            var idents = []
+
+            idents.push(this.CONSUME1(IdentTok).image)
+            this.MANY(isQualifiedNamePart, () => {
+                this.CONSUME1(DotTok)
+                idents.push(this.CONSUME2(IdentTok).image)
+            }, EOF, 1)
+
+            this.CONSUME1(recog.EOF)
+
+            return idents
+        }
+
+    }
+
+    export class IdentTok extends tok.Token {}
+
+    export class DotTok extends tok.Token {
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ".") }
+    }
+
+    function isQualifiedNamePart():boolean {
+        return this.NEXT_TOKEN() instanceof  DotTok
+    }
+
+
     describe("The BaseErrorRecoveryRecognizer", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
@@ -65,35 +103,44 @@ module chevrotain.parse.infra.recognizer.spec {
         })
 
         it("does not allow duplicate grammar rule names", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined);
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {});
             parser.validateRuleName("bamba") // first time with a valid name.
             expect(() => parser.validateRuleName("bamba")).toThrow(
                 Error("Duplicate definition, rule: bamba is already defined in the grammar: BaseErrorRecoveryRecognizer"))
         })
 
         it("only allows a subset of ECMAScript identifiers as rulenames", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined);
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {});
             expect(() => parser.validateRuleName("1baa")).toThrow()
             expect(() => parser.validateRuleName("שלום")).toThrow()
             expect(() => parser.validateRuleName("$bamba")).toThrow()
         })
 
         it("will not perform inRepetition recovery while in backtracking mode", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined)
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {})
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
         })
 
         it("will rethrow and expose none InRuleRecoveryException while performing in rule recovery", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined)
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {})
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
         })
 
-        it("will throw an exception if we try to use it without performing self analysis in the constructor ", function () {
+        it("will throw an exception if we try to use it without performing self analysis in the constructor", function () {
             var parser = new InvalidErrorRecoveryRecog([])
             expect(() => parser.someRule(1, true)).toThrow(Error("missing re-sync follows information, possible cause: " +
             "did not call performSelfAnalysis(this) in the constructor implementation."))
+        })
+
+        it("can perform in-repetition recovery for MANY grammar rule", function () {
+            // a.b+.c
+            var input = [new IdentTok(1, 1, "a"), new DotTok(1, 1), new IdentTok(1, 1, "b"),
+                new PlusTok(1, 1), new DotTok(1, 1), new IdentTok(1, 1, "c")]
+            var parser = new ManyRepetitionRecovery(input)
+            expect(parser.qualifiedName(1, true)).toEqual(["a", "b", "c"])
+            expect(parser.errors.length).toBe(1)
         })
     })
 
