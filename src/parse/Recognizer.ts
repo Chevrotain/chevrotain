@@ -223,21 +223,18 @@ module chevrotain.parse.infra.recognizer {
         }
 
         OR<T>(cases:IOrCase<T>[], errMsgTypes:string):IOrRetType<T> {
-            var oneValidCaseFound = false
             for (var i = 0; i < cases.length; i++) {
                 if (cases[i].WHEN.call(this)) {
-                    oneValidCaseFound = true
                     var res = cases[i].THEN_DO()
                     // TODO: why return the complex object?
                     return {tree: res, matched: true}
                 }
             }
 
-            if (!oneValidCaseFound) {
-                var foundToken = this.NEXT_TOKEN().image
-                throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-                " but found '" + foundToken + "'", this.NEXT_TOKEN()))
-            }
+            // reaching here means no valid case was found
+            var foundToken = this.NEXT_TOKEN().image
+            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
+            " but found '" + foundToken + "'", this.NEXT_TOKEN()))
         }
 
         MANY(lookAheadFunc:() => boolean, consume:() => void):void {

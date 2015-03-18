@@ -8,26 +8,48 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
 
         karma: {
-            options:   {
+            options:          {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
                 browsers:   ['Chrome']
             },
-            dev_build: {},
-            coverage_release:  {
-                options: {
+            dev_build:        {},
+            coverage_release: {
+                options:          {
                     files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js']
                 },
-                browsers:      ['Chrome'],
-                preprocessors: {'release/chevrotain.js': ['coverage']},
-                reporters:     ['progress', 'coverage']
+                browsers:         ['Chrome'],
+                preprocessors:    {'release/chevrotain.js': ['coverage']},
+                reporters:        ['progress', 'coverage'],
+                coverageReporter: {
+                    reporters: [
+                        {type: 'html', dir: 'coverage/'},
+                        {type: 'json', dir: 'coverage/'}
+                    ]
+                }
             },
 
             // TODO: modify the files loaded to the aggregated output of the release compiler
-            release:   {
+            release:          {
                 options: {
-                    files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js'],
-                    browsers:   ['Chrome', 'Firefox', 'IE']
+                    files:    ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js'],
+                    browsers: ['Chrome', 'Firefox', 'IE']
+                }
+            }
+        },
+
+        coverage: {
+            fullCoverage: {
+                options: {
+                    thresholds: {
+                        'statements': 100,
+                        //'branches':   100, TODO: try re-enable branches coverage 100% in tsc 1.5, there is an issue with ignore comments
+                        // being swallowed by tsc 1.4.1 between if/else blocks which makes it harder manually ignore.
+                        'lines':      100,
+                        'functions':  100
+                    },
+                    dir:        'coverage',
+                    root:       ''
                 }
             }
         },
@@ -88,7 +110,7 @@ module.exports = function(grunt) {
 
         clean:  {
             dev_build: ["gen"],
-            release:   ["release"]
+            release:   ["release", "coverage"]
         },
         concat: {
             options: {
@@ -135,8 +157,22 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-umd')
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
+    grunt.loadNpmTasks('grunt-istanbul-coverage');
 
-    grunt.registerTask('release', ['clean:release', 'ts:release', 'tslint', 'umd:release', 'concat:release', 'karma:coverage_release'])
-    grunt.registerTask('dev_build', ['clean:dev_build', 'ts:dev_build', 'tslint', 'karma:dev_build'])
+
+    grunt.registerTask('release', [
+        'clean:release',
+        'ts:release',
+        'tslint',
+        'umd:release',
+        'concat:release',
+        'karma:coverage_release',
+        "coverage:fullCoverage"])
+
+    grunt.registerTask('dev_build', [
+        'clean:dev_build',
+        'ts:dev_build',
+        'tslint',
+        'karma:dev_build'])
 
 }
