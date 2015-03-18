@@ -70,7 +70,10 @@ module chevrotain.examples.recovery.sql {
                         // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
                         stmts.push(this.SUBRULE(this.deleteStmt(1)))}},
                 // @formatter:on
-                ])
+                    // DOCS: in this case we specify we expect EndOfFile after all the statements have been matched
+                    // this means that if once we are ready to exit the MANY_OR EOF is not the next token, in-repetition
+                    // will be attempted
+                ], recog.EOF, 1)
             return PT(new STATEMENTS(), stmts)
         }
 
@@ -169,14 +172,6 @@ module chevrotain.examples.recovery.sql {
                     // @formatter:on
             return PT(value)
         }
-    }
-
-    // LOOK-AHEAD functions
-    function isStatement():boolean {
-        // DOCS: the look-ahead functions are invoked with the parser instance as the "this" context
-        // when calling them ourselves and not via the DSL, we must pass on the correct context, hence the usage
-        // of ".call(this)"
-        return isCreate.call(this) || isInsert.call(this) || isDelete.call(this)
     }
 
     function isCreate():boolean {

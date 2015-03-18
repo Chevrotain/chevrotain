@@ -445,7 +445,7 @@ module chevrotain.parse.infra.recognizer {
                             return singleCase.WHEN
                         })
                         return _.find(allLookAheadFuncs, (singleLookAheadFunc) => {
-                                return singleLookAheadFunc()
+                                return singleLookAheadFunc.call(this)
                             }) !== undefined
                     },
                     expectTokAfterLastMatch)

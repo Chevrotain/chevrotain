@@ -196,6 +196,24 @@ module chevrotain.examples.recovery.sql.spec {
             expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
         })
 
+        it("can re-sync to the next iteration in a MANY_OR rule", function () {
+            var input:any = _.flatten([
+                // CREATE TABLE schema2.Persons
+                new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+                // INSERT (32, "SHAHAR") INTO schema2.Persons TABLE <-- the redundant 'TABLE' should trigger in repetition recovery
+                new InsertTok(1, 1), shahar32Record, new IntoTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1),
+
+                // DELETE (31, "SHAHAR") FROM schema2.Persons
+                new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            ])
+
+            var parser = new DDLExampleRecoveryParser(input)
+            var ptResult = parser.ddl(1, true)
+            expect(parser.errors.length).toBe(1)
+            expect(parser.isAtEndOfInput()).toBe(true)
+            assertAllThreeStatementsPresentAndValid(ptResult)
+        })
+
     })
 
 }
