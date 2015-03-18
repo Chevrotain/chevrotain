@@ -720,10 +720,8 @@ module chevrotain.parse.infra.recognizer {
                     // multiple structures on each rule invocations to find it...
                     var followSet = BaseErrorRecoveryRecognizer.getResyncFollowsForClass(this).get(followName)
                     if (!followSet) {
-                        // always insert an empty set if we have no other information
-                        // this will maintain the valid structure of the FOLLOW_STACK and at worse will cause
-                        // reSync at top most rule for EOF token
-                        followSet = []
+                       throw new Error("missing re-sync follows information, possible cause: " +
+                       "did not call performSelfAnalysis(this) in the constructor implementation.")
                     }
                     this.FOLLOW_STACK.push(followSet)
                 }

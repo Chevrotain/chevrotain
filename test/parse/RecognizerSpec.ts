@@ -22,6 +22,28 @@ module chevrotain.parse.infra.recognizer.spec {
         constructor(startLine:number, startColumn:number, image:string) {super(startLine, startColumn, image)}
     }
 
+
+    class InvalidErrorRecoveryRecog extends BaseErrorRecoveryRecognizer {
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.parse.infra.recognizer.spec)
+            // the invalid part is that we forgot to call the self analysis
+            //recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+        public someRule = this.RULE("someRule", this.parseSomeRule, () => { return undefined })
+        public someNestedRule = this.RULE("someNestedRule", this.parseSomeNestedRule, () => { return undefined })
+
+        private parseSomeRule():void {
+            this.SUBRULE(this.someNestedRule(1))
+        }
+
+        private parseSomeNestedRule():void {
+            this.CONSUME1(PlusTok)
+        }
+
+    }
+
     describe("The BaseErrorRecoveryRecognizer", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
@@ -66,6 +88,12 @@ module chevrotain.parse.infra.recognizer.spec {
             var parser:any = new recog.BaseErrorRecoveryRecognizer([], undefined)
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
+        })
+
+        it("will throw an exception if we try to use it without performing self analysis in the constructor ", function () {
+            var parser = new InvalidErrorRecoveryRecog([])
+            expect(() => parser.someRule(1, true)).toThrow(Error("missing re-sync follows information, possible cause: " +
+            "did not call performSelfAnalysis(this) in the constructor implementation."))
         })
     })
 
@@ -122,6 +150,7 @@ module chevrotain.parse.infra.recognizer.spec {
             var backTrackingFalse = parser.BACKTRACK(() => { throwExceptionFunc() }, () => { return true })
             expect(backTrackingFalse()).toBe(false)
         })
+
     })
 
 }
