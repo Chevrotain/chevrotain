@@ -4,32 +4,19 @@ var specsFiles = require('./scripts/findSpecs')("release/tsc/test/")
 
 module.exports = function(grunt) {
 
+    //noinspection UnnecessaryLabelJS
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
         karma: {
-            options:          {
+            options:   {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
                 browsers:   ['Chrome']
             },
-            dev_build:        {},
-            coverage_release: {
-                options:          {
-                    files: ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js']
-                },
-                browsers:         ['Chrome'],
-                preprocessors:    {'release/chevrotain.js': ['coverage']},
-                reporters:        ['progress', 'coverage'],
-                coverageReporter: {
-                    reporters: [
-                        {type: 'html', dir: 'coverage/'},
-                        {type: 'json', dir: 'coverage/'}
-                    ]
-                }
-            },
+            dev_build: {},
 
-            release:          {
+            tests_on_browsers: {
                 options: {
                     files:    ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js'],
                     browsers: ['Chrome', 'Firefox', 'IE']
@@ -37,19 +24,43 @@ module.exports = function(grunt) {
             }
         },
 
-        coverage: {
-            fullCoverage: {
+        jasmine_node: {
+            node_release_tests: {
                 options: {
-                    thresholds: {
-                        'statements': 100,
-                        //'branches':   100, TODO: try re-enable branches coverage 100% in tsc 1.5, there is an issue with ignore comments
-                        // being swallowed by tsc 1.4.1 between if/else blocks which makes it harder manually ignore.
-                        'lines':      100,
-                        'functions':  100
+                    coverage:          {
+                        reportFile: 'coverage.json',
+                        print:      'both', // none, summary, detail, both
+                        relativize: true,
+                        thresholds: {
+                            statements: 100,
+                            branches:   0,
+                            lines:      100,
+                            functions:  100
+                        },
+                        reportDir:  'coverage',
+                        report:     [
+                            'lcov'
+                        ],
+                        collect:    [ // false to disable, paths are relative to 'reportDir'
+                            '*coverage.json'
+                        ],
+                        excludes:   []
                     },
-                    dir:        'coverage',
-                    root:       ''
-                }
+                    forceExit:         true,
+                    match:             '.',
+                    matchAll:          false,
+                    specFolders:       ['release'],
+                    extensions:        'js',
+                    specNameMatcher:   'tainSpecs',
+                    captureExceptions: true,
+                    junitreport:       {
+                        report:         false,
+                        savePath:       './build/reports/jasmine/',
+                        useDotNotation: true,
+                        consolidate:    true
+                    }
+                },
+                src:     ['release/chevrotain.js']
             }
         },
 
@@ -103,6 +114,19 @@ module.exports = function(grunt) {
                         global:    ['_']
                     }
                 }
+            },
+
+            release_specs: {
+                options: {
+                    src:      'release/chevrotainSpecs.js',
+                    template: 'scripts/umd.hbs',
+                    deps:     {
+                        'default': ['_', 'chevrotain'],
+                        amd:       ['lodash', 'chevrotain'],
+                        cjs:       ['lodash', './chevrotain'],
+                        global:    ['_', 'chevrotain']
+                    }
+                }
             }
         },
 
@@ -113,7 +137,7 @@ module.exports = function(grunt) {
         concat: {
             options: {
                 banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                        '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
 
                 process: function fixTSModulePatternForCoverage(src, filePath) {
                     // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
@@ -155,17 +179,22 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-umd')
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
-    grunt.loadNpmTasks('grunt-istanbul-coverage');
+    grunt.loadNpmTasks('grunt-jasmine-node-coverage');
 
 
-    grunt.registerTask('release', [
+    var commonReleaseTasks = [
         'clean:release',
         'ts:release',
         'tslint',
-        'umd:release',
         'concat:release',
-        'karma:coverage_release',
-        "coverage:fullCoverage"])
+        'umd:release',
+        'umd:release_specs',
+        'jasmine_node:node_release_tests'
+    ]
+
+    grunt.registerTask('release', commonReleaseTasks)
+
+    grunt.registerTask('release_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
 
     grunt.registerTask('dev_build', [
         'clean:dev_build',
