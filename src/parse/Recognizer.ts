@@ -1,12 +1,12 @@
 /// <reference path="../lang/LangExtensions.ts" />
 /// <reference path="../scan/Tokens.ts" />
 /// <reference path="../parse/grammar/GAst.ts" />
+/// <reference path="../parse/GAstBuilder.ts" />
 /// <reference path="../parse/Constants.ts" />
 /// <reference path="../parse/grammar/Interpreter2.ts" />
 /// <reference path="../parse/grammar/Follow.ts" />
 
 /// <reference path="../../libs/lodash.d.ts" />
-
 module chevrotain.parse.infra.recognizer {
 
     import tok = chevrotain.scan.tokens
@@ -295,8 +295,6 @@ module chevrotain.parse.infra.recognizer {
 
         private static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
 
-        // todo: once IDEA supports TypeScript 1.4 use typeAliases to do something like:
-        // new HashTable<ClassName, IHashtable<RuleName, gast.TOP_LEVEL>>()
         private static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
 
         private static getProductionsForClass(classInstance:any):lang.HashTable<gast.TOP_LEVEL> {

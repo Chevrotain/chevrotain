@@ -18,7 +18,6 @@ module chevrotain.text.range {
 
     export class Range implements IRange {
 
-        // TODO: use const?/final properties for immutable ranges? TS 1.5?
         constructor(public start:number, public end:number) {
             if (!isValidRange(start, end)) {
                 throw new Error("INVALID RANGE")

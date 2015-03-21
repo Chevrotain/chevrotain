@@ -29,7 +29,6 @@ module.exports = function(grunt) {
                 }
             },
 
-            // TODO: modify the files loaded to the aggregated output of the release compiler
             release:          {
                 options: {
                     files:    ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js'],
@@ -99,7 +98,6 @@ module.exports = function(grunt) {
                     globalAlias:    'chevrotain',
                     deps:           {
                         'default': ['_'],
-                        // TODO: replace with https://github.com/flesler/hashmap as it also has UMD and can be used with AMD
                         amd:       ['lodash'],
                         cjs:       ['lodash'],
                         global:    ['_']
