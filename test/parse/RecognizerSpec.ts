@@ -85,7 +85,7 @@ module chevrotain.parse.infra.recognizer.spec {
     describe("The BaseErrorRecoveryRecognizer", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
-            var parser = new recog.BaseErrorRecoveryRecognizer([], <any>chevrotain.parse.grammar.gast.builder.spec);
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], <any>chevrotain.parse.grammar.gast.builder.spec);
             parser.reset()
             var testInput = [new IntToken(1, 1, "1"), new PlusTok(1, 1),
                 new IntToken(1, 1, "2"), new PlusTok(1, 1), new IntToken(1, 1, "3")]
@@ -153,14 +153,14 @@ module chevrotain.parse.infra.recognizer.spec {
         })
 
         it("can only SAVE_ERROR for recognition exceptions", function () {
-            var parser = new recog.BaseRecognizer()
+            var parser:any = new recog.BaseRecognizer()
             expect(() => parser.SAVE_ERROR(new Error("I am some random Error"))).
                 toThrow(Error("trying to save an Error which is not a RecognitionException"))
             expect(parser.input).toEqual(jasmine.any(Array))
         })
 
         it("when it runs out of input EOF will be returned", function () {
-            var parser = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
+            var parser:any = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
             expect(parser.CONSUME(IntToken))
             expect(parser.CONSUME(PlusTok))
             expect(parser.NEXT_TOKEN()).toEqual(jasmine.any(recog.EOF))
@@ -172,7 +172,7 @@ module chevrotain.parse.infra.recognizer.spec {
         })
 
         it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
-            var parser = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
+            var parser:any = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
 
             var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
                 parser.CONSUME(IntToken)
@@ -189,7 +189,7 @@ module chevrotain.parse.infra.recognizer.spec {
 
         it("will return false if a RecognitionException is thrown during " +
         "backtracking and rethrow any other kind of Exception", function () {
-            var parser = new recog.BaseRecognizer([])
+            var parser:any = new recog.BaseRecognizer([])
             var backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
             expect(() => backTrackingThrows()).toThrow(Error("division by zero, boom"))
 
