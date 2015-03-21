@@ -5,7 +5,6 @@
 /// <reference path="../../../libs/jasmine.d.ts" />
 
 
-// TODO: rename file to interpreterSpec
 module chevrotain.parse.grammar.interpreter.spec {
 
     import t = test.parser.grammar.samples
