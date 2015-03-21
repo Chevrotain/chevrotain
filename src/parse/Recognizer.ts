@@ -24,16 +24,16 @@ module chevrotain.parse.infra.recognizer {
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
         var recognitionExceptions = [
-            "MismatchedTokenException",
-            "NoViableAltException",
-            "EarlyExitException",
-            "NotAllInputParsedException"]
+            lang.functionName(MismatchedTokenException),
+            lang.functionName(NoViableAltException),
+            lang.functionName(EarlyExitException),
+            lang.functionName(NotAllInputParsedException)]
         // can't do instanceof on hacked custom js exceptions
         return _.contains(recognitionExceptions, error.name)
     }
 
     export function MismatchedTokenException(message:string, token:tok.Token) {
-        this.name = "MismatchedTokenException"
+        this.name = lang.functionName(MismatchedTokenException)
         this.message = message
         this.token = token
     }
@@ -43,7 +43,7 @@ module chevrotain.parse.infra.recognizer {
     MismatchedTokenException.prototype = Error.prototype
 
     export function NoViableAltException(message:string, token:tok.Token) {
-        this.name = "NoViableAltException"
+        this.name = lang.functionName(NoViableAltException)
         this.message = message
         this.token = token
     }
@@ -51,7 +51,7 @@ module chevrotain.parse.infra.recognizer {
     NoViableAltException.prototype = Error.prototype
 
     export function NotAllInputParsedException(message:string, token:tok.Token) {
-        this.name = "NotAllInputParsedException"
+        this.name = lang.functionName(NotAllInputParsedException)
         this.message = message
         this.token = token
     }
@@ -60,7 +60,7 @@ module chevrotain.parse.infra.recognizer {
 
 
     export function EarlyExitException(message:string, token:tok.Token) {
-        this.name = "EarlyExitException"
+        this.name = lang.functionName(EarlyExitException)
         this.message = message
         this.token = token
     }
@@ -277,7 +277,7 @@ module chevrotain.parse.infra.recognizer {
     }
 
     export function InRuleRecoveryException(message:string) {
-        this.name = "InRuleRecoveryException"
+        this.name = lang.functionName(InRuleRecoveryException)
         this.message = message
     }
 
