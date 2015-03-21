@@ -322,7 +322,6 @@ module chevrotain.parse.infra.recognizer {
                 var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions)
                 refResolver.resolveRefs()
                 var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
-                // TODO: can dynamic calculation of the FOLLOW set be used to improve resync recovery?
                 BaseErrorRecoveryRecognizer.setResyncFollowsForClass(classInstance, allFollows)
                 BaseErrorRecoveryRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
             }
@@ -774,7 +773,7 @@ module chevrotain.parse.infra.recognizer {
                         // TODO: this error can only be detected when using an ErrorRecoveryRecognizer
                         // what about a base recognizer? it can happen in that case too.
                         // not we just save the error and not throw an exception because while there is indeed redundant
-                        // input, it does not mean that the none redudant input has not been parsed succesfully
+                        // input, it does not mean that the none redundant input has not been parsed successfully
                         this.SAVE_ERROR(new NotAllInputParsedException(
                                 "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
                     }

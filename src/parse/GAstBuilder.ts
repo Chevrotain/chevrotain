@@ -273,7 +273,7 @@ module chevrotain.parse.gast.builder {
 
         var i = 0
         while (!(_.isEmpty(parenthesisStack)) && i + start < text.length) {
-            // TODO: verify this is indeed meant to skip the first characeter?
+            // TODO: verify this is indeed meant to skip the first character?
             i++
             var nextChar = text.charAt(start + i)
             if (nextChar === opening) {
