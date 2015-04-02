@@ -3,7 +3,8 @@
 var _ = require('lodash');
 var fs = require('fs');
 var wrench = require('wrench');
-var specsFiles = require('./scripts/findSpecs')("target/gen/test/")
+var specsFiles = require('./scripts/findSpecs')("target/gen/test/", "test")
+var exampleSpecsFiles = require('./scripts/findSpecs')("target/gen/examples/", "examples")
 
 
 var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test|examples).+\.ts)/g;
@@ -33,7 +34,7 @@ function getIncludesFromTsRefsFile(fileName) {
 
 var coreIncludes = getIncludesFromTsRefsFile('./build/chevrotain.ts');
 
-var allSrcsIncludes = coreIncludes.concat(specsFiles)
+var allSrcsIncludes = coreIncludes.concat(specsFiles, exampleSpecsFiles)
 
 
 module.exports = function(config) {

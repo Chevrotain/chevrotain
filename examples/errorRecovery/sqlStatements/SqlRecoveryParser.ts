@@ -1,9 +1,9 @@
 /// <reference path="SqlRecoveryTokens.ts" />
-/// <reference path="../../../../src/parse/Recognizer.ts" />
-/// <reference path="../../../../src/scan/Tokens.ts" />
-/// <reference path="../../../../src/parse/ParseTree.ts" />
-/// <reference path="../../../../src/parse/grammar/GAst.ts" />
-/// <reference path="../../../../src/parse/grammar/Follow.ts" />
+/// <reference path="../../../src/parse/Recognizer.ts" />
+/// <reference path="../../../src/scan/Tokens.ts" />
+/// <reference path="../../../src/parse/ParseTree.ts" />
+/// <reference path="../../../src/parse/grammar/GAst.ts" />
+/// <reference path="../../../src/parse/grammar/Follow.ts" />
 
 module chevrotain.examples.recovery.sql {
 

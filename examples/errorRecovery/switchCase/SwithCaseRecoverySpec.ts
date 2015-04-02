@@ -1,9 +1,9 @@
 /// <reference path="SwitchCaseRecoveryParser.ts" />
 /// <reference path="SwitchCaseRecoveryTokens.ts" />
-/// <reference path="../../../../src/scan/Tokens.ts" />
-/// <reference path="../../../../src/parse/ParseTree.ts" />
-/// <reference path="../../../../libs/jasmine.d.ts" />
-/// <reference path="../../../../libs/lodash.d.ts" />
+/// <reference path="../../../src/scan/Tokens.ts" />
+/// <reference path="../../../src/parse/ParseTree.ts" />
+/// <reference path="../../../libs/jasmine.d.ts" />
+/// <reference path="../../../libs/lodash.d.ts" />
 
 
 // long lines for token init seems more readable to me than to break them up

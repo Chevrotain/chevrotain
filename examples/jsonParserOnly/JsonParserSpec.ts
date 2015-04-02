@@ -1,7 +1,7 @@
 /// <reference path="JsonParser.ts" />
-/// <reference path="../../../src/scan/Tokens.ts" />
-/// <reference path="../../../src/parse/Recognizer.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
+/// <reference path="../../src/scan/Tokens.ts" />
+/// <reference path="../../src/parse/Recognizer.ts" />
+/// <reference path="../../libs/jasmine.d.ts" />
 
 var recog = chevrotain.parse.infra.recognizer
 

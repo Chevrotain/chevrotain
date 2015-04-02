@@ -31,4 +31,5 @@ EXAMPLES:
 * html with live diagrams
 * calculator
 
-
+LIBS
+upgrade lodash version

@@ -1,6 +1,7 @@
 var wrench = require('wrench')
 var _ = require('lodash')
-var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/")
+var specsFiles = require('./scripts/findSpecs')("target/gen/test/", "test")
+var exampleSpecsFiles = require('./scripts/findSpecs')("target/gen/examples/", "examples")
 
 module.exports = function(grunt) {
 
@@ -63,7 +64,7 @@ module.exports = function(grunt) {
                 configuration: grunt.file.readJSON("tslint.json")
             },
             files:   {
-                src: ['src/**/*.ts', 'test/**/*.ts']
+                src: ['src/**/*.ts', 'test/**/*.ts', 'examples/**/*.ts']
             }
         },
 
@@ -74,7 +75,7 @@ module.exports = function(grunt) {
 
             },
             dev_build: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/release/**/*.ts"],
+                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/**/*.ts"],
                 outDir: "target/gen"
             },
 
@@ -161,7 +162,7 @@ module.exports = function(grunt) {
             release: {
                 files: {
                     'target/release/chevrotain.js':      ['target/release/chevrotain.js'],
-                    'target/release/chevrotainSpecs.js': specsFiles
+                    'target/release/chevrotainSpecs.js': specsFiles.concat(exampleSpecsFiles)
                 }
             }
         }
