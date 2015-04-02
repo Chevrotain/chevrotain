@@ -1,8 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="KARMA RUN" type="JavaScriptTestRunnerKarma" factoryName="Karma" singleton="true" config-file="$PROJECT_DIR$/karma.conf.js">
-    <envs>
-      <env name="FIREFOX_BIN" value="C:\Program Files (x86)\Mozilla Firefox\firefox.exe" />
-    </envs>
+  <configuration default="false" name="KARMA" type="JavaScriptTestRunnerKarma" factoryName="Karma" singleton="true" config-file="$PROJECT_DIR$/karma.conf.js">
+    <envs />
     <RunnerSettings RunnerId="KarmaCoverageProgramRunner" />
     <RunnerSettings RunnerId="KarmaJavaScriptTestRunnerDebug" />
     <RunnerSettings RunnerId="KarmaJavaScriptTestRunnerRun" />

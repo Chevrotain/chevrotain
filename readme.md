@@ -9,7 +9,8 @@ Features
   * Strong **Error Recovery** capabilities based on Antlr3's algorithms.
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such as automatically generated syntax diagrams or Syntatic error recovery
   * **Backtracking** support 
-  * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar inheritance and/or grammar composition. 
+  * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar composition.
+  * **100% code coverage** 
 
 The Why?
 --------------
@@ -112,7 +113,8 @@ object() {
 
 Getting Started
 ---------------
-
+The best place to start is the examples.
+see 
 
 
 Installation

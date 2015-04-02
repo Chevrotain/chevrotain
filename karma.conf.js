@@ -3,7 +3,7 @@
 var _ = require('lodash');
 var fs = require('fs');
 var wrench = require('wrench');
-var specsFiles = require('./scripts/findSpecs')("gen/test/")
+var specsFiles = require('./scripts/findSpecs')("target/gen/test/")
 
 
 var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test|examples).+\.ts)/g;
@@ -19,7 +19,7 @@ function getCapturingGroups(targetStr, regex, i) {
 }
 
 function transformRefToInclude(ref) {
-    var srcToGen = ref.replace("../", "gen/");
+    var srcToGen = ref.replace("../", "target/gen/");
     var tsToJs = srcToGen.replace(".ts", ".js");
     return tsToJs;
 }
@@ -31,23 +31,14 @@ function getIncludesFromTsRefsFile(fileName) {
     return includes;
 }
 
-
 var coreIncludes = getIncludesFromTsRefsFile('./build/chevrotain.ts');
 
 var allSrcsIncludes = coreIncludes.concat(specsFiles)
 
-//validateAllSpecsHaveBeenIncluded(specIncludes);
 
-module.exports = function (config) {
+module.exports = function(config) {
     "use strict";
 
-    var excludes = [];
-
-    // run mode, avoid errors from issues with map files syntax
-    if (!process.env.DEBUG) {
-        excludes.push('**/*.ts');
-        excludes.push('**/*.map');
-    }
 
     config.set({
 
@@ -58,20 +49,13 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
 
         // list of files / patterns to load in the browser
-        files: ['bower_components/lodash/lodash.js', 'libs/*.js'].concat(
-            // all production code
+        files: ['bower_components/lodash/lodash.js'].concat(
             allSrcsIncludes,
             [
-                // source maps and sources for typeScript debugging
-                // * these will be excluded in modes other then debug as they cause issues to the karma runner
-                'gen/**/*.map',
-                'src/**/*.ts',
-                'test/**/*.ts'
+                {pattern: 'target/gen/**/*.map', included: false},
+                {pattern: 'src/**/*.ts', included: false},
+                {pattern: 'test/**/*.ts', included: false}
             ]),
-
-
-        // list of files to exclude
-        exclude: excludes,
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
@@ -102,7 +86,7 @@ module.exports = function (config) {
         browsers: ['Chrome'],
 
         // If browser does not capture in given timeout [ms], kill it
-        captureTimeout: 10000000,
+        captureTimeout:           10000000,
         browserNoActivityTimeout: 60000,
 
         // Continuous Integration mode

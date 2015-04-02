@@ -1,6 +1,6 @@
 var wrench = require('wrench')
 var _ = require('lodash')
-var specsFiles = require('./scripts/findSpecs')("release/tsc/test/")
+var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/")
 
 module.exports = function(grunt) {
 
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 
             tests_on_browsers: {
                 options: {
-                    files:    ['bower_components/lodash/lodash.js', 'release/chevrotain.js', 'release/chevrotainSpecs.js'],
+                    files:    ['bower_components/lodash/lodash.js', 'target/release/chevrotain.js', 'target/release/chevrotainSpecs.js'],
                     browsers: ['Chrome', 'Firefox', 'IE']
                 }
             }
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
                             lines:      100,
                             functions:  100
                         },
-                        reportDir:  'coverage',
+                        reportDir:  'target/coverage',
                         report:     [
                             'lcov'
                         ],
@@ -49,18 +49,12 @@ module.exports = function(grunt) {
                     forceExit:         true,
                     match:             '.',
                     matchAll:          false,
-                    specFolders:       ['release'],
+                    specFolders:       ['target/release'],
                     extensions:        'js',
                     specNameMatcher:   'tainSpecs',
-                    captureExceptions: true,
-                    junitreport:       {
-                        report:         false,
-                        savePath:       './build/reports/jasmine/',
-                        useDotNotation: true,
-                        consolidate:    true
-                    }
+                    captureExceptions: true
                 },
-                src:     ['release/chevrotain.js']
+                src:     ['target/release/chevrotain.js']
             }
         },
 
@@ -80,16 +74,16 @@ module.exports = function(grunt) {
 
             },
             dev_build: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!release/**/*.ts"],
-                outDir: "gen"
+                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/release/**/*.ts"],
+                outDir: "target/gen"
             },
 
             release: {
                 files:   {
-                    'release/chevrotain.js': ['build/chevrotain.ts'],
+                    'target/release/chevrotain.js': ['build/chevrotain.ts'],
                     // this is the same as the 'build' process, all .ts --> .js in gen directory
                     // in a later step those files will be aggregated into separate components
-                    'release/tsc':           ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!release/**/*.ts"]
+                    'target/release/tsc':           ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/release/**/*.ts"]
                 },
                 options: {
                     declaration:    true,
@@ -102,7 +96,7 @@ module.exports = function(grunt) {
         umd: {
             release: {
                 options: {
-                    src:            'release/chevrotain.js',
+                    src:            'target/release/chevrotain.js',
                     template:       'scripts/umd.hbs',
                     objectToExport: 'chevrotain',
                     amdModuleId:    'chevrotain',
@@ -118,7 +112,7 @@ module.exports = function(grunt) {
 
             release_specs: {
                 options: {
-                    src:      'release/chevrotainSpecs.js',
+                    src:      'target/release/chevrotainSpecs.js',
                     template: 'scripts/umd.hbs',
                     deps:     {
                         'default': ['_', 'chevrotain'],
@@ -131,8 +125,8 @@ module.exports = function(grunt) {
         },
 
         clean:  {
-            dev_build: ["gen"],
-            release:   ["release", "coverage"]
+            dev_build: ["target/gen"],
+            release:   ["target/release", "target/coverage"]
         },
         concat: {
             options: {
@@ -166,8 +160,8 @@ module.exports = function(grunt) {
             },
             release: {
                 files: {
-                    'release/chevrotain.js':      ['release/chevrotain.js'],
-                    'release/chevrotainSpecs.js': specsFiles
+                    'target/release/chevrotain.js':      ['target/release/chevrotain.js'],
+                    'target/release/chevrotainSpecs.js': specsFiles
                 }
             }
         }

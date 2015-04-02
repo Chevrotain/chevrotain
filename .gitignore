@@ -1,12 +1,9 @@
-/coverage/
-
 /.idea/workspace.xml
 /node_modules
 
 /gen
 
-/release
-
+/target
 /.tscache
 /src/parse/.baseDir.ts
 /bower_components

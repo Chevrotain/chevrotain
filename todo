@@ -1,35 +1,34 @@
 
 BUILD/RELEASE/HIGH PRIORITY
 
-* use jasmine_node and jasmine_node coverage
-  ** need to wrap specs in umd too.
 
-5. finish readme.md
+* finish readme.md
 
-6. bower release.
+* bower release.
 
-7. npm release.
+* npm release.
 
 BLOCKED:
 * travis integration for CI (needs to be on github first)
 
-QUALITY
-* example that uses back tracking
-* improve code quality to 90%
-* improve code quality to 92.5%
-* improve code quality to 95%
-* improve code quality to 97.5%
-* improve code quality to 100%
 
 FEATURES:
 * DSL for lookahead
 * lookahead validations
 * semantic validations on grammar (no duplicate CONSUME1 for example)
+* in recovery parser RULE DSL to accept impel as the last argument thus allows in place definition?
 
+  RULE(......, ....., ......, () => {
+    CONSUME(...)
+    MANY(...)
+    ...
+  }
+
+* fault tolerance improvements for in repetitonRecovery? see example in spec called
+ can also sometimes fail in automatic error recovery :)
 
 EXAMPLES:
-* html with live diagrams (maybe firas can help?)
-* back tracking example (also needed for coverage)
+* html with live diagrams
+* calculator
 
-BUGS:
-* fix rule name validation to take into account the parser constructor name.
+
