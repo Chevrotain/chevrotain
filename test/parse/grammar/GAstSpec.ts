@@ -2,7 +2,7 @@
 /// <reference path="../../../libs/lodash.d.ts" />
 /// <reference path="../../../libs/jasmine.d.ts" />
 
-module chevrotain.parse.grammar.gast.spec {
+module chevrotain.gast.spec {
 
     describe("GAst Module", function () {
 

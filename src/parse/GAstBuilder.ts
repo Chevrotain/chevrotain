@@ -6,12 +6,12 @@
 
 
 // module for building the GAst representation of the parserImpel
-module chevrotain.parse.gast.builder {
+module chevrotain.gastBuilder {
 
-    import tok = chevrotain.scan.tokens
-    import r = chevrotain.text.range
-    import gast = chevrotain.parse.grammar.gast
-    import lang = chevrotain.lang.extensions;
+    import tok = chevrotain.tokens
+    import r = chevrotain.range
+    import gast = chevrotain.gast
+    import lang = chevrotain.lang;
 
     export enum ProdType {
         TOP_LEVEL,

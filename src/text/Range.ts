@@ -1,4 +1,4 @@
-module chevrotain.text.range {
+module chevrotain.range {
 
     export interface IRange {
 

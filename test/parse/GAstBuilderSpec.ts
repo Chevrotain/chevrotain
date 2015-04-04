@@ -5,13 +5,13 @@
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-module chevrotain.parse.grammar.gast.builder.spec {
+module chevrotain.gastBuilder.spec {
 
-    import r = chevrotain.text.range
-    import b = chevrotain.parse.gast.builder
-    import tok = test.parser.grammar.samples
+    import r = chevrotain.range
+    import b = chevrotain.gastBuilder
+    import tok = test.samples
     import matchers = test.matchers
-    import lang = chevrotain.lang.extensions
+    import lang = chevrotain.lang
 
     describe("The GAst Builder module", function () {
         "use strict"

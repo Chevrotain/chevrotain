@@ -7,15 +7,15 @@
 /// <reference path="../parse/grammar/Follow.ts" />
 
 /// <reference path="../../libs/lodash.d.ts" />
-module chevrotain.parse.infra.recognizer {
+module chevrotain.recognizer {
 
-    import tok = chevrotain.scan.tokens
-    import gast = chevrotain.parse.grammar.gast
-    import IN = chevrotain.parse.constants.IN
-    import interp = chevrotain.parse.grammar.interpreter
-    import lang = chevrotain.lang.extensions
-    import gastBuilder = chevrotain.parse.gast.builder
-    import follows = chevrotain.parse.grammar.follow
+    import tok = chevrotain.tokens
+    import gast = chevrotain.gast
+    import IN = chevrotain.constants.IN
+    import interp = chevrotain.interpreter
+    import lang = chevrotain.lang
+    import gastBuilder = chevrotain.gastBuilder
+    import follows = chevrotain.follow
 
     export interface RecognitionException extends Error {
         token:tok.Token

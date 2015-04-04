@@ -3,10 +3,10 @@
 /// <reference path="Samples.ts" />
 /// <reference path="../../utils/Matchers.ts" />
 
-module chevrotain.parse.grammar.first.spec {
+module chevrotain.first.spec {
 
-    import t = test.parser.grammar.samples
-    import gast = chevrotain.parse.grammar.gast
+    import t = test.samples
+    import gast = chevrotain.gast
     import matchers = test.matchers
 
     describe("The Grammar Ast first model", function () {

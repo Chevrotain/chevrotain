@@ -1,6 +1,6 @@
 /// <reference path="../../libs/lodash.d.ts" />
 
-module chevrotain.lang.extensions {
+module chevrotain.lang {
 
     var nameRegex = /^\s*function\s*(\S*)\s*\(/
     /* istanbul ignore next */

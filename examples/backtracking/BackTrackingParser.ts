@@ -9,8 +9,8 @@ module chevrotain.examples.backtracking {
     //       element B:ns1.ns2...nsN default 5;
     // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
     // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
-    import recog = chevrotain.parse.infra.recognizer
-    import tok = chevrotain.scan.tokens
+    import recog = chevrotain.recognizer
+    import tok = chevrotain.tokens
 
     export enum RET_TYPE {
         WITH_DEFAULT,

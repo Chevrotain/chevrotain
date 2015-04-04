@@ -5,10 +5,10 @@
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-module chevrotain.parse.infra.recognizer.spec {
+module chevrotain.recognizer.spec {
 
-    import tok = chevrotain.scan.tokens
-    import recog = chevrotain.parse.infra.recognizer
+    import tok = chevrotain.tokens
+    import recog = chevrotain.recognizer
 
     export class PlusTok extends tok.Token {
         constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "+")}
@@ -26,7 +26,7 @@ module chevrotain.parse.infra.recognizer.spec {
     class InvalidErrorRecoveryRecog extends BaseErrorRecoveryRecognizer {
 
         constructor(input:tok.Token[] = []) {
-            super(input, <any>chevrotain.parse.infra.recognizer.spec)
+            super(input, <any>chevrotain.recognizer.spec)
             // the invalid part is that we forgot to call the self analysis
             //recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
         }
@@ -48,7 +48,7 @@ module chevrotain.parse.infra.recognizer.spec {
     class ManyRepetitionRecovery extends BaseErrorRecoveryRecognizer {
 
         constructor(input:tok.Token[] = []) {
-            super(input, <any>chevrotain.parse.infra.recognizer.spec)
+            super(input, <any>chevrotain.recognizer.spec)
             // the invalid part is that we forgot to call the self analysis
             recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
         }
@@ -85,7 +85,7 @@ module chevrotain.parse.infra.recognizer.spec {
     describe("The BaseErrorRecoveryRecognizer", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], <any>chevrotain.parse.grammar.gast.builder.spec);
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([], <any>chevrotain.gastBuilder.spec);
             parser.reset()
             var testInput = [new IntToken(1, 1, "1"), new PlusTok(1, 1),
                 new IntToken(1, 1, "2"), new PlusTok(1, 1), new IntToken(1, 1, "3")]

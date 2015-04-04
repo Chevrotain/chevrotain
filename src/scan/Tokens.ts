@@ -1,8 +1,8 @@
 /// <reference path="../lang/LangExtensions.ts" />
 
-module chevrotain.scan.tokens {
+module chevrotain.tokens {
 
-    import lang = chevrotain.lang.extensions
+    import lang = chevrotain.lang
 
     export function getTokName(tokType:Function):string {
         var tokTypeName = lang.functionName(tokType)

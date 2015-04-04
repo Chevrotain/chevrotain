@@ -2,7 +2,7 @@
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-module chevrotain.lang.extensions.spec {
+module chevrotain.lang.spec {
 
     describe("The HashTable implementation", function () {
 

@@ -2,7 +2,7 @@
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-module chevrotain.text.range.spec {
+module chevrotain.range.spec {
 
 
     describe("The Chevrotain Range module", function () {

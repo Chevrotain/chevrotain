@@ -5,11 +5,11 @@
 /// <reference path="../../../libs/jasmine.d.ts" />
 
 
-module chevrotain.parse.grammar.interpreter.spec {
+module chevrotain.interpreter.spec {
 
-    import t = test.parser.grammar.samples
-    import samples = test.parser.grammar.samples
-    import p = chevrotain.parse.grammar.path
+    import t = test.samples
+    import samples = test.samples
+    import p = chevrotain.path
     import matchers = test.matchers
 
     describe("The Grammar Ast Content Assist Module", function () {

@@ -1,10 +1,10 @@
 /// <reference path="../../../src/scan/Tokens.ts" />
 /// <reference path="../../../src/parse/grammar/GAst.ts" />
 
-module test.parser.grammar.samples {
+module test.samples {
 
-    import t = chevrotain.scan.tokens
-    import gast = chevrotain.parse.grammar.gast
+    import t = chevrotain.tokens
+    import gast = chevrotain.gast
 
     export class IdentTok extends t.Token {}
     export class DotTok extends t.Token {}

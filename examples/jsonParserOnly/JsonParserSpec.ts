@@ -3,7 +3,7 @@
 /// <reference path="../../src/parse/Recognizer.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-var recog = chevrotain.parse.infra.recognizer
+var recog = chevrotain.recognizer
 
 module chevrotain.examples.json.spec {
 

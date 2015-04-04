@@ -39,12 +39,12 @@ module chevrotain.examples.recovery.switchcase {
 
     export interface RetType { [caseValue: string] : number }
 
-    import recog = chevrotain.parse.infra.recognizer
-    import tok = chevrotain.scan.tokens
-    import pt = chevrotain.parse.tree
-    import gast = chevrotain.parse.grammar.gast
-    import gastBuilder = chevrotain.parse.gast.builder
-    import follows = chevrotain.parse.grammar.follow
+    import recog = chevrotain.recognizer
+    import tok = chevrotain.tokens
+    import pt = chevrotain.tree
+    import gast = chevrotain.gast
+    import gastBuilder = chevrotain.gastBuilder
+    import follows = chevrotain.follow
 
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
     export class SwitchCaseRecoveryParser extends recog.BaseErrorRecoveryRecognizer {

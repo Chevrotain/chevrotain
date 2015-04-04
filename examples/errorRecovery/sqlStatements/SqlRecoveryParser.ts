@@ -14,12 +14,12 @@ module chevrotain.examples.recovery.sql {
      * INSERT (32, "SHAHAR") INTO schema2.Persons
      * DELETE (31, "SHAHAR") FROM schema2.Persons
      */
-    import recog = chevrotain.parse.infra.recognizer
-    import tok = chevrotain.scan.tokens
-    import pt = chevrotain.parse.tree
-    import gast = chevrotain.parse.grammar.gast
-    import gastBuilder = chevrotain.parse.gast.builder
-    import follows = chevrotain.parse.grammar.follow
+    import recog = chevrotain.recognizer
+    import tok = chevrotain.tokens
+    import pt = chevrotain.tree
+    import gast = chevrotain.gast
+    import gastBuilder = chevrotain.gastBuilder
+    import follows = chevrotain.follow
 
 
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer

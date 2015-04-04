@@ -5,14 +5,14 @@
 /// <reference path="../../parse/Constants.ts" />
 /// <reference path="../../lang/LangExtensions.ts" />
 
-module chevrotain.parse.grammar.follow {
+module chevrotain.follow {
 
-    import t = chevrotain.scan.tokens
-    import g = chevrotain.parse.grammar.gast
-    import r = chevrotain.parse.grammar.rest
-    import f = chevrotain.parse.grammar.first
-    import IN = chevrotain.parse.constants.IN
-    import lang = chevrotain.lang.extensions
+    import t = chevrotain.tokens
+    import g = chevrotain.gast
+    import r = chevrotain.rest
+    import f = chevrotain.first
+    import IN = chevrotain.constants.IN
+    import lang = chevrotain.lang
 
     // This ResyncFollowsWalker computes all of the follows required for RESYNC
     // (skipping reference production).

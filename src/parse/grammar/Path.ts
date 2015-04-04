@@ -1,8 +1,8 @@
 /// <reference path="../../scan/Tokens.ts" />
 
-module chevrotain.parse.grammar.path {
+module chevrotain.path {
 
-    import tok = chevrotain.scan.tokens
+    import tok = chevrotain.tokens
 
     /**
      * this interfaces defines the path the parser "took" to reach the position

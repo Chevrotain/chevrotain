@@ -1,9 +1,9 @@
 /// <reference path="GAst.ts" />
 /// <reference path="../../../libs/lodash.d.ts" />
 
-module chevrotain.parse.grammar.first {
+module chevrotain.first {
 
-    import gast = chevrotain.parse.grammar.gast
+    import gast = chevrotain.gast
 
     export function first(prod:gast.IProduction):Function[] {
         if (prod instanceof gast.ProdRef) {

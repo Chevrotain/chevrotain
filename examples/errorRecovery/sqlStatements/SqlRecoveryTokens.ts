@@ -2,7 +2,7 @@
 
 module chevrotain.examples.recovery.sql {
 
-    import tok = chevrotain.scan.tokens
+    import tok = chevrotain.tokens
 
 
     export class IdentTok extends tok.Token {}

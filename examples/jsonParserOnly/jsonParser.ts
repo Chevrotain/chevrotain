@@ -3,8 +3,8 @@
 
 module chevrotain.examples.json {
 
-    import recog = chevrotain.parse.infra.recognizer
-    import tok = chevrotain.scan.tokens
+    import recog = chevrotain.recognizer
+    import tok = chevrotain.tokens
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.scan.tokens.Token
     export class StringTok extends tok.Token {}

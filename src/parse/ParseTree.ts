@@ -1,9 +1,9 @@
 /// <reference path="../scan/Tokens.ts" />
 /// <reference path="../../libs/lodash.d.ts" />
 
-module chevrotain.parse.tree {
+module chevrotain.tree {
 
-    import tok = chevrotain.scan.tokens
+    import tok = chevrotain.tokens
 
     export class ParseTree {
         getImage():string { return this.payload.image }

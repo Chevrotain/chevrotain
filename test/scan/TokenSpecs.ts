@@ -2,7 +2,7 @@
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-module chevrotain.scan.tokens.spec {
+module chevrotain.tokens.spec {
 
     describe("The Chevrotain Tokens module", function () {
         "use strict"

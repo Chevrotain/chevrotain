@@ -5,13 +5,13 @@
 /// <reference path="../../parse/grammar/Path.ts" />
 /// <reference path="../../../libs/lodash.d.ts" />
 
-module chevrotain.parse.grammar.interpreter {
+module chevrotain.interpreter {
 
-    import t = chevrotain.scan.tokens
-    import g = chevrotain.parse.grammar.gast
-    import f = chevrotain.parse.grammar.first
-    import r = chevrotain.parse.grammar.rest
-    import p = chevrotain.parse.grammar.path
+    import t = chevrotain.tokens
+    import g = chevrotain.gast
+    import f = chevrotain.first
+    import r = chevrotain.rest
+    import p = chevrotain.path
 
     export class NextPossibleTokensWalker extends r.RestWalker {
 

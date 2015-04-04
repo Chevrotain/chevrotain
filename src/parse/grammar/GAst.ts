@@ -1,9 +1,9 @@
 /// <reference path="../../scan/Tokens.ts" />
 /// <reference path="../../../libs/lodash.d.ts" />
 
-module chevrotain.parse.grammar.gast {
+module chevrotain.gast {
 
-    import tok = chevrotain.scan.tokens
+    import tok = chevrotain.tokens
 
     export interface IProduction {
         accept(visitor:GAstVisitor):void

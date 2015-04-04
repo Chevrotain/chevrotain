@@ -11,8 +11,8 @@
 /* tslint:disable:max-line-length  */
 module chevrotain.examples.recovery.switchcase.spec {
 
-    import tok = chevrotain.scan.tokens
-    import pt =  chevrotain.parse.tree
+    import tok = chevrotain.tokens
+    import pt =  chevrotain.tree
 
     describe("Error Recovery switch-case Example", function () {
         "use strict"

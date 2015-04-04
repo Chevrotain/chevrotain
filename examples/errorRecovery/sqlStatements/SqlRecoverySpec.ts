@@ -10,8 +10,8 @@
 /* tslint:disable:max-line-length  */
 module chevrotain.examples.recovery.sql.spec {
 
-    import tok = chevrotain.scan.tokens
-    import pt =  chevrotain.parse.tree
+    import tok = chevrotain.tokens
+    import pt =  chevrotain.tree
 
     describe("Error Recovery SQL DDL Example", function () {
         "use strict"

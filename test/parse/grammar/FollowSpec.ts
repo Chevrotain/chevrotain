@@ -7,11 +7,11 @@
 /// <reference path="../../../libs/jasmine.d.ts" />
 
 
-module chevrotain.parse.grammar.follow.spec {
+module chevrotain.follow.spec {
 
-    import t = test.parser.grammar.samples
-    import gast = chevrotain.parse.grammar.gast
-    import samples = test.parser.grammar.samples
+    import t = test.samples
+    import gast = chevrotain.gast
+    import samples = test.samples
     import matchers = test.matchers
 
     describe("The Grammar Ast Follows model", function () {

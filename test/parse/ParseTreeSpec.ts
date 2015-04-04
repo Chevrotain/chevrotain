@@ -5,10 +5,10 @@
 /// <reference path="../../libs/lodash.d.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
-module chevrotain.parse.grammar.gast.builder.spec {
+module chevrotain.gastBuilder.spec {
 
-    import pt = chevrotain.parse.tree
-    import tok = chevrotain.scan.tokens
+    import pt = chevrotain.tree
+    import tok = chevrotain.tokens
 
     describe("The ParseTree module", function () {
 
