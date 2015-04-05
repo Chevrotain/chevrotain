@@ -33,12 +33,12 @@ module chevrotain.gastBuilder {
 
     // CONSUME1([ns1.ns2.ns3.]LCurlyTok)
     var terminalRegEx = /this\s*.\s*CONSUME(\d)\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
-    var terminalRegGlobal = /this\s*.\s*CONSUME\d\s*\(\s*(?:\w+\s*\.\s*)*(?:\w+)/g
+    var terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
     // note that there is an optional underscore '_' before the 'this'
     // typescript adds this when generating code for arrow function ()=>{...}
     var refRegEx = /this\s*.\s*SUBRULE\s*\(\s*_?this\s*.\s*(\w+)\s*\(\s*(\d)/
-    var refRegExGlobal = /this\s*.\s*SUBRULE\s*\(\s*_?this\s*.\s*\w+\s*\(\s*\d/g
+    var refRegExGlobal = new RegExp(refRegEx.source, "g")
 
     // this.OPTION(this.isSemicolon, ()=> {semicolon = this.CONSUME1(tok.SemicolonTok)})
     var optionRegEx = /this\s*.\s*OPTION\s*\(/g
