@@ -1,43 +1,45 @@
-Chevrotain
-   ======
+new readme.md
+
+#Chevrotain
+
    
-   Chevrotain is a Javascript/Typescript parsing framework which aims to make it easier to write "hand built" recursive decent parsers.
+Chevrotain is a Javascript/Typescript parsing framework which aims to make it easier to write "hand built" recursive decent parsers.
    
-   Features
-   --------
-     * **DSL** for creating the parsing rules.
-     * Strong **Error Recovery** capabilities based on Antlr3's algorithms.
-     * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such as automatically generated syntax diagrams or Syntatic error recovery
-     * **Backtracking** support 
-     * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar composition.
-     * **100% code coverage** 
+###Features
+  * **DSL** for creating the parsing rules.
+  * Strong **Error Recovery** capabilities based on Antlr3's algorithms.
+  * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such     
+    as automatically generated syntax diagrams or Syntatic error recovery
+  * **Backtracking** support 
+  * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar composition.
+   * **100% code coverage** 
    
-   The Why?
-   --------------
-   Parser Generators are rarely used to build commercial grade compilers/editors/tools.
+###The Why?
+Parser Generators are rarely used to build commercial grade compilers/editors/tools.
    
    [As Terence Parr said:](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900547) 
    1. "A: In my experience, almost no one uses parser generators to build commercial compilers. 
-      So, people are using ANTLR for their everyday work, building everything from configuration files to little scripting languages."
-   2. "I believe that compiler developers are very concerned with parsing speed, error reporting, 
+      So, people are using ANTLR for their everyday work, building everything from configuration files to little 
+      scripting languages."
+  2. "I believe that compiler developers are very concerned with parsing speed, error reporting, 
       and error recovery. For that, they want absolute control over their parser."
    
-   so Parser generators can provide simplicity and easy of use, but at the cost of:
-   1. control.
-   2. speed (sometimes).
-   3. functionality (depends on the specific parser generator features).
+  So Parser generators can provide simplicity and ease of use, but at the cost of:
+  1. control.
+  2. speed (sometimes).
+  3. functionality (depends on the specific parser generator features).
    
-   writing a recursive decent parser by hand can solve some of the above issues but with its owns costs of:
-   1. Easy of use, also know as: "mind numbing manual repetitive labour".
-   2. functionality (how often does a hand built parser include strong fault tolerance capabilities...)
+  writing a recursive decent parser by hand can solve some of the above issues but with its owns costs such as:
+
+  1. Easy of use, also know as: "mind numbing manual repetitive labour".
+  2. functionality (how often does a hand built parser include strong fault tolerance capabilities...).
+
+ 
+Chevrotain tries to bridge the gap between these two approaches.
+providing as much of the control and performance of hand built parsers and as much of the ease of use of parser generators. with some advanced functionality thrown in for good measure.
    
-   Chevrotain tries to bridge the gap between these two approaches.
-   providing as much of the control and performance of hand built parsers
-   and as much of the ease of use of parser generators.
-   with some advanced functionality thrown in for good measure.
    
-   
-   The Parsing DSL is the best example for this:
+The Parsing DSL is the best example for this:
    
    * The DSL allows writing more declarative grammar rule than an hand built parser (although not as declarative as a BNF grammar) --> **easy of use**
    * This has minimal impact on performance because the DSL is not interpreted by some engine in the background,
@@ -57,9 +59,10 @@ Chevrotain
    
    
    
-   At a Glance, simple json parser
-   ---------------
+###At a Glance, simple json parser
+
    * using ES6 fat arrow '=>'
+
    ```JavaScript
    object() {
                this.CONSUME(LCurlyTok)
@@ -113,17 +116,21 @@ Chevrotain
 
 
 
-Getting Started
----------------
+###Getting Started
 The best place to start is the examples folder.
-the most basic one is:
-examples\jsonParserOnly\jsonParser.ts
+the most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/jsonParserOnly/jsonParser.ts)
+
 
 Note that the examples are written in Typescript.
 to see the generated(readable) javascript code 
 
-* $ npm install (only once)
+only once:
+* $ npm install
 * $ npm install -g grunt (only once)
+* $ npm install -g bower
+* $ bower install
+
+to run the dev build:
 * $ grunt dev_build
 * now look in: target\gen\examples folder
 
@@ -145,4 +152,4 @@ Compatibility
 
 Development
 -----------
-Chevrotain was originally developed by Shahar Soel @ SAP Labs Israel
+Chevrotain was originally developed and is maintained by Shahar Soel
