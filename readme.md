@@ -15,22 +15,24 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
 ###The Why?
 Parser Generators are rarely used to build commercial grade compilers/editors/tools.
    
-   [As Terence Parr said:](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900547) 
-   1. "A: In my experience, almost no one uses parser generators to build commercial compilers. 
+[As Terence Parr said:](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900547) 
+
+  1. "A: In my experience, almost no one uses parser generators to build commercial compilers. 
       So, people are using ANTLR for their everyday work, building everything from configuration files to little 
       scripting languages."
   2. "I believe that compiler developers are very concerned with parsing speed, error reporting, 
       and error recovery. For that, they want absolute control over their parser."
    
-  So Parser generators can provide simplicity and ease of use, but at the cost of:
-  1. control.
-  2. speed (sometimes).
-  3. functionality (depends on the specific parser generator features).
+So Parser generators can provide simplicity and ease of use, but at the cost of:
+ 
+1. control.
+2. speed (sometimes).
+3. functionality (depends on the specific parser generator features).
    
-  writing a recursive decent parser by hand can solve some of the above issues but with its owns costs such as:
+writing a recursive decent parser by hand can solve some of the above issues but with its owns costs such as:
 
-  1. Easy of use, also know as: "mind numbing manual repetitive labour".
-  2. functionality (how often does a hand built parser include strong fault tolerance capabilities...).
+1. Easy of use, also know as: "mind numbing manual repetitive labour".
+2. functionality (how often does a hand built parser include strong fault tolerance capabilities...).
 
  
 Chevrotain tries to bridge the gap between these two approaches.
