@@ -2,7 +2,7 @@
   "name": "chevrotain",
   "version": "0.1.0",
   "dependencies": {
-    "lodash": "~3.3.1"
+    "lodash": "~3.6.0"
   },
   "devDependencies": {
     "grunt-cli": "~0.1.13",
@@ -12,9 +12,9 @@
     "grunt-karma": "~0.10.1",
     "grunt-ts": "~3.0.0",
     "grunt-tslint": "~2.0.0",
-    "grunt-umd": "~2.3.2",
+    "grunt-umd": "~2.3.3",
     "karma": "~0.12.31",
-    "karma-chrome-launcher": "~0.1.7",
+    "karma-chrome-launcher": "~0.1.8",
     "karma-firefox-launcher": "~0.1.4",
     "karma-ie-launcher": "~0.1",
     "karma-jasmine": "~0.3.5",
