@@ -37,8 +37,8 @@ module chevrotain.examples.recovery.switchcase.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
 
             expect(parseResult).toEqual({
-                "Terry":   2,
-                "Robert":  4,
+                "Terry": 2,
+                "Robert": 4,
                 "Brandon": 6
             })
         })
@@ -62,9 +62,9 @@ module chevrotain.examples.recovery.switchcase.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
 
             expect(parseResult).toEqual({
-                "Terry":    2,
+                "Terry": 2,
                 "invalid1": undefined,
-                "Brandon":  6
+                "Brandon": 6
             })
         })
 
@@ -107,8 +107,8 @@ module chevrotain.examples.recovery.switchcase.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
 
             expect(parseResult).toEqual({
-                "Terry":   2,
-                "Robert":  4,
+                "Terry": 2,
+                "Robert": 4,
                 "Brandon": 6
             })
         })
@@ -156,8 +156,8 @@ module chevrotain.examples.recovery.switchcase.spec {
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
             expect(parseResult).toEqual({
-                "Terry":   2,
-                "Robert":  4,
+                "Terry": 2,
+                "Robert": 4,
                 "Brandon": 6
             })
         })
@@ -179,7 +179,7 @@ module chevrotain.examples.recovery.switchcase.spec {
         it("will NOT perform single token insertion for a missing string", function () {
             var input = [
                 // case  : return 2 <-- missing the string for the case's value
-                new CaseTok(1, 1), /* new StringTok(1, 1, "Terry"),*/  new ColonTok(1, 1) , new ReturnTok(1, 1), new IntTok(1, 1, "2"), new SemiColonTok(1, 1),
+                new CaseTok(1, 1), /* new StringTok(1, 1, "Terry"),*/  new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok(1, 1, "2"), new SemiColonTok(1, 1),
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)

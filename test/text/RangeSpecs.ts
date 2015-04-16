@@ -64,6 +64,5 @@ module chevrotain.range.spec {
         })
 
 
-
     })
 }

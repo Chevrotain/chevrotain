@@ -81,11 +81,11 @@ module chevrotain.examples.backtracking {
                     // we can build an LL(K) parser that can distinguish the two alternatives as a negative example
                     // would be to simply create a qualifiedName with a length of k+1.
                     {
-                        WHEN:    this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
+                        WHEN: this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
                         THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement(1)) }
                     },
                     {
-                        WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
+                        WHEN: this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
                         THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement(1)) }
                     },
                 ], " a statement")

@@ -17,9 +17,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #1", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.ActionTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.ActionTok,
                 lastTokOccurrence: 1
             }
 
@@ -30,9 +30,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #2", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.IdentTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 1
             }
 
@@ -43,9 +43,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.LParenTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.LParenTok,
                 lastTokOccurrence: 1
             }
 
@@ -56,9 +56,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #4", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.CommaTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.CommaTok,
                 lastTokOccurrence: 1
             }
 
@@ -69,9 +69,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #5", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.RParenTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.RParenTok,
                 lastTokOccurrence: 1
             }
 
@@ -82,9 +82,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #6", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.ColonTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.ColonTok,
                 lastTokOccurrence: 1
             }
 
@@ -95,9 +95,9 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From ActionDec in scope of ActionDec #7", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec"],
-                occurrenceStack:   [1],
-                lastTok:           t.SemicolonTok,
+                ruleStack: ["actionDec"],
+                occurrenceStack: [1],
+                lastTok: t.SemicolonTok,
                 lastTokOccurrence: 1
             }
 
@@ -107,11 +107,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the first ParamSpec INSIDE ActionDec #1", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 1
             }
 
@@ -122,11 +122,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the first ParamSpec INSIDE ActionDec #2", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.ColonTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.ColonTok,
                 lastTokOccurrence: 1
             }
 
@@ -137,11 +137,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the first ParamSpec INSIDE ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.LSquareTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.LSquareTok,
                 lastTokOccurrence: 1
             }
 
@@ -152,11 +152,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the first ParamSpec INSIDE ActionDec #4", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.RSquareTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.RSquareTok,
                 lastTokOccurrence: 1
             }
 
@@ -167,11 +167,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the second ParamSpec INSIDE ActionDec #1", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 2],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 2],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 1
             }
 
@@ -182,11 +182,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the second ParamSpec INSIDE ActionDec #2", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 2],
-                lastTok:           t.ColonTok,
+                occurrenceStack: [1, 2],
+                lastTok: t.ColonTok,
                 lastTokOccurrence: 1
             }
 
@@ -197,11 +197,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the second ParamSpec INSIDE ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 2],
-                lastTok:           t.LSquareTok,
+                occurrenceStack: [1, 2],
+                lastTok: t.LSquareTok,
                 lastTokOccurrence: 1
             }
 
@@ -212,11 +212,11 @@ module chevrotain.interpreter.spec {
 
         it("can compute the next possible token types From the second ParamSpec INSIDE ActionDec #4", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec"
                 ],
-                occurrenceStack:   [1, 2],
-                lastTok:           t.RSquareTok,
+                occurrenceStack: [1, 2],
+                lastTok: t.RSquareTok,
                 lastTokOccurrence: 1
             }
 
@@ -228,12 +228,12 @@ module chevrotain.interpreter.spec {
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an ParamSpec INSIDE ActionDec #1", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1, 1],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 1, 1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 1
             }
 
@@ -245,12 +245,12 @@ module chevrotain.interpreter.spec {
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an ParamSpec INSIDE ActionDec #2", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1, 1],
-                lastTok:           t.DotTok,
+                occurrenceStack: [1, 1, 1],
+                lastTok: t.DotTok,
                 lastTokOccurrence: 1
             }
 
@@ -262,12 +262,12 @@ module chevrotain.interpreter.spec {
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an ParamSpec INSIDE ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["actionDec",
+                ruleStack: ["actionDec",
                     "ParamSpec",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1, 1],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 1, 1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 2
             }
 
@@ -279,11 +279,11 @@ module chevrotain.interpreter.spec {
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an ParamSpec INSIDE ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["ParamSpec",
+                ruleStack: ["ParamSpec",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 1
             }
 
@@ -295,11 +295,11 @@ module chevrotain.interpreter.spec {
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an ParamSpec INSIDE ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["ParamSpec",
+                ruleStack: ["ParamSpec",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.DotTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.DotTok,
                 lastTokOccurrence: 1
             }
 
@@ -311,11 +311,11 @@ module chevrotain.interpreter.spec {
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
         " inside an ParamSpec INSIDE ActionDec #3", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["ParamSpec",
+                ruleStack: ["ParamSpec",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 2
             }
 
@@ -331,11 +331,11 @@ module chevrotain.interpreter.spec {
 
         it("will fail if we try to compute the next token starting from a rule that does not match the path", function () {
             var caPath:p.IGrammarPath = {
-                ruleStack:         ["I_WILL_FAIL_THE_WALKER",
+                ruleStack: ["I_WILL_FAIL_THE_WALKER",
                     "qualifiedName"
                 ],
-                occurrenceStack:   [1, 1],
-                lastTok:           t.IdentTok,
+                occurrenceStack: [1, 1],
+                lastTok: t.IdentTok,
                 lastTokOccurrence: 2
             }
 

@@ -351,9 +351,9 @@ module chevrotain.recognizer {
             var savedRuleStack = _.clone(this.RULE_STACK)
             var savedFollowStack = _.clone(this.FOLLOW_STACK)
             return {
-                errors:       baseState.errors,
-                inputIdx:     baseState.inputIdx,
-                RULE_STACK:   savedRuleStack,
+                errors: baseState.errors,
+                inputIdx: baseState.inputIdx,
+                RULE_STACK: savedRuleStack,
                 FOLLOW_STACK: savedFollowStack
             }
         }
@@ -408,9 +408,9 @@ module chevrotain.recognizer {
         // TODO: can the 2 optional parameters for special 'preemptive' resync recovery into the next item of the 'MANY'
         // be computed automatically?
         protected MANY(lookAheadFunc:() => boolean,
-             consume:() => void,
-             expectTokAfterLastMatch?:Function,
-             nextTokIdx?:number):void {
+                       consume:() => void,
+                       expectTokAfterLastMatch?:Function,
+                       nextTokIdx?:number):void {
             super.MANY(lookAheadFunc, consume)
 
 
@@ -420,10 +420,10 @@ module chevrotain.recognizer {
         }
 
         protected AT_LEAST_ONE(lookAheadFunc:() => boolean,
-                     consume:() => void,
-                     errMsg:string,
-                     expectTokAfterLastMatch?:Function,
-                     nextTokIdx?:number):void {
+                               consume:() => void,
+                               errMsg:string,
+                               expectTokAfterLastMatch?:Function,
+                               nextTokIdx?:number):void {
 
             super.AT_LEAST_ONE(lookAheadFunc, consume, errMsg)
 
@@ -457,9 +457,9 @@ module chevrotain.recognizer {
         }
 
         protected tryInRepetitionRecovery(grammarRule:Function,
-                                grammarRuleArgs:IArguments,
-                                lookAheadFunc:() => boolean,
-                                expectedTokType:Function):void {
+                                          grammarRuleArgs:IArguments,
+                                          lookAheadFunc:() => boolean,
+                                          expectedTokType:Function):void {
             var reSyncTokType = this.findReSyncTokenType()
             var orgInputIdx = this.inputIdx
             var nextTokenWithoutResync = this.NEXT_TOKEN()
@@ -565,9 +565,9 @@ module chevrotain.recognizer {
             var pathRuleStack:string[] = _.clone(this.RULE_STACK)
             var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK)
             var grammarPath:any = {
-                ruleStack:         pathRuleStack,
-                occurrenceStack:   pathOccurrenceStack,
-                lastTok:           tokType,
+                ruleStack: pathRuleStack,
+                occurrenceStack: pathOccurrenceStack,
+                lastTok: tokType,
                 lastTokOccurrence: tokIdxInRule
             }
 
@@ -697,13 +697,13 @@ module chevrotain.recognizer {
         }
 
         protected RULE_NO_RESYNC<T>(ruleName:string, consumer:() => T, invalidRet:() => T):(idxInCallingRule:number,
-                                                                                  isEntryPoint?:boolean) => T {
+                                                                                            isEntryPoint?:boolean) => T {
             return this.RULE(ruleName, consumer, invalidRet, false)
         }
 
 
         protected RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
-                                                                                         isEntryPoint?:boolean) => T {
+                                                                                                   isEntryPoint?:boolean) => T {
 
             this.validateRuleName(ruleName)
             var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this)
@@ -724,8 +724,8 @@ module chevrotain.recognizer {
                     // multiple structures on each rule invocations to find it...
                     var followSet = BaseErrorRecoveryRecognizer.getResyncFollowsForClass(this).get(followName)
                     if (!followSet) {
-                       throw new Error("missing re-sync follows information, possible cause: " +
-                       "did not call performSelfAnalysis(this) in the constructor implementation.")
+                        throw new Error("missing re-sync follows information, possible cause: " +
+                        "did not call performSelfAnalysis(this) in the constructor implementation.")
                     }
                     this.FOLLOW_STACK.push(followSet)
                 }
@@ -773,7 +773,7 @@ module chevrotain.recognizer {
                         // not we just save the error and not throw an exception because while there is indeed redundant
                         // input, it does not mean that the none redundant input has not been parsed successfully
                         this.SAVE_ERROR(new NotAllInputParsedException(
-                                "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
+                            "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
                     }
                 }
             }

@@ -227,8 +227,8 @@ module chevrotain.gastBuilder.spec {
             b.terminalNameToConstructor = <any>tok
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text:  "this.CONSUME2(tok.IdentTok)",
-                type:  b.ProdType.TERMINAL
+                text: "this.CONSUME2(tok.IdentTok)",
+                type: b.ProdType.TERMINAL
             }, [])
             expect(actual).toEqual(jasmine.any(gast.Terminal))
             expect((<gast.Terminal>actual).occurrenceInParent).toBe(2)
@@ -239,8 +239,8 @@ module chevrotain.gastBuilder.spec {
             b.terminalNameToConstructor = {}
             var buildMissingTerminal = () => b.buildProdGast({
                 range: new r.Range(1, 2),
-                text:  "this.CONSUME2(tok.IdentTok)",
-                type:  b.ProdType.TERMINAL
+                text: "this.CONSUME2(tok.IdentTok)",
+                type: b.ProdType.TERMINAL
             }, [])
 
             expect(buildMissingTerminal).toThrow(Error("Terminal Token name: " + "IdentTok" + " not found"))
@@ -249,8 +249,8 @@ module chevrotain.gastBuilder.spec {
         it("can build a Ref Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text:  "this.SUBRULE(this.bamba(1))",
-                type:  b.ProdType.REF
+                text: "this.SUBRULE(this.bamba(1))",
+                type: b.ProdType.REF
             }, [])
             expect(actual).toEqual(jasmine.any(gast.ProdRef))
             expect((<gast.ProdRef>actual).occurrenceInParent).toBe(1)
@@ -272,8 +272,8 @@ module chevrotain.gastBuilder.spec {
         it("can build an AT_LEAST_ONE Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text:  "this.AT_LEAST_ONE(...)",
-                type:  b.ProdType.AT_LEAST_ONE
+                text: "this.AT_LEAST_ONE(...)",
+                type: b.ProdType.AT_LEAST_ONE
             }, [])
             expect(actual).toEqual(jasmine.any(gast.AT_LEAST_ONE))
             expect((<gast.AT_LEAST_ONE>actual).definition.length).toBe(0)
@@ -282,8 +282,8 @@ module chevrotain.gastBuilder.spec {
         it("can build an OPTION Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text:  "this.OPTION(...)",
-                type:  b.ProdType.OPTION
+                text: "this.OPTION(...)",
+                type: b.ProdType.OPTION
             }, [])
             expect(actual).toEqual(jasmine.any(gast.OPTION))
             expect((<gast.OPTION>actual).definition.length).toBe(0)
