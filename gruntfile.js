@@ -59,12 +59,6 @@ module.exports = function(grunt) {
             }
         },
 
-        coveralls: {
-            options: {
-                src: 'target/coverage/lcov.info'
-            }
-        },
-
         tslint: {
             options: {
                 configuration: grunt.file.readJSON("tslint.json")
@@ -181,7 +175,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
     grunt.loadNpmTasks('grunt-jasmine-node-coverage')
-    grunt.loadNpmTasks('grunt-coveralls')
 
     var releaseBuildTasks = [
         'clean:release',
@@ -198,7 +191,6 @@ module.exports = function(grunt) {
     grunt.registerTask('build_and_test', commonReleaseTasks)
     grunt.registerTask('test', ['jasmine_node:node_release_tests'])
     grunt.registerTask('build_and_test_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
-    grunt.registerTask('coveralls', ["coveralls"])
 
     grunt.registerTask('dev_build', [
         'clean:dev_build',
