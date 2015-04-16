@@ -24,5 +24,8 @@
     "tslint": "~2.1.1",
     "wrench": "~1.5.8"
   },
+  "scripts": {
+    "test": "grunt test"
+  },
   "private": true
 }

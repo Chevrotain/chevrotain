@@ -177,19 +177,21 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jasmine-node-coverage');
 
 
-    var commonReleaseTasks = [
+    var releaseBuildTasks = [
         'clean:release',
         'ts:release',
         'tslint',
         'concat:release',
         'umd:release',
-        'umd:release_specs',
-        'jasmine_node:node_release_tests'
+        'umd:release_specs'
     ]
 
-    grunt.registerTask('release', commonReleaseTasks)
+    var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])
 
-    grunt.registerTask('release_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
+    grunt.registerTask('build', releaseBuildTasks)
+    grunt.registerTask('build_and_test', commonReleaseTasks)
+    grunt.registerTask('test', ['jasmine_node:node_release_tests'])
+    grunt.registerTask('build_and_test_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
 
     grunt.registerTask('dev_build', [
         'clean:dev_build',
