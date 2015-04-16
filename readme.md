@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
+
 #Chevrotain
 
    
