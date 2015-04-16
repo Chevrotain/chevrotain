@@ -1,7 +1,7 @@
 var wrench = require('wrench')
 var _ = require('lodash')
-var specsFiles = require('./scripts/findSpecs')("target/gen/test/", "test")
-var exampleSpecsFiles = require('./scripts/findSpecs')("target/gen/examples/", "examples")
+var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/", "test")
+var exampleSpecsFiles = require('./scripts/findSpecs')("target/release/tsc/examples/", "examples")
 
 module.exports = function(grunt) {
 
