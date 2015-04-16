@@ -2,7 +2,6 @@ var wrench = require('wrench')
 var _ = require('lodash')
 
 
-
 module.exports = function(prefix, base) {
     var testFolderContents = wrench.readdirSyncRecursive(base);
 
