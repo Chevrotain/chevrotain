@@ -5,6 +5,7 @@
 /// <reference path="../parse/Constants.ts" />
 /// <reference path="../parse/grammar/Interpreter2.ts" />
 /// <reference path="../parse/grammar/Follow.ts" />
+/// <reference path="../parse/grammar/Lookahead.ts" />
 
 /// <reference path="../../libs/lodash.d.ts" />
 module chevrotain.recognizer {
@@ -16,6 +17,7 @@ module chevrotain.recognizer {
     import lang = chevrotain.lang
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow
+    import lookahead = chevrotain.lookahead
 
     export interface RecognitionException extends Error {
         token:tok.Token
@@ -93,6 +95,9 @@ module chevrotain.recognizer {
         RULE_STACK:string[]
         FOLLOW_STACK:Function[][]
     }
+
+    export type LookAheadFunc = () => boolean
+    export type GrammarAction = () => void
 
     export class BaseRecognizer {
 
@@ -222,7 +227,7 @@ module chevrotain.recognizer {
             this.inputIdx = newState.inputIdx
         }
 
-        protected OPTION(condition:() => boolean, action:() => void):boolean {
+        protected OPTION(condition:LookAheadFunc, action:GrammarAction):boolean {
             if (condition.call(this)) {
                 action.call(this)
                 return true
@@ -293,23 +298,29 @@ module chevrotain.recognizer {
 
     export class BaseErrorRecoveryRecognizer extends BaseRecognizer {
 
-        private static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
+        protected static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
 
-        private static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
+        protected static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
 
-        private static getProductionsForClass(classInstance:any):lang.HashTable<gast.TOP_LEVEL> {
+        protected static getProductionsForClass(classInstance:any):lang.HashTable<gast.TOP_LEVEL> {
             return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS)
         }
 
-        private static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.HashTable<lang.HashTable<Function[]>>()
+        protected static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.HashTable<lang.HashTable<Function[]>>()
 
-        private static getResyncFollowsForClass(classInstance:any):lang.HashTable<Function[]> {
+        protected static getResyncFollowsForClass(classInstance:any):lang.HashTable<Function[]> {
             return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS)
         }
 
-        private static setResyncFollowsForClass(classInstance:any, followSet:lang.HashTable<Function[]>):void {
+        protected static setResyncFollowsForClass(classInstance:any, followSet:lang.HashTable<Function[]>):void {
             var className = lang.classNameFromInstance(classInstance)
             BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
+        }
+
+        protected static CLASS_TO_LOOKAHEAD_FUNCS = new lang.HashTable<lang.HashTable<Function>>()
+
+        protected static getLookaheadFuncsForClass(classInstance:any):lang.HashTable<Function> {
+            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_LOOKAHEAD_FUNCS)
         }
 
         protected static performSelfAnalysis(classInstance:any) {
@@ -403,6 +414,71 @@ module chevrotain.recognizer {
         // can the self parsing itself be done in a more dynamic manner taking into account this information (rules names) ?
         protected SUBRULE<T>(res:T):T {
             return res
+        }
+
+        protected getConditionForOption(occurence:number):() => boolean {
+            var classLAFuncs = BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            var key = "OPTION" + occurence + "_IN" + _.last(this.RULE_STACK)
+            var condition = <any>classLAFuncs.get(key)
+            if (_.isUndefined(condition)) {
+                var ruleName = _.last(this.RULE_STACK)
+                var ruleGrammar = this.getGAstProductions().get(ruleName)
+                condition = lookahead.buildLookaheadForOption(occurence, ruleName, ruleGrammar)
+                classLAFuncs.put(key, condition)
+            }
+
+            return condition
+        }
+
+        // TODO: lots of <any> assertions in OPTIONS due to IntelliJ bugs
+        protected OPTION(condition:LookAheadFunc | GrammarAction,
+                         action?:GrammarAction):boolean {
+            return this.OPTION1.apply(this, arguments)
+        }
+
+        protected OPTION1(condition:LookAheadFunc | GrammarAction,
+                          action?:GrammarAction):boolean {
+            if (arguments.length === 1) {
+                action = <any>condition
+                condition = this.getConditionForOption(1)
+            }
+            return super.OPTION(<any>condition, <any>action)
+        }
+
+        protected OPTION2(condition:LookAheadFunc | GrammarAction,
+                          action?:GrammarAction):boolean {
+            if (arguments.length === 1) {
+                action = <any>condition
+                condition = this.getConditionForOption(2)
+            }
+            return super.OPTION(<any>condition, <any>action)
+        }
+
+        protected OPTION3(condition:LookAheadFunc | GrammarAction,
+                          action?:GrammarAction):boolean {
+            if (arguments.length === 1) {
+                action = <any>condition
+                condition = this.getConditionForOption(3)
+            }
+            return super.OPTION(<any>condition, <any>action)
+        }
+
+        protected OPTION4(condition:LookAheadFunc | GrammarAction,
+                          action?:GrammarAction):boolean {
+            if (arguments.length === 1) {
+                action = <any>condition
+                condition = this.getConditionForOption(4)
+            }
+            return super.OPTION(<any>condition, <any>action)
+        }
+
+        protected OPTION5(condition:LookAheadFunc | GrammarAction,
+                          action?:GrammarAction):boolean {
+            if (arguments.length === 1) {
+                action = <any>condition
+                condition = this.getConditionForOption(5)
+            }
+            return super.OPTION(<any>condition, <any>action)
         }
 
         // TODO: can the 2 optional parameters for special 'preemptive' resync recovery into the next item of the 'MANY'
@@ -574,7 +650,7 @@ module chevrotain.recognizer {
             var topRuleName = _.first(pathRuleStack)
             var gastProductions = this.getGAstProductions()
             var topProduction = gastProductions.get(topRuleName)
-            var follows = new interp.NextPossibleTokensWalker(topProduction, grammarPath).startWalking()
+            var follows = new interp.NextAfterTokenWalker(topProduction, grammarPath).startWalking()
             return follows
         }
 
@@ -675,14 +751,14 @@ module chevrotain.recognizer {
         }
 
         // Not worth the hassle to support Unicode characters in rule names...
-        private ruleNamePattern = /^[a-zA-Z_]\w*$/
-        private definedRulesNames:string[] = []
+        protected ruleNamePattern = /^[a-zA-Z_]\w*$/
+        protected definedRulesNames:string[] = []
 
         /**
          * @param ruleFuncName name of the Grammar rule
          * @throws Grammar validation errors if the name is invalid
          */
-        private validateRuleName(ruleFuncName:string):void {
+        protected validateRuleName(ruleFuncName:string):void {
             if (!ruleFuncName.match(this.ruleNamePattern)) {
                 throw Error("Invalid Grammar rule name --> " + ruleFuncName +
                 " it must match the pattern: " + this.ruleNamePattern.toString())

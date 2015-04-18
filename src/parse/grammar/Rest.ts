@@ -36,11 +36,7 @@ module chevrotain.rest {
             })
         }
 
-        // override this either with an empty impel to ignore terminals
-        // or implement relevant logic to compute "things" once a terminal has been found
-        /* istanbul ignore next */
         walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            throw Error("unimplemented Abstract Error")
         }
 
         // override this either with an empty impel to ignore references to other productions
@@ -53,13 +49,13 @@ module chevrotain.rest {
         walkFlat(flatProd:g.FLAT, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABCDEF => after the D the rest is EF
             var fullOrRest = currRest.concat(prevRest)
-            this.walk(flatProd, fullOrRest)
+            this.walk(flatProd, <any>fullOrRest)
         }
 
-        walkOption(OptionProd:g.OPTION, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkOption(optionProd:g.OPTION, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(DE)?F => after the (DE)? the rest is F
             var fullOrRest = currRest.concat(prevRest)
-            this.walk(OptionProd, fullOrRest)
+            this.walk(optionProd, <any>fullOrRest)
         }
 
         walkAtLeastOne(atLeastOneProd:g.AT_LEAST_ONE, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
@@ -83,7 +79,7 @@ module chevrotain.rest {
                 // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
                 // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
                 var prodWrapper = new gast.FLAT([alt])
-                this.walk(prodWrapper, fullOrRest)
+                this.walk(prodWrapper, <any>fullOrRest)
             })
         }
 

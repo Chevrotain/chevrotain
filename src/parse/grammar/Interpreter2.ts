@@ -13,19 +13,18 @@ module chevrotain.interpreter {
     import r = chevrotain.rest
     import p = chevrotain.path
 
-    export class NextPossibleTokensWalker extends r.RestWalker {
+    export class AbstractNextPossibleTokensWalker extends r.RestWalker {
 
-        private possibleTokTypes:Function[] = []
-        private ruleStack:string[]
-        private occurrenceStack:number[]
+        protected possibleTokTypes:Function[] = []
+        protected ruleStack:string[]
+        protected occurrenceStack:number[]
 
-        private nextTerminalName = ""
-        private nextTerminalOccurrence = 0
-        private nextProductionName = ""
-        private nextProductionOccurrence = 0
-        private found = false
+        protected nextProductionName = ""
+        protected nextProductionOccurrence = 0
+        protected found = false
+        protected isAtEndOfPath = false;
 
-        constructor(private topProd:g.TOP_LEVEL, private path:p.IGrammarPath) {super() }
+        constructor(protected topProd:g.TOP_LEVEL, protected path:p.IGrammarPath) {super() }
 
         startWalking():Function[] {
 
@@ -60,18 +59,6 @@ module chevrotain.interpreter {
             }
         }
 
-        walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            if (t.getTokName(terminal.terminalType) === this.nextTerminalName &&
-                terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)
-            ) {
-                var fullRest = currRest.concat(prevRest)
-                var restProd = new g.FLAT(fullRest)
-                // yey we know what comes after the path and can now compute it's FIRST
-                this.possibleTokTypes = f.first(restProd)
-                this.found = true
-            }
-        }
-
         walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // found the next production, need to keep walking in it
             if (refProd.ref.name === this.nextProductionName &&
@@ -79,26 +66,69 @@ module chevrotain.interpreter {
             ) {
                 var fullRest = currRest.concat(prevRest)
                 this.updateExpectedNext()
-                this.walk(refProd.ref, fullRest)
+                this.walk(refProd.ref, <any>fullRest)
             }
         }
 
         updateExpectedNext():void {
             // need to consume the Terminal
             if (_.isEmpty(this.ruleStack)) {
-                this.nextTerminalName = t.getTokName(this.path.lastTok)
-                this.nextTerminalOccurrence = this.path.lastTokOccurrence
-
                 // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
                 // really seeking is the last Terminal...
                 this.nextProductionName = ""
                 this.nextProductionOccurrence = 0
+                this.isAtEndOfPath = true
             }
             else {
                 this.nextProductionName = this.ruleStack.pop()
                 this.nextProductionOccurrence = this.occurrenceStack.pop()
             }
 
+        }
+    }
+
+    export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
+        private nextTerminalName = ""
+        private nextTerminalOccurrence = 0
+
+        constructor(topProd:g.TOP_LEVEL, protected path:p.ITokenGrammarPath) {
+            super(topProd, path)
+            this.nextTerminalName = t.getTokName(this.path.lastTok)
+            this.nextTerminalOccurrence = this.path.lastTokOccurrence
+        }
+
+        walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (this.isAtEndOfPath && t.getTokName(terminal.terminalType) === this.nextTerminalName &&
+                terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)
+            ) {
+                var fullRest = currRest.concat(prevRest)
+                var restProd = new g.FLAT(<any>fullRest)
+                // yey we know what comes after the path and can now compute it's FIRST
+                this.possibleTokTypes = f.first(restProd)
+                this.found = true
+            }
+        }
+    }
+
+    export class NextInsideOptionWalker extends AbstractNextPossibleTokensWalker {
+
+        private nextOptionOccurrence = 0
+
+        constructor(topProd:g.TOP_LEVEL, protected path:p.IOptionGrammarPath) {
+            super(topProd, path)
+            this.nextOptionOccurrence = this.path.lastOptionOccurrence
+        }
+
+        walkOption(optionProd:g.OPTION, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
+                var restProd = new g.FLAT(optionProd.definition)
+                // yey we know what comes after the path and can now compute it's FIRST
+                this.possibleTokTypes = f.first(restProd)
+                this.found = true
+            }
+            else {
+                super.walkOption(optionProd, currRest, prevRest)
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ module test.samples {
         ])
     ])
 
-    export var ParamSpec = new gast.TOP_LEVEL("ParamSpec", [
+    export var paramSpec = new gast.TOP_LEVEL("paramSpec", [
         new gast.Terminal(IdentTok),
         new gast.Terminal(ColonTok),
         new gast.ProdRef("qualifiedName", qualifiedName),
@@ -51,17 +51,17 @@ module test.samples {
         new gast.Terminal(IdentTok),
         new gast.Terminal(LParenTok),
         new gast.OPTION([
-            new gast.ProdRef("ParamSpec", ParamSpec),
+            new gast.ProdRef("paramSpec", paramSpec),
             new gast.MANY([
                 new gast.Terminal(CommaTok),
-                new gast.ProdRef("ParamSpec", ParamSpec, 2)
+                new gast.ProdRef("paramSpec", paramSpec, 2)
             ])
         ]),
         new gast.Terminal(RParenTok),
         new gast.OPTION([
             new gast.Terminal(ColonTok),
             new gast.ProdRef("qualifiedName", qualifiedName)
-        ]),
+        ], 2),
         new gast.Terminal(SemicolonTok)
     ])
 
@@ -87,8 +87,7 @@ module test.samples {
         new gast.OPTION([
             new gast.Terminal(DefaultTok),
             new gast.ProdRef("expression")
-        ])
+        ], 2)
     ])
-
 
 }

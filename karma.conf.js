@@ -55,7 +55,8 @@ module.exports = function(config) {
             [
                 {pattern: 'target/gen/**/*.map', included: false},
                 {pattern: 'src/**/*.ts', included: false},
-                {pattern: 'test/**/*.ts', included: false}
+                {pattern: 'test/**/*.ts', included: false},
+                {pattern: 'examples/**/*.ts', included: false}
             ]),
 
         // test results reporter to use
