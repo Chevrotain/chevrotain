@@ -115,7 +115,7 @@ module chevrotain.examples.recovery.switchcase {
             this.CONSUME1(ColonTok)
             this.CONSUME1(ReturnTok)
             valueTok = this.CONSUME1(IntTok)
-            this.OPTION(isSemiColon, () => {
+            this.OPTION(() => {
                 this.CONSUME1(SemiColonTok)
             })
 

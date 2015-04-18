@@ -41,7 +41,10 @@ module chevrotain.gastBuilder {
     var refRegExGlobal = new RegExp(refRegEx.source, "g")
 
     // this.OPTION(this.isSemicolon, ()=> {semicolon = this.CONSUME1(tok.SemicolonTok)})
-    var optionRegEx = /this\s*.\s*OPTION\s*\(/g
+    var optionRegEx = /this\s*.\s*OPTION(?:_LA)?(\d)?\s*\(/
+    var optionRegExGlobal = new RegExp(optionRegEx.source, "g")
+
+
     var orRegEx = /this\s*.\s*OR\s*\(/g
     var manyRegEx = /this\s*.\s*MANY\s*\(/g
     var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE\s*\(/g
@@ -81,7 +84,7 @@ module chevrotain.gastBuilder {
             case ProdType.MANY:
                 return buildAbstractProd(new gast.MANY([]), prodRange.range, allRanges)
             case ProdType.OPTION:
-                return buildAbstractProd(new gast.OPTION([]), prodRange.range, allRanges)
+                return buildOptionProd(prodRange, allRanges)
             case ProdType.OR:
                 return buildAbstractProd(new gast.OR([]), prodRange.range, allRanges)
             case ProdType.FLAT:
@@ -111,6 +114,13 @@ module chevrotain.gastBuilder {
             throw Error("Terminal Token name: " + terminalName + " not found")
         }
         return new gast.Terminal(terminalType, terminalOccurrence)
+    }
+
+    function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OPTION {
+        var reResult = optionRegEx.exec(prodRange.text)
+        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var optionProd = new gast.OPTION([], refOccurrence)
+        return buildAbstractProd(optionProd, prodRange.range, allRanges)
     }
 
     function buildAbstractProd<T extends gast.AbstractProduction>(prod:T,
@@ -180,7 +190,7 @@ module chevrotain.gastBuilder {
     }
 
     export function createOptionRanges(text:string):IProdRange[] {
-        return createOperatorProdRangeParenthesis(text, ProdType.OPTION, optionRegEx)
+        return createOperatorProdRangeParenthesis(text, ProdType.OPTION, optionRegExGlobal)
     }
 
     export function createOrRanges(text):IProdRange[] {

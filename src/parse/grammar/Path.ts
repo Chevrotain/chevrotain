@@ -5,19 +5,26 @@ module chevrotain.path {
     import tok = chevrotain.tokens
 
     /**
-     * this interfaces defines the path the parser "took" to reach the position
-     * in which a content assist is required
+     * this interfaces defines the path the parser "took" to reach a certain position
+     * in the grammar.
      */
     export interface IGrammarPath {
         ruleStack:string[]
         occurrenceStack:number[]
+    }
+
+    export interface ITokenGrammarPath extends IGrammarPath {
         lastTok:Function
         lastTokOccurrence:number
     }
 
+    export interface IOptionGrammarPath extends IGrammarPath {
+        lastOptionOccurrence:number
+    }
+
     var invalidContentAssistPath = {ruleStack: [], occurrenceStack: [], lastTok: tok.NoneToken, lastTokOccurrence: -1}
 
-    export function NO_PATH_FOUND():IGrammarPath {
+    export function NO_PATH_FOUND():ITokenGrammarPath {
         return invalidContentAssistPath
     }
 }
