@@ -251,20 +251,6 @@ module chevrotain.recognizer {
             }
         }
 
-        protected MANY_OR(cases:IManyOrCase[]):void {
-            var lastWasValid:any = true
-            while (lastWasValid) {
-                for (var i = 0; i < cases.length; i++) {
-                    lastWasValid = false
-                    if (cases[i].WHEN.call(this)) {
-                        cases[i].THEN_DO()
-                        lastWasValid = true
-                        break
-                    }
-                }
-            }
-        }
-
         protected AT_LEAST_ONE(lookAheadFunc:() => boolean, consume:() => void, errMsg:string):void {
             if (lookAheadFunc.call(this)) {
                 consume.call(this)
@@ -432,27 +418,6 @@ module chevrotain.recognizer {
                 // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
                 // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
                 this.tryInRepetitionRecovery(this.AT_LEAST_ONE, arguments, lookAheadFunc, expectTokAfterLastMatch)
-            }
-        }
-
-        protected MANY_OR(cases:IManyOrCase[], expectTokAfterLastMatch?:Function, nextTokIdx?:number):void {
-            super.MANY_OR(cases)
-
-            if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
-                this.tryInRepetitionRecovery(
-                    this.MANY_OR,
-                    arguments,
-                    // the lookahead Func for trying preemptive in repetition recovery in MANY_OR is
-                    // performed by trying all the OR cases lookaheads one by one
-                    () => {
-                        var allLookAheadFuncs = _.map(cases, (singleCase:IManyOrCase) => {
-                            return singleCase.WHEN
-                        })
-                        return _.find(allLookAheadFuncs, (singleLookAheadFunc) => {
-                                return singleLookAheadFunc.call(this)
-                            }) !== undefined
-                    },
-                    expectTokAfterLastMatch)
             }
         }
 
