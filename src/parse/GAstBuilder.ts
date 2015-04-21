@@ -44,8 +44,6 @@ module chevrotain.gastBuilder {
     var optionRegEx = /this\s*.\s*OPTION\s*\(/g
     var orRegEx = /this\s*.\s*OR\s*\(/g
     var manyRegEx = /this\s*.\s*MANY\s*\(/g
-    var manyOrRegEx = /this\s*.\s*MANY_OR\s*\(/g
-    var orInManyRegEx = /_OR\s*\(/g
     var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE\s*\(/g
 
     var orPartRegEx = /{\s*WHEN\s*:/g
@@ -160,10 +158,9 @@ module chevrotain.gastBuilder {
         var manyRanges = createManyRanges(text)
         var optionRanges = createOptionRanges(text)
         var orRanges = createOrRanges(text)
-        var manyOrRanges = createManyOrRanges(text)
 
         return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneRanges,
-            manyRanges, optionRanges, orRanges, manyOrRanges)
+            manyRanges, optionRanges, orRanges)
     }
 
     export function createTerminalRanges(text:string):IProdRange[] {
@@ -192,21 +189,6 @@ module chevrotain.gastBuilder {
         // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
         var orSubPartsRanges = createOrPartRanges(orRanges)
         return _.union(orRanges, orSubPartsRanges)
-    }
-
-    // MANY_OR is just "syntactic sugar" its parsed as MANY(OR(...)
-    export function createManyOrRanges(text):IProdRange[] {
-        var manyRanges = createOperatorProdRangeParenthesis(text, ProdType.MANY, manyOrRegEx)
-        var orInManyRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orInManyRegEx)
-        _.forEach(orInManyRanges, (innerOr) => {
-            // for MANY_OR(....) the terminating parentehsis is the same, which will break the condition of striclyContains...
-            // so we adjust the OR to 'end' just before the MANY
-            innerOr.range.end = innerOr.range.end - 1
-        })
-        // have to split up the OR cases into separate FLAT productions
-        // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
-        var orSubPartsRanges = createOrPartRanges(orInManyRanges)
-        return _.union(manyRanges, orInManyRanges, orSubPartsRanges)
     }
 
     var findClosingCurly:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "{", "}")
