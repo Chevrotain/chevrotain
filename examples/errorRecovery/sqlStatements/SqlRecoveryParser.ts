@@ -138,7 +138,7 @@ module chevrotain.examples.recovery.sql {
             var allIdentsPts = WRAP_IN_PT(idents)
             var dotsPt = PT(new DOTS(), WRAP_IN_PT(dots))
             var allPtChildren = allIdentsPts.concat([dotsPt])
-            return PT(new QUALIFIED_NAME(), allPtChildren)
+            return PT(new QUALIFIED_NAME(), <any>allPtChildren)
         }
 
         private parseRecordValue():pt.ParseTree {

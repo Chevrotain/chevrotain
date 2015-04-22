@@ -49,7 +49,6 @@ module chevrotain.recognizer.spec {
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
-            // the invalid part is that we forgot to call the self analysis
             recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
         }
 
@@ -172,10 +171,10 @@ module chevrotain.recognizer.spec {
         })
 
         it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
-            var parser:any = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
+            var parser:any = new recog.BaseErrorRecoveryRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)], {})
 
             var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
-                parser.CONSUME(IntToken)
+                parser.CONSUME1(IntToken)
             })
             expect(successfulOption).toBe(true)
 
@@ -183,7 +182,7 @@ module chevrotain.recognizer.spec {
                 // this lookahead should fail because the first token has been consumed and
                 // now the next one is a PlusTok
                 return this.NEXT_TOKEN() instanceof IntToken
-            }, () => { parser.CONSUME(IntToken) })
+            }, () => { parser.CONSUME1(IntToken) })
             expect(failedOption).toBe(false)
         })
 

@@ -11,6 +11,7 @@
 /// <reference path="../src/parse/grammar/Rest.ts" />
 /// <reference path="../src/parse/grammar/Follow.ts" />
 /// <reference path="../src/parse/grammar/Interpreter2.ts" />
+/// <reference path="../src/parse/grammar/Lookahead.ts" />
 /// <reference path="../src/parse/GAstBuilder.ts" />
 /// <reference path="../src/parse/Recognizer.ts" />
 
