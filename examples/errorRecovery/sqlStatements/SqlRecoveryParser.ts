@@ -55,9 +55,10 @@ module chevrotain.examples.recovery.sql {
         private parseDdl():pt.ParseTree {
             var stmts = []
 
-            this.MANY_OR(
-                [
-                    // @formatter:off
+            this.MANY(isStmt,
+                () => {
+                    this.OR([
+                        // @formatter:off
                     {WHEN: isCreate, THEN_DO: () => {
                         // DOCS: note how the invocation of another parseRule also adds the occurrence index
                         //       if we had another invocation of this.createStmt inside this rule, we would have had to use
@@ -70,10 +71,12 @@ module chevrotain.examples.recovery.sql {
                         // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
                         stmts.push(this.SUBRULE(this.deleteStmt(1)))}},
                 // @formatter:on
-                    // DOCS: in this case we specify we expect EndOfFile after all the statements have been matched
-                    // this means that if once we are ready to exit the MANY_OR EOF is not the next token, in-repetition
-                    // will be attempted
-                ], recog.EOF, 1)
+                        // DOCS: in this case we specify we expect EndOfFile after all the statements have been matched
+                        // this means that if once we are ready to exit the MANY if EOF is not the next token, in-repetition
+                        // will be attempted
+                    ], "A Statement")
+                }, recog.EOF, 1)
+
             return PT(new STATEMENTS(), stmts)
         }
 
@@ -153,7 +156,6 @@ module chevrotain.examples.recovery.sql {
                 values.push(this.SUBRULE(this.value(1)))
             })
             this.CONSUME1(RParenTok)
-
             // tree rewrite
             var commasPt = PT(new COMMAS(), WRAP_IN_PT(commas))
             var allPtChildren = values.concat([commasPt])
@@ -172,6 +174,10 @@ module chevrotain.examples.recovery.sql {
                     // @formatter:on
             return PT(value)
         }
+    }
+
+    function isStmt():boolean {
+        return isCreate.call(this) || isInsert.call(this) || isDelete.call(this)
     }
 
     function isCreate():boolean {
