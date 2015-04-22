@@ -65,6 +65,12 @@ module test.samples {
         new gast.Terminal(SemicolonTok)
     ])
 
+    export var manyActions = new gast.TOP_LEVEL("manyActions", [
+        new gast.MANY([
+            new gast.ProdRef("actionDec", actionDec, 1)
+        ])
+    ])
+
     export var cardinality = new gast.TOP_LEVEL("cardinality", [
         new gast.Terminal(LSquareTok),
         new gast.Terminal(UnsignedIntegerLiteralTok),

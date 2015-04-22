@@ -44,11 +44,11 @@ module chevrotain.gastBuilder {
     var optionRegEx = /this\s*.\s*OPTION(?:_LA)?(\d)?\s*\(/
     var optionRegExGlobal = new RegExp(optionRegEx.source, "g")
 
+    var manyRegEx = /this\s*.\s*MANY(\d)?\s*\(/
+    var manyRegExGlobal = new RegExp(manyRegEx.source, "g")
 
     var orRegEx = /this\s*.\s*OR\s*\(/g
-    var manyRegEx = /this\s*.\s*MANY\s*\(/g
     var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE\s*\(/g
-
     var orPartRegEx = /{\s*WHEN\s*:/g
 
     export interface ITerminalNameToConstructor {
@@ -82,7 +82,7 @@ module chevrotain.gastBuilder {
             case ProdType.AT_LEAST_ONE:
                 return buildAbstractProd(new gast.AT_LEAST_ONE([]), prodRange.range, allRanges)
             case ProdType.MANY:
-                return buildAbstractProd(new gast.MANY([]), prodRange.range, allRanges)
+                return buildManyProd(prodRange, allRanges)
             case ProdType.OPTION:
                 return buildOptionProd(prodRange, allRanges)
             case ProdType.OR:
@@ -114,6 +114,14 @@ module chevrotain.gastBuilder {
             throw Error("Terminal Token name: " + terminalName + " not found")
         }
         return new gast.Terminal(terminalType, terminalOccurrence)
+    }
+
+    // TODO: extract reoccuring pattern for buildManyProd/BuildOptionProd
+    function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.MANY {
+        var reResult = manyRegEx.exec(prodRange.text)
+        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var optionProd = new gast.MANY([], refOccurrence)
+        return buildAbstractProd(optionProd, prodRange.range, allRanges)
     }
 
     function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OPTION {
@@ -186,7 +194,7 @@ module chevrotain.gastBuilder {
     }
 
     export function createManyRanges(text:string):IProdRange[] {
-        return createOperatorProdRangeParenthesis(text, ProdType.MANY, manyRegEx)
+        return createOperatorProdRangeParenthesis(text, ProdType.MANY, manyRegExGlobal)
     }
 
     export function createOptionRanges(text:string):IProdRange[] {

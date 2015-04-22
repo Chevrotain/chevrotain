@@ -349,10 +349,10 @@ module chevrotain.interpreter.spec {
 
         describe("The NextInsideOptionWalker", function () {
             it("can compute the next possible token types inside the OPTION in paramSpec", function () {
-                var path:p.IOptionGrammarPath = {
+                var path:p.IRuleGrammarPath = {
                     ruleStack: ["paramSpec"],
                     occurrenceStack: [1],
-                    lastOptionOccurrence: 1
+                    occurrence: 1
                 }
 
                 var possibleNextTokTypes = new NextInsideOptionWalker(samples.paramSpec, path).startWalking()
@@ -360,10 +360,10 @@ module chevrotain.interpreter.spec {
             })
 
             it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", function () {
-                var path:p.IOptionGrammarPath = {
+                var path:p.IRuleGrammarPath = {
                     ruleStack: ["actionDec", "paramSpec"],
                     occurrenceStack: [1, 1],
-                    lastOptionOccurrence: 1
+                    occurrence: 1
                 }
 
                 var possibleNextTokTypes = new NextInsideOptionWalker(samples.actionDec, path).startWalking()
@@ -371,16 +371,61 @@ module chevrotain.interpreter.spec {
             })
 
             it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", function () {
-                var path:p.IOptionGrammarPath = {
+                var path:p.IRuleGrammarPath = {
                     ruleStack: ["actionDec"],
                     occurrenceStack: [1],
-                    lastOptionOccurrence: 2
+                    occurrence: 2
                 }
 
                 var possibleNextTokTypes = new NextInsideOptionWalker(samples.actionDec, path).startWalking()
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.ColonTok])
             })
+        })
 
+        describe("The NextInsideManyWalker", function () {
+            it("can compute the next possible token types inside the MANY in QualifiedName", function () {
+                var path:p.IRuleGrammarPath = {
+                    ruleStack: ["qualifiedName"],
+                    occurrenceStack: [1],
+                    occurrence: 1
+                }
+
+                var possibleNextTokTypes = new NextInsideManyWalker(samples.qualifiedName, path).startWalking()
+                matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok])
+            })
+
+            it("can compute the next possible token types inside the MANY in paramSpec inside ActionDec", function () {
+                var path:p.IRuleGrammarPath = {
+                    ruleStack: ["actionDec"],
+                    occurrenceStack: [1],
+                    occurrence: 1
+                }
+
+                var possibleNextTokTypes = new NextInsideManyWalker(samples.actionDec, path).startWalking()
+                matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.CommaTok])
+            })
+
+            it("can compute the next possible token types inside the MANY in paramSpec inside ParamSpec --> QualifiedName", function () {
+                var path:p.IRuleGrammarPath = {
+                    ruleStack: ["paramSpec", "qualifiedName"],
+                    occurrenceStack: [1, 1],
+                    occurrence: 1
+                }
+
+                var possibleNextTokTypes = new NextInsideManyWalker(samples.paramSpec, path).startWalking()
+                matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok])
+            })
+
+            it("can compute the next possible token types inside the MANY inside: manyActions --> actionDec ", function () {
+                var path:p.IRuleGrammarPath = {
+                    ruleStack: ["manyActions", "actionDec"],
+                    occurrenceStack: [1, 1],
+                    occurrence: 1
+                }
+
+                var possibleNextTokTypes = new NextInsideManyWalker(samples.manyActions, path).startWalking()
+                matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.CommaTok])
+            })
         })
 
     })

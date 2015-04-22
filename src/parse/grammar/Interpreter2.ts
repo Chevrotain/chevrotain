@@ -103,7 +103,6 @@ module chevrotain.interpreter {
             ) {
                 var fullRest = currRest.concat(prevRest)
                 var restProd = new g.FLAT(<any>fullRest)
-                // yey we know what comes after the path and can now compute it's FIRST
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -114,20 +113,40 @@ module chevrotain.interpreter {
 
         private nextOptionOccurrence = 0
 
-        constructor(topProd:g.TOP_LEVEL, protected path:p.IOptionGrammarPath) {
+        constructor(topProd:g.TOP_LEVEL, protected path:p.IRuleGrammarPath) {
             super(topProd, path)
-            this.nextOptionOccurrence = this.path.lastOptionOccurrence
+            this.nextOptionOccurrence = this.path.occurrence
         }
 
         walkOption(optionProd:g.OPTION, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
                 var restProd = new g.FLAT(optionProd.definition)
-                // yey we know what comes after the path and can now compute it's FIRST
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
             else {
                 super.walkOption(optionProd, currRest, prevRest)
+            }
+        }
+    }
+
+    export class NextInsideManyWalker extends AbstractNextPossibleTokensWalker {
+
+        private nextOccurrence = 0
+
+        constructor(topProd:g.TOP_LEVEL, protected path:p.IRuleGrammarPath) {
+            super(topProd, path)
+            this.nextOccurrence = this.path.occurrence
+        }
+
+        walkMany(manyProd:g.MANY, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (this.isAtEndOfPath && manyProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
+                var restProd = new g.FLAT(manyProd.definition)
+                this.possibleTokTypes = f.first(restProd)
+                this.found = true
+            }
+            else {
+                super.walkMany(manyProd, currRest, prevRest)
             }
         }
     }

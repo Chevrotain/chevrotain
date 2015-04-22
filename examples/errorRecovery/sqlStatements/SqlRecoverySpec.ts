@@ -196,7 +196,7 @@ module chevrotain.examples.recovery.sql.spec {
             expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
         })
 
-        it("can re-sync to the next iteration in a MANY_OR rule", function () {
+        it("can re-sync to the next iteration in a MANY rule", function () {
             var input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
