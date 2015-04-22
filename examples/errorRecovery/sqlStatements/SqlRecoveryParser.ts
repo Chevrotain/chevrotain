@@ -55,6 +55,7 @@ module chevrotain.examples.recovery.sql {
         private parseDdl():pt.ParseTree {
             var stmts = []
 
+            // TODO: switch to new style of MANY with automatic lookahead computation
             this.MANY(isStmt,
                 () => {
                     this.OR([

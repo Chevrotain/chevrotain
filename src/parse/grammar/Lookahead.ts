@@ -12,20 +12,29 @@ module chevrotain.lookahead {
     import interp = chevrotain.interpreter
 
     export function buildLookaheadForOption(optionOccurrence:number, ruleName:string, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+        return buildLookAheadForGrammarRule(interp.NextInsideOptionWalker, optionOccurrence, ruleName, ruleGrammar)
+    }
 
-        var path:p.IOptionGrammarPath = {
+    export function buildLookaheadForMany(manyOccurrence:number, ruleName:string, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+        return buildLookAheadForGrammarRule(interp.NextInsideManyWalker, manyOccurrence, ruleName, ruleGrammar)
+    }
+
+    function buildLookAheadForGrammarRule(ruleWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
+                                          ruleName:string, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+        var path:p.IRuleGrammarPath = {
             ruleStack: [ruleName],
             occurrenceStack: [1],
-            lastOptionOccurrence: optionOccurrence
+            occurrence: ruleOccurrence
         }
 
-        var possibleNextTokTypes = new interpreter.NextInsideOptionWalker(ruleGrammar, path).startWalking()
+        var possibleNextTokTypes = new ruleWalker(ruleGrammar, path).startWalking()
 
-        return function() {
-            return _.any(possibleNextTokTypes, function(possibleTok) {
+        return function () {
+            return _.any(possibleNextTokTypes, function (possibleTok) {
                 return this.NEXT_TOKEN() instanceof possibleTok
             }, this)
         }
+
     }
 
 }

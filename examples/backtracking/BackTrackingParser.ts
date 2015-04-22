@@ -119,7 +119,7 @@ module chevrotain.examples.backtracking {
 
         private parseQualifiedName():RET_TYPE {
             this.CONSUME1(IdentTok)
-            this.MANY(isQualifiedNamePart, () => {
+            this.MANY(() => {
                 this.CONSUME1(DotTok)
                 this.CONSUME2(IdentTok)
             })
@@ -127,11 +127,6 @@ module chevrotain.examples.backtracking {
         }
 
     }
-
-    function isQualifiedNamePart():boolean {
-        return this.NEXT_TOKEN() instanceof  DotTok
-    }
-
 
     export function INVALID(stmtType:RET_TYPE):() => RET_TYPE {
         return () => {return stmtType}

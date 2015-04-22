@@ -96,8 +96,8 @@ module chevrotain.recognizer {
         FOLLOW_STACK:Function[][]
     }
 
-    export type LookAheadFunc = () => boolean
-    export type GrammarAction = () => void
+export type LookAheadFunc = () => boolean
+export type GrammarAction = () => void
 
     export class BaseRecognizer {
 
@@ -250,16 +250,16 @@ module chevrotain.recognizer {
             " but found '" + foundToken + "'", this.NEXT_TOKEN()))
         }
 
-        protected MANY(lookAheadFunc:() => boolean, consume:() => void):void {
+        protected MANY(lookAheadFunc:LookAheadFunc, action:GrammarAction):void {
             while (lookAheadFunc.call(this)) {
-                consume.call(this)
+                action.call(this)
             }
         }
 
-        protected AT_LEAST_ONE(lookAheadFunc:() => boolean, consume:() => void, errMsg:string):void {
+        protected AT_LEAST_ONE(lookAheadFunc:LookAheadFunc, action:GrammarAction, errMsg:string):void {
             if (lookAheadFunc.call(this)) {
-                consume.call(this)
-                this.MANY(lookAheadFunc, consume)
+                action.call(this)
+                this.MANY(<any>lookAheadFunc, <any>action)
             }
             else {
                 throw this.SAVE_ERROR(new EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
@@ -402,14 +402,23 @@ module chevrotain.recognizer {
             return res
         }
 
-        protected getConditionForOption(occurence:number):() => boolean {
+        protected getLookaheadFuncForOption(occurence:number):() => boolean {
+            return this.getLookaheadFuncFor("OPTION", occurence, lookahead.buildLookaheadForOption)
+        }
+
+        protected getLookaheadFuncForMany(occurence:number):() => boolean {
+            return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
+        }
+
+        protected getLookaheadFuncFor(prodType:string, occurrence:number,
+                                      laFuncBuilder:(number, string, any) => () => boolean):() => boolean {
             var classLAFuncs = BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
-            var key = "OPTION" + occurence + "_IN" + _.last(this.RULE_STACK)
+            var key = prodType + occurrence + "_IN_" + _.last(this.RULE_STACK)
             var condition = <any>classLAFuncs.get(key)
             if (_.isUndefined(condition)) {
                 var ruleName = _.last(this.RULE_STACK)
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
-                condition = lookahead.buildLookaheadForOption(occurence, ruleName, ruleGrammar)
+                condition = laFuncBuilder(occurrence, ruleName, ruleGrammar)
                 classLAFuncs.put(key, condition)
             }
 
@@ -426,7 +435,7 @@ module chevrotain.recognizer {
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
                 action = <any>condition
-                condition = this.getConditionForOption(1)
+                condition = this.getLookaheadFuncForOption(1)
             }
             return super.OPTION(<any>condition, <any>action)
         }
@@ -435,7 +444,7 @@ module chevrotain.recognizer {
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
                 action = <any>condition
-                condition = this.getConditionForOption(2)
+                condition = this.getLookaheadFuncForOption(2)
             }
             return super.OPTION(<any>condition, <any>action)
         }
@@ -444,7 +453,7 @@ module chevrotain.recognizer {
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
                 action = <any>condition
-                condition = this.getConditionForOption(3)
+                condition = this.getLookaheadFuncForOption(3)
             }
             return super.OPTION(<any>condition, <any>action)
         }
@@ -453,7 +462,7 @@ module chevrotain.recognizer {
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
                 action = <any>condition
-                condition = this.getConditionForOption(4)
+                condition = this.getLookaheadFuncForOption(4)
             }
             return super.OPTION(<any>condition, <any>action)
         }
@@ -462,23 +471,96 @@ module chevrotain.recognizer {
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
                 action = <any>condition
-                condition = this.getConditionForOption(5)
+                condition = this.getLookaheadFuncForOption(5)
             }
             return super.OPTION(<any>condition, <any>action)
         }
 
+        private attemptInRepetitionRecovery(prodFunc:Function,
+                                            args:any[],
+                                            lookaheadFunc:() => boolean,
+                                            expectTokAfterLastMatch:Function,
+                                            nextTokIdx:number) {
+            if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
+                // TODO: performance optimization: instead of passing the original arguments here, we modify
+                // the arguments object (or create a new one) and make sure the lookahead func is explicitly provided
+                // to avoid searching the cache for it once more.
+                this.tryInRepetitionRecovery(prodFunc, args, lookaheadFunc, expectTokAfterLastMatch)
+            }
+        }
+
         // TODO: can the 2 optional parameters for special 'preemptive' resync recovery into the next item of the 'MANY'
         // be computed automatically?
-        protected MANY(lookAheadFunc:() => boolean,
-                       consume:() => void,
+        protected MANY(lookAheadFunc:LookAheadFunc | GrammarAction,
+                       action?:GrammarAction,
                        expectTokAfterLastMatch?:Function,
                        nextTokIdx?:number):void {
-            super.MANY(lookAheadFunc, consume)
+            return this.MANY1.apply(this, arguments)
+        }
 
-
-            if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
-                this.tryInRepetitionRecovery(this.MANY, arguments, lookAheadFunc, expectTokAfterLastMatch)
+        protected MANY1(lookAheadFunc:LookAheadFunc | GrammarAction,
+                        action?:GrammarAction,
+                        expectTokAfterLastMatch?:Function,
+                        nextTokIdx?:number):void {
+            if (arguments.length === 1 || arguments.length === 3) {
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForMany(1)
             }
+
+            super.MANY(<any>lookAheadFunc, <any>action)
+            this.attemptInRepetitionRecovery(this.MANY1, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+        }
+
+        protected MANY2(lookAheadFunc:LookAheadFunc | GrammarAction,
+                        action?:GrammarAction,
+                        expectTokAfterLastMatch?:Function,
+                        nextTokIdx?:number):void {
+            if (arguments.length === 1 || arguments.length === 3) {
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForMany(2)
+            }
+
+            super.MANY(<any>lookAheadFunc, <any>action)
+            this.attemptInRepetitionRecovery(this.MANY2, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+        }
+
+        protected MANY3(lookAheadFunc:LookAheadFunc | GrammarAction,
+                        action?:GrammarAction,
+                        expectTokAfterLastMatch?:Function,
+                        nextTokIdx?:number):void {
+            if (arguments.length === 1 || arguments.length === 3) {
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForMany(3)
+            }
+
+            super.MANY(<any>lookAheadFunc, <any>action)
+            this.attemptInRepetitionRecovery(this.MANY3, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+        }
+
+        protected MANY4(lookAheadFunc:LookAheadFunc | GrammarAction,
+                        action?:GrammarAction,
+                        expectTokAfterLastMatch?:Function,
+                        nextTokIdx?:number):void {
+            if (arguments.length === 1 || arguments.length === 3) {
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForMany(4)
+            }
+
+            super.MANY(<any>lookAheadFunc, <any>action)
+            this.attemptInRepetitionRecovery(this.MANY4, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+        }
+
+        protected MANY5(lookAheadFunc:LookAheadFunc | GrammarAction,
+                        action?:GrammarAction,
+                        expectTokAfterLastMatch?:Function,
+                        nextTokIdx?:number):void {
+            if (arguments.length === 1 || arguments.length === 3) {
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForMany(5)
+            }
+
+            super.MANY(<any>lookAheadFunc, <any>action)
+            this.attemptInRepetitionRecovery(this.MANY5, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
         }
 
         protected AT_LEAST_ONE(lookAheadFunc:() => boolean,
@@ -493,12 +575,12 @@ module chevrotain.recognizer {
                 // note that while it may seem that this can cause an error because by using a recursive call to
                 // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
                 // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-                this.tryInRepetitionRecovery(this.AT_LEAST_ONE, arguments, lookAheadFunc, expectTokAfterLastMatch)
+                this.tryInRepetitionRecovery(this.AT_LEAST_ONE, <any>arguments, lookAheadFunc, expectTokAfterLastMatch)
             }
         }
 
         protected tryInRepetitionRecovery(grammarRule:Function,
-                                          grammarRuleArgs:IArguments,
+                                          grammarRuleArgs:any[],
                                           lookAheadFunc:() => boolean,
                                           expectedTokType:Function):void {
             var reSyncTokType = this.findReSyncTokenType()
