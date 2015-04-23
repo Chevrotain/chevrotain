@@ -148,6 +148,27 @@ module chevrotain.interpreter {
         }
     }
 
+    export class NextInsideAtLeastOneWalker extends AbstractNextPossibleTokensWalker {
+
+        private nextOccurrence = 0
+
+        constructor(topProd:g.TOP_LEVEL, protected path:p.IRuleGrammarPath) {
+            super(topProd, path)
+            this.nextOccurrence = this.path.occurrence
+        }
+
+        walkAtLeastOne(atLeastOneProd:g.AT_LEAST_ONE, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (this.isAtEndOfPath && atLeastOneProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
+                var restProd = new g.FLAT(atLeastOneProd.definition)
+                this.possibleTokTypes = f.first(restProd)
+                this.found = true
+            }
+            else {
+                super.walkAtLeastOne(atLeastOneProd, currRest, prevRest)
+            }
+        }
+    }
+
     export interface IFirstAfterRepetition {
         token:Function
         occurrence:number
@@ -186,6 +207,24 @@ module chevrotain.interpreter {
             }
             else {
                 super.walkMany(manyProd, currRest, prevRest)
+            }
+        }
+    }
+
+    export class NextTerminalAfterAtLeastOneWalker extends AbstractNextTerminalAfterProductionWalker {
+
+        walkAtLeastOne(atLeastOneProd:g.AT_LEAST_ONE, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (atLeastOneProd.occurrenceInParent === this.occurrence) {
+
+                var firstAfterAtLeastOne = _.first(currRest.concat(prevRest))
+                this.result.isEndOfRule = firstAfterAtLeastOne === undefined
+                if (firstAfterAtLeastOne instanceof gast.Terminal) {
+                    this.result.token = firstAfterAtLeastOne.terminalType
+                    this.result.occurrence = firstAfterAtLeastOne.occurrenceInParent
+                }
+            }
+            else {
+                super.walkAtLeastOne(atLeastOneProd, currRest, prevRest)
             }
         }
     }

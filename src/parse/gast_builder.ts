@@ -46,8 +46,10 @@ module chevrotain.gastBuilder {
     var manyRegEx = /this\s*.\s*MANY(\d)?\s*\(/
     var manyRegExGlobal = new RegExp(manyRegEx.source, "g")
 
+    var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE(\d)?\s*\(/
+    var atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
+
     var orRegEx = /this\s*.\s*OR\s*\(/g
-    var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE\s*\(/g
     var orPartRegEx = /{\s*WHEN\s*:/g
 
     export interface ITerminalNameToConstructor {
@@ -79,7 +81,7 @@ module chevrotain.gastBuilder {
         "use strict"
         switch (prodRange.type) {
             case ProdType.AT_LEAST_ONE:
-                return buildAbstractProd(new gast.AT_LEAST_ONE([]), prodRange.range, allRanges)
+                return buildAtLeastOneProd(prodRange, allRanges)
             case ProdType.MANY:
                 return buildManyProd(prodRange, allRanges)
             case ProdType.OPTION:
@@ -116,6 +118,13 @@ module chevrotain.gastBuilder {
     }
 
     // TODO: extract reoccurring pattern for buildManyProd/BuildOptionProd
+    function buildAtLeastOneProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.AT_LEAST_ONE {
+        var reResult = atLeastOneRegEx.exec(prodRange.text)
+        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var optionProd = new gast.AT_LEAST_ONE([], refOccurrence)
+        return buildAbstractProd(optionProd, prodRange.range, allRanges)
+    }
+
     function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.MANY {
         var reResult = manyRegEx.exec(prodRange.text)
         var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
@@ -189,7 +198,7 @@ module chevrotain.gastBuilder {
     }
 
     export function createAtLeastOneRanges(text:string):IProdRange[] {
-        return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE, atLeastOneRegEx)
+        return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE, atLeastOneRegExGlobal)
     }
 
     export function createManyRanges(text:string):IProdRange[] {

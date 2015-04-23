@@ -4,7 +4,7 @@ var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/", "tes
 var exampleSpecsFiles = require('./scripts/findSpecs')("target/release/tsc/examples/", "examples")
 
 module.exports = function(grunt) {
-
+ 
     //noinspection UnnecessaryLabelJS
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),

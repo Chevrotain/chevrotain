@@ -19,6 +19,10 @@ module chevrotain.lookahead {
         return buildLookAheadForGrammarRule(interp.NextInsideManyWalker, manyOccurrence, ruleName, ruleGrammar)
     }
 
+    export function buildLookaheadForAtLeastOne(manyOccurrence:number, ruleName:string, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+        return buildLookAheadForGrammarRule(interp.NextInsideAtLeastOneWalker, manyOccurrence, ruleName, ruleGrammar)
+    }
+
     function buildLookAheadForGrammarRule(prodWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
                                           ruleName:string, ruleGrammar:gast.TOP_LEVEL):() => boolean {
         var path:p.IRuleGrammarPath = {

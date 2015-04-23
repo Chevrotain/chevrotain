@@ -417,13 +417,17 @@ module chevrotain.recognizer {
             return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
         }
 
+        protected getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
+            return this.getLookaheadFuncFor("AT_LEAST_ONE", occurence, lookahead.buildLookaheadForAtLeastOne)
+        }
+
         protected getLookaheadFuncFor(prodType:string, occurrence:number,
                                       laFuncBuilder:(number, string, any) => () => boolean):() => boolean {
             var classLAFuncs = BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
-            var key = prodType + occurrence + "_IN_" + _.last(this.RULE_STACK)
+            var ruleName = _.last(this.RULE_STACK)
+            var key = prodType + occurrence + "_IN_" + ruleName
             var condition = <any>classLAFuncs.get(key)
             if (_.isUndefined(condition)) {
-                var ruleName = _.last(this.RULE_STACK)
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
                 condition = laFuncBuilder(occurrence, ruleName, ruleGrammar)
                 classLAFuncs.put(key, condition)
@@ -486,7 +490,8 @@ module chevrotain.recognizer {
                                             args:any[],
                                             lookaheadFunc:() => boolean,
                                             prodName:string,
-                                            prodOccurrence:number) {
+                                            prodOccurrence:number,
+                                            nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
 
 
             var firstAfterRepMap = BaseErrorRecoveryRecognizer.getFirstAfterRepForClass(this)
@@ -495,8 +500,8 @@ module chevrotain.recognizer {
             var firstAfterRepInfo = firstAfterRepMap.get(key)
             if (_.isUndefined(firstAfterRepInfo)) {
                 var ruleGrammar = this.getGAstProductions().get(currRuleName)
-                // TODO: need to select appropiate walker to support AT_LEAST_ONCE too
-                firstAfterRepInfo =  new interp.NextTerminalAfterManyWalker(ruleGrammar, prodOccurrence).startWalking()
+                // TODO: need to select appropriate walker to support AT_LEAST_ONCE too
+                firstAfterRepInfo = new nextToksWalker(ruleGrammar, prodOccurrence).startWalking()
                 firstAfterRepMap.put(key, firstAfterRepInfo)
             }
 
@@ -539,7 +544,8 @@ module chevrotain.recognizer {
             }
 
             super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], <any>lookAheadFunc, prodName, prodOccurrence)
+            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
+                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker)
         }
 
         protected MANY1(lookAheadFunc:LookAheadFunc | GrammarAction,
@@ -567,21 +573,62 @@ module chevrotain.recognizer {
             this.manyInternal(this.MANY5, "MANY5", 5, lookAheadFunc, action)
         }
 
-        protected AT_LEAST_ONE(lookAheadFunc:() => boolean,
-                               consume:() => void,
-                               errMsg:string,
-                               expectTokAfterLastMatch?:Function,
-                               nextTokIdx?:number):void {
-
-            super.AT_LEAST_ONE(lookAheadFunc, consume, errMsg)
-
-            if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
-                // note that while it may seem that this can cause an error because by using a recursive call to
-                // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
-                // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-                this.tryInRepetitionRecovery(this.AT_LEAST_ONE, <any>arguments, lookAheadFunc, expectTokAfterLastMatch)
+        private atLeastOneInternal(prodFunc:Function,
+                                   prodName:string,
+                                   prodOccurrence:number,
+                                   lookAheadFunc:LookAheadFunc | GrammarAction,
+                                   action:GrammarAction | string,
+                                   errMsg?:string):void {
+            if (_.isString(action)) {
+                errMsg = <any>action;
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
             }
+
+            super.AT_LEAST_ONE(<any>lookAheadFunc, <any>action, errMsg)
+            // note that while it may seem that this can cause an error because by using a recursive call to
+            // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
+            // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
+            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
+                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker)
         }
+
+        protected AT_LEAST_ONE(lookAheadFunc:LookAheadFunc | GrammarAction,
+                               action:GrammarAction | string,
+                               errMsg?:string):void {
+            return this.AT_LEAST_ONE1.apply(this, arguments)
+        }
+
+        protected AT_LEAST_ONE1(lookAheadFunc:LookAheadFunc | GrammarAction,
+                                action:GrammarAction | string,
+                                errMsg?:string):void {
+            this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, lookAheadFunc, action, errMsg)
+        }
+
+        protected AT_LEAST_ONE2(lookAheadFunc:LookAheadFunc | GrammarAction,
+                                action:GrammarAction | string,
+                                errMsg?:string):void {
+            this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, lookAheadFunc, action, errMsg)
+        }
+
+        protected AT_LEAST_ONE3(lookAheadFunc:LookAheadFunc | GrammarAction,
+                                action:GrammarAction | string,
+                                errMsg?:string):void {
+            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE1", 3, lookAheadFunc, action, errMsg)
+        }
+
+        protected AT_LEAST_ONE4(lookAheadFunc:LookAheadFunc | GrammarAction,
+                                action:GrammarAction | string,
+                                errMsg?:string):void {
+            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE1", 4, lookAheadFunc, action, errMsg)
+        }
+
+        protected AT_LEAST_ONE5(lookAheadFunc:LookAheadFunc | GrammarAction,
+                                action:GrammarAction | string,
+                                errMsg?:string):void {
+            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, lookAheadFunc, action, errMsg)
+        }
+
 
         protected tryInRepetitionRecovery(grammarRule:Function,
                                           grammarRuleArgs:any[],

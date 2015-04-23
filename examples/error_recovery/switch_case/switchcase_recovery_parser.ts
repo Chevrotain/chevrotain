@@ -92,7 +92,7 @@ module chevrotain.examples.recovery.switchcase {
             this.CONSUME1(RParenTok)
             this.CONSUME1(LCurlyTok)
 
-            this.AT_LEAST_ONE(isCaseStmt, () => {
+            this.AT_LEAST_ONE(() => {
                     _.assign(retObj, this.SUBRULE(this.caseStmt(1)))
                 }
                 // DOCS: currently the following token and its index must be specified to enable error recovery
@@ -100,7 +100,7 @@ module chevrotain.examples.recovery.switchcase {
                 //       a re-sync recovery trigger inside the rules called by the repetition may cause the whole
                 //       rule containing the repetition to fail.
                 //       ** this may be automatically inferred in a future version.
-                , "case Stmt", RCurlyTok, 1)
+                , "case Stmt")
 
             this.CONSUME1(RCurlyTok)
 
@@ -137,10 +137,6 @@ module chevrotain.examples.recovery.switchcase {
                 return retObj
             }
         }
-    }
-
-    function isCaseStmt() {
-        return this.NEXT_TOKEN() instanceof CaseTok
     }
 
 }
