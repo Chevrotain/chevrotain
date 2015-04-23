@@ -53,6 +53,7 @@ module chevrotain.examples.json {
     }
 
 
+    // TODO: convert this to extend the retrospection recognizer
     export class JsonParser extends recog.BaseRecognizer {
 
         object():void {

@@ -61,7 +61,7 @@ module chevrotain.recognizer.spec {
             this.MANY(isQualifiedNamePart, () => {
                 this.CONSUME1(DotTok)
                 idents.push(this.CONSUME2(IdentTok).image)
-            }, EOF, 1)
+            })
 
             this.CONSUME1(recog.EOF)
 

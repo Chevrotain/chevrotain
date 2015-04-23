@@ -115,7 +115,7 @@ module chevrotain.gastBuilder {
         return new gast.Terminal(terminalType, terminalOccurrence)
     }
 
-    // TODO: extract reoccuring pattern for buildManyProd/BuildOptionProd
+    // TODO: extract reoccurring pattern for buildManyProd/BuildOptionProd
     function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.MANY {
         var reResult = manyRegEx.exec(prodRange.text)
         var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
