@@ -424,7 +424,7 @@ module chevrotain.interpreter.spec {
         })
     })
 
-    describe("The NextAfterManyWalker", function () {
+    describe("The NextTerminalAfterManyWalker", function () {
         it("can compute the next possible token types after the MANY in QualifiedName", function () {
             var result = new NextTerminalAfterManyWalker(samples.qualifiedName, 1).startWalking()
             expect(result.occurrence).toBeUndefined()
@@ -436,5 +436,22 @@ module chevrotain.interpreter.spec {
             expect(result.occurrence).toBe(1)
             expect(result.token).toBe(t.RParenTok)
         })
+    })
+
+    describe("The NextTerminalAfterAtLeastOneWalker", function () {
+        it("can compute the next possible token types after an AT_LEAST_ONE production", function () {
+            var result = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 1).startWalking()
+            expect(result.occurrence).toBe(2)
+            expect(result.token).toBe(t.DotTok)
+
+            var result2 = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 2).startWalking()
+            expect(result2.occurrence).toBe(1)
+            expect(result2.token).toBe(t.DotTok)
+
+            var result3 = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 3).startWalking()
+            expect(result3.occurrence).toBe(1)
+            expect(result3.token).toBe(t.CommaTok)
+        })
+
     })
 }

@@ -56,7 +56,7 @@ module chevrotain.gast {
     }
 
     export class AT_LEAST_ONE extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition) }
+        constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
     export class MANY extends AbstractProduction {

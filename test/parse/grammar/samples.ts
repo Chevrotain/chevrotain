@@ -28,6 +28,17 @@ module test.samples {
     export class KeyTok extends t.Token {}
     export class ElementTok extends t.Token {}
 
+    export var atLeastOneRule = new gast.TOP_LEVEL("atLeastOneRule", [
+        new gast.AT_LEAST_ONE([
+            new gast.AT_LEAST_ONE([
+                new gast.AT_LEAST_ONE([], 3),
+                new gast.Terminal(CommaTok)
+            ], 2),
+            new gast.Terminal(DotTok, 1)
+        ]),
+        new gast.Terminal(DotTok, 2)
+    ])
+
     export var qualifiedName = new gast.TOP_LEVEL("qualifiedName", [
         new gast.Terminal(IdentTok),
         new gast.MANY([
