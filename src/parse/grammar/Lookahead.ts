@@ -19,22 +19,20 @@ module chevrotain.lookahead {
         return buildLookAheadForGrammarRule(interp.NextInsideManyWalker, manyOccurrence, ruleName, ruleGrammar)
     }
 
-    function buildLookAheadForGrammarRule(ruleWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
+    function buildLookAheadForGrammarRule(prodWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
                                           ruleName:string, ruleGrammar:gast.TOP_LEVEL):() => boolean {
         var path:p.IRuleGrammarPath = {
-            ruleStack: [ruleName],
+            ruleStack:       [ruleName],
             occurrenceStack: [1],
-            occurrence: ruleOccurrence
+            occurrence:      ruleOccurrence
         }
 
-        var possibleNextTokTypes = new ruleWalker(ruleGrammar, path).startWalking()
+        var possibleNextTokTypes = new prodWalker(ruleGrammar, path).startWalking()
 
         return function () {
             return _.any(possibleNextTokTypes, function (possibleTok) {
                 return this.NEXT_TOKEN() instanceof possibleTok
             }, this)
         }
-
     }
-
 }

@@ -22,9 +22,4 @@ module chevrotain.path {
         occurrence:number
     }
 
-    var invalidContentAssistPath = {ruleStack: [], occurrenceStack: [], lastTok: tok.NoneToken, lastTokOccurrence: -1}
-
-    export function NO_PATH_FOUND():ITokenGrammarPath {
-        return invalidContentAssistPath
-    }
 }

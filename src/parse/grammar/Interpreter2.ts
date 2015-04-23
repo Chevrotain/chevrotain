@@ -29,9 +29,6 @@ module chevrotain.interpreter {
         startWalking():Function[] {
 
             this.found = false
-            if (this.path === p.NO_PATH_FOUND()) {
-                throw Error("Can't walk an INVALID path!")
-            }
 
             if (this.path.ruleStack[0] !== this.topProd.name) {
                 throw Error("The path does not start with the walker's top Rule!")
@@ -144,6 +141,48 @@ module chevrotain.interpreter {
                 var restProd = new g.FLAT(manyProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
+            }
+            else {
+                super.walkMany(manyProd, currRest, prevRest)
+            }
+        }
+    }
+
+    export interface IFirstAfterRepetition {
+        token:Function
+        occurrence:number
+        isEndOfRule:boolean
+    }
+
+    /**
+     * This walker only "walks" a single "TOP" level in the Grammar Ast, this means
+     * it never "follows" production refs
+     */
+    export class AbstractNextTerminalAfterProductionWalker extends r.RestWalker {
+
+        public result = {token: undefined, occurrence: undefined, isEndOfRule: undefined}
+
+        constructor(protected topRule:g.TOP_LEVEL, protected occurrence:number) {
+            super()
+        }
+
+        startWalking():IFirstAfterRepetition {
+            this.walk(this.topRule)
+            return this.result
+        }
+    }
+
+    export class NextTerminalAfterManyWalker extends AbstractNextTerminalAfterProductionWalker {
+
+        walkMany(manyProd:g.MANY, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (manyProd.occurrenceInParent === this.occurrence) {
+
+                var firstAfterMany = _.first(currRest.concat(prevRest))
+                this.result.isEndOfRule = firstAfterMany === undefined
+                if (firstAfterMany instanceof gast.Terminal) {
+                    this.result.token = firstAfterMany.terminalType
+                    this.result.occurrence = firstAfterMany.occurrenceInParent
+                }
             }
             else {
                 super.walkMany(manyProd, currRest, prevRest)

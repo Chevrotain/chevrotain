@@ -96,8 +96,8 @@ module chevrotain.recognizer {
         FOLLOW_STACK:Function[][]
     }
 
-export type LookAheadFunc = () => boolean
-export type GrammarAction = () => void
+    export type LookAheadFunc = () => boolean
+    export type GrammarAction = () => void
 
     export class BaseRecognizer {
 
@@ -284,6 +284,7 @@ export type GrammarAction = () => void
 
     export class BaseErrorRecoveryRecognizer extends BaseRecognizer {
 
+        // TODO: consider extracting all these caches away the class.
         protected static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
 
         protected static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
@@ -307,6 +308,12 @@ export type GrammarAction = () => void
 
         protected static getLookaheadFuncsForClass(classInstance:any):lang.HashTable<Function> {
             return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_LOOKAHEAD_FUNCS)
+        }
+
+        protected static CLASS_TO_FIRST_AFTER_REPETITION = new lang.HashTable<lang.HashTable<interp.IFirstAfterRepetition>>()
+
+        protected static getFirstAfterRepForClass(classInstance:any):lang.HashTable<interp.IFirstAfterRepetition> {
+            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_FIRST_AFTER_REPETITION)
         }
 
         protected static performSelfAnalysis(classInstance:any) {
@@ -348,9 +355,9 @@ export type GrammarAction = () => void
             var savedRuleStack = _.clone(this.RULE_STACK)
             var savedFollowStack = _.clone(this.FOLLOW_STACK)
             return {
-                errors: baseState.errors,
-                inputIdx: baseState.inputIdx,
-                RULE_STACK: savedRuleStack,
+                errors:       baseState.errors,
+                inputIdx:     baseState.inputIdx,
+                RULE_STACK:   savedRuleStack,
                 FOLLOW_STACK: savedFollowStack
             }
         }
@@ -425,7 +432,6 @@ export type GrammarAction = () => void
             return condition
         }
 
-        // TODO: lots of <any> assertions in OPTIONS due to IntelliJ bugs
         protected OPTION(condition:LookAheadFunc | GrammarAction,
                          action?:GrammarAction):boolean {
             return this.OPTION1.apply(this, arguments)
@@ -479,88 +485,86 @@ export type GrammarAction = () => void
         private attemptInRepetitionRecovery(prodFunc:Function,
                                             args:any[],
                                             lookaheadFunc:() => boolean,
-                                            expectTokAfterLastMatch:Function,
-                                            nextTokIdx:number) {
+                                            prodName:string,
+                                            prodOccurrence:number) {
+
+
+            var firstAfterRepMap = BaseErrorRecoveryRecognizer.getFirstAfterRepForClass(this)
+            var currRuleName = _.last(this.RULE_STACK)
+            var key = prodName + "_IN_" + currRuleName
+            var firstAfterRepInfo = firstAfterRepMap.get(key)
+            if (_.isUndefined(firstAfterRepInfo)) {
+                var ruleGrammar = this.getGAstProductions().get(currRuleName)
+                // TODO: need to select appropiate walker to support AT_LEAST_ONCE too
+                firstAfterRepInfo =  new interp.NextTerminalAfterManyWalker(ruleGrammar, prodOccurrence).startWalking()
+                firstAfterRepMap.put(key, firstAfterRepInfo)
+            }
+
+            var expectTokAfterLastMatch = firstAfterRepInfo.token
+            var nextTokIdx = firstAfterRepInfo.occurrence
+            var isEndOfRule = firstAfterRepInfo.isEndOfRule
+
+            // special edge case of a TOP most repetition after which the input should END.
+            // this will force an attempt for inRule recovery in that scenario.
+            if (this.RULE_STACK.length === 1 &&
+                isEndOfRule &&
+                _.isUndefined(expectTokAfterLastMatch)) {
+                expectTokAfterLastMatch = EOF
+                nextTokIdx = 1
+            }
+
             if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
-                // TODO: performance optimization: instead of passing the original arguments here, we modify
-                // the arguments object (or create a new one) and make sure the lookahead func is explicitly provided
+                // TODO: performance optimization: instead of passing the original args here, we modify
+                // the args param (or create a new one) and make sure the lookahead func is explicitly provided
                 // to avoid searching the cache for it once more.
                 this.tryInRepetitionRecovery(prodFunc, args, lookaheadFunc, expectTokAfterLastMatch)
             }
         }
 
-        // TODO: can the 2 optional parameters for special 'preemptive' resync recovery into the next item of the 'MANY'
-        // be computed automatically?
         protected MANY(lookAheadFunc:LookAheadFunc | GrammarAction,
-                       action?:GrammarAction,
-                       expectTokAfterLastMatch?:Function,
-                       nextTokIdx?:number):void {
+                       action?:GrammarAction):void {
             return this.MANY1.apply(this, arguments)
         }
 
-        protected MANY1(lookAheadFunc:LookAheadFunc | GrammarAction,
-                        action?:GrammarAction,
-                        expectTokAfterLastMatch?:Function,
-                        nextTokIdx?:number):void {
-            if (arguments.length === 1 || arguments.length === 3) {
+
+        private manyInternal(prodFunc:Function,
+                             prodName:string,
+                             prodOccurrence:number,
+                             lookAheadFunc:LookAheadFunc | GrammarAction,
+                             action?:GrammarAction):void {
+
+            if (_.isUndefined(action)) {
                 action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForMany(1)
+                lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
             }
 
             super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(this.MANY1, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], <any>lookAheadFunc, prodName, prodOccurrence)
+        }
+
+        protected MANY1(lookAheadFunc:LookAheadFunc | GrammarAction,
+                        action?:GrammarAction):void {
+            this.manyInternal(this.MANY1, "MANY1", 1, lookAheadFunc, action)
         }
 
         protected MANY2(lookAheadFunc:LookAheadFunc | GrammarAction,
-                        action?:GrammarAction,
-                        expectTokAfterLastMatch?:Function,
-                        nextTokIdx?:number):void {
-            if (arguments.length === 1 || arguments.length === 3) {
-                action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForMany(2)
-            }
-
-            super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(this.MANY2, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+                        action?:GrammarAction):void {
+            this.manyInternal(this.MANY2, "MANY2", 2, lookAheadFunc, action)
         }
 
         protected MANY3(lookAheadFunc:LookAheadFunc | GrammarAction,
-                        action?:GrammarAction,
-                        expectTokAfterLastMatch?:Function,
-                        nextTokIdx?:number):void {
-            if (arguments.length === 1 || arguments.length === 3) {
-                action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForMany(3)
-            }
-
-            super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(this.MANY3, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+                        action?:GrammarAction):void {
+            this.manyInternal(this.MANY3, "MANY3", 3, lookAheadFunc, action)
         }
 
         protected MANY4(lookAheadFunc:LookAheadFunc | GrammarAction,
-                        action?:GrammarAction,
-                        expectTokAfterLastMatch?:Function,
-                        nextTokIdx?:number):void {
-            if (arguments.length === 1 || arguments.length === 3) {
-                action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForMany(4)
-            }
-
-            super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(this.MANY4, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+                        action?:GrammarAction):void {
+            this.manyInternal(this.MANY4, "MANY4", 4, lookAheadFunc, action)
         }
 
         protected MANY5(lookAheadFunc:LookAheadFunc | GrammarAction,
-                        action?:GrammarAction,
-                        expectTokAfterLastMatch?:Function,
-                        nextTokIdx?:number):void {
-            if (arguments.length === 1 || arguments.length === 3) {
-                action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForMany(5)
-            }
-
-            super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(this.MANY5, <any>arguments, <any>lookAheadFunc, expectTokAfterLastMatch, nextTokIdx)
+                        action?:GrammarAction):void {
+            this.manyInternal(this.MANY5, "MANY5", 5, lookAheadFunc, action)
         }
 
         protected AT_LEAST_ONE(lookAheadFunc:() => boolean,
@@ -688,9 +692,9 @@ export type GrammarAction = () => void
             var pathRuleStack:string[] = _.clone(this.RULE_STACK)
             var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK)
             var grammarPath:any = {
-                ruleStack: pathRuleStack,
-                occurrenceStack: pathOccurrenceStack,
-                lastTok: tokType,
+                ruleStack:         pathRuleStack,
+                occurrenceStack:   pathOccurrenceStack,
+                lastTok:           tokType,
                 lastTokOccurrence: tokIdxInRule
             }
 

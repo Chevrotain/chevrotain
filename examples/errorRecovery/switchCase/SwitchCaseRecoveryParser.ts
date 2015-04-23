@@ -143,8 +143,4 @@ module chevrotain.examples.recovery.switchcase {
         return this.NEXT_TOKEN() instanceof CaseTok
     }
 
-    function isSemiColon() {
-        return this.NEXT_TOKEN() instanceof SemiColonTok
-    }
-
 }
