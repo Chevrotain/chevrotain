@@ -55,11 +55,9 @@ module chevrotain.examples.recovery.sql {
         private parseDdl():pt.ParseTree {
             var stmts = []
 
-            // TODO: switch to new style of MANY with automatic lookahead computation
-            this.MANY(isStmt,
-                () => {
-                    this.OR([
-                        // @formatter:off
+            this.MANY(() => {
+                this.OR([
+                    // @formatter:off
                     {WHEN: isCreate, THEN_DO: () => {
                         // DOCS: note how the invocation of another parseRule also adds the occurrence index
                         //       if we had another invocation of this.createStmt inside this rule, we would have had to use
@@ -71,12 +69,12 @@ module chevrotain.examples.recovery.sql {
                         // DOCS: note the usage of the SUBRULE wrapper, it does not actually do anything but it is needed
                         // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
                         stmts.push(this.SUBRULE(this.deleteStmt(1)))}},
-                // @formatter:on
-                        // DOCS: in this case we specify we expect EndOfFile after all the statements have been matched
-                        // this means that if once we are ready to exit the MANY if EOF is not the next token, in-repetition
-                        // will be attempted
-                    ], "A Statement")
-                }, recog.EOF, 1)
+                    // @formatter:on
+                    // DOCS: in this case we specify we expect EndOfFile after all the statements have been matched
+                    // this means that if once we are ready to exit the MANY if EOF is not the next token, in-repetition
+                    // will be attempted
+                ], "A Statement")
+            })
 
             return PT(new STATEMENTS(), stmts)
         }
@@ -130,7 +128,7 @@ module chevrotain.examples.recovery.sql {
             // parse
             // DOCS: note how we use CONSUME1(IdentTok) here
             idents.push(this.CONSUME1(IdentTok))
-            this.MANY(isQualifiedNamePart, () => {
+            this.MANY(() => {
                 dots.push(this.CONSUME1(DotTok))
                 // DOCS: yet here we use CONSUME2(IdentTok)
                 //       The number indicates the occurrence number of the consumption of the specific Token in the current
@@ -152,7 +150,7 @@ module chevrotain.examples.recovery.sql {
             // parse
             this.CONSUME1(LParenTok)
             this.SUBRULE(this.value(1))
-            this.MANY(isAdditionalValue, () => {
+            this.MANY(() => {
                 commas.push(this.CONSUME1(CommaTok))
                 values.push(this.SUBRULE(this.value(1)))
             })
@@ -177,10 +175,6 @@ module chevrotain.examples.recovery.sql {
         }
     }
 
-    function isStmt():boolean {
-        return isCreate.call(this) || isInsert.call(this) || isDelete.call(this)
-    }
-
     function isCreate():boolean {
         return this.NEXT_TOKEN() instanceof CreateTok
     }
@@ -191,14 +185,6 @@ module chevrotain.examples.recovery.sql {
 
     function isDelete():boolean {
         return this.NEXT_TOKEN() instanceof DeleteTok
-    }
-
-    function isQualifiedNamePart():boolean {
-        return this.NEXT_TOKEN() instanceof  DotTok
-    }
-
-    function isAdditionalValue():boolean {
-        return this.NEXT_TOKEN() instanceof CommaTok
     }
 
     function isInteger():boolean {

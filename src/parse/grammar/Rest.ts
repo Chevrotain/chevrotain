@@ -37,15 +37,9 @@ module chevrotain.rest {
             })
         }
 
-        walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-        }
+        walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {}
 
-        // override this either with an empty impel to ignore references to other productions
-        // or implement an expansion of other production references
-        /* istanbul ignore next */
-        walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            throw Error("unimplemented Abstract Error")
-        }
+        walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {}
 
         walkFlat(flatProd:g.FLAT, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABCDEF => after the D the rest is EF
