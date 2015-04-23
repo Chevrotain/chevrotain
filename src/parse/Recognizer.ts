@@ -827,7 +827,6 @@ export type GrammarAction = () => void
 
         protected RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
                                                                                                    isEntryPoint?:boolean) => T {
-
             this.validateRuleName(ruleName)
             var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this)
             // only build the gast representation once
@@ -842,7 +841,7 @@ export type GrammarAction = () => void
                     // the only thing that can appear after the outer most invoked rule is the END OF FILE
                     this.FOLLOW_STACK.push([EOF])
                 } else {
-                    var followName = ruleName + idxInCallingRule + IN + _.last(this.RULE_STACK)
+                    var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
                     // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
                     // multiple structures on each rule invocations to find it...
                     var followSet = BaseErrorRecoveryRecognizer.getResyncFollowsForClass(this).get(followName)

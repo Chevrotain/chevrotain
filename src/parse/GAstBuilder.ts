@@ -14,7 +14,6 @@ module chevrotain.gastBuilder {
     import lang = chevrotain.lang;
 
     export enum ProdType {
-        TOP_LEVEL,
         OPTION,
         OR,
         MANY,
