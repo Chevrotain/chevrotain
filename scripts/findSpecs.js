@@ -16,7 +16,7 @@ module.exports = function(prefix, base) {
     })
 
     var specs = _.filter(testFolderJSContents, function(currFileOrDir) {
-        return _.endsWith(currFileOrDir, 'Spec.js')
+        return _.endsWith(currFileOrDir, 'spec.js')
     })
     var utilsAndExamples = _.difference(testFolderFiles, specs)
 
