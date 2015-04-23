@@ -51,13 +51,13 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: ['bower_components/lodash/lodash.js'].concat(
-            allSrcsIncludes,
             [
                 {pattern: 'target/gen/**/*.map', included: false},
                 {pattern: 'src/**/*.ts', included: false},
                 {pattern: 'test/**/*.ts', included: false},
                 {pattern: 'examples/**/*.ts', included: false}
-            ]),
+            ],
+            allSrcsIncludes),
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
