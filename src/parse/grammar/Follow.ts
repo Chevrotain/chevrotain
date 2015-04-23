@@ -31,9 +31,7 @@ module chevrotain.follow {
         }
 
         walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            var targetProd = (<g.ProdRef>refProd).ref
-            var occurrenceInParent = refProd.occurrenceInParent
-            var followName = buildBetweenProdsFollowPrefix(targetProd, occurrenceInParent) + this.topProd.name
+            var followName = buildBetweenProdsFollowPrefix(refProd.ref, refProd.occurrenceInParent) + this.topProd.name
             var fullRest = currRest.concat(prevRest)
             // TODO: Intellij Bug remove <any> when they fix it :)
             var restProd = new g.FLAT(<any>fullRest)

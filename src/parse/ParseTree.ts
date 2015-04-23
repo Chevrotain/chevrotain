@@ -15,4 +15,3 @@ module chevrotain.tree {
         constructor(public payload:tok.Token, public children:ParseTree[] = []) {}
     }
 }
-
