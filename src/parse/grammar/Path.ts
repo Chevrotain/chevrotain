@@ -18,8 +18,8 @@ module chevrotain.path {
         lastTokOccurrence:number
     }
 
-    export interface IOptionGrammarPath extends IGrammarPath {
-        lastOptionOccurrence:number
+    export interface IRuleGrammarPath extends IGrammarPath {
+        occurrence:number
     }
 
     var invalidContentAssistPath = {ruleStack: [], occurrenceStack: [], lastTok: tok.NoneToken, lastTokOccurrence: -1}
