@@ -7,13 +7,10 @@
     "!license.txt"
   ],
   "dependencies": {
-    "lodash": "~3.3.1"
+    "lodash": "~3.7.0"
   },
   "devDependencies": {
   },
-  "authors": [
-    "Shahar Soel <shahar.soel@gmail.com>"
-  ],
   "license": "APACHE",
   "private": true
 }
