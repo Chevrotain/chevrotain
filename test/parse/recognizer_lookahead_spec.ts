@@ -236,7 +236,7 @@ module chevrotain.recognizer.lookahead.spec {
             recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
         }
 
-        public manyRule = this.RULE("manyOptionsRule", this.parseManyRule, () => { return "-666" })
+        public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
 
         private parseManyRule():string {
             var total = ""
@@ -281,7 +281,7 @@ module chevrotain.recognizer.lookahead.spec {
             recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
         }
 
-        public manyRule = this.RULE("manyOptionsRule", this.parseManyRule, () => { return "-666" })
+        public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
 
         private parseManyRule():string {
             var total = ""
@@ -407,6 +407,147 @@ module chevrotain.recognizer.lookahead.spec {
 
         it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
             var parser = new ManyExplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(0)
+        })
+    })
+
+
+    class AtLeastOneImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+        }
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+        public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
+
+        private parseAtLeastOneRule():string {
+            var total = ""
+
+            this.AT_LEAST_ONE1(() => {
+                this.CONSUME1(OneTok)
+                total += "1"
+            }, "Ones")
+
+            this.AT_LEAST_ONE2(() => {
+                this.CONSUME1(TwoTok)
+                total += "2"
+            }, "Twos")
+
+            this.AT_LEAST_ONE3(() => {
+                this.CONSUME1(ThreeTok)
+                total += "3"
+            }, "Threes")
+
+            this.AT_LEAST_ONE4(() => {
+                this.CONSUME1(FourTok)
+                total += "4"
+            }, "Fours")
+
+            this.AT_LEAST_ONE5(() => {
+                this.CONSUME1(FiveTok)
+                total += "5"
+            }, "Fives")
+
+            return total
+        }
+    }
+
+    class AtLeastOneExplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+        }
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+        public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
+
+        private parseAtLeastOneRule():string {
+            var total = ""
+
+            this.AT_LEAST_ONE1(isOneTok, () => {
+                this.CONSUME1(OneTok)
+                total += "1"
+            }, "Ones")
+
+            this.AT_LEAST_ONE2(isTwoTok, () => {
+                this.CONSUME1(TwoTok)
+                total += "2"
+            }, "Twos")
+
+            this.AT_LEAST_ONE3(isThreeTok, () => {
+                this.CONSUME1(ThreeTok)
+                total += "3"
+            }, "Threes")
+
+            this.AT_LEAST_ONE4(isFourTok, () => {
+                this.CONSUME1(FourTok)
+                total += "4"
+            }, "Fours")
+
+            this.AT_LEAST_ONE5(isFiveTok, () => {
+                this.CONSUME1(FiveTok)
+                total += "5"
+            }, "Fives")
+
+            return total
+        }
+    }
+
+    describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE", function () {
+
+        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
+            var parser = new AtLeastOneImplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(0)
+        })
+
+        it("can accept lookahead function param for AT_LEAST_ONE1-5", function () {
+            var input = [new OneTok(1, 1), new TwoTok(1, 1), new TwoTok(1, 1), new ThreeTok(1, 1),
+                new FourTok(1, 1), new FourTok(1, 1), new FiveTok(1, 1)]
+            var parser = new AtLeastOneImplicitLookAheadParser(input)
+            expect(parser.atLeastOneRule(1)).toBe("1223445")
+        })
+
+        it("will fail when zero occurrences of AT_LEAST_ONE in input", function () {
+            var input = [new OneTok(1, 1), new TwoTok(1, 1), /*new ThreeTok(1, 1),*/ new FourTok(1, 1), new FiveTok(1, 1)]
+            var parser = new AtLeastOneImplicitLookAheadParser(input)
+            expect(parser.atLeastOneRule(1)).toBe("-666")
+        })
+
+        it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
+            var parser = new AtLeastOneImplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(5)
+        })
+    })
+
+    describe("The Explicit lookahead functionality of the Recognizer for AT_LEAST_ONE", function () {
+
+        it("can accept lookahead function param for AT_LEAST_ONE1-5", function () {
+            var input = [new OneTok(1, 1), new TwoTok(1, 1), new TwoTok(1, 1), new ThreeTok(1, 1),
+                new FourTok(1, 1), new FourTok(1, 1), new FiveTok(1, 1)]
+            var parser = new AtLeastOneExplicitLookAheadParser(input)
+            expect(parser.atLeastOneRule(1)).toBe("1223445")
+        })
+
+        it("will fail when zero occurrences of AT_LEAST_ONE in input", function () {
+            var input = [new OneTok(1, 1), new TwoTok(1, 1), /*new ThreeTok(1, 1),*/ new FourTok(1, 1), new FiveTok(1, 1)]
+            var parser = new AtLeastOneExplicitLookAheadParser(input)
+            expect(parser.atLeastOneRule(1)).toBe("-666")
+        })
+
+        it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
+            var parser = new AtLeastOneExplicitLookAheadParser()
             var lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).toBe(0)
         })
