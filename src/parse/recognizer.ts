@@ -933,8 +933,13 @@ module chevrotain.recognizer {
         }
 
 
-        protected RULE<T>(ruleName:string, consumer:() => T, invalidRet:() => T, doReSync = true):(idxInCallingRule:number,
-                                                                                                   isEntryPoint?:boolean) => T {
+        private defaultInvalidReturn():any { return undefined }
+
+        protected RULE<T>(ruleName:string,
+                          consumer:() => T,
+                          invalidRet:() => T = this.defaultInvalidReturn,
+                          doReSync = true):(idxInCallingRule:number,
+                                            isEntryPoint?:boolean) => T {
             this.validateRuleName(ruleName)
             var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this)
             // only build the gast representation once
