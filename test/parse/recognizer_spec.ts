@@ -23,7 +23,7 @@ module chevrotain.recognizer.spec {
     }
 
 
-    class InvalidErrorRecoveryRecog extends BaseErrorRecoveryRecognizer {
+    class InvalidErrorRecoveryRecog extends BaseIntrospectionRecognizer {
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
@@ -45,11 +45,11 @@ module chevrotain.recognizer.spec {
     }
 
 
-    class ManyRepetitionRecovery extends BaseErrorRecoveryRecognizer {
+    class ManyRepetitionRecovery extends BaseIntrospectionRecognizer {
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
@@ -84,7 +84,7 @@ module chevrotain.recognizer.spec {
     describe("The BaseErrorRecoveryRecognizer", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], <any>chevrotain.gastBuilder.spec);
+            var parser:any = new recog.BaseIntrospectionRecognizer([], <any>chevrotain.gastBuilder.spec);
             parser.reset()
             var testInput = [new IntToken(1, 1, "1"), new PlusTok(1, 1),
                 new IntToken(1, 1, "2"), new PlusTok(1, 1), new IntToken(1, 1, "3")]
@@ -99,27 +99,27 @@ module chevrotain.recognizer.spec {
         })
 
         it("does not allow duplicate grammar rule names", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {});
+            var parser:any = new recog.BaseIntrospectionRecognizer([], {});
             parser.validateRuleName("bamba") // first time with a valid name.
             expect(() => parser.validateRuleName("bamba")).toThrow(
-                Error("Duplicate definition, rule: bamba is already defined in the grammar: BaseErrorRecoveryRecognizer"))
+                Error("Duplicate definition, rule: bamba is already defined in the grammar: BaseIntrospectionRecognizer"))
         })
 
         it("only allows a subset of ECMAScript identifiers as rulenames", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {});
+            var parser:any = new recog.BaseIntrospectionRecognizer([], {});
             expect(() => parser.validateRuleName("1baa")).toThrow()
             expect(() => parser.validateRuleName("שלום")).toThrow()
             expect(() => parser.validateRuleName("$bamba")).toThrow()
         })
 
         it("will not perform inRepetition recovery while in backtracking mode", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {})
+            var parser:any = new recog.BaseIntrospectionRecognizer([], {})
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
         })
 
         it("will rethrow and expose none InRuleRecoveryException while performing in rule recovery", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([], {})
+            var parser:any = new recog.BaseIntrospectionRecognizer([], {})
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
         })
@@ -168,7 +168,7 @@ module chevrotain.recognizer.spec {
         })
 
         it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
-            var parser:any = new recog.BaseErrorRecoveryRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)], {})
+            var parser:any = new recog.BaseIntrospectionRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)], {})
 
             var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
                 parser.CONSUME1(IntToken)

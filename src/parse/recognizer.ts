@@ -19,10 +19,6 @@ module chevrotain.recognizer {
     import follows = chevrotain.follow
     import lookahead = chevrotain.lookahead
 
-    export interface RecognitionException extends Error {
-        token:tok.Token
-    }
-
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
         var recognitionExceptions = [
@@ -71,11 +67,6 @@ module chevrotain.recognizer {
 
     export class EOF extends tok.VirtualToken {}
 
-    export interface IManyOrCase {
-        WHEN:() => boolean
-        THEN_DO:() => void
-    }
-
     /**
      * OR([
      *  { WHEN:LA1, THEN_DO:XXX },
@@ -113,6 +104,11 @@ module chevrotain.recognizer {
     export type LookAheadFunc = () => boolean
     export type GrammarAction = () => void
 
+    /**
+     * This is The BaseRecognizer, this should generally not be extended directly, instead
+     * the BaseIntrospectionRecognizer should be used as the base class for external users.
+     * as it has the full feature set.
+     */
     export class BaseRecognizer {
 
         public errors:Error[] = []
@@ -294,7 +290,12 @@ module chevrotain.recognizer {
         return hashTable.get(className)
     }
 
-    export class BaseErrorRecoveryRecognizer extends BaseRecognizer {
+    /**
+     * A Recognizer capable of self analysis to determine it's grammar structure
+     * This is used for more advanced features requiring this information.
+     * for example: Error Recovery, Automatic lookahead calculation
+     */
+    export class BaseIntrospectionRecognizer extends BaseRecognizer {
 
         // TODO: consider extracting all these caches away the class.
         protected static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
@@ -302,42 +303,42 @@ module chevrotain.recognizer {
         protected static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
 
         protected static getProductionsForClass(classInstance:any):lang.HashTable<gast.TOP_LEVEL> {
-            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS)
+            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS)
         }
 
         protected static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.HashTable<lang.HashTable<Function[]>>()
 
         protected static getResyncFollowsForClass(classInstance:any):lang.HashTable<Function[]> {
-            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS)
+            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS)
         }
 
         protected static setResyncFollowsForClass(classInstance:any, followSet:lang.HashTable<Function[]>):void {
             var className = lang.classNameFromInstance(classInstance)
-            BaseErrorRecoveryRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
+            BaseIntrospectionRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
         }
 
         protected static CLASS_TO_LOOKAHEAD_FUNCS = new lang.HashTable<lang.HashTable<Function>>()
 
         protected static getLookaheadFuncsForClass(classInstance:any):lang.HashTable<Function> {
-            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_LOOKAHEAD_FUNCS)
+            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_LOOKAHEAD_FUNCS)
         }
 
         protected static CLASS_TO_FIRST_AFTER_REPETITION = new lang.HashTable<lang.HashTable<interp.IFirstAfterRepetition>>()
 
         protected static getFirstAfterRepForClass(classInstance:any):lang.HashTable<interp.IFirstAfterRepetition> {
-            return getFromNestedHashTable(classInstance, BaseErrorRecoveryRecognizer.CLASS_TO_FIRST_AFTER_REPETITION)
+            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_FIRST_AFTER_REPETITION)
         }
 
         protected static performSelfAnalysis(classInstance:any) {
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
-            if (!BaseErrorRecoveryRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-                var grammarProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(classInstance)
+            if (!BaseIntrospectionRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
+                var grammarProductions = BaseIntrospectionRecognizer.getProductionsForClass(classInstance)
                 var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions)
                 refResolver.resolveRefs()
                 var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
-                BaseErrorRecoveryRecognizer.setResyncFollowsForClass(classInstance, allFollows)
-                BaseErrorRecoveryRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
+                BaseIntrospectionRecognizer.setResyncFollowsForClass(classInstance, allFollows)
+                BaseIntrospectionRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
             }
         }
 
@@ -434,7 +435,7 @@ module chevrotain.recognizer {
         protected getLookaheadFuncFor<T>(prodType:string,
                                          occurrence:number,
                                          laFuncBuilder:(number, any) => () => T):() => T {
-            var classLAFuncs = BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            var classLAFuncs = BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
             var ruleName = _.last(this.RULE_STACK)
             var key = prodType + occurrence + "_IN_" + ruleName
             var condition = <any>classLAFuncs.get(key)
@@ -551,13 +552,12 @@ module chevrotain.recognizer {
                                             nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
 
 
-            var firstAfterRepMap = BaseErrorRecoveryRecognizer.getFirstAfterRepForClass(this)
+            var firstAfterRepMap = BaseIntrospectionRecognizer.getFirstAfterRepForClass(this)
             var currRuleName = _.last(this.RULE_STACK)
             var key = prodName + "_IN_" + currRuleName
             var firstAfterRepInfo = firstAfterRepMap.get(key)
             if (_.isUndefined(firstAfterRepInfo)) {
                 var ruleGrammar = this.getGAstProductions().get(currRuleName)
-                // TODO: need to select appropriate walker to support AT_LEAST_ONCE too
                 firstAfterRepInfo = new nextToksWalker(ruleGrammar, prodOccurrence).startWalking()
                 firstAfterRepMap.put(key, firstAfterRepInfo)
             }
@@ -810,7 +810,7 @@ module chevrotain.recognizer {
         }
 
         protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
-            return BaseErrorRecoveryRecognizer.getProductionsForClass(this)
+            return BaseIntrospectionRecognizer.getProductionsForClass(this)
         }
 
         /*
@@ -941,7 +941,7 @@ module chevrotain.recognizer {
                           doReSync = true):(idxInCallingRule:number,
                                             isEntryPoint?:boolean) => T {
             this.validateRuleName(ruleName)
-            var parserClassProductions = BaseErrorRecoveryRecognizer.getProductionsForClass(this)
+            var parserClassProductions = BaseIntrospectionRecognizer.getProductionsForClass(this)
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
                 parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(consumer.toString(), ruleName, this.tokensMap))
@@ -957,7 +957,7 @@ module chevrotain.recognizer {
                     var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
                     // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
                     // multiple structures on each rule invocations to find it...
-                    var followSet = BaseErrorRecoveryRecognizer.getResyncFollowsForClass(this).get(followName)
+                    var followSet = BaseIntrospectionRecognizer.getResyncFollowsForClass(this).get(followName)
                     if (!followSet) {
                         throw new Error("missing re-sync follows information, possible cause: " +
                         "did not call performSelfAnalysis(this) in the constructor implementation.")
@@ -1002,11 +1002,6 @@ module chevrotain.recognizer {
                     var maxInputIdx = this._input.length - 1
                     if (isEntryPoint && this.inputIdx < maxInputIdx) {
                         var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
-
-                        // TODO: this error can only be detected when using an ErrorRecoveryRecognizer
-                        // what about a base recognizer? it can happen in that case too.
-                        // not we just save the error and not throw an exception because while there is indeed redundant
-                        // input, it does not mean that the none redundant input has not been parsed successfully
                         this.SAVE_ERROR(new NotAllInputParsedException(
                             "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
                     }
@@ -1017,5 +1012,4 @@ module chevrotain.recognizer {
             return wrappedGrammarRule
         }
     }
-
 }
