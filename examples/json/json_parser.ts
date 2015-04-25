@@ -6,10 +6,9 @@ module chevrotain.examples.json {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
 
-    // DOCS: all Tokens must be defined as subclass of chevrotain.scan.tokens.Token
+    // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
     export class StringTok extends tok.Token {}
     export class NumberTok extends tok.Token {}
-
 
     // DOCS: additional hierarchies may be defined for categorization purposes, for example
     //       when implementing Syntax highlighting being able to easily identify all the keywords with a simple
@@ -17,128 +16,103 @@ module chevrotain.examples.json {
     export class Keyword extends tok.Token {}
 
     export class TrueTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "true") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "true") }
     }
 
     export class FalseTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "false") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "false") }
     }
 
     export class NullTok extends Keyword {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "null") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "null") }
     }
 
     export class LCurlyTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "{") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "{") }
     }
 
     export class RCurlyTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "}") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "}") }
     }
 
     export class LSquareTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "[") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "[") }
     }
 
     export class RSquareTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, "]") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "]") }
     }
 
     export class CommaTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ",") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ",") }
     }
 
     export class ColonTok extends tok.Token {
-        constructor(public startLine:number, public startColumn:number) { super(startLine, startColumn, ":") }
+        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ":") }
     }
 
 
-    // TODO: convert this to extend the retrospection recognizer
-    export class JsonParser extends recog.BaseRecognizer {
+    export class JsonParser extends recog.BaseErrorRecoveryRecognizer {
 
-        object():void {
+        constructor(input:tok.Token[] = []) {
+            // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
+            //       it is mandatory to provide this map to be able to perform self analysis
+            //       and allow the framework to "understand" the implemented grammar.
+            super(input, <any>chevrotain.examples.json)
+            // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
+            //       The typescript compiler places the constructor body last after initializations in the class's body
+            //       which is why place the call here meets the criteria.
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+
+        // DOCS: Each line here defines a public parsing rule
+        public object = this.RULE("object", this.parseObject)
+        public objectItem = this.RULE("objectItem", this.parseObjectItem)
+        public array = this.RULE("array", this.parseArray)
+        public value = this.RULE("value", this.parseValue)
+
+
+        // actual parsing rules implementation
+        private parseObject():void {
             this.CONSUME(LCurlyTok)
-            this.OPTION(isString, () => {
-                this.objectItem()
-                this.MANY(isAdditionalItem, () => {
+            this.OPTION(() => {
+                this.SUBRULE(this.objectItem(1))
+                this.MANY(() => {
                     this.CONSUME(CommaTok)
-                    this.objectItem()
-                })
+                    this.SUBRULE(this.objectItem(2)) // DOCS: the index "2" is needed to identify
+                })                                   //       the unique position in the grammar
             })
             this.CONSUME(RCurlyTok)
         }
 
-        objectItem():void {
+        private parseObjectItem():void {
             this.CONSUME(StringTok)
             this.CONSUME(ColonTok)
-            this.value()
+            this.SUBRULE(this.value(1))
         }
 
-        array():void {
+        private parseArray():void {
             this.CONSUME(LSquareTok)
-            this.OPTION(isString, () => {
-                this.value()
-                this.MANY(isAdditionalItem, () => {
-                    this.value()
+            this.OPTION(() => {
+                this.SUBRULE(this.value(1))
+                this.MANY(() => {
+                    this.SUBRULE(this.value(2))
                 })
             })
             this.CONSUME(RSquareTok)
         }
 
-        value():void {
-            this.OR(
-                [
-                    // @formatter:off
-                    {WHEN: isString, THEN_DO: () => {
-                        this.CONSUME(StringTok)}},
-                    {WHEN: isNumber, THEN_DO: () => {
-                        this.CONSUME(NumberTok)}},
-                    {WHEN: isObject, THEN_DO: () => {
-                        this.object()}},
-                    {WHEN: isArray, THEN_DO: () => {
-                        this.array()}},
-                    {WHEN: isTrue, THEN_DO: () => {
-                        this.CONSUME(TrueTok)}},
-                    {WHEN: isFalse, THEN_DO: () => {
-                        this.CONSUME(FalseTok)}},
-                    {WHEN: isNull, THEN_DO: () => {
-                        this.CONSUME(NullTok)}}
-                    // @formatter:off
-
-                ], "a value")
+        private parseValue():void {
+            this.OR([
+                {ALT: () => {this.CONSUME(StringTok)}},
+                {ALT: () => {this.CONSUME(NumberTok)}},
+                {ALT: () => {this.SUBRULE(this.object(1))}},
+                {ALT: () => {this.SUBRULE(this.array(1))}},
+                {ALT: () => {this.CONSUME(TrueTok)}},
+                {ALT: () => {this.CONSUME(FalseTok)}},
+                {ALT: () => {this.CONSUME(NullTok)}}
+            ], "a value")
         }
     }
-
-    function isString():boolean {
-        return this.NEXT_TOKEN() instanceof StringTok
-    }
-
-    function isAdditionalItem():boolean {
-        return this.NEXT_TOKEN() instanceof CommaTok
-    }
-
-    function isNumber():boolean {
-        return this.NEXT_TOKEN() instanceof NumberTok
-    }
-
-    function isObject():boolean {
-        return this.NEXT_TOKEN() instanceof LCurlyTok
-    }
-
-    function isArray():boolean {
-        return this.NEXT_TOKEN() instanceof LSquareTok
-    }
-
-    function isTrue():boolean {
-        return this.NEXT_TOKEN() instanceof TrueTok
-    }
-
-    function isFalse():boolean {
-        return this.NEXT_TOKEN() instanceof FalseTok
-    }
-
-    function isNull():boolean {
-        return this.NEXT_TOKEN() instanceof NullTok
-    }
-
 }
