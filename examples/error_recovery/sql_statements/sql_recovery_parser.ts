@@ -23,7 +23,7 @@ module chevrotain.examples.recovery.sql {
 
 
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
-    export class DDLExampleRecoveryParser extends recog.BaseErrorRecoveryRecognizer {
+    export class DDLExampleRecoveryParser extends recog.BaseIntrospectionRecognizer {
 
         constructor(input:tok.Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
@@ -33,7 +33,7 @@ module chevrotain.examples.recovery.sql {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         // DOCS: the invocation to RULE(...) is what wraps our parsing implementation method

@@ -33,15 +33,15 @@ module chevrotain.recognizer.lookahead.spec {
         constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Six")}
     }
 
-    class OptionsImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class OptionsImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
@@ -78,15 +78,15 @@ module chevrotain.recognizer.lookahead.spec {
         }
     }
 
-    class OptionsExplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class OptionsExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
@@ -229,15 +229,15 @@ module chevrotain.recognizer.lookahead.spec {
     })
 
 
-    class ManyImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class ManyImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
@@ -274,15 +274,15 @@ module chevrotain.recognizer.lookahead.spec {
         }
     }
 
-    class ManyExplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class ManyExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
@@ -417,15 +417,15 @@ module chevrotain.recognizer.lookahead.spec {
     })
 
 
-    class AtLeastOneImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class AtLeastOneImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
@@ -462,15 +462,15 @@ module chevrotain.recognizer.lookahead.spec {
         }
     }
 
-    class AtLeastOneExplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class AtLeastOneExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
@@ -558,15 +558,15 @@ module chevrotain.recognizer.lookahead.spec {
     })
 
 
-    class OrImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class OrImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
@@ -722,15 +722,15 @@ module chevrotain.recognizer.lookahead.spec {
         })
     })
 
-    class OrExplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+    class OrExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+            return recog.BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
         }
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })

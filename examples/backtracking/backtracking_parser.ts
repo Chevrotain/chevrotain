@@ -52,7 +52,7 @@ module chevrotain.examples.backtracking {
 
     // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
     // that needs to be tested too.
-    export class BackTrackingParser extends recog.BaseErrorRecoveryRecognizer {
+    export class BackTrackingParser extends recog.BaseIntrospectionRecognizer {
 
         constructor(input:tok.Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
@@ -62,7 +62,7 @@ module chevrotain.examples.backtracking {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
 

@@ -50,7 +50,8 @@ module chevrotain.lookahead {
             occurrence:      ruleOccurrence
         }
 
-        var possibleNextTokTypes = new prodWalker(ruleGrammar, path).startWalking()
+        var walker:interp.AbstractNextPossibleTokensWalker = new prodWalker(ruleGrammar, path)
+        var possibleNextTokTypes = walker.startWalking()
 
         return function ():boolean {
             return _.any(possibleNextTokTypes, function (possibleTok) {

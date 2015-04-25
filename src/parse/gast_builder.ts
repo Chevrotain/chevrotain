@@ -31,7 +31,7 @@ module chevrotain.gastBuilder {
     }
 
     // CONSUME1([ns1.ns2.ns3.]LCurlyTok)
-    var terminalRegEx = /this\s*.\s*CONSUME(\d)\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
+    var terminalRegEx = /this\s*.\s*CONSUME(\d)?\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
     var terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
     // note that there is an optional underscore '_' before the 'this'
@@ -110,7 +110,7 @@ module chevrotain.gastBuilder {
 
     function buildTerminalProd(prodRange:IProdRange):gast.Terminal {
         var reResult = terminalRegEx.exec(prodRange.text)
-        var terminalOccurrence = parseInt(reResult[1], 10)
+        var terminalOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
         var terminalName = reResult[2]
         var terminalType = terminalNameToConstructor[terminalName]
         if (!terminalType) {
