@@ -30,28 +30,50 @@ module chevrotain.lookahead.spec {
         }
     }
 
+    class EntityParserMock extends recog.BaseRecognizer {
+        protected NEXT_TOKEN():t.Token {
+            return new samples.EntityTok(1, 1, ",")
+        }
+    }
+
+    class KeyParserMock extends recog.BaseRecognizer {
+        protected NEXT_TOKEN():t.Token {
+            return new samples.KeyTok(1, 1, ",")
+        }
+    }
+
+
     describe("The Grammar Lookahead model", function () {
         "use strict"
 
         it("can compute the lookahead function for the first OPTION in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForOption(1, "actionDec", samples.actionDec)
+            var laFunc = lookahead.buildLookaheadForOption(1, samples.actionDec)
 
             expect(laFunc.call(new ColonParserMock())).toBe(false)
             expect(laFunc.call(new IdentParserMock())).toBe(true)
         })
 
         it("can compute the lookahead function for the second OPTION in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForOption(2, "actionDec", samples.actionDec)
+            var laFunc = lookahead.buildLookaheadForOption(2, samples.actionDec)
 
             expect(laFunc.call(new ColonParserMock())).toBe(true)
             expect(laFunc.call(new IdentParserMock())).toBe(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForMany(1, "actionDec", samples.actionDec)
+            var laFunc = lookahead.buildLookaheadForMany(1, samples.actionDec)
 
             expect(laFunc.call(new CommaParserMock())).toBe(true)
             expect(laFunc.call(new IdentParserMock())).toBe(false)
+        })
+
+        it("can compute the lookahead function for the first MANY in ActionDec", function () {
+            var laFunc = lookahead.buildLookaheadForOr(1, samples.lotsOfOrs)
+
+            expect(laFunc.call(new CommaParserMock())).toBe(0)
+            expect(laFunc.call(new KeyParserMock())).toBe(0)
+            expect(laFunc.call(new EntityParserMock())).toBe(1)
+            expect(laFunc.call(new ColonParserMock())).toBe(-1)
         })
     })
 

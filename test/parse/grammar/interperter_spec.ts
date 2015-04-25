@@ -452,6 +452,24 @@ module chevrotain.interpreter.spec {
             expect(result3.occurrence).toBe(1)
             expect(result3.token).toBe(t.CommaTok)
         })
+    })
 
+    describe("The NextInsideOrWalker", function () {
+
+        it("can compute the First Tokens for all alternatives of an OR", function () {
+            var result = new NextInsideOrWalker(samples.cardinality, 1).startWalking()
+            expect(result.length).toBe(2)
+            // TODO: intellij ts types bug, using <any> as a workaround
+            matchers.arrayEqualityNoOrder(<any>result[0], [t.UnsignedIntegerLiteralTok])
+            matchers.arrayEqualityNoOrder(<any>result[1], [t.AsteriskTok])
+        })
+
+        it("can compute the First Tokens for all alternatives of an OR (complex)", function () {
+            var result1 = new NextInsideOrWalker(samples.lotsOfOrs, 1).startWalking()
+            expect(result1.length).toBe(2)
+            // TODO: intellij ts types bug, using <any> as a workaround
+            matchers.arrayEqualityNoOrder(<any>result1[0], [t.CommaTok, t.KeyTok])
+            matchers.arrayEqualityNoOrder(<any>result1[1], [t.EntityTok])
+        })
     })
 }

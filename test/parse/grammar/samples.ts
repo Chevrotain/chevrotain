@@ -107,4 +107,21 @@ module test.samples {
         ], 2)
     ])
 
+    export var lotsOfOrs = new gast.TOP_LEVEL("lotsOfOrs", [
+        new gast.OPTION([
+            new gast.OR([
+                new gast.FLAT([
+                    new gast.OR([
+                        new gast.Terminal(CommaTok, 1),
+                        new gast.Terminal(KeyTok, 1)
+                    ], 2)
+                ]),
+                new gast.Terminal(EntityTok, 1)
+            ]),
+            new gast.OR([
+                new gast.Terminal(DotTok, 1),
+            ], 3)
+        ]),
+    ])
+
 }

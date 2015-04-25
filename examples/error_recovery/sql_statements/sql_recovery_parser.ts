@@ -58,21 +58,18 @@ module chevrotain.examples.recovery.sql {
             this.MANY(() => {
                 this.OR([
                     // @formatter:off
-                    {WHEN: isCreate, THEN_DO: () => {
+                    {ALT: () => {
                         // DOCS: note how the invocation of another parseRule also adds the occurrence index
                         //       if we had another invocation of this.createStmt inside this rule, we would have had to use
                         //       "this.createStmt(2)" and the next one this.createStmt(3) ...
                         stmts.push(this.SUBRULE(this.createStmt(1)))}},
-                    {WHEN: isInsert, THEN_DO: () => {
+                    {ALT: () => {
                         stmts.push(this.SUBRULE(this.insertStmt(1)))}},
-                    {WHEN: isDelete, THEN_DO: () => {
+                    {ALT: () => {
                         // DOCS: note the usage of the SUBRULE wrapper, it does not actually do anything but it is needed
                         // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
                         stmts.push(this.SUBRULE(this.deleteStmt(1)))}},
                     // @formatter:on
-                    // DOCS: in this case we specify we expect EndOfFile after all the statements have been matched
-                    // this means that if once we are ready to exit the MANY if EOF is not the next token, in-repetition
-                    // will be attempted
                 ], "A Statement")
             })
 
@@ -165,36 +162,13 @@ module chevrotain.examples.recovery.sql {
             var value:tok.Token = null
             this.OR(
                 [   // @formatter:off
-                    {WHEN: isString, THEN_DO: () => {
-                        value = this.CONSUME1(StringTok)}},
-                    {WHEN: isInteger, THEN_DO: () => {
-                        value = this.CONSUME1(IntTok)}}
+                    {ALT: () => {value = this.CONSUME1(StringTok)}},
+                    {ALT: () => {value = this.CONSUME1(IntTok)}}
                 ], "a String or an Integer")
                     // @formatter:on
             return PT(value)
         }
     }
-
-    function isCreate():boolean {
-        return this.NEXT_TOKEN() instanceof CreateTok
-    }
-
-    function isInsert():boolean {
-        return this.NEXT_TOKEN() instanceof InsertTok
-    }
-
-    function isDelete():boolean {
-        return this.NEXT_TOKEN() instanceof DeleteTok
-    }
-
-    function isInteger():boolean {
-        return this.NEXT_TOKEN() instanceof IntTok
-    }
-
-    function isString():boolean {
-        return this.NEXT_TOKEN() instanceof StringTok
-    }
-
 
     // TODO: maybe extract to parse.tree module?
     // HELPER FUNCTIONS

@@ -64,7 +64,7 @@ module chevrotain.gast {
     }
 
     export class OR extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition) }
+        constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
     /* tslint:enable:class-name */
 
