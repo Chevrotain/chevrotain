@@ -49,8 +49,10 @@ module chevrotain.gastBuilder {
     var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE(\d)?\s*\(/
     var atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
 
-    var orRegEx = /this\s*.\s*OR\s*\(/g
-    var orPartRegEx = /{\s*WHEN\s*:/g
+    var orRegEx = /this\s*.\s*OR(\d)?\s*\(/
+    var orRegExGlobal = new RegExp(orRegEx.source, "g")
+
+    var orPartRegEx = /{\s*(WHEN|ALT)\s*:/g
 
     export interface ITerminalNameToConstructor {
         [fqn: string]: Function
@@ -87,7 +89,7 @@ module chevrotain.gastBuilder {
             case ProdType.OPTION:
                 return buildOptionProd(prodRange, allRanges)
             case ProdType.OR:
-                return buildAbstractProd(new gast.OR([]), prodRange.range, allRanges)
+                return buildOrProd(prodRange, allRanges)
             case ProdType.FLAT:
                 return buildAbstractProd(new gast.FLAT([]), prodRange.range, allRanges)
             case ProdType.REF:
@@ -121,15 +123,15 @@ module chevrotain.gastBuilder {
     function buildAtLeastOneProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.AT_LEAST_ONE {
         var reResult = atLeastOneRegEx.exec(prodRange.text)
         var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
-        var optionProd = new gast.AT_LEAST_ONE([], refOccurrence)
-        return buildAbstractProd(optionProd, prodRange.range, allRanges)
+        var atLeastOneProd = new gast.AT_LEAST_ONE([], refOccurrence)
+        return buildAbstractProd(atLeastOneProd, prodRange.range, allRanges)
     }
 
     function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.MANY {
         var reResult = manyRegEx.exec(prodRange.text)
         var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
-        var optionProd = new gast.MANY([], refOccurrence)
-        return buildAbstractProd(optionProd, prodRange.range, allRanges)
+        var manyProd = new gast.MANY([], refOccurrence)
+        return buildAbstractProd(manyProd, prodRange.range, allRanges)
     }
 
     function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OPTION {
@@ -137,6 +139,13 @@ module chevrotain.gastBuilder {
         var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
         var optionProd = new gast.OPTION([], refOccurrence)
         return buildAbstractProd(optionProd, prodRange.range, allRanges)
+    }
+
+    function buildOrProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OR {
+        var reResult = orRegEx.exec(prodRange.text)
+        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var orProd = new gast.OR([], refOccurrence)
+        return buildAbstractProd(orProd, prodRange.range, allRanges)
     }
 
     function buildAbstractProd<T extends gast.AbstractProduction>(prod:T,
@@ -210,7 +219,7 @@ module chevrotain.gastBuilder {
     }
 
     export function createOrRanges(text):IProdRange[] {
-        var orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegEx)
+        var orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegExGlobal)
         // have to split up the OR cases into separate FLAT productions
         // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
         var orSubPartsRanges = createOrPartRanges(orRanges)
@@ -276,7 +285,6 @@ module chevrotain.gastBuilder {
         return operatorRanges
     }
 
-
     export function findClosingOffset(opening:string, closing:string, start:number, text:string):number {
         var parenthesisStack = [1]
 
@@ -302,7 +310,6 @@ module chevrotain.gastBuilder {
         }
     }
 
-
     export class GastRefResolverVisitor extends gast.GAstVisitor {
 
         constructor(private nameToProd:lang.HashTable<gast.TOP_LEVEL>) { super() }
@@ -322,7 +329,6 @@ module chevrotain.gastBuilder {
 
             node.ref = ref
         }
-
     }
 }
 

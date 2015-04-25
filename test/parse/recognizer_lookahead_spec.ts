@@ -29,6 +29,10 @@ module chevrotain.recognizer.lookahead.spec {
         constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Five")}
     }
 
+    export class SixTok extends tok.Token {
+        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Six")}
+    }
+
     class OptionsImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
@@ -548,6 +552,243 @@ module chevrotain.recognizer.lookahead.spec {
 
         it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
             var parser = new AtLeastOneExplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(0)
+        })
+    })
+
+
+    class OrImplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+        }
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+        public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+
+        private parseOrRule():string {
+            var total = ""
+
+            // @formatter:off
+            this.OR1([
+                {ALT: () => {
+                    this.CONSUME1(OneTok)
+                    total += "A1"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(TwoTok)
+                    total += "A2"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(ThreeTok)
+                    total += "A3"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(FourTok)
+                    total += "A4"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(FiveTok)
+                    total += "A5"
+                }},
+            ], "digits")
+
+            this.OR2([
+                {ALT: () => {
+                    this.CONSUME2(OneTok)
+                    total += "B1"
+                }},
+                {ALT: () => {
+                    this.CONSUME2(FourTok)
+                    total += "B4"
+                }},
+                {ALT: () => {
+                    this.CONSUME2(ThreeTok)
+                    total += "B3"
+                }},
+                 {ALT: () => {
+                    this.CONSUME2(TwoTok)
+                    total += "B2"
+                }},
+                {ALT: () => {
+                    this.CONSUME2(FiveTok)
+                    total += "B5"
+                }},
+            ], "digits")
+
+            this.OR3([
+                {ALT: () => {
+                    this.CONSUME3(TwoTok)
+                    total += "C2"
+                }},
+                {ALT: () => {
+                    this.CONSUME3(FourTok)
+                    total += "C4"
+                }},
+                {ALT: () => {
+                    this.CONSUME3(ThreeTok)
+                    total += "C3"
+                }},
+                {ALT: () => {
+                    this.CONSUME3(FiveTok)
+                    total += "C5"
+                }},
+                 {ALT: () => {
+                    this.CONSUME3(OneTok)
+                    total += "C1"
+                }}
+            ], "digits")
+
+            this.OR4([
+                {ALT: () => {
+                    this.CONSUME4(OneTok)
+                    total += "D1"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(ThreeTok)
+                    total += "D3"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(FourTok)
+                    total += "D4"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(TwoTok)
+                    total += "D2"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(FiveTok)
+                    total += "D5"
+                }}
+            ], "digits")
+
+            this.OR5([
+                {ALT: () => {
+                    this.CONSUME5(TwoTok)
+                    total += "E2"
+                }},
+                 {ALT: () => {
+                    this.CONSUME5(OneTok)
+                    total += "E1"
+                }},
+                {ALT: () => {
+                    this.CONSUME5(FourTok)
+                    total += "E4"
+                }},
+                 {ALT: () => {
+                    this.CONSUME5(ThreeTok)
+                    total += "E3"
+                }},
+                {ALT: () => {
+                    this.CONSUME5(FiveTok)
+                    total += "E5"
+                }},
+            ], "digits")
+
+            // @formatter:on
+            return total
+        }
+    }
+
+    describe("The implicit lookahead calculation functionality of the Recognizer For OR", function () {
+
+        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
+            var parser = new OrImplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(0)
+        })
+
+        it("can compute the lookahead automatically for OR1-5", function () {
+            var input = [new OneTok(1, 1), new TwoTok(1, 1), new ThreeTok(1, 1), new FourTok(1, 1), new FiveTok(1, 1)]
+            var parser = new OrImplicitLookAheadParser(input)
+            expect(parser.orRule(1)).toBe("A1B2C3D4E5")
+        })
+
+        it("will fail when none of the alternatives match", function () {
+            var input = [new SixTok(1, 1)]
+            var parser = new OrImplicitLookAheadParser(input)
+            expect(parser.orRule(1)).toBe("-666")
+        })
+
+        it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
+            var parser = new OrImplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(5)
+        })
+    })
+
+    class OrExplicitLookAheadParser extends BaseErrorRecoveryRecognizer {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return recog.BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
+        }
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
+        }
+
+        public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+
+        private parseOrRule():string {
+            var total = ""
+
+            // @formatter:off
+            this.OR1([
+                {WHEN: isOneTok, THEN_DO: () => {
+                    this.CONSUME1(OneTok)
+                    total += "1"
+                }},
+                {WHEN: isTwoTok, THEN_DO: () => {
+                    this.CONSUME1(TwoTok)
+                    total += "2"
+                }},
+                {WHEN: isThreeTok, THEN_DO: () => {
+                    this.CONSUME1(ThreeTok)
+                    total += "3"
+                }},
+                {WHEN: isFourTok, THEN_DO: () => {
+                    this.CONSUME1(FourTok)
+                    total += "4"
+                }},
+                {WHEN: isFiveTok, THEN_DO: () => {
+                    this.CONSUME1(FiveTok)
+                    total += "5"
+                }},
+            ], "digits")
+
+            // @formatter:on
+            return total
+        }
+    }
+
+    describe("The Explicit lookahead functionality of the Recognizer for OR", function () {
+
+        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
+            var parser = new OrExplicitLookAheadParser()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).toBe(0)
+        })
+
+        it("can accept the lookahead param explicitly for OR", function () {
+            var input = [new TwoTok(1, 1)]
+            var parser = new OrExplicitLookAheadParser(input)
+            expect(parser.orRule(1)).toBe("2")
+        })
+
+        it("will fail when none of the alternatives match", function () {
+            var input = [new SixTok(1, 1)]
+            var parser = new OrExplicitLookAheadParser(input)
+            expect(parser.orRule(1)).toBe("-666")
+        })
+
+        it("will NOT cache the generatedLookAhead functions in explicit mode", function () {
+            var parser = new OrExplicitLookAheadParser()
             var lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).toBe(0)
         })

@@ -169,6 +169,34 @@ module chevrotain.interpreter {
         }
     }
 
+    export type AlternativesFirstTokens = Function[][]
+
+    export class NextInsideOrWalker extends r.RestWalker {
+
+        public result:AlternativesFirstTokens = []
+
+        constructor(protected topRule:g.TOP_LEVEL, protected occurrence:number) {
+            super()
+        }
+
+        startWalking():AlternativesFirstTokens {
+            this.walk(this.topRule)
+            return this.result
+        }
+
+        walkOr(orProd:g.OR, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (orProd.occurrenceInParent === this.occurrence) {
+                this.result = _.map(orProd.definition, (alt) => {
+                    var altWrapper = new gast.FLAT([alt])
+                    return f.first(altWrapper)
+                })
+            }
+            else {
+                super.walkOr(orProd, currRest, prevRest)
+            }
+        }
+    }
+
     export interface IFirstAfterRepetition {
         token:Function
         occurrence:number
@@ -181,7 +209,7 @@ module chevrotain.interpreter {
      */
     export class AbstractNextTerminalAfterProductionWalker extends r.RestWalker {
 
-        public result = {token: undefined, occurrence: undefined, isEndOfRule: undefined}
+        protected result = {token: undefined, occurrence: undefined, isEndOfRule: undefined}
 
         constructor(protected topRule:g.TOP_LEVEL, protected occurrence:number) {
             super()

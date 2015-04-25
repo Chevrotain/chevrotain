@@ -76,14 +76,28 @@ module chevrotain.recognizer {
         THEN_DO:() => void
     }
 
-    export interface IOrCase<T> {
+    /**
+     * OR([
+     *  { WHEN:LA1, THEN_DO:XXX },
+     *  { WHEN:LA2, THEN_DO:YYY },
+     *  { WHEN:LA3, THEN_DO:ZZZ },
+     * ])
+     */
+    export interface IOrAlt<T> {
         WHEN:() => boolean
+        // TODO: change THEN_DO property to ALT (may need to modify gast builder)
         THEN_DO:() => T
     }
 
-    export interface IOrRetType<T> {
-        tree:T
-        matched:boolean
+    /**
+     * OR([
+     *  {ALT:XXX },
+     *  {ALT:YYY },
+     *  {ALT:ZZZ }
+     * ])
+     */
+    export interface IOrAltImplicit<T> {
+        ALT:() => T
     }
 
     export interface IBaseRecogState {
@@ -235,15 +249,13 @@ module chevrotain.recognizer {
             return false
         }
 
-        protected OR<T>(cases:IOrCase<T>[], errMsgTypes:string):IOrRetType<T> {
-            for (var i = 0; i < cases.length; i++) {
-                if (cases[i].WHEN.call(this)) {
-                    var res = cases[i].THEN_DO()
-                    // TODO: why return the complex object?
-                    return {tree: res, matched: true}
+        protected OR<T>(alts:IOrAlt<T>[], errMsgTypes:string):T {
+            for (var i = 0; i < alts.length; i++) {
+                if (alts[i].WHEN.call(this)) {
+                    var res = alts[i].THEN_DO()
+                    return res
                 }
             }
-
             // reaching here means no valid case was found
             var foundToken = this.NEXT_TOKEN().image
             throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
@@ -399,6 +411,10 @@ module chevrotain.recognizer {
             return this.consumeInternal(tokType, 4)
         }
 
+        protected CONSUME5(tokType:Function):tok.Token {
+            return this.consumeInternal(tokType, 5)
+        }
+
         /**
          *  This is an "empty" wrapper that has no meaning in runtime, it is only used to create an easy to identify
          *  textual mark for the purpose of making the "self" parsing of the implemented grammar rules easier.
@@ -413,6 +429,11 @@ module chevrotain.recognizer {
             return this.getLookaheadFuncFor("OPTION", occurence, lookahead.buildLookaheadForOption)
         }
 
+        protected getLookaheadFuncForOr(occurence:number):() => number {
+            return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr)
+        }
+
+
         protected getLookaheadFuncForMany(occurence:number):() => boolean {
             return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
         }
@@ -421,15 +442,16 @@ module chevrotain.recognizer {
             return this.getLookaheadFuncFor("AT_LEAST_ONE", occurence, lookahead.buildLookaheadForAtLeastOne)
         }
 
-        protected getLookaheadFuncFor(prodType:string, occurrence:number,
-                                      laFuncBuilder:(number, string, any) => () => boolean):() => boolean {
+        protected getLookaheadFuncFor<T>(prodType:string,
+                                         occurrence:number,
+                                         laFuncBuilder:(number, any) => () => T):() => T {
             var classLAFuncs = BaseErrorRecoveryRecognizer.getLookaheadFuncsForClass(this)
             var ruleName = _.last(this.RULE_STACK)
             var key = prodType + occurrence + "_IN_" + ruleName
             var condition = <any>classLAFuncs.get(key)
             if (_.isUndefined(condition)) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
-                condition = laFuncBuilder(occurrence, ruleName, ruleGrammar)
+                condition = laFuncBuilder(occurrence, ruleGrammar)
                 classLAFuncs.put(key, condition)
             }
 
@@ -484,6 +506,52 @@ module chevrotain.recognizer {
                 condition = this.getLookaheadFuncForOption(5)
             }
             return super.OPTION(<any>condition, <any>action)
+        }
+
+        private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
+                              errMsgTypes:string,
+                              occurrence:number):T {
+            // explicit alternatives look ahead
+            if ((<any>alts[0]).WHEN) {
+                return super.OR(<IOrAlt<T>[]>alts, errMsgTypes)
+            }
+
+            // else implicit lookahead
+            var laFunc = this.getLookaheadFuncForOr(occurrence)
+            var altToTake = laFunc.call(this)
+            if (altToTake !== -1) {
+                return (<any>alts[altToTake]).ALT.call(this)
+            }
+
+            // TODO: extract duplicate code from super class
+            // reaching here means no valid case was found
+            var foundToken = this.NEXT_TOKEN().image
+            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
+            " but found '" + foundToken + "'", this.NEXT_TOKEN()))
+        }
+
+        protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
+            return this.OR1(alts, errMsgTypes)
+        }
+
+        protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
+            return this.orInternal(alts, errMsgTypes, 1)
+        }
+
+        protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
+            return this.orInternal(alts, errMsgTypes, 2)
+        }
+
+        protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
+            return this.orInternal(alts, errMsgTypes, 3)
+        }
+
+        protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
+            return this.orInternal(alts, errMsgTypes, 4)
+        }
+
+        protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
+            return this.orInternal(alts, errMsgTypes, 5)
         }
 
         private attemptInRepetitionRecovery(prodFunc:Function,
