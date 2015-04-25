@@ -2,6 +2,7 @@
 /// <reference path="sql_recovery_parser.ts" />
 /// <reference path="../../../src/scan/tokens.ts" />
 /// <reference path="../../../src/parse/parse_tree.ts" />
+/// <reference path="../../../src/parse/recognizer.ts" />
 /// <reference path="../../../libs/jasmine.d.ts" />
 /// <reference path="../../../libs/lodash.d.ts" />
 
@@ -12,6 +13,7 @@ module chevrotain.examples.recovery.sql.spec {
 
     import tok = chevrotain.tokens
     import pt =  chevrotain.tree
+    import recog = chevrotain.recognizer
 
     describe("Error Recovery SQL DDL Example", function () {
         "use strict"
