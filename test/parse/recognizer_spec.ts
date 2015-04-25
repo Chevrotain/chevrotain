@@ -90,9 +90,6 @@ module chevrotain.recognizer.spec {
                 new IntToken(1, 1, "2"), new PlusTok(1, 1), new IntToken(1, 1, "3")]
 
             parser.input = testInput
-            expect(() => parser.CONSUME(IntToken)).
-                toThrow(Error("must use COMSUME1/2/3... to indicate the occurrence of the specific Token inside the current rule"))
-
             expect(parser.CONSUME4(IntToken)).toBe(testInput[0])
             expect(parser.CONSUME2(PlusTok)).toBe(testInput[1])
             expect(parser.CONSUME1(IntToken)).toBe(testInput[2])

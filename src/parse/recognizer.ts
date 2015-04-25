@@ -381,18 +381,7 @@ module chevrotain.recognizer {
         }
 
         protected CONSUME(tokType:Function):tok.Token {
-            // The basic indexless consume is not supported because that index/occurrence number must be provided
-            // to allow the parser to "know" its position. for example: take a simple qualifiedName rule.
-            //
-            // this.CONSUME1(IdentTok)) <-- first Ident
-            // this.MANY(isQualifiedNamePart, () => {
-            //    this.CONSUME1(DotTok)
-            //    this.CONSUME2(IdentTok)   <-- ident 2...n
-            // })
-            //
-            // the behavior for recovering from a mismatched Token may be different depending if we are trying to consume
-            // the first or the second occurrence of IdentTok. because the position in the grammar is different...
-            throw Error("must use COMSUME1/2/3... to indicate the occurrence of the specific Token inside the current rule")
+            return this.CONSUME1(tokType)
         }
 
         protected CONSUME1(tokType:Function):tok.Token {
