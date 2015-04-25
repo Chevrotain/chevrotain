@@ -252,10 +252,8 @@ module chevrotain.recognizer {
                     return res
                 }
             }
-            // reaching here means no valid case was found
-            var foundToken = this.NEXT_TOKEN().image
             throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-            " but found '" + foundToken + "'", this.NEXT_TOKEN()))
+            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
         }
 
         protected MANY(lookAheadFunc:LookAheadFunc, action:GrammarAction):void {
@@ -515,9 +513,8 @@ module chevrotain.recognizer {
 
             // TODO: extract duplicate code from super class
             // reaching here means no valid case was found
-            var foundToken = this.NEXT_TOKEN().image
             throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-            " but found '" + foundToken + "'", this.NEXT_TOKEN()))
+            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
         }
 
         protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
@@ -558,7 +555,8 @@ module chevrotain.recognizer {
             var firstAfterRepInfo = firstAfterRepMap.get(key)
             if (_.isUndefined(firstAfterRepInfo)) {
                 var ruleGrammar = this.getGAstProductions().get(currRuleName)
-                firstAfterRepInfo = new nextToksWalker(ruleGrammar, prodOccurrence).startWalking()
+                var walker:interp.AbstractNextTerminalAfterProductionWalker = new nextToksWalker(ruleGrammar, prodOccurrence)
+                firstAfterRepInfo = walker.startWalking()
                 firstAfterRepMap.put(key, firstAfterRepInfo)
             }
 
