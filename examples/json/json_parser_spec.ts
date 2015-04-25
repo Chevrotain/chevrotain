@@ -1,4 +1,4 @@
-/// <reference path="JsonParser2.ts" />
+/// <reference path="json_parser.ts" />
 /// <reference path="../../src/scan/tokens.ts" />
 /// <reference path="../../src/parse/recognizer.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
