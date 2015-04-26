@@ -119,50 +119,50 @@ module chevrotain.gastBuilder {
         return new gast.Terminal(terminalType, terminalOccurrence)
     }
 
-    // TODO: extract reoccurring pattern for buildManyProd/BuildOptionProd
+
+    // http://stackoverflow.com/questions/17125764/can-you-specify-multiple-type-constraints-for-typescript-generics
+    interface AbsProdWithOccurrence extends gast.IProductionWithOccurrence, gast.AbstractProduction {}
+
+    function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(regEx:RegExp,
+                                                                      prodInstance:T,
+                                                                      prodRange:IProdRange,
+                                                                      allRanges:IProdRange[]):T {
+        var reResult = regEx.exec(prodRange.text)
+        prodInstance.occurrenceInParent = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        // <any> due to intellij bugs
+        return <any>buildAbstractProd(prodInstance, prodRange.range, allRanges)
+    }
+
     function buildAtLeastOneProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.AT_LEAST_ONE {
-        var reResult = atLeastOneRegEx.exec(prodRange.text)
-        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
-        var atLeastOneProd = new gast.AT_LEAST_ONE([], refOccurrence)
-        return buildAbstractProd(atLeastOneProd, prodRange.range, allRanges)
+        return buildProdWithOccurrence(atLeastOneRegEx, new gast.AT_LEAST_ONE([]), prodRange, allRanges)
     }
 
     function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.MANY {
-        var reResult = manyRegEx.exec(prodRange.text)
-        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
-        var manyProd = new gast.MANY([], refOccurrence)
-        return buildAbstractProd(manyProd, prodRange.range, allRanges)
+        return buildProdWithOccurrence(manyRegEx, new gast.MANY([]), prodRange, allRanges)
     }
 
     function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OPTION {
-        var reResult = optionRegEx.exec(prodRange.text)
-        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
-        var optionProd = new gast.OPTION([], refOccurrence)
-        return buildAbstractProd(optionProd, prodRange.range, allRanges)
+        return buildProdWithOccurrence(optionRegEx, new gast.OPTION([]), prodRange, allRanges)
     }
 
     function buildOrProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OR {
-        var reResult = orRegEx.exec(prodRange.text)
-        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
-        var orProd = new gast.OR([], refOccurrence)
-        return buildAbstractProd(orProd, prodRange.range, allRanges)
+        return buildProdWithOccurrence(orRegEx, new gast.OR([]), prodRange, allRanges)
     }
 
-    function buildAbstractProd<T extends gast.AbstractProduction>(prod:T,
-                                                                  topLevelRange:r.IRange,
-                                                                  allRanges:IProdRange[]):T {
+    function buildAbstractProd<T extends AbsProdWithOccurrence | gast.AbstractProduction >(prod:T,
+                                                                                           topLevelRange:r.IRange,
+                                                                                           allRanges:IProdRange[]):T {
         var secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
         var secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
 
         var definition:gast.IProduction[] = []
         _.forEach(secondLevelInOrder, (prodRng) => {
             definition.push(buildProdGast(prodRng, allRanges))
-        })
+        });
 
-        // TODO-ss: intelij bug with generics + constraints remove type assertion when fixed
-        var assertedProd = <gast.AbstractProduction>prod
-        assertedProd.definition = definition
-        return <any>assertedProd
+        // IntelliJ bug workaround
+        (<any>prod).definition = definition
+        return prod
     }
 
     export function getDirectlyContainedRanges(y:r.IRange, prodRanges:IProdRange[]):IProdRange[] {

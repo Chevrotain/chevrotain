@@ -9,6 +9,11 @@ module chevrotain.gast {
         accept(visitor:GAstVisitor):void
     }
 
+    export interface IProductionWithOccurrence {
+        definition:IProduction[]
+        occurrenceInParent:number
+    }
+
     export class AbstractProduction implements IProduction {
         constructor(public definition:IProduction[]) {}
 
@@ -20,7 +25,7 @@ module chevrotain.gast {
         }
     }
 
-    export class ProdRef extends AbstractProduction {
+    export class ProdRef extends AbstractProduction implements IProductionWithOccurrence {
         constructor(public refProdName:string,
                     public ref:TOP_LEVEL = undefined,
                     public occurrenceInParent:number = 1) { super([]) }
@@ -51,19 +56,19 @@ module chevrotain.gast {
         constructor(definition:IProduction[]) { super(definition) }
     }
 
-    export class OPTION extends AbstractProduction {
+    export class OPTION extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
-    export class AT_LEAST_ONE extends AbstractProduction {
+    export class AT_LEAST_ONE extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
-    export class MANY extends AbstractProduction {
+    export class MANY extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
-    export class OR extends AbstractProduction {
+    export class OR extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
     /* tslint:enable:class-name */
@@ -115,7 +120,6 @@ module chevrotain.gast {
     }
 
 
-    // ---------------------- visitor ---------------------
     export class GAstVisitor {
 
         public visit(node:IProduction) {
