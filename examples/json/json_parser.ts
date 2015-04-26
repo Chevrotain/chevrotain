@@ -65,16 +65,8 @@ module chevrotain.examples.json {
             recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
         }
 
-
-        // DOCS: Each line here defines a public parsing rule
-        public object = this.RULE("object", this.parseObject)
-        public objectItem = this.RULE("objectItem", this.parseObjectItem)
-        public array = this.RULE("array", this.parseArray)
-        public value = this.RULE("value", this.parseValue)
-
-
-        // actual parsing rules implementation
-        private parseObject():void {
+        // DOCS: the parsing rules
+        public object = this.RULE("object", () => {
             this.CONSUME(LCurlyTok)
             this.OPTION(() => {
                 this.SUBRULE(this.objectItem(1))
@@ -84,15 +76,15 @@ module chevrotain.examples.json {
                 })                                   //       the unique position in the grammar
             })
             this.CONSUME(RCurlyTok)
-        }
+        })
 
-        private parseObjectItem():void {
+        public objectItem = this.RULE("objectItem", () => {
             this.CONSUME(StringTok)
             this.CONSUME(ColonTok)
             this.SUBRULE(this.value(1))
-        }
+        })
 
-        private parseArray():void {
+        public array = this.RULE("array", () => {
             this.CONSUME(LSquareTok)
             this.OPTION(() => {
                 this.SUBRULE(this.value(1))
@@ -102,9 +94,9 @@ module chevrotain.examples.json {
                 })
             })
             this.CONSUME(RSquareTok)
-        }
+        })
 
-        private parseValue():void {
+        public value = this.RULE("value", () => {
             this.OR([
                 {ALT: () => {this.CONSUME(StringTok)}},
                 {ALT: () => {this.CONSUME(NumberTok)}},
@@ -114,6 +106,6 @@ module chevrotain.examples.json {
                 {ALT: () => {this.CONSUME(FalseTok)}},
                 {ALT: () => {this.CONSUME(NullTok)}}
             ], "a value")
-        }
+        })
     }
 }
