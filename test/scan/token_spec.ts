@@ -14,7 +14,7 @@ module chevrotain.tokens.spec {
         })
 
         it("exports a None token singleton which can't be initialized twice", function () {
-            var noneToken1 = NoneToken.getInstance();
+            NoneToken.getInstance();
             expect(() => { return new NoneToken() }).toThrow((new Error("can't create two instances of a singleton!")))
         })
 
