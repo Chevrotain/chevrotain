@@ -97,6 +97,7 @@ module chevrotain.examples.json {
             this.OPTION(() => {
                 this.SUBRULE(this.value(1))
                 this.MANY(() => {
+                    this.CONSUME(CommaTok)
                     this.SUBRULE(this.value(2))
                 })
             })
