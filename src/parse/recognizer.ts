@@ -925,16 +925,18 @@ module chevrotain.recognizer {
             this.definedRulesNames.push(ruleFuncName)
         }
 
-        protected RULE_NO_RESYNC<T>(ruleName:string, consumer:() => T, invalidRet:() => T):(idxInCallingRule:number,
+        protected RULE_NO_RESYNC<T>(ruleName:string,
+                                    impl:() => T,
+                                    invalidRet:() => T):(idxInCallingRule:number,
                                                                                             isEntryPoint?:boolean) => T {
-            return this.RULE(ruleName, consumer, invalidRet, false)
+            return this.RULE(ruleName, impl, invalidRet, false)
         }
 
 
         private defaultInvalidReturn():any { return undefined }
 
         protected RULE<T>(ruleName:string,
-                          consumer:() => T,
+                          impl:() => T,
                           invalidRet:() => T = this.defaultInvalidReturn,
                           doReSync = true):(idxInCallingRule:number,
                                             isEntryPoint?:boolean) => T {
@@ -942,7 +944,7 @@ module chevrotain.recognizer {
             var parserClassProductions = BaseIntrospectionRecognizer.getProductionsForClass(this)
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
-                parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(consumer.toString(), ruleName, this.tokensMap))
+                parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
             }
 
             var wrappedGrammarRule = function (idxInCallingRule:number = 1, isEntryPoint?:boolean) {
@@ -967,7 +969,7 @@ module chevrotain.recognizer {
 
                 try {
                     // actual parsing happens here
-                    return consumer.call(this)
+                    return impl.call(this)
                 } catch (e) {
                     var isFirstInvokedRule = (this.RULE_STACK.length === 1)
                     // note the reSync is always enabled for the first rule invocation, because we must always be able to
