@@ -36,7 +36,7 @@ module chevrotain.gastBuilder {
 
     // note that there is an optional underscore '_' before the 'this'
     // typescript adds this when generating code for arrow function ()=>{...}
-    var refRegEx = /this\s*.\s*SUBRULE\s*\(\s*_?this\s*.\s*(\w+)\s*\(\s*(\d)/
+    var refRegEx = /this\s*.\s*SUBRULE(\d)?\s*\(\s*_?this\s*.\s*(\w+)/
     var refRegExGlobal = new RegExp(refRegEx.source, "g")
 
     // this.OPTION(this.isSemicolon, ()=> {semicolon = this.CONSUME1(tok.SemicolonTok)})
@@ -103,8 +103,8 @@ module chevrotain.gastBuilder {
 
     function buildRefProd(prodRange:IProdRange):gast.ProdRef {
         var reResult = refRegEx.exec(prodRange.text)
-        var refProdName = reResult[1]
-        var refOccurrence = parseInt(reResult[2], 10)
+        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var refProdName = reResult[2]
         return new gast.ProdRef(refProdName, undefined, refOccurrence)
     }
 

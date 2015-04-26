@@ -404,13 +404,33 @@ module chevrotain.recognizer {
         }
 
         /**
-         *  This is an "empty" wrapper that has no meaning in runtime, it is only used to create an easy to identify
+         *  This method is used as an easy to identify
          *  textual mark for the purpose of making the "self" parsing of the implemented grammar rules easier.
          */
         // TODO: can this limitation be removed? if we know all the parsing rules names (or mark them in one way or another)
-        // can the self parsing itself be done in a more dynamic manner taking into account this information (rules names) ?
-        protected SUBRULE<T>(res:T):T {
-            return res
+        //       can the self parsing itself be done in a more dynamic manner taking into account this information (rules names) ?
+        protected SUBRULE<T>(ruleToCall:(number) => T):T {
+            return this.SUBRULE1(ruleToCall)
+        }
+
+        protected SUBRULE1<T>(ruleToCall:(number) => T):T {
+            return ruleToCall.call(this, 1)
+        }
+
+        protected SUBRULE2<T>(ruleToCall:(number) => T):T {
+            return ruleToCall.call(this, 2)
+        }
+
+        protected SUBRULE3<T>(ruleToCall:(number) => T):T {
+            return ruleToCall.call(this, 3)
+        }
+
+        protected SUBRULE4<T>(ruleToCall:(number) => T):T {
+            return ruleToCall.call(this, 4)
+        }
+
+        protected SUBRULE5<T>(ruleToCall:(number) => T):T {
+            return ruleToCall.call(this, 5)
         }
 
         protected getLookaheadFuncForOption(occurence:number):() => boolean {
@@ -928,7 +948,7 @@ module chevrotain.recognizer {
         protected RULE_NO_RESYNC<T>(ruleName:string,
                                     impl:() => T,
                                     invalidRet:() => T):(idxInCallingRule:number,
-                                                                                            isEntryPoint?:boolean) => T {
+                                                         isEntryPoint?:boolean) => T {
             return this.RULE(ruleName, impl, invalidRet, false)
         }
 

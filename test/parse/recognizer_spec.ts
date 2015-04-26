@@ -35,13 +35,12 @@ module chevrotain.recognizer.spec {
         public someNestedRule = this.RULE("someNestedRule", this.parseSomeNestedRule, () => { return undefined })
 
         private parseSomeRule():void {
-            this.SUBRULE(this.someNestedRule(1))
+            this.SUBRULE(this.someNestedRule)
         }
 
         private parseSomeNestedRule():void {
             this.CONSUME1(PlusTok)
         }
-
     }
 
 
@@ -80,8 +79,42 @@ module chevrotain.recognizer.spec {
         return this.NEXT_TOKEN() instanceof  DotTok
     }
 
+    class SubRuleTestParser extends recog.BaseIntrospectionRecognizer {
 
-    describe("The BaseErrorRecoveryRecognizer", function () {
+        private result = ""
+        private index = 1;
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.spec)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+        }
+
+        public topRule = this.RULE("topRule", () => {
+            this.SUBRULE1(this.subRule)
+            this.SUBRULE2(this.subRule)
+            this.SUBRULE3(this.subRule)
+            this.SUBRULE4(this.subRule)
+            this.SUBRULE5(this.subRule)
+            return this.result
+        })
+
+        public subRule = this.RULE("subRule", () => {
+            this.CONSUME(PlusTok)
+            this.result += this.index++
+        })
+    }
+
+    describe("The Parsing DSL", function () {
+
+        it("provides a production SUBRULE1-5 that invokes another rule", function () {
+            var input = [new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1)]
+            var parser = new SubRuleTestParser(input)
+            var result = parser.topRule(1)
+            expect(result).toBe("12345")
+        })
+    })
+
+    describe("The Error Recovery functionality of the IntrospectionParser", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
             var parser:any = new recog.BaseIntrospectionRecognizer([], <any>chevrotain.gastBuilder.spec);

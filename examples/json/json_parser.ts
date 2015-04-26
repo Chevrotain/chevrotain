@@ -69,11 +69,11 @@ module chevrotain.examples.json {
         public object = this.RULE("object", () => {
             this.CONSUME(LCurlyTok)
             this.OPTION(() => {
-                this.SUBRULE(this.objectItem(1))
+                this.SUBRULE(this.objectItem)
                 this.MANY(() => {
                     this.CONSUME(CommaTok)
-                    this.SUBRULE(this.objectItem(2)) // DOCS: the index "2" is needed to identify
-                })                                   //       the unique position in the grammar
+                    this.SUBRULE1(this.objectItem) // DOCS: the index "2" in SUBRULE2 is needed to identify
+                })                                 //       the unique position in the grammar during runtime
             })
             this.CONSUME(RCurlyTok)
         })
@@ -81,16 +81,16 @@ module chevrotain.examples.json {
         public objectItem = this.RULE("objectItem", () => {
             this.CONSUME(StringTok)
             this.CONSUME(ColonTok)
-            this.SUBRULE(this.value(1))
+            this.SUBRULE(this.value)
         })
 
         public array = this.RULE("array", () => {
             this.CONSUME(LSquareTok)
             this.OPTION(() => {
-                this.SUBRULE(this.value(1))
+                this.SUBRULE(this.value)
                 this.MANY(() => {
                     this.CONSUME(CommaTok)
-                    this.SUBRULE(this.value(2))
+                    this.SUBRULE2(this.value)
                 })
             })
             this.CONSUME(RSquareTok)
@@ -100,8 +100,8 @@ module chevrotain.examples.json {
             this.OR([
                 {ALT: () => {this.CONSUME(StringTok)}},
                 {ALT: () => {this.CONSUME(NumberTok)}},
-                {ALT: () => {this.SUBRULE(this.object(1))}},
-                {ALT: () => {this.SUBRULE(this.array(1))}},
+                {ALT: () => {this.SUBRULE(this.object)}},
+                {ALT: () => {this.SUBRULE(this.array)}},
                 {ALT: () => {this.CONSUME(TrueTok)}},
                 {ALT: () => {this.CONSUME(FalseTok)}},
                 {ALT: () => {this.CONSUME(NullTok)}}

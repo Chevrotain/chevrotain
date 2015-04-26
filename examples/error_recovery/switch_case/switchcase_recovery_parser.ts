@@ -86,14 +86,14 @@ module chevrotain.examples.recovery.switchcase {
 
             var retObj:RetType = {}
 
-            this.CONSUME1(SwitchTok)
-            this.CONSUME1(LParenTok)
-            this.CONSUME1(IdentTok)
-            this.CONSUME1(RParenTok)
-            this.CONSUME1(LCurlyTok)
+            this.CONSUME(SwitchTok)
+            this.CONSUME(LParenTok)
+            this.CONSUME(IdentTok)
+            this.CONSUME(RParenTok)
+            this.CONSUME(LCurlyTok)
 
             this.AT_LEAST_ONE(() => {
-                    _.assign(retObj, this.SUBRULE(this.caseStmt(1)))
+                    _.assign(retObj, this.SUBRULE(this.caseStmt))
                 }
                 // DOCS: currently the following token and its index must be specified to enable error recovery
                 //       inside repetition rules (MANY/AT_LEAST_ONCE), if this information is not provided
@@ -102,7 +102,7 @@ module chevrotain.examples.recovery.switchcase {
                 //       ** this may be automatically inferred in a future version.
                 , "case Stmt")
 
-            this.CONSUME1(RCurlyTok)
+            this.CONSUME(RCurlyTok)
 
             return retObj
         }
@@ -110,13 +110,13 @@ module chevrotain.examples.recovery.switchcase {
         private parseCaseStmt():RetType {
             var keyTok, valueTok, key, value
 
-            this.CONSUME1(CaseTok)
-            keyTok = this.CONSUME1(StringTok)
-            this.CONSUME1(ColonTok)
-            this.CONSUME1(ReturnTok)
-            valueTok = this.CONSUME1(IntTok)
+            this.CONSUME(CaseTok)
+            keyTok = this.CONSUME(StringTok)
+            this.CONSUME(ColonTok)
+            this.CONSUME(ReturnTok)
+            valueTok = this.CONSUME(IntTok)
             this.OPTION(() => {
-                this.CONSUME1(SemiColonTok)
+                this.CONSUME(SemiColonTok)
             })
 
             key = keyTok.image

@@ -82,11 +82,11 @@ module chevrotain.examples.backtracking {
                     // would be to simply create a qualifiedName with a length of k+1.
                     {
                         WHEN: this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
-                        THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement(1)) }
+                        THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement) }
                     },
                     {
                         WHEN: this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
-                        THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement(1)) }
+                        THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement) }
                     },
                 ], " a statement")
 
@@ -94,33 +94,33 @@ module chevrotain.examples.backtracking {
         }
 
         private parseWithEqualsStatement():RET_TYPE {
-            this.CONSUME1(ElementTok)
-            this.CONSUME1(IdentTok)
-            this.CONSUME1(ColonTok)
-            this.SUBRULE(this.qualifiedName(1)) // this rule creates the no fixed look ahead issue
-            this.CONSUME1(EqualsTok)
-            this.CONSUME1(NumberTok)
-            this.CONSUME1(SemiColonTok)
+            this.CONSUME(ElementTok)
+            this.CONSUME(IdentTok)
+            this.CONSUME(ColonTok)
+            this.SUBRULE(this.qualifiedName) // this rule creates the no fixed look ahead issue
+            this.CONSUME(EqualsTok)
+            this.CONSUME(NumberTok)
+            this.CONSUME(SemiColonTok)
 
             return RET_TYPE.WITH_EQUALS
         }
 
         private parseWithDefaultStatement():RET_TYPE {
-            this.CONSUME1(ElementTok)
-            this.CONSUME1(IdentTok)
-            this.CONSUME1(ColonTok)
-            this.SUBRULE(this.qualifiedName(1)) // this rule creates the no fixed look ahead issue
-            this.CONSUME1(DefaultTok)
-            this.CONSUME1(NumberTok)
-            this.CONSUME1(SemiColonTok)
+            this.CONSUME(ElementTok)
+            this.CONSUME(IdentTok)
+            this.CONSUME(ColonTok)
+            this.SUBRULE(this.qualifiedName) // this rule creates the no fixed look ahead issue
+            this.CONSUME(DefaultTok)
+            this.CONSUME(NumberTok)
+            this.CONSUME(SemiColonTok)
 
             return RET_TYPE.WITH_DEFAULT
         }
 
         private parseQualifiedName():RET_TYPE {
-            this.CONSUME1(IdentTok)
+            this.CONSUME(IdentTok)
             this.MANY(() => {
-                this.CONSUME1(DotTok)
+                this.CONSUME(DotTok)
                 this.CONSUME2(IdentTok)
             })
             return RET_TYPE.QUALIFED_NAME

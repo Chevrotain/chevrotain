@@ -58,17 +58,9 @@ module chevrotain.examples.recovery.sql {
             this.MANY(() => {
                 this.OR([
                     // @formatter:off
-                    {ALT: () => {
-                        // DOCS: note how the invocation of another parseRule also adds the occurrence index
-                        //       if we had another invocation of this.createStmt inside this rule, we would have had to use
-                        //       "this.createStmt(2)" and the next one this.createStmt(3) ...
-                        stmts.push(this.SUBRULE(this.createStmt(1)))}},
-                    {ALT: () => {
-                        stmts.push(this.SUBRULE(this.insertStmt(1)))}},
-                    {ALT: () => {
-                        // DOCS: note the usage of the SUBRULE wrapper, it does not actually do anything but it is needed
-                        // as a textual marker to help perform self parsing of the rule and build the runtime grammar information.
-                        stmts.push(this.SUBRULE(this.deleteStmt(1)))}},
+                    {ALT: () => { stmts.push(this.SUBRULE(this.createStmt)) }},
+                    {ALT: () => { stmts.push(this.SUBRULE(this.insertStmt)) }},
+                    {ALT: () => { stmts.push(this.SUBRULE(this.deleteStmt)) }},
                     // @formatter:on
                 ], "A Statement")
             })
@@ -81,7 +73,7 @@ module chevrotain.examples.recovery.sql {
 
             createKW = this.CONSUME1(CreateTok)
             tableKW = this.CONSUME1(TableTok)
-            qn = this.SUBRULE(this.qualifiedName(1))
+            qn = this.SUBRULE(this.qualifiedName)
             semiColon = this.CONSUME1(SemiColonTok)
 
             return PT(new CREATE_STMT(),
@@ -93,9 +85,9 @@ module chevrotain.examples.recovery.sql {
 
             // parse
             insertKW = this.CONSUME1(InsertTok)
-            recordValue = this.SUBRULE(this.recordValue(1))
+            recordValue = this.SUBRULE(this.recordValue)
             intoKW = this.CONSUME1(IntoTok)
-            qn = this.SUBRULE(this.qualifiedName(1))
+            qn = this.SUBRULE(this.qualifiedName)
             semiColon = this.CONSUME1(SemiColonTok)
 
             // tree rewrite
@@ -108,9 +100,9 @@ module chevrotain.examples.recovery.sql {
 
             // parse
             deleteKW = this.CONSUME1(DeleteTok)
-            recordValue = this.SUBRULE(this.recordValue(1))
+            recordValue = this.SUBRULE(this.recordValue)
             fromKW = this.CONSUME1(FromTok)
-            qn = this.SUBRULE(this.qualifiedName(1))
+            qn = this.SUBRULE(this.qualifiedName)
             semiColon = this.CONSUME1(SemiColonTok)
 
             // tree rewrite
@@ -146,10 +138,10 @@ module chevrotain.examples.recovery.sql {
 
             // parse
             this.CONSUME1(LParenTok)
-            this.SUBRULE(this.value(1))
+            this.SUBRULE(this.value)
             this.MANY(() => {
                 commas.push(this.CONSUME1(CommaTok))
-                values.push(this.SUBRULE(this.value(1)))
+                values.push(this.SUBRULE(this.value))
             })
             this.CONSUME1(RParenTok)
             // tree rewrite

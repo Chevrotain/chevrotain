@@ -21,14 +21,14 @@ module chevrotain.gastBuilder.spec {
             "            var typeName = this.CONSUME1(tok.IdentTok)\r\n" +
             "            var typeSpec = this.OR([\r\n" +
             "                {WHEN: this.isStructType, THEN_DO: ()=> {\r\n" +
-            "                    var structType = this.SUBRULE(this.structuredType(1))\r\n" +
+            "                    var structType = this.SUBRULE(this.structuredType)\r\n" +
             "                    this.OPTION(()=> {return this.NEXT_TOKEN() instanceof tok.SemicolonTok}, ()=> {\r\n" +
             "                        semiColon = this.CONSUME1(tok.SemicolonTok)\r\n" +
             "                    })\r\n" +
             "                    return structType\r\n" +
             "                }},\r\n" +
             "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
-            "                    var assTypeSpec = this.SUBRULE(this.assignedTypeSpec(1))\r\n" +
+            "                    var assTypeSpec = this.SUBRULE(this.assignedTypeSpec)\r\n" +
             "                    semiColon = this.CONSUME2(tok.SemicolonTok)\r\n" +
             "                    return assTypeSpec\r\n" +
             "                }}\r\n" +
@@ -45,20 +45,20 @@ module chevrotain.gastBuilder.spec {
             "\r\n" +
             "            var assTypeSpec = this.OR([\r\n" +
             "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
-            "                    return this.SUBRULE(this.SUBRULE(this.assignedTypeSpec(1)))\r\n" +
+            "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
             "                }},\r\n" +
             "                {WHEN: ()=> {return true}, THEN_DO: ()=> {\r\n" +
-            "                    return this.SUBRULE(this.assignedTypeSpecImplicit(1))\r\n" +
+            "                    return this.SUBRULE(this.assignedTypeSpecImplicit)\r\n" +
             "                }}\r\n" +
             "            ], \"\").tree\r\n" +
             "\r\n" +
             "            var semiColon = this.CONSUME1(tok.SemicolonTok)"
 
         var literalArrayText = "var lSquare = this.CONSUME1(tok.LSquareTok)\r\n" +
-            "            arrValues.push(this.SUBRULE(this.expression(1)))\r\n" +
+            "            arrValues.push(this.SUBRULE(this.expression))\r\n" +
             "            this.MANY(this.isAdditionalArgument, () => {\r\n" +
             "                    commas.push(this.CONSUME1(tok.CommaTok))\r\n" +
-            "                    arrValues.push(this.SUBRULE(this.expression(2)))\r\n" +
+            "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
             "                }\r\n" +
             "            )\r\n" +
             "            var rSquare = this.CONSUME1(tok.RSquareTok)"
@@ -86,8 +86,8 @@ module chevrotain.gastBuilder.spec {
             expect(refTypes[0]).toBe(b.ProdType.REF)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe("this.SUBRULE(this.structuredType(1")
-            expect(refText[1]).toBe("this.SUBRULE(this.assignedTypeSpec(1")
+            expect(refText[0]).toBe("this.SUBRULE(this.structuredType")
+            expect(refText[1]).toBe("this.SUBRULE(this.assignedTypeSpec")
         })
 
         it("can extract Option IPRODRanges from a text", function () {
@@ -128,7 +128,7 @@ module chevrotain.gastBuilder.spec {
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             expect(refText[0]).toBe("this.MANY(this.isAdditionalArgument, () => {\r\n" +
             "                    commas.push(this.CONSUME1(tok.CommaTok))\r\n" +
-            "                    arrValues.push(this.SUBRULE(this.expression(2)))\r\n" +
+            "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
             "                }\r\n" +
             "            )")
         })
@@ -144,10 +144,10 @@ module chevrotain.gastBuilder.spec {
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             expect(refText[0]).toBe("this.OR([\r\n" +
             "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
-            "                    return this.SUBRULE(this.SUBRULE(this.assignedTypeSpec(1)))\r\n" +
+            "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
             "                }},\r\n" +
             "                {WHEN: ()=> {return true}, THEN_DO: ()=> {\r\n" +
-            "                    return this.SUBRULE(this.assignedTypeSpecImplicit(1))\r\n" +
+            "                    return this.SUBRULE(this.assignedTypeSpecImplicit)\r\n" +
             "                }}\r\n" +
             "            ], \"\")")
         })
@@ -156,7 +156,7 @@ module chevrotain.gastBuilder.spec {
             var ter = "this.CONSUME3(tok.one1"
             var option = "this.OPTION(2)"
             var many = "this.MANY(3)"
-            var ref = "this.SUBRULE(this.other(4"
+            var ref = "this.SUBRULE4(this.other"
             var atLeastOne = "this.AT_LEAST_ONE(5)"
             var or = "this.OR(6)"
 
