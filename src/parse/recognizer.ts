@@ -1,4 +1,5 @@
 /// <reference path="../lang/lang_extensions.ts" />
+/// <reference path="cache.ts" />
 /// <reference path="../scan/tokens.ts" />
 /// <reference path="grammar/gast.ts" />
 /// <reference path="gast_builder.ts" />
@@ -7,9 +8,11 @@
 /// <reference path="grammar/follow.ts" />
 /// <reference path="grammar/lookahead.ts" />
 
+
 /// <reference path="../../libs/lodash.d.ts" />
 module chevrotain.recognizer {
 
+    import cache = chevrotain.cache
     import tok = chevrotain.tokens
     import gast = chevrotain.gast
     import IN = chevrotain.constants.IN
@@ -280,14 +283,6 @@ module chevrotain.recognizer {
 
     InRuleRecoveryException.prototype = Error.prototype
 
-    function getFromNestedHashTable(classInstance:any, hashTable:lang.HashTable<any>) {
-        var className = lang.classNameFromInstance(classInstance)
-        if (!hashTable.containsKey(className)) {
-            hashTable.put(className, new lang.HashTable<any>())
-        }
-        return hashTable.get(className)
-    }
-
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
      * This is used for more advanced features requiring this information.
@@ -295,48 +290,16 @@ module chevrotain.recognizer {
      */
     export class BaseIntrospectionRecognizer extends BaseRecognizer {
 
-        // TODO: consider extracting all these caches away the class.
-        protected static CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
-
-        protected static CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
-
-        protected static getProductionsForClass(classInstance:any):lang.HashTable<gast.TOP_LEVEL> {
-            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_GRAMMAR_PRODUCTIONS)
-        }
-
-        protected static CLASS_TO_RESYNC_FOLLOW_SETS = new lang.HashTable<lang.HashTable<Function[]>>()
-
-        protected static getResyncFollowsForClass(classInstance:any):lang.HashTable<Function[]> {
-            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS)
-        }
-
-        protected static setResyncFollowsForClass(classInstance:any, followSet:lang.HashTable<Function[]>):void {
-            var className = lang.classNameFromInstance(classInstance)
-            BaseIntrospectionRecognizer.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
-        }
-
-        protected static CLASS_TO_LOOKAHEAD_FUNCS = new lang.HashTable<lang.HashTable<Function>>()
-
-        protected static getLookaheadFuncsForClass(classInstance:any):lang.HashTable<Function> {
-            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_LOOKAHEAD_FUNCS)
-        }
-
-        protected static CLASS_TO_FIRST_AFTER_REPETITION = new lang.HashTable<lang.HashTable<interp.IFirstAfterRepetition>>()
-
-        protected static getFirstAfterRepForClass(classInstance:any):lang.HashTable<interp.IFirstAfterRepetition> {
-            return getFromNestedHashTable(classInstance, BaseIntrospectionRecognizer.CLASS_TO_FIRST_AFTER_REPETITION)
-        }
-
         protected static performSelfAnalysis(classInstance:any) {
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
-            if (!BaseIntrospectionRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-                var grammarProductions = BaseIntrospectionRecognizer.getProductionsForClass(classInstance)
+            if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
+                var grammarProductions = cache.getProductionsForClass(classInstance)
                 var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions)
                 refResolver.resolveRefs()
                 var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
-                BaseIntrospectionRecognizer.setResyncFollowsForClass(classInstance, allFollows)
-                BaseIntrospectionRecognizer.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
+                cache.setResyncFollowsForClass(classInstance, allFollows)
+                cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
             }
         }
 
@@ -453,7 +416,7 @@ module chevrotain.recognizer {
         protected getLookaheadFuncFor<T>(prodType:string,
                                          occurrence:number,
                                          laFuncBuilder:(number, any) => () => T):() => T {
-            var classLAFuncs = BaseIntrospectionRecognizer.getLookaheadFuncsForClass(this)
+            var classLAFuncs = cache.getLookaheadFuncsForClass(this)
             var ruleName = _.last(this.RULE_STACK)
             var key = prodType + occurrence + "_IN_" + ruleName
             var condition = <any>classLAFuncs.get(key)
@@ -569,7 +532,7 @@ module chevrotain.recognizer {
                                             nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
 
 
-            var firstAfterRepMap = BaseIntrospectionRecognizer.getFirstAfterRepForClass(this)
+            var firstAfterRepMap = cache.getFirstAfterRepForClass(this)
             var currRuleName = _.last(this.RULE_STACK)
             var key = prodName + "_IN_" + currRuleName
             var firstAfterRepInfo = firstAfterRepMap.get(key)
@@ -828,7 +791,7 @@ module chevrotain.recognizer {
         }
 
         protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
-            return BaseIntrospectionRecognizer.getProductionsForClass(this)
+            return cache.getProductionsForClass(this)
         }
 
         /*
@@ -961,7 +924,7 @@ module chevrotain.recognizer {
                           doReSync = true):(idxInCallingRule:number,
                                             isEntryPoint?:boolean) => T {
             this.validateRuleName(ruleName)
-            var parserClassProductions = BaseIntrospectionRecognizer.getProductionsForClass(this)
+            var parserClassProductions = cache.getProductionsForClass(this)
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
                 parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
@@ -977,7 +940,7 @@ module chevrotain.recognizer {
                     var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
                     // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
                     // multiple structures on each rule invocations to find it...
-                    var followSet = BaseIntrospectionRecognizer.getResyncFollowsForClass(this).get(followName)
+                    var followSet = cache.getResyncFollowsForClass(this).get(followName)
                     if (!followSet) {
                         throw new Error("missing re-sync follows information, possible cause: " +
                         "did not call performSelfAnalysis(this) in the constructor implementation.")

@@ -12,6 +12,7 @@
 /// <reference path="../src/parse/grammar/rest.ts" />
 /// <reference path="../src/parse/grammar/follow.ts" />
 /// <reference path="../src/parse/grammar/interpreter.ts" />
+/// <reference path="../src/parse/cache.ts" />
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
 /// <reference path="../src/parse/recognizer.ts" />
