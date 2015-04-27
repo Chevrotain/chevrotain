@@ -324,24 +324,7 @@ module chevrotain.recognizer {
             this.FOLLOW_STACK = []
         }
 
-        protected saveRecogState():IErrorRecoveryRecogState {
-            var baseState = super.saveRecogState()
-            var savedRuleStack = _.clone(this.RULE_STACK)
-            var savedFollowStack = _.clone(this.FOLLOW_STACK)
-            return {
-                errors:       baseState.errors,
-                inputIdx:     baseState.inputIdx,
-                RULE_STACK:   savedRuleStack,
-                FOLLOW_STACK: savedFollowStack
-            }
-        }
-
-        protected reloadRecogState(newState:IErrorRecoveryRecogState) {
-            super.reloadRecogState(newState)
-            this.RULE_STACK = newState.RULE_STACK
-            this.FOLLOW_STACK = newState.FOLLOW_STACK
-        }
-
+        // Parsing DSL
         protected CONSUME(tokType:Function):tok.Token {
             return this.CONSUME1(tokType)
         }
@@ -367,7 +350,7 @@ module chevrotain.recognizer {
         }
 
         /**
-         *  This method is used as an easy to identify
+         *  This method is used as an easy way to identify
          *  textual mark for the purpose of making the "self" parsing of the implemented grammar rules easier.
          */
         // TODO: can this limitation be removed? if we know all the parsing rules names (or mark them in one way or another)
@@ -394,39 +377,6 @@ module chevrotain.recognizer {
 
         protected SUBRULE5<T>(ruleToCall:(number) => T):T {
             return ruleToCall.call(this, 5)
-        }
-
-        protected getLookaheadFuncForOption(occurence:number):() => boolean {
-            return this.getLookaheadFuncFor("OPTION", occurence, lookahead.buildLookaheadForOption)
-        }
-
-        protected getLookaheadFuncForOr(occurence:number):() => number {
-            return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr)
-        }
-
-
-        protected getLookaheadFuncForMany(occurence:number):() => boolean {
-            return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
-        }
-
-        protected getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
-            return this.getLookaheadFuncFor("AT_LEAST_ONE", occurence, lookahead.buildLookaheadForAtLeastOne)
-        }
-
-        protected getLookaheadFuncFor<T>(prodType:string,
-                                         occurrence:number,
-                                         laFuncBuilder:(number, any) => () => T):() => T {
-            var classLAFuncs = cache.getLookaheadFuncsForClass(this)
-            var ruleName = _.last(this.RULE_STACK)
-            var key = prodType + occurrence + "_IN_" + ruleName
-            var condition = <any>classLAFuncs.get(key)
-            if (_.isUndefined(condition)) {
-                var ruleGrammar = this.getGAstProductions().get(ruleName)
-                condition = laFuncBuilder(occurrence, ruleGrammar)
-                classLAFuncs.put(key, condition)
-            }
-
-            return condition
         }
 
         protected OPTION(condition:LookAheadFunc | GrammarAction,
@@ -479,27 +429,6 @@ module chevrotain.recognizer {
             return super.OPTION(<any>condition, <any>action)
         }
 
-        private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
-                              errMsgTypes:string,
-                              occurrence:number):T {
-            // explicit alternatives look ahead
-            if ((<any>alts[0]).WHEN) {
-                return super.OR(<IOrAlt<T>[]>alts, errMsgTypes)
-            }
-
-            // else implicit lookahead
-            var laFunc = this.getLookaheadFuncForOr(occurrence)
-            var altToTake = laFunc.call(this)
-            if (altToTake !== -1) {
-                return (<any>alts[altToTake]).ALT.call(this)
-            }
-
-            // TODO: extract duplicate code from super class
-            // reaching here means no valid case was found
-            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
-        }
-
         protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.OR1(alts, errMsgTypes)
         }
@@ -524,66 +453,9 @@ module chevrotain.recognizer {
             return this.orInternal(alts, errMsgTypes, 5)
         }
 
-        private attemptInRepetitionRecovery(prodFunc:Function,
-                                            args:any[],
-                                            lookaheadFunc:() => boolean,
-                                            prodName:string,
-                                            prodOccurrence:number,
-                                            nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
-
-
-            var firstAfterRepMap = cache.getFirstAfterRepForClass(this)
-            var currRuleName = _.last(this.RULE_STACK)
-            var key = prodName + "_IN_" + currRuleName
-            var firstAfterRepInfo = firstAfterRepMap.get(key)
-            if (_.isUndefined(firstAfterRepInfo)) {
-                var ruleGrammar = this.getGAstProductions().get(currRuleName)
-                var walker:interp.AbstractNextTerminalAfterProductionWalker = new nextToksWalker(ruleGrammar, prodOccurrence)
-                firstAfterRepInfo = walker.startWalking()
-                firstAfterRepMap.put(key, firstAfterRepInfo)
-            }
-
-            var expectTokAfterLastMatch = firstAfterRepInfo.token
-            var nextTokIdx = firstAfterRepInfo.occurrence
-            var isEndOfRule = firstAfterRepInfo.isEndOfRule
-
-            // special edge case of a TOP most repetition after which the input should END.
-            // this will force an attempt for inRule recovery in that scenario.
-            if (this.RULE_STACK.length === 1 &&
-                isEndOfRule &&
-                _.isUndefined(expectTokAfterLastMatch)) {
-                expectTokAfterLastMatch = EOF
-                nextTokIdx = 1
-            }
-
-            if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
-                // TODO: performance optimization: instead of passing the original args here, we modify
-                // the args param (or create a new one) and make sure the lookahead func is explicitly provided
-                // to avoid searching the cache for it once more.
-                this.tryInRepetitionRecovery(prodFunc, args, lookaheadFunc, expectTokAfterLastMatch)
-            }
-        }
-
         protected MANY(lookAheadFunc:LookAheadFunc | GrammarAction,
                        action?:GrammarAction):void {
             return this.MANY1.apply(this, arguments)
-        }
-
-
-        private manyInternal(prodFunc:Function,
-                             prodName:string,
-                             prodOccurrence:number,
-                             lookAheadFunc:LookAheadFunc | GrammarAction,
-                             action?:GrammarAction):void {
-
-            if (_.isUndefined(action)) {
-                action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
-            }
-
-            super.MANY(<any>lookAheadFunc, <any>action)
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
-                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker)
         }
 
         protected MANY1(lookAheadFunc:LookAheadFunc | GrammarAction,
@@ -609,26 +481,6 @@ module chevrotain.recognizer {
         protected MANY5(lookAheadFunc:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
             this.manyInternal(this.MANY5, "MANY5", 5, lookAheadFunc, action)
-        }
-
-        private atLeastOneInternal(prodFunc:Function,
-                                   prodName:string,
-                                   prodOccurrence:number,
-                                   lookAheadFunc:LookAheadFunc | GrammarAction,
-                                   action:GrammarAction | string,
-                                   errMsg?:string):void {
-            if (_.isString(action)) {
-                errMsg = <any>action;
-                action = <any>lookAheadFunc
-                lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
-            }
-
-            super.AT_LEAST_ONE(<any>lookAheadFunc, <any>action, errMsg)
-            // note that while it may seem that this can cause an error because by using a recursive call to
-            // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
-            // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
-                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker)
         }
 
         protected AT_LEAST_ONE(lookAheadFunc:LookAheadFunc | GrammarAction,
@@ -667,6 +519,113 @@ module chevrotain.recognizer {
             this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, lookAheadFunc, action, errMsg)
         }
 
+        protected RULE_NO_RESYNC<T>(ruleName:string,
+                                    impl:() => T,
+                                    invalidRet:() => T):(idxInCallingRule:number,
+                                                         isEntryPoint?:boolean) => T {
+            return this.RULE(ruleName, impl, invalidRet, false)
+        }
+
+        protected RULE<T>(ruleName:string,
+                          impl:() => T,
+                          invalidRet:() => T = this.defaultInvalidReturn,
+                          doReSync = true):(idxInCallingRule:number,
+                                            isEntryPoint?:boolean) => T {
+            this.validateRuleName(ruleName)
+            var parserClassProductions = cache.getProductionsForClass(this)
+            // only build the gast representation once
+            if (!(parserClassProductions.containsKey(ruleName))) {
+                parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
+            }
+
+            var wrappedGrammarRule = function (idxInCallingRule:number = 1, isEntryPoint?:boolean) {
+                // state update
+                // first rule invocation
+                if (_.isEmpty(this.RULE_STACK)) {
+                    // the only thing that can appear after the outer most invoked rule is the END OF FILE
+                    this.FOLLOW_STACK.push([EOF])
+                } else {
+                    var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
+                    // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
+                    // multiple structures on each rule invocations to find it...
+                    var followSet = cache.getResyncFollowsForClass(this).get(followName)
+                    if (!followSet) {
+                        throw new Error("missing re-sync follows information, possible cause: " +
+                        "did not call performSelfAnalysis(this) in the constructor implementation.")
+                    }
+                    this.FOLLOW_STACK.push(followSet)
+                }
+                this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
+                this.RULE_STACK.push(ruleName)
+
+                try {
+                    // actual parsing happens here
+                    return impl.call(this)
+                } catch (e) {
+                    var isFirstInvokedRule = (this.RULE_STACK.length === 1)
+                    // note the reSync is always enabled for the first rule invocation, because we must always be able to
+                    // reSync with EOF and just output some INVALID ParseTree
+                    // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
+                    // path is really the most valid one
+                    var reSyncEnabled = (isFirstInvokedRule || doReSync) && !this.isBackTracking()
+
+                    if (reSyncEnabled && isRecognitionException(e)) {
+                        var reSyncTokType = this.findReSyncTokenType()
+                        if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
+                            this.reSyncTo(reSyncTokType)
+                            return invalidRet()
+                        }
+                        else {
+                            // to be handled farther up the call stack
+                            throw e
+                        }
+                    }
+                    else {
+                        // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
+                        throw e
+                    }
+                }
+                finally {
+                    this.FOLLOW_STACK.pop()
+                    this.RULE_STACK.pop()
+                    this.RULE_OCCURRENCE_STACK.pop()
+
+                    var maxInputIdx = this._input.length - 1
+                    if (isEntryPoint && this.inputIdx < maxInputIdx) {
+                        var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
+                        this.SAVE_ERROR(new NotAllInputParsedException(
+                            "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
+                    }
+                }
+            }
+            var ruleNamePropName = "ruleName"
+            wrappedGrammarRule[ruleNamePropName] = ruleName
+            return wrappedGrammarRule
+        }
+
+        private defaultInvalidReturn():any { return undefined }
+
+        // Not worth the hassle to support Unicode characters in rule names...
+        protected ruleNamePattern = /^[a-zA-Z_]\w*$/
+        protected definedRulesNames:string[] = []
+
+        /**
+         * @param ruleFuncName name of the Grammar rule
+         * @throws Grammar validation errors if the name is invalid
+         */
+        protected validateRuleName(ruleFuncName:string):void {
+            if (!ruleFuncName.match(this.ruleNamePattern)) {
+                throw Error("Invalid Grammar rule name --> " + ruleFuncName +
+                " it must match the pattern: " + this.ruleNamePattern.toString())
+            }
+
+            if ((_.contains(this.definedRulesNames, ruleFuncName))) {
+                throw Error("Duplicate definition, rule: " + ruleFuncName +
+                " is already defined in the grammar: " + lang.classNameFromInstance(this))
+            }
+
+            this.definedRulesNames.push(ruleFuncName)
+        }
 
         protected tryInRepetitionRecovery(grammarRule:Function,
                                           grammarRuleArgs:any[],
@@ -726,53 +685,7 @@ module chevrotain.recognizer {
             return true
         }
 
-        /**
-         * @param tokType The Type of Token we wish to consume (Reference to its constructor function)
-         * @param idx occurrence index of consumed token in the invoking parser rule text
-         *         for example:
-         *         IDENT (DOT IDENT)*
-         *         the first ident will have idx 1 and the second one idx 2
-         *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
-         *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
-         *           details
-         *
-         * @returns the consumed Token
-         */
-        protected consumeInternal(tokType:Function, idx:number):tok.Token {
-            try {
-                return super.CONSUME(tokType)
-            } catch (eFromConsumption) {
-                // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
-                // but the original syntax could have been parsed successfully without any backtracking + recovery
-                if (eFromConsumption instanceof MismatchedTokenException && !this.isBackTracking()) {
-                    var follows = this.getFollowsForInRuleRecovery(tokType, idx)
-                    try {
-                        return this.tryInRuleRecovery(tokType, follows)
-                    } catch (eFromInRuleRecovery) {
-                        /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
-                        // it is only needed for the else branch but in tsc 1.4.1 comments
-                        // between if and else seem to get swallowed and disappear.
-                        if (eFromConsumption instanceof InRuleRecoveryException) {
-                            // throw the original error in order to trigger reSync error recovery
-                            throw eFromConsumption
-                        }
-                        // this is not part of the contract, just a workaround javascript weak error handling
-                        // for a test to reach this code one would have to extend the BaseErrorRecoveryParser
-                        // and override some of the recovery code to be faulty (example: throw undefined is not a function error)
-                        // this is not a useful use case that needs to be tested...
-                        /* istanbul ignore next */
-                        else {
-                            // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
-                            throw eFromInRuleRecovery
-                        }
-                    }
-                }
-                else {
-                    throw eFromConsumption
-                }
-            }
-        }
-
+        // Error Recovery functionality
         protected getFollowsForInRuleRecovery(tokType:Function, tokIdxInRule):Function[] {
             var pathRuleStack:string[] = _.clone(this.RULE_STACK)
             var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK)
@@ -788,10 +701,6 @@ module chevrotain.recognizer {
             var topProduction = gastProductions.get(topRuleName)
             var follows = new interp.NextAfterTokenWalker(topProduction, grammarPath).startWalking()
             return follows
-        }
-
-        protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
-            return cache.getProductionsForClass(this)
         }
 
         /*
@@ -886,113 +795,206 @@ module chevrotain.recognizer {
             }
         }
 
-        // Not worth the hassle to support Unicode characters in rule names...
-        protected ruleNamePattern = /^[a-zA-Z_]\w*$/
-        protected definedRulesNames:string[] = []
+        private attemptInRepetitionRecovery(prodFunc:Function,
+                                            args:any[],
+                                            lookaheadFunc:() => boolean,
+                                            prodName:string,
+                                            prodOccurrence:number,
+                                            nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
+
+
+            var firstAfterRepMap = cache.getFirstAfterRepForClass(this)
+            var currRuleName = _.last(this.RULE_STACK)
+            var key = prodName + "_IN_" + currRuleName
+            var firstAfterRepInfo = firstAfterRepMap.get(key)
+            if (_.isUndefined(firstAfterRepInfo)) {
+                var ruleGrammar = this.getGAstProductions().get(currRuleName)
+                var walker:interp.AbstractNextTerminalAfterProductionWalker = new nextToksWalker(ruleGrammar, prodOccurrence)
+                firstAfterRepInfo = walker.startWalking()
+                firstAfterRepMap.put(key, firstAfterRepInfo)
+            }
+
+            var expectTokAfterLastMatch = firstAfterRepInfo.token
+            var nextTokIdx = firstAfterRepInfo.occurrence
+            var isEndOfRule = firstAfterRepInfo.isEndOfRule
+
+            // special edge case of a TOP most repetition after which the input should END.
+            // this will force an attempt for inRule recovery in that scenario.
+            if (this.RULE_STACK.length === 1 &&
+                isEndOfRule &&
+                _.isUndefined(expectTokAfterLastMatch)) {
+                expectTokAfterLastMatch = EOF
+                nextTokIdx = 1
+            }
+
+            if (this.shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch, nextTokIdx)) {
+                // TODO: performance optimization: instead of passing the original args here, we modify
+                // the args param (or create a new one) and make sure the lookahead func is explicitly provided
+                // to avoid searching the cache for it once more.
+                this.tryInRepetitionRecovery(prodFunc, args, lookaheadFunc, expectTokAfterLastMatch)
+            }
+        }
+
+        // Implementation of parsing DSL
+        private atLeastOneInternal(prodFunc:Function,
+                                   prodName:string,
+                                   prodOccurrence:number,
+                                   lookAheadFunc:LookAheadFunc | GrammarAction,
+                                   action:GrammarAction | string,
+                                   errMsg?:string):void {
+            if (_.isString(action)) {
+                errMsg = <any>action;
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
+            }
+
+            super.AT_LEAST_ONE(<any>lookAheadFunc, <any>action, errMsg)
+            // note that while it may seem that this can cause an error because by using a recursive call to
+            // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
+            // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
+            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
+                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker)
+        }
+
+        private manyInternal(prodFunc:Function,
+                             prodName:string,
+                             prodOccurrence:number,
+                             lookAheadFunc:LookAheadFunc | GrammarAction,
+                             action?:GrammarAction):void {
+
+            if (_.isUndefined(action)) {
+                action = <any>lookAheadFunc
+                lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
+            }
+
+            super.MANY(<any>lookAheadFunc, <any>action)
+            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
+                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker)
+        }
+
+        private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
+                              errMsgTypes:string,
+                              occurrence:number):T {
+            // explicit alternatives look ahead
+            if ((<any>alts[0]).WHEN) {
+                return super.OR(<IOrAlt<T>[]>alts, errMsgTypes)
+            }
+
+            // else implicit lookahead
+            var laFunc = this.getLookaheadFuncForOr(occurrence)
+            var altToTake = laFunc.call(this)
+            if (altToTake !== -1) {
+                return (<any>alts[altToTake]).ALT.call(this)
+            }
+
+            // TODO: extract duplicate code from super class
+            // reaching here means no valid case was found
+            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
+            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
+        }
 
         /**
-         * @param ruleFuncName name of the Grammar rule
-         * @throws Grammar validation errors if the name is invalid
+         * @param tokType The Type of Token we wish to consume (Reference to its constructor function)
+         * @param idx occurrence index of consumed token in the invoking parser rule text
+         *         for example:
+         *         IDENT (DOT IDENT)*
+         *         the first ident will have idx 1 and the second one idx 2
+         *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
+         *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
+         *           details
+         *
+         * @returns the consumed Token
          */
-        protected validateRuleName(ruleFuncName:string):void {
-            if (!ruleFuncName.match(this.ruleNamePattern)) {
-                throw Error("Invalid Grammar rule name --> " + ruleFuncName +
-                " it must match the pattern: " + this.ruleNamePattern.toString())
-            }
-
-            if ((_.contains(this.definedRulesNames, ruleFuncName))) {
-                throw Error("Duplicate definition, rule: " + ruleFuncName +
-                " is already defined in the grammar: " + lang.classNameFromInstance(this))
-            }
-
-            this.definedRulesNames.push(ruleFuncName)
-        }
-
-        protected RULE_NO_RESYNC<T>(ruleName:string,
-                                    impl:() => T,
-                                    invalidRet:() => T):(idxInCallingRule:number,
-                                                         isEntryPoint?:boolean) => T {
-            return this.RULE(ruleName, impl, invalidRet, false)
-        }
-
-
-        private defaultInvalidReturn():any { return undefined }
-
-        protected RULE<T>(ruleName:string,
-                          impl:() => T,
-                          invalidRet:() => T = this.defaultInvalidReturn,
-                          doReSync = true):(idxInCallingRule:number,
-                                            isEntryPoint?:boolean) => T {
-            this.validateRuleName(ruleName)
-            var parserClassProductions = cache.getProductionsForClass(this)
-            // only build the gast representation once
-            if (!(parserClassProductions.containsKey(ruleName))) {
-                parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
-            }
-
-            var wrappedGrammarRule = function (idxInCallingRule:number = 1, isEntryPoint?:boolean) {
-                // state update
-                // first rule invocation
-                if (_.isEmpty(this.RULE_STACK)) {
-                    // the only thing that can appear after the outer most invoked rule is the END OF FILE
-                    this.FOLLOW_STACK.push([EOF])
-                } else {
-                    var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
-                    // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
-                    // multiple structures on each rule invocations to find it...
-                    var followSet = cache.getResyncFollowsForClass(this).get(followName)
-                    if (!followSet) {
-                        throw new Error("missing re-sync follows information, possible cause: " +
-                        "did not call performSelfAnalysis(this) in the constructor implementation.")
-                    }
-                    this.FOLLOW_STACK.push(followSet)
-                }
-                this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
-                this.RULE_STACK.push(ruleName)
-
-                try {
-                    // actual parsing happens here
-                    return impl.call(this)
-                } catch (e) {
-                    var isFirstInvokedRule = (this.RULE_STACK.length === 1)
-                    // note the reSync is always enabled for the first rule invocation, because we must always be able to
-                    // reSync with EOF and just output some INVALID ParseTree
-                    // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
-                    // path is really the most valid one
-                    var reSyncEnabled = (isFirstInvokedRule || doReSync) && !this.isBackTracking()
-
-                    if (reSyncEnabled && isRecognitionException(e)) {
-                        var reSyncTokType = this.findReSyncTokenType()
-                        if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-                            this.reSyncTo(reSyncTokType)
-                            return invalidRet()
+        protected consumeInternal(tokType:Function, idx:number):tok.Token {
+            try {
+                return super.CONSUME(tokType)
+            } catch (eFromConsumption) {
+                // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
+                // but the original syntax could have been parsed successfully without any backtracking + recovery
+                if (eFromConsumption instanceof MismatchedTokenException && !this.isBackTracking()) {
+                    var follows = this.getFollowsForInRuleRecovery(tokType, idx)
+                    try {
+                        return this.tryInRuleRecovery(tokType, follows)
+                    } catch (eFromInRuleRecovery) {
+                        /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
+                        // it is only needed for the else branch but in tsc 1.4.1 comments
+                        // between if and else seem to get swallowed and disappear.
+                        if (eFromConsumption instanceof InRuleRecoveryException) {
+                            // throw the original error in order to trigger reSync error recovery
+                            throw eFromConsumption
                         }
+                        // this is not part of the contract, just a workaround javascript weak error handling
+                        // for a test to reach this code one would have to extend the BaseErrorRecoveryParser
+                        // and override some of the recovery code to be faulty (example: throw undefined is not a function error)
+                        // this is not a useful use case that needs to be tested...
+                        /* istanbul ignore next */
                         else {
-                            // to be handled farther up the call stack
-                            throw e
+                            // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
+                            throw eFromInRuleRecovery
                         }
                     }
-                    else {
-                        // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
-                        throw e
-                    }
                 }
-                finally {
-                    this.FOLLOW_STACK.pop()
-                    this.RULE_STACK.pop()
-                    this.RULE_OCCURRENCE_STACK.pop()
-
-                    var maxInputIdx = this._input.length - 1
-                    if (isEntryPoint && this.inputIdx < maxInputIdx) {
-                        var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
-                        this.SAVE_ERROR(new NotAllInputParsedException(
-                            "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
-                    }
+                else {
+                    throw eFromConsumption
                 }
             }
-            var ruleNamePropName = "ruleName"
-            wrappedGrammarRule[ruleNamePropName] = ruleName
-            return wrappedGrammarRule
+        }
+
+        // Automatic lookahead calculation
+        protected getLookaheadFuncForOption(occurence:number):() => boolean {
+            return this.getLookaheadFuncFor("OPTION", occurence, lookahead.buildLookaheadForOption)
+        }
+
+        protected getLookaheadFuncForOr(occurence:number):() => number {
+            return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr)
+        }
+
+
+        protected getLookaheadFuncForMany(occurence:number):() => boolean {
+            return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
+        }
+
+        protected getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
+            return this.getLookaheadFuncFor("AT_LEAST_ONE", occurence, lookahead.buildLookaheadForAtLeastOne)
+        }
+
+        protected getLookaheadFuncFor<T>(prodType:string,
+                                         occurrence:number,
+                                         laFuncBuilder:(number, any) => () => T):() => T {
+            var classLAFuncs = cache.getLookaheadFuncsForClass(this)
+            var ruleName = _.last(this.RULE_STACK)
+            var key = prodType + occurrence + "_IN_" + ruleName
+            var condition = <any>classLAFuncs.get(key)
+            if (_.isUndefined(condition)) {
+                var ruleGrammar = this.getGAstProductions().get(ruleName)
+                condition = laFuncBuilder(occurrence, ruleGrammar)
+                classLAFuncs.put(key, condition)
+            }
+
+            return condition
+        }
+
+        // other functionality
+        protected saveRecogState():IErrorRecoveryRecogState {
+            var baseState = super.saveRecogState()
+            var savedRuleStack = _.clone(this.RULE_STACK)
+            var savedFollowStack = _.clone(this.FOLLOW_STACK)
+            return {
+                errors:       baseState.errors,
+                inputIdx:     baseState.inputIdx,
+                RULE_STACK:   savedRuleStack,
+                FOLLOW_STACK: savedFollowStack
+            }
+        }
+
+        protected reloadRecogState(newState:IErrorRecoveryRecogState) {
+            super.reloadRecogState(newState)
+            this.RULE_STACK = newState.RULE_STACK
+            this.FOLLOW_STACK = newState.FOLLOW_STACK
+        }
+
+        protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
+            return cache.getProductionsForClass(this)
         }
     }
 }
