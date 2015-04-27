@@ -3,7 +3,6 @@
 
 #Chevrotain
 
-   
 Chevrotain is a Javascript/Typescript parsing framework which aims to make it easier to write "hand built" recursive decent parsers.
    
 ###Features
@@ -14,6 +13,55 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
   * **Backtracking** support 
   * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar composition.
    * **100% code coverage** 
+   
+###At a Glance, simple json parsing rules
+
+   * using ES6 fat arrow '=>'
+
+   ```JavaScript
+   
+           var object = this.RULE("object", () => {
+               this.CONSUME(LCurlyTok)
+               this.OPTION(() => {
+                   this.SUBRULE(this.objectItem)
+                   this.MANY(() => {
+                       this.CONSUME(CommaTok)
+                       this.SUBRULE1(this.objectItem)
+                   })
+               })
+               this.CONSUME(RCurlyTok)
+           })
+   
+           var objectItem = this.RULE("objectItem", () => {
+               this.CONSUME(StringTok)
+               this.CONSUME(ColonTok)
+               this.SUBRULE(this.value)
+           })
+   
+           var array = this.RULE("array", () => {
+               this.CONSUME(LSquareTok)
+               this.OPTION(() => {
+                   this.SUBRULE(this.value)
+                   this.MANY(() => {
+                       this.CONSUME(CommaTok)
+                       this.SUBRULE2(this.value)
+                   })
+               })
+               this.CONSUME(RSquareTok)
+           })
+   
+           var value = this.RULE("value", () => {
+               this.OR([
+                   {ALT: () => {this.CONSUME(StringTok)}},
+                   {ALT: () => {this.CONSUME(NumberTok)}},
+                   {ALT: () => {this.SUBRULE(this.object)}},
+                   {ALT: () => {this.SUBRULE(this.array)}},
+                   {ALT: () => {this.CONSUME(TrueTok)}},
+                   {ALT: () => {this.CONSUME(FalseTok)}},
+                   {ALT: () => {this.CONSUME(NullTok)}}
+               ], "a value")
+           })
+   ```   
    
 ###The Why?
 Parser Generators are rarely used to build commercial grade compilers/editors/tools.
@@ -61,82 +109,24 @@ The Parsing DSL is the best example for this:
      it is not even a concern of the framework it is simply the advantage of writing plain javascript code that one has "nearly" full control of. --> **control**
    
    
-   
-###At a Glance, simple json parser
-
-   * using ES6 fat arrow '=>'
-
-   ```JavaScript
-   object() {
-               this.CONSUME(LCurlyTok)
-               this.OPTION(isString, () => {
-                   this.objectItem()
-                   this.MANY(isAdditionalItem, () => {
-                       this.CONSUME(CommaTok)
-                       this.objectItem()
-                   })
-               })
-               this.CONSUME(RCurlyTok)
-           }
-   
-           objectItem() {
-               this.CONSUME(StringTok)
-               this.CONSUME(ColonTok)
-               this.value()
-           }
-   
-           array() {
-               this.CONSUME(LSquareTok)
-               this.OPTION(isString, () => {
-                   this.value()
-                   this.MANY(isAdditionalItem, () => {
-                       this.value()
-                   })
-               })
-               this.CONSUME(RSquareTok)
-           }
-   
-           value() {
-               this.OR(
-                   [
-                       {WHEN: isString, THEN_DO: () => {
-                           this.CONSUME(StringTok)}},
-                       {WHEN: isNumber, THEN_DO: () => {
-                           this.CONSUME(NumberTok)}},
-                       {WHEN: isObject, THEN_DO: () => {
-                           this.object()}},
-                       {WHEN: isArray, THEN_DO: () => {
-                           this.array()}},
-                       {WHEN: isTrue, THEN_DO: () => {
-                           this.CONSUME(TrueTok)}},
-                       {WHEN: isFalse, THEN_DO: () => {
-                           this.CONSUME(FalseTok)}},
-                       {WHEN: isNull, THEN_DO: () => {
-                           this.CONSUME(NullTok)}}
-                   ], "a value")
-           }
-   ```
-
-
 
 ###Getting Started
 The best place to start is the examples folder.
-the most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/jsonParserOnly/jsonParser.ts)
-
+the most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/json/json_parser.ts)
 
 Note that the examples are written in Typescript.
-to see the generated(readable) javascript code 
+To see the generated(readable) javascript code 
 
 only once:
 * $ npm install -g grunt (only once)
 * $ npm install -g bower
 * $ npm install
 
-to run the dev build:
+to run the dev build and generate the javascript sources:
 * $ grunt dev_build
 * now look in: target\gen\examples folder
 
-To debug the examples using chrome developer tools:
+To debug the example's tests using chrome developer tools:
 
 * $ npm install -g karma (only once)
 * $ karma start
