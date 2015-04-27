@@ -459,7 +459,6 @@ module chevrotain.interpreter.spec {
         it("can compute the First Tokens for all alternatives of an OR", function () {
             var result = new NextInsideOrWalker(samples.cardinality, 1).startWalking()
             expect(result.length).toBe(2)
-            // TODO: intellij ts types bug, using <any> as a workaround
             matchers.arrayEqualityNoOrder(<any>result[0], [t.UnsignedIntegerLiteralTok])
             matchers.arrayEqualityNoOrder(<any>result[1], [t.AsteriskTok])
         })
@@ -467,7 +466,6 @@ module chevrotain.interpreter.spec {
         it("can compute the First Tokens for all alternatives of an OR (complex)", function () {
             var result1 = new NextInsideOrWalker(samples.lotsOfOrs, 1).startWalking()
             expect(result1.length).toBe(2)
-            // TODO: intellij ts types bug, using <any> as a workaround
             matchers.arrayEqualityNoOrder(<any>result1[0], [t.CommaTok, t.KeyTok])
             matchers.arrayEqualityNoOrder(<any>result1[1], [t.EntityTok])
         })

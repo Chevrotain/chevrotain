@@ -7,7 +7,6 @@ module chevrotain.rest {
 
     export class RestWalker {
 
-        // TODO: using "any" in prevRest due to IntelliJ bug
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
             _.forEach(prod.definition, (subProd:gast.IProduction, index) => {
                 var currRest = _.drop(prod.definition, index + 1)

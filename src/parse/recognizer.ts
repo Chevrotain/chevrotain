@@ -211,8 +211,6 @@ module chevrotain.recognizer {
                 this.isBackTrackingStack.push(1)
                 var orgState = this.saveRecogState()
                 try {
-                    // TODO: override in BaseErrorRecoveryRecognizer and add the call index?
-                    // or maybe it does not matter because in backtracking error recovery is turned off
                     var ruleResult = grammarRule.call(this)
                     return isValid(ruleResult)
                 } catch (e) {
@@ -255,8 +253,7 @@ module chevrotain.recognizer {
                     return res
                 }
             }
-            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
+            this.raiseNoAltException(errMsgTypes)
         }
 
         protected MANY(lookAheadFunc:LookAheadFunc, action:GrammarAction):void {
@@ -273,6 +270,11 @@ module chevrotain.recognizer {
             else {
                 throw this.SAVE_ERROR(new EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
             }
+        }
+
+        protected raiseNoAltException(errMsgTypes:string):void {
+            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
+            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
         }
     }
 
@@ -311,10 +313,9 @@ module chevrotain.recognizer {
         constructor(input:tok.Token[], tokensMap:gastBuilder.ITerminalNameToConstructor) {
             super(input)
             this.tokensMap = _.clone(tokensMap)
-            // always add EOF to the tokenNames -> constructors map. it is usefull to assure all the input has been
+            // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
             // parsed with a clear error message ("expecting EOF but found ...")
             this.tokensMap[lang.functionName(EOF)] = EOF
-            // TODO: test that EOF does not already exist in the map?
         }
 
         public reset():void {
@@ -887,10 +888,7 @@ module chevrotain.recognizer {
                 return (<any>alts[altToTake]).ALT.call(this)
             }
 
-            // TODO: extract duplicate code from super class
-            // reaching here means no valid case was found
-            throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
+            this.raiseNoAltException(errMsgTypes)
         }
 
         /**
