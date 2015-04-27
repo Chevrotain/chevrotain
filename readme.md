@@ -128,16 +128,15 @@ Note that the examples are written in Typescript.
 to see the generated(readable) javascript code 
 
 only once:
-* $ npm install
 * $ npm install -g grunt (only once)
 * $ npm install -g bower
-* $ bower install
+* $ npm install
 
 to run the dev build:
 * $ grunt dev_build
 * now look in: target\gen\examples folder
 
-To debug the examples using chrome developer tools (after running grunt dev_build)
+To debug the examples using chrome developer tools:
 
 * $ npm install -g karma (only once)
 * $ karma start

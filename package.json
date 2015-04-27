@@ -26,7 +26,8 @@
     "wrench": "~1.5.8"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "postinstall": "bower install"
   },
   "private": true
 }
