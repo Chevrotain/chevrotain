@@ -805,7 +805,7 @@ module chevrotain.recognizer {
 
             var firstAfterRepMap = cache.getFirstAfterRepForClass(this)
             var currRuleName = _.last(this.RULE_STACK)
-            var key = prodName + "_IN_" + currRuleName
+            var key = prodName + IN + currRuleName
             var firstAfterRepInfo = firstAfterRepMap.get(key)
             if (_.isUndefined(firstAfterRepInfo)) {
                 var ruleGrammar = this.getGAstProductions().get(currRuleName)
@@ -963,7 +963,7 @@ module chevrotain.recognizer {
                                          laFuncBuilder:(number, any) => () => T):() => T {
             var classLAFuncs = cache.getLookaheadFuncsForClass(this)
             var ruleName = _.last(this.RULE_STACK)
-            var key = prodType + occurrence + "_IN_" + ruleName
+            var key = prodType + occurrence + IN + ruleName
             var condition = <any>classLAFuncs.get(key)
             if (_.isUndefined(condition)) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
