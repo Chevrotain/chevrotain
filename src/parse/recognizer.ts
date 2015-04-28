@@ -176,14 +176,14 @@ module chevrotain.recognizer {
             }
         }
 
-        protected CONSUME(tokType:Function):tok.Token {
+        protected CONSUME(tokClass:Function):tok.Token {
             var nextToken = this.NEXT_TOKEN()
-            if (this.NEXT_TOKEN() instanceof tokType) {
+            if (this.NEXT_TOKEN() instanceof tokClass) {
                 this.inputIdx++
                 return nextToken
             }
             else {
-                var expectedTokType = tok.getTokName(tokType)
+                var expectedTokType = tok.getTokName(tokClass)
                 var msg = "Expecting token of type -->" + expectedTokType + "<-- but found -->'" + nextToken.image + "'<--"
                 throw this.SAVE_ERROR(new MismatchedTokenException(msg, nextToken))
             }
@@ -326,200 +326,430 @@ module chevrotain.recognizer {
         }
 
         // Parsing DSL
-        protected CONSUME(tokType:Function):tok.Token {
-            return this.CONSUME1(tokType)
-        }
 
-        protected CONSUME1(tokType:Function):tok.Token {
-            return this.consumeInternal(tokType, 1)
-        }
-
-        protected CONSUME2(tokType:Function):tok.Token {
-            return this.consumeInternal(tokType, 2)
-        }
-
-        protected CONSUME3(tokType:Function):tok.Token {
-            return this.consumeInternal(tokType, 3)
-        }
-
-        protected CONSUME4(tokType:Function):tok.Token {
-            return this.consumeInternal(tokType, 4)
-        }
-
-        protected CONSUME5(tokType:Function):tok.Token {
-            return this.consumeInternal(tokType, 5)
+        /**
+         * Convenience method equivalent to CONSUME1
+         * @see CONSUME1
+         */
+        protected CONSUME(tokClass:Function):tok.Token {
+            return this.CONSUME1(tokClass)
         }
 
         /**
-         *  This method is used as an easy way to identify
-         *  textual mark for the purpose of making the "self" parsing of the implemented grammar rules easier.
+         *
+         * A Parsing DSL method use to consume a single terminal Token.
+         * a Token will be consumed, IFF the next token in the token vector is an instanceof tokClass.
+         * otherwise the parser will attempt to perform error recovery.
+         *
+         * The index in the method name indicates the unique occurrence of a terminal consumption
+         * inside a the top level rule. What this means is that if a terminal appears
+         * more than once in a single rule, each appearance must have a difference index.
+         *
+         * for example:
+         *
+         * function parseQualifiedName() {
+         *    this.CONSUME1(Identifier);
+         *    this.MANY(()=> {
+         *       this.CONSUME1(Dot);
+         *       this.CONSUME2(Identifier); // <-- here we use CONSUME2 because the terminal
+         *    });                           //     'Identifier' has already appeared previously in the
+         *                                  //     the rule 'parseQualifiedName'
+         * }
+         *
+         * @param {Function} tokClass A constructor function specifying the type of token
+         *        to be consumed.
+         *
+         * @returns {chevrotain.tokens.Token} The consumed token.
          */
-        // TODO: can this limitation be removed? if we know all the parsing rules names (or mark them in one way or another)
-        //       can the self parsing itself be done in a more dynamic manner taking into account this information (rules names) ?
+        protected CONSUME1(tokClass:Function):tok.Token {
+            return this.consumeInternal(tokClass, 1)
+        }
+
+        /**
+         * @see CONSUME1
+         */
+        protected CONSUME2(tokClass:Function):tok.Token {
+            return this.consumeInternal(tokClass, 2)
+        }
+
+        /**
+         * @see CONSUME1
+         */
+        protected CONSUME3(tokClass:Function):tok.Token {
+            return this.consumeInternal(tokClass, 3)
+        }
+
+        /**
+         * @see CONSUME1
+         */
+        protected CONSUME4(tokClass:Function):tok.Token {
+            return this.consumeInternal(tokClass, 4)
+        }
+
+        /**
+         * @see CONSUME1
+         */
+        protected CONSUME5(tokClass:Function):tok.Token {
+            return this.consumeInternal(tokClass, 5)
+        }
+
+        /**
+         * Convenience method equivalent to SUBRULE1
+         * @see SUBRULE1
+         */
         protected SUBRULE<T>(ruleToCall:(number) => T):T {
             return this.SUBRULE1(ruleToCall)
         }
 
+        /**
+         * The Parsing DSL Method is used by one rule to call another.
+         *
+         * This may seem redundant as it does not actually do much.
+         * However using it is mandatory for all sub rule invocations.
+         * calling another rule without wrapping in SUBRULE(...)
+         * will cause errors/mistakes in the Recognizer's self analysis
+         * which will lead to errors in error recovery/automatic lookahead calcualtion
+         * and any other functionality relying on the Recognizer's self analysis
+         * output.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the sub rule invocation in its rule.
+         *
+         * @param {Function} ruleToCall the rule to invoke
+         * @returns {*} the result of invoking ruleToCall
+         */
         protected SUBRULE1<T>(ruleToCall:(number) => T):T {
             return ruleToCall.call(this, 1)
         }
 
+        /**
+         * @see SUBRULE1
+         */
         protected SUBRULE2<T>(ruleToCall:(number) => T):T {
             return ruleToCall.call(this, 2)
         }
 
+        /**
+         * @see SUBRULE1
+         */
         protected SUBRULE3<T>(ruleToCall:(number) => T):T {
             return ruleToCall.call(this, 3)
         }
 
+        /**
+         * @see SUBRULE1
+         */
         protected SUBRULE4<T>(ruleToCall:(number) => T):T {
             return ruleToCall.call(this, 4)
         }
 
+        /**
+         * @see SUBRULE1
+         */
         protected SUBRULE5<T>(ruleToCall:(number) => T):T {
             return ruleToCall.call(this, 5)
         }
 
-        protected OPTION(condition:LookAheadFunc | GrammarAction,
+        /**
+         * Convenience method equivalent to OPTION1
+         * @see OPTION1
+         */
+        protected OPTION(laFuncOrAction:LookAheadFunc | GrammarAction,
                          action?:GrammarAction):boolean {
             return this.OPTION1.apply(this, arguments)
         }
 
-        protected OPTION1(condition:LookAheadFunc | GrammarAction,
+        /**
+         * Parsing DSL Method that Indicates an Optional production
+         * in EBNF notation: [...]
+         *
+         * note that the 'action' param is optional. so both of the following forms are valid:
+         *
+         * short: this.OPTION(()=>{ this.CONSUME(Digit});
+         * long: this.OPTION(isDigit, ()=>{ this.CONSUME(Digit});
+         *
+         * using the short form is recommended as it will compute the lookahead function
+         * automatically. however this currently has one limitation:
+         * It only works if the lookahead for the grammar is one.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the optional production in it's top rule.
+         *
+         * @param {Function} laFuncOrAction The lookahead function that 'decides'
+         *                                  whether or not the OPTION's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] The action to optionally invoke.
+         *
+         * @returns {boolean} true iff the OPTION's action has been invoked
+         */
+        protected OPTION1(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
-                action = <any>condition
-                condition = this.getLookaheadFuncForOption(1)
+                action = <any>laFuncOrAction
+                laFuncOrAction = this.getLookaheadFuncForOption(1)
             }
-            return super.OPTION(<any>condition, <any>action)
+            return super.OPTION(<any>laFuncOrAction, <any>action)
         }
 
-        protected OPTION2(condition:LookAheadFunc | GrammarAction,
+        /**
+         * @see OPTION1
+         */
+        protected OPTION2(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
-                action = <any>condition
-                condition = this.getLookaheadFuncForOption(2)
+                action = <any>laFuncOrAction
+                laFuncOrAction = this.getLookaheadFuncForOption(2)
             }
-            return super.OPTION(<any>condition, <any>action)
+            return super.OPTION(<any>laFuncOrAction, <any>action)
         }
 
-        protected OPTION3(condition:LookAheadFunc | GrammarAction,
+        /**
+         * @see OPTION1
+         */
+        protected OPTION3(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
-                action = <any>condition
-                condition = this.getLookaheadFuncForOption(3)
+                action = <any>laFuncOrAction
+                laFuncOrAction = this.getLookaheadFuncForOption(3)
             }
-            return super.OPTION(<any>condition, <any>action)
+            return super.OPTION(<any>laFuncOrAction, <any>action)
         }
 
-        protected OPTION4(condition:LookAheadFunc | GrammarAction,
+        /**
+         * @see OPTION1
+         */
+        protected OPTION4(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
-                action = <any>condition
-                condition = this.getLookaheadFuncForOption(4)
+                action = <any>laFuncOrAction
+                laFuncOrAction = this.getLookaheadFuncForOption(4)
             }
-            return super.OPTION(<any>condition, <any>action)
+            return super.OPTION(<any>laFuncOrAction, <any>action)
         }
 
-        protected OPTION5(condition:LookAheadFunc | GrammarAction,
+        /**
+         * @see OPTION1
+         */
+        protected OPTION5(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
             if (arguments.length === 1) {
-                action = <any>condition
-                condition = this.getLookaheadFuncForOption(5)
+                action = <any>laFuncOrAction
+                laFuncOrAction = this.getLookaheadFuncForOption(5)
             }
-            return super.OPTION(<any>condition, <any>action)
+            return super.OPTION(<any>laFuncOrAction, <any>action)
         }
 
+
+        /**
+         * Convenience method equivalent to OR1
+         * @see OR1
+         */
         protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.OR1(alts, errMsgTypes)
         }
 
+        /**
+         * Parsing DSL method that indicates a choice between a set of alternatives must be made.
+         * This is equivalent to EBNF alternation (A | B | C | D ...)
+         *
+         * There are two forms:
+         *
+         * short: this.OR([
+         *           {ALT:()=>{this.CONSUME(One)}},
+         *           {ALT:()=>{this.CONSUME(Two)}},
+         *           {ALT:()=>{this.CONSUME(Three)}},
+         *        ])
+         *
+         * long: this.OR([
+         *           {WHEN: isOne, THEN_DO:()=>{this.CONSUME(One)}},
+         *           {WHEN: isTwo, THEN_DO:()=>{this.CONSUME(Two)}},
+         *           {WHEN: isThree, THEN_DO:()=>{this.CONSUME(Three)}},
+         *        ])
+         *
+         * using the short form is recommended as it will compute the lookahead function
+         * automatically. however this currently has one limitation:
+         * It only works if the lookahead for the grammar is one.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the alternation production in it's top rule.
+         *
+         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts An array of alternatives
+         * @param {string} errMsgTypes A description for the alternatives used in error messages
+         * @returns {*} The result of invoking the chosen alternative
+         */
         protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.orInternal(alts, errMsgTypes, 1)
         }
 
+        /**
+         * @see OR1
+         */
         protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.orInternal(alts, errMsgTypes, 2)
         }
 
+        /**
+         * @see OR1
+         */
         protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.orInternal(alts, errMsgTypes, 3)
         }
 
+        /**
+         * @see OR1
+         */
         protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.orInternal(alts, errMsgTypes, 4)
         }
 
+        /**
+         * @see OR1
+         */
         protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
             return this.orInternal(alts, errMsgTypes, 5)
         }
 
+        /**
+         * Convenience method equivalent to MANY1
+         * @see MANY1
+         */
         protected MANY(lookAheadFunc:LookAheadFunc | GrammarAction,
                        action?:GrammarAction):void {
             return this.MANY1.apply(this, arguments)
         }
 
-        protected MANY1(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * Parsing DSL method, that indicates a repetition of zero or more.
+         * This is equivalent to EBNF repetition {...}
+         *
+         * note that the 'action' param is optional. so both of the following forms are valid:
+         *
+         * short: this.MANY(()=>{
+         *                       this.CONSUME(Comma};
+         *                       this.CONSUME(Digit});
+         * long: this.MANY(isComma, ()=>{
+         *                       this.CONSUME(Comma};
+         *                       this.CONSUME(Digit});
+         *
+         * using the short form is recommended as it will compute the lookahead function
+         * automatically. however this currently has one limitation:
+         * It only works if the lookahead for the grammar is one.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the repetition production in it's top rule.
+         *
+         * @param {Function} laFuncOrAction The lookahead function that 'decides'
+         *                                  whether or not the MANY's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] The action to optionally invoke.
+         */
+        protected MANY1(laFuncOrAction:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
-            this.manyInternal(this.MANY1, "MANY1", 1, lookAheadFunc, action)
+            this.manyInternal(this.MANY1, "MANY1", 1, laFuncOrAction, action)
         }
 
-        protected MANY2(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see MANY1
+         */
+        protected MANY2(laFuncOrAction:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
-            this.manyInternal(this.MANY2, "MANY2", 2, lookAheadFunc, action)
+            this.manyInternal(this.MANY2, "MANY2", 2, laFuncOrAction, action)
         }
 
-        protected MANY3(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see MANY1
+         */
+        protected MANY3(laFuncOrAction:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
-            this.manyInternal(this.MANY3, "MANY3", 3, lookAheadFunc, action)
+            this.manyInternal(this.MANY3, "MANY3", 3, laFuncOrAction, action)
         }
 
-        protected MANY4(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see MANY1
+         */
+        protected MANY4(laFuncOrAction:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
-            this.manyInternal(this.MANY4, "MANY4", 4, lookAheadFunc, action)
+            this.manyInternal(this.MANY4, "MANY4", 4, laFuncOrAction, action)
         }
 
-        protected MANY5(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see MANY1
+         */
+        protected MANY5(laFuncOrAction:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
-            this.manyInternal(this.MANY5, "MANY5", 5, lookAheadFunc, action)
+            this.manyInternal(this.MANY5, "MANY5", 5, laFuncOrAction, action)
         }
 
-        protected AT_LEAST_ONE(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * Convenience method equivalent to AT_LEAST_ONE1
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE(laFuncOrAction:LookAheadFunc | GrammarAction,
                                action:GrammarAction | string,
                                errMsg?:string):void {
             return this.AT_LEAST_ONE1.apply(this, arguments)
         }
 
-        protected AT_LEAST_ONE1(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         *
+         * convenience method, same as MANY but the repetition is of one or more.
+         * failing to match at least one repetition will result in a parsing error and
+         * cause the parser to attempt error recovery.
+         *
+         * @see MANY1
+         *
+         * @param {Function} laFuncOrAction The lookahead function that 'decides'
+         *                                  whether or not the AT_LEAST_ONE's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] The action to optionally invoke.
+         * @param {string} [errMsg] short title/classification to what is being matched
+         */
+        protected AT_LEAST_ONE1(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, lookAheadFunc, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, laFuncOrAction, action, errMsg)
         }
 
-        protected AT_LEAST_ONE2(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE2(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, lookAheadFunc, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, laFuncOrAction, action, errMsg)
         }
 
-        protected AT_LEAST_ONE3(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE3(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE1", 3, lookAheadFunc, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE1", 3, laFuncOrAction, action, errMsg)
         }
 
-        protected AT_LEAST_ONE4(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE4(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE1", 4, lookAheadFunc, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE1", 4, laFuncOrAction, action, errMsg)
         }
 
-        protected AT_LEAST_ONE5(lookAheadFunc:LookAheadFunc | GrammarAction,
+        /**
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE5(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, lookAheadFunc, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, laFuncOrAction, action, errMsg)
         }
 
+        /**
+         * Convenience method, same as RULE with doReSync=false
+         * @see RULE
+         */
         protected RULE_NO_RESYNC<T>(ruleName:string,
                                     impl:() => T,
                                     invalidRet:() => T):(idxInCallingRule:number,
@@ -527,11 +757,22 @@ module chevrotain.recognizer {
             return this.RULE(ruleName, impl, invalidRet, false)
         }
 
+        /**
+         *
+         * @param {string} ruleName The name of the Rule. must match the var it is assigned to.
+         * @param {Function} impl The implementation of the Rule
+         * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
+         *                   re-sync recovery.
+         * @param {boolean} [doReSync] enable or disable re-sync recovery for this rule. defaults to true
+         * @returns {Function} The parsing rule which is the impl Function wrapped with the parsing logic that handles
+         *                     Parser state / error recovery / ...
+         */
         protected RULE<T>(ruleName:string,
                           impl:() => T,
                           invalidRet:() => T = this.defaultInvalidReturn,
                           doReSync = true):(idxInCallingRule:number,
                                             isEntryPoint?:boolean) => T {
+            // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
             this.validateRuleName(ruleName)
             var parserClassProductions = cache.getProductionsForClass(this)
             // only build the gast representation once
@@ -687,13 +928,13 @@ module chevrotain.recognizer {
         }
 
         // Error Recovery functionality
-        protected getFollowsForInRuleRecovery(tokType:Function, tokIdxInRule):Function[] {
+        protected getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule):Function[] {
             var pathRuleStack:string[] = _.clone(this.RULE_STACK)
             var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK)
             var grammarPath:any = {
                 ruleStack:         pathRuleStack,
                 occurrenceStack:   pathOccurrenceStack,
-                lastTok:           tokType,
+                lastTok:           tokClass,
                 lastTokOccurrence: tokIdxInRule
             }
 
@@ -709,8 +950,8 @@ module chevrotain.recognizer {
          * Override this if you require special behavior in your grammar
          * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
          */
-        protected getTokenToInsert(tokType:Function):tok.Token {
-            return new (<any>tokType)(-1, -1)
+        protected getTokenToInsert(tokClass:Function):tok.Token {
+            return new (<any>tokClass)(-1, -1)
         }
 
         /*
@@ -720,7 +961,7 @@ module chevrotain.recognizer {
          * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
          * as the max of the cardinality will be greater than the min value. (and this is a false error!)
          */
-        protected canTokenTypeBeInsertedInRecovery(tokType:Function) {
+        protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
             return true
         }
 
@@ -789,9 +1030,9 @@ module chevrotain.recognizer {
             }
         }
 
-        protected reSyncTo(tokType:Function):void {
+        protected reSyncTo(tokClass:Function):void {
             var nextTok = this.NEXT_TOKEN()
-            while ((nextTok instanceof tokType) === false) {
+            while ((nextTok instanceof tokClass) === false) {
                 nextTok = this.SKIP_TOKEN()
             }
         }
@@ -892,7 +1133,7 @@ module chevrotain.recognizer {
         }
 
         /**
-         * @param tokType The Type of Token we wish to consume (Reference to its constructor function)
+         * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
          * @param idx occurrence index of consumed token in the invoking parser rule text
          *         for example:
          *         IDENT (DOT IDENT)*
@@ -903,16 +1144,16 @@ module chevrotain.recognizer {
          *
          * @returns the consumed Token
          */
-        protected consumeInternal(tokType:Function, idx:number):tok.Token {
+        protected consumeInternal(tokClass:Function, idx:number):tok.Token {
             try {
-                return super.CONSUME(tokType)
+                return super.CONSUME(tokClass)
             } catch (eFromConsumption) {
                 // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
                 // but the original syntax could have been parsed successfully without any backtracking + recovery
                 if (eFromConsumption instanceof MismatchedTokenException && !this.isBackTracking()) {
-                    var follows = this.getFollowsForInRuleRecovery(tokType, idx)
+                    var follows = this.getFollowsForInRuleRecovery(tokClass, idx)
                     try {
-                        return this.tryInRuleRecovery(tokType, follows)
+                        return this.tryInRuleRecovery(tokClass, follows)
                     } catch (eFromInRuleRecovery) {
                         /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
                         // it is only needed for the else branch but in tsc 1.4.1 comments
