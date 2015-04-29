@@ -3,6 +3,7 @@
 
 /// <reference path="../src/lang/lang_extensions.ts" />
 /// <reference path="../src/scan/tokens.ts" />
+/// <reference path="../src/scan/lexer.ts" />
 /// <reference path="../src/parse/parse_tree.ts" />
 /// <reference path="../src/text/range.ts" />
 /// <reference path="../src/parse/constants.ts" />
