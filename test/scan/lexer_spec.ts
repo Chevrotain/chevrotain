@@ -77,6 +77,14 @@ module chevrotain.lexer.spec {
         static PATTERN = /bamba/i
     }
 
+    class IntegerValid extends tok.Token {
+        static PATTERN = /0\d*/
+    }
+
+    class DecimalInvalid extends tok.Token {
+        static PATTERN = /0\d*/ // oops we did copy paste and forgot to change the pattern same as Integer
+    }
+
     describe("The Simple Lexer Validations", function () {
 
         it("won't detect valid patterns as missing", function () {
@@ -123,6 +131,20 @@ module chevrotain.lexer.spec {
             var result = l.findUnsupportedFlags([ValidNaPattern, GlobalPattern])
             expect(result.length).toBe(1)
             expect(_.contains(result[0], "GlobalPattern")).toBe(true)
+        })
+
+        it("won't detect valid patterns as duplicates", function () {
+            var result = l.findDuplicatePatterns([MultiLinePattern, IntegerValid])
+            expect(result.length).toBe(0)
+        })
+
+        it("will detect identical patterns for different classes", function () {
+            var tokenClasses = [DecimalInvalid, IntegerValid]
+            var result = l.findDuplicatePatterns(tokenClasses)
+            expect(result.length).toBe(1)
+            expect(_.contains(result[0], "IntegerValid")).toBe(true)
+            expect(_.contains(result[0], "DecimalInvalid")).toBe(true)
+            expect(() => {l.validatePatterns(tokenClasses)}).toThrow()
         })
     })
 

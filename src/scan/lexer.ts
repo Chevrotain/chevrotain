@@ -4,6 +4,7 @@
 module chevrotain.lexer {
 
     import tok = chevrotain.tokens
+    import lang = chevrotain.lang
 
     var PATTERN = "PATTERN"
     var IGNORE = "IGNORE"
@@ -243,6 +244,11 @@ module chevrotain.lexer {
         if (!_.isEmpty(invalidFlags)) {
             throw new Error(invalidFlags.join("\n ---------------- \n"))
         }
+
+        var duplicates = findDuplicatePatterns(tokenClasses)
+        if (!_.isEmpty(duplicates)) {
+            throw new Error(invalidFlags.join("\n ---------------- \n"))
+        }
     }
 
     export function findMissingPatterns(tokenClasses:TokenConstructor[]):string[] {
@@ -283,7 +289,39 @@ module chevrotain.lexer {
         return errors
     }
 
-    // TODO: find duplicate patterns
+    // This can only test for identical duplicate RegExps, not semantically equivalent ones.
+    export function findDuplicatePatterns(tokenClasses:TokenConstructor[]):string[] {
+
+        var found = []
+        var identicalPatterns = _.map(tokenClasses, (outerClass:any) => {
+            return _.reduce(tokenClasses, (result, innerClass:any) => {
+                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass)) {
+                    // this avoids duplicates in the result, each class may only appear in one "set"
+                    // in essence we are creating Equivalence classes on equality relation.
+                    found.push(innerClass)
+                    return _.union(result, [innerClass])
+                }
+            }, [])
+        })
+
+        identicalPatterns = _.compact(identicalPatterns)
+
+        var duplicatePatterns = _.filter(identicalPatterns, (currIdenticalSet) => {
+            return _.size(currIdenticalSet) > 1
+        })
+
+        var errors = _.map(duplicatePatterns, (setOfIdentical:any) => {
+            var classNames = _.map(setOfIdentical, (currClass:any) => {
+                return lang.functionName(currClass)
+            })
+
+            var dupPatternSrc = (<any>_.first(setOfIdentical)).PATTERN
+            return `The same RegExp pattern ->${dupPatternSrc}<-` +
+                `has been used in all the following classes: ${classNames.join(", ")} <-`
+        })
+
+        return errors
+    }
 
     export function addStartOfInput(pattern:RegExp):RegExp {
         var flags = pattern.ignoreCase ? "i" : ""
