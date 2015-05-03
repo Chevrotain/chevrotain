@@ -12,7 +12,13 @@ module chevrotain.lexer {
     export interface ILexingResult {
         tokens:tok.Token[]
         ignored:tok.Token[]
-        errors:string[]
+        errors:ILexingError[]
+    }
+
+    export interface ILexingError {
+        line:number
+        column:number
+        message:string
     }
 
     export type TokenConstructor = Function
@@ -88,7 +94,7 @@ module chevrotain.lexer {
 
             var ignoredTokens = []
             var matchedTokens = []
-            var errors = []
+            var errors:ILexingError[] = []
             var matchedIgnore = true
 
             while (text.length > 0) {
@@ -124,8 +130,12 @@ module chevrotain.lexer {
                         }
                     }
                     if (res !== NOTHING_CONSUMED() || text.length === 0) {
-                        errors.push(`unexpected character: ->${orgInput.charAt(errorStart)}<- at offset: ${errorStart},` +
-                        ` skipped ${offset - errorStart} characters.`)
+                        var lc:any = offSetToLC[errorStart]
+                        var errorLine = lc.line
+                        var errorColumn = lc.column
+                        var errorMessage = `unexpected character: ->${orgInput.charAt(errorStart)}<- at offset: ${errorStart},` +
+                            ` skipped ${offset - errorStart} characters.`
+                        errors.push({line: errorLine, column: errorColumn, message: errorMessage})
                     }
                 }
                 matchedIgnore = true

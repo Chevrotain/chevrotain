@@ -237,7 +237,9 @@ module chevrotain.lexer.spec {
 
             var lexResult = ifElseLexer.tokenize(input)
             expect(lexResult.errors.length).toBe(1)
-            expect(_.contains(lexResult.errors[0], "@")).toBe(true)
+            expect(_.contains(lexResult.errors[0].message, "@")).toBe(true)
+            expect(lexResult.errors[0].line).toBe(1)
+            expect(lexResult.errors[0].column).toBe(18)
             expect(lexResult.tokens).toEqual([new If(1, 1, "if"), new LParen(1, 4, "("), new Integer(1, 5, "666"), new RParen(1, 8, ")"),
                 new Return(1, 10, "return"), new Integer(1, 17, "1"), new Else(2, 2, "else"), new Return(2, 7, "return"),
                 new Integer(2, 14, "2")
@@ -250,10 +252,11 @@ module chevrotain.lexer.spec {
             var ifElseLexer = new l.SimpleLexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
             var input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
-
             var lexResult = ifElseLexer.tokenize(input)
             expect(lexResult.errors.length).toBe(1)
-            expect(_.contains(lexResult.errors[0], "&")).toBe(true)
+            expect(_.contains(lexResult.errors[0].message, "&")).toBe(true)
+            expect(lexResult.errors[0].line).toBe(1)
+            expect(lexResult.errors[0].column).toBe(3)
             expect(lexResult.tokens).toEqual([new If(1, 1, "if")])
             expect(lexResult.ignored.length).toBe(0)
         })
