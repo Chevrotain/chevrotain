@@ -1,55 +1,43 @@
 /// <reference path="../../src/parse/recognizer.ts" />
 /// <reference path="../../src/scan/tokens.ts" />
+/// <reference path="../../src/scan/lexer.ts" />
 
 module chevrotain.examples.json {
 
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
+    import lex = chevrotain.lexer
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
-    export class StringTok extends tok.Token {}
-    export class NumberTok extends tok.Token {}
 
     // DOCS: additional hierarchies may be defined for categorization purposes, for example
     //       when implementing Syntax highlighting being able to easily identify all the keywords with a simple
     //       "instanceof?" could be convenient.
-    export class Keyword extends tok.Token {}
-
-    export class TrueTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "true") }
+    export class Keyword extends tok.Token { static PATTERN = lex.NA }
+    export class True extends Keyword { static PATTERN = /true/ }
+    export class False extends Keyword { static PATTERN = /false/ }
+    export class Null extends Keyword { static PATTERN = /null/ }
+    export class LCurly extends tok.Token { static PATTERN = /{/ }
+    export class RCurly extends tok.Token { static PATTERN = /}/ }
+    export class LSquare extends tok.Token { static PATTERN = /\[/ }
+    export class RSquare extends tok.Token { static PATTERN = /]/ }
+    export class Comma extends tok.Token { static PATTERN = /,/ }
+    export class Colon extends tok.Token { static PATTERN = /:/ }
+    export class String extends tok.Token {
+        static PATTERN = /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/
+    }
+    export class Number extends tok.Token {
+        static PATTERN = /-?(0|[1-9]\d*)(\.\D+)?([eE][+-]?\d+)?/
+    }
+    export class WhiteSpace extends tok.Token {
+        static PATTERN = / |\t|\n|\r|\r\n/
+        static IGNORE = true
     }
 
-    export class FalseTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "false") }
-    }
-
-    export class NullTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "null") }
-    }
-
-    export class LCurlyTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "{") }
-    }
-
-    export class RCurlyTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "}") }
-    }
-
-    export class LSquareTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "[") }
-    }
-
-    export class RSquareTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "]") }
-    }
-
-    export class CommaTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ",") }
-    }
-
-    export class ColonTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ":") }
-    }
+    // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations
+    //       performed by it's constructor only need to be done once.
+    export var JsonLexer = new lex.SimpleLexer(
+        [Keyword, True, False, Null, LCurly, RCurly, LSquare, RSquare, Comma, Colon, String, Number, WhiteSpace])
 
 
     export class JsonParser extends recog.BaseIntrospectionRecognizer {
@@ -67,44 +55,44 @@ module chevrotain.examples.json {
 
         // DOCS: the parsing rules
         public object = this.RULE("object", () => {
-            this.CONSUME(LCurlyTok)
+            this.CONSUME(LCurly)
             this.OPTION(() => {
                 this.SUBRULE(this.objectItem)
                 this.MANY(() => {
-                    this.CONSUME(CommaTok)
-                    this.SUBRULE1(this.objectItem) // DOCS: the index "2" in SUBRULE2 is needed to identify
+                    this.CONSUME(Comma)
+                    this.SUBRULE2(this.objectItem) // DOCS: the index "2" in SUBRULE2 is needed to identify
                 })                                 //       the unique position in the grammar during runtime
             })
-            this.CONSUME(RCurlyTok)
+            this.CONSUME(RCurly)
         })
 
         public objectItem = this.RULE("objectItem", () => {
-            this.CONSUME(StringTok)
-            this.CONSUME(ColonTok)
+            this.CONSUME(String)
+            this.CONSUME(Colon)
             this.SUBRULE(this.value)
         })
 
         public array = this.RULE("array", () => {
-            this.CONSUME(LSquareTok)
+            this.CONSUME(LSquare)
             this.OPTION(() => {
                 this.SUBRULE(this.value)
                 this.MANY(() => {
-                    this.CONSUME(CommaTok)
+                    this.CONSUME(Comma)
                     this.SUBRULE2(this.value)
                 })
             })
-            this.CONSUME(RSquareTok)
+            this.CONSUME(RSquare)
         })
 
         public value = this.RULE("value", () => {
             this.OR([
-                {ALT: () => {this.CONSUME(StringTok)}},
-                {ALT: () => {this.CONSUME(NumberTok)}},
+                {ALT: () => {this.CONSUME(String)}},
+                {ALT: () => {this.CONSUME(Number)}},
                 {ALT: () => {this.SUBRULE(this.object)}},
                 {ALT: () => {this.SUBRULE(this.array)}},
-                {ALT: () => {this.CONSUME(TrueTok)}},
-                {ALT: () => {this.CONSUME(FalseTok)}},
-                {ALT: () => {this.CONSUME(NullTok)}}
+                {ALT: () => {this.CONSUME(True)}},
+                {ALT: () => {this.CONSUME(False)}},
+                {ALT: () => {this.CONSUME(Null)}}
             ], "a value")
         })
     }
