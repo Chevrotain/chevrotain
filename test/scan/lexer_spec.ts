@@ -152,14 +152,14 @@ module chevrotain.lexer.spec {
         it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", function () {
             var orgSource = BambaTok.PATTERN.source
             var transPattern = l.addStartOfInput(BambaTok.PATTERN)
-            expect(transPattern.source).toEqual("^(:?" + orgSource + ")")
+            expect(transPattern.source).toEqual("^(?:" + orgSource + ")")
             expect(_.startsWith(transPattern.source, "^")).toBe(true)
         })
 
         it("can transform a pattern to one with startOfInput mark ('^') #2", function () {
             var orgSource = PatternNoStart.PATTERN.source
             var transPattern = l.addStartOfInput(PatternNoStart.PATTERN)
-            expect(transPattern.source).toEqual("^(:?" + orgSource + ")")
+            expect(transPattern.source).toEqual("^(?:" + orgSource + ")")
             expect(_.startsWith(transPattern.source, "^")).toBe(true)
         })
 
@@ -170,25 +170,25 @@ module chevrotain.lexer.spec {
             var ignorePatternsString = _.map(analyzeResult.ignorePatterns, (pattern) => {
                 return pattern.source
             })
-            matchers.arrayEqualityNoOrder(ignorePatternsString, ["^(:?(\\t| ))", "^(:?(\\n|\\r|\\r\\n))"])
+            matchers.arrayEqualityNoOrder(ignorePatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))"])
 
             expect(analyzeResult.matchPatterns.length).toBe(6)
             var matchPatternsString = _.map(analyzeResult.matchPatterns, (pattern) => {
                 return pattern.source
             })
             matchers.arrayEqualityNoOrder(matchPatternsString,
-                ["^(:?\\()", "^(:?\\))", "^(:?[1-9]\\d*)", "^(:?if)", "^(:?else)", "^(:?return)"])
+                ["^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
             var patternToClass = analyzeResult.patternToClass
             expect(_.keys(patternToClass).length).toBe(8)
-            expect(patternToClass["/^(:?\\()/"]).toBe(LParen)
-            expect(patternToClass["/^(:?\\))/"]).toBe(RParen)
-            expect(patternToClass["/^(:?[1-9]\\d*)/"]).toBe(Integer)
-            expect(patternToClass["/^(:?if)/"]).toBe(If)
-            expect(patternToClass["/^(:?else)/"]).toBe(Else)
-            expect(patternToClass["/^(:?return)/"]).toBe(Return)
-            expect(patternToClass["/^(:?(\\t| ))/"]).toBe(Whitespace)
-            expect(patternToClass["/^(:?(\\n|\\r|\\r\\n))/"]).toBe(NewLine)
+            expect(patternToClass["/^(?:\\()/"]).toBe(LParen)
+            expect(patternToClass["/^(?:\\))/"]).toBe(RParen)
+            expect(patternToClass["/^(?:[1-9]\\d*)/"]).toBe(Integer)
+            expect(patternToClass["/^(?:if)/"]).toBe(If)
+            expect(patternToClass["/^(?:else)/"]).toBe(Else)
+            expect(patternToClass["/^(?:return)/"]).toBe(Return)
+            expect(patternToClass["/^(?:(\\t| ))/"]).toBe(Whitespace)
+            expect(patternToClass["/^(?:(\\n|\\r|\\r\\n))/"]).toBe(NewLine)
         })
 
         it("can build an offset to lineColumn dictionary for a string", function () {

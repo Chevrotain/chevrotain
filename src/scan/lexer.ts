@@ -124,7 +124,7 @@ module chevrotain.lexer {
                         }
                     }
                     if (res !== NOTHING_CONSUMED() || text.length === 0) {
-                        errors.push(`unexpected character: ${orgInput.charAt(errorStart)} at offset: ${errorStart},` +
+                        errors.push(`unexpected character: ->${orgInput.charAt(errorStart)}<- at offset: ${errorStart},` +
                         ` skipped ${offset - errorStart} characters.`)
                     }
                 }
@@ -279,7 +279,7 @@ module chevrotain.lexer {
         var flags = pattern.ignoreCase ? "i" : ""
         // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
         // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
-        return new RegExp(`^(:?${pattern.source})`, flags)
+        return new RegExp(`^(?:${pattern.source})`, flags)
     }
 
     export interface ILineColumn {
