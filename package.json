@@ -2,7 +2,7 @@
   "name": "chevrotain",
   "version": "0.1.0",
   "dependencies": {
-    "lodash": "~3.7.0"
+    "lodash": "~3.8.0"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
