@@ -108,65 +108,341 @@ module chevrotain.examples.ecma5 {
         // A.4 Statements
 
         // See clause 12
-        public Statement = this.RULE("Statement", () => {})
+        public Statement = this.RULE("Statement", () => {
+            this.OR([
+                {ALT: () => { this.SUBRULE(this.Block) }},
+                {ALT: () => { this.SUBRULE(this.VariableStatement) }},
+                {ALT: () => { this.SUBRULE(this.EmptyStatement) }},
+                {ALT: () => { this.SUBRULE(this.ExpressionStatement) }},
+                {ALT: () => { this.SUBRULE(this.IfStatement) }},
+                {ALT: () => { this.SUBRULE(this.IterationStatement) }},
+                {ALT: () => { this.SUBRULE(this.ContinueStatement) }},
+                {ALT: () => { this.SUBRULE(this.BreakStatement) }},
+                {ALT: () => { this.SUBRULE(this.ReturnStatement) }},
+                {ALT: () => { this.SUBRULE(this.WithStatement) }},
+                {ALT: () => { this.SUBRULE(this.LabelledStatement) }},
+                {ALT: () => { this.SUBRULE(this.SwitchStatement) }},
+                {ALT: () => { this.SUBRULE(this.ThrowStatement) }},
+                {ALT: () => { this.SUBRULE(this.TryStatement) }},
+                {ALT: () => { this.SUBRULE(this.DebuggerStatement) }}
+            ], "a Statement")
+        })
+
         // See 12.1
-        public Block = this.RULE("Block", () => {})
+        public Block = this.RULE("Block", () => {
+            this.CONSUME(LCurly)
+            this.OPTION(() => () => {
+                this.SUBRULE(this.StatementList)
+            })
+            this.CONSUME(RCurly)
+        })
+
         // See 12.1
-        public StatementList = this.RULE("StatementList", () => {})
-        // See 12.2
-        public VariableStatement = this.RULE("VariableStatement", () => {})
-        // See 12.2
-        public VariableDeclarationList = this.RULE("VariableDeclarationList", () => {})
-        // See 12.2
-        public VariableDeclarationListNoIn = this.RULE("VariableDeclarationListNoIn", () => {})
-        // See 12.2
-        public VariableDeclaration = this.RULE("VariableDeclaration", () => {})
-        // See 12.2
-        public VariableDeclarationNoIn = this.RULE("VariableDeclarationNoIn", () => {})
+        public StatementList = this.RULE("StatementList", () => {
+            this.AT_LEAST_ONE(() => {
+                this.SUBRULE(this.Statement)
+            }, "a Statement")
+        })
 
         // See 12.2
-        public Initialiser = this.RULE("Initialiser", () => {})
+        public VariableStatement = this.RULE("VariableStatement", () => {
+            this.CONSUME(VarTok)
+            this.SUBRULE(this.VariableDeclaration)
+        })
+
         // See 12.2
-        public InitialiserNoIn = this.RULE("InitialiserNoIn", () => {})
+        public VariableDeclarationList = this.RULE("VariableDeclarationList", () => {
+            this.SUBRULE(this.VariableDeclaration)
+            this.MANY(() => {
+                this.CONSUME(Comma)
+                this.SUBRULE2(this.VariableDeclaration)
+            })
+        })
+
+        //// See 12.2
+        public VariableDeclarationListNoIn = this.RULE("VariableDeclarationListNoIn", () => {
+            this.SUBRULE(this.VariableDeclarationNoIn)
+            this.MANY(() => {
+                this.CONSUME(Comma)
+                this.SUBRULE2(this.VariableDeclarationNoIn)
+            })
+        })
+
+        // See 12.2
+        public VariableDeclaration = this.RULE("VariableDeclaration", () => {
+            this.CONSUME(Identifier)
+            this.SUBRULE(this.Initialiser)
+        })
+
+        //// See 12.2
+        public VariableDeclarationNoIn = this.RULE("VariableDeclarationNoIn", () => {
+            this.CONSUME(Identifier)
+            this.SUBRULE(this.InitialiserNoIn)
+        })
+
+        // See 12.2
+        public Initialiser = this.RULE("Initialiser", () => {
+            this.CONSUME(Eq)
+            this.SUBRULE(this.AssignmentExpression)
+        })
+
+        // See 12.2
+        public InitialiserNoIn = this.RULE("InitialiserNoIn", () => {
+            this.CONSUME(Eq)
+            this.SUBRULE(this.AssignmentExpressionNoIn)
+        })
+
         // See 12.3
-        public EmptyStatement = this.RULE("EmptyStatement", () => {})
+        public EmptyStatement = this.RULE("EmptyStatement", () => {
+            this.CONSUME(Semicolon)
+        })
+
         // See 12.4
-        public ExpressionStatement = this.RULE("ExpressionStatement", () => {})
+        public ExpressionStatement = this.RULE("ExpressionStatement", () => {
+            // the spec defines [lookahead ? {{, function}] to avoid some ambiguities, however those ambiguities only exist
+            // because in a BNF grammar there is no priority between alternatives. This implementation however, is deterministic
+            // the first alternative found to match will be taken. thus these ambiguities can be resolved
+            // by ordering of the alternatives
+            this.SUBRULE(this.Expression)
+        })
+
         // See 12.5
-        public IfStatement = this.RULE("IfStatement", () => {})
+        public IfStatement = this.RULE("IfStatement", () => {
+            this.CONSUME(IfTok)
+            this.CONSUME(LParan)
+            this.CONSUME(RParan)
+            this.SUBRULE(this.Statement)
+            // refactoring spec to use an OPTION production for the 'else'
+            // to resolve the dangling if-else problem
+            this.OPTION(() => {
+                this.CONSUME(ElseTok)
+                this.SUBRULE2(this.Statement)
+            })
+        })
+
         // See 12.6
-        public IterationStatement = this.RULE("IterationStatement", () => {})
+        public IterationStatement = this.RULE("IterationStatement", () => {
+            // the original spec rule has been refactored into 3 smaller ones
+            this.OR([
+                {ALT: () => { this.SUBRULE(this.DoIteration) }},
+                {ALT: () => { this.SUBRULE(this.WhileIteration) }},
+                {ALT: () => { this.SUBRULE(this.ForIteration) }}
+            ], "an Iteration Statement")
+        })
+
+
+        public DoIteration = this.RULE("DoIteration", () => {
+            this.CONSUME(DoTok)
+            this.SUBRULE(this.Statement)
+            this.CONSUME(WhileTok)
+            this.CONSUME(LParan)
+            this.SUBRULE(this.Expression)
+            this.CONSUME(RParan)
+            this.CONSUME(Semicolon)
+        })
+
+        public WhileIteration = this.RULE("WhileIteration", () => {
+            this.CONSUME(WhileTok)
+            this.CONSUME(LParan)
+            this.SUBRULE(this.Expression)
+            this.CONSUME(RParan)
+            this.SUBRULE(this.Statement)
+        })
+
+        public ForIteration = this.RULE("ForIteration", () => {
+            this.CONSUME(ForTok)
+            this.CONSUME(LParan)
+
+            // @formatter:off
+            this.OR([
+                { ALT: () => {
+                    this.CONSUME(VarTok)
+                    this.SUBRULE(this.VariableDeclarationListNoIn)
+                    this.SUBRULE(this.ForIterationParts)
+                }},
+                {ALT: () => {
+                    this.OPTION(() => {
+                        this.SUBRULE(this.ExpressionNoIn)
+                    })
+                    // TODO: consider feature to pass arguments to  subRules?
+                    this.SUBRULE(this.ForIterationParts)
+                }}
+            ], "var or expression")
+            // @formatter:on
+
+            this.CONSUME(RParan)
+            this.SUBRULE(this.Statement)
+        })
+
+        protected ForIterationParts = this.RULE("ForIterationParts", () => {
+            // TODO: this grammar is not enough to decide between the alternatives
+            // need the additional information from the calling rule
+            // the IN alternative is only possible if BEFORE it appeared
+            // SINGLE VariableDeclarationNoIn or LeftHandSideExpression
+
+            // @formatter:off
+            this.OR([
+                {ALT: () => {
+                    this.CONSUME(Semicolon)
+                    this.OPTION(() => {
+                        this.SUBRULE(this.Expression)
+                    })
+                    this.CONSUME2(Semicolon)
+                    this.OPTION(() => {
+                        this.SUBRULE2(this.Expression)
+                    })
+                }},
+                {ALT: () => {
+                    this.CONSUME(InTok)
+                    this.SUBRULE3(this.Expression)
+                }}
+            ], "in or semiColon")
+            // @formatter:on
+        })
+
         // See 12.7
-        public ContinueStatement = this.RULE("ContinueStatement", () => {})
+        public ContinueStatement = this.RULE("ContinueStatement", () => {
+            this.CONSUME(ContinueTok)
+            this.OPTION(() => {
+                // TODO: [no LineTerminator here]
+                this.CONSUME(Identifier)
+            })
+            this.CONSUME(Semicolon)
+        })
         // See 12.8
-        public BreakStatement = this.RULE("BreakStatement", () => {})
+        public BreakStatement = this.RULE("BreakStatement", () => {
+            this.CONSUME(BreakTok)
+            this.OPTION(() => {
+                // TODO: [no LineTerminator here]
+                this.CONSUME(Identifier)
+            })
+            this.CONSUME(Semicolon)
+        })
+
         // See 12.9
-        public ReturnStatement = this.RULE("ReturnStatement", () => {})
+        public ReturnStatement = this.RULE("ReturnStatement", () => {
+            this.CONSUME(ReturnTok)
+            this.OPTION(() => {
+                // TODO: [no LineTerminator here]
+                this.SUBRULE(this.Expression)
+            })
+            this.CONSUME(Semicolon)
+        })
+
         // See 12.10
-        public WithStatement = this.RULE("WithStatement", () => {})
-        // See 12.11
-        public SwitchStatement = this.RULE("SwitchStatement", () => {})
-        // See 12.11
-        public CaseBlock = this.RULE("CaseBlock", () => {})
-        // See 12.11
-        public CaseClauses = this.RULE("CaseClauses", () => {})
+        public WithStatement = this.RULE("WithStatement", () => {
+            this.CONSUME(WithTok)
+            this.CONSUME(LParan)
+            this.SUBRULE(this.Expression)
+            this.CONSUME(RParan)
+            this.SUBRULE(this.Statement)
+        })
 
         // See 12.11
-        public CaseClause = this.RULE("CaseClause", () => {})
+        public SwitchStatement = this.RULE("SwitchStatement", () => {
+            this.CONSUME(SwitchTok)
+            this.CONSUME(LParan)
+            this.SUBRULE(this.Expression)
+            this.CONSUME(RParan)
+            this.SUBRULE(this.CaseBlock)
+        })
+
         // See 12.11
-        public DefaultClause = this.RULE("DefaultClause", () => {})
+        public CaseBlock = this.RULE("CaseBlock", () => {
+            this.CONSUME(LCurly)
+            this.OPTION(() => {
+                this.SUBRULE(this.CaseClauses)
+            })
+            this.OPTION(() => {
+                this.SUBRULE(this.DefaultClause)
+            })
+            this.OPTION(() => {
+                this.SUBRULE(this.CaseClauses)
+            })
+            this.CONSUME(RCurly)
+        })
+
+        // See 12.11
+        public CaseClauses = this.RULE("CaseClauses", () => {
+            this.AT_LEAST_ONE(() => {
+                this.SUBRULE(this.CaseClause)
+            }, "Case Clause")
+        })
+
+        // See 12.11
+        public CaseClause = this.RULE("CaseClause", () => {
+            this.CONSUME(CaseTok)
+            this.SUBRULE(this.Expression)
+            this.CONSUME(Colon)
+            this.OPTION(() => {
+                this.SUBRULE(this.StatementList)
+            })
+        })
+
+        // See 12.11
+        public DefaultClause = this.RULE("DefaultClause", () => {
+            this.CONSUME(DefaultTok)
+            this.CONSUME(Colon)
+            this.OPTION(() => {
+                this.SUBRULE(this.StatementList)
+            })
+        })
+
         // See 12.12
-        public LabelledStatement = this.RULE("LabelledStatement", () => {})
+        public LabelledStatement = this.RULE("LabelledStatement", () => {
+            this.CONSUME(Identifier)
+            this.CONSUME(Colon)
+            this.SUBRULE(this.Statement)
+        })
+
         // See 12.13
-        public ThrowStatement = this.RULE("ThrowStatement", () => {})
+        public ThrowStatement = this.RULE("ThrowStatement", () => {
+            this.CONSUME(Identifier)
+            // TODO: [no LineTerminator here]
+            this.SUBRULE(this.Expression)
+            this.CONSUME(Semicolon)
+        })
+
         // See 12.14
-        public TryStatement = this.RULE("TryStatement", () => {})
+        public TryStatement = this.RULE("TryStatement", () => {
+            this.CONSUME(TryTok)
+            this.SUBRULE(this.Block)
+
+            // @formatter:off
+            this.OR([
+                {ALT: () => {
+                    this.SUBRULE(this.Catch)
+                    this.OPTION(() => {
+                        this.SUBRULE(this.Finally)
+                    })
+                }},
+                {ALT: () => {
+                    this.SUBRULE(this.Finally)
+                }}
+            ], "catch or finally")
+            // @formatter:on
+        })
+
         // See 12.14
-        public Catch = this.RULE("Catch", () => {})
+        public Catch = this.RULE("Catch", () => {
+            this.CONSUME(CatchTok)
+            this.CONSUME(LParan)
+            this.CONSUME(Identifier)
+            this.CONSUME(RParan)
+            this.SUBRULE(this.Block)
+        })
+
         // See 12.14
-        public Finally = this.RULE("Finally", () => {})
+        public Finally = this.RULE("Finally", () => {
+            this.CONSUME(FinallyTok)
+            this.SUBRULE(this.Block)
+        })
+
         // See 12.15
-        public DebuggerStatement = this.RULE("DebuggerStatement", () => {})
+        public DebuggerStatement = this.RULE("DebuggerStatement", () => {
+            this.CONSUME(DebuggerTok)
+            this.CONSUME(Semicolon)
+        })
 
 
         // A.5 Functions and Programs
