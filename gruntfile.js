@@ -4,10 +4,17 @@ var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/", "tes
 var exampleSpecsFiles = require('./scripts/findSpecs')("target/release/tsc/examples/", "examples")
 
 module.exports = function(grunt) {
- 
+
+    var pkg = grunt.file.readJSON('package.json')
+    var bower = grunt.file.readJSON('bower.json')
+
+    if (pkg.dependencies.lodash !== bower.dependencies.lodash) {
+        throw Error("mismatch in bower and npm lodash dependency version")
+    }
+
     //noinspection UnnecessaryLabelJS
     grunt.initConfig({
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: pkg,
 
         karma: {
             options:   {
