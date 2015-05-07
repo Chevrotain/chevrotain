@@ -134,6 +134,12 @@ module chevrotain.examples.ecma5 {
     export class InTok extends AbsKeyword {}
     export class TryTok extends AbsKeyword {}
 
+    // These special identifiers have special handling in the parser
+    // and thus require a Token class.
+    // @link http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5
+    export class GetTok extends Identifier {}
+    export class SetTok extends Identifier {}
+
     //All future reserved keyword classes and future reserved strict mode keywords extend the following class
     export class AbsAnyFutureReservedWords extends AbsAnyKeyword {}
 
@@ -179,47 +185,61 @@ module chevrotain.examples.ecma5 {
     export class Dot extends AbsPunctuator {} //.
     export class Semicolon extends AbsPunctuator {} //;
     export class Comma extends AbsPunctuator {} //,
-    export class Less extends AbsPunctuator {} //<
-    export class Greater extends AbsPunctuator {} //>
-    export class LessEq extends AbsPunctuator {} //<=
-    export class GreaterEq extends AbsPunctuator {} //>=
-    export class EqEq extends AbsPunctuator {} //==
-    export class NotEq extends AbsPunctuator {} //!=
-    export class EqEqEq extends AbsPunctuator {} //===
-    export class NotEqEq extends AbsPunctuator {} //!==
-    export class Plus extends AbsPunctuator {} //+
-    export class Minus extends AbsPunctuator {} //-
-    export class Asterisk extends AbsPunctuator {} //*
-    export class Percent extends AbsPunctuator {} //%
+
     export class PlusPlus extends AbsPunctuator {} //++
     export class MinusMinus extends AbsPunctuator {} //--
-    export class LessLess extends AbsPunctuator {} //<<
-    export class MoreMore extends AbsPunctuator {} //>>
-    export class MoreMoreMore extends AbsPunctuator {} //>>>
+
     export class Ampersand extends AbsPunctuator {} //&
     export class VerticalBar extends AbsPunctuator {} //|
     export class Circumflex extends AbsPunctuator {} //^
     export class Exclamation extends AbsPunctuator {} //!
     export class Tilde extends AbsPunctuator {} //~
+
     export class AmpersandAmpersand extends AbsPunctuator {} //&&
     export class VerticalBarVerticalBar extends AbsPunctuator {} //||
+
     export class Question extends AbsPunctuator {} //?
     export class Colon extends AbsPunctuator {} //:
-    export class Eq extends AbsPunctuator {} //=
-    export class PlusEq extends AbsPunctuator {} //+=
-    export class MinusEq extends AbsPunctuator {} //-=
-    export class AsteriskEq extends AbsPunctuator {} //*=
-    export class PercentEq extends AbsPunctuator {} //%=
-    export class LessLessEq extends AbsPunctuator {} //<<=
-    export class MoreMoreEq extends AbsPunctuator {} //>>=
-    export class MoreMoreMoreEq extends AbsPunctuator {} //>>>=
-    export class AmpersandEq extends AbsPunctuator {} //&=
-    export class VerticalBarEq extends AbsPunctuator {} //|=
-    export class CircumflexEq extends AbsPunctuator {} //^=
 
-    export class AbsDivPunctuator extends AbsInputElement {}
-    export class Slash extends AbsDivPunctuator {} // /
-    export class SlashEq extends AbsDivPunctuator {} // /=
+    export class AbsMultiplicativeOperator extends AbsPunctuator {}
+    export class Asterisk extends AbsMultiplicativeOperator {} //*
+    export class Slash extends AbsMultiplicativeOperator {} // /
+    export class Percent extends AbsMultiplicativeOperator {} //%
+
+    export class AbsAdditiveOperator extends AbsPunctuator {}
+    export class Plus extends AbsAdditiveOperator {} //+
+    export class Minus extends AbsAdditiveOperator {} //-
+
+    export class AbsShiftOperator extends AbsPunctuator {}
+    export class LessLess extends AbsShiftOperator {} //<<
+    export class MoreMore extends AbsShiftOperator {} //>>
+    export class MoreMoreMore extends AbsShiftOperator {} //>>>
+
+    export class AbsRelationalOperator extends AbsPunctuator {}
+    export class Less extends AbsRelationalOperator {} //<
+    export class Greater extends AbsRelationalOperator {} //>
+    export class LessEq extends AbsRelationalOperator {} //<=
+    export class GreaterEq extends AbsRelationalOperator {} //>=
+
+    export class AbsEqualityOperator extends AbsPunctuator {}
+    export class EqEq extends AbsEqualityOperator {} //==
+    export class NotEq extends AbsEqualityOperator {} //!=
+    export class EqEqEq extends AbsEqualityOperator {} //===
+    export class NotEqEq extends AbsEqualityOperator {} //!==
+
+    export class AbsAssignmentOperator extends AbsPunctuator {}
+    export class Eq extends AbsAssignmentOperator {} //=
+    export class PlusEq extends AbsAssignmentOperator {} //+=
+    export class MinusEq extends AbsAssignmentOperator {} //-=
+    export class AsteriskEq extends AbsAssignmentOperator {} //*=
+    export class PercentEq extends AbsAssignmentOperator {} //%=
+    export class LessLessEq extends AbsAssignmentOperator {} //<<=
+    export class MoreMoreEq extends AbsAssignmentOperator {} //>>=
+    export class MoreMoreMoreEq extends AbsAssignmentOperator {} //>>>=
+    export class AmpersandEq extends AbsAssignmentOperator {} //&=
+    export class VerticalBarEq extends AbsAssignmentOperator {} //|=
+    export class CircumflexEq extends AbsAssignmentOperator {} //^=
+    export class SlashEq extends AbsAssignmentOperator {} // /=
 
     /*
      * Section 7.8 of the spec
