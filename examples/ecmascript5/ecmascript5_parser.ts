@@ -409,13 +409,10 @@ module chevrotain.examples.ecma5 {
         public AssignmentExpressionNoIn = this.RULE("AssignmentExpressionNoIn", () => {
             this.SUBRULE(this.ConditionalExpressionNoIn)
             this.OPTION(() => {
-                this.CONSUME(AbsAssignmentOperator)
+                this.CONSUME(AbsAssignmentOperator) // AssignmentOperator See 11.13 --> this is implemented as a Token Abs class
                 this.SUBRULE(this.AssignmentExpressionNoIn)
             })
         })
-
-        // See 11.13 // this is implemented as a Token Abs class
-        //public AssignmentOperator = this.RULE("AssignmentOperator", () => {})
 
         // See 11.14
         public Expression = this.RULE("Expression", () => {
@@ -478,7 +475,7 @@ module chevrotain.examples.ecma5 {
         // See 12.2
         public VariableStatement = this.RULE("VariableStatement", () => {
             this.CONSUME(VarTok)
-            this.SUBRULE(this.VariableDeclaration)
+            this.SUBRULE(this.VariableDeclarationList)
         })
 
         // See 12.2
@@ -778,19 +775,65 @@ module chevrotain.examples.ecma5 {
         // A.5 Functions and Programs
 
         // See clause 13
-        public FunctionDeclaration = this.RULE("FunctionDeclaration", () => {})
-        // See clause 13
-        public FunctionExpression = this.RULE("FunctionExpression", () => {})
-        // See clause 13
-        public FormalParameterList = this.RULE("FormalParameterList", () => {})
-        // See clause 13
-        public FunctionBody = this.RULE("FunctionBody", () => {})
-        // See clause 14
-        public Program = this.RULE("Program", () => {})
-        // See clause 14
-        public SourceElements = this.RULE("SourceElements", () => {})
-        // See clause 14
-        public SourceElement = this.RULE("SourceElement", () => {})
+        public FunctionDeclaration = this.RULE("FunctionDeclaration", () => {
+            this.CONSUME(FunctionTok)
+            this.CONSUME(Identifier)
+            this.CONSUME(LParen)
+            this.OPTION(() => {
+                this.SUBRULE(this.FormalParameterList)
+            })
+            this.CONSUME(RParen)
+            this.CONSUME(LCurly)
+            this.SUBRULE(this.FunctionBody)
+            this.CONSUME(RCurly)
+        })
 
+        // See clause 13
+        public FunctionExpression = this.RULE("FunctionExpression", () => {
+            this.CONSUME(FunctionTok)
+            this.OPTION1(() => {
+                this.CONSUME(Identifier)
+            })
+            this.CONSUME(LParen)
+            this.OPTION2(() => {
+                this.SUBRULE(this.FormalParameterList)
+            })
+            this.CONSUME(RParen)
+            this.CONSUME(LCurly)
+            this.SUBRULE(this.FunctionBody)
+            this.CONSUME(RCurly)
+        })
+
+        // See clause 13
+        public FormalParameterList = this.RULE("FormalParameterList", () => {
+            this.CONSUME(Identifier)
+            this.MANY(() => {
+                this.CONSUME(Comma)
+                this.CONSUME2(Identifier)
+            })
+        })
+
+        // See clause 13
+        public FunctionBody = this.RULE("FunctionBody", () => {
+            this.SUBRULE(this.SourceElements)
+        })
+
+        // See clause 14
+        public Program = this.RULE("Program", () => {
+            this.SUBRULE(this.SourceElements)
+        })
+
+        // See clause 14
+        // this inlines SourceElementRule rule from the spec
+        public SourceElements = this.RULE("SourceElements", () => {
+            this.MANY(() => {
+                this.OR([
+                    // FunctionDeclaration must appear before statement
+                    // to implement [lookahead ? {{, function}] in ExpressionStatement
+                    {ALT: () => { this.SUBRULE(this.FunctionDeclaration) }},
+                    {ALT: () => { this.SUBRULE(this.Statement) }}
+                ], "Statement or Function Declaration")
+            })
+        })
     }
 }
