@@ -770,8 +770,7 @@ module chevrotain.recognizer {
         protected RULE<T>(ruleName:string,
                           impl:() => T,
                           invalidRet:() => T = this.defaultInvalidReturn,
-                          doReSync = true):(idxInCallingRule:number,
-                                            isEntryPoint?:boolean) => T {
+                          doReSync = true):(idxInCallingRule:number) => T {
             // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
             this.validateRuleName(ruleName)
             var parserClassProductions = cache.getProductionsForClass(this)
@@ -780,7 +779,7 @@ module chevrotain.recognizer {
                 parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
             }
 
-            var wrappedGrammarRule = function (idxInCallingRule:number = 1, isEntryPoint?:boolean) {
+            var wrappedGrammarRule = function (idxInCallingRule:number = 1) {
                 // state update
                 // first rule invocation
                 if (_.isEmpty(this.RULE_STACK)) {
@@ -833,7 +832,7 @@ module chevrotain.recognizer {
                     this.RULE_OCCURRENCE_STACK.pop()
 
                     var maxInputIdx = this._input.length - 1
-                    if (isEntryPoint && this.inputIdx < maxInputIdx) {
+                    if ((this.RULE_STACK.length === 0) && this.inputIdx < maxInputIdx) {
                         var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
                         this.SAVE_ERROR(new NotAllInputParsedException(
                             "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))

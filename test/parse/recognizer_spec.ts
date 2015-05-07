@@ -159,7 +159,7 @@ module chevrotain.recognizer.spec {
 
         it("will throw an exception if we try to use it without performing self analysis in the constructor", function () {
             var parser = new InvalidErrorRecoveryRecog([])
-            expect(() => parser.someRule(1, true)).toThrow(Error("missing re-sync follows information, possible cause: " +
+            expect(() => parser.someRule(1)).toThrow(Error("missing re-sync follows information, possible cause: " +
             "did not call performSelfAnalysis(this) in the constructor implementation."))
         })
 
@@ -168,7 +168,7 @@ module chevrotain.recognizer.spec {
             var input = [new IdentTok(1, 1, "a"), new DotTok(1, 1), new IdentTok(1, 1, "b"),
                 new PlusTok(1, 1), new DotTok(1, 1), new IdentTok(1, 1, "c")]
             var parser = new ManyRepetitionRecovery(input)
-            expect(parser.qualifiedName(1, true)).toEqual(["a", "b", "c"])
+            expect(parser.qualifiedName(1)).toEqual(["a", "b", "c"])
             expect(parser.errors.length).toBe(1)
         })
     })

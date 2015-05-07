@@ -36,7 +36,7 @@ module chevrotain.examples.recovery.sql.spec {
             ])
 
             var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
             assertAllThreeStatementsPresentAndValid(ptResult)
@@ -53,7 +53,7 @@ module chevrotain.examples.recovery.sql.spec {
             ])
 
             var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             // one error encountered
             expect(parser.errors.length).toBe(1)
             // yet the whole input has been parsed
@@ -77,7 +77,7 @@ module chevrotain.examples.recovery.sql.spec {
             ])
 
             var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             // one error encountered
             expect(parser.errors.length).toBe(1)
             // yet the whole input has been parsed
@@ -97,7 +97,7 @@ module chevrotain.examples.recovery.sql.spec {
             ])
 
             var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             // one error encountered
             expect(parser.errors.length).toBe(1)
             // yet the whole input has been parsed
@@ -131,7 +131,7 @@ module chevrotain.examples.recovery.sql.spec {
             ])
 
             var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             // one error encountered
             expect(parser.errors.length).toBe(1)
             // yet the whole input has been parsed
@@ -167,7 +167,7 @@ module chevrotain.examples.recovery.sql.spec {
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1)])
             var parser = new DDLExampleRecoveryParser(input)
 
-            parser.ddl(1, true)
+            parser.ddl(1)
             expect(parser.errors.length).toBe(1)
             expect(parser.errors[0]).toEqual(jasmine.any(recog.NotAllInputParsedException))
         })
@@ -177,7 +177,7 @@ module chevrotain.examples.recovery.sql.spec {
                 // CREATE TABLE schema2.Persons;
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
             var parser = new DDLExampleRecoveryParser(input1)
-            parser.ddl(1, true)
+            parser.ddl(1)
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
 
@@ -188,7 +188,7 @@ module chevrotain.examples.recovery.sql.spec {
             // the parser is being reset instead of creating a new instance for each new input
             parser.reset();
             parser.input = input2
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
             // verify returned ParseTree
@@ -210,7 +210,7 @@ module chevrotain.examples.recovery.sql.spec {
             ])
 
             var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl(1, true)
+            var ptResult = parser.ddl(1)
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
             assertAllThreeStatementsPresentAndValid(ptResult)
