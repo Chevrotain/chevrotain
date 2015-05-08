@@ -35,7 +35,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt(1)
+            var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
 
@@ -60,7 +60,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt(1)
+            var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
 
@@ -78,7 +78,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt(1)
+            var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.errors[0]).toEqual(jasmine.any(recog.EarlyExitException))
             // we have re-synced to the end of the input therefore all the input has been "parsed"
@@ -105,7 +105,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt(1)
+            var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
 
@@ -134,7 +134,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt(1)
+            var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
             expect(parseResult).toEqual({})
@@ -155,7 +155,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt(1)
+            var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.isAtEndOfInput()).toBe(true)
             expect(parseResult).toEqual({
@@ -172,7 +172,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.caseStmt(1)
+            var parseResult = parser.caseStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.errors[0]).toEqual(jasmine.any(recog.MismatchedTokenException))
             expect(parser.isAtEndOfInput()).toBe(true)
@@ -186,7 +186,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             ]
 
             var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.caseStmt(1)
+            var parseResult = parser.caseStmt()
             expect(parser.errors.length).toBe(1)
             expect(parser.errors[0]).toEqual(jasmine.any(recog.MismatchedTokenException))
             expect(parser.isAtEndOfInput()).toBe(true) // in rule recovery failed, will now re-sync to EOF

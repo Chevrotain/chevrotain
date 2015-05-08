@@ -15,7 +15,7 @@ module chevrotain.examples.json.spec {
             var lexResult = JsonLexer.tokenize(input)
             expect(lexResult.errors.length).toBe(0)
             var parser = new JsonParser(lexResult.tokens)
-            parser.object(1)
+            parser.object()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
         })
@@ -25,7 +25,7 @@ module chevrotain.examples.json.spec {
             var lexResult = JsonLexer.tokenize(input)
             expect(lexResult.errors.length).toBe(0)
             var parser = new JsonParser(lexResult.tokens)
-            parser.objectItem(1)
+            parser.objectItem()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
         })
@@ -34,7 +34,7 @@ module chevrotain.examples.json.spec {
         it("will encounter an NoViableAltException when none of the alternatives match", function () {
             var input = [new Colon(1, 8, ":")]
             var parser = new JsonParser(input)
-            parser.value(1)
+            parser.value()
             expect(parser.errors.length).toBe(1)
             expect(parser.errors[0]).toEqual(jasmine.any(recog.NoViableAltException))
             expect(parser.errors[0].message).toBe("expecting: a value but found ':'")

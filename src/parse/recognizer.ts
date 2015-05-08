@@ -770,7 +770,7 @@ module chevrotain.recognizer {
         protected RULE<T>(ruleName:string,
                           impl:() => T,
                           invalidRet:() => T = this.defaultInvalidReturn,
-                          doReSync = true):(idxInCallingRule:number) => T {
+                          doReSync = true):(idxInCallingRule?:number) => T {
             // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
             this.validateRuleName(ruleName)
             var parserClassProductions = cache.getProductionsForClass(this)
