@@ -10,6 +10,13 @@ module chevrotain.lookahead {
     import t = chevrotain.tokens
     import p = chevrotain.path
     import interp = chevrotain.interpreter
+    import f = chevrotain.first
+
+    export function buildLookaheadForTopLevel(rule:gast.TOP_LEVEL):() => boolean {
+        var restProd = new gast.FLAT(rule.definition)
+        var possibleTokTypes = f.first(restProd)
+        return getSimpleLookahead(possibleTokTypes)
+    }
 
     export function buildLookaheadForOption(optionOccurrence:number, ruleGrammar:gast.TOP_LEVEL):() => boolean {
         return buildLookAheadForGrammarProd(interp.NextInsideOptionWalker, optionOccurrence, ruleGrammar)
@@ -53,10 +60,15 @@ module chevrotain.lookahead {
         var walker:interp.AbstractNextPossibleTokensWalker = new prodWalker(ruleGrammar, path)
         var possibleNextTokTypes = walker.startWalking()
 
+        return getSimpleLookahead(possibleNextTokTypes)
+    }
+
+    function getSimpleLookahead(possibleNextTokTypes:Function[]):() => boolean {
         return function ():boolean {
             return _.any(possibleNextTokTypes, function (possibleTok) {
                 return this.NEXT_TOKEN() instanceof possibleTok
             }, this)
         }
     }
+
 }

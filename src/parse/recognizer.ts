@@ -1188,13 +1188,24 @@ module chevrotain.recognizer {
             return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr)
         }
 
-
         protected getLookaheadFuncForMany(occurence:number):() => boolean {
             return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
         }
 
         protected getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
             return this.getLookaheadFuncFor("AT_LEAST_ONE", occurence, lookahead.buildLookaheadForAtLeastOne)
+        }
+
+        protected isNextRule<T>(ruleName:string):boolean {
+            var classLAFuncs = cache.getLookaheadFuncsForClass(this)
+            var condition = <any>classLAFuncs.get(ruleName)
+            if (_.isUndefined(condition)) {
+                var ruleGrammar = this.getGAstProductions().get(ruleName)
+                condition = lookahead.buildLookaheadForTopLevel(ruleGrammar)
+                classLAFuncs.put(ruleName, condition)
+            }
+
+            return condition.call(this)
         }
 
         protected getLookaheadFuncFor<T>(prodType:string,

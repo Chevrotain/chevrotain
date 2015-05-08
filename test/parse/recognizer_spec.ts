@@ -130,6 +130,46 @@ module chevrotain.recognizer.spec {
         })
     }
 
+    class CustomLookaheadParser extends recog.BaseIntrospectionRecognizer {
+
+        private result = ""
+        public plusAllowed = true
+        public minusAllowed = true
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.spec)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+        }
+
+        private isPlus():boolean {
+            return this.isNextRule("plusRule") && this.plusAllowed
+        }
+
+        private isMinus():boolean {
+            return this.isNextRule("minusRule") && this.minusAllowed
+        }
+
+        public topRule = this.RULE("topRule", () => {
+            this.OR([
+                {WHEN: this.isPlus, THEN_DO: () => { this.SUBRULE1(this.plusRule) }},
+                {WHEN: this.isMinus, THEN_DO: () => { this.SUBRULE1(this.minusRule) }}
+            ], "a unicorn")
+
+
+            return this.result
+        })
+
+        public plusRule = this.RULE("plusRule", () => {
+            this.CONSUME(PlusTok)
+            this.result += "plus"
+        })
+
+        public minusRule = this.RULE("minusRule", () => {
+            this.CONSUME(MinusTok)
+            this.result += "minus"
+        })
+    }
+
     describe("The Parsing DSL", function () {
 
         it("provides a production SUBRULE1-5 that invokes another rule", function () {
@@ -145,6 +185,28 @@ module chevrotain.recognizer.spec {
             var result = parser.topRule()
             expect(result.letters).toBe("abcde")
             expect(result.numbers).toBe("54321")
+        })
+
+        it("allows using automatic lookahead even as part of custom lookahead functions valid", function () {
+            var input1 = [new PlusTok(1, 1)]
+            var parser = new CustomLookaheadParser(input1)
+            var result = parser.topRule()
+            expect(result).toBe("plus")
+
+            var input2 = [new MinusTok(1, 1)]
+            var parser2 = new CustomLookaheadParser(input2)
+            var result2 = parser2.topRule()
+            expect(result2).toBe("minus")
+        })
+
+        it("allows using automatic lookahead even as part of custom lookahead functions invalid", function () {
+            var input1 = [new PlusTok(1, 1)]
+            var parser = new CustomLookaheadParser(input1)
+            parser.plusAllowed = false
+            var result = parser.topRule()
+            expect(result).toBe(undefined)
+            expect(parser.errors.length).toBe(1)
+            expect(_.contains(parser.errors[0].message, "unicorn")).toBe(true)
         })
     })
 
