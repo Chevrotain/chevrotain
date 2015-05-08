@@ -397,8 +397,8 @@ module chevrotain.recognizer {
          * Convenience method equivalent to SUBRULE1
          * @see SUBRULE1
          */
-        protected SUBRULE<T>(ruleToCall:(number) => T):T {
-            return this.SUBRULE1(ruleToCall)
+        protected SUBRULE<T>(ruleToCall:(number) => T, args:any[] = []):T {
+            return this.SUBRULE1(ruleToCall, args)
         }
 
         /**
@@ -416,38 +416,39 @@ module chevrotain.recognizer {
          * of the sub rule invocation in its rule.
          *
          * @param {Function} ruleToCall the rule to invoke
+         * @param {*[]} args the arguments to pass to the invoked subrule
          * @returns {*} the result of invoking ruleToCall
          */
-        protected SUBRULE1<T>(ruleToCall:(number) => T):T {
-            return ruleToCall.call(this, 1)
+        protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = []):T {
+            return ruleToCall.call(this, 1, args)
         }
 
         /**
          * @see SUBRULE1
          */
-        protected SUBRULE2<T>(ruleToCall:(number) => T):T {
-            return ruleToCall.call(this, 2)
+        protected SUBRULE2<T>(ruleToCall:(number) => T, args:any[] = []):T {
+            return ruleToCall.call(this, 2, args)
         }
 
         /**
          * @see SUBRULE1
          */
-        protected SUBRULE3<T>(ruleToCall:(number) => T):T {
-            return ruleToCall.call(this, 3)
+        protected SUBRULE3<T>(ruleToCall:(number) => T, args:any[] = []):T {
+            return ruleToCall.call(this, 3, args)
         }
 
         /**
          * @see SUBRULE1
          */
-        protected SUBRULE4<T>(ruleToCall:(number) => T):T {
-            return ruleToCall.call(this, 4)
+        protected SUBRULE4<T>(ruleToCall:(number) => T, args:any[] = []):T {
+            return ruleToCall.call(this, 4, args)
         }
 
         /**
          * @see SUBRULE1
          */
-        protected SUBRULE5<T>(ruleToCall:(number) => T):T {
-            return ruleToCall.call(this, 5)
+        protected SUBRULE5<T>(ruleToCall:(number) => T, args:any[] = []):T {
+            return ruleToCall.call(this, 5, args)
         }
 
         /**
@@ -768,9 +769,9 @@ module chevrotain.recognizer {
          *                     Parser state / error recovery / ...
          */
         protected RULE<T>(ruleName:string,
-                          impl:() => T,
+                          impl:(...implArgs:any[]) => T,
                           invalidRet:() => T = this.defaultInvalidReturn,
-                          doReSync = true):(idxInCallingRule?:number) => T {
+                          doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
             // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
             this.validateRuleName(ruleName)
             var parserClassProductions = cache.getProductionsForClass(this)
@@ -779,7 +780,7 @@ module chevrotain.recognizer {
                 parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
             }
 
-            var wrappedGrammarRule = function (idxInCallingRule:number = 1) {
+            var wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
                 // state update
                 // first rule invocation
                 if (_.isEmpty(this.RULE_STACK)) {
@@ -801,7 +802,7 @@ module chevrotain.recognizer {
 
                 try {
                     // actual parsing happens here
-                    return impl.call(this)
+                    return impl.apply(this, args)
                 } catch (e) {
                     var isFirstInvokedRule = (this.RULE_STACK.length === 1)
                     // note the reSync is always enabled for the first rule invocation, because we must always be able to

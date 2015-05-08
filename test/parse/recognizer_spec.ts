@@ -104,6 +104,32 @@ module chevrotain.recognizer.spec {
         })
     }
 
+    class SubRuleArgsParser extends recog.BaseIntrospectionRecognizer {
+
+        private numbers = ""
+        private letters = ""
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.spec)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+        }
+
+        public topRule = this.RULE("topRule", () => {
+            this.SUBRULE1(this.subRule, [5, "a"])
+            this.SUBRULE2(this.subRule, [4, "b"])
+            this.SUBRULE3(this.subRule, [3, "c"])
+            this.SUBRULE4(this.subRule, [2, "d"])
+            this.SUBRULE5(this.subRule, [1, "e"])
+            return {numbers: this.numbers, letters: this.letters}
+        })
+
+        public subRule = this.RULE("subRule", (numFromCaller, charFromCaller) => {
+            this.CONSUME(PlusTok)
+            this.numbers += numFromCaller
+            this.letters += charFromCaller
+        })
+    }
+
     describe("The Parsing DSL", function () {
 
         it("provides a production SUBRULE1-5 that invokes another rule", function () {
@@ -111,6 +137,14 @@ module chevrotain.recognizer.spec {
             var parser = new SubRuleTestParser(input)
             var result = parser.topRule()
             expect(result).toBe("12345")
+        })
+
+        it("provides a production SUBRULE1-5 that can accept arguments from its caller", function () {
+            var input = [new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1)]
+            var parser = new SubRuleArgsParser(input)
+            var result = parser.topRule()
+            expect(result.letters).toBe("abcde")
+            expect(result.numbers).toBe("54321")
         })
     })
 
