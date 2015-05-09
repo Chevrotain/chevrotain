@@ -42,8 +42,14 @@ module chevrotain.lookahead.spec {
         }
     }
 
+    class ActionParserMock extends recog.BaseRecognizer {
+        protected NEXT_TOKEN():t.Token {
+            return new samples.ActionTok(1, 1, ",")
+        }
+    }
 
-    describe("The Grammar Lookahead model", function () {
+
+    describe("The Grammar Lookahead module", function () {
         "use strict"
 
         it("can compute the lookahead function for the first OPTION in ActionDec", function () {
@@ -74,6 +80,22 @@ module chevrotain.lookahead.spec {
             expect(laFunc.call(new KeyParserMock())).toBe(0)
             expect(laFunc.call(new EntityParserMock())).toBe(1)
             expect(laFunc.call(new ColonParserMock())).toBe(-1)
+        })
+
+        it("can compute the lookahead function for a Top Level Rule", function () {
+            var laFunc = lookahead.buildLookaheadForTopLevel(samples.actionDec)
+
+            expect(laFunc.call(new ActionParserMock())).toBe(true)
+            expect(laFunc.call(new IdentParserMock())).toBe(false)
+        })
+
+        it("can compute the lookahead function for a Top Level Rule #2", function () {
+            var laFunc = lookahead.buildLookaheadForTopLevel(samples.lotsOfOrs)
+
+            expect(laFunc.call(new CommaParserMock())).toBe(true)
+            expect(laFunc.call(new EntityParserMock())).toBe(true)
+            expect(laFunc.call(new KeyParserMock())).toBe(true)
+            expect(laFunc.call(new ActionParserMock())).toBe(false)
         })
     })
 

@@ -28,7 +28,7 @@ module chevrotain.examples.backtracking.spec {
             ])
 
             var parser = new BackTrackingParser(input)
-            var result = parser.statement(1, true)
+            var result = parser.statement()
 
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
@@ -43,7 +43,7 @@ module chevrotain.examples.backtracking.spec {
             ])
 
             var parser = new BackTrackingParser(input)
-            var result = parser.statement(1, true)
+            var result = parser.statement()
 
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)

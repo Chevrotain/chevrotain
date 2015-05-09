@@ -1,5 +1,5 @@
 module chevrotain.constants {
 
-    export var IN = "_IN_"
+    export var IN = "_~IN~_"
 }
 
