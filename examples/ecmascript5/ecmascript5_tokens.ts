@@ -60,11 +60,13 @@ module chevrotain.examples.ecma5 {
      * Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
      */
     export class AbsLineTerminator extends AbsInputElement {}
-    export class LineFeed extends AbsInputElement {} // \u000A
-    export class CarriageReturn extends AbsInputElement {} // \u000D
-    export class LineSeparator extends AbsInputElement {} // \u2028
-    export class ParagraphSeparator extends AbsInputElement {} // \u2029
+    export class LineFeed extends AbsLineTerminator {} // \u000A
+    export class CarriageReturn extends AbsLineTerminator {} // \u000D
+    export class LineSeparator extends AbsLineTerminator {} // \u2028
+    export class ParagraphSeparator extends AbsLineTerminator {} // \u2029
     // The line terminator sequence <CR><LF> is handled in the grammar
+    // TODO: why? the parser only needs to know a line Terminator exists at a certain input idx, nothing less, nothing more.
+    // have to check for a certain sequence of tokens to detect a line terminator during parsing just copmlicates things...
 
     /*
      * Section 7.4 of the spec
@@ -73,7 +75,6 @@ module chevrotain.examples.ecma5 {
      */
     export class AbsComment extends AbsInputElement {}
     export class SingleLineComment extends AbsComment {}
-    //The following two classes exist for the following reason:
     /*
      * The following two classes exist for the following reason:
      * Quoting the spec: "Comments behave like white space and are discarded except that, if a MultiLineComment contains a

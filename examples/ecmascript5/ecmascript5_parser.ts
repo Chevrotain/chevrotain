@@ -7,12 +7,42 @@ module chevrotain.examples.ecma5 {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
 
+    export type IdxToLineTerminator = { [idx: number] : AbsLineTerminator }
+
     // as defined in http://www.ecma-international.org/publications/standards/Ecma-262.htm
     export class ECMAScript5Parser extends recog.BaseIntrospectionRecognizer {
 
-        constructor(input:tok.Token[] = []) {
+        /**
+         *
+         * @param {Token[]} input
+         *    The "meaningful" Token stream without the LineTerminator Tokens.
+         *    this includes everything that modify the parser's behavior.
+         *    excluding the line terminators (which are meaningful in some edge cases)
+         *
+         * @param {Object<number, AbsLineTerminator>} lineTerminatorsInfo
+         *    This adds the missing information about LineTerminators.
+         *    lineTerminatorsInfo[x] is an AbsLineTerminator instance IFF
+         *    in the "complete" meaningful token input vector there is an AbsLineTerminator instance
+         *    in the index 'x'.
+         *
+         *    example:
+         *    text = "throw \r\n new NaughtyException(....)
+         *    input = [Token('throw'), Token('new'), Token('NaughtyException'), ...]
+         *    lineTerminatorsInfo = {
+         *          "1" : AbsLineTerminator("\r\n")
+         *    }
+         */
+        constructor(input:tok.Token[] = [], protected lineTerminatorsInfo:IdxToLineTerminator = {}) {
             super(input, <any>chevrotain.examples.ecma5)
             ECMAScript5Parser.performSelfAnalysis(this)
+        }
+
+        protected isNextLineTerminator():boolean {
+            return this.lineTerminatorsInfo[this.inputIdx + 1] instanceof AbsLineTerminator
+        }
+
+        protected nextLineTerminator():AbsLineTerminator {
+            return this.lineTerminatorsInfo[this.inputIdx + 1]
         }
 
         // A.3 Expressions
@@ -180,11 +210,16 @@ module chevrotain.examples.ecma5 {
             this.SUBRULE(this.MemberCallNewExpression)
         })
 
+        protected isPostFixExp():boolean {
+            return !this.isNextLineTerminator() && // [no LineTerminator here]
+                this.NEXT_TOKEN() instanceof PlusPlus ||
+                this.NEXT_TOKEN() instanceof MinusMinus
+        }
+
         // See 11.3
         public PostfixExpression = this.RULE("PostfixExpression", () => {
             this.SUBRULE(this.LeftHandSideExpression)
-            this.OPTION(() => {
-                // TODO [no LineTerminator here]
+            this.OPTION(this.isPostFixExp, () => {
                 this.OR([
                     {ALT: () => { this.CONSUME(PlusPlus) }},
                     {ALT: () => { this.CONSUME(MinusMinus) }}
@@ -591,7 +626,6 @@ module chevrotain.examples.ecma5 {
                     this.OPTION(() => {
                         this.SUBRULE(this.ExpressionNoIn)
                     })
-                    // TODO: consider feature to pass arguments to  subRules?
                     this.SUBRULE(this.ForIterationParts)
                 }}
             ], "var or expression")
@@ -627,11 +661,15 @@ module chevrotain.examples.ecma5 {
             // @formatter:on
         })
 
+        protected isLabel():boolean {
+            return !this.isNextLineTerminator() && // [no LineTerminator here]
+                this.NEXT_TOKEN() instanceof Identifier
+        }
+
         // See 12.7
         public ContinueStatement = this.RULE("ContinueStatement", () => {
             this.CONSUME(ContinueTok)
-            this.OPTION(() => {
-                // TODO: [no LineTerminator here]
+            this.OPTION(this.isLabel, () => {
                 this.CONSUME(Identifier)
             })
             this.CONSUME(Semicolon)
@@ -639,18 +677,21 @@ module chevrotain.examples.ecma5 {
         // See 12.8
         public BreakStatement = this.RULE("BreakStatement", () => {
             this.CONSUME(BreakTok)
-            this.OPTION(() => {
-                // TODO: [no LineTerminator here]
+            this.OPTION(this.isLabel, () => {
                 this.CONSUME(Identifier)
             })
             this.CONSUME(Semicolon)
         })
 
+        protected isExpressionNoLineTerminator():boolean {
+            return !this.isNextLineTerminator() && // [no LineTerminator here]
+                this.isNextRule("Expression")
+        }
+
         // See 12.9
         public ReturnStatement = this.RULE("ReturnStatement", () => {
             this.CONSUME(ReturnTok)
-            this.OPTION(() => {
-                // TODO: [no LineTerminator here]
+            this.OPTION(this.isExpressionNoLineTerminator, () => {
                 this.SUBRULE(this.Expression)
             })
             this.CONSUME(Semicolon)
@@ -724,8 +765,14 @@ module chevrotain.examples.ecma5 {
 
         // See 12.13
         public ThrowStatement = this.RULE("ThrowStatement", () => {
-            this.CONSUME(Identifier)
-            // TODO: [no LineTerminator here]
+            this.CONSUME(ThrowTok)
+            if (this.isNextLineTerminator()) {
+                // this will trigger re-sync recover which is the desired behavior,
+                // there is no danger of inRule recovery (single token insertion/deletion)
+                // happening in this case because that type of recovery can only happen if CONSUME(...) was invoked.
+                this.SAVE_ERROR(new recog.MismatchedTokenException(
+                    "Line Terminator not allowed before Expression in Throw Statement", this.nextLineTerminator()))
+            }
             this.SUBRULE(this.Expression)
             this.CONSUME(Semicolon)
         })
