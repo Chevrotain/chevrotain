@@ -150,7 +150,7 @@ module chevrotain.examples.ecma5 {
         // this inlines PropertySetParameterList
         public PropertyName = this.RULE("PropertyName", () => {
             this.OR([
-                {ALT: () => { this.CONSUME(AbsIdentifierNamesAndIdentifiers) }},
+                {ALT: () => { this.CONSUME(IdentifierName) }},
                 {ALT: () => { this.CONSUME(AbsStringLiteral) }},
                 {ALT: () => { this.CONSUME(AbsNumericLiteral) }}
             ], "Property name")
@@ -179,7 +179,7 @@ module chevrotain.examples.ecma5 {
                     }},
                     {ALT: () => {
                         this.CONSUME(Dot)
-                        this.CONSUME(AbsIdentifierNamesAndIdentifiers)
+                        this.CONSUME(IdentifierName)
                     }},
                     {ALT: () => {
                         this.SUBRULE(this.Arguments)
