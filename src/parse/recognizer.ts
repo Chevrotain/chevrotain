@@ -202,7 +202,7 @@ module chevrotain.recognizer {
         /**
          *
          * @param grammarRule the rule to try and parse in backtracking mode
-         * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was succesfully or not
+         * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
          * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
          */
         protected BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
