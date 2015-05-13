@@ -968,7 +968,7 @@ module chevrotain.recognizer {
         protected tryInRuleRecovery(expectedTokType:Function, follows:Function[]):tok.Token {
             if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
                 var tokToInsert = this.getTokenToInsert(expectedTokType)
-                tokToInsert.isInserted = true
+                tokToInsert.isInsertedInRecovery = true
                 return tokToInsert
 
             }

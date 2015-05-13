@@ -63,7 +63,7 @@ module chevrotain.examples.recovery.sql.spec {
             var insertedSemiColon:tok.Token = ptResult.children[1].children[4].payload
             // the semicolon is present even though it did not exist in the input, magic!
             expect(insertedSemiColon).toEqual(jasmine.any(SemiColonTok))
-            expect(insertedSemiColon.isInserted).toBe(true)
+            expect(insertedSemiColon.isInsertedInRecovery).toBe(true)
         })
 
         it("can perform single token deletion for a redundant keyword", function () {

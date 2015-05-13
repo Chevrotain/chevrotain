@@ -21,6 +21,46 @@ module chevrotain.examples.ecma5.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
         })
 
+        //TODO: more assertions once the parsing rules actually returns a value
+        it("can perform semicolon insertion #1", function () {
+            var input = "{ 1\n" +
+                "2 } 3"
+            var lexResult = ECMA5Lexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(0)
+            // TODO: this information should be produced by the 'full' lexer
+            var LineTerminatorsInfo:any = {2: new LineFeed(-1, -1, "\n")}
+            var parser = new ECMAScript5Parser(lexResult.tokens, LineTerminatorsInfo)
+            parser.Program()
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
+        it("can perform semicolon insertion #2", function () {
+            var input = "return\n" +
+                "a + b"
+            var lexResult = ECMA5Lexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(0)
+            // TODO: this information should be produced by the 'full' lexer
+            var LineTerminatorsInfo:any = {1: new LineFeed(-1, -1, "\n")}
+            var parser = new ECMAScript5Parser(lexResult.tokens, LineTerminatorsInfo)
+            parser.Program()
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
+        it("can perform semicolon insertion #3", function () {
+            var input = "a = b\n" +
+                "++c"
+            var lexResult = ECMA5Lexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(0)
+            // TODO: this information should be produced by the 'full' lexer
+            var LineTerminatorsInfo:any = {3: new LineFeed(-1, -1, "\n")}
+            var parser = new ECMAScript5Parser(lexResult.tokens, LineTerminatorsInfo)
+            parser.Program()
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
     })
 
 }
