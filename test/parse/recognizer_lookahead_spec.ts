@@ -794,4 +794,45 @@ module chevrotain.recognizer.lookahead.spec {
         })
     })
 
+
+    class OrAmbiguityLookAheadParser extends BaseIntrospectionRecognizer {
+
+        constructor(input:tok.Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+        }
+
+        public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
+
+        private parseAmbiguityRule():void {
+
+            // @formatter:off
+            this.OR1([
+                {ALT: () => {
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(TwoTok)
+                }},
+                {ALT: () => { // <-- this alternative starts with the same token as the previous one, ambiguity!
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(ThreeTok)
+                }},
+                {ALT: () => {
+                    this.CONSUME1(TwoTok)
+                }},
+                {ALT: () => {
+                    this.CONSUME2(ThreeTok)
+                }}
+            ], "digits")
+            // @formatter:on
+        }
+    }
+
+    describe("OR production ambiguity detection when using implicit lookahead calculation", function () {
+
+        it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", function () {
+            var parser = new OrAmbiguityLookAheadParser()
+            expect(() => parser.ambiguityRule()).toThrow()
+        })
+    })
+
 }

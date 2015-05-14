@@ -476,19 +476,28 @@ module chevrotain.examples.ecma5 {
                 {ALT: () => { this.SUBRULE(this.Block) }},
                 {ALT: () => { this.SUBRULE(this.VariableStatement) }},
                 {ALT: () => { this.SUBRULE(this.EmptyStatement) }},
-                {ALT: () => { this.SUBRULE(this.ExpressionStatement) }},
+                {
+                    ALT: () => {
+                        this.SUBRULE(this.ExpressionStatement)
+                        var isOnlyIdentifierStatement = false // TODO: compute from ExpressionStatement once the rules return a parseTree
+                        // LabelledStatement (See 12.12) is inlined here as it requires 2 token lookahead
+                        this.OPTION(() => { return this.NEXT_TOKEN() instanceof Semicolon && isOnlyIdentifierStatement }, () => {
+                            this.CONSUME(Colon)
+                            this.SUBRULE(this.Statement)
+                        })
+                    }
+                },
                 {ALT: () => { this.SUBRULE(this.IfStatement) }},
                 {ALT: () => { this.SUBRULE(this.IterationStatement) }},
                 {ALT: () => { this.SUBRULE(this.ContinueStatement) }},
                 {ALT: () => { this.SUBRULE(this.BreakStatement) }},
                 {ALT: () => { this.SUBRULE(this.ReturnStatement) }},
                 {ALT: () => { this.SUBRULE(this.WithStatement) }},
-                {ALT: () => { this.SUBRULE(this.LabelledStatement) }},
                 {ALT: () => { this.SUBRULE(this.SwitchStatement) }},
                 {ALT: () => { this.SUBRULE(this.ThrowStatement) }},
                 {ALT: () => { this.SUBRULE(this.TryStatement) }},
                 {ALT: () => { this.SUBRULE(this.DebuggerStatement) }}
-            ], "a Statement")
+            ], "a Statement", recog.IGNORE_AMBIGUITIES)
         })
 
         // See 12.1
@@ -756,13 +765,6 @@ module chevrotain.examples.ecma5 {
             })
         })
 
-        // See 12.12
-        public LabelledStatement = this.RULE("LabelledStatement", () => {
-            this.CONSUME(Identifier)
-            this.CONSUME(Colon)
-            this.SUBRULE(this.Statement)
-        })
-
         // See 12.13
         public ThrowStatement = this.RULE("ThrowStatement", () => {
             this.CONSUME(ThrowTok)
@@ -875,11 +877,13 @@ module chevrotain.examples.ecma5 {
         public SourceElements = this.RULE("SourceElements", () => {
             this.MANY(() => {
                 this.OR([
-                    // FunctionDeclaration must appear before statement
-                    // to implement [lookahead ? {{, function}] in ExpressionStatement
-                    {ALT: () => { this.SUBRULE(this.FunctionDeclaration) }},
-                    {ALT: () => { this.SUBRULE(this.Statement) }}
-                ], "Statement or Function Declaration")
+                        // FunctionDeclaration must appear before statement
+                        // to implement [lookahead ? {{, function}] in ExpressionStatement
+                        {ALT: () => { this.SUBRULE(this.FunctionDeclaration) }},
+                        {ALT: () => { this.SUBRULE(this.Statement) }}
+                    ],
+                    "Statement or Function Declaration",
+                    recog.IGNORE_AMBIGUITIES)
             })
         })
     }
