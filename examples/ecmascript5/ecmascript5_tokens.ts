@@ -138,7 +138,16 @@ module chevrotain.examples.ecma5 {
     export class LBracket extends AbsPunctuator { static PATTERN = /\[/ }
     export class RBracket extends AbsPunctuator { static PATTERN = /]/ }
     export class Dot extends AbsPunctuator { static PATTERN = /\./ }
-    export class Semicolon extends AbsPunctuator { static PATTERN = /;/ }
+
+    export class Semicolon extends AbsPunctuator {
+        constructor(startLine:number, startColumn:number, image:string,
+                    public isAutomaticSemiColonInsertion = false) {
+            super(startLine, startColumn, image)
+        }
+
+        static PATTERN = /;/
+    }
+
     export class Comma extends AbsPunctuator { static PATTERN = /,/ }
 
     export class PlusPlus extends AbsPunctuator { static PATTERN = /\+\+/ }

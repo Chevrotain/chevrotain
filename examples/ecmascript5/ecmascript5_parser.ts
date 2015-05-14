@@ -7,6 +7,10 @@ module chevrotain.examples.ecma5 {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
 
+    // TODO: in Typescript 1.5 use const
+    var DISABLE_SEMICOLON_INSERTION = false
+    var ENABLE_SEMICOLON_INSERTION = true
+
     export type IdxToLineTerminator = { [idx: number] : AbsLineTerminator }
 
     // as defined in http://www.ecma-international.org/publications/standards/Ecma-262.htm
@@ -38,11 +42,60 @@ module chevrotain.examples.ecma5 {
         }
 
         protected isNextLineTerminator():boolean {
-            return this.lineTerminatorsInfo[this.inputIdx + 1] instanceof AbsLineTerminator
+            var nextLT = this.lineTerminatorsInfo[this.inputIdx + 1]
+            return nextLT instanceof AbsLineTerminator ||
+                nextLT instanceof MultipleLineCommentWithTerminator
         }
 
         protected nextLineTerminator():AbsLineTerminator {
             return this.lineTerminatorsInfo[this.inputIdx + 1]
+        }
+
+        /*
+         * Link http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
+         * Automatic semicolon insertion implementation.
+         * The spec defines the insertion in terms of encountering an "offending"
+         * token and then inserting a semicolon under one of three basic rules.
+         * 1. Offending token is after a lineTerminator.
+         * 2. Offending token is a '}' RCurly.
+         * 3. Reached EOF but failed to parse a complete ECMAScript Program.
+         *
+         * In addition there are two overriding conditions on these rules.
+         * 1. do not insert if the semicolon would then be parsed as an empty statement.
+         * 2. do not If that semicolon would become one of the two semicolons in the header of a for statement.
+         *
+         * The implementation approaches this problem in a slightly different but equivalent approach:
+         *
+         * anytime a semicolon should be consumed AND
+         * the nextToken is not a semicolon AND
+         * the context is one that allows semicolon insertion (not in a for header or empty Statement) AND
+         * one of the 3 basic rules match
+         * ---------------------------------->
+         * THEN insert a semicolon
+         *
+         * Note that the context information is passed as the 'trySemiColonInsertion' argument
+         * to the CONSUME parsing DSL method
+         */
+        protected canAndShouldDoSemiColonInsertion():boolean {
+            var isNextTokenSemiColon = this.NEXT_TOKEN() instanceof Semicolon
+            return !isNextTokenSemiColon &&
+                (this.isNextLineTerminator() || // basic rule 1a and 3
+                this.NEXT_TOKEN() instanceof RCurly || // basic rule 1b
+                this.NEXT_TOKEN() instanceof recog.EOF)  // basic rule 2
+        }
+
+        protected CONSUME(tokClass:Function, trySemiColonInsertion = false):tok.Token {
+            if (trySemiColonInsertion && this.canAndShouldDoSemiColonInsertion()) {
+                return new Semicolon(-1, -1, ";", true)
+            }
+            return this.CONSUME1(tokClass)
+        }
+
+        protected CONSUME2(tokClass:Function, trySemiColonInsertion = false):tok.Token {
+            if (trySemiColonInsertion && this.canAndShouldDoSemiColonInsertion()) {
+                return new Semicolon(-1, -1, ";", true)
+            }
+            return this.CONSUME2(tokClass)
         }
 
         // A.3 Expressions
@@ -233,7 +286,7 @@ module chevrotain.examples.ecma5 {
             this.OR([
                 {ALT: () => { this.SUBRULE(this.PostfixExpression) }},
                 {ALT: () => {
-                    this.OR([
+                    this.OR2([
                         {ALT: () => { this.CONSUME(DeleteTok) }},
                         {ALT: () => { this.CONSUME(VoidTok) }},
                         {ALT: () => { this.CONSUME(TypeOfTok) }},
@@ -511,6 +564,7 @@ module chevrotain.examples.ecma5 {
         public VariableStatement = this.RULE("VariableStatement", () => {
             this.CONSUME(VarTok)
             this.SUBRULE(this.VariableDeclarationList)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
         // See 12.2
@@ -557,7 +611,8 @@ module chevrotain.examples.ecma5 {
 
         // See 12.3
         public EmptyStatement = this.RULE("EmptyStatement", () => {
-            this.CONSUME(Semicolon)
+            //  a semicolon is never inserted automatically if the semicolon would then be parsed as an empty statement
+            this.CONSUME(Semicolon, DISABLE_SEMICOLON_INSERTION)
         })
 
         // See 12.4
@@ -567,6 +622,7 @@ module chevrotain.examples.ecma5 {
             // the first alternative found to match will be taken. thus these ambiguities can be resolved
             // by ordering of the alternatives
             this.SUBRULE(this.Expression)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
         // See 12.5
@@ -600,7 +656,7 @@ module chevrotain.examples.ecma5 {
             this.CONSUME(LParen)
             this.SUBRULE(this.Expression)
             this.CONSUME(RParen)
-            this.CONSUME(Semicolon)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
         public WhileIteration = this.RULE("WhileIteration", () => {
@@ -644,11 +700,11 @@ module chevrotain.examples.ecma5 {
             // @formatter:off
             this.OR([
                 {ALT: () => {
-                    this.CONSUME(Semicolon)
+                    this.CONSUME(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
                     this.OPTION(() => {
                         this.SUBRULE(this.Expression)
                     })
-                    this.CONSUME2(Semicolon)
+                    this.CONSUME2(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
                     this.OPTION2(() => {
                         this.SUBRULE2(this.Expression)
                     })
@@ -672,7 +728,7 @@ module chevrotain.examples.ecma5 {
             this.OPTION(this.isLabel, () => {
                 this.CONSUME(Identifier)
             })
-            this.CONSUME(Semicolon)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
         // See 12.8
         public BreakStatement = this.RULE("BreakStatement", () => {
@@ -680,7 +736,7 @@ module chevrotain.examples.ecma5 {
             this.OPTION(this.isLabel, () => {
                 this.CONSUME(Identifier)
             })
-            this.CONSUME(Semicolon)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
         protected isExpressionNoLineTerminator():boolean {
@@ -694,7 +750,7 @@ module chevrotain.examples.ecma5 {
             this.OPTION(this.isExpressionNoLineTerminator, () => {
                 this.SUBRULE(this.Expression)
             })
-            this.CONSUME(Semicolon)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
         // See 12.10
@@ -774,7 +830,7 @@ module chevrotain.examples.ecma5 {
                     "Line Terminator not allowed before Expression in Throw Statement", this.nextLineTerminator()))
             }
             this.SUBRULE(this.Expression)
-            this.CONSUME(Semicolon)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
         // See 12.14
@@ -815,9 +871,8 @@ module chevrotain.examples.ecma5 {
         // See 12.15
         public DebuggerStatement = this.RULE("DebuggerStatement", () => {
             this.CONSUME(DebuggerTok)
-            this.CONSUME(Semicolon)
+            this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
-
 
         // A.5 Functions and Programs
 

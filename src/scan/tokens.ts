@@ -11,7 +11,7 @@ module chevrotain.tokens {
 
     export class Token {
         // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
-        public isInserted:boolean = false
+        public isInsertedInRecovery:boolean = false
 
         constructor(public startLine:number, public startColumn:number, public image:string) {}
     }
