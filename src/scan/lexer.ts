@@ -240,6 +240,11 @@ module chevrotain.lexer {
             throw new Error(invalidPatterns.join("\n ---------------- \n"))
         }
 
+        var InvalidEndOfInputAnchor = findEndOfInputAnchor(tokenClasses)
+        if (!_.isEmpty(InvalidEndOfInputAnchor)) {
+            throw new Error(InvalidEndOfInputAnchor.join("\n ---------------- \n"))
+        }
+
         var invalidFlags = findUnsupportedFlags(tokenClasses)
         if (!_.isEmpty(invalidFlags)) {
             throw new Error(invalidFlags.join("\n ---------------- \n"))
@@ -271,6 +276,21 @@ module chevrotain.lexer {
 
         var errors = _.map(invalidRegex, (currClass) => {
             return "Token class: ->" + lang.functionName(currClass) + "<- static 'PATTERN' can only be a RegEx"
+        })
+
+        return errors
+    }
+
+    var end_of_input = /[^\\][\$]/
+
+    export function findEndOfInputAnchor(tokenClasses:TokenConstructor[]):string[] {
+        var invalidRegex = _.filter(tokenClasses, (currClass) => {
+            var pattern = currClass[PATTERN]
+            return end_of_input.test(pattern.source)
+        })
+
+        var errors = _.map(invalidRegex, (currClass) => {
+            return "Token class: ->" + lang.functionName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'"
         })
 
         return errors

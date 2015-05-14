@@ -69,6 +69,10 @@ module chevrotain.lexer.spec {
         static PATTERN = /bamba/m
     }
 
+    class EndOfInputAnchor extends tok.Token {
+        static PATTERN = /BAMBA$/
+    }
+
     class GlobalPattern extends tok.Token {
         static PATTERN = /bamba/g
     }
@@ -128,13 +132,28 @@ module chevrotain.lexer.spec {
         })
 
         it("will detect patterns using unsupported global flag", function () {
-            var result = l.findUnsupportedFlags([ValidNaPattern, GlobalPattern])
+            var tokenClasses = [ValidNaPattern, GlobalPattern]
+            var result = l.findUnsupportedFlags(tokenClasses)
             expect(result.length).toBe(1)
             expect(_.contains(result[0], "GlobalPattern")).toBe(true)
+            expect(() => {l.validatePatterns(tokenClasses)}).toThrow()
         })
 
         it("won't detect valid patterns as duplicates", function () {
             var result = l.findDuplicatePatterns([MultiLinePattern, IntegerValid])
+            expect(result.length).toBe(0)
+        })
+
+        it("will detect patterns using unsupported end of input anchor", function () {
+            var tokenClasses = [ValidNaPattern, EndOfInputAnchor]
+            var result = l.findEndOfInputAnchor([ValidNaPattern, EndOfInputAnchor])
+            expect(result.length).toBe(1)
+            expect(_.contains(result[0], "EndOfInputAnchor")).toBe(true)
+            expect(() => {l.validatePatterns(tokenClasses)}).toThrow()
+        })
+
+        it("won't detect valid patterns as using unsupported end of input anchor", function () {
+            var result = l.findEndOfInputAnchor([IntegerTok, IntegerValid])
             expect(result.length).toBe(0)
         })
 
