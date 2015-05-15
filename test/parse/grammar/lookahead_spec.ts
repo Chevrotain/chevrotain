@@ -99,4 +99,23 @@ module chevrotain.lookahead.spec {
         })
     })
 
+
+    class A extends t.Token {}
+    class B extends t.Token {}
+    class C extends t.Token {}
+    class D extends t.Token {}
+    class E extends t.Token {}
+
+    describe("The Grammar Lookahead module", function () {
+        "use strict"
+
+        it("can detect ambiguities when calculating lookahead functions for OR alternatives", function () {
+            var input = [[A, B], [C, D], [E, C]]
+            var ambiguities = lookahead.checkAlternativesAmbiguities(input)
+            expect(ambiguities.length).toBe(1)
+            expect(ambiguities[0].alts).toEqual([2, 3])
+        })
+    })
+
+
 }

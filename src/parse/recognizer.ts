@@ -107,6 +107,10 @@ module chevrotain.recognizer {
     export type LookAheadFunc = () => boolean
     export type GrammarAction = () => void
 
+    // TODO: TSC 1.5 switch to const
+    // used to toggle ignoring of OR production ambiguities
+    export var IGNORE_AMBIGUITIES:boolean = true
+
     /**
      * This is The BaseRecognizer, this should generally not be extended directly, instead
      * the BaseIntrospectionRecognizer should be used as the base class for external users.
@@ -274,7 +278,7 @@ module chevrotain.recognizer {
 
         protected raiseNoAltException(errMsgTypes:string):void {
             throw this.SAVE_ERROR(new NoViableAltException("expecting: " + errMsgTypes +
-            " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
+                " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
         }
     }
 
@@ -545,8 +549,8 @@ module chevrotain.recognizer {
          * Convenience method equivalent to OR1
          * @see OR1
          */
-        protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
-            return this.OR1(alts, errMsgTypes)
+        protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+            return this.OR1(alts, errMsgTypes, ignoreAmbiguities)
         }
 
         /**
@@ -559,13 +563,13 @@ module chevrotain.recognizer {
          *           {ALT:()=>{this.CONSUME(One)}},
          *           {ALT:()=>{this.CONSUME(Two)}},
          *           {ALT:()=>{this.CONSUME(Three)}},
-         *        ])
+         *        ], "a number")
          *
          * long: this.OR([
          *           {WHEN: isOne, THEN_DO:()=>{this.CONSUME(One)}},
          *           {WHEN: isTwo, THEN_DO:()=>{this.CONSUME(Two)}},
          *           {WHEN: isThree, THEN_DO:()=>{this.CONSUME(Three)}},
-         *        ])
+         *        ], "a number")
          *
          * using the short form is recommended as it will compute the lookahead function
          * automatically. however this currently has one limitation:
@@ -577,37 +581,41 @@ module chevrotain.recognizer {
          * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts An array of alternatives
          * @param {string} errMsgTypes A description for the alternatives used in error messages
          * @returns {*} The result of invoking the chosen alternative
+         * @param {boolean} [ignoreAmbiguities] if true this will ignore ambiguities caused when two alternatives can not
+         *                                      be distinguished by a lookahead of one. enabling this means the first alternative
+         *                                      that matches will be taken. This is sometimes the grammar's intent.
+         *                                      * only enable this if you know what you are doing!
          */
-        protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
-            return this.orInternal(alts, errMsgTypes, 1)
+        protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+            return this.orInternal(alts, errMsgTypes, 1, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
-            return this.orInternal(alts, errMsgTypes, 2)
+        protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+            return this.orInternal(alts, errMsgTypes, 2, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
-            return this.orInternal(alts, errMsgTypes, 3)
+        protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+            return this.orInternal(alts, errMsgTypes, 3, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
-            return this.orInternal(alts, errMsgTypes, 4)
+        protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+            return this.orInternal(alts, errMsgTypes, 4, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string):T {
-            return this.orInternal(alts, errMsgTypes, 5)
+        protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+            return this.orInternal(alts, errMsgTypes, 5, ignoreAmbiguities)
         }
 
         /**
@@ -793,7 +801,7 @@ module chevrotain.recognizer {
                     var followSet = cache.getResyncFollowsForClass(this).get(followName)
                     if (!followSet) {
                         throw new Error("missing re-sync follows information, possible cause: " +
-                        "did not call performSelfAnalysis(this) in the constructor implementation.")
+                            "did not call performSelfAnalysis(this) in the constructor implementation.")
                     }
                     this.FOLLOW_STACK.push(followSet)
                 }
@@ -858,12 +866,12 @@ module chevrotain.recognizer {
         protected validateRuleName(ruleFuncName:string):void {
             if (!ruleFuncName.match(this.ruleNamePattern)) {
                 throw Error("Invalid Grammar rule name --> " + ruleFuncName +
-                " it must match the pattern: " + this.ruleNamePattern.toString())
+                    " it must match the pattern: " + this.ruleNamePattern.toString())
             }
 
             if ((_.contains(this.definedRulesNames, ruleFuncName))) {
                 throw Error("Duplicate definition, rule: " + ruleFuncName +
-                " is already defined in the grammar: " + lang.classNameFromInstance(this))
+                    " is already defined in the grammar: " + lang.classNameFromInstance(this))
             }
 
             this.definedRulesNames.push(ruleFuncName)
@@ -1116,14 +1124,15 @@ module chevrotain.recognizer {
 
         private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
                               errMsgTypes:string,
-                              occurrence:number):T {
+                              occurrence:number,
+                              ignoreAmbiguities:boolean):T {
             // explicit alternatives look ahead
             if ((<any>alts[0]).WHEN) {
                 return super.OR(<IOrAlt<T>[]>alts, errMsgTypes)
             }
 
             // else implicit lookahead
-            var laFunc = this.getLookaheadFuncForOr(occurrence)
+            var laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities)
             var altToTake = laFunc.call(this)
             if (altToTake !== -1) {
                 return (<any>alts[altToTake]).ALT.call(this)
@@ -1184,8 +1193,8 @@ module chevrotain.recognizer {
             return this.getLookaheadFuncFor("OPTION", occurence, lookahead.buildLookaheadForOption)
         }
 
-        protected getLookaheadFuncForOr(occurence:number):() => number {
-            return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr)
+        protected getLookaheadFuncForOr(occurence:number, ignoreErrors:boolean):() => number {
+            return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr, [ignoreErrors])
         }
 
         protected getLookaheadFuncForMany(occurence:number):() => boolean {
@@ -1210,14 +1219,15 @@ module chevrotain.recognizer {
 
         protected getLookaheadFuncFor<T>(prodType:string,
                                          occurrence:number,
-                                         laFuncBuilder:(number, any) => () => T):() => T {
+                                         laFuncBuilder:(number, any) => () => T,
+                                         extraArgs:any[] = []):() => T {
             var classLAFuncs = cache.getLookaheadFuncsForClass(this)
             var ruleName = _.last(this.RULE_STACK)
             var key = prodType + occurrence + IN + ruleName
             var condition = <any>classLAFuncs.get(key)
             if (_.isUndefined(condition)) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
-                condition = laFuncBuilder(occurrence, ruleGrammar)
+                condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar].concat(extraArgs))
                 classLAFuncs.put(key, condition)
             }
 
