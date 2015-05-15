@@ -110,6 +110,7 @@ module chevrotain.recognizer {
     // TODO: TSC 1.5 switch to const
     // used to toggle ignoring of OR production ambiguities
     export var IGNORE_AMBIGUITIES:boolean = true
+    export var NO_RESYNC:boolean = false
 
     /**
      * This is The BaseRecognizer, this should generally not be extended directly, instead

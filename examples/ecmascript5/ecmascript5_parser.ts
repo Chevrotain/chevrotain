@@ -6,6 +6,7 @@ module chevrotain.examples.ecma5 {
 
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
+    import PT = chevrotain.tree.PT
 
     // TODO: in Typescript 1.5 use const
     var DISABLE_SEMICOLON_INSERTION = false
@@ -13,8 +14,23 @@ module chevrotain.examples.ecma5 {
 
     export type IdxToLineTerminator = { [idx: number] : AbsLineTerminator }
 
+    function isSingleOperandExp(binExpParts:chevrotain.tree.ParseTree[]):boolean {
+        return binExpParts.length === 1
+    }
+
     // as defined in http://www.ecma-international.org/publications/standards/Ecma-262.htm
     export class ECMAScript5Parser extends recog.BaseIntrospectionRecognizer {
+
+        /*
+         * overridden to always enable re-sync and the creation of InvalidRetFunction from Virtual Token class.
+         */
+        protected RULE<T>(ruleName:string,
+                          impl:(...implArgs:any[]) => T,
+                          invalidVirtualClass:tok.VirtualTokenClass,
+                          doResync = true):(idxInCallingRule?:number, ...args:any[]) => T {
+            var invalidRet = function () { return new (<any>invalidVirtualClass)() }
+            return super.RULE(ruleName, impl, invalidRet, doResync)
+        }
 
         /**
          *
@@ -102,166 +118,235 @@ module chevrotain.examples.ecma5 {
 
         // See 11.1
         public PrimaryExpression = this.RULE("PrimaryExpression", () => {
-            // @formatter:off
-            this.OR([
-                {ALT: () => { this.CONSUME(ThisTok) }},
-                {ALT: () => { this.CONSUME(Identifier) }},
-                {ALT: () => { this.CONSUME(AbsLiteral) }},
-                {ALT: () => { this.SUBRULE(this.ArrayLiteral) }},
-                {ALT: () => { this.SUBRULE(this.ObjectLiteral) }},
-                {ALT: () => {
-                    this.CONSUME(LParen)
-                    this.SUBRULE(this.Expression)
-                    this.CONSUME(RParen)
-                }},
+            return this.OR([
+                {ALT: () => { return PT(this.CONSUME(ThisTok)) }},
+                {ALT: () => { return PT(this.CONSUME(Identifier)) }},
+                {ALT: () => { return PT(this.CONSUME(AbsLiteral)) }},
+                {ALT: () => { return this.SUBRULE(this.ArrayLiteral) }},
+                {ALT: () => { return this.SUBRULE(this.ObjectLiteral) }},
+                {ALT: () => { return this.SUBRULE(this.ParenthesisExpression)}},
             ], "'this', Identifier, Literal or parenthesis expression")
-            // @formatter:on
-        })
+        }, InvalidPrimaryExpression)
+
+
+        protected ParenthesisExpression = this.RULE("ParenthesisExpression", () => {
+            var exp
+
+            this.CONSUME(LParen)
+            exp = this.SUBRULE(this.Expression)
+            this.CONSUME(RParen)
+
+            return PT(ParenthesisExpression, exp)
+        }, InvalidParenthesisExpression)
+
 
         // See 11.1.4
         public ArrayLiteral = this.RULE("ArrayLiteral", () => {
+            var elements = []
+
             this.CONSUME(LBracket)
             this.MANY(() => {
                 this.OR([
-                    {ALT: () => { this.SUBRULE(this.ElementList) }},
-                    {ALT: () => { this.SUBRULE(this.Elision) }}
+                    {ALT: () => { elements.push(this.SUBRULE(this.ElementList)) }},
+                    {ALT: () => { elements.push(this.SUBRULE(this.Elision)) }}
                 ], "expression or comma")
             })
             this.CONSUME(RBracket)
-        })
+
+            return PT(ArrayLiteral, elements)
+        }, InvalidArrayLiteral)
+
 
         // See 11.1.4
         public ElementList = this.RULE("ElementList", () => {
+            var elements = []
+
             this.OPTION(() => {
-                this.SUBRULE(this.Elision)
+                elements.push(this.SUBRULE(this.Elision))
             })
-            this.SUBRULE(this.AssignmentExpression)
+            elements.push(this.SUBRULE(this.AssignmentExpression))
             this.MANY(() => {
-                this.SUBRULE2(this.Elision)
-                this.SUBRULE2(this.AssignmentExpression)
+                elements.push(this.SUBRULE2(this.Elision))
+                elements.push(this.SUBRULE2(this.AssignmentExpression))
             })
 
-        })
+            return PT(ElementList, elements)
+        }, InvalidElementList)
+
 
         // See 11.1.4
         public Elision = this.RULE("Elision", () => {
+            var commas = []
             this.AT_LEAST_ONE(() => {
-                this.CONSUME(Comma)
+                commas.push(PT(this.CONSUME(Comma)))
             }, "a comma")
-        })
+
+            return PT(Elision, commas)
+        }, InvalidElision)
+
 
         // See 11.1.5
         // this inlines PropertyNameAndValueList
         public ObjectLiteral = this.RULE("ObjectLiteral", () => {
+            var props = []
+
             this.CONSUME(LCurly)
             this.OPTION(() => {
-                this.SUBRULE(this.PropertyAssignment)
+                props.push(this.SUBRULE(this.PropertyAssignment))
                 this.MANY(() => {
                     this.CONSUME(Comma)
-                    this.SUBRULE2(this.PropertyAssignment)
+                    props.push(this.SUBRULE2(this.PropertyAssignment))
                 })
                 this.OPTION2(() => {
                     this.CONSUME2(Comma)
                 })
             })
             this.CONSUME(RCurly)
-        })
+
+            return PT(ObjectLiteral, props)
+        }, InvalidObjectLiteral)
+
 
         // See 11.1.5
         public PropertyAssignment = this.RULE("PropertyAssignment", () => {
-            // @formatter:off
-            this.OR([
-                {ALT: () => {
-                    this.SUBRULE(this.PropertyName)
-                    this.CONSUME(Colon)
-                    this.SUBRULE(this.AssignmentExpression)
-                }},
-                {ALT: () => {
-                    this.CONSUME(GetTok)
-                    this.SUBRULE2(this.PropertyName)
-                    this.CONSUME(LParen)
-                    this.CONSUME(RParen)
-                    this.CONSUME(LCurly)
-                    this.SUBRULE(this.FunctionBody)
-                    this.CONSUME(RCurly)
-                }},
-                {ALT: () => {
-                    this.CONSUME(SetTok)
-                    this.SUBRULE3(this.PropertyName)
-                    this.CONSUME2(LParen)
-                    this.CONSUME1(Identifier)
-                    this.CONSUME2(RParen)
-                    this.CONSUME2(LCurly)
-                    this.SUBRULE2(this.FunctionBody)
-                    this.CONSUME2(RCurly)
-                }}
+            return this.OR([
+                {ALT: () => { return this.SUBRULE(this.RegularPropertyAssignment) }},
+                {ALT: () => { return this.SUBRULE(this.GetPropertyAssignment) }},
+                {ALT: () => { return this.SUBRULE(this.SetPropertyAssignment) }},
             ], "a property assignment")
             // @formatter:on
-        })
+        }, InvalidPropertyAssignment)
+
+
+        protected RegularPropertyAssignment = this.RULE("RegularPropertyAssignment", () => {
+            var name, value
+
+            name = this.SUBRULE(this.PropertyName)
+            this.CONSUME(Colon)
+            value = this.SUBRULE(this.AssignmentExpression)
+
+            return PT(RegularPropertyAssignment, [name, value])
+        }, InvalidRegularPropertyAssignment)
+
+
+        protected GetPropertyAssignment = this.RULE("GetPropertyAssignment", () => {
+            var name, value
+
+            this.CONSUME(GetTok)
+            name = this.SUBRULE(this.PropertyName)
+            this.CONSUME(LParen)
+            this.CONSUME(RParen)
+            this.CONSUME(LCurly)
+            value = this.SUBRULE(this.FunctionBody)
+            this.CONSUME(RCurly)
+
+            return PT(GetPropertyAssignment, [name, value])
+        }, InvalidGetPropertyAssignment)
+
+
+        protected SetPropertyAssignment = this.RULE("SetPropertyAssignment", () => {
+            var name, value
+
+            this.CONSUME(SetTok)
+            name = this.SUBRULE(this.PropertyName)
+            this.CONSUME2(LParen)
+            this.CONSUME(Identifier)
+            this.CONSUME(RParen)
+            this.CONSUME(LCurly)
+            value = this.SUBRULE(this.FunctionBody)
+            this.CONSUME(RCurly)
+
+            return PT(SetPropertyAssignment, [name, value])
+        }, InvalidSetPropertyAssignment)
+
 
         // See 11.1.5
         // this inlines PropertySetParameterList
         public PropertyName = this.RULE("PropertyName", () => {
+            var propNameTok = undefined
+
             this.OR([
-                {ALT: () => { this.CONSUME(IdentifierName) }},
-                {ALT: () => { this.CONSUME(AbsStringLiteral) }},
-                {ALT: () => { this.CONSUME(AbsNumericLiteral) }}
+                {ALT: () => { propNameTok = this.CONSUME(IdentifierName) }},
+                {ALT: () => { propNameTok = this.CONSUME(AbsStringLiteral) }},
+                {ALT: () => { propNameTok = this.CONSUME(AbsNumericLiteral) }}
             ], "Property name")
-        })
+
+            return PT(PropertyName, [PT(propNameTok)])
+        }, InvalidPropertyName)
+
 
         // See 11.2
         // merging MemberExpression, NewExpression and CallExpression into one rule
         public MemberCallNewExpression = this.RULE("MemberCallNewExpression", () => {
+            var newPts = [], exp = undefined, memberCallParts = []
+
             this.MANY(() => {
-                this.CONSUME(NewTok)
+                newPts.push(PT(this.CONSUME(NewTok)))
             })
 
             this.OR([
-                {ALT: () => { this.SUBRULE(this.PrimaryExpression) }},
-                {ALT: () => { this.SUBRULE(this.FunctionExpression) }}
+                {ALT: () => { exp = this.SUBRULE(this.PrimaryExpression) }},
+                {ALT: () => { exp = this.SUBRULE(this.FunctionExpression) }}
             ], "expression or comma")
 
             this.MANY2(() => {
-                // @formatter:off
-                // TODO: empty alternative support?
                 this.OR2([
-                    {ALT: () => {
-                        this.CONSUME(LBracket)
-                        this.SUBRULE(this.Expression)
-                        this.CONSUME(RBracket)
-                    }},
-                    {ALT: () => {
-                        this.CONSUME(Dot)
-                        this.CONSUME(IdentifierName)
-                    }},
-                    {ALT: () => {
-                        this.SUBRULE(this.Arguments)
-                    }}
+                    {ALT: () => { memberCallParts.push(this.SUBRULE(this.BoxMemberExpression)) }},
+                    {ALT: () => { memberCallParts.push(this.SUBRULE(this.DotMemberExpression)) }},
+                    {ALT: () => { memberCallParts.push(this.SUBRULE(this.Arguments)) }}
                 ], "property access or arguments")
-                // @formatter:on
             })
-        })
+
+            return PT(MemberCallNewExpression, newPts.concat([exp], memberCallParts))
+        }, InvalidMemberCallNewExpression)
+
+
+        protected BoxMemberExpression = this.RULE("BoxMemberExpression", () => {
+            var exp
+
+            this.CONSUME(LBracket)
+            exp = this.SUBRULE(this.Expression)
+            this.CONSUME(RBracket)
+
+            return PT(BoxMemberExpression, [exp])
+        }, InvalidBoxMemberExpression)
+
+
+        protected DotMemberExpression = this.RULE("DotMemberExpression", () => {
+            var ident
+
+            this.CONSUME(Dot)
+            ident = this.CONSUME(IdentifierName)
+
+            return PT(DotMemberExpression, [PT(ident)])
+        }, InvalidDotMemberExpression)
+
 
         // See 11.2
         // this inlines ArgumentList
         public Arguments = this.RULE("Arguments", () => {
+            var args = []
+
             this.CONSUME(LParen)
-            // TODO: MANY_SEP (separator) parsing DSL support?
             this.OPTION(() => {
-                this.SUBRULE(this.AssignmentExpression)
+                args.push(this.SUBRULE(this.AssignmentExpression))
                 this.MANY(() => {
                     this.CONSUME(Comma)
-                    this.SUBRULE2(this.AssignmentExpression)
+                    args.push(this.SUBRULE2(this.AssignmentExpression))
                 })
             })
             this.CONSUME(RParen)
-        })
+
+            return PT(Arguments, args)
+        }, InvalidArguments)
+
 
         // See 11.2
         public LeftHandSideExpression = this.RULE("LeftHandSideExpression", () => {
             // TODO: consider factoring out LHSExpression all together ?
-            this.SUBRULE(this.MemberCallNewExpression)
-        })
+            return this.SUBRULE(this.MemberCallNewExpression)
+        }, InvalidLeftHandSideExpression, recog.NO_RESYNC)
+
 
         protected isPostFixExp():boolean {
             return !this.isNextLineTerminator() && // [no LineTerminator here]
@@ -269,560 +354,840 @@ module chevrotain.examples.ecma5 {
                 this.NEXT_TOKEN() instanceof MinusMinus
         }
 
+
         // See 11.3
         public PostfixExpression = this.RULE("PostfixExpression", () => {
-            this.SUBRULE(this.LeftHandSideExpression)
+            var exp, operator = undefined
+
+            exp = this.SUBRULE(this.LeftHandSideExpression)
             this.OPTION(this.isPostFixExp, () => {
                 this.OR([
-                    {ALT: () => { this.CONSUME(PlusPlus) }},
-                    {ALT: () => { this.CONSUME(MinusMinus) }}
+                    {ALT: () => { operator = this.CONSUME(PlusPlus) }},
+                    {ALT: () => { operator = this.CONSUME(MinusMinus) }}
                 ], "++ or --")
             })
-        })
+
+            return operator ? PT(PostfixExpression, [PT(operator), exp]) : exp
+        }, InvalidPostfixExpression)
+
 
         // See 11.4
         public UnaryExpression = this.RULE("UnaryExpression", () => {
+            var exp = undefined, operator = undefined
+
             // @formatter:off
             this.OR([
-                {ALT: () => { this.SUBRULE(this.PostfixExpression) }},
+                {ALT: () => { exp = this.SUBRULE(this.PostfixExpression) }},
                 {ALT: () => {
                     this.OR2([
-                        {ALT: () => { this.CONSUME(DeleteTok) }},
-                        {ALT: () => { this.CONSUME(VoidTok) }},
-                        {ALT: () => { this.CONSUME(TypeOfTok) }},
-                        {ALT: () => { this.CONSUME(PlusPlus) }},
-                        {ALT: () => { this.CONSUME(MinusMinus) }},
-                        {ALT: () => { this.CONSUME(Plus) }},
-                        {ALT: () => { this.CONSUME(Minus) }},
-                        {ALT: () => { this.CONSUME(Tilde) }},
-                        {ALT: () => { this.CONSUME(Exclamation) }}
+                        {ALT: () => { operator = this.CONSUME(DeleteTok) }},
+                        {ALT: () => { operator = this.CONSUME(VoidTok) }},
+                        {ALT: () => { operator = this.CONSUME(TypeOfTok) }},
+                        {ALT: () => { operator = this.CONSUME(PlusPlus) }},
+                        {ALT: () => { operator = this.CONSUME(MinusMinus) }},
+                        {ALT: () => { operator = this.CONSUME(Plus) }},
+                        {ALT: () => { operator = this.CONSUME(Minus) }},
+                        {ALT: () => { operator = this.CONSUME(Tilde) }},
+                        {ALT: () => { operator = this.CONSUME(Exclamation) }}
                     ], "")
-                    this.SUBRULE(this.UnaryExpression)
+                    exp = this.SUBRULE(this.UnaryExpression)
                 }},
             ], "PostFixExpression or UnaryExpression")
             // @formatter:on
-        })
+
+            return operator ? PT(UnaryExpression, [exp, PT(operator)]) : exp
+        }, InvalidUnaryExpression)
+
 
         // See 11.5
         public MultiplicativeExpression = this.RULE("MultiplicativeExpression", () => {
-            this.SUBRULE(this.UnaryExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.UnaryExpression))
             this.MANY(() => {
-                this.CONSUME(AbsMultiplicativeOperator)
-                this.SUBRULE2(this.UnaryExpression)
+                binExpParts.push(PT(this.CONSUME(AbsMultiplicativeOperator)))
+                binExpParts.push(this.SUBRULE2(this.UnaryExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(MultiplicativeExpression, binExpParts)
+        }, InvalidMultiplicativeExpression)
+
 
         // See 11.6
         public AdditiveExpression = this.RULE("AdditiveExpression", () => {
-            this.SUBRULE(this.MultiplicativeExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.MultiplicativeExpression))
             this.MANY(() => {
-                this.CONSUME(AbsAdditiveOperator)
-                this.SUBRULE2(this.MultiplicativeExpression)
+                binExpParts.push(PT(this.CONSUME(AbsAdditiveOperator)))
+                binExpParts.push(this.SUBRULE2(this.MultiplicativeExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(AdditiveExpression, binExpParts)
+        }, InvalidAdditiveExpression)
+
 
         // See 11.7
         public ShiftExpression = this.RULE("ShiftExpression", () => {
-            this.SUBRULE(this.AdditiveExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.AdditiveExpression))
             this.MANY(() => {
-                this.CONSUME(AbsShiftOperator)
-                this.SUBRULE2(this.AdditiveExpression)
+                binExpParts.push(PT(this.CONSUME(AbsShiftOperator)))
+                binExpParts.push(this.SUBRULE2(this.AdditiveExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(ShiftExpression, binExpParts)
+        }, InvalidShiftExpression)
+
 
         // See 11.8
         public RelationalExpression = this.RULE("RelationalExpression", () => {
-            this.SUBRULE(this.ShiftExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.ShiftExpression))
             this.MANY(() => {
                 this.OR([
-                    {ALT: () => { this.CONSUME(AbsRelationalOperator) }},
-                    {ALT: () => { this.CONSUME(InstanceOfTok) }},
-                    {ALT: () => { this.CONSUME(InTok) }}
+                    {ALT: () => { binExpParts.push(PT(this.CONSUME(AbsRelationalOperator))) }},
+                    {ALT: () => { binExpParts.push(PT(this.CONSUME(InstanceOfTok))) }},
+                    {ALT: () => { binExpParts.push(PT(this.CONSUME(InTok))) }}
                 ], "a Relational operator")
-                this.SUBRULE2(this.ShiftExpression)
+                binExpParts.push(this.SUBRULE2(this.ShiftExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(RelationalExpression, binExpParts)
+        }, InvalidRelationalExpression)
+
+
         // See 11.8
         public RelationalExpressionNoIn = this.RULE("RelationalExpressionNoIn", () => {
-            this.SUBRULE(this.ShiftExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.ShiftExpression))
             this.MANY(() => {
                 this.OR([
-                    {ALT: () => { this.CONSUME(AbsRelationalOperator) }},
-                    {ALT: () => { this.CONSUME(InstanceOfTok) }},
+                    {ALT: () => { binExpParts.push(PT(this.CONSUME(AbsRelationalOperator))) }},
+                    {ALT: () => { binExpParts.push(PT(this.CONSUME(InstanceOfTok))) }},
                 ], "a Relational operator excluding 'in'")
-                this.SUBRULE2(this.ShiftExpression)
+                binExpParts.push(this.SUBRULE2(this.ShiftExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(RelationalExpression, binExpParts)
+        }, InvalidRelationalExpressionNoIn)
+
+
         // See 11.9
         public EqualityExpression = this.RULE("EqualityExpression", () => {
-            this.SUBRULE(this.RelationalExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.RelationalExpression))
             this.MANY(() => {
-                this.CONSUME(AbsEqualityOperator)
-                this.SUBRULE2(this.RelationalExpression)
+                binExpParts.push(PT(this.CONSUME(AbsEqualityOperator)))
+                binExpParts.push(this.SUBRULE2(this.RelationalExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(EqualityExpression, binExpParts)
+        }, InvalidEqualityExpression)
+
 
         // See 11.9
         public EqualityExpressionNoIn = this.RULE("EqualityExpressionNoIn", () => {
-            this.SUBRULE(this.RelationalExpressionNoIn)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.RelationalExpressionNoIn))
             this.MANY(() => {
-                this.CONSUME(AbsEqualityOperator)
-                this.SUBRULE2(this.RelationalExpressionNoIn)
+                binExpParts.push(PT(this.CONSUME(AbsEqualityOperator)))
+                binExpParts.push(this.SUBRULE2(this.RelationalExpressionNoIn))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(EqualityExpression, binExpParts)
+        }, InvalidEqualityExpressionNoIn)
+
 
         // See 11.10
         public BitwiseANDExpression = this.RULE("BitwiseANDExpression", () => {
-            this.SUBRULE(this.EqualityExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.EqualityExpression))
             this.MANY(() => {
-                this.CONSUME(Ampersand)
-                this.SUBRULE2(this.EqualityExpression)
+                binExpParts.push(PT(this.CONSUME(Ampersand)))
+                binExpParts.push(this.SUBRULE2(this.EqualityExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(BitwiseANDExpression, binExpParts)
+        }, InvalidBitwiseANDExpression)
+
 
         // See 11.10
         public BitwiseANDExpressionNoIn = this.RULE("BitwiseANDExpressionNoIn", () => {
-            this.SUBRULE(this.EqualityExpressionNoIn)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.EqualityExpressionNoIn))
             this.MANY(() => {
-                this.CONSUME(Ampersand)
-                this.SUBRULE2(this.EqualityExpressionNoIn)
+                binExpParts.push(PT(this.CONSUME(Ampersand)))
+                binExpParts.push(this.SUBRULE2(this.EqualityExpressionNoIn))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(BitwiseANDExpression, binExpParts)
+        }, InvalidBitwiseANDExpressionNoIn)
+
 
         // See 11.10
         public BitwiseXORExpression = this.RULE("BitwiseXORExpression", () => {
-            this.SUBRULE(this.BitwiseANDExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.BitwiseANDExpression))
             this.MANY(() => {
-                this.CONSUME(Circumflex)
-                this.SUBRULE2(this.BitwiseANDExpression)
+                binExpParts.push(PT(this.CONSUME(Circumflex)))
+                binExpParts.push(this.SUBRULE2(this.BitwiseANDExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(BitwiseXORExpression, binExpParts)
+        }, InvalidBitwiseXORExpression)
+
 
         // See 11.10
         public BitwiseXORExpressionNoIn = this.RULE("BitwiseXORExpressionNoIn", () => {
-            this.SUBRULE(this.BitwiseANDExpressionNoIn)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.BitwiseANDExpressionNoIn))
             this.MANY(() => {
-                this.CONSUME(Circumflex)
-                this.SUBRULE2(this.BitwiseANDExpressionNoIn)
+                binExpParts.push(PT(this.CONSUME(Circumflex)))
+                binExpParts.push(this.SUBRULE2(this.BitwiseANDExpressionNoIn))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(BitwiseXORExpression, binExpParts)
+        }, InvalidBitwiseXORExpressionNoIn)
+
 
         // See 11.10
         public BitwiseORExpression = this.RULE("BitwiseORExpression", () => {
-            this.SUBRULE(this.BitwiseXORExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.BitwiseXORExpression))
             this.MANY(() => {
-                this.CONSUME(VerticalBar)
-                this.SUBRULE2(this.BitwiseXORExpression)
+                binExpParts.push(PT(this.CONSUME(VerticalBar)))
+                binExpParts.push(this.SUBRULE2(this.BitwiseXORExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(BitwiseORExpression, binExpParts)
+        }, InvalidBitwiseORExpression)
+
 
         // See 11.10
         public BitwiseORExpressionNoIn = this.RULE("BitwiseORExpressionNoIn", () => {
-            this.SUBRULE(this.BitwiseXORExpressionNoIn)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.BitwiseXORExpressionNoIn))
             this.MANY(() => {
-                this.CONSUME(VerticalBar)
-                this.SUBRULE2(this.BitwiseXORExpressionNoIn)
+                binExpParts.push(PT(this.CONSUME(VerticalBar)))
+                binExpParts.push(this.SUBRULE2(this.BitwiseXORExpressionNoIn))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(BitwiseORExpression, binExpParts)
+        }, InvalidBitwiseORExpressionNoIn)
+
 
         // See 11.11
         public LogicalANDExpression = this.RULE("LogicalANDExpression", () => {
-            this.SUBRULE(this.BitwiseORExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.BitwiseORExpression))
             this.MANY(() => {
-                this.CONSUME(AmpersandAmpersand)
-                this.SUBRULE2(this.BitwiseORExpression)
+                binExpParts.push(PT(this.CONSUME(AmpersandAmpersand)))
+                binExpParts.push(this.SUBRULE2(this.BitwiseORExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(LogicalANDExpression, binExpParts)
+        }, InvalidLogicalANDExpression)
+
 
         // See 11.11
         public LogicalANDExpressionNoIn = this.RULE("LogicalANDExpressionNoIn", () => {
-            this.SUBRULE(this.BitwiseORExpressionNoIn)
-            this.MANY(() => {
-                this.CONSUME(AmpersandAmpersand)
-                this.SUBRULE2(this.BitwiseORExpressionNoIn)
-            })
+            var binExpParts = []
 
-        })
+            binExpParts.push(this.SUBRULE(this.BitwiseORExpressionNoIn))
+            this.MANY(() => {
+                binExpParts.push(PT(this.CONSUME(AmpersandAmpersand)))
+                binExpParts.push(this.SUBRULE2(this.BitwiseORExpressionNoIn))
+            })
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(LogicalANDExpression, binExpParts)
+        }, InvalidLogicalANDExpressionNoIn)
+
 
         // See 11.11
         public LogicalORExpression = this.RULE("LogicalORExpression", () => {
-            this.SUBRULE(this.LogicalANDExpression)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.LogicalANDExpression))
             this.MANY(() => {
-                this.CONSUME(VerticalBarVerticalBar)
-                this.SUBRULE2(this.LogicalANDExpression)
+                binExpParts.push(PT(this.CONSUME(VerticalBarVerticalBar)))
+                binExpParts.push(this.SUBRULE2(this.LogicalANDExpression))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(LogicalORExpression, binExpParts)
+        }, InvalidLogicalORExpression)
+
 
         // See 11.11
         public LogicalORExpressionNoIn = this.RULE("LogicalORExpressionNoIn", () => {
-            this.SUBRULE(this.LogicalANDExpressionNoIn)
+            var binExpParts = []
+
+            binExpParts.push(this.SUBRULE(this.LogicalANDExpressionNoIn))
             this.MANY(() => {
-                this.CONSUME(VerticalBarVerticalBar)
-                this.SUBRULE2(this.LogicalANDExpressionNoIn)
+                binExpParts.push(PT(this.CONSUME(VerticalBarVerticalBar)))
+                binExpParts.push(this.SUBRULE2(this.LogicalANDExpressionNoIn))
             })
-        })
+
+            return isSingleOperandExp(binExpParts) ? _.first(binExpParts) :
+                PT(LogicalORExpression, binExpParts)
+        }, InvalidLogicalORExpressionNoIn)
+
 
         // See 11.12
         public ConditionalExpression = this.RULE("ConditionalExpression", () => {
-            this.SUBRULE(this.LogicalORExpression)
+            var orExp, assignExp1 = undefined, assignExp2 = undefined
+
+            orExp = this.SUBRULE(this.LogicalORExpression)
             this.OPTION(() => {
                 this.CONSUME(Question)
-                this.SUBRULE(this.AssignmentExpression)
+                assignExp1 = this.SUBRULE(this.AssignmentExpression)
                 this.CONSUME(Colon)
-                this.SUBRULE2(this.AssignmentExpression)
+                assignExp2 = this.SUBRULE2(this.AssignmentExpression)
             })
-        })
+
+            return assignExp1 ? PT(ConditionalExpression, [orExp, orExp, assignExp2]) : orExp
+        }, InvalidConditionalExpression)
+
 
         // See 11.12
         public ConditionalExpressionNoIn = this.RULE("ConditionalExpressionNoIn", () => {
-            this.SUBRULE(this.LogicalORExpressionNoIn)
+            var orExp, assignExp1 = undefined, assignExp2 = undefined
+
+            orExp = this.SUBRULE(this.LogicalORExpressionNoIn)
             this.OPTION(() => {
                 this.CONSUME(Question)
-                this.SUBRULE(this.AssignmentExpression) // TODO: why does spec not say "NoIn" here?
+                assignExp1 = this.SUBRULE(this.AssignmentExpression) // TODO: why does spec not say "NoIn" here?
                 this.CONSUME(Colon)
-                this.SUBRULE2(this.AssignmentExpressionNoIn)
+                assignExp2 = this.SUBRULE2(this.AssignmentExpressionNoIn)
             })
-        })
+
+            return assignExp1 ? PT(ConditionalExpression, [orExp, orExp, assignExp2]) : orExp
+        }, InvalidConditionalExpressionNoIn)
+
 
         // See 11.13
         public AssignmentExpression = this.RULE("AssignmentExpression", () => {
-            this.SUBRULE(this.ConditionalExpression)
+            var condExp, assignExp = undefined
+
+            condExp = this.SUBRULE(this.ConditionalExpression)
             this.OPTION(() => {
                 this.CONSUME(AbsAssignmentOperator)
-                this.SUBRULE(this.AssignmentExpression)
+                assignExp = this.SUBRULE(this.AssignmentExpression)
             })
-        })
+
+            return assignExp ? PT(AssignmentExpression, [condExp, assignExp]) : condExp
+        }, InvalidAssignmentExpression)
+
 
         // See 11.13
         public AssignmentExpressionNoIn = this.RULE("AssignmentExpressionNoIn", () => {
-            this.SUBRULE(this.ConditionalExpressionNoIn)
+            var condExp, assignExp = undefined
+
+            condExp = this.SUBRULE(this.ConditionalExpressionNoIn)
             this.OPTION(() => {
                 this.CONSUME(AbsAssignmentOperator) // AssignmentOperator See 11.13 --> this is implemented as a Token Abs class
-                this.SUBRULE(this.AssignmentExpressionNoIn)
+                assignExp = this.SUBRULE(this.AssignmentExpressionNoIn)
             })
-        })
+
+            return assignExp ? PT(AssignmentExpression, [condExp, assignExp]) : condExp
+        }, InvalidAssignmentExpressionNoIn)
+
 
         // See 11.14
         public Expression = this.RULE("Expression", () => {
-            this.SUBRULE(this.AssignmentExpression)
+            var exps = []
+
+            exps.push(this.SUBRULE(this.AssignmentExpression))
             this.MANY(() => {
                 this.CONSUME(Comma)
-                this.SUBRULE2(this.AssignmentExpression)
+                exps.push(this.SUBRULE2(this.AssignmentExpression))
             })
-        })
+
+            return PT(Expression, exps)
+        }, InvalidExpression)
+
 
         // See 11.14
         public ExpressionNoIn = this.RULE("ExpressionNoIn", () => {
-            this.SUBRULE(this.AssignmentExpressionNoIn)
+            var exps = []
+
+            exps.push(this.SUBRULE(this.AssignmentExpressionNoIn))
             this.MANY(() => {
                 this.CONSUME(Comma)
-                this.SUBRULE2(this.AssignmentExpressionNoIn)
+                exps.push(this.SUBRULE2(this.AssignmentExpressionNoIn))
             })
-        })
+
+            return PT(Expression, exps)
+        }, InvalidExpressionNoIn)
 
 
         // A.4 Statements
 
         // See clause 12
         public Statement = this.RULE("Statement", () => {
-            this.OR([
-                {ALT: () => { this.SUBRULE(this.Block) }},
-                {ALT: () => { this.SUBRULE(this.VariableStatement) }},
-                {ALT: () => { this.SUBRULE(this.EmptyStatement) }},
+            return this.OR([
+                {ALT: () => { return this.SUBRULE(this.Block) }},
+                {ALT: () => { return this.SUBRULE(this.VariableStatement) }},
+                {ALT: () => { return this.SUBRULE(this.EmptyStatement) }},
                 {
                     ALT: () => {
-                        this.SUBRULE(this.ExpressionStatement)
+                        var expOrLabel, stmt = undefined
+
+                        expOrLabel = this.SUBRULE(this.ExpressionStatement)
                         var isOnlyIdentifierStatement = false // TODO: compute from ExpressionStatement once the rules return a parseTree
                         // LabelledStatement (See 12.12) is inlined here as it requires 2 token lookahead
+                        // TODO:undo some of the inlining, the suffix (':' stmt) can be extracted for readability and better error reporting
                         this.OPTION(() => { return this.NEXT_TOKEN() instanceof Semicolon && isOnlyIdentifierStatement }, () => {
                             this.CONSUME(Colon)
-                            this.SUBRULE(this.Statement)
+                            stmt = this.SUBRULE(this.Statement)
                         })
+                        return stmt ? PT(LabeledStatement, [stmt]) : expOrLabel
                     }
                 },
-                {ALT: () => { this.SUBRULE(this.IfStatement) }},
-                {ALT: () => { this.SUBRULE(this.IterationStatement) }},
-                {ALT: () => { this.SUBRULE(this.ContinueStatement) }},
-                {ALT: () => { this.SUBRULE(this.BreakStatement) }},
-                {ALT: () => { this.SUBRULE(this.ReturnStatement) }},
-                {ALT: () => { this.SUBRULE(this.WithStatement) }},
-                {ALT: () => { this.SUBRULE(this.SwitchStatement) }},
-                {ALT: () => { this.SUBRULE(this.ThrowStatement) }},
-                {ALT: () => { this.SUBRULE(this.TryStatement) }},
-                {ALT: () => { this.SUBRULE(this.DebuggerStatement) }}
+                {ALT: () => { return this.SUBRULE(this.IfStatement) }},
+                {ALT: () => { return this.SUBRULE(this.IterationStatement) }},
+                {ALT: () => { return this.SUBRULE(this.ContinueStatement) }},
+                {ALT: () => { return this.SUBRULE(this.BreakStatement) }},
+                {ALT: () => { return this.SUBRULE(this.ReturnStatement) }},
+                {ALT: () => { return this.SUBRULE(this.WithStatement) }},
+                {ALT: () => { return this.SUBRULE(this.SwitchStatement) }},
+                {ALT: () => { return this.SUBRULE(this.ThrowStatement) }},
+                {ALT: () => { return this.SUBRULE(this.TryStatement) }},
+                {ALT: () => { return this.SUBRULE(this.DebuggerStatement) }}
             ], "a Statement", recog.IGNORE_AMBIGUITIES)
-        })
+        }, InvalidStatement)
+
 
         // See 12.1
         public Block = this.RULE("Block", () => {
+            var stmtList = undefined
+
             this.CONSUME(LCurly)
             this.OPTION(() => {
-                this.SUBRULE(this.StatementList)
+                stmtList = this.SUBRULE(this.StatementList)
             })
             this.CONSUME(RCurly)
-        })
+
+            return PT(Block, stmtList)
+        }, InvalidBlock)
+
 
         // See 12.1
         public StatementList = this.RULE("StatementList", () => {
+            var stmts = []
+
             this.AT_LEAST_ONE(() => {
-                this.SUBRULE(this.Statement)
+                stmts.push(this.SUBRULE(this.Statement))
             }, "a Statement")
-        })
+
+            return PT(StatementList, stmts)
+        }, InvalidStatementList)
+
 
         // See 12.2
         public VariableStatement = this.RULE("VariableStatement", () => {
+            var VarDecList
+
             this.CONSUME(VarTok)
-            this.SUBRULE(this.VariableDeclarationList)
+            VarDecList = this.SUBRULE(this.VariableDeclarationList)
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(VariableStatement, VarDecList)
+        }, InvalidVariableStatement)
+
 
         // See 12.2
         public VariableDeclarationList = this.RULE("VariableDeclarationList", () => {
-            this.SUBRULE(this.VariableDeclaration)
+            var varDecsVec = []
+
+            varDecsVec.push(this.SUBRULE(this.VariableDeclaration))
             this.MANY(() => {
                 this.CONSUME(Comma)
-                this.SUBRULE2(this.VariableDeclaration)
+                varDecsVec.push(this.SUBRULE2(this.VariableDeclaration))
             })
-        })
+
+            return PT(VariableDeclarationList, varDecsVec)
+        }, InvalidVariableDeclarationList)
+
 
         //// See 12.2
         public VariableDeclarationListNoIn = this.RULE("VariableDeclarationListNoIn", () => {
-            this.SUBRULE(this.VariableDeclarationNoIn)
+            var varDecsVec = []
+
+            varDecsVec.push(this.SUBRULE(this.VariableDeclarationNoIn))
             this.MANY(() => {
                 this.CONSUME(Comma)
-                this.SUBRULE2(this.VariableDeclarationNoIn)
+                varDecsVec.push(this.SUBRULE2(this.VariableDeclarationNoIn))
             })
-        })
+
+            return PT(VariableDeclaration, varDecsVec)
+        }, InvalidVariableDeclarationListNoIn)
+
 
         // See 12.2
         public VariableDeclaration = this.RULE("VariableDeclaration", () => {
-            this.CONSUME(Identifier)
-            this.SUBRULE(this.Initialiser)
-        })
+            var ident, initExp
+
+            ident = this.CONSUME(Identifier)
+            initExp = this.SUBRULE(this.Initialiser)
+
+            return PT(VariableDeclaration, [PT(ident), initExp])
+        }, InvalidVariableDeclaration)
+
 
         //// See 12.2
         public VariableDeclarationNoIn = this.RULE("VariableDeclarationNoIn", () => {
-            this.CONSUME(Identifier)
-            this.SUBRULE(this.InitialiserNoIn)
-        })
+            var ident, initExp
+
+            ident = this.CONSUME(Identifier)
+            initExp = this.SUBRULE(this.InitialiserNoIn)
+
+            return PT(VariableDeclaration, [PT(ident), initExp])
+        }, InvalidVariableDeclarationNoIn)
+
 
         // See 12.2
         public Initialiser = this.RULE("Initialiser", () => {
+            var initExp
+
             this.CONSUME(Eq)
-            this.SUBRULE(this.AssignmentExpression)
-        })
+            initExp = this.SUBRULE(this.AssignmentExpression)
+
+            return PT(Initialiser, [initExp])
+        }, InvalidInitialiser)
+
 
         // See 12.2
         public InitialiserNoIn = this.RULE("InitialiserNoIn", () => {
+            var initExp
+
             this.CONSUME(Eq)
-            this.SUBRULE(this.AssignmentExpressionNoIn)
-        })
+            initExp = this.SUBRULE(this.AssignmentExpressionNoIn)
+
+            return PT(Initialiser, [initExp])
+        }, InvalidInitialiserNoIn)
+
 
         // See 12.3
         public EmptyStatement = this.RULE("EmptyStatement", () => {
             //  a semicolon is never inserted automatically if the semicolon would then be parsed as an empty statement
             this.CONSUME(Semicolon, DISABLE_SEMICOLON_INSERTION)
-        })
+            return PT(EmptyStatement)
+        }, InvalidEmptyStatement)
+
 
         // See 12.4
         public ExpressionStatement = this.RULE("ExpressionStatement", () => {
             // the spec defines [lookahead ? {{, function}] to avoid some ambiguities, however those ambiguities only exist
             // because in a BNF grammar there is no priority between alternatives. This implementation however, is deterministic
             // the first alternative found to match will be taken. thus these ambiguities can be resolved
-            // by ordering of the alternatives
-            this.SUBRULE(this.Expression)
+            // by ordering the alternatives
+
+            var exp
+
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(ExpressionStatement, [exp])
+        }, InvalidExpressionStatement)
+
 
         // See 12.5
         public IfStatement = this.RULE("IfStatement", () => {
+            var cond, ifBody, elseBody = undefined
+
             this.CONSUME(IfTok)
             this.CONSUME(LParen)
+            cond = this.SUBRULE(this.Expression)
             this.CONSUME(RParen)
-            this.SUBRULE(this.Statement)
+            ifBody = this.SUBRULE(this.Statement)
             // refactoring spec to use an OPTION production for the 'else'
             // to resolve the dangling if-else problem
             this.OPTION(() => {
                 this.CONSUME(ElseTok)
-                this.SUBRULE2(this.Statement)
+                elseBody = this.SUBRULE2(this.Statement)
             })
-        })
+
+            return PT(IfStatement, [cond, ifBody, elseBody])
+        }, InvalidIfStatement)
+
 
         // See 12.6
         public IterationStatement = this.RULE("IterationStatement", () => {
             // the original spec rule has been refactored into 3 smaller ones
-            this.OR([
-                {ALT: () => { this.SUBRULE(this.DoIteration) }},
-                {ALT: () => { this.SUBRULE(this.WhileIteration) }},
-                {ALT: () => { this.SUBRULE(this.ForIteration) }}
+            return this.OR([
+                {ALT: () => { return this.SUBRULE(this.DoIteration) }},
+                {ALT: () => { return this.SUBRULE(this.WhileIteration) }},
+                {ALT: () => { return this.SUBRULE(this.ForIteration) }}
             ], "an Iteration Statement")
-        })
+        }, InvalidIterationStatement, recog.NO_RESYNC)
+
 
         public DoIteration = this.RULE("DoIteration", () => {
+            var exp, stmt
+
             this.CONSUME(DoTok)
-            this.SUBRULE(this.Statement)
+            stmt = this.SUBRULE(this.Statement)
             this.CONSUME(WhileTok)
             this.CONSUME(LParen)
-            this.SUBRULE(this.Expression)
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(RParen)
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(DoIteration, [exp, stmt])
+        }, InvalidDoIteration)
+
 
         public WhileIteration = this.RULE("WhileIteration", () => {
+            var exp, stmt
+
             this.CONSUME(WhileTok)
             this.CONSUME(LParen)
-            this.SUBRULE(this.Expression)
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(RParen)
-            this.SUBRULE(this.Statement)
-        })
+            stmt = this.SUBRULE(this.Statement)
+
+            return PT(WhileIteration, [exp, stmt])
+        }, InvalidWhileIteration)
+
 
         public ForIteration = this.RULE("ForIteration", () => {
+            var header, headerExp, headerPart, body
+
             this.CONSUME(ForTok)
             this.CONSUME(LParen)
 
             // @formatter:off
-            this.OR([
+            header = this.OR([
                 { ALT: () => {
                     this.CONSUME(VarTok)
-                    this.SUBRULE(this.VariableDeclarationListNoIn)
-                    this.SUBRULE(this.ForIterationParts)
+                    headerExp = this.SUBRULE(this.VariableDeclarationListNoIn)
+                    headerPart = this.SUBRULE(this.ForHeaderParts)
+                    return PT(ForVarHeader, [headerExp, headerPart])
                 }},
                 {ALT: () => {
                     this.OPTION(() => {
-                        this.SUBRULE(this.ExpressionNoIn)
+                        headerExp = this.SUBRULE(this.ExpressionNoIn)
                     })
-                    this.SUBRULE(this.ForIterationParts)
+                    headerPart = this.SUBRULE(this.ForHeaderParts)
+                    return PT(ForNoVarHeader, [headerExp, headerPart])
                 }}
             ], "var or expression")
             // @formatter:on
 
             this.CONSUME(RParen)
-            this.SUBRULE(this.Statement)
-        })
+            body = this.SUBRULE(this.Statement)
 
-        protected ForIterationParts = this.RULE("ForIterationParts", () => {
+            return PT(ForIteration, [header, body])
+        }, InvalidForIteration)
+
+
+        protected ForHeaderParts = this.RULE("ForHeaderParts", () => {
             // TODO: this grammar is not enough to decide between the alternatives
             // need the additional information from the calling rule
             // the IN alternative is only possible if BEFORE it appeared
             // SINGLE VariableDeclarationNoIn or LeftHandSideExpression
+            var exp1 = undefined, exp2 = undefined
 
             // @formatter:off
-            this.OR([
+            return this.OR([
                 {ALT: () => {
                     this.CONSUME(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
                     this.OPTION(() => {
-                        this.SUBRULE(this.Expression)
+                        exp1 = this.SUBRULE(this.Expression)
                     })
                     this.CONSUME2(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
                     this.OPTION2(() => {
-                        this.SUBRULE2(this.Expression)
+                        exp2 = this.SUBRULE2(this.Expression)
                     })
+                    return PT(ForHeaderRegularPart, [exp1, exp2])
                 }},
                 {ALT: () => {
                     this.CONSUME(InTok)
-                    this.SUBRULE3(this.Expression)
+                    exp1 = this.SUBRULE3(this.Expression)
+                    return PT(ForHeaderInPart, [exp1])
                 }}
             ], "in or semiColon")
             // @formatter:on
-        })
+        }, InvalidForHeaderPart)
+
 
         protected isLabel():boolean {
             return !this.isNextLineTerminator() && // [no LineTerminator here]
                 this.NEXT_TOKEN() instanceof Identifier
         }
 
+
         // See 12.7
         public ContinueStatement = this.RULE("ContinueStatement", () => {
+            var ident = undefined
+
             this.CONSUME(ContinueTok)
             this.OPTION(this.isLabel, () => {
-                this.CONSUME(Identifier)
+                ident = this.CONSUME(Identifier)
             })
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(ContinueStatement, [ident])
+        }, InvalidContinueStatement)
+
+
         // See 12.8
         public BreakStatement = this.RULE("BreakStatement", () => {
+            var ident = undefined
+
             this.CONSUME(BreakTok)
             this.OPTION(this.isLabel, () => {
-                this.CONSUME(Identifier)
+                ident = this.CONSUME(Identifier)
             })
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(BreakStatement, [ident])
+        }, InvalidBreakStatement)
+
 
         protected isExpressionNoLineTerminator():boolean {
             return !this.isNextLineTerminator() && // [no LineTerminator here]
                 this.isNextRule("Expression")
         }
 
+
         // See 12.9
         public ReturnStatement = this.RULE("ReturnStatement", () => {
+            var exp = undefined
+
             this.CONSUME(ReturnTok)
             this.OPTION(this.isExpressionNoLineTerminator, () => {
-                this.SUBRULE(this.Expression)
+                exp = this.SUBRULE(this.Expression)
             })
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(ReturnStatement, [exp])
+        }, InvalidReturnStatement)
+
 
         // See 12.10
         public WithStatement = this.RULE("WithStatement", () => {
+            var exp, stmt
+
             this.CONSUME(WithTok)
             this.CONSUME(LParen)
-            this.SUBRULE(this.Expression)
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(RParen)
-            this.SUBRULE(this.Statement)
-        })
+            stmt = this.SUBRULE(this.Statement)
+
+            return PT(WithStatement, [exp, stmt])
+        }, InvalidWithStatement)
+
 
         // See 12.11
         public SwitchStatement = this.RULE("SwitchStatement", () => {
+            var exp, block
+
             this.CONSUME(SwitchTok)
             this.CONSUME(LParen)
-            this.SUBRULE(this.Expression)
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(RParen)
-            this.SUBRULE(this.CaseBlock)
-        })
+            block = this.SUBRULE(this.CaseBlock)
+
+            return PT(SwitchStatement, [exp, block])
+
+        }, InvalidSwitchStatement)
+
 
         // See 12.11
         public CaseBlock = this.RULE("CaseBlock", () => {
+            var clausesBeforeDefault = undefined, defaultClause = undefined, clausesAfterDefault = undefined
+
             this.CONSUME(LCurly)
             this.OPTION(() => {
-                this.SUBRULE(this.CaseClauses)
+                clausesBeforeDefault = this.SUBRULE(this.CaseClauses)
             })
             this.OPTION2(() => {
-                this.SUBRULE(this.DefaultClause)
+                defaultClause = this.SUBRULE(this.DefaultClause)
             })
             this.OPTION3(() => {
-                this.SUBRULE(this.CaseClauses)
+                clausesAfterDefault = this.SUBRULE(this.CaseClauses)
             })
             this.CONSUME(RCurly)
-        })
+
+            return PT(CaseBlock, [clausesBeforeDefault, defaultClause, clausesAfterDefault])
+        }, InvalidCaseBlock)
+
 
         // See 12.11
+        // TODO: consider inlining caseClause in CaseClauses?
         public CaseClauses = this.RULE("CaseClauses", () => {
+            var caseClausesVec = []
+
             this.AT_LEAST_ONE(() => {
-                this.SUBRULE(this.CaseClause)
+                caseClausesVec.push(this.SUBRULE(this.CaseClause))
             }, "Case Clause")
-        })
+
+            return PT(CaseClauses, caseClausesVec)
+        }, InvalidCaseClauses)
+
 
         // See 12.11
         public CaseClause = this.RULE("CaseClause", () => {
+            var exp, stmtList = undefined
+
             this.CONSUME(CaseTok)
-            this.SUBRULE(this.Expression)
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(Colon)
             this.OPTION(() => {
-                this.SUBRULE(this.StatementList)
+                stmtList = this.SUBRULE(this.StatementList)
             })
-        })
+
+            return PT(CaseClause, [exp, stmtList])
+        }, InvalidCaseClause)
+
 
         // See 12.11
         public DefaultClause = this.RULE("DefaultClause", () => {
+            var stmtList = undefined
+
             this.CONSUME(DefaultTok)
             this.CONSUME(Colon)
             this.OPTION(() => {
-                this.SUBRULE(this.StatementList)
+                stmtList = this.SUBRULE(this.StatementList)
             })
-        })
+
+            return PT(DefaultClause, [stmtList])
+        }, InvalidDefaultClause)
+
 
         // See 12.13
         public ThrowStatement = this.RULE("ThrowStatement", () => {
+            var exp
+
             this.CONSUME(ThrowTok)
             if (this.isNextLineTerminator()) {
                 // this will trigger re-sync recover which is the desired behavior,
@@ -831,115 +1196,159 @@ module chevrotain.examples.ecma5 {
                 this.SAVE_ERROR(new recog.MismatchedTokenException(
                     "Line Terminator not allowed before Expression in Throw Statement", this.nextLineTerminator()))
             }
-            this.SUBRULE(this.Expression)
+            exp = this.SUBRULE(this.Expression)
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(ThrowStatement, [exp])
+        }, InvalidThrowStatement)
+
 
         // See 12.14
         public TryStatement = this.RULE("TryStatement", () => {
+            var block, catchPt = undefined, finallyPt = undefined
+
             this.CONSUME(TryTok)
-            this.SUBRULE(this.Block)
+            block = this.SUBRULE(this.Block)
 
             // @formatter:off
             this.OR([
                 {ALT: () => {
-                    this.SUBRULE(this.Catch)
+                    catchPt = this.SUBRULE(this.Catch)
                     this.OPTION(() => {
-                        this.SUBRULE(this.Finally)
+                        finallyPt = this.SUBRULE(this.Finally)
                     })
                 }},
                 {ALT: () => {
-                    this.SUBRULE(this.Finally)
+                    finallyPt = this.SUBRULE(this.Finally)
                 }}
             ], "catch or finally")
             // @formatter:on
-        })
+
+            return PT(TryStatement, [block, catchPt, finallyPt])
+        }, InvalidTryStatement)
+
 
         // See 12.14
         public Catch = this.RULE("Catch", () => {
+            var ident, block
+
             this.CONSUME(CatchTok)
             this.CONSUME(LParen)
-            this.CONSUME(Identifier)
+            ident = this.CONSUME(Identifier)
             this.CONSUME(RParen)
-            this.SUBRULE(this.Block)
-        })
+            block = this.SUBRULE(this.Block)
+
+            return PT(Catch, [PT(ident), block])
+        }, InvalidCatch)
+
 
         // See 12.14
         public Finally = this.RULE("Finally", () => {
+            var block
+
             this.CONSUME(FinallyTok)
-            this.SUBRULE(this.Block)
-        })
+            block = this.SUBRULE(this.Block)
+
+            return PT(Finally, [block])
+        }, InvalidFinally)
+
 
         // See 12.15
         public DebuggerStatement = this.RULE("DebuggerStatement", () => {
             this.CONSUME(DebuggerTok)
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
-        })
+
+            return PT(DebuggerStatement)
+        }, InvalidDebuggerStatement)
 
         // A.5 Functions and Programs
 
+
         // See clause 13
         public FunctionDeclaration = this.RULE("FunctionDeclaration", () => {
+            var funcName, params = undefined, body
+
             this.CONSUME(FunctionTok)
-            this.CONSUME(Identifier)
+            funcName = this.CONSUME(Identifier)
             this.CONSUME(LParen)
             this.OPTION(() => {
-                this.SUBRULE(this.FormalParameterList)
+                params = this.SUBRULE(this.FormalParameterList)
             })
             this.CONSUME(RParen)
             this.CONSUME(LCurly)
-            this.SUBRULE(this.FunctionBody)
+            body = this.SUBRULE(this.FunctionBody)
             this.CONSUME(RCurly)
-        })
+
+            return PT(new FunctionDeclaration(), [PT(funcName), params, body])
+        }, InvalidFunctionDeclaration)
+
 
         // See clause 13
         public FunctionExpression = this.RULE("FunctionExpression", () => {
+            var funcName = undefined, params = undefined, body
+
             this.CONSUME(FunctionTok)
             this.OPTION1(() => {
-                this.CONSUME(Identifier)
+                funcName = this.CONSUME(Identifier)
             })
             this.CONSUME(LParen)
             this.OPTION2(() => {
-                this.SUBRULE(this.FormalParameterList)
+                params = this.SUBRULE(this.FormalParameterList)
             })
             this.CONSUME(RParen)
             this.CONSUME(LCurly)
-            this.SUBRULE(this.FunctionBody)
+            body = this.SUBRULE(this.FunctionBody)
             this.CONSUME(RCurly)
-        })
+
+            return PT(new FunctionExpression(), [PT(funcName), params, body])
+        }, InvalidFunctionExpression)
+
 
         // See clause 13
         public FormalParameterList = this.RULE("FormalParameterList", () => {
-            this.CONSUME(Identifier)
+            var paramNames = []
+
+            paramNames.push(this.CONSUME(Identifier))
             this.MANY(() => {
                 this.CONSUME(Comma)
-                this.CONSUME2(Identifier)
+                paramNames.push(PT(this.CONSUME2(Identifier)))
             })
-        })
 
-        // See clause 13
+            return PT(FormalParameterList, paramNames)
+        }, InvalidFormalParameterList)
+
+        // See clause 13 //TODO: this rule seems redundant inline it?
         public FunctionBody = this.RULE("FunctionBody", () => {
-            this.SUBRULE(this.SourceElements)
-        })
+            return this.SUBRULE(this.SourceElements)
+        }, InvalidFunctionBody)
+
 
         // See clause 14
         public Program = this.RULE("Program", () => {
-            this.SUBRULE(this.SourceElements)
-        })
+            var srcElements
+
+            srcElements = this.SUBRULE(this.SourceElements)
+
+            return PT(Program, [srcElements])
+        }, InvalidProgram)
+
 
         // See clause 14
         // this inlines SourceElementRule rule from the spec
         public SourceElements = this.RULE("SourceElements", () => {
+            var funcDec = [], stmts = []
+
             this.MANY(() => {
+                // FunctionDeclaration must appear before statement to implement [lookahead ? {{, function}] in ExpressionStatement
                 this.OR([
-                        // FunctionDeclaration must appear before statement
-                        // to implement [lookahead ? {{, function}] in ExpressionStatement
-                        {ALT: () => { this.SUBRULE(this.FunctionDeclaration) }},
-                        {ALT: () => { this.SUBRULE(this.Statement) }}
+                        {ALT: () => { funcDec.push(this.SUBRULE(this.FunctionDeclaration))}},
+                        {ALT: () => { stmts.push(this.SUBRULE(this.Statement)) }}
                     ],
                     "Statement or Function Declaration",
                     recog.IGNORE_AMBIGUITIES)
             })
-        })
+
+            return PT(SourceElements, funcDec.concat(stmts))
+        }, InvalidSourceElements)
     }
 }
