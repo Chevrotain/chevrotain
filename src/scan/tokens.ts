@@ -9,6 +9,7 @@ module chevrotain.tokens {
         return tokTypeName.replace("Tok", "")
     }
 
+    export type TokenClass = Function
     export class Token {
         // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
         public isInsertedInRecovery:boolean = false
@@ -16,6 +17,7 @@ module chevrotain.tokens {
         constructor(public startLine:number, public startColumn:number, public image:string) {}
     }
 
+    export type VirtualTokenClass = Function
     export class VirtualToken extends Token {
         constructor() {super(-1, -1, "") }
     }

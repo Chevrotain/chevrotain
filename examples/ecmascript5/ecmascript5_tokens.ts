@@ -242,4 +242,223 @@ module chevrotain.examples.ecma5 {
 
     export var ECMA5Lexer = new lex.SimpleLexer(onlySortedTokens)
 
+
+    // Virtual Tokens for defining the ParseTree
+
+    export class PrimaryExpression extends tok.VirtualToken {}
+    export class InvalidPrimaryExpression extends PrimaryExpression {}
+
+    export class ParenthesisExpression extends tok.VirtualToken {}
+    export class InvalidParenthesisExpression extends ParenthesisExpression {}
+
+    export class ArrayLiteral extends tok.VirtualToken {}
+    export class InvalidArrayLiteral extends ArrayLiteral {}
+
+    export class ElementList extends tok.VirtualToken {}
+    export class InvalidElementList extends ElementList {}
+
+    export class Elision extends tok.VirtualToken {}
+    export class InvalidElision extends Elision {}
+
+    export class ObjectLiteral extends tok.VirtualToken {}
+    export class InvalidObjectLiteral extends ObjectLiteral {}
+
+    export class PropertyAssignment extends tok.VirtualToken {}
+    export class InvalidPropertyAssignment extends PropertyAssignment {}
+
+    export class RegularPropertyAssignment extends tok.VirtualToken {}
+    export class InvalidRegularPropertyAssignment extends RegularPropertyAssignment {}
+    export class GetPropertyAssignment extends tok.VirtualToken {}
+    export class InvalidGetPropertyAssignment extends GetPropertyAssignment {}
+    export class SetPropertyAssignment extends tok.VirtualToken {}
+    export class InvalidSetPropertyAssignment extends SetPropertyAssignment {}
+
+    export class PropertyName extends tok.VirtualToken {}
+    export class InvalidPropertyName extends PropertyName {}
+
+    export class MemberCallNewExpression extends tok.VirtualToken {}
+    export class InvalidMemberCallNewExpression extends MemberCallNewExpression {}
+
+    export class BoxMemberExpression extends tok.VirtualToken {}
+    export class InvalidBoxMemberExpression extends BoxMemberExpression {}
+
+    export class DotMemberExpression extends tok.VirtualToken {}
+    export class InvalidDotMemberExpression extends DotMemberExpression {}
+
+    export class Arguments extends tok.VirtualToken {}
+    export class InvalidArguments extends Arguments {}
+
+    export class InvalidLeftHandSideExpression extends tok.VirtualToken {}
+
+    export class PostfixExpression extends tok.VirtualToken {}
+    export class InvalidPostfixExpression extends PostfixExpression {}
+
+    export class UnaryExpression extends tok.VirtualToken {}
+    export class InvalidUnaryExpression extends UnaryExpression {}
+
+    export class MultiplicativeExpression extends tok.VirtualToken {}
+    export class InvalidMultiplicativeExpression extends MultiplicativeExpression {}
+
+    export class AdditiveExpression extends tok.VirtualToken {}
+    export class InvalidAdditiveExpression extends AdditiveExpression {}
+
+    export class ShiftExpression extends tok.VirtualToken {}
+    export class InvalidShiftExpression extends ShiftExpression {}
+
+    export class RelationalExpression extends tok.VirtualToken {}
+    export class InvalidRelationalExpression extends RelationalExpression {}
+    export class InvalidRelationalExpressionNoIn extends InvalidRelationalExpression {}
+
+    export class EqualityExpression extends tok.VirtualToken {}
+    export class InvalidEqualityExpression extends EqualityExpression {}
+    export class InvalidEqualityExpressionNoIn extends InvalidEqualityExpression {}
+
+    export class BitwiseANDExpression extends tok.VirtualToken {}
+    export class InvalidBitwiseANDExpression extends BitwiseANDExpression {}
+    export class InvalidBitwiseANDExpressionNoIn extends InvalidBitwiseANDExpression {}
+
+    export class BitwiseXORExpression extends tok.VirtualToken {}
+    export class InvalidBitwiseXORExpression extends BitwiseXORExpression {}
+    export class InvalidBitwiseXORExpressionNoIn extends InvalidBitwiseXORExpression {}
+
+    export class BitwiseORExpression extends tok.VirtualToken {}
+    export class InvalidBitwiseORExpression extends BitwiseORExpression {}
+    export class InvalidBitwiseORExpressionNoIn extends InvalidBitwiseORExpression {}
+
+    export class LogicalANDExpression extends tok.VirtualToken {}
+    export class InvalidLogicalANDExpression extends LogicalANDExpression {}
+    export class InvalidLogicalANDExpressionNoIn extends InvalidLogicalANDExpression {}
+
+    export class LogicalORExpression extends tok.VirtualToken {}
+    export class InvalidLogicalORExpression extends LogicalORExpression {}
+    export class InvalidLogicalORExpressionNoIn extends InvalidLogicalORExpression {}
+
+    export class ConditionalExpression extends tok.VirtualToken {}
+    export class InvalidConditionalExpression extends ConditionalExpression {}
+    export class InvalidConditionalExpressionNoIn extends InvalidConditionalExpression {}
+
+    export class AssignmentExpression extends tok.VirtualToken {}
+    export class InvalidAssignmentExpression extends AssignmentExpression {}
+    export class InvalidAssignmentExpressionNoIn extends InvalidAssignmentExpression {}
+
+    export class Expression extends tok.VirtualToken {}
+    export class InvalidExpression extends Expression {}
+    export class InvalidExpressionNoIn extends InvalidExpression {}
+
+    export class Statement extends tok.VirtualToken {}
+    export class InvalidStatement extends Statement {}
+
+    export class Block extends tok.VirtualToken {}
+    export class InvalidBlock extends Block {}
+
+    export class StatementList extends tok.VirtualToken {}
+    export class InvalidStatementList extends StatementList {}
+
+    export class VariableStatement extends tok.VirtualToken {}
+    export class InvalidVariableStatement extends VariableStatement {}
+
+    export class VariableDeclarationList extends tok.VirtualToken {}
+    export class InvalidVariableDeclarationList extends VariableDeclarationList {}
+    export class InvalidVariableDeclarationListNoIn extends InvalidVariableDeclarationList {}
+
+    export class VariableDeclaration extends tok.VirtualToken {}
+    export class InvalidVariableDeclaration extends VariableDeclaration {}
+    export class InvalidVariableDeclarationNoIn extends InvalidVariableDeclaration {}
+
+    export class Initialiser extends tok.VirtualToken {}
+    export class InvalidInitialiser extends Initialiser {}
+    export class InvalidInitialiserNoIn extends InvalidInitialiser {}
+
+    export class EmptyStatement extends tok.VirtualToken {}
+    export class InvalidEmptyStatement extends EmptyStatement {}
+
+    export class ExpressionStatement extends tok.VirtualToken {}
+    export class InvalidExpressionStatement extends ExpressionStatement {}
+
+    export class IfStatement extends tok.VirtualToken {}
+    export class InvalidIfStatement extends IfStatement {}
+
+    export class IterationStatement extends tok.VirtualToken {}
+    export class InvalidIterationStatement extends IterationStatement {}
+
+    export class DoIteration extends IterationStatement {}
+    export class InvalidDoIteration extends DoIteration {}
+
+    export class WhileIteration extends IterationStatement {}
+    export class InvalidWhileIteration extends WhileIteration {}
+
+    export class ForIteration extends IterationStatement {}
+    export class InvalidForIteration extends ForIteration {}
+
+    export class ForHeader extends tok.VirtualToken {}
+    export class ForVarHeader extends ForHeader {}
+    export class ForNoVarHeader extends ForHeader {}
+
+    export class ForHeaderPart extends tok.VirtualToken {}
+    export class ForHeaderInPart extends ForHeaderPart {}
+    export class ForHeaderRegularPart extends ForHeaderPart {}
+    export class InvalidForHeaderPart extends ForHeaderInPart {}
+
+    export class LabeledStatement extends tok.VirtualToken {}
+
+    export class ContinueStatement extends tok.VirtualToken {}
+    export class InvalidContinueStatement extends ContinueStatement {}
+
+    export class BreakStatement extends tok.VirtualToken {}
+    export class InvalidBreakStatement extends BreakStatement {}
+
+    export class ReturnStatement extends tok.VirtualToken {}
+    export class InvalidReturnStatement extends ReturnStatement {}
+
+    export class WithStatement extends tok.VirtualToken {}
+    export class InvalidWithStatement extends WithStatement {}
+
+    export class SwitchStatement extends tok.VirtualToken {}
+    export class InvalidSwitchStatement extends SwitchStatement {}
+
+    export class CaseBlock extends tok.VirtualToken {}
+    export class InvalidCaseBlock extends CaseBlock {}
+
+    export class CaseClauses extends tok.VirtualToken {}
+    export class InvalidCaseClauses extends CaseClauses {}
+
+    export class CaseClause extends tok.VirtualToken {}
+    export class InvalidCaseClause extends CaseClause {}
+
+    export class DefaultClause extends tok.VirtualToken {}
+    export class InvalidDefaultClause extends DefaultClause {}
+
+    export class ThrowStatement extends tok.VirtualToken {}
+    export class InvalidThrowStatement extends ThrowStatement {}
+
+    export class TryStatement extends tok.VirtualToken {}
+    export class InvalidTryStatement extends TryStatement {}
+
+    export class Catch extends tok.VirtualToken {}
+    export class InvalidCatch extends Catch {}
+
+    export class Finally extends tok.VirtualToken {}
+    export class InvalidFinally extends Finally {}
+
+    export class DebuggerStatement extends tok.VirtualToken {}
+    export class InvalidDebuggerStatement extends DebuggerStatement {}
+
+    export class FunctionDeclaration extends tok.VirtualToken {}
+    export class InvalidFunctionDeclaration extends FunctionDeclaration {}
+
+    export class FunctionExpression extends tok.VirtualToken {}
+    export class InvalidFunctionExpression extends FunctionExpression {}
+
+    export class FormalParameterList extends tok.VirtualToken {}
+    export class InvalidFormalParameterList extends FormalParameterList {}
+
+    export class FunctionBody extends tok.VirtualToken {}
+    export class InvalidFunctionBody extends FunctionBody {}
+
+    export class Program extends tok.VirtualToken {}
+    export class InvalidProgram extends Program {}
+
+    export class SourceElements extends tok.VirtualToken {}
+    export class InvalidSourceElements extends SourceElements {}
+
 }
