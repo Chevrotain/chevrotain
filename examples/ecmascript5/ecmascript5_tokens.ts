@@ -288,8 +288,6 @@ module chevrotain.examples.ecma5 {
     export class Arguments extends tok.VirtualToken {}
     export class InvalidArguments extends Arguments {}
 
-    export class InvalidLeftHandSideExpression extends tok.VirtualToken {}
-
     export class PostfixExpression extends tok.VirtualToken {}
     export class InvalidPostfixExpression extends PostfixExpression {}
 
@@ -451,9 +449,6 @@ module chevrotain.examples.ecma5 {
 
     export class FormalParameterList extends tok.VirtualToken {}
     export class InvalidFormalParameterList extends FormalParameterList {}
-
-    export class FunctionBody extends tok.VirtualToken {}
-    export class InvalidFunctionBody extends FunctionBody {}
 
     export class Program extends tok.VirtualToken {}
     export class InvalidProgram extends Program {}

@@ -237,7 +237,7 @@ module chevrotain.examples.ecma5 {
             this.CONSUME(LParen)
             this.CONSUME(RParen)
             this.CONSUME(LCurly)
-            value = this.SUBRULE(this.FunctionBody)
+            value = this.SUBRULE(this.SourceElements) // FunctionBody(clause 13) is equivalent to SourceElements
             this.CONSUME(RCurly)
 
             return PT(GetPropertyAssignment, [name, value])
@@ -253,7 +253,7 @@ module chevrotain.examples.ecma5 {
             this.CONSUME(Identifier)
             this.CONSUME(RParen)
             this.CONSUME(LCurly)
-            value = this.SUBRULE(this.FunctionBody)
+            value = this.SUBRULE(this.SourceElements) // FunctionBody(clause 13) is equivalent to SourceElements
             this.CONSUME(RCurly)
 
             return PT(SetPropertyAssignment, [name, value])
@@ -341,13 +341,6 @@ module chevrotain.examples.ecma5 {
         }, InvalidArguments)
 
 
-        // See 11.2
-        public LeftHandSideExpression = this.RULE("LeftHandSideExpression", () => {
-            // TODO: consider factoring out LHSExpression all together ?
-            return this.SUBRULE(this.MemberCallNewExpression)
-        }, InvalidLeftHandSideExpression, recog.NO_RESYNC)
-
-
         protected isPostFixExp():boolean {
             return !this.isNextLineTerminator() && // [no LineTerminator here]
                 this.NEXT_TOKEN() instanceof PlusPlus ||
@@ -359,7 +352,7 @@ module chevrotain.examples.ecma5 {
         public PostfixExpression = this.RULE("PostfixExpression", () => {
             var exp, operator = undefined
 
-            exp = this.SUBRULE(this.LeftHandSideExpression)
+            exp = this.SUBRULE(this.MemberCallNewExpression) // LHSExpression(see 11.2) is identical to MemberCallNewExpression
             this.OPTION(this.isPostFixExp, () => {
                 this.OR([
                     {ALT: () => { operator = this.CONSUME(PlusPlus) }},
@@ -1143,7 +1136,6 @@ module chevrotain.examples.ecma5 {
 
 
         // See 12.11
-        // TODO: consider inlining caseClause in CaseClauses?
         public CaseClauses = this.RULE("CaseClauses", () => {
             var caseClausesVec = []
 
@@ -1276,7 +1268,7 @@ module chevrotain.examples.ecma5 {
             })
             this.CONSUME(RParen)
             this.CONSUME(LCurly)
-            body = this.SUBRULE(this.FunctionBody)
+            body = this.SUBRULE(this.SourceElements) // FunctionBody(clause 13) is equivalent to SourceElements
             this.CONSUME(RCurly)
 
             return PT(new FunctionDeclaration(), [PT(funcName), params, body])
@@ -1297,7 +1289,7 @@ module chevrotain.examples.ecma5 {
             })
             this.CONSUME(RParen)
             this.CONSUME(LCurly)
-            body = this.SUBRULE(this.FunctionBody)
+            body = this.SUBRULE(this.SourceElements) // FunctionBody(clause 13) is equivalent to SourceElements
             this.CONSUME(RCurly)
 
             return PT(new FunctionExpression(), [PT(funcName), params, body])
@@ -1316,11 +1308,6 @@ module chevrotain.examples.ecma5 {
 
             return PT(FormalParameterList, paramNames)
         }, InvalidFormalParameterList)
-
-        // See clause 13 //TODO: this rule seems redundant inline it?
-        public FunctionBody = this.RULE("FunctionBody", () => {
-            return this.SUBRULE(this.SourceElements)
-        }, InvalidFunctionBody)
 
 
         // See clause 14
