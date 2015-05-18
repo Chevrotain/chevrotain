@@ -67,6 +67,15 @@ module chevrotain.examples.ecma5 {
             return this.lineTerminatorsInfo[this.inputIdx + 1]
         }
 
+        protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
+            var tokInstance = new (<any>tokClass)()
+            // Literals and Identifiers tokens carry additional information.
+            // Thus inserting them automatically can cause other errors "down the line"
+            // for example, inserting a variable Identifier may cause duplicate identifiers,
+            // or inserting a number literal may cause division by zero.
+            // thus in these cases the parser avoids automatic single token insertion.
+            return !(tokInstance instanceof AbsLiteral || tokInstance instanceof Identifier)
+        }
         /*
          * Link http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
          * Automatic semicolon insertion implementation.
