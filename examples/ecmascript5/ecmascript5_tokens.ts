@@ -245,8 +245,7 @@ module chevrotain.examples.ecma5 {
 
     // Virtual Tokens for defining the ParseTree
 
-    export class PrimaryExpression extends tok.VirtualToken {}
-    export class InvalidPrimaryExpression extends PrimaryExpression {}
+    export class InvalidPrimaryExpression extends tok.VirtualToken {}
 
     export class ParenthesisExpression extends tok.VirtualToken {}
     export class InvalidParenthesisExpression extends ParenthesisExpression {}

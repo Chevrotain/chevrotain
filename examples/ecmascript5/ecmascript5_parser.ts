@@ -7,6 +7,7 @@ module chevrotain.examples.ecma5 {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
     import PT = chevrotain.tree.PT
+    import ParseTree = chevrotain.tree.ParseTree
 
     // TODO: in Typescript 1.5 use const
     var DISABLE_SEMICOLON_INSERTION = false
@@ -28,6 +29,7 @@ module chevrotain.examples.ecma5 {
                           impl:(...implArgs:any[]) => T,
                           invalidVirtualClass:tok.VirtualTokenClass,
                           doResync = true):(idxInCallingRule?:number, ...args:any[]) => T {
+            // TODO: need to return a ParseTree wrapping the virtual invalid token...
             var invalidRet = function () { return new (<any>invalidVirtualClass)() }
             return super.RULE(ruleName, impl, invalidRet, doResync)
         }
@@ -76,6 +78,7 @@ module chevrotain.examples.ecma5 {
             // thus in these cases the parser avoids automatic single token insertion.
             return !(tokInstance instanceof AbsLiteral || tokInstance instanceof Identifier)
         }
+
         /*
          * Link http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
          * Automatic semicolon insertion implementation.
@@ -155,7 +158,7 @@ module chevrotain.examples.ecma5 {
 
             this.CONSUME(LBracket)
             this.MANY(() => {
-                this.OR([
+                this.OR([ // TODO: fix ambiguities with commas
                     {ALT: () => { elements.push(this.SUBRULE(this.ElementList)) }},
                     {ALT: () => { elements.push(this.SUBRULE(this.Elision)) }}
                 ], "expression or comma")
@@ -732,7 +735,7 @@ module chevrotain.examples.ecma5 {
                 exps.push(this.SUBRULE2(this.AssignmentExpression))
             })
 
-            return PT(Expression, exps)
+            return exps.length === 1 ? _.first(exps) : PT(Expression, exps)
         }, InvalidExpression)
 
 
@@ -746,7 +749,7 @@ module chevrotain.examples.ecma5 {
                 exps.push(this.SUBRULE2(this.AssignmentExpressionNoIn))
             })
 
-            return PT(Expression, exps)
+            return exps.length === 1 ? _.first(exps) : PT(Expression, exps)
         }, InvalidExpressionNoIn)
 
 
@@ -855,10 +858,12 @@ module chevrotain.examples.ecma5 {
 
         // See 12.2
         public VariableDeclaration = this.RULE("VariableDeclaration", () => {
-            var ident, initExp
+            var ident, initExp = undefined
 
             ident = this.CONSUME(Identifier)
-            initExp = this.SUBRULE(this.Initialiser)
+            this.OPTION(() => {
+                initExp = this.SUBRULE(this.Initialiser)
+            })
 
             return PT(VariableDeclaration, [PT(ident), initExp])
         }, InvalidVariableDeclaration)
@@ -866,10 +871,13 @@ module chevrotain.examples.ecma5 {
 
         //// See 12.2
         public VariableDeclarationNoIn = this.RULE("VariableDeclarationNoIn", () => {
-            var ident, initExp
+            var ident, initExp = undefined
 
             ident = this.CONSUME(Identifier)
-            initExp = this.SUBRULE(this.InitialiserNoIn)
+            this.OPTION(() => {
+                initExp = this.SUBRULE(this.InitialiserNoIn)
+            })
+
 
             return PT(VariableDeclaration, [PT(ident), initExp])
         }, InvalidVariableDeclarationNoIn)
@@ -980,8 +988,20 @@ module chevrotain.examples.ecma5 {
         }, InvalidWhileIteration)
 
 
+        protected canInComeAfterExp(exp:chevrotain.tree.ParseTree):boolean {
+            // anything that a call to MemberCallNewExpression rule may return
+            return exp.payload instanceof MemberCallNewExpression ||
+                exp.payload instanceof ObjectLiteral ||
+                exp.payload instanceof ArrayLiteral ||
+                exp.payload instanceof ParenthesisExpression ||
+                exp.payload instanceof AbsLiteral ||
+                exp.payload instanceof ThisTok ||
+                exp.payload instanceof Identifier
+        }
+
         public ForIteration = this.RULE("ForIteration", () => {
-            var header, headerExp, headerPart, body
+            var header, headerExp:ParseTree, headerPart, body
+            var inPossible = false
 
             this.CONSUME(ForTok)
             this.CONSUME(LParen)
@@ -991,14 +1011,17 @@ module chevrotain.examples.ecma5 {
                 { ALT: () => {
                     this.CONSUME(VarTok)
                     headerExp = this.SUBRULE(this.VariableDeclarationListNoIn)
-                    headerPart = this.SUBRULE(this.ForHeaderParts)
+                    inPossible = headerExp.children.length === 1 // 'in' is only possible if there was just one VarDec
+                    headerPart = this.SUBRULE(this.ForHeaderParts, [inPossible])
                     return PT(ForVarHeader, [headerExp, headerPart])
                 }},
                 {ALT: () => {
                     this.OPTION(() => {
                         headerExp = this.SUBRULE(this.ExpressionNoIn)
+                        inPossible = this.canInComeAfterExp(headerExp)
                     })
-                    headerPart = this.SUBRULE(this.ForHeaderParts)
+
+                    headerPart = this.SUBRULE(this.ForHeaderParts, [inPossible])
                     return PT(ForNoVarHeader, [headerExp, headerPart])
                 }}
             ], "var or expression")
@@ -1011,34 +1034,41 @@ module chevrotain.examples.ecma5 {
         }, InvalidForIteration)
 
 
-        protected ForHeaderParts = this.RULE("ForHeaderParts", () => {
-            // TODO: this grammar is not enough to decide between the alternatives
-            // need the additional information from the calling rule
-            // the IN alternative is only possible if BEFORE it appeared
-            // SINGLE VariableDeclarationNoIn or LeftHandSideExpression
-            var exp1 = undefined, exp2 = undefined
+        protected isForHeaderRegularPart() {
+            return this.NEXT_TOKEN() instanceof Semicolon
+        }
 
-            // @formatter:off
-            return this.OR([
-                {ALT: () => {
-                    this.CONSUME(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
-                    this.OPTION(() => {
-                        exp1 = this.SUBRULE(this.Expression)
-                    })
-                    this.CONSUME2(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
-                    this.OPTION2(() => {
-                        exp2 = this.SUBRULE2(this.Expression)
-                    })
-                    return PT(ForHeaderRegularPart, [exp1, exp2])
-                }},
-                {ALT: () => {
-                    this.CONSUME(InTok)
-                    exp1 = this.SUBRULE3(this.Expression)
-                    return PT(ForHeaderInPart, [exp1])
-                }}
-            ], "in or semiColon")
-            // @formatter:on
-        }, InvalidForHeaderPart)
+        protected ForHeaderParts = this.RULE("ForHeaderParts",
+
+            /**
+             * @param inPossible wheather or not the second alternative starting with InTok is aviliable under
+             *        the current context. note that this means the grammar is not context free.
+             *        however the only other alternative is to use backtracking which is even worse.
+             */
+            (inPossible:boolean) => {
+                var exp1 = undefined, exp2 = undefined
+
+                // @formatter:off
+                return this.OR([
+                    {WHEN: this.isForHeaderRegularPart , THEN_DO: () => {
+                        this.CONSUME(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
+                        this.OPTION(() => {
+                            exp1 = this.SUBRULE(this.Expression)
+                        })
+                        this.CONSUME2(Semicolon, DISABLE_SEMICOLON_INSERTION) // no semicolon insertion in for header
+                        this.OPTION2(() => {
+                            exp2 = this.SUBRULE2(this.Expression)
+                        })
+                        return PT(ForHeaderRegularPart, [exp1, exp2])
+                    }},
+                    {WHEN: () => { return inPossible && this.NEXT_TOKEN() instanceof InTok }, THEN_DO: () => {
+                        this.CONSUME(InTok)
+                        exp1 = this.SUBRULE3(this.Expression)
+                        return PT(ForHeaderInPart, [exp1])
+                    }}
+                ], "in or semiColon")
+                // @formatter:on
+            }, InvalidForHeaderPart)
 
 
         protected isLabel():boolean {

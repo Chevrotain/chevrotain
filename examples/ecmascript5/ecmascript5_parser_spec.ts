@@ -61,6 +61,26 @@ module chevrotain.examples.ecma5.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
         })
 
+        it("can parse a 'forIn #1", function () {
+            var input = "for (var x in arr) {alert(x)}"
+            var lexResult = ECMA5Lexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(0)
+            var parser = new ECMAScript5Parser(lexResult.tokens)
+            parser.ForIteration()
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
+        it("can parse a 'forIn #2", function () {
+            var input = "for (x in arr) {alert(x)}"
+            var lexResult = ECMA5Lexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(0)
+            var parser = new ECMAScript5Parser(lexResult.tokens)
+            parser.ForIteration()
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
     })
 
 }
