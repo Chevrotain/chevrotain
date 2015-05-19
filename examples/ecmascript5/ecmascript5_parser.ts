@@ -29,8 +29,7 @@ module chevrotain.examples.ecma5 {
                           impl:(...implArgs:any[]) => T,
                           invalidVirtualClass:tok.VirtualTokenClass,
                           doResync = true):(idxInCallingRule?:number, ...args:any[]) => T {
-            // TODO: need to return a ParseTree wrapping the virtual invalid token...
-            var invalidRet = function () { return new (<any>invalidVirtualClass)() }
+            var invalidRet:any = function () { return PT(new (<any>invalidVirtualClass)()) }
             return super.RULE(ruleName, impl, invalidRet, doResync)
         }
 
@@ -957,7 +956,7 @@ module chevrotain.examples.ecma5 {
                 {ALT: () => { return this.SUBRULE(this.WhileIteration) }},
                 {ALT: () => { return this.SUBRULE(this.ForIteration) }}
             ], "an Iteration Statement")
-        }, InvalidIterationStatement, recog.NO_RESYNC)
+        }, InvalidIterationStatement)
 
 
         public DoIteration = this.RULE("DoIteration", () => {

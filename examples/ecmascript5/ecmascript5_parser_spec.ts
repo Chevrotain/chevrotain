@@ -81,6 +81,18 @@ module chevrotain.examples.ecma5.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
         })
 
+        it("will return an invalidParseTree for an invalid statement text", function () {
+            var input = "var x += 5;"
+            var lexResult = ECMA5Lexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(0)
+            var parser = new ECMAScript5Parser(lexResult.tokens)
+            var parseResult = parser.Statement()
+            expect(parser.errors.length).toBe(1)
+            var errMessage = _.first(parser.errors).message
+            expect(errMessage).toBe("Expecting token of type -->Semicolon<-- but found -->'+='<--")
+            expect(parseResult.payload).toEqual(jasmine.any(InvalidStatement))
+        })
+
     })
 
 }
