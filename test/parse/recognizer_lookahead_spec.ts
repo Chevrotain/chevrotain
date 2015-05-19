@@ -813,11 +813,11 @@ module chevrotain.recognizer.lookahead.spec {
                     this.CONSUME1(TwoTok)
                 }},
                 {ALT: () => { // <-- this alternative starts with the same token as the previous one, ambiguity!
-                    this.CONSUME1(OneTok)
+                    this.CONSUME2(OneTok)
                     this.CONSUME1(ThreeTok)
                 }},
                 {ALT: () => {
-                    this.CONSUME1(TwoTok)
+                    this.CONSUME2(TwoTok)
                 }},
                 {ALT: () => {
                     this.CONSUME2(ThreeTok)

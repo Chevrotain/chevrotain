@@ -138,10 +138,10 @@ module chevrotain.examples.recovery.sql {
 
             // parse
             this.CONSUME1(LParenTok)
-            this.SUBRULE(this.value)
+            this.SUBRULE1(this.value)
             this.MANY(() => {
                 commas.push(this.CONSUME1(CommaTok))
-                values.push(this.SUBRULE(this.value))
+                values.push(this.SUBRULE2(this.value))
             })
             this.CONSUME1(RParenTok)
             // tree rewrite

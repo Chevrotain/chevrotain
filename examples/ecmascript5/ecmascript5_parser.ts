@@ -1024,7 +1024,7 @@ module chevrotain.examples.ecma5 {
                         inPossible = this.canInComeAfterExp(headerExp)
                     })
 
-                    headerPart = this.SUBRULE(this.ForHeaderParts, [inPossible])
+                    headerPart = this.SUBRULE2(this.ForHeaderParts, [inPossible])
                     return PT(ForNoVarHeader, [headerExp, headerPart])
                 }}
             ], "var or expression")
@@ -1169,7 +1169,7 @@ module chevrotain.examples.ecma5 {
                 defaultClause = this.SUBRULE(this.DefaultClause)
             })
             this.OPTION3(() => {
-                clausesAfterDefault = this.SUBRULE(this.CaseClauses)
+                clausesAfterDefault = this.SUBRULE2(this.CaseClauses)
             })
             this.CONSUME(RCurly)
 
@@ -1253,7 +1253,7 @@ module chevrotain.examples.ecma5 {
                     })
                 }},
                 {ALT: () => {
-                    finallyPt = this.SUBRULE(this.Finally)
+                    finallyPt = this.SUBRULE2(this.Finally)
                 }}
             ], "catch or finally")
             // @formatter:on

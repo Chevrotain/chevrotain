@@ -16,6 +16,7 @@
 /// <reference path="../src/parse/cache.ts" />
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
+/// <reference path="../src/parse/grammar/checks.ts" />
 /// <reference path="../src/parse/recognizer.ts" />
 /// <reference path="../src/api.ts" />
 
