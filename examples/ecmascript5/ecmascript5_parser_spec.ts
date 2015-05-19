@@ -1,5 +1,6 @@
 /// <reference path="ecmascript5_parser.ts" />
 /// <reference path="ecmascript5_tokens.ts" />
+/// <reference path="ecmascript5_zlexer.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
 
@@ -13,9 +14,9 @@ module chevrotain.examples.ecma5.spec {
                 "// this is a comment\n" +
                 "alert('Hello World!');" +
                 "}"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
-            var parser = new ECMAScript5Parser(lexResult.tokens)
+            var parser = new ECMAScript5Parser(lexResult.tokens, lexResult.idxTolineTerminators)
             parser.Program()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
@@ -25,11 +26,9 @@ module chevrotain.examples.ecma5.spec {
         it("can perform semicolon insertion #1", function () {
             var input = "{ 1\n" +
                 "2 } 3"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
-            // TODO: this information should be produced by the 'full' lexer
-            var LineTerminatorsInfo:any = {2: new LineFeed(-1, -1, "\n")}
-            var parser = new ECMAScript5Parser(lexResult.tokens, LineTerminatorsInfo)
+            var parser = new ECMAScript5Parser(lexResult.tokens, lexResult.idxTolineTerminators)
             parser.Program()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
@@ -38,11 +37,9 @@ module chevrotain.examples.ecma5.spec {
         it("can perform semicolon insertion #2", function () {
             var input = "return\n" +
                 "a + b"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
-            // TODO: this information should be produced by the 'full' lexer
-            var LineTerminatorsInfo:any = {1: new LineFeed(-1, -1, "\n")}
-            var parser = new ECMAScript5Parser(lexResult.tokens, LineTerminatorsInfo)
+            var parser = new ECMAScript5Parser(lexResult.tokens, lexResult.idxTolineTerminators)
             parser.Program()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
@@ -51,11 +48,9 @@ module chevrotain.examples.ecma5.spec {
         it("can perform semicolon insertion #3", function () {
             var input = "a = b\n" +
                 "++c"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
-            // TODO: this information should be produced by the 'full' lexer
-            var LineTerminatorsInfo:any = {3: new LineFeed(-1, -1, "\n")}
-            var parser = new ECMAScript5Parser(lexResult.tokens, LineTerminatorsInfo)
+            var parser = new ECMAScript5Parser(lexResult.tokens, lexResult.idxTolineTerminators)
             parser.Program()
             expect(parser.errors.length).toBe(0)
             expect(parser.isAtEndOfInput()).toBe(true)
@@ -63,7 +58,7 @@ module chevrotain.examples.ecma5.spec {
 
         it("can parse a 'forIn #1", function () {
             var input = "for (var x in arr) {alert(x)}"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
             var parser = new ECMAScript5Parser(lexResult.tokens)
             parser.ForIteration()
@@ -73,7 +68,7 @@ module chevrotain.examples.ecma5.spec {
 
         it("can parse a 'forIn #2", function () {
             var input = "for (x in arr) {alert(x)}"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
             var parser = new ECMAScript5Parser(lexResult.tokens)
             parser.ForIteration()
@@ -83,7 +78,7 @@ module chevrotain.examples.ecma5.spec {
 
         it("will return an invalidParseTree for an invalid statement text", function () {
             var input = "var x += 5;"
-            var lexResult = ECMA5Lexer.tokenize(input)
+            var lexResult = lexer.lex(input)
             expect(lexResult.errors.length).toBe(0)
             var parser = new ECMAScript5Parser(lexResult.tokens)
             var parseResult = parser.Statement()
@@ -94,5 +89,4 @@ module chevrotain.examples.ecma5.spec {
         })
 
     })
-
 }
