@@ -1,6 +1,6 @@
 /// <reference path="ecmascript5_parser.ts" />
 /// <reference path="ecmascript5_tokens.ts" />
-/// <reference path="ecmascript5_zlexer.ts" />
+/// <reference path="ecmascript5_lexer.ts" />
 /// <reference path="../../libs/jasmine.d.ts" />
 
 

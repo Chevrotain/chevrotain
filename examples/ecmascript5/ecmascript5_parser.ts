@@ -1,5 +1,6 @@
 /// <reference path="../../src/parse/recognizer.ts" />
 /// <reference path="../../src/scan/tokens.ts" />
+/// <reference path="../../src/parse/parse_tree.ts" />
 /// <reference path="../../src/scan/lexer.ts" />
 
 module chevrotain.examples.ecma5 {

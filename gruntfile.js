@@ -139,7 +139,22 @@ module.exports = function(grunt) {
                         global:    ['_', 'chevrotain']
                     }
                 }
+            },
+
+            ecma5: {
+                options: {
+                    src:      'target/examples/ecma5.js',
+                    objectToExport: 'chevrotain.examples.ecma5',
+                    template: 'scripts/umd.hbs',
+                    deps:     {
+                        'default': ['_', 'chevrotain'],
+                        amd:       ['lodash', 'chevrotain'],
+                        cjs:       ['lodash', '../release/chevrotain'],
+                        global:    ['_', 'chevrotain']
+                    }
+                }
             }
+
         },
 
         clean:  {
@@ -181,7 +196,14 @@ module.exports = function(grunt) {
                     'target/release/chevrotain.js':      ['target/release/chevrotain.js'],
                     'target/release/chevrotainSpecs.js': specsFiles.concat(exampleSpecsFiles)
                 }
+            },
+
+            ecma5: {
+                files: {
+                    'target/examples/ecma5.js': specsFiles.concat(ecma5Includes)
+                }
             }
+
         }
     })
 
@@ -214,5 +236,8 @@ module.exports = function(grunt) {
         'ts:dev_build',
         'tslint',
         'karma:dev_build'])
+
+
+    grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
 
 }
