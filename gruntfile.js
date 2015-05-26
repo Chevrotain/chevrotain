@@ -4,7 +4,7 @@ var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/", "test")
 var exampleSpecsFiles = require('./scripts/findSpecs')("target/release/tsc/examples/", "examples")
 
-var ecma5Includes = findRefs('./build/ecma5.ts');
+var ecma5Includes = findRefs('./build/ecma5.ts', "target/release/tsc/");
 
 exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
     return _.contains(item, "ecmascript5") && !_.contains(item, "spec")

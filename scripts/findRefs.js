@@ -13,15 +13,17 @@ function getCapturingGroups(targetStr, regex, i) {
     return references;
 }
 
-function transformRefToInclude(ref) {
-    var srcToGen = ref.replace("../", "target/gen/");
+function transformRefToInclude(ref, newLocPrefix) {
+    var srcToGen = ref.replace("../", newLocPrefix);
     var tsToJs = srcToGen.replace(".ts", ".js");
     return tsToJs;
 }
 
-module.exports = function getIncludesFromTsRefsFile(fileName) {
+module.exports = function getIncludesFromTsRefsFile(fileName, newLocPrefix) {
     var contents = fs.readFileSync(fileName).toString();
     var refs = getCapturingGroups(contents, tsRefRegex, 1);
-    var includes = refs.map(transformRefToInclude);
+    var includes = refs.map(function(item) {
+        return transformRefToInclude(item, newLocPrefix)
+    });
     return includes;
 }
