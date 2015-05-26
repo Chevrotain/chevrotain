@@ -5,36 +5,41 @@ var fs = require('fs');
 var wrench = require('wrench');
 var specsFiles = require('./scripts/findSpecs')("target/gen/test/", "test")
 var exampleSpecsFiles = require('./scripts/findSpecs')("target/gen/examples/", "examples")
+var findRefs = require('./scripts/findRefs')
 
+//var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test|examples).+\.ts)/g;
+//
+//function getCapturingGroups(targetStr, regex, i) {
+//    var references = [];
+//    var matched;
+//    while (matched = regex.exec(targetStr)) {
+//        var currRef = matched[i];
+//        references.push(currRef);
+//    }
+//    return references;
+//}
+//
+//function transformRefToInclude(ref) {
+//    var srcToGen = ref.replace("../", "target/gen/");
+//    var tsToJs = srcToGen.replace(".ts", ".js");
+//    return tsToJs;
+//}
+//
+//function getIncludesFromTsRefsFile(fileName) {
+//    var contents = fs.readFileSync(fileName).toString();
+//    var refs = getCapturingGroups(contents, tsRefRegex, 1);
+//    var includes = refs.map(transformRefToInclude);
+//    return includes;
+//}
 
-var tsRefRegex = /path\s*=\s*["'](\.\.\/(src|test|examples).+\.ts)/g;
+var coreIncludes = findRefs('./build/chevrotain.ts');
+var ecma5Includes = findRefs('./build/ecma5.ts');
 
-function getCapturingGroups(targetStr, regex, i) {
-    var references = [];
-    var matched;
-    while (matched = regex.exec(targetStr)) {
-        var currRef = matched[i];
-        references.push(currRef);
-    }
-    return references;
-}
+exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
+    return _.contains(item, "ecmascript5") && !_.contains(item, "spec")
+})
 
-function transformRefToInclude(ref) {
-    var srcToGen = ref.replace("../", "target/gen/");
-    var tsToJs = srcToGen.replace(".ts", ".js");
-    return tsToJs;
-}
-
-function getIncludesFromTsRefsFile(fileName) {
-    var contents = fs.readFileSync(fileName).toString();
-    var refs = getCapturingGroups(contents, tsRefRegex, 1);
-    var includes = refs.map(transformRefToInclude);
-    return includes;
-}
-
-var coreIncludes = getIncludesFromTsRefsFile('./build/chevrotain.ts');
-
-var allSrcsIncludes = coreIncludes.concat(specsFiles, exampleSpecsFiles)
+var allSrcsIncludes = coreIncludes.concat(ecma5Includes, specsFiles, exampleSpecsFiles)
 
 
 module.exports = function(config) {
