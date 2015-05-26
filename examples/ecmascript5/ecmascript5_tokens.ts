@@ -24,227 +24,183 @@ module chevrotain.examples.ecma5 {
      */
 
     // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.2
-    export class AbsWhiteSpace extends tok.Token {
-        static PATTERN = lex.NA
-        static IGNORE = true
-    }
-
-    export class Tab extends AbsWhiteSpace { static PATTERN = /\u0009/ }
-    export class Vertical extends AbsWhiteSpace { static PATTERN = /\u000B/ }
-    export class FormFeed extends AbsWhiteSpace { static PATTERN = /\u000C/ }
-    export class Space extends AbsWhiteSpace { static PATTERN = /\u0020/ }
-    export class NoBreakSpace extends AbsWhiteSpace { static PATTERN = /\u00A0/ }
-    export class ByteOrderMarkWS extends AbsWhiteSpace { static PATTERN = /\uFEFF/ }
-
-    // TODO-SS does this need to exist? what happens in other implementations?
-    export class UnicodeSpaceSeparator extends AbsWhiteSpace { static PATTERN = lex.NA } // Other category "Zs"
+    export class Whitespace extends tok.Token {}
 
     // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
-    export class AbsLineTerminator extends AbsWhiteSpace {
-        static PATTERN = lex.NA
-        static IGNORE = true
-    }
-    export class LineFeed extends AbsLineTerminator { static PATTERN = /\u000A/ }
-    export class CarriageReturn extends AbsLineTerminator { static PATTERN = /\u000D/ }
-    export class LineSeparator extends AbsLineTerminator { static PATTERN = /\u2028/ }
-    export class ParagraphSeparator extends AbsLineTerminator { static PATTERN = /\u2029/ }
-    export class CarriageReturnLineFeed extends AbsLineTerminator { static PATTERN = /\u000D\u000A/ }
+    export class LineTerminator extends Whitespace {}
 
     // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.4
     export class AbsComment extends tok.Token {
-        static PATTERN = lex.NA
+
         static IGNORE = true
     }
-    export class SingleLineComment extends AbsComment { static PATTERN = /(?:\/\/(?:.*))/}
+    export class SingleLineComment extends AbsComment { /*(?:\/\/(?:.*))*/}
     /*
-     * The following two classes exist for the following reason:
+     * The following two classes exist due to the following reason:
      * Quoting the spec: "Comments behave like white space and are discarded except that, if a MultiLineComment contains a
      * line terminator character, then the entire comment is considered to be a LineTerminator for purposes of parsing
      * by the syntactic grammar."
      */
-    // TODO-SS: pattern? simpleLexer does not support multi-line?
-    export class MultipleLineCommentWithTerminator extends AbsComment { static PATTERN = lex.NA }
-    export class MultipleLineCommentWithoutTerminator extends AbsComment { static PATTERN = lex.NA }
+    export class MultipleLineCommentWithTerminator extends AbsComment { }
+    export class MultipleLineCommentWithoutTerminator extends AbsComment { }
 
     // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.6
-    export class IdentifierName extends tok.Token { static PATTERN = lex.NA }
+    export class IdentifierName extends tok.Token { }
 
-    export class AbsAnyKeyword extends IdentifierName { static PATTERN = lex.NA }
+    export class AbsAnyKeyword extends IdentifierName { }
 
-    export class AbsKeyword extends AbsAnyKeyword { static PATTERN = lex.NA }
-    export class BreakTok extends AbsKeyword { static PATTERN = /break/}
-    export class DoTok extends AbsKeyword { static PATTERN = /do/}
-    export class InstanceOfTok extends AbsKeyword { static PATTERN = /instanceof/}
-    export class TypeOfTok extends AbsKeyword { static PATTERN = /typeof/}
-    export class CaseTok extends AbsKeyword { static PATTERN = /case/}
-    export class ElseTok extends AbsKeyword { static PATTERN = /else/}
-    export class NewTok extends AbsKeyword { static PATTERN = /new/}
-    export class VarTok extends AbsKeyword { static PATTERN = /var/}
-    export class CatchTok extends AbsKeyword { static PATTERN = /catch/}
-    export class FinallyTok extends AbsKeyword { static PATTERN = /finally/}
-    export class ReturnTok extends AbsKeyword { static PATTERN = /return/}
-    export class VoidTok extends AbsKeyword { static PATTERN = /void/}
-    export class ContinueTok extends AbsKeyword { static PATTERN = /continue/}
-    export class ForTok extends AbsKeyword { static PATTERN = /for/}
-    export class SwitchTok extends AbsKeyword { static PATTERN = /switch/}
-    export class WhileTok extends AbsKeyword { static PATTERN = /while/}
-    export class DebuggerTok extends AbsKeyword { static PATTERN = /debugger/}
-    export class FunctionTok extends AbsKeyword { static PATTERN = /function/}
-    export class ThisTok extends AbsKeyword { static PATTERN = /this/}
-    export class WithTok extends AbsKeyword { static PATTERN = /with/}
-    export class DefaultTok extends AbsKeyword { static PATTERN = /default/}
-    export class IfTok extends AbsKeyword { static PATTERN = /if/}
-    export class ThrowTok extends AbsKeyword { static PATTERN = /throw/}
-    export class DeleteTok extends AbsKeyword { static PATTERN = /delete/}
-    export class InTok extends AbsKeyword { static PATTERN = /in/}
-    export class TryTok extends AbsKeyword { static PATTERN = /try/}
+    export class AbsKeyword extends AbsAnyKeyword { }
+    export class BreakTok extends AbsKeyword { }
+    export class DoTok extends AbsKeyword { }
+    export class InstanceOfTok extends AbsKeyword { }
+    export class TypeOfTok extends AbsKeyword { }
+    export class CaseTok extends AbsKeyword { }
+    export class ElseTok extends AbsKeyword { }
+    export class NewTok extends AbsKeyword { }
+    export class VarTok extends AbsKeyword { }
+    export class CatchTok extends AbsKeyword { }
+    export class FinallyTok extends AbsKeyword { }
+    export class ReturnTok extends AbsKeyword { }
+    export class VoidTok extends AbsKeyword { }
+    export class ContinueTok extends AbsKeyword { }
+    export class ForTok extends AbsKeyword { }
+    export class SwitchTok extends AbsKeyword { }
+    export class WhileTok extends AbsKeyword { }
+    export class DebuggerTok extends AbsKeyword { }
+    export class FunctionTok extends AbsKeyword { }
+    export class ThisTok extends AbsKeyword { }
+    export class WithTok extends AbsKeyword { }
+    export class DefaultTok extends AbsKeyword { }
+    export class IfTok extends AbsKeyword { }
+    export class ThrowTok extends AbsKeyword { }
+    export class DeleteTok extends AbsKeyword { }
+    export class InTok extends AbsKeyword { }
+    export class TryTok extends AbsKeyword { }
 
-    export class AbsAnyFutureReservedWords extends AbsAnyKeyword { static PATTERN = lex.NA }
+    export class AbsAnyFutureReservedWords extends AbsAnyKeyword { }
 
-    export class AbsFutureReservedWord extends AbsAnyFutureReservedWords { static PATTERN = lex.NA }
-    export class ClassTok extends AbsFutureReservedWord { static PATTERN = /class/}
-    export class EnumTok extends AbsFutureReservedWord { static PATTERN = /enum/}
-    export class ExtendsTok extends AbsFutureReservedWord { static PATTERN = /extends/}
-    export class SuperTok extends AbsFutureReservedWord { static PATTERN = /super/}
-    export class ConstTok extends AbsFutureReservedWord { static PATTERN = /const/}
-    export class ExportTok extends AbsFutureReservedWord { static PATTERN = /export/}
-    export class ImportTok extends AbsFutureReservedWord { static PATTERN = /import/}
+    export class AbsFutureReservedWord extends AbsAnyFutureReservedWords { }
+    export class ClassTok extends AbsFutureReservedWord { }
+    export class EnumTok extends AbsFutureReservedWord { }
+    export class ExtendsTok extends AbsFutureReservedWord { }
+    export class SuperTok extends AbsFutureReservedWord { }
+    export class ConstTok extends AbsFutureReservedWord { }
+    export class ExportTok extends AbsFutureReservedWord { }
+    export class ImportTok extends AbsFutureReservedWord { }
 
-    export class AbsFutureReservedWordStrictMode extends AbsAnyFutureReservedWords { static PATTERN = lex.NA }
-    export class ImplementsTok extends AbsFutureReservedWordStrictMode { static PATTERN = /implements/}
-    export class LetTok extends AbsFutureReservedWordStrictMode { static PATTERN = /let/}
-    export class PrivateTok extends AbsFutureReservedWordStrictMode { static PATTERN = /private/}
-    export class PublicTok extends AbsFutureReservedWordStrictMode { static PATTERN = /public/}
-    export class YieldTok extends AbsFutureReservedWordStrictMode { static PATTERN = /yield/}
-    export class InterfaceTok extends AbsFutureReservedWordStrictMode { static PATTERN = /interface/}
-    export class PackageTok extends AbsFutureReservedWordStrictMode { static PATTERN = /package/}
-    export class ProtectedTok extends AbsFutureReservedWordStrictMode { static PATTERN = /protected/}
-    export class StaticTok extends AbsFutureReservedWordStrictMode { static PATTERN = /static/}
+    export class AbsFutureReservedWordStrictMode extends AbsAnyFutureReservedWords { }
+    export class ImplementsTok extends AbsFutureReservedWordStrictMode { }
+    export class LetTok extends AbsFutureReservedWordStrictMode { }
+    export class PrivateTok extends AbsFutureReservedWordStrictMode { }
+    export class PublicTok extends AbsFutureReservedWordStrictMode { }
+    export class YieldTok extends AbsFutureReservedWordStrictMode { }
+    export class InterfaceTok extends AbsFutureReservedWordStrictMode { }
+    export class PackageTok extends AbsFutureReservedWordStrictMode { }
+    export class ProtectedTok extends AbsFutureReservedWordStrictMode { }
+    export class StaticTok extends AbsFutureReservedWordStrictMode { }
 
     // TODO-SS this pattern is a subset of JS Identifier without the unicode mess, need the full pattern
-    export class Identifier extends IdentifierName { static PATTERN = /[_A-Za-z\$][_A-Za-z\d]*/ }
+    export class Identifier extends IdentifierName { } // [_A-Za-z\$][_A-Za-z\d]*
 
     // The 'get' and 'set' identifiers require a Token class as they have special handling in the grammar
     // @link http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5
-    export class GetTok extends Identifier { static PATTERN = /get/}
-    export class SetTok extends Identifier { static PATTERN = /set/}
+    export class GetTok extends Identifier { }
+    export class SetTok extends Identifier { }
 
     // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.7
-    export class AbsPunctuator extends tok.Token { static PATTERN = lex.NA }
-    export class LCurly extends AbsPunctuator { static PATTERN = /{/ }
-    export class RCurly extends AbsPunctuator { static PATTERN = /}/ }
-    export class LParen extends AbsPunctuator { static PATTERN = /\(/ }
-    export class RParen extends AbsPunctuator { static PATTERN = /\)/ }
-    export class LBracket extends AbsPunctuator { static PATTERN = /\[/ }
-    export class RBracket extends AbsPunctuator { static PATTERN = /]/ }
-    export class Dot extends AbsPunctuator { static PATTERN = /\./ }
+    export class AbsPunctuator extends tok.Token { }
+    export class LCurly extends AbsPunctuator { } // {
+    export class RCurly extends AbsPunctuator { } // }
+    export class LParen extends AbsPunctuator { } // (
+    export class RParen extends AbsPunctuator { } // )
+    export class LBracket extends AbsPunctuator { } // [
+    export class RBracket extends AbsPunctuator { } // ]
+    export class Dot extends AbsPunctuator { } // .
 
     export class Semicolon extends AbsPunctuator {
         constructor(startLine:number, startColumn:number, image:string,
                     public isAutomaticSemiColonInsertion = false) {
             super(startLine, startColumn, image)
         }
-
-        static PATTERN = /;/
     }
 
-    export class Comma extends AbsPunctuator { static PATTERN = /,/ }
+    export class Comma extends AbsPunctuator { } // ,
 
-    export class PlusPlus extends AbsPunctuator { static PATTERN = /\+\+/ }
-    export class MinusMinus extends AbsPunctuator { static PATTERN = /\-\-/ }
+    export class PlusPlus extends AbsPunctuator { } // ++
+    export class MinusMinus extends AbsPunctuator { } // --
 
-    export class Ampersand extends AbsPunctuator { static PATTERN = /&/ }
-    export class VerticalBar extends AbsPunctuator { static PATTERN = /\|/ }
-    export class Circumflex extends AbsPunctuator { static PATTERN = /\^/ }
-    export class Exclamation extends AbsPunctuator { static PATTERN = /!/ }
-    export class Tilde extends AbsPunctuator { static PATTERN = /~/ }
+    export class Ampersand extends AbsPunctuator { } // &
+    export class VerticalBar extends AbsPunctuator { } // |
+    export class Circumflex extends AbsPunctuator { } // ^
+    export class Exclamation extends AbsPunctuator { } // !
+    export class Tilde extends AbsPunctuator { } // ~
 
-    export class AmpersandAmpersand extends AbsPunctuator { static PATTERN = /&&/ }
-    export class VerticalBarVerticalBar extends AbsPunctuator { static PATTERN = /\|\|/ }
+    export class AmpersandAmpersand extends AbsPunctuator { } // &&
+    export class VerticalBarVerticalBar extends AbsPunctuator { } // ||
 
-    export class Question extends AbsPunctuator { static PATTERN = /\?/ }
-    export class Colon extends AbsPunctuator { static PATTERN = /:/ }
+    export class Question extends AbsPunctuator { } // ?
+    export class Colon extends AbsPunctuator { } // :
 
-    export class AbsMultiplicativeOperator extends AbsPunctuator { static PATTERN = lex.NA }
-    export class Asterisk extends AbsMultiplicativeOperator { static PATTERN = /\*/ }
-    export class Slash extends AbsMultiplicativeOperator { static PATTERN = /\// }
-    export class Percent extends AbsMultiplicativeOperator { static PATTERN = /%/ }
+    export class AbsMultiplicativeOperator extends AbsPunctuator { }
+    export class Asterisk extends AbsMultiplicativeOperator { } // *
+    export class Slash extends AbsMultiplicativeOperator { } // /
+    export class Percent extends AbsMultiplicativeOperator { } // %
 
-    export class AbsAdditiveOperator extends AbsPunctuator { static PATTERN = lex.NA }
-    export class Plus extends AbsAdditiveOperator { static PATTERN = /\+/ }
-    export class Minus extends AbsAdditiveOperator { static PATTERN = /-/ }
+    export class AbsAdditiveOperator extends AbsPunctuator { }
+    export class Plus extends AbsAdditiveOperator { } // +
+    export class Minus extends AbsAdditiveOperator { } // -
 
-    export class AbsShiftOperator extends AbsPunctuator { static PATTERN = lex.NA }
-    export class LessLess extends AbsShiftOperator { static PATTERN = /<</ }
-    export class MoreMore extends AbsShiftOperator { static PATTERN = />>/ }
-    export class MoreMoreMore extends AbsShiftOperator { static PATTERN = />>>/ }
+    export class AbsShiftOperator extends AbsPunctuator { }
+    export class LessLess extends AbsShiftOperator { } // <<
+    export class MoreMore extends AbsShiftOperator { } // >>
+    export class MoreMoreMore extends AbsShiftOperator { } // >>>
 
-    export class AbsRelationalOperator extends AbsPunctuator { static PATTERN = lex.NA }
-    export class Less extends AbsRelationalOperator { static PATTERN = /</ }
-    export class Greater extends AbsRelationalOperator { static PATTERN = />/ }
-    export class LessEq extends AbsRelationalOperator { static PATTERN = /<=/ }
-    export class GreaterEq extends AbsRelationalOperator { static PATTERN = />=/ }
+    export class AbsRelationalOperator extends AbsPunctuator { }
+    export class Less extends AbsRelationalOperator { } // <
+    export class Greater extends AbsRelationalOperator { } // >
+    export class LessEq extends AbsRelationalOperator { } // <=
+    export class GreaterEq extends AbsRelationalOperator { } // >=
 
-    export class AbsEqualityOperator extends AbsPunctuator { static PATTERN = lex.NA }
-    export class EqEq extends AbsEqualityOperator { static PATTERN = /==/ }
-    export class NotEq extends AbsEqualityOperator { static PATTERN = /!=/ }
-    export class EqEqEq extends AbsEqualityOperator { static PATTERN = /===/ }
-    export class NotEqEq extends AbsEqualityOperator { static PATTERN = /!==/ }
+    export class AbsEqualityOperator extends AbsPunctuator { }
+    export class EqEq extends AbsEqualityOperator { } // ==
+    export class NotEq extends AbsEqualityOperator { } // !=
+    export class EqEqEq extends AbsEqualityOperator { } // ===
+    export class NotEqEq extends AbsEqualityOperator { } // !==
 
-    export class AbsAssignmentOperator extends AbsPunctuator { static PATTERN = lex.NA }
-    export class Eq extends AbsAssignmentOperator { static PATTERN = /=/ }
-    export class PlusEq extends AbsAssignmentOperator { static PATTERN = /\+=/ }
-    export class MinusEq extends AbsAssignmentOperator { static PATTERN = /-=/ }
-    export class AsteriskEq extends AbsAssignmentOperator { static PATTERN = /\*=/ }
-    export class PercentEq extends AbsAssignmentOperator { static PATTERN = /%=/ }
-    export class LessLessEq extends AbsAssignmentOperator { static PATTERN = /<<=/ }
-    export class MoreMoreEq extends AbsAssignmentOperator { static PATTERN = />>=/ }
-    export class MoreMoreMoreEq extends AbsAssignmentOperator { static PATTERN = />>>=/ }
-    export class AmpersandEq extends AbsAssignmentOperator { static PATTERN = /&=/ }
-    export class VerticalBarEq extends AbsAssignmentOperator { static PATTERN = /|=/ }
-    export class CircumflexEq extends AbsAssignmentOperator { static PATTERN = /^=/ }
-    export class SlashEq extends AbsAssignmentOperator { static PATTERN = /\/=/ }
+    export class AbsAssignmentOperator extends AbsPunctuator { }
+    export class Eq extends AbsAssignmentOperator { } // =
+    export class PlusEq extends AbsAssignmentOperator { } // +=
+    export class MinusEq extends AbsAssignmentOperator { } // -=
+    export class AsteriskEq extends AbsAssignmentOperator { } // *=
+    export class PercentEq extends AbsAssignmentOperator { } // %=
+    export class LessLessEq extends AbsAssignmentOperator { } // <<=
+    export class MoreMoreEq extends AbsAssignmentOperator { } // >>=
+    export class MoreMoreMoreEq extends AbsAssignmentOperator { } // >>>=
+    export class AmpersandEq extends AbsAssignmentOperator { } // &=
+    export class VerticalBarEq extends AbsAssignmentOperator { } // |=
+    export class CircumflexEq extends AbsAssignmentOperator { } // ^=
+    export class SlashEq extends AbsAssignmentOperator { } // /=
 
     // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.8
-    export class AbsLiteral extends tok.Token { static PATTERN = lex.NA }
+    export class AbsLiteral extends tok.Token { }
 
-    export class NullTok extends AbsLiteral { static PATTERN = /null/}
+    export class NullTok extends AbsLiteral { }
 
-    export class AbsBooleanLiteral extends AbsLiteral { static PATTERN = lex.NA }
-    export class TrueTok extends AbsBooleanLiteral { static PATTERN = /true/}
-    export class FalseTok extends AbsBooleanLiteral { static PATTERN = /false/}
+    export class AbsBooleanLiteral extends AbsLiteral { }
+    export class TrueTok extends AbsBooleanLiteral { }
+    export class FalseTok extends AbsBooleanLiteral { }
 
-    export class AbsNumericLiteral extends AbsLiteral { static PATTERN = lex.NA }
-    export class DecimalLiteral extends AbsNumericLiteral { static PATTERN = /-?(0|[1-9]\d*)(\.\D+)?([eE][+-]?\d+)?/ }
-    export class HexIntegerLiteral extends AbsNumericLiteral { static PATTERN = /0(x|X)[0-9a-fA-F]+/ }
+    export class AbsNumericLiteral extends AbsLiteral { }
+    export class DecimalLiteral extends AbsNumericLiteral { } // -?(0|[1-9]\d*)(\.\D+)?([eE][+-]?\d+)?
+    export class HexIntegerLiteral extends AbsNumericLiteral { } // 0(x|X)[0-9a-fA-F]+
 
-    export class AbsStringLiteral extends AbsLiteral { static PATTERN = lex.NA }
-    export class DoubleQuotationStringLiteral extends AbsStringLiteral {
-        static PATTERN = /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/
-    }
-    export class SingleQuotationStringLiteral extends AbsStringLiteral {
-        static PATTERN = /'([^\\']+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*'/
-    }
+    export class AbsStringLiteral extends AbsLiteral { }
+    export class DoubleQuotationStringLiteral extends AbsStringLiteral { }
+    export class SingleQuotationStringLiteral extends AbsStringLiteral { }
 
-    // TODO: pattern?
-    export class RegularExpressionLiteral extends AbsLiteral { static PATTERN = lex.NA }
-
-    // the Identifier Token must appear last in the array of Token passed to
-    // the simpleLexer, otherwise keywords may be lexed as Identifiers
-    var sortedTokens = _.sortBy(_.values(ecma5), (tokClass) => {
-        return tokClass === Identifier ? 666 : 1
-    })
-
-    // TODO: temp hack while using the SimplerLexer, remove the hack + SimplerLexer once a hand built lexer has been built
-    var onlySortedTokens = _.filter(sortedTokens, (prop) => {
-        return prop !== chevrotain.examples.ecma5.spec && prop !== chevrotain.examples.ecma5.ECMAScript5Parser
-    })
-
-    export var ECMA5Lexer = new lex.SimpleLexer(onlySortedTokens)
-
+    export class RegularExpressionLiteral extends AbsLiteral { }
 
     // Virtual Tokens for defining the ParseTree
-
     export class InvalidPrimaryExpression extends tok.VirtualToken {}
 
     export class ParenthesisExpression extends tok.VirtualToken {}

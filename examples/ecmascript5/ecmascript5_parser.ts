@@ -13,8 +13,6 @@ module chevrotain.examples.ecma5 {
     var DISABLE_SEMICOLON_INSERTION = false
     var ENABLE_SEMICOLON_INSERTION = true
 
-    export type IdxToLineTerminator = { [idx: number] : AbsLineTerminator }
-
     function isSingleOperandExp(binExpParts:chevrotain.tree.ParseTree[]):boolean {
         return binExpParts.length === 1
     }
@@ -40,7 +38,7 @@ module chevrotain.examples.ecma5 {
          *    this includes everything that modify the parser's behavior.
          *    excluding the line terminators (which are meaningful in some edge cases)
          *
-         * @param {Object<number, AbsLineTerminator>} lineTerminatorsInfo
+         * @param {Object<number, LineTerminator>} lineTerminatorsInfo
          *    This adds the missing information about LineTerminators.
          *    lineTerminatorsInfo[x] is an AbsLineTerminator instance IFF
          *    in the "complete" meaningful token input vector there is an AbsLineTerminator instance
@@ -53,18 +51,18 @@ module chevrotain.examples.ecma5 {
          *          "1" : AbsLineTerminator("\r\n")
          *    }
          */
-        constructor(input:tok.Token[] = [], protected lineTerminatorsInfo:IdxToLineTerminator = {}) {
+        constructor(input:tok.Token[] = [], protected lineTerminatorsInfo:lexer.IdxToLineTerminator = {}) {
             super(input, <any>chevrotain.examples.ecma5)
             ECMAScript5Parser.performSelfAnalysis(this)
         }
 
         protected isNextLineTerminator():boolean {
             var nextLT = this.lineTerminatorsInfo[this.inputIdx + 1]
-            return nextLT instanceof AbsLineTerminator ||
+            return nextLT instanceof LineTerminator ||
                 nextLT instanceof MultipleLineCommentWithTerminator
         }
 
-        protected nextLineTerminator():AbsLineTerminator {
+        protected nextLineTerminator():LineTerminator {
             return this.lineTerminatorsInfo[this.inputIdx + 1]
         }
 
