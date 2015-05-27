@@ -88,5 +88,15 @@ module chevrotain.examples.ecma5.spec {
             expect(parseResult.payload).toEqual(jasmine.any(InvalidStatement))
         })
 
+        it("can parse an assigment statement with an array literal", function () {
+            var input = "var x = [1,2,3];"
+            var lexResult = lexer.lex(input)
+            expect(lexResult.errors.length).toBe(0)
+            var parser = new ECMAScript5Parser(lexResult.tokens)
+            var parseResult = parser.Statement()
+            expect(parser.errors.length).toBe(0)
+            expect(parser.isAtEndOfInput()).toBe(true)
+        })
+
     })
 }

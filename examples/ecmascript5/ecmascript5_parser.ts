@@ -171,9 +171,10 @@ module chevrotain.examples.ecma5 {
         public ElementList = this.RULE("ElementList", () => {
             var elements = []
 
-            this.OPTION(() => {
-                elements.push(this.SUBRULE(this.Elision))
-            })
+            // in the spec this may start with an optional Elision,
+            // this create an ambiguity in the ArrayLiteral rule.
+            // removing the Elision from this here does not modify the grammar
+            // as the ElementList rule is only invoked from ArrayLiteral rule
             elements.push(this.SUBRULE(this.AssignmentExpression))
             this.MANY(() => {
                 elements.push(this.SUBRULE2(this.Elision))
@@ -822,7 +823,7 @@ module chevrotain.examples.ecma5 {
             VarDecList = this.SUBRULE(this.VariableDeclarationList)
             this.CONSUME(Semicolon, ENABLE_SEMICOLON_INSERTION)
 
-            return PT(VariableStatement, VarDecList)
+            return PT(VariableStatement, [VarDecList])
         }, InvalidVariableStatement)
 
 
