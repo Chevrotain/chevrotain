@@ -303,7 +303,7 @@ module chevrotain.examples.ecma5.lexer {
         // There is no keyword or literal with only one character.
         // Thus, it must be an identifier.
         if (id.length === 1) {
-            return new Identifier(startLine, startColumn, cc)
+            return new Identifier(startLine, startColumn, CURR_CHAR())
         } else if (isKeyword(id)) {
             var keywordConstructor = keywordsToConstructor[id]
             return new keywordConstructor(startLine, startColumn, id)
