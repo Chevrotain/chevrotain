@@ -200,7 +200,7 @@ module.exports = function(grunt) {
 
             ecma5: {
                 files: {
-                    'target/examples/ecma5.js': specsFiles.concat(ecma5Includes)
+                    'target/examples/ecma5.js': ecma5Includes
                 }
             }
 
