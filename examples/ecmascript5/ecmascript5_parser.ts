@@ -114,14 +114,14 @@ module chevrotain.examples.ecma5 {
             if (trySemiColonInsertion && this.canAndShouldDoSemiColonInsertion()) {
                 return new Semicolon(-1, -1, ";", true)
             }
-            return this.CONSUME1(tokClass)
+            return super.CONSUME1(tokClass)
         }
 
         protected CONSUME2(tokClass:Function, trySemiColonInsertion = false):tok.Token {
             if (trySemiColonInsertion && this.canAndShouldDoSemiColonInsertion()) {
                 return new Semicolon(-1, -1, ";", true)
             }
-            return this.CONSUME2(tokClass)
+            return super.CONSUME2(tokClass)
         }
 
         // A.3 Expressions
