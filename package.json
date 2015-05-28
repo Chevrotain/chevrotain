@@ -47,7 +47,7 @@
     "grunt-contrib-concat": "^0.5.1",
     "grunt-jasmine-node-coverage": "^0.4.1",
     "grunt-karma": "~0.11.0",
-    "grunt-ts": "~3.0.0",
+    "grunt-ts": "~4.1.0",
     "grunt-tslint": "~2.2.0-beta",
     "grunt-umd": "~2.3.3",
     "karma": "~0.12.33",

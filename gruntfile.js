@@ -1,4 +1,3 @@
-var wrench = require('wrench')
 var _ = require('lodash')
 var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/", "test")
@@ -97,12 +96,20 @@ module.exports = function(grunt) {
             },
 
             release: {
-                files:   {
-                    'target/release/chevrotain.js': ['build/chevrotain.ts'],
-                    // this is the same as the 'build' process, all .ts --> .js in gen directory
-                    // in a later step those files will be aggregated into separate components
-                    'target/release/tsc':           ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/release/**/*.ts"]
-                },
+                src:    ['build/chevrotain.ts'],
+                out: 'target/release/chevrotain.js',
+                options: {
+                    declaration:    true,
+                    removeComments: false,
+                    sourceMap:      false // due to UMD and concat generated headers the original source map will be invalid.
+                }
+            },
+
+            // this is the same as the 'build' process, all .ts --> .js in gen directory
+            // in a later step those files will be aggregated into separate components
+            release_test_code: {
+                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/**/*.ts"],
+                outDir: "target/release/tsc",
                 options: {
                     declaration:    true,
                     removeComments: false,
@@ -143,10 +150,10 @@ module.exports = function(grunt) {
 
             ecma5: {
                 options: {
-                    src:      'target/examples/ecma5.js',
+                    src:            'target/examples/ecma5.js',
                     objectToExport: 'chevrotain.examples.ecma5',
-                    template: 'scripts/umd.hbs',
-                    deps:     {
+                    template:       'scripts/umd.hbs',
+                    deps:           {
                         'default': ['_', 'chevrotain'],
                         amd:       ['lodash', 'chevrotain'],
                         cjs:       ['lodash', '../release/chevrotain'],
@@ -218,6 +225,7 @@ module.exports = function(grunt) {
     var releaseBuildTasks = [
         'clean:release',
         'ts:release',
+        'ts:release_test_code',
         'tslint',
         'concat:release',
         'umd:release',
