@@ -38,7 +38,7 @@
     "postinstall": "bower install"
   },
   "dependencies": {
-    "lodash": "~3.8.0"
+    "lodash": "~3.9.3"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
@@ -46,19 +46,19 @@
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-jasmine-node-coverage": "^0.4.1",
-    "grunt-karma": "~0.10.1",
+    "grunt-karma": "~0.11.0",
     "grunt-ts": "~3.0.0",
-    "grunt-tslint": "~2.0.0",
+    "grunt-tslint": "~2.2.0-beta",
     "grunt-umd": "~2.3.3",
-    "karma": "~0.12.31",
-    "karma-chrome-launcher": "~0.1.8",
-    "karma-firefox-launcher": "~0.1.4",
+    "karma": "~0.12.33",
+    "karma-chrome-launcher": "~0.1.12",
+    "karma-firefox-launcher": "~0.1.6",
     "karma-ie-launcher": "~0.1",
     "karma-jasmine": "~0.3.5",
-    "karma-sauce-launcher": "~0.2.10",
+    "karma-sauce-launcher": "~0.2.11",
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
-    "tslint": "~2.1.1",
+    "tslint": "~2.2.0-beta",
     "wrench": "~1.5.8"
   },
   "private": true
