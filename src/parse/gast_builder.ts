@@ -31,25 +31,25 @@ module chevrotain.gastBuilder {
     }
 
     // CONSUME1([ns1.ns2.ns3.]LCurlyTok)
-    var terminalRegEx = /this\s*.\s*CONSUME(\d)?\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
+    var terminalRegEx = /(?:this|that)\s*.\s*CONSUME(\d)?\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
     var terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
     // note that there is an optional underscore '_' before the 'this'
     // typescript adds this when generating code for arrow function ()=>{...}
-    var refRegEx = /this\s*.\s*SUBRULE(\d)?\s*\(\s*_?this\s*.\s*([a-zA-Z_]\w*)/
+    var refRegEx = /(?:this|that)\s*.\s*SUBRULE(\d)?\s*\(\s*_?(?:this|that)\s*.\s*([a-zA-Z_]\w*)/
     var refRegExGlobal = new RegExp(refRegEx.source, "g")
 
     // this.OPTION(this.isSemicolon, ()=> {semicolon = this.CONSUME1(tok.SemicolonTok)})
-    var optionRegEx = /this\s*.\s*OPTION(?:_LA)?(\d)?\s*\(/
+    var optionRegEx = /(?:this|that)\s*.\s*OPTION(?:_LA)?(\d)?\s*\(/
     var optionRegExGlobal = new RegExp(optionRegEx.source, "g")
 
-    var manyRegEx = /this\s*.\s*MANY(\d)?\s*\(/
+    var manyRegEx = /(?:this|that)\s*.\s*MANY(\d)?\s*\(/
     var manyRegExGlobal = new RegExp(manyRegEx.source, "g")
 
-    var atLeastOneRegEx = /this\s*.\s*AT_LEAST_ONE(\d)?\s*\(/
+    var atLeastOneRegEx = /(?:this|that)\s*.\s*AT_LEAST_ONE(\d)?\s*\(/
     var atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
 
-    var orRegEx = /this\s*.\s*OR(\d)?\s*\(/
+    var orRegEx = /(?:this|that)\s*.\s*OR(\d)?\s*\(/
     var orRegExGlobal = new RegExp(orRegEx.source, "g")
 
     var orPartRegEx = /{\s*(WHEN|ALT)\s*:/g
