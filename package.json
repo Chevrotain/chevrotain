@@ -1,6 +1,42 @@
 {
   "name": "chevrotain",
   "version": "0.1.0",
+  "description": "Javascript/Typescript parsing framework",
+  "keywords": [
+    "parser",
+    "syntax",
+    "grammar",
+    "lexer",
+    "tokenizer"
+  ],
+  "bugs": {
+    "url": "https://github.com/SAP/chevrotain/issues"
+  },
+  "license": " Apache-2.0",
+  "author": {
+    "name": "Shahar Soel",
+    "email": "shahar.soel@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Firas Najjar"
+    }
+  ],
+  "files": [
+    "target/release/chevrotain.d.ts",
+    "target/release/chevrotain.js",
+    "readme.md",
+    "docs"
+  ],
+  "main": "target/release/chevrotain.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SAP/chevrotain.git"
+  },
+  "scripts": {
+    "test": "grunt test",
+    "postinstall": "bower install"
+  },
   "dependencies": {
     "lodash": "~3.8.0"
   },
@@ -24,10 +60,6 @@
     "karma-story-reporter": "~0.3.1",
     "tslint": "~2.1.1",
     "wrench": "~1.5.8"
-  },
-  "scripts": {
-    "test": "grunt test",
-    "postinstall": "bower install"
   },
   "private": true
 }
