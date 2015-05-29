@@ -5,6 +5,8 @@ cache:
 node_js:
   - "0.12"
 before_install: npm install -g grunt-cli bower
-install: npm install
+install:
+  - npm install
+  - bower install
 before_script: grunt build
 after_script: cat ./bin/coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js

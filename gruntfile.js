@@ -11,6 +11,19 @@ exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
 
 exampleSpecsFiles = ecma5Includes.concat(exampleSpecsFiles)
 
+// TODO: this is a bit ugly, but including the root and then performing negation
+//       seems to cause inclusion of things outside the root...
+var githubReleaseFiles = ['./*.js',
+    './license',
+    './*.json',
+    './*.md',
+    './*/**',
+    '!./node_modules/**',
+    '!./bower_components/**',
+    '!./package/**',
+    '!./bin/tsc/**',
+    '!./bin/gen/**'
+]
 
 module.exports = function(grunt) {
 
@@ -86,8 +99,8 @@ module.exports = function(grunt) {
 
         ts: {
             options:   {
-                bin: "ES5",
-                fast:   "never"
+                bin:  "ES5",
+                fast: "never"
 
             },
             dev_build: {
@@ -96,8 +109,8 @@ module.exports = function(grunt) {
             },
 
             release: {
-                src:    ['build/chevrotain.ts'],
-                out: 'bin/chevrotain.js',
+                src:     ['build/chevrotain.ts'],
+                out:     'bin/chevrotain.js',
                 options: {
                     declaration:    true,
                     removeComments: false,
@@ -108,8 +121,8 @@ module.exports = function(grunt) {
             // this is the same as the 'build' process, all .ts --> .js in gen directory
             // in a later step those files will be aggregated into separate components
             release_test_code: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
-                outDir: "bin/tsc",
+                src:     ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
+                outDir:  "bin/tsc",
                 options: {
                     declaration:    true,
                     removeComments: false,
@@ -209,7 +222,35 @@ module.exports = function(grunt) {
                     'bin/examples/ecma5.js': ecma5Includes
                 }
             }
+        },
 
+        release: {
+            options: {
+                tagName:         'v<%=version%>',
+                additionalFiles: ['bower.json'],
+                github:          {
+                    repo:        'SAP/chevrotain',
+                    usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
+                    passwordVar: 'GITHUB_PASSWORD' // ENVIRONMENT VARIABLE that contains Github password or token
+                    // github token must be defined as an env parameter
+                }
+            }
+
+        },
+
+        compress: {
+            github_release_zip: {
+                options: {
+                    archive: 'package/chevrotain.zip'
+                },
+                files:   [{src: githubReleaseFiles, dest: '/'}]
+            },
+            github_release_tgz: {
+                options: {
+                    archive: 'package/chevrotain.tar.gz'
+                },
+                files:   [{src: githubReleaseFiles, dest: '/'}]
+            }
         }
     })
 
@@ -220,6 +261,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
     grunt.loadNpmTasks('grunt-jasmine-node-coverage')
+    grunt.loadNpmTasks('grunt-release')
+    grunt.loadNpmTasks('grunt-contrib-compress');
 
     var releaseBuildTasks = [
         'clean:all',
@@ -228,7 +271,8 @@ module.exports = function(grunt) {
         'tslint',
         'concat:release',
         'umd:release',
-        'umd:release_specs'
+        'umd:release_specs',
+        'compress'
     ]
 
     var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])

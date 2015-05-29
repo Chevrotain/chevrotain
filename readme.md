@@ -74,7 +74,7 @@ Note that the examples are written in Typescript.
 To see the generated(readable) javascript code: 
 
 only once:
-* $ npm install -g grunt (only once)
+* $ npm install -g grunt
 * $ npm install -g bower
 * $ npm install
 
@@ -84,7 +84,11 @@ to run the dev build and generate the javascript sources:
 
 To debug the example's tests using chrome developer tools:
 
-* $ npm install -g karma (only once)
+only once:
+* $ bower install
+* $ npm install -g karma
+
+each time:
 * $ karma start
 * in the karma chrome window press the debug button   
 * open developer tools(F12), add breakpoints and refresh the page to rerun the tests
