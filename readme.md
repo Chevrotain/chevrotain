@@ -80,7 +80,7 @@ only once:
 
 to run the dev build and generate the javascript sources:
 * $ grunt dev_build
-* now look in: target\gen\examples folder
+* now look in: bin\gen\examples folder
 
 To debug the example's tests using chrome developer tools:
 

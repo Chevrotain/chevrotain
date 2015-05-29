@@ -1,9 +1,9 @@
 var _ = require('lodash')
 var findRefs = require('./scripts/findRefs')
-var specsFiles = require('./scripts/findSpecs')("target/release/tsc/test/", "test")
-var exampleSpecsFiles = require('./scripts/findSpecs')("target/release/tsc/examples/", "examples")
+var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
+var exampleSpecsFiles = require('./scripts/findSpecs')("bin/tsc/examples/", "examples")
 
-var ecma5Includes = findRefs('./build/ecma5.ts', "target/release/tsc/");
+var ecma5Includes = findRefs('./build/ecma5.ts', "bin/tsc/");
 
 exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
     return _.contains(item, "ecmascript5") && !_.contains(item, "spec")
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
 
             tests_on_browsers: {
                 options: {
-                    files:    ['bower_components/lodash/lodash.js', 'target/release/chevrotain.js', 'target/release/chevrotainSpecs.js'],
+                    files:    ['bower_components/lodash/lodash.js', 'bin/chevrotain.js', 'bin/chevrotainSpecs.js'],
                     browsers: ['Chrome', 'Firefox', 'IE']
                 }
             }
@@ -54,7 +54,7 @@ module.exports = function(grunt) {
                             lines:      100,
                             functions:  100
                         },
-                        reportDir:  'target/coverage',
+                        reportDir:  'bin/coverage',
                         report:     [
                             'lcov'
                         ],
@@ -66,12 +66,12 @@ module.exports = function(grunt) {
                     forceExit:         true,
                     match:             '.',
                     matchAll:          false,
-                    specFolders:       ['target/release'],
+                    specFolders:       ['bin'],
                     extensions:        'js',
-                    specNameMatcher:   'tainSpecs',
+                    specNameMatcher:   'tainSpecs', // to only run the aggregated specs
                     captureExceptions: true
                 },
-                src:     ['target/release/chevrotain.js']
+                src:     ['bin/chevrotain.js']
             }
         },
 
@@ -86,18 +86,18 @@ module.exports = function(grunt) {
 
         ts: {
             options:   {
-                target: "ES5",
+                bin: "ES5",
                 fast:   "never"
 
             },
             dev_build: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/**/*.ts"],
-                outDir: "target/gen"
+                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
+                outDir: "bin/gen"
             },
 
             release: {
                 src:    ['build/chevrotain.ts'],
-                out: 'target/release/chevrotain.js',
+                out: 'bin/chevrotain.js',
                 options: {
                     declaration:    true,
                     removeComments: false,
@@ -108,8 +108,8 @@ module.exports = function(grunt) {
             // this is the same as the 'build' process, all .ts --> .js in gen directory
             // in a later step those files will be aggregated into separate components
             release_test_code: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!target/**/*.ts"],
-                outDir: "target/release/tsc",
+                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
+                outDir: "bin/tsc",
                 options: {
                     declaration:    true,
                     removeComments: false,
@@ -121,7 +121,7 @@ module.exports = function(grunt) {
         umd: {
             release: {
                 options: {
-                    src:            'target/release/chevrotain.js',
+                    src:            'bin/chevrotain.js',
                     template:       'scripts/umd.hbs',
                     objectToExport: 'chevrotain',
                     amdModuleId:    'chevrotain',
@@ -137,7 +137,7 @@ module.exports = function(grunt) {
 
             release_specs: {
                 options: {
-                    src:      'target/release/chevrotainSpecs.js',
+                    src:      'bin/chevrotainSpecs.js',
                     template: 'scripts/umd.hbs',
                     deps:     {
                         'default': ['_', 'chevrotain'],
@@ -150,13 +150,13 @@ module.exports = function(grunt) {
 
             ecma5: {
                 options: {
-                    src:            'target/examples/ecma5.js',
+                    src:            'bin/examples/ecma5.js',
                     objectToExport: 'chevrotain.examples.ecma5',
                     template:       'scripts/umd.hbs',
                     deps:           {
                         'default': ['_', 'chevrotain'],
                         amd:       ['lodash', 'chevrotain'],
-                        cjs:       ['lodash', '../release/chevrotain'],
+                        cjs:       ['lodash', '../chevrotain'],
                         global:    ['_', 'chevrotain']
                     }
                 }
@@ -165,8 +165,7 @@ module.exports = function(grunt) {
         },
 
         clean:  {
-            dev_build: ["target/gen"],
-            release:   ["target/release", "target/coverage"]
+            all: ["bin/"]
         },
         concat: {
             options: {
@@ -200,14 +199,14 @@ module.exports = function(grunt) {
             },
             release: {
                 files: {
-                    'target/release/chevrotain.js':      ['target/release/chevrotain.js'],
-                    'target/release/chevrotainSpecs.js': specsFiles.concat(exampleSpecsFiles)
+                    'bin/chevrotain.js':      ['bin/chevrotain.js'],
+                    'bin/chevrotainSpecs.js': specsFiles.concat(exampleSpecsFiles)
                 }
             },
 
             ecma5: {
                 files: {
-                    'target/examples/ecma5.js': ecma5Includes
+                    'bin/examples/ecma5.js': ecma5Includes
                 }
             }
 
@@ -223,7 +222,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jasmine-node-coverage')
 
     var releaseBuildTasks = [
-        'clean:release',
+        'clean:all',
         'ts:release',
         'ts:release_test_code',
         'tslint',
@@ -240,7 +239,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build_and_test_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
 
     grunt.registerTask('dev_build', [
-        'clean:dev_build',
+        'clean:all',
         'ts:dev_build',
         'tslint',
         'karma:dev_build'])

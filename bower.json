@@ -2,8 +2,8 @@
   "name": "chevrotain",
   "version": "0.1.0",
   "ignore": [
-    "./release/!(chevrotain.js)",
-    "./release/!(chevrotain.d.ts)",
+    "./bin/!(chevrotain.js)",
+    "./bin/!(chevrotain.d.ts)",
     "!license.txt"
   ],
   "dependencies": {

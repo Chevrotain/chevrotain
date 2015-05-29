@@ -23,12 +23,12 @@
     }
   ],
   "files": [
-    "target/release/chevrotain.d.ts",
-    "target/release/chevrotain.js",
+    "bin/chevrotain.d.ts",
+    "bin/chevrotain.js",
     "readme.md",
     "docs"
   ],
-  "main": "target/release/chevrotain.js",
+  "main": "bin/chevrotain.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/SAP/chevrotain.git"

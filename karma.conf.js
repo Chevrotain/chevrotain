@@ -3,12 +3,12 @@
 var _ = require('lodash');
 var fs = require('fs');
 var wrench = require('wrench');
-var specsFiles = require('./scripts/findSpecs')("target/gen/test/", "test")
-var exampleSpecsFiles = require('./scripts/findSpecs')("target/gen/examples/", "examples")
+var specsFiles = require('./scripts/findSpecs')("bin/gen/test/", "test")
+var exampleSpecsFiles = require('./scripts/findSpecs')("bin/gen/examples/", "examples")
 var findRefs = require('./scripts/findRefs')
 
-var coreIncludes = findRefs('./build/chevrotain.ts', "target/gen/");
-var ecma5Includes = findRefs('./build/ecma5.ts', "target/gen/");
+var coreIncludes = findRefs('./build/chevrotain.ts', "bin/gen/");
+var ecma5Includes = findRefs('./build/ecma5.ts', "bin/gen/");
 
 exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
     return _.contains(item, "ecmascript5") && !_.contains(item, "spec")
@@ -32,7 +32,7 @@ module.exports = function(config) {
         // list of files / patterns to load in the browser
         files: ['bower_components/lodash/lodash.js'].concat(
             [
-                {pattern: 'target/gen/**/*.map', included: false},
+                {pattern: 'bin/gen/**/*.map', included: false},
                 {pattern: 'src/**/*.ts', included: false},
                 {pattern: 'test/**/*.ts', included: false},
                 {pattern: 'examples/**/*.ts', included: false}
