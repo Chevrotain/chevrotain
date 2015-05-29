@@ -4,8 +4,9 @@ import tok = chevrotain.tokens
 
 /**
  * ECMA5 lexer HEAVILY based on Esprima's implementation.
+ * see attached copyright notice (./copyrights/esprima.txt)
  */
-// TODO: rename zlexer --> lexer. there is an issue with order of files provided to karma which the name zlexer is a workaround
+
 // TODO: better error messages (instead of 'sad sad panda'...)
 // TODO: error recovery + only 1 error message for whole recovery
 // TODO: due to ambiguity of '/'|'/=' vs RegExpLiteral Lexing is dependent on Parser's context.
