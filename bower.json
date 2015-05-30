@@ -9,8 +9,7 @@
   "dependencies": {
     "lodash": "~3.9.3"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "license": "APACHE",
   "private": true
 }
