@@ -13,16 +13,11 @@ exampleSpecsFiles = ecma5Includes.concat(exampleSpecsFiles)
 
 // TODO: this is a bit ugly, but including the root and then performing negation
 //       seems to cause inclusion of things outside the root...
-var githubReleaseFiles = ['./*.js',
-    './license',
-    './*.json',
-    './*.md',
-    './*/**',
-    '!./node_modules/**',
-    '!./bower_components/**',
-    '!./package/**',
-    '!./bin/tsc/**',
-    '!./bin/gen/**'
+var githubReleaseFiles = ['./package.json',
+    './LICENSE.txt',
+    "./bin/chevrotain.d.ts",
+    "./bin/chevrotain.js",
+    './readme.md'
 ]
 
 module.exports = function(grunt) {
@@ -241,13 +236,13 @@ module.exports = function(grunt) {
         compress: {
             github_release_zip: {
                 options: {
-                    archive: 'package/chevrotain.zip'
+                    archive: 'package/chevrotain-binaries-' + pkg.version + '.zip'
                 },
                 files:   [{src: githubReleaseFiles, dest: '/'}]
             },
             github_release_tgz: {
                 options: {
-                    archive: 'package/chevrotain.tar.gz'
+                    archive: 'package/chevrotain-binaries-' + pkg.version + '.tar.gz'
                 },
                 files:   [{src: githubReleaseFiles, dest: '/'}]
             }
