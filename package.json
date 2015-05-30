@@ -26,7 +26,7 @@
     "bin/chevrotain.d.ts",
     "bin/chevrotain.js",
     "readme.md",
-    "docs"
+    "LICENSE.TXT"
   ],
   "main": "bin/chevrotain.js",
   "repository": {
@@ -61,6 +61,5 @@
     "karma-story-reporter": "~0.3.1",
     "tslint": "~2.2.0-beta",
     "wrench": "~1.5.8"
-  },
-  "private": true
+  }
 }
