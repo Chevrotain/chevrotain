@@ -16,6 +16,12 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
   * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar composition.
    * Well tested with **100% code coverage** 
    
+
+###Installation
+* ```npm install chevrotain```
+* or download the javascript source directly from [github releases](https://github.com/SAP/chevrotain/releases)
+
+   
 ###At a Glance, simple json parsing rules
 
    * using ES6 fat arrow '=>'
@@ -93,9 +99,6 @@ each time:
 * in the karma chrome window press the debug button   
 * open developer tools(F12), add breakpoints and refresh the page to rerun the tests
 
-Installation
-------------
-**TODO**
 
 Dependencies
 -------------
