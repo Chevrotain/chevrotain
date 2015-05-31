@@ -72,11 +72,12 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
    ```      
 
 ###Getting Started
-The best place to start is the examples folder.
-The most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/json/json_parser.ts)
-A more complex one is: [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
+The best place to start is the examples folder:
+* The most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/json/json_parser.ts)
+* A more complex one is: [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
+* Plain Javascript example in node.js: [Json Parser Plain.js](https://github.com/Chevrotain/examples_nodejs)
 
-Note that the examples are written in Typescript.
+Note that most of the examples are written in Typescript.
 To see the generated(readable) javascript code: 
 
 only once:
