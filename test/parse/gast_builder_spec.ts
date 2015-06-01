@@ -72,10 +72,10 @@ module chevrotain.gastBuilder.spec {
             expect(terminalTypes[0]).toBe(b.ProdType.TERMINAL)
 
             var terminalTexts = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(terminalTexts[0]).toBe("this.CONSUME1(tok.TypeTok")
-            expect(terminalTexts[1]).toBe("this.CONSUME1(tok.IdentTok")
-            expect(terminalTexts[2]).toBe("this.CONSUME1(tok.SemicolonTok")
-            expect(terminalTexts[3]).toBe("this.CONSUME2(tok.SemicolonTok")
+            expect(terminalTexts[0]).toBe(".CONSUME1(tok.TypeTok")
+            expect(terminalTexts[1]).toBe(".CONSUME1(tok.IdentTok")
+            expect(terminalTexts[2]).toBe(".CONSUME1(tok.SemicolonTok")
+            expect(terminalTexts[3]).toBe(".CONSUME2(tok.SemicolonTok")
         })
 
         it("can extract SubRule references IPRODRanges from a text", function () {
@@ -86,8 +86,8 @@ module chevrotain.gastBuilder.spec {
             expect(refTypes[0]).toBe(b.ProdType.REF)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe("this.SUBRULE(this.structuredType")
-            expect(refText[1]).toBe("this.SUBRULE(this.assignedTypeSpec")
+            expect(refText[0]).toBe(".SUBRULE(this.structuredType")
+            expect(refText[1]).toBe(".SUBRULE(this.assignedTypeSpec")
         })
 
         it("can extract Option IPRODRanges from a text", function () {
@@ -98,10 +98,10 @@ module chevrotain.gastBuilder.spec {
             expect(refTypes[0]).toBe(b.ProdType.OPTION)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe("this.OPTION(this.isRequiredKw, ()=> {\r\n" +
+            expect(refText[0]).toBe(".OPTION(this.isRequiredKw, ()=> {\r\n" +
             "                requiredKW = this.CONSUME1(tok.RequiredTok)\r\n" +
             "            })")
-            expect(refText[1]).toBe("this.OPTION(this.isKeyKw, ()=> {\r\n" +
+            expect(refText[1]).toBe(".OPTION(this.isKeyKw, ()=> {\r\n" +
             "                keyKW = this.CONSUME1(tok.KeyTok)\r\n" +
             "            })")
         })
@@ -114,8 +114,8 @@ module chevrotain.gastBuilder.spec {
             expect(refTypes[0]).toBe(b.ProdType.AT_LEAST_ONE)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe("this.AT_LEAST_ONE(bamba)")
-            expect(refText[1]).toBe("this.AT_LEAST_ONE(THIS.OPTION(bisli))")
+            expect(refText[0]).toBe(".AT_LEAST_ONE(bamba)")
+            expect(refText[1]).toBe(".AT_LEAST_ONE(THIS.OPTION(bisli))")
         })
 
         it("can extract 'many' IPRODRanges from a text", function () {
@@ -126,7 +126,7 @@ module chevrotain.gastBuilder.spec {
             expect(refTypes[0]).toBe(b.ProdType.MANY)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe("this.MANY(this.isAdditionalArgument, () => {\r\n" +
+            expect(refText[0]).toBe(".MANY(this.isAdditionalArgument, () => {\r\n" +
             "                    commas.push(this.CONSUME1(tok.CommaTok))\r\n" +
             "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
             "                }\r\n" +
@@ -142,7 +142,7 @@ module chevrotain.gastBuilder.spec {
             matchers.arrayEqualityNoOrder(_.uniq(refTypes), [b.ProdType.OR, b.ProdType.FLAT])
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe("this.OR([\r\n" +
+            expect(refText[0]).toBe(".OR([\r\n" +
             "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
             "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
             "                }},\r\n" +
@@ -153,18 +153,18 @@ module chevrotain.gastBuilder.spec {
         })
 
         it("can extract all IPRODRanges from a text", function () {
-            var ter = "this.CONSUME3(tok.one1"
-            var option = "this.OPTION(2)"
-            var many = "this.MANY(3)"
-            var ref = "this.SUBRULE4(this.other"
-            var atLeastOne = "this.AT_LEAST_ONE(5)"
-            var or = "this.OR(6)"
+            var ter = ".CONSUME3(tok.one1"
+            var option = ".OPTION(2)"
+            var many = ".MANY(3)"
+            var ref = ".SUBRULE4(this.other"
+            var atLeastOne = ".AT_LEAST_ONE(5)"
+            var or = ".OR(6)"
 
             var actual = b.createRanges(
-                ter + " " +
+                ter + ") " +
                 option +
                 many +
-                ref + " " +
+                ref + ") " +
                 atLeastOne +
                 or)
 
