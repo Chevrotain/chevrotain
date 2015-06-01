@@ -1,11 +1,11 @@
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 
-#Chevrotain
+# Chevrotain
 
 Chevrotain is a Javascript/Typescript parsing framework which aims to make it easier to write "hand built" recursive decent parsers.
    
-###Features
+## Features
   * **DSL** for creating the parsing rules.
     * Automatic lookahead calculation for LL(1) grammars
     * For other grammars custom lookahead functions can be provided.
@@ -17,12 +17,12 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
    * Well tested with **100% code coverage** 
    
 
-###Installation
+## Installation
 * ```npm install chevrotain```
 * or download the javascript source directly from [github releases](https://github.com/SAP/chevrotain/releases)
 
    
-###At a Glance, simple json parsing rules
+## At a Glance, simple json parsing rules
 
    * using ES6 fat arrow '=>'
 
@@ -71,7 +71,7 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
            })
    ```      
 
-###Getting Started
+## Getting Started
 The best place to start is the examples folder:
 * The most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/json/json_parser.ts)
 * A more complex one is: [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
@@ -101,11 +101,11 @@ each time:
 * open developer tools(F12), add breakpoints and refresh the page to rerun the tests
 
 
-Dependencies
+## Dependencies
 -------------
 Only a single dependency to [lodash](https://lodash.com/).
 
-Compatibility
+## Compatibility
 -------------
 The Generated artifact(chevrotain.js) should run any modern Javascript ES5 runtime. 
 * The CI build runs the tests under Node.js.
@@ -114,6 +114,6 @@ The Generated artifact(chevrotain.js) should run any modern Javascript ES5 runti
   in order to make chevrotain.js portable to multiple environments.
   
 
-Development
+## Development
 -----------
 Chevrotain was originally developed and is maintained by Shahar Soel
