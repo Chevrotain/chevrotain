@@ -103,11 +103,9 @@ each time:
 
 
 ## Dependencies
--------------
 Only a single dependency to [lodash](https://lodash.com/).
 
 ## Compatibility
--------------
 The Generated artifact(chevrotain.js) should run any modern Javascript ES5 runtime. 
 * The CI build runs the tests under Node.js.
 * additionally local testing is done on latest versions of Chrome/Firefox/IE.
@@ -116,5 +114,4 @@ The Generated artifact(chevrotain.js) should run any modern Javascript ES5 runti
   
 
 ## Development
------------
 Chevrotain was originally developed and is maintained by Shahar Soel
