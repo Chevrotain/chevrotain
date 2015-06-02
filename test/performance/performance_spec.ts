@@ -1087,7 +1087,7 @@ module chevrotain.performance.spec {
         "  }"
 
 
-    var NUM_OF_TIMES = 1000
+    var NUM_OF_TIMES = 5000
     xdescribe("Performance Testing", function () {
         "use strict"
 
@@ -1101,14 +1101,15 @@ module chevrotain.performance.spec {
         var parseTotal = 0
 
         xit("performance test", function () {
-
-
             var start = NOW()
+            var lexStart = NOW()
+
+            // move lexer inside the loop if you wish to test it's performance currently it will only be run once
+            var lexResult = examples.json.JsonLexer.tokenize(sampleInput)
+            expect(lexResult.errors.length).toBe(0)
+            lexTotal += NOW() - lexStart
+
             _.forEach(_.range(NUM_OF_TIMES), () => {
-                var lexStart = NOW()
-                var lexResult = examples.json.JsonLexer.tokenize(sampleInput)
-                expect(lexResult.errors.length).toBe(0)
-                lexTotal += NOW() - lexStart
                 var parseStart = NOW()
                 var parser = new examples.json.JsonParser(lexResult.tokens)
                 parser.object()

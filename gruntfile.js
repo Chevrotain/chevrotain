@@ -88,7 +88,8 @@ module.exports = function(grunt) {
                 configuration: grunt.file.readJSON("tslint.json")
             },
             files:   {
-                src: ['src/**/*.ts', 'test/**/*.ts', 'examples/**/*.ts']
+                // performance_spec causes issues with TS-Lint randomly crashing due to a very large sample string it contains.
+                src: ['src/**/*.ts', 'test/**/*.ts', 'examples/**/*.ts', '!test/performance/performance_spec.ts']
             }
         },
 

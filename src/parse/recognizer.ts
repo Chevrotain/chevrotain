@@ -859,7 +859,7 @@ module chevrotain.recognizer {
                     "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
             }
         }
-        
+
         private defaultInvalidReturn():any { return undefined }
 
         // Not worth the hassle to support Unicode characters in rule names...

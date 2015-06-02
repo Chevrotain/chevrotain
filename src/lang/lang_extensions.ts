@@ -55,12 +55,11 @@ module chevrotain.lang {
         }
 
         get(key:string):V {
-            // avoid edge case with a key called "hasOwnProperty"
-            if (Object.prototype.hasOwnProperty.call(this._state, key)) {
-                return this._state[key]
-            }
-
-            return undefined
+            // To avoid edge case with a key called "hasOwnProperty" we need to perform the commented out check below
+            // -> if (Object.prototype.hasOwnProperty.call(this._state, key)) { ... } <-
+            // however this costs nearly 25% of the parser's runtime.
+            // if someone decides to name their Parser class "hasOwnProperty" they deserve what they will get :)
+            return this._state[key]
         }
 
         containsKey(key:string):boolean {
