@@ -123,9 +123,13 @@ module chevrotain.recognizer {
         protected _input:tok.Token[] = []
         protected inputIdx = -1
         protected isBackTrackingStack = []
+        // caching for performance
+        protected className:string
+
 
         constructor(input:tok.Token[] = []) {
             this._input = input
+            this.className = lang.classNameFromInstance(this)
         }
 
         set input(newInput:tok.Token[]) {
@@ -301,11 +305,11 @@ module chevrotain.recognizer {
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
             if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-                var grammarProductions = cache.getProductionsForClass(classInstance)
+                var grammarProductions = cache.getProductionsForClass(className)
                 var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions)
                 refResolver.resolveRefs()
                 var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
-                cache.setResyncFollowsForClass(classInstance, allFollows)
+                cache.setResyncFollowsForClass(className, allFollows)
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
             }
         }
@@ -783,7 +787,7 @@ module chevrotain.recognizer {
                           doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
             // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
             this.validateRuleName(ruleName)
-            var parserClassProductions = cache.getProductionsForClass(this)
+            var parserClassProductions = cache.getProductionsForClass(this.className)
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
                 parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
@@ -836,7 +840,7 @@ module chevrotain.recognizer {
                 var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
                 // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
                 // multiple structures on each rule invocations to find it...
-                var followSet = cache.getResyncFollowsForClass(this).get(followName)
+                var followSet = cache.getResyncFollowsForClass(this.className).get(followName)
                 if (!followSet) {
                     throw new Error("missing re-sync follows information, possible cause: " +
                         "did not call performSelfAnalysis(this) in the constructor implementation.")
@@ -878,7 +882,7 @@ module chevrotain.recognizer {
 
             if ((_.contains(this.definedRulesNames, ruleFuncName))) {
                 throw Error("Duplicate definition, rule: " + ruleFuncName +
-                    " is already defined in the grammar: " + lang.classNameFromInstance(this))
+                    " is already defined in the grammar: " + this.className)
             }
 
             this.definedRulesNames.push(ruleFuncName)
@@ -1060,7 +1064,7 @@ module chevrotain.recognizer {
                                             nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
 
 
-            var firstAfterRepMap = cache.getFirstAfterRepForClass(this)
+            var firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
             var currRuleName = _.last(this.RULE_STACK)
             var key = prodName + IN + currRuleName
             var firstAfterRepInfo = firstAfterRepMap.get(key)
@@ -1213,7 +1217,7 @@ module chevrotain.recognizer {
         }
 
         protected isNextRule<T>(ruleName:string):boolean {
-            var classLAFuncs = cache.getLookaheadFuncsForClass(this)
+            var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
             var condition = <any>classLAFuncs.get(ruleName)
             if (_.isUndefined(condition)) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -1228,7 +1232,7 @@ module chevrotain.recognizer {
                                          occurrence:number,
                                          laFuncBuilder:(number, any) => () => T,
                                          extraArgs:any[] = []):() => T {
-            var classLAFuncs = cache.getLookaheadFuncsForClass(this)
+            var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
             var ruleName = _.last(this.RULE_STACK)
             var key = prodType + occurrence + IN + ruleName
             var condition = <any>classLAFuncs.get(key)
@@ -1261,7 +1265,7 @@ module chevrotain.recognizer {
         }
 
         protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
-            return cache.getProductionsForClass(this)
+            return cache.getProductionsForClass(this.className)
         }
     }
 }

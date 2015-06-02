@@ -36,7 +36,7 @@ module chevrotain.recognizer.lookahead.spec {
     class OptionsImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -81,7 +81,7 @@ module chevrotain.recognizer.lookahead.spec {
     class OptionsExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -232,7 +232,7 @@ module chevrotain.recognizer.lookahead.spec {
     class ManyImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -277,7 +277,7 @@ module chevrotain.recognizer.lookahead.spec {
     class ManyExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -420,7 +420,7 @@ module chevrotain.recognizer.lookahead.spec {
     class AtLeastOneImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -465,7 +465,7 @@ module chevrotain.recognizer.lookahead.spec {
     class AtLeastOneExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -561,7 +561,7 @@ module chevrotain.recognizer.lookahead.spec {
     class OrImplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
@@ -725,7 +725,7 @@ module chevrotain.recognizer.lookahead.spec {
     class OrExplicitLookAheadParser extends BaseIntrospectionRecognizer {
 
         public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this)
+            return cache.getLookaheadFuncsForClass(this.className)
         }
 
         constructor(input:tok.Token[] = []) {
