@@ -790,24 +790,7 @@ module chevrotain.recognizer {
             }
 
             var wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
-                // state update
-                // first rule invocation
-                if (_.isEmpty(this.RULE_STACK)) {
-                    // the only thing that can appear after the outer most invoked rule is the END OF FILE
-                    this.FOLLOW_STACK.push([EOF])
-                } else {
-                    var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
-                    // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
-                    // multiple structures on each rule invocations to find it...
-                    var followSet = cache.getResyncFollowsForClass(this).get(followName)
-                    if (!followSet) {
-                        throw new Error("missing re-sync follows information, possible cause: " +
-                            "did not call performSelfAnalysis(this) in the constructor implementation.")
-                    }
-                    this.FOLLOW_STACK.push(followSet)
-                }
-                this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
-                this.RULE_STACK.push(ruleName)
+                this.ruleInvocationStateUpdate(ruleName, idxInCallingRule)
 
                 try {
                     // actual parsing happens here
@@ -837,16 +820,7 @@ module chevrotain.recognizer {
                     }
                 }
                 finally {
-                    this.FOLLOW_STACK.pop()
-                    this.RULE_STACK.pop()
-                    this.RULE_OCCURRENCE_STACK.pop()
-
-                    var maxInputIdx = this._input.length - 1
-                    if ((this.RULE_STACK.length === 0) && this.inputIdx < maxInputIdx) {
-                        var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
-                        this.SAVE_ERROR(new NotAllInputParsedException(
-                            "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
-                    }
+                    this.ruleFinallyStateUpdate()
                 }
             }
             var ruleNamePropName = "ruleName"
@@ -854,6 +828,38 @@ module chevrotain.recognizer {
             return wrappedGrammarRule
         }
 
+        protected ruleInvocationStateUpdate(ruleName:string, idxInCallingRule:number):void {
+            if (_.isEmpty(this.RULE_STACK)) {
+                // the only thing that can appear after the outer most invoked rule is the END OF FILE
+                this.FOLLOW_STACK.push([EOF])
+            } else {
+                var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
+                // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
+                // multiple structures on each rule invocations to find it...
+                var followSet = cache.getResyncFollowsForClass(this).get(followName)
+                if (!followSet) {
+                    throw new Error("missing re-sync follows information, possible cause: " +
+                        "did not call performSelfAnalysis(this) in the constructor implementation.")
+                }
+                this.FOLLOW_STACK.push(followSet)
+            }
+            this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
+            this.RULE_STACK.push(ruleName)
+        }
+
+        protected ruleFinallyStateUpdate():void {
+            this.FOLLOW_STACK.pop()
+            this.RULE_STACK.pop()
+            this.RULE_OCCURRENCE_STACK.pop()
+
+            var maxInputIdx = this._input.length - 1
+            if ((this.RULE_STACK.length === 0) && this.inputIdx < maxInputIdx) {
+                var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
+                this.SAVE_ERROR(new NotAllInputParsedException(
+                    "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
+            }
+        }
+        
         private defaultInvalidReturn():any { return undefined }
 
         // Not worth the hassle to support Unicode characters in rule names...

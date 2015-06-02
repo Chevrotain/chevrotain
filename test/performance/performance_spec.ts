@@ -1087,8 +1087,8 @@ module chevrotain.performance.spec {
         "  }"
 
 
-    var NUM_OF_TIMES = 500
-    xdescribe("The Chevrotain Tokens module", function () {
+    var NUM_OF_TIMES = 1000
+    xdescribe("Performance Testing", function () {
         "use strict"
 
 
@@ -1104,14 +1104,11 @@ module chevrotain.performance.spec {
 
 
             var start = NOW()
-
-
             _.forEach(_.range(NUM_OF_TIMES), () => {
                 var lexStart = NOW()
                 var lexResult = examples.json.JsonLexer.tokenize(sampleInput)
-                lexTotal += NOW() - lexStart
                 expect(lexResult.errors.length).toBe(0)
-
+                lexTotal += NOW() - lexStart
                 var parseStart = NOW()
                 var parser = new examples.json.JsonParser(lexResult.tokens)
                 parser.object()
@@ -1124,7 +1121,8 @@ module chevrotain.performance.spec {
 
             console.log("chevrotain: " + totalChevrotain)
             console.log("chevrotain Lexer : " + lexTotal)
-            console.log("chevrotain Parser : " + parseTotal)
+            console.log("chevrotain Parser total : " + parseTotal)
+            console.log("chevrotain Parser average : " + parseTotal / NUM_OF_TIMES)
         })
 
         //var totalJison = 0;
