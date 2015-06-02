@@ -39,9 +39,11 @@ module chevrotain.cache {
 
     function getFromNestedHashTable(classInstance:any, hashTable:lang.HashTable<any>) {
         var className = lang.classNameFromInstance(classInstance)
-        if (!hashTable.containsKey(className)) {
+        var result = hashTable.get(className)
+        if (result === undefined) {
             hashTable.put(className, new lang.HashTable<any>())
+            result = hashTable.get(className)
         }
-        return hashTable.get(className)
+        return result
     }
 }
