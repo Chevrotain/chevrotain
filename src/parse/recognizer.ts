@@ -69,6 +69,7 @@ module chevrotain.recognizer {
     EarlyExitException.prototype = Error.prototype
 
     export class EOF extends tok.VirtualToken {}
+    var EOF_FOLLOW_KEY:any = {} // TODO const in Typescript 1.5
 
     /**
      * OR([
@@ -101,7 +102,6 @@ module chevrotain.recognizer {
 
     export interface IErrorRecoveryRecogState extends IBaseRecogState {
         RULE_STACK:string[]
-        FOLLOW_STACK:Function[][]
     }
 
     export type LookAheadFunc = () => boolean
@@ -294,6 +294,13 @@ module chevrotain.recognizer {
 
     InRuleRecoveryException.prototype = Error.prototype
 
+    // parameters needs to compute the key in the FOLLOW_SET map.
+    export interface IFollowKey {
+        ruleName: string
+        idxInCallingRule: number
+        inRule:string
+    }
+
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
      * This is used for more advanced features requiring this information.
@@ -316,7 +323,6 @@ module chevrotain.recognizer {
 
         protected RULE_STACK:string[] = []
         protected RULE_OCCURRENCE_STACK:number[] = []
-        protected FOLLOW_STACK:Function[][] = []
         protected tokensMap:gastBuilder.ITerminalNameToConstructor = undefined
 
         constructor(input:tok.Token[], tokensMap:gastBuilder.ITerminalNameToConstructor) {
@@ -331,7 +337,6 @@ module chevrotain.recognizer {
             super.reset()
             this.RULE_STACK = []
             this.RULE_OCCURRENCE_STACK = []
-            this.FOLLOW_STACK = []
         }
 
         // Parsing DSL
@@ -833,26 +838,11 @@ module chevrotain.recognizer {
         }
 
         protected ruleInvocationStateUpdate(ruleName:string, idxInCallingRule:number):void {
-            if (_.isEmpty(this.RULE_STACK)) {
-                // the only thing that can appear after the outer most invoked rule is the END OF FILE
-                this.FOLLOW_STACK.push([EOF])
-            } else {
-                var followName = ruleName + idxInCallingRule + IN + (<any>_.last)(this.RULE_STACK)
-                // TODO: performance optimization, keep a reference to the follow set on the instance instead of accessing
-                // multiple structures on each rule invocations to find it...
-                var followSet = cache.getResyncFollowsForClass(this.className).get(followName)
-                if (!followSet) {
-                    throw new Error("missing re-sync follows information, possible cause: " +
-                        "did not call performSelfAnalysis(this) in the constructor implementation.")
-                }
-                this.FOLLOW_STACK.push(followSet)
-            }
             this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
             this.RULE_STACK.push(ruleName)
         }
 
         protected ruleFinallyStateUpdate():void {
-            this.FOLLOW_STACK.pop()
             this.RULE_STACK.pop()
             this.RULE_OCCURRENCE_STACK.pop()
 
@@ -1030,12 +1020,13 @@ module chevrotain.recognizer {
         }
 
         protected isInCurrentRuleReSyncSet(token:Function):boolean {
-            var currentRuleReSyncSet = _.last(this.FOLLOW_STACK)
+            var followKey = this.getCurrFollowKey()
+            var currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
             return _.contains(currentRuleReSyncSet, token)
         }
 
         protected findReSyncTokenType():Function {
-            var allPossibleReSyncTokTypes = _.flatten(this.FOLLOW_STACK)
+            var allPossibleReSyncTokTypes = this.flattenFollowSet()
             // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
             var nextToken = this.NEXT_TOKEN()
             var k = 2
@@ -1047,6 +1038,47 @@ module chevrotain.recognizer {
                 nextToken = this.LA(k)
                 k++
             }
+        }
+
+        protected getCurrFollowKey():IFollowKey {
+            // the length is at least one as we always add the ruleName to the stack before invoking the rule.
+            if (this.RULE_STACK.length === 1) {
+                return EOF_FOLLOW_KEY
+            }
+            var currRuleIdx = this.RULE_STACK.length - 1;
+            var currRuleOccIdx = currRuleIdx
+            var prevRuleIdx = currRuleIdx - 1;
+
+            return {ruleName: this.RULE_STACK[currRuleIdx],
+                idxInCallingRule: this.RULE_OCCURRENCE_STACK[currRuleOccIdx],
+                inRule: this.RULE_STACK[prevRuleIdx]}
+        }
+
+        protected buildFullFollowKeyStack():IFollowKey[] {
+            return _.map(this.RULE_STACK, (ruleName, idx) => {
+                if (idx === 0 ) {
+                    return EOF_FOLLOW_KEY
+                }
+                return {ruleName: ruleName,
+                    idxInCallingRule: this.RULE_OCCURRENCE_STACK[idx],
+                    inRule: this.RULE_STACK[idx - 1]}
+            })
+        }
+
+        protected flattenFollowSet():Function[] {
+            var followStack = _.map(this.buildFullFollowKeyStack(), (currKey) => {
+                return this.getFollowSetFromFollowKey(currKey)
+            })
+            return <any>_.flatten(followStack)
+        }
+
+        protected getFollowSetFromFollowKey(followKey:IFollowKey):Function[] {
+            if (followKey === EOF_FOLLOW_KEY) {
+                return [EOF]
+            }
+
+            var followName = followKey.ruleName + followKey.idxInCallingRule + IN + followKey.inRule
+            return cache.getResyncFollowsForClass(this.className).get(followName)
         }
 
         protected reSyncTo(tokClass:Function):void {
@@ -1066,6 +1098,8 @@ module chevrotain.recognizer {
 
             var firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
             var currRuleName = _.last(this.RULE_STACK)
+            // TODO: why no usage of the Occurrence in the key
+            // TODO: string concat is evil performance wise, use maps instead?
             var key = prodName + IN + currRuleName
             var firstAfterRepInfo = firstAfterRepMap.get(key)
             if (_.isUndefined(firstAfterRepInfo)) {
@@ -1232,6 +1266,7 @@ module chevrotain.recognizer {
                                          occurrence:number,
                                          laFuncBuilder:(number, any) => () => T,
                                          extraArgs:any[] = []):() => T {
+            // TODO: cache this instead of calling the cache each time?
             var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
             var ruleName = _.last(this.RULE_STACK)
             var key = prodType + occurrence + IN + ruleName
@@ -1249,19 +1284,16 @@ module chevrotain.recognizer {
         protected saveRecogState():IErrorRecoveryRecogState {
             var baseState = super.saveRecogState()
             var savedRuleStack = _.clone(this.RULE_STACK)
-            var savedFollowStack = _.clone(this.FOLLOW_STACK)
             return {
                 errors:       baseState.errors,
                 inputIdx:     baseState.inputIdx,
-                RULE_STACK:   savedRuleStack,
-                FOLLOW_STACK: savedFollowStack
+                RULE_STACK:   savedRuleStack
             }
         }
 
         protected reloadRecogState(newState:IErrorRecoveryRecogState) {
             super.reloadRecogState(newState)
             this.RULE_STACK = newState.RULE_STACK
-            this.FOLLOW_STACK = newState.FOLLOW_STACK
         }
 
         protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {

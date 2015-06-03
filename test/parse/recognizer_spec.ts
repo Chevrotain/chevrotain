@@ -22,28 +22,6 @@ module chevrotain.recognizer.spec {
         constructor(startLine:number, startColumn:number, image:string) {super(startLine, startColumn, image)}
     }
 
-
-    class InvalidErrorRecoveryRecog extends BaseIntrospectionRecognizer {
-
-        constructor(input:tok.Token[] = []) {
-            super(input, <any>chevrotain.recognizer.spec)
-            // the invalid part is that we forgot to call the self analysis
-            //recog.BaseErrorRecoveryRecognizer.performSelfAnalysis(this)
-        }
-
-        public someRule = this.RULE("someRule", this.parseSomeRule, () => { return undefined })
-        public someNestedRule = this.RULE("someNestedRule", this.parseSomeNestedRule, () => { return undefined })
-
-        private parseSomeRule():void {
-            this.SUBRULE(this.someNestedRule)
-        }
-
-        private parseSomeNestedRule():void {
-            this.CONSUME1(PlusTok)
-        }
-    }
-
-
     class ManyRepetitionRecovery extends BaseIntrospectionRecognizer {
 
         constructor(input:tok.Token[] = []) {
@@ -66,7 +44,6 @@ module chevrotain.recognizer.spec {
 
             return idents
         }
-
     }
 
     export class IdentTok extends tok.Token {}
@@ -253,12 +230,6 @@ module chevrotain.recognizer.spec {
             expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
         })
 
-        it("will throw an exception if we try to use it without performing self analysis in the constructor", function () {
-            var parser = new InvalidErrorRecoveryRecog([])
-            expect(() => parser.someRule()).toThrow(Error("missing re-sync follows information, possible cause: " +
-            "did not call performSelfAnalysis(this) in the constructor implementation."))
-        })
-
         it("can perform in-repetition recovery for MANY grammar rule", function () {
             // a.b+.c
             var input = [new IdentTok(1, 1, "a"), new DotTok(1, 1), new IdentTok(1, 1, "b"),
@@ -313,7 +284,7 @@ module chevrotain.recognizer.spec {
         })
 
         it("will return false if a RecognitionException is thrown during " +
-        "backtracking and rethrow any other kind of Exception", function () {
+            "backtracking and rethrow any other kind of Exception", function () {
             var parser:any = new recog.BaseRecognizer([])
             var backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
             expect(() => backTrackingThrows()).toThrow(Error("division by zero, boom"))
