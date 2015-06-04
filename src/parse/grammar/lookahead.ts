@@ -58,11 +58,13 @@ module chevrotain.lookahead {
          * This will return the Index of the alternative to take or -1 if none of the alternatives match
          */
         return function ():number {
+            var nextToken = this.NEXT_TOKEN()
             for (var i = 0; i < alternativesTokens.length; i++) {
-                if (_.any(alternativesTokens[i], function (possibleTok) {
-                        return this.NEXT_TOKEN() instanceof possibleTok
-                    }, this)) {
-                    return i;
+                var currAltTokens = alternativesTokens[i]
+                for (var j = 0; j < (<any>currAltTokens).length; j++) {
+                    if (nextToken instanceof currAltTokens[j]) {
+                        return i
+                    }
                 }
             }
             return -1;
@@ -116,9 +118,13 @@ module chevrotain.lookahead {
 
     function getSimpleLookahead(possibleNextTokTypes:Function[]):() => boolean {
         return function ():boolean {
-            return _.any(possibleNextTokTypes, function (possibleTok) {
-                return this.NEXT_TOKEN() instanceof possibleTok
-            }, this)
+            var nextToken = this.NEXT_TOKEN()
+            for (var j = 0; j < possibleNextTokTypes.length; j++) {
+                if (nextToken instanceof possibleNextTokTypes[j]) {
+                    return true
+                }
+            }
+            return false
         }
     }
 

@@ -488,7 +488,7 @@ module chevrotain.recognizer {
          */
         protected OPTION(laFuncOrAction:LookAheadFunc | GrammarAction,
                          action?:GrammarAction):boolean {
-            return this.OPTION1.apply(this, arguments)
+            return this.OPTION1.call(this, laFuncOrAction, action)
         }
 
         /**
@@ -516,7 +516,7 @@ module chevrotain.recognizer {
          */
         protected OPTION1(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
-            if (arguments.length === 1) {
+            if (action === undefined) {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(1)
             }
@@ -528,7 +528,7 @@ module chevrotain.recognizer {
          */
         protected OPTION2(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
-            if (arguments.length === 1) {
+            if (action === undefined) {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(2)
             }
@@ -540,7 +540,7 @@ module chevrotain.recognizer {
          */
         protected OPTION3(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
-            if (arguments.length === 1) {
+            if (action === undefined) {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(3)
             }
@@ -552,7 +552,7 @@ module chevrotain.recognizer {
          */
         protected OPTION4(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
-            if (arguments.length === 1) {
+            if (action === undefined) {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(4)
             }
@@ -564,13 +564,12 @@ module chevrotain.recognizer {
          */
         protected OPTION5(laFuncOrAction:LookAheadFunc | GrammarAction,
                           action?:GrammarAction):boolean {
-            if (arguments.length === 1) {
+            if (action === undefined) {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(5)
             }
             return super.OPTION(<any>laFuncOrAction, <any>action)
         }
-
 
         /**
          * Convenience method equivalent to OR1
@@ -651,7 +650,7 @@ module chevrotain.recognizer {
          */
         protected MANY(lookAheadFunc:LookAheadFunc | GrammarAction,
                        action?:GrammarAction):void {
-            return this.MANY1.apply(this, arguments)
+            return this.MANY1.call(this, lookAheadFunc, action)
         }
 
         /**
@@ -723,7 +722,7 @@ module chevrotain.recognizer {
         protected AT_LEAST_ONE(laFuncOrAction:LookAheadFunc | GrammarAction,
                                action:GrammarAction | string,
                                errMsg?:string):void {
-            return this.AT_LEAST_ONE1.apply(this, arguments)
+            return this.AT_LEAST_ONE1.call(this, laFuncOrAction, action, errMsg)
         }
 
         /**
@@ -1178,7 +1177,7 @@ module chevrotain.recognizer {
                              lookAheadFunc:LookAheadFunc | GrammarAction,
                              action?:GrammarAction):void {
 
-            if (_.isUndefined(action)) {
+            if (action === undefined) {
                 action = <any>lookAheadFunc
                 lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
             }
@@ -1193,7 +1192,7 @@ module chevrotain.recognizer {
                               occurrence:number,
                               ignoreAmbiguities:boolean):T {
             // explicit alternatives look ahead
-            if ((<any>alts[0]).WHEN) {
+            if ((<any>alts[0]).WHEN !== undefined) {
                 return super.OR(<IOrAlt<T>[]>alts, errMsgTypes)
             }
 
