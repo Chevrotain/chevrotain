@@ -36,6 +36,33 @@ module chevrotain.cache {
         return getFromNestedHashTable(className, CLASS_TO_FIRST_AFTER_REPETITION)
     }
 
+    export var CLASS_TO_OR_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
+    export var CLASS_TO_MANY_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
+    export var CLASS_TO_AT_LEAST_ONE_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
+    export var CLASS_TO_OPTION_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
+
+    // TODO: CONST in typescript 1.5
+    // TODO reflective test to verify this has not changed, for example (OPTION6 added)
+    export var MAX_OCCURRENCE_INDEX = 5
+
+    export function initLookAheadKeyCache(className) {
+        CLASS_TO_OR_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
+        CLASS_TO_MANY_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
+        CLASS_TO_AT_LEAST_ONE_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
+        CLASS_TO_OPTION_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
+
+        initSingleLookAheadKeyCache(CLASS_TO_OR_LA_CACHE[className])
+        initSingleLookAheadKeyCache(CLASS_TO_MANY_LA_CACHE[className])
+        initSingleLookAheadKeyCache(CLASS_TO_AT_LEAST_ONE_LA_CACHE[className])
+        initSingleLookAheadKeyCache(CLASS_TO_OPTION_LA_CACHE[className])
+    }
+
+    function initSingleLookAheadKeyCache(laCache:lang.HashTable<string>[]):void {
+        for (var i = 0; i < MAX_OCCURRENCE_INDEX; i++) {
+            laCache[i] = new lang.HashTable<string>()
+        }
+    }
+
     function getFromNestedHashTable(className:string, hashTable:lang.HashTable<any>) {
         var result = hashTable.get(className)
         if (result === undefined) {

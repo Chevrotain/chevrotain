@@ -303,7 +303,7 @@ module chevrotain.recognizer {
 
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
-     * This is used for more advanced features requiring this information.
+     * This is used for more advanced features requiring such information.
      * for example: Error Recovery, Automatic lookahead calculation
      */
     export class BaseIntrospectionRecognizer extends BaseRecognizer {
@@ -325,12 +325,29 @@ module chevrotain.recognizer {
         protected RULE_OCCURRENCE_STACK:number[] = []
         protected tokensMap:gastBuilder.ITerminalNameToConstructor = undefined
 
+
+        protected classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
+
+        protected orLookaheadKeys:lang.HashTable<string>[]
+        protected manyLookaheadKeys:lang.HashTable<string>[]
+        protected atLeastOneLookaheadKeys:lang.HashTable<string>[]
+        protected optionLookaheadKeys:lang.HashTable<string>[]
+
         constructor(input:tok.Token[], tokensMap:gastBuilder.ITerminalNameToConstructor) {
             super(input)
             this.tokensMap = _.clone(tokensMap)
             // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
             // parsed with a clear error message ("expecting EOF but found ...")
             this.tokensMap[lang.functionName(EOF)] = EOF
+
+            if (cache.CLASS_TO_OR_LA_CACHE[this.className] === undefined) {
+                cache.initLookAheadKeyCache(this.className)
+            }
+
+            this.orLookaheadKeys = cache.CLASS_TO_OR_LA_CACHE[this.className]
+            this.manyLookaheadKeys = cache.CLASS_TO_MANY_LA_CACHE[this.className]
+            this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className]
+            this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
         }
 
         public reset():void {
@@ -1049,19 +1066,23 @@ module chevrotain.recognizer {
             var currRuleOccIdx = currRuleIdx
             var prevRuleIdx = currRuleIdx - 1;
 
-            return {ruleName: this.RULE_STACK[currRuleIdx],
+            return {
+                ruleName:         this.RULE_STACK[currRuleIdx],
                 idxInCallingRule: this.RULE_OCCURRENCE_STACK[currRuleOccIdx],
-                inRule: this.RULE_STACK[prevRuleIdx]}
+                inRule:           this.RULE_STACK[prevRuleIdx]
+            }
         }
 
         protected buildFullFollowKeyStack():IFollowKey[] {
             return _.map(this.RULE_STACK, (ruleName, idx) => {
-                if (idx === 0 ) {
+                if (idx === 0) {
                     return EOF_FOLLOW_KEY
                 }
-                return {ruleName: ruleName,
+                return {
+                    ruleName:         ruleName,
                     idxInCallingRule: this.RULE_OCCURRENCE_STACK[idx],
-                    inRule: this.RULE_STACK[idx - 1]}
+                    inRule:           this.RULE_STACK[idx - 1]
+                }
             })
         }
 
@@ -1233,21 +1254,37 @@ module chevrotain.recognizer {
             }
         }
 
+        protected getKeyForAutomaticLookahead(prodName:string, prodKeys:lang.HashTable<string>[], occurrence:number):string {
+
+            var occuMap = prodKeys[occurrence - 1]
+            var currRule = _.last(this.RULE_STACK)
+            var key = occuMap[currRule]
+            if (key === undefined) {
+                key = prodName + occurrence + IN + currRule
+                occuMap[currRule] = key
+            }
+            return key
+        }
+
         // Automatic lookahead calculation
         protected getLookaheadFuncForOption(occurence:number):() => boolean {
-            return this.getLookaheadFuncFor("OPTION", occurence, lookahead.buildLookaheadForOption)
+            var key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurence)
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForOption)
         }
 
         protected getLookaheadFuncForOr(occurence:number, ignoreErrors:boolean):() => number {
-            return this.getLookaheadFuncFor("OR", occurence, lookahead.buildLookaheadForOr, [ignoreErrors])
+            var key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurence)
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForOr, [ignoreErrors])
         }
 
         protected getLookaheadFuncForMany(occurence:number):() => boolean {
-            return this.getLookaheadFuncFor("MANY", occurence, lookahead.buildLookaheadForMany)
+            var key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence)
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForMany)
         }
 
         protected getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
-            return this.getLookaheadFuncFor("AT_LEAST_ONE", occurence, lookahead.buildLookaheadForAtLeastOne)
+            var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence)
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne)
         }
 
         protected isNextRule<T>(ruleName:string):boolean {
@@ -1262,21 +1299,17 @@ module chevrotain.recognizer {
             return condition.call(this)
         }
 
-        protected getLookaheadFuncFor<T>(prodType:string,
+        protected getLookaheadFuncFor<T>(key:string,
                                          occurrence:number,
                                          laFuncBuilder:(number, any) => () => T,
                                          extraArgs:any[] = []):() => T {
-            // TODO: cache this instead of calling the cache each time?
-            var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
             var ruleName = _.last(this.RULE_STACK)
-            var key = prodType + occurrence + IN + ruleName
-            var condition = <any>classLAFuncs.get(key)
+            var condition = <any>this.classLAFuncs.get(key)
             if (_.isUndefined(condition)) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
                 condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar].concat(extraArgs))
-                classLAFuncs.put(key, condition)
+                this.classLAFuncs.put(key, condition)
             }
-
             return condition
         }
 
@@ -1285,9 +1318,9 @@ module chevrotain.recognizer {
             var baseState = super.saveRecogState()
             var savedRuleStack = _.clone(this.RULE_STACK)
             return {
-                errors:       baseState.errors,
-                inputIdx:     baseState.inputIdx,
-                RULE_STACK:   savedRuleStack
+                errors:     baseState.errors,
+                inputIdx:   baseState.inputIdx,
+                RULE_STACK: savedRuleStack
             }
         }
 
