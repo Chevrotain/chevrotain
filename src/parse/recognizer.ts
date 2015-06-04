@@ -325,13 +325,15 @@ module chevrotain.recognizer {
         protected RULE_OCCURRENCE_STACK:number[] = []
         protected tokensMap:gastBuilder.ITerminalNameToConstructor = undefined
 
-
+        protected firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         protected classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
 
         protected orLookaheadKeys:lang.HashTable<string>[]
         protected manyLookaheadKeys:lang.HashTable<string>[]
         protected atLeastOneLookaheadKeys:lang.HashTable<string>[]
         protected optionLookaheadKeys:lang.HashTable<string>[]
+
+
 
         constructor(input:tok.Token[], tokensMap:gastBuilder.ITerminalNameToConstructor) {
             super(input)
@@ -898,6 +900,7 @@ module chevrotain.recognizer {
                                           grammarRuleArgs:any[],
                                           lookAheadFunc:() => boolean,
                                           expectedTokType:Function):void {
+            // TODO: can the resyncTokenType be cached?
             var reSyncTokType = this.findReSyncTokenType()
             var orgInputIdx = this.inputIdx
             var nextTokenWithoutResync = this.NEXT_TOKEN()
@@ -926,7 +929,7 @@ module chevrotain.recognizer {
 
         protected shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:Function, nextTokIdx?:number):boolean {
             // arguments to try and perform resync into the next iteration of the many are missing
-            if (_.isUndefined(expectTokAfterLastMatch) || _.isUndefined(nextTokIdx)) {
+            if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
                 return false
             }
 
@@ -1113,20 +1116,17 @@ module chevrotain.recognizer {
                                             lookaheadFunc:() => boolean,
                                             prodName:string,
                                             prodOccurrence:number,
-                                            nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker) {
+                                            nextToksWalker:typeof interp.AbstractNextTerminalAfterProductionWalker,
+                                            prodKeys:lang.HashTable<string>[]) {
 
-
-            var firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
-            var currRuleName = _.last(this.RULE_STACK)
-            // TODO: why no usage of the Occurrence in the key
-            // TODO: string concat is evil performance wise, use maps instead?
-            var key = prodName + IN + currRuleName
-            var firstAfterRepInfo = firstAfterRepMap.get(key)
-            if (_.isUndefined(firstAfterRepInfo)) {
+            var key = this.getKeyForAutomaticLookahead(prodName, prodKeys, prodOccurrence)
+            var firstAfterRepInfo = this.firstAfterRepMap.get(key)
+            if (firstAfterRepInfo === undefined) {
+                var currRuleName = _.last(this.RULE_STACK)
                 var ruleGrammar = this.getGAstProductions().get(currRuleName)
                 var walker:interp.AbstractNextTerminalAfterProductionWalker = new nextToksWalker(ruleGrammar, prodOccurrence)
                 firstAfterRepInfo = walker.startWalking()
-                firstAfterRepMap.put(key, firstAfterRepInfo)
+                this.firstAfterRepMap.put(key, firstAfterRepInfo)
             }
 
             var expectTokAfterLastMatch = firstAfterRepInfo.token
@@ -1137,7 +1137,7 @@ module chevrotain.recognizer {
             // this will force an attempt for inRule recovery in that scenario.
             if (this.RULE_STACK.length === 1 &&
                 isEndOfRule &&
-                _.isUndefined(expectTokAfterLastMatch)) {
+                expectTokAfterLastMatch === undefined) {
                 expectTokAfterLastMatch = EOF
                 nextTokIdx = 1
             }
@@ -1168,7 +1168,7 @@ module chevrotain.recognizer {
             // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
             // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
-                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker)
+                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
         }
 
         private manyInternal(prodFunc:Function,
@@ -1184,7 +1184,7 @@ module chevrotain.recognizer {
 
             super.MANY(<any>lookAheadFunc, <any>action)
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
-                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker)
+                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys)
         }
 
         private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
@@ -1289,7 +1289,7 @@ module chevrotain.recognizer {
         protected isNextRule<T>(ruleName:string):boolean {
             var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
             var condition = <any>classLAFuncs.get(ruleName)
-            if (_.isUndefined(condition)) {
+            if (condition === undefined) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
                 condition = lookahead.buildLookaheadForTopLevel(ruleGrammar)
                 classLAFuncs.put(ruleName, condition)
@@ -1304,7 +1304,7 @@ module chevrotain.recognizer {
                                          extraArgs:any[] = []):() => T {
             var ruleName = _.last(this.RULE_STACK)
             var condition = <any>this.classLAFuncs.get(key)
-            if (_.isUndefined(condition)) {
+            if (condition === undefined) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName)
                 condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar].concat(extraArgs))
                 this.classLAFuncs.put(key, condition)
