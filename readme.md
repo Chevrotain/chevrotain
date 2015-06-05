@@ -15,14 +15,16 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such     
     as automatically generated syntax diagrams or Syntactic error recovery.
   * **No generated code** - what you write is what will be run, this makes debugging trivial and provides great flexibility for inserting custom actions into the grammar.
-   * Well tested with **100% code coverage** 
+  * Well tested with **100% code coverage** 
    
 
 ## Installation
 * ```npm install chevrotain```
-* or download the javascript source directly from [github releases](https://github.com/SAP/chevrotain/releases)
+* or download the javascript source directly from github releases:
+   * [0.1.0 zip](https://github.com/SAP/chevrotain/releases/download/v0.1.0/chevrotain-binaries-0.1.0.zip)
+   * [0.1.0 tar.gz](https://github.com/SAP/chevrotain/releases/download/v0.1.0/chevrotain-binaries-0.1.0.tar.gz)
 
-   
+
 ## At a Glance, simple json parsing rules
 
    * using ES6 fat arrow '=>'
