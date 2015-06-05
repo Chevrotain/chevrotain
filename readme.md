@@ -13,8 +13,8 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
     * Backtracking support.  
   * Strong **Error Recovery** capabilities based on Antlr3's algorithms.
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such     
-    as automatically generated syntax diagrams or Syntactic error recovery 
-  * **No generated code** - what you write is what will be run, this makes debugging easier and provides great flexibility. For example this could be used to implement grammar composition.
+    as automatically generated syntax diagrams or Syntactic error recovery.
+  * **No generated code** - what you write is what will be run, this makes debugging trivial and provides great flexibility for inserting custom actions into the grammar.
    * Well tested with **100% code coverage** 
    
 
@@ -73,12 +73,13 @@ Chevrotain is a Javascript/Typescript parsing framework which aims to make it ea
    ```      
 
 ## Getting Started
-The best place to start is the examples folder:
+The best place to start is the [examples folder](https://github.com/SAP/chevrotain/tree/master/examples):
 * The most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/json/json_parser.ts)
 * A more complex one is: [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
 * Plain Javascript example in node.js: [Json Parser Plain.js](https://github.com/Chevrotain/examples_nodejs)
+* Using jison-lex for the lexing phase: [Plain.js with jison-lex](https://github.com/Chevrotain/examples_jison-lex)
 
-Note that most of the examples are written in Typescript.
+Note that The examples in the examples folder are written in Typescript.
 To see the generated(readable) javascript code: 
 
 only once:
@@ -106,7 +107,7 @@ each time:
 Only a single dependency to [lodash](https://lodash.com/).
 
 ## Compatibility
-The Generated artifact(chevrotain.js) should run any modern Javascript ES5 runtime. 
+The Generated artifact(chevrotain.js) can run any modern Javascript ES5 runtime. 
 * The CI build runs the tests under Node.js.
 * additionally local testing is done on latest versions of Chrome/Firefox/IE.
 * The dependency to lodash is imported via [UMD](https://github.com/umdjs/umd),
