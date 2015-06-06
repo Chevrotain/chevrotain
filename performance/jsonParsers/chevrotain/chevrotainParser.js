@@ -34,10 +34,10 @@ var Colon = extendToken("Colon");
 var StringLiteral = extendToken("StringLiteral");
 var NumberLiteral = extendToken("NumberLiteral");
 
-var lexer = jisonJsonLexer
+var jisonLexer = jisonJsonLexer
 // DOCS: by attaching this utility on the lexer instance we can invoke it from the generated lexer actions.
 //       by calling 'this.buildTokenInstance(...). this is the part that 'connects' the Chevrotain Tokens and the jison lexer output
-lexer.buildTokenInstance = function (className) {
+jisonLexer.buildTokenInstance = function (className) {
     var clazz = jsonTokens[className];
     return new clazz(this.yylloc.first_line, this.yylloc.first_column, this.yytext);
 };
@@ -103,31 +103,3 @@ function JsonParser(input) {
 JsonParser.prototype = Object.create(BaseRecognizer.prototype);
 JsonParser.prototype.constructor = JsonParser;
 
-// ----------------- wrapping it all together -----------------
-function parseChevrotain(text) {
-    var fullResult = {};
-
-    lexer.setInput(text);
-    var reachedEOF = false;
-    var tokens = [];
-
-    // lex the whole input
-    while (!reachedEOF) {
-        var nextToken = lexer.lex();
-        if (nextToken === 'EOF') {
-            reachedEOF = true;
-        }
-        else {
-            tokens.push(nextToken);
-        }
-    }
-
-    var parser = new JsonParser(tokens);
-    parser.object();
-
-    fullResult.tokens = tokens;
-    fullResult.parseErrors = parser.errors;
-    fullResult.lexerDone = lexer.done;
-
-    return fullResult;
-}

@@ -14,7 +14,11 @@
 
 <script src="jsonParsers/chevrotain/jisonLexer.js"></script>
 <script src="jsonParsers/chevrotain/chevrotainParser.js"></script>
+<script src="jsonParsers/chevrotain/json_handbuilt_lexer.js"></script>
+<script src="jsonParsers/chevrotain/api.js"></script>
+
 <script src="jsonParsers/jison/jisonParser.js"></script>
+
 <script src="jsonParsers/pegjs/pegjs_jison_parser.js"></script>
 
 <script>
@@ -23,7 +27,9 @@
     suite.add('Jison Generated Parser + lexer', function() {
         jisonJsonParser.parse(json_sample10k)
     }).add('Chevrotain With Jison Generated Lexer', function() {
-        parseChevrotain(json_sample10k)
+        parseChevrotainWithJisonLexer(json_sample10k)
+    }).add('Chevrotain With hand built Lexer', function() {
+        parseChevrotainWithHandBuiltLexer(json_sample10k)
     }).add('pegjs generated parser + lexer', function() {
         pegjsParser.parse(json_sample10k)
     }).on('cycle', function(event) {
