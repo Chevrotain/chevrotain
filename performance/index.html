@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="UTF-8">
     <title></title>
 </head>
@@ -20,7 +21,13 @@
 <script src="jsonParsers/jison/jisonParser.js"></script>
 
 <script src="jsonParsers/pegjs/pegjs_jison_parser.js"></script>
-
+<table id="resultsTable">
+    <tr>
+        <td style="font-weight: bold">Parser Generator Configuration</td>
+        <td style="font-weight: bold">Time</td>
+        <td style="font-weight: bold">Number of Iterations</td>
+    </tr>
+</table>
 <script>
 
     var suite = new Benchmark.Suite;
@@ -34,6 +41,21 @@
         pegjsParser.parse(json_sample10k)
     }).on('cycle', function(event) {
         console.log(String(event.target));
+        // Find a <table> element with id="resultsTable":
+        var table = document.getElementById("resultsTable");
+
+        // Create an empty <tr> element and add it to the 1st position of the table:
+        var row = table.insertRow(-1);
+
+        // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+
+        // Add some text to the new cells:
+        cell1.innerHTML = event.target.name;
+        cell2.innerHTML = event.target.hz + "    " + "\xB1" + event.target.stats.rme + "%";
+        cell3.innerHTML = event.target.stats.sample.length + " samples ran";
     }).on('complete', function() {
         console.log('Fastest is ' + this.filter('fastest').pluck('name'));
     }).run({'async': true});
