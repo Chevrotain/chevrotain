@@ -1,27 +1,10 @@
 // originally from :
 // https://github.com/pegjs/pegjs/blob/master/examples/json.pegjs
 
-/*
- * JSON Grammar
- * ============
- *
- * Based on the grammar from RFC 7159 [1].
- *
- * Note that JSON is also specified in ECMA-262 [2], ECMA-404 [3], and on the
- * JSON website [4] (somewhat informally). The RFC seems the most authoritative
- * source, which is confirmed e.g. by [5].
- *
- * [1] http://tools.ietf.org/html/rfc7159
- * [2] http://www.ecma-international.org/publications/standards/Ecma-262.htm
- * [3] http://www.ecma-international.org/publications/standards/Ecma-404.htm
- * [4] http://json.org/
- * [5] https://www.tbray.org/ongoing/When/201x/2014/03/05/RFC7159-JSON
- */
-
 /* ----- 2. JSON Grammar ----- */
 
 JSON_text
-  = ws value:value ws { return value; }
+  = ws value:value ws
 
 begin_array     = ws "[" ws
 begin_object    = ws "{" ws
@@ -43,9 +26,9 @@ value
   / number
   / string
 
-false = "false" { return false; }
-null  = "null"  { return null;  }
-true  = "true"  { return true;  }
+false = "false"
+null  = "null"
+true  = "true"
 
 /* ----- 4. Objects ----- */
 
@@ -53,26 +36,12 @@ object
   = begin_object
     members:(
       first:member
-      rest:(value_separator m:member { return m; })*
-      {
-        var result = {}, i;
-
-        result[first.name] = first.value;
-
-        for (i = 0; i < rest.length; i++) {
-          result[rest[i].name] = rest[i].value;
-        }
-
-        return result;
-      }
+      rest:(value_separator m:member)*
     )?
     end_object
-    { return members !== null ? members: {}; }
 
 member
-  = name:string name_separator value:value {
-      return { name: name, value: value };
-    }
+  = name:string name_separator value:value
 
 /* ----- 5. Arrays ----- */
 
@@ -80,16 +49,14 @@ array
   = begin_array
     values:(
       first:value
-      rest:(value_separator v:value { return v; })*
-      { return [first].concat(rest); }
+      rest:(value_separator v:value )*
     )?
     end_array
-    { return values !== null ? values : []; }
 
 /* ----- 6. Numbers ----- */
 
 number "number"
-  = minus? int frac? exp? { return parseFloat(text()); }
+  = minus? int frac? exp?
 
 decimal_point = "."
 digit1_9      = [1-9]
@@ -104,7 +71,7 @@ zero          = "0"
 /* ----- 7. Strings ----- */
 
 string "string"
-  = quotation_mark chars:char* quotation_mark { return chars.join(""); }
+  = quotation_mark chars:char* quotation_mark
 
 char
   = unescaped
@@ -113,16 +80,13 @@ char
         '"'
       / "\\"
       / "/"
-      / "b" { return "\b"; }
-      / "f" { return "\f"; }
-      / "n" { return "\n"; }
-      / "r" { return "\r"; }
-      / "t" { return "\t"; }
-      / "u" digits:$(HEXDIG HEXDIG HEXDIG HEXDIG) {
-          return String.fromCharCode(parseInt(digits, 16));
-        }
+      / "b"
+      / "f"
+      / "n"
+      / "r"
+      / "t"
+      / "u" digits:$(HEXDIG HEXDIG HEXDIG HEXDIG)
     )
-    { return sequence; }
 
 escape         = "\\"
 quotation_mark = '"'

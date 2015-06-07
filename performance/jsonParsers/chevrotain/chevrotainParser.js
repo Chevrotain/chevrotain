@@ -34,7 +34,7 @@ var Colon = extendToken("Colon");
 var StringLiteral = extendToken("StringLiteral");
 var NumberLiteral = extendToken("NumberLiteral");
 
-var jisonLexer = jisonJsonLexer
+var jisonLexer = jisonJsonLexer;
 // DOCS: by attaching this utility on the lexer instance we can invoke it from the generated lexer actions.
 //       by calling 'this.buildTokenInstance(...). this is the part that 'connects' the Chevrotain Tokens and the jison lexer output
 jisonLexer.buildTokenInstance = function (className) {

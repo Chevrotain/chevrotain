@@ -1,6 +1,6 @@
 
 // ----------------- wrapping it all together -----------------
-function parseChevrotainWithJisonLexer(text) {
+function chevrotainParseWithJisonLexer(text) {
     var fullResult = {};
 
     jisonLexer.setInput(text);
@@ -32,7 +32,7 @@ function parseChevrotainWithJisonLexer(text) {
 }
 
 
-function parseChevrotainWithHandBuiltLexer(text) {
+function chevrotainParseWithHandBuiltLexer(text) {
     var lextTest = chevrotain.examples.json.lexer.lex('"bamba\\r" : true');
 
     var fullResult = {};

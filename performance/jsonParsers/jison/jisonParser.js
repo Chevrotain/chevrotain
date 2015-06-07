@@ -71,7 +71,7 @@
  recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
  }
  */
-var jisonJsonParser = (function() {
+var jisonJsonLexerAndParser = (function() {
     var o = function(k, v, o, l) {
         for (o = o || {}, l = k.length; l--; o[k[l]] = v);
         return o

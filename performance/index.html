@@ -10,7 +10,6 @@
 <script src="libs/lodash.js"></script>
 <script src="libs/benchmark.js"></script>
 <script src="libs/chevrotain.js"></script>
-<script src="samples/5K_json.js"></script>
 <script src="samples/10K_json.js"></script>
 
 <script src="jsonParsers/chevrotain/jisonLexer.js"></script>
@@ -33,13 +32,13 @@
 
     var suite = new Benchmark.Suite;
     suite.add('Jison Generated Parser + lexer', function() {
-        jisonJsonParser.parse(json_sample10k)
+        jisonJsonLexerAndParser.parse(json_sample10k)
     }).add('Chevrotain With Jison Generated Lexer', function() {
-        parseChevrotainWithJisonLexer(json_sample10k)
+        chevrotainParseWithJisonLexer(json_sample10k)
     }).add('Chevrotain With hand built Lexer', function() {
-        parseChevrotainWithHandBuiltLexer(json_sample10k)
+        chevrotainParseWithHandBuiltLexer(json_sample10k)
     }).add('pegjs generated parser + lexer', function() {
-        pegjsParser.parse(json_sample10k)
+        pegjsJsonLexerAndParser.parse(json_sample10k)
     }).on('cycle', function(event) {
         console.log(String(event.target));
         // Find a <table> element with id="resultsTable":
