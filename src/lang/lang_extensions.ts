@@ -10,7 +10,6 @@ module chevrotain.lang {
         return functionName(instance.constructor)
     }
 
-
     /* istanbul ignore next too many hacks for IE here*/
     export function functionName(func:Function):string {
         if (hasNativeName) {

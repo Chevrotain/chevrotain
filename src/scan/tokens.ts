@@ -4,9 +4,16 @@ module chevrotain.tokens {
 
     import lang = chevrotain.lang
 
-    export function getTokName(tokType:Function):string {
-        var tokTypeName = lang.functionName(tokType)
-        return tokTypeName.replace("Tok", "")
+    export function tokenName(clazz:Function):string {
+        // used to support js inheritance patterns that do not use named functions
+        // in that situation setting a property tokenName on a token constructor will
+        // enable producing readable error messages.
+        if (_.isString((<any>clazz).tokenName)) {
+            return (<any>clazz).tokenName
+        }
+        else {
+            return lang.functionName(clazz)
+        }
     }
 
     export type TokenClass = Function

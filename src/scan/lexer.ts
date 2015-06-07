@@ -262,7 +262,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(noPatternClasses, (currClass) => {
-            return "Token class: ->" + lang.functionName(currClass) + "<- missing static 'PATTERN' property"
+            return "Token class: ->" + tok.tokenName(currClass) + "<- missing static 'PATTERN' property"
         })
 
         return errors
@@ -275,7 +275,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(invalidRegex, (currClass) => {
-            return "Token class: ->" + lang.functionName(currClass) + "<- static 'PATTERN' can only be a RegEx"
+            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'PATTERN' can only be a RegEx"
         })
 
         return errors
@@ -290,7 +290,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(invalidRegex, (currClass) => {
-            return "Token class: ->" + lang.functionName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'"
+            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'"
         })
 
         return errors
@@ -303,7 +303,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(invalidFlags, (currClass) => {
-            return "Token class: ->" + lang.functionName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')"
+            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')"
         })
 
         return errors
@@ -332,7 +332,7 @@ module chevrotain.lexer {
 
         var errors = _.map(duplicatePatterns, (setOfIdentical:any) => {
             var classNames = _.map(setOfIdentical, (currClass:any) => {
-                return lang.functionName(currClass)
+                return tok.tokenName(currClass)
             })
 
             var dupPatternSrc = (<any>_.first(setOfIdentical)).PATTERN

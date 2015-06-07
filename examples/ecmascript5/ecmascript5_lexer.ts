@@ -1,4 +1,3 @@
-import tok = chevrotain.tokens
 // seems like false positives with this ts-line rule
 /* tslint:disable:no-use-before-declare */
 
@@ -15,6 +14,7 @@ import tok = chevrotain.tokens
 //       the lexed token should be cached. (should cache takes into account context?)
 
 module chevrotain.examples.ecma5.lexer {
+    import tok = chevrotain.tokens
 
     var PLUS_ALTS = {
         "+": {token: PlusPlus, nextStates: null},

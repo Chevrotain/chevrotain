@@ -90,12 +90,12 @@ module chevrotain.interpreter {
 
         constructor(topProd:g.TOP_LEVEL, protected path:p.ITokenGrammarPath) {
             super(topProd, path)
-            this.nextTerminalName = t.getTokName(this.path.lastTok)
+            this.nextTerminalName = t.tokenName(this.path.lastTok)
             this.nextTerminalOccurrence = this.path.lastTokOccurrence
         }
 
         walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            if (this.isAtEndOfPath && t.getTokName(terminal.terminalType) === this.nextTerminalName &&
+            if (this.isAtEndOfPath && t.tokenName(terminal.terminalType) === this.nextTerminalName &&
                 terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)
             ) {
                 var fullRest = currRest.concat(prevRest)

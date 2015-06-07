@@ -20,12 +20,12 @@ module chevrotain.follow.spec {
         it("can build a followNamePrefix from a Terminal", function () {
             var terminal = new gast.Terminal(t.IdentTok)
             var actual = buildInProdFollowPrefix(terminal)
-            expect(actual).toBe("Ident1_~IN~_")
+            expect(actual).toBe("IdentTok1_~IN~_")
 
             var terminal2 = new gast.Terminal(t.EntityTok)
             terminal2.occurrenceInParent = 3
             var actual2 = buildInProdFollowPrefix(terminal2)
-            expect(actual2).toBe("Entity3_~IN~_")
+            expect(actual2).toBe("EntityTok3_~IN~_")
         })
 
         it("can build a followName prefix from a TopLevel Production and index", function () {

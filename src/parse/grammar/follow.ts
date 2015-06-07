@@ -54,7 +54,7 @@ module chevrotain.follow {
     }
 
     export function buildInProdFollowPrefix(terminal:g.Terminal):string {
-        var terminalName = t.getTokName(terminal.terminalType)
+        var terminalName = t.tokenName(terminal.terminalType)
         return terminalName + terminal.occurrenceInParent + IN
     }
 

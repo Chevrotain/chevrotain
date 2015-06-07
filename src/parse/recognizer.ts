@@ -192,7 +192,7 @@ module chevrotain.recognizer {
                 return nextToken
             }
             else {
-                var expectedTokType = tok.getTokName(tokClass)
+                var expectedTokType = tok.tokenName(tokClass)
                 var msg = "Expecting token of type -->" + expectedTokType + "<-- but found -->'" + nextToken.image + "'<--"
                 throw this.SAVE_ERROR(new MismatchedTokenException(msg, nextToken))
             }
@@ -340,7 +340,7 @@ module chevrotain.recognizer {
             this.tokensMap = _.clone(tokensMap)
             // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
             // parsed with a clear error message ("expecting EOF but found ...")
-            this.tokensMap[lang.functionName(EOF)] = EOF
+            this.tokensMap[tok.tokenName(EOF)] = EOF
 
             if (cache.CLASS_TO_OR_LA_CACHE[this.className] === undefined) {
                 cache.initLookAheadKeyCache(this.className)
@@ -910,7 +910,7 @@ module chevrotain.recognizer {
                 if (lookAheadFunc.call(this)) {
                     // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
                     // the error that would have been thrown
-                    var expectedTokName = tok.getTokName(expectedTokType)
+                    var expectedTokName = tok.tokenName(expectedTokType)
                     var msg = "Expecting token of type -->" + expectedTokName +
                         "<-- but found -->'" + nextTokenWithoutResync.image + "'<--"
                     this.SAVE_ERROR(new MismatchedTokenException(msg, nextTokenWithoutResync))

@@ -40,7 +40,7 @@ module chevrotain.lookahead {
             if (!_.isEmpty(altsAmbiguityErrors)) {
                 var errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
                     return `Ambiguous alternatives ${currAmbiguity.alts.join(" ,")} in OR${orOccurrence} inside ${ruleGrammar.name} ` +
-                        `Rule, ${lang.functionName(currAmbiguity.token)} may appears as the first Terminal in all these alternatives.\n`
+                        `Rule, ${t.tokenName(currAmbiguity.token)} may appears as the first Terminal in all these alternatives.\n`
                 })
 
                 throw new Error(errorMessages.join("\n ---------------- \n") +
