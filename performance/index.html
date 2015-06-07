@@ -28,6 +28,7 @@
         <td style="font-weight: bold">Number of Iterations</td>
     </tr>
 </table>
+<p id="fastestInResults"></p>
 <script>
 
     var suite = new Benchmark.Suite;
@@ -57,7 +58,9 @@
         cell2.innerHTML = event.target.hz + "    " + "\xB1" + event.target.stats.rme + "%";
         cell3.innerHTML = event.target.stats.sample.length + " samples ran";
     }).on('complete', function() {
-        console.log('Fastest is ' + this.filter('fastest').pluck('name'));
+        var sFastest = 'Fastest is ' + this.filter('fastest').pluck('name');
+        console.log(sFastest);
+        document.getElementById("fastestInResults").innerHTML = sFastest;
     }).run({'async': true});
 
 </script>
