@@ -27,7 +27,7 @@ module chevrotain.examples.json {
         static PATTERN = /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/
     }
     export class NumberLiteral extends tok.Token {
-        static PATTERN = /-?(0|[1-9]\d*)(\.\D+)?([eE][+-]?\d+)?/
+        static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
     }
     export class WhiteSpace extends tok.Token {
         static PATTERN = / |\t|\n|\r|\r\n/
