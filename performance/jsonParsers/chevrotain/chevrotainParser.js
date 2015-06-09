@@ -8,7 +8,7 @@ var jsonTokens = {};
 // DOCS:
 // Javascript inheritance using Object.create().
 // Any inheritance implementation will work as long it works with the instanceof operator.
-function extendToken(className) {
+function extendToken(className, pattern) {
     var childConstructor = function (line, column, image) {
         Token.call(this, line, column, image);
     };
@@ -18,21 +18,28 @@ function extendToken(className) {
     jsonTokens[className] = childConstructor;
     childConstructor.prototype = Object.create(Token.prototype);
     childConstructor.prototype.constructor = childConstructor;
+    childConstructor.PATTERN = pattern;
     return childConstructor;
 }
 
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with simple "class X extends Y"...
-var True = extendToken("True");
-var False = extendToken("False");
-var Null = extendToken("Null");
-var LCurly = extendToken("LCurly");
-var RCurly = extendToken("RCurly");
-var LSquare = extendToken("LSquare");
-var RSquare = extendToken("RSquare");
-var Comma = extendToken("Comma");
-var Colon = extendToken("Colon");
-var StringLiteral = extendToken("StringLiteral");
-var NumberLiteral = extendToken("NumberLiteral");
+var True = extendToken("True", /true/);
+var False = extendToken("False" ,/false/);
+var Null = extendToken("Null", /null/);
+var LCurly = extendToken("LCurly", /{/);
+var RCurly = extendToken("RCurly", /}/);
+var LSquare = extendToken("LSquare", /\[/);
+var RSquare = extendToken("RSquare", /]/);
+var Comma = extendToken("Comma", /,/);
+var Colon = extendToken("Colon", /:/);
+var StringLiteral = extendToken("StringLiteral", /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/);
+var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
+var WhiteSpace = extendToken("WhiteSpace", / |\t|\n|\r|\r\n/);
+WhiteSpace.GROUP = chevrotain.lexer.SKIPPED; // marking WhiteSpace as 'IGNORE' makes the lexer skip it.
+
+var simpleLexer = chevrotain.lexer.SimpleLexer;
+var ChevJsonLexer = new simpleLexer([WhiteSpace, NumberLiteral, StringLiteral, RCurly,LCurly, LSquare, RSquare, Comma, Colon, True, False, Null]);
+
 
 var jisonLexer = jisonJsonLexer;
 // DOCS: by attaching this utility on the lexer instance we can invoke it from the generated lexer actions.
