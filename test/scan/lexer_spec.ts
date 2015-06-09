@@ -9,9 +9,13 @@ module chevrotain.lexer.spec {
     import tok = chevrotain.tokens
     import matchers = test.matchers
 
-    export class BambaTok extends tok.Token { static PATTERN = /^bamba/ }
+
     export class IntegerTok extends tok.Token { static PATTERN = /^[1-9]\d*/ }
     export class IdentifierTok extends tok.Token { static PATTERN = /^[A-Za-z_]\w*/ }
+    export class BambaTok extends tok.Token {
+        static PATTERN = /^bamba/
+        static LONGER_ALT = IdentifierTok
+    }
 
     var patternsToClass = {}
     patternsToClass[BambaTok.PATTERN.toString()] = BambaTok
@@ -19,38 +23,36 @@ module chevrotain.lexer.spec {
     patternsToClass[IdentifierTok.PATTERN.toString()] = IdentifierTok
     var patterns:RegExp[] = <any>_.collect(_.values(patternsToClass), "PATTERN")
 
+    var testLexer = new SimpleLexer([BambaTok, IntegerTok, IdentifierTok])
 
     describe("The Chevrotain Simple Lexer", function () {
 
         it("can create a token from a string with priority to the First Token class with the longest match #1", function () {
             // this can match either IdentifierTok or BambaTok but should match BambaTok has its pattern is defined before IdentifierTok
-            var input = "bamba bisli"
-            var result = l.tokenizeOne(input, 0, patterns, patternsToClass)
-            expect(result.offset).toBe(5)
-            expect(result.token).toEqual(jasmine.any(BambaTok))
-            expect(result.token.image).toBe("bamba")
+            var input = "bamba"
+            var result = testLexer.tokenize(input)
+            expect(result.tokens[0]).toEqual(jasmine.any(BambaTok))
+            expect(result.tokens[0].image).toBe("bamba")
+            expect(result.tokens[0].startLine).toBe(1)
+            expect(result.tokens[0].startColumn).toBe(1)
         })
 
         it("can create a token from a string with priority to the First Token class with the longest match #2", function () {
-            var input = "bambaMIA 666"
-            var result = l.tokenizeOne(input, 0, patterns, patternsToClass)
-            expect(result.offset).toBe(8)
-            expect(result.token).toEqual(jasmine.any(IdentifierTok))
-            expect(result.token.image).toBe("bambaMIA")
+            var input = "bambaMIA"
+            var result = testLexer.tokenize(input)
+            expect(result.tokens[0]).toEqual(jasmine.any(IdentifierTok))
+            expect(result.tokens[0].image).toBe("bambaMIA")
+            expect(result.tokens[0].startLine).toBe(1)
+            expect(result.tokens[0].startColumn).toBe(1)
         })
 
         it("can create a token from a string", function () {
-            var input = "6666543221231 bamab"
-            var result = l.tokenizeOne(input, 0, patterns, patternsToClass)
-            expect(result.offset).toBe(13)
-            expect(result.token).toEqual(jasmine.any(IntegerTok))
-            expect(result.token.image).toBe("6666543221231")
-        })
-
-        it("can create a token from a string", function () {
-            var input = "[1,2,3]"
-            var result = l.tokenizeOne(input, 0, patterns, patternsToClass)
-            expect(result).toBe(l.NOTHING_CONSUMED())
+            var input = "6666543221231"
+            var result = testLexer.tokenize(input)
+            expect(result.tokens[0]).toEqual(jasmine.any(IntegerTok))
+            expect(result.tokens[0].image).toBe("6666543221231")
+            expect(result.tokens[0].startLine).toBe(1)
+            expect(result.tokens[0].startColumn).toBe(1)
         })
     })
 
@@ -167,7 +169,6 @@ module chevrotain.lexer.spec {
         })
     })
 
-
     class PatternNoStart extends tok.Token { static PATTERN = /bamba/i }
 
     class Keyword extends tok.Token { static PATTERN = l.NA }
@@ -181,11 +182,11 @@ module chevrotain.lexer.spec {
 
     class Whitespace extends tok.Token {
         static PATTERN = /(\t| )/
-        static IGNORE = true
+        static GROUP = SKIPPED
     }
     class NewLine extends tok.Token {
         static PATTERN = /(\n|\r|\r\n)/
-        static IGNORE = true
+        static GROUP = SKIPPED
     }
 
     describe("The Simple Lexer transformations", function () {
@@ -207,29 +208,23 @@ module chevrotain.lexer.spec {
         it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", function () {
             var tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
             var analyzeResult = l.analyzeTokenClasses(tokenClasses)
-            expect(analyzeResult.ignorePatterns.length).toBe(2)
-            var ignorePatternsString = _.map(analyzeResult.ignorePatterns, (pattern) => {
+            expect(analyzeResult.allPatterns.length).toBe(8)
+            var allPatternsString = _.map(analyzeResult.allPatterns, (pattern) => {
                 return pattern.source
             })
-            matchers.arrayEqualityNoOrder(ignorePatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))"])
+            matchers.arrayEqualityNoOrder(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
+                "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
-            expect(analyzeResult.matchPatterns.length).toBe(6)
-            var matchPatternsString = _.map(analyzeResult.matchPatterns, (pattern) => {
-                return pattern.source
-            })
-            matchers.arrayEqualityNoOrder(matchPatternsString,
-                ["^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
-
-            var patternToClass = analyzeResult.patternToClass
-            expect(_.keys(patternToClass).length).toBe(8)
-            expect(patternToClass["/^(?:\\()/"]).toBe(LParen)
-            expect(patternToClass["/^(?:\\))/"]).toBe(RParen)
-            expect(patternToClass["/^(?:[1-9]\\d*)/"]).toBe(Integer)
-            expect(patternToClass["/^(?:if)/"]).toBe(If)
-            expect(patternToClass["/^(?:else)/"]).toBe(Else)
-            expect(patternToClass["/^(?:return)/"]).toBe(Return)
-            expect(patternToClass["/^(?:(\\t| ))/"]).toBe(Whitespace)
-            expect(patternToClass["/^(?:(\\n|\\r|\\r\\n))/"]).toBe(NewLine)
+            var patternIdxToClass = analyzeResult.patternIdxToClass
+            expect(_.keys(patternIdxToClass).length).toBe(8)
+            expect(patternIdxToClass[0]).toBe(If);
+            expect(patternIdxToClass[1]).toBe(Else);
+            expect(patternIdxToClass[2]).toBe(Return);
+            expect(patternIdxToClass[3]).toBe(Integer);
+            expect(patternIdxToClass[4]).toBe(LParen);
+            expect(patternIdxToClass[5]).toBe(RParen);
+            expect(patternIdxToClass[6]).toBe(Whitespace);
+            expect(patternIdxToClass[7]).toBe(NewLine);
         })
 
         it("can build an offset to lineColumn dictionary for a string", function () {
@@ -238,17 +233,32 @@ module chevrotain.lexer.spec {
                 "def\r"
 
             var offsetToLC = l.buildOffsetToLineColumnDict(text)
-            expect(offsetToLC.length).toBe(10)
-            expect(offsetToLC[0]).toEqual({line: 1, column: 1})
-            expect(offsetToLC[1]).toEqual({line: 1, column: 2})
-            expect(offsetToLC[2]).toEqual({line: 1, column: 3})
-            expect(offsetToLC[3]).toEqual({line: 2, column: 1})
-            expect(offsetToLC[4]).toEqual({line: 2, column: 2})
-            expect(offsetToLC[5]).toEqual({line: 2, column: 3})
-            expect(offsetToLC[6]).toEqual({line: 3, column: 1})
-            expect(offsetToLC[7]).toEqual({line: 3, column: 2})
-            expect(offsetToLC[8]).toEqual({line: 3, column: 3})
-            expect(offsetToLC[9]).toEqual({line: 3, column: 4})
+            var offsetToLine = offsetToLC.offsetToLine
+            var offsetToColumn = offsetToLC.offsetToColumn
+            expect(offsetToLine.length).toBe(10)
+            expect(offsetToColumn.length).toBe(10)
+
+            expect(offsetToLine[0]).toBe(1)
+            expect(offsetToLine[1]).toBe(1)
+            expect(offsetToLine[2]).toBe(1)
+            expect(offsetToLine[3]).toBe(2)
+            expect(offsetToLine[4]).toBe(2)
+            expect(offsetToLine[5]).toBe(2)
+            expect(offsetToLine[6]).toBe(3)
+            expect(offsetToLine[7]).toBe(3)
+            expect(offsetToLine[8]).toBe(3)
+            expect(offsetToLine[9]).toBe(3)
+
+            expect(offsetToColumn[0]).toBe(1)
+            expect(offsetToColumn[1]).toBe(2)
+            expect(offsetToColumn[2]).toBe(3)
+            expect(offsetToColumn[3]).toBe(1)
+            expect(offsetToColumn[4]).toBe(2)
+            expect(offsetToColumn[5]).toBe(3)
+            expect(offsetToColumn[6]).toBe(1)
+            expect(offsetToColumn[7]).toBe(2)
+            expect(offsetToColumn[8]).toBe(3)
+            expect(offsetToColumn[9]).toBe(4)
         })
     })
 
@@ -265,8 +275,9 @@ module chevrotain.lexer.spec {
                 new Return(1, 10, "return"), new Integer(1, 17, "1"), new Else(2, 2, "else"), new Return(2, 7, "return"),
                 new Integer(2, 14, "2")
             ])
-            expect(lexResult.ignored).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
-                new NewLine(1, 18, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
+            // TODO: support returning skipped tokens under certain conditions (token groups)
+            //expect(lexResult.skipped).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
+            //    new NewLine(1, 18, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
         })
 
 
@@ -285,8 +296,9 @@ module chevrotain.lexer.spec {
                 new Return(1, 10, "return"), new Integer(1, 17, "1"), new Else(2, 2, "else"), new Return(2, 7, "return"),
                 new Integer(2, 14, "2")
             ])
-            expect(lexResult.ignored).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
-                new NewLine(1, 24, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
+            // TODO: support returning skipped tokens under certain conditions (token groups)
+            //expect(lexResult.skipped).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
+            //    new NewLine(1, 24, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
         })
 
         it("won't go into infinite loops when skipping at end of input", function () {
@@ -299,7 +311,6 @@ module chevrotain.lexer.spec {
             expect(lexResult.errors[0].line).toBe(1)
             expect(lexResult.errors[0].column).toBe(3)
             expect(lexResult.tokens).toEqual([new If(1, 1, "if")])
-            expect(lexResult.ignored.length).toBe(0)
         })
     })
 }

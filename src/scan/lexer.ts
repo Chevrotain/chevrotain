@@ -6,13 +6,18 @@ module chevrotain.lexer {
     import tok = chevrotain.tokens
     import lang = chevrotain.lang
 
+
+    export var SKIPPED = {
+        description: "This marks a skipped Token pattern, this means each token identified by it will" +
+                     "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
+    }
+
     var PATTERN = "PATTERN"
-    var IGNORE = "IGNORE"
     export var NA = /NOT_APPLICIABLE/
+
 
     export interface ILexingResult {
         tokens:tok.Token[]
-        ignored:tok.Token[]
         errors:ILexingError[]
     }
 
@@ -32,10 +37,10 @@ module chevrotain.lexer {
      */
     export class SimpleLexer {
 
-        protected matchPatterns:RegExp[]
-        protected ignorePatterns:RegExp[]
         protected allPatterns:RegExp[]
-        protected patternToClass = {}
+        protected patternIdxToClass:Function[]
+        protected patternIdxToSkipped:boolean[]
+        protected patternIdxToLongerAltIdx:number[]
 
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
@@ -59,18 +64,43 @@ module chevrotain.lexer {
          *   b. /b global flag
          *   c. /m multi-line flag
          *
-         *   The Lexer will try to locate the longest match each time. if two patterns both match and with the same match length
-         *   The pattern defined first will "win". for example: if an Identifier's pattern is /\w+/ and we also have keywords such
-         *   as /while/ /for/ ... the Identifier constructor must appear AFTER all keywords constructors in the 'tokenClasses' arg.
+         *   The Lexer will identify the first pattern the matches, Therefor the order of Token Constructors passed
+         *   To the SimpleLexer's constructor is meaningful. If two patterns may match the same string, the longer one
+         *   should be before the shorter one.
+         *
+         *   Note that there are situations in which we may wish to place the longer pattern after the shorter one.
+         *   For example: keywords vs Identifiers.
+         *   'do'(/do/) and 'done'(/w+)
+         *
+         *   * If the Identifier pattern appears before the 'do' pattern both 'do' and 'done'
+         *     will be lexed as an Identifier.
+         *
+         *   * If the 'do' pattern appears before the Identifier pattern 'do' will be lexed correctly as a keyword.
+         *     however 'done' will be lexed as TWO tokens keyword 'do' and identifier 'ne'.
+         *
+         *   To resolve this problem, add a static property on the keyword's Tokens constructor named: LONGER_ALT
+         *   example:
+         *
+         *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
+         *       export class Keyword extends tok.Token {
+         *          static PATTERN = lex.NA
+         *          static LONGER_ALT = Identifier
+         *       }
+         *       export class Do extends Keyword { static PATTERN = /do/ }
+         *       export class While extends Keyword { static PATTERN = /while/ }
+         *       export class Return extends Keyword { static PATTERN = /return/ }
+         *
+         *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched
+         *
          *
          */
         constructor(protected tokenClasses:TokenConstructor[]) {
             validatePatterns(tokenClasses)
             var analyzeResult = analyzeTokenClasses(tokenClasses)
-            this.matchPatterns = analyzeResult.matchPatterns
-            this.ignorePatterns = analyzeResult.ignorePatterns
-            this.patternToClass = analyzeResult.patternToClass
-            this.allPatterns = this.ignorePatterns.concat(this.matchPatterns)
+            this.allPatterns = analyzeResult.allPatterns
+            this.patternIdxToClass = analyzeResult.patternIdxToClass
+            this.patternIdxToSkipped = analyzeResult.patternIdxToSkipped
+            this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx
         }
 
         /**
@@ -85,148 +115,114 @@ module chevrotain.lexer {
             var orgInput = text
             var offset = 0
             var offSetToLC = buildOffsetToLineColumnDict(text)
-
-            function addLineColumnInfoTo(token:tok.Token):tok.Token {
-                var lc:any = offSetToLC[offset]
-                token.startLine = lc.line
-                token.startColumn = lc.column
-                return token
-            }
-
-            var ignoredTokens = []
+            // avoid repeated member access
+            var offsetToColumn = offSetToLC.offsetToColumn
+            var offsetToLine = offSetToLC.offsetToLine
             var matchedTokens = []
             var errors:ILexingError[] = []
-            var matchedIgnore = true
 
             while (text.length > 0) {
 
-                while (matchedIgnore) {
-                    var oneIgnoreResult = tokenizeOne(text, offset, this.ignorePatterns, this.patternToClass)
-                    if (oneIgnoreResult !== NOTHING_CONSUMED()) {
-                        ignoredTokens.push(addLineColumnInfoTo(oneIgnoreResult.token))
-                        text = oneIgnoreResult.remainingInput
-                        offset = oneIgnoreResult.offset
-                    }
-                    else {
-                        matchedIgnore = false
+                var match = null
+                for (var i = 0; i < this.allPatterns.length; i++) {
+                    match = this.allPatterns[i].exec(text)
+                    if (match !== null) {
+                        // even though this pattern matched we must try a another longer alternative.
+                        // this can be used to prioritize keywords over identifers
+                        var longerAltIdx = this.patternIdxToLongerAltIdx[i]
+                        if (longerAltIdx) {
+                            var matchAlt = this.allPatterns[longerAltIdx].exec(text)
+                            if (matchAlt && matchAlt[0].length > match[0].length) {
+                                match = matchAlt
+                                i = longerAltIdx
+                            }
+                        }
+                        break
                     }
                 }
-
-                var oneMatchResult = tokenizeOne(text, offset, this.matchPatterns, this.patternToClass)
-                if (oneMatchResult !== NOTHING_CONSUMED()) {
-                    matchedTokens.push(addLineColumnInfoTo(oneMatchResult.token))
-                    text = oneMatchResult.remainingInput
-                    offset = oneMatchResult.offset
+                if (match !== null) {
+                    var matchedImage = match[0]
+                    var line = offsetToLine[offset]
+                    var column = offsetToColumn[offset]
+                    var tokClass:any = this.patternIdxToClass[i]
+                    var newToken = new tokClass(line, column, matchedImage);
+                    var skipped = this.patternIdxToSkipped[i]
+                    text = text.slice(matchedImage.length)
+                    offset = offset + matchedImage.length
+                    if (!skipped) {
+                        matchedTokens.push(newToken)
+                    }
                 }
-                else {
-                    var errorStart = offset
+                else { // error recovery, drop characters until we identify a valid token's start point
+                    var errorStartOffset = offset
                     var foundResyncPoint = false
                     while (!foundResyncPoint && text.length > 0) {
-                        // drop chars until we can match something
+                        // drop chars until we succeed in matching something
                         text = text.substr(1)
                         offset++
-                        var res = tokenizeOne(text, offset, this.allPatterns, this.patternToClass)
-                        if (res !== NOTHING_CONSUMED()) {
-                            foundResyncPoint = true
+                        for (var j = 0; j < this.allPatterns.length; j++) {
+                            foundResyncPoint = this.allPatterns[j].test(text)
+                            if (foundResyncPoint) {
+                                break
+                            }
                         }
                     }
-                    if (res !== NOTHING_CONSUMED() || text.length === 0) {
-                        var lc:any = offSetToLC[errorStart]
-                        var errorLine = lc.line
-                        var errorColumn = lc.column
-                        var errorMessage = `unexpected character: ->${orgInput.charAt(errorStart)}<- at offset: ${errorStart},` +
-                            ` skipped ${offset - errorStart} characters.`
-                        errors.push({line: errorLine, column: errorColumn, message: errorMessage})
-                    }
+
+                    // at this point we either re-synced or reached the end of the input text
+                    var errorLine = offsetToLine[errorStartOffset]
+                    var errorColumn = offsetToColumn[errorStartOffset]
+                    var errorMessage = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
+                        ` skipped ${offset - errorStartOffset} characters.`
+                    errors.push({line: errorLine, column: errorColumn, message: errorMessage})
                 }
-                matchedIgnore = true
             }
 
-            return {tokens: matchedTokens, ignored: ignoredTokens, errors: errors}
+            return {tokens: matchedTokens, errors: errors}
         }
-    }
-
-    export interface IConsumeResult {
-        token:tok.Token
-        remainingInput:string
-        offset:number
-    }
-
-    // poor man's const
-    var nothing_consumed = {token: undefined, remainingInput: "", offset: -1}
-    Object.freeze(nothing_consumed)
-    export function NOTHING_CONSUMED():IConsumeResult {
-        return nothing_consumed
-    }
-
-    export function tokenizeOne(input:string,
-                                offset:number,
-                                patterns:RegExp[],
-                                patternsToConstructor:any):IConsumeResult {
-        var matches = _.map(patterns, (pattern) => {
-            return pattern.exec(input)
-        })
-
-        var maxLength = 0
-        var biggestMatchIdx = _.reduce(matches, (maxIdx, possibleMatch, currIdx) => {
-            //noinspection JSReferencingMutableVariableFromClosure
-            if (_.isArray(possibleMatch) && possibleMatch[0].length > maxLength) {
-                maxLength = possibleMatch[0].length
-                return currIdx
-            }
-            return maxIdx
-        }, -1)
-
-        if (biggestMatchIdx !== -1) {
-            var matchedPattern = patterns[biggestMatchIdx]
-            var matchedImage = matches[biggestMatchIdx][0]
-            var matchedClass = patternsToConstructor[matchedPattern.toString()]
-            var matchedToken = new matchedClass(-1, -1, matchedImage)
-            var newInput = input.substr(matchedImage.length)
-            var newOffset = offset + matchedImage.length
-            return {token: matchedToken, remainingInput: newInput, offset: newOffset}
-        }
-
-        return NOTHING_CONSUMED()
     }
 
     export interface IAnalyzeResult {
-        matchPatterns: RegExp[]
-        ignorePatterns: RegExp[]
-        patternToClass: { [pattern: string] : RegExp }
-
+        allPatterns: RegExp[]
+        patternIdxToClass: Function[]
+        patternIdxToSkipped : boolean[]
+        patternIdxToLongerAltIdx : number[]
     }
 
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
 
-        var onlyRelevant = _.reject(tokenClasses, (currClass) => {
+        var onlyRelevantClasses = _.reject(tokenClasses, (currClass) => {
             return currClass[PATTERN] === NA
         })
 
-        var matchedClasses = _.filter(onlyRelevant, (currClass) => {
-            return _.has(currClass, PATTERN) && !_.has(currClass, IGNORE)
-        })
-
-        var matchPatterns = _.map(matchedClasses, (currClass) => {
+        var allTransformedPatterns = _.map(onlyRelevantClasses, (currClass) => {
             return addStartOfInput(currClass[PATTERN])
         })
 
-        var ignoredClasses = _.filter(onlyRelevant, (currClass) => {
-            return _.has(currClass, PATTERN) && _.has(currClass, IGNORE)
+        var allPatternsToClass = _.zipObject(<any>allTransformedPatterns, onlyRelevantClasses)
+
+        var patternIdxToClass:any = _.map(allTransformedPatterns, (pattern) => {
+            return allPatternsToClass[pattern.toString()]
         })
 
-        var ignorePatterns = _.map(ignoredClasses, (currClass) => {
-            return addStartOfInput(currClass[PATTERN])
+        var patternIdxToIgnored = _.map(onlyRelevantClasses, (clazz:any) => {
+            return clazz.GROUP === SKIPPED
         })
 
-        var matchedPatternsToClass = _.zipObject(<any>matchPatterns, matchedClasses)
-        var ignoredPatternsToClass = _.zipObject(<any>ignorePatterns, ignoredClasses)
+        var patternIdxToLongerAltIdx:any = _.map(onlyRelevantClasses, (clazz:any, idx) => {
+            var longerAltClass = clazz.LONGER_ALT
 
-        var patternToClass:{ [pattern: string] : RegExp } = {}
-        _.assign(patternToClass, matchedPatternsToClass)
-        _.assign(patternToClass, ignoredPatternsToClass)
+            if (longerAltClass) {
+                var longerAltIdx = _.indexOf(onlyRelevantClasses, longerAltClass)
+                return longerAltIdx
+            }
+        })
 
-        return {matchPatterns: matchPatterns, ignorePatterns: ignorePatterns, patternToClass: patternToClass}
+        return {
+            allPatterns:              allTransformedPatterns,
+            patternIdxToClass:        patternIdxToClass,
+            patternIdxToSkipped:      patternIdxToIgnored,
+            patternIdxToLongerAltIdx: patternIdxToLongerAltIdx
+        }
     }
 
     export function validatePatterns(tokenClasses:TokenConstructor[]) {
@@ -350,44 +346,44 @@ module chevrotain.lexer {
         return new RegExp(`^(?:${pattern.source})`, flags)
     }
 
-    export interface ILineColumn {
-        line:number
-        column:number
+    export interface  LineColumnInfo {
+        offsetToLine: number[]
+        offsetToColumn: number[]
     }
 
-    export type OffsetToLineColumn = ILineColumn[]
-
-    export function buildOffsetToLineColumnDict(text:string):OffsetToLineColumn {
-        var offSetToLineColumn = new Array(text.length)
+    export function buildOffsetToLineColumnDict(text:string):LineColumnInfo {
+        var offSetToColumn = new Array(text.length)
+        var offSetToLine = new Array(text.length)
         var column = 1
         var line = 1
         var currOffset = 0
 
-        offSetToLineColumn[currOffset] = {line: line, column: column}
-
-        while (currOffset < text.length - 1) {
+        while (currOffset < text.length) {
             var c = text.charAt(currOffset)
-            var c2 = text.charAt(currOffset + 1)
-            var nextIsSlashN = c2 === "\n"
 
+            offSetToColumn[currOffset] = column
+            offSetToLine[currOffset] = line
             if (c === "\n") {
                 line++
                 column = 1
             }
-            else if (c === "\r" && nextIsSlashN) {
-                column++
-            }
             else if (c === "\r") {
-                line++
-                column = 1
+                if (currOffset !== text.length - 1 &&
+                    text.charAt(currOffset + 1) === "\n") {
+                    column++
+                }
+                else {
+                    line++
+                    column = 1
+                }
             }
             else {
                 column++
             }
+
             currOffset++
-            offSetToLineColumn[currOffset] = {line: line, column: column}
         }
 
-        return offSetToLineColumn
+        return {offsetToLine: offSetToLine, offsetToColumn: offSetToColumn}
     }
 }

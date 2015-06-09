@@ -24,7 +24,7 @@ module chevrotain.examples.calculator {
     }
     export class WhiteSpace extends tok.Token {
         static PATTERN = / |\t|\n|\r|\r\n/
-        static IGNORE = true
+        static GROUP = lex.SKIPPED
     }
 
     // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations

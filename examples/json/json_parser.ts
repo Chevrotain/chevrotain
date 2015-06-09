@@ -31,13 +31,13 @@ module chevrotain.examples.json {
     }
     export class WhiteSpace extends tok.Token {
         static PATTERN = / |\t|\n|\r|\r\n/
-        static IGNORE = true
+        static GROUP = lex.SKIPPED
     }
 
     // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations
     //       performed by it's constructor only need to be done once.
     export var JsonLexer = new lex.SimpleLexer(
-        [Keyword, True, False, Null, LCurly, RCurly, LSquare, RSquare, Comma, Colon, StringLiteral, NumberLiteral, WhiteSpace])
+        [Keyword, WhiteSpace, NumberLiteral, StringLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null])
 
 
     export class JsonParser extends recog.BaseIntrospectionRecognizer {
