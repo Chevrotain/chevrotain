@@ -358,17 +358,17 @@ module chevrotain.lexer {
         var currOffset = 0
 
         while (currOffset < text.length) {
-            var c = text.charAt(currOffset)
+            var c = text.charCodeAt(currOffset)
 
             offSetToColumn[currOffset] = column
             offSetToLine[currOffset] = line
-            if (c === "\n") {
+            if (c === 10) { // "\n"
                 line++
                 column = 1
             }
-            else if (c === "\r") {
+            else if (c === 13) { // \r
                 if (currOffset !== text.length - 1 &&
-                    text.charAt(currOffset + 1) === "\n") {
+                    text.charCodeAt(currOffset + 1) === 10) { // "\n"
                     column++
                 }
                 else {
