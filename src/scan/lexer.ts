@@ -33,7 +33,6 @@ module chevrotain.lexer {
      * A RegExp lexer meant to be used for quick prototyping and/or simple grammars.
      * This is NOT meant to be used in commercial compilers/tooling.
      * concerns such as performance/extendability/modularity are ignored in this implementation.
-     *
      */
     export class SimpleLexer {
 
@@ -109,7 +108,7 @@ module chevrotain.lexer {
          * does not modify the state of the Lexer.
          *
          * @param {string} text the string to lex
-         * @returns {{tokens: {Token}[], ignored: {Token}[], errors: string[]}}
+         * @returns {{tokens: {Token}[], errors: string[]}}
          */
         public tokenize(text:string):ILexingResult {
             var orgInput = text
