@@ -174,7 +174,6 @@
              * A RegExp lexer meant to be used for quick prototyping and/or simple grammars.
              * This is NOT meant to be used in commercial compilers/tooling.
              * concerns such as performance/extendability/modularity are ignored in this implementation.
-             *
              */
             var SimpleLexer = (function () {
                 /**
@@ -244,7 +243,7 @@
                  * does not modify the state of the Lexer.
                  *
                  * @param {string} text the string to lex
-                 * @returns {{tokens: {Token}[], ignored: {Token}[], errors: string[]}}
+                 * @returns {{tokens: {Token}[], errors: string[]}}
                  */
                 SimpleLexer.prototype.tokenize = function (text) {
                     var orgInput = text;
@@ -449,15 +448,15 @@
                 var line = 1;
                 var currOffset = 0;
                 while (currOffset < text.length) {
-                    var c = text.charAt(currOffset);
+                    var c = text.charCodeAt(currOffset);
                     offSetToColumn[currOffset] = column;
                     offSetToLine[currOffset] = line;
-                    if (c === "\n") {
+                    if (c === 10) {
                         line++;
                         column = 1;
                     }
-                    else if (c === "\r") {
-                        if (currOffset !== text.length - 1 && text.charAt(currOffset + 1) === "\n") {
+                    else if (c === 13) {
+                        if (currOffset !== text.length - 1 && text.charCodeAt(currOffset + 1) === 10) {
                             column++;
                         }
                         else {
