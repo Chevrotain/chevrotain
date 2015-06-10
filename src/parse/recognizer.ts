@@ -333,11 +333,22 @@ module chevrotain.recognizer {
         protected atLeastOneLookaheadKeys:lang.HashTable<string>[]
         protected optionLookaheadKeys:lang.HashTable<string>[]
 
-
-
-        constructor(input:tok.Token[], tokensMap:gastBuilder.ITerminalNameToConstructor) {
+        constructor(input:tok.Token[], tokensMapOrArr:gastBuilder.ITerminalNameToConstructor | Function[]) {
             super(input)
-            this.tokensMap = _.clone(tokensMap)
+
+            if (_.isArray(tokensMapOrArr)) {
+                this.tokensMap = <any>_.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
+                    acc[tok.tokenName(tokenClazz)] = tokenClazz
+                    return acc
+                }, {})
+            }
+            else if (_.isObject(tokensMapOrArr)) {
+                this.tokensMap = _.clone(<any>tokensMapOrArr)
+            }
+            else {
+                throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.")
+            }
+
             // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
             // parsed with a clear error message ("expecting EOF but found ...")
             this.tokensMap[tok.tokenName(EOF)] = EOF

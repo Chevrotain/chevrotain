@@ -296,4 +296,45 @@ module chevrotain.recognizer.spec {
 
     })
 
+    describe("The BaseRecognizer", function () {
+
+        it("can be initialized with a vector of Tokens", function () {
+            var parser:any = new recog.BaseIntrospectionRecognizer([], [PlusTok, MinusTok, IntToken])
+            var tokensMap = (<any>parser).tokensMap
+            expect(tokensMap.PlusTok).toBe(PlusTok)
+            expect(tokensMap.MinusTok).toBe(MinusTok)
+            expect(tokensMap.IntToken).toBe(IntToken)
+        })
+
+        it("can be initialized with a Dictionary of Tokens", function () {
+            var initTokenDictionary = {PlusTok: PlusTok, MinusTok: MinusTok, IntToken: IntToken}
+            var parser:any = new recog.BaseIntrospectionRecognizer([], {
+                PlusTok:  PlusTok,
+                MinusTok: MinusTok,
+                IntToken: IntToken
+            })
+            var tokensMap = (<any>parser).tokensMap
+            // the implementation should clone the dictionary to avoid bugs caused by mutability
+            expect(tokensMap).not.toBe(initTokenDictionary)
+            expect(tokensMap.PlusTok).toBe(PlusTok)
+            expect(tokensMap.MinusTok).toBe(MinusTok)
+            expect(tokensMap.IntToken).toBe(IntToken)
+        })
+
+        it("cannot be initialized with other parameters", function () {
+            expect(() => {
+                return new recog.BaseIntrospectionRecognizer([], null)
+            }).toThrow()
+
+            expect(() => {
+                return new recog.BaseIntrospectionRecognizer([], <any>666)
+            }).toThrow()
+
+            expect(() => {
+                return new recog.BaseIntrospectionRecognizer([], <any>"woof woof")
+            }).toThrow()
+        })
+
+    })
+
 }
