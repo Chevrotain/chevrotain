@@ -1,28 +1,21 @@
-// ----------------- Tokens -----------------
+// ----------------- Lexer -----------------
 var Token = chevrotain.tokens.Token;
 
-// DOCS: this object will act as a map between the TokenClass names and their constructors.
-//       It is used via a closure in 'buildTokenInstance' to create new token instances during the lexing
-var jsonTokens = {};
 
-// DOCS:
 // Javascript inheritance using Object.create().
 // Any inheritance implementation will work as long it works with the instanceof operator.
 function extendToken(className, pattern) {
     var childConstructor = function (line, column, image) {
         Token.call(this, line, column, image);
     };
-    // TODO: Function.name is not writable, need to workaround this to provide good error messages
-    //       In case anonymous functions have been used as the constructors.
-    childConstructor.name = className;
-    jsonTokens[className] = childConstructor;
+    childConstructor.tokenName = className;
     childConstructor.prototype = Object.create(Token.prototype);
     childConstructor.prototype.constructor = childConstructor;
     childConstructor.PATTERN = pattern;
     return childConstructor;
 }
 
-// In ES6, custom inheritance implementation (such as the one above) can be replaced with simple "class X extends Y"...
+// In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
 var True = extendToken("True", /true/);
 var False = extendToken("False" ,/false/);
 var Null = extendToken("Null", /null/);
@@ -34,20 +27,13 @@ var Comma = extendToken("Comma", /,/);
 var Colon = extendToken("Colon", /:/);
 var StringLiteral = extendToken("StringLiteral", /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/);
 var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
-var WhiteSpace = extendToken("WhiteSpace", / |\t|\n|\r|\r\n/);
-WhiteSpace.GROUP = chevrotain.lexer.SKIPPED; // marking WhiteSpace as 'IGNORE' makes the lexer skip it.
+var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+WhiteSpace.GROUP = chevrotain.lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
 var simpleLexer = chevrotain.lexer.SimpleLexer;
-var ChevJsonLexer = new simpleLexer([WhiteSpace, NumberLiteral, StringLiteral, RCurly,LCurly, LSquare, RSquare, Comma, Colon, True, False, Null]);
+var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly,LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
+var ChevJsonLexer = new simpleLexer(jsonTokens);
 
-
-var jisonLexer = jisonJsonLexer;
-// DOCS: by attaching this utility on the lexer instance we can invoke it from the generated lexer actions.
-//       by calling 'this.buildTokenInstance(...). this is the part that 'connects' the Chevrotain Tokens and the jison lexer output
-jisonLexer.buildTokenInstance = function (className) {
-    var clazz = jsonTokens[className];
-    return new clazz(this.yylloc.first_line, this.yylloc.first_column, this.yytext);
-};
 
 // ----------------- parser -----------------
 var BaseRecognizer = chevrotain.recognizer.BaseIntrospectionRecognizer;

@@ -12,7 +12,6 @@
 <script src="libs/chevrotain.js"></script>
 <script src="samples/10K_json.js"></script>
 
-<script src="jsonParsers/chevrotain/jisonLexer.js"></script>
 <script src="jsonParsers/chevrotain/chevrotainParser.js"></script>
 <script src="jsonParsers/chevrotain/json_handbuilt_lexer.js"></script>
 <script src="jsonParsers/chevrotain/api.js"></script>
@@ -30,17 +29,10 @@
 <p id="fastestInResults"></p>
 <script>
 
-    //    for(var i= 0; i < 50; i++) {
-    //        chevrotainParseWithChevrotainLexer(json_sample10k)
-    //    }
-
     var suite = new Benchmark.Suite;
     suite
             .add('Jison Generated Parser + lexer', function () {
                 jisonJsonLexerAndParser.parse(json_sample10k)
-            })
-            .add('Chevrotain With Jison Generated Lexer', function () {
-                chevrotainParseWithJisonLexer(json_sample10k)
             }).add('Chevrotain With hand built Lexer', function () {
                 chevrotainParseWithHandBuiltLexer(json_sample10k)
             }).add('pegjs generated parser + lexer', function () {
