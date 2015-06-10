@@ -275,16 +275,16 @@
                         }
                         if (match !== null) {
                             var matchedImage = match[0];
-                            var line = offsetToLine[offset];
-                            var column = offsetToColumn[offset];
-                            var tokClass = this.patternIdxToClass[i];
-                            var newToken = new tokClass(line, column, matchedImage);
                             var skipped = this.patternIdxToSkipped[i];
-                            text = text.slice(matchedImage.length);
-                            offset = offset + matchedImage.length;
                             if (!skipped) {
+                                var line = offsetToLine[offset];
+                                var column = offsetToColumn[offset];
+                                var tokClass = this.patternIdxToClass[i];
+                                var newToken = new tokClass(line, column, matchedImage);
                                 matchedTokens.push(newToken);
                             }
+                            text = text.slice(matchedImage.length);
+                            offset = offset + matchedImage.length;
                         }
                         else {
                             var errorStartOffset = offset;
