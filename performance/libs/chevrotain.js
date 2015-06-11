@@ -15,7 +15,7 @@
     }
 }(this, function (_) {
 
-    /*! chevrotain - v1.1.0 - 2015-06-10 */
+    /*! chevrotain - v1.1.0 - 2015-06-11 */
 /// <reference path="../../libs/lodash.d.ts" />
     var chevrotain;
     (function (chevrotain) {
@@ -236,6 +236,7 @@
                     this.patternIdxToClass = analyzeResult.patternIdxToClass;
                     this.patternIdxToSkipped = analyzeResult.patternIdxToSkipped;
                     this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx;
+                    this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator;
                 }
                 /**
                  * Will lex(Tokenize) a string.
@@ -248,12 +249,10 @@
                 SimpleLexer.prototype.tokenize = function (text) {
                     var orgInput = text;
                     var offset = 0;
-                    var offSetToLC = buildOffsetToLineColumnDict(text);
-                    // avoid repeated member access
-                    var offsetToColumn = offSetToLC.offsetToColumn;
-                    var offsetToLine = offSetToLC.offsetToLine;
                     var matchedTokens = [];
                     var errors = [];
+                    var line = 1;
+                    var column = 1;
                     while (text.length > 0) {
                         var match = null;
                         for (var i = 0; i < this.allPatterns.length; i++) {
@@ -274,22 +273,43 @@
                         }
                         if (match !== null) {
                             var matchedImage = match[0];
+                            var imageLength = matchedImage.length;
                             var skipped = this.patternIdxToSkipped[i];
                             if (!skipped) {
-                                var line = offsetToLine[offset];
-                                var column = offsetToColumn[offset];
                                 var tokClass = this.patternIdxToClass[i];
                                 var newToken = new tokClass(line, column, matchedImage);
                                 matchedTokens.push(newToken);
                             }
-                            text = text.slice(matchedImage.length);
-                            offset = offset + matchedImage.length;
+                            text = text.slice(imageLength);
+                            offset = offset + imageLength;
+                            column = column + imageLength;
+                            var canContainLineTerminator = this.patternIdxToCanLineTerminator[i];
+                            if (canContainLineTerminator) {
+                                var lineTerminatorsInMatch = countLineTerminators(matchedImage);
+                                // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
+                                if (lineTerminatorsInMatch !== 0) {
+                                    line = line + lineTerminatorsInMatch;
+                                    column = 1;
+                                }
+                            }
                         }
                         else {
                             var errorStartOffset = offset;
+                            var errorLine = line;
+                            var errorColumn = column;
                             var foundResyncPoint = false;
                             while (!foundResyncPoint && text.length > 0) {
                                 // drop chars until we succeed in matching something
+                                var droppedChar = text.charCodeAt(0);
+                                if (droppedChar === 10 || (droppedChar === 13 && (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) {
+                                    line++;
+                                    column = 1;
+                                }
+                                else {
+                                    // either when skipping the next char, or when consuming the following pattern
+                                    // (which will have to start in a '\n' if we manage to consume it)
+                                    column++;
+                                }
                                 text = text.substr(1);
                                 offset++;
                                 for (var j = 0; j < this.allPatterns.length; j++) {
@@ -300,8 +320,6 @@
                                 }
                             }
                             // at this point we either re-synced or reached the end of the input text
-                            var errorLine = offsetToLine[errorStartOffset];
-                            var errorColumn = offsetToColumn[errorStartOffset];
                             var errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") + (" skipped " + (offset - errorStartOffset) + " characters.");
                             errors.push({ line: errorLine, column: errorColumn, message: errorMessage });
                         }
@@ -332,11 +350,16 @@
                         return longerAltIdx;
                     }
                 });
+                var patternIdxToCanLineTerminator = _.map(allTransformedPatterns, function (pattern) {
+                    // TODO: unicode escapes of line terminators too?
+                    return /\\n|\\r|\\s/g.test(pattern.source);
+                });
                 return {
                     allPatterns: allTransformedPatterns,
                     patternIdxToClass: patternIdxToClass,
                     patternIdxToSkipped: patternIdxToIgnored,
-                    patternIdxToLongerAltIdx: patternIdxToLongerAltIdx
+                    patternIdxToLongerAltIdx: patternIdxToLongerAltIdx,
+                    patternIdxToCanLineTerminator: patternIdxToCanLineTerminator
                 };
             }
             lexer.analyzeTokenClasses = analyzeTokenClasses;
@@ -441,37 +464,26 @@
                 return new RegExp("^(?:" + pattern.source + ")", flags);
             }
             lexer.addStartOfInput = addStartOfInput;
-            function buildOffsetToLineColumnDict(text) {
-                var offSetToColumn = new Array(text.length);
-                var offSetToLine = new Array(text.length);
-                var column = 1;
-                var line = 1;
+            function countLineTerminators(text) {
+                var lineTerminators = 0;
                 var currOffset = 0;
                 while (currOffset < text.length) {
                     var c = text.charCodeAt(currOffset);
-                    offSetToColumn[currOffset] = column;
-                    offSetToLine[currOffset] = line;
                     if (c === 10) {
-                        line++;
-                        column = 1;
+                        lineTerminators++;
                     }
                     else if (c === 13) {
                         if (currOffset !== text.length - 1 && text.charCodeAt(currOffset + 1) === 10) {
-                            column++;
                         }
                         else {
-                            line++;
-                            column = 1;
+                            lineTerminators++;
                         }
-                    }
-                    else {
-                        column++;
                     }
                     currOffset++;
                 }
-                return { offsetToLine: offSetToLine, offsetToColumn: offSetToColumn };
+                return lineTerminators;
             }
-            lexer.buildOffsetToLineColumnDict = buildOffsetToLineColumnDict;
+            lexer.countLineTerminators = countLineTerminators;
         })/* istanbul ignore next */ (lexer = chevrotain.lexer || /* istanbul ignore next */ (chevrotain.lexer = {}));
     })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /// <reference path="../scan/tokens.ts" />
