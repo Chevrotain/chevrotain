@@ -227,38 +227,10 @@ module chevrotain.lexer.spec {
             expect(patternIdxToClass[7]).toBe(NewLine);
         })
 
-        it("can build an offset to lineColumn dictionary for a string", function () {
-            var text = "ab\r" +
-                "c\r\n" +
-                "def\r"
-
-            var offsetToLC = l.buildOffsetToLineColumnDict(text)
-            var offsetToLine = offsetToLC.offsetToLine
-            var offsetToColumn = offsetToLC.offsetToColumn
-            expect(offsetToLine.length).toBe(10)
-            expect(offsetToColumn.length).toBe(10)
-
-            expect(offsetToLine[0]).toBe(1)
-            expect(offsetToLine[1]).toBe(1)
-            expect(offsetToLine[2]).toBe(1)
-            expect(offsetToLine[3]).toBe(2)
-            expect(offsetToLine[4]).toBe(2)
-            expect(offsetToLine[5]).toBe(2)
-            expect(offsetToLine[6]).toBe(3)
-            expect(offsetToLine[7]).toBe(3)
-            expect(offsetToLine[8]).toBe(3)
-            expect(offsetToLine[9]).toBe(3)
-
-            expect(offsetToColumn[0]).toBe(1)
-            expect(offsetToColumn[1]).toBe(2)
-            expect(offsetToColumn[2]).toBe(3)
-            expect(offsetToColumn[3]).toBe(1)
-            expect(offsetToColumn[4]).toBe(2)
-            expect(offsetToColumn[5]).toBe(3)
-            expect(offsetToColumn[6]).toBe(1)
-            expect(offsetToColumn[7]).toBe(2)
-            expect(offsetToColumn[8]).toBe(3)
-            expect(offsetToColumn[9]).toBe(4)
+        it("can count the number of line terminators in a string", function () {
+            expect(l.countLineTerminators("bamba\r\nbisli\r")).toBe(2)
+            expect(l.countLineTerminators("\r\r\r1234\r\n")).toBe(4)
+            expect(l.countLineTerminators("aaaa\raaa\n\r1234\n")).toBe(4)
         })
     })
 
@@ -311,6 +283,26 @@ module chevrotain.lexer.spec {
             expect(lexResult.errors[0].line).toBe(1)
             expect(lexResult.errors[0].column).toBe(3)
             expect(lexResult.tokens).toEqual([new If(1, 1, "if")])
+        })
+
+        it("can deal with line terminators during resync", function () {
+            var ifElseLexer = new l.SimpleLexer([If, Else]) // no newLine tokens those will be resynced
+
+            var input = "if\r\nelse\rif\r"
+            var lexResult = ifElseLexer.tokenize(input)
+            expect(lexResult.errors.length).toBe(3)
+            expect(_.contains(lexResult.errors[0].message, "\r")).toBe(true)
+            expect(lexResult.errors[0].line).toBe(1)
+            expect(lexResult.errors[0].column).toBe(3)
+
+            expect(_.contains(lexResult.errors[1].message, "\r")).toBe(true)
+            expect(lexResult.errors[1].line).toBe(2)
+            expect(lexResult.errors[1].column).toBe(5)
+
+            expect(_.contains(lexResult.errors[1].message, "\r")).toBe(true)
+            expect(lexResult.errors[2].line).toBe(3)
+            expect(lexResult.errors[2].column).toBe(3)
+            expect(lexResult.tokens).toEqual([new If(1, 1, "if"), new Else(2, 1, "else"), new If(3, 1, "if")])
         })
     })
 }

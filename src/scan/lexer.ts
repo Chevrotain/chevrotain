@@ -40,6 +40,7 @@ module chevrotain.lexer {
         protected patternIdxToClass:Function[]
         protected patternIdxToSkipped:boolean[]
         protected patternIdxToLongerAltIdx:number[]
+        protected patternIdxToCanLineTerminator:boolean[]
 
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
@@ -100,6 +101,7 @@ module chevrotain.lexer {
             this.patternIdxToClass = analyzeResult.patternIdxToClass
             this.patternIdxToSkipped = analyzeResult.patternIdxToSkipped
             this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx
+            this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator
         }
 
         /**
@@ -113,12 +115,10 @@ module chevrotain.lexer {
         public tokenize(text:string):ILexingResult {
             var orgInput = text
             var offset = 0
-            var offSetToLC = buildOffsetToLineColumnDict(text)
-            // avoid repeated member access
-            var offsetToColumn = offSetToLC.offsetToColumn
-            var offsetToLine = offSetToLC.offsetToLine
             var matchedTokens = []
             var errors:ILexingError[] = []
+            var line = 1
+            var column = 1
 
             while (text.length > 0) {
 
@@ -141,24 +141,49 @@ module chevrotain.lexer {
                 }
                 if (match !== null) {
                     var matchedImage = match[0]
+                    var imageLength = matchedImage.length
                     var skipped = this.patternIdxToSkipped[i]
                     if (!skipped) {
-                        var line = offsetToLine[offset]
-                        var column = offsetToColumn[offset]
                         var tokClass:any = this.patternIdxToClass[i]
                         var newToken = new tokClass(line, column, matchedImage);
                         matchedTokens.push(newToken)
                     }
-                    text = text.slice(matchedImage.length)
-                    offset = offset + matchedImage.length
+                    text = text.slice(imageLength)
+                    offset = offset + imageLength
+                    column = column + imageLength
+                    var canContainLineTerminator = this.patternIdxToCanLineTerminator[i]
+                    if (canContainLineTerminator) {
+                        var lineTerminatorsInMatch = countLineTerminators(matchedImage)
+                        // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
+                        if (lineTerminatorsInMatch !== 0) {
+                            line = line + lineTerminatorsInMatch
+                            column = 1
+                        }
+                    }
+
                 }
                 else { // error recovery, drop characters until we identify a valid token's start point
                     var errorStartOffset = offset
+                    var errorLine = line
+                    var errorColumn = column
                     var foundResyncPoint = false
                     while (!foundResyncPoint && text.length > 0) {
                         // drop chars until we succeed in matching something
+                        var droppedChar = text.charCodeAt(0)
+                        if (droppedChar === 10 || // '\n'
+                            (droppedChar === 13 &&
+                            (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) { //'\r' not followed by '\n'
+                            line++
+                            column = 1
+                        }
+                        else { // this else also matches '\r\n' which is fine, the '\n' will be counted
+                            // either when skipping the next char, or when consuming the following pattern
+                            // (which will have to start in a '\n' if we manage to consume it)
+                            column++
+                        }
+
                         text = text.substr(1)
-                        offset++
+                        offset++;
                         for (var j = 0; j < this.allPatterns.length; j++) {
                             foundResyncPoint = this.allPatterns[j].test(text)
                             if (foundResyncPoint) {
@@ -168,8 +193,6 @@ module chevrotain.lexer {
                     }
 
                     // at this point we either re-synced or reached the end of the input text
-                    var errorLine = offsetToLine[errorStartOffset]
-                    var errorColumn = offsetToColumn[errorStartOffset]
                     var errorMessage = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
                         ` skipped ${offset - errorStartOffset} characters.`
                     errors.push({line: errorLine, column: errorColumn, message: errorMessage})
@@ -185,6 +208,7 @@ module chevrotain.lexer {
         patternIdxToClass: Function[]
         patternIdxToSkipped : boolean[]
         patternIdxToLongerAltIdx : number[]
+        patternIdxToCanLineTerminator: boolean[]
     }
 
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
@@ -216,11 +240,17 @@ module chevrotain.lexer {
             }
         })
 
+        var patternIdxToCanLineTerminator = _.map(allTransformedPatterns, (pattern:RegExp) => {
+            // TODO: unicode escapes of line terminators too?
+            return /\\n|\\r|\\s/g.test(pattern.source)
+        })
+
         return {
-            allPatterns:              allTransformedPatterns,
-            patternIdxToClass:        patternIdxToClass,
-            patternIdxToSkipped:      patternIdxToIgnored,
-            patternIdxToLongerAltIdx: patternIdxToLongerAltIdx
+            allPatterns:                   allTransformedPatterns,
+            patternIdxToClass:             patternIdxToClass,
+            patternIdxToSkipped:           patternIdxToIgnored,
+            patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
+            patternIdxToCanLineTerminator: patternIdxToCanLineTerminator
         }
     }
 
@@ -350,39 +380,29 @@ module chevrotain.lexer {
         offsetToColumn: number[]
     }
 
-    export function buildOffsetToLineColumnDict(text:string):LineColumnInfo {
-        var offSetToColumn = new Array(text.length)
-        var offSetToLine = new Array(text.length)
-        var column = 1
-        var line = 1
+
+    export function countLineTerminators(text:string):number {
+        var lineTerminators = 0
         var currOffset = 0
 
         while (currOffset < text.length) {
             var c = text.charCodeAt(currOffset)
-
-            offSetToColumn[currOffset] = column
-            offSetToLine[currOffset] = line
             if (c === 10) { // "\n"
-                line++
-                column = 1
+                lineTerminators++
             }
             else if (c === 13) { // \r
                 if (currOffset !== text.length - 1 &&
                     text.charCodeAt(currOffset + 1) === 10) { // "\n"
-                    column++
                 }
                 else {
-                    line++
-                    column = 1
+                    lineTerminators++
                 }
-            }
-            else {
-                column++
             }
 
             currOffset++
         }
 
-        return {offsetToLine: offSetToLine, offsetToColumn: offSetToColumn}
+        return lineTerminators
     }
 }
+
