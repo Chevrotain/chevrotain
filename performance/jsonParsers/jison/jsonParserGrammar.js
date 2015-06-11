@@ -1,33 +1,27 @@
-// Originally from :
-// https://raw.githubusercontent.com/zaach/jison/master/examples/json.js
+// Original version from : https://raw.githubusercontent.com/zaach/jison/master/examples/json.js
+// * removed lexer macros which caused issues when inserted into regExp char blocks []
+// * removed '\b' word boundry used in some of the lexer rules
+// * simplified number regExp
+// * fixed missing grammar rule for 'JSONNullLiteral'
 
-var Generator = require("../lib/jison").Generator;
-
-exports.grammar = {
+var grammar = {
     "comment": "ECMA-262 5th Edition, 15.12.1 The JSON Grammar.",
     "author": "Zach Carter",
 
     "lex": {
-        "macros": {
-            "digit": "[0-9]",
-            "esc": "\\\\",
-            "int": "-?(?:[0-9]|[1-9][0-9]+)",
-            "exp": "(?:[eE][-+]?[0-9]+)",
-            "frac": "(?:\\.[0-9]+)"
-        },
         "rules": [
             ["\\s+", "/* skip whitespace */"],
-            ["{int}{frac}?{exp}?\\b", "return 'NUMBER';"],
-            ["\"(?:{esc}[\"bfnrt/{esc}]|{esc}u[a-fA-F0-9]{4}|[^\"{esc}])*\"", "yytext = yytext.substr(1,yyleng-2); return 'STRING';"],
+            ["-?(:?0|[1-9]\\d*)(:?\\.\\d+)?(:?[eE][+-]?\\d+)?", "return 'NUMBER';"],
+            ["\"(?:\\\\[\"bfnrt/\\\\]|\\\\u[a-fA-F0-9]{4}|[^\"\\\\])*\"", "return 'STRING';"],
             ["\\{", "return '{'"],
             ["\\}", "return '}'"],
             ["\\[", "return '['"],
             ["\\]", "return ']'"],
             [",", "return ','"],
             [":", "return ':'"],
-            ["true\\b", "return 'TRUE'"],
-            ["false\\b", "return 'FALSE'"],
-            ["null\\b", "return 'NULL'"]
+            ["true", "return 'TRUE'"],
+            ["false", "return 'FALSE'"],
+            ["null", "return 'NULL'"]
         ]
     },
 
@@ -41,6 +35,7 @@ exports.grammar = {
 
         "JSONBooleanLiteral": [ "TRUE", "FALSE" ],
 
+        "JSONNullLiteral" : [ "NULL" ],
 
         "JSONText": [ "JSONValue" ],
 
@@ -69,11 +64,15 @@ exports.grammar = {
 
 var options = {type: "slr", moduleType: "commonjs", moduleName: "jsoncheck"};
 
-exports.main = function main () {
-    var code = new Generator(exports.grammar, options).generate();
-    console.log(code);
-};
 
-if (require.main === module)
-    exports.main();
+var Parser = require("jison").Parser;
+var jsonParser = new Parser(grammar);
+var parserSource = jsonParser.generate({moduleName: "jisonJsonLexerAndParser"});
+
+var JisonLex = require('jison-lex');
+var lexerSource = JisonLex.generate(grammar.lex);
+
+var fs = require("fs");
+// must be a way to connect the generated lexer and parser in a better way...
+fs.writeFileSync("jisonParser.js", parserSource + "\n\n\n\n\n" + lexerSource + "\n jisonJsonLexerAndParser.lexer = lexer;");
 
