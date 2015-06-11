@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <!-- Style Sheets -->
+    <link rel="stylesheet" type="text/css" href="CSS/playground.css">
+    <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
+    <!-- Libraries -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
+    <title>Playground</title>
+</head>
+    <body>
+
+    <div align="center">
+        <div style="float: left;width: 50%">
+            <h1>Parser Code</h1>
+            <textarea id="parserCodeAreaID" rows="25" cols="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        </div>
+        <div style="float: right;width: 50%">
+            <h1>Try Your Parser</h1>
+            <textarea rows="25" cols="100" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">Batata</textarea>
+        </div>
+    </div>
+    <div style="clear:both;"></div>
+    <div align="center">
+        <h1>Syntax Diagrams</h1>
+        <h1 id='url'>URL</h1>
+        <script>
+            Diagram(
+                    Choice(0, 'u', 'U'),
+                    Choice(0, 'r', 'R'),
+                    Choice(0, 'l', 'L'),
+                    '(',
+                    Choice(1,
+                            Optional(NonTerminal('WS')),
+                            Sequence(
+                                    Optional(NonTerminal('WS')),
+                                    NonTerminal('STRING', '#string'),
+                                    Optional(NonTerminal('WS'))),
+                            Sequence(
+                                    Optional(NonTerminal('WS')),
+                                    OneOrMore(
+                                            Choice(0,
+                                                    NonTerminal('not " \' ( ) WS or NPC'),
+                                                    NonTerminal('escape'))),
+                                    Optional(NonTerminal('WS')))),
+                    ')').addTo();
+        </script>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: "DefaultParserCodeValue.txt",
+                dataType: "text",
+                success: function (data) {
+                    $("#parserCodeAreaID").text(data);
+                }
+            });
+        });
+    </script>
+
+    </body>
+</html>

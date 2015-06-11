@@ -1,0 +1,213 @@
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var chevrotain;
+(function (chevrotain) {
+    var examples;
+    (function (examples) {
+        var json;
+        (function (json) {
+            var recog = chevrotain.recognizer;
+            var tok = chevrotain.tokens;
+            var lex = chevrotain.lexer;
+            // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
+            // DOCS: additional hierarchies may be defined for categorization purposes, for example
+            //       when implementing Syntax highlighting being able to easily identify all the keywords with a simple
+            //       "instanceof?" could be convenient.
+            var Keyword = (function (_super) {
+                __extends(Keyword, _super);
+                function Keyword() {
+                    _super.apply(this, arguments);
+                }
+                Keyword.PATTERN = lex.NA;
+                return Keyword;
+            })(tok.Token);
+            json.Keyword = Keyword;
+            var True = (function (_super) {
+                __extends(True, _super);
+                function True() {
+                    _super.apply(this, arguments);
+                }
+                True.PATTERN = /true/;
+                return True;
+            })(Keyword);
+            json.True = True;
+            var False = (function (_super) {
+                __extends(False, _super);
+                function False() {
+                    _super.apply(this, arguments);
+                }
+                False.PATTERN = /false/;
+                return False;
+            })(Keyword);
+            json.False = False;
+            var Null = (function (_super) {
+                __extends(Null, _super);
+                function Null() {
+                    _super.apply(this, arguments);
+                }
+                Null.PATTERN = /null/;
+                return Null;
+            })(Keyword);
+            json.Null = Null;
+            var LCurly = (function (_super) {
+                __extends(LCurly, _super);
+                function LCurly() {
+                    _super.apply(this, arguments);
+                }
+                LCurly.PATTERN = /{/;
+                return LCurly;
+            })(tok.Token);
+            json.LCurly = LCurly;
+            var RCurly = (function (_super) {
+                __extends(RCurly, _super);
+                function RCurly() {
+                    _super.apply(this, arguments);
+                }
+                RCurly.PATTERN = /}/;
+                return RCurly;
+            })(tok.Token);
+            json.RCurly = RCurly;
+            var LSquare = (function (_super) {
+                __extends(LSquare, _super);
+                function LSquare() {
+                    _super.apply(this, arguments);
+                }
+                LSquare.PATTERN = /\[/;
+                return LSquare;
+            })(tok.Token);
+            json.LSquare = LSquare;
+            var RSquare = (function (_super) {
+                __extends(RSquare, _super);
+                function RSquare() {
+                    _super.apply(this, arguments);
+                }
+                RSquare.PATTERN = /]/;
+                return RSquare;
+            })(tok.Token);
+            json.RSquare = RSquare;
+            var Comma = (function (_super) {
+                __extends(Comma, _super);
+                function Comma() {
+                    _super.apply(this, arguments);
+                }
+                Comma.PATTERN = /,/;
+                return Comma;
+            })(tok.Token);
+            json.Comma = Comma;
+            var Colon = (function (_super) {
+                __extends(Colon, _super);
+                function Colon() {
+                    _super.apply(this, arguments);
+                }
+                Colon.PATTERN = /:/;
+                return Colon;
+            })(tok.Token);
+            json.Colon = Colon;
+            var String = (function (_super) {
+                __extends(String, _super);
+                function String() {
+                    _super.apply(this, arguments);
+                }
+                String.PATTERN = /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/;
+                return String;
+            })(tok.Token);
+            json.String = String;
+            var Number = (function (_super) {
+                __extends(Number, _super);
+                function Number() {
+                    _super.apply(this, arguments);
+                }
+                Number.PATTERN = /-?(0|[1-9]\d*)(\.\D+)?([eE][+-]?\d+)?/;
+                return Number;
+            })(tok.Token);
+            json.Number = Number;
+            var WhiteSpace = (function (_super) {
+                __extends(WhiteSpace, _super);
+                function WhiteSpace() {
+                    _super.apply(this, arguments);
+                }
+                WhiteSpace.PATTERN = / |\t|\n|\r|\r\n/;
+                WhiteSpace.IGNORE = true;
+                return WhiteSpace;
+            })(tok.Token);
+            json.WhiteSpace = WhiteSpace;
+            // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations
+            //       performed by it's constructor only need to be done once.
+            json.JsonLexer = new lex.SimpleLexer([Keyword, True, False, Null, LCurly, RCurly, LSquare, RSquare, Comma, Colon, String, Number, WhiteSpace]);
+            var JsonParser = (function (_super) {
+                __extends(JsonParser, _super);
+                function JsonParser(input) {
+                    var _this = this;
+                    if (input === void 0) { input = []; }
+                    // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
+                    //       it is mandatory to provide this map to be able to perform self analysis
+                    //       and allow the framework to "understand" the implemented grammar.
+                    _super.call(this, input, chevrotain.examples.json);
+                    // DOCS: the parsing rules
+                    this.object = this.RULE("object", function () {
+                        _this.CONSUME(LCurly);
+                        _this.OPTION(function () {
+                            _this.SUBRULE(_this.objectItem);
+                            _this.MANY(function () {
+                                _this.CONSUME(Comma);
+                                _this.SUBRULE2(_this.objectItem); // DOCS: the index "2" in SUBRULE2 is needed to identify
+                            }); //       the unique position in the grammar during runtime
+                        });
+                        _this.CONSUME(RCurly);
+                    });
+                    this.objectItem = this.RULE("objectItem", function () {
+                        _this.CONSUME(String);
+                        _this.CONSUME(Colon);
+                        _this.SUBRULE(_this.value);
+                    });
+                    this.array = this.RULE("array", function () {
+                        _this.CONSUME(LSquare);
+                        _this.OPTION(function () {
+                            _this.SUBRULE(_this.value);
+                            _this.MANY(function () {
+                                _this.CONSUME(Comma);
+                                _this.SUBRULE2(_this.value);
+                            });
+                        });
+                        _this.CONSUME(RSquare);
+                    });
+                    this.value = this.RULE("value", function () {
+                        _this.OR([
+                            { ALT: function () {
+                                _this.CONSUME(String);
+                            } },
+                            { ALT: function () {
+                                _this.CONSUME(Number);
+                            } },
+                            { ALT: function () {
+                                _this.SUBRULE(_this.object);
+                            } },
+                            { ALT: function () {
+                                _this.SUBRULE(_this.array);
+                            } },
+                            { ALT: function () {
+                                _this.CONSUME(True);
+                            } },
+                            { ALT: function () {
+                                _this.CONSUME(False);
+                            } },
+                            { ALT: function () {
+                                _this.CONSUME(Null);
+                            } }
+                        ], "a value");
+                    });
+                    // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
+                    //       The typescript compiler places the constructor body last after initializations in the class's body
+                    //       which is why place the call here meets the criteria.
+                    recog.BaseIntrospectionRecognizer.performSelfAnalysis(this);
+                }
+                return JsonParser;
+            })(recog.BaseIntrospectionRecognizer);
+            json.JsonParser = JsonParser;
+        })(json = examples.json || (examples.json = {}));
+    })(examples = chevrotain.examples || (chevrotain.examples = {}));
+})(chevrotain || (chevrotain = {}));
