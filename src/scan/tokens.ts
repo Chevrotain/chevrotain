@@ -24,42 +24,9 @@ module chevrotain.tokens {
         constructor(public startLine:number, public startColumn:number, public image:string) {}
     }
 
+    // TODO: this may not belong in the production code...
     export type VirtualTokenClass = Function
     export class VirtualToken extends Token {
         constructor() {super(-1, -1, "") }
     }
-
-    export function INVALID_LINE():number {
-        return -1
-    }
-
-    export function INVALID_COLUMN():number {
-        return -1
-    }
-
-    export class NoneToken extends Token {
-
-        private static _instance:NoneToken = null
-
-        constructor() {
-            super(INVALID_LINE(), INVALID_COLUMN(), "")
-            if (NoneToken._instance) {
-                throw new Error("can't create two instances of a singleton!")
-            }
-            NoneToken._instance = this
-        }
-
-        // returning any to be able to assign this to anything
-        public static getInstance():any {
-            if (NoneToken._instance === null) {
-                NoneToken._instance = new NoneToken()
-            }
-            return NoneToken._instance
-        }
-    }
-
-    export function NONE_TOKEN():Token {
-        return NoneToken.getInstance()
-    }
-
 }

@@ -221,13 +221,7 @@ module chevrotain.recognizer.spec {
         it("will not perform inRepetition recovery while in backtracking mode", function () {
             var parser:any = new recog.BaseIntrospectionRecognizer([], {})
             parser.isBackTrackingStack.push(1)
-            expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
-        })
-
-        it("will rethrow and expose none InRuleRecoveryException while performing in rule recovery", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([], {})
-            parser.isBackTrackingStack.push(1)
-            expect(parser.shouldInRepetitionRecoveryBeTried(tok.NoneToken, 1)).toBe(false)
+            expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).toBe(false)
         })
 
         it("can perform in-repetition recovery for MANY grammar rule", function () {
