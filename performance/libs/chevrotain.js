@@ -3,7 +3,7 @@
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module unless amdModuleId is set
         define('chevrotain', ["lodash"], function (a0) {
-            return (root['chevrotain'] = factory(a0));
+            return (root['API'] = factory(a0));
         });
     } else if (typeof exports === 'object') {
         // Node. Does not work with strict CommonJS, but
@@ -15,7 +15,7 @@
     }
 }(this, function (_) {
 
-    /*! chevrotain - v1.1.0 - 2015-06-11 */
+    /*! chevrotain - v0.2.0 - 2015-06-12 */
 /// <reference path="../../libs/lodash.d.ts" />
     var chevrotain;
     (function (chevrotain) {
@@ -124,38 +124,6 @@
                 return VirtualToken;
             })(Token);
             tokens.VirtualToken = VirtualToken;
-            function INVALID_LINE() {
-                return -1;
-            }
-            tokens.INVALID_LINE = INVALID_LINE;
-            function INVALID_COLUMN() {
-                return -1;
-            }
-            tokens.INVALID_COLUMN = INVALID_COLUMN;
-            var NoneToken = (function (_super) {
-                __extends(NoneToken, _super);
-                function NoneToken() {
-                    _super.call(this, INVALID_LINE(), INVALID_COLUMN(), "");
-                    if (NoneToken._instance) {
-                        throw new Error("can't create two instances of a singleton!");
-                    }
-                    NoneToken._instance = this;
-                }
-                // returning any to be able to assign this to anything
-                NoneToken.getInstance = function () {
-                    if (NoneToken._instance === null) {
-                        NoneToken._instance = new NoneToken();
-                    }
-                    return NoneToken._instance;
-                };
-                NoneToken._instance = null;
-                return NoneToken;
-            })(Token);
-            tokens.NoneToken = NoneToken;
-            function NONE_TOKEN() {
-                return NoneToken.getInstance();
-            }
-            tokens.NONE_TOKEN = NONE_TOKEN;
         })/* istanbul ignore next */ (tokens = chevrotain.tokens || /* istanbul ignore next */ (chevrotain.tokens = {}));
     })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /// <reference path="../lang/lang_extensions.ts" />
@@ -165,11 +133,7 @@
         var lexer;
         (function (lexer) {
             var tok = chevrotain.tokens;
-            lexer.SKIPPED = {
-                description: "This marks a skipped Token pattern, this means each token identified by it will" + "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
-            };
             var PATTERN = "PATTERN";
-            lexer.NA = /NOT_APPLICIABLE/;
             /**
              * A RegExp lexer meant to be used for quick prototyping and/or simple grammars.
              * This is NOT meant to be used in commercial compilers/tooling.
@@ -326,12 +290,16 @@
                     }
                     return { tokens: matchedTokens, errors: errors };
                 };
+                SimpleLexer.SKIPPED = {
+                    description: "This marks a skipped Token pattern, this means each token identified by it will" + "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
+                };
+                SimpleLexer.NA = /NOT_APPLICIABLE/;
                 return SimpleLexer;
             })();
             lexer.SimpleLexer = SimpleLexer;
             function analyzeTokenClasses(tokenClasses) {
                 var onlyRelevantClasses = _.reject(tokenClasses, function (currClass) {
-                    return currClass[PATTERN] === lexer.NA;
+                    return currClass[PATTERN] === SimpleLexer.NA;
                 });
                 var allTransformedPatterns = _.map(onlyRelevantClasses, function (currClass) {
                     return addStartOfInput(currClass[PATTERN]);
@@ -341,7 +309,7 @@
                     return allPatternsToClass[pattern.toString()];
                 });
                 var patternIdxToIgnored = _.map(onlyRelevantClasses, function (clazz) {
-                    return clazz.GROUP === lexer.SKIPPED;
+                    return clazz.GROUP === SimpleLexer.SKIPPED;
                 });
                 var patternIdxToLongerAltIdx = _.map(onlyRelevantClasses, function (clazz, idx) {
                     var longerAltClass = clazz.LONGER_ALT;
@@ -488,6 +456,7 @@
     })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /// <reference path="../scan/tokens.ts" />
 /// <reference path="../../libs/lodash.d.ts" />
+// todo: consider if this module really belongs in chevrotain?
     var chevrotain;
     (function (chevrotain) {
         var tree;
@@ -2804,6 +2773,33 @@
             recognizer.BaseIntrospectionRecognizer = BaseIntrospectionRecognizer;
         })/* istanbul ignore next */ (recognizer = chevrotain.recognizer || /* istanbul ignore next */ (chevrotain.recognizer = {}));
     })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+    /**
+     * defines the public API of Chevrotain.
+     * changes here may require major version change. (semVer)
+     */
+    var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) || (typeof window === "object" && window.CHEV_TEST_MODE);
+    var API = {};
+    /* istanbul ignore next */
+    if (!testMode) {
+        // runtime API
+        API.Parser = chevrotain.recognizer.BaseIntrospectionRecognizer;
+        API.Lexer = chevrotain.lexer.SimpleLexer;
+        API.Token = chevrotain.tokens.Token;
+        // grammar reflection API
+        API.gast = {};
+        API.gast.GAstVisitor = chevrotain.gast.GAstVisitor;
+        API.gast.FLAT = chevrotain.gast.FLAT;
+        API.gast.AT_LEAST_ONE = chevrotain.gast.AT_LEAST_ONE;
+        API.gast.MANY = chevrotain.gast.MANY;
+        API.gast.OPTION = chevrotain.gast.OPTION;
+        API.gast.OR = chevrotain.gast.OR;
+        API.gast.ProdRef = chevrotain.gast.ProdRef;
+        API.gast.Terminal = chevrotain.gast.Terminal;
+    }
+    else {
+        console.log("running in TEST_MODE");
+        API = chevrotain;
+    }
 // production code
 /// <reference path="../src/lang/lang_extensions.ts" />
 /// <reference path="../src/scan/tokens.ts" />
@@ -2821,7 +2817,8 @@
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
 /// <reference path="../src/parse/recognizer.ts" />
+/// <reference path="../src/api.ts" />
 
-    return chevrotain;
+    return API;
 
 }));

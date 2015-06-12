@@ -1,5 +1,5 @@
 // ----------------- Lexer -----------------
-var Token = chevrotain.tokens.Token;
+var Token = chevrotain.Token;
 
 
 // Javascript inheritance using Object.create().
@@ -15,9 +15,10 @@ function extendToken(className, pattern) {
     return childConstructor;
 }
 
+var ChevrotainLexer = chevrotain.Lexer;
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
 var True = extendToken("True", /true/);
-var False = extendToken("False" ,/false/);
+var False = extendToken("False", /false/);
 var Null = extendToken("Null", /null/);
 var LCurly = extendToken("LCurly", /{/);
 var RCurly = extendToken("RCurly", /}/);
@@ -28,19 +29,18 @@ var Colon = extendToken("Colon", /:/);
 var StringLiteral = extendToken("StringLiteral", /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
 var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
 var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = chevrotain.lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
-var simpleLexer = chevrotain.lexer.SimpleLexer;
-var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly,LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
-var ChevJsonLexer = new simpleLexer(jsonTokens);
+
+var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
+var ChevJsonLexer = new ChevrotainLexer(jsonTokens);
 
 
 // ----------------- parser -----------------
-var BaseRecognizer = chevrotain.recognizer.BaseIntrospectionRecognizer;
+var ChevrotainParser = chevrotain.Parser;
 
-function JsonParser(input) {
-    BaseRecognizer.call(this, input, jsonTokens);
-
+function ChevrotainJsonParser(input) {
+    ChevrotainParser.call(this, input, jsonTokens);
     var _this = this;
 
     this.object = this.RULE("object", function () {
@@ -90,9 +90,9 @@ function JsonParser(input) {
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
     // derived from the self analysis.
-    BaseRecognizer.performSelfAnalysis(this);
+    ChevrotainParser.performSelfAnalysis(this);
 }
 
-JsonParser.prototype = Object.create(BaseRecognizer.prototype);
-JsonParser.prototype.constructor = JsonParser;
+ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
+ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
 
