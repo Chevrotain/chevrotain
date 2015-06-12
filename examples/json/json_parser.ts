@@ -7,13 +7,15 @@ module chevrotain.examples.json {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
     import lex = chevrotain.lexer
+    var NA = lex.SimpleLexer.NA
+    var SKIPPED = lex.SimpleLexer.SKIPPED
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
 
     // DOCS: additional hierarchies may be defined for categorization purposes, for example
     //       when implementing Syntax highlighting being able to easily identify all the keywords with a simple
     //       "instanceof?" could be convenient.
-    export class Keyword extends tok.Token { static PATTERN = lex.NA }
+    export class Keyword extends tok.Token { static PATTERN = NA }
     export class True extends Keyword { static PATTERN = /true/ }
     export class False extends Keyword { static PATTERN = /false/ }
     export class Null extends Keyword { static PATTERN = /null/ }
@@ -24,6 +26,7 @@ module chevrotain.examples.json {
     export class Comma extends tok.Token { static PATTERN = /,/ }
     export class Colon extends tok.Token { static PATTERN = /:/ }
     export class StringLiteral extends tok.Token {
+        // TODO: this is a javascript string not a json string
         static PATTERN = /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/
     }
     export class NumberLiteral extends tok.Token {
@@ -31,7 +34,7 @@ module chevrotain.examples.json {
     }
     export class WhiteSpace extends tok.Token {
         static PATTERN = / |\t|\n|\r|\r\n/
-        static GROUP = lex.SKIPPED
+        static GROUP = SKIPPED
     }
 
     // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations

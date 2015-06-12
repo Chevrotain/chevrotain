@@ -7,13 +7,7 @@ module chevrotain.lexer {
     import lang = chevrotain.lang
 
 
-    export var SKIPPED = {
-        description: "This marks a skipped Token pattern, this means each token identified by it will" +
-                     "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
-    }
-
     var PATTERN = "PATTERN"
-    export var NA = /NOT_APPLICIABLE/
 
 
     export interface ILexingResult {
@@ -35,6 +29,13 @@ module chevrotain.lexer {
      * concerns such as performance/extendability/modularity are ignored in this implementation.
      */
     export class SimpleLexer {
+
+        public static SKIPPED = {
+            description: "This marks a skipped Token pattern, this means each token identified by it will" +
+                         "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
+        }
+
+        public static NA = /NOT_APPLICIABLE/
 
         protected allPatterns:RegExp[]
         protected patternIdxToClass:Function[]
@@ -214,7 +215,7 @@ module chevrotain.lexer {
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
 
         var onlyRelevantClasses = _.reject(tokenClasses, (currClass) => {
-            return currClass[PATTERN] === NA
+            return currClass[PATTERN] === SimpleLexer.NA
         })
 
         var allTransformedPatterns = _.map(onlyRelevantClasses, (currClass) => {
@@ -228,7 +229,7 @@ module chevrotain.lexer {
         })
 
         var patternIdxToIgnored = _.map(onlyRelevantClasses, (clazz:any) => {
-            return clazz.GROUP === SKIPPED
+            return clazz.GROUP === SimpleLexer.SKIPPED
         })
 
         var patternIdxToLongerAltIdx:any = _.map(onlyRelevantClasses, (clazz:any, idx) => {

@@ -8,6 +8,8 @@ module chevrotain.lexer.spec {
     import l = chevrotain.lexer
     import tok = chevrotain.tokens
     import matchers = test.matchers
+    var NA = l.SimpleLexer.NA
+    var SKIPPED = l.SimpleLexer.SKIPPED
 
 
     export class IntegerTok extends tok.Token { static PATTERN = /^[1-9]\d*/ }
@@ -58,7 +60,7 @@ module chevrotain.lexer.spec {
 
 
     class ValidNaPattern extends tok.Token {
-        static PATTERN = l.NA
+        static PATTERN = NA
     }
 
     class InvalidPattern extends tok.Token {
@@ -171,12 +173,12 @@ module chevrotain.lexer.spec {
 
     class PatternNoStart extends tok.Token { static PATTERN = /bamba/i }
 
-    class Keyword extends tok.Token { static PATTERN = l.NA }
+    class Keyword extends tok.Token { static PATTERN = NA }
     class If extends Keyword { static PATTERN = /if/ }
     class Else extends Keyword { static PATTERN = /else/ }
     class Return extends Keyword { static PATTERN = /return/ }
     class Integer extends tok.Token { static PATTERN = /[1-9]\d*/ }
-    class Punctuation extends tok.Token { static PATTERN = l.NA }
+    class Punctuation extends tok.Token { static PATTERN = NA }
     class LParen extends Punctuation { static PATTERN = /\(/ }
     class RParen extends Punctuation { static PATTERN = /\)/ }
 

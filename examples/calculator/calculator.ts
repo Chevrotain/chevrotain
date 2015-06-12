@@ -7,13 +7,15 @@ module chevrotain.examples.calculator {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
     import lex = chevrotain.lexer
+    var NA = lex.SimpleLexer.NA
+    var SKIPPED = lex.SimpleLexer.SKIPPED
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
-    export class AdditionOperator extends tok.Token { static PATTERN = lex.NA }
+    export class AdditionOperator extends tok.Token { static PATTERN = NA }
     export class Plus extends AdditionOperator { static PATTERN = /\+/ }
     export class Minus extends AdditionOperator { static PATTERN = /-/ }
 
-    export class MultiplicationOperator extends tok.Token { static PATTERN = lex.NA }
+    export class MultiplicationOperator extends tok.Token { static PATTERN = NA }
     export class Multi extends MultiplicationOperator { static PATTERN = /\*/ }
     export class Div extends MultiplicationOperator { static PATTERN = /\// }
 
@@ -24,7 +26,7 @@ module chevrotain.examples.calculator {
     }
     export class WhiteSpace extends tok.Token {
         static PATTERN = / |\t|\n|\r|\r\n/
-        static GROUP = lex.SKIPPED
+        static GROUP = SKIPPED
     }
 
     // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations
