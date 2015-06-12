@@ -132,7 +132,7 @@ module.exports = function(grunt) {
                 options: {
                     src:            'bin/chevrotain.js',
                     template:       'scripts/umd.hbs',
-                    objectToExport: 'chevrotain',
+                    objectToExport: 'API',
                     amdModuleId:    'chevrotain',
                     globalAlias:    'chevrotain',
                     deps:           {
@@ -149,10 +149,10 @@ module.exports = function(grunt) {
                     src:      'bin/chevrotainSpecs.js',
                     template: 'scripts/umd.hbs',
                     deps:     {
-                        'default': ['_', 'chevrotain'],
-                        amd:       ['lodash', 'chevrotain'],
-                        cjs:       ['lodash', './chevrotain'],
-                        global:    ['_', 'chevrotain']
+                        'default': ['_', 'config', 'chevrotain'],
+                        amd:       ['lodash', '../test.config.js', 'chevrotain'],
+                        cjs:       ['lodash', '../test.config.js', './chevrotain'],
+                        global:    ['_', "config", 'chevrotain']
                     }
                 }
             },
