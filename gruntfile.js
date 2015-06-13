@@ -43,7 +43,7 @@ module.exports = function(grunt) {
 
             tests_on_browsers: {
                 options: {
-                    files:    ['bower_components/lodash/lodash.js', 'bin/chevrotain.js', 'bin/chevrotainSpecs.js'],
+                    files:    ['bower_components/lodash/lodash.js', 'test.config.js', 'bin/chevrotain.js', 'bin/chevrotainSpecs.js'],
                     browsers: ['Chrome', 'Firefox', 'IE']
                 }
             }
@@ -152,7 +152,7 @@ module.exports = function(grunt) {
                         'default': ['_', 'config', 'chevrotain'],
                         amd:       ['lodash', '../test.config.js', 'chevrotain'],
                         cjs:       ['lodash', '../test.config.js', './chevrotain'],
-                        global:    ['_', "config", 'chevrotain']
+                        global:    ['_', "undefined", 'chevrotain']
                     }
                 }
             },
