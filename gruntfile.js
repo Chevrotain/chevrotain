@@ -222,6 +222,7 @@ module.exports = function(grunt) {
 
         release: {
             options: {
+                bump: false,
                 tagName:         'v<%=version%>',
                 additionalFiles: ['bower.json'],
                 github:          {
