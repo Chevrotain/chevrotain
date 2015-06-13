@@ -114,6 +114,8 @@ module chevrotain.lexer {
          * @returns {{tokens: {Token}[], errors: string[]}}
          */
         public tokenize(text:string):ILexingResult {
+            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, shouldBeSkipped, tokClass, newToken,
+                canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT
             var orgInput = text
             var offset = 0
             var matchedTokens = []
@@ -121,17 +123,18 @@ module chevrotain.lexer {
             var line = 1
             var column = 1
 
+
             while (text.length > 0) {
 
-                var match = null
-                for (var i = 0; i < this.allPatterns.length; i++) {
+                match = null
+                for (i = 0; i < this.allPatterns.length; i++) {
                     match = this.allPatterns[i].exec(text)
                     if (match !== null) {
                         // even though this pattern matched we must try a another longer alternative.
                         // this can be used to prioritize keywords over identifers
-                        var longerAltIdx = this.patternIdxToLongerAltIdx[i]
+                        longerAltIdx = this.patternIdxToLongerAltIdx[i]
                         if (longerAltIdx) {
-                            var matchAlt = this.allPatterns[longerAltIdx].exec(text)
+                            matchAlt = this.allPatterns[longerAltIdx].exec(text)
                             if (matchAlt && matchAlt[0].length > match[0].length) {
                                 match = matchAlt
                                 i = longerAltIdx
@@ -141,24 +144,48 @@ module chevrotain.lexer {
                     }
                 }
                 if (match !== null) {
-                    var matchedImage = match[0]
-                    var imageLength = matchedImage.length
-                    var skipped = this.patternIdxToSkipped[i]
-                    if (!skipped) {
-                        var tokClass:any = this.patternIdxToClass[i]
-                        var newToken = new tokClass(line, column, matchedImage);
+                    matchedImage = match[0]
+                    imageLength = matchedImage.length
+                    shouldBeSkipped = this.patternIdxToSkipped[i]
+                    if (!shouldBeSkipped) {
+                        tokClass = this.patternIdxToClass[i]
+                        newToken = new tokClass(matchedImage, offset, line, column);
                         matchedTokens.push(newToken)
                     }
                     text = text.slice(imageLength)
                     offset = offset + imageLength
-                    column = column + imageLength
-                    var canContainLineTerminator = this.patternIdxToCanLineTerminator[i]
-                    if (canContainLineTerminator) {
+                    column = column + imageLength // TODO: with newlines the column may change be assigned twice
+                    canMatchedContainLineTerminator = this.patternIdxToCanLineTerminator[i]
+                    if (canMatchedContainLineTerminator) {
                         var lineTerminatorsInMatch = countLineTerminators(matchedImage)
                         // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
                         if (lineTerminatorsInMatch !== 0) {
                             line = line + lineTerminatorsInMatch
-                            column = 1
+
+                            lastLTIdx = imageLength - 1
+                            while (lastLTIdx >= 0) {
+                                c = matchedImage.charCodeAt(lastLTIdx)
+                                // scan in reverse to find last lineTerminator in image
+                                if (c === 13 || c === 10) { // '\r' or '\n'
+                                    break;
+                                }
+                                lastLTIdx--
+                            }
+                            column = imageLength - lastLTIdx
+
+                            if (!shouldBeSkipped) { // a none skipped multi line Token, need to update endLine/endColumn
+                                lastCharIsLT = lastLTIdx === imageLength - 1
+                                fixForEndingInLT = lastCharIsLT ? -1 : 0
+
+                                if (!(lineTerminatorsInMatch === 1 && lastCharIsLT)) {
+                                    // if a token ends in a LT that last LT only affects the line numbering of following Tokens
+                                    newToken.endLine = line + fixForEndingInLT
+                                    // the last LT in a token does not affect the endColumn either as the [columnStart ... columnEnd)
+                                    // inclusive to exclusive range.
+                                    newToken.endColumn = column - 1 + -fixForEndingInLT
+                                }
+                                // else single LT in the last character of a token, no need to modify the endLine/EndColumn
+                            }
                         }
                     }
 
@@ -170,7 +197,7 @@ module chevrotain.lexer {
                     var foundResyncPoint = false
                     while (!foundResyncPoint && text.length > 0) {
                         // drop chars until we succeed in matching something
-                        var droppedChar = text.charCodeAt(0)
+                        droppedChar = text.charCodeAt(0)
                         if (droppedChar === 10 || // '\n'
                             (droppedChar === 13 &&
                             (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) { //'\r' not followed by '\n'
@@ -185,7 +212,7 @@ module chevrotain.lexer {
 
                         text = text.substr(1)
                         offset++;
-                        for (var j = 0; j < this.allPatterns.length; j++) {
+                        for (j = 0; j < this.allPatterns.length; j++) {
                             foundResyncPoint = this.allPatterns[j].test(text)
                             if (foundResyncPoint) {
                                 break
@@ -194,7 +221,7 @@ module chevrotain.lexer {
                     }
 
                     // at this point we either re-synced or reached the end of the input text
-                    var errorMessage = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
+                    errorMessage = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
                         ` skipped ${offset - errorStartOffset} characters.`
                     errors.push({line: errorLine, column: errorColumn, message: errorMessage})
                 }
@@ -375,12 +402,6 @@ module chevrotain.lexer {
         // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
         return new RegExp(`^(?:${pattern.source})`, flags)
     }
-
-    export interface  LineColumnInfo {
-        offsetToLine: number[]
-        offsetToColumn: number[]
-    }
-
 
     export function countLineTerminators(text:string):number {
         var lineTerminators = 0

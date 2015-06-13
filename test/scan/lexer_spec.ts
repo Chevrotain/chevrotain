@@ -186,10 +186,16 @@ module chevrotain.lexer.spec {
         static PATTERN = /(\t| )/
         static GROUP = SKIPPED
     }
+
     class NewLine extends tok.Token {
         static PATTERN = /(\n|\r|\r\n)/
         static GROUP = SKIPPED
     }
+
+    class WhitespaceNotSkipped extends tok.Token {
+        static PATTERN = /\s+/
+    }
+
 
     describe("The Simple Lexer transformations", function () {
 
@@ -245,9 +251,9 @@ module chevrotain.lexer.spec {
                 "\telse return 2"
 
             var lexResult = ifElseLexer.tokenize(input)
-            expect(lexResult.tokens).toEqual([new If(1, 1, "if"), new LParen(1, 4, "("), new Integer(1, 5, "666"), new RParen(1, 8, ")"),
-                new Return(1, 10, "return"), new Integer(1, 17, "1"), new Else(2, 2, "else"), new Return(2, 7, "return"),
-                new Integer(2, 14, "2")
+            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
+                new RParen(")", 7, 1, 8), new Return("return", 9, 1, 10), new Integer("1", 16, 1, 17), new Else("else", 19, 2, 2),
+                new Return("return", 24, 2, 7), new Integer("2", 31, 2, 14)
             ])
             // TODO: support returning skipped tokens under certain conditions (token groups)
             //expect(lexResult.skipped).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
@@ -258,6 +264,7 @@ module chevrotain.lexer.spec {
         it("can skip invalid character inputs and only report one error per sequence of characters skipped", function () {
             var ifElseLexer = new l.SimpleLexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
+
             var input = "if (666) return 1@#$@#$\n" +
                 "\telse return 2"
 
@@ -266,9 +273,9 @@ module chevrotain.lexer.spec {
             expect(_.contains(lexResult.errors[0].message, "@")).toBe(true)
             expect(lexResult.errors[0].line).toBe(1)
             expect(lexResult.errors[0].column).toBe(18)
-            expect(lexResult.tokens).toEqual([new If(1, 1, "if"), new LParen(1, 4, "("), new Integer(1, 5, "666"), new RParen(1, 8, ")"),
-                new Return(1, 10, "return"), new Integer(1, 17, "1"), new Else(2, 2, "else"), new Return(2, 7, "return"),
-                new Integer(2, 14, "2")
+            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
+                new RParen(")", 7, 1, 8), new Return("return", 9, 1, 10), new Integer("1", 16, 1, 17), new Else("else", 25, 2, 2),
+                new Return("return", 30, 2, 7), new Integer("2", 37, 2, 14)
             ])
             // TODO: support returning skipped tokens under certain conditions (token groups)
             //expect(lexResult.skipped).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
@@ -284,7 +291,7 @@ module chevrotain.lexer.spec {
             expect(_.contains(lexResult.errors[0].message, "&")).toBe(true)
             expect(lexResult.errors[0].line).toBe(1)
             expect(lexResult.errors[0].column).toBe(3)
-            expect(lexResult.tokens).toEqual([new If(1, 1, "if")])
+            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1)])
         })
 
         it("can deal with line terminators during resync", function () {
@@ -304,7 +311,24 @@ module chevrotain.lexer.spec {
             expect(_.contains(lexResult.errors[1].message, "\r")).toBe(true)
             expect(lexResult.errors[2].line).toBe(3)
             expect(lexResult.errors[2].column).toBe(3)
-            expect(lexResult.tokens).toEqual([new If(1, 1, "if"), new Else(2, 1, "else"), new If(3, 1, "if")])
+            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1), new Else("else", 4, 2, 1), new If("if", 9, 3, 1)])
+        })
+
+        it("can deal with line terminators inside multi-line Tokens", function () {
+            var ifElseLexer = new l.SimpleLexer([If, Else, WhitespaceNotSkipped]) // no newLine tokens those will be resynced
+
+            var input = "if\r\r\telse\rif\n"
+            var lexResult = ifElseLexer.tokenize(input)
+
+            expect(lexResult.tokens).toEqual([
+                new If("if", 0, 1, 1, 1, 2),
+                new WhitespaceNotSkipped("\r\r\t", 2, 1, 3, 3, 1),
+                new Else("else", 5, 3, 2, 3, 5),
+                new WhitespaceNotSkipped("\r", 9, 3, 6, 3, 6),
+                new If("if", 10, 4, 1, 4, 2),
+                new WhitespaceNotSkipped("\n", 12, 4, 3, 4, 3),
+            ])
+
         })
     })
 }

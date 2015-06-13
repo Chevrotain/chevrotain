@@ -5,57 +5,63 @@ module chevrotain.examples.recovery.sql {
     import tok = chevrotain.tokens
 
 
-    export class IdentTok extends tok.Token {}
+    export class IdentTok extends tok.Token {
+        constructor(startLine:number, startColumn:number, image:string) { super(image, -1, startLine, startColumn) }
+    }
 
     // DOCS: once again an example of Token types hierarchies
     export class LiteralTok extends tok.Token {}
-    export class StringTok extends LiteralTok {}
-    export class IntTok extends LiteralTok {}
+    export class StringTok extends LiteralTok {
+        constructor(startLine:number, startColumn:number, image:string) { super(image, -1, startLine, startColumn) }
+    }
+    export class IntTok extends LiteralTok {
+        constructor(startLine:number, startColumn:number, image:string) { super(image, -1, startLine, startColumn) }
+    }
 
     export class Keyword extends tok.Token {}
 
     export class CreateTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "CREATE") }
+        constructor(startLine:number, startColumn:number) { super("CREATE", -1, startLine, startColumn) }
     }
 
     export class TableTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "TABLE") }
+        constructor(startLine:number, startColumn:number) { super("TABLE", -1, startLine, startColumn) }
     }
 
     export class InsertTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "INSERT") }
+        constructor(startLine:number, startColumn:number) { super("INSERT", -1, startLine, startColumn) }
     }
 
     export class IntoTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "INTO") }
+        constructor(startLine:number, startColumn:number) { super("INTO", -1, startLine, startColumn) }
     }
 
     export class DeleteTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "DELETE") }
+        constructor(startLine:number, startColumn:number) { super("DELETE", -1, startLine, startColumn) }
     }
 
     export class FromTok extends Keyword {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "FROM") }
+        constructor(startLine:number, startColumn:number) { super("FROM", -1, startLine, startColumn) }
     }
 
     export class LParenTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "(") }
+        constructor(startLine:number, startColumn:number) { super("(", -1, startLine, startColumn) }
     }
 
     export class RParenTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ")") }
+        constructor(startLine:number, startColumn:number) { super(")", -1, startLine, startColumn) }
     }
 
     export class CommaTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ",") }
+        constructor(startLine:number, startColumn:number) { super(",", -1, startLine, startColumn) }
     }
 
     export class SemiColonTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ";") }
+        constructor(startLine:number, startColumn:number) { super(";", -1, startLine, startColumn) }
     }
 
     export class DotTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ".") }
+        constructor(startLine:number, startColumn:number) { super(".", -1, startLine, startColumn) }
     }
 
 

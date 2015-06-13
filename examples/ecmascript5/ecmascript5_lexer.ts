@@ -203,14 +203,14 @@ module chevrotain.examples.ecma5.lexer {
             }
             else if (cc2 === 45) { // --
                 NEXT_CHAR_CODE()
-                tokens.push(new MinusMinus(startLine, startColumn, "--"))
+                tokens.push(new MinusMinus("--", startOffset, startLine, startColumn))
             }
             else if (cc2 === 61) { // -=
                 NEXT_CHAR_CODE()
-                tokens.push(new MinusEq(startLine, startColumn, "-="))
+                tokens.push(new MinusEq("-=", startOffset, startLine, startColumn))
             }
             else { // -
-                tokens.push(new Minus(startLine, startColumn, "-"))
+                tokens.push(new Minus("-", startOffset, startLine, startColumn))
             }
             return
         }
@@ -220,7 +220,7 @@ module chevrotain.examples.ecma5.lexer {
                 tokens.push(scanNumericLiteral())
             }
             else {
-                tokens.push(new Dot(startLine, startColumn, ".")) // .
+                tokens.push(new Dot(".", startOffset, startLine, startColumn)) // .
             }
             return
         }
@@ -251,15 +251,15 @@ module chevrotain.examples.ecma5.lexer {
             }
             else if (c2 === 61) { // 61 is "="
                 NEXT_CHAR()
-                tokens.push(new SlashEq(startLine, startColumn, "/="))
+                tokens.push(new SlashEq("/=", startOffset, startLine, startColumn))
             }
             else { // simple regular slash
-                tokens.push(new Slash(startLine, startColumn, "/"))
+                tokens.push(new Slash("/", startOffset, startLine, startColumn))
             }
             return
         }
         if (isWhiteSpace(cc)) {
-            whitespace.push(new Whitespace(startLine, startColumn, CURR_CHAR()))
+            whitespace.push(new Whitespace(CURR_CHAR(), startOffset, startLine, startColumn))
             return
         }
         if (isLineTerminator(cc)) {
@@ -290,7 +290,7 @@ module chevrotain.examples.ecma5.lexer {
                     endOfTheLine = true
                 }
             }
-            result.tokens.push(new (<any>longestMatchedTokType)(startLine, startColumn, longestMatch))
+            result.tokens.push(new (<any>longestMatchedTokType)(longestMatch, startOffset, startLine, startColumn))
             return
         }
 
@@ -304,18 +304,18 @@ module chevrotain.examples.ecma5.lexer {
         // There is no keyword or literal with only one character.
         // Thus, it must be an identifier.
         if (id.length === 1) {
-            return new Identifier(startLine, startColumn, CURR_CHAR())
+            return new Identifier(CURR_CHAR(), startOffset, startLine, startColumn)
         } else if (isKeyword(id)) {
             var keywordConstructor = keywordsToConstructor[id]
-            return new keywordConstructor(startLine, startColumn, id)
+            return new keywordConstructor(id, startOffset, startLine, startColumn)
         } else if (id === "null") {
-            return new NullTok(startLine, startColumn, id)
+            return new NullTok(id, startOffset, startLine, startColumn)
         } else if (id === "true") {
-            return new TrueTok(startLine, startColumn, id)
+            return new TrueTok(id, startOffset, startLine, startColumn)
         } else if (id === "false") {
-            return new FalseTok(startLine, startColumn, id)
+            return new FalseTok(id, startOffset, startLine, startColumn)
         } else {
-            return new Identifier(startLine, startColumn, id)
+            return new Identifier(id, startOffset, startLine, startColumn)
         }
 
     }
@@ -353,19 +353,19 @@ module chevrotain.examples.ecma5.lexer {
             NEXT_CHAR()
             //noinspection JSUnusedAssignment
             currColumn = 1
-            return new LineTerminator(startLine, startColumn, "\r\n")
+            return new LineTerminator("\r\n", startOffset, startLine, startColumn)
         }
         currColumn = 1
-        return new LineTerminator(startLine, startColumn, CURR_CHAR())
+        return new LineTerminator(CURR_CHAR(), startOffset, startLine, startColumn)
     }
 
-    function isWhiteSpace(cc):boolean  {
+    function isWhiteSpace(cc):boolean {
         return (cc === 0x20) || (cc === 0x09) || (cc === 0x0B) || (cc === 0x0C) || (cc === 0xA0) ||
             (cc >= 0x1680 && [0x1680, 0x180E, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006,
                 0x2007, 0x2008, 0x2009, 0x200A, 0x202F, 0x205F, 0x3000, 0xFEFF].indexOf(cc) >= 0)
     }
 
-    function isLineTerminator(cc):boolean  {
+    function isLineTerminator(cc):boolean {
         return (cc === 0x0A) || (cc === 0x0D) || (cc === 0x2028) || (cc === 0x2029)
     }
 
@@ -587,9 +587,9 @@ module chevrotain.examples.ecma5.lexer {
         }
 
         if (opening === "'") {
-            return new SingleQuotationStringLiteral(startLine, startColumn, str)
+            return new SingleQuotationStringLiteral(str, startOffset, startLine, startColumn)
         } else {
-            return new DoubleQuotationStringLiteral(startLine, startColumn, str)
+            return new DoubleQuotationStringLiteral(str, startOffset, startLine, startColumn)
         }
     }
 
@@ -691,7 +691,7 @@ module chevrotain.examples.ecma5.lexer {
             throw new Error("Sad Sad Panda") // TODO: better error message
         }
 
-        return new DecimalLiteral(startLine, startColumn, image)
+        return new DecimalLiteral(image, startOffset, startLine, startColumn)
 
     }
 
@@ -713,7 +713,7 @@ module chevrotain.examples.ecma5.lexer {
             throw new Error("Sad Sad Panda") // TODO: better error message
         }
 
-        return new HexIntegerLiteral(startLine, startColumn, prefix + image)
+        return new HexIntegerLiteral(prefix + image, startOffset, startLine, startColumn)
     }
 
     function scanSingleLineComment():SingleLineComment {
@@ -723,14 +723,14 @@ module chevrotain.examples.ecma5.lexer {
             cc = PEEK_CHAR_CODE()
 
             if (isLineTerminator(cc)) {
-                return new SingleLineComment(startLine, startColumn, "//" + image)
+                return new SingleLineComment("//" + image, startOffset, startLine, startColumn)
             }
             ch = NEXT_CHAR()
             image += ch
         }
 
         // single line comment on the last line in the source (no line terminator)
-        return new SingleLineComment(startLine, startColumn, "//" + image)
+        return new SingleLineComment("//" + image, startOffset, startLine, startColumn)
     }
 
     function scanMultiLineComment():AbsComment {
@@ -751,12 +751,12 @@ module chevrotain.examples.ecma5.lexer {
                 if (PEEK_CHAR_CODE() === 0x2F) { // '*'
                     image += NEXT_CHAR()
                     if (hasLineTerminator) {
-                        comment = new MultipleLineCommentWithTerminator(startLine, startColumn, "/*" + image)
+                        comment = new MultipleLineCommentWithTerminator("/*" + image, startOffset, startLine, startColumn)
                         result.idxTolineTerminators[result.tokens.length] = comment
                         return comment
 
                     }
-                    return new MultipleLineCommentWithoutTerminator(startLine, startColumn, "/*" + image)
+                    return new MultipleLineCommentWithoutTerminator("/*" + image, startOffset, startLine, startColumn)
 
 
                 }
@@ -768,12 +768,12 @@ module chevrotain.examples.ecma5.lexer {
         // Ran off the end of the file - the whole thing is a comment
         // TODO: add error about unterminated comment?
         if (hasLineTerminator) {
-            comment = new MultipleLineCommentWithTerminator(startLine, startColumn, "/*" + image)
+            comment = new MultipleLineCommentWithTerminator("/*" + image, startOffset, startLine, startColumn)
             result.idxTolineTerminators[result.tokens.length] = comment
             return comment
 
         }
-        return new MultipleLineCommentWithoutTerminator(startLine, startColumn, "/*" + image)
+        return new MultipleLineCommentWithoutTerminator("/*" + image, startOffset, startLine, startColumn)
     }
 
     var keywordsToConstructor = {

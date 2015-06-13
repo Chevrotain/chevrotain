@@ -10,7 +10,7 @@ module chevrotain.gastBuilder.spec {
     import pt = chevrotain.tree
     import tok = chevrotain.tokens
 
-    class BambaTok extends tok.Token {}
+    class BambaTok extends tok.VirtualToken {}
     class BisliTok extends tok.Token {}
 
     describe("The ParseTree module", function () {
@@ -26,7 +26,7 @@ module chevrotain.gastBuilder.spec {
             var bambaPt = pt.PT(BambaTok)
             expect(bambaPt.payload).toEqual(jasmine.any(BambaTok))
 
-            var bisliPt = pt.PT(new BisliTok(1, 1, "bisli"), [bambaPt])
+            var bisliPt = pt.PT(new BisliTok("bisli", 0, 1, 1), [bambaPt])
             expect(bisliPt.children.length).toBe(1)
             expect(bisliPt.children[0]).toBe(bambaPt)
             expect(bisliPt.payload.image).toBe("bisli")

@@ -32,7 +32,7 @@ module chevrotain.examples.json.spec {
 
 
         it("will encounter an NoViableAltException when none of the alternatives match", function () {
-            var input = [new Colon(1, 8, ":")]
+            var input = [new Colon(":", 0, 1, 1)]
             var parser = new JsonParser(input)
             parser.value()
             expect(parser.errors.length).toBe(1)

@@ -23,30 +23,12 @@ module chevrotain.examples.backtracking {
     }
 
     export class NumberTok extends tok.Token {}
-    export class ElementTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "true") }
-    }
-
-    export class DefaultTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "default") }
-    }
-
-    export class DotTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ".") }
-    }
-
-    export class ColonTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ":") }
-    }
-
-    export class EqualsTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, "=") }
-    }
-
-    export class SemiColonTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ";") }
-    }
-
+    export class ElementTok extends tok.Token {}
+    export class DefaultTok extends tok.Token {}
+    export class DotTok extends tok.Token {}
+    export class ColonTok extends tok.Token {}
+    export class EqualsTok extends tok.Token {}
+    export class SemiColonTok extends tok.Token {}
     export class IdentTok extends tok.Token {}
 
 
@@ -81,11 +63,11 @@ module chevrotain.examples.backtracking {
                     // we can build an LL(K) parser that can distinguish the two alternatives as a negative example
                     // would be to simply create a qualifiedName with a length of k+1.
                     {
-                        WHEN: this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
+                        WHEN:    this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
                         THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement) }
                     },
                     {
-                        WHEN: this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
+                        WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
                         THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement) }
                     },
                 ], " a statement")

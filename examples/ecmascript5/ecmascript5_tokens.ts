@@ -118,10 +118,7 @@ module chevrotain.examples.ecma5 {
     export class Dot extends AbsPunctuator { } // .
 
     export class Semicolon extends AbsPunctuator {
-        constructor(startLine:number, startColumn:number, image:string,
-                    public isAutomaticSemiColonInsertion = false) {
-            super(startLine, startColumn, image)
-        }
+        public isAutomaticSemiColonInsertion:boolean = false
     }
 
     export class Comma extends AbsPunctuator { } // ,

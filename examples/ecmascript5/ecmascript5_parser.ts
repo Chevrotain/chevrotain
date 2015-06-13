@@ -112,14 +112,18 @@ module chevrotain.examples.ecma5 {
 
         protected CONSUME(tokClass:Function, trySemiColonInsertion = false):tok.Token {
             if (trySemiColonInsertion && this.canAndShouldDoSemiColonInsertion()) {
-                return new Semicolon(-1, -1, ";", true)
+                var insertedSemiColon = new Semicolon(";", -1, -1, -1)
+                insertedSemiColon.isAutomaticSemiColonInsertion = true
+                return insertedSemiColon
             }
             return super.CONSUME1(tokClass)
         }
 
         protected CONSUME2(tokClass:Function, trySemiColonInsertion = false):tok.Token {
             if (trySemiColonInsertion && this.canAndShouldDoSemiColonInsertion()) {
-                return new Semicolon(-1, -1, ";", true)
+                var insertedSemiColon = new Semicolon(";", -1, -1, -1)
+                insertedSemiColon.isAutomaticSemiColonInsertion = true
+                return insertedSemiColon
             }
             return super.CONSUME2(tokClass)
         }

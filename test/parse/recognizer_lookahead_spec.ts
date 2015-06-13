@@ -10,27 +10,27 @@ module chevrotain.recognizer.lookahead.spec {
     import recog = chevrotain.recognizer
 
     export class OneTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "One")}
+        constructor() { super("One", 0, 1, 1) }
     }
 
     export class TwoTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Two")}
+        constructor() { super("Two", 0, 1, 1) }
     }
 
     export class ThreeTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Three")}
+        constructor() { super("Three", 0, 1, 1) }
     }
 
     export class FourTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Four")}
+        constructor() { super("Four", 0, 1, 1) }
     }
 
     export class FiveTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Five")}
+        constructor() { super("Five", 0, 1, 1) }
     }
 
     export class SixTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "Six")}
+        constructor() { super("Six", 0, 1, 1) }
     }
 
     class OptionsImplicitLookAheadParser extends BaseIntrospectionRecognizer {
@@ -152,31 +152,31 @@ module chevrotain.recognizer.lookahead.spec {
         })
 
         it("can automatically compute lookahead for OPTION1", function () {
-            var input = [new OneTok(1, 1)]
+            var input = [new OneTok()]
             var parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("1")
         })
 
         it("can automatically compute lookahead for OPTION2", function () {
-            var input = [new TwoTok(1, 1)]
+            var input = [new TwoTok()]
             var parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("2")
         })
 
         it("can automatically compute lookahead for OPTION3", function () {
-            var input = [new ThreeTok(1, 1)]
+            var input = [new ThreeTok()]
             var parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("3")
         })
 
         it("can automatically compute lookahead for OPTION4", function () {
-            var input = [new FourTok(1, 1)]
+            var input = [new FourTok()]
             var parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("4")
         })
 
         it("can automatically compute lookahead for OPTION5", function () {
-            var input = [new FiveTok(1, 1)]
+            var input = [new FiveTok()]
             var parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("5")
         })
@@ -192,31 +192,31 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for OPTION", function () {
 
         it("can accept lookahead function param for OPTION1", function () {
-            var input = [new OneTok(1, 1)]
+            var input = [new OneTok()]
             var parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("1")
         })
 
         it("can accept lookahead function param for OPTION2", function () {
-            var input = [new TwoTok(1, 1)]
+            var input = [new TwoTok()]
             var parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("2")
         })
 
         it("can accept lookahead function param for OPTION3", function () {
-            var input = [new ThreeTok(1, 1)]
+            var input = [new ThreeTok()]
             var parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("3")
         })
 
         it("can accept lookahead function param for OPTION4", function () {
-            var input = [new FourTok(1, 1)]
+            var input = [new FourTok()]
             var parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("4")
         })
 
         it("can accept lookahead function param for OPTION5", function () {
-            var input = [new FiveTok(1, 1)]
+            var input = [new FiveTok()]
             var parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).toBe("5")
         })
@@ -328,37 +328,37 @@ module chevrotain.recognizer.lookahead.spec {
         })
 
         it("can automatically compute lookahead for MANY1", function () {
-            var input = [new OneTok(1, 1)]
+            var input = [new OneTok()]
             var parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("1")
         })
 
         it("can automatically compute lookahead for MANY2", function () {
-            var input = [new TwoTok(1, 1)]
+            var input = [new TwoTok()]
             var parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("2")
         })
 
         it("can automatically compute lookahead for MANY3", function () {
-            var input = [new ThreeTok(1, 1)]
+            var input = [new ThreeTok()]
             var parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("3")
         })
 
         it("can automatically compute lookahead for MANY4", function () {
-            var input = [new FourTok(1, 1)]
+            var input = [new FourTok()]
             var parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("4")
         })
 
         it("can automatically compute lookahead for MANY5", function () {
-            var input = [new FiveTok(1, 1)]
+            var input = [new FiveTok()]
             var parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("5")
         })
 
         it("can accept lookahead function param for flow mixing several MANYs", function () {
-            var input = [new OneTok(1, 1), new OneTok(1, 1), new ThreeTok(1, 1), new ThreeTok(1, 1), new ThreeTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new OneTok(), new ThreeTok(), new ThreeTok(), new ThreeTok(), new FiveTok()]
             var parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("113335")
         })
@@ -374,37 +374,37 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for MANY", function () {
 
         it("can accept lookahead function param for MANY1", function () {
-            var input = [new OneTok(1, 1)]
+            var input = [new OneTok()]
             var parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("1")
         })
 
         it("can accept lookahead function param for MANY2", function () {
-            var input = [new TwoTok(1, 1)]
+            var input = [new TwoTok()]
             var parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("2")
         })
 
         it("can accept lookahead function param for MANY3", function () {
-            var input = [new ThreeTok(1, 1)]
+            var input = [new ThreeTok()]
             var parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("3")
         })
 
         it("can accept lookahead function param for MANY4", function () {
-            var input = [new FourTok(1, 1)]
+            var input = [new FourTok()]
             var parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("4")
         })
 
         it("can accept lookahead function param for MANY5", function () {
-            var input = [new FiveTok(1, 1)]
+            var input = [new FiveTok()]
             var parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("5")
         })
 
         it("can accept lookahead function param for flow mixing several MANYs", function () {
-            var input = [new OneTok(1, 1), new OneTok(1, 1), new ThreeTok(1, 1), new ThreeTok(1, 1), new ThreeTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new OneTok(), new ThreeTok(), new ThreeTok(), new ThreeTok(), new FiveTok()]
             var parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).toBe("113335")
         })
@@ -516,14 +516,14 @@ module chevrotain.recognizer.lookahead.spec {
         })
 
         it("can accept lookahead function param for AT_LEAST_ONE1-5", function () {
-            var input = [new OneTok(1, 1), new TwoTok(1, 1), new TwoTok(1, 1), new ThreeTok(1, 1),
-                new FourTok(1, 1), new FourTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new TwoTok(), new TwoTok(), new ThreeTok(),
+                new FourTok(), new FourTok(), new FiveTok()]
             var parser = new AtLeastOneImplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).toBe("1223445")
         })
 
         it("will fail when zero occurrences of AT_LEAST_ONE in input", function () {
-            var input = [new OneTok(1, 1), new TwoTok(1, 1), /*new ThreeTok(1, 1),*/ new FourTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
             var parser = new AtLeastOneImplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).toBe("-666")
         })
@@ -538,14 +538,14 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for AT_LEAST_ONE", function () {
 
         it("can accept lookahead function param for AT_LEAST_ONE1-5", function () {
-            var input = [new OneTok(1, 1), new TwoTok(1, 1), new TwoTok(1, 1), new ThreeTok(1, 1),
-                new FourTok(1, 1), new FourTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new TwoTok(), new TwoTok(), new ThreeTok(),
+                new FourTok(), new FourTok(), new FiveTok()]
             var parser = new AtLeastOneExplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).toBe("1223445")
         })
 
         it("will fail when zero occurrences of AT_LEAST_ONE in input", function () {
-            var input = [new OneTok(1, 1), new TwoTok(1, 1), /*new ThreeTok(1, 1),*/ new FourTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
             var parser = new AtLeastOneExplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).toBe("-666")
         })
@@ -704,13 +704,13 @@ module chevrotain.recognizer.lookahead.spec {
         })
 
         it("can compute the lookahead automatically for OR1-5", function () {
-            var input = [new OneTok(1, 1), new TwoTok(1, 1), new ThreeTok(1, 1), new FourTok(1, 1), new FiveTok(1, 1)]
+            var input = [new OneTok(), new TwoTok(), new ThreeTok(), new FourTok(), new FiveTok()]
             var parser = new OrImplicitLookAheadParser(input)
             expect(parser.orRule()).toBe("A1B2C3D4E5")
         })
 
         it("will fail when none of the alternatives match", function () {
-            var input = [new SixTok(1, 1)]
+            var input = [new SixTok()]
             var parser = new OrImplicitLookAheadParser(input)
             expect(parser.orRule()).toBe("-666")
         })
@@ -776,13 +776,13 @@ module chevrotain.recognizer.lookahead.spec {
         })
 
         it("can accept the lookahead param explicitly for OR", function () {
-            var input = [new TwoTok(1, 1)]
+            var input = [new TwoTok()]
             var parser = new OrExplicitLookAheadParser(input)
             expect(parser.orRule()).toBe("2")
         })
 
         it("will fail when none of the alternatives match", function () {
-            var input = [new SixTok(1, 1)]
+            var input = [new SixTok()]
             var parser = new OrExplicitLookAheadParser(input)
             expect(parser.orRule()).toBe("-666")
         })

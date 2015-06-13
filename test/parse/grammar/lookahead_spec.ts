@@ -14,37 +14,37 @@ module chevrotain.lookahead.spec {
 
     class ColonParserMock extends recog.BaseRecognizer {
         protected NEXT_TOKEN():t.Token {
-            return new samples.ColonTok(1, 1, ":")
+            return new samples.ColonTok(":", 0, 1, 1)
         }
     }
 
     class IdentParserMock extends recog.BaseRecognizer {
         protected NEXT_TOKEN():t.Token {
-            return new samples.IdentTok(1, 1, "bamba")
+            return new samples.IdentTok("bamba", 0, 1, 1)
         }
     }
 
     class CommaParserMock extends recog.BaseRecognizer {
         protected NEXT_TOKEN():t.Token {
-            return new samples.CommaTok(1, 1, ",")
+            return new samples.CommaTok(",", 0, 1, 1)
         }
     }
 
     class EntityParserMock extends recog.BaseRecognizer {
         protected NEXT_TOKEN():t.Token {
-            return new samples.EntityTok(1, 1, ",")
+            return new samples.EntityTok(",", 0, 1, 1)
         }
     }
 
     class KeyParserMock extends recog.BaseRecognizer {
         protected NEXT_TOKEN():t.Token {
-            return new samples.KeyTok(1, 1, ",")
+            return new samples.KeyTok(",", 0, 1, 1)
         }
     }
 
     class ActionParserMock extends recog.BaseRecognizer {
         protected NEXT_TOKEN():t.Token {
-            return new samples.ActionTok(1, 1, ",")
+            return new samples.ActionTok(",", 0, 1, 1)
         }
     }
 

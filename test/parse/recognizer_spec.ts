@@ -11,15 +11,15 @@ module chevrotain.recognizer.spec {
     import recog = chevrotain.recognizer
 
     export class PlusTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "+")}
+        constructor() { super("+", 0, 1, 1) }
     }
 
     export class MinusTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) {super(startLine, startColumn, "-")}
+        constructor() { super("+", 0, 1, 1) }
     }
 
     export class IntToken extends tok.Token {
-        constructor(startLine:number, startColumn:number, image:string) {super(startLine, startColumn, image)}
+        constructor(image:string) { super(image, 0, 1, 1) }
     }
 
     class ManyRepetitionRecovery extends BaseIntrospectionRecognizer {
@@ -46,10 +46,12 @@ module chevrotain.recognizer.spec {
         }
     }
 
-    export class IdentTok extends tok.Token {}
+    export class IdentTok extends tok.Token {
+        constructor(image:string) { super(image, 0, 1, 1) }
+    }
 
     export class DotTok extends tok.Token {
-        constructor(startLine:number, startColumn:number) { super(startLine, startColumn, ".") }
+        constructor() { super(".", 0, 1, 1) }
     }
 
     function isQualifiedNamePart():boolean {
@@ -150,14 +152,14 @@ module chevrotain.recognizer.spec {
     describe("The Parsing DSL", function () {
 
         it("provides a production SUBRULE1-5 that invokes another rule", function () {
-            var input = [new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1)]
+            var input = [new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok()]
             var parser = new SubRuleTestParser(input)
             var result = parser.topRule()
             expect(result).toBe("12345")
         })
 
         it("provides a production SUBRULE1-5 that can accept arguments from its caller", function () {
-            var input = [new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1), new PlusTok(1, 1)]
+            var input = [new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok()]
             var parser = new SubRuleArgsParser(input)
             var result = parser.topRule()
             expect(result.letters).toBe("abcde")
@@ -165,19 +167,19 @@ module chevrotain.recognizer.spec {
         })
 
         it("allows using automatic lookahead even as part of custom lookahead functions valid", function () {
-            var input1 = [new PlusTok(1, 1)]
+            var input1 = [new PlusTok()]
             var parser = new CustomLookaheadParser(input1)
             var result = parser.topRule()
             expect(result).toBe("plus")
 
-            var input2 = [new MinusTok(1, 1)]
+            var input2 = [new MinusTok()]
             var parser2 = new CustomLookaheadParser(input2)
             var result2 = parser2.topRule()
             expect(result2).toBe("minus")
         })
 
         it("allows using automatic lookahead even as part of custom lookahead functions invalid", function () {
-            var input1 = [new PlusTok(1, 1)]
+            var input1 = [new PlusTok()]
             var parser = new CustomLookaheadParser(input1)
             parser.plusAllowed = false
             var result = parser.topRule()
@@ -192,8 +194,8 @@ module chevrotain.recognizer.spec {
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
             var parser:any = new recog.BaseIntrospectionRecognizer([], <any>chevrotain.gastBuilder.spec);
             parser.reset()
-            var testInput = [new IntToken(1, 1, "1"), new PlusTok(1, 1),
-                new IntToken(1, 1, "2"), new PlusTok(1, 1), new IntToken(1, 1, "3")]
+            var testInput = [new IntToken("1"), new PlusTok(),
+                new IntToken("2"), new PlusTok(), new IntToken("3")]
 
             parser.input = testInput
             expect(parser.CONSUME4(IntToken)).toBe(testInput[0])
@@ -226,8 +228,8 @@ module chevrotain.recognizer.spec {
 
         it("can perform in-repetition recovery for MANY grammar rule", function () {
             // a.b+.c
-            var input = [new IdentTok(1, 1, "a"), new DotTok(1, 1), new IdentTok(1, 1, "b"),
-                new PlusTok(1, 1), new DotTok(1, 1), new IdentTok(1, 1, "c")]
+            var input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                new PlusTok(), new DotTok(), new IdentTok("c")]
             var parser = new ManyRepetitionRecovery(input)
             expect(parser.qualifiedName()).toEqual(["a", "b", "c"])
             expect(parser.errors.length).toBe(1)
@@ -250,7 +252,7 @@ module chevrotain.recognizer.spec {
         })
 
         it("when it runs out of input EOF will be returned", function () {
-            var parser:any = new recog.BaseRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)])
+            var parser:any = new recog.BaseRecognizer([new IntToken("1"), new PlusTok()])
             expect(parser.CONSUME(IntToken))
             expect(parser.CONSUME(PlusTok))
             expect(parser.NEXT_TOKEN()).toEqual(jasmine.any(recog.EOF))
@@ -262,7 +264,7 @@ module chevrotain.recognizer.spec {
         })
 
         it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([new IntToken(1, 1, "1"), new PlusTok(1, 1)], {})
+            var parser:any = new recog.BaseIntrospectionRecognizer([new IntToken("1"), new PlusTok()], {})
 
             var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
                 parser.CONSUME1(IntToken)
@@ -283,7 +285,7 @@ module chevrotain.recognizer.spec {
             var backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
             expect(() => backTrackingThrows()).toThrow(Error("division by zero, boom"))
 
-            var throwExceptionFunc = () => { throw new recog.NotAllInputParsedException("sad sad panda", new PlusTok(1, 1)) }
+            var throwExceptionFunc = () => { throw new recog.NotAllInputParsedException("sad sad panda", new PlusTok()) }
             var backTrackingFalse = parser.BACKTRACK(() => { throwExceptionFunc() }, () => { return true })
             expect(backTrackingFalse()).toBe(false)
         })
