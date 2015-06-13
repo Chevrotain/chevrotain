@@ -42,7 +42,7 @@ the code generation phase.
   These are not mandatory for using Chevrotain, they just make the example clearer.
   The example is also provided in [ES5 syntax](https://github.com/Chevrotain/examples_nodejs)
 
-## step 1 define your Tokens:
+#### step 1: define your Tokens:
 
 ```JavaScript
 
@@ -66,7 +66,7 @@ the code generation phase.
     }
 ```
 
-## step 2 create a lexer from the Token definitions:
+#### step 2: create a lexer from the Token definitions:
 ```JavaScript
 
     var Lexer = require("chevrotain").Lexer
@@ -76,7 +76,7 @@ the code generation phase.
 
 ```
 
-## step 3 define the parsing rules:
+#### step 3: define the parsing rules:
 
 
 ```JavaScript
@@ -133,7 +133,7 @@ the code generation phase.
     }
    ```      
 
-## step 4 add custom actions to the grammar defined in step 3
+#### step 4: add custom actions to the grammar defined in step 3
 
 * this shows the modification for just two grammar rules.
 
@@ -173,7 +173,7 @@ the code generation phase.
 
 ```
 
-## step 5 wrap it all together
+#### step 5: wrap it all together
 
 
 ```JavaScript
