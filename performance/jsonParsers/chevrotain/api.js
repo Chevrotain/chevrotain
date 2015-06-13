@@ -1,21 +1,4 @@
 // ----------------- wrapping it all together -----------------
-function chevrotainParseWithHandBuiltLexer(text) {
-    var fullResult = {};
-    var lexResult = chevrotain.examples.json.lexer.lex(text);
-
-    var parser = new ChevrotainJsonParser(lexResult.tokens);
-    parser.object();
-
-    fullResult.tokens = lexResult.tokens;
-    fullResult.parseErrors = parser.errors;
-
-    if (parser.errors.length > 0) {
-        throw "Errors when parsing with Chevrotain and hand built lexer"
-    }
-
-    return fullResult;
-}
-
 function chevrotainParseWithChevrotainLexer(text) {
 
     var fullResult = {};

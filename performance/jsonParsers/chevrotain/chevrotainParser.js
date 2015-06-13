@@ -5,8 +5,8 @@ var Token = chevrotain.Token;
 // Javascript inheritance using Object.create().
 // Any inheritance implementation will work as long it works with the instanceof operator.
 function extendToken(className, pattern) {
-    var childConstructor = function (line, column, image) {
-        Token.call(this, line, column, image);
+    var childConstructor = function (image, offset, startLine, startColumn, endLine, endColumn) {
+        Token.call(this, image, offset, startLine, startColumn, endLine, endColumn);
     };
     childConstructor.tokenName = className;
     childConstructor.prototype = Object.create(Token.prototype);

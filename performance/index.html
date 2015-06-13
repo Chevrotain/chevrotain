@@ -33,8 +33,6 @@
     suite
             .add('Jison Generated Parser + lexer', function () {
                 jisonJsonLexerAndParser.parse(json_sample10k)
-            }).add('Chevrotain With hand built Lexer', function () {
-                chevrotainParseWithHandBuiltLexer(json_sample10k)
             }).add('pegjs generated parser + lexer', function () {
                 pegjsJsonLexerAndParser.parse(json_sample10k)
             }).add('Chevrotain lexer + parser', function () {
