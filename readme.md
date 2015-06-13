@@ -15,6 +15,7 @@ the code generation phase.
     * Supports Token skipping (whitespace/comments/...)
     * Allows prioritising shorter matches (Keywords vs Identifiers).
     * **No code generation** The Lexer does not require any code generation phase. 
+   
   * **Parsing DSL** for creating the parsing rules.
     * **No code generation** - the DSL is just javascript not a new external language, what is written is what will be run, this speeds up development, 
          makes debugging trivial and provides great flexibility for inserting custom actions into the grammar.
@@ -22,6 +23,7 @@ the code generation phase.
     * Automatic lookahead calculation for LL(1) grammars.
     * In addition custom lookahead logic can be provided explicitly.
     * Backtracking support.  
+
   * **High performance** see: [performance comparison](http://jsperf.com/json-parsers-comparison/6)   
   
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such     
