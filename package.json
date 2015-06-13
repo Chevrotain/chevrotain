@@ -5,9 +5,15 @@
   "keywords": [
     "parser",
     "syntax",
+    "lexical",
+    "analysis",
     "grammar",
     "lexer",
-    "tokenizer"
+    "tokenizer",
+    "generator",
+    "compiler",
+    "fault",
+    "tolerant"
   ],
   "bugs": {
     "url": "https://github.com/SAP/chevrotain/issues"
