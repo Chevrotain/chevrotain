@@ -224,7 +224,6 @@ module.exports = function(grunt) {
             options: {
                 bump: false,
                 tagName:         'v<%=version%>',
-                additionalFiles: ['bower.json'],
                 github:          {
                     repo:        'SAP/chevrotain',
                     usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
