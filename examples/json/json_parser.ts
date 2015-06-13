@@ -25,13 +25,8 @@ module chevrotain.examples.json {
     export class RSquare extends tok.Token { static PATTERN = /]/ }
     export class Comma extends tok.Token { static PATTERN = /,/ }
     export class Colon extends tok.Token { static PATTERN = /:/ }
-    export class StringLiteral extends tok.Token {
-        // TODO: this is a javascript string not a json string
-        static PATTERN = /"([^\\"]+|\\([bfnrtv'"\\]|[0-3]?[0-7]{1,2}|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}))*"/
-    }
-    export class NumberLiteral extends tok.Token {
-        static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
-    }
+    export class StringLiteral extends tok.Token { static PATTERN = /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/}
+    export class NumberLiteral extends tok.Token { static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/ }
     export class WhiteSpace extends tok.Token {
         static PATTERN = / |\t|\n|\r|\r\n/
         static GROUP = SKIPPED
