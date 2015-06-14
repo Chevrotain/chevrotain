@@ -36,12 +36,9 @@ module chevrotain.gastBuilder {
     var terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
     var terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
-    // TODO: same for this regExp but in this case it limits the names which can be used
-    // for a reference to 'this' (that.SUBRULE(...
     var refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:\w+\s*\.\s*)*([a-zA-Z_]\w*)/
     var refRegExGlobal = new RegExp(refRegEx.source, "g")
 
-    // .OPTION(this.isSemicolon, ...)
     var optionRegEx = /\.\s*OPTION(\d)?\s*\(/
     var optionRegExGlobal = new RegExp(optionRegEx.source, "g")
 
@@ -105,22 +102,28 @@ module chevrotain.gastBuilder {
 
     function buildRefProd(prodRange:IProdRange):gast.ProdRef {
         var reResult = refRegEx.exec(prodRange.text)
-        var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var isImplicitOccurrenceIdx = reResult[1] === undefined
+        var refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
         var refProdName = reResult[2]
-        return new gast.ProdRef(refProdName, undefined, refOccurrence)
+        var newRef = new gast.ProdRef(refProdName, undefined, refOccurrence)
+        newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx
+        return newRef
     }
 
     function buildTerminalProd(prodRange:IProdRange):gast.Terminal {
         var reResult = terminalRegEx.exec(prodRange.text)
-        var terminalOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var isImplicitOccurrenceIdx = reResult[1] === undefined
+        var terminalOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
         var terminalName = reResult[2]
         var terminalType = terminalNameToConstructor[terminalName]
         if (!terminalType) {
             throw Error("Terminal Token name: " + terminalName + " not found")
         }
-        return new gast.Terminal(terminalType, terminalOccurrence)
-    }
 
+        var newTerminal = new gast.Terminal(terminalType, terminalOccurrence)
+        newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx
+        return newTerminal
+    }
 
     // http://stackoverflow.com/questions/17125764/can-you-specify-multiple-type-constraints-for-typescript-generics
     interface AbsProdWithOccurrence extends gast.IProductionWithOccurrence, gast.AbstractProduction {}
@@ -130,7 +133,9 @@ module chevrotain.gastBuilder {
                                                                       prodRange:IProdRange,
                                                                       allRanges:IProdRange[]):T {
         var reResult = regEx.exec(prodRange.text)
-        prodInstance.occurrenceInParent = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10)
+        var isImplicitOccurrenceIdx = reResult[1] === undefined
+        prodInstance.occurrenceInParent = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
+        prodInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
         // <any> due to intellij bugs
         return <any>buildAbstractProd(prodInstance, prodRange.range, allRanges)
     }

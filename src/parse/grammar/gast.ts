@@ -12,9 +12,11 @@ module chevrotain.gast {
     export interface IProductionWithOccurrence {
         definition:IProduction[]
         occurrenceInParent:number
+        implicitOccurrenceIndex:boolean
     }
 
     export class AbstractProduction implements IProduction {
+        public implicitOccurrenceIndex = false
         constructor(public definition:IProduction[]) {}
 
         accept(visitor:GAstVisitor):void {
@@ -74,6 +76,7 @@ module chevrotain.gast {
     /* tslint:enable:class-name */
 
     export class Terminal implements IProduction {
+        public implicitOccurrenceIndex:boolean = false
         constructor(public terminalType:Function, public occurrenceInParent:number = 1) {}
 
         accept(visitor:GAstVisitor):void {
