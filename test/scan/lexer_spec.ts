@@ -93,6 +93,19 @@ module chevrotain.lexer.spec {
         static PATTERN = /0\d*/ // oops we did copy paste and forgot to change the pattern same as Integer
     }
 
+    class Skipped extends tok.Token {
+        static GROUP = SKIPPED
+    }
+
+    class Special extends tok.Token {
+        static GROUP = "Strange"
+    }
+
+    class InvalidGroupNumber extends tok.Token {
+        static PATTERN = /\d\d\d/
+        static GROUP = 666
+    }
+
     describe("The Simple Lexer Validations", function () {
 
         it("won't detect valid patterns as missing", function () {
@@ -169,6 +182,19 @@ module chevrotain.lexer.spec {
             expect(_.contains(result[0], "DecimalInvalid")).toBe(true)
             expect(() => {l.validatePatterns(tokenClasses)}).toThrow()
         })
+
+
+        it("won't detect valid groups as unsupported", function () {
+            var result = l.findInvalidGroupType([IntegerTok, Skipped, Special])
+            expect(result.length).toBe(0)
+        })
+
+        it("will detect unsupported group types", function () {
+            var result = l.findInvalidGroupType([InvalidGroupNumber])
+            expect(result.length).toBe(1)
+            expect(_.contains(result[0], "InvalidGroupNumber")).toBe(true)
+            expect(() => {l.validatePatterns([InvalidGroupNumber])}).toThrow()
+        })
     })
 
     class PatternNoStart extends tok.Token { static PATTERN = /bamba/i }
@@ -194,6 +220,11 @@ module chevrotain.lexer.spec {
 
     class WhitespaceNotSkipped extends tok.Token {
         static PATTERN = /\s+/
+    }
+
+    class Comment extends tok.Token {
+        static PATTERN = /\/\/.+/
+        static GROUP = "comments"
     }
 
 
@@ -328,6 +359,24 @@ module chevrotain.lexer.spec {
                 new If("if", 10, 4, 1, 4, 2),
                 new WhitespaceNotSkipped("\n", 12, 4, 3, 4, 3),
             ])
+
+        })
+
+
+        it("supports Token groups", function () {
+
+            var ifElseLexer = new l.SimpleLexer([If, Else, Comment])
+            var input = "if//else"
+            var lexResult = ifElseLexer.tokenize(input)
+
+            expect(lexResult.tokens).toEqual([
+                new If("if", 0, 1, 1, 1, 2),
+            ])
+
+            expect((<any>lexResult.groups).comments).toEqual([
+                new Comment("//else", 2, 1, 3, 1, 8),
+            ])
+
 
         })
     })

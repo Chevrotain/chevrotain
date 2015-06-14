@@ -12,6 +12,7 @@ module chevrotain.lexer {
 
     export interface ILexingResult {
         tokens:tok.Token[]
+        groups:{ [groupName: string] : tok.Token }
         errors:ILexingError[]
     }
 
@@ -39,9 +40,10 @@ module chevrotain.lexer {
 
         protected allPatterns:RegExp[]
         protected patternIdxToClass:Function[]
-        protected patternIdxToSkipped:boolean[]
+        protected patternIdxToGroup:boolean[]
         protected patternIdxToLongerAltIdx:number[]
         protected patternIdxToCanLineTerminator:boolean[]
+        protected emptyGroups:{ [groupName: string] : tok.Token }
 
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
@@ -100,9 +102,10 @@ module chevrotain.lexer {
             var analyzeResult = analyzeTokenClasses(tokenClasses)
             this.allPatterns = analyzeResult.allPatterns
             this.patternIdxToClass = analyzeResult.patternIdxToClass
-            this.patternIdxToSkipped = analyzeResult.patternIdxToSkipped
+            this.patternIdxToGroup = analyzeResult.patternIdxToGroup
             this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx
             this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator
+            this.emptyGroups = analyzeResult.emptyGroups
         }
 
         /**
@@ -114,7 +117,7 @@ module chevrotain.lexer {
          * @returns {{tokens: {Token}[], errors: string[]}}
          */
         public tokenize(text:string):ILexingResult {
-            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, shouldBeSkipped, tokClass, newToken,
+            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken,
                 canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT
             var orgInput = text
             var offset = 0
@@ -122,6 +125,7 @@ module chevrotain.lexer {
             var errors:ILexingError[] = []
             var line = 1
             var column = 1
+            var groups:any = _.clone(this.emptyGroups)
 
 
             while (text.length > 0) {
@@ -146,11 +150,16 @@ module chevrotain.lexer {
                 if (match !== null) {
                     matchedImage = match[0]
                     imageLength = matchedImage.length
-                    shouldBeSkipped = this.patternIdxToSkipped[i]
-                    if (!shouldBeSkipped) {
+                    group = this.patternIdxToGroup[i]
+                    if (group !== undefined) {
                         tokClass = this.patternIdxToClass[i]
                         newToken = new tokClass(matchedImage, offset, line, column);
-                        matchedTokens.push(newToken)
+                        if (group === "default") {
+                            matchedTokens.push(newToken)
+                        }
+                        else {
+                            groups[group].push(newToken)
+                        }
                     }
                     text = text.slice(imageLength)
                     offset = offset + imageLength
@@ -173,7 +182,7 @@ module chevrotain.lexer {
                             }
                             column = imageLength - lastLTIdx
 
-                            if (!shouldBeSkipped) { // a none skipped multi line Token, need to update endLine/endColumn
+                            if (group !== undefined) { // a none skipped multi line Token, need to update endLine/endColumn
                                 lastCharIsLT = lastLTIdx === imageLength - 1
                                 fixForEndingInLT = lastCharIsLT ? -1 : 0
 
@@ -227,16 +236,17 @@ module chevrotain.lexer {
                 }
             }
 
-            return {tokens: matchedTokens, errors: errors}
+            return {tokens: matchedTokens, groups: groups, errors: errors}
         }
     }
 
     export interface IAnalyzeResult {
         allPatterns: RegExp[]
         patternIdxToClass: Function[]
-        patternIdxToSkipped : boolean[]
+        patternIdxToGroup : any[]
         patternIdxToLongerAltIdx : number[]
         patternIdxToCanLineTerminator: boolean[]
+        emptyGroups: { [groupName: string] : tok.Token }
     }
 
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
@@ -255,8 +265,20 @@ module chevrotain.lexer {
             return allPatternsToClass[pattern.toString()]
         })
 
-        var patternIdxToIgnored = _.map(onlyRelevantClasses, (clazz:any) => {
-            return clazz.GROUP === SimpleLexer.SKIPPED
+        var patternIdxToGroup = _.map(onlyRelevantClasses, (clazz:any) => {
+            var groupName = clazz.GROUP
+            if (groupName === SimpleLexer.SKIPPED) {
+                return undefined
+            }
+            else if (_.isString(groupName)) {
+                return groupName
+            }
+            else if (_.isUndefined(groupName)) {
+                return "default"
+            }
+            else {
+                throw Error("non exhaustive match")
+            }
         })
 
         var patternIdxToLongerAltIdx:any = _.map(onlyRelevantClasses, (clazz:any, idx) => {
@@ -273,12 +295,21 @@ module chevrotain.lexer {
             return /\\n|\\r|\\s/g.test(pattern.source)
         })
 
+        var emptyGroups = _.reduce(onlyRelevantClasses, (acc, clazz:any) => {
+            var groupName = clazz.GROUP
+            if (_.isString(groupName)) {
+                acc[groupName] = []
+            }
+            return acc
+        }, {})
+
         return {
             allPatterns:                   allTransformedPatterns,
             patternIdxToClass:             patternIdxToClass,
-            patternIdxToSkipped:           patternIdxToIgnored,
+            patternIdxToGroup:             patternIdxToGroup,
             patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
-            patternIdxToCanLineTerminator: patternIdxToCanLineTerminator
+            patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
+            emptyGroups:                   emptyGroups
         }
     }
 
@@ -306,6 +337,12 @@ module chevrotain.lexer {
         var duplicates = findDuplicatePatterns(tokenClasses)
         if (!_.isEmpty(duplicates)) {
             throw new Error(invalidFlags.join("\n ---------------- \n"))
+        }
+
+        var invalidGroupType = findInvalidGroupType(tokenClasses)
+
+        if (!_.isEmpty(invalidGroupType)) {
+            throw new Error(invalidGroupType.join("\n ---------------- \n"))
         }
     }
 
@@ -395,6 +432,28 @@ module chevrotain.lexer {
 
         return errors
     }
+
+
+    export function findInvalidGroupType(tokenClasses:TokenConstructor[]):string[] {
+
+        var invalidTypes = _.filter(tokenClasses, (clazz:any) => {
+            if (!_.has(clazz, "GROUP")) {
+                return false
+            }
+            var group = clazz.GROUP
+
+            return group !== SimpleLexer.SKIPPED &&
+                group !== SimpleLexer.NA && !_.isString(group)
+        })
+
+
+        var errors = _.map(invalidTypes, (currClass) => {
+            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String"
+        })
+
+        return errors
+    }
+
 
     export function addStartOfInput(pattern:RegExp):RegExp {
         var flags = pattern.ignoreCase ? "i" : ""
