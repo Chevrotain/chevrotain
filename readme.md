@@ -74,7 +74,7 @@ the code generation phase.
     var Lexer = require("chevrotain").Lexer
     
     var JsonLexer = new chevrotain.Lexer([WhiteSpace, NumberLiteral, StringLiteral,
-        RCurly, LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];);
+        RCurly, LCurly, LSquare, RSquare, Comma, Colon, True, False, Null])
 
 ```
 
@@ -181,9 +181,9 @@ the code generation phase.
 ```JavaScript
 
     function lexAndParse(text) {
-        var lexResult = JsonLexer.tokenize(text);
-        var parser = new JsonParser(lexResult.tokens);
-        return parser.object();
+        var lexResult = JsonLexer.tokenize(text)
+        var parser = new JsonParser(lexResult.tokens)
+        return parser.object()
     }
 
 ```
