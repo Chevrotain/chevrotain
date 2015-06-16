@@ -1,85 +1,73 @@
 /// <reference path="gast.ts" />
 /// <reference path="../../../libs/lodash.d.ts" />
 
+// TODO: rename to validations ?
 module chevrotain.validations {
 
     import gast = chevrotain.gast
 
-    export class GrammarError implements Error {
-
-        public get message() :string {
-            return getProductionDslName(this.refs[0]) + " with occurence number " + (<any>this.refs[0]).occurrenceInParent +
-                " appears " + this.refs.length + " times in " + this.topLevelRule.name
-                + " with the same occurrence number"
-        }
-
-        //In order to show the message in the printed error in the console
-        public toString() :string {
-            return this.name + ": " + this.message
-        }
-
-        constructor(public refs: gast.IProduction[],
-                    public topLevelRule: gast.TOP_LEVEL,
-                    public name: string = "Occurrence Number Error" ) {
-        }
+    export function validateGrammar(topLevels:gast.TOP_LEVEL[]):string[] {
+        var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule)
+        return <string[]>_.flatten(errorMessagesArrs)
     }
 
-    export function validateGrammar(topLevels:gast.TOP_LEVEL[]): GrammarError[] {
-        var errorsArrays = _.map(topLevels, (topLevel) => {
-            var collectorVisitor = new OccurrenceValidationCollector()
-            topLevel.accept(collectorVisitor)
-           return validateOccurrenceUsageInProductions(collectorVisitor.allProductions, topLevel)
+    function validateSingleTopLevelRule(topLevelRule:gast.TOP_LEVEL):string[] {
+        var collectorVisitor = new OccurrenceValidationCollector()
+        topLevelRule.accept(collectorVisitor)
+        var allRuleProductions = collectorVisitor.allProductions
+
+        var productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates)
+
+        var duplicates:any = _.pick(productionGroups, (currGroup) => {
+            return currGroup.length > 1
         })
 
-        return _.flatten<GrammarError>(errorsArrays)
-    }
-
-    export function getProductionDslName(prod: gast.IProduction) {
-        if (prod instanceof gast.Terminal) {
-            return "CONSUME"
-        } else if ( prod instanceof  gast.ProdRef) {
-            return "SUBRULE"
-        } else {
-            return lang.functionName((<any>prod).constructor)
-        }
-    }
-
-    export function getRelevantProductionArgument(prod: gast.IProduction, defaultProductionArgument: string = "...") {
-        if (prod instanceof gast.Terminal) {
-            return lang.functionName((<gast.Terminal>prod).terminalType)
-        } else if ( prod instanceof  gast.ProdRef) {
-            return (<gast.ProdRef>prod).refProdName
-        } else {
-            return defaultProductionArgument
-        }
-    }
-
-    export function identifyProductionForDuplicates(prod: gast.IProduction) {
-        return getProductionDslName(prod) + (<any>prod).occurrenceInParent + "(" + getRelevantProductionArgument(prod) + ")"
-    }
-
-    export function productionOccurrenceErrorGenerator(prods:gast.IProduction[], topLevelRule:gast.TOP_LEVEL) : GrammarError {
-        //All the productions should be of the same type and they have the same occurrence number
-        var representativeProduction = prods[0]
-        return new GrammarError(prods, topLevelRule)
-    }
-
-    export function validateOccurrenceUsageInProductions(productions:gast.IProduction[], topLevel:gast.TOP_LEVEL) : GrammarError[] {
-        var groups = _.groupBy(productions, identifyProductionForDuplicates)
-
-        //Cannot use _.filter because groups is an object of arrays and not an array
-        var errors = []
-        _.forEach(groups, function(groupValues, groupKey) {
-            if (groupValues.length > 1) {
-                errors.push(productionOccurrenceErrorGenerator(groupValues, topLevel))
-            }
+        var errorMsgs = _.map(duplicates, (currDuplicates:any) => {
+            return createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
         })
 
-        return errors
+        return errorMsgs
+    }
+
+    function createDuplicatesErrorMessage(duplicateProds:gast.IProductionWithOccurrence[], topLevelName):string {
+        var firstProd = _.first(duplicateProds)
+        var index = firstProd.occurrenceInParent
+        var dslName = firstProd.dslName
+        var extraArgument = getExtraProductionArgument(firstProd)
+
+        var msg = `->${dslName}<- with occurrence index: ->${index}<-
+                  ${extraArgument ? `and argument: ${extraArgument}` : ""}
+                  appears more than once (${duplicateProds.length} times) in the top level rule: ${topLevelName}.
+                  ${index === 1 ? `note that ${dslName} and ${dslName}1 both have the same occurrence index 1}` : ""}}
+                  to fix this make sure each usage of ${dslName} ${extraArgument ? `with the argument: ${extraArgument}` : ""}
+                  in the rule ${topLevelName} has a different occurrence index (1-5), as that combination acts as a unique
+                  position key in the grammar, which is needed by the parsing engine.`
+
+        // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
+        msg = msg.replace(/[ \t]+/g, " ")
+        msg = msg.replace(/\s\s+/g, "\n")
+
+        return msg;
+    }
+
+    export function identifyProductionForDuplicates(prod:gast.IProductionWithOccurrence):string {
+        return `${prod.dslName}_#_${prod.occurrenceInParent}_#_${getExtraProductionArgument(prod)}`
+    }
+
+    function getExtraProductionArgument(prod:gast.IProductionWithOccurrence):string {
+        if (prod instanceof gast.Terminal) {
+            return lang.functionName(prod.terminalType)
+        }
+        else if (prod instanceof  gast.ProdRef) {
+            return prod.refProdName
+        }
+        else {
+            return ""
+        }
     }
 
     export class OccurrenceValidationCollector extends gast.GAstVisitor {
-        public allProductions : gast.IProduction[]= []
+        public allProductions:gast.IProduction[] = []
 
         public visitProdRef(subrule:gast.ProdRef):void {
             this.allProductions.push(subrule)
@@ -104,7 +92,6 @@ module chevrotain.validations {
         public visitTerminal(terminal:gast.Terminal):void {
             this.allProductions.push(terminal)
         }
-
     }
 
 }

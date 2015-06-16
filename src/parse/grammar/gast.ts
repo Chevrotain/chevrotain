@@ -4,19 +4,22 @@
 module chevrotain.gast {
 
     import tok = chevrotain.tokens
+    import lang = chevrotain.lang
 
     export interface IProduction {
         accept(visitor:GAstVisitor):void
+        dslName:string
     }
 
-    export interface IProductionWithOccurrence {
-        definition:IProduction[]
+    export interface IProductionWithOccurrence extends IProduction {
         occurrenceInParent:number
         implicitOccurrenceIndex:boolean
     }
 
     export class AbstractProduction implements IProduction {
         public implicitOccurrenceIndex = false
+        public dslName = lang.functionName(this.constructor)
+
         constructor(public definition:IProduction[]) {}
 
         accept(visitor:GAstVisitor):void {
@@ -28,6 +31,8 @@ module chevrotain.gast {
     }
 
     export class ProdRef extends AbstractProduction implements IProductionWithOccurrence {
+        public dslName = "SUBRULE"
+
         constructor(public refProdName:string,
                     public ref:TOP_LEVEL = undefined,
                     public occurrenceInParent:number = 1) { super([]) }
@@ -75,8 +80,10 @@ module chevrotain.gast {
     }
     /* tslint:enable:class-name */
 
-    export class Terminal implements IProduction {
+    export class Terminal implements IProductionWithOccurrence {
+        public dslName = "CONSUME"
         public implicitOccurrenceIndex:boolean = false
+
         constructor(public terminalType:Function, public occurrenceInParent:number = 1) {}
 
         accept(visitor:GAstVisitor):void {

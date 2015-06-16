@@ -149,45 +149,6 @@ module chevrotain.recognizer.spec {
         })
     }
 
-    class ErroneousOccurrenceNumUsageParser extends recog.BaseIntrospectionRecognizer {
-
-        private numbers = ""
-        private letters = ""
-
-        constructor(input:tok.Token[] = []) {
-            super(input, <any>chevrotain.recognizer.spec)
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
-        }
-
-        public topRule = this.RULE("topRule", () => {
-            this.SUBRULE1(this.subRule, [5, "a"])
-            this.SUBRULE1(this.subRule, [4, "b"])
-            return {numbers: this.numbers, letters: this.letters}
-        })
-
-        public subRule = this.RULE("subRule", (numFromCaller, charFromCaller) => {
-            this.CONSUME(PlusTok)
-            this.CONSUME(PlusTok)
-
-            this.numbers += numFromCaller
-            this.letters += charFromCaller
-        })
-    }
-
-    describe("The ErroneousOccurrenceNumUsageParser", function () {
-
-        it("will throw errors on erroneous occurrence usage", function () {
-            try {
-                var parser = new ErroneousOccurrenceNumUsageParser()
-            } catch (e) {
-                expect(e.length).toBe(2)
-                expect(e[0].refs.length).toBe(2)
-                expect(e[1].refs.length).toBe(2)
-            }
-        })
-
-    })
-
     describe("The Parsing DSL", function () {
 
         it("provides a production SUBRULE1-5 that invokes another rule", function () {

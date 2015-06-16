@@ -322,7 +322,7 @@ module chevrotain.recognizer {
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
                 var validationErrors = validations.validateGrammar(grammarProductions.values())
                 if (validationErrors.length > 0) {
-                    throw validationErrors
+                    throw new Error (validationErrors.join("-------------------------------\n"))
                 }
             }
         }
