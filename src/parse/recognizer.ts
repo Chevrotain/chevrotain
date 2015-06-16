@@ -7,6 +7,7 @@
 /// <reference path="grammar/interpreter.ts" />
 /// <reference path="grammar/follow.ts" />
 /// <reference path="grammar/lookahead.ts" />
+/// <reference path="grammar/checks.ts" />
 
 
 /// <reference path="../../libs/lodash.d.ts" />
@@ -21,6 +22,7 @@ module chevrotain.recognizer {
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow
     import lookahead = chevrotain.lookahead
+    import validations = chevrotain.validations
 
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
@@ -308,7 +310,7 @@ module chevrotain.recognizer {
      */
     export class BaseIntrospectionRecognizer extends BaseRecognizer {
 
-        protected static performSelfAnalysis(classInstance:any) {
+        protected static performSelfAnalysis(classInstance:BaseIntrospectionRecognizer) {
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
             if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
@@ -318,6 +320,10 @@ module chevrotain.recognizer {
                 var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
                 cache.setResyncFollowsForClass(className, allFollows)
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
+                var validationErrors = validations.validateGrammar(grammarProductions.values())
+                if (validationErrors.length > 0) {
+                    throw validationErrors
+                }
             }
         }
 
@@ -824,7 +830,8 @@ module chevrotain.recognizer {
             var parserClassProductions = cache.getProductionsForClass(this.className)
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
-                parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap))
+                var gastProduction = gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap)
+                parserClassProductions.put(ruleName, gastProduction)
             }
 
             var wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {

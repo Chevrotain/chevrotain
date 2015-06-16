@@ -317,8 +317,8 @@ module chevrotain.gastBuilder {
         }
     }
 
-    export class GastRefResolverVisitor extends gast.GAstVisitor {
 
+    export class GastRefResolverVisitor extends gast.GAstVisitor {
         constructor(private nameToProd:lang.HashTable<gast.TOP_LEVEL>) { super() }
 
         public resolveRefs():void {
