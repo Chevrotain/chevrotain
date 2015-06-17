@@ -223,6 +223,7 @@ module.exports = function(grunt) {
         release: {
             options: {
                 tagName:         'v<%=version%>',
+                additionalFiles: ['bower.json'],
                 github:          {
                     repo:        'SAP/chevrotain',
                     usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
@@ -285,5 +286,8 @@ module.exports = function(grunt) {
 
 
     grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
+
+    grunt.registerTask('release_patch', commonReleaseTasks.concat(['release:patch']))
+    grunt.registerTask('release_minor', commonReleaseTasks.concat(['release:minor']))
 
 }
