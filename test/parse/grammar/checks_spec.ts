@@ -140,6 +140,22 @@ module chevrotain.validations.spec {
         })
     }
 
+    var myToken = tok.extendToken("myToken")
+    var myOtherToken = tok.extendToken("myOtherToken")
+
+    class ValidOccurrenceNumUsageParser extends recog.Parser {
+
+        constructor(input:tok.Token[] = []) {
+            super(input, [myToken, myOtherToken])
+            recog.Parser.performSelfAnalysis(this)
+        }
+
+        public anonymousTokens = this.RULE("anonymousTokens", () => {
+            this.CONSUME1(myToken)
+            this.CONSUME1(myOtherToken)
+        })
+    }
+
     describe("The duplicate occurrence validations full flow", function () {
 
         it("will throw errors on duplicate Terminals consumption in the same top level rule", function () {
@@ -194,5 +210,13 @@ module chevrotain.validations.spec {
             }
             expect(thrown).toBe(true)
         })
+
+
+        it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
+            //noinspection JSUnusedLocalSymbols
+            var parser = new ValidOccurrenceNumUsageParser()
+        })
+
+
     })
 }
