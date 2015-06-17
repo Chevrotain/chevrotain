@@ -33,9 +33,8 @@ the code generation phase.
 
 ## Installation
 * ```npm install chevrotain```
-* or download the javascript source directly from github releases:
-   * [0.3.1 zip](https://github.com/SAP/chevrotain/releases/download/v0.3.1/chevrotain-binaries-0.3.1.zip)
-   * [0.3.1 tar.gz](https://github.com/SAP/chevrotain/releases/download/v0.3.1/chevrotain-binaries-0.3.1.tar.gz)
+* or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest):
+  * the 'chevrotain-binaries-...' files contain the compiled javascript code.
 
 
 ## Usage example JSON Parser:
