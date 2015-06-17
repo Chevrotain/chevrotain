@@ -20,6 +20,19 @@ var githubReleaseFiles = ['./package.json',
     './readme.md'
 ]
 
+var releaseBuildTasks = [
+    'clean:all',
+    'ts:release',
+    'ts:release_test_code',
+    'tslint',
+    'concat:release',
+    'umd:release',
+    'umd:release_specs',
+    'compress'
+]
+
+var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])
+
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
@@ -224,6 +237,7 @@ module.exports = function(grunt) {
             options: {
                 tagName:         'v<%=version%>',
                 additionalFiles: ['bower.json'],
+                afterBump: commonReleaseTasks,
                 github:          {
                     repo:        'SAP/chevrotain',
                     usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
@@ -260,18 +274,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-release')
     grunt.loadNpmTasks('grunt-contrib-compress');
 
-    var releaseBuildTasks = [
-        'clean:all',
-        'ts:release',
-        'ts:release_test_code',
-        'tslint',
-        'concat:release',
-        'umd:release',
-        'umd:release_specs',
-        'compress'
-    ]
-
-    var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])
 
     grunt.registerTask('build', releaseBuildTasks)
     grunt.registerTask('build_and_test', commonReleaseTasks)
@@ -287,7 +289,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
 
-    grunt.registerTask('release_patch', commonReleaseTasks.concat(['release:patch']))
-    grunt.registerTask('release_minor', commonReleaseTasks.concat(['release:minor']))
+    grunt.registerTask('release_patch', 'release:patch')
+    grunt.registerTask('release_minor', 'release:minor')
 
 }
