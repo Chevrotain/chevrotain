@@ -61,7 +61,6 @@ module chevrotain.tokens {
         }
     }
 
-    export type TokenClass = Function
     export class Token {
         // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
         public isInsertedInRecovery:boolean = false

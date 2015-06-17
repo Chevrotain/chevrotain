@@ -24,7 +24,7 @@ module chevrotain.tree {
      * @param {ParseTree[]} children The sub nodes of the ParseTree to the built
      * @returns {ParseTree}
      */
-    export function PT(tokenOrTokenClass:tok.TokenClass|tok.Token, children:ParseTree[] = []):ParseTree {
+    export function PT(tokenOrTokenClass:Function|tok.Token, children:ParseTree[] = []):ParseTree {
         var childrenCompact = _.compact(children)
 
         if (tokenOrTokenClass instanceof tok.Token) {

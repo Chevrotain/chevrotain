@@ -17,6 +17,9 @@ if (!testMode) {
     API.Lexer = chevrotain.lexer.SimpleLexer
     API.Token = chevrotain.tokens.Token
 
+    // utilities
+    API.extendToken = chevrotain.tokens.extendToken
+
     // grammar reflection API
     API.gast = {}
     API.gast.GAstVisitor = chevrotain.gast.GAstVisitor
