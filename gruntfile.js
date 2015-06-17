@@ -222,9 +222,7 @@ module.exports = function(grunt) {
 
         release: {
             options: {
-                bump: false,
                 tagName:         'v<%=version%>',
-                commit : false,
                 github:          {
                     repo:        'SAP/chevrotain',
                     usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
