@@ -4,6 +4,51 @@ module chevrotain.tokens {
 
     import lang = chevrotain.lang
 
+    /**
+     * utility to help the poor souls who are still stuck writing pure javascript 5.1
+     * extend and create Token subclasses in a less verbose manner
+     *
+     * @param {string} tokenName the name of the new TokenClass
+     * @param {*} patternOrParent Pa
+     * @param {Function} parentConstructor the Token class to be extended
+     * @returns {Function} a constructor for the new extended Token subclass
+     */
+    export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token) {
+        var pattern
+
+        if (_.isRegExp(patternOrParent) ||
+            patternOrParent === chevrotain.lexer.SimpleLexer.SKIPPED ||
+            patternOrParent === chevrotain.lexer.SimpleLexer.NA) {
+            pattern = patternOrParent
+        }
+        else if (_.isFunction(patternOrParent)) {
+            parentConstructor = patternOrParent
+            pattern = undefined
+        }
+
+        var derivedCostructor:any = function () {
+            parentConstructor.apply(this, arguments);
+        }
+
+        // static properties mixing
+        for (var p in parentConstructor) {
+            if (parentConstructor.hasOwnProperty(p)) {
+                derivedCostructor[p] = parentConstructor[p];
+            }
+        }
+
+        // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
+        derivedCostructor.tokenName = tokenName;
+        derivedCostructor.prototype = Object.create(parentConstructor.prototype);
+        derivedCostructor.prototype.constructor = derivedCostructor;
+        if (!_.isUndefined(pattern)) {
+            derivedCostructor.PATTERN = pattern;
+        }
+
+        return derivedCostructor;
+    }
+
+
     export function tokenName(clazz:Function):string {
         // used to support js inheritance patterns that do not use named functions
         // in that situation setting a property tokenName on a token constructor will
