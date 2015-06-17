@@ -20,19 +20,6 @@ var githubReleaseFiles = ['./package.json',
     './readme.md'
 ]
 
-var releaseBuildTasks = [
-    'clean:all',
-    'ts:release',
-    'ts:release_test_code',
-    'tslint',
-    'concat:release',
-    'umd:release',
-    'umd:release_specs',
-    'compress'
-]
-
-var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])
-
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
@@ -233,12 +220,21 @@ module.exports = function(grunt) {
             }
         },
 
+        bump: {
+            options: {
+                files: ['package.json', 'bower.json'],
+                updateConfigs: ['pkg'],
+                createTag: false,
+                commit: false,
+                push: false
+            }
+        },
+
         release: {
             options: {
-                tagName:         'v<%=version%>',
-                additionalFiles: ['bower.json'],
-                afterBump: commonReleaseTasks,
-                github:          {
+                tagName: 'v<%=version%>',
+                bump:    false, // grunt-bump does this
+                github:  {
                     repo:        'SAP/chevrotain',
                     usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
                     passwordVar: 'GITHUB_PASSWORD' // ENVIRONMENT VARIABLE that contains Github password or token
@@ -264,6 +260,19 @@ module.exports = function(grunt) {
         }
     })
 
+    var releaseBuildTasks = [
+        'clean:all',
+        'ts:release',
+        'ts:release_test_code',
+        'tslint',
+        'concat:release',
+        'umd:release',
+        'umd:release_specs',
+        'compress'
+    ]
+
+    var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])
+
     grunt.loadNpmTasks('grunt-karma')
     grunt.loadNpmTasks('grunt-tslint')
     grunt.loadNpmTasks("grunt-ts")
@@ -273,6 +282,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jasmine-node-coverage')
     grunt.loadNpmTasks('grunt-release')
     grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-bump');
 
 
     grunt.registerTask('build', releaseBuildTasks)
@@ -289,7 +299,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
 
-    grunt.registerTask('release_patch', 'release:patch')
-    grunt.registerTask('release_minor', 'release:minor')
+    grunt.registerTask('publish_patch', ['bump:patch'].concat(commonReleaseTasks, ['release:patch']))
+    grunt.registerTask('publish_minor', ['bump:minor'].concat(commonReleaseTasks, ['release:minor']))
 
 }
