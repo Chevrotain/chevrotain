@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.2.0 - 2015-06-14 */
+/*! chevrotain - v0.3.1 - 2015-06-17 */
 /// <reference path="../../libs/lodash.d.ts" />
 var chevrotain;
 (function (chevrotain) {
@@ -93,6 +93,44 @@ var chevrotain;
     var tokens;
     (function (tokens) {
         var lang = chevrotain.lang;
+        /**
+         * utility to help the poor souls who are still stuck writing pure javascript 5.1
+         * extend and create Token subclasses in a less verbose manner
+         *
+         * @param {string} tokenName the name of the new TokenClass
+         * @param {*} patternOrParent Pa
+         * @param {Function} parentConstructor the Token class to be extended
+         * @returns {Function} a constructor for the new extended Token subclass
+         */
+        function extendToken(tokenName, patternOrParent, parentConstructor) {
+            if (patternOrParent === void 0) { patternOrParent = undefined; }
+            if (parentConstructor === void 0) { parentConstructor = Token; }
+            var pattern;
+            if (_.isRegExp(patternOrParent) || patternOrParent === chevrotain.lexer.Lexer.SKIPPED || patternOrParent === chevrotain.lexer.Lexer.NA) {
+                pattern = patternOrParent;
+            }
+            else if (_.isFunction(patternOrParent)) {
+                parentConstructor = patternOrParent;
+                pattern = undefined;
+            }
+            var derivedCostructor = function () {
+                parentConstructor.apply(this, arguments);
+            };
+            for (var p in parentConstructor) {
+                if (parentConstructor.hasOwnProperty(p)) {
+                    derivedCostructor[p] = parentConstructor[p];
+                }
+            }
+            // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
+            derivedCostructor.tokenName = tokenName;
+            derivedCostructor.prototype = Object.create(parentConstructor.prototype);
+            derivedCostructor.prototype.constructor = derivedCostructor;
+            if (!_.isUndefined(pattern)) {
+                derivedCostructor.PATTERN = pattern;
+            }
+            return derivedCostructor;
+        }
+        tokens.extendToken = extendToken;
         function tokenName(clazz) {
             // used to support js inheritance patterns that do not use named functions
             // in that situation setting a property tokenName on a token constructor will
@@ -153,12 +191,7 @@ var chevrotain;
     (function (lexer) {
         var tok = chevrotain.tokens;
         var PATTERN = "PATTERN";
-        /**
-         * A RegExp lexer meant to be used for quick prototyping and/or simple grammars.
-         * This is NOT meant to be used in commercial compilers/tooling.
-         * concerns such as performance/extendability/modularity are ignored in this implementation.
-         */
-        var SimpleLexer = (function () {
+        var Lexer = (function () {
             /**
              * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
              *                     These constructors must be in one of three forms:
@@ -211,15 +244,16 @@ var chevrotain;
              *
              *
              */
-            function SimpleLexer(tokenClasses) {
+            function Lexer(tokenClasses) {
                 this.tokenClasses = tokenClasses;
                 validatePatterns(tokenClasses);
                 var analyzeResult = analyzeTokenClasses(tokenClasses);
                 this.allPatterns = analyzeResult.allPatterns;
                 this.patternIdxToClass = analyzeResult.patternIdxToClass;
-                this.patternIdxToSkipped = analyzeResult.patternIdxToSkipped;
+                this.patternIdxToGroup = analyzeResult.patternIdxToGroup;
                 this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx;
                 this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator;
+                this.emptyGroups = analyzeResult.emptyGroups;
             }
             /**
              * Will lex(Tokenize) a string.
@@ -229,14 +263,15 @@ var chevrotain;
              * @param {string} text the string to lex
              * @returns {{tokens: {Token}[], errors: string[]}}
              */
-            SimpleLexer.prototype.tokenize = function (text) {
-                var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, shouldBeSkipped, tokClass, newToken, canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT;
+            Lexer.prototype.tokenize = function (text) {
+                var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT;
                 var orgInput = text;
                 var offset = 0;
                 var matchedTokens = [];
                 var errors = [];
                 var line = 1;
                 var column = 1;
+                var groups = _.clone(this.emptyGroups);
                 while (text.length > 0) {
                     match = null;
                     for (i = 0; i < this.allPatterns.length; i++) {
@@ -258,11 +293,16 @@ var chevrotain;
                     if (match !== null) {
                         matchedImage = match[0];
                         imageLength = matchedImage.length;
-                        shouldBeSkipped = this.patternIdxToSkipped[i];
-                        if (!shouldBeSkipped) {
+                        group = this.patternIdxToGroup[i];
+                        if (group !== undefined) {
                             tokClass = this.patternIdxToClass[i];
                             newToken = new tokClass(matchedImage, offset, line, column);
-                            matchedTokens.push(newToken);
+                            if (group === "default") {
+                                matchedTokens.push(newToken);
+                            }
+                            else {
+                                groups[group].push(newToken);
+                            }
                         }
                         text = text.slice(imageLength);
                         offset = offset + imageLength;
@@ -283,7 +323,7 @@ var chevrotain;
                                     lastLTIdx--;
                                 }
                                 column = imageLength - lastLTIdx;
-                                if (!shouldBeSkipped) {
+                                if (group !== undefined) {
                                     lastCharIsLT = lastLTIdx === imageLength - 1;
                                     fixForEndingInLT = lastCharIsLT ? -1 : 0;
                                     if (!(lineTerminatorsInMatch === 1 && lastCharIsLT)) {
@@ -328,18 +368,18 @@ var chevrotain;
                         errors.push({ line: errorLine, column: errorColumn, message: errorMessage });
                     }
                 }
-                return { tokens: matchedTokens, errors: errors };
+                return { tokens: matchedTokens, groups: groups, errors: errors };
             };
-            SimpleLexer.SKIPPED = {
+            Lexer.SKIPPED = {
                 description: "This marks a skipped Token pattern, this means each token identified by it will" + "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
             };
-            SimpleLexer.NA = /NOT_APPLICIABLE/;
-            return SimpleLexer;
+            Lexer.NA = /NOT_APPLICIABLE/;
+            return Lexer;
         })();
-        lexer.SimpleLexer = SimpleLexer;
+        lexer.Lexer = Lexer;
         function analyzeTokenClasses(tokenClasses) {
             var onlyRelevantClasses = _.reject(tokenClasses, function (currClass) {
-                return currClass[PATTERN] === SimpleLexer.NA;
+                return currClass[PATTERN] === Lexer.NA;
             });
             var allTransformedPatterns = _.map(onlyRelevantClasses, function (currClass) {
                 return addStartOfInput(currClass[PATTERN]);
@@ -348,8 +388,20 @@ var chevrotain;
             var patternIdxToClass = _.map(allTransformedPatterns, function (pattern) {
                 return allPatternsToClass[pattern.toString()];
             });
-            var patternIdxToIgnored = _.map(onlyRelevantClasses, function (clazz) {
-                return clazz.GROUP === SimpleLexer.SKIPPED;
+            var patternIdxToGroup = _.map(onlyRelevantClasses, function (clazz) {
+                var groupName = clazz.GROUP;
+                if (groupName === Lexer.SKIPPED) {
+                    return undefined;
+                }
+                else if (_.isString(groupName)) {
+                    return groupName;
+                }
+                else if (_.isUndefined(groupName)) {
+                    return "default";
+                }
+                else {
+                    /* istanbul ignore next */ throw Error("non exhaustive match");
+                }
             });
             var patternIdxToLongerAltIdx = _.map(onlyRelevantClasses, function (clazz, idx) {
                 var longerAltClass = clazz.LONGER_ALT;
@@ -362,12 +414,20 @@ var chevrotain;
                 // TODO: unicode escapes of line terminators too?
                 return /\\n|\\r|\\s/g.test(pattern.source);
             });
+            var emptyGroups = _.reduce(onlyRelevantClasses, function (acc, clazz) {
+                var groupName = clazz.GROUP;
+                if (_.isString(groupName)) {
+                    acc[groupName] = [];
+                }
+                return acc;
+            }, {});
             return {
                 allPatterns: allTransformedPatterns,
                 patternIdxToClass: patternIdxToClass,
-                patternIdxToSkipped: patternIdxToIgnored,
+                patternIdxToGroup: patternIdxToGroup,
                 patternIdxToLongerAltIdx: patternIdxToLongerAltIdx,
-                patternIdxToCanLineTerminator: patternIdxToCanLineTerminator
+                patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
+                emptyGroups: emptyGroups
             };
         }
         lexer.analyzeTokenClasses = analyzeTokenClasses;
@@ -391,6 +451,10 @@ var chevrotain;
             var duplicates = findDuplicatePatterns(tokenClasses);
             if (!_.isEmpty(duplicates)) {
                 throw new Error(invalidFlags.join("\n ---------------- \n"));
+            }
+            var invalidGroupType = findInvalidGroupType(tokenClasses);
+            if (!_.isEmpty(invalidGroupType)) {
+                throw new Error(invalidGroupType.join("\n ---------------- \n"));
             }
         }
         lexer.validatePatterns = validatePatterns;
@@ -465,6 +529,20 @@ var chevrotain;
             return errors;
         }
         lexer.findDuplicatePatterns = findDuplicatePatterns;
+        function findInvalidGroupType(tokenClasses) {
+            var invalidTypes = _.filter(tokenClasses, function (clazz) {
+                if (!_.has(clazz, "GROUP")) {
+                    return false;
+                }
+                var group = clazz.GROUP;
+                return group !== Lexer.SKIPPED && group !== Lexer.NA && !_.isString(group);
+            });
+            var errors = _.map(invalidTypes, function (currClass) {
+                return "Token class: ->" + tok.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String";
+            });
+            return errors;
+        }
+        lexer.findInvalidGroupType = findInvalidGroupType;
         function addStartOfInput(pattern) {
             var flags = pattern.ignoreCase ? "i" : "";
             // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
@@ -597,9 +675,12 @@ var chevrotain;
 (function (chevrotain) {
     var gast;
     (function (gast) {
+        var lang = chevrotain.lang;
         var AbstractProduction = (function () {
             function AbstractProduction(definition) {
                 this.definition = definition;
+                this.implicitOccurrenceIndex = false;
+                this.dslName = lang.functionName(this.constructor);
             }
             AbstractProduction.prototype.accept = function (visitor) {
                 visitor.visit(this);
@@ -619,6 +700,7 @@ var chevrotain;
                 this.refProdName = refProdName;
                 this.ref = ref;
                 this.occurrenceInParent = occurrenceInParent;
+                this.dslName = "SUBRULE";
             }
             Object.defineProperty(ProdRef.prototype, "definition", {
                 get: function () {
@@ -704,6 +786,8 @@ var chevrotain;
                 if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                 this.terminalType = terminalType;
                 this.occurrenceInParent = occurrenceInParent;
+                this.dslName = "CONSUME";
+                this.implicitOccurrenceIndex = false;
             }
             Terminal.prototype.accept = function (visitor) {
                 visitor.visit(this);
@@ -1440,11 +1524,8 @@ var chevrotain;
         // TODO: document and consider reducing the constraint by expanding the regexp
         var terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/;
         var terminalRegGlobal = new RegExp(terminalRegEx.source, "g");
-        // TODO: same for this regExp but in this case it limits the names which can be used
-        // for a reference to 'this' (that.SUBRULE(...
         var refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:\w+\s*\.\s*)*([a-zA-Z_]\w*)/;
         var refRegExGlobal = new RegExp(refRegEx.source, "g");
-        // .OPTION(this.isSemicolon, ...)
         var optionRegEx = /\.\s*OPTION(\d)?\s*\(/;
         var optionRegExGlobal = new RegExp(optionRegEx.source, "g");
         var manyRegEx = /\s*.\s*MANY(\d)?\s*\(/;
@@ -1497,23 +1578,31 @@ var chevrotain;
         gastBuilder.buildProdGast = buildProdGast;
         function buildRefProd(prodRange) {
             var reResult = refRegEx.exec(prodRange.text);
-            var refOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10);
+            var isImplicitOccurrenceIdx = reResult[1] === undefined;
+            var refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10);
             var refProdName = reResult[2];
-            return new gast.ProdRef(refProdName, undefined, refOccurrence);
+            var newRef = new gast.ProdRef(refProdName, undefined, refOccurrence);
+            newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx;
+            return newRef;
         }
         function buildTerminalProd(prodRange) {
             var reResult = terminalRegEx.exec(prodRange.text);
-            var terminalOccurrence = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10);
+            var isImplicitOccurrenceIdx = reResult[1] === undefined;
+            var terminalOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10);
             var terminalName = reResult[2];
             var terminalType = gastBuilder.terminalNameToConstructor[terminalName];
             if (!terminalType) {
                 throw Error("Terminal Token name: " + terminalName + " not found");
             }
-            return new gast.Terminal(terminalType, terminalOccurrence);
+            var newTerminal = new gast.Terminal(terminalType, terminalOccurrence);
+            newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx;
+            return newTerminal;
         }
         function buildProdWithOccurrence(regEx, prodInstance, prodRange, allRanges) {
             var reResult = regEx.exec(prodRange.text);
-            prodInstance.occurrenceInParent = reResult[1] === undefined ? 1 : parseInt(reResult[1], 10);
+            var isImplicitOccurrenceIdx = reResult[1] === undefined;
+            prodInstance.occurrenceInParent = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10);
+            prodInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx;
             // <any> due to intellij bugs
             return buildAbstractProd(prodInstance, prodRange.range, allRanges);
         }
@@ -1695,6 +1784,88 @@ var chevrotain;
         gastBuilder.GastRefResolverVisitor = GastRefResolverVisitor;
     })/* istanbul ignore next */ (gastBuilder = chevrotain.gastBuilder || /* istanbul ignore next */ (chevrotain.gastBuilder = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+/// <reference path="gast.ts" />
+/// <reference path="../../../libs/lodash.d.ts" />
+// TODO: rename to validations ?
+var chevrotain;
+(function (chevrotain) {
+    var validations;
+    (function (validations) {
+        var gast = chevrotain.gast;
+        var tok = chevrotain.tokens;
+        function validateGrammar(topLevels) {
+            var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule);
+            return _.flatten(errorMessagesArrs);
+        }
+        validations.validateGrammar = validateGrammar;
+        function validateSingleTopLevelRule(topLevelRule) {
+            var collectorVisitor = new OccurrenceValidationCollector();
+            topLevelRule.accept(collectorVisitor);
+            var allRuleProductions = collectorVisitor.allProductions;
+            var productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates);
+            var duplicates = _.pick(productionGroups, function (currGroup) {
+                return currGroup.length > 1;
+            });
+            var errorMsgs = _.map(duplicates, function (currDuplicates) {
+                return createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
+            });
+            return errorMsgs;
+        }
+        function createDuplicatesErrorMessage(duplicateProds, topLevelName) {
+            var firstProd = _.first(duplicateProds);
+            var index = firstProd.occurrenceInParent;
+            var dslName = firstProd.dslName;
+            var extraArgument = getExtraProductionArgument(firstProd);
+            var msg = "->" + dslName + "<- with occurrence index: ->" + index + "<-\n                  " + (extraArgument ? "and argument: " + extraArgument : "") + "\n                  appears more than once (" + duplicateProds.length + " times) in the top level rule: " + topLevelName + ".\n                  " + (index === 1 ? "note that " + dslName + " and " + dslName + "1 both have the same occurrence index 1}" : "") + "}\n                  to fix this make sure each usage of " + dslName + " " + (extraArgument ? "with the argument: " + extraArgument : "") + "\n                  in the rule " + topLevelName + " has a different occurrence index (1-5), as that combination acts as a unique\n                  position key in the grammar, which is needed by the parsing engine.";
+            // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
+            msg = msg.replace(/[ \t]+/g, " ");
+            msg = msg.replace(/\s\s+/g, "\n");
+            return msg;
+        }
+        function identifyProductionForDuplicates(prod) {
+            return "" + prod.dslName + "_#_" + prod.occurrenceInParent + "_#_" + getExtraProductionArgument(prod);
+        }
+        validations.identifyProductionForDuplicates = identifyProductionForDuplicates;
+        function getExtraProductionArgument(prod) {
+            if (prod instanceof gast.Terminal) {
+                return tok.tokenName(prod.terminalType);
+            }
+            else if (prod instanceof gast.ProdRef) {
+                return prod.refProdName;
+            }
+            else {
+                return "";
+            }
+        }
+        var OccurrenceValidationCollector = (function (_super) {
+            __extends(OccurrenceValidationCollector, _super);
+            function OccurrenceValidationCollector() {
+                _super.apply(this, arguments);
+                this.allProductions = [];
+            }
+            OccurrenceValidationCollector.prototype.visitProdRef = function (subrule) {
+                this.allProductions.push(subrule);
+            };
+            OccurrenceValidationCollector.prototype.visitOPTION = function (option) {
+                this.allProductions.push(option);
+            };
+            OccurrenceValidationCollector.prototype.visitAT_LEAST_ONE = function (atLeastOne) {
+                this.allProductions.push(atLeastOne);
+            };
+            OccurrenceValidationCollector.prototype.visitMANY = function (many) {
+                this.allProductions.push(many);
+            };
+            OccurrenceValidationCollector.prototype.visitOR = function (or) {
+                this.allProductions.push(or);
+            };
+            OccurrenceValidationCollector.prototype.visitTerminal = function (terminal) {
+                this.allProductions.push(terminal);
+            };
+            return OccurrenceValidationCollector;
+        })(gast.GAstVisitor);
+        validations.OccurrenceValidationCollector = OccurrenceValidationCollector;
+    })/* istanbul ignore next */ (validations = chevrotain.validations || /* istanbul ignore next */ (chevrotain.validations = {}));
+})/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /// <reference path="../lang/lang_extensions.ts" />
 /// <reference path="cache.ts" />
 /// <reference path="../scan/tokens.ts" />
@@ -1704,6 +1875,7 @@ var chevrotain;
 /// <reference path="grammar/interpreter.ts" />
 /// <reference path="grammar/follow.ts" />
 /// <reference path="grammar/lookahead.ts" />
+/// <reference path="grammar/checks.ts" />
 /// <reference path="../../libs/lodash.d.ts" />
 var chevrotain;
 (function (chevrotain) {
@@ -1717,6 +1889,7 @@ var chevrotain;
         var gastBuilder = chevrotain.gastBuilder;
         var follows = chevrotain.follow;
         var lookahead = chevrotain.lookahead;
+        var validations = chevrotain.validations;
         // hacks to bypass no support for custom Errors in javascript/typescript
         function isRecognitionException(error) {
             var recognitionExceptions = [
@@ -1941,9 +2114,9 @@ var chevrotain;
          * This is used for more advanced features requiring such information.
          * for example: Error Recovery, Automatic lookahead calculation
          */
-        var BaseIntrospectionRecognizer = (function (_super) {
-            __extends(BaseIntrospectionRecognizer, _super);
-            function BaseIntrospectionRecognizer(input, tokensMapOrArr) {
+        var Parser = (function (_super) {
+            __extends(Parser, _super);
+            function Parser(input, tokensMapOrArr) {
                 _super.call(this, input);
                 this.RULE_STACK = [];
                 this.RULE_OCCURRENCE_STACK = [];
@@ -1976,7 +2149,7 @@ var chevrotain;
                 this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className];
                 this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className];
             }
-            BaseIntrospectionRecognizer.performSelfAnalysis = function (classInstance) {
+            Parser.performSelfAnalysis = function (classInstance) {
                 var className = lang.classNameFromInstance(classInstance);
                 // this information only needs to be computed once
                 if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
@@ -1986,9 +2159,13 @@ var chevrotain;
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
                     cache.setResyncFollowsForClass(className, allFollows);
                     cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
+                    var validationErrors = validations.validateGrammar(grammarProductions.values());
+                    if (validationErrors.length > 0) {
+                        throw new Error(validationErrors.join("-------------------------------\n"));
+                    }
                 }
             };
-            BaseIntrospectionRecognizer.prototype.reset = function () {
+            Parser.prototype.reset = function () {
                 _super.prototype.reset.call(this);
                 this.RULE_STACK = [];
                 this.RULE_OCCURRENCE_STACK = [];
@@ -1998,7 +2175,7 @@ var chevrotain;
              * Convenience method equivalent to CONSUME1
              * @see CONSUME1
              */
-            BaseIntrospectionRecognizer.prototype.CONSUME = function (tokClass) {
+            Parser.prototype.CONSUME = function (tokClass) {
                 return this.CONSUME1(tokClass);
             };
             /**
@@ -2027,38 +2204,38 @@ var chevrotain;
              *
              * @returns {chevrotain.tokens.Token} The consumed token.
              */
-            BaseIntrospectionRecognizer.prototype.CONSUME1 = function (tokClass) {
+            Parser.prototype.CONSUME1 = function (tokClass) {
                 return this.consumeInternal(tokClass, 1);
             };
             /**
              * @see CONSUME1
              */
-            BaseIntrospectionRecognizer.prototype.CONSUME2 = function (tokClass) {
+            Parser.prototype.CONSUME2 = function (tokClass) {
                 return this.consumeInternal(tokClass, 2);
             };
             /**
              * @see CONSUME1
              */
-            BaseIntrospectionRecognizer.prototype.CONSUME3 = function (tokClass) {
+            Parser.prototype.CONSUME3 = function (tokClass) {
                 return this.consumeInternal(tokClass, 3);
             };
             /**
              * @see CONSUME1
              */
-            BaseIntrospectionRecognizer.prototype.CONSUME4 = function (tokClass) {
+            Parser.prototype.CONSUME4 = function (tokClass) {
                 return this.consumeInternal(tokClass, 4);
             };
             /**
              * @see CONSUME1
              */
-            BaseIntrospectionRecognizer.prototype.CONSUME5 = function (tokClass) {
+            Parser.prototype.CONSUME5 = function (tokClass) {
                 return this.consumeInternal(tokClass, 5);
             };
             /**
              * Convenience method equivalent to SUBRULE1
              * @see SUBRULE1
              */
-            BaseIntrospectionRecognizer.prototype.SUBRULE = function (ruleToCall, args) {
+            Parser.prototype.SUBRULE = function (ruleToCall, args) {
                 if (args === void 0) { args = []; }
                 return this.SUBRULE1(ruleToCall, args);
             };
@@ -2080,35 +2257,35 @@ var chevrotain;
              * @param {*[]} args the arguments to pass to the invoked subrule
              * @returns {*} the result of invoking ruleToCall
              */
-            BaseIntrospectionRecognizer.prototype.SUBRULE1 = function (ruleToCall, args) {
+            Parser.prototype.SUBRULE1 = function (ruleToCall, args) {
                 if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 1, args);
             };
             /**
              * @see SUBRULE1
              */
-            BaseIntrospectionRecognizer.prototype.SUBRULE2 = function (ruleToCall, args) {
+            Parser.prototype.SUBRULE2 = function (ruleToCall, args) {
                 if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 2, args);
             };
             /**
              * @see SUBRULE1
              */
-            BaseIntrospectionRecognizer.prototype.SUBRULE3 = function (ruleToCall, args) {
+            Parser.prototype.SUBRULE3 = function (ruleToCall, args) {
                 if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 3, args);
             };
             /**
              * @see SUBRULE1
              */
-            BaseIntrospectionRecognizer.prototype.SUBRULE4 = function (ruleToCall, args) {
+            Parser.prototype.SUBRULE4 = function (ruleToCall, args) {
                 if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 4, args);
             };
             /**
              * @see SUBRULE1
              */
-            BaseIntrospectionRecognizer.prototype.SUBRULE5 = function (ruleToCall, args) {
+            Parser.prototype.SUBRULE5 = function (ruleToCall, args) {
                 if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 5, args);
             };
@@ -2116,7 +2293,7 @@ var chevrotain;
              * Convenience method equivalent to OPTION1
              * @see OPTION1
              */
-            BaseIntrospectionRecognizer.prototype.OPTION = function (laFuncOrAction, action) {
+            Parser.prototype.OPTION = function (laFuncOrAction, action) {
                 return this.OPTION1.call(this, laFuncOrAction, action);
             };
             /**
@@ -2142,7 +2319,7 @@ var chevrotain;
              *
              * @returns {boolean} true iff the OPTION's action has been invoked
              */
-            BaseIntrospectionRecognizer.prototype.OPTION1 = function (laFuncOrAction, action) {
+            Parser.prototype.OPTION1 = function (laFuncOrAction, action) {
                 if (action === undefined) {
                     action = laFuncOrAction;
                     laFuncOrAction = this.getLookaheadFuncForOption(1);
@@ -2152,7 +2329,7 @@ var chevrotain;
             /**
              * @see OPTION1
              */
-            BaseIntrospectionRecognizer.prototype.OPTION2 = function (laFuncOrAction, action) {
+            Parser.prototype.OPTION2 = function (laFuncOrAction, action) {
                 if (action === undefined) {
                     action = laFuncOrAction;
                     laFuncOrAction = this.getLookaheadFuncForOption(2);
@@ -2162,7 +2339,7 @@ var chevrotain;
             /**
              * @see OPTION1
              */
-            BaseIntrospectionRecognizer.prototype.OPTION3 = function (laFuncOrAction, action) {
+            Parser.prototype.OPTION3 = function (laFuncOrAction, action) {
                 if (action === undefined) {
                     action = laFuncOrAction;
                     laFuncOrAction = this.getLookaheadFuncForOption(3);
@@ -2172,7 +2349,7 @@ var chevrotain;
             /**
              * @see OPTION1
              */
-            BaseIntrospectionRecognizer.prototype.OPTION4 = function (laFuncOrAction, action) {
+            Parser.prototype.OPTION4 = function (laFuncOrAction, action) {
                 if (action === undefined) {
                     action = laFuncOrAction;
                     laFuncOrAction = this.getLookaheadFuncForOption(4);
@@ -2182,7 +2359,7 @@ var chevrotain;
             /**
              * @see OPTION1
              */
-            BaseIntrospectionRecognizer.prototype.OPTION5 = function (laFuncOrAction, action) {
+            Parser.prototype.OPTION5 = function (laFuncOrAction, action) {
                 if (action === undefined) {
                     action = laFuncOrAction;
                     laFuncOrAction = this.getLookaheadFuncForOption(5);
@@ -2193,7 +2370,7 @@ var chevrotain;
              * Convenience method equivalent to OR1
              * @see OR1
              */
-            BaseIntrospectionRecognizer.prototype.OR = function (alts, errMsgTypes, ignoreAmbiguities) {
+            Parser.prototype.OR = function (alts, errMsgTypes, ignoreAmbiguities) {
                 if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.OR1(alts, errMsgTypes, ignoreAmbiguities);
             };
@@ -2230,35 +2407,35 @@ var chevrotain;
              *                                      that matches will be taken. This is sometimes the grammar's intent.
              *                                      * only enable this if you know what you are doing!
              */
-            BaseIntrospectionRecognizer.prototype.OR1 = function (alts, errMsgTypes, ignoreAmbiguities) {
+            Parser.prototype.OR1 = function (alts, errMsgTypes, ignoreAmbiguities) {
                 if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 1, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
-            BaseIntrospectionRecognizer.prototype.OR2 = function (alts, errMsgTypes, ignoreAmbiguities) {
+            Parser.prototype.OR2 = function (alts, errMsgTypes, ignoreAmbiguities) {
                 if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 2, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
-            BaseIntrospectionRecognizer.prototype.OR3 = function (alts, errMsgTypes, ignoreAmbiguities) {
+            Parser.prototype.OR3 = function (alts, errMsgTypes, ignoreAmbiguities) {
                 if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 3, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
-            BaseIntrospectionRecognizer.prototype.OR4 = function (alts, errMsgTypes, ignoreAmbiguities) {
+            Parser.prototype.OR4 = function (alts, errMsgTypes, ignoreAmbiguities) {
                 if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 4, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
-            BaseIntrospectionRecognizer.prototype.OR5 = function (alts, errMsgTypes, ignoreAmbiguities) {
+            Parser.prototype.OR5 = function (alts, errMsgTypes, ignoreAmbiguities) {
                 if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 5, ignoreAmbiguities);
             };
@@ -2266,7 +2443,7 @@ var chevrotain;
              * Convenience method equivalent to MANY1
              * @see MANY1
              */
-            BaseIntrospectionRecognizer.prototype.MANY = function (lookAheadFunc, action) {
+            Parser.prototype.MANY = function (lookAheadFunc, action) {
                 return this.MANY1.call(this, lookAheadFunc, action);
             };
             /**
@@ -2294,38 +2471,38 @@ var chevrotain;
              *                                  invoked or the action to optionally invoke
              * @param {Function} [action] The action to optionally invoke.
              */
-            BaseIntrospectionRecognizer.prototype.MANY1 = function (laFuncOrAction, action) {
+            Parser.prototype.MANY1 = function (laFuncOrAction, action) {
                 this.manyInternal(this.MANY1, "MANY1", 1, laFuncOrAction, action);
             };
             /**
              * @see MANY1
              */
-            BaseIntrospectionRecognizer.prototype.MANY2 = function (laFuncOrAction, action) {
+            Parser.prototype.MANY2 = function (laFuncOrAction, action) {
                 this.manyInternal(this.MANY2, "MANY2", 2, laFuncOrAction, action);
             };
             /**
              * @see MANY1
              */
-            BaseIntrospectionRecognizer.prototype.MANY3 = function (laFuncOrAction, action) {
+            Parser.prototype.MANY3 = function (laFuncOrAction, action) {
                 this.manyInternal(this.MANY3, "MANY3", 3, laFuncOrAction, action);
             };
             /**
              * @see MANY1
              */
-            BaseIntrospectionRecognizer.prototype.MANY4 = function (laFuncOrAction, action) {
+            Parser.prototype.MANY4 = function (laFuncOrAction, action) {
                 this.manyInternal(this.MANY4, "MANY4", 4, laFuncOrAction, action);
             };
             /**
              * @see MANY1
              */
-            BaseIntrospectionRecognizer.prototype.MANY5 = function (laFuncOrAction, action) {
+            Parser.prototype.MANY5 = function (laFuncOrAction, action) {
                 this.manyInternal(this.MANY5, "MANY5", 5, laFuncOrAction, action);
             };
             /**
              * Convenience method equivalent to AT_LEAST_ONE1
              * @see AT_LEAST_ONE1
              */
-            BaseIntrospectionRecognizer.prototype.AT_LEAST_ONE = function (laFuncOrAction, action, errMsg) {
+            Parser.prototype.AT_LEAST_ONE = function (laFuncOrAction, action, errMsg) {
                 return this.AT_LEAST_ONE1.call(this, laFuncOrAction, action, errMsg);
             };
             /**
@@ -2342,38 +2519,38 @@ var chevrotain;
              * @param {Function} [action] The action to optionally invoke.
              * @param {string} [errMsg] short title/classification to what is being matched
              */
-            BaseIntrospectionRecognizer.prototype.AT_LEAST_ONE1 = function (laFuncOrAction, action, errMsg) {
+            Parser.prototype.AT_LEAST_ONE1 = function (laFuncOrAction, action, errMsg) {
                 this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, laFuncOrAction, action, errMsg);
             };
             /**
              * @see AT_LEAST_ONE1
              */
-            BaseIntrospectionRecognizer.prototype.AT_LEAST_ONE2 = function (laFuncOrAction, action, errMsg) {
+            Parser.prototype.AT_LEAST_ONE2 = function (laFuncOrAction, action, errMsg) {
                 this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, laFuncOrAction, action, errMsg);
             };
             /**
              * @see AT_LEAST_ONE1
              */
-            BaseIntrospectionRecognizer.prototype.AT_LEAST_ONE3 = function (laFuncOrAction, action, errMsg) {
+            Parser.prototype.AT_LEAST_ONE3 = function (laFuncOrAction, action, errMsg) {
                 this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE1", 3, laFuncOrAction, action, errMsg);
             };
             /**
              * @see AT_LEAST_ONE1
              */
-            BaseIntrospectionRecognizer.prototype.AT_LEAST_ONE4 = function (laFuncOrAction, action, errMsg) {
+            Parser.prototype.AT_LEAST_ONE4 = function (laFuncOrAction, action, errMsg) {
                 this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE1", 4, laFuncOrAction, action, errMsg);
             };
             /**
              * @see AT_LEAST_ONE1
              */
-            BaseIntrospectionRecognizer.prototype.AT_LEAST_ONE5 = function (laFuncOrAction, action, errMsg) {
+            Parser.prototype.AT_LEAST_ONE5 = function (laFuncOrAction, action, errMsg) {
                 this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, laFuncOrAction, action, errMsg);
             };
             /**
              * Convenience method, same as RULE with doReSync=false
              * @see RULE
              */
-            BaseIntrospectionRecognizer.prototype.RULE_NO_RESYNC = function (ruleName, impl, invalidRet) {
+            Parser.prototype.RULE_NO_RESYNC = function (ruleName, impl, invalidRet) {
                 return this.RULE(ruleName, impl, invalidRet, false);
             };
             /**
@@ -2386,7 +2563,7 @@ var chevrotain;
              * @returns {Function} The parsing rule which is the impl Function wrapped with the parsing logic that handles
              *                     Parser state / error recovery / ...
              */
-            BaseIntrospectionRecognizer.prototype.RULE = function (ruleName, impl, invalidRet, doReSync) {
+            Parser.prototype.RULE = function (ruleName, impl, invalidRet, doReSync) {
                 if (invalidRet === void 0) { invalidRet = this.defaultInvalidReturn; }
                 if (doReSync === void 0) { doReSync = true; }
                 // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
@@ -2394,7 +2571,8 @@ var chevrotain;
                 var parserClassProductions = cache.getProductionsForClass(this.className);
                 // only build the gast representation once
                 if (!(parserClassProductions.containsKey(ruleName))) {
-                    parserClassProductions.put(ruleName, gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap));
+                    var gastProduction = gastBuilder.buildTopProduction(impl.toString(), ruleName, this.tokensMap);
+                    parserClassProductions.put(ruleName, gastProduction);
                 }
                 var wrappedGrammarRule = function (idxInCallingRule, args) {
                     if (idxInCallingRule === void 0) { idxInCallingRule = 1; }
@@ -2433,11 +2611,11 @@ var chevrotain;
                 wrappedGrammarRule[ruleNamePropName] = ruleName;
                 return wrappedGrammarRule;
             };
-            BaseIntrospectionRecognizer.prototype.ruleInvocationStateUpdate = function (ruleName, idxInCallingRule) {
+            Parser.prototype.ruleInvocationStateUpdate = function (ruleName, idxInCallingRule) {
                 this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
                 this.RULE_STACK.push(ruleName);
             };
-            BaseIntrospectionRecognizer.prototype.ruleFinallyStateUpdate = function () {
+            Parser.prototype.ruleFinallyStateUpdate = function () {
                 this.RULE_STACK.pop();
                 this.RULE_OCCURRENCE_STACK.pop();
                 var maxInputIdx = this._input.length - 1;
@@ -2446,14 +2624,14 @@ var chevrotain;
                     this.SAVE_ERROR(new NotAllInputParsedException("Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok));
                 }
             };
-            BaseIntrospectionRecognizer.prototype.defaultInvalidReturn = function () {
+            Parser.prototype.defaultInvalidReturn = function () {
                 return undefined;
             };
             /**
              * @param ruleFuncName name of the Grammar rule
              * @throws Grammar validation errors if the name is invalid
              */
-            BaseIntrospectionRecognizer.prototype.validateRuleName = function (ruleFuncName) {
+            Parser.prototype.validateRuleName = function (ruleFuncName) {
                 if (!ruleFuncName.match(this.ruleNamePattern)) {
                     throw Error("Invalid Grammar rule name --> " + ruleFuncName + " it must match the pattern: " + this.ruleNamePattern.toString());
                 }
@@ -2462,7 +2640,7 @@ var chevrotain;
                 }
                 this.definedRulesNames.push(ruleFuncName);
             };
-            BaseIntrospectionRecognizer.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
+            Parser.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
                 // TODO: can the resyncTokenType be cached?
                 var reSyncTokType = this.findReSyncTokenType();
                 var orgInputIdx = this.inputIdx;
@@ -2486,7 +2664,7 @@ var chevrotain;
                 // rethrow the exception for farther recovery attempts into rules deeper in the rules stack
                 this.inputIdx = orgInputIdx;
             };
-            BaseIntrospectionRecognizer.prototype.shouldInRepetitionRecoveryBeTried = function (expectTokAfterLastMatch, nextTokIdx) {
+            Parser.prototype.shouldInRepetitionRecoveryBeTried = function (expectTokAfterLastMatch, nextTokIdx) {
                 // arguments to try and perform resync into the next iteration of the many are missing
                 if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
                     return false;
@@ -2509,7 +2687,7 @@ var chevrotain;
                 return true;
             };
             // Error Recovery functionality
-            BaseIntrospectionRecognizer.prototype.getFollowsForInRuleRecovery = function (tokClass, tokIdxInRule) {
+            Parser.prototype.getFollowsForInRuleRecovery = function (tokClass, tokIdxInRule) {
                 var pathRuleStack = _.clone(this.RULE_STACK);
                 var pathOccurrenceStack = _.clone(this.RULE_OCCURRENCE_STACK);
                 var grammarPath = {
@@ -2529,7 +2707,7 @@ var chevrotain;
              * Override this if you require special behavior in your grammar
              * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
              */
-            BaseIntrospectionRecognizer.prototype.getTokenToInsert = function (tokClass) {
+            Parser.prototype.getTokenToInsert = function (tokClass) {
                 return new tokClass(-1, -1);
             };
             /*
@@ -2539,10 +2717,10 @@ var chevrotain;
              * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
              * as the max of the cardinality will be greater than the min value. (and this is a false error!)
              */
-            BaseIntrospectionRecognizer.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
+            Parser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
                 return true;
             };
-            BaseIntrospectionRecognizer.prototype.tryInRuleRecovery = function (expectedTokType, follows) {
+            Parser.prototype.tryInRuleRecovery = function (expectedTokType, follows) {
                 if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
                     var tokToInsert = this.getTokenToInsert(expectedTokType);
                     tokToInsert.isInsertedInRecovery = true;
@@ -2555,10 +2733,10 @@ var chevrotain;
                 }
                 throw new InRuleRecoveryException("sad sad panda");
             };
-            BaseIntrospectionRecognizer.prototype.canPerformInRuleRecovery = function (expectedToken, follows) {
+            Parser.prototype.canPerformInRuleRecovery = function (expectedToken, follows) {
                 return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) || this.canRecoverWithSingleTokenDeletion(expectedToken);
             };
-            BaseIntrospectionRecognizer.prototype.canRecoverWithSingleTokenInsertion = function (expectedTokType, follows) {
+            Parser.prototype.canRecoverWithSingleTokenInsertion = function (expectedTokType, follows) {
                 if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
                     return false;
                 }
@@ -2572,16 +2750,16 @@ var chevrotain;
                 }) !== undefined;
                 return isMisMatchedTokInFollows;
             };
-            BaseIntrospectionRecognizer.prototype.canRecoverWithSingleTokenDeletion = function (expectedTokType) {
+            Parser.prototype.canRecoverWithSingleTokenDeletion = function (expectedTokType) {
                 var isNextTokenWhatIsExpected = this.LA(2) instanceof expectedTokType;
                 return isNextTokenWhatIsExpected;
             };
-            BaseIntrospectionRecognizer.prototype.isInCurrentRuleReSyncSet = function (token) {
+            Parser.prototype.isInCurrentRuleReSyncSet = function (token) {
                 var followKey = this.getCurrFollowKey();
                 var currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey);
                 return _.contains(currentRuleReSyncSet, token);
             };
-            BaseIntrospectionRecognizer.prototype.findReSyncTokenType = function () {
+            Parser.prototype.findReSyncTokenType = function () {
                 var allPossibleReSyncTokTypes = this.flattenFollowSet();
                 // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
                 var nextToken = this.NEXT_TOKEN();
@@ -2595,7 +2773,7 @@ var chevrotain;
                     k++;
                 }
             };
-            BaseIntrospectionRecognizer.prototype.getCurrFollowKey = function () {
+            Parser.prototype.getCurrFollowKey = function () {
                 // the length is at least one as we always add the ruleName to the stack before invoking the rule.
                 if (this.RULE_STACK.length === 1) {
                     return EOF_FOLLOW_KEY;
@@ -2609,7 +2787,7 @@ var chevrotain;
                     inRule: this.RULE_STACK[prevRuleIdx]
                 };
             };
-            BaseIntrospectionRecognizer.prototype.buildFullFollowKeyStack = function () {
+            Parser.prototype.buildFullFollowKeyStack = function () {
                 var _this = this;
                 return _.map(this.RULE_STACK, function (ruleName, idx) {
                     if (idx === 0) {
@@ -2622,27 +2800,27 @@ var chevrotain;
                     };
                 });
             };
-            BaseIntrospectionRecognizer.prototype.flattenFollowSet = function () {
+            Parser.prototype.flattenFollowSet = function () {
                 var _this = this;
                 var followStack = _.map(this.buildFullFollowKeyStack(), function (currKey) {
                     return _this.getFollowSetFromFollowKey(currKey);
                 });
                 return _.flatten(followStack);
             };
-            BaseIntrospectionRecognizer.prototype.getFollowSetFromFollowKey = function (followKey) {
+            Parser.prototype.getFollowSetFromFollowKey = function (followKey) {
                 if (followKey === EOF_FOLLOW_KEY) {
                     return [EOF];
                 }
                 var followName = followKey.ruleName + followKey.idxInCallingRule + IN + followKey.inRule;
                 return cache.getResyncFollowsForClass(this.className).get(followName);
             };
-            BaseIntrospectionRecognizer.prototype.reSyncTo = function (tokClass) {
+            Parser.prototype.reSyncTo = function (tokClass) {
                 var nextTok = this.NEXT_TOKEN();
                 while ((nextTok instanceof tokClass) === false) {
                     nextTok = this.SKIP_TOKEN();
                 }
             };
-            BaseIntrospectionRecognizer.prototype.attemptInRepetitionRecovery = function (prodFunc, args, lookaheadFunc, prodName, prodOccurrence, nextToksWalker, prodKeys) {
+            Parser.prototype.attemptInRepetitionRecovery = function (prodFunc, args, lookaheadFunc, prodName, prodOccurrence, nextToksWalker, prodKeys) {
                 var key = this.getKeyForAutomaticLookahead(prodName, prodKeys, prodOccurrence);
                 var firstAfterRepInfo = this.firstAfterRepMap.get(key);
                 if (firstAfterRepInfo === undefined) {
@@ -2669,7 +2847,7 @@ var chevrotain;
                 }
             };
             // Implementation of parsing DSL
-            BaseIntrospectionRecognizer.prototype.atLeastOneInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg) {
+            Parser.prototype.atLeastOneInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg) {
                 if (_.isString(action)) {
                     errMsg = action;
                     action = lookAheadFunc;
@@ -2681,7 +2859,7 @@ var chevrotain;
                 // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
                 this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
             };
-            BaseIntrospectionRecognizer.prototype.manyInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action) {
+            Parser.prototype.manyInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action) {
                 if (action === undefined) {
                     action = lookAheadFunc;
                     lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence);
@@ -2689,7 +2867,7 @@ var chevrotain;
                 _super.prototype.MANY.call(this, lookAheadFunc, action);
                 this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys);
             };
-            BaseIntrospectionRecognizer.prototype.orInternal = function (alts, errMsgTypes, occurrence, ignoreAmbiguities) {
+            Parser.prototype.orInternal = function (alts, errMsgTypes, occurrence, ignoreAmbiguities) {
                 // explicit alternatives look ahead
                 if (alts[0].WHEN !== undefined) {
                     return _super.prototype.OR.call(this, alts, errMsgTypes);
@@ -2714,7 +2892,7 @@ var chevrotain;
              *
              * @returns the consumed Token
              */
-            BaseIntrospectionRecognizer.prototype.consumeInternal = function (tokClass, idx) {
+            Parser.prototype.consumeInternal = function (tokClass, idx) {
                 try {
                     return _super.prototype.CONSUME.call(this, tokClass);
                 }
@@ -2743,7 +2921,7 @@ var chevrotain;
                     }
                 }
             };
-            BaseIntrospectionRecognizer.prototype.getKeyForAutomaticLookahead = function (prodName, prodKeys, occurrence) {
+            Parser.prototype.getKeyForAutomaticLookahead = function (prodName, prodKeys, occurrence) {
                 var occuMap = prodKeys[occurrence - 1];
                 var currRule = _.last(this.RULE_STACK);
                 var key = occuMap[currRule];
@@ -2754,23 +2932,23 @@ var chevrotain;
                 return key;
             };
             // Automatic lookahead calculation
-            BaseIntrospectionRecognizer.prototype.getLookaheadFuncForOption = function (occurence) {
+            Parser.prototype.getLookaheadFuncForOption = function (occurence) {
                 var key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurence);
                 return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForOption);
             };
-            BaseIntrospectionRecognizer.prototype.getLookaheadFuncForOr = function (occurence, ignoreErrors) {
+            Parser.prototype.getLookaheadFuncForOr = function (occurence, ignoreErrors) {
                 var key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurence);
                 return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForOr, [ignoreErrors]);
             };
-            BaseIntrospectionRecognizer.prototype.getLookaheadFuncForMany = function (occurence) {
+            Parser.prototype.getLookaheadFuncForMany = function (occurence) {
                 var key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence);
                 return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForMany);
             };
-            BaseIntrospectionRecognizer.prototype.getLookaheadFuncForAtLeastOne = function (occurence) {
+            Parser.prototype.getLookaheadFuncForAtLeastOne = function (occurence) {
                 var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence);
                 return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne);
             };
-            BaseIntrospectionRecognizer.prototype.isNextRule = function (ruleName) {
+            Parser.prototype.isNextRule = function (ruleName) {
                 var classLAFuncs = cache.getLookaheadFuncsForClass(this.className);
                 var condition = classLAFuncs.get(ruleName);
                 if (condition === undefined) {
@@ -2780,7 +2958,7 @@ var chevrotain;
                 }
                 return condition.call(this);
             };
-            BaseIntrospectionRecognizer.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, extraArgs) {
+            Parser.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, extraArgs) {
                 if (extraArgs === void 0) { extraArgs = []; }
                 var ruleName = _.last(this.RULE_STACK);
                 var condition = this.classLAFuncs.get(key);
@@ -2792,7 +2970,7 @@ var chevrotain;
                 return condition;
             };
             // other functionality
-            BaseIntrospectionRecognizer.prototype.saveRecogState = function () {
+            Parser.prototype.saveRecogState = function () {
                 var baseState = _super.prototype.saveRecogState.call(this);
                 var savedRuleStack = _.clone(this.RULE_STACK);
                 return {
@@ -2801,16 +2979,16 @@ var chevrotain;
                     RULE_STACK: savedRuleStack
                 };
             };
-            BaseIntrospectionRecognizer.prototype.reloadRecogState = function (newState) {
+            Parser.prototype.reloadRecogState = function (newState) {
                 _super.prototype.reloadRecogState.call(this, newState);
                 this.RULE_STACK = newState.RULE_STACK;
             };
-            BaseIntrospectionRecognizer.prototype.getGAstProductions = function () {
+            Parser.prototype.getGAstProductions = function () {
                 return cache.getProductionsForClass(this.className);
             };
-            return BaseIntrospectionRecognizer;
+            return Parser;
         })(BaseRecognizer);
-        recognizer.BaseIntrospectionRecognizer = BaseIntrospectionRecognizer;
+        recognizer.Parser = Parser;
     })/* istanbul ignore next */ (recognizer = chevrotain.recognizer || /* istanbul ignore next */ (chevrotain.recognizer = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /**
@@ -2822,9 +3000,11 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // runtime API
-    API.Parser = chevrotain.recognizer.BaseIntrospectionRecognizer;
-    API.Lexer = chevrotain.lexer.SimpleLexer;
+    API.Parser = chevrotain.recognizer.Parser;
+    API.Lexer = chevrotain.lexer.Lexer;
     API.Token = chevrotain.tokens.Token;
+    // utilities
+    API.extendToken = chevrotain.tokens.extendToken;
     // grammar reflection API
     API.gast = {};
     API.gast.GAstVisitor = chevrotain.gast.GAstVisitor;
@@ -2856,6 +3036,7 @@ else {
 /// <reference path="../src/parse/cache.ts" />
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
+/// <reference path="../src/parse/grammar/checks.ts" />
 /// <reference path="../src/parse/recognizer.ts" />
 /// <reference path="../src/api.ts" />
 

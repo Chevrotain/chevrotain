@@ -1,21 +1,8 @@
 // ----------------- Lexer -----------------
 var Token = chevrotain.Token;
-
-
-// Javascript inheritance using Object.create().
-// Any inheritance implementation will work as long it works with the instanceof operator.
-function extendToken(className, pattern) {
-    var childConstructor = function (image, offset, startLine, startColumn, endLine, endColumn) {
-        Token.call(this, image, offset, startLine, startColumn, endLine, endColumn);
-    };
-    childConstructor.tokenName = className;
-    childConstructor.prototype = Object.create(Token.prototype);
-    childConstructor.prototype.constructor = childConstructor;
-    childConstructor.PATTERN = pattern;
-    return childConstructor;
-}
-
+var extendToken = chevrotain.extendToken;
 var ChevrotainLexer = chevrotain.Lexer;
+
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
 var True = extendToken("True", /true/);
 var False = extendToken("False", /false/);
