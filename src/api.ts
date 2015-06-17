@@ -13,8 +13,8 @@ var API:any = {}
 /* istanbul ignore next */
 if (!testMode) {
     // runtime API
-    API.Parser = chevrotain.recognizer.BaseIntrospectionRecognizer
-    API.Lexer = chevrotain.lexer.SimpleLexer
+    API.Parser = chevrotain.recognizer.Parser
+    API.Lexer = chevrotain.lexer.Lexer
     API.Token = chevrotain.tokens.Token
 
     // utilities

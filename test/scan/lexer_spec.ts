@@ -8,8 +8,8 @@ module chevrotain.lexer.spec {
     import l = chevrotain.lexer
     import tok = chevrotain.tokens
     import matchers = test.matchers
-    var NA = l.SimpleLexer.NA
-    var SKIPPED = l.SimpleLexer.SKIPPED
+    var NA = l.Lexer.NA
+    var SKIPPED = l.Lexer.SKIPPED
 
 
     export class IntegerTok extends tok.Token { static PATTERN = /^[1-9]\d*/ }
@@ -25,7 +25,7 @@ module chevrotain.lexer.spec {
     patternsToClass[IdentifierTok.PATTERN.toString()] = IdentifierTok
     var patterns:RegExp[] = <any>_.collect(_.values(patternsToClass), "PATTERN")
 
-    var testLexer = new SimpleLexer([BambaTok, IntegerTok, IdentifierTok])
+    var testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok])
 
     describe("The Chevrotain Simple Lexer", function () {
 
@@ -276,7 +276,7 @@ module chevrotain.lexer.spec {
     describe("The Simple Lexer Full flow", function () {
 
         it("can create a simple Lexer from a List of Token Classes", function () {
-            var ifElseLexer = new l.SimpleLexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+            var ifElseLexer = new l.Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
             var input = "if (666) return 1\n" +
                 "\telse return 2"
@@ -293,7 +293,7 @@ module chevrotain.lexer.spec {
 
 
         it("can skip invalid character inputs and only report one error per sequence of characters skipped", function () {
-            var ifElseLexer = new l.SimpleLexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+            var ifElseLexer = new l.Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
 
             var input = "if (666) return 1@#$@#$\n" +
@@ -314,7 +314,7 @@ module chevrotain.lexer.spec {
         })
 
         it("won't go into infinite loops when skipping at end of input", function () {
-            var ifElseLexer = new l.SimpleLexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+            var ifElseLexer = new l.Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
             var input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
             var lexResult = ifElseLexer.tokenize(input)
@@ -326,7 +326,7 @@ module chevrotain.lexer.spec {
         })
 
         it("can deal with line terminators during resync", function () {
-            var ifElseLexer = new l.SimpleLexer([If, Else]) // no newLine tokens those will be resynced
+            var ifElseLexer = new l.Lexer([If, Else]) // no newLine tokens those will be resynced
 
             var input = "if\r\nelse\rif\r"
             var lexResult = ifElseLexer.tokenize(input)
@@ -346,7 +346,7 @@ module chevrotain.lexer.spec {
         })
 
         it("can deal with line terminators inside multi-line Tokens", function () {
-            var ifElseLexer = new l.SimpleLexer([If, Else, WhitespaceNotSkipped]) // no newLine tokens those will be resynced
+            var ifElseLexer = new l.Lexer([If, Else, WhitespaceNotSkipped]) // no newLine tokens those will be resynced
 
             var input = "if\r\r\telse\rif\n"
             var lexResult = ifElseLexer.tokenize(input)
@@ -365,7 +365,7 @@ module chevrotain.lexer.spec {
 
         it("supports Token groups", function () {
 
-            var ifElseLexer = new l.SimpleLexer([If, Else, Comment])
+            var ifElseLexer = new l.Lexer([If, Else, Comment])
             var input = "if//else"
             var lexResult = ifElseLexer.tokenize(input)
 

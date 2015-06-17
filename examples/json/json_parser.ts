@@ -7,8 +7,8 @@ module chevrotain.examples.json {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
     import lex = chevrotain.lexer
-    var NA = lex.SimpleLexer.NA
-    var SKIPPED = lex.SimpleLexer.SKIPPED
+    var NA = lex.Lexer.NA
+    var SKIPPED = lex.Lexer.SKIPPED
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
 
@@ -34,11 +34,11 @@ module chevrotain.examples.json {
 
     // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations
     //       performed by it's constructor only need to be done once.
-    export var JsonLexer = new lex.SimpleLexer(
+    export var JsonLexer = new lex.Lexer(
         [Keyword, WhiteSpace, NumberLiteral, StringLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null])
 
 
-    export class JsonParser extends recog.BaseIntrospectionRecognizer {
+    export class JsonParser extends recog.Parser {
 
         constructor(input:tok.Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
@@ -48,7 +48,7 @@ module chevrotain.examples.json {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         // DOCS: the parsing rules

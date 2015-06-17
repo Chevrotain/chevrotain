@@ -7,8 +7,8 @@ module chevrotain.examples.calculator {
     import recog = chevrotain.recognizer
     import tok = chevrotain.tokens
     import lex = chevrotain.lexer
-    var NA = lex.SimpleLexer.NA
-    var SKIPPED = lex.SimpleLexer.SKIPPED
+    var NA = lex.Lexer.NA
+    var SKIPPED = lex.Lexer.SKIPPED
 
     // DOCS: all Tokens must be defined as subclass of chevrotain.tokens.Token
     export class AdditionOperator extends tok.Token { static PATTERN = NA }
@@ -31,11 +31,11 @@ module chevrotain.examples.calculator {
 
     // DOCS: The lexer should be used as a singleton as using it does not change it's state and the validations
     //       performed by it's constructor only need to be done once.
-    export var CalculatorLexer = new lex.SimpleLexer(
+    export var CalculatorLexer = new lex.Lexer(
         [Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, WhiteSpace])
 
 
-    export class Calculator extends recog.BaseIntrospectionRecognizer {
+    export class Calculator extends recog.Parser {
 
         constructor(input:tok.Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
@@ -45,7 +45,7 @@ module chevrotain.examples.calculator {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         // avoids inserting number literals as these can have multiple(and infinite) semantic values, thus it is unlikely

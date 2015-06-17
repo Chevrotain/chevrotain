@@ -19,7 +19,7 @@ module chevrotain.examples.ecma5 {
     }
 
     // as defined in http://www.ecma-international.org/publications/standards/Ecma-262.htm
-    export class ECMAScript5Parser extends recog.BaseIntrospectionRecognizer {
+    export class ECMAScript5Parser extends recog.Parser {
 
         /*
          * overridden to always enable re-sync and the creation of InvalidRetFunction from Virtual Token class.

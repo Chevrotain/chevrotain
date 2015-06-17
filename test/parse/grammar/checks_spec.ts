@@ -93,11 +93,11 @@ module chevrotain.validations.spec {
         constructor() { super("+", 0, 1, 1) }
     }
 
-    class ErroneousOccurrenceNumUsageParser1 extends recog.BaseIntrospectionRecognizer {
+    class ErroneousOccurrenceNumUsageParser1 extends recog.Parser {
 
         constructor(input:tok.Token[] = []) {
             super(input, [PlusTok])
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         public duplicateRef = this.RULE("duplicateRef", () => {
@@ -110,11 +110,11 @@ module chevrotain.validations.spec {
         })
     }
 
-    class ErroneousOccurrenceNumUsageParser2 extends recog.BaseIntrospectionRecognizer {
+    class ErroneousOccurrenceNumUsageParser2 extends recog.Parser {
 
         constructor(input:tok.Token[] = []) {
             super(input, [PlusTok])
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         public duplicateTerminal = this.RULE("duplicateTerminal", () => {
@@ -123,11 +123,11 @@ module chevrotain.validations.spec {
         })
     }
 
-    class ErroneousOccurrenceNumUsageParser3 extends recog.BaseIntrospectionRecognizer {
+    class ErroneousOccurrenceNumUsageParser3 extends recog.Parser {
 
         constructor(input:tok.Token[] = []) {
             super(input, [PlusTok, MinusTok])
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         public duplicateMany = this.RULE("duplicateMany", () => {

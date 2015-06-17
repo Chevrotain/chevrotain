@@ -24,12 +24,7 @@ module chevrotain.lexer {
 
     export type TokenConstructor = Function
 
-    /**
-     * A RegExp lexer meant to be used for quick prototyping and/or simple grammars.
-     * This is NOT meant to be used in commercial compilers/tooling.
-     * concerns such as performance/extendability/modularity are ignored in this implementation.
-     */
-    export class SimpleLexer {
+    export class Lexer {
 
         public static SKIPPED = {
             description: "This marks a skipped Token pattern, this means each token identified by it will" +
@@ -252,7 +247,7 @@ module chevrotain.lexer {
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
 
         var onlyRelevantClasses = _.reject(tokenClasses, (currClass) => {
-            return currClass[PATTERN] === SimpleLexer.NA
+            return currClass[PATTERN] === Lexer.NA
         })
 
         var allTransformedPatterns = _.map(onlyRelevantClasses, (currClass) => {
@@ -267,7 +262,7 @@ module chevrotain.lexer {
 
         var patternIdxToGroup = _.map(onlyRelevantClasses, (clazz:any) => {
             var groupName = clazz.GROUP
-            if (groupName === SimpleLexer.SKIPPED) {
+            if (groupName === Lexer.SKIPPED) {
                 return undefined
             }
             else if (_.isString(groupName)) {
@@ -442,8 +437,8 @@ module chevrotain.lexer {
             }
             var group = clazz.GROUP
 
-            return group !== SimpleLexer.SKIPPED &&
-                group !== SimpleLexer.NA && !_.isString(group)
+            return group !== Lexer.SKIPPED &&
+                group !== Lexer.NA && !_.isString(group)
         })
 
 

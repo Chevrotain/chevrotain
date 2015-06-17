@@ -22,11 +22,11 @@ module chevrotain.recognizer.spec {
         constructor(image:string) { super(image, 0, 1, 1) }
     }
 
-    class ManyRepetitionRecovery extends BaseIntrospectionRecognizer {
+    class ManyRepetitionRecovery extends Parser {
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
@@ -58,14 +58,14 @@ module chevrotain.recognizer.spec {
         return this.NEXT_TOKEN() instanceof  DotTok
     }
 
-    class SubRuleTestParser extends recog.BaseIntrospectionRecognizer {
+    class SubRuleTestParser extends recog.Parser {
 
         private result = ""
         private index = 1;
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         public topRule = this.RULE("topRule", () => {
@@ -83,14 +83,14 @@ module chevrotain.recognizer.spec {
         })
     }
 
-    class SubRuleArgsParser extends recog.BaseIntrospectionRecognizer {
+    class SubRuleArgsParser extends recog.Parser {
 
         private numbers = ""
         private letters = ""
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         public topRule = this.RULE("topRule", () => {
@@ -109,7 +109,7 @@ module chevrotain.recognizer.spec {
         })
     }
 
-    class CustomLookaheadParser extends recog.BaseIntrospectionRecognizer {
+    class CustomLookaheadParser extends recog.Parser {
 
         private result = ""
         public plusAllowed = true
@@ -117,7 +117,7 @@ module chevrotain.recognizer.spec {
 
         constructor(input:tok.Token[] = []) {
             super(input, <any>chevrotain.recognizer.spec)
-            recog.BaseIntrospectionRecognizer.performSelfAnalysis(this)
+            recog.Parser.performSelfAnalysis(this)
         }
 
         private isPlus():boolean {
@@ -192,7 +192,7 @@ module chevrotain.recognizer.spec {
     describe("The Error Recovery functionality of the IntrospectionParser", function () {
 
         it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([], <any>chevrotain.gastBuilder.spec);
+            var parser:any = new recog.Parser([], <any>chevrotain.gastBuilder.spec);
             parser.reset()
             var testInput = [new IntToken("1"), new PlusTok(),
                 new IntToken("2"), new PlusTok(), new IntToken("3")]
@@ -207,21 +207,21 @@ module chevrotain.recognizer.spec {
         })
 
         it("does not allow duplicate grammar rule names", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([], {});
+            var parser:any = new recog.Parser([], {});
             parser.validateRuleName("bamba") // first time with a valid name.
             expect(() => parser.validateRuleName("bamba")).toThrow(
-                Error("Duplicate definition, rule: bamba is already defined in the grammar: BaseIntrospectionRecognizer"))
+                Error("Duplicate definition, rule: bamba is already defined in the grammar: Parser"))
         })
 
         it("only allows a subset of ECMAScript identifiers as rulenames", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([], {});
+            var parser:any = new recog.Parser([], {});
             expect(() => parser.validateRuleName("1baa")).toThrow()
             expect(() => parser.validateRuleName("שלום")).toThrow()
             expect(() => parser.validateRuleName("$bamba")).toThrow()
         })
 
         it("will not perform inRepetition recovery while in backtracking mode", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([], {})
+            var parser:any = new recog.Parser([], {})
             parser.isBackTrackingStack.push(1)
             expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).toBe(false)
         })
@@ -264,7 +264,7 @@ module chevrotain.recognizer.spec {
         })
 
         it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([new IntToken("1"), new PlusTok()], {})
+            var parser:any = new recog.Parser([new IntToken("1"), new PlusTok()], {})
 
             var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
                 parser.CONSUME1(IntToken)
@@ -295,7 +295,7 @@ module chevrotain.recognizer.spec {
     describe("The BaseRecognizer", function () {
 
         it("can be initialized with a vector of Tokens", function () {
-            var parser:any = new recog.BaseIntrospectionRecognizer([], [PlusTok, MinusTok, IntToken])
+            var parser:any = new recog.Parser([], [PlusTok, MinusTok, IntToken])
             var tokensMap = (<any>parser).tokensMap
             expect(tokensMap.PlusTok).toBe(PlusTok)
             expect(tokensMap.MinusTok).toBe(MinusTok)
@@ -304,7 +304,7 @@ module chevrotain.recognizer.spec {
 
         it("can be initialized with a Dictionary of Tokens", function () {
             var initTokenDictionary = {PlusTok: PlusTok, MinusTok: MinusTok, IntToken: IntToken}
-            var parser:any = new recog.BaseIntrospectionRecognizer([], {
+            var parser:any = new recog.Parser([], {
                 PlusTok:  PlusTok,
                 MinusTok: MinusTok,
                 IntToken: IntToken
@@ -319,15 +319,15 @@ module chevrotain.recognizer.spec {
 
         it("cannot be initialized with other parameters", function () {
             expect(() => {
-                return new recog.BaseIntrospectionRecognizer([], null)
+                return new recog.Parser([], null)
             }).toThrow()
 
             expect(() => {
-                return new recog.BaseIntrospectionRecognizer([], <any>666)
+                return new recog.Parser([], <any>666)
             }).toThrow()
 
             expect(() => {
-                return new recog.BaseIntrospectionRecognizer([], <any>"woof woof")
+                return new recog.Parser([], <any>"woof woof")
             }).toThrow()
         })
 

@@ -17,8 +17,8 @@ module chevrotain.tokens {
         var pattern
 
         if (_.isRegExp(patternOrParent) ||
-            patternOrParent === chevrotain.lexer.SimpleLexer.SKIPPED ||
-            patternOrParent === chevrotain.lexer.SimpleLexer.NA) {
+            patternOrParent === chevrotain.lexer.Lexer.SKIPPED ||
+            patternOrParent === chevrotain.lexer.Lexer.NA) {
             pattern = patternOrParent
         }
         else if (_.isFunction(patternOrParent)) {

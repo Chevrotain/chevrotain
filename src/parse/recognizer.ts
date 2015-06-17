@@ -308,9 +308,9 @@ module chevrotain.recognizer {
      * This is used for more advanced features requiring such information.
      * for example: Error Recovery, Automatic lookahead calculation
      */
-    export class BaseIntrospectionRecognizer extends BaseRecognizer {
+    export class Parser extends BaseRecognizer {
 
-        protected static performSelfAnalysis(classInstance:BaseIntrospectionRecognizer) {
+        protected static performSelfAnalysis(classInstance:Parser) {
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
             if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
