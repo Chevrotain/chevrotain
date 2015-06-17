@@ -24,7 +24,7 @@ the code generation phase.
     * In addition custom lookahead logic can be provided explicitly.
     * Backtracking support.  
 
-  * **High performance** see: [performance comparison](http://jsperf.com/json-parsers-comparison/7)   
+  * **High performance** see: [performance comparison](http://jsperf.com/json-parsers-comparison/8)   
   
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such as automatically generated syntax diagrams or Syntactic error recovery.
   
