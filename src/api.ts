@@ -30,6 +30,7 @@ if (!testMode) {
     API.gast.OR = chevrotain.gast.OR
     API.gast.ProdRef = chevrotain.gast.ProdRef
     API.gast.Terminal = chevrotain.gast.Terminal
+    API.gast.TOP_LEVEL = chevrotain.gast.TOP_LEVEL
 }
 else {
     console.log("running in TEST_MODE")
