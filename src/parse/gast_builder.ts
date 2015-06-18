@@ -26,23 +26,21 @@ module chevrotain.gastBuilder {
     export interface IProdRange {
         range:r.IRange
         text:string
-        // can't simply do 'typeof' IProduction because typeScript does not support 'typeof' on an Interface
         type:ProdType
     }
 
-    // CONSUME1([ns1.ns2.ns3.]LCurlyTok)
     // TODO: this regexp creates a constraint on names of Terminals (Tokens).
     // TODO: document and consider reducing the constraint by expanding the regexp
-    var terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:\w+\s*\.\s*)*(\w+)/
+    var terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
     var terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
-    var refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:\w+\s*\.\s*)*([a-zA-Z_]\w*)/
+    var refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
     var refRegExGlobal = new RegExp(refRegEx.source, "g")
 
     var optionRegEx = /\.\s*OPTION(\d)?\s*\(/
     var optionRegExGlobal = new RegExp(optionRegEx.source, "g")
 
-    var manyRegEx = /\s*.\s*MANY(\d)?\s*\(/
+    var manyRegEx = /.\s*MANY(\d)?\s*\(/
     var manyRegExGlobal = new RegExp(manyRegEx.source, "g")
 
     var atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
