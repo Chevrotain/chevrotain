@@ -1,0 +1,52 @@
+h1 {
+    font-family: Arial;
+    font-size: 30px;
+    color: #4f93ff;
+    text-align: -webkit-auto;
+    padding-left: 8px;
+    padding-top: 8px;
+    margin-top: 0px;
+}
+
+.textArea {
+    background-color: #ffffff;
+    font-family: consolas,"courier new",monospace;
+    font-size: 15px;
+    height: 100%;
+    width: 99%;
+    padding-top: 8px;
+    resize: vertical;
+    border: none;
+}
+
+.textareawrapper {
+    width: 98%;
+    height: 92%;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.rightPart {
+    float: right;
+    width: 39.8%;
+}
+
+.leftPart {
+    float: left;
+    width: 59.8%;
+}
+
+.card {
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+}
+
+.svgWrapper > :first-child {
+    width: 100%;
+}
+
+svg {
+    width: 100%;
+}
