@@ -322,8 +322,15 @@ module chevrotain.recognizer {
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
                 var validationErrors = validations.validateGrammar(grammarProductions.values())
                 if (validationErrors.length > 0) {
+                    //cache the validation errors so they can be thrown each time the parser is instantiated
+                    cache.CLASS_TO_VALIDTATION_ERRORS.put(className, validationErrors)
                     throw new Error (validationErrors.join("-------------------------------\n"))
                 }
+            }
+
+            //Throw the validation errors each time an erroneous parser is instantiated
+            if (cache.CLASS_TO_VALIDTATION_ERRORS.containsKey(className)) {
+                throw new Error (cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"))
             }
         }
 

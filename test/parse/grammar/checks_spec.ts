@@ -211,12 +211,25 @@ module chevrotain.validations.spec {
             expect(thrown).toBe(true)
         })
 
-
         it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
             //noinspection JSUnusedLocalSymbols
             var parser = new ValidOccurrenceNumUsageParser()
         })
 
+        it("will throw validation errors each time the parser is instantiated although they are calculated only once", function () {
+            var thrown = 0
+            for (var x = 1 ; x <= 5 ; x++) {
+                try {
+                    //noinspection JSUnusedLocalSymbols
+                    var parser = new ErroneousOccurrenceNumUsageParser3()
+                    // todo: need to update to jsamine > 2.0.0 on node.js to get support for
+                    // expect(...).toThrow("partial string to match")
+                } catch (e) {
+                    thrown++
+                }
+            }
 
+            expect(thrown).toBe(5)
+        })
     })
 }
