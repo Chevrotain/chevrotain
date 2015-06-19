@@ -1,6 +1,4 @@
 var _ = require('lodash')
-var semver = require('semver')
-var replace = require("replace");
 var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
 var exampleSpecsFiles = require('./scripts/findSpecs')("bin/tsc/examples/", "examples")
@@ -27,34 +25,6 @@ var githubReleaseFiles = ['./package.json',
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
-    var oldVersion = pkg.version
-
-    var PUBLISH_PATCH = "publish_patch"
-    var PUBLISH_MINOR = "publish_minor"
-
-    // manual version increase triggered by current grunt task name
-    // this is needed for compress task which will still output zip/tar with old version
-    // numbers in the file name because 'updateConfigs' of grunt bump cannot update
-    // an expression that has already been evaluated.
-    if (_.includes(process.argv, PUBLISH_PATCH)) {
-        pkg.version = semver.inc(pkg.version, "patch")
-    }
-    else if (_.includes(process.argv, PUBLISH_MINOR)) {
-
-        pkg.version = semver.inc(pkg.version, "minor")
-    }
-
-    var publishMode = false
-    if (oldVersion !== pkg.version) {
-        publishMode = true
-        replace({
-            regex:       oldVersion,
-            replacement: pkg.version,
-            paths:       ['.travis.yml'],
-            recursive:   false,
-            silent:      false
-        });
-    }
 
     // this helps reduce mistakes caused by the interface between the screen and the chair :)
     var bower = grunt.file.readJSON('bower.json')
@@ -255,33 +225,6 @@ module.exports = function(grunt) {
             }
         },
 
-        bump: {
-            options: {
-                files:         ['package.json', 'bower.json'],
-                updateConfigs: ['pkg'],
-                createTag:     false,
-                commit:        false, // commits and pushes should happen only if the build process succeeded
-                push:          false
-            }
-        },
-
-        release: {
-            options: {
-                npm: false, //default: true
-                npmtag: true, //default: no tag
-
-                tagName: 'v<%=version%>',
-                bump:    false, // grunt-bump does this
-                options: {
-                    additionalFiles: ['bower.json', '.travis.yml']
-                },
-                github:  {
-                    repo:           'SAP/chevrotain',
-                    accessTokenVar: 'GITHUB_TOKEN'
-                }
-            }
-        },
-
         // TODO: instead of compressing maybe just commit the generated stuff to github?
         // that would be easy to do as the release jobs already perform a commit...
         compress: {
@@ -320,9 +263,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
     grunt.loadNpmTasks('grunt-jasmine-node-coverage')
-    grunt.loadNpmTasks('grunt-release')
     grunt.loadNpmTasks('grunt-contrib-compress')
-    grunt.loadNpmTasks('grunt-bump')
 
 
     grunt.registerTask('build', releaseBuildTasks)
@@ -338,11 +279,4 @@ module.exports = function(grunt) {
 
 
     grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
-
-
-    // this hack avoids the publish_xxx tasks being available in Intellij's grunt console, thus helps avoid accidental release
-    if (publishMode) {
-        grunt.registerTask(PUBLISH_PATCH, ['bump:patch'].concat(commonReleaseTasks, ['release:patch']))
-        grunt.registerTask(PUBLISH_MINOR, ['bump:minor'].concat(commonReleaseTasks, ['release:minor']))
-    }
 }

@@ -40,24 +40,26 @@
     "url": "git://github.com/SAP/chevrotain.git"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "release_patch": "node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch",
+    "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor"
   },
   "dependencies": {
     "lodash": "~3.9.3"
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
-    "grunt-bump": "^0.3.1",
+    "gitty": "^3.2.3",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compress": "^0.13.0",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-jasmine-node-coverage": "^0.4.1",
     "grunt-karma": "~0.11.0",
-    "grunt-release": "^0.13.0",
     "grunt-ts": "~4.1.0",
     "grunt-tslint": "~2.2.0-beta",
     "grunt-umd": "~2.3.3",
+    "jsonfile": "^2.1.1",
     "karma": "~0.12.33",
     "karma-chrome-launcher": "~0.1.12",
     "karma-firefox-launcher": "~0.1.6",
@@ -66,7 +68,6 @@
     "karma-sauce-launcher": "~0.2.11",
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
-    "replace": "^0.3.0",
     "semver": "^4.3.6",
     "tslint": "~2.2.0-beta",
     "wrench": "~1.5.8"

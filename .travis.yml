@@ -18,4 +18,5 @@ deploy:
     - package/chevrotain-binaries-0.3.4.zip
     - package/chevrotain-binaries-0.3.4.tar.gz
   on:
-    tags
+    tags : true
+    all_branches: true
