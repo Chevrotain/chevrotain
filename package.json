@@ -65,6 +65,7 @@
     "karma-sauce-launcher": "~0.2.11",
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
+    "semver": "^4.3.6",
     "tslint": "~2.2.0-beta",
     "wrench": "~1.5.8"
   }

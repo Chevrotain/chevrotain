@@ -1,9 +1,10 @@
 var _ = require('lodash')
+var semver = require('semver')
 var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
 var exampleSpecsFiles = require('./scripts/findSpecs')("bin/tsc/examples/", "examples")
 
-var ecma5Includes = findRefs('./build/ecma5.ts', "bin/tsc/");
+var ecma5Includes = findRefs('./build/ecma5.ts', "bin/tsc/")
 
 exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
     return _.contains(item, "ecmascript5") && !_.contains(item, "spec")
@@ -20,11 +21,27 @@ var githubReleaseFiles = ['./package.json',
     './readme.md'
 ]
 
+
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
-    var bower = grunt.file.readJSON('bower.json')
 
+    var PUBLISH_PATCH = "publish_patch"
+    var PUBLISH_MINOR = "publish_minor"
+
+    // manual version increase triggered by current grunt task name
+    // this is needed for compress task which will still output zip/tar with old version
+    // numbers in the file name because 'updateConfigs' of grunt bump cannot update
+    // an expression that has already been evaluated.
+    if (_.includes(process.argv, PUBLISH_PATCH)) {
+        pkg.version = semver.inc(pkg.version, "patch")
+    }
+    else if (_.includes(process.argv, PUBLISH_MINOR)) {
+        pkg.version = semver.inc(pkg.version, "minor")
+    }
+
+    // this helps reduce mistakes caused by the interface between the screen and the chair :)
+    var bower = grunt.file.readJSON('bower.json')
     if (pkg.dependencies.lodash !== bower.dependencies.lodash) {
         throw Error("mismatch in bower and npm lodash dependency version")
     }
@@ -184,10 +201,10 @@ module.exports = function(grunt) {
                 process: function fixTSModulePatternForCoverage(src, filePath) {
                     // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
                     var fixed2PartsModules = src.replace(
-                        /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{\}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
+                        /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
 
                     var fixedAllModulesPattern = fixed2PartsModules.replace(
-                        /(\(chevrotain \|\| \(chevrotain = \{\}\)\);)/g, "/* istanbul ignore next */ $1")
+                        /(\(chevrotain \|\| \(chevrotain = \{}\)\);)/g, "/* istanbul ignore next */ $1")
 
                     var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];",
                         "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
@@ -225,7 +242,7 @@ module.exports = function(grunt) {
                 files: ['package.json', 'bower.json'],
                 updateConfigs: ['pkg'],
                 createTag: false,
-                commit: false,
+                commit: false, // commits and pushes should happen only if the build process succeeded
                 push: false
             }
         },
@@ -234,6 +251,9 @@ module.exports = function(grunt) {
             options: {
                 tagName: 'v<%=version%>',
                 bump:    false, // grunt-bump does this
+                options: {
+                    additionalFiles: ['bower.json']
+                },
                 github:  {
                     repo:        'SAP/chevrotain',
                     usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
@@ -241,9 +261,10 @@ module.exports = function(grunt) {
                     // github token must be defined as an env parameter
                 }
             }
-
         },
 
+        // TODO: instead of compressing maybe just commit the generated stuff to github?
+        // that would be easy to do as the release jobs already perform a commit...
         compress: {
             github_release_zip: {
                 options: {
@@ -281,8 +302,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat')
     grunt.loadNpmTasks('grunt-jasmine-node-coverage')
     grunt.loadNpmTasks('grunt-release')
-    grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-contrib-compress')
+    grunt.loadNpmTasks('grunt-bump')
 
 
     grunt.registerTask('build', releaseBuildTasks)
@@ -299,7 +320,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
 
-    grunt.registerTask('publish_patch', ['bump:patch'].concat(commonReleaseTasks, ['release:patch']))
-    grunt.registerTask('publish_minor', ['bump:minor'].concat(commonReleaseTasks, ['release:minor']))
+    grunt.registerTask(PUBLISH_PATCH, ['bump:patch'].concat(commonReleaseTasks,  ['release:patch']))
+    grunt.registerTask(PUBLISH_MINOR, ['bump:minor'].concat(commonReleaseTasks, ['release:minor']))
 
 }
