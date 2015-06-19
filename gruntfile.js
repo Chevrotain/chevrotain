@@ -1,8 +1,10 @@
 var _ = require('lodash')
 var semver = require('semver')
+var replace = require("replace");
 var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
 var exampleSpecsFiles = require('./scripts/findSpecs')("bin/tsc/examples/", "examples")
+
 
 var ecma5Includes = findRefs('./build/ecma5.ts', "bin/tsc/")
 
@@ -25,6 +27,7 @@ var githubReleaseFiles = ['./package.json',
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
+    var oldVersion = pkg.version
 
     var PUBLISH_PATCH = "publish_patch"
     var PUBLISH_MINOR = "publish_minor"
@@ -37,7 +40,20 @@ module.exports = function(grunt) {
         pkg.version = semver.inc(pkg.version, "patch")
     }
     else if (_.includes(process.argv, PUBLISH_MINOR)) {
+
         pkg.version = semver.inc(pkg.version, "minor")
+    }
+
+    var publishMode = false
+    if (oldVersion !== pkg.version) {
+        publishMode = true
+        replace({
+            regex:       oldVersion,
+            replacement: pkg.version,
+            paths:       ['.travis.yml'],
+            recursive:   false,
+            silent:      false
+        });
     }
 
     // this helps reduce mistakes caused by the interface between the screen and the chair :)
@@ -56,6 +72,7 @@ module.exports = function(grunt) {
                 singleRun:  true,
                 browsers:   ['Chrome']
             },
+
             dev_build: {},
 
             tests_on_browsers: {
@@ -104,6 +121,7 @@ module.exports = function(grunt) {
             options: {
                 configuration: grunt.file.readJSON("tslint.json")
             },
+
             files:   {
                 // performance_spec causes issues with TS-Lint randomly crashing due to a very large sample string it contains.
                 src: ['src/**/*.ts', 'test/**/*.ts', 'examples/**/*.ts', '!test/performance/performance_spec.ts']
@@ -116,6 +134,7 @@ module.exports = function(grunt) {
                 fast: "never"
 
             },
+
             dev_build: {
                 src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
                 outDir: "bin/gen"
@@ -187,7 +206,6 @@ module.exports = function(grunt) {
                     }
                 }
             }
-
         },
 
         clean:  {
@@ -239,11 +257,11 @@ module.exports = function(grunt) {
 
         bump: {
             options: {
-                files: ['package.json', 'bower.json'],
+                files:         ['package.json', 'bower.json'],
                 updateConfigs: ['pkg'],
-                createTag: false,
-                commit: false, // commits and pushes should happen only if the build process succeeded
-                push: false
+                createTag:     false,
+                commit:        false, // commits and pushes should happen only if the build process succeeded
+                push:          false
             }
         },
 
@@ -252,13 +270,11 @@ module.exports = function(grunt) {
                 tagName: 'v<%=version%>',
                 bump:    false, // grunt-bump does this
                 options: {
-                    additionalFiles: ['bower.json']
+                    additionalFiles: ['bower.json', '.travis.yml']
                 },
                 github:  {
-                    repo:        'SAP/chevrotain',
-                    usernameVar: 'GITHUB_USERNAME', //ENVIRONMENT VARIABLE that contains Github username
-                    passwordVar: 'GITHUB_PASSWORD' // ENVIRONMENT VARIABLE that contains Github password or token
-                    // github token must be defined as an env parameter
+                    repo:           'SAP/chevrotain',
+                    accessTokenVar: 'GITHUB_TOKEN'
                 }
             }
         },
@@ -320,7 +336,10 @@ module.exports = function(grunt) {
 
     grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
 
-    grunt.registerTask(PUBLISH_PATCH, ['bump:patch'].concat(commonReleaseTasks,  ['release:patch']))
-    grunt.registerTask(PUBLISH_MINOR, ['bump:minor'].concat(commonReleaseTasks, ['release:minor']))
 
+    // this hack avoids the publish_xxx tasks being available in Intellij's grunt console, thus helps avoid accidental release
+    if (publishMode) {
+        grunt.registerTask(PUBLISH_PATCH, ['bump:patch'].concat(commonReleaseTasks, ['release:patch']))
+        grunt.registerTask(PUBLISH_MINOR, ['bump:minor'].concat(commonReleaseTasks, ['release:minor']))
+    }
 }

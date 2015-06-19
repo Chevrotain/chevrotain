@@ -1,12 +1,21 @@
 language: node_js
 cache:
   directories:
-    - node_modules
+  - node_modules
 node_js:
-  - "0.12"
+- '0.12'
 before_install: npm install -g grunt-cli bower
 install:
-  - npm install
-  - bower install
+- npm install
+- bower install
 before_script: grunt build
 after_script: cat ./bin/coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
+deploy:
+  provider: releases
+  api_key:
+    secure: DNq1wbqLPHVpJPDx9O89HZM+RJB6v2R7/wk8pok7Z8NT72kUWdvbqcThGhczPO4sZ8cUTJ3ergTCE8hs9mynlR/lX6932U4fj4+uICQL9+G+deBB/t2SNyTBllkE64WrJ9BKmQvIk/Chh7ZJOM0Fro3p2BIq3JsVnfYg1tZ3U5o=
+  file:
+    - package/chevrotain-binaries-0.3.3.zip
+    - package/chevrotain-binaries-0.3.3.tar.gz
+  on:
+    tags
