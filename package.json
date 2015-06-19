@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.2",
+    "grunt-bump": "^0.3.1",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compress": "^0.13.0",
