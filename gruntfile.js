@@ -267,6 +267,9 @@ module.exports = function(grunt) {
 
         release: {
             options: {
+                npm: false, //default: true
+                npmtag: true, //default: no tag
+
                 tagName: 'v<%=version%>',
                 bump:    false, // grunt-bump does this
                 options: {
