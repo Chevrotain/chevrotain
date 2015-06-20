@@ -11,12 +11,22 @@ install:
 before_script: grunt build
 after_script: cat ./bin/coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
 deploy:
-  provider: releases
-  api_key:
-    secure: DNq1wbqLPHVpJPDx9O89HZM+RJB6v2R7/wk8pok7Z8NT72kUWdvbqcThGhczPO4sZ8cUTJ3ergTCE8hs9mynlR/lX6932U4fj4+uICQL9+G+deBB/t2SNyTBllkE64WrJ9BKmQvIk/Chh7ZJOM0Fro3p2BIq3JsVnfYg1tZ3U5o=
-  file:
-    - package/chevrotain-binaries-0.3.4.zip
-    - package/chevrotain-binaries-0.3.4.tar.gz
-  on:
-    tags : true
-    all_branches: true
+  - provider: releases
+    api_key:
+      secure: DNq1wbqLPHVpJPDx9O89HZM+RJB6v2R7/wk8pok7Z8NT72kUWdvbqcThGhczPO4sZ8cUTJ3ergTCE8hs9mynlR/lX6932U4fj4+uICQL9+G+deBB/t2SNyTBllkE64WrJ9BKmQvIk/Chh7ZJOM0Fro3p2BIq3JsVnfYg1tZ3U5o=
+    file:
+      - package/chevrotain-binaries-0.3.4.zip
+      - package/chevrotain-binaries-0.3.4.tar.gz
+    on:
+      tags : true
+      all_branches: true
+    skip_cleanup: true
+
+  - provider: npm
+    email: shahar.soel@gmail.com
+    api_key:
+      secure: AF/0Qu5UX6uOXHA4+SuO5SUVVtoMPkdriDW/w8gv30Suoxcl/Lyt6CtpIXbEIpG/GTi8Fcia6ZLsJExMDOJjfmVo/fMLfUBDQPw2EUngEc1msse2iADdfQV/H9eFTPg3hla+KSPbLTurGeJcLdqOIZk4y8pDHZV1S/qnHfOsEDM=
+    on:
+      tags: true
+      all_branches: true
+    skip_cleanup: true
