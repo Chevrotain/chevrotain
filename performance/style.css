@@ -1,3 +1,10 @@
+* {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+#resultsTable {
+    width: 50%;
+    border-collapse: collapse;
+}
 table, th, td {
     border: 1px solid black;
 }

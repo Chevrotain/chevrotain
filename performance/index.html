@@ -18,16 +18,26 @@
 <script src="jsonParsers/jison/jisonParser.js"></script>
 
 <script src="jsonParsers/pegjs/pegjs_jison_parser.js"></script>
-<table id="resultsTable">
-    <tr>
-        <td style="font-weight: bold">Parser Generator Configuration</td>
-        <td style="font-weight: bold">ops/second</td>
-        <td style="font-weight: bold">Number of Iterations</td>
-    </tr>
-</table>
-<p id="fastestInResults"></p>
+<div align="center">
+    <span id="wait">Running</span>
+    <table id="resultsTable">
+        <tr>
+            <td style="font-weight: bold">Parser Generator Configuration</td>
+            <td style="font-weight: bold">ops/second</td>
+            <td style="font-weight: bold">Number of Iterations</td>
+        </tr>
+    </table>
+    <p id="fastestInResults"></p>
+</div>
 <script>
-
+    var dots = window.setInterval( function() {
+        var wait = document.getElementById("wait");
+        var valueBeforeTheDots = "Running";
+        if ( wait.innerHTML.length > valueBeforeTheDots.length + 3 )
+            wait.innerHTML = "Running";
+        else
+            wait.innerHTML += ".";
+    }, 500);
     var suite = new Benchmark.Suite;
     suite
             .add('Jison Generated Parser + lexer', function () {
@@ -57,6 +67,8 @@
                 var sFastest = 'Fastest is ' + this.filter('fastest').pluck('name');
                 console.log(sFastest);
                 document.getElementById("fastestInResults").innerHTML = sFastest;
+                window.clearInterval(dots);
+                document.getElementById("wait").innerHTML = "";
             }).run({'async': true});
 
 </script>
