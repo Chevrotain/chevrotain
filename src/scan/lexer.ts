@@ -9,7 +9,6 @@ module chevrotain.lexer {
 
     var PATTERN = "PATTERN"
 
-
     export interface ILexingResult {
         tokens:tok.Token[]
         groups:{ [groupName: string] : tok.Token }
@@ -331,7 +330,7 @@ module chevrotain.lexer {
 
         var duplicates = findDuplicatePatterns(tokenClasses)
         if (!_.isEmpty(duplicates)) {
-            throw new Error(invalidFlags.join("\n ---------------- \n"))
+            throw new Error(duplicates.join("\n ---------------- \n"))
         }
 
         var invalidGroupType = findInvalidGroupType(tokenClasses)
@@ -400,7 +399,8 @@ module chevrotain.lexer {
         var found = []
         var identicalPatterns = _.map(tokenClasses, (outerClass:any) => {
             return _.reduce(tokenClasses, (result, innerClass:any) => {
-                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass)) {
+                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) &&
+                    innerClass.PATTERN !== Lexer.NA) {
                     // this avoids duplicates in the result, each class may only appear in one "set"
                     // in essence we are creating Equivalence classes on equality relation.
                     found.push(innerClass)

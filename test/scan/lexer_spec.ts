@@ -63,6 +63,10 @@ module chevrotain.lexer.spec {
         static PATTERN = NA
     }
 
+    class ValidNaPattern2 extends tok.Token {
+        static PATTERN = NA
+    }
+
     class InvalidPattern extends tok.Token {
         static PATTERN = "BAMBA"
     }
@@ -158,6 +162,11 @@ module chevrotain.lexer.spec {
 
         it("won't detect valid patterns as duplicates", function () {
             var result = l.findDuplicatePatterns([MultiLinePattern, IntegerValid])
+            expect(result.length).toBe(0)
+        })
+
+        it("won't detect NA patterns as duplicates", function () {
+            var result = l.findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
             expect(result.length).toBe(0)
         })
 
