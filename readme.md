@@ -188,34 +188,13 @@ the code generation phase.
 ```
 
 ## Getting Started
-The best place to start is the [examples folder](https://github.com/SAP/chevrotain/tree/master/examples):
-* The most basic one is: [Json Parser](https://github.com/SAP/chevrotain/blob/master/examples/json/json_parser.ts)
-* A more complex one is: [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
-* Plain Javascript example in node.js: [Json Parser Plain.js](https://github.com/Chevrotain/examples_nodejs)
-* Using jison-lex for the lexing phase: [Plain.js with jison-lex](https://github.com/Chevrotain/examples_jison-lex)
+The best way to start is by looking at some running examples:
 
-Note that The examples in the examples folder are written in Typescript.
-To see the generated(readable) javascript code: 
-
-only once:
-* $ npm install -g grunt
-* $ npm install -g bower
-* $ npm install
-
-to run the dev build and generate the javascript sources:
-* $ grunt dev_build
-* now look in: bin\gen\examples folder
-
-To debug the example's tests using chrome developer tools:
-
-only once:
-* $ bower install
-* $ npm install -g karma
-
-each time:
-* $ karma start
-* in the karma chrome window press the debug button   
-* open developer tools(F12), add breakpoints and refresh the page to rerun the tests
+* [Json Parser](https://github.com/Chevrotain/examples_nodejs/blob/master/jsonParser.js)
+* [Simple Calculator](https://github.com/Chevrotain/examples_nodejs/blob/master/calculator.js)
+* [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
+* [Lexer advanced features](https://github.com/Chevrotain/examples_lexer)
+* [and more](https://github.com/Chevrotain)
 
 
 ## Dependencies
@@ -228,6 +207,3 @@ The Generated artifact(chevrotain.js) should run on any modern Javascript ES5 ru
 * The dependency to lodash is imported via [UMD](https://github.com/umdjs/umd),
   in order to make chevrotain.js portable to multiple environments.
   
-
-## Development
-Chevrotain was originally developed and is maintained by Shahar Soel
