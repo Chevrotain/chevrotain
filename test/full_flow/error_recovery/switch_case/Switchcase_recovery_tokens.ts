@@ -1,4 +1,4 @@
-/// <reference path="../../../src/scan/tokens.ts" />
+/// <reference path="../../../../src/scan/tokens.ts" />
 
 module chevrotain.examples.recovery.switchcase {
 
