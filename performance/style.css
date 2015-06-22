@@ -2,9 +2,32 @@
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 }
 #resultsTable {
-    width: 50%;
+    width: 80%;
     border-collapse: collapse;
 }
 table, th, td {
     border: 1px solid black;
+}
+
+body {
+    background-color: #f1f1f1;
+}
+
+.card {
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    width: 50%;
+}
+
+section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
 }
