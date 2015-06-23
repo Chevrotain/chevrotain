@@ -1,8 +1,3 @@
-/// <reference path="../../src/scan/tokens.ts" />
-/// <reference path="../../src/parse/recognizer.ts" />
-/// <reference path="../utils/matchers.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/jasmine.d.ts" />
 
 module chevrotain.recognizer.lookahead.spec {
 

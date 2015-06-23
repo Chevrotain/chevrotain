@@ -1,6 +1,3 @@
-/// <reference path="gast.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
-
 // TODO: rename to validations ?
 module chevrotain.validations {
 

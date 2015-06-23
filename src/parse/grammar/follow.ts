@@ -1,9 +1,3 @@
-/// <reference path="../../scan/tokens.ts" />
-/// <reference path="gast.ts" />
-/// <reference path="rest.ts" />
-/// <reference path="first.ts" />
-/// <reference path="../constants.ts" />
-/// <reference path="../../lang/lang_extensions.ts" />
 
 module chevrotain.follow {
 

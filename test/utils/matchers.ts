@@ -1,5 +1,3 @@
-/// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/jasmine.d.ts" />
 
 module test.matchers {
 

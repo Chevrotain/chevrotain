@@ -1,7 +1,3 @@
-/// <reference path="../../src/scan/tokens.ts" />
-/// <reference path="../../src/scan/lexer.ts" />
-/// <reference path="../utils/matchers.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
 
 module chevrotain.lexer.spec {
 

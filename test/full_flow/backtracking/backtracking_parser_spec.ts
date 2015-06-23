@@ -1,7 +1,3 @@
-/// <reference path="backtracking_parser.ts" />
-/// <reference path="../../../src/scan/tokens.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
-
 
 module chevrotain.examples.backtracking.spec {
 

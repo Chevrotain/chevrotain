@@ -1,8 +1,3 @@
-/// <reference path="../../../src/parse/grammar/lookahead.ts" />
-/// <reference path="../../../src/parse/recognizer.ts" />
-/// <reference path="samples.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
-/// <reference path="../../utils/matchers.ts" />
 
 module chevrotain.lookahead.spec {
 

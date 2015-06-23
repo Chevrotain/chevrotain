@@ -1,10 +1,3 @@
-/// <reference path="grammar/samples.ts" />
-/// <reference path="../../src/text/range.ts" />
-/// <reference path="../../src/parse/gast_builder.ts" />
-/// <reference path="../utils/matchers.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/jasmine.d.ts" />
-
 module chevrotain.gastBuilder.spec {
 
     import r = chevrotain.range
@@ -99,11 +92,11 @@ module chevrotain.gastBuilder.spec {
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             expect(refText[0]).toBe(".OPTION(this.isRequiredKw, ()=> {\r\n" +
-            "                requiredKW = this.CONSUME1(tok.RequiredTok)\r\n" +
-            "            })")
+                "                requiredKW = this.CONSUME1(tok.RequiredTok)\r\n" +
+                "            })")
             expect(refText[1]).toBe(".OPTION(this.isKeyKw, ()=> {\r\n" +
-            "                keyKW = this.CONSUME1(tok.KeyTok)\r\n" +
-            "            })")
+                "                keyKW = this.CONSUME1(tok.KeyTok)\r\n" +
+                "            })")
         })
 
         it("can extract 'at least one' IPRODRanges from a text", function () {
@@ -127,10 +120,10 @@ module chevrotain.gastBuilder.spec {
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             expect(refText[0]).toBe(".MANY(this.isAdditionalArgument, () => {\r\n" +
-            "                    commas.push(this.CONSUME1(tok.CommaTok))\r\n" +
-            "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
-            "                }\r\n" +
-            "            )")
+                "                    commas.push(this.CONSUME1(tok.CommaTok))\r\n" +
+                "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
+                "                }\r\n" +
+                "            )")
         })
 
         it("can extract 'or' IPRODRanges from a text", function () {
@@ -143,13 +136,13 @@ module chevrotain.gastBuilder.spec {
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             expect(refText[0]).toBe(".OR([\r\n" +
-            "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
-            "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
-            "                }},\r\n" +
-            "                {WHEN: ()=> {return true}, THEN_DO: ()=> {\r\n" +
-            "                    return this.SUBRULE(this.assignedTypeSpecImplicit)\r\n" +
-            "                }}\r\n" +
-            "            ], \"\")")
+                "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
+                "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
+                "                }},\r\n" +
+                "                {WHEN: ()=> {return true}, THEN_DO: ()=> {\r\n" +
+                "                    return this.SUBRULE(this.assignedTypeSpecImplicit)\r\n" +
+                "                }}\r\n" +
+                "            ], \"\")")
         })
 
         it("can extract all IPRODRanges from a text", function () {
@@ -227,8 +220,8 @@ module chevrotain.gastBuilder.spec {
             b.terminalNameToConstructor = <any>tok
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.CONSUME2(tok.IdentTok)",
-                type: b.ProdType.TERMINAL
+                text:  "this.CONSUME2(tok.IdentTok)",
+                type:  b.ProdType.TERMINAL
             }, [])
             expect(actual).toEqual(jasmine.any(gast.Terminal))
             expect((<gast.Terminal>actual).occurrenceInParent).toBe(2)
@@ -239,8 +232,8 @@ module chevrotain.gastBuilder.spec {
             b.terminalNameToConstructor = {}
             var buildMissingTerminal = () => b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.CONSUME2(tok.IdentTok)",
-                type: b.ProdType.TERMINAL
+                text:  "this.CONSUME2(tok.IdentTok)",
+                type:  b.ProdType.TERMINAL
             }, [])
 
             expect(buildMissingTerminal).toThrow(Error("Terminal Token name: " + "IdentTok" + " not found"))
@@ -249,8 +242,8 @@ module chevrotain.gastBuilder.spec {
         it("can build a Ref Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.SUBRULE(this.bamba(1))",
-                type: b.ProdType.REF
+                text:  "this.SUBRULE(this.bamba(1))",
+                type:  b.ProdType.REF
             }, [])
             expect(actual).toEqual(jasmine.any(gast.ProdRef))
             expect((<gast.ProdRef>actual).occurrenceInParent).toBe(1)
@@ -272,8 +265,8 @@ module chevrotain.gastBuilder.spec {
         it("can build an AT_LEAST_ONE Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.AT_LEAST_ONE(...)",
-                type: b.ProdType.AT_LEAST_ONE
+                text:  "this.AT_LEAST_ONE(...)",
+                type:  b.ProdType.AT_LEAST_ONE
             }, [])
             expect(actual).toEqual(jasmine.any(gast.AT_LEAST_ONE))
             expect((<gast.AT_LEAST_ONE>actual).definition.length).toBe(0)
@@ -282,8 +275,8 @@ module chevrotain.gastBuilder.spec {
         it("can build an OPTION Production from a RangeProd", function () {
             var actual = b.buildProdGast({
                 range: new r.Range(1, 2),
-                text: "this.OPTION(...)",
-                type: b.ProdType.OPTION
+                text:  "this.OPTION(...)",
+                type:  b.ProdType.OPTION
             }, [])
             expect(actual).toEqual(jasmine.any(gast.OPTION))
             expect((<gast.OPTION>actual).definition.length).toBe(0)

@@ -1,5 +1,3 @@
-/// <reference path="../../../src/scan/tokens.ts" />
-/// <reference path="../../../src/parse/grammar/gast.ts" />
 
 module test.samples {
 

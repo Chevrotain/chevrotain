@@ -1,7 +1,6 @@
-/// <reference path="grammar/interpreter.ts" />
-
 /**
- *  Module used to cache static information about parsers,
+ *
+module used to cache static information about parsers,
  */
 module chevrotain.cache {
     export var CLASS_TO_VALIDTATION_ERRORS = new lang.HashTable<string[]>()

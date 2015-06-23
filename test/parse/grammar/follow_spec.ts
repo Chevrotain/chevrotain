@@ -1,11 +1,3 @@
-/// <reference path="samples.ts" />
-/// <reference path="../../../src/parse/grammar/follow.ts" />
-/// <reference path="../../../src/scan/tokens.ts" />
-/// <reference path="../../../src/parse/grammar/gast.ts" />
-/// <reference path="../../utils/matchers.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
-
 
 module chevrotain.follow.spec {
 

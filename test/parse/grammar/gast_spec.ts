@@ -1,10 +1,7 @@
-/// <reference path="../../utils/matchers.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
 
 module chevrotain.gast.spec {
 
-    describe("GAst Module", function () {
+    describe("GAst module", function () {
 
         describe("the ProdRef class", function () {
 

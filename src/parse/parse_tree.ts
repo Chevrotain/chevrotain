@@ -1,6 +1,3 @@
-/// <reference path="../scan/tokens.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-
 // todo: consider if this module really belongs in chevrotain?
 module chevrotain.tree {
 

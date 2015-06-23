@@ -1,8 +1,3 @@
-/// <reference path="gast.ts" />
-/// <reference path="../../scan/tokens.ts" />
-/// <reference path="path.ts" />
-/// <reference path="interpreter.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
 
 module chevrotain.lookahead {
 

@@ -1,6 +1,3 @@
-/// <reference path="../lang/lang_extensions.ts" />
-/// <reference path="../scan/tokens.ts" />
-
 // using only root module name ('chevrotain') and not a longer name ('chevrotain.lexer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
 // TODO: examine module in module to reduce spam on chevrotain namespace
@@ -52,7 +49,8 @@ module chevrotain {
          *     this is usually used for ignoring whitespace/comments
          *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
          *
-         *  3. With a PATTERN property that has the value of the var NA define in this module.
+         *  3. With a PATTERN property that has the value of the var NA define in this
+module.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
          *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *

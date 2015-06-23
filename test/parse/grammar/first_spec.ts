@@ -1,7 +1,3 @@
-/// <reference path="../../../src/parse/grammar/follow.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
-/// <reference path="samples.ts" />
-/// <reference path="../../utils/matchers.ts" />
 
 module chevrotain.first.spec {
 

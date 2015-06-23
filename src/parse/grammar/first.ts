@@ -1,5 +1,3 @@
-/// <reference path="gast.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
 
 module chevrotain.first {
 

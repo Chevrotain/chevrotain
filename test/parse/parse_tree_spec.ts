@@ -1,9 +1,3 @@
-/// <reference path="grammar/samples.ts" />
-/// <reference path="../../src/text/range.ts" />
-/// <reference path="../../src/parse/gast_builder.ts" />
-/// <reference path="../utils/matchers.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/jasmine.d.ts" />
 
 module chevrotain.gastBuilder.spec {
 

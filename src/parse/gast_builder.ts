@@ -1,9 +1,3 @@
-/// <reference path="../text/range.ts" />
-/// <reference path="../lang/lang_extensions.ts" />
-/// <reference path="grammar/gast.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-
-
 // module for building the GAst representation of a Grammar
 module chevrotain.gastBuilder {
 

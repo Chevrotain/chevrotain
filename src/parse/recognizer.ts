@@ -1,15 +1,3 @@
-/// <reference path="../lang/lang_extensions.ts" />
-/// <reference path="cache.ts" />
-/// <reference path="../scan/tokens.ts" />
-/// <reference path="grammar/gast.ts" />
-/// <reference path="gast_builder.ts" />
-/// <reference path="constants.ts" />
-/// <reference path="grammar/interpreter.ts" />
-/// <reference path="grammar/follow.ts" />
-/// <reference path="grammar/lookahead.ts" />
-/// <reference path="grammar/checks.ts" />
-
-
 // using only root module name ('chevrotain') and not a longer name ('chevrotain.recognizer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
 // TODO: examine module in module to reduce spam on chevrotain namespace
@@ -25,7 +13,7 @@ module chevrotain {
     import lookahead = chevrotain.lookahead
     import validations = chevrotain.validations
 
-    // hacks to bypass no support for custom Errors in javascript/typescript
+// hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
         var recognitionExceptions = [
             lang.functionName(MismatchedTokenException),
@@ -42,8 +30,8 @@ module chevrotain {
         this.token = token
     }
 
-    // must use the "Error.prototype" instead of "new Error"
-    // because the stack trace points to where "new Error" was invoked"
+// must use the "Error.prototype" instead of "new Error"
+// because the stack trace points to where "new Error" was invoked"
     MismatchedTokenException.prototype = Error.prototype
 
     export function NoViableAltException(message:string, token:Token) {
@@ -110,9 +98,9 @@ module chevrotain {
     export type LookAheadFunc = () => boolean
     export type GrammarAction = () => void
 
-    // TODO: TSC 1.5 switch to const
-    // used to toggle ignoring of OR production ambiguities
-    // TODO: expose on Parser for public API?
+// TODO: TSC 1.5 switch to const
+// used to toggle ignoring of OR production ambiguities
+// TODO: expose on Parser for public API?
     export var IGNORE_AMBIGUITIES:boolean = true
     export var NO_RESYNC:boolean = false
 
@@ -298,7 +286,7 @@ module chevrotain {
 
     InRuleRecoveryException.prototype = Error.prototype
 
-    // parameters needs to compute the key in the FOLLOW_SET map.
+// parameters needs to compute the key in the FOLLOW_SET map.
     export interface IFollowKey {
         ruleName: string
         idxInCallingRule: number
@@ -326,13 +314,13 @@ module chevrotain {
                 if (validationErrors.length > 0) {
                     //cache the validation errors so they can be thrown each time the parser is instantiated
                     cache.CLASS_TO_VALIDTATION_ERRORS.put(className, validationErrors)
-                    throw new Error (validationErrors.join("-------------------------------\n"))
+                    throw new Error(validationErrors.join("-------------------------------\n"))
                 }
             }
 
             //Throw the validation errors each time an erroneous parser is instantiated
             if (cache.CLASS_TO_VALIDTATION_ERRORS.containsKey(className)) {
-                throw new Error (cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"))
+                throw new Error(cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"))
             }
         }
 

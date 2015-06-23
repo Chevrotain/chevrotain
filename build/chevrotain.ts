@@ -1,6 +1,9 @@
+
+// libs
+/// <reference path="../libs/lodash.d.ts" />
+/// <reference path="../libs/jasmine.d.ts" />
+
 // production code
-
-
 /// <reference path="../src/lang/lang_extensions.ts" />
 /// <reference path="../src/scan/tokens.ts" />
 /// <reference path="../src/scan/lexer.ts" />

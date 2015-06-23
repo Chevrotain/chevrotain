@@ -1,4 +1,3 @@
-/// <reference path="../../scan/tokens.ts" />
 
 module chevrotain.path {
 

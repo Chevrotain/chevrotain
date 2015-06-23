@@ -1,9 +1,3 @@
-/// <reference path="samples.ts" />
-/// <reference path="../../../src/parse/grammar/interpreter.ts" />
-/// <reference path="../../../src/parse/grammar/path.ts" />
-/// <reference path="../../utils/matchers.ts" />
-/// <reference path="../../../libs/jasmine.d.ts" />
-
 
 module chevrotain.interpreter.spec {
 

@@ -1,9 +1,3 @@
-/// <reference path="Switchcase_recovery_tokens.ts" />
-/// <reference path="../../../../src/parse/recognizer.ts" />
-/// <reference path="../../../../src/scan/tokens.ts" />
-/// <reference path="../../../../src/parse/parse_tree.ts" />
-/// <reference path="../../../../src/parse/grammar/gast.ts" />
-/// <reference path="../../../../src/parse/grammar/follow.ts" />
 
 module chevrotain.examples.recovery.switchcase {
 

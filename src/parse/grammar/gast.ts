@@ -1,5 +1,3 @@
-/// <reference path="../../scan/tokens.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
 
 module chevrotain.gast {
 

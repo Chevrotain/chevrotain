@@ -1,4 +1,3 @@
-/// <reference path="../../libs/lodash.d.ts" />
 
 module chevrotain.lang {
 

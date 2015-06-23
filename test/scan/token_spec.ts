@@ -1,6 +1,3 @@
-/// <reference path="../../src/scan/tokens.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/jasmine.d.ts" />
 
 module chevrotain.tokens.spec {
 

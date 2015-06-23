@@ -1,9 +1,3 @@
-/// <reference path="../../scan/tokens.ts" />
-/// <reference path="gast.ts" />
-/// <reference path="rest.ts" />
-/// <reference path="first.ts" />
-/// <reference path="path.ts" />
-/// <reference path="../../../libs/lodash.d.ts" />
 
 module chevrotain.interpreter {
 

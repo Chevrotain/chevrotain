@@ -1,5 +1,3 @@
-/// <reference path="../lang/lang_extensions.ts" />
-
 // using only root module name ('chevrotain') and not a longer name ('chevrotain.tokens')
 // because the external and internal API must have the same names for d.ts definition files to be valid
 // TODO: examine module in module to reduce spam on chevrotain namespace

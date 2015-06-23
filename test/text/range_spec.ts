@@ -1,6 +1,3 @@
-/// <reference path="../../src/text/range.ts" />
-/// <reference path="../../libs/lodash.d.ts" />
-/// <reference path="../../libs/jasmine.d.ts" />
 
 module chevrotain.range.spec {
 
