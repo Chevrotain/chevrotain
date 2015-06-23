@@ -2,8 +2,6 @@
 
 module chevrotain.path {
 
-    import tok = chevrotain.tokens
-
     /**
      * this interfaces defines the path the parser "took" to reach a certain position
      * in the grammar.

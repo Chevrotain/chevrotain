@@ -7,7 +7,6 @@
 
 module chevrotain.follow {
 
-    import t = chevrotain.tokens
     import g = chevrotain.gast
     import r = chevrotain.rest
     import f = chevrotain.first
@@ -54,7 +53,7 @@ module chevrotain.follow {
     }
 
     export function buildInProdFollowPrefix(terminal:g.Terminal):string {
-        var terminalName = t.tokenName(terminal.terminalType)
+        var terminalName = tokenName(terminal.terminalType)
         return terminalName + terminal.occurrenceInParent + IN
     }
 

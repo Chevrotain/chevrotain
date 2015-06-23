@@ -14,8 +14,6 @@ module chevrotain.examples.recovery.sql {
      * INSERT (32, "SHAHAR") INTO schema2.Persons
      * DELETE (31, "SHAHAR") FROM schema2.Persons
      */
-    import recog = chevrotain.recognizer
-    import tok = chevrotain.tokens
     import pt = chevrotain.tree
     import gast = chevrotain.gast
     import gastBuilder = chevrotain.gastBuilder
@@ -23,9 +21,9 @@ module chevrotain.examples.recovery.sql {
 
 
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
-    export class DDLExampleRecoveryParser extends recog.Parser {
+    export class DDLExampleRecoveryParser extends Parser {
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
             //       it is mandatory to provide this map to be able to perform self analysis
             //       and allow the framework to "understand" the implemented grammar.
@@ -33,7 +31,7 @@ module chevrotain.examples.recovery.sql {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         // DOCS: the invocation to RULE(...) is what wraps our parsing implementation method
@@ -151,7 +149,7 @@ module chevrotain.examples.recovery.sql {
         }
 
         private parseValue():pt.ParseTree {
-            var value:tok.Token = null
+            var value:Token = null
             this.OR(
                 [   // @formatter:off
                     {ALT: () => {value = this.CONSUME1(StringTok)}},
@@ -164,11 +162,11 @@ module chevrotain.examples.recovery.sql {
 
     // TODO: maybe extract to parse.tree module?
     // HELPER FUNCTIONS
-    function PT(token:tok.Token, children:pt.ParseTree[] = []):pt.ParseTree {
+    function PT(token:Token, children:pt.ParseTree[] = []):pt.ParseTree {
         return new pt.ParseTree(token, children)
     }
 
-    export function WRAP_IN_PT(toks:tok.Token[]):pt.ParseTree[] {
+    export function WRAP_IN_PT(toks:Token[]):pt.ParseTree[] {
         var parseTrees = new Array(toks.length)
         for (var i = 0; i < toks.length; i++) {
             parseTrees[i] = (PT(toks[i]))
@@ -178,7 +176,7 @@ module chevrotain.examples.recovery.sql {
 
 
     /* tslint:disable:class-name */
-    export class INVALID_INPUT extends tok.VirtualToken {}
+    export class INVALID_INPUT extends VirtualToken {}
     /* tslint:enable:class-name */
     export function INVALID(tokType:Function = INVALID_INPUT):() => pt.ParseTree {
         // virtual invalid tokens should have no parameters...

@@ -7,7 +7,6 @@
 
 module chevrotain.interpreter {
 
-    import t = chevrotain.tokens
     import g = chevrotain.gast
     import f = chevrotain.first
     import r = chevrotain.rest
@@ -90,12 +89,12 @@ module chevrotain.interpreter {
 
         constructor(topProd:g.TOP_LEVEL, protected path:p.ITokenGrammarPath) {
             super(topProd, path)
-            this.nextTerminalName = t.tokenName(this.path.lastTok)
+            this.nextTerminalName = tokenName(this.path.lastTok)
             this.nextTerminalOccurrence = this.path.lastTokOccurrence
         }
 
         walkTerminal(terminal:g.Terminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            if (this.isAtEndOfPath && t.tokenName(terminal.terminalType) === this.nextTerminalName &&
+            if (this.isAtEndOfPath && tokenName(terminal.terminalType) === this.nextTerminalName &&
                 terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)
             ) {
                 var fullRest = currRest.concat(prevRest)

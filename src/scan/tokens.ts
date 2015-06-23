@@ -1,6 +1,9 @@
 /// <reference path="../lang/lang_extensions.ts" />
 
-module chevrotain.tokens {
+// using only root module name ('chevrotain') and not a longer name ('chevrotain.tokens')
+// because the external and internal API must have the same names for d.ts definition files to be valid
+// TODO: examine module in module to reduce spam on chevrotain namespace
+module chevrotain {
 
     import lang = chevrotain.lang
 
@@ -17,8 +20,8 @@ module chevrotain.tokens {
         var pattern
 
         if (_.isRegExp(patternOrParent) ||
-            patternOrParent === chevrotain.lexer.Lexer.SKIPPED ||
-            patternOrParent === chevrotain.lexer.Lexer.NA) {
+            patternOrParent === chevrotain.Lexer.SKIPPED ||
+            patternOrParent === chevrotain.Lexer.NA) {
             pattern = patternOrParent
         }
         else if (_.isFunction(patternOrParent)) {

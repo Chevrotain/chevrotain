@@ -4,8 +4,6 @@
 // todo: consider if this module really belongs in chevrotain?
 module chevrotain.tree {
 
-    import tok = chevrotain.tokens
-
     export class ParseTree {
         getImage():string { return this.payload.image }
 
@@ -13,7 +11,7 @@ module chevrotain.tree {
 
         getColumn():number { return this.payload.startColumn }
 
-        constructor(public payload:tok.Token, public children:ParseTree[] = []) {}
+        constructor(public payload:Token, public children:ParseTree[] = []) {}
     }
 
     /**
@@ -24,10 +22,10 @@ module chevrotain.tree {
      * @param {ParseTree[]} children The sub nodes of the ParseTree to the built
      * @returns {ParseTree}
      */
-    export function PT(tokenOrTokenClass:Function|tok.Token, children:ParseTree[] = []):ParseTree {
+    export function PT(tokenOrTokenClass:Function|Token, children:ParseTree[] = []):ParseTree {
         var childrenCompact = _.compact(children)
 
-        if (tokenOrTokenClass instanceof tok.Token) {
+        if (tokenOrTokenClass instanceof Token) {
             return new ParseTree(tokenOrTokenClass, childrenCompact)
         }
         else if (_.isFunction(tokenOrTokenClass)) {

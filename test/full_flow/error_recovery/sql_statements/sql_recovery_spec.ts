@@ -11,9 +11,7 @@
 /* tslint:disable:max-line-length  */
 module chevrotain.examples.recovery.sql.spec {
 
-    import tok = chevrotain.tokens
     import pt =  chevrotain.tree
-    import recog = chevrotain.recognizer
 
     describe("Error Recovery SQL DDL Example", function () {
         "use strict"
@@ -60,7 +58,7 @@ module chevrotain.examples.recovery.sql.spec {
             expect(parser.isAtEndOfInput()).toBe(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
-            var insertedSemiColon:tok.Token = ptResult.children[1].children[4].payload
+            var insertedSemiColon:Token = ptResult.children[1].children[4].payload
             // the semicolon is present even though it did not exist in the input, magic!
             expect(insertedSemiColon).toEqual(jasmine.any(SemiColonTok))
             expect(insertedSemiColon.isInsertedInRecovery).toBe(true)
@@ -169,7 +167,7 @@ module chevrotain.examples.recovery.sql.spec {
 
             parser.ddl()
             expect(parser.errors.length).toBe(1)
-            expect(parser.errors[0]).toEqual(jasmine.any(recog.NotAllInputParsedException))
+            expect(parser.errors[0]).toEqual(jasmine.any(NotAllInputParsedException))
         })
 
         it("can use the same parser instance to parse multiple inputs", function () {

@@ -3,7 +3,6 @@
 
 module chevrotain.gast {
 
-    import tok = chevrotain.tokens
     import lang = chevrotain.lang
 
     export interface IProduction {

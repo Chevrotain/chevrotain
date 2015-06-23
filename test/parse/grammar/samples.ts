@@ -3,30 +3,29 @@
 
 module test.samples {
 
-    import t = chevrotain.tokens
     import gast = chevrotain.gast
 
-    export class IdentTok extends t.Token {}
-    export class DotTok extends t.Token {}
-    export class DotDotTok extends t.Token {}
-    export class ColonTok extends t.Token {}
-    export class LSquareTok extends t.Token {}
-    export class RSquareTok extends t.Token {}
-    export class ActionTok extends t.Token {}
-    export class LParenTok extends t.Token {}
-    export class RParenTok extends t.Token {}
-    export class CommaTok extends t.Token {}
-    export class SemicolonTok extends t.Token {}
-    export class UnsignedIntegerLiteralTok extends t.Token {}
-    export class DefaultTok extends t.Token {}
-    export class AsteriskTok extends t.Token {}
-    export class EntityTok extends t.Token {}
-    export class NamespaceTok extends t.Token {}
-    export class TypeTok extends t.Token {}
-    export class ConstTok extends t.Token {}
-    export class RequiredTok extends t.Token {}
-    export class KeyTok extends t.Token {}
-    export class ElementTok extends t.Token {}
+    export class IdentTok extends chevrotain.Token {}
+    export class DotTok extends chevrotain.Token {}
+    export class DotDotTok extends chevrotain.Token {}
+    export class ColonTok extends chevrotain.Token {}
+    export class LSquareTok extends chevrotain.Token {}
+    export class RSquareTok extends chevrotain.Token {}
+    export class ActionTok extends chevrotain.Token {}
+    export class LParenTok extends chevrotain.Token {}
+    export class RParenTok extends chevrotain.Token {}
+    export class CommaTok extends chevrotain.Token {}
+    export class SemicolonTok extends chevrotain.Token {}
+    export class UnsignedIntegerLiteralTok extends chevrotain.Token {}
+    export class DefaultTok extends chevrotain.Token {}
+    export class AsteriskTok extends chevrotain.Token {}
+    export class EntityTok extends chevrotain.Token {}
+    export class NamespaceTok extends chevrotain.Token {}
+    export class TypeTok extends chevrotain.Token {}
+    export class ConstTok extends chevrotain.Token {}
+    export class RequiredTok extends chevrotain.Token {}
+    export class KeyTok extends chevrotain.Token {}
+    export class ElementTok extends chevrotain.Token {}
 
     export var atLeastOneRule = new gast.TOP_LEVEL("atLeastOneRule", [
         new gast.AT_LEAST_ONE([

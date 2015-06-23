@@ -6,8 +6,8 @@ module chevrotain.tokens.spec {
 
     import tok = chevrotain.tokens
 
-    var TrueLiteral = tok.extendToken("TrueLiteral");
-    class FalseLiteral extends tok.Token {}
+    var TrueLiteral = extendToken("TrueLiteral")
+    class FalseLiteral extends Token {}
 
     describe("The Chevrotain Tokens module", function () {
         "use strict"
@@ -19,13 +19,12 @@ module chevrotain.tokens.spec {
             expect(tokenName(TrueLiteral)).toBe("TrueLiteral")
         })
 
-
-        var A = tok.extendToken("A")
-        var B = tok.extendToken("B", A)
+        var A = extendToken("A")
+        var B = extendToken("B", A)
         B.GROUP = "Special"
 
-        var C = tok.extendToken("C", /\d+/, B)
-        var D = tok.extendToken("D", /\w+/, B)
+        var C = extendToken("C", /\d+/, B)
+        var D = extendToken("D", /\w+/, B)
 
         it("provides an extendToken utility - creating an instance", function () {
             var aInstance = new A("Hello", 0, 1, 1)

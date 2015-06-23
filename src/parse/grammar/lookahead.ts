@@ -7,7 +7,6 @@
 module chevrotain.lookahead {
 
     import gast = chevrotain.gast
-    import t = chevrotain.tokens
     import p = chevrotain.path
     import interp = chevrotain.interpreter
     import f = chevrotain.first
@@ -40,7 +39,7 @@ module chevrotain.lookahead {
             if (!_.isEmpty(altsAmbiguityErrors)) {
                 var errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
                     return `Ambiguous alternatives ${currAmbiguity.alts.join(" ,")} in OR${orOccurrence} inside ${ruleGrammar.name} ` +
-                        `Rule, ${t.tokenName(currAmbiguity.token)} may appears as the first Terminal in all these alternatives.\n`
+                        `Rule, ${tokenName(currAmbiguity.token)} may appears as the first Terminal in all these alternatives.\n`
                 })
 
                 throw new Error(errorMessages.join("\n ---------------- \n") +

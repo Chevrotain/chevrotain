@@ -2,17 +2,12 @@
 
 module chevrotain.examples.recovery.switchcase {
 
-    import tok = chevrotain.tokens
 
-
-    export class IdentTok extends tok.Token {}
-
-    export class LiteralTok extends tok.Token {}
+    export class IdentTok extends Token {}
+    export class LiteralTok extends Token {}
     export class IntTok extends LiteralTok {}
     export class StringTok extends LiteralTok {}
-
-
-    export class Keyword extends tok.Token {}
+    export class Keyword extends Token {}
 
     export class SwitchTok extends Keyword {
         constructor(startLine:number, startColumn:number) { super("switch", -1, startLine, startColumn) }
@@ -26,27 +21,27 @@ module chevrotain.examples.recovery.switchcase {
         constructor(startLine:number, startColumn:number) { super("INTO", -1, startLine, startColumn) }
     }
 
-    export class LParenTok extends tok.Token {
+    export class LParenTok extends Token {
         constructor(startLine:number, startColumn:number) { super("(", -1, startLine, startColumn) }
     }
 
-    export class RParenTok extends tok.Token {
+    export class RParenTok extends Token {
         constructor(startLine:number, startColumn:number) { super(")", -1, startLine, startColumn) }
     }
 
-    export class LCurlyTok extends tok.Token {
+    export class LCurlyTok extends Token {
         constructor(startLine:number, startColumn:number) { super("{", -1, startLine, startColumn) }
     }
 
-    export class RCurlyTok extends tok.Token {
+    export class RCurlyTok extends Token {
         constructor(startLine:number, startColumn:number) { super("}", -1, startLine, startColumn) }
     }
 
-    export class ColonTok extends tok.Token {
+    export class ColonTok extends Token {
         constructor(startLine:number, startColumn:number) { super(":", -1, startLine, startColumn) }
     }
 
-    export class SemiColonTok extends tok.Token {
+    export class SemiColonTok extends Token {
         constructor(startLine:number, startColumn:number) { super(";", -1, startLine, startColumn) }
     }
 

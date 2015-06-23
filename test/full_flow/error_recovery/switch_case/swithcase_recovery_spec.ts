@@ -14,8 +14,6 @@ module chevrotain.examples.recovery.switchcase.spec {
 
     import tok = chevrotain.tokens
     import pt =  chevrotain.tree
-    import recog = chevrotain.recognizer
-
 
     describe("Error Recovery switch-case Example", function () {
         "use strict"
@@ -80,7 +78,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parser = new SwitchCaseRecoveryParser(input)
             var parseResult = parser.switchStmt()
             expect(parser.errors.length).toBe(1)
-            expect(parser.errors[0]).toEqual(jasmine.any(recog.EarlyExitException))
+            expect(parser.errors[0]).toEqual(jasmine.any(EarlyExitException))
             // we have re-synced to the end of the input therefore all the input has been "parsed"
             expect(parser.isAtEndOfInput()).toBe(true)
             expect(parseResult).toEqual({})
@@ -174,7 +172,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parser = new SwitchCaseRecoveryParser(input)
             var parseResult = parser.caseStmt()
             expect(parser.errors.length).toBe(1)
-            expect(parser.errors[0]).toEqual(jasmine.any(recog.MismatchedTokenException))
+            expect(parser.errors[0]).toEqual(jasmine.any(MismatchedTokenException))
             expect(parser.isAtEndOfInput()).toBe(true)
             expect(parseResult).toEqual({"Terry": 2})
         })
@@ -189,7 +187,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parser = new SwitchCaseRecoveryParser(input)
             var parseResult = parser.caseStmt()
             expect(parser.errors.length).toBe(1)
-            expect(parser.errors[0]).toEqual(jasmine.any(recog.MismatchedTokenException))
+            expect(parser.errors[0]).toEqual(jasmine.any(MismatchedTokenException))
             expect(parser.isAtEndOfInput()).toBe(true) // in rule recovery failed, will now re-sync to EOF
             expect(parseResult).toEqual({"invalid1": undefined})
         })

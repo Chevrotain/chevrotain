@@ -10,13 +10,13 @@ module chevrotain.gastBuilder.spec {
     import pt = chevrotain.tree
     import tok = chevrotain.tokens
 
-    class BambaTok extends tok.VirtualToken {}
-    class BisliTok extends tok.Token {}
+    class BambaTok extends VirtualToken {}
+    class BisliTok extends Token {}
 
     describe("The ParseTree module", function () {
 
         it("exposes a constructor and three getters accessing the internal token", function () {
-            var ptInstance = new pt.ParseTree(new tok.VirtualToken())
+            var ptInstance = new pt.ParseTree(new VirtualToken())
             expect(ptInstance.getImage()).toBe("")
             expect(ptInstance.getColumn()).toBe(-1)
             expect(ptInstance.getLine()).toBe(-1)

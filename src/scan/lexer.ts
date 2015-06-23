@@ -1,17 +1,18 @@
 /// <reference path="../lang/lang_extensions.ts" />
 /// <reference path="../scan/tokens.ts" />
 
-module chevrotain.lexer {
+// using only root module name ('chevrotain') and not a longer name ('chevrotain.lexer')
+// because the external and internal API must have the same names for d.ts definition files to be valid
+// TODO: examine module in module to reduce spam on chevrotain namespace
+module chevrotain {
 
-    import tok = chevrotain.tokens
     import lang = chevrotain.lang
-
 
     var PATTERN = "PATTERN"
 
     export interface ILexingResult {
-        tokens:tok.Token[]
-        groups:{ [groupName: string] : tok.Token }
+        tokens:Token[]
+        groups:{ [groupName: string] : Token }
         errors:ILexingError[]
     }
 
@@ -37,23 +38,23 @@ module chevrotain.lexer {
         protected patternIdxToGroup:boolean[]
         protected patternIdxToLongerAltIdx:number[]
         protected patternIdxToCanLineTerminator:boolean[]
-        protected emptyGroups:{ [groupName: string] : tok.Token }
+        protected emptyGroups:{ [groupName: string] : Token }
 
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
          *                     These constructors must be in one of three forms:
          *
          *  1. With a PATTERN property that has a RegExp value for tokens to match:
-         *     example: -->class Integer extends tok.Token { static PATTERN = /[1-9]\d }<--
+         *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
          *
          *  2. With a PATTERN property that has a RegExp value AND an IGNORE property with boolean value true.
          *     These tokens will be matched but not as part of the main token vector.
          *     this is usually used for ignoring whitespace/comments
-         *     example: -->    class Whitespace extends tok.Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
+         *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
          *
          *  3. With a PATTERN property that has the value of the var NA define in this module.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
-         *     example: -->class Keyword extends tok.Token { static PATTERN = NA }<--
+         *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *
          *
          *   The following RegExp patterns are not supported:
@@ -79,7 +80,7 @@ module chevrotain.lexer {
          *   example:
          *
          *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
-         *       export class Keyword extends tok.Token {
+         *       export class Keyword extends Token {
          *          static PATTERN = lex.NA
          *          static LONGER_ALT = Identifier
          *       }
@@ -240,7 +241,7 @@ module chevrotain.lexer {
         patternIdxToGroup : any[]
         patternIdxToLongerAltIdx : number[]
         patternIdxToCanLineTerminator: boolean[]
-        emptyGroups: { [groupName: string] : tok.Token }
+        emptyGroups: { [groupName: string] : Token }
     }
 
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
@@ -346,7 +347,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(noPatternClasses, (currClass) => {
-            return "Token class: ->" + tok.tokenName(currClass) + "<- missing static 'PATTERN' property"
+            return "Token class: ->" + tokenName(currClass) + "<- missing static 'PATTERN' property"
         })
 
         return errors
@@ -359,7 +360,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(invalidRegex, (currClass) => {
-            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'PATTERN' can only be a RegEx"
+            return "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' can only be a RegEx"
         })
 
         return errors
@@ -374,7 +375,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(invalidRegex, (currClass) => {
-            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'"
+            return "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'"
         })
 
         return errors
@@ -387,7 +388,7 @@ module chevrotain.lexer {
         })
 
         var errors = _.map(invalidFlags, (currClass) => {
-            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')"
+            return "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')"
         })
 
         return errors
@@ -417,7 +418,7 @@ module chevrotain.lexer {
 
         var errors = _.map(duplicatePatterns, (setOfIdentical:any) => {
             var classNames = _.map(setOfIdentical, (currClass:any) => {
-                return tok.tokenName(currClass)
+                return tokenName(currClass)
             })
 
             var dupPatternSrc = (<any>_.first(setOfIdentical)).PATTERN
@@ -443,7 +444,7 @@ module chevrotain.lexer {
 
 
         var errors = _.map(invalidTypes, (currClass) => {
-            return "Token class: ->" + tok.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String"
+            return "Token class: ->" + tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String"
         })
 
         return errors

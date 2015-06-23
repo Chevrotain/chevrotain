@@ -5,7 +5,6 @@
 module chevrotain.validations {
 
     import gast = chevrotain.gast
-    import tok = chevrotain.tokens
 
     export function validateGrammar(topLevels:gast.TOP_LEVEL[]):string[] {
         var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule)
@@ -57,7 +56,7 @@ module chevrotain.validations {
 
     function getExtraProductionArgument(prod:gast.IProductionWithOccurrence):string {
         if (prod instanceof gast.Terminal) {
-            return tok.tokenName(prod.terminalType)
+            return tokenName(prod.terminalType)
         }
         else if (prod instanceof  gast.ProdRef) {
             return prod.refProdName

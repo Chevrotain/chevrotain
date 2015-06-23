@@ -9,8 +9,6 @@ module chevrotain.examples.backtracking {
     //       element B:ns1.ns2...nsN default 5;
     // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
     // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
-    import recog = chevrotain.recognizer
-    import tok = chevrotain.tokens
 
     export enum RET_TYPE {
         WITH_DEFAULT,
@@ -22,21 +20,21 @@ module chevrotain.examples.backtracking {
         INVALID_FQN
     }
 
-    export class NumberTok extends tok.Token {}
-    export class ElementTok extends tok.Token {}
-    export class DefaultTok extends tok.Token {}
-    export class DotTok extends tok.Token {}
-    export class ColonTok extends tok.Token {}
-    export class EqualsTok extends tok.Token {}
-    export class SemiColonTok extends tok.Token {}
-    export class IdentTok extends tok.Token {}
+    export class NumberTok extends Token {}
+    export class ElementTok extends Token {}
+    export class DefaultTok extends Token {}
+    export class DotTok extends Token {}
+    export class ColonTok extends Token {}
+    export class EqualsTok extends Token {}
+    export class SemiColonTok extends Token {}
+    export class IdentTok extends Token {}
 
 
     // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
     // that needs to be tested too.
-    export class BackTrackingParser extends recog.Parser {
+    export class BackTrackingParser extends Parser {
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
             //       it is mandatory to provide this map to be able to perform self analysis
             //       and allow the framework to "understand" the implemented grammar.
@@ -44,7 +42,7 @@ module chevrotain.examples.backtracking {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
 

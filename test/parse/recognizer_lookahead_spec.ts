@@ -6,30 +6,27 @@
 
 module chevrotain.recognizer.lookahead.spec {
 
-    import tok = chevrotain.tokens
-    import recog = chevrotain.recognizer
-
-    export class OneTok extends tok.Token {
+    export class OneTok extends Token {
         constructor() { super("One", 0, 1, 1) }
     }
 
-    export class TwoTok extends tok.Token {
+    export class TwoTok extends Token {
         constructor() { super("Two", 0, 1, 1) }
     }
 
-    export class ThreeTok extends tok.Token {
+    export class ThreeTok extends Token {
         constructor() { super("Three", 0, 1, 1) }
     }
 
-    export class FourTok extends tok.Token {
+    export class FourTok extends Token {
         constructor() { super("Four", 0, 1, 1) }
     }
 
-    export class FiveTok extends tok.Token {
+    export class FiveTok extends Token {
         constructor() { super("Five", 0, 1, 1) }
     }
 
-    export class SixTok extends tok.Token {
+    export class SixTok extends Token {
         constructor() { super("Six", 0, 1, 1) }
     }
 
@@ -39,9 +36,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
@@ -84,9 +81,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
@@ -235,9 +232,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
@@ -280,9 +277,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
@@ -423,9 +420,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
@@ -468,9 +465,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
@@ -564,9 +561,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
@@ -728,9 +725,9 @@ module chevrotain.recognizer.lookahead.spec {
             return cache.getLookaheadFuncsForClass(this.className)
         }
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
@@ -797,9 +794,9 @@ module chevrotain.recognizer.lookahead.spec {
 
     class OrAmbiguityLookAheadParser extends Parser {
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             super(input, <any>chevrotain.recognizer.lookahead.spec)
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)

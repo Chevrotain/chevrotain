@@ -39,17 +39,15 @@ module chevrotain.examples.recovery.switchcase {
 
     export interface RetType { [caseValue: string] : number }
 
-    import recog = chevrotain.recognizer
-    import tok = chevrotain.tokens
     import pt = chevrotain.tree
     import gast = chevrotain.gast
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow
 
     // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
-    export class SwitchCaseRecoveryParser extends recog.Parser {
+    export class SwitchCaseRecoveryParser extends Parser {
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
             //       it is mandatory to provide this map to be able to perform self analysis
             //       and allow the framework to "understand" the implemented grammar.
@@ -57,7 +55,7 @@ module chevrotain.examples.recovery.switchcase {
             // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
             //       The typescript compiler places the constructor body last after initializations in the class's body
             //       which is why place the call here meets the criteria.
-            recog.Parser.performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public switchStmt = this.RULE("switchStmt", this.parseSwitchStmt, () => { return {} })

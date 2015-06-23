@@ -6,44 +6,42 @@
 
 module chevrotain.lookahead.spec {
 
-    import recog = chevrotain.recognizer
     import samples = test.samples
     import lookahead = chevrotain.lookahead
     import matchers = test.matchers
-    import t = chevrotain.tokens
 
-    class ColonParserMock extends recog.BaseRecognizer {
-        protected NEXT_TOKEN():t.Token {
+    class ColonParserMock extends BaseRecognizer {
+        protected NEXT_TOKEN():Token {
             return new samples.ColonTok(":", 0, 1, 1)
         }
     }
 
-    class IdentParserMock extends recog.BaseRecognizer {
-        protected NEXT_TOKEN():t.Token {
+    class IdentParserMock extends BaseRecognizer {
+        protected NEXT_TOKEN():Token {
             return new samples.IdentTok("bamba", 0, 1, 1)
         }
     }
 
-    class CommaParserMock extends recog.BaseRecognizer {
-        protected NEXT_TOKEN():t.Token {
+    class CommaParserMock extends BaseRecognizer {
+        protected NEXT_TOKEN():Token {
             return new samples.CommaTok(",", 0, 1, 1)
         }
     }
 
-    class EntityParserMock extends recog.BaseRecognizer {
-        protected NEXT_TOKEN():t.Token {
+    class EntityParserMock extends BaseRecognizer {
+        protected NEXT_TOKEN():Token {
             return new samples.EntityTok(",", 0, 1, 1)
         }
     }
 
-    class KeyParserMock extends recog.BaseRecognizer {
-        protected NEXT_TOKEN():t.Token {
+    class KeyParserMock extends BaseRecognizer {
+        protected NEXT_TOKEN():Token {
             return new samples.KeyTok(",", 0, 1, 1)
         }
     }
 
-    class ActionParserMock extends recog.BaseRecognizer {
-        protected NEXT_TOKEN():t.Token {
+    class ActionParserMock extends BaseRecognizer {
+        protected NEXT_TOKEN():Token {
             return new samples.ActionTok(",", 0, 1, 1)
         }
     }
@@ -100,11 +98,11 @@ module chevrotain.lookahead.spec {
     })
 
 
-    class A extends t.Token {}
-    class B extends t.Token {}
-    class C extends t.Token {}
-    class D extends t.Token {}
-    class E extends t.Token {}
+    class A extends Token {}
+    class B extends Token {}
+    class C extends Token {}
+    class D extends Token {}
+    class E extends Token {}
 
     describe("The Grammar Lookahead module", function () {
         "use strict"

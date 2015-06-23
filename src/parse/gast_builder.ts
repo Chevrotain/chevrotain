@@ -1,4 +1,3 @@
-/// <reference path="../scan/tokens.ts" />
 /// <reference path="../text/range.ts" />
 /// <reference path="../lang/lang_extensions.ts" />
 /// <reference path="grammar/gast.ts" />
@@ -8,7 +7,6 @@
 // module for building the GAst representation of a Grammar
 module chevrotain.gastBuilder {
 
-    import tok = chevrotain.tokens
     import r = chevrotain.range
     import gast = chevrotain.gast
     import lang = chevrotain.lang;

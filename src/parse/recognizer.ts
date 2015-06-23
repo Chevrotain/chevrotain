@@ -10,11 +10,12 @@
 /// <reference path="grammar/checks.ts" />
 
 
-/// <reference path="../../libs/lodash.d.ts" />
-module chevrotain.recognizer {
+// using only root module name ('chevrotain') and not a longer name ('chevrotain.recognizer')
+// because the external and internal API must have the same names for d.ts definition files to be valid
+// TODO: examine module in module to reduce spam on chevrotain namespace
+module chevrotain {
 
     import cache = chevrotain.cache
-    import tok = chevrotain.tokens
     import gast = chevrotain.gast
     import IN = chevrotain.constants.IN
     import interp = chevrotain.interpreter
@@ -35,7 +36,7 @@ module chevrotain.recognizer {
         return _.contains(recognitionExceptions, error.name)
     }
 
-    export function MismatchedTokenException(message:string, token:tok.Token) {
+    export function MismatchedTokenException(message:string, token:Token) {
         this.name = lang.functionName(MismatchedTokenException)
         this.message = message
         this.token = token
@@ -45,7 +46,7 @@ module chevrotain.recognizer {
     // because the stack trace points to where "new Error" was invoked"
     MismatchedTokenException.prototype = Error.prototype
 
-    export function NoViableAltException(message:string, token:tok.Token) {
+    export function NoViableAltException(message:string, token:Token) {
         this.name = lang.functionName(NoViableAltException)
         this.message = message
         this.token = token
@@ -53,7 +54,7 @@ module chevrotain.recognizer {
 
     NoViableAltException.prototype = Error.prototype
 
-    export function NotAllInputParsedException(message:string, token:tok.Token) {
+    export function NotAllInputParsedException(message:string, token:Token) {
         this.name = lang.functionName(NotAllInputParsedException)
         this.message = message
         this.token = token
@@ -62,7 +63,7 @@ module chevrotain.recognizer {
     NotAllInputParsedException.prototype = Error.prototype
 
 
-    export function EarlyExitException(message:string, token:tok.Token) {
+    export function EarlyExitException(message:string, token:Token) {
         this.name = lang.functionName(EarlyExitException)
         this.message = message
         this.token = token
@@ -70,7 +71,7 @@ module chevrotain.recognizer {
 
     EarlyExitException.prototype = Error.prototype
 
-    export class EOF extends tok.VirtualToken {}
+    export class EOF extends VirtualToken {}
     var EOF_FOLLOW_KEY:any = {} // TODO const in Typescript 1.5
 
     /**
@@ -111,6 +112,7 @@ module chevrotain.recognizer {
 
     // TODO: TSC 1.5 switch to const
     // used to toggle ignoring of OR production ambiguities
+    // TODO: expose on Parser for public API?
     export var IGNORE_AMBIGUITIES:boolean = true
     export var NO_RESYNC:boolean = false
 
@@ -122,24 +124,24 @@ module chevrotain.recognizer {
     export class BaseRecognizer {
 
         public errors:Error[] = []
-        protected _input:tok.Token[] = []
+        protected _input:Token[] = []
         protected inputIdx = -1
         protected isBackTrackingStack = []
         // caching for performance
         protected className:string
 
 
-        constructor(input:tok.Token[] = []) {
+        constructor(input:Token[] = []) {
             this._input = input
             this.className = lang.classNameFromInstance(this)
         }
 
-        set input(newInput:tok.Token[]) {
+        set input(newInput:Token[]) {
             this.reset()
             this._input = newInput
         }
 
-        get input():tok.Token[] {
+        get input():Token[] {
             return _.clone(this._input)
         }
 
@@ -169,12 +171,12 @@ module chevrotain.recognizer {
             }
         }
 
-        protected NEXT_TOKEN():tok.Token {
+        protected NEXT_TOKEN():Token {
             return this.LA(1)
         }
 
         // skips a token and returns the next token
-        protected SKIP_TOKEN():tok.Token {
+        protected SKIP_TOKEN():Token {
             // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
             // input[45] which is the 46th item and no longer exists,
             // so in this case the largest valid input index is 43 (input.length - 2 )
@@ -187,20 +189,20 @@ module chevrotain.recognizer {
             }
         }
 
-        protected CONSUME(tokClass:Function):tok.Token {
+        protected CONSUME(tokClass:Function):Token {
             var nextToken = this.NEXT_TOKEN()
             if (this.NEXT_TOKEN() instanceof tokClass) {
                 this.inputIdx++
                 return nextToken
             }
             else {
-                var expectedTokType = tok.tokenName(tokClass)
+                var expectedTokType = tokenName(tokClass)
                 var msg = "Expecting token of type -->" + expectedTokType + "<-- but found -->'" + nextToken.image + "'<--"
                 throw this.SAVE_ERROR(new MismatchedTokenException(msg, nextToken))
             }
         }
 
-        protected LA(howMuch:number):tok.Token {
+        protected LA(howMuch:number):Token {
             if (this._input.length <= this.inputIdx + howMuch) {
                 return new EOF()
             }
@@ -346,12 +348,12 @@ module chevrotain.recognizer {
         protected atLeastOneLookaheadKeys:lang.HashTable<string>[]
         protected optionLookaheadKeys:lang.HashTable<string>[]
 
-        constructor(input:tok.Token[], tokensMapOrArr:gastBuilder.ITerminalNameToConstructor | Function[]) {
+        constructor(input:Token[], tokensMapOrArr:gastBuilder.ITerminalNameToConstructor | Function[]) {
             super(input)
 
             if (_.isArray(tokensMapOrArr)) {
                 this.tokensMap = <any>_.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
-                    acc[tok.tokenName(tokenClazz)] = tokenClazz
+                    acc[tokenName(tokenClazz)] = tokenClazz
                     return acc
                 }, {})
             }
@@ -364,7 +366,7 @@ module chevrotain.recognizer {
 
             // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
             // parsed with a clear error message ("expecting EOF but found ...")
-            this.tokensMap[tok.tokenName(EOF)] = EOF
+            this.tokensMap[tokenName(EOF)] = EOF
 
             if (cache.CLASS_TO_OR_LA_CACHE[this.className] === undefined) {
                 cache.initLookAheadKeyCache(this.className)
@@ -388,7 +390,7 @@ module chevrotain.recognizer {
          * Convenience method equivalent to CONSUME1
          * @see CONSUME1
          */
-        protected CONSUME(tokClass:Function):tok.Token {
+        protected CONSUME(tokClass:Function):Token {
             return this.CONSUME1(tokClass)
         }
 
@@ -418,35 +420,35 @@ module chevrotain.recognizer {
          *
          * @returns {chevrotain.tokens.Token} The consumed token.
          */
-        protected CONSUME1(tokClass:Function):tok.Token {
+        protected CONSUME1(tokClass:Function):Token {
             return this.consumeInternal(tokClass, 1)
         }
 
         /**
          * @see CONSUME1
          */
-        protected CONSUME2(tokClass:Function):tok.Token {
+        protected CONSUME2(tokClass:Function):Token {
             return this.consumeInternal(tokClass, 2)
         }
 
         /**
          * @see CONSUME1
          */
-        protected CONSUME3(tokClass:Function):tok.Token {
+        protected CONSUME3(tokClass:Function):Token {
             return this.consumeInternal(tokClass, 3)
         }
 
         /**
          * @see CONSUME1
          */
-        protected CONSUME4(tokClass:Function):tok.Token {
+        protected CONSUME4(tokClass:Function):Token {
             return this.consumeInternal(tokClass, 4)
         }
 
         /**
          * @see CONSUME1
          */
-        protected CONSUME5(tokClass:Function):tok.Token {
+        protected CONSUME5(tokClass:Function):Token {
             return this.consumeInternal(tokClass, 5)
         }
 
@@ -891,7 +893,7 @@ module chevrotain.recognizer {
 
             var maxInputIdx = this._input.length - 1
             if ((this.RULE_STACK.length === 0) && this.inputIdx < maxInputIdx) {
-                var firstRedundantTok:tok.Token = this.NEXT_TOKEN()
+                var firstRedundantTok:Token = this.NEXT_TOKEN()
                 this.SAVE_ERROR(new NotAllInputParsedException(
                     "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
             }
@@ -935,7 +937,7 @@ module chevrotain.recognizer {
                 if (lookAheadFunc.call(this)) {
                     // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
                     // the error that would have been thrown
-                    var expectedTokName = tok.tokenName(expectedTokType)
+                    var expectedTokName = tokenName(expectedTokType)
                     var msg = "Expecting token of type -->" + expectedTokName +
                         "<-- but found -->'" + nextTokenWithoutResync.image + "'<--"
                     this.SAVE_ERROR(new MismatchedTokenException(msg, nextTokenWithoutResync))
@@ -1003,7 +1005,7 @@ module chevrotain.recognizer {
          * Override this if you require special behavior in your grammar
          * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
          */
-        protected getTokenToInsert(tokClass:Function):tok.Token {
+        protected getTokenToInsert(tokClass:Function):Token {
             return new (<any>tokClass)(-1, -1)
         }
 
@@ -1018,7 +1020,7 @@ module chevrotain.recognizer {
             return true
         }
 
-        protected tryInRuleRecovery(expectedTokType:Function, follows:Function[]):tok.Token {
+        protected tryInRuleRecovery(expectedTokType:Function, follows:Function[]):Token {
             if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
                 var tokToInsert = this.getTokenToInsert(expectedTokType)
                 tokToInsert.isInsertedInRecovery = true
@@ -1243,7 +1245,7 @@ module chevrotain.recognizer {
          *
          * @returns the consumed Token
          */
-        protected consumeInternal(tokClass:Function, idx:number):tok.Token {
+        protected consumeInternal(tokClass:Function, idx:number):Token {
             try {
                 return super.CONSUME(tokClass)
             } catch (eFromConsumption) {

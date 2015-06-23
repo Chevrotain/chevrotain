@@ -13,12 +13,12 @@ var API:any = {}
 /* istanbul ignore next */
 if (!testMode) {
     // runtime API
-    API.Parser = chevrotain.recognizer.Parser
-    API.Lexer = chevrotain.lexer.Lexer
-    API.Token = chevrotain.tokens.Token
+    API.Parser = chevrotain.Parser
+    API.Lexer = chevrotain.Lexer
+    API.Token = chevrotain.Token
 
     // utilities
-    API.extendToken = chevrotain.tokens.extendToken
+    API.extendToken = chevrotain.extendToken
 
     // grammar reflection API
     API.gast = {}
