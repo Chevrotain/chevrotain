@@ -192,7 +192,7 @@ The best way to start is by looking at some running examples:
 
 * [Json Parser](https://github.com/Chevrotain/examples_nodejs/blob/master/jsonParser.js)
 * [Simple Calculator](https://github.com/Chevrotain/examples_nodejs/blob/master/calculator.js)
-* [ECMAScript5 Parser](https://github.com/SAP/chevrotain/blob/master/examples/examples/ecmascript5_parser.ts)
+* [ECMAScript5 Parser](https://github.com/Chevrotain/examples_ecma5_typescript/blob/master/src/ecmascript5_parser.ts)
 * [Lexer advanced features](https://github.com/Chevrotain/examples_lexer)
 * [and more](https://github.com/Chevrotain)
 

@@ -1,16 +1,6 @@
 var _ = require('lodash')
 var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
-var exampleSpecsFiles = require('./scripts/findSpecs')("bin/tsc/examples/", "examples")
-
-
-var ecma5Includes = findRefs('./build/ecma5.ts', "bin/tsc/")
-
-exampleSpecsFiles = _.reject(exampleSpecsFiles, function(item) {
-    return _.contains(item, "ecmascript5") && !_.contains(item, "spec")
-})
-
-exampleSpecsFiles = ecma5Includes.concat(exampleSpecsFiles)
 
 // TODO: this is a bit ugly, but including the root and then performing negation
 //       seems to cause inclusion of things outside the root...
@@ -37,7 +27,7 @@ module.exports = function(grunt) {
         pkg: pkg,
 
         karma: {
-            options:   {
+            options: {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
                 browsers:   ['Chrome']
@@ -92,14 +82,13 @@ module.exports = function(grunt) {
                 configuration: grunt.file.readJSON("tslint.json")
             },
 
-            files:   {
-                // performance_spec causes issues with TS-Lint randomly crashing due to a very large sample string it contains.
-                src: ['src/**/*.ts', 'test/**/*.ts', 'examples/**/*.ts', '!test/performance/performance_spec.ts']
+            files: {
+                src: ['src/**/*.ts', 'test/**/*.ts']
             }
         },
 
         ts: {
-            options:   {
+            options: {
                 bin:  "ES5",
                 fast: "never"
 
@@ -161,20 +150,6 @@ module.exports = function(grunt) {
                         global:    ['_', "undefined", 'chevrotain']
                     }
                 }
-            },
-
-            ecma5: {
-                options: {
-                    src:            'bin/examples/ecma5.js',
-                    objectToExport: 'chevrotain.examples.ecma5',
-                    template:       'scripts/umd.hbs',
-                    deps:           {
-                        'default': ['_', 'chevrotain'],
-                        amd:       ['lodash', 'chevrotain'],
-                        cjs:       ['lodash', '../chevrotain'],
-                        global:    ['_', 'chevrotain']
-                    }
-                }
             }
         },
 
@@ -214,13 +189,7 @@ module.exports = function(grunt) {
             release: {
                 files: {
                     'bin/chevrotain.js':      ['bin/chevrotain.js'],
-                    'bin/chevrotainSpecs.js': specsFiles.concat(exampleSpecsFiles)
-                }
-            },
-
-            ecma5: {
-                files: {
-                    'bin/examples/ecma5.js': ecma5Includes
+                    'bin/chevrotainSpecs.js': specsFiles
                 }
             }
         },
@@ -276,7 +245,4 @@ module.exports = function(grunt) {
         'ts:dev_build',
         'tslint',
         'karma:dev_build'])
-
-
-    grunt.registerTask('ecma5', releaseBuildTasks.concat(['concat:ecma5', 'umd:ecma5']))
 }
