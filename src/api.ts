@@ -6,7 +6,7 @@
  */
 
 declare var CHEV_TEST_MODE
-
+/* istanbul ignore next */
 var testMode = (typeof global === "object" && (<any>global).CHEV_TEST_MODE) ||
     (typeof window === "object" && (<any>window).CHEV_TEST_MODE)
 

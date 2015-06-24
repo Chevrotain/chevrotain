@@ -52,7 +52,7 @@ module.exports = function(grunt) {
                     coverageFolder: 'bin/coverage',
                     excludes: ['*tainSpecs.js']
                 }
-            },
+            }
         },
 
         istanbul_check_coverage: {
@@ -171,6 +171,9 @@ module.exports = function(grunt) {
                     // of the contract, it just makes sure we fail fast if we supply invalid arguments.
                     var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(default\s*:\s*throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
                         "/* istanbul ignore next */ $1")
+
+                    fixedNoneExhaustive = fixedNoneExhaustive.replace(/(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
+                        "/* istanbul ignore else */ $1$2")
 
                     fixedNoneExhaustive = fixedNoneExhaustive.replace(/(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
                         "/* istanbul ignore next */ $1")
