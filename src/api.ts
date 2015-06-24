@@ -1,12 +1,13 @@
+/// <reference path="../libs/node.d.ts" />
+
 /**
  * defines the public API of Chevrotain.
  * changes here may require major version change. (semVer)
  */
 
 declare var CHEV_TEST_MODE
-declare var global
 
-var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) ||
+var testMode = (typeof global === "object" && (<any>global).CHEV_TEST_MODE) ||
     (typeof window === "object" && (<any>window).CHEV_TEST_MODE)
 
 var API:any = {}

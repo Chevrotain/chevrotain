@@ -25,7 +25,7 @@ module chevrotain.validations.spec {
                 ])
             ])
             var errors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
-            expect(errors.length).toBe(4)
+            expect(errors.length).to.equal(4)
         })
     })
 
@@ -33,32 +33,32 @@ module chevrotain.validations.spec {
     describe("identifyProductionForDuplicates function", function () {
         it("generates DSL code for a ProdRef", function () {
             var dslCode = identifyProductionForDuplicates(new gast.ProdRef("ActionDeclaration"))
-            expect(dslCode).toBe("SUBRULE_#_1_#_ActionDeclaration")
+            expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration")
         })
 
         it("generates DSL code for a OPTION", function () {
             var dslCode = identifyProductionForDuplicates(new gast.OPTION([], 3))
-            expect(dslCode).toBe("OPTION_#_3_#_")
+            expect(dslCode).to.equal("OPTION_#_3_#_")
         })
 
         it("generates DSL code for a AT_LEAST_ONE", function () {
             var dslCode = identifyProductionForDuplicates(new gast.AT_LEAST_ONE([]))
-            expect(dslCode).toBe("AT_LEAST_ONE_#_1_#_")
+            expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_")
         })
 
         it("generates DSL code for a MANY", function () {
             var dslCode = identifyProductionForDuplicates(new gast.MANY([], 5))
-            expect(dslCode).toBe("MANY_#_5_#_")
+            expect(dslCode).to.equal("MANY_#_5_#_")
         })
 
         it("generates DSL code for a OR", function () {
             var dslCode = identifyProductionForDuplicates(new gast.OR([], 1))
-            expect(dslCode).toBe("OR_#_1_#_")
+            expect(dslCode).to.equal("OR_#_1_#_")
         })
 
         it("generates DSL code for a Terminal", function () {
             var dslCode = identifyProductionForDuplicates(new gast.Terminal(samples.IdentTok, 4))
-            expect(dslCode).toBe("CONSUME_#_4_#_IdentTok")
+            expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
         })
     })
 
@@ -68,13 +68,13 @@ module chevrotain.validations.spec {
         it("collects all the productions relevant to occurrence validation", function () {
             var qualifiedNameVisitor = new OccurrenceValidationCollector()
             samples.qualifiedName.accept(qualifiedNameVisitor)
-            expect(qualifiedNameVisitor.allProductions.length).toBe(4)
+            expect(qualifiedNameVisitor.allProductions.length).to.equal(4)
 
             // TODO: check set equality
 
             var actionDecVisitor = new OccurrenceValidationCollector()
             samples.actionDec.accept(actionDecVisitor)
-            expect(actionDecVisitor.allProductions.length).toBe(13)
+            expect(actionDecVisitor.allProductions.length).to.equal(13)
 
             // TODO: check set equality
         })
@@ -161,16 +161,16 @@ module chevrotain.validations.spec {
                 //noinspection JSUnusedLocalSymbols
                 var parser = new ErroneousOccurrenceNumUsageParser1()
                 // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                // expect(...).toThrow("partial string to match")
+                // expect(...).to.throw("partial string to match")
             } catch (e) {
                 thrown = true
-                expect(_.contains(e.message, "SUBRULE")).toBe(true)
-                expect(_.contains(e.message, "1")).toBe(true)
-                expect(_.contains(e.message, "duplicateRef")).toBe(true)
-                expect(_.contains(e.message, "anotherRule")).toBe(true)
-                expect(_.contains(e.message, "both have the same occurrence index 1")).toBe(true)
+                expect(_.contains(e.message, "SUBRULE")).to.equal(true)
+                expect(_.contains(e.message, "1")).to.equal(true)
+                expect(_.contains(e.message, "duplicateRef")).to.equal(true)
+                expect(_.contains(e.message, "anotherRule")).to.equal(true)
+                expect(_.contains(e.message, "both have the same occurrence index 1")).to.equal(true)
             }
-            expect(thrown).toBe(true)
+            expect(thrown).to.equal(true)
         })
 
         it("will throw errors on duplicate Subrules references in the same top level rule", function () {
@@ -179,15 +179,15 @@ module chevrotain.validations.spec {
                 //noinspection JSUnusedLocalSymbols
                 var parser = new ErroneousOccurrenceNumUsageParser2()
                 // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                // expect(...).toThrow("partial string to match")
+                // expect(...).to.throw("partial string to match")
             } catch (e) {
                 thrown = true
-                expect(_.contains(e.message, "CONSUME")).toBe(true)
-                expect(_.contains(e.message, "3")).toBe(true)
-                expect(_.contains(e.message, "PlusTok")).toBe(true)
-                expect(_.contains(e.message, "duplicateTerminal")).toBe(true)
+                expect(_.contains(e.message, "CONSUME")).to.equal(true)
+                expect(_.contains(e.message, "3")).to.equal(true)
+                expect(_.contains(e.message, "PlusTok")).to.equal(true)
+                expect(_.contains(e.message, "duplicateTerminal")).to.equal(true)
             }
-            expect(thrown).toBe(true)
+            expect(thrown).to.equal(true)
         })
 
         it("will throw errors on duplicate MANY productions in the same top level rule", function () {
@@ -196,16 +196,16 @@ module chevrotain.validations.spec {
                 //noinspection JSUnusedLocalSymbols
                 var parser = new ErroneousOccurrenceNumUsageParser3()
                 // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                // expect(...).toThrow("partial string to match")
+                // expect(...).to.throw("partial string to match")
             } catch (e) {
                 thrown = true
-                expect(_.contains(e.message, "MANY")).toBe(true)
-                expect(_.contains(e.message, "1")).toBe(true)
-                expect(_.contains(e.message, "duplicateMany")).toBe(true)
-                expect(_.contains(e.message, "both have the same occurrence index 1")).toBe(true)
+                expect(_.contains(e.message, "MANY")).to.equal(true)
+                expect(_.contains(e.message, "1")).to.equal(true)
+                expect(_.contains(e.message, "duplicateMany")).to.equal(true)
+                expect(_.contains(e.message, "both have the same occurrence index 1")).to.equal(true)
 
             }
-            expect(thrown).toBe(true)
+            expect(thrown).to.equal(true)
         })
 
         it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
@@ -220,13 +220,13 @@ module chevrotain.validations.spec {
                     //noinspection JSUnusedLocalSymbols
                     var parser = new ErroneousOccurrenceNumUsageParser3()
                     // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                    // expect(...).toThrow("partial string to match")
+                    // expect(...).to.throw("partial string to match")
                 } catch (e) {
                     thrown++
                 }
             }
 
-            expect(thrown).toBe(5)
+            expect(thrown).to.equal(5)
         })
     })
 }

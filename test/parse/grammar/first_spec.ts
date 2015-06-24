@@ -11,20 +11,20 @@ module chevrotain.first.spec {
         it("can compute the first for a terminal", function () {
             var terminal = new gast.Terminal(t.EntityTok)
             var actual = first(terminal)
-            expect(actual.length).toBe(1)
-            expect(actual[0]).toBe(t.EntityTok)
+            expect(actual.length).to.equal(1)
+            expect(actual[0]).to.equal(t.EntityTok)
 
             var terminal2 = new gast.Terminal(t.CommaTok)
             var actual2 = first(terminal2)
-            expect(actual2.length).toBe(1)
-            expect(actual2[0]).toBe(t.CommaTok)
+            expect(actual2.length).to.equal(1)
+            expect(actual2[0]).to.equal(t.CommaTok)
         })
 
         it("can compute the first for a Sequence production ", function () {
             var seqProduction = new gast.FLAT([new gast.Terminal(t.EntityTok)])
             var actual = first(seqProduction)
-            expect(actual.length).toBe(1)
-            expect(actual[0]).toBe(t.EntityTok)
+            expect(actual.length).to.equal(1)
+            expect(actual[0]).to.equal(t.EntityTok)
 
             var seqProduction2 = new gast.FLAT(
                 [
@@ -32,8 +32,8 @@ module chevrotain.first.spec {
                     new gast.OPTION([new gast.Terminal(t.NamespaceTok)])
                 ])
             var actual2 = first(seqProduction2)
-            expect(actual2.length).toBe(1)
-            expect(actual2[0]).toBe(t.EntityTok)
+            expect(actual2.length).to.equal(1)
+            expect(actual2[0]).to.equal(t.EntityTok)
         })
 
         it("can compute the first for an alternatives production ", function () {
@@ -45,10 +45,10 @@ module chevrotain.first.spec {
 
                 ])
             var actual = first(altProduction)
-            expect(actual.length).toBe(3)
-            expect(actual[0]).toBe(t.EntityTok)
-            expect(actual[1]).toBe(t.NamespaceTok)
-            expect(actual[2]).toBe(t.TypeTok)
+            expect(actual.length).to.equal(3)
+            expect(actual[0]).to.equal(t.EntityTok)
+            expect(actual[1]).to.equal(t.NamespaceTok)
+            expect(actual[2]).to.equal(t.TypeTok)
 
         })
 

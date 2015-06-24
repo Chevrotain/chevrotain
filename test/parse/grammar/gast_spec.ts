@@ -7,7 +7,7 @@ module chevrotain.gast.spec {
 
             it("will always return a valid empty definition, even if it's ref is unresolved", function () {
                 var prodRef = new ProdRef("SomeGrammarRuleName")
-                expect(prodRef.definition).toEqual(jasmine.any(Array))
+                expect(prodRef.definition).to.be.an.instanceof(Array)
             })
         })
     })

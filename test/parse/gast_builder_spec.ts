@@ -59,67 +59,67 @@ module chevrotain.gastBuilder.spec {
 
         it("can extract Terminals IPRODRanges from a text", function () {
             var actual = b.createTerminalRanges(typeDefText)
-            expect(actual.length).toBe(4)
+            expect(actual.length).to.equal(4)
             var terminalTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(terminalTypes).length).toBe(1)
-            expect(terminalTypes[0]).toBe(b.ProdType.TERMINAL)
+            expect(_.uniq(terminalTypes).length).to.equal(1)
+            expect(terminalTypes[0]).to.equal(b.ProdType.TERMINAL)
 
             var terminalTexts = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(terminalTexts[0]).toBe(".CONSUME1(tok.TypeTok")
-            expect(terminalTexts[1]).toBe(".CONSUME1(tok.IdentTok")
-            expect(terminalTexts[2]).toBe(".CONSUME1(tok.SemicolonTok")
-            expect(terminalTexts[3]).toBe(".CONSUME2(tok.SemicolonTok")
+            expect(terminalTexts[0]).to.equal(".CONSUME1(tok.TypeTok")
+            expect(terminalTexts[1]).to.equal(".CONSUME1(tok.IdentTok")
+            expect(terminalTexts[2]).to.equal(".CONSUME1(tok.SemicolonTok")
+            expect(terminalTexts[3]).to.equal(".CONSUME2(tok.SemicolonTok")
         })
 
         it("can extract SubRule references IPRODRanges from a text", function () {
             var actual = b.createRefsRanges(typeDefText)
-            expect(actual.length).toBe(2)
+            expect(actual.length).to.equal(2)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).toBe(1)
-            expect(refTypes[0]).toBe(b.ProdType.REF)
+            expect(_.uniq(refTypes).length).to.equal(1)
+            expect(refTypes[0]).to.equal(b.ProdType.REF)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe(".SUBRULE(this.structuredType")
-            expect(refText[1]).toBe(".SUBRULE(this.assignedTypeSpec")
+            expect(refText[0]).to.equal(".SUBRULE(this.structuredType")
+            expect(refText[1]).to.equal(".SUBRULE(this.assignedTypeSpec")
         })
 
         it("can extract Option IPRODRanges from a text", function () {
             var actual = b.createOptionRanges(elementDefText)
-            expect(actual.length).toBe(2)
+            expect(actual.length).to.equal(2)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).toBe(1)
-            expect(refTypes[0]).toBe(b.ProdType.OPTION)
+            expect(_.uniq(refTypes).length).to.equal(1)
+            expect(refTypes[0]).to.equal(b.ProdType.OPTION)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe(".OPTION(this.isRequiredKw, ()=> {\r\n" +
+            expect(refText[0]).to.equal(".OPTION(this.isRequiredKw, ()=> {\r\n" +
                 "                requiredKW = this.CONSUME1(tok.RequiredTok)\r\n" +
                 "            })")
-            expect(refText[1]).toBe(".OPTION(this.isKeyKw, ()=> {\r\n" +
+            expect(refText[1]).to.equal(".OPTION(this.isKeyKw, ()=> {\r\n" +
                 "                keyKW = this.CONSUME1(tok.KeyTok)\r\n" +
                 "            })")
         })
 
         it("can extract 'at least one' IPRODRanges from a text", function () {
             var actual = b.createAtLeastOneRanges("this.MANY(...) this.AT_LEAST_ONE(bamba) this.AT_LEAST_ONE(THIS.OPTION(bisli))")
-            expect(actual.length).toBe(2)
+            expect(actual.length).to.equal(2)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).toBe(1)
-            expect(refTypes[0]).toBe(b.ProdType.AT_LEAST_ONE)
+            expect(_.uniq(refTypes).length).to.equal(1)
+            expect(refTypes[0]).to.equal(b.ProdType.AT_LEAST_ONE)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe(".AT_LEAST_ONE(bamba)")
-            expect(refText[1]).toBe(".AT_LEAST_ONE(THIS.OPTION(bisli))")
+            expect(refText[0]).to.equal(".AT_LEAST_ONE(bamba)")
+            expect(refText[1]).to.equal(".AT_LEAST_ONE(THIS.OPTION(bisli))")
         })
 
         it("can extract 'many' IPRODRanges from a text", function () {
             var actual = b.createManyRanges(literalArrayText)
-            expect(actual.length).toBe(1)
+            expect(actual.length).to.equal(1)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).toBe(1)
-            expect(refTypes[0]).toBe(b.ProdType.MANY)
+            expect(_.uniq(refTypes).length).to.equal(1)
+            expect(refTypes[0]).to.equal(b.ProdType.MANY)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe(".MANY(this.isAdditionalArgument, () => {\r\n" +
+            expect(refText[0]).to.equal(".MANY(this.isAdditionalArgument, () => {\r\n" +
                 "                    commas.push(this.CONSUME1(tok.CommaTok))\r\n" +
                 "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
                 "                }\r\n" +
@@ -129,13 +129,13 @@ module chevrotain.gastBuilder.spec {
         it("can extract 'or' IPRODRanges from a text", function () {
             var actual = b.createOrRanges(elementDefText)
             // 1 or range + 2 orPart ranges (flat ranges)
-            expect(actual.length).toBe(3)
+            expect(actual.length).to.equal(3)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).toBe(2)
+            expect(_.uniq(refTypes).length).to.equal(2)
             matchers.arrayEqualityNoOrder(_.uniq(refTypes), [b.ProdType.OR, b.ProdType.FLAT])
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            expect(refText[0]).toBe(".OR([\r\n" +
+            expect(refText[0]).to.equal(".OR([\r\n" +
                 "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
                 "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
                 "                }},\r\n" +
@@ -161,9 +161,9 @@ module chevrotain.gastBuilder.spec {
                 atLeastOne +
                 or)
 
-            expect(actual.length).toBe(6)
+            expect(actual.length).to.equal(6)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).toBe(6)
+            expect(_.uniq(refTypes).length).to.equal(6)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             matchers.arrayEqualityNoOrder(refText, [ter, option, many, ref, atLeastOne, or])
@@ -179,12 +179,12 @@ module chevrotain.gastBuilder.spec {
                 "// another single line!"
 
             var actual = b.removeComments(input)
-            expect(actual).toBe("\nhello world")
+            expect(actual).to.equal("\nhello world")
         })
 
         it("can detect missing closing parenthesis in a string", function () {
             var input = " ((()))" // the input is assumed to start right after an opening parenthesis
-            expect(() => b.findClosingOffset("(", ")", 0, input)).toThrow(new Error("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS"))
+            expect(() => b.findClosingOffset("(", ")", 0, input)).to.throw("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS")
         })
 
         it("can find the direct 'childs' of another Production from an IProd representation", function () {
@@ -199,21 +199,21 @@ module chevrotain.gastBuilder.spec {
             ]
 
             var topRange = b.getDirectlyContainedRanges(new r.Range(0, 210), allProdRanges)
-            expect(topRange.length).toBe(3)
-            expect(topRange[0].text).toBe("1.1")
-            expect(topRange[1].text).toBe("1.2")
-            expect(topRange[2].text).toBe("1.3")
+            expect(topRange.length).to.equal(3)
+            expect(topRange[0].text).to.equal("1.1")
+            expect(topRange[1].text).to.equal("1.2")
+            expect(topRange[2].text).to.equal("1.3")
 
 
             var orRange = b.getDirectlyContainedRanges(new r.Range(11, 200), allProdRanges)
-            expect(orRange.length).toBe(2)
-            expect(orRange[0].text).toBe("1.2.1")
-            expect(orRange[1].text).toBe("1.2.2")
+            expect(orRange.length).to.equal(2)
+            expect(orRange[0].text).to.equal("1.2.1")
+            expect(orRange[1].text).to.equal("1.2.2")
 
             var manyRange = b.getDirectlyContainedRanges(new r.Range(20, 180), allProdRanges)
-            expect(manyRange.length).toBe(2)
-            expect(manyRange[0].text).toBe("1.2.1.1")
-            expect(manyRange[1].text).toBe("1.2.1.2")
+            expect(manyRange.length).to.equal(2)
+            expect(manyRange[0].text).to.equal("1.2.1.1")
+            expect(manyRange[1].text).to.equal("1.2.1.2")
         })
 
         it("can build a Terminal Production from a RangeProd", function () {
@@ -223,9 +223,9 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.CONSUME2(tok.IdentTok)",
                 type:  b.ProdType.TERMINAL
             }, [])
-            expect(actual).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>actual).occurrenceInParent).toBe(2)
-            expect((<gast.Terminal>actual).terminalType).toBe(tok.IdentTok)
+            expect(actual).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>actual).occurrenceInParent).to.equal(2)
+            expect((<gast.Terminal>actual).terminalType).to.equal(tok.IdentTok)
         })
 
         it("will fail building a terminal if it cannot find it's constructor", function () {
@@ -236,7 +236,7 @@ module chevrotain.gastBuilder.spec {
                 type:  b.ProdType.TERMINAL
             }, [])
 
-            expect(buildMissingTerminal).toThrow(Error("Terminal Token name: " + "IdentTok" + " not found"))
+            expect(buildMissingTerminal).to.throw("Terminal Token name: " + "IdentTok" + " not found")
         })
 
         it("can build a Ref Production from a RangeProd", function () {
@@ -245,21 +245,21 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.SUBRULE(this.bamba(1))",
                 type:  b.ProdType.REF
             }, [])
-            expect(actual).toEqual(jasmine.any(gast.ProdRef))
-            expect((<gast.ProdRef>actual).occurrenceInParent).toBe(1)
-            expect((<gast.ProdRef>actual).refProdName).toBe("bamba")
+            expect(actual).to.be.an.instanceof(gast.ProdRef)
+            expect((<gast.ProdRef>actual).occurrenceInParent).to.equal(1)
+            expect((<gast.ProdRef>actual).refProdName).to.equal("bamba")
         })
 
         it("can build an OR Production from a RangeProd", function () {
             var actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.OR(...)", type: b.ProdType.OR}, [])
-            expect(actual).toEqual(jasmine.any(gast.OR))
-            expect((<gast.OR>actual).definition.length).toBe(0)
+            expect(actual).to.be.an.instanceof(gast.OR)
+            expect((<gast.OR>actual).definition.length).to.equal(0)
         })
 
         it("can build a MANY Production from a RangeProd", function () {
             var actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.MANY(...)", type: b.ProdType.MANY}, [])
-            expect(actual).toEqual(jasmine.any(gast.MANY))
-            expect((<gast.MANY>actual).definition.length).toBe(0)
+            expect(actual).to.be.an.instanceof(gast.MANY)
+            expect((<gast.MANY>actual).definition.length).to.equal(0)
         })
 
         it("can build an AT_LEAST_ONE Production from a RangeProd", function () {
@@ -268,8 +268,8 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.AT_LEAST_ONE(...)",
                 type:  b.ProdType.AT_LEAST_ONE
             }, [])
-            expect(actual).toEqual(jasmine.any(gast.AT_LEAST_ONE))
-            expect((<gast.AT_LEAST_ONE>actual).definition.length).toBe(0)
+            expect(actual).to.be.an.instanceof(gast.AT_LEAST_ONE)
+            expect((<gast.AT_LEAST_ONE>actual).definition.length).to.equal(0)
         })
 
         it("can build an OPTION Production from a RangeProd", function () {
@@ -278,96 +278,96 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.OPTION(...)",
                 type:  b.ProdType.OPTION
             }, [])
-            expect(actual).toEqual(jasmine.any(gast.OPTION))
-            expect((<gast.OPTION>actual).definition.length).toBe(0)
+            expect(actual).to.be.an.instanceof(gast.OPTION)
+            expect((<gast.OPTION>actual).definition.length).to.equal(0)
         })
 
         it("can build an OR Production from a RangeProd", function () {
             var actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.OR(...)", type: b.ProdType.OR}, [])
-            expect(actual).toEqual(jasmine.any(gast.OR))
-            expect((<gast.OR>actual).definition.length).toBe(0)
+            expect(actual).to.be.an.instanceof(gast.OR)
+            expect((<gast.OR>actual).definition.length).to.equal(0)
         })
 
         it("can build The Gast representation of a literalArray Grammar Rule", function () {
             var actual = b.buildTopProduction(literalArrayText, "literalArray", <any>tok)
-            expect(actual.name).toBe("literalArray")
+            expect(actual.name).to.equal("literalArray")
             var def = actual.definition
-            expect(def.length).toBe(4)
-            expect(def[0]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>def[0]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>def[0]).terminalType).toBe(tok.LSquareTok)
+            expect(def.length).to.equal(4)
+            expect(def[0]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>def[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>def[0]).terminalType).to.equal(tok.LSquareTok)
 
-            expect(def[1]).toEqual(jasmine.any(gast.ProdRef))
-            expect((<gast.ProdRef>def[1]).occurrenceInParent).toBe(1)
-            expect((<gast.ProdRef>def[1]).refProdName).toBe("expression")
+            expect(def[1]).to.be.an.instanceof(gast.ProdRef)
+            expect((<gast.ProdRef>def[1]).occurrenceInParent).to.equal(1)
+            expect((<gast.ProdRef>def[1]).refProdName).to.equal("expression")
 
-            expect(def[2]).toEqual(jasmine.any(gast.MANY))
+            expect(def[2]).to.be.an.instanceof(gast.MANY)
             // -- MANY part begin
             var manyDef = (<gast.MANY>def[2]).definition
-            expect(manyDef.length).toBe(2)
+            expect(manyDef.length).to.equal(2)
 
-            expect(manyDef[0]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>manyDef[0]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>manyDef[0]).terminalType).toBe(tok.CommaTok)
+            expect(manyDef[0]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>manyDef[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>manyDef[0]).terminalType).to.equal(tok.CommaTok)
 
-            expect(manyDef[1]).toEqual(jasmine.any(gast.ProdRef))
-            expect((<gast.ProdRef>manyDef[1]).occurrenceInParent).toBe(2)
-            expect((<gast.ProdRef>manyDef[1]).refProdName).toBe("expression")
+            expect(manyDef[1]).to.be.an.instanceof(gast.ProdRef)
+            expect((<gast.ProdRef>manyDef[1]).occurrenceInParent).to.equal(2)
+            expect((<gast.ProdRef>manyDef[1]).refProdName).to.equal("expression")
             // -- MANY part end
 
-            expect(def[3]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>def[3]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>def[3]).terminalType).toBe(tok.RSquareTok)
+            expect(def[3]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>def[3]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>def[3]).terminalType).to.equal(tok.RSquareTok)
         })
 
 
         it("can build The Gast representation of an elementDefinition Grammar Rule", function () {
             var actual = b.buildTopProduction(" " + elementDefText, "elementDef", <any>tok)
-            expect(actual.name).toBe("elementDef")
+            expect(actual.name).to.equal("elementDef")
             var def = actual.definition
-            expect(def.length).toBe(6)
-            expect(def[0]).toEqual(jasmine.any(gast.OPTION))
+            expect(def.length).to.equal(6)
+            expect(def[0]).to.be.an.instanceof(gast.OPTION)
             var option1Def = (<gast.OPTION>def[0]).definition
-            expect(option1Def.length).toBe(1)
-            expect(option1Def[0]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>option1Def[0]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>option1Def[0]).terminalType).toBe(tok.RequiredTok)
+            expect(option1Def.length).to.equal(1)
+            expect(option1Def[0]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>option1Def[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>option1Def[0]).terminalType).to.equal(tok.RequiredTok)
 
-            expect(def[1]).toEqual(jasmine.any(gast.OPTION))
+            expect(def[1]).to.be.an.instanceof(gast.OPTION)
             var option2Def = (<gast.OPTION>def[1]).definition
-            expect(option2Def.length).toBe(1)
-            expect(option2Def[0]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>option2Def[0]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>option2Def[0]).terminalType).toBe(tok.KeyTok)
+            expect(option2Def.length).to.equal(1)
+            expect(option2Def[0]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>option2Def[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>option2Def[0]).terminalType).to.equal(tok.KeyTok)
 
-            expect(def[2]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>def[2]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>def[2]).terminalType).toBe(tok.ElementTok)
+            expect(def[2]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>def[2]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>def[2]).terminalType).to.equal(tok.ElementTok)
 
-            expect(def[3]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>def[3]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>def[3]).terminalType).toBe(tok.IdentTok)
+            expect(def[3]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>def[3]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>def[3]).terminalType).to.equal(tok.IdentTok)
 
-            expect(def[4]).toEqual(jasmine.any(gast.OR))
+            expect(def[4]).to.be.an.instanceof(gast.OR)
             var orDef = (<gast.OR>def[4]).definition
-            expect(orDef.length).toBe(2)
-            expect(orDef[0]).toEqual(jasmine.any(gast.FLAT))
+            expect(orDef.length).to.equal(2)
+            expect(orDef[0]).to.be.an.instanceof(gast.FLAT)
             var orPartDef1 = (<gast.FLAT>orDef[0]).definition
-            expect(orPartDef1.length).toBe(1)
-            expect(orPartDef1[0]).toEqual(jasmine.any(gast.ProdRef))
-            expect((<gast.ProdRef>orPartDef1[0]).occurrenceInParent).toBe(1)
-            expect((<gast.ProdRef>orPartDef1[0]).refProdName).toBe("assignedTypeSpec")
+            expect(orPartDef1.length).to.equal(1)
+            expect(orPartDef1[0]).to.be.an.instanceof(gast.ProdRef)
+            expect((<gast.ProdRef>orPartDef1[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.ProdRef>orPartDef1[0]).refProdName).to.equal("assignedTypeSpec")
 
-            expect(orDef[1]).toEqual(jasmine.any(gast.FLAT))
+            expect(orDef[1]).to.be.an.instanceof(gast.FLAT)
             var orPartDef2 = (<gast.FLAT>orDef[1]).definition
-            expect(orPartDef2.length).toBe(1)
-            expect(orPartDef2[0]).toEqual(jasmine.any(gast.ProdRef))
-            expect((<gast.ProdRef>orPartDef2[0]).occurrenceInParent).toBe(1)
-            expect((<gast.ProdRef>orPartDef2[0]).refProdName).toBe("assignedTypeSpecImplicit")
+            expect(orPartDef2.length).to.equal(1)
+            expect(orPartDef2[0]).to.be.an.instanceof(gast.ProdRef)
+            expect((<gast.ProdRef>orPartDef2[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.ProdRef>orPartDef2[0]).refProdName).to.equal("assignedTypeSpecImplicit")
 
-            expect(def[5]).toEqual(jasmine.any(gast.Terminal))
-            expect((<gast.Terminal>def[5]).occurrenceInParent).toBe(1)
-            expect((<gast.Terminal>def[5]).terminalType).toBe(tok.SemicolonTok)
+            expect(def[5]).to.be.an.instanceof(gast.Terminal)
+            expect((<gast.Terminal>def[5]).occurrenceInParent).to.equal(1)
+            expect((<gast.Terminal>def[5]).terminalType).to.equal(tok.SemicolonTok)
         })
 
 
@@ -386,17 +386,17 @@ module chevrotain.gastBuilder.spec {
 
 
             var orRanges = b.createOrRanges(input)
-            expect(orRanges.length).toBe(4)
+            expect(orRanges.length).to.equal(4)
 
             var allFlatRanges = _.filter(orRanges, (prodRange:b.IProdRange) => {
                 return prodRange.type === b.ProdType.FLAT
             })
-            expect(allFlatRanges.length).toBe(2)
+            expect(allFlatRanges.length).to.equal(2)
 
             var allOrRanges = _.filter(orRanges, (prodRange:b.IProdRange) => {
                 return prodRange.type === b.ProdType.FLAT
             })
-            expect(allOrRanges.length).toBe(2)
+            expect(allOrRanges.length).to.equal(2)
         })
     })
 
@@ -409,7 +409,7 @@ module chevrotain.gastBuilder.spec {
             var topLevelRules = new lang.HashTable<gast.TOP_LEVEL>()
             topLevelRules.put("TOP", topLevel)
             var resolver = new b.GastRefResolverVisitor(topLevelRules);
-            expect(() => resolver.resolveRefs()).toThrow(Error("Invalid grammar, reference to rule which is not defined --> missingRule"))
+            expect(() => resolver.resolveRefs()).to.throw("Invalid grammar, reference to rule which is not defined --> missingRule")
         })
     })
 

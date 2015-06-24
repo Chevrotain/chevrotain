@@ -48,47 +48,47 @@ module chevrotain.lookahead.spec {
         it("can compute the lookahead function for the first OPTION in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForOption(1, samples.actionDec)
 
-            expect(laFunc.call(new ColonParserMock())).toBe(false)
-            expect(laFunc.call(new IdentParserMock())).toBe(true)
+            expect(laFunc.call(new ColonParserMock())).to.equal(false)
+            expect(laFunc.call(new IdentParserMock())).to.equal(true)
         })
 
         it("can compute the lookahead function for the second OPTION in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForOption(2, samples.actionDec)
 
-            expect(laFunc.call(new ColonParserMock())).toBe(true)
-            expect(laFunc.call(new IdentParserMock())).toBe(false)
+            expect(laFunc.call(new ColonParserMock())).to.equal(true)
+            expect(laFunc.call(new IdentParserMock())).to.equal(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForMany(1, samples.actionDec)
 
-            expect(laFunc.call(new CommaParserMock())).toBe(true)
-            expect(laFunc.call(new IdentParserMock())).toBe(false)
+            expect(laFunc.call(new CommaParserMock())).to.equal(true)
+            expect(laFunc.call(new IdentParserMock())).to.equal(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForOr(1, samples.lotsOfOrs)
 
-            expect(laFunc.call(new CommaParserMock())).toBe(0)
-            expect(laFunc.call(new KeyParserMock())).toBe(0)
-            expect(laFunc.call(new EntityParserMock())).toBe(1)
-            expect(laFunc.call(new ColonParserMock())).toBe(-1)
+            expect(laFunc.call(new CommaParserMock())).to.equal(0)
+            expect(laFunc.call(new KeyParserMock())).to.equal(0)
+            expect(laFunc.call(new EntityParserMock())).to.equal(1)
+            expect(laFunc.call(new ColonParserMock())).to.equal(-1)
         })
 
         it("can compute the lookahead function for a Top Level Rule", function () {
             var laFunc = lookahead.buildLookaheadForTopLevel(samples.actionDec)
 
-            expect(laFunc.call(new ActionParserMock())).toBe(true)
-            expect(laFunc.call(new IdentParserMock())).toBe(false)
+            expect(laFunc.call(new ActionParserMock())).to.equal(true)
+            expect(laFunc.call(new IdentParserMock())).to.equal(false)
         })
 
         it("can compute the lookahead function for a Top Level Rule #2", function () {
             var laFunc = lookahead.buildLookaheadForTopLevel(samples.lotsOfOrs)
 
-            expect(laFunc.call(new CommaParserMock())).toBe(true)
-            expect(laFunc.call(new EntityParserMock())).toBe(true)
-            expect(laFunc.call(new KeyParserMock())).toBe(true)
-            expect(laFunc.call(new ActionParserMock())).toBe(false)
+            expect(laFunc.call(new CommaParserMock())).to.equal(true)
+            expect(laFunc.call(new EntityParserMock())).to.equal(true)
+            expect(laFunc.call(new KeyParserMock())).to.equal(true)
+            expect(laFunc.call(new ActionParserMock())).to.equal(false)
         })
     })
 
@@ -105,8 +105,8 @@ module chevrotain.lookahead.spec {
         it("can detect ambiguities when calculating lookahead functions for OR alternatives", function () {
             var input = [[A, B], [C, D], [E, C]]
             var ambiguities = lookahead.checkAlternativesAmbiguities(input)
-            expect(ambiguities.length).toBe(1)
-            expect(ambiguities[0].alts).toEqual([2, 3])
+            expect(ambiguities.length).to.equal(1)
+            expect(ambiguities[0].alts).to.deep.equal([2, 3])
         })
     })
 

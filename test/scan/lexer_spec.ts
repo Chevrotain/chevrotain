@@ -27,28 +27,28 @@ module chevrotain.lexer.spec {
             // this can match either IdentifierTok or BambaTok but should match BambaTok has its pattern is defined before IdentifierTok
             var input = "bamba"
             var result = testLexer.tokenize(input)
-            expect(result.tokens[0]).toEqual(jasmine.any(BambaTok))
-            expect(result.tokens[0].image).toBe("bamba")
-            expect(result.tokens[0].startLine).toBe(1)
-            expect(result.tokens[0].startColumn).toBe(1)
+            expect(result.tokens[0]).to.be.an.instanceof(BambaTok)
+            expect(result.tokens[0].image).to.equal("bamba")
+            expect(result.tokens[0].startLine).to.equal(1)
+            expect(result.tokens[0].startColumn).to.equal(1)
         })
 
         it("can create a token from a string with priority to the First Token class with the longest match #2", function () {
             var input = "bambaMIA"
             var result = testLexer.tokenize(input)
-            expect(result.tokens[0]).toEqual(jasmine.any(IdentifierTok))
-            expect(result.tokens[0].image).toBe("bambaMIA")
-            expect(result.tokens[0].startLine).toBe(1)
-            expect(result.tokens[0].startColumn).toBe(1)
+            expect(result.tokens[0]).to.be.an.instanceof(IdentifierTok)
+            expect(result.tokens[0].image).to.equal("bambaMIA")
+            expect(result.tokens[0].startLine).to.equal(1)
+            expect(result.tokens[0].startColumn).to.equal(1)
         })
 
         it("can create a token from a string", function () {
             var input = "6666543221231"
             var result = testLexer.tokenize(input)
-            expect(result.tokens[0]).toEqual(jasmine.any(IntegerTok))
-            expect(result.tokens[0].image).toBe("6666543221231")
-            expect(result.tokens[0].startLine).toBe(1)
-            expect(result.tokens[0].startColumn).toBe(1)
+            expect(result.tokens[0]).to.be.an.instanceof(IntegerTok)
+            expect(result.tokens[0].image).to.equal("6666543221231")
+            expect(result.tokens[0].startLine).to.equal(1)
+            expect(result.tokens[0].startColumn).to.equal(1)
         })
     })
 
@@ -108,95 +108,95 @@ module chevrotain.lexer.spec {
 
         it("won't detect valid patterns as missing", function () {
             var result = findMissingPatterns([BambaTok, IntegerTok, IdentifierTok])
-            expect(_.isEmpty(result)).toBe(true)
+            expect(_.isEmpty(result)).to.equal(true)
         })
 
         it("will detect missing patterns", function () {
             var tokenClasses = [ValidNaPattern, MissingPattern]
             var result = findMissingPatterns(tokenClasses)
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "MissingPattern")).toBe(true)
-            // TODO: use toThrowError once jasmine_node_coverage updates to jasmine 2.0
-            expect(() => {validatePatterns(tokenClasses)}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "MissingPattern")).to.equal(true)
+            // TODO: use to.throwError once jasmine_node_coverage updates to jasmine 2.0
+            expect(() => {validatePatterns(tokenClasses)}).to.throw()
         })
 
         it("won't detect valid patterns as invalid", function () {
             var result = findInvalidPatterns([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
-            expect(_.isEmpty(result)).toBe(true)
+            expect(_.isEmpty(result)).to.equal(true)
         })
 
         it("will detect invalid patterns as invalid", function () {
             var tokenClasses = [ValidNaPattern, InvalidPattern]
             var result = findInvalidPatterns(tokenClasses)
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "InvalidPattern")).toBe(true)
-            expect(() => {validatePatterns(tokenClasses)}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "InvalidPattern")).to.equal(true)
+            expect(() => {validatePatterns(tokenClasses)}).to.throw()
         })
 
         it("won't detect valid patterns as using unsupported flags", function () {
             var result = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
-            expect(_.isEmpty(result)).toBe(true)
+            expect(_.isEmpty(result)).to.equal(true)
         })
 
         it("will detect patterns using unsupported multiline flag", function () {
             var tokenClasses = [ValidNaPattern, MultiLinePattern]
             var result = findUnsupportedFlags(tokenClasses)
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "MultiLinePattern")).toBe(true)
-            expect(() => {validatePatterns(tokenClasses)}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "MultiLinePattern")).to.equal(true)
+            expect(() => {validatePatterns(tokenClasses)}).to.throw()
         })
 
         it("will detect patterns using unsupported global flag", function () {
             var tokenClasses = [ValidNaPattern, GlobalPattern]
             var result = findUnsupportedFlags(tokenClasses)
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "GlobalPattern")).toBe(true)
-            expect(() => {validatePatterns(tokenClasses)}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "GlobalPattern")).to.equal(true)
+            expect(() => {validatePatterns(tokenClasses)}).to.throw()
         })
 
         it("won't detect valid patterns as duplicates", function () {
             var result = findDuplicatePatterns([MultiLinePattern, IntegerValid])
-            expect(result.length).toBe(0)
+            expect(result.length).to.equal(0)
         })
 
         it("won't detect NA patterns as duplicates", function () {
             var result = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
-            expect(result.length).toBe(0)
+            expect(result.length).to.equal(0)
         })
 
         it("will detect patterns using unsupported end of input anchor", function () {
             var tokenClasses = [ValidNaPattern, EndOfInputAnchor]
             var result = findEndOfInputAnchor([ValidNaPattern, EndOfInputAnchor])
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "EndOfInputAnchor")).toBe(true)
-            expect(() => {validatePatterns(tokenClasses)}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "EndOfInputAnchor")).to.equal(true)
+            expect(() => {validatePatterns(tokenClasses)}).to.throw()
         })
 
         it("won't detect valid patterns as using unsupported end of input anchor", function () {
             var result = findEndOfInputAnchor([IntegerTok, IntegerValid])
-            expect(result.length).toBe(0)
+            expect(result.length).to.equal(0)
         })
 
         it("will detect identical patterns for different classes", function () {
             var tokenClasses = [DecimalInvalid, IntegerValid]
             var result = findDuplicatePatterns(tokenClasses)
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "IntegerValid")).toBe(true)
-            expect(_.contains(result[0], "DecimalInvalid")).toBe(true)
-            expect(() => {validatePatterns(tokenClasses)}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "IntegerValid")).to.equal(true)
+            expect(_.contains(result[0], "DecimalInvalid")).to.equal(true)
+            expect(() => {validatePatterns(tokenClasses)}).to.throw()
         })
 
 
         it("won't detect valid groups as unsupported", function () {
             var result = findInvalidGroupType([IntegerTok, Skipped, Special])
-            expect(result.length).toBe(0)
+            expect(result.length).to.equal(0)
         })
 
         it("will detect unsupported group types", function () {
             var result = findInvalidGroupType([InvalidGroupNumber])
-            expect(result.length).toBe(1)
-            expect(_.contains(result[0], "InvalidGroupNumber")).toBe(true)
-            expect(() => {validatePatterns([InvalidGroupNumber])}).toThrow()
+            expect(result.length).to.equal(1)
+            expect(_.contains(result[0], "InvalidGroupNumber")).to.equal(true)
+            expect(() => {validatePatterns([InvalidGroupNumber])}).to.throw()
         })
     })
 
@@ -236,21 +236,21 @@ module chevrotain.lexer.spec {
         it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", function () {
             var orgSource = BambaTok.PATTERN.source
             var transPattern = addStartOfInput(BambaTok.PATTERN)
-            expect(transPattern.source).toEqual("^(?:" + orgSource + ")")
-            expect(_.startsWith(transPattern.source, "^")).toBe(true)
+            expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
+            expect(_.startsWith(transPattern.source, "^")).to.equal(true)
         })
 
         it("can transform a pattern to one with startOfInput mark ('^') #2", function () {
             var orgSource = PatternNoStart.PATTERN.source
             var transPattern = addStartOfInput(PatternNoStart.PATTERN)
-            expect(transPattern.source).toEqual("^(?:" + orgSource + ")")
-            expect(_.startsWith(transPattern.source, "^")).toBe(true)
+            expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
+            expect(_.startsWith(transPattern.source, "^")).to.equal(true)
         })
 
         it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", function () {
             var tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
             var analyzeResult = analyzeTokenClasses(tokenClasses)
-            expect(analyzeResult.allPatterns.length).toBe(8)
+            expect(analyzeResult.allPatterns.length).to.equal(8)
             var allPatternsString = _.map(analyzeResult.allPatterns, (pattern) => {
                 return pattern.source
             })
@@ -258,21 +258,21 @@ module chevrotain.lexer.spec {
                 "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
             var patternIdxToClass = analyzeResult.patternIdxToClass
-            expect(_.keys(patternIdxToClass).length).toBe(8)
-            expect(patternIdxToClass[0]).toBe(If);
-            expect(patternIdxToClass[1]).toBe(Else);
-            expect(patternIdxToClass[2]).toBe(Return);
-            expect(patternIdxToClass[3]).toBe(Integer);
-            expect(patternIdxToClass[4]).toBe(LParen);
-            expect(patternIdxToClass[5]).toBe(RParen);
-            expect(patternIdxToClass[6]).toBe(Whitespace);
-            expect(patternIdxToClass[7]).toBe(NewLine);
+            expect(_.keys(patternIdxToClass).length).to.equal(8)
+            expect(patternIdxToClass[0]).to.equal(If);
+            expect(patternIdxToClass[1]).to.equal(Else);
+            expect(patternIdxToClass[2]).to.equal(Return);
+            expect(patternIdxToClass[3]).to.equal(Integer);
+            expect(patternIdxToClass[4]).to.equal(LParen);
+            expect(patternIdxToClass[5]).to.equal(RParen);
+            expect(patternIdxToClass[6]).to.equal(Whitespace);
+            expect(patternIdxToClass[7]).to.equal(NewLine);
         })
 
         it("can count the number of line terminators in a string", function () {
-            expect(countLineTerminators("bamba\r\nbisli\r")).toBe(2)
-            expect(countLineTerminators("\r\r\r1234\r\n")).toBe(4)
-            expect(countLineTerminators("aaaa\raaa\n\r1234\n")).toBe(4)
+            expect(countLineTerminators("bamba\r\nbisli\r")).to.equal(2)
+            expect(countLineTerminators("\r\r\r1234\r\n")).to.equal(4)
+            expect(countLineTerminators("aaaa\raaa\n\r1234\n")).to.equal(4)
         })
     })
 
@@ -285,12 +285,12 @@ module chevrotain.lexer.spec {
                 "\telse return 2"
 
             var lexResult = ifElseLexer.tokenize(input)
-            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
+            expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
                 new RParen(")", 7, 1, 8), new Return("return", 9, 1, 10), new Integer("1", 16, 1, 17), new Else("else", 19, 2, 2),
                 new Return("return", 24, 2, 7), new Integer("2", 31, 2, 14)
             ])
             // TODO: support returning skipped tokens under certain conditions (token groups)
-            //expect(lexResult.skipped).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
+            //expect(lexResult.skipped).to.deep.equal([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
             //    new NewLine(1, 18, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
         })
 
@@ -303,16 +303,16 @@ module chevrotain.lexer.spec {
                 "\telse return 2"
 
             var lexResult = ifElseLexer.tokenize(input)
-            expect(lexResult.errors.length).toBe(1)
-            expect(_.contains(lexResult.errors[0].message, "@")).toBe(true)
-            expect(lexResult.errors[0].line).toBe(1)
-            expect(lexResult.errors[0].column).toBe(18)
-            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
+            expect(lexResult.errors.length).to.equal(1)
+            expect(_.contains(lexResult.errors[0].message, "@")).to.equal(true)
+            expect(lexResult.errors[0].line).to.equal(1)
+            expect(lexResult.errors[0].column).to.equal(18)
+            expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
                 new RParen(")", 7, 1, 8), new Return("return", 9, 1, 10), new Integer("1", 16, 1, 17), new Else("else", 25, 2, 2),
                 new Return("return", 30, 2, 7), new Integer("2", 37, 2, 14)
             ])
             // TODO: support returning skipped tokens under certain conditions (token groups)
-            //expect(lexResult.skipped).toEqual([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
+            //expect(lexResult.skipped).to.deep.equal([new Whitespace(1, 3, " "), new Whitespace(1, 9, " "), new Whitespace(1, 16, " "),
             //    new NewLine(1, 24, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
         })
 
@@ -321,11 +321,11 @@ module chevrotain.lexer.spec {
 
             var input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
             var lexResult = ifElseLexer.tokenize(input)
-            expect(lexResult.errors.length).toBe(1)
-            expect(_.contains(lexResult.errors[0].message, "&")).toBe(true)
-            expect(lexResult.errors[0].line).toBe(1)
-            expect(lexResult.errors[0].column).toBe(3)
-            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1)])
+            expect(lexResult.errors.length).to.equal(1)
+            expect(_.contains(lexResult.errors[0].message, "&")).to.equal(true)
+            expect(lexResult.errors[0].line).to.equal(1)
+            expect(lexResult.errors[0].column).to.equal(3)
+            expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1)])
         })
 
         it("can deal with line terminators during resync", function () {
@@ -333,19 +333,19 @@ module chevrotain.lexer.spec {
 
             var input = "if\r\nelse\rif\r"
             var lexResult = ifElseLexer.tokenize(input)
-            expect(lexResult.errors.length).toBe(3)
-            expect(_.contains(lexResult.errors[0].message, "\r")).toBe(true)
-            expect(lexResult.errors[0].line).toBe(1)
-            expect(lexResult.errors[0].column).toBe(3)
+            expect(lexResult.errors.length).to.equal(3)
+            expect(_.contains(lexResult.errors[0].message, "\r")).to.equal(true)
+            expect(lexResult.errors[0].line).to.equal(1)
+            expect(lexResult.errors[0].column).to.equal(3)
 
-            expect(_.contains(lexResult.errors[1].message, "\r")).toBe(true)
-            expect(lexResult.errors[1].line).toBe(2)
-            expect(lexResult.errors[1].column).toBe(5)
+            expect(_.contains(lexResult.errors[1].message, "\r")).to.equal(true)
+            expect(lexResult.errors[1].line).to.equal(2)
+            expect(lexResult.errors[1].column).to.equal(5)
 
-            expect(_.contains(lexResult.errors[1].message, "\r")).toBe(true)
-            expect(lexResult.errors[2].line).toBe(3)
-            expect(lexResult.errors[2].column).toBe(3)
-            expect(lexResult.tokens).toEqual([new If("if", 0, 1, 1), new Else("else", 4, 2, 1), new If("if", 9, 3, 1)])
+            expect(_.contains(lexResult.errors[1].message, "\r")).to.equal(true)
+            expect(lexResult.errors[2].line).to.equal(3)
+            expect(lexResult.errors[2].column).to.equal(3)
+            expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1), new Else("else", 4, 2, 1), new If("if", 9, 3, 1)])
         })
 
         it("can deal with line terminators inside multi-line Tokens", function () {
@@ -354,7 +354,7 @@ module chevrotain.lexer.spec {
             var input = "if\r\r\telse\rif\n"
             var lexResult = ifElseLexer.tokenize(input)
 
-            expect(lexResult.tokens).toEqual([
+            expect(lexResult.tokens).to.deep.equal([
                 new If("if", 0, 1, 1, 1, 2),
                 new WhitespaceNotSkipped("\r\r\t", 2, 1, 3, 3, 1),
                 new Else("else", 5, 3, 2, 3, 5),
@@ -370,11 +370,11 @@ module chevrotain.lexer.spec {
             var input = "if//else"
             var lexResult = ifElseLexer.tokenize(input)
 
-            expect(lexResult.tokens).toEqual([
+            expect(lexResult.tokens).to.deep.equal([
                 new If("if", 0, 1, 1, 1, 2),
             ])
 
-            expect((<any>lexResult.groups).comments).toEqual([
+            expect((<any>lexResult.groups).comments).to.deep.equal([
                 new Comment("//else", 2, 1, 3, 1, 8),
             ])
         })

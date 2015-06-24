@@ -43,37 +43,29 @@ module.exports = function(grunt) {
             }
         },
 
-        jasmine_node: {
-            node_release_tests: {
+        mocha_istanbul: {
+            coverage: {
+                src: 'bin/chevrotain.js',
                 options: {
-                    coverage:          {
-                        reportFile: 'coverage.json',
-                        print:      'both', // none, summary, detail, both
-                        relativize: true,
-                        thresholds: {
-                            statements: 100,
-                            branches:   0,
-                            lines:      100,
-                            functions:  100
-                        },
-                        reportDir:  'bin/coverage',
-                        report:     [
-                            'lcov'
-                        ],
-                        collect:    [ // false to disable, paths are relative to 'reportDir'
-                            '*coverage.json'
-                        ],
-                        excludes:   []
-                    },
-                    forceExit:         true,
-                    match:             '.',
-                    matchAll:          false,
-                    specFolders:       ['bin'],
-                    extensions:        'js',
-                    specNameMatcher:   'tainSpecs', // to only run the aggregated specs
-                    captureExceptions: true
-                },
-                src:     ['bin/chevrotain.js']
+                    root: './bin/',
+                    mask: '*tainSpecs.js',
+                    coverageFolder: 'bin/coverage',
+                    excludes: ['*tainSpecs.js']
+                }
+            },
+        },
+
+        istanbul_check_coverage: {
+            default: {
+                options: {
+                    coverageFolder: 'bin/coverage',
+                    check: {
+                        statements: 100,
+                        branches:   0,
+                        lines:      100,
+                        functions:  100
+                    }
+                }
             }
         },
 
@@ -223,7 +215,7 @@ module.exports = function(grunt) {
         'compress'
     ]
 
-    var commonReleaseTasks = releaseBuildTasks.concat(['jasmine_node:node_release_tests'])
+    var commonReleaseTasks = releaseBuildTasks.concat(['mocha_istanbul', 'istanbul_check_coverage'])
 
     grunt.loadNpmTasks('grunt-karma')
     grunt.loadNpmTasks('grunt-tslint')
@@ -231,13 +223,13 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-umd')
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
-    grunt.loadNpmTasks('grunt-jasmine-node-coverage')
     grunt.loadNpmTasks('grunt-contrib-compress')
+    grunt.loadNpmTasks('grunt-mocha-istanbul');
 
 
     grunt.registerTask('build', releaseBuildTasks)
     grunt.registerTask('build_and_test', commonReleaseTasks)
-    grunt.registerTask('test', ['jasmine_node:node_release_tests'])
+    grunt.registerTask('test', ['mocha_istanbul', 'istanbul_check_coverage'])
     grunt.registerTask('build_and_test_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
 
     grunt.registerTask('dev_build', [

@@ -8,9 +8,9 @@ module chevrotain.lang.spec {
             hashTable.put("one", 1)
             hashTable.put("two", 2)
 
-            expect(hashTable.get("one")).toBe(1)
-            expect(hashTable.get("two")).toBe(2)
-            expect(hashTable.get("three")).toBe(undefined)
+            expect(hashTable.get("one")).to.equal(1)
+            expect(hashTable.get("two")).to.equal(2)
+            expect(hashTable.get("three")).to.equal(undefined)
         })
 
         it("support property names that are also names of built in properties on javascript Object", function () {
@@ -18,8 +18,8 @@ module chevrotain.lang.spec {
             hashTable.put("toString", 1)
             hashTable.put("hasOwnProperty", 2)
 
-            expect(hashTable.get("toString")).toBe(1)
-            expect(hashTable.get("hasOwnProperty")).toBe(2)
+            expect(hashTable.get("toString")).to.equal(1)
+            expect(hashTable.get("hasOwnProperty")).to.equal(2)
         })
     })
 

@@ -146,27 +146,27 @@ module chevrotain.recognizer.spec {
             var input = [new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok()]
             var parser = new SubRuleTestParser(input)
             var result = parser.topRule()
-            expect(result).toBe("12345")
+            expect(result).to.equal("12345")
         })
 
         it("provides a production SUBRULE1-5 that can accept arguments from its caller", function () {
             var input = [new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok()]
             var parser = new SubRuleArgsParser(input)
             var result = parser.topRule()
-            expect(result.letters).toBe("abcde")
-            expect(result.numbers).toBe("54321")
+            expect(result.letters).to.equal("abcde")
+            expect(result.numbers).to.equal("54321")
         })
 
         it("allows using automatic lookahead even as part of custom lookahead functions valid", function () {
             var input1 = [new PlusTok()]
             var parser = new CustomLookaheadParser(input1)
             var result = parser.topRule()
-            expect(result).toBe("plus")
+            expect(result).to.equal("plus")
 
             var input2 = [new MinusTok()]
             var parser2 = new CustomLookaheadParser(input2)
             var result2 = parser2.topRule()
-            expect(result2).toBe("minus")
+            expect(result2).to.equal("minus")
         })
 
         it("allows using automatic lookahead even as part of custom lookahead functions invalid", function () {
@@ -174,9 +174,9 @@ module chevrotain.recognizer.spec {
             var parser = new CustomLookaheadParser(input1)
             parser.plusAllowed = false
             var result = parser.topRule()
-            expect(result).toBe(undefined)
-            expect(parser.errors.length).toBe(1)
-            expect(_.contains(parser.errors[0].message, "unicorn")).toBe(true)
+            expect(result).to.equal(undefined)
+            expect(parser.errors.length).to.equal(1)
+            expect(_.contains(parser.errors[0].message, "unicorn")).to.equal(true)
         })
     })
 
@@ -189,32 +189,32 @@ module chevrotain.recognizer.spec {
                 new IntToken("2"), new PlusTok(), new IntToken("3")]
 
             parser.input = testInput
-            expect(parser.CONSUME4(IntToken)).toBe(testInput[0])
-            expect(parser.CONSUME2(PlusTok)).toBe(testInput[1])
-            expect(parser.CONSUME1(IntToken)).toBe(testInput[2])
-            expect(parser.CONSUME3(PlusTok)).toBe(testInput[3])
-            expect(parser.CONSUME1(IntToken)).toBe(testInput[4])
-            expect(parser.NEXT_TOKEN()).toEqual(jasmine.any(EOF))
+            expect(parser.CONSUME4(IntToken)).to.equal(testInput[0])
+            expect(parser.CONSUME2(PlusTok)).to.equal(testInput[1])
+            expect(parser.CONSUME1(IntToken)).to.equal(testInput[2])
+            expect(parser.CONSUME3(PlusTok)).to.equal(testInput[3])
+            expect(parser.CONSUME1(IntToken)).to.equal(testInput[4])
+            expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
         })
 
         it("does not allow duplicate grammar rule names", function () {
             var parser:any = new Parser([], {});
             parser.validateRuleName("bamba") // first time with a valid name.
-            expect(() => parser.validateRuleName("bamba")).toThrow(
-                Error("Duplicate definition, rule: bamba is already defined in the grammar: Parser"))
+            expect(() => parser.validateRuleName("bamba")).to.throw(
+                "Duplicate definition, rule: bamba is already defined in the grammar: Parser")
         })
 
         it("only allows a subset of ECMAScript identifiers as rulenames", function () {
             var parser:any = new Parser([], {});
-            expect(() => parser.validateRuleName("1baa")).toThrow()
-            expect(() => parser.validateRuleName("שלום")).toThrow()
-            expect(() => parser.validateRuleName("$bamba")).toThrow()
+            expect(() => parser.validateRuleName("1baa")).to.throw()
+            expect(() => parser.validateRuleName("שלום")).to.throw()
+            expect(() => parser.validateRuleName("$bamba")).to.throw()
         })
 
         it("will not perform inRepetition recovery while in backtracking mode", function () {
             var parser:any = new Parser([], {})
             parser.isBackTrackingStack.push(1)
-            expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).toBe(false)
+            expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).to.equal(false)
         })
 
         it("can perform in-repetition recovery for MANY grammar rule", function () {
@@ -222,8 +222,8 @@ module chevrotain.recognizer.spec {
             var input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
                 new PlusTok(), new DotTok(), new IdentTok("c")]
             var parser = new ManyRepetitionRecovery(input)
-            expect(parser.qualifiedName()).toEqual(["a", "b", "c"])
-            expect(parser.errors.length).toBe(1)
+            expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
+            expect(parser.errors.length).to.equal(1)
         })
     })
 
@@ -231,25 +231,25 @@ module chevrotain.recognizer.spec {
 
         it("can be initialized without supplying an input vector", function () {
             var parser = new BaseRecognizer()
-            expect(parser.input).toBeDefined()
-            expect(parser.input).toEqual(jasmine.any(Array))
+            expect(parser.input).to.deep.equal([])
+            expect(parser.input).to.be.an.instanceof(Array)
         })
 
         it("can only SAVE_ERROR for recognition exceptions", function () {
             var parser:any = new BaseRecognizer()
             expect(() => parser.SAVE_ERROR(new Error("I am some random Error"))).
-                toThrow(Error("trying to save an Error which is not a RecognitionException"))
-            expect(parser.input).toEqual(jasmine.any(Array))
+                to.throw("trying to save an Error which is not a RecognitionException")
+            expect(parser.input).to.be.an.instanceof(Array)
         })
 
         it("when it runs out of input EOF will be returned", function () {
             var parser:any = new BaseRecognizer([new IntToken("1"), new PlusTok()])
             expect(parser.CONSUME(IntToken))
             expect(parser.CONSUME(PlusTok))
-            expect(parser.NEXT_TOKEN()).toEqual(jasmine.any(EOF))
-            expect(parser.NEXT_TOKEN()).toEqual(jasmine.any(EOF))
-            expect(parser.SKIP_TOKEN()).toEqual(jasmine.any(EOF))
-            expect(parser.SKIP_TOKEN()).toEqual(jasmine.any(EOF))
+            expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
+            expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
+            expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
+            expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
             // and we can go on and on and on... this avoid returning null/undefined
             // see: http://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
         })
@@ -260,25 +260,25 @@ module chevrotain.recognizer.spec {
             var successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
                 parser.CONSUME1(IntToken)
             })
-            expect(successfulOption).toBe(true)
+            expect(successfulOption).to.equal(true)
 
             var failedOption = parser.OPTION(function () {
                 // this lookahead should fail because the first token has been consumed and
                 // now the next one is a PlusTok
                 return this.NEXT_TOKEN() instanceof IntToken
             }, () => { parser.CONSUME1(IntToken) })
-            expect(failedOption).toBe(false)
+            expect(failedOption).to.equal(false)
         })
 
         it("will return false if a RecognitionException is thrown during " +
             "backtracking and rethrow any other kind of Exception", function () {
             var parser:any = new BaseRecognizer([])
             var backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
-            expect(() => backTrackingThrows()).toThrow(Error("division by zero, boom"))
+            expect(() => backTrackingThrows()).to.throw("division by zero, boom")
 
             var throwExceptionFunc = () => { throw new NotAllInputParsedException("sad sad panda", new PlusTok()) }
             var backTrackingFalse = parser.BACKTRACK(() => { throwExceptionFunc() }, () => { return true })
-            expect(backTrackingFalse()).toBe(false)
+            expect(backTrackingFalse()).to.equal(false)
         })
 
     })
@@ -288,9 +288,9 @@ module chevrotain.recognizer.spec {
         it("can be initialized with a vector of Tokens", function () {
             var parser:any = new Parser([], [PlusTok, MinusTok, IntToken])
             var tokensMap = (<any>parser).tokensMap
-            expect(tokensMap.PlusTok).toBe(PlusTok)
-            expect(tokensMap.MinusTok).toBe(MinusTok)
-            expect(tokensMap.IntToken).toBe(IntToken)
+            expect(tokensMap.PlusTok).to.equal(PlusTok)
+            expect(tokensMap.MinusTok).to.equal(MinusTok)
+            expect(tokensMap.IntToken).to.equal(IntToken)
         })
 
         it("can be initialized with a Dictionary of Tokens", function () {
@@ -302,24 +302,24 @@ module chevrotain.recognizer.spec {
             })
             var tokensMap = (<any>parser).tokensMap
             // the implementation should clone the dictionary to avoid bugs caused by mutability
-            expect(tokensMap).not.toBe(initTokenDictionary)
-            expect(tokensMap.PlusTok).toBe(PlusTok)
-            expect(tokensMap.MinusTok).toBe(MinusTok)
-            expect(tokensMap.IntToken).toBe(IntToken)
+            expect(tokensMap).not.to.equal(initTokenDictionary)
+            expect(tokensMap.PlusTok).to.equal(PlusTok)
+            expect(tokensMap.MinusTok).to.equal(MinusTok)
+            expect(tokensMap.IntToken).to.equal(IntToken)
         })
 
         it("cannot be initialized with other parameters", function () {
             expect(() => {
                 return new Parser([], null)
-            }).toThrow()
+            }).to.throw()
 
             expect(() => {
                 return new Parser([], <any>666)
-            }).toThrow()
+            }).to.throw()
 
             expect(() => {
                 return new Parser([], <any>"woof woof")
-            }).toThrow()
+            }).to.throw()
         })
 
     })

@@ -35,8 +35,8 @@ module chevrotain.examples.recovery.sql.spec {
 
             var parser = new DDLExampleRecoveryParser(input)
             var ptResult = parser.ddl()
-            expect(parser.errors.length).toBe(0)
-            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parser.errors.length).to.equal(0)
+            expect(parser.isAtEndOfInput()).to.equal(true)
             assertAllThreeStatementsPresentAndValid(ptResult)
         })
 
@@ -53,15 +53,15 @@ module chevrotain.examples.recovery.sql.spec {
             var parser = new DDLExampleRecoveryParser(input)
             var ptResult = parser.ddl()
             // one error encountered
-            expect(parser.errors.length).toBe(1)
+            expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parser.isAtEndOfInput()).to.equal(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
             var insertedSemiColon:Token = ptResult.children[1].children[4].payload
             // the semicolon is present even though it did not exist in the input, magic!
-            expect(insertedSemiColon).toEqual(jasmine.any(SemiColonTok))
-            expect(insertedSemiColon.isInsertedInRecovery).toBe(true)
+            expect(insertedSemiColon).to.be.an.instanceof(SemiColonTok)
+            expect(insertedSemiColon.isInsertedInRecovery).to.equal(true)
         })
 
         it("can perform single token deletion for a redundant keyword", function () {
@@ -77,9 +77,9 @@ module chevrotain.examples.recovery.sql.spec {
             var parser = new DDLExampleRecoveryParser(input)
             var ptResult = parser.ddl()
             // one error encountered
-            expect(parser.errors.length).toBe(1)
+            expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parser.isAtEndOfInput()).to.equal(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
         })
@@ -97,19 +97,19 @@ module chevrotain.examples.recovery.sql.spec {
             var parser = new DDLExampleRecoveryParser(input)
             var ptResult = parser.ddl()
             // one error encountered
-            expect(parser.errors.length).toBe(1)
+            expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).toBe(true)
-            expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
+            expect(parser.isAtEndOfInput()).to.equal(true)
+            expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
             // 3 statements found
-            expect(ptResult.children.length).toBe(3)
-            expect(ptResult.children[0].payload).toEqual(jasmine.any(CREATE_STMT))
-            expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_CREATE_STMT))
+            expect(ptResult.children.length).to.equal(3)
+            expect(ptResult.children[0].payload).to.be.an.instanceOf(CREATE_STMT)
+            expect(ptResult.children[0].payload).not.to.be.an.instanceof(INVALID_CREATE_STMT)
             // but the second one is marked as invalid
-            expect(ptResult.children[1].payload).toEqual(jasmine.any(INVALID_INSERT_STMT))
+            expect(ptResult.children[1].payload).to.be.an.instanceof(INVALID_INSERT_STMT)
             // yet the third one is still valid!, we recovered and continued parsing.
-            expect(ptResult.children[2].payload).toEqual(jasmine.any(DELETE_STMT))
-            expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
+            expect(ptResult.children[2].payload).to.be.an.instanceof(DELETE_STMT)
+            expect(ptResult.children[2].payload).not.to.be.an.instanceof(INVALID_DELETE_STMT)
         })
 
         it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", function () {
@@ -131,31 +131,31 @@ module chevrotain.examples.recovery.sql.spec {
             var parser = new DDLExampleRecoveryParser(input)
             var ptResult = parser.ddl()
             // one error encountered
-            expect(parser.errors.length).toBe(1)
+            expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
-            expect(parser.isAtEndOfInput()).toBe(true)
-            expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
+            expect(parser.isAtEndOfInput()).to.equal(true)
+            expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
             // 3 statements found
-            expect(ptResult.children.length).toBe(3)
-            expect(ptResult.children[0].payload).toEqual(jasmine.any(CREATE_STMT))
-            expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_CREATE_STMT))
+            expect(ptResult.children.length).to.equal(3)
+            expect(ptResult.children[0].payload).to.be.an.instanceof(CREATE_STMT)
+            expect(ptResult.children[0].payload).not.to.be.an.instanceof(INVALID_CREATE_STMT)
             // but the second one is marked as invalid, this means we kept trying to re-sync to an "higher" rule
-            expect(ptResult.children[1].payload).toEqual(jasmine.any(INVALID_INSERT_STMT))
+            expect(ptResult.children[1].payload).to.be.an.instanceof(INVALID_INSERT_STMT)
             // yet the third one is still valid!, we recovered and continued parsing.
-            expect(ptResult.children[2].payload).toEqual(jasmine.any(DELETE_STMT))
-            expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
+            expect(ptResult.children[2].payload).to.be.an.instanceof(DELETE_STMT)
+            expect(ptResult.children[2].payload).not.to.be.an.instanceof(INVALID_DELETE_STMT)
         })
 
         function assertAllThreeStatementsPresentAndValid(ptResult:pt.ParseTree):void {
-            expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
+            expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
             // 3 statements found
-            expect(ptResult.children.length).toBe(3)
-            expect(ptResult.children[0].payload).toEqual(jasmine.any(CREATE_STMT))
-            expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_CREATE_STMT))
-            expect(ptResult.children[1].payload).toEqual(jasmine.any(INSERT_STMT))
-            expect(ptResult.children[1].payload).not.toEqual(jasmine.any(INVALID_INSERT_STMT))
-            expect(ptResult.children[2].payload).toEqual(jasmine.any(DELETE_STMT))
-            expect(ptResult.children[2].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
+            expect(ptResult.children.length).to.equal(3)
+            expect(ptResult.children[0].payload).to.be.an.instanceof(CREATE_STMT)
+            expect(ptResult.children[0].payload).not.to.be.an.instanceof(INVALID_CREATE_STMT)
+            expect(ptResult.children[1].payload).to.be.an.instanceof(INSERT_STMT)
+            expect(ptResult.children[1].payload).not.to.be.an.instanceof(INVALID_INSERT_STMT)
+            expect(ptResult.children[2].payload).to.be.an.instanceof(DELETE_STMT)
+            expect(ptResult.children[2].payload).not.to.be.an.instanceof(INVALID_DELETE_STMT)
         }
 
 
@@ -166,8 +166,8 @@ module chevrotain.examples.recovery.sql.spec {
             var parser = new DDLExampleRecoveryParser(input)
 
             parser.ddl()
-            expect(parser.errors.length).toBe(1)
-            expect(parser.errors[0]).toEqual(jasmine.any(NotAllInputParsedException))
+            expect(parser.errors.length).to.equal(1)
+            expect(parser.errors[0]).to.be.an.instanceof(NotAllInputParsedException)
         })
 
         it("can use the same parser instance to parse multiple inputs", function () {
@@ -176,8 +176,8 @@ module chevrotain.examples.recovery.sql.spec {
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
             var parser = new DDLExampleRecoveryParser(input1)
             parser.ddl()
-            expect(parser.errors.length).toBe(0)
-            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parser.errors.length).to.equal(0)
+            expect(parser.isAtEndOfInput()).to.equal(true)
 
 
             var input2:any = _.flatten([
@@ -187,13 +187,13 @@ module chevrotain.examples.recovery.sql.spec {
             parser.reset();
             parser.input = input2
             var ptResult = parser.ddl()
-            expect(parser.errors.length).toBe(0)
-            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parser.errors.length).to.equal(0)
+            expect(parser.isAtEndOfInput()).to.equal(true)
             // verify returned ParseTree
-            expect(ptResult.payload).toEqual(jasmine.any(STATEMENTS))
-            expect(ptResult.children.length).toBe(1)
-            expect(ptResult.children[0].payload).toEqual(jasmine.any(DELETE_STMT))
-            expect(ptResult.children[0].payload).not.toEqual(jasmine.any(INVALID_DELETE_STMT))
+            expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
+            expect(ptResult.children.length).to.equal(1)
+            expect(ptResult.children[0].payload).to.be.an.instanceof(DELETE_STMT)
+            expect(ptResult.children[0].payload).not.to.be.an.instanceof(INVALID_DELETE_STMT)
         })
 
         it("can re-sync to the next iteration in a MANY rule", function () {
@@ -209,8 +209,8 @@ module chevrotain.examples.recovery.sql.spec {
 
             var parser = new DDLExampleRecoveryParser(input)
             var ptResult = parser.ddl()
-            expect(parser.errors.length).toBe(1)
-            expect(parser.isAtEndOfInput()).toBe(true)
+            expect(parser.errors.length).to.equal(1)
+            expect(parser.isAtEndOfInput()).to.equal(true)
             assertAllThreeStatementsPresentAndValid(ptResult)
         })
 

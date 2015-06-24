@@ -11,27 +11,27 @@ module chevrotain.gastBuilder.spec {
 
         it("exposes a constructor and three getters accessing the internal token", function () {
             var ptInstance = new pt.ParseTree(new VirtualToken())
-            expect(ptInstance.getImage()).toBe("")
-            expect(ptInstance.getColumn()).toBe(-1)
-            expect(ptInstance.getLine()).toBe(-1)
+            expect(ptInstance.getImage()).to.equal("")
+            expect(ptInstance.getColumn()).to.equal(-1)
+            expect(ptInstance.getLine()).to.equal(-1)
         })
 
         it("exposes a factory method that helps create ParseTree", function () {
             var bambaPt = pt.PT(BambaTok)
-            expect(bambaPt.payload).toEqual(jasmine.any(BambaTok))
+            expect(bambaPt.payload).to.be.an.instanceof(BambaTok)
 
             var bisliPt = pt.PT(new BisliTok("bisli", 0, 1, 1), [bambaPt])
-            expect(bisliPt.children.length).toBe(1)
-            expect(bisliPt.children[0]).toBe(bambaPt)
-            expect(bisliPt.payload.image).toBe("bisli")
-            expect(bisliPt.payload.startLine).toBe(1)
-            expect(bisliPt.payload.startColumn).toBe(1)
-            expect(bisliPt.payload).toEqual(jasmine.any(BisliTok))
+            expect(bisliPt.children.length).to.equal(1)
+            expect(bisliPt.children[0]).to.equal(bambaPt)
+            expect(bisliPt.payload.image).to.equal("bisli")
+            expect(bisliPt.payload.startLine).to.equal(1)
+            expect(bisliPt.payload.startColumn).to.equal(1)
+            expect(bisliPt.payload).to.be.an.instanceof(BisliTok)
 
-            expect(pt.PT(null)).toBe(null)
-            expect(pt.PT(undefined)).toBe(null)
+            expect(pt.PT(null)).to.equal(null)
+            expect(pt.PT(undefined)).to.equal(null)
 
-            expect(() => pt.PT(<any>666)).toThrow()
+            expect(() => pt.PT(<any>666)).to.throw()
         })
 
     })

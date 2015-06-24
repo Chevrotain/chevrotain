@@ -1,7 +1,6 @@
 
 // libs
 /// <reference path="../libs/lodash.d.ts" />
-/// <reference path="../libs/jasmine.d.ts" />
 
 // production code
 /// <reference path="../src/lang/lang_extensions.ts" />
@@ -22,5 +21,3 @@
 /// <reference path="../src/parse/grammar/checks.ts" />
 /// <reference path="../src/parse/recognizer.ts" />
 /// <reference path="../src/api.ts" />
-
-

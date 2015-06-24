@@ -15,7 +15,7 @@ module.exports = function(config) {
         basePath: '',
 
         // frameworks to use
-        frameworks: ['jasmine'],
+        frameworks: ['mocha', 'chai'],
 
         // list of files / patterns to load in the browser
         files: ['bower_components/lodash/lodash.js'].concat(

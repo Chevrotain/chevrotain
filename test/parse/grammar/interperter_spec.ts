@@ -20,8 +20,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From ActionDec in scope of ActionDec #2", function () {
@@ -33,8 +33,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.LParenTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.LParenTok)
             })
 
             it("can compute the next possible token types From ActionDec in scope of ActionDec #3", function () {
@@ -46,7 +46,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(2)
+                expect(possibleNextTokTypes.length).to.equal(2)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.IdentTok, t.RParenTok])
             })
 
@@ -59,8 +59,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From ActionDec in scope of ActionDec #5", function () {
@@ -72,7 +72,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(2)
+                expect(possibleNextTokTypes.length).to.equal(2)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.SemicolonTok, t.ColonTok])
             })
 
@@ -85,8 +85,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From ActionDec in scope of ActionDec #7", function () {
@@ -98,7 +98,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(0)
+                expect(possibleNextTokTypes.length).to.equal(0)
             })
 
             it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #1", function () {
@@ -112,8 +112,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.ColonTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.ColonTok)
             })
 
             it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #2", function () {
@@ -127,8 +127,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #3", function () {
@@ -142,8 +142,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.RSquareTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.RSquareTok)
             })
 
             it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #4", function () {
@@ -157,7 +157,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(2)
+                expect(possibleNextTokTypes.length).to.equal(2)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.CommaTok, t.RParenTok])
             })
 
@@ -172,8 +172,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.ColonTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.ColonTok)
             })
 
             it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #2", function () {
@@ -187,8 +187,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #3", function () {
@@ -202,8 +202,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.RSquareTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.RSquareTok)
             })
 
             it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #4", function () {
@@ -217,7 +217,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(2)
+                expect(possibleNextTokTypes.length).to.equal(2)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.CommaTok, t.RParenTok])
             })
 
@@ -234,7 +234,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(4)
+                expect(possibleNextTokTypes.length).to.equal(4)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok, t.LSquareTok, t.CommaTok, t.RParenTok])
             })
 
@@ -251,8 +251,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From a fqn inside an actionParamSpec" +
@@ -268,7 +268,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.actionDec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(4)
+                expect(possibleNextTokTypes.length).to.equal(4)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok, t.LSquareTok, t.CommaTok, t.RParenTok])
             })
 
@@ -284,7 +284,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.paramSpec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(2)
+                expect(possibleNextTokTypes.length).to.equal(2)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok, t.LSquareTok])
             })
 
@@ -300,8 +300,8 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.paramSpec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(1)
-                expect(possibleNextTokTypes[0]).toBe(t.IdentTok)
+                expect(possibleNextTokTypes.length).to.equal(1)
+                expect(possibleNextTokTypes[0]).to.equal(t.IdentTok)
             })
 
             it("can compute the next possible token types From a fqn inside an actionParamSpec" +
@@ -316,7 +316,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var possibleNextTokTypes = new NextAfterTokenWalker(samples.paramSpec, caPath).startWalking()
-                expect(possibleNextTokTypes.length).toBe(2)
+                expect(possibleNextTokTypes.length).to.equal(2)
                 matchers.arrayEqualityNoOrder(possibleNextTokTypes, [t.DotTok, t.LSquareTok])
             })
 
@@ -331,7 +331,7 @@ module chevrotain.interpreter.spec {
                 }
 
                 var walker = new NextAfterTokenWalker(samples.paramSpec, caPath)
-                expect(() => walker.startWalking()).toThrow(Error("The path does not start with the walker's top Rule!"))
+                expect(() => walker.startWalking()).to.throw("The path does not start with the walker's top Rule!")
             })
         })
 
@@ -421,30 +421,30 @@ module chevrotain.interpreter.spec {
     describe("The NextTerminalAfterManyWalker", function () {
         it("can compute the next possible token types after the MANY in QualifiedName", function () {
             var result = new NextTerminalAfterManyWalker(samples.qualifiedName, 1).startWalking()
-            expect(result.occurrence).toBeUndefined()
-            expect(result.token).toBeUndefined()
+            expect(result.occurrence).to.be.undefined
+            expect(result.token).to.be.undefined
         })
 
         it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", function () {
             var result = new NextTerminalAfterManyWalker(samples.actionDec, 1).startWalking()
-            expect(result.occurrence).toBe(1)
-            expect(result.token).toBe(t.RParenTok)
+            expect(result.occurrence).to.equal(1)
+            expect(result.token).to.equal(t.RParenTok)
         })
     })
 
     describe("The NextTerminalAfterAtLeastOneWalker", function () {
         it("can compute the next possible token types after an AT_LEAST_ONE production", function () {
             var result = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 1).startWalking()
-            expect(result.occurrence).toBe(2)
-            expect(result.token).toBe(t.DotTok)
+            expect(result.occurrence).to.equal(2)
+            expect(result.token).to.equal(t.DotTok)
 
             var result2 = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 2).startWalking()
-            expect(result2.occurrence).toBe(1)
-            expect(result2.token).toBe(t.DotTok)
+            expect(result2.occurrence).to.equal(1)
+            expect(result2.token).to.equal(t.DotTok)
 
             var result3 = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 3).startWalking()
-            expect(result3.occurrence).toBe(1)
-            expect(result3.token).toBe(t.CommaTok)
+            expect(result3.occurrence).to.equal(1)
+            expect(result3.token).to.equal(t.CommaTok)
         })
     })
 
@@ -452,14 +452,14 @@ module chevrotain.interpreter.spec {
 
         it("can compute the First Tokens for all alternatives of an OR", function () {
             var result = new NextInsideOrWalker(samples.cardinality, 1).startWalking()
-            expect(result.length).toBe(2)
+            expect(result.length).to.equal(2)
             matchers.arrayEqualityNoOrder(<any>result[0], [t.UnsignedIntegerLiteralTok])
             matchers.arrayEqualityNoOrder(<any>result[1], [t.AsteriskTok])
         })
 
         it("can compute the First Tokens for all alternatives of an OR (complex)", function () {
             var result1 = new NextInsideOrWalker(samples.lotsOfOrs, 1).startWalking()
-            expect(result1.length).toBe(2)
+            expect(result1.length).to.equal(2)
             matchers.arrayEqualityNoOrder(<any>result1[0], [t.CommaTok, t.KeyTok])
             matchers.arrayEqualityNoOrder(<any>result1[1], [t.EntityTok])
         })

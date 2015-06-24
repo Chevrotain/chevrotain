@@ -5,6 +5,7 @@
 if (typeof global === "object") {
     console.log("CHEV_TEST_MODE flag enabled")
     global.CHEV_TEST_MODE = true
+    global.expect = require("chai").expect
 }
 
 else if (typeof window === "object") {
