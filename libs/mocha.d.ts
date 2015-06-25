@@ -4,6 +4,98 @@
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
 /// <reference path="./node.d.ts" />
+declare module Mocha {
+    /** Partial interface for Mocha's `Runnable` class. */
+    interface IRunnable extends NodeJS.EventEmitter {
+        title: string;
+        fn: Function;
+        async: boolean;
+        sync: boolean;
+        timedOut: boolean;
+    }
+
+    /** Partial interface for Mocha's `Suite` class. */
+    interface ISuite extends NodeJS.EventEmitter {
+        parent: ISuite;
+        title: string;
+
+        fullTitle(): string;
+    }
+
+    /** Partial interface for Mocha's `Test` class. */
+    interface ITest extends IRunnable {
+        parent: ISuite;
+        pending: boolean;
+
+        fullTitle(): string;
+    }
+
+    /** Partial interface for Mocha's `Runner` class. */
+    interface IRunner extends NodeJS.EventEmitter {}
+
+    interface IContextDefinition {
+        (description: string, spec: () => void): ISuite;
+        only(description: string, spec: () => void): ISuite;
+        skip(description: string, spec: () => void): void;
+        timeout(ms: number): void;
+    }
+
+    interface ITestDefinition extends Function {
+        (expectation: string, assertion?: () => void): ITest;
+        (expectation: string, assertion?: (done: MochaDone) => void): ITest;
+        only(expectation: string, assertion?: () => void): ITest;
+        only(expectation: string, assertion?: (done: MochaDone) => void): ITest;
+        skip(expectation: string, assertion?: () => void): void;
+        skip(expectation: string, assertion?: (done: MochaDone) => void): void;
+        timeout(ms: number): void;
+    }
+
+    export module reporters {
+        export class Base {
+            stats: {
+                suites: number;
+                tests: number;
+                passes: number;
+                pending: number;
+                failures: number;
+            };
+
+            constructor(runner: IRunner);
+        }
+
+        export class Doc extends Base {}
+        export class Dot extends Base {}
+        export class HTML extends Base {}
+        export class HTMLCov extends Base {}
+        export class JSON extends Base {}
+        export class JSONCov extends Base {}
+        export class JSONStream extends Base {}
+        export class Landing extends Base {}
+        export class List extends Base {}
+        export class Markdown extends Base {}
+        export class Min extends Base {}
+        export class Nyan extends Base {}
+        export class Progress extends Base {
+            /**
+             * @param options.open String used to indicate the start of the progress bar.
+             * @param options.complete String used to indicate a complete test on the progress bar.
+             * @param options.incomplete String used to indicate an incomplete test on the progress bar.
+             * @param options.close String used to indicate the end of the progress bar.
+             */
+            constructor(runner: IRunner, options?: {
+                open?: string;
+                complete?: string;
+                incomplete?: string;
+                close?: string;
+            });
+        }
+        export class Spec extends Base {}
+        export class TAP extends Base {}
+        export class XUnit extends Base {
+            constructor(runner: IRunner, options?: any);
+        }
+    }
+}
 
 interface MochaSetupOptions {
     //milliseconds to wait before considering a test slow
@@ -118,98 +210,8 @@ declare class Mocha {
 }
 
 // merge the Mocha class declaration with a module
-declare module Mocha {
-    /** Partial interface for Mocha's `Runnable` class. */
-    interface IRunnable extends NodeJS.EventEmitter {
-        title: string;
-        fn: Function;
-        async: boolean;
-        sync: boolean;
-        timedOut: boolean;
-    }
 
-    /** Partial interface for Mocha's `Suite` class. */
-    interface ISuite extends NodeJS.EventEmitter {
-        parent: ISuite;
-        title: string;
 
-        fullTitle(): string;
-    }
-
-    /** Partial interface for Mocha's `Test` class. */
-    interface ITest extends IRunnable {
-        parent: ISuite;
-        pending: boolean;
-
-        fullTitle(): string;
-    }
-
-    /** Partial interface for Mocha's `Runner` class. */
-    interface IRunner extends NodeJS.EventEmitter {}
-
-    interface IContextDefinition {
-        (description: string, spec: () => void): ISuite;
-        only(description: string, spec: () => void): ISuite;
-        skip(description: string, spec: () => void): void;
-        timeout(ms: number): void;
-    }
-
-    interface ITestDefinition {
-        (expectation: string, assertion?: () => void): ITest;
-        (expectation: string, assertion?: (done: MochaDone) => void): ITest;
-        only(expectation: string, assertion?: () => void): ITest;
-        only(expectation: string, assertion?: (done: MochaDone) => void): ITest;
-        skip(expectation: string, assertion?: () => void): void;
-        skip(expectation: string, assertion?: (done: MochaDone) => void): void;
-        timeout(ms: number): void;
-    }
-
-    export module reporters {
-        export class Base {
-            stats: {
-                suites: number;
-                tests: number;
-                passes: number;
-                pending: number;
-                failures: number;
-            };
-
-            constructor(runner: IRunner);
-        }
-
-        export class Doc extends Base {}
-        export class Dot extends Base {}
-        export class HTML extends Base {}
-        export class HTMLCov extends Base {}
-        export class JSON extends Base {}
-        export class JSONCov extends Base {}
-        export class JSONStream extends Base {}
-        export class Landing extends Base {}
-        export class List extends Base {}
-        export class Markdown extends Base {}
-        export class Min extends Base {}
-        export class Nyan extends Base {}
-        export class Progress extends Base {
-            /**
-             * @param options.open String used to indicate the start of the progress bar.
-             * @param options.complete String used to indicate a complete test on the progress bar.
-             * @param options.incomplete String used to indicate an incomplete test on the progress bar.
-             * @param options.close String used to indicate the end of the progress bar.
-             */
-            constructor(runner: IRunner, options?: {
-                open?: string;
-                complete?: string;
-                incomplete?: string;
-                close?: string;
-            });
-        }
-        export class Spec extends Base {}
-        export class TAP extends Base {}
-        export class XUnit extends Base {
-            constructor(runner: IRunner, options?: any);
-        }
-    }
-}
 
 declare module "mocha" {
     export = Mocha;
