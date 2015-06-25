@@ -7,9 +7,9 @@ module chevrotain.cache {
 
     export var CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
 
-    export var CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.TOP_LEVEL>>()
+    export var CLASS_TO_GRAMMAR_PRODUCTIONS = new lang.HashTable<lang.HashTable<gast.Rule>>()
 
-    export function getProductionsForClass(className:string):lang.HashTable<gast.TOP_LEVEL> {
+    export function getProductionsForClass(className:string):lang.HashTable<gast.Rule> {
         return getFromNestedHashTable(className, CLASS_TO_GRAMMAR_PRODUCTIONS)
     }
 

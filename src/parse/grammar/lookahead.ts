@@ -6,25 +6,25 @@ module chevrotain.lookahead {
     import interp = chevrotain.interpreter
     import f = chevrotain.first
 
-    export function buildLookaheadForTopLevel(rule:gast.TOP_LEVEL):() => boolean {
-        var restProd = new gast.FLAT(rule.definition)
+    export function buildLookaheadForTopLevel(rule:gast.Rule):() => boolean {
+        var restProd = new gast.Flat(rule.definition)
         var possibleTokTypes = f.first(restProd)
         return getSimpleLookahead(possibleTokTypes)
     }
 
-    export function buildLookaheadForOption(optionOccurrence:number, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+    export function buildLookaheadForOption(optionOccurrence:number, ruleGrammar:gast.Rule):() => boolean {
         return buildLookAheadForGrammarProd(interp.NextInsideOptionWalker, optionOccurrence, ruleGrammar)
     }
 
-    export function buildLookaheadForMany(manyOccurrence:number, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+    export function buildLookaheadForMany(manyOccurrence:number, ruleGrammar:gast.Rule):() => boolean {
         return buildLookAheadForGrammarProd(interp.NextInsideManyWalker, manyOccurrence, ruleGrammar)
     }
 
-    export function buildLookaheadForAtLeastOne(manyOccurrence:number, ruleGrammar:gast.TOP_LEVEL):() => boolean {
+    export function buildLookaheadForAtLeastOne(manyOccurrence:number, ruleGrammar:gast.Rule):() => boolean {
         return buildLookAheadForGrammarProd(interp.NextInsideAtLeastOneWalker, manyOccurrence, ruleGrammar)
     }
 
-    export function buildLookaheadForOr(orOccurrence:number, ruleGrammar:gast.TOP_LEVEL, ignoreAmbiguities:boolean = false):() => number {
+    export function buildLookaheadForOr(orOccurrence:number, ruleGrammar:gast.Rule, ignoreAmbiguities:boolean = false):() => number {
 
         var alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking()
 
@@ -97,7 +97,7 @@ module chevrotain.lookahead {
     }
 
     function buildLookAheadForGrammarProd(prodWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
-                                          ruleGrammar:gast.TOP_LEVEL):() => boolean {
+                                          ruleGrammar:gast.Rule):() => boolean {
         var path:p.IRuleGrammarPath = {
             ruleStack:       [ruleGrammar.name],
             occurrenceStack: [1],

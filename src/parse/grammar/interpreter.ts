@@ -17,7 +17,7 @@ module chevrotain.interpreter {
         protected found = false
         protected isAtEndOfPath = false;
 
-        constructor(protected topProd:g.TOP_LEVEL, protected path:p.IGrammarPath) {super() }
+        constructor(protected topProd:g.Rule, protected path:p.IGrammarPath) {super() }
 
         startWalking():Function[] {
 
@@ -49,14 +49,14 @@ module chevrotain.interpreter {
             }
         }
 
-        walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkProdRef(refProd:g.NonTerminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // found the next production, need to keep walking in it
-            if (refProd.ref.name === this.nextProductionName &&
+            if (refProd.referencedRule.name === this.nextProductionName &&
                 refProd.occurrenceInParent === this.nextProductionOccurrence
             ) {
                 var fullRest = currRest.concat(prevRest)
                 this.updateExpectedNext()
-                this.walk(refProd.ref, <any>fullRest)
+                this.walk(refProd.referencedRule, <any>fullRest)
             }
         }
 
@@ -81,7 +81,7 @@ module chevrotain.interpreter {
         private nextTerminalName = ""
         private nextTerminalOccurrence = 0
 
-        constructor(topProd:g.TOP_LEVEL, protected path:p.ITokenGrammarPath) {
+        constructor(topProd:g.Rule, protected path:p.ITokenGrammarPath) {
             super(topProd, path)
             this.nextTerminalName = tokenName(this.path.lastTok)
             this.nextTerminalOccurrence = this.path.lastTokOccurrence
@@ -92,7 +92,7 @@ module chevrotain.interpreter {
                 terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)
             ) {
                 var fullRest = currRest.concat(prevRest)
-                var restProd = new g.FLAT(<any>fullRest)
+                var restProd = new g.Flat(<any>fullRest)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -103,14 +103,14 @@ module chevrotain.interpreter {
 
         private nextOptionOccurrence = 0
 
-        constructor(topProd:g.TOP_LEVEL, protected path:p.IRuleGrammarPath) {
+        constructor(topProd:g.Rule, protected path:p.IRuleGrammarPath) {
             super(topProd, path)
             this.nextOptionOccurrence = this.path.occurrence
         }
 
-        walkOption(optionProd:g.OPTION, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkOption(optionProd:g.Option, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
-                var restProd = new g.FLAT(optionProd.definition)
+                var restProd = new g.Flat(optionProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -124,14 +124,14 @@ module chevrotain.interpreter {
 
         private nextOccurrence = 0
 
-        constructor(topProd:g.TOP_LEVEL, protected path:p.IRuleGrammarPath) {
+        constructor(topProd:g.Rule, protected path:p.IRuleGrammarPath) {
             super(topProd, path)
             this.nextOccurrence = this.path.occurrence
         }
 
-        walkMany(manyProd:g.MANY, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && manyProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-                var restProd = new g.FLAT(manyProd.definition)
+                var restProd = new g.Flat(manyProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -145,14 +145,14 @@ module chevrotain.interpreter {
 
         private nextOccurrence = 0
 
-        constructor(topProd:g.TOP_LEVEL, protected path:p.IRuleGrammarPath) {
+        constructor(topProd:g.Rule, protected path:p.IRuleGrammarPath) {
             super(topProd, path)
             this.nextOccurrence = this.path.occurrence
         }
 
-        walkAtLeastOne(atLeastOneProd:g.AT_LEAST_ONE, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkAtLeastOne(atLeastOneProd:g.RepetitionMandatory, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && atLeastOneProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-                var restProd = new g.FLAT(atLeastOneProd.definition)
+                var restProd = new g.Flat(atLeastOneProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -168,7 +168,7 @@ module chevrotain.interpreter {
 
         public result:AlternativesFirstTokens = []
 
-        constructor(protected topRule:g.TOP_LEVEL, protected occurrence:number) {
+        constructor(protected topRule:g.Rule, protected occurrence:number) {
             super()
         }
 
@@ -177,10 +177,10 @@ module chevrotain.interpreter {
             return this.result
         }
 
-        walkOr(orProd:g.OR, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkOr(orProd:g.Alternation, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (orProd.occurrenceInParent === this.occurrence) {
                 this.result = _.map(orProd.definition, (alt) => {
-                    var altWrapper = new gast.FLAT([alt])
+                    var altWrapper = new gast.Flat([alt])
                     return f.first(altWrapper)
                 })
             }
@@ -204,7 +204,7 @@ module chevrotain.interpreter {
 
         protected result = {token: undefined, occurrence: undefined, isEndOfRule: undefined}
 
-        constructor(protected topRule:g.TOP_LEVEL, protected occurrence:number) {
+        constructor(protected topRule:g.Rule, protected occurrence:number) {
             super()
         }
 
@@ -216,7 +216,7 @@ module chevrotain.interpreter {
 
     export class NextTerminalAfterManyWalker extends AbstractNextTerminalAfterProductionWalker {
 
-        walkMany(manyProd:g.MANY, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (manyProd.occurrenceInParent === this.occurrence) {
 
                 var firstAfterMany = _.first(currRest.concat(prevRest))
@@ -234,7 +234,7 @@ module chevrotain.interpreter {
 
     export class NextTerminalAfterAtLeastOneWalker extends AbstractNextTerminalAfterProductionWalker {
 
-        walkAtLeastOne(atLeastOneProd:g.AT_LEAST_ONE, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+        walkAtLeastOne(atLeastOneProd:g.RepetitionMandatory, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (atLeastOneProd.occurrenceInParent === this.occurrence) {
 
                 var firstAfterAtLeastOne = _.first(currRest.concat(prevRest))

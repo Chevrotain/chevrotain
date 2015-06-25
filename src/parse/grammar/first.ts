@@ -4,7 +4,7 @@ module chevrotain.first {
     import gast = chevrotain.gast
 
     export function first(prod:gast.IProduction):Function[] {
-        if (prod instanceof gast.ProdRef) {
+        if (prod instanceof gast.NonTerminal) {
             // this could in theory cause infinite loops if
             // (1) prod A refs prod B.
             // (2) prod B refs prod A
@@ -13,7 +13,7 @@ module chevrotain.first {
             // looking ahead for the next optional part and will never exit
             // currently there is no safeguard for this unique edge case because
             // (1) not sure a grammar in which this can happen is useful for anything (productive)
-            return first((<gast.ProdRef>prod).ref)
+            return first((<gast.NonTerminal>prod).referencedRule)
 
         }
         else if (prod instanceof gast.Terminal) {

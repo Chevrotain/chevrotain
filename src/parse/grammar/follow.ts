@@ -12,7 +12,7 @@ module chevrotain.follow {
     export class ResyncFollowsWalker extends r.RestWalker {
         public follows = new lang.HashTable<Function[]>()
 
-        constructor(private topProd:g.TOP_LEVEL) { super() }
+        constructor(private topProd:g.Rule) { super() }
 
         startWalking():lang.HashTable<Function[]> {
             this.walk(this.topProd)
@@ -23,16 +23,16 @@ module chevrotain.follow {
             // do nothing! just like in the public sector after 13:00
         }
 
-        walkProdRef(refProd:g.ProdRef, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            var followName = buildBetweenProdsFollowPrefix(refProd.ref, refProd.occurrenceInParent) + this.topProd.name
+        walkProdRef(refProd:g.NonTerminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            var followName = buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.occurrenceInParent) + this.topProd.name
             var fullRest:g.IProduction[] = currRest.concat(prevRest)
-            var restProd = new g.FLAT(fullRest)
+            var restProd = new g.Flat(fullRest)
             var t_in_topProd_follows = f.first(restProd)
             this.follows.put(followName, t_in_topProd_follows)
         }
     }
 
-    export function computeAllProdsFollows(topProductions:g.TOP_LEVEL[]):lang.HashTable<Function[]> {
+    export function computeAllProdsFollows(topProductions:g.Rule[]):lang.HashTable<Function[]> {
         var reSyncFollows = new lang.HashTable<Function[]>()
 
         _.forEach(topProductions, (topProd) => {
@@ -42,7 +42,7 @@ module chevrotain.follow {
         return reSyncFollows
     }
 
-    export function buildBetweenProdsFollowPrefix(inner:g.TOP_LEVEL, occurenceInParent:number):string {
+    export function buildBetweenProdsFollowPrefix(inner:g.Rule, occurenceInParent:number):string {
         return inner.name + occurenceInParent + IN
     }
 

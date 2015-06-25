@@ -21,15 +21,15 @@ module chevrotain.first.spec {
         })
 
         it("can compute the first for a Sequence production ", function () {
-            var seqProduction = new gast.FLAT([new gast.Terminal(t.EntityTok)])
+            var seqProduction = new gast.Flat([new gast.Terminal(t.EntityTok)])
             var actual = first(seqProduction)
             expect(actual.length).to.equal(1)
             expect(actual[0]).to.equal(t.EntityTok)
 
-            var seqProduction2 = new gast.FLAT(
+            var seqProduction2 = new gast.Flat(
                 [
                     new gast.Terminal(t.EntityTok),
-                    new gast.OPTION([new gast.Terminal(t.NamespaceTok)])
+                    new gast.Option([new gast.Terminal(t.NamespaceTok)])
                 ])
             var actual2 = first(seqProduction2)
             expect(actual2.length).to.equal(1)
@@ -37,7 +37,7 @@ module chevrotain.first.spec {
         })
 
         it("can compute the first for an alternatives production ", function () {
-            var altProduction = new gast.OR(
+            var altProduction = new gast.Alternation(
                 [
                     new gast.Terminal(t.EntityTok),
                     new gast.Terminal(t.NamespaceTok),
@@ -53,21 +53,21 @@ module chevrotain.first.spec {
         })
 
         it("can compute the first for an production with optional prefix", function () {
-            var withOptionalPrefix = new gast.FLAT(
+            var withOptionalPrefix = new gast.Flat(
                 [
-                    new gast.OPTION([new gast.Terminal(t.NamespaceTok)]),
+                    new gast.Option([new gast.Terminal(t.NamespaceTok)]),
                     new gast.Terminal(t.EntityTok)
                 ])
             var actual = first(withOptionalPrefix)
             matchers.arrayEqualityNoOrder(actual, [t.NamespaceTok, t.EntityTok])
 
 
-            var withTwoOptPrefix = new gast.FLAT(
+            var withTwoOptPrefix = new gast.Flat(
                 [
-                    new gast.OPTION([new gast.Terminal(t.NamespaceTok)]),
-                    new gast.OPTION([new gast.Terminal(t.ColonTok)]),
+                    new gast.Option([new gast.Terminal(t.NamespaceTok)]),
+                    new gast.Option([new gast.Terminal(t.ColonTok)]),
                     new gast.Terminal(t.EntityTok),
-                    new gast.OPTION([new gast.Terminal(t.ConstTok)])
+                    new gast.Option([new gast.Terminal(t.ConstTok)])
                 ])
             var actual2 = first(withTwoOptPrefix)
             matchers.arrayEqualityNoOrder(actual2, [t.NamespaceTok, t.ColonTok, t.EntityTok])

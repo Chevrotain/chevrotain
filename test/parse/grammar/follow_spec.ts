@@ -21,7 +21,7 @@ module chevrotain.follow.spec {
         })
 
         it("can build a followName prefix from a TopLevel Production and index", function () {
-            var prod = new gast.TOP_LEVEL("bamba", [])
+            var prod = new gast.Rule("bamba", [])
             var index = 5
 
             var actual = buildBetweenProdsFollowPrefix(prod, index)

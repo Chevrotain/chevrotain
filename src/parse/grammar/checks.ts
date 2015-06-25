@@ -3,12 +3,12 @@ module chevrotain.validations {
 
     import gast = chevrotain.gast
 
-    export function validateGrammar(topLevels:gast.TOP_LEVEL[]):string[] {
+    export function validateGrammar(topLevels:gast.Rule[]):string[] {
         var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule)
         return <string[]>_.flatten(errorMessagesArrs)
     }
 
-    function validateSingleTopLevelRule(topLevelRule:gast.TOP_LEVEL):string[] {
+    function validateSingleTopLevelRule(topLevelRule:gast.Rule):string[] {
         var collectorVisitor = new OccurrenceValidationCollector()
         topLevelRule.accept(collectorVisitor)
         var allRuleProductions = collectorVisitor.allProductions
@@ -29,7 +29,7 @@ module chevrotain.validations {
     function createDuplicatesErrorMessage(duplicateProds:gast.IProductionWithOccurrence[], topLevelName):string {
         var firstProd = _.first(duplicateProds)
         var index = firstProd.occurrenceInParent
-        var dslName = firstProd.dslName
+        var dslName = gast.getProductionDslName(firstProd)
         var extraArgument = getExtraProductionArgument(firstProd)
 
         var msg = `->${dslName}<- with occurrence index: ->${index}<-
@@ -48,15 +48,15 @@ module chevrotain.validations {
     }
 
     export function identifyProductionForDuplicates(prod:gast.IProductionWithOccurrence):string {
-        return `${prod.dslName}_#_${prod.occurrenceInParent}_#_${getExtraProductionArgument(prod)}`
+        return `${gast.getProductionDslName(prod)}_#_${prod.occurrenceInParent}_#_${getExtraProductionArgument(prod)}`
     }
 
     function getExtraProductionArgument(prod:gast.IProductionWithOccurrence):string {
         if (prod instanceof gast.Terminal) {
             return tokenName(prod.terminalType)
         }
-        else if (prod instanceof  gast.ProdRef) {
-            return prod.refProdName
+        else if (prod instanceof  gast.NonTerminal) {
+            return prod.nonTerminalName
         }
         else {
             return ""
@@ -66,23 +66,23 @@ module chevrotain.validations {
     export class OccurrenceValidationCollector extends gast.GAstVisitor {
         public allProductions:gast.IProduction[] = []
 
-        public visitProdRef(subrule:gast.ProdRef):void {
+        public visitNonTerminal(subrule:gast.NonTerminal):void {
             this.allProductions.push(subrule)
         }
 
-        public visitOPTION(option:gast.OPTION):void {
+        public visitOption(option:gast.Option):void {
             this.allProductions.push(option)
         }
 
-        public visitAT_LEAST_ONE(atLeastOne:gast.AT_LEAST_ONE):void {
+        public visitRepetitionMandatory(atLeastOne:gast.RepetitionMandatory):void {
             this.allProductions.push(atLeastOne)
         }
 
-        public visitMANY(many:gast.MANY):void {
+        public visitRepetition(many:gast.Repetition):void {
             this.allProductions.push(many)
         }
 
-        public visitOR(or:gast.OR):void {
+        public visitAlternation(or:gast.Alternation):void {
             this.allProductions.push(or)
         }
 

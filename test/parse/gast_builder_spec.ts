@@ -245,21 +245,21 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.SUBRULE(this.bamba(1))",
                 type:  b.ProdType.REF
             }, [])
-            expect(actual).to.be.an.instanceof(gast.ProdRef)
-            expect((<gast.ProdRef>actual).occurrenceInParent).to.equal(1)
-            expect((<gast.ProdRef>actual).refProdName).to.equal("bamba")
+            expect(actual).to.be.an.instanceof(gast.NonTerminal)
+            expect((<gast.NonTerminal>actual).occurrenceInParent).to.equal(1)
+            expect((<gast.NonTerminal>actual).nonTerminalName).to.equal("bamba")
         })
 
         it("can build an OR Production from a RangeProd", function () {
             var actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.OR(...)", type: b.ProdType.OR}, [])
-            expect(actual).to.be.an.instanceof(gast.OR)
-            expect((<gast.OR>actual).definition.length).to.equal(0)
+            expect(actual).to.be.an.instanceof(gast.Alternation)
+            expect((<gast.Alternation>actual).definition.length).to.equal(0)
         })
 
         it("can build a MANY Production from a RangeProd", function () {
             var actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.MANY(...)", type: b.ProdType.MANY}, [])
-            expect(actual).to.be.an.instanceof(gast.MANY)
-            expect((<gast.MANY>actual).definition.length).to.equal(0)
+            expect(actual).to.be.an.instanceof(gast.Repetition)
+            expect((<gast.Repetition>actual).definition.length).to.equal(0)
         })
 
         it("can build an AT_LEAST_ONE Production from a RangeProd", function () {
@@ -268,8 +268,8 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.AT_LEAST_ONE(...)",
                 type:  b.ProdType.AT_LEAST_ONE
             }, [])
-            expect(actual).to.be.an.instanceof(gast.AT_LEAST_ONE)
-            expect((<gast.AT_LEAST_ONE>actual).definition.length).to.equal(0)
+            expect(actual).to.be.an.instanceof(gast.RepetitionMandatory)
+            expect((<gast.RepetitionMandatory>actual).definition.length).to.equal(0)
         })
 
         it("can build an OPTION Production from a RangeProd", function () {
@@ -278,14 +278,14 @@ module chevrotain.gastBuilder.spec {
                 text:  "this.OPTION(...)",
                 type:  b.ProdType.OPTION
             }, [])
-            expect(actual).to.be.an.instanceof(gast.OPTION)
-            expect((<gast.OPTION>actual).definition.length).to.equal(0)
+            expect(actual).to.be.an.instanceof(gast.Option)
+            expect((<gast.Option>actual).definition.length).to.equal(0)
         })
 
         it("can build an OR Production from a RangeProd", function () {
             var actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.OR(...)", type: b.ProdType.OR}, [])
-            expect(actual).to.be.an.instanceof(gast.OR)
-            expect((<gast.OR>actual).definition.length).to.equal(0)
+            expect(actual).to.be.an.instanceof(gast.Alternation)
+            expect((<gast.Alternation>actual).definition.length).to.equal(0)
         })
 
         it("can build The Gast representation of a literalArray Grammar Rule", function () {
@@ -297,22 +297,22 @@ module chevrotain.gastBuilder.spec {
             expect((<gast.Terminal>def[0]).occurrenceInParent).to.equal(1)
             expect((<gast.Terminal>def[0]).terminalType).to.equal(tok.LSquareTok)
 
-            expect(def[1]).to.be.an.instanceof(gast.ProdRef)
-            expect((<gast.ProdRef>def[1]).occurrenceInParent).to.equal(1)
-            expect((<gast.ProdRef>def[1]).refProdName).to.equal("expression")
+            expect(def[1]).to.be.an.instanceof(gast.NonTerminal)
+            expect((<gast.NonTerminal>def[1]).occurrenceInParent).to.equal(1)
+            expect((<gast.NonTerminal>def[1]).nonTerminalName).to.equal("expression")
 
-            expect(def[2]).to.be.an.instanceof(gast.MANY)
+            expect(def[2]).to.be.an.instanceof(gast.Repetition)
             // -- MANY part begin
-            var manyDef = (<gast.MANY>def[2]).definition
+            var manyDef = (<gast.Repetition>def[2]).definition
             expect(manyDef.length).to.equal(2)
 
             expect(manyDef[0]).to.be.an.instanceof(gast.Terminal)
             expect((<gast.Terminal>manyDef[0]).occurrenceInParent).to.equal(1)
             expect((<gast.Terminal>manyDef[0]).terminalType).to.equal(tok.CommaTok)
 
-            expect(manyDef[1]).to.be.an.instanceof(gast.ProdRef)
-            expect((<gast.ProdRef>manyDef[1]).occurrenceInParent).to.equal(2)
-            expect((<gast.ProdRef>manyDef[1]).refProdName).to.equal("expression")
+            expect(manyDef[1]).to.be.an.instanceof(gast.NonTerminal)
+            expect((<gast.NonTerminal>manyDef[1]).occurrenceInParent).to.equal(2)
+            expect((<gast.NonTerminal>manyDef[1]).nonTerminalName).to.equal("expression")
             // -- MANY part end
 
             expect(def[3]).to.be.an.instanceof(gast.Terminal)
@@ -326,15 +326,15 @@ module chevrotain.gastBuilder.spec {
             expect(actual.name).to.equal("elementDef")
             var def = actual.definition
             expect(def.length).to.equal(6)
-            expect(def[0]).to.be.an.instanceof(gast.OPTION)
-            var option1Def = (<gast.OPTION>def[0]).definition
+            expect(def[0]).to.be.an.instanceof(gast.Option)
+            var option1Def = (<gast.Option>def[0]).definition
             expect(option1Def.length).to.equal(1)
             expect(option1Def[0]).to.be.an.instanceof(gast.Terminal)
             expect((<gast.Terminal>option1Def[0]).occurrenceInParent).to.equal(1)
             expect((<gast.Terminal>option1Def[0]).terminalType).to.equal(tok.RequiredTok)
 
-            expect(def[1]).to.be.an.instanceof(gast.OPTION)
-            var option2Def = (<gast.OPTION>def[1]).definition
+            expect(def[1]).to.be.an.instanceof(gast.Option)
+            var option2Def = (<gast.Option>def[1]).definition
             expect(option2Def.length).to.equal(1)
             expect(option2Def[0]).to.be.an.instanceof(gast.Terminal)
             expect((<gast.Terminal>option2Def[0]).occurrenceInParent).to.equal(1)
@@ -348,22 +348,22 @@ module chevrotain.gastBuilder.spec {
             expect((<gast.Terminal>def[3]).occurrenceInParent).to.equal(1)
             expect((<gast.Terminal>def[3]).terminalType).to.equal(tok.IdentTok)
 
-            expect(def[4]).to.be.an.instanceof(gast.OR)
-            var orDef = (<gast.OR>def[4]).definition
+            expect(def[4]).to.be.an.instanceof(gast.Alternation)
+            var orDef = (<gast.Alternation>def[4]).definition
             expect(orDef.length).to.equal(2)
-            expect(orDef[0]).to.be.an.instanceof(gast.FLAT)
-            var orPartDef1 = (<gast.FLAT>orDef[0]).definition
+            expect(orDef[0]).to.be.an.instanceof(gast.Flat)
+            var orPartDef1 = (<gast.Flat>orDef[0]).definition
             expect(orPartDef1.length).to.equal(1)
-            expect(orPartDef1[0]).to.be.an.instanceof(gast.ProdRef)
-            expect((<gast.ProdRef>orPartDef1[0]).occurrenceInParent).to.equal(1)
-            expect((<gast.ProdRef>orPartDef1[0]).refProdName).to.equal("assignedTypeSpec")
+            expect(orPartDef1[0]).to.be.an.instanceof(gast.NonTerminal)
+            expect((<gast.NonTerminal>orPartDef1[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.NonTerminal>orPartDef1[0]).nonTerminalName).to.equal("assignedTypeSpec")
 
-            expect(orDef[1]).to.be.an.instanceof(gast.FLAT)
-            var orPartDef2 = (<gast.FLAT>orDef[1]).definition
+            expect(orDef[1]).to.be.an.instanceof(gast.Flat)
+            var orPartDef2 = (<gast.Flat>orDef[1]).definition
             expect(orPartDef2.length).to.equal(1)
-            expect(orPartDef2[0]).to.be.an.instanceof(gast.ProdRef)
-            expect((<gast.ProdRef>orPartDef2[0]).occurrenceInParent).to.equal(1)
-            expect((<gast.ProdRef>orPartDef2[0]).refProdName).to.equal("assignedTypeSpecImplicit")
+            expect(orPartDef2[0]).to.be.an.instanceof(gast.NonTerminal)
+            expect((<gast.NonTerminal>orPartDef2[0]).occurrenceInParent).to.equal(1)
+            expect((<gast.NonTerminal>orPartDef2[0]).nonTerminalName).to.equal("assignedTypeSpecImplicit")
 
             expect(def[5]).to.be.an.instanceof(gast.Terminal)
             expect((<gast.Terminal>def[5]).occurrenceInParent).to.equal(1)
@@ -404,9 +404,9 @@ module chevrotain.gastBuilder.spec {
     describe("The RefResolverVisitor", function () {
 
         it("will fail when trying to resolve a ref to a grammar rule that does not exist", function () {
-            var ref = new gast.ProdRef("missingRule")
-            var topLevel = new gast.TOP_LEVEL("TOP", [ref])
-            var topLevelRules = new lang.HashTable<gast.TOP_LEVEL>()
+            var ref = new gast.NonTerminal("missingRule")
+            var topLevel = new gast.Rule("TOP", [ref])
+            var topLevelRules = new lang.HashTable<gast.Rule>()
             topLevelRules.put("TOP", topLevel)
             var resolver = new b.GastRefResolverVisitor(topLevelRules);
             expect(() => resolver.resolveRefs()).to.throw("Invalid grammar, reference to rule which is not defined --> missingRule")

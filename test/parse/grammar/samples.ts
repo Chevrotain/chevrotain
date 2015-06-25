@@ -25,10 +25,10 @@ module test.samples {
     export class KeyTok extends chevrotain.Token {}
     export class ElementTok extends chevrotain.Token {}
 
-    export var atLeastOneRule = new gast.TOP_LEVEL("atLeastOneRule", [
-        new gast.AT_LEAST_ONE([
-            new gast.AT_LEAST_ONE([
-                new gast.AT_LEAST_ONE([], 3),
+    export var atLeastOneRule = new gast.Rule("atLeastOneRule", [
+        new gast.RepetitionMandatory([
+            new gast.RepetitionMandatory([
+                new gast.RepetitionMandatory([], 3),
                 new gast.Terminal(CommaTok)
             ], 2),
             new gast.Terminal(DotTok, 1)
@@ -36,86 +36,86 @@ module test.samples {
         new gast.Terminal(DotTok, 2)
     ])
 
-    export var qualifiedName = new gast.TOP_LEVEL("qualifiedName", [
+    export var qualifiedName = new gast.Rule("qualifiedName", [
         new gast.Terminal(IdentTok),
-        new gast.MANY([
+        new gast.Repetition([
             new gast.Terminal(DotTok),
             new gast.Terminal(IdentTok, 2)
         ])
     ])
 
-    export var paramSpec = new gast.TOP_LEVEL("paramSpec", [
+    export var paramSpec = new gast.Rule("paramSpec", [
         new gast.Terminal(IdentTok),
         new gast.Terminal(ColonTok),
-        new gast.ProdRef("qualifiedName", qualifiedName),
-        new gast.OPTION([
+        new gast.NonTerminal("qualifiedName", qualifiedName),
+        new gast.Option([
             new gast.Terminal(LSquareTok),
             new gast.Terminal(RSquareTok)
         ])
     ])
 
-    export var actionDec = new gast.TOP_LEVEL("actionDec", [
+    export var actionDec = new gast.Rule("actionDec", [
         new gast.Terminal(ActionTok),
         new gast.Terminal(IdentTok),
         new gast.Terminal(LParenTok),
-        new gast.OPTION([
-            new gast.ProdRef("paramSpec", paramSpec),
-            new gast.MANY([
+        new gast.Option([
+            new gast.NonTerminal("paramSpec", paramSpec),
+            new gast.Repetition([
                 new gast.Terminal(CommaTok),
-                new gast.ProdRef("paramSpec", paramSpec, 2)
+                new gast.NonTerminal("paramSpec", paramSpec, 2)
             ])
         ]),
         new gast.Terminal(RParenTok),
-        new gast.OPTION([
+        new gast.Option([
             new gast.Terminal(ColonTok),
-            new gast.ProdRef("qualifiedName", qualifiedName)
+            new gast.NonTerminal("qualifiedName", qualifiedName)
         ], 2),
         new gast.Terminal(SemicolonTok)
     ])
 
-    export var manyActions = new gast.TOP_LEVEL("manyActions", [
-        new gast.MANY([
-            new gast.ProdRef("actionDec", actionDec, 1)
+    export var manyActions = new gast.Rule("manyActions", [
+        new gast.Repetition([
+            new gast.NonTerminal("actionDec", actionDec, 1)
         ])
     ])
 
-    export var cardinality = new gast.TOP_LEVEL("cardinality", [
+    export var cardinality = new gast.Rule("cardinality", [
         new gast.Terminal(LSquareTok),
         new gast.Terminal(UnsignedIntegerLiteralTok),
         new gast.Terminal(DotDotTok),
-        new gast.OR([
+        new gast.Alternation([
             new gast.Terminal(UnsignedIntegerLiteralTok, 2),
             new gast.Terminal(AsteriskTok)
         ]),
         new gast.Terminal(RSquareTok)
     ])
 
-    export var assignedTypeSpec = new gast.TOP_LEVEL("assignedTypeSpec", [
+    export var assignedTypeSpec = new gast.Rule("assignedTypeSpec", [
         new gast.Terminal(ColonTok),
-        new gast.ProdRef("assignedType"),
+        new gast.NonTerminal("assignedType"),
 
-        new gast.OPTION([
-            new gast.ProdRef("enumClause")
+        new gast.Option([
+            new gast.NonTerminal("enumClause")
         ]),
 
-        new gast.OPTION([
+        new gast.Option([
             new gast.Terminal(DefaultTok),
-            new gast.ProdRef("expression")
+            new gast.NonTerminal("expression")
         ], 2)
     ])
 
-    export var lotsOfOrs = new gast.TOP_LEVEL("lotsOfOrs", [
-        new gast.OPTION([
-            new gast.OR([
-                new gast.FLAT([
-                    new gast.OR([
+    export var lotsOfOrs = new gast.Rule("lotsOfOrs", [
+        new gast.Option([
+            new gast.Alternation([
+                new gast.Flat([
+                    new gast.Alternation([
                         new gast.Terminal(CommaTok, 1),
                         new gast.Terminal(KeyTok, 1)
                     ], 2)
                 ]),
                 new gast.Terminal(EntityTok, 1)
             ]),
-            new gast.OR([
+            new gast.Alternation([
                 new gast.Terminal(DotTok, 1),
             ], 3)
         ]),

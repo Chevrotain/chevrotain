@@ -1105,7 +1105,7 @@ module chevrotain {
             this.RULE_STACK = newState.RULE_STACK
         }
 
-        protected getGAstProductions():lang.HashTable<gast.TOP_LEVEL> {
+        protected getGAstProductions():lang.HashTable<gast.Rule> {
             return cache.getProductionsForClass(this.className)
         }
     }

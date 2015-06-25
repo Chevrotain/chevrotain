@@ -49,7 +49,7 @@ module chevrotain.gastBuilder {
 
     export var terminalNameToConstructor:ITerminalNameToConstructor = {}
 
-    export function buildTopProduction(impelText:string, name:string, terminals:ITerminalNameToConstructor):gast.TOP_LEVEL {
+    export function buildTopProduction(impelText:string, name:string, terminals:ITerminalNameToConstructor):gast.Rule {
         // pseudo state. so little state does not yet mandate the complexity of wrapping in a class...
         // TODO: this is confusing, might be time to create a class..
         terminalNameToConstructor = terminals
@@ -63,8 +63,8 @@ module chevrotain.gastBuilder {
         return buildTopLevel(name, topRange, prodRanges)
     }
 
-    function buildTopLevel(name:string, topRange:r.IRange, allRanges:IProdRange[]):gast.TOP_LEVEL {
-        var topLevelProd = new gast.TOP_LEVEL(name, [])
+    function buildTopLevel(name:string, topRange:r.IRange, allRanges:IProdRange[]):gast.Rule {
+        var topLevelProd = new gast.Rule(name, [])
         return buildAbstractProd(topLevelProd, topRange, allRanges)
     }
 
@@ -80,7 +80,7 @@ module chevrotain.gastBuilder {
             case ProdType.OR:
                 return buildOrProd(prodRange, allRanges)
             case ProdType.FLAT:
-                return buildAbstractProd(new gast.FLAT([]), prodRange.range, allRanges)
+                return buildAbstractProd(new gast.Flat([]), prodRange.range, allRanges)
             case ProdType.REF:
                 return buildRefProd(prodRange)
             case ProdType.TERMINAL:
@@ -90,12 +90,12 @@ module chevrotain.gastBuilder {
         }
     }
 
-    function buildRefProd(prodRange:IProdRange):gast.ProdRef {
+    function buildRefProd(prodRange:IProdRange):gast.NonTerminal {
         var reResult = refRegEx.exec(prodRange.text)
         var isImplicitOccurrenceIdx = reResult[1] === undefined
         var refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
         var refProdName = reResult[2]
-        var newRef = new gast.ProdRef(refProdName, undefined, refOccurrence)
+        var newRef = new gast.NonTerminal(refProdName, undefined, refOccurrence)
         newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx
         return newRef
     }
@@ -130,20 +130,20 @@ module chevrotain.gastBuilder {
         return <any>buildAbstractProd(prodInstance, prodRange.range, allRanges)
     }
 
-    function buildAtLeastOneProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.AT_LEAST_ONE {
-        return buildProdWithOccurrence(atLeastOneRegEx, new gast.AT_LEAST_ONE([]), prodRange, allRanges)
+    function buildAtLeastOneProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.RepetitionMandatory {
+        return buildProdWithOccurrence(atLeastOneRegEx, new gast.RepetitionMandatory([]), prodRange, allRanges)
     }
 
-    function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.MANY {
-        return buildProdWithOccurrence(manyRegEx, new gast.MANY([]), prodRange, allRanges)
+    function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Repetition {
+        return buildProdWithOccurrence(manyRegEx, new gast.Repetition([]), prodRange, allRanges)
     }
 
-    function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OPTION {
-        return buildProdWithOccurrence(optionRegEx, new gast.OPTION([]), prodRange, allRanges)
+    function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Option {
+        return buildProdWithOccurrence(optionRegEx, new gast.Option([]), prodRange, allRanges)
     }
 
-    function buildOrProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.OR {
-        return buildProdWithOccurrence(orRegEx, new gast.OR([]), prodRange, allRanges)
+    function buildOrProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Alternation {
+        return buildProdWithOccurrence(orRegEx, new gast.Alternation([]), prodRange, allRanges)
     }
 
     function buildAbstractProd<T extends AbsProdWithOccurrence | gast.AbstractProduction >(prod:T,
@@ -309,7 +309,7 @@ module chevrotain.gastBuilder {
 
 
     export class GastRefResolverVisitor extends gast.GAstVisitor {
-        constructor(private nameToProd:lang.HashTable<gast.TOP_LEVEL>) { super() }
+        constructor(private nameToProd:lang.HashTable<gast.Rule>) { super() }
 
         public resolveRefs():void {
             _.forEach(this.nameToProd.values(), (prod) => {
@@ -317,14 +317,14 @@ module chevrotain.gastBuilder {
             })
         }
 
-        public visitProdRef(node:gast.ProdRef):void {
-            var ref = this.nameToProd.get(node.refProdName)
+        public visitNonTerminal(node:gast.NonTerminal):void {
+            var ref = this.nameToProd.get(node.nonTerminalName)
 
             if (!ref) {
-                throw Error("Invalid grammar, reference to rule which is not defined --> " + node.refProdName)
+                throw Error("Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName)
             }
 
-            node.ref = ref
+            node.referencedRule = ref
         }
     }
 }

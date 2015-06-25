@@ -1,11 +1,9 @@
-
 module chevrotain.gast {
 
     import lang = chevrotain.lang
 
     export interface IProduction {
         accept(visitor:GAstVisitor):void
-        dslName:string
     }
 
     export interface IProductionWithOccurrence extends IProduction {
@@ -15,7 +13,6 @@ module chevrotain.gast {
 
     export class AbstractProduction implements IProduction {
         public implicitOccurrenceIndex = false
-        public dslName = lang.functionName(this.constructor)
 
         constructor(public definition:IProduction[]) {}
 
@@ -27,11 +24,9 @@ module chevrotain.gast {
         }
     }
 
-    export class ProdRef extends AbstractProduction implements IProductionWithOccurrence {
-        public dslName = "SUBRULE"
-
-        constructor(public refProdName:string,
-                    public ref:TOP_LEVEL = undefined,
+    export class NonTerminal extends AbstractProduction implements IProductionWithOccurrence {
+        constructor(public nonTerminalName:string,
+                    public referencedRule:Rule = undefined,
                     public occurrenceInParent:number = 1) { super([]) }
 
         set definition(definition:IProduction[]) {
@@ -39,8 +34,8 @@ module chevrotain.gast {
         }
 
         get definition():IProduction[] {
-            if (this.ref !== undefined) {
-                return this.ref.definition
+            if (this.referencedRule !== undefined) {
+                return this.referencedRule.definition
             }
             return []
         }
@@ -51,34 +46,31 @@ module chevrotain.gast {
         }
     }
 
-    /* tslint:disable:class-name */
-    export class TOP_LEVEL extends AbstractProduction {
+    export class Rule extends AbstractProduction {
         constructor(public name:string, definition:IProduction[]) { super(definition) }
     }
 
-    export class FLAT extends AbstractProduction {
+    export class Flat extends AbstractProduction {
         constructor(definition:IProduction[]) { super(definition) }
     }
 
-    export class OPTION extends AbstractProduction implements IProductionWithOccurrence {
+    export class Option extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
-    export class AT_LEAST_ONE extends AbstractProduction implements IProductionWithOccurrence {
+    export class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
-    export class MANY extends AbstractProduction implements IProductionWithOccurrence {
+    export class Repetition extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
-    export class OR extends AbstractProduction implements IProductionWithOccurrence {
+    export class Alternation extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
-    /* tslint:enable:class-name */
 
     export class Terminal implements IProductionWithOccurrence {
-        public dslName = "CONSUME"
         public implicitOccurrenceIndex:boolean = false
 
         constructor(public terminalType:Function, public occurrenceInParent:number = 1) {}
@@ -89,16 +81,16 @@ module chevrotain.gast {
     }
 
     export function isSequenceProd(prod:IProduction):boolean {
-        return prod instanceof FLAT ||
-            prod instanceof OPTION ||
-            prod instanceof MANY ||
-            prod instanceof AT_LEAST_ONE ||
+        return prod instanceof Flat ||
+            prod instanceof Option ||
+            prod instanceof Repetition ||
+            prod instanceof RepetitionMandatory ||
             prod instanceof Terminal ||
-            prod instanceof TOP_LEVEL
+            prod instanceof Rule
     }
 
     export function isOptionalProd(prod:IProduction):boolean {
-        var isDirectlyOptional = prod instanceof OPTION || prod instanceof MANY
+        var isDirectlyOptional = prod instanceof Option || prod instanceof Repetition
         if (isDirectlyOptional) {
             return true
         }
@@ -106,9 +98,9 @@ module chevrotain.gast {
         // note that this can cause infinite loop if one optional empty TOP production has a cyclic dependency with another
         // empty optional top rule
         // may be indirectly optional ((A?B?C?) | (D?E?F?))
-        if (prod instanceof OR) {
+        if (prod instanceof Alternation) {
             // for OR its enough for just one of the alternatives to be optional
-            return _.some((<OR>prod).definition, (subProd:IProduction) => {
+            return _.some((<Alternation>prod).definition, (subProd:IProduction) => {
                 return isOptionalProd(subProd)
             })
         }
@@ -123,30 +115,29 @@ module chevrotain.gast {
     }
 
     export function isBranchingProd(prod:IProduction):boolean {
-        return prod instanceof OR
+        return prod instanceof Alternation
     }
-
 
     export class GAstVisitor {
 
         public visit(node:IProduction) {
-            if (node instanceof ProdRef) {
-                this.visitProdRef(<ProdRef>node)
+            if (node instanceof NonTerminal) {
+                this.visitNonTerminal(<NonTerminal>node)
             }
-            else if (node instanceof FLAT) {
-                this.visitFLAT(<FLAT>node)
+            else if (node instanceof Flat) {
+                this.visitFlat(<Flat>node)
             }
-            else if (node instanceof OPTION) {
-                this.visitOPTION(<OPTION>node)
+            else if (node instanceof Option) {
+                this.visitOption(<Option>node)
             }
-            else if (node instanceof AT_LEAST_ONE) {
-                this.visitAT_LEAST_ONE(<AT_LEAST_ONE>node)
+            else if (node instanceof RepetitionMandatory) {
+                this.visitRepetitionMandatory(<RepetitionMandatory>node)
             }
-            else if (node instanceof MANY) {
-                this.visitMANY(<MANY>node)
+            else if (node instanceof Repetition) {
+                this.visitRepetition(<Repetition>node)
             }
-            else if (node instanceof OR) {
-                this.visitOR(<OR>node)
+            else if (node instanceof Alternation) {
+                this.visitAlternation(<Alternation>node)
             }
             else if (node instanceof Terminal) {
                 this.visitTerminal(<Terminal>node)
@@ -154,33 +145,35 @@ module chevrotain.gast {
         }
 
         /* istanbul ignore next */ // this is an "Abstract" method that does nothing, testing it is pointless.
-        public  visitProdRef(node:ProdRef):void {
+        public visitNonTerminal(node:NonTerminal):void {}
 
-        }
+        public visitFlat(node:Flat):void {}
 
-        public  visitFLAT(node:FLAT):void {
+        public visitOption(node:Option):void {}
 
-        }
+        public visitRepetitionMandatory(node:RepetitionMandatory):void {}
 
-        public  visitOPTION(node:OPTION):void {
+        public visitRepetition(node:Repetition):void {}
 
-        }
+        public visitAlternation(node:Alternation):void {}
 
-        public  visitAT_LEAST_ONE(node:AT_LEAST_ONE):void {
+        public visitTerminal(node:Terminal):void {}
+    }
 
-        }
 
-        public  visitMANY(node:MANY):void {
+    var productionToDslName = {}
+    productionToDslName[lang.functionName(NonTerminal)] = "SUBRULE"
+    productionToDslName[lang.functionName(Option)] = "OPTION"
+    productionToDslName[lang.functionName(RepetitionMandatory)] = "AT_LEAST_ONE"
+    productionToDslName[lang.functionName(Repetition)] = "MANY"
+    productionToDslName[lang.functionName(Alternation)] = "OR"
+    productionToDslName[lang.functionName(Terminal)] = "CONSUME"
 
-        }
 
-        public  visitOR(node:OR):void {
-
-        }
-
-        public  visitTerminal(node:Terminal):void {
-
-        }
+    export function getProductionDslName(prod:IProductionWithOccurrence):string {
+        var clazz = prod.constructor
+        var prodName = lang.functionName(clazz)
+        return productionToDslName[prodName]
     }
 
 }

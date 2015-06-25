@@ -5,21 +5,21 @@ module chevrotain.validations.spec {
     describe("validateGrammar", function () {
 
         it("validates every one of the TOP_RULEs in the input", function () {
-            var qualifiedNameErr1 = new gast.TOP_LEVEL("qualifiedNameErr1", [
+            var qualifiedNameErr1 = new gast.Rule("qualifiedNameErr1", [
                 new gast.Terminal(samples.IdentTok, 1),
-                new gast.MANY([
+                new gast.Repetition([
                     new gast.Terminal(samples.DotTok),
                     new gast.Terminal(samples.IdentTok, 1) // duplicate Terminal IdentTok with occurrence index 1
                 ])
             ])
 
-            var qualifiedNameErr2 = new gast.TOP_LEVEL("qualifiedNameErr2", [
+            var qualifiedNameErr2 = new gast.Rule("qualifiedNameErr2", [
                 new gast.Terminal(samples.IdentTok, 1),
-                new gast.MANY([
+                new gast.Repetition([
                     new gast.Terminal(samples.DotTok),
                     new gast.Terminal(samples.IdentTok, 2)
                 ]),
-                new gast.MANY([
+                new gast.Repetition([
                     new gast.Terminal(samples.DotTok),
                     new gast.Terminal(samples.IdentTok, 2)
                 ])
@@ -32,27 +32,27 @@ module chevrotain.validations.spec {
 
     describe("identifyProductionForDuplicates function", function () {
         it("generates DSL code for a ProdRef", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.ProdRef("ActionDeclaration"))
+            var dslCode = identifyProductionForDuplicates(new gast.NonTerminal("ActionDeclaration"))
             expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration")
         })
 
         it("generates DSL code for a OPTION", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.OPTION([], 3))
+            var dslCode = identifyProductionForDuplicates(new gast.Option([], 3))
             expect(dslCode).to.equal("OPTION_#_3_#_")
         })
 
         it("generates DSL code for a AT_LEAST_ONE", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.AT_LEAST_ONE([]))
+            var dslCode = identifyProductionForDuplicates(new gast.RepetitionMandatory([]))
             expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_")
         })
 
         it("generates DSL code for a MANY", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.MANY([], 5))
+            var dslCode = identifyProductionForDuplicates(new gast.Repetition([], 5))
             expect(dslCode).to.equal("MANY_#_5_#_")
         })
 
         it("generates DSL code for a OR", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.OR([], 1))
+            var dslCode = identifyProductionForDuplicates(new gast.Alternation([], 1))
             expect(dslCode).to.equal("OR_#_1_#_")
         })
 

@@ -24,14 +24,14 @@ if (!testMode) {
     // grammar reflection API
     API.gast = {}
     API.gast.GAstVisitor = chevrotain.gast.GAstVisitor
-    API.gast.FLAT = chevrotain.gast.FLAT
-    API.gast.AT_LEAST_ONE = chevrotain.gast.AT_LEAST_ONE
-    API.gast.MANY = chevrotain.gast.MANY
-    API.gast.OPTION = chevrotain.gast.OPTION
-    API.gast.OR = chevrotain.gast.OR
-    API.gast.ProdRef = chevrotain.gast.ProdRef
+    API.gast.Flat = chevrotain.gast.Flat
+    API.gast.RepetitionMandatory = chevrotain.gast.RepetitionMandatory
+    API.gast.Repetition = chevrotain.gast.Repetition
+    API.gast.Option = chevrotain.gast.Option
+    API.gast.Alternation = chevrotain.gast.Alternation
+    API.gast.NonTerminal = chevrotain.gast.NonTerminal
     API.gast.Terminal = chevrotain.gast.Terminal
-    API.gast.TOP_LEVEL = chevrotain.gast.TOP_LEVEL
+    API.gast.Rule = chevrotain.gast.Rule
 }
 else {
     console.log("running in TEST_MODE")
