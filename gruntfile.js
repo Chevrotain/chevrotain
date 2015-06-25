@@ -45,12 +45,12 @@ module.exports = function(grunt) {
 
         mocha_istanbul: {
             coverage: {
-                src: 'bin/chevrotain.js',
+                src:     'bin/chevrotain.js',
                 options: {
-                    root: './bin/',
-                    mask: '*tainSpecs.js',
+                    root:           './bin/',
+                    mask:           '*tainSpecs.js',
                     coverageFolder: 'bin/coverage',
-                    excludes: ['*tainSpecs.js']
+                    excludes:       ['*tainSpecs.js']
                 }
             }
         },
@@ -59,7 +59,7 @@ module.exports = function(grunt) {
             default: {
                 options: {
                     coverageFolder: 'bin/coverage',
-                    check: {
+                    check:          {
                         statements: 100,
                         branches:   0,
                         lines:      100,
@@ -95,7 +95,6 @@ module.exports = function(grunt) {
                 src:     ['build/chevrotain.ts'],
                 out:     'bin/chevrotain.js',
                 options: {
-                    declaration:    true,
                     removeComments: false,
                     sourceMap:      false // due to UMD and concat generated headers the original source map will be invalid.
                 }
@@ -149,42 +148,64 @@ module.exports = function(grunt) {
             all: ["bin/"]
         },
         concat: {
-            options: {
-                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                        '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
+            release:             {
+                options: {
+                    banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+                            '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
 
-                process: function fixTSModulePatternForCoverage(src, filePath) {
-                    // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
-                    var fixed2PartsModules = src.replace(
-                        /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
+                    process: function fixTSModulePatternForCoverage(src, filePath) {
+                        // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
+                        var fixed2PartsModules = src.replace(
+                            /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
 
-                    var fixedAllModulesPattern = fixed2PartsModules.replace(
-                        /(\(chevrotain \|\| \(chevrotain = \{}\)\);)/g, "/* istanbul ignore next */ $1")
+                        var fixedAllModulesPattern = fixed2PartsModules.replace(
+                            /(\(chevrotain \|\| \(chevrotain = \{}\)\);)/g, "/* istanbul ignore next */ $1")
 
-                    var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];",
-                        "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
+                        var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];",
+                            "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
 
-                    // TODO: try to remove this with typescript 1.5+. this replace is done in the grunt file due to bug in tsc 1.4.1
-                    // TODO: that in certain situations removes the comments.
-                    // very little point in testing this, this is a pattern matching functionality missing in typescript/javascript
-                    // if the code reaches that point it will go "boom" which is the purpose, the going boom part is not part
-                    // of the contract, it just makes sure we fail fast if we supply invalid arguments.
-                    var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(default\s*:\s*throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
-                        "/* istanbul ignore next */ $1")
+                        // TODO: try to remove this with typescript 1.5+. this replace is done in the grunt file due to bug in tsc 1.4.1
+                        // TODO: that in certain situations removes the comments.
+                        // very little point in testing this, this is a pattern matching functionality missing in typescript/javascript
+                        // if the code reaches that point it will go "boom" which is the purpose, the going boom part is not part
+                        // of the contract, it just makes sure we fail fast if we supply invalid arguments.
+                        var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(default\s*:\s*throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
+                            "/* istanbul ignore next */ $1")
 
-                    fixedNoneExhaustive = fixedNoneExhaustive.replace(/(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
-                        "/* istanbul ignore else */ $1$2")
+                        fixedNoneExhaustive = fixedNoneExhaustive.replace(/(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
+                            "/* istanbul ignore else */ $1$2")
 
-                    fixedNoneExhaustive = fixedNoneExhaustive.replace(/(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
-                        "/* istanbul ignore next */ $1")
+                        fixedNoneExhaustive = fixedNoneExhaustive.replace(/(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
+                            "/* istanbul ignore next */ $1")
 
-                    return fixedNoneExhaustive
-                }
-            },
-            release: {
-                files: {
+                        return fixedNoneExhaustive
+                    }
+                },
+                files:   {
                     'bin/chevrotain.js':      ['bin/chevrotain.js'],
                     'bin/chevrotainSpecs.js': specsFiles
+                }
+            },
+            release_definitions: {
+                options: {
+                    banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+                            '<%= grunt.template.today("yyyy-mm-dd") %> */\n' +
+                            'declare module chevrotain {\n',
+
+                    process: function removeOriginalHeaderAndFooter(src, filePath) {
+                        var result = src.replace("declare module chevrotain {", "")
+                        var lastRCurlyIdx = result.lastIndexOf("}")
+                        result = result.substring(0, lastRCurlyIdx - 2)
+                        return result;
+                    },
+
+                    footer: '}'
+                },
+                files:   {
+                    'bin/chevrotain.d.ts': [
+                        'bin/tsc/src/scan/tokens_public.d.ts',
+                        'bin/tsc/src/scan/lexer_public.d.ts',
+                        'bin/tsc/src/parse/parser_public.d.ts']
                 }
             }
         },
@@ -213,6 +234,7 @@ module.exports = function(grunt) {
         'ts:release_test_code',
         'tslint',
         'concat:release',
+        'concat:release_definitions',
         'umd:release',
         'umd:release_specs',
         'compress'
@@ -227,7 +249,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean')
     grunt.loadNpmTasks('grunt-contrib-concat')
     grunt.loadNpmTasks('grunt-contrib-compress')
-    grunt.loadNpmTasks('grunt-mocha-istanbul');
+    grunt.loadNpmTasks('grunt-mocha-istanbul')
 
 
     grunt.registerTask('build', releaseBuildTasks)
