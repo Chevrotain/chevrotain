@@ -187,7 +187,7 @@ declare class Mocha {
     /** Sets reporter by name, defaults to "spec". */
     reporter(name: string): Mocha;
     /** Sets reporter constructor, defaults to mocha.reporters.Spec. */
-    reporter(reporter: (runner: Mocha.IRunner, options: any) => any): Mocha;
+    //reporter(reporter: (runner: Mocha.IRunner, options: any) => any): Mocha;
     ui(value: string): Mocha;
     grep(value: string): Mocha;
     grep(value: RegExp): Mocha;
@@ -206,7 +206,7 @@ declare class Mocha {
     asyncOnly(value: boolean): Mocha;
     noHighlighting(value: boolean): Mocha;
     /** Runs tests and invokes `onComplete()` when finished. */
-    run(onComplete?: (failures: number) => void): Mocha.IRunner;
+    //run(onComplete?: (failures: number) => void): Mocha.IRunner;
 }
 
 // merge the Mocha class declaration with a module
