@@ -13,6 +13,13 @@ module chevrotain {
     import lookahead = chevrotain.lookahead
     import validations = chevrotain.validations
 
+    // parameters needs to compute the key in the FOLLOW_SET map.
+    export interface IFollowKey {
+        ruleName: string
+        idxInCallingRule: number
+        inRule:string
+    }
+
     /**
      * OR([
      *  { WHEN:LA1, THEN_DO:XXX },
@@ -49,9 +56,9 @@ module chevrotain {
     export type LookAheadFunc = () => boolean
     export type GrammarAction = () => void
 
-// TODO: TSC 1.5 switch to const
-// used to toggle ignoring of OR production ambiguities
-// TODO: expose on Parser for public API?
+    // TODO: TSC 1.5 switch to const
+    // used to toggle ignoring of OR production ambiguities
+    // TODO: expose on Parser for public API?
     export var IGNORE_AMBIGUITIES:boolean = true
     export var NO_RESYNC:boolean = false
 
@@ -88,17 +95,17 @@ module chevrotain {
 
         protected RULE_STACK:string[] = []
         protected RULE_OCCURRENCE_STACK:number[] = []
-        protected tokensMap:gastBuilder.ITerminalNameToConstructor = undefined
+        protected tokensMap:{ [fqn: string] : Function; } = undefined
 
-        protected firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
-        protected classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
+        private firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
+        private classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
 
-        protected orLookaheadKeys:lang.HashTable<string>[]
-        protected manyLookaheadKeys:lang.HashTable<string>[]
-        protected atLeastOneLookaheadKeys:lang.HashTable<string>[]
-        protected optionLookaheadKeys:lang.HashTable<string>[]
+        private orLookaheadKeys:lang.HashTable<string>[]
+        private manyLookaheadKeys:lang.HashTable<string>[]
+        private atLeastOneLookaheadKeys:lang.HashTable<string>[]
+        private optionLookaheadKeys:lang.HashTable<string>[]
 
-        constructor(input:Token[], tokensMapOrArr:gastBuilder.ITerminalNameToConstructor | Function[]) {
+        constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[]) {
             super(input)
 
             if (_.isArray(tokensMapOrArr)) {
@@ -652,14 +659,14 @@ module chevrotain {
         private defaultInvalidReturn():any { return undefined }
 
         // Not worth the hassle to support Unicode characters in rule names...
-        protected ruleNamePattern = /^[a-zA-Z_]\w*$/
-        protected definedRulesNames:string[] = []
+        private ruleNamePattern = /^[a-zA-Z_]\w*$/
+        private definedRulesNames:string[] = []
 
         /**
          * @param ruleFuncName name of the Grammar rule
          * @throws Grammar validation errors if the name is invalid
          */
-        protected validateRuleName(ruleFuncName:string):void {
+        private validateRuleName(ruleFuncName:string):void {
             if (!ruleFuncName.match(this.ruleNamePattern)) {
                 throw Error("Invalid Grammar rule name --> " + ruleFuncName +
                     " it must match the pattern: " + this.ruleNamePattern.toString())
@@ -673,7 +680,7 @@ module chevrotain {
             this.definedRulesNames.push(ruleFuncName)
         }
 
-        protected tryInRepetitionRecovery(grammarRule:Function,
+        private tryInRepetitionRecovery(grammarRule:Function,
                                           grammarRuleArgs:any[],
                                           lookAheadFunc:() => boolean,
                                           expectedTokType:Function):void {
@@ -704,7 +711,7 @@ module chevrotain {
             this.inputIdx = orgInputIdx
         }
 
-        protected shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:Function, nextTokIdx?:number):boolean {
+        private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:Function, nextTokIdx?:number):boolean {
             // arguments to try and perform resync into the next iteration of the many are missing
             if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
                 return false
@@ -733,7 +740,7 @@ module chevrotain {
         }
 
         // Error Recovery functionality
-        protected getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule):Function[] {
+        private getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule):Function[] {
             var pathRuleStack:string[] = _.clone(this.RULE_STACK)
             var pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK)
             var grammarPath:any = {
@@ -770,7 +777,7 @@ module chevrotain {
             return true
         }
 
-        protected tryInRuleRecovery(expectedTokType:Function, follows:Function[]):Token {
+        private tryInRuleRecovery(expectedTokType:Function, follows:Function[]):Token {
             if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
                 var tokToInsert = this.getTokenToInsert(expectedTokType)
                 tokToInsert.isInsertedInRecovery = true
@@ -787,12 +794,12 @@ module chevrotain {
             throw new InRuleRecoveryException("sad sad panda")
         }
 
-        protected canPerformInRuleRecovery(expectedToken:Function, follows:Function[]):boolean {
+        private canPerformInRuleRecovery(expectedToken:Function, follows:Function[]):boolean {
             return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
                 this.canRecoverWithSingleTokenDeletion(expectedToken)
         }
 
-        protected canRecoverWithSingleTokenInsertion(expectedTokType:Function, follows:Function[]):boolean {
+        private canRecoverWithSingleTokenInsertion(expectedTokType:Function, follows:Function[]):boolean {
             if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
                 return false
             }
@@ -810,18 +817,18 @@ module chevrotain {
             return isMisMatchedTokInFollows
         }
 
-        protected canRecoverWithSingleTokenDeletion(expectedTokType:Function):boolean {
+        private canRecoverWithSingleTokenDeletion(expectedTokType:Function):boolean {
             var isNextTokenWhatIsExpected = this.LA(2) instanceof expectedTokType
             return isNextTokenWhatIsExpected
         }
 
-        protected isInCurrentRuleReSyncSet(token:Function):boolean {
+        private isInCurrentRuleReSyncSet(token:Function):boolean {
             var followKey = this.getCurrFollowKey()
             var currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
             return _.contains(currentRuleReSyncSet, token)
         }
 
-        protected findReSyncTokenType():Function {
+        private findReSyncTokenType():Function {
             var allPossibleReSyncTokTypes = this.flattenFollowSet()
             // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
             var nextToken = this.NEXT_TOKEN()
@@ -836,7 +843,7 @@ module chevrotain {
             }
         }
 
-        protected getCurrFollowKey():IFollowKey {
+        private getCurrFollowKey():IFollowKey {
             // the length is at least one as we always add the ruleName to the stack before invoking the rule.
             if (this.RULE_STACK.length === 1) {
                 return EOF_FOLLOW_KEY
@@ -852,7 +859,7 @@ module chevrotain {
             }
         }
 
-        protected buildFullFollowKeyStack():IFollowKey[] {
+        private buildFullFollowKeyStack():IFollowKey[] {
             return _.map(this.RULE_STACK, (ruleName, idx) => {
                 if (idx === 0) {
                     return EOF_FOLLOW_KEY
@@ -865,14 +872,14 @@ module chevrotain {
             })
         }
 
-        protected flattenFollowSet():Function[] {
+        private flattenFollowSet():Function[] {
             var followStack = _.map(this.buildFullFollowKeyStack(), (currKey) => {
                 return this.getFollowSetFromFollowKey(currKey)
             })
             return <any>_.flatten(followStack)
         }
 
-        protected getFollowSetFromFollowKey(followKey:IFollowKey):Function[] {
+        private getFollowSetFromFollowKey(followKey:IFollowKey):Function[] {
             if (followKey === EOF_FOLLOW_KEY) {
                 return [EOF]
             }
@@ -881,7 +888,7 @@ module chevrotain {
             return cache.getResyncFollowsForClass(this.className).get(followName)
         }
 
-        protected reSyncTo(tokClass:Function):void {
+        private reSyncTo(tokClass:Function):void {
             var nextTok = this.NEXT_TOKEN()
             while ((nextTok instanceof tokClass) === false) {
                 nextTok = this.SKIP_TOKEN()
@@ -995,7 +1002,7 @@ module chevrotain {
          *
          * @returns the consumed Token
          */
-        protected consumeInternal(tokClass:Function, idx:number):Token {
+        private consumeInternal(tokClass:Function, idx:number):Token {
             try {
                 return super.CONSUME(tokClass)
             } catch (eFromConsumption) {
@@ -1030,7 +1037,7 @@ module chevrotain {
             }
         }
 
-        protected getKeyForAutomaticLookahead(prodName:string, prodKeys:lang.HashTable<string>[], occurrence:number):string {
+        private getKeyForAutomaticLookahead(prodName:string, prodKeys:lang.HashTable<string>[], occurrence:number):string {
 
             var occuMap = prodKeys[occurrence - 1]
             var currRule = _.last(this.RULE_STACK)
@@ -1043,22 +1050,22 @@ module chevrotain {
         }
 
         // Automatic lookahead calculation
-        protected getLookaheadFuncForOption(occurence:number):() => boolean {
+        private getLookaheadFuncForOption(occurence:number):() => boolean {
             var key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurence)
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForOption)
         }
 
-        protected getLookaheadFuncForOr(occurence:number, ignoreErrors:boolean):() => number {
+        private getLookaheadFuncForOr(occurence:number, ignoreErrors:boolean):() => number {
             var key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurence)
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForOr, [ignoreErrors])
         }
 
-        protected getLookaheadFuncForMany(occurence:number):() => boolean {
+        private getLookaheadFuncForMany(occurence:number):() => boolean {
             var key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence)
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForMany)
         }
 
-        protected getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
+        private getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
             var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence)
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne)
         }
@@ -1105,6 +1112,7 @@ module chevrotain {
             this.RULE_STACK = newState.RULE_STACK
         }
 
+        // TODO: should probably be public
         protected getGAstProductions():lang.HashTable<gast.Rule> {
             return cache.getProductionsForClass(this.className)
         }

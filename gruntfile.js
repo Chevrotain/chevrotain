@@ -1,9 +1,6 @@
 var _ = require('lodash')
-var findRefs = require('./scripts/findRefs')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
 
-// TODO: this is a bit ugly, but including the root and then performing negation
-//       seems to cause inclusion of things outside the root...
 var githubReleaseFiles = ['./package.json',
     './LICENSE.txt',
     "./bin/chevrotain.d.ts",
@@ -100,6 +97,11 @@ module.exports = function(grunt) {
                 }
             },
 
+            validate_definitions: {
+                src:    ["bin/chevrotain.d.ts"],
+                outDir: "bin/garbage"
+            },
+
             // this is the same as the 'build' process, all .ts --> .js in gen directory
             // in a later step those files will be aggregated into separate components
             release_test_code: {
@@ -188,30 +190,38 @@ module.exports = function(grunt) {
             },
             release_definitions: {
                 options: {
-                    banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                            '<%= grunt.template.today("yyyy-mm-dd") %> */\n' +
-                            'declare module chevrotain {\n',
-
+                    banner:  '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+                             '<%= grunt.template.today("yyyy-mm-dd") %> */\n' +
+                             'declare module chevrotain {\n' +
+                             '    class BaseRecognizer{}\n' +
+                             '    module lang {\n' +
+                             '        class HashTable<V>{}\n' +
+                             '    }\n',
                     process: function removeOriginalHeaderAndFooter(src, filePath) {
+                        if (_.contains(filePath, 'gast_public' )){
+                            var fixedModuleName =  src.replace('declare module chevrotain.gast {', '\nmodule gast {')
+                            var fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
+                            return fixedIndentation
+                        }
                         var result = src.replace("declare module chevrotain {", "")
                         var lastRCurlyIdx = result.lastIndexOf("}")
-                        result = result.substring(0, lastRCurlyIdx - 2)
-                        return result;
+                        result = result.substring(0, lastRCurlyIdx)
+                        result = _.trimRight(result)
+                        return result
                     },
 
-                    footer: '}'
+                    footer: '\n}'
                 },
                 files:   {
                     'bin/chevrotain.d.ts': [
                         'bin/tsc/src/scan/tokens_public.d.ts',
                         'bin/tsc/src/scan/lexer_public.d.ts',
-                        'bin/tsc/src/parse/parser_public.d.ts']
+                        'bin/tsc/src/parse/parser_public.d.ts',
+                        'bin/tsc/src/parse/grammar/gast_public.d.ts']
                 }
             }
         },
 
-        // TODO: instead of compressing maybe just commit the generated stuff to github?
-        // that would be easy to do as the release jobs already perform a commit...
         compress: {
             github_release_zip: {
                 options: {
@@ -235,6 +245,7 @@ module.exports = function(grunt) {
         'tslint',
         'concat:release',
         'concat:release_definitions',
+        'ts:validate_definitions',
         'umd:release',
         'umd:release_specs',
         'compress'

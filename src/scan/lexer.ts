@@ -7,8 +7,6 @@ module chevrotain {
 
     var PATTERN = "PATTERN"
 
-    export type TokenConstructor = Function
-
     export interface IAnalyzeResult {
         allPatterns: RegExp[]
         patternIdxToClass: Function[]

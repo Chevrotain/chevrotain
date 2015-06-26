@@ -5,6 +5,8 @@ module chevrotain {
 
     import lang = chevrotain.lang
 
+    export type TokenConstructor = Function
+
     export interface ILexingResult {
         tokens:Token[]
         groups:{ [groupName: string] : Token }

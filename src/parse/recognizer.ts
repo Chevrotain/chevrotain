@@ -243,11 +243,4 @@ module chevrotain {
     }
 
     InRuleRecoveryException.prototype = Error.prototype
-
-    // parameters needs to compute the key in the FOLLOW_SET map.
-    export interface IFollowKey {
-        ruleName: string
-        idxInCallingRule: number
-        inRule:string
-    }
 }
