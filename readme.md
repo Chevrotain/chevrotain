@@ -188,7 +188,7 @@ the code generation phase.
 ```
 
 ## Getting Started
-The best way to start is by looking at some running examples:
+The best way to start is by looking at some runable (and debugable) examples:
 
 * [Json Parser](https://github.com/Chevrotain/examples_nodejs/blob/master/jsonParser.js)
 * [Simple Calculator](https://github.com/Chevrotain/examples_nodejs/blob/master/calculator.js)
@@ -196,7 +196,16 @@ The best way to start is by looking at some running examples:
 * [Lexer advanced features](https://github.com/Chevrotain/examples_lexer)
 * [and more](https://github.com/Chevrotain)
 
-
+## Documentation
+No html docs (yet...), use either :
+* Annotated source code:
+   *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
+   *  [lexer_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/lexer_public.ts)
+   *  [parser_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/parser_public.ts)
+   *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
+   
+*  The aggregated Typescript definitions (**chevrotain.d.ts**) packaged in both the github and npm releases.
+   
 ## Dependencies
 Only a single dependency to [lodash](https://lodash.com/).
 
