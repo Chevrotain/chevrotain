@@ -12,6 +12,7 @@ module chevrotain {
     import follows = chevrotain.follow
     import lookahead = chevrotain.lookahead
     import validations = chevrotain.validations
+    import exceptions = chevrotain.exceptions
 
     // parameters needs to compute the key in the FOLLOW_SET map.
     export interface IFollowKey {
@@ -44,13 +45,11 @@ module chevrotain {
         ALT:() => T
     }
 
-    export interface IBaseRecogState {
+    export interface IParseState {
         errors: Error[]
         inputIdx:number
-    }
-
-    export interface IErrorRecoveryRecogState extends IBaseRecogState {
         RULE_STACK:string[]
+
     }
 
     export type LookAheadFunc = () => boolean
@@ -58,16 +57,18 @@ module chevrotain {
 
     // TODO: TSC 1.5 switch to const
     // used to toggle ignoring of OR production ambiguities
-    // TODO: expose on Parser for public API?
+    // TODO: expose on Parser as 'static' for public API?
     export var IGNORE_AMBIGUITIES:boolean = true
     export var NO_RESYNC:boolean = false
+
+    var EOF_FOLLOW_KEY:any = {} // TODO const in Typescript 1.5
 
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
      * This is used for more advanced features requiring such information.
      * for example: Error Recovery, Automatic lookahead calculation
      */
-    export class Parser extends BaseRecognizer {
+    export class Parser {
 
         protected static performSelfAnalysis(classInstance:Parser) {
             var className = lang.classNameFromInstance(classInstance)
@@ -97,16 +98,27 @@ module chevrotain {
         protected RULE_OCCURRENCE_STACK:number[] = []
         protected tokensMap:{ [fqn: string] : Function; } = undefined
 
-        private firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
-        private classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
+        private firstAfterRepMap
+        private classLAFuncs
 
         private orLookaheadKeys:lang.HashTable<string>[]
         private manyLookaheadKeys:lang.HashTable<string>[]
         private atLeastOneLookaheadKeys:lang.HashTable<string>[]
         private optionLookaheadKeys:lang.HashTable<string>[]
 
+
+        public errors:Error[] = []
+        protected _input:Token[] = []
+        protected inputIdx = -1
+        protected isBackTrackingStack = []
+        // caching for performance
+        protected className:string
+
         constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[]) {
-            super(input)
+            this._input = input
+            this.className = lang.classNameFromInstance(this)
+            this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
+            this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
 
             if (_.isArray(tokensMapOrArr)) {
                 this.tokensMap = <any>_.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
@@ -135,8 +147,93 @@ module chevrotain {
             this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
         }
 
+        set input(newInput:Token[]) {
+            this.reset()
+            this._input = newInput
+        }
+
+        get input():Token[] {
+            return _.clone(this._input)
+        }
+
+        protected isBackTracking():boolean {
+            return !(_.isEmpty(this.isBackTrackingStack))
+        }
+
+        public isAtEndOfInput():boolean {
+            return this.LA(1) instanceof EOF
+        }
+
+        protected SAVE_ERROR(error:Error):Error {
+            if (exceptions.isRecognitionException(error)) {
+                this.errors.push(error)
+                return error
+            }
+            else {
+                throw Error("trying to save an Error which is not a RecognitionException")
+            }
+        }
+
+        protected NEXT_TOKEN():Token {
+            return this.LA(1)
+        }
+
+        protected LA(howMuch:number):Token {
+            if (this._input.length <= this.inputIdx + howMuch) {
+                return new EOF()
+            }
+            else {
+                return this._input[this.inputIdx + howMuch]
+            }
+        }
+
+        /**
+         *
+         * @param grammarRule the rule to try and parse in backtracking mode
+         * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
+         * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
+         */
+        protected BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
+            return () => {
+                // save org state
+                this.isBackTrackingStack.push(1)
+                var orgState = this.saveRecogState()
+                try {
+                    var ruleResult = grammarRule.call(this)
+                    return isValid(ruleResult)
+                } catch (e) {
+                    if (exceptions.isRecognitionException(e)) {
+                        return false
+                    }
+                    else {
+                        throw e
+                    }
+                }
+                finally {
+                    this.reloadRecogState(orgState)
+                    this.isBackTrackingStack.pop()
+                }
+            }
+        }
+        // skips a token and returns the next token
+        protected SKIP_TOKEN():Token {
+            // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
+            // input[45] which is the 46th item and no longer exists,
+            // so in this case the largest valid input index is 43 (input.length - 2 )
+            if (this.inputIdx <= this._input.length - 2) {
+                this.inputIdx++
+                return this.NEXT_TOKEN()
+            }
+            else {
+                return new EOF()
+            }
+        }
+
         public reset():void {
-            super.reset()
+            this.isBackTrackingStack = []
+            this.errors = []
+            this._input = []
+            this.inputIdx = -1
             this.RULE_STACK = []
             this.RULE_OCCURRENCE_STACK = []
         }
@@ -305,7 +402,7 @@ module chevrotain {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(1)
             }
-            return super.OPTION(<any>laFuncOrAction, <any>action)
+            return this.optionInternal(<any>laFuncOrAction, <any>action)
         }
 
         /**
@@ -317,7 +414,7 @@ module chevrotain {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(2)
             }
-            return super.OPTION(<any>laFuncOrAction, <any>action)
+            return this.optionInternal(<any>laFuncOrAction, <any>action)
         }
 
         /**
@@ -329,7 +426,7 @@ module chevrotain {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(3)
             }
-            return super.OPTION(<any>laFuncOrAction, <any>action)
+            return this.optionInternal(<any>laFuncOrAction, <any>action)
         }
 
         /**
@@ -341,7 +438,7 @@ module chevrotain {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(4)
             }
-            return super.OPTION(<any>laFuncOrAction, <any>action)
+            return this.optionInternal(<any>laFuncOrAction, <any>action)
         }
 
         /**
@@ -353,7 +450,7 @@ module chevrotain {
                 action = <any>laFuncOrAction
                 laFuncOrAction = this.getLookaheadFuncForOption(5)
             }
-            return super.OPTION(<any>laFuncOrAction, <any>action)
+            return this.optionInternal(<any>laFuncOrAction, <any>action)
         }
 
         /**
@@ -614,7 +711,7 @@ module chevrotain {
                     // path is really the most valid one
                     var reSyncEnabled = (isFirstInvokedRule || doReSync) && !this.isBackTracking()
 
-                    if (reSyncEnabled && isRecognitionException(e)) {
+                    if (reSyncEnabled && exceptions.isRecognitionException(e)) {
                         var reSyncTokType = this.findReSyncTokenType()
                         if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
                             this.reSyncTo(reSyncTokType)
@@ -651,7 +748,7 @@ module chevrotain {
             var maxInputIdx = this._input.length - 1
             if ((this.RULE_STACK.length === 0) && this.inputIdx < maxInputIdx) {
                 var firstRedundantTok:Token = this.NEXT_TOKEN()
-                this.SAVE_ERROR(new NotAllInputParsedException(
+                this.SAVE_ERROR(new exceptions.NotAllInputParsedException(
                     "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
             }
         }
@@ -697,7 +794,7 @@ module chevrotain {
                     var expectedTokName = tokenName(expectedTokType)
                     var msg = "Expecting token of type -->" + expectedTokName +
                         "<-- but found -->'" + nextTokenWithoutResync.image + "'<--"
-                    this.SAVE_ERROR(new MismatchedTokenException(msg, nextTokenWithoutResync))
+                    this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync))
 
                     // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
                     grammarRule.apply(this, grammarRuleArgs)
@@ -934,6 +1031,13 @@ module chevrotain {
             }
         }
 
+        private optionInternal(condition:LookAheadFunc, action:GrammarAction):boolean {
+            if (condition.call(this)) {
+                action.call(this)
+                return true
+            }
+            return false
+        }
         // Implementation of parsing DSL
         private atLeastOneInternal(prodFunc:Function,
                                    prodName:string,
@@ -947,7 +1051,14 @@ module chevrotain {
                 lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
             }
 
-            super.AT_LEAST_ONE(<any>lookAheadFunc, <any>action, errMsg)
+            if (lookAheadFunc.call(this)) {
+                (<any>action).call(this)
+                this.MANY(<any>lookAheadFunc, <any>action)
+            }
+            else {
+                throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
+            }
+
             // note that while it may seem that this can cause an error because by using a recursive call to
             // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
             // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
@@ -966,7 +1077,9 @@ module chevrotain {
                 lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
             }
 
-            super.MANY(<any>lookAheadFunc, <any>action)
+            while (lookAheadFunc.call(this)) {
+                action.call(this)
+            }
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
                 <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys)
         }
@@ -977,7 +1090,13 @@ module chevrotain {
                               ignoreAmbiguities:boolean):T {
             // explicit alternatives look ahead
             if ((<any>alts[0]).WHEN !== undefined) {
-                return super.OR(<IOrAlt<T>[]>alts, errMsgTypes)
+                for (var i = 0; i < alts.length; i++) {
+                    if ((<any>alts[i]).WHEN.call(this)) {
+                        var res = (<any>alts[i]).THEN_DO()
+                        return res
+                    }
+                }
+                this.raiseNoAltException(errMsgTypes)
             }
 
             // else implicit lookahead
@@ -1004,11 +1123,11 @@ module chevrotain {
          */
         private consumeInternal(tokClass:Function, idx:number):Token {
             try {
-                return super.CONSUME(tokClass)
+                return this.consumeInternalOptimized(tokClass)
             } catch (eFromConsumption) {
                 // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
                 // but the original syntax could have been parsed successfully without any backtracking + recovery
-                if (eFromConsumption instanceof MismatchedTokenException && !this.isBackTracking()) {
+                if (eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
                     var follows = this.getFollowsForInRuleRecovery(tokClass, idx)
                     try {
                         return this.tryInRuleRecovery(tokClass, follows)
@@ -1034,6 +1153,20 @@ module chevrotain {
                 else {
                     throw eFromConsumption
                 }
+            }
+        }
+
+        // to enable opimizations this logic has been extract to a method as its caller method contains try/catch
+        private consumeInternalOptimized(tokClass:Function):Token {
+            var nextToken = this.NEXT_TOKEN()
+            if (this.NEXT_TOKEN() instanceof tokClass) {
+                this.inputIdx++
+                return nextToken
+            }
+            else {
+                var expectedTokType = tokenName(tokClass)
+                var msg = "Expecting token of type -->" + expectedTokType + "<-- but found -->'" + nextToken.image + "'<--"
+                throw this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextToken))
             }
         }
 
@@ -1097,18 +1230,19 @@ module chevrotain {
         }
 
         // other functionality
-        protected saveRecogState():IErrorRecoveryRecogState {
-            var baseState = super.saveRecogState()
+        protected saveRecogState():IParseState {
+            var savedErrors = _.clone(this.errors)
             var savedRuleStack = _.clone(this.RULE_STACK)
             return {
-                errors:     baseState.errors,
-                inputIdx:   baseState.inputIdx,
+                errors:     savedErrors,
+                inputIdx:   this.inputIdx,
                 RULE_STACK: savedRuleStack
             }
         }
 
-        protected reloadRecogState(newState:IErrorRecoveryRecogState) {
-            super.reloadRecogState(newState)
+        protected reloadRecogState(newState:IParseState) {
+            this.errors = newState.errors
+            this.inputIdx = newState.inputIdx
             this.RULE_STACK = newState.RULE_STACK
         }
 
@@ -1116,5 +1250,17 @@ module chevrotain {
         protected getGAstProductions():lang.HashTable<gast.Rule> {
             return cache.getProductionsForClass(this.className)
         }
+
+        protected raiseNoAltException(errMsgTypes:string):void {
+            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
+                " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
+        }
     }
+
+    function InRuleRecoveryException(message:string) {
+        this.name = lang.functionName(InRuleRecoveryException)
+        this.message = message
+    }
+
+    InRuleRecoveryException.prototype = Error.prototype
 }

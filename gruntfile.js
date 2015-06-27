@@ -193,14 +193,19 @@ module.exports = function(grunt) {
                     banner:  '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
                              '<%= grunt.template.today("yyyy-mm-dd") %> */\n' +
                              'declare module chevrotain {\n' +
-                             '    class BaseRecognizer{}\n' +
                              '    module lang {\n' +
                              '        class HashTable<V>{}\n' +
                              '    }\n',
                     process: function removeOriginalHeaderAndFooter(src, filePath) {
+                        var fixedModuleName, fixedIndentation
                         if (_.contains(filePath, 'gast_public' )){
-                            var fixedModuleName =  src.replace('declare module chevrotain.gast {', '\nmodule gast {')
-                            var fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
+                            fixedModuleName =  src.replace('declare module chevrotain.gast {', '\nmodule gast {')
+                            fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
+                            return fixedIndentation
+                        }
+                        else if (_.contains(filePath, 'exceptions_public' )){
+                            fixedModuleName =  src.replace('declare module chevrotain.exceptions {', '\nmodule exceptions {')
+                            fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
                             return fixedIndentation
                         }
                         var result = src.replace("declare module chevrotain {", "")
@@ -217,6 +222,7 @@ module.exports = function(grunt) {
                         'bin/tsc/src/scan/tokens_public.d.ts',
                         'bin/tsc/src/scan/lexer_public.d.ts',
                         'bin/tsc/src/parse/parser_public.d.ts',
+                        'bin/tsc/src/parse/exceptions_public.d.ts',
                         'bin/tsc/src/parse/grammar/gast_public.d.ts']
                 }
             }

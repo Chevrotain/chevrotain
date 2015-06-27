@@ -12,6 +12,7 @@
 module chevrotain.examples.recovery.sql.spec {
 
     import pt =  chevrotain.tree
+    import exceptions = chevrotain.exceptions
 
     describe("Error Recovery SQL DDL Example", function () {
         "use strict"
@@ -167,7 +168,7 @@ module chevrotain.examples.recovery.sql.spec {
 
             parser.ddl()
             expect(parser.errors.length).to.equal(1)
-            expect(parser.errors[0]).to.be.an.instanceof(NotAllInputParsedException)
+            expect(parser.errors[0]).to.be.an.instanceof(exceptions.NotAllInputParsedException)
         })
 
         it("can use the same parser instance to parse multiple inputs", function () {

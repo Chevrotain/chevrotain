@@ -230,22 +230,22 @@ module chevrotain.recognizer.spec {
     describe("The BaseRecognizer", function () {
 
         it("can be initialized without supplying an input vector", function () {
-            var parser = new BaseRecognizer()
+            var parser = new Parser([], [])
             expect(parser.input).to.deep.equal([])
             expect(parser.input).to.be.an.instanceof(Array)
         })
 
         it("can only SAVE_ERROR for recognition exceptions", function () {
-            var parser:any = new BaseRecognizer()
+            var parser:any = new Parser([], [])
             expect(() => parser.SAVE_ERROR(new Error("I am some random Error"))).
                 to.throw("trying to save an Error which is not a RecognitionException")
             expect(parser.input).to.be.an.instanceof(Array)
         })
 
         it("when it runs out of input EOF will be returned", function () {
-            var parser:any = new BaseRecognizer([new IntToken("1"), new PlusTok()])
-            expect(parser.CONSUME(IntToken))
-            expect(parser.CONSUME(PlusTok))
+            var parser:any = new Parser([new IntToken("1"), new PlusTok()], [])
+            parser.CONSUME(IntToken)
+            parser.CONSUME(PlusTok)
             expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
             expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
             expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
@@ -272,11 +272,11 @@ module chevrotain.recognizer.spec {
 
         it("will return false if a RecognitionException is thrown during " +
             "backtracking and rethrow any other kind of Exception", function () {
-            var parser:any = new BaseRecognizer([])
+            var parser:any = new Parser([], [])
             var backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
             expect(() => backTrackingThrows()).to.throw("division by zero, boom")
 
-            var throwExceptionFunc = () => { throw new NotAllInputParsedException("sad sad panda", new PlusTok()) }
+            var throwExceptionFunc = () => { throw new exceptions.NotAllInputParsedException("sad sad panda", new PlusTok()) }
             var backTrackingFalse = parser.BACKTRACK(() => { throwExceptionFunc() }, () => { return true })
             expect(backTrackingFalse()).to.equal(false)
         })

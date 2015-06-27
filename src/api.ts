@@ -17,9 +17,19 @@ if (!testMode) {
     API.Parser = chevrotain.Parser
     API.Lexer = chevrotain.Lexer
     API.Token = chevrotain.Token
+    API.VirtualToken = chevrotain.VirtualToken
+    API.EOF = chevrotain.EOF
 
-    // utilities
+    // Tokens utilities
     API.extendToken = chevrotain.extendToken
+    API.tokenName = chevrotain.tokenName
+
+    API.exceptions = {}
+    API.exceptions.isRecognitionException = chevrotain.exceptions.isRecognitionException
+    API.exceptions.EarlyExitException = chevrotain.exceptions.EarlyExitException
+    API.exceptions.MismatchedTokenException = chevrotain.exceptions.MismatchedTokenException
+    API.exceptions.NotAllInputParsedException = chevrotain.exceptions.NotAllInputParsedException
+    API.exceptions.NoViableAltException = chevrotain.exceptions.NoViableAltException
 
     // grammar reflection API
     API.gast = {}

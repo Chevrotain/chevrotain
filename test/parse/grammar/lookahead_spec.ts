@@ -5,37 +5,37 @@ module chevrotain.lookahead.spec {
     import lookahead = chevrotain.lookahead
     import matchers = test.matchers
 
-    class ColonParserMock extends BaseRecognizer {
+    class ColonParserMock extends Parser {
         protected NEXT_TOKEN():Token {
             return new samples.ColonTok(":", 0, 1, 1)
         }
     }
 
-    class IdentParserMock extends BaseRecognizer {
+    class IdentParserMock extends Parser {
         protected NEXT_TOKEN():Token {
             return new samples.IdentTok("bamba", 0, 1, 1)
         }
     }
 
-    class CommaParserMock extends BaseRecognizer {
+    class CommaParserMock extends Parser {
         protected NEXT_TOKEN():Token {
             return new samples.CommaTok(",", 0, 1, 1)
         }
     }
 
-    class EntityParserMock extends BaseRecognizer {
+    class EntityParserMock extends Parser {
         protected NEXT_TOKEN():Token {
             return new samples.EntityTok(",", 0, 1, 1)
         }
     }
 
-    class KeyParserMock extends BaseRecognizer {
+    class KeyParserMock extends Parser {
         protected NEXT_TOKEN():Token {
             return new samples.KeyTok(",", 0, 1, 1)
         }
     }
 
-    class ActionParserMock extends BaseRecognizer {
+    class ActionParserMock extends Parser {
         protected NEXT_TOKEN():Token {
             return new samples.ActionTok(",", 0, 1, 1)
         }
@@ -48,47 +48,47 @@ module chevrotain.lookahead.spec {
         it("can compute the lookahead function for the first OPTION in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForOption(1, samples.actionDec)
 
-            expect(laFunc.call(new ColonParserMock())).to.equal(false)
-            expect(laFunc.call(new IdentParserMock())).to.equal(true)
+            expect(laFunc.call(new ColonParserMock([], []))).to.equal(false)
+            expect(laFunc.call(new IdentParserMock([], []))).to.equal(true)
         })
 
         it("can compute the lookahead function for the second OPTION in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForOption(2, samples.actionDec)
 
-            expect(laFunc.call(new ColonParserMock())).to.equal(true)
-            expect(laFunc.call(new IdentParserMock())).to.equal(false)
+            expect(laFunc.call(new ColonParserMock([], []))).to.equal(true)
+            expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForMany(1, samples.actionDec)
 
-            expect(laFunc.call(new CommaParserMock())).to.equal(true)
-            expect(laFunc.call(new IdentParserMock())).to.equal(false)
+            expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
+            expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
             var laFunc = lookahead.buildLookaheadForOr(1, samples.lotsOfOrs)
 
-            expect(laFunc.call(new CommaParserMock())).to.equal(0)
-            expect(laFunc.call(new KeyParserMock())).to.equal(0)
-            expect(laFunc.call(new EntityParserMock())).to.equal(1)
-            expect(laFunc.call(new ColonParserMock())).to.equal(-1)
+            expect(laFunc.call(new CommaParserMock([], []))).to.equal(0)
+            expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
+            expect(laFunc.call(new EntityParserMock([], []))).to.equal(1)
+            expect(laFunc.call(new ColonParserMock([], []))).to.equal(-1)
         })
 
         it("can compute the lookahead function for a Top Level Rule", function () {
             var laFunc = lookahead.buildLookaheadForTopLevel(samples.actionDec)
 
-            expect(laFunc.call(new ActionParserMock())).to.equal(true)
-            expect(laFunc.call(new IdentParserMock())).to.equal(false)
+            expect(laFunc.call(new ActionParserMock([], []))).to.equal(true)
+            expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
         it("can compute the lookahead function for a Top Level Rule #2", function () {
             var laFunc = lookahead.buildLookaheadForTopLevel(samples.lotsOfOrs)
 
-            expect(laFunc.call(new CommaParserMock())).to.equal(true)
-            expect(laFunc.call(new EntityParserMock())).to.equal(true)
-            expect(laFunc.call(new KeyParserMock())).to.equal(true)
-            expect(laFunc.call(new ActionParserMock())).to.equal(false)
+            expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
+            expect(laFunc.call(new EntityParserMock([], []))).to.equal(true)
+            expect(laFunc.call(new KeyParserMock([], []))).to.equal(true)
+            expect(laFunc.call(new ActionParserMock([], []))).to.equal(false)
         })
     })
 

@@ -78,7 +78,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parser = new SwitchCaseRecoveryParser(input)
             var parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(1)
-            expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
+            expect(parser.errors[0]).to.be.an.instanceof(exceptions.EarlyExitException)
             // we have re-synced to the end of the input therefore all the input has been "parsed"
             expect(parser.isAtEndOfInput()).to.equal(true)
             expect(parseResult).to.deep.equal({})
@@ -172,7 +172,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parser = new SwitchCaseRecoveryParser(input)
             var parseResult = parser.caseStmt()
             expect(parser.errors.length).to.equal(1)
-            expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
+            expect(parser.errors[0]).to.be.an.instanceof(exceptions.MismatchedTokenException)
             expect(parser.isAtEndOfInput()).to.equal(true)
             expect(parseResult).to.deep.equal({"Terry": 2})
         })
@@ -187,7 +187,7 @@ module chevrotain.examples.recovery.switchcase.spec {
             var parser = new SwitchCaseRecoveryParser(input)
             var parseResult = parser.caseStmt()
             expect(parser.errors.length).to.equal(1)
-            expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
+            expect(parser.errors[0]).to.be.an.instanceof(exceptions.MismatchedTokenException)
             expect(parser.isAtEndOfInput()).to.equal(true) // in rule recovery failed, will now re-sync to EOF
             expect(parseResult).to.deep.equal({"invalid1": undefined})
         })

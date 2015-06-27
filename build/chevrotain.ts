@@ -5,7 +5,6 @@
 // production code
 /// <reference path="../src/lang/lang_extensions.ts" />
 /// <reference path="../src/scan/tokens_public.ts" />
-/// <reference path="../src/scan/tokens.ts" />
 /// <reference path="../src/scan/lexer_public.ts" />
 /// <reference path="../src/scan/lexer.ts" />
 /// <reference path="../src/parse/parse_tree.ts" />
@@ -22,6 +21,6 @@
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
 /// <reference path="../src/parse/grammar/checks.ts" />
-/// <reference path="../src/parse/recognizer.ts" />
+/// <reference path="../src/parse/exceptions_public.ts" />
 /// <reference path="../src/parse/parser_public.ts" />
 /// <reference path="../src/api.ts" />

@@ -5,6 +5,18 @@ module chevrotain {
 
     import lang = chevrotain.lang
 
+    export function tokenName(clazz:Function):string {
+        // used to support js inheritance patterns that do not use named functions
+        // in that situation setting a property tokenName on a token constructor will
+        // enable producing readable error messages.
+        if (_.isString((<any>clazz).tokenName)) {
+            return (<any>clazz).tokenName
+        }
+        else {
+            return lang.functionName(clazz)
+        }
+    }
+
     /**
      * utility to help the poor souls who are still stuck writing pure javascript 5.1
      * extend and create Token subclasses in a less verbose manner
@@ -76,4 +88,15 @@ module chevrotain {
 
         // TODO: getter(computed) for endOffSet
     }
+
+    /**
+     * a special kind of Token which does not really exist in the input
+     * (hence the 'Virtual' prefix). These type of Tokens can be used as special markers:
+     * for example, EOF (end-of-file).
+     */
+    export class VirtualToken extends Token {
+        constructor() {super("", -1, -1, -1, -1, -1) }
+    }
+
+    export class EOF extends VirtualToken {}
 }
