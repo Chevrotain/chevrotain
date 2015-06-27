@@ -1,6 +1,5 @@
 // using only root module name ('chevrotain') and not a longer name ('chevrotain.recognizer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
 module chevrotain {
 
     import cache = chevrotain.cache
@@ -45,7 +44,7 @@ module chevrotain {
         ALT:() => T
     }
 
-    export interface IParseState {
+    export interface IParserState {
         errors: Error[]
         inputIdx:number
         RULE_STACK:string[]
@@ -55,13 +54,7 @@ module chevrotain {
     export type LookAheadFunc = () => boolean
     export type GrammarAction = () => void
 
-    // TODO: TSC 1.5 switch to const
-    // used to toggle ignoring of OR production ambiguities
-    // TODO: expose on Parser as 'static' for public API?
-    export var IGNORE_AMBIGUITIES:boolean = true
-    export var NO_RESYNC:boolean = false
-
-    var EOF_FOLLOW_KEY:any = {} // TODO const in Typescript 1.5
+    var EOF_FOLLOW_KEY:any = {}
 
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
@@ -69,6 +62,9 @@ module chevrotain {
      * for example: Error Recovery, Automatic lookahead calculation
      */
     export class Parser {
+
+        static IGNORE_AMBIGUITIES:boolean = true
+        static NO_RESYNC:boolean = false
 
         protected static performSelfAnalysis(classInstance:Parser) {
             var className = lang.classNameFromInstance(classInstance)
@@ -88,31 +84,28 @@ module chevrotain {
                 }
             }
 
-            //Throw the validation errors each time an erroneous parser is instantiated
+            // reThrow the validation errors each time an erroneous parser is instantiated
             if (cache.CLASS_TO_VALIDTATION_ERRORS.containsKey(className)) {
                 throw new Error(cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"))
             }
         }
 
+        public errors:Error[] = []
+
+        protected _input:Token[] = []
+        protected inputIdx = -1
+        protected isBackTrackingStack = []
+        protected className:string
         protected RULE_STACK:string[] = []
         protected RULE_OCCURRENCE_STACK:number[] = []
         protected tokensMap:{ [fqn: string] : Function; } = undefined
 
         private firstAfterRepMap
         private classLAFuncs
-
         private orLookaheadKeys:lang.HashTable<string>[]
         private manyLookaheadKeys:lang.HashTable<string>[]
         private atLeastOneLookaheadKeys:lang.HashTable<string>[]
         private optionLookaheadKeys:lang.HashTable<string>[]
-
-
-        public errors:Error[] = []
-        protected _input:Token[] = []
-        protected inputIdx = -1
-        protected isBackTrackingStack = []
-        // caching for performance
-        protected className:string
 
         constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[]) {
             this._input = input
@@ -147,21 +140,34 @@ module chevrotain {
             this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
         }
 
-        set input(newInput:Token[]) {
+        public set input(newInput:Token[]) {
             this.reset()
             this._input = newInput
         }
 
-        get input():Token[] {
+        public get input():Token[] {
             return _.clone(this._input)
         }
 
-        protected isBackTracking():boolean {
-            return !(_.isEmpty(this.isBackTrackingStack))
+        public reset():void {
+            this.isBackTrackingStack = []
+            this.errors = []
+            this._input = []
+            this.inputIdx = -1
+            this.RULE_STACK = []
+            this.RULE_OCCURRENCE_STACK = []
         }
 
         public isAtEndOfInput():boolean {
             return this.LA(1) instanceof EOF
+        }
+
+        public getGAstProductions():lang.HashTable<gast.Rule> {
+            return cache.getProductionsForClass(this.className)
+        }
+
+        protected isBackTracking():boolean {
+            return !(_.isEmpty(this.isBackTrackingStack))
         }
 
         protected SAVE_ERROR(error:Error):Error {
@@ -185,6 +191,18 @@ module chevrotain {
             else {
                 return this._input[this.inputIdx + howMuch]
             }
+        }
+
+        protected isNextRule<T>(ruleName:string):boolean {
+            var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
+            var condition = <any>classLAFuncs.get(ruleName)
+            if (condition === undefined) {
+                var ruleGrammar = this.getGAstProductions().get(ruleName)
+                condition = lookahead.buildLookaheadForTopLevel(ruleGrammar)
+                classLAFuncs.put(ruleName, condition)
+            }
+
+            return condition.call(this)
         }
 
         /**
@@ -215,6 +233,7 @@ module chevrotain {
                 }
             }
         }
+
         // skips a token and returns the next token
         protected SKIP_TOKEN():Token {
             // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
@@ -227,15 +246,6 @@ module chevrotain {
             else {
                 return new EOF()
             }
-        }
-
-        public reset():void {
-            this.isBackTrackingStack = []
-            this.errors = []
-            this._input = []
-            this.inputIdx = -1
-            this.RULE_STACK = []
-            this.RULE_OCCURRENCE_STACK = []
         }
 
         // Parsing DSL
@@ -753,6 +763,26 @@ module chevrotain {
             }
         }
 
+        /*
+         * Returns an "imaginary" Token to insert when Single Token Insertion is done
+         * Override this if you require special behavior in your grammar
+         * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
+         */
+        protected getTokenToInsert(tokClass:Function):Token {
+            return new (<any>tokClass)(-1, -1)
+        }
+
+        /*
+         * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
+         * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
+         * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
+         * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
+         * as the max of the cardinality will be greater than the min value. (and this is a false error!)
+         */
+        protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
+            return true
+        }
+
         private defaultInvalidReturn():any { return undefined }
 
         // Not worth the hassle to support Unicode characters in rule names...
@@ -778,9 +808,9 @@ module chevrotain {
         }
 
         private tryInRepetitionRecovery(grammarRule:Function,
-                                          grammarRuleArgs:any[],
-                                          lookAheadFunc:() => boolean,
-                                          expectedTokType:Function):void {
+                                        grammarRuleArgs:any[],
+                                        lookAheadFunc:() => boolean,
+                                        expectedTokType:Function):void {
             // TODO: can the resyncTokenType be cached?
             var reSyncTokType = this.findReSyncTokenType()
             var orgInputIdx = this.inputIdx
@@ -852,26 +882,6 @@ module chevrotain {
             var topProduction = gastProductions.get(topRuleName)
             var follows = new interp.NextAfterTokenWalker(topProduction, grammarPath).startWalking()
             return follows
-        }
-
-        /*
-         * Returns an "imaginary" Token to insert when Single Token Insertion is done
-         * Override this if you require special behavior in your grammar
-         * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
-         */
-        protected getTokenToInsert(tokClass:Function):Token {
-            return new (<any>tokClass)(-1, -1)
-        }
-
-        /*
-         * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
-         * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
-         * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
-         * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
-         * as the max of the cardinality will be greater than the min value. (and this is a false error!)
-         */
-        protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
-            return true
         }
 
         private tryInRuleRecovery(expectedTokType:Function, follows:Function[]):Token {
@@ -1038,6 +1048,7 @@ module chevrotain {
             }
             return false
         }
+
         // Implementation of parsing DSL
         private atLeastOneInternal(prodFunc:Function,
                                    prodName:string,
@@ -1203,19 +1214,7 @@ module chevrotain {
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne)
         }
 
-        protected isNextRule<T>(ruleName:string):boolean {
-            var classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
-            var condition = <any>classLAFuncs.get(ruleName)
-            if (condition === undefined) {
-                var ruleGrammar = this.getGAstProductions().get(ruleName)
-                condition = lookahead.buildLookaheadForTopLevel(ruleGrammar)
-                classLAFuncs.put(ruleName, condition)
-            }
-
-            return condition.call(this)
-        }
-
-        protected getLookaheadFuncFor<T>(key:string,
+        private getLookaheadFuncFor<T>(key:string,
                                          occurrence:number,
                                          laFuncBuilder:(number, any) => () => T,
                                          extraArgs:any[] = []):() => T {
@@ -1230,7 +1229,7 @@ module chevrotain {
         }
 
         // other functionality
-        protected saveRecogState():IParseState {
+        private saveRecogState():IParserState {
             var savedErrors = _.clone(this.errors)
             var savedRuleStack = _.clone(this.RULE_STACK)
             return {
@@ -1240,18 +1239,13 @@ module chevrotain {
             }
         }
 
-        protected reloadRecogState(newState:IParseState) {
+        private reloadRecogState(newState:IParserState) {
             this.errors = newState.errors
             this.inputIdx = newState.inputIdx
             this.RULE_STACK = newState.RULE_STACK
         }
 
-        // TODO: should probably be public
-        protected getGAstProductions():lang.HashTable<gast.Rule> {
-            return cache.getProductionsForClass(this.className)
-        }
-
-        protected raiseNoAltException(errMsgTypes:string):void {
+        private raiseNoAltException(errMsgTypes:string):void {
             throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
                 " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
         }
