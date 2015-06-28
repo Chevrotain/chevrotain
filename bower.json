@@ -1,6 +1,6 @@
 {
   "name": "chevrotain",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "ignore": [
     "./bin/!(chevrotain.js)",
     "./bin/!(chevrotain.d.ts)",
