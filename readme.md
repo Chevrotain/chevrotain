@@ -32,7 +32,8 @@ the code generation phase.
    
 
 ## Installation
-* ```npm install chevrotain```
+* **npm**: ```npm install chevrotain```
+* **Bower** ```bower install chevrotain```
 * or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest):
   * the 'chevrotain-binaries-...' files contain the compiled javascript code.
 
@@ -204,15 +205,16 @@ No html docs (yet...), use either :
    *  [parser_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/parser_public.ts)
    *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
    
-*  The aggregated Typescript definitions (**chevrotain.d.ts**) packaged in both the github and npm releases.
+*  The aggregated Typescript definitions [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts)
+   * Also packaged in both the github and npm releases.
    
 ## Dependencies
 Only a single dependency to [lodash](https://lodash.com/).
 
 ## Compatibility
-The Generated artifact(chevrotain.js) should run on any modern Javascript ES5 runtime. 
+The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 runtime. 
 * The CI build runs the tests under Node.js.
-* additionally local testing is done on latest versions of Chrome/Firefox/IE.
+* Additionally local testing is done on latest versions of Chrome/Firefox/IE.
 * The dependency to lodash is imported via [UMD](https://github.com/umdjs/umd),
   in order to make chevrotain.js portable to multiple environments.
   

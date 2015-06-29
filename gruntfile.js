@@ -84,7 +84,7 @@ module.exports = function(grunt) {
             },
 
             dev_build: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
+                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts", "!release/**/*.ts"],
                 outDir: "bin/gen"
             },
 
@@ -105,7 +105,7 @@ module.exports = function(grunt) {
             // this is the same as the 'build' process, all .ts --> .js in gen directory
             // in a later step those files will be aggregated into separate components
             release_test_code: {
-                src:     ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts"],
+                src:     ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts", "!release/**/*.ts"],
                 outDir:  "bin/tsc",
                 options: {
                     declaration:    true,
