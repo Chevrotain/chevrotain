@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.3 - 2015-06-29 */
+/*! chevrotain - v0.4.4 - 2015-06-29 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
