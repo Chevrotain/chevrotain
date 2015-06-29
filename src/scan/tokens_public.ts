@@ -40,25 +40,23 @@ module chevrotain {
         }
 
         var derivedCostructor:any = function () {
-            parentConstructor.apply(this, arguments);
+            parentConstructor.apply(this, arguments)
         }
 
         // static properties mixing
-        for (var p in parentConstructor) {
-            if (parentConstructor.hasOwnProperty(p)) {
-                derivedCostructor[p] = parentConstructor[p];
-            }
-        }
+        _.forOwn(parentConstructor, (v, k) => {
+            derivedCostructor[k] = v
+        })
 
         // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
-        derivedCostructor.tokenName = tokenName;
-        derivedCostructor.prototype = Object.create(parentConstructor.prototype);
-        derivedCostructor.prototype.constructor = derivedCostructor;
+        derivedCostructor.tokenName = tokenName
+        derivedCostructor.prototype = Object.create(parentConstructor.prototype)
+        derivedCostructor.prototype.constructor = derivedCostructor
         if (!_.isUndefined(pattern)) {
-            derivedCostructor.PATTERN = pattern;
+            derivedCostructor.PATTERN = pattern
         }
 
-        return derivedCostructor;
+        return derivedCostructor
     }
 
     export class Token {

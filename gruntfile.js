@@ -58,7 +58,7 @@ module.exports = function(grunt) {
                     coverageFolder: 'bin/coverage',
                     check:          {
                         statements: 100,
-                        branches:   0,
+                        branches:   100,
                         lines:      100,
                         functions:  100
                     }

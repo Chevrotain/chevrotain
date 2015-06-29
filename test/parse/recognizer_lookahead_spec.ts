@@ -843,7 +843,7 @@ module chevrotain.recognizer.lookahead.spec {
             var total = ""
 
             // @formatter:off
-            this.OR1([
+            this.OR([
                 {ALT: () => {
                     this.CONSUME1(OneTok)
                     total += "A1"

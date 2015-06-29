@@ -1,4 +1,3 @@
-
 module chevrotain.lexer.spec {
 
     import matchers = test.matchers
@@ -230,6 +229,10 @@ module chevrotain.lexer.spec {
         static GROUP = "comments"
     }
 
+    class WhitespaceOrAmp extends Token {
+        static PATTERN = /\s+|&/
+    }
+
 
     describe("The Simple Lexer transformations", function () {
 
@@ -349,7 +352,7 @@ module chevrotain.lexer.spec {
         })
 
         it("can deal with line terminators inside multi-line Tokens", function () {
-            var ifElseLexer = new Lexer([If, Else, WhitespaceNotSkipped]) // no newLine tokens those will be resynced
+            var ifElseLexer = new Lexer([If, Else, WhitespaceNotSkipped])
 
             var input = "if\r\r\telse\rif\n"
             var lexResult = ifElseLexer.tokenize(input)
@@ -361,6 +364,21 @@ module chevrotain.lexer.spec {
                 new WhitespaceNotSkipped("\r", 9, 3, 6, 3, 6),
                 new If("if", 10, 4, 1, 4, 2),
                 new WhitespaceNotSkipped("\n", 12, 4, 3, 4, 3),
+            ])
+        })
+
+        it("can deal with Tokens which may or may not be a lineTerminator", function () {
+            var ifElseLexer = new Lexer([If, Else, WhitespaceOrAmp])
+
+            var input = "if\r\r\telse&if"
+            var lexResult = ifElseLexer.tokenize(input)
+
+            expect(lexResult.tokens).to.deep.equal([
+                new If("if", 0, 1, 1, 1, 2),
+                new WhitespaceOrAmp("\r\r\t", 2, 1, 3, 3, 1),
+                new Else("else", 5, 3, 2, 3, 5),
+                new WhitespaceOrAmp("&", 9, 3, 6, 3, 6),
+                new If("if", 10, 3, 7, 3, 8),
             ])
         })
 
