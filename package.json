@@ -45,7 +45,7 @@
     "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor"
   },
   "dependencies": {
-    "lodash": "~3.9.3"
+    "lodash": "^3.9.3"
   },
   "devDependencies": {
     "chai": "^3.0.0",
