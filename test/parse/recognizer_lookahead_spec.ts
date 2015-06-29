@@ -1,4 +1,3 @@
-
 module chevrotain.recognizer.lookahead.spec {
 
     export class OneTok extends Token {
@@ -824,6 +823,166 @@ module chevrotain.recognizer.lookahead.spec {
         it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", function () {
             var parser = new OrAmbiguityLookAheadParser()
             expect(() => parser.ambiguityRule()).to.throw()
+        })
+    })
+
+    class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return cache.getLookaheadFuncsForClass(this.className)
+        }
+
+        constructor(input:Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+
+        private parseOrRule():string {
+            var total = ""
+
+            // @formatter:off
+            this.OR1([
+                {ALT: () => {
+                    this.CONSUME1(OneTok)
+                    total += "A1"
+                }},
+                {ALT: () => {
+                    this.CONSUME2(OneTok)
+                    total += "OOPS!"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(ThreeTok)
+                    total += "A3"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(FourTok)
+                    total += "A4"
+                }},
+                {ALT: () => {
+                    this.CONSUME1(FiveTok)
+                    total += "A5"
+                }},
+            ], "digits", Parser.IGNORE_AMBIGUITIES)
+
+            this.OR2([
+                {ALT: () => {
+                    this.CONSUME2(FourTok)
+                    total += "B4"
+                }},
+                {ALT: () => {
+                    this.CONSUME2(ThreeTok)
+                    total += "B3"
+                }},
+                 {ALT: () => {
+                    this.CONSUME2(TwoTok)
+                    total += "B2"
+                }},
+                {ALT: () => {
+                    this.CONSUME3(TwoTok)
+                    total += "OOPS!"
+                }},
+                {ALT: () => {
+                    this.CONSUME2(FiveTok)
+                    total += "B5"
+                }},
+            ], "digits", Parser.IGNORE_AMBIGUITIES)
+
+            this.OR3([
+                {ALT: () => {
+                    this.CONSUME3(FourTok)
+                    total += "C4"
+                }},
+                {ALT: () => {
+                    this.CONSUME3(ThreeTok)
+                    total += "C3"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(ThreeTok)
+                    total += "OOPS!"
+                }},
+                {ALT: () => {
+                    this.CONSUME3(FiveTok)
+                    total += "C5"
+                }},
+                 {ALT: () => {
+                    this.CONSUME3(OneTok)
+                    total += "C1"
+                }}
+            ], "digits", Parser.IGNORE_AMBIGUITIES)
+
+            this.OR4([
+                {ALT: () => {
+                    this.CONSUME4(OneTok)
+                    total += "D1"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(FourTok)
+                    total += "D4"
+                }},
+                {ALT: () => {
+                    this.CONSUME5(FourTok)
+                    total += "OOPS!"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(TwoTok)
+                    total += "D2"
+                }},
+            ], "digits", Parser.IGNORE_AMBIGUITIES)
+
+            this.OR5([
+                {ALT: () => {
+                    this.CONSUME5(TwoTok)
+                    total += "E2"
+                }},
+                 {ALT: () => {
+                    this.CONSUME5(OneTok)
+                    total += "E1"
+                }},
+                {ALT: () => {
+                    this.CONSUME4(FiveTok)
+                    total += "E5"
+                }},
+                 {ALT: () => {
+                    this.CONSUME5(ThreeTok)
+                    total += "E3"
+                }},
+                {ALT: () => {
+                    this.CONSUME5(FiveTok)
+                    total += "OOPS!"
+                }},
+            ], "digits", Parser.IGNORE_AMBIGUITIES)
+
+            // @formatter:on
+            return total
+        }
+    }
+
+    describe("The implicit lookahead calculation functionality of the Recognizer For OR (with IGNORE_AMBIGUITIES)", function () {
+
+        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
+            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).to.equal(0)
+        })
+
+        it("can compute the lookahead automatically for OR1-5", function () {
+            var input = [new OneTok(), new TwoTok(), new ThreeTok(), new FourTok(), new FiveTok()]
+            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
+            expect(parser.orRule()).to.equal("A1B2C3D4E5")
+        })
+
+        it("will fail when none of the alternatives match", function () {
+            var input = [new SixTok()]
+            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
+            expect(parser.orRule()).to.equal("-666")
+        })
+
+        it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
+            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
+            var lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).to.equal(5)
         })
     })
 

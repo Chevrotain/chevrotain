@@ -85,7 +85,7 @@ module chevrotain.recognizer.spec {
         }
 
         public topRule = this.RULE("topRule", () => {
-            this.SUBRULE1(this.subRule, [5, "a"])
+            this.SUBRULE(this.subRule, [5, "a"])
             this.SUBRULE2(this.subRule, [4, "b"])
             this.SUBRULE3(this.subRule, [3, "c"])
             this.SUBRULE4(this.subRule, [2, "d"])
