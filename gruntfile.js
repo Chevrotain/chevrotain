@@ -147,8 +147,10 @@ module.exports = function(grunt) {
         },
 
         clean:  {
-            all: ["bin/"]
+            release: ['bin/*.*', 'bin/tsc'],
+            dev:     ['bin/gen']
         },
+
         concat: {
             release:             {
                 options: {
@@ -198,13 +200,13 @@ module.exports = function(grunt) {
                              '    }\n',
                     process: function removeOriginalHeaderAndFooter(src, filePath) {
                         var fixedModuleName, fixedIndentation
-                        if (_.contains(filePath, 'gast_public' )){
-                            fixedModuleName =  src.replace('declare module chevrotain.gast {', '\nmodule gast {')
+                        if (_.contains(filePath, 'gast_public')) {
+                            fixedModuleName = src.replace('declare module chevrotain.gast {', '\nmodule gast {')
                             fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
                             return fixedIndentation
                         }
-                        else if (_.contains(filePath, 'exceptions_public' )){
-                            fixedModuleName =  src.replace('declare module chevrotain.exceptions {', '\nmodule exceptions {')
+                        else if (_.contains(filePath, 'exceptions_public')) {
+                            fixedModuleName = src.replace('declare module chevrotain.exceptions {', '\nmodule exceptions {')
                             fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
                             return fixedIndentation
                         }
@@ -245,7 +247,7 @@ module.exports = function(grunt) {
     })
 
     var releaseBuildTasks = [
-        'clean:all',
+        'clean:release',
         'ts:release',
         'ts:release_test_code',
         'tslint',
@@ -275,7 +277,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build_and_test_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
 
     grunt.registerTask('dev_build', [
-        'clean:all',
+        'clean:dev',
         'ts:dev_build',
         'tslint',
         'karma:dev_build'])
