@@ -60,6 +60,7 @@
     "grunt-mocha-istanbul": "^2.4.0",
     "grunt-ts": "~4.1.0",
     "grunt-tslint": "~2.2.0-beta",
+    "grunt-typedoc": "^0.2.2",
     "grunt-umd": "~2.3.3",
     "istanbul": "^0.3.16",
     "jsonfile": "^2.1.1",

@@ -1,13 +1,15 @@
 var _ = require('lodash')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
+var srcFiles = require('./scripts/findRefs')('build/chevrotain.ts')
+
 
 var githubReleaseFiles = ['./package.json',
     './LICENSE.txt',
     "./bin/chevrotain.d.ts",
     "./bin/chevrotain.js",
-    './readme.md'
+    './readme.md',
+    'bin/docs'
 ]
-
 
 module.exports = function(grunt) {
 
@@ -147,7 +149,7 @@ module.exports = function(grunt) {
         },
 
         clean:  {
-            release: ['bin/*.*', 'bin/tsc'],
+            release: ['bin/*.*', 'bin/tsc', 'bin/docs'],
             dev:     ['bin/gen']
         },
 
@@ -230,6 +232,24 @@ module.exports = function(grunt) {
             }
         },
 
+        typedoc: {
+            build_docs: {
+                options: {
+                    mode : 'file',
+                    target: 'es5',
+                    out: 'bin/docs',
+                    name: 'Chevrotain',
+                    excludeExternals: '',
+                    // see: https://github.com/sebastian-lenz/typedoc/issues/73
+                    // double negative for the win!
+                    externalPattern: '!**/*public**'
+                },
+                // must include all the files explicitly instead of just targeting build/chevrotain.ts
+                // otherwise the include(exclude !...) won't work
+                src: srcFiles
+            }
+        },
+
         compress: {
             github_release_zip: {
                 options: {
@@ -256,6 +276,7 @@ module.exports = function(grunt) {
         'ts:validate_definitions',
         'umd:release',
         'umd:release_specs',
+        'typedoc:build_docs',
         'compress'
     ]
 
@@ -269,6 +290,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-concat')
     grunt.loadNpmTasks('grunt-contrib-compress')
     grunt.loadNpmTasks('grunt-mocha-istanbul')
+    grunt.loadNpmTasks('grunt-typedoc')
 
 
     grunt.registerTask('build', releaseBuildTasks)
