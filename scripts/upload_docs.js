@@ -1,0 +1,48 @@
+var git = require('gitty')
+var _ = require('lodash')
+var jf = require('jsonfile')
+var fs = require('fs')
+var wrench = require('wrench')
+var path = require('path')
+
+var myRepo = git('')
+var status = myRepo.statusSync()
+if (!_.isEmpty(status.staged) || !_.isEmpty(status.unstaged) || !_.isEmpty(status.untracked)) {
+    console.error('Error: git working directory must be clean in order to perform a release')
+    process.exit(-1)
+}
+
+var branchesInfo = myRepo.getBranchesSync()
+
+if (branchesInfo.current !== 'master') {
+    console.error('Error: can only perform release job from master branch')
+    process.exit(-1)
+}
+
+chevrotainPkgPath = path.join(__dirname, '../../chevrotain/package.json')
+var chevrotainPkg = jf.readFileSync(chevrotainPkgPath)
+
+var version = chevrotainPkg.version
+var noDotsVersion = version.replace(/\./g, '_')
+var targetDocsDir = path.join(__dirname, '../documentation/' + noDotsVersion)
+
+try {
+    stats = fs.lstatSync(targetDocsDir)
+
+    if (stats.isDirectory()) {
+        console.error('docs directory for ' + noDotsVersion + ' already exists')
+        process.exit(-1)
+    }
+}
+catch (e) {
+    // no issues it does not exist
+}
+
+var orgDocsLocation = path.join(__dirname, '../../chevrotain/bin/docs')
+wrench.copyDirSyncRecursive(orgDocsLocation, targetDocsDir)
+
+myRepo.addSync([targetDocsDir])
+myRepo.commitSync("docs for release " + version)
+myRepo.push("origin", "master", function() {
+    console.log("finished push to branch")
+})

@@ -2,12 +2,16 @@
   "name": "Chevrotain.github.io",
   "version": "0.1.0",
   "license": " Apache-2.0",
-  "dependencies" : {
+  "dependencies": {
     "chevrotain": "*"
   },
   "devDependencies": {
+    "gitty": "^3.2.3",
     "jison": "*",
-    "jison-lex": "*"
+    "jison-lex": "*",
+    "jsonfile": "^2.2.1",
+    "lodash": "^3.10.0",
+    "wrench": "^1.5.8"
   },
   "private": true
 }
