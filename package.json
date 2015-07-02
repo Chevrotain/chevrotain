@@ -29,6 +29,7 @@
     }
   ],
   "files": [
+    "bin/docs",
     "bin/chevrotain.d.ts",
     "bin/chevrotain.js",
     "readme.md",
@@ -41,8 +42,8 @@
   },
   "scripts": {
     "test": "grunt test",
-    "release_patch": "node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch",
-    "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor"
+    "release_patch": "node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch node ../Chevrotain.github.io/scripts/upload_docs.js",
+    "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor node ../Chevrotain.github.io/scripts/upload_docs.js"
   },
   "dependencies": {
     "lodash": "^3.9.3"
