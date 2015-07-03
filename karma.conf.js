@@ -1,9 +1,19 @@
 /*global module process */
 var specsFiles = require('./scripts/findSpecs')("bin/gen/test/", "test")
 var findRefs = require('./scripts/findRefs')
-
+var _ = require('lodash')
 
 var coreIncludes = findRefs('./build/chevrotain.ts', "bin/gen/");
+coreIncludes = _.reject(coreIncludes, function(srcFile) {
+    return /libs\//.test(srcFile)
+})
+
+coreIncludes = _.map(coreIncludes, function(srcFile) {
+    var fixedPath = srcFile.replace('src', 'bin/gen/src')
+    var fixedSuffix  = fixedPath.replace('.ts', '.js')
+    return fixedSuffix
+})
+
 var allSrcsIncludes = coreIncludes.concat(specsFiles)
 
 module.exports = function(config) {
