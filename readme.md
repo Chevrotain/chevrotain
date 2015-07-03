@@ -207,7 +207,7 @@ The best way to start is by looking at some runable (and debugable) examples:
    *  [parser_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/parser_public.ts)
    *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
    
-*  The aggregated Typescript definitions 
+*  The aggregated Typescript definitions :
    * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts) (dev version)
    * Also packaged in both the github and npm releases.
    
