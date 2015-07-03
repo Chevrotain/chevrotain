@@ -1,0 +1,15 @@
+{
+  "name": "Chevrotain.github.io",
+  "version": "0.1.0",
+  "homepage": "https://github.com/Chevrotain/Chevrotain.github.io",
+  "authors": [
+    "Shahar Soel <shahar.soel@gmail.com>"
+  ],
+  "description": "Chevrotain website",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "chevrotain": "*",
+    "benchmark": "~1.0.0"
+  },
+  "private": true
+}

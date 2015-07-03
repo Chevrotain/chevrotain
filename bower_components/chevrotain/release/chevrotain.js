@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.2 - 2015-06-28 */
+/*! chevrotain - v0.4.4 - 2015-06-29 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -127,11 +127,10 @@ var chevrotain;
         var derivedCostructor = function () {
             parentConstructor.apply(this, arguments);
         };
-        for (var p in parentConstructor) {
-            if (parentConstructor.hasOwnProperty(p)) {
-                derivedCostructor[p] = parentConstructor[p];
-            }
-        }
+        // static properties mixing
+        _.forOwn(parentConstructor, function (v, k) {
+            derivedCostructor[k] = v;
+        });
         // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
         derivedCostructor.tokenName = tokenName;
         derivedCostructor.prototype = Object.create(parentConstructor.prototype);

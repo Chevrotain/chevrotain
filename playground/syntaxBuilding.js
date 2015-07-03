@@ -15,20 +15,20 @@ function definitionsToSubDiagrams(definitions) {
  */
 function convertProductionToDiagram(prod) {
 
-    if (prod instanceof chevrotain.gast.ProdRef) {
+    if (prod instanceof chevrotain.gast.NonTerminal) {
         // must handle ProdRef separately from the other AbstractProductions as we do not want to expand the subDefinition
         // of a reference and cause infinite loops
-        return NonTerminal(prod.refProdName)
+        return NonTerminal(prod.nonTerminalName)
     }
     else if(!(prod instanceof chevrotain.gast.Terminal)){
         var subDiagrams = definitionsToSubDiagrams(prod.definition);
-        if (prod instanceof chevrotain.gast.TOP_LEVEL) {
+        if (prod instanceof chevrotain.gast.Rule) {
             return Diagram.apply(this, subDiagrams)
         }
-        else if (prod instanceof chevrotain.gast.FLAT) {
+        else if (prod instanceof chevrotain.gast.Flat) {
             return Sequence.apply(this, subDiagrams)
         }
-        else if (prod instanceof chevrotain.gast.OPTION) {
+        else if (prod instanceof chevrotain.gast.Option) {
             if (subDiagrams.length > 1) {
                 return Optional(Sequence.apply(this, subDiagrams))
             }
@@ -39,7 +39,7 @@ function convertProductionToDiagram(prod) {
                 throw new Error("Empty Optional production, WTF!")
             }
         }
-        else if (prod instanceof chevrotain.gast.MANY) {
+        else if (prod instanceof chevrotain.gast.Repetition) {
             if (subDiagrams.length > 1) {
                 return ZeroOrMore(Sequence.apply(this, subDiagrams))
             }
@@ -50,11 +50,11 @@ function convertProductionToDiagram(prod) {
                 throw new Error("Empty Optional production, WTF!")
             }
         }
-        else if (prod instanceof chevrotain.gast.OR) {
+        else if (prod instanceof chevrotain.gast.Alternation) {
             // what does the first argument of choice (the index 0 means?)
             return Choice.apply(this, _.flatten([0, subDiagrams]))
         }
-        else if (prod instanceof chevrotain.gast.AT_LEAST_ONE) {
+        else if (prod instanceof chevrotain.gast.RepetitionMandatory) {
             if (subDiagrams.length > 1) {
                 return OneOrMore(Sequence.apply(this, subDiagrams))
             }
