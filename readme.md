@@ -198,14 +198,17 @@ The best way to start is by looking at some runable (and debugable) examples:
 * [and more](https://github.com/Chevrotain)
 
 ## Documentation
-No html docs (yet...), use either :
-* Annotated source code:
+* [Latest released version's HTML docs](http://chevrotain.github.io/documentation)
+   * Also packaged in both the github and npm releases.
+   
+* Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
    *  [lexer_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/lexer_public.ts)
    *  [parser_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/parser_public.ts)
    *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
    
-*  The aggregated Typescript definitions [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts)
+*  The aggregated Typescript definitions 
+   * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts) (dev version)
    * Also packaged in both the github and npm releases.
    
 ## Dependencies
