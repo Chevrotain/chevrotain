@@ -46,7 +46,7 @@
     "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor node ../Chevrotain.github.io/scripts/upload_docs.js"
   },
   "dependencies": {
-    "lodash": "^3.9.3"
+    "lodash": "^3.10.0"
   },
   "devDependencies": {
     "chai": "^3.0.0",
@@ -56,27 +56,25 @@
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compress": "^0.13.0",
     "grunt-contrib-concat": "^0.5.1",
-    "grunt-jasmine-node-coverage": "^0.4.1",
-    "grunt-karma": "~0.11.0",
+    "grunt-karma": "~0.11.2",
     "grunt-mocha-istanbul": "^2.4.0",
-    "grunt-ts": "~4.1.0",
-    "grunt-tslint": "~2.2.0-beta",
+    "grunt-ts": "~4.1.0-beta",
+    "grunt-tslint": "~2.3.1-beta",
     "grunt-typedoc": "^0.2.2",
     "grunt-umd": "~2.3.3",
-    "istanbul": "^0.3.16",
-    "jsonfile": "^2.1.1",
-    "karma": "~0.12.33",
+    "istanbul": "^0.3.17",
+    "jsonfile": "^2.2.1",
+    "karma": "~0.12.37",
     "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "~0.1.12",
+    "karma-chrome-launcher": "~0.2.0",
     "karma-firefox-launcher": "~0.1.6",
-    "karma-ie-launcher": "~0.1",
-    "karma-jasmine": "~0.3.5",
+    "karma-ie-launcher": "~0.2",
     "karma-mocha": "^0.2.0",
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
     "mocha": "^2.2.5",
     "semver": "^4.3.6",
-    "tslint": "~2.2.0-beta",
+    "tslint": "~2.3.1-beta",
     "wrench": "~1.5.8"
   }
 }
