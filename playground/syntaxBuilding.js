@@ -20,7 +20,7 @@ function convertProductionToDiagram(prod) {
         // of a reference and cause infinite loops
         return NonTerminal(prod.nonTerminalName)
     }
-    else if(!(prod instanceof chevrotain.gast.Terminal)){
+    else if (!(prod instanceof chevrotain.gast.Terminal)) {
         var subDiagrams = definitionsToSubDiagrams(prod.definition);
         if (prod instanceof chevrotain.gast.Rule) {
             return Diagram.apply(this, subDiagrams)
@@ -75,57 +75,3 @@ function convertProductionToDiagram(prod) {
         throw Error("non exhaustive match")
     }
 }
-//
-////noinspection JSAccessibilityCheck
-//var parserImpl = rdt.parse.parser.impl;
-//var rdlParser = new parserImpl.RDLParser();
-//var allProductions = parserImpl.RDLParser.RDL_GRAMMAR_PRODUCTIONS;
-//var DDLRuleNames = parserImpl.DDLParser.partRulesNames;
-//var PLRuleNames = parserImpl.PLParser.partRulesNames;
-//var QLRuleNames = parserImpl.QLParser.partRulesNames;
-//var ExpRuleNames = parserImpl.ExpressionsParser.partRulesNames;
-//var navItems = { };
-//var search = document.createElement("input");
-//var diagramsDiv = document.getElementById("diagrams");
-//var sidebar = document.getElementById("sidebar");
-//
-//
-//function addDiagramsToPage(ruleNames, categoryName) {
-//    diagramsDiv.innerHTML += "<h2><!--suppress HtmlDeprecatedTag --><u>" + categoryName + "</u></h2>";
-//    sidebar.innerHTML += "<h2><!--suppress HtmlDeprecatedTag --><u>" + categoryName + "</u></h2>";
-//    _.forEach(ruleNames, function (currRuleName) {
-//        var currProduction = allProductions.get(currRuleName);
-//        var currDiag = convertProductionToDiagram(currProduction);
-//        var currDiagSvg = currDiag.toSVG();
-//        var header = "<h3>" + currRuleName + ":</h3>";
-//        var anchor = '<a name=' + currRuleName + '>' + header + '</a>';
-//        sidebar.innerHTML += '<a href="#' + currRuleName + '"><h3>' + currRuleName + '</h3></a>';
-//        diagramsDiv.innerHTML += anchor;
-//        diagramsDiv.appendChild(currDiagSvg);
-//    });
-//    navItems[categoryName] = ruleNames;
-//}
-//
-////noinspection JSAccessibilityCheck
-//var tok = rdt.scan.tokens;
-//
-//function hasSpecialTerminalText(tokTypeName) {
-//    return tok.TokTypeNameToPunctuation[tokTypeName] !== undefined;
-//}
-//
-//function getSpecialTerminalText(tokTypeName) {
-//    var punctuationImage = tok.TokTypeNameToPunctuation[tokTypeName];
-//    if (punctuationImage) {
-//        return punctuationImage;
-//    }
-//    else {
-//        return tokTypeName;
-//    }
-//}
-//
-//addDiagramsToPage(DDLRuleNames, "DDL");
-//addDiagramsToPage(PLRuleNames, "PL");
-//addDiagramsToPage(ExpRuleNames, "Expressions");
-//addDiagramsToPage(QLRuleNames, "QL");
-//
-//

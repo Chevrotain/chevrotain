@@ -6,8 +6,13 @@
     <link rel="stylesheet" type="text/css" href="CSS/playground.css">
     <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
     <!-- Libraries -->
+    <script>
+        // expose even the Chevrotain's 'private' API to allow cleaning the the cache.
+        window.CHEV_TEST_MODE = true
+    </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.9.3/lodash.min.js"></script>
+    <script src="../bower_components/lodash/lodash.js"></script>
+    <script src="../bower_components/chevrotain/release/chevrotain.js"></script>
     <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
     <script src="../bower_components/chevrotain/release/chevrotain.js"></script>
     <script src="syntaxBuilding.js"></script>
@@ -53,14 +58,29 @@
 
 
 <script>
+
+
+
+    function cleanCache() {
+        var hashmaps = _.filter(chevrotain.cache, function(prop) {
+            return prop.hasOwnProperty("_state");
+        })
+
+        _.forEach(hashmaps, function(cacheMap) {
+            cacheMap._state = {}
+        })
+    }
+
+
     $(document).ready(function () {
         $.ajax({
-            url: "DefaultParserCodeValue.txt",
+            url     : "DefaultParserCodeValue.txt",
             dataType: "text",
-            success: function (data) {
+            success : function (data) {
                 $("#parserCodeAreaID").text(data);
 
                 function addSvgDiagrams() {
+                    cleanCache()
                     var svgWrapperDiv = document.getElementById("svgWrapperId");
                     svgWrapperDiv.innerHTML = "";
                     var parserConstructor = eval($("#parserCodeAreaID").val());
