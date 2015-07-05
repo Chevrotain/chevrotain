@@ -2,10 +2,8 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <!-- Style Sheets -->
     <link rel="stylesheet" type="text/css" href="CSS/playground.css">
     <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
-    <!-- Libraries -->
     <script>
         // expose even the Chevrotain's 'private' API to allow cleaning the the cache.
         window.CHEV_TEST_MODE = true
@@ -14,6 +12,7 @@
     <script src="../bower_components/lodash/lodash.js"></script>
     <script src="../bower_components/chevrotain/release/chevrotain.js"></script>
     <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
+    <script src="samples.js"></script>
     <script src="syntaxBuilding.js"></script>
     <title>Playground</title>
 </head>
@@ -22,25 +21,24 @@
 <div align="center">
     <div class="leftPart">
         <div class="card">
+
             <div align="center">
                 <h1>Parser Code</h1>
-                <div id="errorMessagesDiv">
-                </div>
+
+                <div id="errorMessagesDiv"></div>
             </div>
 
             <div class="textareawrapper">
                 <label for="parserCodeAreaID"></label>
-                <textarea class="textArea" id="parserCodeAreaID" rows="25"
-                          cols="100"
-                          spellcheck="false"></textarea>
+                <textarea class="textArea" id="parserCodeAreaID" rows="25" cols="100" spellcheck="false"></textarea>
             </div>
 
             <div align="center">
                 <h1>Try Your Parser</h1>
             </div>
+
             <div class="textareawrapper">
-            <textarea class="textArea" rows="25" cols="100"
-                      spellcheck="false" placeholder="Coming Soon!!"></textarea>
+                <textarea class="textArea" rows="25" cols="100" spellcheck="false" placeholder="Coming Soon!!"></textarea>
             </div>
         </div>
     </div>
@@ -49,7 +47,7 @@
             <div align="center">
                 <h1 style="float: left">Syntax Diagrams</h1>
                 <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 16px;margin-left: 12px;">Refresh</button>
-                <label class="checkboxLabel"><input type='checkbox' onclick='checkboxStateChangeHandler(!this.checked);'>Show Terminal's RegExp</label>
+                <label class="checkboxLabel"><input type='checkbox' onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
             <div id="svgWrapperId" class="svgWrapper"></div>
@@ -60,8 +58,7 @@
 
 
 <script>
-
-    var parser = null;
+    var parser = null
 
     function cleanCache() {
         var hashmaps = _.filter(chevrotain.cache, function (prop) {
@@ -85,37 +82,33 @@
     function textAreaChangeHandler() {
         cleanCache()
         var parserConstructor = eval($("#parserCodeAreaID").val())
-        $("#errorMessagesDiv").empty()
+        var errMsgDiv = $("#errorMessagesDiv")
+        errMsgDiv.empty()
         try {
             parser = new parserConstructor()
         } catch (error) {
-            $("#errorMessagesDiv").append($('<h3 class="errorMessage">' + error + '</h3>'))
+            errMsgDiv.append($('<h3 class="errorMessage">' + error + '</h3>'))
         }
         var topRules = parser.getGAstProductions().values()
         addSvgDiagrams(topRules, true)
     }
 
-    function checkboxStateChangeHandler(state) {
+    function checkboxChangeHandler(cb) {
+        var state = !cb.checked
         var topRules = parser.getGAstProductions().values()
         addSvgDiagrams(topRules, state)
     }
 
     $(document).ready(function () {
-        $.ajax({
-            url     : "DefaultParserCodeValue.txt",
-            dataType: "text",
-            success : function (data) {
-                $("#parserCodeAreaID").text(data)
+        var data = "(" + samples.json.toString() + "())"
+        $("#parserCodeAreaID").text(data)
 
-                textAreaChangeHandler()
+        textAreaChangeHandler()
 
-                $("#refreshSyntaxDiagrams").click(function () {
-                    console.log("Refreshing the diagrams")
-                    textAreaChangeHandler()
-                })
-            }
+        $("#refreshSyntaxDiagrams").click(function () {
+            console.log("Refreshing the diagrams")
+            textAreaChangeHandler()
         })
-
     })
 </script>
 
