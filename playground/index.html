@@ -10,11 +10,10 @@
         // expose even the Chevrotain's 'private' API to allow cleaning the the cache.
         window.CHEV_TEST_MODE = true
     </script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
     <script src="../bower_components/lodash/lodash.js"></script>
     <script src="../bower_components/chevrotain/release/chevrotain.js"></script>
     <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
-    <script src="../bower_components/chevrotain/release/chevrotain.js"></script>
     <script src="syntaxBuilding.js"></script>
     <title>Playground</title>
 </head>
@@ -28,16 +27,17 @@
             </div>
 
             <div class="textareawrapper">
-            <textarea class="textArea" id="parserCodeAreaID" rows="25" cols="100" autocomplete="off" autocorrect="off"
-                      autocapitalize="off" spellcheck="false"></textarea>
+                <label for="parserCodeAreaID"></label>
+                <textarea class="textArea" id="parserCodeAreaID" rows="25"
+                          cols="100"
+                          spellcheck="false"></textarea>
             </div>
-        </div>
-        <div class="card">
+
             <div align="center">
                 <h1>Try Your Parser</h1>
             </div>
             <div class="textareawrapper">
-            <textarea class="textArea" rows="25" cols="100" autocomplete="off" autocorrect="off" autocapitalize="off"
+            <textarea class="textArea" rows="25" cols="100"
                       spellcheck="false" placeholder="Coming Soon!!"></textarea>
             </div>
         </div>
@@ -59,49 +59,45 @@
 
 <script>
 
-
-
     function cleanCache() {
-        var hashmaps = _.filter(chevrotain.cache, function(prop) {
-            return prop.hasOwnProperty("_state");
+        var hashmaps = _.filter(chevrotain.cache, function (prop) {
+            return prop.hasOwnProperty("_state")
         })
 
-        _.forEach(hashmaps, function(cacheMap) {
+        _.forEach(hashmaps, function (cacheMap) {
             cacheMap._state = {}
         })
     }
 
+    function addSvgDiagrams() {
+        cleanCache()
+        var svgWrapperDiv = document.getElementById("svgWrapperId")
+        svgWrapperDiv.innerHTML = ""
+        var parserConstructor = eval($("#parserCodeAreaID").val())
+        var parser = new parserConstructor()
+        var topRules = parser.getGAstProductions().values()
+        _.forEach(topRules, function (production) {
+            document.getElementById("svgWrapperId").innerHTML += convertProductionToDiagram(production)
+        })
+    }
 
     $(document).ready(function () {
         $.ajax({
             url     : "DefaultParserCodeValue.txt",
             dataType: "text",
             success : function (data) {
-                $("#parserCodeAreaID").text(data);
+                $("#parserCodeAreaID").text(data)
 
-                function addSvgDiagrams() {
-                    cleanCache()
-                    var svgWrapperDiv = document.getElementById("svgWrapperId");
-                    svgWrapperDiv.innerHTML = "";
-                    var parserConstructor = eval($("#parserCodeAreaID").val());
-                    var parser = new parserConstructor();
-                    var topLevels = parser.getGAstProductions().values();
-                    _.forEach(topLevels, function (production) {
-                        var svg = convertProductionToDiagram(production);
-                        document.getElementById("svgWrapperId").innerHTML += svg;
-                    })
-                }
-
-                addSvgDiagrams();
+                addSvgDiagrams()
 
                 $("#refreshSyntaxDiagrams").click(function () {
-                    console.log("Refreshing the diagrams");
-                    addSvgDiagrams();
-                });
+                    console.log("Refreshing the diagrams")
+                    addSvgDiagrams()
+                })
             }
-        });
+        })
 
-    });
+    })
 </script>
 
 </body>

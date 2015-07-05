@@ -1,6 +1,4 @@
-/**
- * @param definitions {rdt.parse.grammar.gast.AbstractProduction[]}
- */
+
 function definitionsToSubDiagrams(definitions) {
     "use strict";
     var subDiagrams = _.map(definitions, function (subProd) {
@@ -9,14 +7,10 @@ function definitionsToSubDiagrams(definitions) {
     return subDiagrams;
 }
 
-/**
- * @param prod {rdt.parse.grammar.gast.IProduction}
- * @returns {*}
- */
 function convertProductionToDiagram(prod) {
 
     if (prod instanceof chevrotain.gast.NonTerminal) {
-        // must handle ProdRef separately from the other AbstractProductions as we do not want to expand the subDefinition
+        // must handle NonTerminal separately from the other AbstractProductions as we do not want to expand the subDefinition
         // of a reference and cause infinite loops
         return NonTerminal(prod.nonTerminalName)
     }
@@ -51,7 +45,7 @@ function convertProductionToDiagram(prod) {
             }
         }
         else if (prod instanceof chevrotain.gast.Alternation) {
-            // what does the first argument of choice (the index 0 means?)
+            // todo: what does the first argument of choice (the index 0 means?)
             return Choice.apply(this, _.flatten([0, subDiagrams]))
         }
         else if (prod instanceof chevrotain.gast.RepetitionMandatory) {
@@ -65,10 +59,9 @@ function convertProductionToDiagram(prod) {
                 throw new Error("Empty Optional production, WTF!")
             }
         }
-
     }
     else if (prod instanceof chevrotain.gast.Terminal) {
-        // we do not have the definition of the terminals inside the grammar, lets just use their names (IdentTok/IntegerTok...)
+        // TODO: TokenName or regexp?
         return Terminal(prod.terminalType.PATTERN.source)
     }
     else {
