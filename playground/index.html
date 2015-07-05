@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="CSS/playground.css">
     <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
+    <link rel="stylesheet" href="../bower_components/CodeMirror/lib/codemirror.css">
+    <!-- Libraries -->
     <script>
         // expose even the Chevrotain's 'private' API to allow cleaning the the cache.
         window.CHEV_TEST_MODE = true
@@ -11,6 +13,8 @@
     <script src="../bower_components/jquery/dist/jquery.js"></script>
     <script src="../bower_components/lodash/lodash.js"></script>
     <script src="../bower_components/chevrotain/release/chevrotain.js"></script>
+    <script src="../bower_components/CodeMirror/lib/codemirror.js"></script>
+    <script src="../bower_components/CodeMirror/mode/javascript/javascript.js"></script>
     <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
     <script src="samples.js"></script>
     <script src="syntaxBuilding.js"></script>
@@ -30,7 +34,7 @@
 
             <div class="textareawrapper">
                 <label for="parserCodeAreaID"></label>
-                <textarea class="textArea" id="parserCodeAreaID" rows="25" cols="100" spellcheck="false"></textarea>
+                <textarea id="parserCodeAreaID"></textarea>
             </div>
 
             <div align="center">
@@ -58,7 +62,8 @@
 
 
 <script>
-    var parser = null
+    var parser = null;
+    var editor = null;
 
     function cleanCache() {
         var hashmaps = _.filter(chevrotain.cache, function (prop) {
@@ -81,7 +86,7 @@
 
     function textAreaChangeHandler() {
         cleanCache()
-        var parserConstructor = eval($("#parserCodeAreaID").val())
+        var parserConstructor = eval(editor.getValue())
         var errMsgDiv = $("#errorMessagesDiv")
         errMsgDiv.empty()
         try {
@@ -103,6 +108,12 @@
         var data = "(" + samples.calculator.toString() + "())"
         $("#parserCodeAreaID").text(data)
 
+        editor = CodeMirror.fromTextArea(document.getElementById("parserCodeAreaID"), {
+            lineNumbers: true,
+            viewportMargin: 35
+        });
+        //Workaround... I don't know why the text is aligned center by default...
+        $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
         textAreaChangeHandler()
 
         $("#refreshSyntaxDiagrams").click(function () {

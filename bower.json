@@ -10,7 +10,8 @@
   "dependencies": {
     "chevrotain": "*",
     "benchmark": "~1.0.0",
-    "jquery": "~2.1.4"
+    "jquery": "~2.1.4",
+    "CodeMirror": "~5.4.0"
   },
   "private": true
 }
