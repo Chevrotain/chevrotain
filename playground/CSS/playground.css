@@ -50,3 +50,12 @@ h1 {
 svg {
     width: 100%;
 }
+
+.errorMessage {
+    color: #ff0033;
+    font-family: Arial;
+    font-size: 15px;
+    text-align: left;
+    padding-left: 8px;
+    font-weight: normal;
+}
