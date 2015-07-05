@@ -47,7 +47,7 @@
             <div align="center">
                 <h1 style="float: left">Syntax Diagrams</h1>
                 <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 16px;margin-left: 12px;">Refresh</button>
-                    <label><input type='checkbox' onclick='addSvgDiagrams(!this.checked);'>Show Terminal's RegExp</label>
+                    <label><input type='checkbox' id="nameOrRegExp" onclick='addSvgDiagrams(!this.checked);'>Show Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
             <div id="svgWrapperId" class="svgWrapper"></div>
@@ -92,7 +92,8 @@
 
                 $("#refreshSyntaxDiagrams").click(function () {
                     console.log("Refreshing the diagrams")
-                    addSvgDiagrams()
+                    var useTokenNames = !document.getElementById('nameOrRegExp').checked;
+                    addSvgDiagrams(useTokenNames)
                 })
             }
         })
