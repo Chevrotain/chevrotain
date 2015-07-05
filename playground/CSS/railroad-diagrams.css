@@ -17,10 +17,10 @@ svg.railroad-diagram text.comment {
     font: italic 12px monospace;
 }
 svg.railroad-diagram g.non-terminal rect {
-    fill: hsl(220, 100%, 83%);
+    fill: hsl(223, 100%, 83%);
 }
 svg.railroad-diagram rect {
     stroke-width: 3;
     stroke: black;
-    fill: hsl(196, 100%, 83%);
+    fill: hsl(190, 100%, 83%);
 }
