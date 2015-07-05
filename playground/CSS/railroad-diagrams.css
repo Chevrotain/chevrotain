@@ -16,8 +16,8 @@ svg.railroad-diagram text.label {
 svg.railroad-diagram text.comment {
     font: italic 12px monospace;
 }
-svg.railroad-diagram g.non-terminal text {
-    /*font-style: italic;*/
+svg.railroad-diagram g.non-terminal rect {
+    fill: hsl(220, 100%, 83%);
 }
 svg.railroad-diagram rect {
     stroke-width: 3;
