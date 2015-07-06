@@ -18,7 +18,7 @@ samples.json = function () {
     var StringLiteral = extendToken("StringLiteral", /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
     var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-    WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+    WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' causes the lexer skip such tokens.
 
 
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
@@ -30,48 +30,70 @@ samples.json = function () {
 
     function ChevrotainJsonParser(input) {
         ChevrotainParser.call(this, input, jsonTokens);
-        var _this = this;
+        var $ = this;
 
         this.object = this.RULE("object", function () {
-            _this.CONSUME(LCurly);
-            _this.OPTION(function () {
-                _this.SUBRULE(_this.objectItem);
-                _this.MANY(function () {
-                    _this.CONSUME(Comma);
-                    _this.SUBRULE2(_this.objectItem);
-                });
-            });
-            _this.CONSUME(RCurly);
+            var obj = {}
+
+            $.CONSUME(LCurly);
+            $.OPTION(function () {
+                _.assign(obj, $.SUBRULE($.objectItem));
+                $.MANY(function () {
+                    $.CONSUME(Comma);
+                    _.assign(obj, $.SUBRULE2($.objectItem)); // note the usage of '2' suffix. this is done to distinguish it from
+                });                           // 'SUBRULE($.objectItem)' three lines above. The combination of index
+            });                               // and invoked subrule is used as a key to mark the current position in the
+            $.CONSUME(RCurly);                // grammar by the parser engine.
+
+            return obj;
         });
 
         this.objectItem = this.RULE("objectItem", function () {
-            _this.CONSUME(StringLiteral);
-            _this.CONSUME(Colon);
-            _this.SUBRULE(_this.value);
+            var key, value, obj = {};
+
+            key = $.CONSUME(StringLiteral).image;
+            $.CONSUME(Colon);
+            value = $.SUBRULE($.value);
+
+            obj[key] = value;
+            return obj;
         });
 
         this.array = this.RULE("array", function () {
-            _this.CONSUME(LSquare);
-            _this.OPTION(function () {
-                _this.SUBRULE(_this.value);
-                _this.MANY(function () {
-                    _this.CONSUME(Comma);
-                    _this.SUBRULE2(_this.value);
+            var arr = []
+            $.CONSUME(LSquare);
+            $.OPTION(function () {
+                arr.push($.SUBRULE($.value));
+                $.MANY(function () {
+                    $.CONSUME(Comma);
+                    arr.push($.SUBRULE2($.value)); // once again note the usage of '2' suffix
                 });
             });
-            _this.CONSUME(RSquare);
+            $.CONSUME(RSquare);
         });
 
         // @formatter:off
         this.value = this.RULE("value", function () {
-            _this.OR([
-                { ALT: function () { _this.CONSUME(StringLiteral) }},
-                { ALT: function () { _this.CONSUME(NumberLiteral) }},
-                { ALT: function () { _this.SUBRULE(_this.object) }},
-                { ALT: function () { _this.SUBRULE(_this.array) }},
-                { ALT: function () { _this.CONSUME(True) }},
-                { ALT: function () { _this.CONSUME(False) }},
-                { ALT: function () { _this.CONSUME(Null) }}
+            return $.OR([
+                { ALT: function () {
+                    var stringLiteral = $.CONSUME(StringLiteral).image
+                    return stringLiteral.substr(1, stringLiteral - 2); // chop of the quotation marks
+                }},
+                { ALT: function () { return Number($.CONSUME(NumberLiteral).image) }},
+                { ALT: function () { return $.SUBRULE($.object) }},
+                { ALT: function () { return $.SUBRULE($.array) }},
+                { ALT: function () {
+                    $.CONSUME(True);
+                    return true;
+                }},
+                { ALT: function () {
+                    $.CONSUME(False);
+                    return false;
+                }},
+                { ALT: function () {
+                    $.CONSUME(Null);
+                    return null;
+                }}
             ], "a value");
         });
         // @formatter:on
@@ -85,10 +107,16 @@ samples.json = function () {
     ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
     ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
 
+    // for the playground to work the returned object must contain these two fields
+    return {
+        lexer      : ChevJsonLexer,
+        parser     : ChevrotainJsonParser,
+        defaultRule: "object"
+    };
 
-    return ChevrotainJsonParser;
 };
 
+samples.json.exampleInput = '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}'
 
 samples.calculator = function () {
 
@@ -216,8 +244,9 @@ samples.calculator = function () {
 
     // for the playground to work the returned object must contain these two fields
     return {
-        lexer : CalculatorLexer,
-        parser: Calculator
+        lexer      : CalculatorLexer,
+        parser     : Calculator,
+        defaultRule: "expression"
     };
 }
 

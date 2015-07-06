@@ -33,6 +33,7 @@
             </div>
 
             <div class="textareawrapper">
+                <select id="example-choice"></select>
                 <label for="parserCodeAreaID"></label>
                 <textarea id="parserCodeAreaID"></textarea>
             </div>
@@ -42,12 +43,10 @@
             </div>
             <button id="parseInputBtn" style="float: left;margin-top: 16px;margin-left: 12px;">Parse!</button>
             <div class="textareawrapper">
-                <textarea id="parserInput" class="textArea" rows="2" cols="100" spellcheck="false" ></textarea>
+                <textarea id="parserInput" class="textArea" rows="2" cols="100" spellcheck="false"></textarea>
             </div>
 
-            <div class="textareawrapper">
-                <textarea id="parserOutput" class="textArea" rows="2" cols="100" spellcheck="false" readonly="true"  ></textarea>
-            </div>
+
         </div>
     </div>
     <div class="rightPart">
@@ -60,6 +59,9 @@
             <div style="clear:both;"></div>
             <div id="svgWrapperId" class="svgWrapper"></div>
         </div>
+        <div class="textareawrapper">
+            <textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false" readonly="true"></textarea>
+        </div>
     </div>
     <div style="clear:both;"></div>
 </div>
@@ -68,10 +70,10 @@
 <script>
     var lexer = null
     var parser = null
+    var defaultRuleName = null
     var editor = null
 
-    // TODO: need to return both Parser and Lexer and a method that chains them
-    function lexAndParse(text, lexer, parser) {
+    function lexAndParse(text, lexer, parser, startRuleName) {
         var lexResult = lexer.tokenize(text)
         // TODO: expose lexing errors in a better way
         if (lexResult.errors.length > 1) {
@@ -81,13 +83,13 @@
         parser.reset()
         parser.input = lexResult.tokens
         // TODO: need to choose the entry point rule dynamically
-        var value = parser.expression()
+        var value = parser[startRuleName]()
         // TODO: expose parsing errors in a better way
         if (parser.errors.length > 1) {
             throw new Error("sad sad panda, parsing errors detected!")
         }
 
-        return value;
+        return value
     }
 
     function cleanCache() {
@@ -114,6 +116,7 @@
         var editorFuncVal = eval(editor.getValue())
         var parserConstructor = editorFuncVal.parser
         lexer = editorFuncVal.lexer
+        defaultRuleName = editorFuncVal.defaultRule
         var errMsgDiv = $("#errorMessagesDiv")
         errMsgDiv.empty()
         try {
@@ -131,19 +134,26 @@
         addSvgDiagrams(topRules, state)
     }
 
-    $(document).ready(function () {
-        var sample = samples.calculator
+    function loadExample(exampleName) {
+        var sample = samples[exampleName]
         var sampleText = "(" + sample.toString() + "())"
-        $("#parserCodeAreaID").text(sampleText)
         $("#parserInput").text(sample.exampleInput)
+        $("#parserOutput").text("")
+        editor.setValue(sampleText)
+        textAreaChangeHandler()
+    }
+
+    $(document).ready(function () {
 
         editor = CodeMirror.fromTextArea(document.getElementById("parserCodeAreaID"), {
             lineNumbers   : true,
             viewportMargin: 35
         })
+
         //Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
-        textAreaChangeHandler()
+
+        loadExample("calculator")
 
         $("#refreshSyntaxDiagrams").click(function () {
             console.log("Refreshing the diagrams")
@@ -152,8 +162,24 @@
 
         $("#parseInputBtn").click(function () {
             console.log("Parsing!")
-            var result = lexAndParse($("#parserInput").val(), lexer, parser)
-            $("#parserOutput").text(result)
+            var result = lexAndParse($("#parserInput").val(), lexer, parser, defaultRuleName)
+            var processedResult
+            if (_.isNumber(result) || _.isString(result) || _.isBoolean(result)) {
+                processedResult = result // no processing needed
+            }
+            else if (_.isObject(result)) {
+                processedResult = JSON.stringify(result, null, "\t") // TODO: any better way to display json?
+            }
+            $("#parserOutput").text(processedResult)
+        })
+
+        var examplesDropdown = $("#example-choice")
+        _.forEach(_.sortBy(_.keys(samples)), function (sampleName) {
+            examplesDropdown.append("<option>" + sampleName + "</option>")
+        })
+
+        examplesDropdown.change(function () {
+            loadExample(examplesDropdown.val())
         })
     })
 </script>
