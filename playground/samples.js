@@ -2,7 +2,6 @@ var samples = {}
 
 samples.json = function () {
     // ----------------- Lexer -----------------
-    var Token = chevrotain.Token;
     var extendToken = chevrotain.extendToken;
     var ChevrotainLexer = chevrotain.Lexer;
 
@@ -91,7 +90,7 @@ samples.json = function () {
 };
 
 
-samples.calculator = function() {
+samples.calculator = function () {
 
     // ----------------- lexer -----------------
     var extendToken = chevrotain.extendToken;
@@ -215,21 +214,11 @@ samples.calculator = function() {
     Calculator.prototype = Object.create(Parser.prototype);
     Calculator.prototype.constructor = Calculator;
 
-    return Calculator;
-    // TODO: need to return both Parser and Lexer and a method that chains them
-    //return function (text) {
-    //    var lexResult = CalculatorLexer.tokenize(text);
-    //    if (lexResult.errors.length > 1) {
-    //        throw new Error("sad sad panda, lexing errors detected")
-    //    }
-    //
-    //    var parser = new Calculator(lexResult.tokens);
-    //    var value = parser.expression(); // any exposed top level rule may be used as an entry point
-    //    if (parser.errors.length > 1) {
-    //        throw new Error("sad sad panda, parsing errors detected!")
-    //    }
-    //
-    //    return value;
-    //};
+    // for the playground to work the returned object must contain these two fields
+    return {
+        lexer : CalculatorLexer,
+        parser: Calculator
+    };
 }
 
+samples.calculator.exampleInput = "2 * ( 3 + 7)"

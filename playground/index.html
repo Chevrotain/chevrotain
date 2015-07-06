@@ -27,7 +27,7 @@
         <div class="card">
 
             <div align="center">
-                <h1>Parser Code</h1>
+                <h1>Implement your parser</h1>
 
                 <div id="errorMessagesDiv"></div>
             </div>
@@ -38,18 +38,22 @@
             </div>
 
             <div align="center">
-                <h1>Try Your Parser</h1>
+                <h1>Run Your Parser</h1>
+            </div>
+            <button id="parseInputBtn" style="float: left;margin-top: 16px;margin-left: 12px;">Parse!</button>
+            <div class="textareawrapper">
+                <textarea id="parserInput" class="textArea" rows="2" cols="100" spellcheck="false" ></textarea>
             </div>
 
             <div class="textareawrapper">
-                <textarea class="textArea" rows="25" cols="100" spellcheck="false" placeholder="Coming Soon!!"></textarea>
+                <textarea id="parserOutput" class="textArea" rows="2" cols="100" spellcheck="false" readonly="true"  ></textarea>
             </div>
         </div>
     </div>
     <div class="rightPart">
         <div class="card">
             <div align="center">
-                <h1 style="float: left">Syntax Diagrams</h1>
+                <h1 style="float: left">Inspect your grammar</h1>
                 <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 16px;margin-left: 12px;">Refresh</button>
                 <label class="checkboxLabel"><input type='checkbox' onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
             </div>
@@ -62,8 +66,29 @@
 
 
 <script>
-    var parser = null;
-    var editor = null;
+    var lexer = null
+    var parser = null
+    var editor = null
+
+    // TODO: need to return both Parser and Lexer and a method that chains them
+    function lexAndParse(text, lexer, parser) {
+        var lexResult = lexer.tokenize(text)
+        // TODO: expose lexing errors in a better way
+        if (lexResult.errors.length > 1) {
+            throw new Error("sad sad panda, lexing errors detected")
+        }
+
+        parser.reset()
+        parser.input = lexResult.tokens
+        // TODO: need to choose the entry point rule dynamically
+        var value = parser.expression()
+        // TODO: expose parsing errors in a better way
+        if (parser.errors.length > 1) {
+            throw new Error("sad sad panda, parsing errors detected!")
+        }
+
+        return value;
+    }
 
     function cleanCache() {
         var hashmaps = _.filter(chevrotain.cache, function (prop) {
@@ -86,7 +111,9 @@
 
     function textAreaChangeHandler() {
         cleanCache()
-        var parserConstructor = eval(editor.getValue())
+        var editorFuncVal = eval(editor.getValue())
+        var parserConstructor = editorFuncVal.parser
+        lexer = editorFuncVal.lexer
         var errMsgDiv = $("#errorMessagesDiv")
         errMsgDiv.empty()
         try {
@@ -105,13 +132,15 @@
     }
 
     $(document).ready(function () {
-        var data = "(" + samples.calculator.toString() + "())"
-        $("#parserCodeAreaID").text(data)
+        var sample = samples.calculator
+        var sampleText = "(" + sample.toString() + "())"
+        $("#parserCodeAreaID").text(sampleText)
+        $("#parserInput").text(sample.exampleInput)
 
         editor = CodeMirror.fromTextArea(document.getElementById("parserCodeAreaID"), {
-            lineNumbers: true,
+            lineNumbers   : true,
             viewportMargin: 35
-        });
+        })
         //Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
         textAreaChangeHandler()
@@ -119,6 +148,12 @@
         $("#refreshSyntaxDiagrams").click(function () {
             console.log("Refreshing the diagrams")
             textAreaChangeHandler()
+        })
+
+        $("#parseInputBtn").click(function () {
+            console.log("Parsing!")
+            var result = lexAndParse($("#parserInput").val(), lexer, parser)
+            $("#parserOutput").text(result)
         })
     })
 </script>

@@ -1,6 +1,6 @@
 h1 {
     font-family: Arial;
-    font-size: 30px;
+    font-size: 20px;
     color: #4f93ff;
     text-align: -webkit-auto;
     padding-left: 8px;
@@ -54,7 +54,7 @@ svg {
 .errorMessage {
     color: #ff0033;
     font-family: Arial;
-    font-size: 20px;
+    font-size: 15px;
     text-align: left;
     padding-left: 8px;
     font-weight: normal;
