@@ -54,7 +54,7 @@
             <div align="center">
                 <h1 style="float: left">Inspect your grammar</h1>
                 <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 16px;margin-left: 12px;">Refresh</button>
-                <label class="checkboxLabel"><input type='checkbox' onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
+                <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
             <div id="svgWrapperId" class="svgWrapper"></div>
@@ -141,6 +141,7 @@
         $("#parserOutput").text("")
         editor.setValue(sampleText)
         textAreaChangeHandler()
+        $("#chooseTerminalPrintStyle").attr('checked', false)
     }
 
     $(document).ready(function () {
