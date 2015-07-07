@@ -77,7 +77,7 @@ samples.json = function () {
             return $.OR([
                 { ALT: function () {
                     var stringLiteral = $.CONSUME(StringLiteral).image
-                    return stringLiteral.substr(1, stringLiteral - 2); // chop of the quotation marks
+                    return stringLiteral.substr(1, stringLiteral.length  - 2); // chop of the quotation marks
                 }},
                 { ALT: function () { return Number($.CONSUME(NumberLiteral).image) }},
                 { ALT: function () { return $.SUBRULE($.object) }},
