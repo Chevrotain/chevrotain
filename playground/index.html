@@ -136,8 +136,9 @@
     function loadExample(exampleName) {
         var sample = samples[exampleName]
         var sampleText = "(" + sample.toString() + "())"
-        $("#parserInput").text(sample.exampleInput)
-        $("#parserOutput").text("")
+        $("#parserInput").val("")
+        $("#parserInput").val(sample.exampleInput)
+        $("#parserOutput").val("")
         editor.setValue(sampleText)
         textAreaChangeHandler()
         $("#chooseTerminalPrintStyle").attr('checked', false)
@@ -163,7 +164,7 @@
         $("#parseInputBtn").click(function () {
             console.log("Parsing!")
             var parserOutput = $("#parserOutput")
-            parserOutput.text("")
+            parserOutput.val("")
             var result = lexAndParse($("#parserInput").val(), lexer, parser, defaultRuleName)
             var processedResult
             if (_.isNumber(result) || _.isString(result) || _.isBoolean(result)) {
@@ -172,7 +173,7 @@
             else if (_.isObject(result)) {
                 processedResult = JSON.stringify(result, null, "\t") // TODO: any better way to display json?
             }
-            parserOutput.text(processedResult)
+            parserOutput.val(processedResult)
         })
 
         var examplesDropdown = $("#example-choice")
