@@ -163,6 +163,8 @@
 
         $("#parseInputBtn").click(function () {
             console.log("Parsing!")
+            var parserOutput = $("#parserOutput")
+            parserOutput.text("")
             var result = lexAndParse($("#parserInput").val(), lexer, parser, defaultRuleName)
             var processedResult
             if (_.isNumber(result) || _.isString(result) || _.isBoolean(result)) {
@@ -171,7 +173,7 @@
             else if (_.isObject(result)) {
                 processedResult = JSON.stringify(result, null, "\t") // TODO: any better way to display json?
             }
-            $("#parserOutput").text(processedResult)
+            parserOutput.text(processedResult)
         })
 
         var examplesDropdown = $("#example-choice")
