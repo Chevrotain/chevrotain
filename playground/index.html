@@ -27,39 +27,46 @@
         <div class="card">
 
             <div align="center">
-                <h1>Implement your parser</h1>
+                <h1 style="float: left;">Implement your parser</h1>
 
+                <div style="float: right; margin-top: 7px;">
+                    <h3 style="float: left; margin-top: 4px">Eample</h3>
+                    <select id="example-choice"
+                            style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+                </div>
+                <!-- In order to stop the float...-->
+                <div style="clear:both;"></div>
                 <div id="errorMessagesDiv"></div>
             </div>
 
             <div class="textareawrapper">
-                <select id="example-choice"></select>
                 <label for="parserCodeAreaID"></label>
                 <textarea id="parserCodeAreaID"></textarea>
             </div>
+        </div>
 
-            <div align="center">
-                <h1>Run Your Parser</h1>
-            </div>
-            <button id="parseInputBtn" style="float: left;margin-top: 16px;margin-left: 12px;">Parse!</button>
+        <div align="center" class="card">
+            <h1 style="float: left">Run Your Parser</h1>
+            <button id="parseInputBtn" style="float: left;margin-top: 7px;margin-left: 12px;">Parse!</button>
             <div class="textareawrapper">
                 <textarea id="parserInput" class="textArea" rows="2" cols="100" spellcheck="false"></textarea>
             </div>
-
-
         </div>
+
+
     </div>
     <div class="rightPart">
         <div class="card">
             <div align="center">
                 <h1 style="float: left">Inspect your grammar</h1>
-                <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 16px;margin-left: 12px;">Refresh</button>
+                <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 9px;margin-left: 12px;">Refresh</button>
                 <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
             <div id="svgWrapperId" class="svgWrapper"></div>
         </div>
-        <div class="textareawrapper">
+        <div class="card">
+            <h1 style="float: left">Parser Output</h1>
             <textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false" readonly="true"></textarea>
         </div>
     </div>
