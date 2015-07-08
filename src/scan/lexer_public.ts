@@ -26,7 +26,7 @@ module chevrotain {
                          "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
         }
 
-        public static NA = /NOT_APPLICIABLE/
+        public static NA = /NOT_APPLICABLE/
 
         protected allPatterns:RegExp[]
         protected patternIdxToClass:Function[]
