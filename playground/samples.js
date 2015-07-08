@@ -1,6 +1,4 @@
-var samples = {}
-
-samples.json = function () {
+function jsonExample() {
     // ----------------- Lexer -----------------
     var extendToken = chevrotain.extendToken;
     var ChevrotainLexer = chevrotain.Lexer;
@@ -114,12 +112,8 @@ samples.json = function () {
         defaultRule: "object"
     };
 
-};
-
-samples.json.exampleInput = '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}'
-
-samples.calculator = function () {
-
+}
+function calculatorExample() {
     // ----------------- lexer -----------------
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
@@ -249,5 +243,19 @@ samples.calculator = function () {
         defaultRule: "expression"
     };
 }
-
-samples.calculator.exampleInput = "2 * ( 3 + 7)"
+var samples = {
+    "json": {
+        "_function": jsonExample,
+        "exampleInput": {
+            'Valid Syntax': '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
+            'Missing Comma': '{"firstName": "John" "lastName": "Smith", "isAlive": true, "age": 25}'
+}
+    },
+    "calculator": {
+        "_function": calculatorExample,
+        "exampleInput": {
+            "Valid": "2 * ( 3 + 7)",
+            "Syntax Error": "2 * ( 3 + ((7)"
+        }
+    }
+}

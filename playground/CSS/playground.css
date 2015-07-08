@@ -80,3 +80,15 @@ button {
     font-family: Arial;
     font-size: 15px;
 }
+
+.hrInCardHeader {
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    margin-top: 0px;
+    color: #4f93ff;
+    background-color: #4f93ff;
+    height: 1px;
+    border: 0;
+    opacity: 0.5;
+}

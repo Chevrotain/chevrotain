@@ -30,12 +30,12 @@
                 <h1 style="float: left;">Implement your parser</h1>
 
                 <div style="float: right; margin-top: 7px;">
-                    <h3 style="float: left; margin-top: 4px">Eample</h3>
+                    <h3 style="float: left; margin-top: 4px">Eample:</h3>
                     <select id="example-choice"
                             style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
                 </div>
-                <!-- In order to stop the float...-->
                 <div style="clear:both;"></div>
+                <hr class="hrInCardHeader">
                 <div id="errorMessagesDiv"></div>
             </div>
 
@@ -48,6 +48,13 @@
         <div align="center" class="card">
             <h1 style="float: left">Run Your Parser</h1>
             <button id="parseInputBtn" style="float: left;margin-top: 7px;margin-left: 12px;">Parse!</button>
+            <div style="float: right; margin-top: 7px;">
+                <h3 style="float: left; margin-top: 4px">Eample:</h3>
+                <select id="parser-input-example-choice"
+                        style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+            </div>
+            <div style="clear:both;"></div>
+            <hr class="hrInCardHeader">
             <div class="textareawrapper">
                 <textarea id="parserInput" class="textArea" rows="2" cols="100" spellcheck="false"></textarea>
             </div>
@@ -63,11 +70,17 @@
                 <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
+            <hr class="hrInCardHeader">
             <div id="svgWrapperId" class="svgWrapper"></div>
         </div>
         <div class="card">
             <h1 style="float: left">Parser Output</h1>
-            <textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false" readonly="true"></textarea>
+            <div style="clear:both;"></div>
+            <hr class="hrInCardHeader">
+            <div class="textareawrapper">
+                <textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false"
+                          readonly="true"></textarea>
+            </div>
         </div>
     </div>
     <div style="clear:both;"></div>
@@ -140,19 +153,11 @@
         addSvgDiagrams(topRules, state)
     }
 
-    function loadExample(exampleName) {
-        var sample = samples[exampleName]
-        var sampleText = "(" + sample.toString() + "())"
-        $("#parserInput").val("")
-        $("#parserInput").val(sample.exampleInput)
-        $("#parserOutput").val("")
-        editor.setValue(sampleText)
-        textAreaChangeHandler()
-        $("#chooseTerminalPrintStyle").attr('checked', false)
-    }
-
     $(document).ready(function () {
+        var examplesDropdown = $("#example-choice")
+        var parserInputExamplesDropdown = $("#parser-input-example-choice")
 
+        //Init the CodeMirror editor
         editor = CodeMirror.fromTextArea(document.getElementById("parserCodeAreaID"), {
             lineNumbers   : true,
             viewportMargin: 35
@@ -161,14 +166,64 @@
         //Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
 
+        //Examples DropDown handling
+        function loadExample(exampleName) {
+            var sample = samples[exampleName]
+            var sampleText = "(" + sample._function.toString() + "())"
+
+            editor.setValue(sampleText)
+            textAreaChangeHandler()
+
+            $("#chooseTerminalPrintStyle").attr('checked', false)
+
+            initParserInputExamplesDropDown()
+            loadParserInputExample(parserInputExamplesDropdown.val())
+        }
+
+        function initExamplesDropDownValues() {
+            examplesDropdown.find("option").remove()
+            _.forEach(_.sortBy(_.keys(samples)), function (sampleName) {
+                examplesDropdown.append("<option>" + sampleName + "</option>")
+            })
+        }
+
+        initExamplesDropDownValues()
+
+        examplesDropdown.change(function () {
+            loadExample(examplesDropdown.val())
+        })
+
         loadExample("calculator")
+
+        //Parser input examples DropDown handling
+        function loadParserInputExample(parserInputExampleName) {
+            var parserInput = $("#parserInput")
+            parserInput.val("")
+            parserInput.val(samples[examplesDropdown.val()].exampleInput[parserInputExampleName])
+            $("#parserOutput").val("")
+            //Simulate a click on the parse button
+            parseInputClickHandler()
+        }
+
+        function initParserInputExamplesDropDown() {
+            parserInputExamplesDropdown.find("option").remove()
+            _.forOwn(samples[examplesDropdown.val()].exampleInput, function(exampleValue, exampleName) {
+                parserInputExamplesDropdown.append("<option>" + exampleName + "</option>")
+            })
+        }
+
+        initParserInputExamplesDropDown()
+
+        parserInputExamplesDropdown.change(function () {
+            loadParserInputExample(parserInputExamplesDropdown.val())
+        })
 
         $("#refreshSyntaxDiagrams").click(function () {
             console.log("Refreshing the diagrams")
             textAreaChangeHandler()
         })
 
-        $("#parseInputBtn").click(function () {
+        function parseInputClickHandler() {
             console.log("Parsing!")
             var parserOutput = $("#parserOutput")
             parserOutput.val("")
@@ -181,16 +236,10 @@
                 processedResult = JSON.stringify(result, null, "\t") // TODO: any better way to display json?
             }
             parserOutput.val(processedResult)
-        })
+        }
 
-        var examplesDropdown = $("#example-choice")
-        _.forEach(_.sortBy(_.keys(samples)), function (sampleName) {
-            examplesDropdown.append("<option>" + sampleName + "</option>")
-        })
+        $("#parseInputBtn").click(parseInputClickHandler)
 
-        examplesDropdown.change(function () {
-            loadExample(examplesDropdown.val())
-        })
     })
 </script>
 
