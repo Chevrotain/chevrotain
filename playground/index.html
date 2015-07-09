@@ -19,7 +19,7 @@
     <script src="../bower_components/CodeMirror/lib/codemirror.js"></script>
     <script src="../bower_components/CodeMirror/mode/javascript/javascript.js"></script>
     <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
-    <script src="samples.js"></script>
+    <script src="examples.js"></script>
     <script src="syntaxBuilding.js"></script>
     <title>Playground</title>
 </head>
@@ -179,7 +179,7 @@
         var examplesDropdown = $("#example-choice")
         var parserInput = $("#parserInput")
         parserInput.val("")
-        parserInput.val(samples[examplesDropdown.val()].exampleInput[exampleName])
+        parserInput.val(samples[examplesDropdown.val()].sampleInputs[exampleName])
         $("#parserOutput").val("")
         // TODO: not sure this helps the scenario, the purpose is not to be
         // super easy to use best in class editor... as this is not a productive tool.
@@ -207,7 +207,7 @@
         var samplesDropdown = $("#samples-choice")
         var examplesDropdown = $("#example-choice")
         samplesDropdown.find("option").remove()
-        _.forOwn(samples[examplesDropdown.val()].exampleInput, function (exampleValue, exampleName) {
+        _.forOwn(samples[examplesDropdown.val()].sampleInputs, function (exampleValue, exampleName) {
             samplesDropdown.append("<option>" + exampleName + "</option>")
         })
     }

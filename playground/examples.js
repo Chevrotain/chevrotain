@@ -248,14 +248,14 @@ function calculatorExample() {
 var samples = {
     "json"      : {
         "_function"   : jsonExample,
-        "exampleInput": {
+        "sampleInputs": {
             'Valid Syntax' : '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
             'Missing Comma': '{"firstName": "John" "lastName": "Smith", "isAlive": true, "age": 25}'
         }
     },
     "calculator": {
         "_function"   : calculatorExample,
-        "exampleInput": {
+        "sampleInputs": {
             "Valid"       : "2 * ( 3 + 7)",
             "Syntax Error": "2 * ( 3 + ((7)"
         }
