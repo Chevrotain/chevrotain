@@ -58,7 +58,7 @@ function jsonExample() {
         });
 
         this.array = this.RULE("array", function () {
-            var arr = []
+            var arr = [];
             $.CONSUME(LSquare);
             $.OPTION(function () {
                 arr.push($.SUBRULE($.value));
@@ -68,6 +68,8 @@ function jsonExample() {
                 });
             });
             $.CONSUME(RSquare);
+
+            return arr;
         });
 
         // @formatter:off
