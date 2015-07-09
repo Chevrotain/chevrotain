@@ -243,18 +243,20 @@ function calculatorExample() {
         defaultRule: "expression"
     };
 }
+
+
 var samples = {
-    "json": {
-        "_function": jsonExample,
+    "json"      : {
+        "_function"   : jsonExample,
         "exampleInput": {
-            'Valid Syntax': '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
+            'Valid Syntax' : '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
             'Missing Comma': '{"firstName": "John" "lastName": "Smith", "isAlive": true, "age": 25}'
-}
+        }
     },
     "calculator": {
-        "_function": calculatorExample,
+        "_function"   : calculatorExample,
         "exampleInput": {
-            "Valid": "2 * ( 3 + 7)",
+            "Valid"       : "2 * ( 3 + 7)",
             "Syntax Error": "2 * ( 3 + ((7)"
         }
     }

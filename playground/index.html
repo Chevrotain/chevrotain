@@ -8,9 +8,9 @@
     <link rel="stylesheet" type="text/css" href="CSS/playground.css">
     <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
     <link rel="stylesheet" href="../bower_components/CodeMirror/lib/codemirror.css">
-    <!-- Libraries -->
+
     <script>
-        // expose even the Chevrotain's 'private' API to allow cleaning the the cache.
+        // expose the whole Chevrotain's API including the 'private' parts to allow cleaning the the cache.
         window.CHEV_TEST_MODE = true
     </script>
     <script src="../bower_components/jquery/dist/jquery.js"></script>
@@ -34,8 +34,8 @@
 
                 <div style="float: right; margin-top: 7px;">
                     <h3 style="float: left; margin-top: 4px">Eample:</h3>
-                    <select id="example-choice"
-                            style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+                    <label for="example-choice"></label><select id="example-choice"
+                                                                style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
                 </div>
                 <div style="clear:both;"></div>
                 <hr class="hrInCardHeader">
@@ -43,8 +43,8 @@
             </div>
 
             <div class="textareawrapper">
-                <label for="parserCodeAreaID"></label>
-                <textarea id="parserCodeAreaID"></textarea>
+                <label for="parserImplementationEditor"></label>
+                <textarea id="parserImplementationEditor"></textarea>
             </div>
         </div>
 
@@ -52,14 +52,15 @@
             <h1 style="float: left">Run Your Parser</h1>
             <button id="parseInputBtn" style="float: left;margin-top: 7px;margin-left: 12px;">Parse!</button>
             <div style="float: right; margin-top: 7px;">
-                <h3 style="float: left; margin-top: 4px">Eample:</h3>
-                <select id="parser-input-example-choice"
-                        style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+                <h3 style="float: left; margin-top: 4px">Example:</h3>
+                <label for="samples-choice"></label><select id="samples-choice"
+                                                            style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
             </div>
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
             <div class="textareawrapper">
-                <textarea id="parserInput" class="textArea" rows="2" cols="100" spellcheck="false"></textarea>
+                <label for="parserInput"></label><textarea id="parserInput" class="textArea" rows="2" cols="100"
+                                                           spellcheck="false"></textarea>
             </div>
         </div>
 
@@ -70,19 +71,21 @@
             <div align="center">
                 <h1 style="float: left">Inspect your grammar</h1>
                 <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 9px;margin-left: 12px;">Refresh</button>
-                <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChangeHandler(this)'>Show Terminal's RegExp</label>
+                <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChanged(this)'>Show
+                    Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
-            <div id="svgWrapperId" class="svgWrapper"></div>
+            <div id="svgWrapper" class="svgWrapper"></div>
         </div>
         <div class="card">
             <h1 style="float: left">Parser Output</h1>
+
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
             <div class="textareawrapper">
-                <textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false"
-                          readonly="true"></textarea>
+                <label for="parserOutput"></label><textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false"
+                                                            readonly></textarea>
             </div>
         </div>
     </div>
@@ -99,24 +102,18 @@
     function lexAndParse(text, lexer, parser, startRuleName) {
         var lexResult = lexer.tokenize(text)
         // TODO: expose lexing errors in a better way
-//        if (lexResult.errors.length > 1) {
-//            throw new Error("sad sad panda, lexing errors detected")
-//        }
 
         parser.reset()
         parser.input = lexResult.tokens
         var value = parser[startRuleName]()
         // TODO: expose parsing errors in a better way
-//        if (parser.errors.length > 1) {
-//            throw new Error("sad sad panda, parsing errors detected!")
-//        }
 
         return value
     }
 
-    function cleanCache() {
+    function cleanChevrotainCache() {
         var hashmaps = _.filter(chevrotain.cache, function (prop) {
-            return prop.hasOwnProperty("_state")
+            return prop instanceof chevrotain.lang.HashTable
         })
 
         _.forEach(hashmaps, function (cacheMap) {
@@ -124,17 +121,17 @@
         })
     }
 
-    function addSvgDiagrams(topRules, useTokenNames) {
+    function renderSyntaxDiagrams(topRules, useTokenNames) {
         //TODO Use jQuery
-        var svgWrapperDiv = document.getElementById("svgWrapperId")
+        var svgWrapperDiv = document.getElementById("svgWrapper")
         svgWrapperDiv.innerHTML = ""
         _.forEach(topRules, function (production) {
-            document.getElementById("svgWrapperId").innerHTML += convertProductionToDiagram(production, useTokenNames)
+            document.getElementById("svgWrapper").innerHTML += convertProductionToDiagram(production, useTokenNames)
         })
     }
 
-    function textAreaChangeHandler() {
-        cleanCache()
+    function editorContentsChanged() {
+        cleanChevrotainCache()
         var editorFuncVal = eval(editor.getValue())
         var parserConstructor = editorFuncVal.parser
         lexer = editorFuncVal.lexer
@@ -147,101 +144,102 @@
             errMsgDiv.append($('<h3 class="errorMessage">' + error + '</h3>'))
         }
         var topRules = parser.getGAstProductions().values()
-        addSvgDiagrams(topRules, true)
+        renderSyntaxDiagrams(topRules, true)
     }
 
-    function checkboxChangeHandler(cb) {
+    function checkboxChanged(cb) {
         var state = !cb.checked
         var topRules = parser.getGAstProductions().values()
-        addSvgDiagrams(topRules, state)
+        renderSyntaxDiagrams(topRules, state)
+    }
+
+    function initExamplesDropDown() {
+        var examplesDropdown = $("#example-choice")
+        examplesDropdown.find("option").remove()
+        _.forEach(_.sortBy(_.keys(samples)), function (sampleName) {
+            examplesDropdown.append("<option>" + sampleName + "</option>")
+        })
+    }
+
+    function loadExample(exampleName) {
+        var samplesDropdown = $("#samples-choice")
+        var sample = samples[exampleName]
+        var sampleText = "(" + sample._function.toString() + "())"
+
+        editor.setValue(sampleText)
+        editorContentsChanged()
+
+        $("#chooseTerminalPrintStyle").attr('checked', false)
+
+        updateSamplesDropDown()
+        loadSamples(samplesDropdown.val())
+    }
+
+    function loadSamples(exampleName) {
+        var examplesDropdown = $("#example-choice")
+        var parserInput = $("#parserInput")
+        parserInput.val("")
+        parserInput.val(samples[examplesDropdown.val()].exampleInput[exampleName])
+        $("#parserOutput").val("")
+        // TODO: not sure this helps the scenario, the purpose is not to be
+        // super easy to use best in class editor... as this is not a productive tool.
+        // the point is to demonstrate the capabilities of chevrotain.
+        // will actually clicking a button give ppl a greater feel of control ? more understanding that their input is actually parsed using the
+        // implemented parser?
+        parseInputAndDisplayResult()
+    }
+
+    function parseInputAndDisplayResult() {
+        var parserOutput = $("#parserOutput")
+        parserOutput.val("")
+        var result = lexAndParse($("#parserInput").val(), lexer, parser, defaultRuleName)
+        var processedResult
+        if (_.isNumber(result) || _.isString(result) || _.isBoolean(result)) {
+            processedResult = result // no processing needed
+        }
+        else if (_.isObject(result)) {
+            processedResult = JSON.stringify(result, null, "\t") // TODO: any better way to display json?
+        }
+        parserOutput.val(processedResult)
+    }
+
+    function updateSamplesDropDown() {
+        var samplesDropdown = $("#samples-choice")
+        var examplesDropdown = $("#example-choice")
+        samplesDropdown.find("option").remove()
+        _.forOwn(samples[examplesDropdown.val()].exampleInput, function (exampleValue, exampleName) {
+            samplesDropdown.append("<option>" + exampleName + "</option>")
+        })
     }
 
     $(document).ready(function () {
-        var examplesDropdown = $("#example-choice")
-        var parserInputExamplesDropdown = $("#parser-input-example-choice")
 
-        //Init the CodeMirror editor
-        editor = CodeMirror.fromTextArea(document.getElementById("parserCodeAreaID"), {
+        editor = CodeMirror.fromTextArea(document.getElementById("parserImplementationEditor"), {
             lineNumbers   : true,
             viewportMargin: 35
         })
-
-        //Workaround... I don't know why the text is aligned center by default...
+        // Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
 
-        //Examples DropDown handling
-        function loadExample(exampleName) {
-            var sample = samples[exampleName]
-            var sampleText = "(" + sample._function.toString() + "())"
-
-            editor.setValue(sampleText)
-            textAreaChangeHandler()
-
-            $("#chooseTerminalPrintStyle").attr('checked', false)
-
-            initParserInputExamplesDropDown()
-            loadParserInputExample(parserInputExamplesDropdown.val())
-        }
-
-        function initExamplesDropDownValues() {
-            examplesDropdown.find("option").remove()
-            _.forEach(_.sortBy(_.keys(samples)), function (sampleName) {
-                examplesDropdown.append("<option>" + sampleName + "</option>")
-            })
-        }
-
-        initExamplesDropDownValues()
-
+        var examplesDropdown = $("#example-choice")
+        initExamplesDropDown(examplesDropdown)
         examplesDropdown.change(function () {
             loadExample(examplesDropdown.val())
         })
 
         loadExample("calculator")
+        updateSamplesDropDown()
 
-        //Parser input examples DropDown handling
-        function loadParserInputExample(parserInputExampleName) {
-            var parserInput = $("#parserInput")
-            parserInput.val("")
-            parserInput.val(samples[examplesDropdown.val()].exampleInput[parserInputExampleName])
-            $("#parserOutput").val("")
-            //Simulate a click on the parse button
-            parseInputClickHandler()
-        }
-
-        function initParserInputExamplesDropDown() {
-            parserInputExamplesDropdown.find("option").remove()
-            _.forOwn(samples[examplesDropdown.val()].exampleInput, function(exampleValue, exampleName) {
-                parserInputExamplesDropdown.append("<option>" + exampleName + "</option>")
-            })
-        }
-
-        initParserInputExamplesDropDown()
-
-        parserInputExamplesDropdown.change(function () {
-            loadParserInputExample(parserInputExamplesDropdown.val())
+        var samplesDropdown = $("#samples-choice")
+        samplesDropdown.change(function () {
+            loadSamples(samplesDropdown.val())
         })
 
         $("#refreshSyntaxDiagrams").click(function () {
-            console.log("Refreshing the diagrams")
-            textAreaChangeHandler()
+            editorContentsChanged()
         })
 
-        function parseInputClickHandler() {
-            console.log("Parsing!")
-            var parserOutput = $("#parserOutput")
-            parserOutput.val("")
-            var result = lexAndParse($("#parserInput").val(), lexer, parser, defaultRuleName)
-            var processedResult
-            if (_.isNumber(result) || _.isString(result) || _.isBoolean(result)) {
-                processedResult = result // no processing needed
-            }
-            else if (_.isObject(result)) {
-                processedResult = JSON.stringify(result, null, "\t") // TODO: any better way to display json?
-            }
-            parserOutput.val(processedResult)
-        }
-
-        $("#parseInputBtn").click(parseInputClickHandler)
+        $("#parseInputBtn").click(parseInputAndDisplayResult)
 
     })
 </script>
