@@ -246,18 +246,21 @@ function calculatorExample() {
 
 
 var samples = {
-    "json"      : {
-        "_function"   : jsonExample,
-        "sampleInputs": {
-            'Valid Syntax' : '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
-            'Missing Comma': '{"firstName": "John" "lastName": "Smith", "isAlive": true, "age": 25}'
+    json      : {
+        implementation: jsonExample,
+        sampleInputs  : {
+            'basic valid'                              : '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
+            'look mom no colons - success'             : '{"firstName" "John", "lastName" "Smith", "isAlive" true, "age" 25}',
+            'the dog ate my opening curly :( - success': '"firstName" "John", "lastName" "Smith", "isAlive" true, "age" 25}',
+            'missing comma - partial success'          : '"firstName" "John" "lastName" "Smith", "isAlive" true, "age" 25}'
         }
     },
-    "calculator": {
-        "_function"   : calculatorExample,
-        "sampleInputs": {
-            "Valid"       : "2 * ( 3 + 7)",
-            "Syntax Error": "2 * ( 3 + ((7)"
+    calculator: {
+        implementation: calculatorExample,
+        sampleInputs  : {
+            "parenthesis precedence"      : "2 * ( 3 + 7)",
+            "operator precedence"         : "2 + 4 * 5 / 10",
+            "unidentified Token - success": "1 + @@1 + 1"
         }
     }
 }

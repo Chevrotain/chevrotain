@@ -164,7 +164,7 @@
     function loadExample(exampleName) {
         var samplesDropdown = $("#samples-choice")
         var sample = samples[exampleName]
-        var sampleText = "(" + sample._function.toString() + "())"
+        var sampleText = "(" + sample.implementation.toString() + "())"
 
         editor.setValue(sampleText)
         editorContentsChanged()
