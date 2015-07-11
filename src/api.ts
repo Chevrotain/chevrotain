@@ -13,6 +13,10 @@ var testMode = (typeof global === "object" && (<any>global).CHEV_TEST_MODE) ||
 var API:any = {}
 /* istanbul ignore next */
 if (!testMode) {
+
+    // semantic version
+    API.VERSION = "0.4.4";
+
     // runtime API
     API.Parser = chevrotain.Parser
     API.Lexer = chevrotain.Lexer

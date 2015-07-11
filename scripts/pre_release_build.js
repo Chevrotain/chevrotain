@@ -39,11 +39,14 @@ var bumpedPkgJson = _.clone(config.pkgJson)
 var bumpBowerJson = _.clone(config.bowerJson)
 bumpedPkgJson.version = newVersion
 bumpBowerJson.version = newVersion
-var oldVerisonRegExpGlobal = new RegExp(oldVersion, "g")
-var bumpedTravisString = config.travisString.replace(oldVerisonRegExpGlobal, newVersion)
+var oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
+var bumpedTravisString = config.travisString.replace(oldVersionRegExpGlobal, newVersion)
+var bumpedApiString = config.apiString.replace(oldVersionRegExpGlobal, newVersion)
+
 
 jf.spaces = 2
 
 jf.writeFileSync(config.packagePath, bumpedPkgJson)
 jf.writeFileSync(config.bowerPath, bumpBowerJson)
 fs.writeFileSync(config.travisPath, bumpedTravisString)
+fs.writeFileSync(config.apiPath, bumpedApiString)
