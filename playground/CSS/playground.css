@@ -35,12 +35,12 @@ h3 {
 
 .rightPart {
     float: right;
-    width: 39.8%;
+    width: 49.8%;
 }
 
 .leftPart {
     float: left;
-    width: 59.8%;
+    width: 49.8%;
 }
 
 .card {
@@ -48,10 +48,6 @@ h3 {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
     margin-bottom: 8px;
     padding-bottom: 8px;
-}
-
-.svgWrapper > :first-child {
-    width: 100%;
 }
 
 svg {

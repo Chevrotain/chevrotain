@@ -30,10 +30,10 @@
         <div class="card">
 
             <div align="center">
-                <h1 style="float: left;">Implement your parser</h1>
+                <h1 style="float: left;">1. Implement a Parser</h1>
 
                 <div style="float: right; margin-top: 7px;">
-                    <h3 style="float: left; margin-top: 4px">Eample:</h3>
+                    <h3 style="float: left; margin-top: 4px">Example:</h3>
                     <label for="example-choice"></label><select id="example-choice"
                                                                 style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
                 </div>
@@ -49,10 +49,10 @@
         </div>
 
         <div align="center" class="card">
-            <h1 style="float: left">Run Your Parser</h1>
+            <h1 style="float: left">3. Parse Some Input</h1>
             <button id="parseInputBtn" style="float: left;margin-top: 7px;margin-left: 12px;">Parse!</button>
             <div style="float: right; margin-top: 7px;">
-                <h3 style="float: left; margin-top: 4px">Example:</h3>
+                <h3 style="float: left; margin-top: 4px">Sample:</h3>
                 <label for="samples-choice"></label><select id="samples-choice"
                                                             style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
             </div>
@@ -69,7 +69,7 @@
     <div class="rightPart">
         <div class="card">
             <div align="center">
-                <h1 style="float: left">Inspect your grammar</h1>
+                <h1 style="float: left">2. Inspect The Grammar</h1>
                 <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 9px;margin-left: 12px;">Refresh</button>
                 <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChanged(this)'>Show
                     Terminal's RegExp</label>
@@ -79,7 +79,7 @@
             <div id="svgWrapper" class="svgWrapper"></div>
         </div>
         <div class="card">
-            <h1 style="float: left">Parser Output</h1>
+            <h1 style="float: left">4. Examine The Output</h1>
 
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
@@ -181,11 +181,6 @@
         parserInput.val("")
         parserInput.val(samples[examplesDropdown.val()].sampleInputs[exampleName])
         $("#parserOutput").val("")
-        // TODO: not sure this helps the scenario, the purpose is not to be
-        // super easy to use best in class editor... as this is not a productive tool.
-        // the point is to demonstrate the capabilities of chevrotain.
-        // will actually clicking a button give ppl a greater feel of control ? more understanding that their input is actually parsed using the
-        // implemented parser?
         parseInputAndDisplayResult()
     }
 
