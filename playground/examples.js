@@ -254,9 +254,9 @@ var samples = {
             'basic valid'                              : '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
             'look mom no colons - success'             : '{"firstName" "John", "lastName" "Smith", "isAlive" true, "age" 25}',
             'the dog ate my opening curly :( - success': '"firstName" "John", "lastName" "Smith", "isAlive" true, "age" 25}',
-            'too many commas - success': '{"firstName": "John",,, "lastName": "Smith",, "isAlive": true,,,,, "age": 25}',
+            'too many commas - success'                : '{"firstName": "John",,, "lastName": "Smith",, "isAlive": true,,,,, "age": 25}',
             'missing comma - partial success'          : '"firstName" "John" "lastName" "Smith", "isAlive" true, "age" 25}',
-            'missing comma in nested - partial success'          : '{ "firstName" : "John", "lastName" : "Smith", "children ages" : [1,2 3]}'
+            'missing comma in nested - partial success': '{ "firstName" : "John", "lastName" : "Smith", "children ages" : [1,2 3]}'
         }
     },
     calculator: {
