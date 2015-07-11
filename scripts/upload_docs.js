@@ -38,11 +38,16 @@ catch (e) {
     // no issues it does not exist
 }
 
+var docsIndexHtmlPath = path.join(__dirname, '../documentation/index.html')
+var docsIndexHtmlString = fs.readFileSync(docsIndexHtmlPath, 'utf8').toString()
+var bumpedDocsIndexHtmlString = docsIndexHtmlString.replace(/\d+_\d+_\d+/, noDotsVersion)
+fs.writeFileSync(docsIndexHtmlPath, bumpedDocsIndexHtmlString)
+
 var orgDocsLocation = path.join(__dirname, '../../chevrotain/bin/docs')
 wrench.copyDirSyncRecursive(orgDocsLocation, targetDocsDir)
 
-myRepo.addSync([targetDocsDir])
+myRepo.addSync([targetDocsDir].concat([docsIndexHtmlPath]))
 myRepo.commitSync("docs for release " + version)
-myRepo.push("origin", "master", function() {
+myRepo.push("origin", "master", function () {
     console.log("finished push to branch")
 })
