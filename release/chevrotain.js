@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.4 - 2015-06-29 */
+/*! chevrotain - v0.4.5 - 2015-07-11 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -380,7 +380,7 @@ var chevrotain;
         Lexer.SKIPPED = {
             description: "This marks a skipped Token pattern, this means each token identified by it will" + "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
         };
-        Lexer.NA = /NOT_APPLICIABLE/;
+        Lexer.NA = /NOT_APPLICABLE/;
         return Lexer;
     })();
     chevrotain.Lexer = Lexer;
@@ -2942,6 +2942,8 @@ var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) || (typeof 
 var API = {};
 /* istanbul ignore next */
 if (!testMode) {
+    // semantic version
+    API.VERSION = "0.4.5";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
