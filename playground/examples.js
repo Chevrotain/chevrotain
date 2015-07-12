@@ -304,14 +304,14 @@ var samples = {
             '\n\t"missing ": "comma->" ' +
             '\n\t"I will be lost in": "recovery", ' +
             '\n\t"but I am still": "here",' +
-            '\n\t "!": "partial success"' +
+            '\n\t "partial success": "only one property lost"' +
             '\n}',
 
             'Missing comma in array':
                 '{' +
                 '\n\t"name" : "Bobby",' +
-                '\n\t"children ages" : [1, 2 3, 4]' +
-                '\n\t"!": "partial success"' +
+                '\n\t"children ages" : [1, 2 3, 4],' +
+                '\n\t"partial success": "only one array element lost"' +
                 '\n}'
         }
     },
