@@ -816,7 +816,8 @@ module chevrotain {
             var orgInputIdx = this.inputIdx
             var nextTokenWithoutResync = this.NEXT_TOKEN()
             var currToken = this.NEXT_TOKEN()
-            while (!(currToken instanceof reSyncTokType)) {
+            var passedResyncPoint = false
+            while (!passedResyncPoint) {
                 // we skipped enough tokens so we can resync right back into another iteration of the repetition grammar rule
                 if (lookAheadFunc.call(this)) {
                     // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
@@ -829,6 +830,9 @@ module chevrotain {
                     // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
                     grammarRule.apply(this, grammarRuleArgs)
                     return // must return here to avoid reverting the inputIdx
+                }
+                if (currToken instanceof reSyncTokType) {
+                    passedResyncPoint = true
                 }
                 currToken = this.SKIP_TOKEN()
             }
