@@ -133,8 +133,8 @@ function calculatorExample() {
     var Parser = chevrotain.Parser;
 
     // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
-    // AdditionOperator defines a Tokens hierarchy but only leafs in this hierarchy define
-    // actual Tokens that can appear in the text
+    // AdditionOperator defines a Tokens hierarchy but only leafs in this hierarchy
+    // define actual Tokens that can appear in the text
     var AdditionOperator = extendToken("AdditionOperator", Lexer.NA);
     var Plus = extendToken("Plus", /\+/, AdditionOperator);
     var Minus = extendToken("Minus", /-/, AdditionOperator);
@@ -221,8 +221,8 @@ function calculatorExample() {
         this.atomicExpression = $.RULE("atomicExpression", function () {
             // @formatter:off
             return $.OR([
-                // parenthesisExpression has the highest precedence and thus it appears
-                // in the "lowest" leaf in the expression ParseTree.
+                // parenthesisExpression has the highest precedence and thus it
+                // appears in the "lowest" leaf in the expression ParseTree.
                 {ALT: function(){ return $.SUBRULE($.parenthesisExpression)}},
                 {ALT: function(){ return parseInt($.CONSUME(NumberLiteral).image, 10)}}
             ], "a number or parenthesis expression");
@@ -247,8 +247,8 @@ function calculatorExample() {
 
     // avoids inserting number literals as these have a additional meaning.
     // and we can never choose the "right meaning".
-    // For example: a Comma has just one meaning, but a Number may be 1,2,3,...n, 0.4E+3
-    // which number should we insert... ?
+    // For example: a Comma has just one meaning, but a Number may be any of:
+    // 1,2,3,...n, 0.4E+3 which value should we used when inserting... ?
     Calculator.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
         return tokClass !== NumberLiteral
     };

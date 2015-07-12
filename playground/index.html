@@ -164,7 +164,8 @@
     function loadExample(exampleName) {
         var samplesDropdown = $("#samples-choice")
         var sample = samples[exampleName]
-        var sampleText = "(" + sample.implementation.toString() + "())"
+        // reduce whitespace used for Indentation, 2 spaces is also used in our code mirror editor
+        var sampleText = "(" + sample.implementation.toString().replace(/    /g, "  ") + "())"
 
         editor.setValue(sampleText)
         editorContentsChanged()
