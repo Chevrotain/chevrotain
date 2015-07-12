@@ -14,7 +14,7 @@ fs.writeFileSync(chevrotainDTSPath_release, fs.readFileSync(chevrotainDTSPath_bi
 var newTagName = config.tagPrefix + config.currVersion
 
 var myRepo = git('')
-myRepo.addSync([config.travisPath.apiPath, config.travisPath, config.packagePath, config.bowerPath, chevrotainJSPath_release, chevrotainDTSPath_release])
+myRepo.addSync([config.apiPath, config.travisPath, config.packagePath, config.bowerPath, chevrotainJSPath_release, chevrotainDTSPath_release])
 myRepo.commitSync("release " + config.currVersion) // version has already been increased...
 myRepo.createTagSync(newTagName)
 myRepo.push("origin", "master", function() {
