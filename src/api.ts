@@ -15,7 +15,7 @@ var API:any = {}
 if (!testMode) {
 
     // semantic version
-    API.VERSION = "0.4.5";
+    API.VERSION = "0.4.6";
 
     // runtime API
     API.Parser = chevrotain.Parser
