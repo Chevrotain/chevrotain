@@ -3,7 +3,8 @@ function jsonExample() {
     var extendToken = chevrotain.extendToken;
     var ChevrotainLexer = chevrotain.Lexer;
 
-    // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
+    // In ES6, custom inheritance implementation (such as the one above) can be replaced
+    // with a more simple: "class X extends Y"...
     var True = extendToken("True", /true/);
     var False = extendToken("False", /false/);
     var Null = extendToken("Null", /null/);
@@ -13,13 +14,18 @@ function jsonExample() {
     var RSquare = extendToken("RSquare", /]/);
     var Comma = extendToken("Comma", /,/);
     var Colon = extendToken("Colon", /:/);
-    var StringLiteral = extendToken("StringLiteral", /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
-    var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
+    var StringLiteral = extendToken("StringLiteral",
+        /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
+    var NumberLiteral = extendToken("NumberLiteral",
+        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-    WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' causes the lexer skip such tokens.
+    // marking WhiteSpace as 'SKIPPED' causes the lexer skip such tokens.
+    WhiteSpace.GROUP = ChevrotainLexer.SKIPPED;
 
 
-    var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
+    var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
+        LSquare, RSquare, Comma, Colon, True, False, Null];
+
     var ChevJsonLexer = new ChevrotainLexer(jsonTokens);
 
 
@@ -38,10 +44,14 @@ function jsonExample() {
                 _.assign(obj, $.SUBRULE($.objectItem));
                 $.MANY(function () {
                     $.CONSUME(Comma);
-                    _.assign(obj, $.SUBRULE2($.objectItem)); // note the usage of '2' suffix. this is done to distinguish it from
-                });                           // 'SUBRULE($.objectItem)' three lines above. The combination of index
-            });                               // and invoked subrule is used as a key to mark the current position in the
-            $.CONSUME(RCurly);                // grammar by the parser engine.
+                    // note the usage of '2' suffix. this is done to distinguish it from
+                    // 'SUBRULE($.objectItem)' three lines above. The combination of index
+                    // and invoked subrule is used as a key to mark the current position
+                    // in the grammar by the parser engine.
+                    _.assign(obj, $.SUBRULE2($.objectItem));
+                });
+            });
+            $.CONSUME(RCurly);
 
             return obj;
         });
@@ -64,7 +74,7 @@ function jsonExample() {
                 arr.push($.SUBRULE($.value));
                 $.MANY(function () {
                     $.CONSUME(Comma);
-                    arr.push($.SUBRULE2($.value)); // once again note the usage of '2' suffix
+                    arr.push($.SUBRULE2($.value)); // note the usage of '2' suffix
                 });
             });
             $.CONSUME(RSquare);
@@ -77,7 +87,8 @@ function jsonExample() {
             return $.OR([
                 { ALT: function () {
                     var stringLiteral = $.CONSUME(StringLiteral).image
-                    return stringLiteral.substr(1, stringLiteral.length  - 2); // chop of the quotation marks
+                    // chop of the quotation marks
+                    return stringLiteral.substr(1, stringLiteral.length  - 2);
                 }},
                 { ALT: function () { return Number($.CONSUME(NumberLiteral).image) }},
                 { ALT: function () { return $.SUBRULE($.object) }},
@@ -136,10 +147,13 @@ function calculatorExample() {
     var RParen = extendToken("RParen", /\)/);
     var NumberLiteral = extendToken("NumberLiteral", /[1-9]\d*/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-    WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+    // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+    WhiteSpace.GROUP = Lexer.SKIPPED;
 
-    var allTokens = [WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
-        Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator];
+    // whitespace is normally very common so it is placed first to speed up the lexer
+    var allTokens = [WhiteSpace,
+        Plus, Minus, Multi, Div, LParen, RParen,
+        NumberLiteral, AdditionOperator, MultiplicationOperator];
     var CalculatorLexer = new Lexer(allTokens);
 
 
@@ -154,17 +168,19 @@ function calculatorExample() {
         });
 
         //  lowest precedence thus it is first in the rule chain
-        // The precedence of binary expressions is determined by how far down the Parse Tree
-        // The binary expression appears.
+        // The precedence of binary expressions is determined by
+        // how far down the Parse Tree the binary expression appears.
         this.additionExpression = $.RULE("additionExpression", function () {
             var value, op, rhsVal;
 
             // parsing part
             value = $.SUBRULE($.multiplicationExpression);
             $.MANY(function () {
-                // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
+                // consuming 'AdditionOperator' will consume
+                // either Plus or Minus as they are subclasses of AdditionOperator
                 op = $.CONSUME(AdditionOperator);
-                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                //  the index "2" in SUBRULE2 is needed to identify the unique
+                // position in the grammar during runtime
                 rhsVal = $.SUBRULE2($.multiplicationExpression);
 
                 // interpreter part
@@ -186,7 +202,8 @@ function calculatorExample() {
             value = $.SUBRULE($.atomicExpression);
             $.MANY(function () {
                 op = $.CONSUME(MultiplicationOperator);
-                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                //  the index "2" in SUBRULE2 is needed to identify the unique
+                // position in the grammar during runtime
                 rhsVal = $.SUBRULE2($.atomicExpression);
 
                 // interpreter part
@@ -228,8 +245,10 @@ function calculatorExample() {
         Parser.performSelfAnalysis(this);
     }
 
-    // avoids inserting number literals as these can have multiple(and infinite) semantic values, thus it is unlikely
-    // we can choose the correct number value to insert.
+    // avoids inserting number literals as these have a additional meaning.
+    // and we can never choose the "right meaning".
+    // For example: a Comma has just one meaning, but a Number may be 1,2,3,...n, 0.4E+3
+    // which number should we insert... ?
     Calculator.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
         return tokClass !== NumberLiteral
     };
