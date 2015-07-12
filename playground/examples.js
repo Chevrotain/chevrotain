@@ -270,12 +270,49 @@ var samples = {
     json      : {
         implementation: jsonExample,
         sampleInputs  : {
-            'basic valid'                              : '{"firstName": "John", "lastName": "Smith", "isAlive": true, "age": 25}',
-            'look mom no colons - success'             : '{"firstName" "John", "lastName" "Smith", "isAlive" true, "age" 25}',
-            'the dog ate my opening curly :( - success': '"firstName" "John", "lastName" "Smith", "isAlive" true, "age" 25}',
-            'too many commas - success'                : '{"firstName": "John",,, "lastName": "Smith",, "isAlive": true,,,,, "age": 25}',
-            'missing comma - partial success'          : '"firstName" "John" "lastName" "Smith", "isAlive" true, "age" 25}',
-            'missing comma in nested - partial success': '{ "firstName" : "John", "lastName" : "Smith", "children ages" : [1,2 3]}'
+            'Valid'                              :
+                '{' +
+                '\n\t"firstName": "John",' +
+                '\n\t"lastName": "Smith",' +
+                '\n\t"isAlive": true,' +
+                '\n\t"age": 25' +
+                '\n}',
+
+            'Missing colons'                           :
+                '{' +
+                '\n\t"look" "mom",' +
+                '\n\t"no" "colons",' +
+                '\n\t"!" "success!",' +
+                '\n}',
+
+            'Also missing opening curly'               :
+                '\t"the" "dog",' +
+                '\n\t"ate" "my",' +
+                '\n\t"opening" "left",' +
+                '\n\t"curly" "success!"' +
+                '\n}',
+
+            'Too many commas'                          :
+                '{' +
+                '\n\t"three commas" : 3,,,' +
+                '\n\t"five commas": 5,,,,,' +
+                '\n\t"!" : "success"' +
+                '\n}',
+
+            'Missing comma'                            :
+            '{' +
+            '\n\t"missing ": "comma->" ' +
+            '\n\t"I will be lost in": "recovery", ' +
+            '\n\t"but I am still": "here",' +
+            '\n\t "!": "partial success"' +
+            '\n}',
+
+            'Missing comma in array':
+                '{' +
+                '\n\t"name" : "Bobby",' +
+                '\n\t"children ages" : [1, 2 3, 4]' +
+                '\n\t"!": "partial success"' +
+                '\n}'
         }
     },
     calculator: {
