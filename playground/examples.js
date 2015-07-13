@@ -270,49 +270,43 @@ var samples = {
     json      : {
         implementation: jsonExample,
         sampleInputs  : {
-            'Valid'                              :
-                '{' +
-                '\n\t"firstName": "John",' +
-                '\n\t"lastName": "Smith",' +
-                '\n\t"isAlive": true,' +
-                '\n\t"age": 25' +
-                '\n}',
+            'Valid': '{' +
+            '\n\t"firstName": "John",' +
+            '\n\t"lastName": "Smith",' +
+            '\n\t"isAlive": true,' +
+            '\n\t"age": 25' +
+            '\n}',
 
-            'Missing colons'                           :
-                '{' +
-                '\n\t"look" "mom",' +
-                '\n\t"no" "colons",' +
-                '\n\t"!" "success!",' +
-                '\n}',
+            'Missing colons': '{' +
+            '\n\t"look" "mom",' +
+            '\n\t"no" "colons",' +
+            '\n\t"!" "success!",' +
+            '\n}',
 
-            'Also missing opening curly'               :
-                '\t"the" "dog",' +
-                '\n\t"ate" "my",' +
-                '\n\t"opening" "left",' +
-                '\n\t"curly" "success!"' +
-                '\n}',
+            'Also missing opening curly': '\t"the" "dog",' +
+            '\n\t"ate" "my",' +
+            '\n\t"opening" "left",' +
+            '\n\t"curly" "success!"' +
+            '\n}',
 
-            'Too many commas'                          :
-                '{' +
-                '\n\t"three commas" : 3,,,' +
-                '\n\t"five commas": 5,,,,,' +
-                '\n\t"!" : "success"' +
-                '\n}',
+            'Too many commas': '{' +
+            '\n\t"three commas" : 3,,,' +
+            '\n\t"five commas": 5,,,,,' +
+            '\n\t"!" : "success"' +
+            '\n}',
 
-            'Missing comma'                            :
-            '{' +
+            'Missing comma': '{' +
             '\n\t"missing ": "comma->" ' +
             '\n\t"I will be lost in": "recovery", ' +
             '\n\t"but I am still": "here",' +
-            '\n\t "partial success": "only one property lost"' +
+            '\n\t"partial success": "only one property lost"' +
             '\n}',
 
-            'Missing comma in array':
-                '{' +
-                '\n\t"name" : "Bobby",' +
-                '\n\t"children ages" : [1, 2 3, 4],' +
-                '\n\t"partial success": "only one array element lost"' +
-                '\n}'
+            'Missing comma in array': '{' +
+            '\n\t"name" : "Bobby",' +
+            '\n\t"children ages" : [1, 2 3, 4],' +
+            '\n\t"partial success": "only one array element lost"' +
+            '\n}'
         }
     },
     calculator: {

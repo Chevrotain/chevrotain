@@ -156,7 +156,7 @@
     function initExamplesDropDown() {
         var examplesDropdown = $("#example-choice")
         examplesDropdown.find("option").remove()
-        _.forEach(_.sortBy(_.keys(samples)), function (sampleName) {
+        _.forEach(_.keys(samples), function (sampleName) {
             examplesDropdown.append("<option>" + sampleName + "</option>")
         })
     }
@@ -223,7 +223,7 @@
             loadExample(examplesDropdown.val())
         })
 
-        loadExample("calculator")
+        loadExample("json")
         updateSamplesDropDown()
 
         var samplesDropdown = $("#samples-choice")
