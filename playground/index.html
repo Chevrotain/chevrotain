@@ -167,7 +167,6 @@
         var sampleText = "(" + sample.implementation.toString().replace(/    /g, "  ") + "())"
 
         editor.setValue(sampleText)
-        editorContentsChanged()
 
         updateSamplesDropDown()
         loadSamples(samplesDropdown.val())
@@ -215,7 +214,7 @@
         // Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
 
-        editor.on("change", _.debounce(editorContentsChanged, 500))
+        editor.on("change", _.debounce(editorContentsChanged, 250))
 
         var examplesDropdown = $("#example-choice")
         initExamplesDropDown(examplesDropdown)
