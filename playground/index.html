@@ -70,7 +70,6 @@
         <div class="card">
             <div align="center">
                 <h1 style="float: left">2. Inspect The Grammar</h1>
-                <button id="refreshSyntaxDiagrams" style="float: left;margin-top: 9px;margin-left: 12px;">Refresh</button>
                 <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChanged(this)'>Show
                     Terminal's RegExp</label>
             </div>
@@ -214,8 +213,11 @@
             lineNumbers   : true,
             viewportMargin: 35
         })
+
         // Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
+
+        editor.on("change", _.debounce(editorContentsChanged, 500))
 
         var examplesDropdown = $("#example-choice")
         initExamplesDropDown(examplesDropdown)
@@ -229,10 +231,6 @@
         var samplesDropdown = $("#samples-choice")
         samplesDropdown.change(function () {
             loadSamples(samplesDropdown.val())
-        })
-
-        $("#refreshSyntaxDiagrams").click(function () {
-            editorContentsChanged()
         })
 
         $("#parseInputBtn").click(parseInputAndDisplayResult)
