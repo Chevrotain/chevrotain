@@ -50,7 +50,7 @@
 
         <div align="center" class="card">
             <h1 style="float: left">3. Parse Some Input</h1>
-            <button id="parseInputBtn" style="float: left;margin-top: 7px;margin-left: 12px;">Parse!</button>
+
             <div style="float: right; margin-top: 7px;">
                 <h3 style="float: left; margin-top: 4px">Sample:</h3>
                 <label for="samples-choice"></label><select id="samples-choice"
@@ -96,7 +96,8 @@
     var lexer = null
     var parser = null
     var defaultRuleName = null
-    var editor = null
+    var javascriptEditor = null
+    var inputEditor = null
 
     function lexAndParse(text, lexer, parser, startRuleName) {
         var lexResult = lexer.tokenize(text)
@@ -131,7 +132,7 @@
 
     function editorContentsChanged() {
         cleanChevrotainCache()
-        var editorFuncVal = eval(editor.getValue())
+        var editorFuncVal = eval(javascriptEditor.getValue())
         var parserConstructor = editorFuncVal.parser
         lexer = editorFuncVal.lexer
         defaultRuleName = editorFuncVal.defaultRule
@@ -160,23 +161,23 @@
         })
     }
 
-    function loadExample(exampleName) {
+    function loadExample(exampleName, firstTime) {
         var samplesDropdown = $("#samples-choice")
         var sample = samples[exampleName]
         // reduce whitespace used for Indentation, 2 spaces is also used in our code mirror editor
         var sampleText = "(" + sample.implementation.toString().replace(/    /g, "  ") + "())"
 
-        editor.setValue(sampleText)
-
+        javascriptEditor.setValue(sampleText)
         updateSamplesDropDown()
+        if (firstTime) {
+            editorContentsChanged() // can't wait for debounce on the first load as loadSamples will trigger lexAndParse
+        }
         loadSamples(samplesDropdown.val())
     }
 
     function loadSamples(exampleName) {
         var examplesDropdown = $("#example-choice")
-        var parserInput = $("#parserInput")
-        parserInput.val("")
-        parserInput.val(samples[examplesDropdown.val()].sampleInputs[exampleName])
+        inputEditor.setValue(samples[examplesDropdown.val()].sampleInputs[exampleName])
         $("#parserOutput").val("")
         parseInputAndDisplayResult()
     }
@@ -184,7 +185,7 @@
     function parseInputAndDisplayResult() {
         var parserOutput = $("#parserOutput")
         parserOutput.val("")
-        var result = lexAndParse($("#parserInput").val(), lexer, parser, defaultRuleName)
+        var result = lexAndParse(inputEditor.getValue(), lexer, parser, defaultRuleName)
         var processedResult
         if (_.isNumber(result) || _.isString(result) || _.isBoolean(result)) {
             processedResult = result // no processing needed
@@ -206,15 +207,19 @@
 
     $(document).ready(function () {
 
-        editor = CodeMirror.fromTextArea(document.getElementById("parserImplementationEditor"), {
+        javascriptEditor = CodeMirror.fromTextArea(document.getElementById("parserImplementationEditor"), {
             lineNumbers   : true,
             viewportMargin: 35
         })
+        javascriptEditor.setSize("100%", "33rem")
+        javascriptEditor.on("change", _.debounce(editorContentsChanged, 250))
+
+        inputEditor = CodeMirror.fromTextArea(document.getElementById("parserInput"), {})
+        inputEditor.setSize("100%", "100%") // 100% height to auto adjust to contents
+        inputEditor.on("change", _.debounce(parseInputAndDisplayResult, 250))
 
         // Workaround... I don't know why the text is aligned center by default...
-        $(".CodeMirror").css({"text-align": "left", "height": "33rem"})
-
-        editor.on("change", _.debounce(editorContentsChanged, 250))
+        $(".CodeMirror").css({"text-align": "left"})
 
         var examplesDropdown = $("#example-choice")
         initExamplesDropDown(examplesDropdown)
@@ -222,16 +227,13 @@
             loadExample(examplesDropdown.val())
         })
 
-        loadExample("json")
+        loadExample("json", true)
         updateSamplesDropDown()
 
         var samplesDropdown = $("#samples-choice")
         samplesDropdown.change(function () {
             loadSamples(samplesDropdown.val())
         })
-
-        $("#parseInputBtn").click(parseInputAndDisplayResult)
-
     })
 </script>
 
