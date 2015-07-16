@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.6 - 2015-07-13 */
+/*! chevrotain - v0.4.7 - 2015-07-17 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -271,7 +271,7 @@ var chevrotain;
          * @returns {{tokens: {Token}[], errors: string[]}}
          */
         Lexer.prototype.tokenize = function (text) {
-            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT;
+            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength, canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT;
             var orgInput = text;
             var offset = 0;
             var matchedTokens = [];
@@ -370,9 +370,10 @@ var chevrotain;
                             }
                         }
                     }
+                    errLength = offset - errorStartOffset;
                     // at this point we either re-synced or reached the end of the input text
                     errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") + (" skipped " + (offset - errorStartOffset) + " characters.");
-                    errors.push({ line: errorLine, column: errorColumn, message: errorMessage });
+                    errors.push({ line: errorLine, column: errorColumn, length: errLength, message: errorMessage });
                 }
             }
             return { tokens: matchedTokens, groups: groups, errors: errors };
@@ -2947,7 +2948,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.4.6";
+    API.VERSION = "0.4.7";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
