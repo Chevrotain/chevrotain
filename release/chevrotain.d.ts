@@ -1,4 +1,4 @@
-/*! chevrotain - v0.4.6 - 2015-07-13 */
+/*! chevrotain - v0.4.7 - 2015-07-17 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -61,6 +61,7 @@ declare module chevrotain {
     interface ILexingError {
         line: number;
         column: number;
+        length: number;
         message: string;
     }
     class Lexer {
