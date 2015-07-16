@@ -16,9 +16,20 @@ h3 {
 }
 
 .markTextError {
-    text-decoration-line: underline;
-    text-decoration-style: wavy;
-    text-decoration-color: red;
+    display: inline-block;
+    position: relative;
+}
+
+.markTextError:before {
+    content: "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    font-size: 0.8em;
+    font-weight: bolder;
+    font-family: Times New Roman, Serif;
+    color: red;
+    width: 100%;
+    position: absolute;
+    top: 6px;
+    overflow: hidden;
 }
 
 .textArea {
