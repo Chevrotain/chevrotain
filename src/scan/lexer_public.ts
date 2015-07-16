@@ -16,6 +16,7 @@ module chevrotain {
     export interface ILexingError {
         line:number
         column:number
+        length:number
         message:string
     }
 
@@ -107,7 +108,7 @@ module chevrotain {
          * @returns {{tokens: {Token}[], errors: string[]}}
          */
         public tokenize(text:string):ILexingResult {
-            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken,
+            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
                 canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT
             var orgInput = text
             var offset = 0
@@ -219,10 +220,11 @@ module chevrotain {
                         }
                     }
 
+                    errLength = offset - errorStartOffset
                     // at this point we either re-synced or reached the end of the input text
                     errorMessage = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
                         ` skipped ${offset - errorStartOffset} characters.`
-                    errors.push({line: errorLine, column: errorColumn, message: errorMessage})
+                    errors.push({line: errorLine, column: errorColumn, length: errLength, message: errorMessage})
                 }
             }
 

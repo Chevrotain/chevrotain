@@ -310,6 +310,7 @@ module chevrotain.lexer.spec {
             expect(_.contains(lexResult.errors[0].message, "@")).to.equal(true)
             expect(lexResult.errors[0].line).to.equal(1)
             expect(lexResult.errors[0].column).to.equal(18)
+            expect(lexResult.errors[0].length).to.equal(6)
             expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1), new LParen("(", 3, 1, 4), new Integer("666", 4, 1, 5),
                 new RParen(")", 7, 1, 8), new Return("return", 9, 1, 10), new Integer("1", 16, 1, 17), new Else("else", 25, 2, 2),
                 new Return("return", 30, 2, 7), new Integer("2", 37, 2, 14)
@@ -328,6 +329,7 @@ module chevrotain.lexer.spec {
             expect(_.contains(lexResult.errors[0].message, "&")).to.equal(true)
             expect(lexResult.errors[0].line).to.equal(1)
             expect(lexResult.errors[0].column).to.equal(3)
+            expect(lexResult.errors[0].length).to.equal(28)
             expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1)])
         })
 
@@ -340,14 +342,17 @@ module chevrotain.lexer.spec {
             expect(_.contains(lexResult.errors[0].message, "\r")).to.equal(true)
             expect(lexResult.errors[0].line).to.equal(1)
             expect(lexResult.errors[0].column).to.equal(3)
+            expect(lexResult.errors[0].length).to.equal(2)
 
             expect(_.contains(lexResult.errors[1].message, "\r")).to.equal(true)
             expect(lexResult.errors[1].line).to.equal(2)
             expect(lexResult.errors[1].column).to.equal(5)
+            expect(lexResult.errors[1].length).to.equal(1)
 
-            expect(_.contains(lexResult.errors[1].message, "\r")).to.equal(true)
+            expect(_.contains(lexResult.errors[2].message, "\r")).to.equal(true)
             expect(lexResult.errors[2].line).to.equal(3)
             expect(lexResult.errors[2].column).to.equal(3)
+            expect(lexResult.errors[2].length).to.equal(1)
             expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1), new Else("else", 4, 2, 1), new If("if", 9, 3, 1)])
         })
 
