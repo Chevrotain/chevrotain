@@ -118,13 +118,19 @@ module chevrotain {
                 var allErrMessagesString = allErrMessages.join("-----------------------\n")
                 throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString)
             }
-            var analyzeResult = analyzeTokenClasses(tokenClasses)
-            this.allPatterns = analyzeResult.allPatterns
-            this.patternIdxToClass = analyzeResult.patternIdxToClass
-            this.patternIdxToGroup = analyzeResult.patternIdxToGroup
-            this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx
-            this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator
-            this.emptyGroups = analyzeResult.emptyGroups
+
+            // If definition errors were encountered, the analysis phase may fail unexpectedly/
+            // Considering a lexer with definition errors may never be used, there is no point
+            // to performing the analysis anyhow...
+            if (_.isEmpty(this.lexerDefinitionErrors)) {
+                var analyzeResult = analyzeTokenClasses(tokenClasses)
+                this.allPatterns = analyzeResult.allPatterns
+                this.patternIdxToClass = analyzeResult.patternIdxToClass
+                this.patternIdxToGroup = analyzeResult.patternIdxToGroup
+                this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx
+                this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator
+                this.emptyGroups = analyzeResult.emptyGroups
+            }
         }
 
         /**

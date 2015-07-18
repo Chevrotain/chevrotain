@@ -21,10 +21,10 @@ module chevrotain {
      * utility to help the poor souls who are still stuck writing pure javascript 5.1
      * extend and create Token subclasses in a less verbose manner
      *
-     * @param {string} tokenName the name of the new TokenClass
-     * @param {*} patternOrParent Pa
-     * @param {Function} parentConstructor the Token class to be extended
-     * @returns {Function} a constructor for the new extended Token subclass
+     * @param {string} tokenName - the name of the new TokenClass
+     * @param {RegExp|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
+     * @param {Function} parentConstructor - the Token class to be extended
+     * @returns {Function} - a constructor for the new extended Token subclass
      */
     export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token) {
         var pattern

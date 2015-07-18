@@ -187,6 +187,7 @@ module chevrotain {
                     found.push(innerClass)
                     return _.union(result, [innerClass])
                 }
+                return result
             }, [])
         })
 
