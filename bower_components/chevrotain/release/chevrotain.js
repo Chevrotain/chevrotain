@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.7 - 2015-07-17 */
+/*! chevrotain - v0.4.8 - 2015-07-18 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -198,6 +198,15 @@ var chevrotain;
 // TODO: examine module in module to reduce spam on chevrotain namespace
 var chevrotain;
 (function (chevrotain) {
+    (function (LexerDefinitionErrorType) {
+        LexerDefinitionErrorType[LexerDefinitionErrorType["MISSING_PATTERN"] = 0] = "MISSING_PATTERN";
+        LexerDefinitionErrorType[LexerDefinitionErrorType["INVALID_PATTERN"] = 1] = "INVALID_PATTERN";
+        LexerDefinitionErrorType[LexerDefinitionErrorType["EOI_ANCHOR_FOUND"] = 2] = "EOI_ANCHOR_FOUND";
+        LexerDefinitionErrorType[LexerDefinitionErrorType["UNSUPPORTED_FLAGS_FOUND"] = 3] = "UNSUPPORTED_FLAGS_FOUND";
+        LexerDefinitionErrorType[LexerDefinitionErrorType["DUPLICATE_PATTERNS_FOUND"] = 4] = "DUPLICATE_PATTERNS_FOUND";
+        LexerDefinitionErrorType[LexerDefinitionErrorType["INVALID_GROUP_TYPE_FOUND"] = 5] = "INVALID_GROUP_TYPE_FOUND";
+    })(chevrotain.LexerDefinitionErrorType || (chevrotain.LexerDefinitionErrorType = {}));
+    var LexerDefinitionErrorType = chevrotain.LexerDefinitionErrorType;
     var Lexer = (function () {
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
@@ -250,10 +259,24 @@ var chevrotain;
          *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched
          *
          *
+         * @param {boolean} [deferDefinitionErrorsHandling=false]
+         *                  an optional flag indicating that lexer definition errors
+         *                  should not automatically cause an error to be raised.
+         *                  This can be useful when wishing to indicate lexer errors in another manner
+         *                  than simply throwing an error (for example in an online playground).
          */
-        function Lexer(tokenClasses) {
+        function Lexer(tokenClasses, deferDefinitionErrorsHandling) {
+            if (deferDefinitionErrorsHandling === void 0) { deferDefinitionErrorsHandling = false; }
             this.tokenClasses = tokenClasses;
-            chevrotain.validatePatterns(tokenClasses);
+            this.lexerDefinitionErrors = [];
+            this.lexerDefinitionErrors = chevrotain.validatePatterns(tokenClasses);
+            if (!_.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
+                var allErrMessages = _.map(this.lexerDefinitionErrors, function (error) {
+                    return error.message;
+                });
+                var allErrMessagesString = allErrMessages.join("-----------------------\n");
+                throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString);
+            }
             var analyzeResult = chevrotain.analyzeTokenClasses(tokenClasses);
             this.allPatterns = analyzeResult.allPatterns;
             this.patternIdxToClass = analyzeResult.patternIdxToClass;
@@ -279,6 +302,13 @@ var chevrotain;
             var line = 1;
             var column = 1;
             var groups = _.clone(this.emptyGroups);
+            if (!_.isEmpty(this.lexerDefinitionErrors)) {
+                var allErrMessages = _.map(this.lexerDefinitionErrors, function (error) {
+                    return error.message;
+                });
+                var allErrMessagesString = allErrMessages.join("-----------------------\n");
+                throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString);
+            }
             while (text.length > 0) {
                 match = null;
                 for (i = 0; i < this.allPatterns.length; i++) {
@@ -447,51 +477,49 @@ var chevrotain;
     }
     chevrotain.analyzeTokenClasses = analyzeTokenClasses;
     function validatePatterns(tokenClasses) {
-        var missingErrors = findMissingPatterns(tokenClasses);
-        if (!_.isEmpty(missingErrors)) {
-            throw new Error(missingErrors.join("\n ---------------- \n"));
-        }
-        var invalidPatterns = findInvalidPatterns(tokenClasses);
-        if (!_.isEmpty(invalidPatterns)) {
-            throw new Error(invalidPatterns.join("\n ---------------- \n"));
-        }
-        var InvalidEndOfInputAnchor = findEndOfInputAnchor(tokenClasses);
-        if (!_.isEmpty(InvalidEndOfInputAnchor)) {
-            throw new Error(InvalidEndOfInputAnchor.join("\n ---------------- \n"));
-        }
-        var invalidFlags = findUnsupportedFlags(tokenClasses);
-        if (!_.isEmpty(invalidFlags)) {
-            throw new Error(invalidFlags.join("\n ---------------- \n"));
-        }
-        var duplicates = findDuplicatePatterns(tokenClasses);
-        if (!_.isEmpty(duplicates)) {
-            throw new Error(duplicates.join("\n ---------------- \n"));
-        }
-        var invalidGroupType = findInvalidGroupType(tokenClasses);
-        if (!_.isEmpty(invalidGroupType)) {
-            throw new Error(invalidGroupType.join("\n ---------------- \n"));
-        }
+        var errors = [];
+        var missingResult = findMissingPatterns(tokenClasses);
+        var validTokenClasses = missingResult.validTokenClasses;
+        errors = errors.concat(missingResult.errors);
+        var invalidResult = findInvalidPatterns(validTokenClasses);
+        validTokenClasses = invalidResult.validTokenClasses;
+        errors = errors.concat(invalidResult.errors);
+        errors = errors.concat(findEndOfInputAnchor(validTokenClasses));
+        errors = errors.concat(findUnsupportedFlags(validTokenClasses));
+        errors = errors.concat(findDuplicatePatterns(validTokenClasses));
+        errors = errors.concat(findInvalidGroupType(validTokenClasses));
+        return errors;
     }
     chevrotain.validatePatterns = validatePatterns;
     function findMissingPatterns(tokenClasses) {
-        var noPatternClasses = _.filter(tokenClasses, function (currClass) {
+        var tokenClassesWithMissingPattern = _.filter(tokenClasses, function (currClass) {
             return !_.has(currClass, PATTERN);
         });
-        var errors = _.map(noPatternClasses, function (currClass) {
-            return "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property";
+        var errors = _.map(tokenClassesWithMissingPattern, function (currClass) {
+            return {
+                message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property",
+                type: 0 /* MISSING_PATTERN */,
+                tokenClasses: [currClass]
+            };
         });
-        return errors;
+        var validTokenClasses = _.difference(tokenClasses, tokenClassesWithMissingPattern);
+        return { errors: errors, validTokenClasses: validTokenClasses };
     }
     chevrotain.findMissingPatterns = findMissingPatterns;
     function findInvalidPatterns(tokenClasses) {
-        var invalidRegex = _.filter(tokenClasses, function (currClass) {
+        var tokenClassesWithInvalidPattern = _.filter(tokenClasses, function (currClass) {
             var pattern = currClass[PATTERN];
             return !_.isRegExp(pattern);
         });
-        var errors = _.map(invalidRegex, function (currClass) {
-            return "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegEx";
+        var errors = _.map(tokenClassesWithInvalidPattern, function (currClass) {
+            return {
+                message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
+                type: 1 /* INVALID_PATTERN */,
+                tokenClasses: [currClass]
+            };
         });
-        return errors;
+        var validTokenClasses = _.difference(tokenClasses, tokenClassesWithInvalidPattern);
+        return { errors: errors, validTokenClasses: validTokenClasses };
     }
     chevrotain.findInvalidPatterns = findInvalidPatterns;
     var end_of_input = /[^\\][\$]/;
@@ -501,7 +529,11 @@ var chevrotain;
             return end_of_input.test(pattern.source);
         });
         var errors = _.map(invalidRegex, function (currClass) {
-            return "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'";
+            return {
+                message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
+                type: 2 /* EOI_ANCHOR_FOUND */,
+                tokenClasses: [currClass]
+            };
         });
         return errors;
     }
@@ -512,7 +544,11 @@ var chevrotain;
             return pattern instanceof RegExp && (pattern.multiline || pattern.global);
         });
         var errors = _.map(invalidFlags, function (currClass) {
-            return "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')";
+            return {
+                message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
+                type: 3 /* UNSUPPORTED_FLAGS_FOUND */,
+                tokenClasses: [currClass]
+            };
         });
         return errors;
     }
@@ -539,7 +575,11 @@ var chevrotain;
                 return chevrotain.tokenName(currClass);
             });
             var dupPatternSrc = _.first(setOfIdentical).PATTERN;
-            return ("The same RegExp pattern ->" + dupPatternSrc + "<-") + ("has been used in all the following classes: " + classNames.join(", ") + " <-");
+            return {
+                message: ("The same RegExp pattern ->" + dupPatternSrc + "<-") + ("has been used in all the following classes: " + classNames.join(", ") + " <-"),
+                type: 4 /* DUPLICATE_PATTERNS_FOUND */,
+                tokenClasses: setOfIdentical
+            };
         });
         return errors;
     }
@@ -553,7 +593,11 @@ var chevrotain;
             return group !== chevrotain.Lexer.SKIPPED && group !== chevrotain.Lexer.NA && !_.isString(group);
         });
         var errors = _.map(invalidTypes, function (currClass) {
-            return "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String";
+            return {
+                message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
+                type: 5 /* INVALID_GROUP_TYPE_FOUND */,
+                tokenClasses: [currClass]
+            };
         });
         return errors;
     }
@@ -2948,7 +2992,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.4.7";
+    API.VERSION = "0.4.8";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
