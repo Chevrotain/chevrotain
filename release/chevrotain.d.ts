@@ -1,4 +1,4 @@
-/*! chevrotain - v0.4.7 - 2015-07-17 */
+/*! chevrotain - v0.4.8 - 2015-07-18 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -58,6 +58,19 @@ declare module chevrotain {
         };
         errors: ILexingError[];
     }
+    enum LexerDefinitionErrorType {
+        MISSING_PATTERN = 0,
+        INVALID_PATTERN = 1,
+        EOI_ANCHOR_FOUND = 2,
+        UNSUPPORTED_FLAGS_FOUND = 3,
+        DUPLICATE_PATTERNS_FOUND = 4,
+        INVALID_GROUP_TYPE_FOUND = 5,
+    }
+    interface ILexerDefinitionError {
+        message: string;
+        type: LexerDefinitionErrorType;
+        tokenClasses: Function[];
+    }
     interface ILexingError {
         line: number;
         column: number;
@@ -70,6 +83,7 @@ declare module chevrotain {
             description: string;
         };
         static NA: RegExp;
+        lexerDefinitionErrors: any[];
         protected allPatterns: RegExp[];
         protected patternIdxToClass: Function[];
         protected patternIdxToGroup: boolean[];
@@ -129,8 +143,13 @@ declare module chevrotain {
          *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched
          *
          *
+         * @param {boolean} [deferDefinitionErrorsHandling=false]
+         *                  an optional flag indicating that lexer definition errors
+         *                  should not automatically cause an error to be raised.
+         *                  This can be useful when wishing to indicate lexer errors in another manner
+         *                  than simply throwing an error (for example in an online playground).
          */
-        constructor(tokenClasses: TokenConstructor[]);
+        constructor(tokenClasses: TokenConstructor[], deferDefinitionErrorsHandling?: boolean);
         /**
          * Will lex(Tokenize) a string.
          * Note that this can be called repeatedly on different strings as this method
