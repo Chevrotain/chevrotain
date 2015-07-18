@@ -21,7 +21,7 @@ h3 {
 }
 
 .markTextError:before {
-    content: "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
+    content: "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~";
     font-size: 0.8em;
     font-weight: bolder;
     font-family: Times New Roman, Serif;
