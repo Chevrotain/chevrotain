@@ -3,46 +3,46 @@
 /**
  * @param {chevrotain.ILexerDefinitionError} lexErr
  * @param {string} parserImplText
- * @param {CodeMirror.Doc} editor
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}[]}
  */
-function getLexerErrorStartStopPos(lexErr, parserImplText, editor) { // TODO: instead of passing CodeMirror.Doc use duck typing?
+function getLexerErrorStartStopPos(lexErr, parserImplText, positionHelper) {
     switch (lexErr.type) {
         case chevrotain.LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND:
-            return locateRegExpLiteral(_.first(lexErr.tokenClasses).PATTERN, parserImplText, editor, lexErr.tokenClasses.length)
+            return locateRegExpLiteral(_.first(lexErr.tokenClasses).PATTERN, parserImplText, positionHelper, lexErr.tokenClasses.length)
             break
         case chevrotain.LexerDefinitionErrorType.INVALID_PATTERN:
         case chevrotain.LexerDefinitionErrorType.MISSING_PATTERN:
-            return [locateExtendTokenPos(_.first(lexErr.tokenClasses), parserImplText, editor)]
+            return [locateExtendTokenPos(_.first(lexErr.tokenClasses), parserImplText, positionHelper)]
             break
         case chevrotain.LexerDefinitionErrorType.EOI_ANCHOR_FOUND:
         case chevrotain.LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND:
         case chevrotain.LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND:
         default:
-            return locateRegExpLiteral(_.first(lexErr.tokenClasses).PATTERN, parserImplText, editor, 1)
+            return locateRegExpLiteral(_.first(lexErr.tokenClasses).PATTERN, parserImplText, positionHelper, 1)
     }
 }
 
 /**
  * @param {RegExp} regExp - the regExp whose literal we are seeking in the text.
  * @param {string} text - the text to search in.
- * @param {CodeMirror.Doc} editor
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  * @param {number} times - how many occurrences of the RegExp literal to seek.
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateRegExpLiteral(regExp, text, editor, times) {
+function locateRegExpLiteral(regExp, text, positionHelper, times) {
     var fromOffset = 0
     var soughtPattern = regExp.toString()
 
     return _.map(_.range(times), function () {
         var startOffset = text.indexOf(soughtPattern, fromOffset)
         var endOffset = startOffset + soughtPattern.length
-        var startPos = editor.posFromIndex(startOffset)
-        var endPos = editor.posFromIndex(endOffset)
+        var startPos = positionHelper.posFromIndex(startOffset)
+        var endPos = positionHelper.posFromIndex(endOffset)
         fromOffset = endOffset
         return {start: startPos, end: endPos}
     })
@@ -52,12 +52,12 @@ function locateRegExpLiteral(regExp, text, editor, times) {
  *
  * @param {Function} tokenClass - constructor of the Token whos definition we are seeking.
  * @param {string} text - the text to seek the definition in.
- * @param {CodeMirror.Doc} editor
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateExtendTokenPos(tokenClass, text, editor) {
+function locateExtendTokenPos(tokenClass, text, positionHelper) {
     var tokenName = chevrotain.tokenName(tokenClass)
     var extendRegExp = new RegExp("extendToken\\s*\\(\\s*('|\")" + tokenName)
     var execResult = extendRegExp.exec(text)
@@ -68,8 +68,8 @@ function locateExtendTokenPos(tokenClass, text, editor) {
 
     var startOffset = execResult.index
     var endOffset = locateClosingParenthesis(startOffset, text)
-    var startPos = editor.posFromIndex(startOffset)
-    var endPos = editor.posFromIndex(endOffset)
+    var startPos = positionHelper.posFromIndex(startOffset)
+    var endPos = positionHelper.posFromIndex(endOffset)
     return {start: startPos, end: endPos}
 }
 
