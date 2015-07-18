@@ -13,6 +13,21 @@ module chevrotain {
         errors:ILexingError[]
     }
 
+    export enum LexerDefinitionErrorType {
+        MISSING_PATTERN,
+        INVALID_PATTERN,
+        EOI_ANCHOR_FOUND,
+        UNSUPPORTED_FLAGS_FOUND,
+        DUPLICATE_PATTERNS_FOUND,
+        INVALID_GROUP_TYPE_FOUND
+    }
+
+    export interface ILexerDefinitionError {
+        message:string
+        type:LexerDefinitionErrorType
+        tokenClasses:Function[]
+    }
+
     export interface ILexingError {
         line:number
         column:number
@@ -28,6 +43,7 @@ module chevrotain {
         }
 
         public static NA = /NOT_APPLICABLE/
+        public lexerDefinitionErrors = []
 
         protected allPatterns:RegExp[]
         protected patternIdxToClass:Function[]
@@ -87,9 +103,21 @@ module chevrotain {
          *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched
          *
          *
+         * @param {boolean} [deferDefinitionErrorsHandling=false]
+         *                  an optional flag indicating that lexer definition errors
+         *                  should not automatically cause an error to be raised.
+         *                  This can be useful when wishing to indicate lexer errors in another manner
+         *                  than simply throwing an error (for example in an online playground).
          */
-        constructor(protected tokenClasses:TokenConstructor[]) {
-            validatePatterns(tokenClasses)
+        constructor(protected tokenClasses:TokenConstructor[], deferDefinitionErrorsHandling:boolean = false) {
+            this.lexerDefinitionErrors = validatePatterns(tokenClasses)
+            if (!_.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
+                var allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
+                    return error.message
+                })
+                var allErrMessagesString = allErrMessages.join("-----------------------\n")
+                throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString)
+            }
             var analyzeResult = analyzeTokenClasses(tokenClasses)
             this.allPatterns = analyzeResult.allPatterns
             this.patternIdxToClass = analyzeResult.patternIdxToClass
@@ -118,6 +146,13 @@ module chevrotain {
             var column = 1
             var groups:any = _.clone(this.emptyGroups)
 
+            if (!_.isEmpty(this.lexerDefinitionErrors)) {
+                var allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
+                    return error.message
+                })
+                var allErrMessagesString = allErrMessages.join("-----------------------\n")
+                throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString)
+            }
 
             while (text.length > 0) {
 

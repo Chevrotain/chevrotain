@@ -107,95 +107,112 @@ module chevrotain.lexer.spec {
 
         it("won't detect valid patterns as missing", function () {
             var result = findMissingPatterns([BambaTok, IntegerTok, IdentifierTok])
-            expect(_.isEmpty(result)).to.equal(true)
+            //noinspection BadExpressionStatementJS
+            expect(result.errors).to.be.empty
+            expect(result.validTokenClasses).to.deep.equal([BambaTok, IntegerTok, IdentifierTok])
         })
 
         it("will detect missing patterns", function () {
             var tokenClasses = [ValidNaPattern, MissingPattern]
             var result = findMissingPatterns(tokenClasses)
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "MissingPattern")).to.equal(true)
-            // TODO: use to.throwError once jasmine_node_coverage updates to jasmine 2.0
-            expect(() => {validatePatterns(tokenClasses)}).to.throw()
+            expect(result.errors.length).to.equal(1)
+            expect(result.errors[0].tokenClasses).to.deep.equal([MissingPattern])
+            expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.MISSING_PATTERN)
+            expect(result.errors[0].message).to.contain("MissingPattern")
+            expect(result.validTokenClasses).to.deep.equal([ValidNaPattern])
         })
 
         it("won't detect valid patterns as invalid", function () {
             var result = findInvalidPatterns([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
-            expect(_.isEmpty(result)).to.equal(true)
+            //noinspection BadExpressionStatementJS
+            expect(result.errors).to.be.empty
+            expect(result.validTokenClasses).to.deep.equal([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
         })
 
         it("will detect invalid patterns as invalid", function () {
             var tokenClasses = [ValidNaPattern, InvalidPattern]
             var result = findInvalidPatterns(tokenClasses)
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "InvalidPattern")).to.equal(true)
-            expect(() => {validatePatterns(tokenClasses)}).to.throw()
+            expect(result.errors.length).to.equal(1)
+            expect(result.errors[0].tokenClasses).to.deep.equal([InvalidPattern])
+            expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_PATTERN)
+            expect(result.errors[0].message).to.contain("InvalidPattern")
+            expect(result.validTokenClasses).to.deep.equal([ValidNaPattern])
         })
 
         it("won't detect valid patterns as using unsupported flags", function () {
-            var result = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
-            expect(_.isEmpty(result)).to.equal(true)
+            var errors = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
+            //noinspection BadExpressionStatementJS
+            expect(errors).to.be.empty
         })
 
         it("will detect patterns using unsupported multiline flag", function () {
             var tokenClasses = [ValidNaPattern, MultiLinePattern]
-            var result = findUnsupportedFlags(tokenClasses)
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "MultiLinePattern")).to.equal(true)
-            expect(() => {validatePatterns(tokenClasses)}).to.throw()
+            var errors = findUnsupportedFlags(tokenClasses)
+            expect(errors.length).to.equal(1)
+            expect(errors[0].tokenClasses).to.deep.equal([MultiLinePattern])
+            expect(errors[0].type).to.equal(LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND)
+            expect(errors[0].message).to.contain("MultiLinePattern")
         })
 
         it("will detect patterns using unsupported global flag", function () {
             var tokenClasses = [ValidNaPattern, GlobalPattern]
-            var result = findUnsupportedFlags(tokenClasses)
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "GlobalPattern")).to.equal(true)
-            expect(() => {validatePatterns(tokenClasses)}).to.throw()
+            var errors = findUnsupportedFlags(tokenClasses)
+            expect(errors.length).to.equal(1)
+            expect(errors[0].tokenClasses).to.deep.equal([GlobalPattern])
+            expect(errors[0].type).to.equal(LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND)
+            expect(errors[0].message).to.contain("GlobalPattern")
         })
 
         it("won't detect valid patterns as duplicates", function () {
-            var result = findDuplicatePatterns([MultiLinePattern, IntegerValid])
-            expect(result.length).to.equal(0)
+            var errors = findDuplicatePatterns([MultiLinePattern, IntegerValid])
+            //noinspection BadExpressionStatementJS
+            expect(errors).to.be.empty
         })
 
         it("won't detect NA patterns as duplicates", function () {
-            var result = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
-            expect(result.length).to.equal(0)
+            var errors = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
+            //noinspection BadExpressionStatementJS
+            expect(errors).to.be.empty
         })
 
         it("will detect patterns using unsupported end of input anchor", function () {
             var tokenClasses = [ValidNaPattern, EndOfInputAnchor]
-            var result = findEndOfInputAnchor([ValidNaPattern, EndOfInputAnchor])
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "EndOfInputAnchor")).to.equal(true)
-            expect(() => {validatePatterns(tokenClasses)}).to.throw()
+            var errors = findEndOfInputAnchor(tokenClasses)
+            expect(errors.length).to.equal(1)
+            expect(errors[0].tokenClasses).to.deep.equal([EndOfInputAnchor])
+            expect(errors[0].type).to.equal(LexerDefinitionErrorType.EOI_ANCHOR_FOUND)
+            expect(errors[0].message).to.contain("EndOfInputAnchor")
         })
 
         it("won't detect valid patterns as using unsupported end of input anchor", function () {
-            var result = findEndOfInputAnchor([IntegerTok, IntegerValid])
-            expect(result.length).to.equal(0)
+            var errors = findEndOfInputAnchor([IntegerTok, IntegerValid])
+            //noinspection BadExpressionStatementJS
+            expect(errors).to.be.empty
         })
 
         it("will detect identical patterns for different classes", function () {
             var tokenClasses = [DecimalInvalid, IntegerValid]
-            var result = findDuplicatePatterns(tokenClasses)
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "IntegerValid")).to.equal(true)
-            expect(_.contains(result[0], "DecimalInvalid")).to.equal(true)
-            expect(() => {validatePatterns(tokenClasses)}).to.throw()
+            var errors = findDuplicatePatterns(tokenClasses)
+            expect(errors.length).to.equal(1)
+            expect(errors[0].tokenClasses).to.deep.equal([DecimalInvalid, IntegerValid])
+            expect(errors[0].type).to.equal(LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND)
+            expect(errors[0].message).to.contain("IntegerValid")
+            expect(errors[0].message).to.contain("DecimalInvalid")
         })
 
-
         it("won't detect valid groups as unsupported", function () {
-            var result = findInvalidGroupType([IntegerTok, Skipped, Special])
-            expect(result.length).to.equal(0)
+            var errors = findInvalidGroupType([IntegerTok, Skipped, Special])
+            //noinspection BadExpressionStatementJS
+            expect(errors).to.be.empty
         })
 
         it("will detect unsupported group types", function () {
-            var result = findInvalidGroupType([InvalidGroupNumber])
-            expect(result.length).to.equal(1)
-            expect(_.contains(result[0], "InvalidGroupNumber")).to.equal(true)
-            expect(() => {validatePatterns([InvalidGroupNumber])}).to.throw()
+            var tokenClasses = [InvalidGroupNumber]
+            var errors = findInvalidGroupType(tokenClasses)
+            expect(errors.length).to.equal(1)
+            expect(errors[0].tokenClasses).to.deep.equal([InvalidGroupNumber])
+            expect(errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND)
+            expect(errors[0].message).to.contain("InvalidGroupNumber")
         })
     })
 
@@ -283,6 +300,8 @@ module chevrotain.lexer.spec {
 
         it("can create a simple Lexer from a List of Token Classes", function () {
             var ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+            //noinspection BadExpressionStatementJS
+            expect(ifElseLexer.lexerDefinitionErrors).to.be.empty
 
             var input = "if (666) return 1\n" +
                 "\telse return 2"
@@ -297,6 +316,22 @@ module chevrotain.lexer.spec {
             //    new NewLine(1, 18, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
         })
 
+        it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", function () {
+            expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/Errors detected in definition of Lexer/)
+            expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/EndOfInputAnchor/)
+        })
+
+        it("can defer the throwing of errors during the creation of a Lexer if the Lexer's definition is invalid", function () {
+            expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/Errors detected in definition of Lexer/)
+            expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/EndOfInputAnchor/)
+
+            var lexerWithErrs = new Lexer([EndOfInputAnchor, If, Else], true)
+            //noinspection BadExpressionStatementJS
+            expect(lexerWithErrs.lexerDefinitionErrors).to.not.be.empty
+            // even when the Error handling is deferred, actual usage of an invalid lexer is not permitted!
+            expect(() => lexerWithErrs.tokenize("else")).to.throw(/Unable to Tokenize because Errors detected in definition of Lexer/)
+            expect(() => lexerWithErrs.tokenize("else")).to.throw(/EndOfInputAnchor/)
+        })
 
         it("can skip invalid character inputs and only report one error per sequence of characters skipped", function () {
             var ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
@@ -307,7 +342,7 @@ module chevrotain.lexer.spec {
 
             var lexResult = ifElseLexer.tokenize(input)
             expect(lexResult.errors.length).to.equal(1)
-            expect(_.contains(lexResult.errors[0].message, "@")).to.equal(true)
+            expect(lexResult.errors[0].message).to.contain("@")
             expect(lexResult.errors[0].line).to.equal(1)
             expect(lexResult.errors[0].column).to.equal(18)
             expect(lexResult.errors[0].length).to.equal(6)
@@ -326,7 +361,7 @@ module chevrotain.lexer.spec {
             var input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
             var lexResult = ifElseLexer.tokenize(input)
             expect(lexResult.errors.length).to.equal(1)
-            expect(_.contains(lexResult.errors[0].message, "&")).to.equal(true)
+            expect(lexResult.errors[0].message).to.contain("&")
             expect(lexResult.errors[0].line).to.equal(1)
             expect(lexResult.errors[0].column).to.equal(3)
             expect(lexResult.errors[0].length).to.equal(28)
@@ -339,17 +374,17 @@ module chevrotain.lexer.spec {
             var input = "if\r\nelse\rif\r"
             var lexResult = ifElseLexer.tokenize(input)
             expect(lexResult.errors.length).to.equal(3)
-            expect(_.contains(lexResult.errors[0].message, "\r")).to.equal(true)
+            expect(lexResult.errors[0].message).to.contain("\r")
             expect(lexResult.errors[0].line).to.equal(1)
             expect(lexResult.errors[0].column).to.equal(3)
             expect(lexResult.errors[0].length).to.equal(2)
 
-            expect(_.contains(lexResult.errors[1].message, "\r")).to.equal(true)
+            expect(lexResult.errors[1].message).to.contain("\r")
             expect(lexResult.errors[1].line).to.equal(2)
             expect(lexResult.errors[1].column).to.equal(5)
             expect(lexResult.errors[1].length).to.equal(1)
 
-            expect(_.contains(lexResult.errors[2].message, "\r")).to.equal(true)
+            expect(lexResult.errors[2].message).to.contain("\r")
             expect(lexResult.errors[2].line).to.equal(3)
             expect(lexResult.errors[2].column).to.equal(3)
             expect(lexResult.errors[2].length).to.equal(1)

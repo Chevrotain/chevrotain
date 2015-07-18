@@ -80,94 +80,102 @@ module chevrotain {
         }
     }
 
-    export function validatePatterns(tokenClasses:TokenConstructor[]) {
-        var missingErrors = findMissingPatterns(tokenClasses)
-        if (!_.isEmpty(missingErrors)) {
-            throw new Error(missingErrors.join("\n ---------------- \n"))
-        }
+    export function validatePatterns(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
+        var errors = []
 
-        var invalidPatterns = findInvalidPatterns(tokenClasses)
-        if (!_.isEmpty(invalidPatterns)) {
-            throw new Error(invalidPatterns.join("\n ---------------- \n"))
-        }
+        var missingResult = findMissingPatterns(tokenClasses)
+        var validTokenClasses = missingResult.validTokenClasses
+        errors = errors.concat(missingResult.errors)
 
-        var InvalidEndOfInputAnchor = findEndOfInputAnchor(tokenClasses)
-        if (!_.isEmpty(InvalidEndOfInputAnchor)) {
-            throw new Error(InvalidEndOfInputAnchor.join("\n ---------------- \n"))
-        }
+        var invalidResult = findInvalidPatterns(validTokenClasses)
+        validTokenClasses = invalidResult.validTokenClasses
+        errors = errors.concat(invalidResult.errors)
 
-        var invalidFlags = findUnsupportedFlags(tokenClasses)
-        if (!_.isEmpty(invalidFlags)) {
-            throw new Error(invalidFlags.join("\n ---------------- \n"))
-        }
+        errors = errors.concat(findEndOfInputAnchor(validTokenClasses))
 
-        var duplicates = findDuplicatePatterns(tokenClasses)
-        if (!_.isEmpty(duplicates)) {
-            throw new Error(duplicates.join("\n ---------------- \n"))
-        }
+        errors = errors.concat(findUnsupportedFlags(validTokenClasses))
 
-        var invalidGroupType = findInvalidGroupType(tokenClasses)
+        errors = errors.concat(findDuplicatePatterns(validTokenClasses))
 
-        if (!_.isEmpty(invalidGroupType)) {
-            throw new Error(invalidGroupType.join("\n ---------------- \n"))
-        }
-    }
-
-    export function findMissingPatterns(tokenClasses:TokenConstructor[]):string[] {
-        var noPatternClasses = _.filter(tokenClasses, (currClass) => {
-            return !_.has(currClass, PATTERN)
-        })
-
-        var errors = _.map(noPatternClasses, (currClass) => {
-            return "Token class: ->" + tokenName(currClass) + "<- missing static 'PATTERN' property"
-        })
+        errors = errors.concat(findInvalidGroupType(validTokenClasses))
 
         return errors
     }
 
-    export function findInvalidPatterns(tokenClasses:TokenConstructor[]):string[] {
-        var invalidRegex = _.filter(tokenClasses, (currClass) => {
+    export function findMissingPatterns(tokenClasses:TokenConstructor[]) {
+        var tokenClassesWithMissingPattern = _.filter(tokenClasses, (currClass) => {
+            return !_.has(currClass, PATTERN)
+        })
+
+        var errors = _.map(tokenClassesWithMissingPattern, (currClass) => {
+            return {
+                message:      "Token class: ->" + tokenName(currClass) + "<- missing static 'PATTERN' property",
+                type:         LexerDefinitionErrorType.MISSING_PATTERN,
+                tokenClasses: [currClass]
+            }
+        })
+
+        var validTokenClasses = _.difference(tokenClasses, tokenClassesWithMissingPattern)
+        return {errors: errors, validTokenClasses}
+    }
+
+    export function findInvalidPatterns(tokenClasses:TokenConstructor[]) {
+        var tokenClassesWithInvalidPattern = _.filter(tokenClasses, (currClass) => {
             var pattern = currClass[PATTERN]
             return !_.isRegExp(pattern)
         })
 
-        var errors = _.map(invalidRegex, (currClass) => {
-            return "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' can only be a RegEx"
+        var errors = _.map(tokenClassesWithInvalidPattern, (currClass) => {
+            return {
+                message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
+                type:         LexerDefinitionErrorType.INVALID_PATTERN,
+                tokenClasses: [currClass]
+            }
         })
 
-        return errors
+        var validTokenClasses = _.difference(tokenClasses, tokenClassesWithInvalidPattern)
+        return {errors: errors, validTokenClasses}
     }
 
     var end_of_input = /[^\\][\$]/
 
-    export function findEndOfInputAnchor(tokenClasses:TokenConstructor[]):string[] {
+    export function findEndOfInputAnchor(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
         var invalidRegex = _.filter(tokenClasses, (currClass) => {
             var pattern = currClass[PATTERN]
             return end_of_input.test(pattern.source)
         })
 
         var errors = _.map(invalidRegex, (currClass) => {
-            return "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'"
+            return {
+                message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
+                type:         LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
+                tokenClasses: [currClass]
+            }
         })
 
         return errors
     }
 
-    export function findUnsupportedFlags(tokenClasses:TokenConstructor[]):string[] {
+    export function findUnsupportedFlags(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
         var invalidFlags = _.filter(tokenClasses, (currClass) => {
             var pattern = currClass[PATTERN]
             return pattern instanceof RegExp && (pattern.multiline || pattern.global)
         })
 
         var errors = _.map(invalidFlags, (currClass) => {
-            return "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')"
+            return {
+                message:      "Token class: ->" + tokenName(currClass) +
+                              "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
+                type:         LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
+                tokenClasses: [currClass]
+            }
         })
 
         return errors
     }
 
     // This can only test for identical duplicate RegExps, not semantically equivalent ones.
-    export function findDuplicatePatterns(tokenClasses:TokenConstructor[]):string[] {
+    export function findDuplicatePatterns(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
 
         var found = []
         var identicalPatterns = _.map(tokenClasses, (outerClass:any) => {
@@ -194,16 +202,18 @@ module chevrotain {
             })
 
             var dupPatternSrc = (<any>_.first(setOfIdentical)).PATTERN
-            return `The same RegExp pattern ->${dupPatternSrc}<-` +
-                `has been used in all the following classes: ${classNames.join(", ")} <-`
+            return {
+                message:      `The same RegExp pattern ->${dupPatternSrc}<-` +
+                              `has been used in all the following classes: ${classNames.join(", ")} <-`,
+                type:         LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
+                tokenClasses: setOfIdentical
+            }
         })
 
         return errors
     }
 
-
-    export function findInvalidGroupType(tokenClasses:TokenConstructor[]):string[] {
-
+    export function findInvalidGroupType(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
         var invalidTypes = _.filter(tokenClasses, (clazz:any) => {
             if (!_.has(clazz, "GROUP")) {
                 return false
@@ -214,14 +224,16 @@ module chevrotain {
                 group !== Lexer.NA && !_.isString(group)
         })
 
-
         var errors = _.map(invalidTypes, (currClass) => {
-            return "Token class: ->" + tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String"
+            return {
+                message:      "Token class: ->" + tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
+                type:         LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
+                tokenClasses: [currClass]
+            }
         })
 
         return errors
     }
-
 
     export function addStartOfInput(pattern:RegExp):RegExp {
         var flags = pattern.ignoreCase ? "i" : ""
