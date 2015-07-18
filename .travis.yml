@@ -25,7 +25,7 @@ deploy:
   - provider: npm
     email: shahar.soel@gmail.com
     api_key:
-      secure: AF/0Qu5UX6uOXHA4+SuO5SUVVtoMPkdriDW/w8gv30Suoxcl/Lyt6CtpIXbEIpG/GTi8Fcia6ZLsJExMDOJjfmVo/fMLfUBDQPw2EUngEc1msse2iADdfQV/H9eFTPg3hla+KSPbLTurGeJcLdqOIZk4y8pDHZV1S/qnHfOsEDM=
+      secure: k7juzhofg3lWLolMOIQ6AM0xKYLaRc0MAlGO3sbm2ZFZlGdmXuayHGAD+UL1Vi+KXLfU14fwvIjCpkWc6EWezcFkTG2cxoIC+NpUygQ0z3/E1ylCYM5NU23J+bDtv9xcj5bhNQ/611kHahtIH9DNbY1BbsL0lMH6KwbLDXYUlzk=
     on:
       tags: true
       all_branches: true
