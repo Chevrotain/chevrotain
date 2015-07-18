@@ -1,7 +1,7 @@
 function jsonExample() {
     // ----------------- Lexer -----------------
     var extendToken = chevrotain.extendToken;
-    var ChevrotainLexer = chevrotain.Lexer;
+    var Lexer = chevrotain.Lexer;
 
     // In ES6, custom inheritance implementation (such as the one above) can be replaced
     // with a more simple: "class X extends Y"...
@@ -20,13 +20,13 @@ function jsonExample() {
         /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
     // marking WhiteSpace as 'SKIPPED' causes the lexer skip such tokens.
-    WhiteSpace.GROUP = ChevrotainLexer.SKIPPED;
+    WhiteSpace.GROUP = Lexer.SKIPPED;
 
 
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var ChevJsonLexer = new ChevrotainLexer(jsonTokens);
+    var ChevJsonLexer = new Lexer(jsonTokens, true);
 
 
     // ----------------- parser -----------------
@@ -154,7 +154,7 @@ function calculatorExample() {
     var allTokens = [WhiteSpace,
         Plus, Minus, Multi, Div, LParen, RParen,
         NumberLiteral, AdditionOperator, MultiplicationOperator];
-    var CalculatorLexer = new Lexer(allTokens);
+    var CalculatorLexer = new Lexer(allTokens, true);
 
 
     // ----------------- parser -----------------
