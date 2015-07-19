@@ -10,7 +10,7 @@ module chevrotain {
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow
     import lookahead = chevrotain.lookahead
-    import validations = chevrotain.validations
+    import validations = chevrotain.checks
     import exceptions = chevrotain.exceptions
 
     // parameters needs to compute the key in the FOLLOW_SET map.

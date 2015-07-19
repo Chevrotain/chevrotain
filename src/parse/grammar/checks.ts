@@ -1,5 +1,4 @@
-// TODO: rename to validations ?
-module chevrotain.validations {
+module chevrotain.checks {
 
     import gast = chevrotain.gast
 

@@ -1,4 +1,4 @@
-module chevrotain.validations.spec {
+module chevrotain.checks.spec {
     import gast = chevrotain.gast
     import samples = test.samples
 
