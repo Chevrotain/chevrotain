@@ -13,7 +13,7 @@ module chevrotain {
     import validations = chevrotain.checks
     import exceptions = chevrotain.exceptions
 
-    // parameters needs to compute the key in the FOLLOW_SET map.
+    // parameters needed to compute the key in the FOLLOW_SET map.
     export interface IFollowKey {
         ruleName: string
         idxInCallingRule: number
@@ -48,7 +48,6 @@ module chevrotain {
         errors: Error[]
         inputIdx:number
         RULE_STACK:string[]
-
     }
 
     export type LookAheadFunc = () => boolean
@@ -1219,9 +1218,9 @@ module chevrotain {
         }
 
         private getLookaheadFuncFor<T>(key:string,
-                                         occurrence:number,
-                                         laFuncBuilder:(number, any) => () => T,
-                                         extraArgs:any[] = []):() => T {
+                                       occurrence:number,
+                                       laFuncBuilder:(number, any) => () => T,
+                                       extraArgs:any[] = []):() => T {
             var ruleName = _.last(this.RULE_STACK)
             var condition = <any>this.classLAFuncs.get(key)
             if (condition === undefined) {
