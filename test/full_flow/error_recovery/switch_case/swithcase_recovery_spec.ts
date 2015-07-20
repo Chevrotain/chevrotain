@@ -18,7 +18,6 @@ module chevrotain.examples.recovery.switchcase.spec {
     describe("Error Recovery switch-case Example", function () {
         "use strict"
 
-
         it("can parse a valid text successfully", function () {
             var input = [
                 // switch (name) {

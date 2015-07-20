@@ -10,7 +10,8 @@ module chevrotain {
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow
     import lookahead = chevrotain.lookahead
-    import validations = chevrotain.checks
+    import checks = chevrotain.checks
+    import resolver = chevrotain.resolver
     import exceptions = chevrotain.exceptions
 
     // parameters needed to compute the key in the FOLLOW_SET map.
@@ -66,26 +67,29 @@ module chevrotain {
         static NO_RESYNC:boolean = false
 
         protected static performSelfAnalysis(classInstance:Parser) {
+            var definitionErrors = []
+
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
             if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
                 var grammarProductions = cache.getProductionsForClass(className)
-                var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions)
-                refResolver.resolveRefs()
-                var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
-                cache.setResyncFollowsForClass(className, allFollows)
+                definitionErrors = definitionErrors.concat(resolver.resolveGrammar(grammarProductions))
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
-                var validationErrors = validations.validateGrammar(grammarProductions.values())
-                if (validationErrors.length > 0) {
-                    //cache the validation errors so they can be thrown each time the parser is instantiated
-                    cache.CLASS_TO_VALIDTATION_ERRORS.put(className, validationErrors)
-                    throw new Error(validationErrors.join("-------------------------------\n"))
+                definitionErrors = definitionErrors.concat(checks.validateGrammar(grammarProductions.values()))
+                if (!_.isEmpty(definitionErrors)) {
+                    //cache the definition errors so they can be thrown each time the parser is instantiated
+                    cache.CLASS_TO_DEFINITION_ERRORS.put(className, definitionErrors)
+                    throw new Error(`Parser Definition Errors detected\n: ${definitionErrors.join("-------------------------------\n")}`)
+                }
+                else { // this analysis may fail if the grammar is not perfectly valid
+                    var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
+                    cache.setResyncFollowsForClass(className, allFollows)
                 }
             }
 
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (cache.CLASS_TO_VALIDTATION_ERRORS.containsKey(className)) {
-                throw new Error(cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"))
+            if (cache.CLASS_TO_DEFINITION_ERRORS.containsKey(className)) {
+                throw new Error(cache.CLASS_TO_DEFINITION_ERRORS.get(className).join("-------------------------------\n"))
             }
         }
 
@@ -790,7 +794,7 @@ module chevrotain {
 
         /**
          * @param ruleFuncName name of the Grammar rule
-         * @throws Grammar validation errors if the name is invalid
+         * @throws Grammar Definition error if the name is invalid
          */
         private validateRuleName(ruleFuncName:string):void {
             if (!ruleFuncName.match(this.ruleNamePattern)) {

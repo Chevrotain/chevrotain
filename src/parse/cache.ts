@@ -3,7 +3,7 @@
 module used to cache static information about parsers,
  */
 module chevrotain.cache {
-    export var CLASS_TO_VALIDTATION_ERRORS = new lang.HashTable<string[]>()
+    export var CLASS_TO_DEFINITION_ERRORS = new lang.HashTable<string[]>()
 
     export var CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()
 

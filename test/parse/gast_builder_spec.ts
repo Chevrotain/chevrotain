@@ -399,18 +399,4 @@ module chevrotain.gastBuilder.spec {
             expect(allOrRanges.length).to.equal(2)
         })
     })
-
-
-    describe("The RefResolverVisitor", function () {
-
-        it("will fail when trying to resolve a ref to a grammar rule that does not exist", function () {
-            var ref = new gast.NonTerminal("missingRule")
-            var topLevel = new gast.Rule("TOP", [ref])
-            var topLevelRules = new lang.HashTable<gast.Rule>()
-            topLevelRules.put("TOP", topLevel)
-            var resolver = new b.GastRefResolverVisitor(topLevelRules);
-            expect(() => resolver.resolveRefs()).to.throw("Invalid grammar, reference to rule which is not defined --> missingRule")
-        })
-    })
-
 }

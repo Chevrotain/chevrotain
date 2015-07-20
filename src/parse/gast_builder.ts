@@ -306,26 +306,4 @@ module chevrotain.gastBuilder {
             throw new Error("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS")
         }
     }
-
-
-    export class GastRefResolverVisitor extends gast.GAstVisitor {
-        constructor(private nameToProd:lang.HashTable<gast.Rule>) { super() }
-
-        public resolveRefs():void {
-            _.forEach(this.nameToProd.values(), (prod) => {
-                prod.accept(this)
-            })
-        }
-
-        public visitNonTerminal(node:gast.NonTerminal):void {
-            var ref = this.nameToProd.get(node.nonTerminalName)
-
-            if (!ref) {
-                throw Error("Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName)
-            }
-
-            node.referencedRule = ref
-        }
-    }
 }
-

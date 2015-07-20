@@ -21,6 +21,7 @@
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
 /// <reference path="../src/parse/grammar/checks.ts" />
+/// <reference path="../src/parse/grammar/resolver.ts" />
 /// <reference path="../src/parse/exceptions_public.ts" />
 /// <reference path="../src/parse/parser_public.ts" />
 /// <reference path="../src/api.ts" />

@@ -156,77 +156,30 @@ module chevrotain.checks.spec {
     describe("The duplicate occurrence validations full flow", function () {
 
         it("will throw errors on duplicate Terminals consumption in the same top level rule", function () {
-            var thrown = false
-            try {
-                //noinspection JSUnusedLocalSymbols
-                var parser = new ErroneousOccurrenceNumUsageParser1()
-                // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                // expect(...).to.throw("partial string to match")
-            } catch (e) {
-                thrown = true
-                expect(_.contains(e.message, "SUBRULE")).to.equal(true)
-                expect(_.contains(e.message, "1")).to.equal(true)
-                expect(_.contains(e.message, "duplicateRef")).to.equal(true)
-                expect(_.contains(e.message, "anotherRule")).to.equal(true)
-                expect(_.contains(e.message, "both have the same occurrence index 1")).to.equal(true)
-            }
-            expect(thrown).to.equal(true)
+            expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("SUBRULE")
+            expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("1")
+            expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("duplicateRef")
+            expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("anotherRule")
+            expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("both have the same occurrence index 1")
         })
 
         it("will throw errors on duplicate Subrules references in the same top level rule", function () {
-            var thrown = false
-            try {
-                //noinspection JSUnusedLocalSymbols
-                var parser = new ErroneousOccurrenceNumUsageParser2()
-                // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                // expect(...).to.throw("partial string to match")
-            } catch (e) {
-                thrown = true
-                expect(_.contains(e.message, "CONSUME")).to.equal(true)
-                expect(_.contains(e.message, "3")).to.equal(true)
-                expect(_.contains(e.message, "PlusTok")).to.equal(true)
-                expect(_.contains(e.message, "duplicateTerminal")).to.equal(true)
-            }
-            expect(thrown).to.equal(true)
+            expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("CONSUME")
+            expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("3")
+            expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("PlusTok")
+            expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("duplicateTerminal")
         })
 
         it("will throw errors on duplicate MANY productions in the same top level rule", function () {
-            var thrown = false
-            try {
-                //noinspection JSUnusedLocalSymbols
-                var parser = new ErroneousOccurrenceNumUsageParser3()
-                // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                // expect(...).to.throw("partial string to match")
-            } catch (e) {
-                thrown = true
-                expect(_.contains(e.message, "MANY")).to.equal(true)
-                expect(_.contains(e.message, "1")).to.equal(true)
-                expect(_.contains(e.message, "duplicateMany")).to.equal(true)
-                expect(_.contains(e.message, "both have the same occurrence index 1")).to.equal(true)
-
-            }
-            expect(thrown).to.equal(true)
+            expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("MANY")
+            expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("1")
+            expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("duplicateMany")
+            expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("both have the same occurrence index 1")
         })
 
         it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
             //noinspection JSUnusedLocalSymbols
             var parser = new ValidOccurrenceNumUsageParser()
-        })
-
-        it("will throw validation errors each time the parser is instantiated although they are calculated only once", function () {
-            var thrown = 0
-            for (var x = 1 ; x <= 5 ; x++) {
-                try {
-                    //noinspection JSUnusedLocalSymbols
-                    var parser = new ErroneousOccurrenceNumUsageParser3()
-                    // todo: need to update to jsamine > 2.0.0 on node.js to get support for
-                    // expect(...).to.throw("partial string to match")
-                } catch (e) {
-                    thrown++
-                }
-            }
-
-            expect(thrown).to.equal(5)
         })
     })
 }
