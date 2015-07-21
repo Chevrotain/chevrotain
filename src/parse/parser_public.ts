@@ -14,6 +14,25 @@ module chevrotain {
     import resolver = chevrotain.resolver
     import exceptions = chevrotain.exceptions
 
+
+    export enum ParserDefinitionErrorType {
+        DUPLICATE_RULE_NAME,
+        DUPLICATE_PRODUCTIONS,
+        UNRESOLVED_SUBRULE_REF
+    }
+
+    export interface IParserDefinitionError {
+        message:string
+        type:ParserDefinitionErrorType
+        ruleName:string
+    }
+
+    export interface IParserDuplicatesDefinitionError extends IParserDefinitionError {
+        dslName:string
+        occurrence:number
+        parameter?:string
+    }
+
     // parameters needed to compute the key in the FOLLOW_SET map.
     export interface IFollowKey {
         ruleName: string
@@ -68,6 +87,7 @@ module chevrotain {
 
         protected static performSelfAnalysis(classInstance:Parser) {
             var definitionErrors = []
+            var defErrorsMsgs
 
             var className = lang.classNameFromInstance(classInstance)
             // this information only needs to be computed once
@@ -77,9 +97,10 @@ module chevrotain {
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
                 definitionErrors = definitionErrors.concat(checks.validateGrammar(grammarProductions.values()))
                 if (!_.isEmpty(definitionErrors)) {
+                    defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
                     //cache the definition errors so they can be thrown each time the parser is instantiated
                     cache.CLASS_TO_DEFINITION_ERRORS.put(className, definitionErrors)
-                    throw new Error(`Parser Definition Errors detected\n: ${definitionErrors.join("-------------------------------\n")}`)
+                    throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
                 }
                 else { // this analysis may fail if the grammar is not perfectly valid
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
@@ -89,7 +110,8 @@ module chevrotain {
 
             // reThrow the validation errors each time an erroneous parser is instantiated
             if (cache.CLASS_TO_DEFINITION_ERRORS.containsKey(className)) {
-                throw new Error(cache.CLASS_TO_DEFINITION_ERRORS.get(className).join("-------------------------------\n"))
+                defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
+                throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
             }
         }
 

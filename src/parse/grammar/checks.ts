@@ -7,7 +7,7 @@ module chevrotain.checks {
         return <string[]>_.flatten(errorMessagesArrs)
     }
 
-    function validateSingleTopLevelRule(topLevelRule:gast.Rule):string[] {
+    function validateSingleTopLevelRule(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
         var collectorVisitor = new OccurrenceValidationCollector()
         topLevelRule.accept(collectorVisitor)
         var allRuleProductions = collectorVisitor.allProductions
@@ -18,11 +18,26 @@ module chevrotain.checks {
             return currGroup.length > 1
         })
 
-        var errorMsgs = _.map(duplicates, (currDuplicates:any) => {
-            return createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
-        })
+        var errors = _.map(duplicates, (currDuplicates:any) => {
+            var firstProd:any = _.first(currDuplicates)
+            var msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
+            var dslName = gast.getProductionDslName(firstProd)
+            var defError:IParserDuplicatesDefinitionError = {
+                message:    msg,
+                type:       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
+                ruleName:   topLevelRule.name,
+                dslName:    dslName,
+                occurrence: firstProd.occurrenceInParent
+            }
 
-        return errorMsgs
+            var param = getExtraProductionArgument(firstProd)
+            if (param) {
+                defError.parameter = param
+            }
+
+            return defError
+        })
+        return errors
     }
 
     function createDuplicatesErrorMessage(duplicateProds:gast.IProductionWithOccurrence[], topLevelName):string {

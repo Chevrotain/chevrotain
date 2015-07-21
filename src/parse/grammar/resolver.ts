@@ -2,7 +2,7 @@ module chevrotain.resolver {
 
     import gast = chevrotain.gast
 
-    export function resolveGrammar(topLevels:lang.HashTable<gast.Rule>):string[] {
+    export function resolveGrammar(topLevels:lang.HashTable<gast.Rule>):IParserDefinitionError[] {
         var refResolver = new GastRefResolverVisitor(topLevels)
         refResolver.resolveRefs()
         return refResolver.errors
@@ -10,21 +10,28 @@ module chevrotain.resolver {
 
     export class GastRefResolverVisitor extends gast.GAstVisitor {
 
-        public errors:string[] = []
+        public errors:IParserDefinitionError[] = []
+        private currTopLevel:gast.Rule
 
-        constructor(private nameToProd:lang.HashTable<gast.Rule>) { super() }
+        constructor(private nameToTopRule:lang.HashTable<gast.Rule>) { super() }
 
         public resolveRefs():void {
-            _.forEach(this.nameToProd.values(), (prod) => {
+            _.forEach(this.nameToTopRule.values(), (prod) => {
+                this.currTopLevel = prod
                 prod.accept(this)
             })
         }
 
         public visitNonTerminal(node:gast.NonTerminal):void {
-            var ref = this.nameToProd.get(node.nonTerminalName)
+            var ref = this.nameToTopRule.get(node.nonTerminalName)
 
             if (!ref) {
-                this.errors.push("Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName)
+                var msg = "Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName
+                this.errors.push({
+                    message:msg,
+                    type:ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
+                    ruleName: this.currTopLevel.name
+                })
             }
             else {
                 node.referencedRule = ref

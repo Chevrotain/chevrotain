@@ -11,7 +11,9 @@ module chevrotain.resolver.spec {
             var resolver = new GastRefResolverVisitor(topLevelRules)
             resolver.resolveRefs()
             expect(resolver.errors).to.have.lengthOf(1)
-            expect(resolver.errors[0]).to.contain("Invalid grammar, reference to rule which is not defined --> missingRule")
+            expect(resolver.errors[0].message).to.contain("Invalid grammar, reference to rule which is not defined --> missingRule")
+            expect(resolver.errors[0].type).to.equal(ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF)
+            expect(resolver.errors[0].ruleName).to.equal("TOP")
         })
     })
 }

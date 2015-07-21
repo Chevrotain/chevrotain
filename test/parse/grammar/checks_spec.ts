@@ -5,6 +5,33 @@ module chevrotain.checks.spec {
     describe("validateGrammar", function () {
 
         it("validates every one of the TOP_RULEs in the input", function () {
+
+            var expectedErrorsNoMsg = [{
+                "type":       1,
+                "ruleName":   "qualifiedNameErr1",
+                "dslName":    "CONSUME",
+                "occurrence": 1,
+                "parameter":  "IdentTok"
+            }, {
+                "type":       1,
+                "ruleName":   "qualifiedNameErr2",
+                "dslName":    "MANY",
+                "occurrence": 1
+            }, {
+                "type":       1,
+                "ruleName":   "qualifiedNameErr2",
+                "dslName":    "CONSUME",
+                "occurrence": 1,
+                "parameter":  "DotTok"
+            }, {
+                "type":       1,
+                "ruleName":   "qualifiedNameErr2",
+                "dslName":    "CONSUME",
+                "occurrence": 2,
+                "parameter":  "IdentTok"
+            }]
+
+
             var qualifiedNameErr1 = new gast.Rule("qualifiedNameErr1", [
                 new gast.Terminal(samples.IdentTok, 1),
                 new gast.Repetition([
@@ -24,8 +51,12 @@ module chevrotain.checks.spec {
                     new gast.Terminal(samples.IdentTok, 2)
                 ])
             ])
-            var errors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
-            expect(errors.length).to.equal(4)
+            var actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
+            expect(actualErrors.length).to.equal(4)
+
+            var actualErrorsNoMsg = _.map(actualErrors, err => _.omit(err, "message"))
+            expect(actualErrorsNoMsg).to.deep.include.members(expectedErrorsNoMsg)
+            expect(expectedErrorsNoMsg).to.deep.include.members(actualErrorsNoMsg)
         })
     })
 
@@ -180,6 +211,29 @@ module chevrotain.checks.spec {
         it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
             //noinspection JSUnusedLocalSymbols
             var parser = new ValidOccurrenceNumUsageParser()
+        })
+    })
+
+
+    class InvalidRefParser extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [myToken, myOtherToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public one = this.RULE("one", () => {
+            this.SUBRULE2((<any>this).oopsTypo)
+        })
+
+    }
+
+    describe("The reference resolver validation full flow", function () {
+
+        it("will throw an error when trying to init a parser with unresolved rule references ", function () {
+            expect(() => new InvalidRefParser()).to.throw("oopsTypo")
+            expect(() => new InvalidRefParser()).to.throw("Parser Definition Errors detected")
+            expect(() => new InvalidRefParser()).to.throw("reference to rule which is not defined")
         })
     })
 }
