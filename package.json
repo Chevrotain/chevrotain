@@ -49,22 +49,22 @@
     "lodash": "^3.10.0"
   },
   "devDependencies": {
-    "chai": "^3.0.0",
-    "coveralls": "^2.11.2",
+    "chai": "^3.2.0",
+    "coveralls": "^2.11.3",
     "gitty": "^3.2.3",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compress": "^0.13.0",
     "grunt-contrib-concat": "^0.5.1",
-    "grunt-karma": "~0.11.2",
+    "grunt-karma": "~0.12.0",
     "grunt-mocha-istanbul": "^2.4.0",
-    "grunt-ts": "~4.1.0-beta",
+    "grunt-ts": "~4.1.2",
     "grunt-tslint": "~2.3.1-beta",
     "grunt-typedoc": "^0.2.2",
     "grunt-umd": "~2.3.3",
     "istanbul": "^0.3.17",
     "jsonfile": "^2.2.1",
-    "karma": "~0.12.37",
+    "karma": "~0.13.2",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "~0.2.0",
     "karma-firefox-launcher": "~0.1.6",
@@ -73,8 +73,8 @@
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
     "mocha": "^2.2.5",
-    "semver": "^4.3.6",
-    "tslint": "~2.3.1-beta",
+    "semver": "^5.0.1",
+    "tslint": "~2.4.0",
     "wrench": "~1.5.8"
   }
 }
