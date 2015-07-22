@@ -225,15 +225,35 @@ module chevrotain.checks.spec {
         public one = this.RULE("one", () => {
             this.SUBRULE2((<any>this).oopsTypo)
         })
+    }
 
+    class InvalidRefParser2 extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [myToken, myOtherToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public one = this.RULE("one", () => {
+            this.SUBRULE2((<any>this).oopsTypo)
+        })
     }
 
     describe("The reference resolver validation full flow", function () {
 
-        it("will throw an error when trying to init a parser with unresolved rule references ", function () {
+        it("will throw an error when trying to init a parser with unresolved rule references", function () {
             expect(() => new InvalidRefParser()).to.throw("oopsTypo")
             expect(() => new InvalidRefParser()).to.throw("Parser Definition Errors detected")
             expect(() => new InvalidRefParser()).to.throw("reference to rule which is not defined")
+        })
+
+        it("won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
+            "of definition errors", function () {
+            Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
+            expect(() => new InvalidRefParser2()).to.not.throw()
+            expect(() => new InvalidRefParser2()).to.not.throw()
+            expect(() => new InvalidRefParser2()).to.not.throw()
+            Parser.DEFER_DEFINITION_ERRORS_HANDLING = false
         })
     })
 }

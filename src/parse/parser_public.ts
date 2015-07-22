@@ -84,6 +84,13 @@ module chevrotain {
 
         static IGNORE_AMBIGUITIES:boolean = true
         static NO_RESYNC:boolean = false
+        // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
+        // (normally during the parser's constructor).
+        // This is a design time flag, it will not affect the runtime error handling of the parser, just design time errors,
+        // for example: duplicate rule names, referencing an unresolved subrule, ect...
+        // This flag should not be enabled during normal usage, it is used in special situations, for example when
+        // needing to display the parser definition errors in some GUI(online playground).
+        static DEFER_DEFINITION_ERRORS_HANDLING:boolean = false
 
         protected static performSelfAnalysis(classInstance:Parser) {
             var definitionErrors = []
@@ -97,10 +104,12 @@ module chevrotain {
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
                 definitionErrors = definitionErrors.concat(checks.validateGrammar(grammarProductions.values()))
                 if (!_.isEmpty(definitionErrors)) {
-                    defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
                     //cache the definition errors so they can be thrown each time the parser is instantiated
                     cache.CLASS_TO_DEFINITION_ERRORS.put(className, definitionErrors)
-                    throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
+                    if (!Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                        defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
+                        throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
+                    }
                 }
                 else { // this analysis may fail if the grammar is not perfectly valid
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
@@ -109,7 +118,7 @@ module chevrotain {
             }
 
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (cache.CLASS_TO_DEFINITION_ERRORS.containsKey(className)) {
+            if (cache.CLASS_TO_DEFINITION_ERRORS.containsKey(className) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
                 throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
             }
