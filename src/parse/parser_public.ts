@@ -16,6 +16,7 @@ module chevrotain {
 
 
     export enum ParserDefinitionErrorType {
+        INVALID_RULE_NAME,
         DUPLICATE_RULE_NAME,
         DUPLICATE_PRODUCTIONS,
         UNRESOLVED_SUBRULE_REF
@@ -97,28 +98,32 @@ module chevrotain {
             var defErrorsMsgs
 
             var className = lang.classNameFromInstance(classInstance)
-            // this information only needs to be computed once
+            // this information should only be computed once
             if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
                 var grammarProductions = cache.getProductionsForClass(className)
-                definitionErrors = definitionErrors.concat(resolver.resolveGrammar(grammarProductions))
+
+                // assumes this cache has been initialized (in the relevant parser's constructor)
+                // TODO: consider making the self analysis a member method to resolve this.
+                // that way it won't be callable before the constructor has been invoked...
+                definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className)
+
+                var resolverErrors = resolver.resolveGrammar(grammarProductions)
+                definitionErrors.push.apply(definitionErrors, resolverErrors) // mutability for the win?
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
-                definitionErrors = definitionErrors.concat(checks.validateGrammar(grammarProductions.values()))
-                if (!_.isEmpty(definitionErrors)) {
-                    //cache the definition errors so they can be thrown each time the parser is instantiated
-                    cache.CLASS_TO_DEFINITION_ERRORS.put(className, definitionErrors)
-                    if (!Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                        defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
-                        throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
-                    }
+                var validationErrors = checks.validateGrammar(grammarProductions.values())
+                definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
+                if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                    defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
+                    throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
                 }
-                else { // this analysis may fail if the grammar is not perfectly valid
+                if (_.isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values())
                     cache.setResyncFollowsForClass(className, allFollows)
                 }
             }
 
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (cache.CLASS_TO_DEFINITION_ERRORS.containsKey(className) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+            if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
                 throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
             }
@@ -136,16 +141,26 @@ module chevrotain {
 
         private firstAfterRepMap
         private classLAFuncs
+        private definitionErrors:IParserDefinitionError[]
         private orLookaheadKeys:lang.HashTable<string>[]
         private manyLookaheadKeys:lang.HashTable<string>[]
         private atLeastOneLookaheadKeys:lang.HashTable<string>[]
         private optionLookaheadKeys:lang.HashTable<string>[]
+        private definedRulesNames:string[] = []
 
         constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[]) {
             this._input = input
             this.className = lang.classNameFromInstance(this)
             this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
             this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
+
+            if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
+                this.definitionErrors = []
+                cache.CLASS_TO_DEFINITION_ERRORS.put(this.className, this.definitionErrors)
+            }
+            else {
+                this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className)
+            }
 
             if (_.isArray(tokensMapOrArr)) {
                 this.tokensMap = <any>_.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
@@ -733,7 +748,9 @@ module chevrotain {
                           invalidRet:() => T = this.defaultInvalidReturn,
                           doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
             // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
-            this.validateRuleName(ruleName)
+            var ruleNameErrors = checks.validateRuleName(ruleName, this.definedRulesNames, this.className)
+            this.definedRulesNames.push(ruleName)
+            this.definitionErrors.push.apply(this.definitionErrors, ruleNameErrors) // mutability for the win
             var parserClassProductions = cache.getProductionsForClass(this.className)
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
@@ -818,28 +835,6 @@ module chevrotain {
         }
 
         private defaultInvalidReturn():any { return undefined }
-
-        // Not worth the hassle to support Unicode characters in rule names...
-        private ruleNamePattern = /^[a-zA-Z_]\w*$/
-        private definedRulesNames:string[] = []
-
-        /**
-         * @param ruleFuncName name of the Grammar rule
-         * @throws Grammar Definition error if the name is invalid
-         */
-        private validateRuleName(ruleFuncName:string):void {
-            if (!ruleFuncName.match(this.ruleNamePattern)) {
-                throw Error("Invalid Grammar rule name --> " + ruleFuncName +
-                    " it must match the pattern: " + this.ruleNamePattern.toString())
-            }
-
-            if ((_.contains(this.definedRulesNames, ruleFuncName))) {
-                throw Error("Duplicate definition, rule: " + ruleFuncName +
-                    " is already defined in the grammar: " + this.className)
-            }
-
-            this.definedRulesNames.push(ruleFuncName)
-        }
 
         private tryInRepetitionRecovery(grammarRule:Function,
                                         grammarRuleArgs:any[],

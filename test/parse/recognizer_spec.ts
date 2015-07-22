@@ -197,20 +197,6 @@ module chevrotain.recognizer.spec {
             expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
         })
 
-        it("does not allow duplicate grammar rule names", function () {
-            var parser:any = new Parser([], {});
-            parser.validateRuleName("bamba") // first time with a valid name.
-            expect(() => parser.validateRuleName("bamba")).to.throw(
-                "Duplicate definition, rule: bamba is already defined in the grammar: Parser")
-        })
-
-        it("only allows a subset of ECMAScript identifiers as rulenames", function () {
-            var parser:any = new Parser([], {});
-            expect(() => parser.validateRuleName("1baa")).to.throw()
-            expect(() => parser.validateRuleName("שלום")).to.throw()
-            expect(() => parser.validateRuleName("$bamba")).to.throw()
-        })
-
         it("will not perform inRepetition recovery while in backtracking mode", function () {
             var parser:any = new Parser([], {})
             parser.isBackTrackingStack.push(1)

@@ -105,4 +105,32 @@ module chevrotain.checks {
         }
     }
 
+
+    var ruleNamePattern = /^[a-zA-Z_]\w*$/
+
+    export function validateRuleName(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
+        var errors = []
+        var errMsg
+
+        if (!ruleName.match(ruleNamePattern)) {
+            errMsg = `Invalid Grammar rule name --> ${ruleName} it must match the pattern: ${ruleNamePattern.toString()}`
+            errors.push({
+                message:  errMsg,
+                type:     ParserDefinitionErrorType.INVALID_RULE_NAME,
+                ruleName: ruleName
+            })
+        }
+
+        if ((_.contains(definedRulesNames, ruleName))) {
+            errMsg = `Duplicate definition, rule: ${ruleName} is already defined in the grammar: ${className}`
+            errors.push({
+                message:  errMsg,
+                type:     ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+                ruleName: ruleName
+            })
+        }
+
+        return errors
+    }
+
 }

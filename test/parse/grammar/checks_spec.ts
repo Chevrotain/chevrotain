@@ -2,29 +2,29 @@ module chevrotain.checks.spec {
     import gast = chevrotain.gast
     import samples = test.samples
 
-    describe("validateGrammar", function () {
+    describe("the grammar validations", function () {
 
         it("validates every one of the TOP_RULEs in the input", function () {
 
             var expectedErrorsNoMsg = [{
-                "type":       1,
+                "type":       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
                 "ruleName":   "qualifiedNameErr1",
                 "dslName":    "CONSUME",
                 "occurrence": 1,
                 "parameter":  "IdentTok"
             }, {
-                "type":       1,
+                "type":       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
                 "ruleName":   "qualifiedNameErr2",
                 "dslName":    "MANY",
                 "occurrence": 1
             }, {
-                "type":       1,
+                "type":       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
                 "ruleName":   "qualifiedNameErr2",
                 "dslName":    "CONSUME",
                 "occurrence": 1,
                 "parameter":  "DotTok"
             }, {
-                "type":       1,
+                "type":       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
                 "ruleName":   "qualifiedNameErr2",
                 "dslName":    "CONSUME",
                 "occurrence": 2,
@@ -57,6 +57,39 @@ module chevrotain.checks.spec {
             var actualErrorsNoMsg = _.map(actualErrors, err => _.omit(err, "message"))
             expect(actualErrorsNoMsg).to.deep.include.members(expectedErrorsNoMsg)
             expect(expectedErrorsNoMsg).to.deep.include.members(actualErrorsNoMsg)
+        })
+
+        it("does not allow duplicate grammar rule names", function () {
+            var noErrors = validateRuleName("A", ["B", "C"], "className")
+            //noinspection BadExpressionStatementJS
+            expect(noErrors).to.be.empty
+
+            var duplicateErr = validateRuleName("A", ["A", "B", "C"], "className")
+            //noinspection BadExpressionStatementJS
+            expect(duplicateErr).to.have.length(1)
+            expect(duplicateErr[0]).to.have.property("message")
+            expect(duplicateErr[0]).to.have.property("type", ParserDefinitionErrorType.DUPLICATE_RULE_NAME)
+            expect(duplicateErr[0]).to.have.property("ruleName", "A")
+        })
+
+        it("only allows a subset of ECMAScript identifiers as rule names", function () {
+            var res1 = validateRuleName("1baa", [], "className")
+            expect(res1).to.have.lengthOf(1)
+            expect(res1[0]).to.have.property("message")
+            expect(res1[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
+            expect(res1[0]).to.have.property("ruleName", "1baa")
+
+            var res2 = validateRuleName("שלום", [], "className")
+            expect(res2).to.have.lengthOf(1)
+            expect(res2[0]).to.have.property("message")
+            expect(res2[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
+            expect(res2[0]).to.have.property("ruleName", "שלום")
+
+            var res3 = validateRuleName("$bamba", [], "className")
+            expect(res3).to.have.lengthOf(1)
+            expect(res3[0]).to.have.property("message")
+            expect(res3[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
+            expect(res3[0]).to.have.property("ruleName", "$bamba")
         })
     })
 
@@ -253,6 +286,53 @@ module chevrotain.checks.spec {
             expect(() => new InvalidRefParser2()).to.not.throw()
             expect(() => new InvalidRefParser2()).to.not.throw()
             expect(() => new InvalidRefParser2()).to.not.throw()
+            Parser.DEFER_DEFINITION_ERRORS_HANDLING = false
+        })
+    })
+
+
+    class DuplicateRulesParser extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [myToken, myOtherToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public one = this.RULE("oops_duplicate", () => {})
+        public two = this.RULE("oops_duplicate", () => {})
+    }
+
+    class InvalidRuleNameParser extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [myToken, myOtherToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public one = this.RULE("שלום", () => {})
+    }
+
+    describe("The rule names  validation full flow", function () {
+
+        it("will throw an error when trying to init a parser with duplicate ruleNames", function () {
+            expect(() => new DuplicateRulesParser()).to.throw("is already defined in the grammar")
+            expect(() => new DuplicateRulesParser()).to.throw("DuplicateRulesParser")
+            expect(() => new DuplicateRulesParser()).to.throw("oops_duplicate")
+        })
+
+        it("will throw an error when trying to init a parser with an invalid rule names", function () {
+            expect(() => new InvalidRuleNameParser()).to.throw("it must match the pattern")
+            expect(() => new InvalidRuleNameParser()).to.throw("Invalid Grammar rule name")
+            expect(() => new InvalidRuleNameParser()).to.throw("שלום")
+        })
+
+        it("won't throw an errors when trying to init a parser with definition errors but with a flag active to defer handling" +
+            "of definition errors (ruleName validation", function () {
+            Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
+            expect(() => new InvalidRuleNameParser()).to.not.throw()
+            expect(() => new InvalidRuleNameParser()).to.not.throw()
+            expect(() => new DuplicateRulesParser()).to.not.throw()
+            expect(() => new DuplicateRulesParser()).to.not.throw()
             Parser.DEFER_DEFINITION_ERRORS_HANDLING = false
         })
     })
