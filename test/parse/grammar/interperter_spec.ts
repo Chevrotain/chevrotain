@@ -1,10 +1,10 @@
 
 module chevrotain.interpreter.spec {
 
-    import t = test.samples
-    import samples = test.samples
+    import t = specs.samples
+    import samples = specs.samples
     import p = chevrotain.path
-    import matchers = test.matchers
+    import matchers = specs.matchers
 
     describe("The Grammar Interpeter module", function () {
         "use strict"

@@ -1,10 +1,10 @@
 
 module chevrotain.follow.spec {
 
-    import t = test.samples
+    import t = specs.samples
     import gast = chevrotain.gast
-    import samples = test.samples
-    import matchers = test.matchers
+    import samples = specs.samples
+    import matchers = specs.matchers
 
     describe("The Grammar Ast Follows model", function () {
         "use strict"

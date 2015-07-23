@@ -3,10 +3,40 @@
 // Definitions by: Kazi Manzur Rashid <https://github.com/kazimanzurrashid/>, otiai10 <https://github.com/otiai10>, jt000 <https://github.com/jt000>, Vadim Macagon <https://github.com/enlight>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="./node.d.ts" />
+interface MochaSetupOptions {
+    //milliseconds to wait before considering a test slow
+    slow?: number;
+
+    // timeout in milliseconds
+    timeout?: number;
+
+    // ui name "bdd", "tdd", "exports" etc
+    ui?: string;
+
+    //array of accepted globals
+    globals?: any[];
+
+    // reporter instance (function or string), defaults to `mocha.reporters.Spec`
+    reporter?: any;
+
+    // bail on the first test failure
+    bail?: boolean;
+
+    // ignore global leaks
+    ignoreLeaks?: boolean;
+
+    // grep string or regexp to filter tests with
+    grep?: any;
+}
+
+interface MochaDone {
+    (error?: Error): void;
+}
+
+// merge the Mocha class declaration with a module
 declare module Mocha {
     /** Partial interface for Mocha's `Runnable` class. */
-    interface IRunnable extends NodeJS.EventEmitter {
+    interface IRunnable {
         title: string;
         fn: Function;
         async: boolean;
@@ -15,7 +45,7 @@ declare module Mocha {
     }
 
     /** Partial interface for Mocha's `Suite` class. */
-    interface ISuite extends NodeJS.EventEmitter {
+    interface ISuite {
         parent: ISuite;
         title: string;
 
@@ -31,7 +61,7 @@ declare module Mocha {
     }
 
     /** Partial interface for Mocha's `Runner` class. */
-    interface IRunner extends NodeJS.EventEmitter {}
+    interface IRunner {}
 
     interface IContextDefinition {
         (description: string, spec: () => void): ISuite;
@@ -40,7 +70,7 @@ declare module Mocha {
         timeout(ms: number): void;
     }
 
-    interface ITestDefinition extends Function {
+    interface ITestDefinition {
         (expectation: string, assertion?: () => void): ITest;
         (expectation: string, assertion?: (done: MochaDone) => void): ITest;
         only(expectation: string, assertion?: () => void): ITest;
@@ -97,36 +127,6 @@ declare module Mocha {
     }
 }
 
-interface MochaSetupOptions {
-    //milliseconds to wait before considering a test slow
-    slow?: number;
-
-    // timeout in milliseconds
-    timeout?: number;
-
-    // ui name "bdd", "tdd", "exports" etc
-    ui?: string;
-
-    //array of accepted globals
-    globals?: any[];
-
-    // reporter instance (function or string), defaults to `mocha.reporters.Spec`
-    reporter?: any;
-
-    // bail on the first test failure
-    bail?: boolean;
-
-    // ignore global leaks
-    ignoreLeaks?: boolean;
-
-    // grep string or regexp to filter tests with
-    grep?: any;
-}
-
-interface MochaDone {
-    (error?: Error): void;
-}
-
 declare var mocha: Mocha;
 declare var describe: Mocha.IContextDefinition;
 declare var xdescribe: Mocha.IContextDefinition;
@@ -137,7 +137,7 @@ declare var suite: Mocha.IContextDefinition;
 declare var it: Mocha.ITestDefinition;
 declare var xit: Mocha.ITestDefinition;
 // alias for `it`
-//declare var test: Mocha.ITestDefinition;
+declare var test: Mocha.ITestDefinition;
 
 declare function before(action: () => void): void;
 
@@ -208,10 +208,6 @@ declare class Mocha {
     /** Runs tests and invokes `onComplete()` when finished. */
     //run(onComplete?: (failures: number) => void): Mocha.IRunner;
 }
-
-// merge the Mocha class declaration with a module
-
-
 
 declare module "mocha" {
     export = Mocha;

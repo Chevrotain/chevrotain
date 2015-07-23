@@ -1,9 +1,9 @@
 
 module chevrotain.first.spec {
 
-    import t = test.samples
+    import t = specs.samples
     import gast = chevrotain.gast
-    import matchers = test.matchers
+    import matchers = specs.matchers
 
     describe("The Grammar Ast first model", function () {
         "use strict"

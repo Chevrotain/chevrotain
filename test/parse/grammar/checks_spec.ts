@@ -1,6 +1,6 @@
 module chevrotain.checks.spec {
     import gast = chevrotain.gast
-    import samples = test.samples
+    import samples = specs.samples
 
     describe("the grammar validations", function () {
 

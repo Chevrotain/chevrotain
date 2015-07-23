@@ -1,5 +1,5 @@
 
-module test.matchers {
+module specs.matchers {
 
     // won't always work for arrays with duplicates...
     export function arrayEqualityNoOrder<T>(actual:T[], expected:T[]):void {

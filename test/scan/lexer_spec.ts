@@ -1,6 +1,6 @@
 module chevrotain.lexer.spec {
 
-    import matchers = test.matchers
+    import matchers = specs.matchers
     var NA = Lexer.NA
     var SKIPPED = Lexer.SKIPPED
 

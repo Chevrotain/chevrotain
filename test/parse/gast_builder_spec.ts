@@ -2,8 +2,8 @@ module chevrotain.gastBuilder.spec {
 
     import r = chevrotain.range
     import b = chevrotain.gastBuilder
-    import tok = test.samples
-    import matchers = test.matchers
+    import tok = specs.samples
+    import matchers = specs.matchers
     import lang = chevrotain.lang
 
     describe("The GAst Builder module", function () {

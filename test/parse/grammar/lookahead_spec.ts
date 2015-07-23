@@ -1,9 +1,9 @@
 
 module chevrotain.lookahead.spec {
 
-    import samples = test.samples
+    import samples = specs.samples
     import lookahead = chevrotain.lookahead
-    import matchers = test.matchers
+    import matchers = specs.matchers
 
     class ColonParserMock extends Parser {
         protected NEXT_TOKEN():Token {
