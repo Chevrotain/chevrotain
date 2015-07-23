@@ -291,6 +291,7 @@ module chevrotain.gastBuilder.spec {
         it("can build The Gast representation of a literalArray Grammar Rule", function () {
             var actual = b.buildTopProduction(literalArrayText, "literalArray", <any>tok)
             expect(actual.name).to.equal("literalArray")
+            expect(actual.orgText).to.equal(literalArrayText)
             var def = actual.definition
             expect(def.length).to.equal(4)
             expect(def[0]).to.be.an.instanceof(gast.Terminal)
@@ -322,7 +323,8 @@ module chevrotain.gastBuilder.spec {
 
 
         it("can build The Gast representation of an elementDefinition Grammar Rule", function () {
-            var actual = b.buildTopProduction(" " + elementDefText, "elementDef", <any>tok)
+            var actual = b.buildTopProduction(elementDefText, "elementDef", <any>tok)
+            expect(actual.orgText).to.equal(elementDefText)
             expect(actual.name).to.equal("elementDef")
             var def = actual.definition
             expect(def.length).to.equal(6)

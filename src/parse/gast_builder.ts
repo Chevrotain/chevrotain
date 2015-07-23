@@ -55,16 +55,16 @@ module chevrotain.gastBuilder {
         terminalNameToConstructor = terminals
         // the top most range must strictly contain all the other ranges
         // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
-        impelText = " " + impelText
-        var txtWithoutComments = removeComments(" " + impelText)
+        var spacedImpelText = " " + impelText
+        var txtWithoutComments = removeComments(" " + spacedImpelText)
         // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
         var prodRanges = createRanges(txtWithoutComments)
         var topRange = new r.Range(0, impelText.length + 2)
-        return buildTopLevel(name, topRange, prodRanges)
+        return buildTopLevel(name, topRange, prodRanges, impelText)
     }
 
-    function buildTopLevel(name:string, topRange:r.IRange, allRanges:IProdRange[]):gast.Rule {
-        var topLevelProd = new gast.Rule(name, [])
+    function buildTopLevel(name:string, topRange:r.IRange, allRanges:IProdRange[], orgText:string):gast.Rule {
+        var topLevelProd = new gast.Rule(name, [], orgText)
         return buildAbstractProd(topLevelProd, topRange, allRanges)
     }
 

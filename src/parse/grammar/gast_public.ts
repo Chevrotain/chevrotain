@@ -47,7 +47,7 @@ module chevrotain.gast {
     }
 
     export class Rule extends AbstractProduction {
-        constructor(public name:string, definition:IProduction[]) { super(definition) }
+        constructor(public name:string, definition:IProduction[], public orgText:string = "") { super(definition) }
     }
 
     export class Flat extends AbstractProduction {
