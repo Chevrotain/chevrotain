@@ -59,7 +59,7 @@ module chevrotain.first.spec {
                     new gast.Terminal(t.EntityTok)
                 ])
             var actual = first(withOptionalPrefix)
-            matchers.arrayEqualityNoOrder(actual, [t.NamespaceTok, t.EntityTok])
+            matchers.setEquality(actual, [t.NamespaceTok, t.EntityTok])
 
 
             var withTwoOptPrefix = new gast.Flat(
@@ -70,7 +70,7 @@ module chevrotain.first.spec {
                     new gast.Option([new gast.Terminal(t.ConstTok)])
                 ])
             var actual2 = first(withTwoOptPrefix)
-            matchers.arrayEqualityNoOrder(actual2, [t.NamespaceTok, t.ColonTok, t.EntityTok])
+            matchers.setEquality(actual2, [t.NamespaceTok, t.ColonTok, t.EntityTok])
         })
 
     })

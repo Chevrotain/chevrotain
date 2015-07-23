@@ -274,7 +274,7 @@ module chevrotain.lexer.spec {
             var allPatternsString = _.map(analyzeResult.allPatterns, (pattern) => {
                 return pattern.source
             })
-            matchers.arrayEqualityNoOrder(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
+            matchers.setEquality(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
                 "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
             var patternIdxToClass = analyzeResult.patternIdxToClass

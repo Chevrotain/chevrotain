@@ -33,11 +33,11 @@ module chevrotain.follow.spec {
             var actualFollowNames = actual.keys()
             expect(actualFollowNames.length).to.equal(3)
             expect(actual.get("paramSpec1_~IN~_actionDec").length).to.equal(2)
-            matchers.arrayEqualityNoOrder(actual.get("paramSpec1_~IN~_actionDec"), [t.CommaTok, t.RParenTok])
+            matchers.setEquality(actual.get("paramSpec1_~IN~_actionDec"), [t.CommaTok, t.RParenTok])
             expect(actual.get("paramSpec2_~IN~_actionDec").length).to.equal(2)
-            matchers.arrayEqualityNoOrder(actual.get("paramSpec1_~IN~_actionDec"), [t.CommaTok, t.RParenTok])
+            matchers.setEquality(actual.get("paramSpec1_~IN~_actionDec"), [t.CommaTok, t.RParenTok])
             expect(actual.get("qualifiedName1_~IN~_actionDec").length).to.equal(1)
-            matchers.arrayEqualityNoOrder(actual.get("qualifiedName1_~IN~_actionDec"), [t.SemicolonTok])
+            matchers.setEquality(actual.get("qualifiedName1_~IN~_actionDec"), [t.SemicolonTok])
         })
 
         it("can compute all follows for a set of top level productions", function () {

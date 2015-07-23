@@ -132,7 +132,7 @@ module chevrotain.gastBuilder.spec {
             expect(actual.length).to.equal(3)
             var refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
             expect(_.uniq(refTypes).length).to.equal(2)
-            matchers.arrayEqualityNoOrder(_.uniq(refTypes), [b.ProdType.OR, b.ProdType.FLAT])
+            matchers.setEquality(_.uniq(refTypes), [b.ProdType.OR, b.ProdType.FLAT])
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
             expect(refText[0]).to.equal(".OR([\r\n" +
@@ -166,7 +166,7 @@ module chevrotain.gastBuilder.spec {
             expect(_.uniq(refTypes).length).to.equal(6)
 
             var refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            matchers.arrayEqualityNoOrder(refText, [ter, option, many, ref, atLeastOne, or])
+            matchers.setEquality(refText, [ter, option, many, ref, atLeastOne, or])
         })
 
         it("has a utility function that can remove comments(single line and multiline) from texts", function () {
