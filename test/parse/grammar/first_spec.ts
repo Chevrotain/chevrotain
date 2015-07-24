@@ -1,5 +1,5 @@
 
-module chevrotain.first.spec {
+namespace chevrotain.first.spec {
 
     import t = specs.samples
     import gast = chevrotain.gast

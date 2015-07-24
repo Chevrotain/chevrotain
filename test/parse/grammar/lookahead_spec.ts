@@ -1,5 +1,5 @@
 
-module chevrotain.lookahead.spec {
+namespace chevrotain.lookahead.spec {
 
     import samples = specs.samples
     import lookahead = chevrotain.lookahead
@@ -42,7 +42,7 @@ module chevrotain.lookahead.spec {
     }
 
 
-    describe("The Grammar Lookahead module", function () {
+    describe("The Grammar Lookahead namespace", function () {
         "use strict"
 
         it("can compute the lookahead function for the first OPTION in ActionDec", function () {
@@ -99,7 +99,7 @@ module chevrotain.lookahead.spec {
     class D extends Token {}
     class E extends Token {}
 
-    describe("The Grammar Lookahead module", function () {
+    describe("The Grammar Lookahead namespace", function () {
         "use strict"
 
         it("can detect ambiguities when calculating lookahead functions for OR alternatives", function () {

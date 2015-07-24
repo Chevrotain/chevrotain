@@ -10,7 +10,7 @@
 // long lines for token init seems more readable to me than to break them up
 // into multiple line.
 /* tslint:disable:max-line-length  */
-module chevrotain.examples.recovery.switchcase.spec {
+namespace chevrotain.examples.recovery.switchcase.spec {
 
     import tok = chevrotain.tokens
     import pt =  chevrotain.tree

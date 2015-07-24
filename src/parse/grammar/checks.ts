@@ -1,4 +1,4 @@
-module chevrotain.checks {
+namespace chevrotain.checks {
 
     import gast = chevrotain.gast
 

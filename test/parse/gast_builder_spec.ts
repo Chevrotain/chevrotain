@@ -1,4 +1,4 @@
-module chevrotain.gastBuilder.spec {
+namespace chevrotain.gastBuilder.spec {
 
     import r = chevrotain.range
     import b = chevrotain.gastBuilder
@@ -6,7 +6,7 @@ module chevrotain.gastBuilder.spec {
     import matchers = specs.matchers
     import lang = chevrotain.lang
 
-    describe("The GAst Builder module", function () {
+    describe("The GAst Builder namespace", function () {
         "use strict"
 
         let typeDefText = "// parse\r\n" +

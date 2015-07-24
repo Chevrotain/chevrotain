@@ -1,5 +1,5 @@
 
-module chevrotain.follow {
+namespace chevrotain.follow {
 
     import g = chevrotain.gast
     import r = chevrotain.rest

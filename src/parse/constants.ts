@@ -1,4 +1,4 @@
-module chevrotain.constants {
+namespace chevrotain.constants {
 
     export let IN = "_~IN~_"
 }

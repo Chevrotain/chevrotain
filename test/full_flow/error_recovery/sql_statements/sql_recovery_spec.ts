@@ -9,7 +9,7 @@
 // long lines for token init seems more readable to me than to break them up
 // into multiple line.
 /* tslint:disable:max-line-length  */
-module chevrotain.examples.recovery.sql.spec {
+namespace chevrotain.examples.recovery.sql.spec {
 
     import pt =  chevrotain.tree
     import exceptions = chevrotain.exceptions

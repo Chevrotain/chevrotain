@@ -1,12 +1,12 @@
 
-module chevrotain.tokens.spec {
+namespace chevrotain.tokens.spec {
 
     import tok = chevrotain.tokens
 
     let TrueLiteral = extendToken("TrueLiteral")
     class FalseLiteral extends Token {}
 
-    describe("The Chevrotain Tokens module", function () {
+    describe("The Chevrotain Tokens namespace", function () {
         "use strict"
 
         it("exports a utility function that returns a token's name", function () {

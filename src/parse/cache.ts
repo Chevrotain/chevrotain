@@ -1,8 +1,8 @@
 /**
  *
-module used to cache static information about parsers,
+namespace used to cache static information about parsers,
  */
-module chevrotain.cache {
+namespace chevrotain.cache {
     export let CLASS_TO_DEFINITION_ERRORS = new lang.HashTable<IParserDefinitionError[]>()
 
     export let CLASS_TO_SELF_ANALYSIS_DONE = new lang.HashTable<boolean>()

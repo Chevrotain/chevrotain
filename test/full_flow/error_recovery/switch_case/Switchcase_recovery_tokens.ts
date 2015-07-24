@@ -1,5 +1,5 @@
 
-module chevrotain.examples.recovery.switchcase {
+namespace chevrotain.examples.recovery.switchcase {
 
 
     export class IdentTok extends Token {}

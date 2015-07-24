@@ -1,5 +1,5 @@
-// todo: consider if this module really belongs in chevrotain?
-module chevrotain.tree {
+// todo: consider if this namespace really belongs in chevrotain?
+namespace chevrotain.tree {
 
     export class ParseTree {
         getImage():string { return this.payload.image }

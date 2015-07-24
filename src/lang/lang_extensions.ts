@@ -1,5 +1,5 @@
 
-module chevrotain.lang {
+namespace chevrotain.lang {
 
     let nameRegex = /^\s*function\s*(\S*)\s*\(/
     /* istanbul ignore next */

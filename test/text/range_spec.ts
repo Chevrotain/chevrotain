@@ -1,8 +1,8 @@
 
-module chevrotain.range.spec {
+namespace chevrotain.range.spec {
 
 
-    describe("The Chevrotain Range module", function () {
+    describe("The Chevrotain Range namespace", function () {
 
         it("an invalid range can not be created", function () {
             expect(() => { return new Range(5, 1)}).to.throw("INVALID RANGE")

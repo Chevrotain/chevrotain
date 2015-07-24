@@ -1,5 +1,5 @@
 
-module chevrotain.lookahead {
+namespace chevrotain.lookahead {
 
     import gast = chevrotain.gast
     import p = chevrotain.path

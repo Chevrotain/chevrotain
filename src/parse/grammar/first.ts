@@ -1,5 +1,5 @@
 
-module chevrotain.first {
+namespace chevrotain.first {
 
     import gast = chevrotain.gast
 

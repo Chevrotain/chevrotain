@@ -1,5 +1,5 @@
 
-module chevrotain.examples.recovery.sql {
+namespace chevrotain.examples.recovery.sql {
 
 
     export class IdentTok extends Token {

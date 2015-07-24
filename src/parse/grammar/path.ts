@@ -1,5 +1,5 @@
 
-module chevrotain.path {
+namespace chevrotain.path {
 
     /**
      * this interfaces defines the path the parser "took" to reach a certain position

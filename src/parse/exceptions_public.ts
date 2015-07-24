@@ -1,4 +1,4 @@
-module chevrotain.exceptions {
+namespace chevrotain.exceptions {
 
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {

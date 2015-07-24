@@ -1,4 +1,4 @@
-module chevrotain.recognizer.lookahead.spec {
+namespace chevrotain.recognizer.lookahead.spec {
 
     export class OneTok extends Token {
         constructor() { super("One", 0, 1, 1) }

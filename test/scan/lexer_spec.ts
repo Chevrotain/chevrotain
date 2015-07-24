@@ -1,4 +1,4 @@
-module chevrotain.lexer.spec {
+namespace chevrotain.lexer.spec {
 
     import matchers = specs.matchers
     let NA = Lexer.NA

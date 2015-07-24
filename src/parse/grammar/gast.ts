@@ -1,4 +1,4 @@
-module chevrotain.gast {
+namespace chevrotain.gast {
 
     import lang = chevrotain.lang
 

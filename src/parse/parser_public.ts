@@ -1,6 +1,6 @@
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.recognizer')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.recognizer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-module chevrotain {
+namespace chevrotain {
 
     import cache = chevrotain.cache
     import gast = chevrotain.gast

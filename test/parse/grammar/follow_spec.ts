@@ -1,5 +1,5 @@
 
-module chevrotain.follow.spec {
+namespace chevrotain.follow.spec {
 
     import t = specs.samples
     import gast = chevrotain.gast

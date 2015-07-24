@@ -1,5 +1,5 @@
 
-module chevrotain.lang.spec {
+namespace chevrotain.lang.spec {
 
     describe("The HashTable implementation", function () {
 

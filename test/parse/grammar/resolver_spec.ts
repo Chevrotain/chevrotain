@@ -1,4 +1,4 @@
-module chevrotain.resolver.spec {
+namespace chevrotain.resolver.spec {
     import gast = chevrotain.gast
 
     describe("The RefResolverVisitor", function () {

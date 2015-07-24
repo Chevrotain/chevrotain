@@ -1,12 +1,12 @@
 
-module chevrotain.interpreter.spec {
+namespace chevrotain.interpreter.spec {
 
     import t = specs.samples
     import samples = specs.samples
     import p = chevrotain.path
     import matchers = specs.matchers
 
-    describe("The Grammar Interpeter module", function () {
+    describe("The Grammar Interpeter namespace", function () {
         "use strict"
 
         describe("The NextAfterTokenWalker", function () {

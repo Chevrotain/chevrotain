@@ -1,5 +1,5 @@
-// module for building the GAst representation of a Grammar
-module chevrotain.gastBuilder {
+// namespace for building the GAst representation of a Grammar
+namespace chevrotain.gastBuilder {
 
     import r = chevrotain.range
     import gast = chevrotain.gast

@@ -1,4 +1,4 @@
-module chevrotain.resolver {
+namespace chevrotain.resolver {
 
     import gast = chevrotain.gast
 

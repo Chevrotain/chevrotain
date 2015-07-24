@@ -1,7 +1,7 @@
 
-module chevrotain.gast.spec {
+namespace chevrotain.gast.spec {
 
-    describe("GAst module", function () {
+    describe("GAst namespace", function () {
 
         describe("the ProdRef class", function () {
 

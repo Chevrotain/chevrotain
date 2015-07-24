@@ -1,4 +1,4 @@
-module chevrotain.checks.spec {
+namespace chevrotain.checks.spec {
     import gast = chevrotain.gast
     import samples = specs.samples
 

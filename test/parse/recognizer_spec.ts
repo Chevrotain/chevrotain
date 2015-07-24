@@ -1,5 +1,5 @@
 
-module chevrotain.recognizer.spec {
+namespace chevrotain.recognizer.spec {
 
     export class PlusTok extends Token {
         constructor() { super("+", 0, 1, 1) }

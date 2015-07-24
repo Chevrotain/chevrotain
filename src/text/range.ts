@@ -1,4 +1,4 @@
-module chevrotain.range {
+namespace chevrotain.range {
 
     export interface IRange {
 

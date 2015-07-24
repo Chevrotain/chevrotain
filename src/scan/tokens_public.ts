@@ -1,7 +1,7 @@
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.tokens')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.tokens')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
-module chevrotain {
+// TODO: examine namespace in namespace to reduce spam on chevrotain namespace
+namespace chevrotain {
 
     import lang = chevrotain.lang
 

@@ -1,5 +1,5 @@
 
-module chevrotain.interpreter {
+namespace chevrotain.interpreter {
 
     import g = chevrotain.gast
     import f = chevrotain.first

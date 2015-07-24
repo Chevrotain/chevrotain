@@ -1,5 +1,5 @@
 
-module chevrotain.examples.backtracking {
+namespace chevrotain.examples.backtracking {
 
 
     // DOCS: simple language with two statements which require backtracking to differentiate during parse time

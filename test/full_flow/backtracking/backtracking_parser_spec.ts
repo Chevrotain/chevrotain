@@ -1,4 +1,4 @@
-module chevrotain.examples.backtracking.spec {
+namespace chevrotain.examples.backtracking.spec {
 
     describe("Simple backtracking example", function () {
 

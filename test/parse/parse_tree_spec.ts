@@ -1,5 +1,5 @@
 
-module chevrotain.gastBuilder.spec {
+namespace chevrotain.gastBuilder.spec {
 
     import pt = chevrotain.tree
     import tok = chevrotain.tokens
@@ -7,7 +7,7 @@ module chevrotain.gastBuilder.spec {
     class BambaTok extends VirtualToken {}
     class BisliTok extends Token {}
 
-    describe("The ParseTree module", function () {
+    describe("The ParseTree namespace", function () {
 
         it("exposes a constructor and three getters accessing the internal token", function () {
             let ptInstance = new pt.ParseTree(new VirtualToken())

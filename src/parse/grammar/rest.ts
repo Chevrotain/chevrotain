@@ -1,5 +1,5 @@
 
-module chevrotain.rest {
+namespace chevrotain.rest {
 
     import g = chevrotain.gast
 

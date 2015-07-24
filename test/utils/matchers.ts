@@ -1,4 +1,4 @@
-module specs.matchers {
+namespace specs.matchers {
 
     export function setEquality<T>(actual:T[], expected:T[]):void {
         expect(actual).to.contain.members(expected)
