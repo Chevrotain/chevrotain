@@ -25,7 +25,7 @@ module specs.samples {
     export class KeyTok extends chevrotain.Token {}
     export class ElementTok extends chevrotain.Token {}
 
-    export var atLeastOneRule = new gast.Rule("atLeastOneRule", [
+    export let atLeastOneRule = new gast.Rule("atLeastOneRule", [
         new gast.RepetitionMandatory([
             new gast.RepetitionMandatory([
                 new gast.RepetitionMandatory([], 3),
@@ -36,7 +36,7 @@ module specs.samples {
         new gast.Terminal(DotTok, 2)
     ])
 
-    export var qualifiedName = new gast.Rule("qualifiedName", [
+    export let qualifiedName = new gast.Rule("qualifiedName", [
         new gast.Terminal(IdentTok),
         new gast.Repetition([
             new gast.Terminal(DotTok),
@@ -44,7 +44,7 @@ module specs.samples {
         ])
     ])
 
-    export var paramSpec = new gast.Rule("paramSpec", [
+    export let paramSpec = new gast.Rule("paramSpec", [
         new gast.Terminal(IdentTok),
         new gast.Terminal(ColonTok),
         new gast.NonTerminal("qualifiedName", qualifiedName),
@@ -54,7 +54,7 @@ module specs.samples {
         ])
     ])
 
-    export var actionDec = new gast.Rule("actionDec", [
+    export let actionDec = new gast.Rule("actionDec", [
         new gast.Terminal(ActionTok),
         new gast.Terminal(IdentTok),
         new gast.Terminal(LParenTok),
@@ -73,13 +73,13 @@ module specs.samples {
         new gast.Terminal(SemicolonTok)
     ])
 
-    export var manyActions = new gast.Rule("manyActions", [
+    export let manyActions = new gast.Rule("manyActions", [
         new gast.Repetition([
             new gast.NonTerminal("actionDec", actionDec, 1)
         ])
     ])
 
-    export var cardinality = new gast.Rule("cardinality", [
+    export let cardinality = new gast.Rule("cardinality", [
         new gast.Terminal(LSquareTok),
         new gast.Terminal(UnsignedIntegerLiteralTok),
         new gast.Terminal(DotDotTok),
@@ -90,7 +90,7 @@ module specs.samples {
         new gast.Terminal(RSquareTok)
     ])
 
-    export var assignedTypeSpec = new gast.Rule("assignedTypeSpec", [
+    export let assignedTypeSpec = new gast.Rule("assignedTypeSpec", [
         new gast.Terminal(ColonTok),
         new gast.NonTerminal("assignedType"),
 
@@ -104,7 +104,7 @@ module specs.samples {
         ], 2)
     ])
 
-    export var lotsOfOrs = new gast.Rule("lotsOfOrs", [
+    export let lotsOfOrs = new gast.Rule("lotsOfOrs", [
         new gast.Option([
             new gast.Alternation([
                 new gast.Flat([

@@ -17,15 +17,15 @@ module chevrotain.examples.recovery.sql.spec {
     describe("Error Recovery SQL DDL Example", function () {
         "use strict"
 
-        var schemaFQN = [new IdentTok(1, 1, "schema2"), new DotTok(1, 1), new IdentTok(1, 1, "Persons")]
+        let schemaFQN = [new IdentTok(1, 1, "schema2"), new DotTok(1, 1), new IdentTok(1, 1, "Persons")]
         /* tslint:disable:quotemark  */
-        var shahar32Record = [
+        let shahar32Record = [
             new LParenTok(1, 1), new IntTok(1, 9, "32"), new CommaTok(1, 1), new StringTok(1, 1, '"SHAHAR"'), new RParenTok(1, 1)]
-        var shahar31Record = [new LParenTok(1, 1), new IntTok(1, 9, "31"), new CommaTok(1, 1), new StringTok(1, 1, '"SHAHAR"'), new RParenTok(1, 1)]
+        let shahar31Record = [new LParenTok(1, 1), new IntTok(1, 9, "31"), new CommaTok(1, 1), new StringTok(1, 1, '"SHAHAR"'), new RParenTok(1, 1)]
         /* tslint:enable:quotemark  */
 
         it("can parse a series of three statements successfully", function () {
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // INSERT (32, "SHAHAR") INTO schema2.Persons
@@ -34,15 +34,15 @@ module chevrotain.examples.recovery.sql.spec {
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
             ])
 
-            var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl()
+            let parser = new DDLExampleRecoveryParser(input)
+            let ptResult = parser.ddl()
             expect(parser.errors.length).to.equal(0)
             expect(parser.isAtEndOfInput()).to.equal(true)
             assertAllThreeStatementsPresentAndValid(ptResult)
         })
 
         it("can perform single token insertion for a missing semicolon", function () {
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // INSERT (32, "SHAHAR") INTO schema2.Persons
@@ -51,22 +51,22 @@ module chevrotain.examples.recovery.sql.spec {
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
             ])
 
-            var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl()
+            let parser = new DDLExampleRecoveryParser(input)
+            let ptResult = parser.ddl()
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
             expect(parser.isAtEndOfInput()).to.equal(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
-            var insertedSemiColon:Token = ptResult.children[1].children[4].payload
+            let insertedSemiColon:Token = ptResult.children[1].children[4].payload
             // the semicolon is present even though it did not exist in the input, magic!
             expect(insertedSemiColon).to.be.an.instanceof(SemiColonTok)
             expect(insertedSemiColon.isInsertedInRecovery).to.equal(true)
         })
 
         it("can perform single token deletion for a redundant keyword", function () {
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // INSERT (32, "SHAHAR") INTO INTO schema2.Persons
@@ -75,8 +75,8 @@ module chevrotain.examples.recovery.sql.spec {
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
             ])
 
-            var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl()
+            let parser = new DDLExampleRecoveryParser(input)
+            let ptResult = parser.ddl()
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
@@ -86,7 +86,7 @@ module chevrotain.examples.recovery.sql.spec {
         })
 
         it("can perform re-sync recovery and only 'lose' part of the input", function () {
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // INSERT (32, "SHAHAR") FROM (( schema2.Persons <-- this can't be recovered with a single token insertion of deletion, must do re-sync
@@ -95,8 +95,8 @@ module chevrotain.examples.recovery.sql.spec {
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
             ])
 
-            var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl()
+            let parser = new DDLExampleRecoveryParser(input)
+            let ptResult = parser.ddl()
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
@@ -115,10 +115,10 @@ module chevrotain.examples.recovery.sql.spec {
 
         it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", function () {
             // (32, "SHAHAR" ( <-- wrong parenthesis
-            var badShahar32Record = [
+            let badShahar32Record = [
                 new LParenTok(1, 1), new IntTok(1, 9, "32"), new CommaTok(1, 1), new StringTok(1, 1, "\"SHAHAR\""), new LParenTok(1, 1)]
 
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // issues:
@@ -129,8 +129,8 @@ module chevrotain.examples.recovery.sql.spec {
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
             ])
 
-            var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl()
+            let parser = new DDLExampleRecoveryParser(input)
+            let ptResult = parser.ddl()
             // one error encountered
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
@@ -161,10 +161,10 @@ module chevrotain.examples.recovery.sql.spec {
 
 
         it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", function () {
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1)])
-            var parser = new DDLExampleRecoveryParser(input)
+            let parser = new DDLExampleRecoveryParser(input)
 
             parser.ddl()
             expect(parser.errors.length).to.equal(1)
@@ -172,22 +172,22 @@ module chevrotain.examples.recovery.sql.spec {
         })
 
         it("can use the same parser instance to parse multiple inputs", function () {
-            var input1:any = _.flatten([
+            let input1:any = _.flatten([
                 // CREATE TABLE schema2.Persons;
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
-            var parser = new DDLExampleRecoveryParser(input1)
+            let parser = new DDLExampleRecoveryParser(input1)
             parser.ddl()
             expect(parser.errors.length).to.equal(0)
             expect(parser.isAtEndOfInput()).to.equal(true)
 
 
-            var input2:any = _.flatten([
+            let input2:any = _.flatten([
                 // DELETE (31, "SHAHAR") FROM schema2.Persons
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
             // the parser is being reset instead of creating a new instance for each new input
             parser.reset();
             parser.input = input2
-            var ptResult = parser.ddl()
+            let ptResult = parser.ddl()
             expect(parser.errors.length).to.equal(0)
             expect(parser.isAtEndOfInput()).to.equal(true)
             // verify returned ParseTree
@@ -198,7 +198,7 @@ module chevrotain.examples.recovery.sql.spec {
         })
 
         it("can re-sync to the next iteration in a MANY rule", function () {
-            var input:any = _.flatten([
+            let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // INSERT (32, "SHAHAR") INTO schema2.Persons TABLE <-- the redundant 'TABLE' should trigger in repetition recovery
@@ -208,8 +208,8 @@ module chevrotain.examples.recovery.sql.spec {
                 new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
             ])
 
-            var parser = new DDLExampleRecoveryParser(input)
-            var ptResult = parser.ddl()
+            let parser = new DDLExampleRecoveryParser(input)
+            let ptResult = parser.ddl()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
             assertAllThreeStatementsPresentAndValid(ptResult)

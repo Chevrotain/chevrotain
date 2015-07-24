@@ -7,8 +7,8 @@ module chevrotain.lookahead {
     import f = chevrotain.first
 
     export function buildLookaheadForTopLevel(rule:gast.Rule):() => boolean {
-        var restProd = new gast.Flat(rule.definition)
-        var possibleTokTypes = f.first(restProd)
+        let restProd = new gast.Flat(rule.definition)
+        let possibleTokTypes = f.first(restProd)
         return getSimpleLookahead(possibleTokTypes)
     }
 
@@ -26,13 +26,13 @@ module chevrotain.lookahead {
 
     export function buildLookaheadForOr(orOccurrence:number, ruleGrammar:gast.Rule, ignoreAmbiguities:boolean = false):() => number {
 
-        var alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking()
+        let alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking()
 
         if (!ignoreAmbiguities) {
-            var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens)
+            let altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens)
 
             if (!_.isEmpty(altsAmbiguityErrors)) {
-                var errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
+                let errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
                     return `Ambiguous alternatives ${currAmbiguity.alts.join(" ,")} in OR${orOccurrence} inside ${ruleGrammar.name} ` +
                         `Rule, ${tokenName(currAmbiguity.token)} may appears as the first Terminal in all these alternatives.\n`
                 })
@@ -52,10 +52,10 @@ module chevrotain.lookahead {
          * This will return the Index of the alternative to take or -1 if none of the alternatives match
          */
         return function ():number {
-            var nextToken = this.NEXT_TOKEN()
-            for (var i = 0; i < alternativesTokens.length; i++) {
-                var currAltTokens = alternativesTokens[i]
-                for (var j = 0; j < (<any>currAltTokens).length; j++) {
+            let nextToken = this.NEXT_TOKEN()
+            for (let i = 0; i < alternativesTokens.length; i++) {
+                let currAltTokens = alternativesTokens[i]
+                for (let j = 0; j < (<any>currAltTokens).length; j++) {
                     if (nextToken instanceof currAltTokens[j]) {
                         return i
                     }
@@ -72,24 +72,24 @@ module chevrotain.lookahead {
 
     export function checkAlternativesAmbiguities(alternativesTokens:Function[][]):IAmbiguityDescriptor[] {
 
-        var allTokensFlat = _.flatten(alternativesTokens)
-        var uniqueTokensFlat = _.uniq(allTokensFlat)
+        let allTokensFlat = _.flatten(alternativesTokens)
+        let uniqueTokensFlat = _.uniq(allTokensFlat)
 
-        var tokensToAltsIndicesItAppearsIn = _.map(uniqueTokensFlat, (seekToken) => {
-            var altsCurrTokenAppearsIn = _.pick(alternativesTokens, (altToLookIn) => {
+        let tokensToAltsIndicesItAppearsIn = _.map(uniqueTokensFlat, (seekToken) => {
+            let altsCurrTokenAppearsIn = _.pick(alternativesTokens, (altToLookIn) => {
                 return <any> _.find(altToLookIn, (currToken) => {
                     return currToken === seekToken
                 })
             })
 
-            var altsIndicesTokenAppearsIn = _.map(_.keys(altsCurrTokenAppearsIn), (index) => {
+            let altsIndicesTokenAppearsIn = _.map(_.keys(altsCurrTokenAppearsIn), (index) => {
                 return parseInt(index, 10) + 1
             })
 
             return {token: seekToken, alts: altsIndicesTokenAppearsIn}
         })
 
-        var tokensToAltsIndicesWithAmbiguity:any = _.filter(tokensToAltsIndicesItAppearsIn, (tokAndAltsItAppearsIn) => {
+        let tokensToAltsIndicesWithAmbiguity:any = _.filter(tokensToAltsIndicesItAppearsIn, (tokAndAltsItAppearsIn) => {
             return tokAndAltsItAppearsIn.alts.length > 1
         })
 
@@ -98,22 +98,22 @@ module chevrotain.lookahead {
 
     function buildLookAheadForGrammarProd(prodWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
                                           ruleGrammar:gast.Rule):() => boolean {
-        var path:p.IRuleGrammarPath = {
+        let path:p.IRuleGrammarPath = {
             ruleStack:       [ruleGrammar.name],
             occurrenceStack: [1],
             occurrence:      ruleOccurrence
         }
 
-        var walker:interp.AbstractNextPossibleTokensWalker = new prodWalker(ruleGrammar, path)
-        var possibleNextTokTypes = walker.startWalking()
+        let walker:interp.AbstractNextPossibleTokensWalker = new prodWalker(ruleGrammar, path)
+        let possibleNextTokTypes = walker.startWalking()
 
         return getSimpleLookahead(possibleNextTokTypes)
     }
 
     function getSimpleLookahead(possibleNextTokTypes:Function[]):() => boolean {
         return function ():boolean {
-            var nextToken = this.NEXT_TOKEN()
-            for (var j = 0; j < possibleNextTokTypes.length; j++) {
+            let nextToken = this.NEXT_TOKEN()
+            for (let j = 0; j < possibleNextTokTypes.length; j++) {
                 if (nextToken instanceof possibleNextTokTypes[j]) {
                     return true
                 }

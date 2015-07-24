@@ -10,17 +10,17 @@ module chevrotain.gastBuilder.spec {
     describe("The ParseTree module", function () {
 
         it("exposes a constructor and three getters accessing the internal token", function () {
-            var ptInstance = new pt.ParseTree(new VirtualToken())
+            let ptInstance = new pt.ParseTree(new VirtualToken())
             expect(ptInstance.getImage()).to.equal("")
             expect(ptInstance.getColumn()).to.equal(-1)
             expect(ptInstance.getLine()).to.equal(-1)
         })
 
         it("exposes a factory method that helps create ParseTree", function () {
-            var bambaPt = pt.PT(BambaTok)
+            let bambaPt = pt.PT(BambaTok)
             expect(bambaPt.payload).to.be.an.instanceof(BambaTok)
 
-            var bisliPt = pt.PT(new BisliTok("bisli", 0, 1, 1), [bambaPt])
+            let bisliPt = pt.PT(new BisliTok("bisli", 0, 1, 1), [bambaPt])
             expect(bisliPt.children.length).to.equal(1)
             expect(bisliPt.children[0]).to.equal(bambaPt)
             expect(bisliPt.payload.image).to.equal("bisli")

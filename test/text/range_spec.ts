@@ -10,7 +10,7 @@ module chevrotain.range.spec {
         })
 
         it("can check if a number is contained in a give range", function () {
-            var r = new Range(90, 110)
+            let r = new Range(90, 110)
             expect(r.contains(-4)).to.equal(false)
             expect(r.contains(30)).to.equal(false)
             expect(r.contains(89)).to.equal(false)
@@ -23,12 +23,12 @@ module chevrotain.range.spec {
         })
 
         it("can check if it is contained in another range", function () {
-            var _10_50 = new Range(10, 50)
-            var _1_6 = new Range(1, 6)
-            var _5_15 = new Range(5, 15)
-            var _20_35 = new Range(20, 35)
-            var _45_55 = new Range(45, 55)
-            var _51_100 = new Range(51, 100)
+            let _10_50 = new Range(10, 50)
+            let _1_6 = new Range(1, 6)
+            let _5_15 = new Range(5, 15)
+            let _20_35 = new Range(20, 35)
+            let _45_55 = new Range(45, 55)
+            let _51_100 = new Range(51, 100)
 
             expect(_1_6.isContainedInRange(_10_50)).to.equal(false)
             expect(_5_15.isContainedInRange(_10_50)).to.equal(false)
@@ -39,15 +39,15 @@ module chevrotain.range.spec {
         })
 
         it("can check if it is strictly contained in another range", function () {
-            var _10_50 = new Range(10, 50)
+            let _10_50 = new Range(10, 50)
 
-            var _1_6 = new Range(1, 6)
-            var _10_11 = new Range(10, 11)
-            var _5_15 = new Range(5, 15)
-            var _20_35 = new Range(20, 35)
-            var _45_55 = new Range(45, 55)
-            var _49_50 = new Range(49, 50)
-            var _51_100 = new Range(51, 100)
+            let _1_6 = new Range(1, 6)
+            let _10_11 = new Range(10, 11)
+            let _5_15 = new Range(5, 15)
+            let _20_35 = new Range(20, 35)
+            let _45_55 = new Range(45, 55)
+            let _49_50 = new Range(49, 50)
+            let _51_100 = new Range(51, 100)
 
             expect(_1_6.isStrictlyContainedInRange(_10_50)).to.equal(false)
             expect(_10_11.isStrictlyContainedInRange(_10_50)).to.equal(false)

@@ -1,9 +1,9 @@
 
 module chevrotain.lang {
 
-    var nameRegex = /^\s*function\s*(\S*)\s*\(/
+    let nameRegex = /^\s*function\s*(\S*)\s*\(/
     /* istanbul ignore next */
-    var hasNativeName = typeof (<any>(function f() {})).name !== "undefined"
+    let hasNativeName = typeof (<any>(function f() {})).name !== "undefined"
 
     export function classNameFromInstance(instance:any):string {
         return functionName(instance.constructor)
@@ -22,7 +22,7 @@ module chevrotain.lang {
         }
         /* istanbul ignore next */
         else {
-            var name = func.toString().match(nameRegex)[1];
+            let name = func.toString().match(nameRegex)[1];
             (<any>func).rdtFuncNameCache666 = name
             return name
         }

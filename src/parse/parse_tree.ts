@@ -20,7 +20,7 @@ module chevrotain.tree {
      * @returns {ParseTree}
      */
     export function PT(tokenOrTokenClass:Function|Token, children:ParseTree[] = []):ParseTree {
-        var childrenCompact = _.compact(children)
+        let childrenCompact = _.compact(children)
 
         if (tokenOrTokenClass instanceof Token) {
             return new ParseTree(tokenOrTokenClass, childrenCompact)

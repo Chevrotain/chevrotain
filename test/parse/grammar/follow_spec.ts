@@ -10,27 +10,27 @@ module chevrotain.follow.spec {
         "use strict"
 
         it("can build a followNamePrefix from a Terminal", function () {
-            var terminal = new gast.Terminal(t.IdentTok)
-            var actual = buildInProdFollowPrefix(terminal)
+            let terminal = new gast.Terminal(t.IdentTok)
+            let actual = buildInProdFollowPrefix(terminal)
             expect(actual).to.equal("IdentTok1_~IN~_")
 
-            var terminal2 = new gast.Terminal(t.EntityTok)
+            let terminal2 = new gast.Terminal(t.EntityTok)
             terminal2.occurrenceInParent = 3
-            var actual2 = buildInProdFollowPrefix(terminal2)
+            let actual2 = buildInProdFollowPrefix(terminal2)
             expect(actual2).to.equal("EntityTok3_~IN~_")
         })
 
         it("can build a followName prefix from a TopLevel Production and index", function () {
-            var prod = new gast.Rule("bamba", [])
-            var index = 5
+            let prod = new gast.Rule("bamba", [])
+            let index = 5
 
-            var actual = buildBetweenProdsFollowPrefix(prod, index)
+            let actual = buildBetweenProdsFollowPrefix(prod, index)
             expect(actual).to.equal("bamba5_~IN~_")
         })
 
         it("can compute the follows for Top level production ref in ActionDec", function () {
-            var actual:any = new ResyncFollowsWalker(samples.actionDec).startWalking()
-            var actualFollowNames = actual.keys()
+            let actual:any = new ResyncFollowsWalker(samples.actionDec).startWalking()
+            let actualFollowNames = actual.keys()
             expect(actualFollowNames.length).to.equal(3)
             expect(actual.get("paramSpec1_~IN~_actionDec").length).to.equal(2)
             matchers.setEquality(actual.get("paramSpec1_~IN~_actionDec"), [t.CommaTok, t.RParenTok])
@@ -41,7 +41,7 @@ module chevrotain.follow.spec {
         })
 
         it("can compute all follows for a set of top level productions", function () {
-            var actual = computeAllProdsFollows([samples.actionDec])
+            let actual = computeAllProdsFollows([samples.actionDec])
             expect(actual.keys().length).to.equal(3)
         })
 

@@ -24,19 +24,19 @@ module chevrotain.follow {
         }
 
         walkProdRef(refProd:g.NonTerminal, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            var followName = buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.occurrenceInParent) + this.topProd.name
-            var fullRest:g.IProduction[] = currRest.concat(prevRest)
-            var restProd = new g.Flat(fullRest)
-            var t_in_topProd_follows = f.first(restProd)
+            let followName = buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.occurrenceInParent) + this.topProd.name
+            let fullRest:g.IProduction[] = currRest.concat(prevRest)
+            let restProd = new g.Flat(fullRest)
+            let t_in_topProd_follows = f.first(restProd)
             this.follows.put(followName, t_in_topProd_follows)
         }
     }
 
     export function computeAllProdsFollows(topProductions:g.Rule[]):lang.HashTable<Function[]> {
-        var reSyncFollows = new lang.HashTable<Function[]>()
+        let reSyncFollows = new lang.HashTable<Function[]>()
 
         _.forEach(topProductions, (topProd) => {
-            var currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
+            let currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
             reSyncFollows.putAll(currRefsFollow)
         })
         return reSyncFollows
@@ -47,7 +47,7 @@ module chevrotain.follow {
     }
 
     export function buildInProdFollowPrefix(terminal:g.Terminal):string {
-        var terminalName = tokenName(terminal.terminalType)
+        let terminalName = tokenName(terminal.terminalType)
         return terminalName + terminal.occurrenceInParent + IN
     }
 

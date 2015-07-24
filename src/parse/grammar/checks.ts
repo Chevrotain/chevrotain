@@ -3,26 +3,26 @@ module chevrotain.checks {
     import gast = chevrotain.gast
 
     export function validateGrammar(topLevels:gast.Rule[]):string[] {
-        var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule)
+        let errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule)
         return <string[]>_.flatten(errorMessagesArrs)
     }
 
     function validateSingleTopLevelRule(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
-        var collectorVisitor = new OccurrenceValidationCollector()
+        let collectorVisitor = new OccurrenceValidationCollector()
         topLevelRule.accept(collectorVisitor)
-        var allRuleProductions = collectorVisitor.allProductions
+        let allRuleProductions = collectorVisitor.allProductions
 
-        var productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates)
+        let productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates)
 
-        var duplicates:any = _.pick(productionGroups, (currGroup) => {
+        let duplicates:any = _.pick(productionGroups, (currGroup) => {
             return currGroup.length > 1
         })
 
-        var errors = _.map(duplicates, (currDuplicates:any) => {
-            var firstProd:any = _.first(currDuplicates)
-            var msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
-            var dslName = gast.getProductionDslName(firstProd)
-            var defError:IParserDuplicatesDefinitionError = {
+        let errors = _.map(duplicates, (currDuplicates:any) => {
+            let firstProd:any = _.first(currDuplicates)
+            let msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
+            let dslName = gast.getProductionDslName(firstProd)
+            let defError:IParserDuplicatesDefinitionError = {
                 message:    msg,
                 type:       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
                 ruleName:   topLevelRule.name,
@@ -30,7 +30,7 @@ module chevrotain.checks {
                 occurrence: firstProd.occurrenceInParent
             }
 
-            var param = getExtraProductionArgument(firstProd)
+            let param = getExtraProductionArgument(firstProd)
             if (param) {
                 defError.parameter = param
             }
@@ -41,12 +41,12 @@ module chevrotain.checks {
     }
 
     function createDuplicatesErrorMessage(duplicateProds:gast.IProductionWithOccurrence[], topLevelName):string {
-        var firstProd = _.first(duplicateProds)
-        var index = firstProd.occurrenceInParent
-        var dslName = gast.getProductionDslName(firstProd)
-        var extraArgument = getExtraProductionArgument(firstProd)
+        let firstProd = _.first(duplicateProds)
+        let index = firstProd.occurrenceInParent
+        let dslName = gast.getProductionDslName(firstProd)
+        let extraArgument = getExtraProductionArgument(firstProd)
 
-        var msg = `->${dslName}<- with occurrence index: ->${index}<-
+        let msg = `->${dslName}<- with occurrence index: ->${index}<-
                   ${extraArgument ? `and argument: ${extraArgument}` : ""}
                   appears more than once (${duplicateProds.length} times) in the top level rule: ${topLevelName}.
                   ${index === 1 ? `note that ${dslName} and ${dslName}1 both have the same occurrence index 1}` : ""}}
@@ -106,11 +106,11 @@ module chevrotain.checks {
     }
 
 
-    var ruleNamePattern = /^[a-zA-Z_]\w*$/
+    let ruleNamePattern = /^[a-zA-Z_]\w*$/
 
     export function validateRuleName(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
-        var errors = []
-        var errMsg
+        let errors = []
+        let errMsg
 
         if (!ruleName.match(ruleNamePattern)) {
             errMsg = `Invalid Grammar rule name --> ${ruleName} it must match the pattern: ${ruleNamePattern.toString()}`

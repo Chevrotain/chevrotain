@@ -19,7 +19,7 @@ module chevrotain.examples.recovery.switchcase.spec {
         "use strict"
 
         it("can parse a valid text successfully", function () {
-            var input = [
+            let input = [
                 // switch (name) {
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
                 // case "Terry" : return 2;
@@ -31,8 +31,8 @@ module chevrotain.examples.recovery.switchcase.spec {
                 new RCurlyTok(1, 1)
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(0)
             expect(parser.isAtEndOfInput()).to.equal(true)
 
@@ -44,7 +44,7 @@ module chevrotain.examples.recovery.switchcase.spec {
         })
 
         it("can perform re-sync recovery to the next case stmt", function () {
-            var input = [
+            let input = [
                 // switch (name) {
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
                 // case "Terry" : return 2;
@@ -56,8 +56,8 @@ module chevrotain.examples.recovery.switchcase.spec {
                 new RCurlyTok(1, 1)
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
 
@@ -69,13 +69,13 @@ module chevrotain.examples.recovery.switchcase.spec {
         })
 
         it("will detect an error if missing AT_LEAST_ONCE occurrence", function () {
-            var input = [
+            let input = [
                 // switch (name) { }
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1), new RCurlyTok(1, 1)
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.errors[0]).to.be.an.instanceof(exceptions.EarlyExitException)
             // we have re-synced to the end of the input therefore all the input has been "parsed"
@@ -85,7 +85,7 @@ module chevrotain.examples.recovery.switchcase.spec {
 
 
         it("can perform re-sync recovery to the next case stmt even if the unexpected tokens are between valid case stmts", function () {
-            var input = [
+            let input = [
                 // switch (name) {
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
                 // case "Terry" : return 2;
@@ -101,8 +101,8 @@ module chevrotain.examples.recovery.switchcase.spec {
                 new RCurlyTok(1, 1)
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
 
@@ -114,7 +114,7 @@ module chevrotain.examples.recovery.switchcase.spec {
         })
 
         it("can also sometimes fail in automatic error recovery :)", function () {
-            var input = [
+            let input = [
                 // switch (name) {
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
                 // case "Terry" : return 2;
@@ -130,15 +130,15 @@ module chevrotain.examples.recovery.switchcase.spec {
                 new RCurlyTok(1, 1)
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
             expect(parseResult).to.deep.equal({})
         })
 
         it("can perform single token deletion recovery", function () {
-            var input = [
+            let input = [
                 // switch (name) {
                 new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
                 // case "Terry" : return 2;
@@ -151,8 +151,8 @@ module chevrotain.examples.recovery.switchcase.spec {
                 new RCurlyTok(1, 1)
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.switchStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.switchStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
             expect(parseResult).to.deep.equal({
@@ -163,13 +163,13 @@ module chevrotain.examples.recovery.switchcase.spec {
         })
 
         it("will perform single token insertion for a missing colon", function () {
-            var input = [
+            let input = [
                 // case "Terry" return 2 <-- missing the colon between "Terry" and return
                 new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), /* new ColonTok(1, 1) ,*/ new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.caseStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.caseStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.errors[0]).to.be.an.instanceof(exceptions.MismatchedTokenException)
             expect(parser.isAtEndOfInput()).to.equal(true)
@@ -177,14 +177,14 @@ module chevrotain.examples.recovery.switchcase.spec {
         })
 
         it("will NOT perform single token insertion for a missing string", function () {
-            var input = [
+            let input = [
                 // case  : return 2 <-- missing the string for the case's value
                 new CaseTok(1, 1), /* new StringTok("Terry" , 0, 1, 1),*/  new ColonTok(1, 1), new ReturnTok(1, 1),
                 new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
             ]
 
-            var parser = new SwitchCaseRecoveryParser(input)
-            var parseResult = parser.caseStmt()
+            let parser = new SwitchCaseRecoveryParser(input)
+            let parseResult = parser.caseStmt()
             expect(parser.errors.length).to.equal(1)
             expect(parser.errors[0]).to.be.an.instanceof(exceptions.MismatchedTokenException)
             expect(parser.isAtEndOfInput()).to.equal(true) // in rule recovery failed, will now re-sync to EOF

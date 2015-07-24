@@ -27,7 +27,7 @@ module chevrotain {
      * @returns {Function} - a constructor for the new extended Token subclass
      */
     export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token) {
-        var pattern
+        let pattern
 
         if (_.isRegExp(patternOrParent) ||
             patternOrParent === chevrotain.Lexer.SKIPPED ||
@@ -39,7 +39,7 @@ module chevrotain {
             pattern = undefined
         }
 
-        var derivedCostructor:any = function () {
+        let derivedCostructor:any = function () {
             parentConstructor.apply(this, arguments)
         }
 

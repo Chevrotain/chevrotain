@@ -54,7 +54,7 @@ module chevrotain.interpreter {
             if (refProd.referencedRule.name === this.nextProductionName &&
                 refProd.occurrenceInParent === this.nextProductionOccurrence
             ) {
-                var fullRest = currRest.concat(prevRest)
+                let fullRest = currRest.concat(prevRest)
                 this.updateExpectedNext()
                 this.walk(refProd.referencedRule, <any>fullRest)
             }
@@ -91,8 +91,8 @@ module chevrotain.interpreter {
             if (this.isAtEndOfPath && tokenName(terminal.terminalType) === this.nextTerminalName &&
                 terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)
             ) {
-                var fullRest = currRest.concat(prevRest)
-                var restProd = new g.Flat(<any>fullRest)
+                let fullRest = currRest.concat(prevRest)
+                let restProd = new g.Flat(<any>fullRest)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -110,7 +110,7 @@ module chevrotain.interpreter {
 
         walkOption(optionProd:g.Option, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
-                var restProd = new g.Flat(optionProd.definition)
+                let restProd = new g.Flat(optionProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -131,7 +131,7 @@ module chevrotain.interpreter {
 
         walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && manyProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-                var restProd = new g.Flat(manyProd.definition)
+                let restProd = new g.Flat(manyProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -152,7 +152,7 @@ module chevrotain.interpreter {
 
         walkAtLeastOne(atLeastOneProd:g.RepetitionMandatory, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (this.isAtEndOfPath && atLeastOneProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-                var restProd = new g.Flat(atLeastOneProd.definition)
+                let restProd = new g.Flat(atLeastOneProd.definition)
                 this.possibleTokTypes = f.first(restProd)
                 this.found = true
             }
@@ -180,7 +180,7 @@ module chevrotain.interpreter {
         walkOr(orProd:g.Alternation, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (orProd.occurrenceInParent === this.occurrence) {
                 this.result = _.map(orProd.definition, (alt) => {
-                    var altWrapper = new gast.Flat([alt])
+                    let altWrapper = new gast.Flat([alt])
                     return f.first(altWrapper)
                 })
             }
@@ -219,7 +219,7 @@ module chevrotain.interpreter {
         walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (manyProd.occurrenceInParent === this.occurrence) {
 
-                var firstAfterMany = _.first(currRest.concat(prevRest))
+                let firstAfterMany = _.first(currRest.concat(prevRest))
                 this.result.isEndOfRule = firstAfterMany === undefined
                 if (firstAfterMany instanceof gast.Terminal) {
                     this.result.token = firstAfterMany.terminalType
@@ -237,7 +237,7 @@ module chevrotain.interpreter {
         walkAtLeastOne(atLeastOneProd:g.RepetitionMandatory, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (atLeastOneProd.occurrenceInParent === this.occurrence) {
 
-                var firstAfterAtLeastOne = _.first(currRest.concat(prevRest))
+                let firstAfterAtLeastOne = _.first(currRest.concat(prevRest))
                 this.result.isEndOfRule = firstAfterAtLeastOne === undefined
                 if (firstAfterAtLeastOne instanceof gast.Terminal) {
                     this.result.token = firstAfterAtLeastOne.terminalType

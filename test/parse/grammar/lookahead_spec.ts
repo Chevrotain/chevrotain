@@ -46,28 +46,28 @@ module chevrotain.lookahead.spec {
         "use strict"
 
         it("can compute the lookahead function for the first OPTION in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForOption(1, samples.actionDec)
+            let laFunc = lookahead.buildLookaheadForOption(1, samples.actionDec)
 
             expect(laFunc.call(new ColonParserMock([], []))).to.equal(false)
             expect(laFunc.call(new IdentParserMock([], []))).to.equal(true)
         })
 
         it("can compute the lookahead function for the second OPTION in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForOption(2, samples.actionDec)
+            let laFunc = lookahead.buildLookaheadForOption(2, samples.actionDec)
 
             expect(laFunc.call(new ColonParserMock([], []))).to.equal(true)
             expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForMany(1, samples.actionDec)
+            let laFunc = lookahead.buildLookaheadForMany(1, samples.actionDec)
 
             expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
             expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
         it("can compute the lookahead function for the first MANY in ActionDec", function () {
-            var laFunc = lookahead.buildLookaheadForOr(1, samples.lotsOfOrs)
+            let laFunc = lookahead.buildLookaheadForOr(1, samples.lotsOfOrs)
 
             expect(laFunc.call(new CommaParserMock([], []))).to.equal(0)
             expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
@@ -76,14 +76,14 @@ module chevrotain.lookahead.spec {
         })
 
         it("can compute the lookahead function for a Top Level Rule", function () {
-            var laFunc = lookahead.buildLookaheadForTopLevel(samples.actionDec)
+            let laFunc = lookahead.buildLookaheadForTopLevel(samples.actionDec)
 
             expect(laFunc.call(new ActionParserMock([], []))).to.equal(true)
             expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
         it("can compute the lookahead function for a Top Level Rule #2", function () {
-            var laFunc = lookahead.buildLookaheadForTopLevel(samples.lotsOfOrs)
+            let laFunc = lookahead.buildLookaheadForTopLevel(samples.lotsOfOrs)
 
             expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
             expect(laFunc.call(new EntityParserMock([], []))).to.equal(true)
@@ -103,8 +103,8 @@ module chevrotain.lookahead.spec {
         "use strict"
 
         it("can detect ambiguities when calculating lookahead functions for OR alternatives", function () {
-            var input = [[A, B], [C, D], [E, C]]
-            var ambiguities = lookahead.checkAlternativesAmbiguities(input)
+            let input = [[A, B], [C, D], [E, C]]
+            let ambiguities = lookahead.checkAlternativesAmbiguities(input)
             expect(ambiguities.length).to.equal(1)
             expect(ambiguities[0].alts).to.deep.equal([2, 3])
         })

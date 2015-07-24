@@ -45,7 +45,7 @@ module chevrotain.examples.recovery.sql {
         // DOCS: note how all the parsing rules in this example return a ParseTree, we require some output from the parser
         // to demonstrate the error recovery mechanisms. otherwise it is harder to prove we have indeed recovered.
         private parseDdl():pt.ParseTree {
-            var stmts = []
+            let stmts = []
 
             this.MANY(() => {
                 this.OR([
@@ -61,7 +61,7 @@ module chevrotain.examples.recovery.sql {
         }
 
         private parseCreateStmt():pt.ParseTree {
-            var createKW, tableKW, qn, semiColon
+            let createKW, tableKW, qn, semiColon
 
             createKW = this.CONSUME1(CreateTok)
             tableKW = this.CONSUME1(TableTok)
@@ -73,7 +73,7 @@ module chevrotain.examples.recovery.sql {
         }
 
         private parseInsertStmt():pt.ParseTree {
-            var insertKW, recordValue, intoKW, qn, semiColon
+            let insertKW, recordValue, intoKW, qn, semiColon
 
             // parse
             insertKW = this.CONSUME1(InsertTok)
@@ -88,7 +88,7 @@ module chevrotain.examples.recovery.sql {
         }
 
         private parseDeleteStmt():pt.ParseTree {
-            var deleteKW, recordValue, fromKW, qn, semiColon
+            let deleteKW, recordValue, fromKW, qn, semiColon
 
             // parse
             deleteKW = this.CONSUME1(DeleteTok)
@@ -103,8 +103,8 @@ module chevrotain.examples.recovery.sql {
         }
 
         private parseQualifiedName():pt.ParseTree {
-            var dots = []
-            var idents = []
+            let dots = []
+            let idents = []
 
             // parse
             // DOCS: note how we use CONSUME1(IdentTok) here
@@ -118,15 +118,15 @@ module chevrotain.examples.recovery.sql {
             })
 
             // tree rewrite
-            var allIdentsPts = WRAP_IN_PT(idents)
-            var dotsPt = PT(new DOTS(), WRAP_IN_PT(dots))
-            var allPtChildren = allIdentsPts.concat([dotsPt])
+            let allIdentsPts = WRAP_IN_PT(idents)
+            let dotsPt = PT(new DOTS(), WRAP_IN_PT(dots))
+            let allPtChildren = allIdentsPts.concat([dotsPt])
             return PT(new QUALIFIED_NAME(), <any>allPtChildren)
         }
 
         private parseRecordValue():pt.ParseTree {
-            var values = []
-            var commas = []
+            let values = []
+            let commas = []
 
             // parse
             this.CONSUME1(LParenTok)
@@ -137,13 +137,13 @@ module chevrotain.examples.recovery.sql {
             })
             this.CONSUME1(RParenTok)
             // tree rewrite
-            var commasPt = PT(new COMMAS(), WRAP_IN_PT(commas))
-            var allPtChildren = values.concat([commasPt])
+            let commasPt = PT(new COMMAS(), WRAP_IN_PT(commas))
+            let allPtChildren = values.concat([commasPt])
             return PT(new QUALIFIED_NAME(), allPtChildren)
         }
 
         private parseValue():pt.ParseTree {
-            var value:Token = null
+            let value:Token = null
             this.OR(
                 [   // @formatter:off
                     {ALT: () => {value = this.CONSUME1(StringTok)}},
@@ -161,8 +161,8 @@ module chevrotain.examples.recovery.sql {
     }
 
     export function WRAP_IN_PT(toks:Token[]):pt.ParseTree[] {
-        var parseTrees = new Array(toks.length)
-        for (var i = 0; i < toks.length; i++) {
+        let parseTrees = new Array(toks.length)
+        for (let i = 0; i < toks.length; i++) {
             parseTrees[i] = (PT(toks[i]))
         }
         return parseTrees

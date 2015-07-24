@@ -1,1 +1,1 @@
-declare var expect:Chai.ExpectStatic
+declare let expect:Chai.ExpectStatic

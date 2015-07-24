@@ -3,7 +3,7 @@ module chevrotain.tokens.spec {
 
     import tok = chevrotain.tokens
 
-    var TrueLiteral = extendToken("TrueLiteral")
+    let TrueLiteral = extendToken("TrueLiteral")
     class FalseLiteral extends Token {}
 
     describe("The Chevrotain Tokens module", function () {
@@ -16,15 +16,15 @@ module chevrotain.tokens.spec {
             expect(tokenName(TrueLiteral)).to.equal("TrueLiteral")
         })
 
-        var A = extendToken("A")
-        var B = extendToken("B", A)
+        let A = extendToken("A")
+        let B = extendToken("B", A)
         B.GROUP = "Special"
 
-        var C = extendToken("C", /\d+/, B)
-        var D = extendToken("D", /\w+/, B)
+        let C = extendToken("C", /\d+/, B)
+        let D = extendToken("D", /\w+/, B)
 
         it("provides an extendToken utility - creating an instance", function () {
-            var aInstance = new A("Hello", 0, 1, 1)
+            let aInstance = new A("Hello", 0, 1, 1)
             expect(aInstance.image).to.equal("Hello")
             expect(aInstance.offset).to.equal(0)
             expect(aInstance.startLine).to.equal(1)
@@ -34,7 +34,7 @@ module chevrotain.tokens.spec {
         })
 
         it("provides an extendToken utility - creating a subclass instance", function () {
-            var aInstance = new C("world", 0, 1, 1)
+            let aInstance = new C("world", 0, 1, 1)
             expect(aInstance.image).to.equal("world")
             expect(aInstance.offset).to.equal(0)
             expect(aInstance.startLine).to.equal(1)
@@ -44,16 +44,16 @@ module chevrotain.tokens.spec {
         })
 
         it("provides an extendToken utility - inheritance chain", function () {
-            var dInstance = new D("world", 0, 1, 1)
+            let dInstance = new D("world", 0, 1, 1)
             expect(dInstance).to.be.an.instanceof(A)
             expect(dInstance).to.be.an.instanceof(B)
             expect(dInstance).not.to.be.an.instanceof(C)
 
-            var cInstance = new C("666", 0, 1, 1)
+            let cInstance = new C("666", 0, 1, 1)
             expect(cInstance).to.be.an.instanceof(A)
             expect(cInstance).to.be.an.instanceof(B)
 
-            var bInstance = new B("666", 0, 1, 1)
+            let bInstance = new B("666", 0, 1, 1)
             expect(bInstance).to.be.an.instanceof(A)
         })
 

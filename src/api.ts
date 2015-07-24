@@ -2,16 +2,15 @@
  * defines the public API of Chevrotain.
  * changes here may require major version change. (semVer)
  */
-declare var global
-declare var CHEV_TEST_MODE
+declare let global
+declare let CHEV_TEST_MODE
 /* istanbul ignore next */
-var testMode = (typeof global === "object" && (<any>global).CHEV_TEST_MODE) ||
+let testMode = (typeof global === "object" && (<any>global).CHEV_TEST_MODE) ||
     (typeof window === "object" && (<any>window).CHEV_TEST_MODE)
 
-var API:any = {}
+let API:any = {}
 /* istanbul ignore next */
 if (!testMode) {
-
     // semantic version
     API.VERSION = "0.4.8";
 

@@ -2,7 +2,7 @@ module chevrotain.exceptions {
 
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
-        var recognitionExceptions = [
+        let recognitionExceptions = [
             lang.functionName(MismatchedTokenException),
             lang.functionName(NoViableAltException),
             lang.functionName(EarlyExitException),

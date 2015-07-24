@@ -3,7 +3,7 @@ module chevrotain.resolver {
     import gast = chevrotain.gast
 
     export function resolveGrammar(topLevels:lang.HashTable<gast.Rule>):IParserDefinitionError[] {
-        var refResolver = new GastRefResolverVisitor(topLevels)
+        let refResolver = new GastRefResolverVisitor(topLevels)
         refResolver.resolveRefs()
         return refResolver.errors
     }
@@ -23,10 +23,10 @@ module chevrotain.resolver {
         }
 
         public visitNonTerminal(node:gast.NonTerminal):void {
-            var ref = this.nameToTopRule.get(node.nonTerminalName)
+            let ref = this.nameToTopRule.get(node.nonTerminalName)
 
             if (!ref) {
-                var msg = "Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName
+                let msg = "Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName
                 this.errors.push({
                     message:msg,
                     type:ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,

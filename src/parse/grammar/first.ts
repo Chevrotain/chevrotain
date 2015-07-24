@@ -31,13 +31,13 @@ module chevrotain.first {
     }
 
     export function firstForSequence(prod:gast.AbstractProduction):Function[] {
-        var firstSet:Function[] = []
-        var seq = prod.definition
-        var nextSubProdIdx = 0
-        var hasInnerProdsRemaining = seq.length > nextSubProdIdx
-        var currSubProd
+        let firstSet:Function[] = []
+        let seq = prod.definition
+        let nextSubProdIdx = 0
+        let hasInnerProdsRemaining = seq.length > nextSubProdIdx
+        let currSubProd
         // so we enter the loop at least once (if the definition is not empty
-        var isLastInnerProdOptional = true
+        let isLastInnerProdOptional = true
         // scan a sequence until it's end or until we have found a NONE optional production in it
         while (hasInnerProdsRemaining && isLastInnerProdOptional) {
             currSubProd = seq[nextSubProdIdx]
@@ -51,7 +51,7 @@ module chevrotain.first {
     }
 
     export function firstForBranching(prod:gast.AbstractProduction):Function[] {
-        var allAlternativesFirsts:Function[][] = _.map(prod.definition, (innerProd) => {
+        let allAlternativesFirsts:Function[][] = _.map(prod.definition, (innerProd) => {
             return first(innerProd)
         })
         return _.uniq(_.flatten<Function>(allAlternativesFirsts))

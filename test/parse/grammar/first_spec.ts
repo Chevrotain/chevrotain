@@ -9,42 +9,42 @@ module chevrotain.first.spec {
         "use strict"
 
         it("can compute the first for a terminal", function () {
-            var terminal = new gast.Terminal(t.EntityTok)
-            var actual = first(terminal)
+            let terminal = new gast.Terminal(t.EntityTok)
+            let actual = first(terminal)
             expect(actual.length).to.equal(1)
             expect(actual[0]).to.equal(t.EntityTok)
 
-            var terminal2 = new gast.Terminal(t.CommaTok)
-            var actual2 = first(terminal2)
+            let terminal2 = new gast.Terminal(t.CommaTok)
+            let actual2 = first(terminal2)
             expect(actual2.length).to.equal(1)
             expect(actual2[0]).to.equal(t.CommaTok)
         })
 
         it("can compute the first for a Sequence production ", function () {
-            var seqProduction = new gast.Flat([new gast.Terminal(t.EntityTok)])
-            var actual = first(seqProduction)
+            let seqProduction = new gast.Flat([new gast.Terminal(t.EntityTok)])
+            let actual = first(seqProduction)
             expect(actual.length).to.equal(1)
             expect(actual[0]).to.equal(t.EntityTok)
 
-            var seqProduction2 = new gast.Flat(
+            let seqProduction2 = new gast.Flat(
                 [
                     new gast.Terminal(t.EntityTok),
                     new gast.Option([new gast.Terminal(t.NamespaceTok)])
                 ])
-            var actual2 = first(seqProduction2)
+            let actual2 = first(seqProduction2)
             expect(actual2.length).to.equal(1)
             expect(actual2[0]).to.equal(t.EntityTok)
         })
 
         it("can compute the first for an alternatives production ", function () {
-            var altProduction = new gast.Alternation(
+            let altProduction = new gast.Alternation(
                 [
                     new gast.Terminal(t.EntityTok),
                     new gast.Terminal(t.NamespaceTok),
                     new gast.Terminal(t.TypeTok)
 
                 ])
-            var actual = first(altProduction)
+            let actual = first(altProduction)
             expect(actual.length).to.equal(3)
             expect(actual[0]).to.equal(t.EntityTok)
             expect(actual[1]).to.equal(t.NamespaceTok)
@@ -53,23 +53,23 @@ module chevrotain.first.spec {
         })
 
         it("can compute the first for an production with optional prefix", function () {
-            var withOptionalPrefix = new gast.Flat(
+            let withOptionalPrefix = new gast.Flat(
                 [
                     new gast.Option([new gast.Terminal(t.NamespaceTok)]),
                     new gast.Terminal(t.EntityTok)
                 ])
-            var actual = first(withOptionalPrefix)
+            let actual = first(withOptionalPrefix)
             matchers.setEquality(actual, [t.NamespaceTok, t.EntityTok])
 
 
-            var withTwoOptPrefix = new gast.Flat(
+            let withTwoOptPrefix = new gast.Flat(
                 [
                     new gast.Option([new gast.Terminal(t.NamespaceTok)]),
                     new gast.Option([new gast.Terminal(t.ColonTok)]),
                     new gast.Terminal(t.EntityTok),
                     new gast.Option([new gast.Terminal(t.ConstTok)])
                 ])
-            var actual2 = first(withTwoOptPrefix)
+            let actual2 = first(withTwoOptPrefix)
             matchers.setEquality(actual2, [t.NamespaceTok, t.ColonTok, t.EntityTok])
         })
 

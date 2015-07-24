@@ -23,31 +23,31 @@ module chevrotain.gastBuilder {
 
     // TODO: this regexp creates a constraint on names of Terminals (Tokens).
     // TODO: document and consider reducing the constraint by expanding the regexp
-    var terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-    var terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
+    let terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+    let terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
-    var refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-    var refRegExGlobal = new RegExp(refRegEx.source, "g")
+    let refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+    let refRegExGlobal = new RegExp(refRegEx.source, "g")
 
-    var optionRegEx = /\.\s*OPTION(\d)?\s*\(/
-    var optionRegExGlobal = new RegExp(optionRegEx.source, "g")
+    let optionRegEx = /\.\s*OPTION(\d)?\s*\(/
+    let optionRegExGlobal = new RegExp(optionRegEx.source, "g")
 
-    var manyRegEx = /.\s*MANY(\d)?\s*\(/
-    var manyRegExGlobal = new RegExp(manyRegEx.source, "g")
+    let manyRegEx = /.\s*MANY(\d)?\s*\(/
+    let manyRegExGlobal = new RegExp(manyRegEx.source, "g")
 
-    var atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
-    var atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
+    let atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
+    let atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
 
-    var orRegEx = /\.\s*OR(\d)?\s*\(/
-    var orRegExGlobal = new RegExp(orRegEx.source, "g")
+    let orRegEx = /\.\s*OR(\d)?\s*\(/
+    let orRegExGlobal = new RegExp(orRegEx.source, "g")
 
-    var orPartRegEx = /{\s*(WHEN|ALT)\s*:/g
+    let orPartRegEx = /{\s*(WHEN|ALT)\s*:/g
 
     export interface ITerminalNameToConstructor {
         [fqn: string]: Function
     }
 
-    export var terminalNameToConstructor:ITerminalNameToConstructor = {}
+    export let terminalNameToConstructor:ITerminalNameToConstructor = {}
 
     export function buildTopProduction(impelText:string, name:string, terminals:ITerminalNameToConstructor):gast.Rule {
         // pseudo state. so little state does not yet mandate the complexity of wrapping in a class...
@@ -55,16 +55,16 @@ module chevrotain.gastBuilder {
         terminalNameToConstructor = terminals
         // the top most range must strictly contain all the other ranges
         // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
-        var spacedImpelText = " " + impelText
-        var txtWithoutComments = removeComments(" " + spacedImpelText)
+        let spacedImpelText = " " + impelText
+        let txtWithoutComments = removeComments(" " + spacedImpelText)
         // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
-        var prodRanges = createRanges(txtWithoutComments)
-        var topRange = new r.Range(0, impelText.length + 2)
+        let prodRanges = createRanges(txtWithoutComments)
+        let topRange = new r.Range(0, impelText.length + 2)
         return buildTopLevel(name, topRange, prodRanges, impelText)
     }
 
     function buildTopLevel(name:string, topRange:r.IRange, allRanges:IProdRange[], orgText:string):gast.Rule {
-        var topLevelProd = new gast.Rule(name, [], orgText)
+        let topLevelProd = new gast.Rule(name, [], orgText)
         return buildAbstractProd(topLevelProd, topRange, allRanges)
     }
 
@@ -91,26 +91,26 @@ module chevrotain.gastBuilder {
     }
 
     function buildRefProd(prodRange:IProdRange):gast.NonTerminal {
-        var reResult = refRegEx.exec(prodRange.text)
-        var isImplicitOccurrenceIdx = reResult[1] === undefined
-        var refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
-        var refProdName = reResult[2]
-        var newRef = new gast.NonTerminal(refProdName, undefined, refOccurrence)
+        let reResult = refRegEx.exec(prodRange.text)
+        let isImplicitOccurrenceIdx = reResult[1] === undefined
+        let refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
+        let refProdName = reResult[2]
+        let newRef = new gast.NonTerminal(refProdName, undefined, refOccurrence)
         newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx
         return newRef
     }
 
     function buildTerminalProd(prodRange:IProdRange):gast.Terminal {
-        var reResult = terminalRegEx.exec(prodRange.text)
-        var isImplicitOccurrenceIdx = reResult[1] === undefined
-        var terminalOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
-        var terminalName = reResult[2]
-        var terminalType = terminalNameToConstructor[terminalName]
+        let reResult = terminalRegEx.exec(prodRange.text)
+        let isImplicitOccurrenceIdx = reResult[1] === undefined
+        let terminalOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
+        let terminalName = reResult[2]
+        let terminalType = terminalNameToConstructor[terminalName]
         if (!terminalType) {
             throw Error("Terminal Token name: " + terminalName + " not found")
         }
 
-        var newTerminal = new gast.Terminal(terminalType, terminalOccurrence)
+        let newTerminal = new gast.Terminal(terminalType, terminalOccurrence)
         newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx
         return newTerminal
     }
@@ -122,8 +122,8 @@ module chevrotain.gastBuilder {
                                                                       prodInstance:T,
                                                                       prodRange:IProdRange,
                                                                       allRanges:IProdRange[]):T {
-        var reResult = regEx.exec(prodRange.text)
-        var isImplicitOccurrenceIdx = reResult[1] === undefined
+        let reResult = regEx.exec(prodRange.text)
+        let isImplicitOccurrenceIdx = reResult[1] === undefined
         prodInstance.occurrenceInParent = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
         prodInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
         // <any> due to intellij bugs
@@ -149,10 +149,10 @@ module chevrotain.gastBuilder {
     function buildAbstractProd<T extends AbsProdWithOccurrence | gast.AbstractProduction >(prod:T,
                                                                                            topLevelRange:r.IRange,
                                                                                            allRanges:IProdRange[]):T {
-        var secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
-        var secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
+        let secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
+        let secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
 
-        var definition:gast.IProduction[] = []
+        let definition:gast.IProduction[] = []
         _.forEach(secondLevelInOrder, (prodRng) => {
             definition.push(buildProdGast(prodRng, allRanges))
         });
@@ -164,32 +164,32 @@ module chevrotain.gastBuilder {
 
     export function getDirectlyContainedRanges(y:r.IRange, prodRanges:IProdRange[]):IProdRange[] {
         return _.filter(prodRanges, (x:IProdRange) => {
-            var isXDescendantOfY = y.strictlyContainsRange(x.range)
-            var xDoesNotHaveAnyAncestorWhichIsDecendantOfY = _.every(prodRanges, (maybeAnotherParent:IProdRange) => {
-                var isParentOfX = maybeAnotherParent.range.strictlyContainsRange(x.range)
-                var isChildOfY = maybeAnotherParent.range.isStrictlyContainedInRange(y)
+            let isXDescendantOfY = y.strictlyContainsRange(x.range)
+            let xDoesNotHaveAnyAncestorWhichIsDecendantOfY = _.every(prodRanges, (maybeAnotherParent:IProdRange) => {
+                let isParentOfX = maybeAnotherParent.range.strictlyContainsRange(x.range)
+                let isChildOfY = maybeAnotherParent.range.isStrictlyContainedInRange(y)
                 return !(isParentOfX && isChildOfY)
             })
             return isXDescendantOfY && xDoesNotHaveAnyAncestorWhichIsDecendantOfY
         })
     }
 
-    var singleLineCommentRegEx = /\/\/.*/g
-    var multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g
+    let singleLineCommentRegEx = /\/\/.*/g
+    let multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g
 
     export function removeComments(text:string):string {
-        var noSingleLine = text.replace(singleLineCommentRegEx, "")
-        var noComments = noSingleLine.replace(multiLineCommentRegEx, "")
+        let noSingleLine = text.replace(singleLineCommentRegEx, "")
+        let noComments = noSingleLine.replace(multiLineCommentRegEx, "")
         return noComments
     }
 
     export function createRanges(text:string):IProdRange[] {
-        var terminalRanges = createTerminalRanges(text)
-        var refsRanges = createRefsRanges(text)
-        var atLeastOneRanges = createAtLeastOneRanges(text)
-        var manyRanges = createManyRanges(text)
-        var optionRanges = createOptionRanges(text)
-        var orRanges = createOrRanges(text)
+        let terminalRanges = createTerminalRanges(text)
+        let refsRanges = createRefsRanges(text)
+        let atLeastOneRanges = createAtLeastOneRanges(text)
+        let manyRanges = createManyRanges(text)
+        let optionRanges = createOptionRanges(text)
+        let orRanges = createOrRanges(text)
 
         return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneRanges,
             manyRanges, optionRanges, orRanges)
@@ -216,22 +216,22 @@ module chevrotain.gastBuilder {
     }
 
     export function createOrRanges(text):IProdRange[] {
-        var orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegExGlobal)
+        let orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegExGlobal)
         // have to split up the OR cases into separate FLAT productions
         // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
-        var orSubPartsRanges = createOrPartRanges(orRanges)
+        let orSubPartsRanges = createOrPartRanges(orRanges)
         return _.union(orRanges, orSubPartsRanges)
     }
 
-    var findClosingCurly:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "{", "}")
+    let findClosingCurly:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "{", "}")
 
-    var findClosingParen:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "(", ")")
+    let findClosingParen:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "(", ")")
 
     export function createOrPartRanges(orRanges:IProdRange[]):IProdRange[] {
-        var orPartRanges:IProdRange[] = []
+        let orPartRanges:IProdRange[] = []
         _.forEach(orRanges, (orRange) => {
-            var currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly)
-            var currOrRangeStart = orRange.range.start
+            let currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly)
+            let currOrRangeStart = orRange.range.start
             // fix offsets as we are working on a subset of the text
             _.forEach(currOrParts, (orPart) => {
                 orPart.range.start += currOrRangeStart
@@ -240,7 +240,7 @@ module chevrotain.gastBuilder {
             orPartRanges = _.union(orPartRanges, currOrParts)
         })
 
-        var uniqueOrPartRanges = _.uniq(orPartRanges, (prodRange:IProdRange) => {
+        let uniqueOrPartRanges = _.uniq(orPartRanges, (prodRange:IProdRange) => {
             // using "~" as a separator for the identify function as its not a valid char in javascript
             return prodRange.type + "~" + prodRange.range.start + "~" + prodRange.range.end + "~" + prodRange.text
         })
@@ -249,13 +249,13 @@ module chevrotain.gastBuilder {
     }
 
     function createRefOrTerminalProdRangeInternal(text:string, prodType:ProdType, pattern:RegExp):IProdRange[] {
-        var prodRanges:IProdRange[] = []
-        var matched:RegExpExecArray
+        let prodRanges:IProdRange[] = []
+        let matched:RegExpExecArray
         while (matched = pattern.exec(text)) {
-            var start = matched.index
-            var stop = pattern.lastIndex
-            var currRange = new r.Range(start, stop)
-            var currText = matched[0]
+            let start = matched.index
+            let stop = pattern.lastIndex
+            let currRange = new r.Range(start, stop)
+            let currText = matched[0]
             prodRanges.push({range: currRange, text: currText, type: prodType})
         }
         return prodRanges
@@ -270,26 +270,26 @@ module chevrotain.gastBuilder {
                                              pattern:RegExp,
                                              findTerminatorOffSet:(startAt:number,
                                                                    text:string) => number):IProdRange[] {
-        var operatorRanges:IProdRange[] = []
-        var matched:RegExpExecArray
+        let operatorRanges:IProdRange[] = []
+        let matched:RegExpExecArray
         while (matched = pattern.exec(text)) {
-            var start = matched.index
-            var stop = findTerminatorOffSet(start + matched[0].length, text)
-            var currRange = new r.Range(start, stop)
-            var currText = text.substr(start, stop - start + 1)
+            let start = matched.index
+            let stop = findTerminatorOffSet(start + matched[0].length, text)
+            let currRange = new r.Range(start, stop)
+            let currText = text.substr(start, stop - start + 1)
             operatorRanges.push({range: currRange, text: currText, type: prodType})
         }
         return operatorRanges
     }
 
     export function findClosingOffset(opening:string, closing:string, start:number, text:string):number {
-        var parenthesisStack = [1]
+        let parenthesisStack = [1]
 
-        var i = 0
+        let i = 0
         while (!(_.isEmpty(parenthesisStack)) && i + start < text.length) {
             // TODO: verify this is indeed meant to skip the first character?
             i++
-            var nextChar = text.charAt(start + i)
+            let nextChar = text.charAt(start + i)
             if (nextChar === opening) {
                 parenthesisStack.push(1)
             }

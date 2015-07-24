@@ -38,7 +38,7 @@ module chevrotain.recognizer.lookahead.spec {
         public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
 
         private parseManyOptionsRule():string {
-            var total = ""
+            let total = ""
 
             this.OPTION1(() => {
                 this.CONSUME1(OneTok)
@@ -83,7 +83,7 @@ module chevrotain.recognizer.lookahead.spec {
         public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
 
         private parseManyOptionsRule():string {
-            var total = ""
+            let total = ""
 
             this.OPTION1(isOneTok, () => {
                 this.CONSUME1(OneTok)
@@ -137,44 +137,44 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", function () {
 
         it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
-            var parser = new OptionsImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OptionsImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
 
         it("can automatically compute lookahead for OPTION1", function () {
-            var input = [new OneTok()]
-            var parser = new OptionsImplicitLookAheadParser(input)
+            let input = [new OneTok()]
+            let parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("1")
         })
 
         it("can automatically compute lookahead for OPTION2", function () {
-            var input = [new TwoTok()]
-            var parser = new OptionsImplicitLookAheadParser(input)
+            let input = [new TwoTok()]
+            let parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("2")
         })
 
         it("can automatically compute lookahead for OPTION3", function () {
-            var input = [new ThreeTok()]
-            var parser = new OptionsImplicitLookAheadParser(input)
+            let input = [new ThreeTok()]
+            let parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("3")
         })
 
         it("can automatically compute lookahead for OPTION4", function () {
-            var input = [new FourTok()]
-            var parser = new OptionsImplicitLookAheadParser(input)
+            let input = [new FourTok()]
+            let parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("4")
         })
 
         it("can automatically compute lookahead for OPTION5", function () {
-            var input = [new FiveTok()]
-            var parser = new OptionsImplicitLookAheadParser(input)
+            let input = [new FiveTok()]
+            let parser = new OptionsImplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("5")
         })
 
         it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
-            var parser = new OptionsImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OptionsImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(5)
         })
     })
@@ -183,38 +183,38 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for OPTION", function () {
 
         it("can accept lookahead function param for OPTION1", function () {
-            var input = [new OneTok()]
-            var parser = new OptionsExplicitLookAheadParser(input)
+            let input = [new OneTok()]
+            let parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("1")
         })
 
         it("can accept lookahead function param for OPTION2", function () {
-            var input = [new TwoTok()]
-            var parser = new OptionsExplicitLookAheadParser(input)
+            let input = [new TwoTok()]
+            let parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("2")
         })
 
         it("can accept lookahead function param for OPTION3", function () {
-            var input = [new ThreeTok()]
-            var parser = new OptionsExplicitLookAheadParser(input)
+            let input = [new ThreeTok()]
+            let parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("3")
         })
 
         it("can accept lookahead function param for OPTION4", function () {
-            var input = [new FourTok()]
-            var parser = new OptionsExplicitLookAheadParser(input)
+            let input = [new FourTok()]
+            let parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("4")
         })
 
         it("can accept lookahead function param for OPTION5", function () {
-            var input = [new FiveTok()]
-            var parser = new OptionsExplicitLookAheadParser(input)
+            let input = [new FiveTok()]
+            let parser = new OptionsExplicitLookAheadParser(input)
             expect(parser.manyOptionsRule()).to.equal("5")
         })
 
         it("Will not cache any ImplicitLookahead functions", function () {
-            var parser = new OptionsExplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OptionsExplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
     })
@@ -234,7 +234,7 @@ module chevrotain.recognizer.lookahead.spec {
         public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
 
         private parseManyRule():string {
-            var total = ""
+            let total = ""
 
             this.MANY1(() => {
                 this.CONSUME1(OneTok)
@@ -279,7 +279,7 @@ module chevrotain.recognizer.lookahead.spec {
         public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
 
         private parseManyRule():string {
-            var total = ""
+            let total = ""
 
             this.MANY1(isOneTok, () => {
                 this.CONSUME1(OneTok)
@@ -313,50 +313,50 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The implicit lookahead calculation functionality of the Recognizer For MANY", function () {
 
         it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
-            var parser = new ManyImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new ManyImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
 
         it("can automatically compute lookahead for MANY1", function () {
-            var input = [new OneTok()]
-            var parser = new ManyImplicitLookAheadParser(input)
+            let input = [new OneTok()]
+            let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("1")
         })
 
         it("can automatically compute lookahead for MANY2", function () {
-            var input = [new TwoTok()]
-            var parser = new ManyImplicitLookAheadParser(input)
+            let input = [new TwoTok()]
+            let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("2")
         })
 
         it("can automatically compute lookahead for MANY3", function () {
-            var input = [new ThreeTok()]
-            var parser = new ManyImplicitLookAheadParser(input)
+            let input = [new ThreeTok()]
+            let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("3")
         })
 
         it("can automatically compute lookahead for MANY4", function () {
-            var input = [new FourTok()]
-            var parser = new ManyImplicitLookAheadParser(input)
+            let input = [new FourTok()]
+            let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("4")
         })
 
         it("can automatically compute lookahead for MANY5", function () {
-            var input = [new FiveTok()]
-            var parser = new ManyImplicitLookAheadParser(input)
+            let input = [new FiveTok()]
+            let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("5")
         })
 
         it("can accept lookahead function param for flow mixing several MANYs", function () {
-            var input = [new OneTok(), new OneTok(), new ThreeTok(), new ThreeTok(), new ThreeTok(), new FiveTok()]
-            var parser = new ManyImplicitLookAheadParser(input)
+            let input = [new OneTok(), new OneTok(), new ThreeTok(), new ThreeTok(), new ThreeTok(), new FiveTok()]
+            let parser = new ManyImplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("113335")
         })
 
         it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
-            var parser = new ManyImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new ManyImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(5)
         })
     })
@@ -365,44 +365,44 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for MANY", function () {
 
         it("can accept lookahead function param for MANY1", function () {
-            var input = [new OneTok()]
-            var parser = new ManyExplicitLookAheadParser(input)
+            let input = [new OneTok()]
+            let parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("1")
         })
 
         it("can accept lookahead function param for MANY2", function () {
-            var input = [new TwoTok()]
-            var parser = new ManyExplicitLookAheadParser(input)
+            let input = [new TwoTok()]
+            let parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("2")
         })
 
         it("can accept lookahead function param for MANY3", function () {
-            var input = [new ThreeTok()]
-            var parser = new ManyExplicitLookAheadParser(input)
+            let input = [new ThreeTok()]
+            let parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("3")
         })
 
         it("can accept lookahead function param for MANY4", function () {
-            var input = [new FourTok()]
-            var parser = new ManyExplicitLookAheadParser(input)
+            let input = [new FourTok()]
+            let parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("4")
         })
 
         it("can accept lookahead function param for MANY5", function () {
-            var input = [new FiveTok()]
-            var parser = new ManyExplicitLookAheadParser(input)
+            let input = [new FiveTok()]
+            let parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("5")
         })
 
         it("can accept lookahead function param for flow mixing several MANYs", function () {
-            var input = [new OneTok(), new OneTok(), new ThreeTok(), new ThreeTok(), new ThreeTok(), new FiveTok()]
-            var parser = new ManyExplicitLookAheadParser(input)
+            let input = [new OneTok(), new OneTok(), new ThreeTok(), new ThreeTok(), new ThreeTok(), new FiveTok()]
+            let parser = new ManyExplicitLookAheadParser(input)
             expect(parser.manyRule()).to.equal("113335")
         })
 
         it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
-            var parser = new ManyExplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new ManyExplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
     })
@@ -422,7 +422,7 @@ module chevrotain.recognizer.lookahead.spec {
         public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
 
         private parseAtLeastOneRule():string {
-            var total = ""
+            let total = ""
 
             this.AT_LEAST_ONE1(() => {
                 this.CONSUME1(OneTok)
@@ -467,7 +467,7 @@ module chevrotain.recognizer.lookahead.spec {
         public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
 
         private parseAtLeastOneRule():string {
-            var total = ""
+            let total = ""
 
             this.AT_LEAST_ONE1(isOneTok, () => {
                 this.CONSUME1(OneTok)
@@ -501,27 +501,27 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE", function () {
 
         it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
-            var parser = new AtLeastOneImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new AtLeastOneImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
 
         it("can accept lookahead function param for AT_LEAST_ONE1-5", function () {
-            var input = [new OneTok(), new TwoTok(), new TwoTok(), new ThreeTok(),
+            let input = [new OneTok(), new TwoTok(), new TwoTok(), new ThreeTok(),
                 new FourTok(), new FourTok(), new FiveTok()]
-            var parser = new AtLeastOneImplicitLookAheadParser(input)
+            let parser = new AtLeastOneImplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).to.equal("1223445")
         })
 
         it("will fail when zero occurrences of AT_LEAST_ONE in input", function () {
-            var input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
-            var parser = new AtLeastOneImplicitLookAheadParser(input)
+            let input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
+            let parser = new AtLeastOneImplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).to.equal("-666")
         })
 
         it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
-            var parser = new AtLeastOneImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new AtLeastOneImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(5)
         })
     })
@@ -529,21 +529,21 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for AT_LEAST_ONE", function () {
 
         it("can accept lookahead function param for AT_LEAST_ONE1-5", function () {
-            var input = [new OneTok(), new TwoTok(), new TwoTok(), new ThreeTok(),
+            let input = [new OneTok(), new TwoTok(), new TwoTok(), new ThreeTok(),
                 new FourTok(), new FourTok(), new FiveTok()]
-            var parser = new AtLeastOneExplicitLookAheadParser(input)
+            let parser = new AtLeastOneExplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).to.equal("1223445")
         })
 
         it("will fail when zero occurrences of AT_LEAST_ONE in input", function () {
-            var input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
-            var parser = new AtLeastOneExplicitLookAheadParser(input)
+            let input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
+            let parser = new AtLeastOneExplicitLookAheadParser(input)
             expect(parser.atLeastOneRule()).to.equal("-666")
         })
 
         it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
-            var parser = new AtLeastOneExplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new AtLeastOneExplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
     })
@@ -563,7 +563,7 @@ module chevrotain.recognizer.lookahead.spec {
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
 
         private parseOrRule():string {
-            var total = ""
+            let total = ""
 
             // @formatter:off
             this.OR1([
@@ -689,26 +689,26 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The implicit lookahead calculation functionality of the Recognizer For OR", function () {
 
         it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
-            var parser = new OrImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OrImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
 
         it("can compute the lookahead automatically for OR1-5", function () {
-            var input = [new OneTok(), new TwoTok(), new ThreeTok(), new FourTok(), new FiveTok()]
-            var parser = new OrImplicitLookAheadParser(input)
+            let input = [new OneTok(), new TwoTok(), new ThreeTok(), new FourTok(), new FiveTok()]
+            let parser = new OrImplicitLookAheadParser(input)
             expect(parser.orRule()).to.equal("A1B2C3D4E5")
         })
 
         it("will fail when none of the alternatives match", function () {
-            var input = [new SixTok()]
-            var parser = new OrImplicitLookAheadParser(input)
+            let input = [new SixTok()]
+            let parser = new OrImplicitLookAheadParser(input)
             expect(parser.orRule()).to.equal("-666")
         })
 
         it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
-            var parser = new OrImplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OrImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(5)
         })
     })
@@ -727,7 +727,7 @@ module chevrotain.recognizer.lookahead.spec {
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
 
         private parseOrRule():string {
-            var total = ""
+            let total = ""
 
             // @formatter:off
             this.OR1([
@@ -761,26 +761,26 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The Explicit lookahead functionality of the Recognizer for OR", function () {
 
         it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
-            var parser = new OrExplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OrExplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
 
         it("can accept the lookahead param explicitly for OR", function () {
-            var input = [new TwoTok()]
-            var parser = new OrExplicitLookAheadParser(input)
+            let input = [new TwoTok()]
+            let parser = new OrExplicitLookAheadParser(input)
             expect(parser.orRule()).to.equal("2")
         })
 
         it("will fail when none of the alternatives match", function () {
-            var input = [new SixTok()]
-            var parser = new OrExplicitLookAheadParser(input)
+            let input = [new SixTok()]
+            let parser = new OrExplicitLookAheadParser(input)
             expect(parser.orRule()).to.equal("-666")
         })
 
         it("will NOT cache the generatedLookAhead functions in explicit mode", function () {
-            var parser = new OrExplicitLookAheadParser()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OrExplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
     })
@@ -821,7 +821,7 @@ module chevrotain.recognizer.lookahead.spec {
     describe("OR production ambiguity detection when using implicit lookahead calculation", function () {
 
         it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", function () {
-            var parser = new OrAmbiguityLookAheadParser()
+            let parser = new OrAmbiguityLookAheadParser()
             expect(() => parser.ambiguityRule()).to.throw()
         })
     })
@@ -840,7 +840,7 @@ module chevrotain.recognizer.lookahead.spec {
         public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
 
         private parseOrRule():string {
-            var total = ""
+            let total = ""
 
             // @formatter:off
             this.OR([
@@ -962,26 +962,26 @@ module chevrotain.recognizer.lookahead.spec {
     describe("The implicit lookahead calculation functionality of the Recognizer For OR (with IGNORE_AMBIGUITIES)", function () {
 
         it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
-            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })
 
         it("can compute the lookahead automatically for OR1-5", function () {
-            var input = [new OneTok(), new TwoTok(), new ThreeTok(), new FourTok(), new FiveTok()]
-            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
+            let input = [new OneTok(), new TwoTok(), new ThreeTok(), new FourTok(), new FiveTok()]
+            let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
             expect(parser.orRule()).to.equal("A1B2C3D4E5")
         })
 
         it("will fail when none of the alternatives match", function () {
-            var input = [new SixTok()]
-            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
+            let input = [new SixTok()]
+            let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
             expect(parser.orRule()).to.equal("-666")
         })
 
         it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
-            var parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
-            var lookaheadCache = parser.getLookAheadCache()
+            let parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
+            let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(5)
         })
     })

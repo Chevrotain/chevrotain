@@ -64,7 +64,7 @@ module chevrotain {
          *     this is usually used for ignoring whitespace/comments
          *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
          *
-         *  3. With a PATTERN property that has the value of the var Lexer.NA defined above.
+         *  3. With a PATTERN property that has the value of the let Lexer.NA defined above.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
          *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *
@@ -112,10 +112,10 @@ module chevrotain {
         constructor(protected tokenClasses:TokenConstructor[], deferDefinitionErrorsHandling:boolean = false) {
             this.lexerDefinitionErrors = validatePatterns(tokenClasses)
             if (!_.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
-                var allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
+                let allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
                     return error.message
                 })
-                var allErrMessagesString = allErrMessages.join("-----------------------\n")
+                let allErrMessagesString = allErrMessages.join("-----------------------\n")
                 throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString)
             }
 
@@ -123,7 +123,7 @@ module chevrotain {
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
             if (_.isEmpty(this.lexerDefinitionErrors)) {
-                var analyzeResult = analyzeTokenClasses(tokenClasses)
+                let analyzeResult = analyzeTokenClasses(tokenClasses)
                 this.allPatterns = analyzeResult.allPatterns
                 this.patternIdxToClass = analyzeResult.patternIdxToClass
                 this.patternIdxToGroup = analyzeResult.patternIdxToGroup
@@ -142,21 +142,21 @@ module chevrotain {
          * @returns {{tokens: {Token}[], errors: string[]}}
          */
         public tokenize(text:string):ILexingResult {
-            var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
+            let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
                 canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT
-            var orgInput = text
-            var offset = 0
-            var matchedTokens = []
-            var errors:ILexingError[] = []
-            var line = 1
-            var column = 1
-            var groups:any = _.clone(this.emptyGroups)
+            let orgInput = text
+            let offset = 0
+            let matchedTokens = []
+            let errors:ILexingError[] = []
+            let line = 1
+            let column = 1
+            let groups:any = _.clone(this.emptyGroups)
 
             if (!_.isEmpty(this.lexerDefinitionErrors)) {
-                var allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
+                let allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
                     return error.message
                 })
-                var allErrMessagesString = allErrMessages.join("-----------------------\n")
+                let allErrMessagesString = allErrMessages.join("-----------------------\n")
                 throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString)
             }
 
@@ -198,7 +198,7 @@ module chevrotain {
                     column = column + imageLength // TODO: with newlines the column may change be assigned twice
                     canMatchedContainLineTerminator = this.patternIdxToCanLineTerminator[i]
                     if (canMatchedContainLineTerminator) {
-                        var lineTerminatorsInMatch = countLineTerminators(matchedImage)
+                        let lineTerminatorsInMatch = countLineTerminators(matchedImage)
                         // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
                         if (lineTerminatorsInMatch !== 0) {
                             line = line + lineTerminatorsInMatch
@@ -232,10 +232,10 @@ module chevrotain {
 
                 }
                 else { // error recovery, drop characters until we identify a valid token's start point
-                    var errorStartOffset = offset
-                    var errorLine = line
-                    var errorColumn = column
-                    var foundResyncPoint = false
+                    let errorStartOffset = offset
+                    let errorLine = line
+                    let errorColumn = column
+                    let foundResyncPoint = false
                     while (!foundResyncPoint && text.length > 0) {
                         // drop chars until we succeed in matching something
                         droppedChar = text.charCodeAt(0)

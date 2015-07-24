@@ -76,7 +76,7 @@ module chevrotain.examples.recovery.switchcase {
             // previous grammar rule invocations.
             this.invalidIdx = 1;
 
-            var retObj:RetType = {}
+            let retObj:RetType = {}
 
             this.CONSUME(SwitchTok)
             this.CONSUME(LParenTok)
@@ -100,7 +100,7 @@ module chevrotain.examples.recovery.switchcase {
         }
 
         private parseCaseStmt():RetType {
-            var keyTok, valueTok, key, value
+            let keyTok, valueTok, key, value
 
             this.CONSUME(CaseTok)
             keyTok = this.CONSUME(StringTok)
@@ -113,7 +113,7 @@ module chevrotain.examples.recovery.switchcase {
 
             key = keyTok.image
             value = parseInt(valueTok.image, 10)
-            var caseKeyValue:RetType = {}
+            let caseKeyValue:RetType = {}
             caseKeyValue[key] = value
             return caseKeyValue
         }
@@ -124,7 +124,7 @@ module chevrotain.examples.recovery.switchcase {
 
         private INVALID():() => RetType {
             return () => {
-                var retObj:RetType = {}
+                let retObj:RetType = {}
                 retObj["invalid" + this.invalidIdx++] = undefined;
                 return retObj
             }

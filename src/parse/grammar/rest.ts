@@ -7,7 +7,7 @@ module chevrotain.rest {
 
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
             _.forEach(prod.definition, (subProd:gast.IProduction, index) => {
-                var currRest = _.drop(prod.definition, index + 1)
+                let currRest = _.drop(prod.definition, index + 1)
 
                 if (subProd instanceof g.NonTerminal) {
                     this.walkProdRef(<g.NonTerminal>subProd, currRest, prevRest)
@@ -40,37 +40,37 @@ module chevrotain.rest {
 
         walkFlat(flatProd:g.Flat, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABCDEF => after the D the rest is EF
-            var fullOrRest = currRest.concat(prevRest)
+            let fullOrRest = currRest.concat(prevRest)
             this.walk(flatProd, <any>fullOrRest)
         }
 
         walkOption(optionProd:g.Option, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(DE)?F => after the (DE)? the rest is F
-            var fullOrRest = currRest.concat(prevRest)
+            let fullOrRest = currRest.concat(prevRest)
             this.walk(optionProd, <any>fullOrRest)
         }
 
         walkAtLeastOne(atLeastOneProd:g.RepetitionMandatory, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
-            var fullAtLeastOneRest:g.IProduction[] = [new g.Option(atLeastOneProd.definition)].concat(<any>currRest, <any>prevRest)
+            let fullAtLeastOneRest:g.IProduction[] = [new g.Option(atLeastOneProd.definition)].concat(<any>currRest, <any>prevRest)
             this.walk(atLeastOneProd, fullAtLeastOneRest)
         }
 
         walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(DE)*F => after the (DE)* the rest is (DE)?F
-            var fullManyRest:g.IProduction[] = [new g.Option(manyProd.definition)].concat(<any>currRest, <any>prevRest)
+            let fullManyRest:g.IProduction[] = [new g.Option(manyProd.definition)].concat(<any>currRest, <any>prevRest)
             this.walk(manyProd, fullManyRest)
         }
 
         walkOr(orProd:g.Alternation, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
-            var fullOrRest = currRest.concat(prevRest)
+            let fullOrRest = currRest.concat(prevRest)
             // walk all different alternatives
             _.forEach(orProd.definition, (alt) => {
                 // wrapping each alternative in a single definition wrapper
                 // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
                 // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
-                var prodWrapper = new gast.Flat([alt])
+                let prodWrapper = new gast.Flat([alt])
                 this.walk(prodWrapper, <any>fullOrRest)
             })
         }

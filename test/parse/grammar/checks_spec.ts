@@ -6,7 +6,7 @@ module chevrotain.checks.spec {
 
         it("validates every one of the TOP_RULEs in the input", function () {
 
-            var expectedErrorsNoMsg = [{
+            let expectedErrorsNoMsg = [{
                 "type":       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
                 "ruleName":   "qualifiedNameErr1",
                 "dslName":    "CONSUME",
@@ -32,7 +32,7 @@ module chevrotain.checks.spec {
             }]
 
 
-            var qualifiedNameErr1 = new gast.Rule("qualifiedNameErr1", [
+            let qualifiedNameErr1 = new gast.Rule("qualifiedNameErr1", [
                 new gast.Terminal(samples.IdentTok, 1),
                 new gast.Repetition([
                     new gast.Terminal(samples.DotTok),
@@ -40,7 +40,7 @@ module chevrotain.checks.spec {
                 ])
             ])
 
-            var qualifiedNameErr2 = new gast.Rule("qualifiedNameErr2", [
+            let qualifiedNameErr2 = new gast.Rule("qualifiedNameErr2", [
                 new gast.Terminal(samples.IdentTok, 1),
                 new gast.Repetition([
                     new gast.Terminal(samples.DotTok),
@@ -51,20 +51,20 @@ module chevrotain.checks.spec {
                     new gast.Terminal(samples.IdentTok, 2)
                 ])
             ])
-            var actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
+            let actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
             expect(actualErrors.length).to.equal(4)
 
-            var actualErrorsNoMsg = _.map(actualErrors, err => _.omit(err, "message"))
+            let actualErrorsNoMsg = _.map(actualErrors, err => _.omit(err, "message"))
             expect(actualErrorsNoMsg).to.deep.include.members(expectedErrorsNoMsg)
             expect(expectedErrorsNoMsg).to.deep.include.members(actualErrorsNoMsg)
         })
 
         it("does not allow duplicate grammar rule names", function () {
-            var noErrors = validateRuleName("A", ["B", "C"], "className")
+            let noErrors = validateRuleName("A", ["B", "C"], "className")
             //noinspection BadExpressionStatementJS
             expect(noErrors).to.be.empty
 
-            var duplicateErr = validateRuleName("A", ["A", "B", "C"], "className")
+            let duplicateErr = validateRuleName("A", ["A", "B", "C"], "className")
             //noinspection BadExpressionStatementJS
             expect(duplicateErr).to.have.length(1)
             expect(duplicateErr[0]).to.have.property("message")
@@ -73,19 +73,19 @@ module chevrotain.checks.spec {
         })
 
         it("only allows a subset of ECMAScript identifiers as rule names", function () {
-            var res1 = validateRuleName("1baa", [], "className")
+            let res1 = validateRuleName("1baa", [], "className")
             expect(res1).to.have.lengthOf(1)
             expect(res1[0]).to.have.property("message")
             expect(res1[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
             expect(res1[0]).to.have.property("ruleName", "1baa")
 
-            var res2 = validateRuleName("שלום", [], "className")
+            let res2 = validateRuleName("שלום", [], "className")
             expect(res2).to.have.lengthOf(1)
             expect(res2[0]).to.have.property("message")
             expect(res2[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
             expect(res2[0]).to.have.property("ruleName", "שלום")
 
-            var res3 = validateRuleName("$bamba", [], "className")
+            let res3 = validateRuleName("$bamba", [], "className")
             expect(res3).to.have.lengthOf(1)
             expect(res3[0]).to.have.property("message")
             expect(res3[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
@@ -96,32 +96,32 @@ module chevrotain.checks.spec {
 
     describe("identifyProductionForDuplicates function", function () {
         it("generates DSL code for a ProdRef", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.NonTerminal("ActionDeclaration"))
+            let dslCode = identifyProductionForDuplicates(new gast.NonTerminal("ActionDeclaration"))
             expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration")
         })
 
         it("generates DSL code for a OPTION", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.Option([], 3))
+            let dslCode = identifyProductionForDuplicates(new gast.Option([], 3))
             expect(dslCode).to.equal("OPTION_#_3_#_")
         })
 
         it("generates DSL code for a AT_LEAST_ONE", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.RepetitionMandatory([]))
+            let dslCode = identifyProductionForDuplicates(new gast.RepetitionMandatory([]))
             expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_")
         })
 
         it("generates DSL code for a MANY", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.Repetition([], 5))
+            let dslCode = identifyProductionForDuplicates(new gast.Repetition([], 5))
             expect(dslCode).to.equal("MANY_#_5_#_")
         })
 
         it("generates DSL code for a OR", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.Alternation([], 1))
+            let dslCode = identifyProductionForDuplicates(new gast.Alternation([], 1))
             expect(dslCode).to.equal("OR_#_1_#_")
         })
 
         it("generates DSL code for a Terminal", function () {
-            var dslCode = identifyProductionForDuplicates(new gast.Terminal(samples.IdentTok, 4))
+            let dslCode = identifyProductionForDuplicates(new gast.Terminal(samples.IdentTok, 4))
             expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
         })
     })
@@ -130,13 +130,13 @@ module chevrotain.checks.spec {
     describe("OccurrenceValidationCollector GASTVisitor class", function () {
 
         it("collects all the productions relevant to occurrence validation", function () {
-            var qualifiedNameVisitor = new OccurrenceValidationCollector()
+            let qualifiedNameVisitor = new OccurrenceValidationCollector()
             samples.qualifiedName.accept(qualifiedNameVisitor)
             expect(qualifiedNameVisitor.allProductions.length).to.equal(4)
 
             // TODO: check set equality
 
-            var actionDecVisitor = new OccurrenceValidationCollector()
+            let actionDecVisitor = new OccurrenceValidationCollector()
             samples.actionDec.accept(actionDecVisitor)
             expect(actionDecVisitor.allProductions.length).to.equal(13)
 
@@ -201,8 +201,8 @@ module chevrotain.checks.spec {
         })
     }
 
-    var myToken = extendToken("myToken")
-    var myOtherToken = extendToken("myOtherToken")
+    let myToken = extendToken("myToken")
+    let myOtherToken = extendToken("myOtherToken")
 
     class ValidOccurrenceNumUsageParser extends Parser {
 
@@ -243,7 +243,7 @@ module chevrotain.checks.spec {
 
         it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
             //noinspection JSUnusedLocalSymbols
-            var parser = new ValidOccurrenceNumUsageParser()
+            let parser = new ValidOccurrenceNumUsageParser()
         })
     })
 

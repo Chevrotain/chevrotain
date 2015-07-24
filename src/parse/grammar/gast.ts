@@ -12,7 +12,7 @@ module chevrotain.gast {
     }
 
     export function isOptionalProd(prod:IProduction):boolean {
-        var isDirectlyOptional = prod instanceof Option || prod instanceof Repetition
+        let isDirectlyOptional = prod instanceof Option || prod instanceof Repetition
         if (isDirectlyOptional) {
             return true
         }
@@ -40,7 +40,7 @@ module chevrotain.gast {
         return prod instanceof Alternation
     }
 
-    var productionToDslName = {}
+    let productionToDslName = {}
     productionToDslName[lang.functionName(NonTerminal)] = "SUBRULE"
     productionToDslName[lang.functionName(Option)] = "OPTION"
     productionToDslName[lang.functionName(RepetitionMandatory)] = "AT_LEAST_ONE"
@@ -50,8 +50,8 @@ module chevrotain.gast {
 
 
     export function getProductionDslName(prod:IProductionWithOccurrence):string {
-        var clazz = prod.constructor
-        var prodName = lang.functionName(clazz)
+        let clazz = prod.constructor
+        let prodName = lang.functionName(clazz)
         return productionToDslName[prodName]
     }
 
