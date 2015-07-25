@@ -256,7 +256,7 @@
         parserErrorsMarkers = []
 
         _.forEach(parser.definitionErrors, function (currParserDefError) {
-            errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), javaScriptEditor)
+            errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), parser.getGAstProductions(), javaScriptEditor)
             _.forEach(errPositions, function (currPos) {
                 marker = javaScriptEditor.markText(currPos.start, currPos.end, {
                     className: "markTextError",

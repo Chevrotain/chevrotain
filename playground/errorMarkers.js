@@ -25,6 +25,7 @@ function getLexerErrorStartStopPos(lexErr, parserImplText, positionHelper) {
     }
 }
 
+
 /**
  * @param {RegExp} regExp - the regExp whose literal we are seeking in the text.
  * @param {string} text - the text to search in.
@@ -47,6 +48,7 @@ function locateRegExpLiteral(regExp, text, positionHelper, times) {
         return {start: startPos, end: endPos}
     })
 }
+
 
 /**
  *
@@ -72,6 +74,7 @@ function locateExtendTokenPos(tokenClass, text, positionHelper) {
     var endPos = positionHelper.posFromIndex(endOffset)
     return {start: startPos, end: endPos}
 }
+
 
 /**
  * locates the closing parenthesis of a function invocation.
@@ -103,20 +106,25 @@ function locateClosingParenthesis(startOffset, text) {
 /**
  * @param {chevrotain.IParserDefinitionError} parseErr
  * @param {string} parserImplText
+ * @param {lang.HashTable<gast.Rule>} gAstProductions
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}[]}
  */
-function getParserErrorStartStopPos(parseErr, parserImplText, positionHelper) {
+function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, positionHelper) {
+    var ruleText
     switch (parseErr.type) {
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS:
+            return locateDuplicateProductions()
             break
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME:
         case chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME:
             return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
             break
         case chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF:
+            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            return locateUnresolvedSubruleRef(parserImplText, ruleText, parseErr.unresolvedRefName, positionHelper)
             break
         default:
             throw new Error("none exhaustive match ->" + parseErr.type + "<-")
@@ -150,4 +158,36 @@ function locateRuleDefinition(ruleName, text, positionHelper) {
     }
 
     return ruleDefPositions
+}
+
+
+/**
+ * @param {string} fullText - the full text to search in.
+ * @param {string} ruleText - a subset of the full text to search in
+ * @param {string} unresolvedRefName - the name of the unresolved
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
+ *
+ * @return {{start:{line:number, column:number},
+ *             end:{line:number, column:number}}
+ */
+// TODO: extract common logic with locateRuleDefinition ?
+function locateUnresolvedSubruleRef(fullText, ruleText, unresolvedRefName, positionHelper) {
+    var ruleTextStartOffset = fullText.indexOf(ruleText)
+    // the capturing group for the '.rule(' part of the seekerRegExp
+    var patternPrefixGroup = 1
+    var patternRuleRefGroup = 2
+    var soughtPattern = "(\\.SUBRULE(?:\\d)?\\s*\\(.*)(" + unresolvedRefName + ")"
+    var seekerRegExp = new RegExp(soughtPattern, "g")
+
+    var unresolvedRefPos = []
+    var execResult
+    while ((execResult = seekerRegExp.exec(ruleText))) {
+        var startOffset = ruleTextStartOffset + execResult.index + execResult[patternPrefixGroup].length
+        var endOffset = startOffset + execResult[patternRuleRefGroup].length
+        var startPos = positionHelper.posFromIndex(startOffset)
+        var endPos = positionHelper.posFromIndex(endOffset)
+        unresolvedRefPos.push({start: startPos, end: endPos})
+    }
+
+    return unresolvedRefPos
 }
