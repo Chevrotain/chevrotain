@@ -63,7 +63,7 @@ namespace chevrotain {
          *     this is usually used for ignoring whitespace/comments
          *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
          *
-         *  3. With a PATTERN property that has the value of the let Lexer.NA defined above.
+         *  3. With a PATTERN property that has the value of the var Lexer.NA defined above.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
          *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *

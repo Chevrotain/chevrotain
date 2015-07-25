@@ -34,6 +34,10 @@ namespace chevrotain {
         parameter?:string
     }
 
+    export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
+        unresolvedRefName:string
+    }
+
     // parameters needed to compute the key in the FOLLOW_SET map.
     export interface IFollowKey {
         ruleName: string
