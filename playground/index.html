@@ -101,6 +101,7 @@
     var inputEditor = null
     var inputEditorMarkers = []
     var lexerErrorsMarkers = []
+    var parserErrorsMarkers = []
 
     function lexAndParse(text, lexer, parser, startRuleName) {
         var lexResult = lexer.tokenize(text)
@@ -136,14 +137,12 @@
         lexer = editorFuncVal.lexer
         markLexerDefinitionErrors(lexer)
 
+
         defaultRuleName = editorFuncVal.defaultRule
         var errMsgDiv = $("#errorMessagesDiv")
         errMsgDiv.empty()
-        try {
-            parser = new parserConstructor()
-        } catch (error) {
-//            errMsgDiv.append($('<h3 class="errorMessage">' + error + '</h3>'))
-        }
+        parser = new parserConstructor()
+        markParserDefinitionErrors(parser)
         var topRules = parser.getGAstProductions().values()
         renderSyntaxDiagrams(topRules, !$("#chooseTerminalPrintStyle").is(':checked'))
     }
@@ -248,6 +247,26 @@
         })
     }
 
+    // TODO extract common logic with markLexerDefinitonErrors
+    function markParserDefinitionErrors(parser) {
+        var marker, errPositions
+        _.forEach(parserErrorsMarkers, function (currMarker) {
+            currMarker.clear()
+        })
+        parserErrorsMarkers = []
+
+        _.forEach(parser.definitionErrors, function (currParserDefError) {
+            errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), javaScriptEditor)
+            _.forEach(errPositions, function (currPos) {
+                marker = javaScriptEditor.markText(currPos.start, currPos.end, {
+                    className: "markTextError",
+                    title    : currParserDefError.message
+                })
+                parserErrorsMarkers.push(marker)
+            })
+        })
+    }
+
     function updateSamplesDropDown() {
         var samplesDropdown = $("#samples-choice")
         var examplesDropdown = $("#example-choice")
@@ -258,6 +277,10 @@
     }
 
     $(document).ready(function () {
+
+        // defer error handling so we can display error markers visually
+        // instead of using the default chevrotain behavior of throwing exceptions.
+        chevrotain.Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
 
         javaScriptEditor = CodeMirror.fromTextArea(document.getElementById("parserImplementationEditor"), {
             lineNumbers   : true,

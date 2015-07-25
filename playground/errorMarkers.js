@@ -100,3 +100,54 @@ function locateClosingParenthesis(startOffset, text) {
 }
 
 
+/**
+ * @param {chevrotain.IParserDefinitionError} parseErr
+ * @param {string} parserImplText
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
+ *
+ * @return {{start:{line:number, column:number},
+ *             end:{line:number, column:number}[]}
+ */
+function getParserErrorStartStopPos(parseErr, parserImplText, positionHelper) {
+    switch (parseErr.type) {
+        case chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS:
+            break
+        case chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME:
+        case chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME:
+            return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
+            break
+        case chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF:
+            break
+        default:
+            throw new Error("none exhaustive match ->" + parseErr.type + "<-")
+    }
+}
+
+
+/**
+ * @param {string} ruleName - the name of the rule whose definition we are seeking in the text.
+ * @param {string} text - the text to search in.
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
+ *
+ * @return {{start:{line:number, column:number},
+ *             end:{line:number, column:number}}
+ */
+function locateRuleDefinition(ruleName, text, positionHelper) {
+    // the capturing group for the '.rule(' part of the seekerRegExp
+    var patternPrefixGroup = 1
+    var patternRuleNameGroup = 2
+    var soughtPattern = "(\\.RULE\\s*\\(\\s*)(['\"]" + ruleName + "['\"])"
+    var seekerRegExp = new RegExp(soughtPattern, "g")
+
+    var ruleDefPositions = []
+    var execResult
+    while ((execResult = seekerRegExp.exec(text))) {
+        var startOffset = execResult.index + execResult[patternPrefixGroup].length
+        var endOffset = startOffset + execResult[patternRuleNameGroup].length
+        var startPos = positionHelper.posFromIndex(startOffset)
+        var endPos = positionHelper.posFromIndex(endOffset)
+        ruleDefPositions.push({start: startPos, end: endPos})
+    }
+
+    return ruleDefPositions
+}
