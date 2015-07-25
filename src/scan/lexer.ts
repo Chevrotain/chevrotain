@@ -1,6 +1,5 @@
 // using only root namespace name ('chevrotain') and not a longer name ('chevrotain.lexer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine namespace in namespace to reduce spam on chevrotain namespace
 namespace chevrotain {
 
     import lang = chevrotain.lang

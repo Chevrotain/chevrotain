@@ -154,7 +154,6 @@ namespace chevrotain.examples.recovery.sql {
         }
     }
 
-    // TODO: maybe extract to parse.tree namespace?
     // HELPER FUNCTIONS
     function PT(token:Token, children:pt.ParseTree[] = []):pt.ParseTree {
         return new pt.ParseTree(token, children)
