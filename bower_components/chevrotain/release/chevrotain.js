@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.8 - 2015-07-25 */
+/*! chevrotain - v0.4.9 - 2015-07-26 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -3089,7 +3089,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.4.8";
+    API.VERSION = "0.4.9";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
