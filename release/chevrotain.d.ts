@@ -1,4 +1,4 @@
-/*! chevrotain - v0.4.8 - 2015-07-18 */
+/*! chevrotain - v0.4.9 - 2015-07-26 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -9,10 +9,10 @@ declare module chevrotain {
      * utility to help the poor souls who are still stuck writing pure javascript 5.1
      * extend and create Token subclasses in a less verbose manner
      *
-     * @param {string} tokenName the name of the new TokenClass
-     * @param {*} patternOrParent Pa
-     * @param {Function} parentConstructor the Token class to be extended
-     * @returns {Function} a constructor for the new extended Token subclass
+     * @param {string} tokenName - the name of the new TokenClass
+     * @param {RegExp|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
+     * @param {Function} parentConstructor - the Token class to be extended
+     * @returns {Function} - a constructor for the new extended Token subclass
      */
     function extendToken(tokenName: string, patternOrParent?: any, parentConstructor?: Function): any;
     class Token {
@@ -163,6 +163,25 @@ declare module chevrotain {
 
     import gast = chevrotain.gast;
     import lang = chevrotain.lang;
+    enum ParserDefinitionErrorType {
+        INVALID_RULE_NAME = 0,
+        DUPLICATE_RULE_NAME = 1,
+        DUPLICATE_PRODUCTIONS = 2,
+        UNRESOLVED_SUBRULE_REF = 3,
+    }
+    interface IParserDefinitionError {
+        message: string;
+        type: ParserDefinitionErrorType;
+        ruleName: string;
+    }
+    interface IParserDuplicatesDefinitionError extends IParserDefinitionError {
+        dslName: string;
+        occurrence: number;
+        parameter?: string;
+    }
+    interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
+        unresolvedRefName: string;
+    }
     interface IFollowKey {
         ruleName: string;
         idxInCallingRule: number;
@@ -204,6 +223,7 @@ declare module chevrotain {
     class Parser {
         static IGNORE_AMBIGUITIES: boolean;
         static NO_RESYNC: boolean;
+        static DEFER_DEFINITION_ERRORS_HANDLING: boolean;
         protected static performSelfAnalysis(classInstance: Parser): void;
         errors: Error[];
         protected _input: Token[];
@@ -217,10 +237,12 @@ declare module chevrotain {
         };
         private firstAfterRepMap;
         private classLAFuncs;
+        private definitionErrors;
         private orLookaheadKeys;
         private manyLookaheadKeys;
         private atLeastOneLookaheadKeys;
         private optionLookaheadKeys;
+        private definedRulesNames;
         constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
         } | Function[]);
@@ -519,7 +541,7 @@ declare module chevrotain {
         protected RULE_NO_RESYNC<T>(ruleName: string, impl: () => T, invalidRet: () => T): (idxInCallingRule: number, isEntryPoint?: boolean) => T;
         /**
          *
-         * @param {string} ruleName The name of the Rule. must match the var it is assigned to.
+         * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
          * @param {Function} impl The implementation of the Rule
          * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
          *                   re-sync recovery.
@@ -533,13 +555,6 @@ declare module chevrotain {
         protected getTokenToInsert(tokClass: Function): Token;
         protected canTokenTypeBeInsertedInRecovery(tokClass: Function): boolean;
         private defaultInvalidReturn();
-        private ruleNamePattern;
-        private definedRulesNames;
-        /**
-         * @param ruleFuncName name of the Grammar rule
-         * @throws Grammar validation errors if the name is invalid
-         */
-        private validateRuleName(ruleFuncName);
         private tryInRepetitionRecovery(grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType);
         private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?, nextTokIdx?);
         private getFollowsForInRuleRecovery(tokClass, tokIdxInRule);
@@ -617,7 +632,8 @@ declare module chevrotain {
     	}
     	class Rule extends AbstractProduction {
         	name: string;
-        	constructor(name: string, definition: IProduction[]);
+        	orgText: string;
+        	constructor(name: string, definition: IProduction[], orgText?: string);
     	}
     	class Flat extends AbstractProduction {
         	constructor(definition: IProduction[]);

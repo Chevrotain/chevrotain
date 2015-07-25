@@ -15,15 +15,14 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.8 - 2015-07-18 */
+/*! chevrotain - v0.4.9 - 2015-07-26 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
     (function (lang) {
         var nameRegex = /^\s*function\s*(\S*)\s*\(/;
         /* istanbul ignore next */
-        var hasNativeName = typeof (function f() {
-        }).name !== "undefined";
+        var hasNativeName = typeof (function f() { }).name !== "undefined";
         function classNameFromInstance(instance) {
             return functionName(instance.constructor);
         }
@@ -39,9 +38,9 @@ var chevrotain;
                 return func.rdtFuncNameCache666;
             }
             else {
-                var name = func.toString().match(nameRegex)[1];
-                func.rdtFuncNameCache666 = name;
-                return name;
+                var name_1 = func.toString().match(nameRegex)[1];
+                func.rdtFuncNameCache666 = name_1;
+                return name_1;
             }
         }
         lang.functionName = functionName;
@@ -80,15 +79,14 @@ var chevrotain;
         lang.HashTable = HashTable;
     })/* istanbul ignore next */ (lang = chevrotain.lang || /* istanbul ignore next */ (chevrotain.lang = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.tokens')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.tokens')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
 var chevrotain;
 (function (chevrotain) {
     var lang = chevrotain.lang;
@@ -108,16 +106,18 @@ var chevrotain;
      * utility to help the poor souls who are still stuck writing pure javascript 5.1
      * extend and create Token subclasses in a less verbose manner
      *
-     * @param {string} tokenName the name of the new TokenClass
-     * @param {*} patternOrParent Pa
-     * @param {Function} parentConstructor the Token class to be extended
-     * @returns {Function} a constructor for the new extended Token subclass
+     * @param {string} tokenName - the name of the new TokenClass
+     * @param {RegExp|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
+     * @param {Function} parentConstructor - the Token class to be extended
+     * @returns {Function} - a constructor for the new extended Token subclass
      */
     function extendToken(tokenName, patternOrParent, parentConstructor) {
         if (patternOrParent === void 0) { patternOrParent = undefined; }
         if (parentConstructor === void 0) { parentConstructor = Token; }
         var pattern;
-        if (_.isRegExp(patternOrParent) || patternOrParent === chevrotain.Lexer.SKIPPED || patternOrParent === chevrotain.Lexer.NA) {
+        if (_.isRegExp(patternOrParent) ||
+            patternOrParent === chevrotain.Lexer.SKIPPED ||
+            patternOrParent === chevrotain.Lexer.NA) {
             pattern = patternOrParent;
         }
         else if (_.isFunction(patternOrParent)) {
@@ -193,9 +193,8 @@ var chevrotain;
     })(VirtualToken);
     chevrotain.EOF = EOF;
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.lexer')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.lexer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
 var chevrotain;
 (function (chevrotain) {
     (function (LexerDefinitionErrorType) {
@@ -277,13 +276,18 @@ var chevrotain;
                 var allErrMessagesString = allErrMessages.join("-----------------------\n");
                 throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString);
             }
-            var analyzeResult = chevrotain.analyzeTokenClasses(tokenClasses);
-            this.allPatterns = analyzeResult.allPatterns;
-            this.patternIdxToClass = analyzeResult.patternIdxToClass;
-            this.patternIdxToGroup = analyzeResult.patternIdxToGroup;
-            this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx;
-            this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator;
-            this.emptyGroups = analyzeResult.emptyGroups;
+            // If definition errors were encountered, the analysis phase may fail unexpectedly/
+            // Considering a lexer with definition errors may never be used, there is no point
+            // to performing the analysis anyhow...
+            if (_.isEmpty(this.lexerDefinitionErrors)) {
+                var analyzeResult = chevrotain.analyzeTokenClasses(tokenClasses);
+                this.allPatterns = analyzeResult.allPatterns;
+                this.patternIdxToClass = analyzeResult.patternIdxToClass;
+                this.patternIdxToGroup = analyzeResult.patternIdxToGroup;
+                this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx;
+                this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator;
+                this.emptyGroups = analyzeResult.emptyGroups;
+            }
         }
         /**
          * Will lex(Tokenize) a string.
@@ -343,7 +347,7 @@ var chevrotain;
                     }
                     text = text.slice(imageLength);
                     offset = offset + imageLength;
-                    column = column + imageLength; // TODO: with newlines the column may change be assigned twice
+                    column = column + imageLength; // TODO: with newlines the column may be assigned twice
                     canMatchedContainLineTerminator = this.patternIdxToCanLineTerminator[i];
                     if (canMatchedContainLineTerminator) {
                         var lineTerminatorsInMatch = chevrotain.countLineTerminators(matchedImage);
@@ -382,7 +386,9 @@ var chevrotain;
                     while (!foundResyncPoint && text.length > 0) {
                         // drop chars until we succeed in matching something
                         droppedChar = text.charCodeAt(0);
-                        if (droppedChar === 10 || (droppedChar === 13 && (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) {
+                        if (droppedChar === 10 ||
+                            (droppedChar === 13 &&
+                                (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) {
                             line++;
                             column = 1;
                         }
@@ -402,23 +408,24 @@ var chevrotain;
                     }
                     errLength = offset - errorStartOffset;
                     // at this point we either re-synced or reached the end of the input text
-                    errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") + (" skipped " + (offset - errorStartOffset) + " characters.");
+                    errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") +
+                        (" skipped " + (offset - errorStartOffset) + " characters.");
                     errors.push({ line: errorLine, column: errorColumn, length: errLength, message: errorMessage });
                 }
             }
             return { tokens: matchedTokens, groups: groups, errors: errors };
         };
         Lexer.SKIPPED = {
-            description: "This marks a skipped Token pattern, this means each token identified by it will" + "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
+            description: "This marks a skipped Token pattern, this means each token identified by it will" +
+                "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
         };
         Lexer.NA = /NOT_APPLICABLE/;
         return Lexer;
     })();
     chevrotain.Lexer = Lexer;
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.lexer')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.lexer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
 var chevrotain;
 (function (chevrotain) {
     var PATTERN = "PATTERN";
@@ -498,7 +505,7 @@ var chevrotain;
         var errors = _.map(tokenClassesWithMissingPattern, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property",
-                type: 0 /* MISSING_PATTERN */,
+                type: chevrotain.LexerDefinitionErrorType.MISSING_PATTERN,
                 tokenClasses: [currClass]
             };
         });
@@ -514,7 +521,7 @@ var chevrotain;
         var errors = _.map(tokenClassesWithInvalidPattern, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
-                type: 1 /* INVALID_PATTERN */,
+                type: chevrotain.LexerDefinitionErrorType.INVALID_PATTERN,
                 tokenClasses: [currClass]
             };
         });
@@ -531,7 +538,7 @@ var chevrotain;
         var errors = _.map(invalidRegex, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
-                type: 2 /* EOI_ANCHOR_FOUND */,
+                type: chevrotain.LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
                 tokenClasses: [currClass]
             };
         });
@@ -545,8 +552,9 @@ var chevrotain;
         });
         var errors = _.map(invalidFlags, function (currClass) {
             return {
-                message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
-                type: 3 /* UNSUPPORTED_FLAGS_FOUND */,
+                message: "Token class: ->" + chevrotain.tokenName(currClass) +
+                    "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
+                type: chevrotain.LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
                 tokenClasses: [currClass]
             };
         });
@@ -558,12 +566,14 @@ var chevrotain;
         var found = [];
         var identicalPatterns = _.map(tokenClasses, function (outerClass) {
             return _.reduce(tokenClasses, function (result, innerClass) {
-                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) && innerClass.PATTERN !== chevrotain.Lexer.NA) {
+                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) &&
+                    innerClass.PATTERN !== chevrotain.Lexer.NA) {
                     // this avoids duplicates in the result, each class may only appear in one "set"
                     // in essence we are creating Equivalence classes on equality relation.
                     found.push(innerClass);
                     return _.union(result, [innerClass]);
                 }
+                return result;
             }, []);
         });
         identicalPatterns = _.compact(identicalPatterns);
@@ -576,8 +586,9 @@ var chevrotain;
             });
             var dupPatternSrc = _.first(setOfIdentical).PATTERN;
             return {
-                message: ("The same RegExp pattern ->" + dupPatternSrc + "<-") + ("has been used in all the following classes: " + classNames.join(", ") + " <-"),
-                type: 4 /* DUPLICATE_PATTERNS_FOUND */,
+                message: ("The same RegExp pattern ->" + dupPatternSrc + "<-") +
+                    ("has been used in all the following classes: " + classNames.join(", ") + " <-"),
+                type: chevrotain.LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
                 tokenClasses: setOfIdentical
             };
         });
@@ -590,12 +601,13 @@ var chevrotain;
                 return false;
             }
             var group = clazz.GROUP;
-            return group !== chevrotain.Lexer.SKIPPED && group !== chevrotain.Lexer.NA && !_.isString(group);
+            return group !== chevrotain.Lexer.SKIPPED &&
+                group !== chevrotain.Lexer.NA && !_.isString(group);
         });
         var errors = _.map(invalidTypes, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
-                type: 5 /* INVALID_GROUP_TYPE_FOUND */,
+                type: chevrotain.LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
                 tokenClasses: [currClass]
             };
         });
@@ -618,7 +630,8 @@ var chevrotain;
                 lineTerminators++;
             }
             else if (c === 13) {
-                if (currOffset !== text.length - 1 && text.charCodeAt(currOffset + 1) === 10) {
+                if (currOffset !== text.length - 1 &&
+                    text.charCodeAt(currOffset + 1) === 10) {
                 }
                 else {
                     lineTerminators++;
@@ -630,7 +643,7 @@ var chevrotain;
     }
     chevrotain.countLineTerminators = countLineTerminators;
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// todo: consider if this module really belongs in chevrotain?
+// todo: consider if this namespace really belongs in chevrotain?
 var chevrotain;
 (function (chevrotain) {
     var tree;
@@ -641,15 +654,9 @@ var chevrotain;
                 this.payload = payload;
                 this.children = children;
             }
-            ParseTree.prototype.getImage = function () {
-                return this.payload.image;
-            };
-            ParseTree.prototype.getLine = function () {
-                return this.payload.startLine;
-            };
-            ParseTree.prototype.getColumn = function () {
-                return this.payload.startColumn;
-            };
+            ParseTree.prototype.getImage = function () { return this.payload.image; };
+            ParseTree.prototype.getLine = function () { return this.payload.startLine; };
+            ParseTree.prototype.getColumn = function () { return this.payload.startColumn; };
             return ParseTree;
         })();
         tree.ParseTree = ParseTree;
@@ -773,9 +780,11 @@ var chevrotain;
         gast.NonTerminal = NonTerminal;
         var Rule = (function (_super) {
             __extends(Rule, _super);
-            function Rule(name, definition) {
+            function Rule(name, definition, orgText) {
+                if (orgText === void 0) { orgText = ""; }
                 _super.call(this, definition);
                 this.name = name;
+                this.orgText = orgText;
             }
             return Rule;
         })(AbstractProduction);
@@ -868,20 +877,13 @@ var chevrotain;
                 }
             };
             /* istanbul ignore next */ // this is an "Abstract" method that does nothing, testing it is pointless.
-            GAstVisitor.prototype.visitNonTerminal = function (node) {
-            };
-            GAstVisitor.prototype.visitFlat = function (node) {
-            };
-            GAstVisitor.prototype.visitOption = function (node) {
-            };
-            GAstVisitor.prototype.visitRepetitionMandatory = function (node) {
-            };
-            GAstVisitor.prototype.visitRepetition = function (node) {
-            };
-            GAstVisitor.prototype.visitAlternation = function (node) {
-            };
-            GAstVisitor.prototype.visitTerminal = function (node) {
-            };
+            GAstVisitor.prototype.visitNonTerminal = function (node) { };
+            GAstVisitor.prototype.visitFlat = function (node) { };
+            GAstVisitor.prototype.visitOption = function (node) { };
+            GAstVisitor.prototype.visitRepetitionMandatory = function (node) { };
+            GAstVisitor.prototype.visitRepetition = function (node) { };
+            GAstVisitor.prototype.visitAlternation = function (node) { };
+            GAstVisitor.prototype.visitTerminal = function (node) { };
             return GAstVisitor;
         })();
         gast.GAstVisitor = GAstVisitor;
@@ -893,7 +895,12 @@ var chevrotain;
     (function (gast) {
         var lang = chevrotain.lang;
         function isSequenceProd(prod) {
-            return prod instanceof gast.Flat || prod instanceof gast.Option || prod instanceof gast.Repetition || prod instanceof gast.RepetitionMandatory || prod instanceof gast.Terminal || prod instanceof gast.Rule;
+            return prod instanceof gast.Flat ||
+                prod instanceof gast.Option ||
+                prod instanceof gast.Repetition ||
+                prod instanceof gast.RepetitionMandatory ||
+                prod instanceof gast.Terminal ||
+                prod instanceof gast.Rule;
         }
         gast.isSequenceProd = isSequenceProd;
         function isOptionalProd(prod) {
@@ -942,7 +949,7 @@ var chevrotain;
 var chevrotain;
 (function (chevrotain) {
     var first;
-    (function (_first) {
+    (function (first_1) {
         var gast = chevrotain.gast;
         function first(prod) {
             if (prod instanceof gast.NonTerminal) {
@@ -969,7 +976,7 @@ var chevrotain;
                 /* istanbul ignore next */ throw Error("non exhaustive match");
             }
         }
-        _first.first = first;
+        first_1.first = first;
         function firstForSequence(prod) {
             var firstSet = [];
             var seq = prod.definition;
@@ -978,6 +985,7 @@ var chevrotain;
             var currSubProd;
             // so we enter the loop at least once (if the definition is not empty
             var isLastInnerProdOptional = true;
+            // scan a sequence until it's end or until we have found a NONE optional production in it
             while (hasInnerProdsRemaining && isLastInnerProdOptional) {
                 currSubProd = seq[nextSubProdIdx];
                 isLastInnerProdOptional = gast.isOptionalProd(currSubProd);
@@ -987,18 +995,18 @@ var chevrotain;
             }
             return _.uniq(firstSet);
         }
-        _first.firstForSequence = firstForSequence;
+        first_1.firstForSequence = firstForSequence;
         function firstForBranching(prod) {
             var allAlternativesFirsts = _.map(prod.definition, function (innerProd) {
                 return first(innerProd);
             });
             return _.uniq(_.flatten(allAlternativesFirsts));
         }
-        _first.firstForBranching = firstForBranching;
+        first_1.firstForBranching = firstForBranching;
         function firstForTerminal(terminal) {
             return [terminal.terminalType];
         }
-        _first.firstForTerminal = firstForTerminal;
+        first_1.firstForTerminal = firstForTerminal;
     })/* istanbul ignore next */ (first = chevrotain.first || /* istanbul ignore next */ (chevrotain.first = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
@@ -1040,10 +1048,8 @@ var chevrotain;
                     }
                 });
             };
-            RestWalker.prototype.walkTerminal = function (terminal, currRest, prevRest) {
-            };
-            RestWalker.prototype.walkProdRef = function (refProd, currRest, prevRest) {
-            };
+            RestWalker.prototype.walkTerminal = function (terminal, currRest, prevRest) { };
+            RestWalker.prototype.walkProdRef = function (refProd, currRest, prevRest) { };
             RestWalker.prototype.walkFlat = function (flatProd, currRest, prevRest) {
                 // ABCDEF => after the D the rest is EF
                 var fullOrRest = currRest.concat(prevRest);
@@ -1180,7 +1186,8 @@ var chevrotain;
             };
             AbstractNextPossibleTokensWalker.prototype.walkProdRef = function (refProd, currRest, prevRest) {
                 // found the next production, need to keep walking in it
-                if (refProd.referencedRule.name === this.nextProductionName && refProd.occurrenceInParent === this.nextProductionOccurrence) {
+                if (refProd.referencedRule.name === this.nextProductionName &&
+                    refProd.occurrenceInParent === this.nextProductionOccurrence) {
                     var fullRest = currRest.concat(prevRest);
                     this.updateExpectedNext();
                     this.walk(refProd.referencedRule, fullRest);
@@ -1214,7 +1221,8 @@ var chevrotain;
                 this.nextTerminalOccurrence = this.path.lastTokOccurrence;
             }
             NextAfterTokenWalker.prototype.walkTerminal = function (terminal, currRest, prevRest) {
-                if (this.isAtEndOfPath && chevrotain.tokenName(terminal.terminalType) === this.nextTerminalName && terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)) {
+                if (this.isAtEndOfPath && chevrotain.tokenName(terminal.terminalType) === this.nextTerminalName &&
+                    terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)) {
                     var fullRest = currRest.concat(prevRest);
                     var restProd = new g.Flat(fullRest);
                     this.possibleTokTypes = f.first(restProd);
@@ -1378,13 +1386,13 @@ var chevrotain;
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /**
  *
-module used to cache static information about parsers,
+namespace used to cache static information about parsers,
  */
 var chevrotain;
 (function (chevrotain) {
     var cache;
     (function (cache) {
-        cache.CLASS_TO_VALIDTATION_ERRORS = new chevrotain.lang.HashTable();
+        cache.CLASS_TO_DEFINITION_ERRORS = new chevrotain.lang.HashTable();
         cache.CLASS_TO_SELF_ANALYSIS_DONE = new chevrotain.lang.HashTable();
         cache.CLASS_TO_GRAMMAR_PRODUCTIONS = new chevrotain.lang.HashTable();
         function getProductionsForClass(className) {
@@ -1475,9 +1483,17 @@ var chevrotain;
                 var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
                 if (!_.isEmpty(altsAmbiguityErrors)) {
                     var errorMessages = _.map(altsAmbiguityErrors, function (currAmbiguity) {
-                        return ("Ambiguous alternatives " + currAmbiguity.alts.join(" ,") + " in OR" + orOccurrence + " inside " + ruleGrammar.name + " ") + ("Rule, " + chevrotain.tokenName(currAmbiguity.token) + " may appears as the first Terminal in all these alternatives.\n");
+                        return ("Ambiguous alternatives " + currAmbiguity.alts.join(" ,") + " in OR" + orOccurrence + " inside " + ruleGrammar.name + " ") +
+                            ("Rule, " + chevrotain.tokenName(currAmbiguity.token) + " may appears as the first Terminal in all these alternatives.\n");
                     });
-                    throw new Error(errorMessages.join("\n ---------------- \n") + "To Resolve this, either: \n" + "1. refactor your grammar to be LL(1)\n" + "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" + "3. Add ignore arg to this OR Production:\n" + "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" + "In that case the parser will always pick the first alternative that" + " matches and ignore all the others");
+                    throw new Error(errorMessages.join("\n ---------------- \n") +
+                        "To Resolve this, either: \n" +
+                        "1. refactor your grammar to be LL(1)\n" +
+                        "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
+                        "3. Add ignore arg to this OR Production:\n" +
+                        "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
+                        "In that case the parser will always pick the first alternative that" +
+                        " matches and ignore all the others");
                 }
             }
             /**
@@ -1540,7 +1556,7 @@ var chevrotain;
         }
     })/* istanbul ignore next */ (lookahead = chevrotain.lookahead || /* istanbul ignore next */ (chevrotain.lookahead = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// module for building the GAst representation of a Grammar
+// namespace for building the GAst representation of a Grammar
 var chevrotain;
 (function (chevrotain) {
     var gastBuilder;
@@ -1579,34 +1595,34 @@ var chevrotain;
             gastBuilder.terminalNameToConstructor = terminals;
             // the top most range must strictly contain all the other ranges
             // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
-            impelText = " " + impelText;
-            var txtWithoutComments = removeComments(" " + impelText);
+            var spacedImpelText = " " + impelText;
+            var txtWithoutComments = removeComments(" " + spacedImpelText);
             // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
             var prodRanges = createRanges(txtWithoutComments);
             var topRange = new r.Range(0, impelText.length + 2);
-            return buildTopLevel(name, topRange, prodRanges);
+            return buildTopLevel(name, topRange, prodRanges, impelText);
         }
         gastBuilder.buildTopProduction = buildTopProduction;
-        function buildTopLevel(name, topRange, allRanges) {
-            var topLevelProd = new gast.Rule(name, []);
+        function buildTopLevel(name, topRange, allRanges, orgText) {
+            var topLevelProd = new gast.Rule(name, [], orgText);
             return buildAbstractProd(topLevelProd, topRange, allRanges);
         }
         function buildProdGast(prodRange, allRanges) {
             "use strict";
             switch (prodRange.type) {
-                case 3 /* AT_LEAST_ONE */:
+                case ProdType.AT_LEAST_ONE:
                     return buildAtLeastOneProd(prodRange, allRanges);
-                case 2 /* MANY */:
+                case ProdType.MANY:
                     return buildManyProd(prodRange, allRanges);
-                case 0 /* OPTION */:
+                case ProdType.OPTION:
                     return buildOptionProd(prodRange, allRanges);
-                case 1 /* OR */:
+                case ProdType.OR:
                     return buildOrProd(prodRange, allRanges);
-                case 6 /* FLAT */:
+                case ProdType.FLAT:
                     return buildAbstractProd(new gast.Flat([]), prodRange.range, allRanges);
-                case 4 /* REF */:
+                case ProdType.REF:
                     return buildRefProd(prodRange);
-                case 5 /* TERMINAL */:
+                case ProdType.TERMINAL:
                     return buildTerminalProd(prodRange);
                 /* istanbul ignore next */ default:
                     /* istanbul ignore next */ throw Error("non exhaustive match");
@@ -1657,9 +1673,7 @@ var chevrotain;
         }
         function buildAbstractProd(prod, topLevelRange, allRanges) {
             var secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges);
-            var secondLevelInOrder = _.sortBy(secondLevelProds, function (prodRng) {
-                return prodRng.range.start;
-            });
+            var secondLevelInOrder = _.sortBy(secondLevelProds, function (prodRng) { return prodRng.range.start; });
             var definition = [];
             _.forEach(secondLevelInOrder, function (prodRng) {
                 definition.push(buildProdGast(prodRng, allRanges));
@@ -1699,27 +1713,27 @@ var chevrotain;
         }
         gastBuilder.createRanges = createRanges;
         function createTerminalRanges(text) {
-            return createRefOrTerminalProdRangeInternal(text, 5 /* TERMINAL */, terminalRegGlobal);
+            return createRefOrTerminalProdRangeInternal(text, ProdType.TERMINAL, terminalRegGlobal);
         }
         gastBuilder.createTerminalRanges = createTerminalRanges;
         function createRefsRanges(text) {
-            return createRefOrTerminalProdRangeInternal(text, 4 /* REF */, refRegExGlobal);
+            return createRefOrTerminalProdRangeInternal(text, ProdType.REF, refRegExGlobal);
         }
         gastBuilder.createRefsRanges = createRefsRanges;
         function createAtLeastOneRanges(text) {
-            return createOperatorProdRangeParenthesis(text, 3 /* AT_LEAST_ONE */, atLeastOneRegExGlobal);
+            return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE, atLeastOneRegExGlobal);
         }
         gastBuilder.createAtLeastOneRanges = createAtLeastOneRanges;
         function createManyRanges(text) {
-            return createOperatorProdRangeParenthesis(text, 2 /* MANY */, manyRegExGlobal);
+            return createOperatorProdRangeParenthesis(text, ProdType.MANY, manyRegExGlobal);
         }
         gastBuilder.createManyRanges = createManyRanges;
         function createOptionRanges(text) {
-            return createOperatorProdRangeParenthesis(text, 0 /* OPTION */, optionRegExGlobal);
+            return createOperatorProdRangeParenthesis(text, ProdType.OPTION, optionRegExGlobal);
         }
         gastBuilder.createOptionRanges = createOptionRanges;
         function createOrRanges(text) {
-            var orRanges = createOperatorProdRangeParenthesis(text, 1 /* OR */, orRegExGlobal);
+            var orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegExGlobal);
             // have to split up the OR cases into separate FLAT productions
             // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
             var orSubPartsRanges = createOrPartRanges(orRanges);
@@ -1731,7 +1745,7 @@ var chevrotain;
         function createOrPartRanges(orRanges) {
             var orPartRanges = [];
             _.forEach(orRanges, function (orRange) {
-                var currOrParts = createOperatorProdRangeInternal(orRange.text, 6 /* FLAT */, orPartRegEx, findClosingCurly);
+                var currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly);
                 var currOrRangeStart = orRange.range.start;
                 // fix offsets as we are working on a subset of the text
                 _.forEach(currOrParts, function (orPart) {
@@ -1797,41 +1811,18 @@ var chevrotain;
             }
         }
         gastBuilder.findClosingOffset = findClosingOffset;
-        var GastRefResolverVisitor = (function (_super) {
-            __extends(GastRefResolverVisitor, _super);
-            function GastRefResolverVisitor(nameToProd) {
-                _super.call(this);
-                this.nameToProd = nameToProd;
-            }
-            GastRefResolverVisitor.prototype.resolveRefs = function () {
-                var _this = this;
-                _.forEach(this.nameToProd.values(), function (prod) {
-                    prod.accept(_this);
-                });
-            };
-            GastRefResolverVisitor.prototype.visitNonTerminal = function (node) {
-                var ref = this.nameToProd.get(node.nonTerminalName);
-                if (!ref) {
-                    throw Error("Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName);
-                }
-                node.referencedRule = ref;
-            };
-            return GastRefResolverVisitor;
-        })(gast.GAstVisitor);
-        gastBuilder.GastRefResolverVisitor = GastRefResolverVisitor;
     })/* istanbul ignore next */ (gastBuilder = chevrotain.gastBuilder || /* istanbul ignore next */ (chevrotain.gastBuilder = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// TODO: rename to validations ?
 var chevrotain;
 (function (chevrotain) {
-    var validations;
-    (function (validations) {
+    var checks;
+    (function (checks) {
         var gast = chevrotain.gast;
         function validateGrammar(topLevels) {
             var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule);
             return _.flatten(errorMessagesArrs);
         }
-        validations.validateGrammar = validateGrammar;
+        checks.validateGrammar = validateGrammar;
         function validateSingleTopLevelRule(topLevelRule) {
             var collectorVisitor = new OccurrenceValidationCollector();
             topLevelRule.accept(collectorVisitor);
@@ -1840,10 +1831,24 @@ var chevrotain;
             var duplicates = _.pick(productionGroups, function (currGroup) {
                 return currGroup.length > 1;
             });
-            var errorMsgs = _.map(duplicates, function (currDuplicates) {
-                return createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
+            var errors = _.map(duplicates, function (currDuplicates) {
+                var firstProd = _.first(currDuplicates);
+                var msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
+                var dslName = gast.getProductionDslName(firstProd);
+                var defError = {
+                    message: msg,
+                    type: chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
+                    ruleName: topLevelRule.name,
+                    dslName: dslName,
+                    occurrence: firstProd.occurrenceInParent
+                };
+                var param = getExtraProductionArgument(firstProd);
+                if (param) {
+                    defError.parameter = param;
+                }
+                return defError;
             });
-            return errorMsgs;
+            return errors;
         }
         function createDuplicatesErrorMessage(duplicateProds, topLevelName) {
             var firstProd = _.first(duplicateProds);
@@ -1857,9 +1862,9 @@ var chevrotain;
             return msg;
         }
         function identifyProductionForDuplicates(prod) {
-            return "" + gast.getProductionDslName(prod) + "_#_" + prod.occurrenceInParent + "_#_" + getExtraProductionArgument(prod);
+            return gast.getProductionDslName(prod) + "_#_" + prod.occurrenceInParent + "_#_" + getExtraProductionArgument(prod);
         }
-        validations.identifyProductionForDuplicates = identifyProductionForDuplicates;
+        checks.identifyProductionForDuplicates = identifyProductionForDuplicates;
         function getExtraProductionArgument(prod) {
             if (prod instanceof gast.Terminal) {
                 return chevrotain.tokenName(prod.terminalType);
@@ -1897,8 +1902,76 @@ var chevrotain;
             };
             return OccurrenceValidationCollector;
         })(gast.GAstVisitor);
-        validations.OccurrenceValidationCollector = OccurrenceValidationCollector;
-    })/* istanbul ignore next */ (validations = chevrotain.validations || /* istanbul ignore next */ (chevrotain.validations = {}));
+        checks.OccurrenceValidationCollector = OccurrenceValidationCollector;
+        var ruleNamePattern = /^[a-zA-Z_]\w*$/;
+        function validateRuleName(ruleName, definedRulesNames, className) {
+            var errors = [];
+            var errMsg;
+            if (!ruleName.match(ruleNamePattern)) {
+                errMsg = "Invalid Grammar rule name --> " + ruleName + " it must match the pattern: " + ruleNamePattern.toString();
+                errors.push({
+                    message: errMsg,
+                    type: chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME,
+                    ruleName: ruleName
+                });
+            }
+            if ((_.contains(definedRulesNames, ruleName))) {
+                errMsg = "Duplicate definition, rule: " + ruleName + " is already defined in the grammar: " + className;
+                errors.push({
+                    message: errMsg,
+                    type: chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+                    ruleName: ruleName
+                });
+            }
+            return errors;
+        }
+        checks.validateRuleName = validateRuleName;
+    })/* istanbul ignore next */ (checks = chevrotain.checks || /* istanbul ignore next */ (chevrotain.checks = {}));
+})/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+var chevrotain;
+(function (chevrotain) {
+    var resolver;
+    (function (resolver) {
+        var gast = chevrotain.gast;
+        function resolveGrammar(topLevels) {
+            var refResolver = new GastRefResolverVisitor(topLevels);
+            refResolver.resolveRefs();
+            return refResolver.errors;
+        }
+        resolver.resolveGrammar = resolveGrammar;
+        var GastRefResolverVisitor = (function (_super) {
+            __extends(GastRefResolverVisitor, _super);
+            function GastRefResolverVisitor(nameToTopRule) {
+                _super.call(this);
+                this.nameToTopRule = nameToTopRule;
+                this.errors = [];
+            }
+            GastRefResolverVisitor.prototype.resolveRefs = function () {
+                var _this = this;
+                _.forEach(this.nameToTopRule.values(), function (prod) {
+                    _this.currTopLevel = prod;
+                    prod.accept(_this);
+                });
+            };
+            GastRefResolverVisitor.prototype.visitNonTerminal = function (node) {
+                var ref = this.nameToTopRule.get(node.nonTerminalName);
+                if (!ref) {
+                    var msg = "Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName;
+                    this.errors.push({
+                        message: msg,
+                        type: chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
+                        ruleName: this.currTopLevel.name,
+                        unresolvedRefName: node.nonTerminalName
+                    });
+                }
+                else {
+                    node.referencedRule = ref;
+                }
+            };
+            return GastRefResolverVisitor;
+        })(gast.GAstVisitor);
+        resolver.GastRefResolverVisitor = GastRefResolverVisitor;
+    })/* istanbul ignore next */ (resolver = chevrotain.resolver || /* istanbul ignore next */ (chevrotain.resolver = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
 (function (chevrotain) {
@@ -1910,8 +1983,7 @@ var chevrotain;
                 chevrotain.lang.functionName(MismatchedTokenException),
                 chevrotain.lang.functionName(NoViableAltException),
                 chevrotain.lang.functionName(EarlyExitException),
-                chevrotain.lang.functionName(NotAllInputParsedException)
-            ];
+                chevrotain.lang.functionName(NotAllInputParsedException)];
             // can't do instanceof on hacked custom js exceptions
             return _.contains(recognitionExceptions, error.name);
         }
@@ -1948,7 +2020,7 @@ var chevrotain;
         EarlyExitException.prototype = Error.prototype;
     })/* istanbul ignore next */ (exceptions = chevrotain.exceptions || /* istanbul ignore next */ (chevrotain.exceptions = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.recognizer')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.recognizer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
 var chevrotain;
 (function (chevrotain) {
@@ -1959,8 +2031,16 @@ var chevrotain;
     var gastBuilder = chevrotain.gastBuilder;
     var follows = chevrotain.follow;
     var lookahead = chevrotain.lookahead;
-    var validations = chevrotain.validations;
+    var checks = chevrotain.checks;
+    var resolver = chevrotain.resolver;
     var exceptions = chevrotain.exceptions;
+    (function (ParserDefinitionErrorType) {
+        ParserDefinitionErrorType[ParserDefinitionErrorType["INVALID_RULE_NAME"] = 0] = "INVALID_RULE_NAME";
+        ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_RULE_NAME"] = 1] = "DUPLICATE_RULE_NAME";
+        ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 2] = "DUPLICATE_PRODUCTIONS";
+        ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 3] = "UNRESOLVED_SUBRULE_REF";
+    })(chevrotain.ParserDefinitionErrorType || (chevrotain.ParserDefinitionErrorType = {}));
+    var ParserDefinitionErrorType = chevrotain.ParserDefinitionErrorType;
     var EOF_FOLLOW_KEY = {};
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
@@ -1976,13 +2056,18 @@ var chevrotain;
             this.RULE_STACK = [];
             this.RULE_OCCURRENCE_STACK = [];
             this.tokensMap = undefined;
-            // Not worth the hassle to support Unicode characters in rule names...
-            this.ruleNamePattern = /^[a-zA-Z_]\w*$/;
             this.definedRulesNames = [];
             this._input = input;
             this.className = lang.classNameFromInstance(this);
             this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className);
             this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className);
+            if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
+                this.definitionErrors = [];
+                cache.CLASS_TO_DEFINITION_ERRORS.put(this.className, this.definitionErrors);
+            }
+            else {
+                this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className);
+            }
             if (_.isArray(tokensMapOrArr)) {
                 this.tokensMap = _.reduce(tokensMapOrArr, function (acc, tokenClazz) {
                     acc[chevrotain.tokenName(tokenClazz)] = tokenClazz;
@@ -2007,25 +2092,34 @@ var chevrotain;
             this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className];
         }
         Parser.performSelfAnalysis = function (classInstance) {
+            var definitionErrors = [];
+            var defErrorsMsgs;
             var className = lang.classNameFromInstance(classInstance);
-            // this information only needs to be computed once
+            // this information should only be computed once
             if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
                 var grammarProductions = cache.getProductionsForClass(className);
-                var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions);
-                refResolver.resolveRefs();
-                var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
-                cache.setResyncFollowsForClass(className, allFollows);
+                // assumes this cache has been initialized (in the relevant parser's constructor)
+                // TODO: consider making the self analysis a member method to resolve this.
+                // that way it won't be callable before the constructor has been invoked...
+                definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className);
+                var resolverErrors = resolver.resolveGrammar(grammarProductions);
+                definitionErrors.push.apply(definitionErrors, resolverErrors); // mutability for the win?
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
-                var validationErrors = validations.validateGrammar(grammarProductions.values());
-                if (validationErrors.length > 0) {
-                    //cache the validation errors so they can be thrown each time the parser is instantiated
-                    cache.CLASS_TO_VALIDTATION_ERRORS.put(className, validationErrors);
-                    throw new Error(validationErrors.join("-------------------------------\n"));
+                var validationErrors = checks.validateGrammar(grammarProductions.values());
+                definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
+                if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                    defErrorsMsgs = _.map(definitionErrors, function (defError) { return defError.message; });
+                    throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
+                }
+                if (_.isEmpty(definitionErrors)) {
+                    var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
+                    cache.setResyncFollowsForClass(className, allFollows);
                 }
             }
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (cache.CLASS_TO_VALIDTATION_ERRORS.containsKey(className)) {
-                throw new Error(cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"));
+            if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
+                throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
             }
         };
         Object.defineProperty(Parser.prototype, "input", {
@@ -2514,7 +2608,7 @@ var chevrotain;
         };
         /**
          *
-         * @param {string} ruleName The name of the Rule. must match the var it is assigned to.
+         * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
          * @param {Function} impl The implementation of the Rule
          * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
          *                   re-sync recovery.
@@ -2526,7 +2620,9 @@ var chevrotain;
             if (invalidRet === void 0) { invalidRet = this.defaultInvalidReturn; }
             if (doReSync === void 0) { doReSync = true; }
             // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
-            this.validateRuleName(ruleName);
+            var ruleNameErrors = checks.validateRuleName(ruleName, this.definedRulesNames, this.className);
+            this.definedRulesNames.push(ruleName);
+            this.definitionErrors.push.apply(this.definitionErrors, ruleNameErrors); // mutability for the win
             var parserClassProductions = cache.getProductionsForClass(this.className);
             // only build the gast representation once
             if (!(parserClassProductions.containsKey(ruleName))) {
@@ -2555,10 +2651,12 @@ var chevrotain;
                             return invalidRet();
                         }
                         else {
+                            // to be handled farther up the call stack
                             throw e;
                         }
                     }
                     else {
+                        // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
                         throw e;
                     }
                 }
@@ -2601,22 +2699,7 @@ var chevrotain;
         Parser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
             return true;
         };
-        Parser.prototype.defaultInvalidReturn = function () {
-            return undefined;
-        };
-        /**
-         * @param ruleFuncName name of the Grammar rule
-         * @throws Grammar validation errors if the name is invalid
-         */
-        Parser.prototype.validateRuleName = function (ruleFuncName) {
-            if (!ruleFuncName.match(this.ruleNamePattern)) {
-                throw Error("Invalid Grammar rule name --> " + ruleFuncName + " it must match the pattern: " + this.ruleNamePattern.toString());
-            }
-            if ((_.contains(this.definedRulesNames, ruleFuncName))) {
-                throw Error("Duplicate definition, rule: " + ruleFuncName + " is already defined in the grammar: " + this.className);
-            }
-            this.definedRulesNames.push(ruleFuncName);
-        };
+        Parser.prototype.defaultInvalidReturn = function () { return undefined; };
         Parser.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
             // TODO: can the resyncTokenType be cached?
             var reSyncTokType = this.findReSyncTokenType();
@@ -2630,7 +2713,8 @@ var chevrotain;
                     // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
                     // the error that would have been thrown
                     var expectedTokName = chevrotain.tokenName(expectedTokType);
-                    var msg = "Expecting token of type -->" + expectedTokName + "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
+                    var msg = "Expecting token of type -->" + expectedTokName +
+                        "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
                     this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync));
                     // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
                     grammarRule.apply(this, grammarRuleArgs);
@@ -2697,7 +2781,8 @@ var chevrotain;
             throw new InRuleRecoveryException("sad sad panda");
         };
         Parser.prototype.canPerformInRuleRecovery = function (expectedToken, follows) {
-            return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) || this.canRecoverWithSingleTokenDeletion(expectedToken);
+            return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
+                this.canRecoverWithSingleTokenDeletion(expectedToken);
         };
         Parser.prototype.canRecoverWithSingleTokenInsertion = function (expectedTokType, follows) {
             if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
@@ -2798,7 +2883,9 @@ var chevrotain;
             var isEndOfRule = firstAfterRepInfo.isEndOfRule;
             // special edge case of a TOP most repetition after which the input should END.
             // this will force an attempt for inRule recovery in that scenario.
-            if (this.RULE_STACK.length === 1 && isEndOfRule && expectTokAfterLastMatch === undefined) {
+            if (this.RULE_STACK.length === 1 &&
+                isEndOfRule &&
+                expectTokAfterLastMatch === undefined) {
                 expectTokAfterLastMatch = chevrotain.EOF;
                 nextTokIdx = 1;
             }
@@ -2884,18 +2971,20 @@ var chevrotain;
                 // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
                 // but the original syntax could have been parsed successfully without any backtracking + recovery
                 if (eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
-                    var follows = this.getFollowsForInRuleRecovery(tokClass, idx);
+                    var follows_1 = this.getFollowsForInRuleRecovery(tokClass, idx);
                     try {
-                        return this.tryInRuleRecovery(tokClass, follows);
+                        return this.tryInRuleRecovery(tokClass, follows_1);
                     }
                     catch (eFromInRuleRecovery) {
                         /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
                         // it is only needed for the else branch but in tsc 1.4.1 comments
                         // between if and else seem to get swallowed and disappear.
                         if (eFromConsumption instanceof InRuleRecoveryException) {
+                            // throw the original error in order to trigger reSync error recovery
                             throw eFromConsumption;
                         }
                         else {
+                            // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
                             throw eFromInRuleRecovery;
                         }
                     }
@@ -2972,10 +3061,18 @@ var chevrotain;
             this.RULE_STACK = newState.RULE_STACK;
         };
         Parser.prototype.raiseNoAltException = function (errMsgTypes) {
-            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()));
+            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
+                " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()));
         };
         Parser.IGNORE_AMBIGUITIES = true;
         Parser.NO_RESYNC = false;
+        // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
+        // (normally during the parser's constructor).
+        // This is a design time flag, it will not affect the runtime error handling of the parser, just design time errors,
+        // for example: duplicate rule names, referencing an unresolved subrule, ect...
+        // This flag should not be enabled during normal usage, it is used in special situations, for example when
+        // needing to display the parser definition errors in some GUI(online playground).
+        Parser.DEFER_DEFINITION_ERRORS_HANDLING = false;
         return Parser;
     })();
     chevrotain.Parser = Parser;
@@ -2985,14 +3082,14 @@ var chevrotain;
     }
     InRuleRecoveryException.prototype = Error.prototype;
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-/// <reference path="../libs/node.d.ts" />
 /* istanbul ignore next */
-var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) || (typeof window === "object" && window.CHEV_TEST_MODE);
+var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) ||
+    (typeof window === "object" && window.CHEV_TEST_MODE);
 var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.4.8";
+    API.VERSION = "0.4.9";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
@@ -3045,6 +3142,7 @@ else {
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
 /// <reference path="../src/parse/grammar/checks.ts" />
+/// <reference path="../src/parse/grammar/resolver.ts" />
 /// <reference path="../src/parse/exceptions_public.ts" />
 /// <reference path="../src/parse/parser_public.ts" />
 /// <reference path="../src/api.ts" />
