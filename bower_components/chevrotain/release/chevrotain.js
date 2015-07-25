@@ -15,20 +15,17 @@
     }
 }(this, function (_) {
 
-    /*! chevrotain - v0.4.8 - 2015-07-18 */
+    /*! chevrotain - v0.4.8 - 2015-07-25 */
     var chevrotain;
     (function (chevrotain) {
         var lang;
         (function (lang) {
             var nameRegex = /^\s*function\s*(\S*)\s*\(/;
             /* istanbul ignore next */
-            var hasNativeName = typeof (function f() {
-                }).name !== "undefined";
-
+            var hasNativeName = typeof (function f() { }).name !== "undefined";
             function classNameFromInstance(instance) {
                 return functionName(instance.constructor);
             }
-
             lang.classNameFromInstance = classNameFromInstance;
             /* istanbul ignore next too many hacks for IE here*/
             function functionName(func) {
@@ -41,12 +38,11 @@
                     return func.rdtFuncNameCache666;
                 }
                 else {
-                    var name = func.toString().match(nameRegex)[1];
-                    func.rdtFuncNameCache666 = name;
-                    return name;
+                    var name_1 = func.toString().match(nameRegex)[1];
+                    func.rdtFuncNameCache666 = name_1;
+                    return name_1;
                 }
             }
-
             lang.functionName = functionName;
             /**
              * simple Hashtable between a string and some generic value
@@ -56,7 +52,6 @@
                 function HashTable() {
                     this._state = {};
                 }
-
                 HashTable.prototype.keys = function () {
                     return _.keys(this._state);
                 };
@@ -82,24 +77,19 @@
                 return HashTable;
             })();
             lang.HashTable = HashTable;
-        })/* istanbul ignore next */(lang = chevrotain.lang || /* istanbul ignore next */ (chevrotain.lang = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-    var __extends = this.__extends || function (d, b) {
+        })/* istanbul ignore next */ (lang = chevrotain.lang || /* istanbul ignore next */ (chevrotain.lang = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+    var __extends = (this && this.__extends) || function (d, b) {
             for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
-            function __() {
-                this.constructor = d;
-            }
-
+            function __() { this.constructor = d; }
             __.prototype = b.prototype;
             d.prototype = new __();
         };
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.tokens')
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.tokens')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
     var chevrotain;
     (function (chevrotain) {
         var lang = chevrotain.lang;
-
         function tokenName(clazz) {
             // used to support js inheritance patterns that do not use named functions
             // in that situation setting a property tokenName on a token constructor will
@@ -111,7 +101,6 @@
                 return lang.functionName(clazz);
             }
         }
-
         chevrotain.tokenName = tokenName;
         /**
          * utility to help the poor souls who are still stuck writing pure javascript 5.1
@@ -123,14 +112,12 @@
          * @returns {Function} - a constructor for the new extended Token subclass
          */
         function extendToken(tokenName, patternOrParent, parentConstructor) {
-            if (patternOrParent === void 0) {
-                patternOrParent = undefined;
-            }
-            if (parentConstructor === void 0) {
-                parentConstructor = Token;
-            }
+            if (patternOrParent === void 0) { patternOrParent = undefined; }
+            if (parentConstructor === void 0) { parentConstructor = Token; }
             var pattern;
-            if (_.isRegExp(patternOrParent) || patternOrParent === chevrotain.Lexer.SKIPPED || patternOrParent === chevrotain.Lexer.NA) {
+            if (_.isRegExp(patternOrParent) ||
+                patternOrParent === chevrotain.Lexer.SKIPPED ||
+                patternOrParent === chevrotain.Lexer.NA) {
                 pattern = patternOrParent;
             }
             else if (_.isFunction(patternOrParent)) {
@@ -153,7 +140,6 @@
             }
             return derivedCostructor;
         }
-
         chevrotain.extendToken = extendToken;
         var Token = (function () {
             /**
@@ -171,12 +157,8 @@
              *                                                              (unicode escaping is untouched).
              */
             function Token(image, offset, startLine, startColumn, endLine, endColumn) {
-                if (endLine === void 0) {
-                    endLine = startLine;
-                }
-                if (endColumn === void 0) {
-                    endColumn = startColumn + image.length - 1;
-                }
+                if (endLine === void 0) { endLine = startLine; }
+                if (endColumn === void 0) { endColumn = startColumn + image.length - 1; }
                 this.image = image;
                 this.offset = offset;
                 this.startLine = startLine;
@@ -186,7 +168,6 @@
                 // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
                 this.isInsertedInRecovery = false;
             }
-
             return Token;
         })();
         chevrotain.Token = Token;
@@ -200,7 +181,6 @@
             function VirtualToken() {
                 _super.call(this, "", -1, -1, -1, -1, -1);
             }
-
             return VirtualToken;
         })(Token);
         chevrotain.VirtualToken = VirtualToken;
@@ -209,14 +189,12 @@
             function EOF() {
                 _super.apply(this, arguments);
             }
-
             return EOF;
         })(VirtualToken);
         chevrotain.EOF = EOF;
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.lexer')
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.lexer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
     var chevrotain;
     (function (chevrotain) {
         (function (LexerDefinitionErrorType) {
@@ -241,7 +219,7 @@
              *     this is usually used for ignoring whitespace/comments
              *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
              *
-             *  3. With a PATTERN property that has the value of the var Lexer.NA defined above.
+             *  3. With a PATTERN property that has the value of the let Lexer.NA defined above.
              *     This is a convenience form used to avoid matching Token classes that only act as categories.
              *     example: -->class Keyword extends Token { static PATTERN = NA }<--
              *
@@ -287,9 +265,7 @@
              *                  than simply throwing an error (for example in an online playground).
              */
             function Lexer(tokenClasses, deferDefinitionErrorsHandling) {
-                if (deferDefinitionErrorsHandling === void 0) {
-                    deferDefinitionErrorsHandling = false;
-                }
+                if (deferDefinitionErrorsHandling === void 0) { deferDefinitionErrorsHandling = false; }
                 this.tokenClasses = tokenClasses;
                 this.lexerDefinitionErrors = [];
                 this.lexerDefinitionErrors = chevrotain.validatePatterns(tokenClasses);
@@ -313,7 +289,6 @@
                     this.emptyGroups = analyzeResult.emptyGroups;
                 }
             }
-
             /**
              * Will lex(Tokenize) a string.
              * Note that this can be called repeatedly on different strings as this method
@@ -372,7 +347,7 @@
                         }
                         text = text.slice(imageLength);
                         offset = offset + imageLength;
-                        column = column + imageLength; // TODO: with newlines the column may change be assigned twice
+                        column = column + imageLength; // TODO: with newlines the column may be assigned twice
                         canMatchedContainLineTerminator = this.patternIdxToCanLineTerminator[i];
                         if (canMatchedContainLineTerminator) {
                             var lineTerminatorsInMatch = chevrotain.countLineTerminators(matchedImage);
@@ -411,7 +386,9 @@
                         while (!foundResyncPoint && text.length > 0) {
                             // drop chars until we succeed in matching something
                             droppedChar = text.charCodeAt(0);
-                            if (droppedChar === 10 || (droppedChar === 13 && (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) {
+                            if (droppedChar === 10 ||
+                                (droppedChar === 13 &&
+                                (text.length === 1 || (text.length > 1 && text.charCodeAt(1) !== 10)))) {
                                 line++;
                                 column = 1;
                             }
@@ -431,32 +408,27 @@
                         }
                         errLength = offset - errorStartOffset;
                         // at this point we either re-synced or reached the end of the input text
-                        errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") + (" skipped " + (offset - errorStartOffset) + " characters.");
-                        errors.push({
-                            line   : errorLine,
-                            column : errorColumn,
-                            length : errLength,
-                            message: errorMessage
-                        });
+                        errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") +
+                            (" skipped " + (offset - errorStartOffset) + " characters.");
+                        errors.push({ line: errorLine, column: errorColumn, length: errLength, message: errorMessage });
                     }
                 }
-                return {tokens: matchedTokens, groups: groups, errors: errors};
+                return { tokens: matchedTokens, groups: groups, errors: errors };
             };
             Lexer.SKIPPED = {
-                description: "This marks a skipped Token pattern, this means each token identified by it will" + "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
+                description: "This marks a skipped Token pattern, this means each token identified by it will" +
+                "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
             };
             Lexer.NA = /NOT_APPLICABLE/;
             return Lexer;
         })();
         chevrotain.Lexer = Lexer;
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.lexer')
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.lexer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
-// TODO: examine module in module to reduce spam on chevrotain namespace
     var chevrotain;
     (function (chevrotain) {
         var PATTERN = "PATTERN";
-
         function analyzeTokenClasses(tokenClasses) {
             var onlyRelevantClasses = _.reject(tokenClasses, function (currClass) {
                 return currClass[PATTERN] === chevrotain.Lexer.NA;
@@ -480,8 +452,7 @@
                     return "default";
                 }
                 else {
-                    /* istanbul ignore next */
-                    throw Error("non exhaustive match");
+                    /* istanbul ignore next */ throw Error("non exhaustive match");
                 }
             });
             var patternIdxToLongerAltIdx = _.map(onlyRelevantClasses, function (clazz, idx) {
@@ -503,15 +474,14 @@
                 return acc;
             }, {});
             return {
-                allPatterns                  : allTransformedPatterns,
-                patternIdxToClass            : patternIdxToClass,
-                patternIdxToGroup            : patternIdxToGroup,
-                patternIdxToLongerAltIdx     : patternIdxToLongerAltIdx,
+                allPatterns: allTransformedPatterns,
+                patternIdxToClass: patternIdxToClass,
+                patternIdxToGroup: patternIdxToGroup,
+                patternIdxToLongerAltIdx: patternIdxToLongerAltIdx,
                 patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
-                emptyGroups                  : emptyGroups
+                emptyGroups: emptyGroups
             };
         }
-
         chevrotain.analyzeTokenClasses = analyzeTokenClasses;
         function validatePatterns(tokenClasses) {
             var errors = [];
@@ -527,7 +497,6 @@
             errors = errors.concat(findInvalidGroupType(validTokenClasses));
             return errors;
         }
-
         chevrotain.validatePatterns = validatePatterns;
         function findMissingPatterns(tokenClasses) {
             var tokenClassesWithMissingPattern = _.filter(tokenClasses, function (currClass) {
@@ -535,15 +504,14 @@
             });
             var errors = _.map(tokenClassesWithMissingPattern, function (currClass) {
                 return {
-                    message     : "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property",
-                    type        : 0 /* MISSING_PATTERN */,
+                    message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property",
+                    type: chevrotain.LexerDefinitionErrorType.MISSING_PATTERN,
                     tokenClasses: [currClass]
                 };
             });
             var validTokenClasses = _.difference(tokenClasses, tokenClassesWithMissingPattern);
-            return {errors: errors, validTokenClasses: validTokenClasses};
+            return { errors: errors, validTokenClasses: validTokenClasses };
         }
-
         chevrotain.findMissingPatterns = findMissingPatterns;
         function findInvalidPatterns(tokenClasses) {
             var tokenClassesWithInvalidPattern = _.filter(tokenClasses, function (currClass) {
@@ -552,18 +520,16 @@
             });
             var errors = _.map(tokenClassesWithInvalidPattern, function (currClass) {
                 return {
-                    message     : "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
-                    type        : 1 /* INVALID_PATTERN */,
+                    message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
+                    type: chevrotain.LexerDefinitionErrorType.INVALID_PATTERN,
                     tokenClasses: [currClass]
                 };
             });
             var validTokenClasses = _.difference(tokenClasses, tokenClassesWithInvalidPattern);
-            return {errors: errors, validTokenClasses: validTokenClasses};
+            return { errors: errors, validTokenClasses: validTokenClasses };
         }
-
         chevrotain.findInvalidPatterns = findInvalidPatterns;
         var end_of_input = /[^\\][\$]/;
-
         function findEndOfInputAnchor(tokenClasses) {
             var invalidRegex = _.filter(tokenClasses, function (currClass) {
                 var pattern = currClass[PATTERN];
@@ -571,14 +537,13 @@
             });
             var errors = _.map(invalidRegex, function (currClass) {
                 return {
-                    message     : "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
-                    type        : 2 /* EOI_ANCHOR_FOUND */,
+                    message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
+                    type: chevrotain.LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
                     tokenClasses: [currClass]
                 };
             });
             return errors;
         }
-
         chevrotain.findEndOfInputAnchor = findEndOfInputAnchor;
         function findUnsupportedFlags(tokenClasses) {
             var invalidFlags = _.filter(tokenClasses, function (currClass) {
@@ -587,21 +552,22 @@
             });
             var errors = _.map(invalidFlags, function (currClass) {
                 return {
-                    message     : "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
-                    type        : 3 /* UNSUPPORTED_FLAGS_FOUND */,
+                    message: "Token class: ->" + chevrotain.tokenName(currClass) +
+                    "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
+                    type: chevrotain.LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
                     tokenClasses: [currClass]
                 };
             });
             return errors;
         }
-
         chevrotain.findUnsupportedFlags = findUnsupportedFlags;
         // This can only test for identical duplicate RegExps, not semantically equivalent ones.
         function findDuplicatePatterns(tokenClasses) {
             var found = [];
             var identicalPatterns = _.map(tokenClasses, function (outerClass) {
                 return _.reduce(tokenClasses, function (result, innerClass) {
-                    if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) && innerClass.PATTERN !== chevrotain.Lexer.NA) {
+                    if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) &&
+                        innerClass.PATTERN !== chevrotain.Lexer.NA) {
                         // this avoids duplicates in the result, each class may only appear in one "set"
                         // in essence we are creating Equivalence classes on equality relation.
                         found.push(innerClass);
@@ -620,14 +586,14 @@
                 });
                 var dupPatternSrc = _.first(setOfIdentical).PATTERN;
                 return {
-                    message     : ("The same RegExp pattern ->" + dupPatternSrc + "<-") + ("has been used in all the following classes: " + classNames.join(", ") + " <-"),
-                    type        : 4 /* DUPLICATE_PATTERNS_FOUND */,
+                    message: ("The same RegExp pattern ->" + dupPatternSrc + "<-") +
+                    ("has been used in all the following classes: " + classNames.join(", ") + " <-"),
+                    type: chevrotain.LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
                     tokenClasses: setOfIdentical
                 };
             });
             return errors;
         }
-
         chevrotain.findDuplicatePatterns = findDuplicatePatterns;
         function findInvalidGroupType(tokenClasses) {
             var invalidTypes = _.filter(tokenClasses, function (clazz) {
@@ -635,18 +601,18 @@
                     return false;
                 }
                 var group = clazz.GROUP;
-                return group !== chevrotain.Lexer.SKIPPED && group !== chevrotain.Lexer.NA && !_.isString(group);
+                return group !== chevrotain.Lexer.SKIPPED &&
+                    group !== chevrotain.Lexer.NA && !_.isString(group);
             });
             var errors = _.map(invalidTypes, function (currClass) {
                 return {
-                    message     : "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
-                    type        : 5 /* INVALID_GROUP_TYPE_FOUND */,
+                    message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
+                    type: chevrotain.LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
                     tokenClasses: [currClass]
                 };
             });
             return errors;
         }
-
         chevrotain.findInvalidGroupType = findInvalidGroupType;
         function addStartOfInput(pattern) {
             var flags = pattern.ignoreCase ? "i" : "";
@@ -654,7 +620,6 @@
             // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
             return new RegExp("^(?:" + pattern.source + ")", flags);
         }
-
         chevrotain.addStartOfInput = addStartOfInput;
         function countLineTerminators(text) {
             var lineTerminators = 0;
@@ -665,7 +630,8 @@
                     lineTerminators++;
                 }
                 else if (c === 13) {
-                    if (currOffset !== text.length - 1 && text.charCodeAt(currOffset + 1) === 10) {
+                    if (currOffset !== text.length - 1 &&
+                        text.charCodeAt(currOffset + 1) === 10) {
                     }
                     else {
                         lineTerminators++;
@@ -675,32 +641,22 @@
             }
             return lineTerminators;
         }
-
         chevrotain.countLineTerminators = countLineTerminators;
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-// todo: consider if this module really belongs in chevrotain?
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+// todo: consider if this namespace really belongs in chevrotain?
     var chevrotain;
     (function (chevrotain) {
         var tree;
         (function (tree) {
             var ParseTree = (function () {
                 function ParseTree(payload, children) {
-                    if (children === void 0) {
-                        children = [];
-                    }
+                    if (children === void 0) { children = []; }
                     this.payload = payload;
                     this.children = children;
                 }
-
-                ParseTree.prototype.getImage = function () {
-                    return this.payload.image;
-                };
-                ParseTree.prototype.getLine = function () {
-                    return this.payload.startLine;
-                };
-                ParseTree.prototype.getColumn = function () {
-                    return this.payload.startColumn;
-                };
+                ParseTree.prototype.getImage = function () { return this.payload.image; };
+                ParseTree.prototype.getLine = function () { return this.payload.startLine; };
+                ParseTree.prototype.getColumn = function () { return this.payload.startColumn; };
                 return ParseTree;
             })();
             tree.ParseTree = ParseTree;
@@ -713,9 +669,7 @@
              * @returns {ParseTree}
              */
             function PT(tokenOrTokenClass, children) {
-                if (children === void 0) {
-                    children = [];
-                }
+                if (children === void 0) { children = []; }
                 var childrenCompact = _.compact(children);
                 if (tokenOrTokenClass instanceof chevrotain.Token) {
                     return new ParseTree(tokenOrTokenClass, childrenCompact);
@@ -730,10 +684,9 @@
                     throw "Invalid parameter " + tokenOrTokenClass + " to PT factory.";
                 }
             }
-
             tree.PT = PT;
-        })/* istanbul ignore next */(tree = chevrotain.tree || /* istanbul ignore next */ (chevrotain.tree = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (tree = chevrotain.tree || /* istanbul ignore next */ (chevrotain.tree = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var range;
@@ -746,7 +699,6 @@
                         throw new Error("INVALID RANGE");
                     }
                 }
-
                 Range.prototype.contains = function (num) {
                     return this.start <= num && this.end >= num;
                 };
@@ -768,17 +720,16 @@
             function isValidRange(start, end) {
                 return !(start < 0 || end < start);
             }
-
             range.isValidRange = isValidRange;
-        })/* istanbul ignore next */(range = chevrotain.range || /* istanbul ignore next */ (chevrotain.range = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (range = chevrotain.range || /* istanbul ignore next */ (chevrotain.range = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var constants;
         (function (constants) {
             constants.IN = "_~IN~_";
-        })/* istanbul ignore next */(constants = chevrotain.constants || /* istanbul ignore next */ (chevrotain.constants = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (constants = chevrotain.constants || /* istanbul ignore next */ (chevrotain.constants = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var gast;
@@ -788,7 +739,6 @@
                     this.definition = definition;
                     this.implicitOccurrenceIndex = false;
                 }
-
                 AbstractProduction.prototype.accept = function (visitor) {
                     visitor.visit(this);
                     _.forEach(this.definition, function (prod) {
@@ -801,29 +751,24 @@
             var NonTerminal = (function (_super) {
                 __extends(NonTerminal, _super);
                 function NonTerminal(nonTerminalName, referencedRule, occurrenceInParent) {
-                    if (referencedRule === void 0) {
-                        referencedRule = undefined;
-                    }
-                    if (occurrenceInParent === void 0) {
-                        occurrenceInParent = 1;
-                    }
+                    if (referencedRule === void 0) { referencedRule = undefined; }
+                    if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                     _super.call(this, []);
                     this.nonTerminalName = nonTerminalName;
                     this.referencedRule = referencedRule;
                     this.occurrenceInParent = occurrenceInParent;
                 }
-
                 Object.defineProperty(NonTerminal.prototype, "definition", {
-                    get         : function () {
+                    get: function () {
                         if (this.referencedRule !== undefined) {
                             return this.referencedRule.definition;
                         }
                         return [];
                     },
-                    set         : function (definition) {
+                    set: function (definition) {
                         // immutable
                     },
-                    enumerable  : true,
+                    enumerable: true,
                     configurable: true
                 });
                 NonTerminal.prototype.accept = function (visitor) {
@@ -835,11 +780,12 @@
             gast.NonTerminal = NonTerminal;
             var Rule = (function (_super) {
                 __extends(Rule, _super);
-                function Rule(name, definition) {
+                function Rule(name, definition, orgText) {
+                    if (orgText === void 0) { orgText = ""; }
                     _super.call(this, definition);
                     this.name = name;
+                    this.orgText = orgText;
                 }
-
                 return Rule;
             })(AbstractProduction);
             gast.Rule = Rule;
@@ -848,72 +794,56 @@
                 function Flat(definition) {
                     _super.call(this, definition);
                 }
-
                 return Flat;
             })(AbstractProduction);
             gast.Flat = Flat;
             var Option = (function (_super) {
                 __extends(Option, _super);
                 function Option(definition, occurrenceInParent) {
-                    if (occurrenceInParent === void 0) {
-                        occurrenceInParent = 1;
-                    }
+                    if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                     _super.call(this, definition);
                     this.occurrenceInParent = occurrenceInParent;
                 }
-
                 return Option;
             })(AbstractProduction);
             gast.Option = Option;
             var RepetitionMandatory = (function (_super) {
                 __extends(RepetitionMandatory, _super);
                 function RepetitionMandatory(definition, occurrenceInParent) {
-                    if (occurrenceInParent === void 0) {
-                        occurrenceInParent = 1;
-                    }
+                    if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                     _super.call(this, definition);
                     this.occurrenceInParent = occurrenceInParent;
                 }
-
                 return RepetitionMandatory;
             })(AbstractProduction);
             gast.RepetitionMandatory = RepetitionMandatory;
             var Repetition = (function (_super) {
                 __extends(Repetition, _super);
                 function Repetition(definition, occurrenceInParent) {
-                    if (occurrenceInParent === void 0) {
-                        occurrenceInParent = 1;
-                    }
+                    if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                     _super.call(this, definition);
                     this.occurrenceInParent = occurrenceInParent;
                 }
-
                 return Repetition;
             })(AbstractProduction);
             gast.Repetition = Repetition;
             var Alternation = (function (_super) {
                 __extends(Alternation, _super);
                 function Alternation(definition, occurrenceInParent) {
-                    if (occurrenceInParent === void 0) {
-                        occurrenceInParent = 1;
-                    }
+                    if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                     _super.call(this, definition);
                     this.occurrenceInParent = occurrenceInParent;
                 }
-
                 return Alternation;
             })(AbstractProduction);
             gast.Alternation = Alternation;
             var Terminal = (function () {
                 function Terminal(terminalType, occurrenceInParent) {
-                    if (occurrenceInParent === void 0) {
-                        occurrenceInParent = 1;
-                    }
+                    if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
                     this.terminalType = terminalType;
                     this.occurrenceInParent = occurrenceInParent;
                     this.implicitOccurrenceIndex = false;
                 }
-
                 Terminal.prototype.accept = function (visitor) {
                     visitor.visit(this);
                 };
@@ -923,7 +853,6 @@
             var GAstVisitor = (function () {
                 function GAstVisitor() {
                 }
-
                 GAstVisitor.prototype.visit = function (node) {
                     if (node instanceof NonTerminal) {
                         this.visitNonTerminal(node);
@@ -948,35 +877,31 @@
                     }
                 };
                 /* istanbul ignore next */ // this is an "Abstract" method that does nothing, testing it is pointless.
-                GAstVisitor.prototype.visitNonTerminal = function (node) {
-                };
-                GAstVisitor.prototype.visitFlat = function (node) {
-                };
-                GAstVisitor.prototype.visitOption = function (node) {
-                };
-                GAstVisitor.prototype.visitRepetitionMandatory = function (node) {
-                };
-                GAstVisitor.prototype.visitRepetition = function (node) {
-                };
-                GAstVisitor.prototype.visitAlternation = function (node) {
-                };
-                GAstVisitor.prototype.visitTerminal = function (node) {
-                };
+                GAstVisitor.prototype.visitNonTerminal = function (node) { };
+                GAstVisitor.prototype.visitFlat = function (node) { };
+                GAstVisitor.prototype.visitOption = function (node) { };
+                GAstVisitor.prototype.visitRepetitionMandatory = function (node) { };
+                GAstVisitor.prototype.visitRepetition = function (node) { };
+                GAstVisitor.prototype.visitAlternation = function (node) { };
+                GAstVisitor.prototype.visitTerminal = function (node) { };
                 return GAstVisitor;
             })();
             gast.GAstVisitor = GAstVisitor;
-        })/* istanbul ignore next */(gast = chevrotain.gast || /* istanbul ignore next */ (chevrotain.gast = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (gast = chevrotain.gast || /* istanbul ignore next */ (chevrotain.gast = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var gast;
         (function (gast) {
             var lang = chevrotain.lang;
-
             function isSequenceProd(prod) {
-                return prod instanceof gast.Flat || prod instanceof gast.Option || prod instanceof gast.Repetition || prod instanceof gast.RepetitionMandatory || prod instanceof gast.Terminal || prod instanceof gast.Rule;
+                return prod instanceof gast.Flat ||
+                    prod instanceof gast.Option ||
+                    prod instanceof gast.Repetition ||
+                    prod instanceof gast.RepetitionMandatory ||
+                    prod instanceof gast.Terminal ||
+                    prod instanceof gast.Rule;
             }
-
             gast.isSequenceProd = isSequenceProd;
             function isOptionalProd(prod) {
                 var isDirectlyOptional = prod instanceof gast.Option || prod instanceof gast.Repetition;
@@ -1001,12 +926,10 @@
                     return false;
                 }
             }
-
             gast.isOptionalProd = isOptionalProd;
             function isBranchingProd(prod) {
                 return prod instanceof gast.Alternation;
             }
-
             gast.isBranchingProd = isBranchingProd;
             var productionToDslName = {};
             productionToDslName[lang.functionName(gast.NonTerminal)] = "SUBRULE";
@@ -1020,16 +943,14 @@
                 var prodName = lang.functionName(clazz);
                 return productionToDslName[prodName];
             }
-
             gast.getProductionDslName = getProductionDslName;
-        })/* istanbul ignore next */(gast = chevrotain.gast || /* istanbul ignore next */ (chevrotain.gast = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (gast = chevrotain.gast || /* istanbul ignore next */ (chevrotain.gast = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var first;
-        (function (_first) {
+        (function (first_1) {
             var gast = chevrotain.gast;
-
             function first(prod) {
                 if (prod instanceof gast.NonTerminal) {
                     // this could in theory cause infinite loops if
@@ -1052,12 +973,10 @@
                     return firstForBranching(prod);
                 }
                 else {
-                    /* istanbul ignore next */
-                    throw Error("non exhaustive match");
+                    /* istanbul ignore next */ throw Error("non exhaustive match");
                 }
             }
-
-            _first.first = first;
+            first_1.first = first;
             function firstForSequence(prod) {
                 var firstSet = [];
                 var seq = prod.definition;
@@ -1066,6 +985,7 @@
                 var currSubProd;
                 // so we enter the loop at least once (if the definition is not empty
                 var isLastInnerProdOptional = true;
+                // scan a sequence until it's end or until we have found a NONE optional production in it
                 while (hasInnerProdsRemaining && isLastInnerProdOptional) {
                     currSubProd = seq[nextSubProdIdx];
                     isLastInnerProdOptional = gast.isOptionalProd(currSubProd);
@@ -1075,23 +995,20 @@
                 }
                 return _.uniq(firstSet);
             }
-
-            _first.firstForSequence = firstForSequence;
+            first_1.firstForSequence = firstForSequence;
             function firstForBranching(prod) {
                 var allAlternativesFirsts = _.map(prod.definition, function (innerProd) {
                     return first(innerProd);
                 });
                 return _.uniq(_.flatten(allAlternativesFirsts));
             }
-
-            _first.firstForBranching = firstForBranching;
+            first_1.firstForBranching = firstForBranching;
             function firstForTerminal(terminal) {
                 return [terminal.terminalType];
             }
-
-            _first.firstForTerminal = firstForTerminal;
-        })/* istanbul ignore next */(first = chevrotain.first || /* istanbul ignore next */ (chevrotain.first = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+            first_1.firstForTerminal = firstForTerminal;
+        })/* istanbul ignore next */ (first = chevrotain.first || /* istanbul ignore next */ (chevrotain.first = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var rest;
@@ -1100,12 +1017,9 @@
             var RestWalker = (function () {
                 function RestWalker() {
                 }
-
                 RestWalker.prototype.walk = function (prod, prevRest) {
                     var _this = this;
-                    if (prevRest === void 0) {
-                        prevRest = [];
-                    }
+                    if (prevRest === void 0) { prevRest = []; }
                     _.forEach(prod.definition, function (subProd, index) {
                         var currRest = _.drop(prod.definition, index + 1);
                         if (subProd instanceof g.NonTerminal) {
@@ -1130,15 +1044,12 @@
                             _this.walkOr(subProd, currRest, prevRest);
                         }
                         else {
-                            /* istanbul ignore next */
-                            throw Error("non exhaustive match");
+                            /* istanbul ignore next */ throw Error("non exhaustive match");
                         }
                     });
                 };
-                RestWalker.prototype.walkTerminal = function (terminal, currRest, prevRest) {
-                };
-                RestWalker.prototype.walkProdRef = function (refProd, currRest, prevRest) {
-                };
+                RestWalker.prototype.walkTerminal = function (terminal, currRest, prevRest) { };
+                RestWalker.prototype.walkProdRef = function (refProd, currRest, prevRest) { };
                 RestWalker.prototype.walkFlat = function (flatProd, currRest, prevRest) {
                     // ABCDEF => after the D the rest is EF
                     var fullOrRest = currRest.concat(prevRest);
@@ -1175,8 +1086,8 @@
                 return RestWalker;
             })();
             rest.RestWalker = RestWalker;
-        })/* istanbul ignore next */(rest = chevrotain.rest || /* istanbul ignore next */ (chevrotain.rest = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (rest = chevrotain.rest || /* istanbul ignore next */ (chevrotain.rest = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var follow;
@@ -1195,7 +1106,6 @@
                     this.topProd = topProd;
                     this.follows = new lang.HashTable();
                 }
-
                 ResyncFollowsWalker.prototype.startWalking = function () {
                     this.walk(this.topProd);
                     return this.follows;
@@ -1221,21 +1131,18 @@
                 });
                 return reSyncFollows;
             }
-
             follow.computeAllProdsFollows = computeAllProdsFollows;
             function buildBetweenProdsFollowPrefix(inner, occurenceInParent) {
                 return inner.name + occurenceInParent + IN;
             }
-
             follow.buildBetweenProdsFollowPrefix = buildBetweenProdsFollowPrefix;
             function buildInProdFollowPrefix(terminal) {
                 var terminalName = chevrotain.tokenName(terminal.terminalType);
                 return terminalName + terminal.occurrenceInParent + IN;
             }
-
             follow.buildInProdFollowPrefix = buildInProdFollowPrefix;
-        })/* istanbul ignore next */(follow = chevrotain.follow || /* istanbul ignore next */ (chevrotain.follow = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (follow = chevrotain.follow || /* istanbul ignore next */ (chevrotain.follow = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var interpreter;
@@ -1255,7 +1162,6 @@
                     this.found = false;
                     this.isAtEndOfPath = false;
                 }
-
                 AbstractNextPossibleTokensWalker.prototype.startWalking = function () {
                     this.found = false;
                     if (this.path.ruleStack[0] !== this.topProd.name) {
@@ -1272,9 +1178,7 @@
                     return this.possibleTokTypes;
                 };
                 AbstractNextPossibleTokensWalker.prototype.walk = function (prod, prevRest) {
-                    if (prevRest === void 0) {
-                        prevRest = [];
-                    }
+                    if (prevRest === void 0) { prevRest = []; }
                     // stop scanning once we found the path
                     if (!this.found) {
                         _super.prototype.walk.call(this, prod, prevRest);
@@ -1282,7 +1186,8 @@
                 };
                 AbstractNextPossibleTokensWalker.prototype.walkProdRef = function (refProd, currRest, prevRest) {
                     // found the next production, need to keep walking in it
-                    if (refProd.referencedRule.name === this.nextProductionName && refProd.occurrenceInParent === this.nextProductionOccurrence) {
+                    if (refProd.referencedRule.name === this.nextProductionName &&
+                        refProd.occurrenceInParent === this.nextProductionOccurrence) {
                         var fullRest = currRest.concat(prevRest);
                         this.updateExpectedNext();
                         this.walk(refProd.referencedRule, fullRest);
@@ -1315,9 +1220,9 @@
                     this.nextTerminalName = chevrotain.tokenName(this.path.lastTok);
                     this.nextTerminalOccurrence = this.path.lastTokOccurrence;
                 }
-
                 NextAfterTokenWalker.prototype.walkTerminal = function (terminal, currRest, prevRest) {
-                    if (this.isAtEndOfPath && chevrotain.tokenName(terminal.terminalType) === this.nextTerminalName && terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)) {
+                    if (this.isAtEndOfPath && chevrotain.tokenName(terminal.terminalType) === this.nextTerminalName &&
+                        terminal.occurrenceInParent === this.nextTerminalOccurrence && !(this.found)) {
                         var fullRest = currRest.concat(prevRest);
                         var restProd = new g.Flat(fullRest);
                         this.possibleTokTypes = f.first(restProd);
@@ -1335,7 +1240,6 @@
                     this.nextOptionOccurrence = 0;
                     this.nextOptionOccurrence = this.path.occurrence;
                 }
-
                 NextInsideOptionWalker.prototype.walkOption = function (optionProd, currRest, prevRest) {
                     if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
                         var restProd = new g.Flat(optionProd.definition);
@@ -1357,7 +1261,6 @@
                     this.nextOccurrence = 0;
                     this.nextOccurrence = this.path.occurrence;
                 }
-
                 NextInsideManyWalker.prototype.walkMany = function (manyProd, currRest, prevRest) {
                     if (this.isAtEndOfPath && manyProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
                         var restProd = new g.Flat(manyProd.definition);
@@ -1379,7 +1282,6 @@
                     this.nextOccurrence = 0;
                     this.nextOccurrence = this.path.occurrence;
                 }
-
                 NextInsideAtLeastOneWalker.prototype.walkAtLeastOne = function (atLeastOneProd, currRest, prevRest) {
                     if (this.isAtEndOfPath && atLeastOneProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
                         var restProd = new g.Flat(atLeastOneProd.definition);
@@ -1401,7 +1303,6 @@
                     this.occurrence = occurrence;
                     this.result = [];
                 }
-
                 NextInsideOrWalker.prototype.startWalking = function () {
                     this.walk(this.topRule);
                     return this.result;
@@ -1430,13 +1331,8 @@
                     _super.call(this);
                     this.topRule = topRule;
                     this.occurrence = occurrence;
-                    this.result = {
-                        token      : undefined,
-                        occurrence : undefined,
-                        isEndOfRule: undefined
-                    };
+                    this.result = { token: undefined, occurrence: undefined, isEndOfRule: undefined };
                 }
-
                 AbstractNextTerminalAfterProductionWalker.prototype.startWalking = function () {
                     this.walk(this.topRule);
                     return this.result;
@@ -1449,7 +1345,6 @@
                 function NextTerminalAfterManyWalker() {
                     _super.apply(this, arguments);
                 }
-
                 NextTerminalAfterManyWalker.prototype.walkMany = function (manyProd, currRest, prevRest) {
                     if (manyProd.occurrenceInParent === this.occurrence) {
                         var firstAfterMany = _.first(currRest.concat(prevRest));
@@ -1471,7 +1366,6 @@
                 function NextTerminalAfterAtLeastOneWalker() {
                     _super.apply(this, arguments);
                 }
-
                 NextTerminalAfterAtLeastOneWalker.prototype.walkAtLeastOne = function (atLeastOneProd, currRest, prevRest) {
                     if (atLeastOneProd.occurrenceInParent === this.occurrence) {
                         var firstAfterAtLeastOne = _.first(currRest.concat(prevRest));
@@ -1488,46 +1382,41 @@
                 return NextTerminalAfterAtLeastOneWalker;
             })(AbstractNextTerminalAfterProductionWalker);
             interpreter.NextTerminalAfterAtLeastOneWalker = NextTerminalAfterAtLeastOneWalker;
-        })/* istanbul ignore next */(interpreter = chevrotain.interpreter || /* istanbul ignore next */ (chevrotain.interpreter = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (interpreter = chevrotain.interpreter || /* istanbul ignore next */ (chevrotain.interpreter = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     /**
      *
-     module used to cache static information about parsers,
+     namespace used to cache static information about parsers,
      */
     var chevrotain;
     (function (chevrotain) {
         var cache;
         (function (cache) {
-            cache.CLASS_TO_VALIDTATION_ERRORS = new chevrotain.lang.HashTable();
+            cache.CLASS_TO_DEFINITION_ERRORS = new chevrotain.lang.HashTable();
             cache.CLASS_TO_SELF_ANALYSIS_DONE = new chevrotain.lang.HashTable();
             cache.CLASS_TO_GRAMMAR_PRODUCTIONS = new chevrotain.lang.HashTable();
             function getProductionsForClass(className) {
                 return getFromNestedHashTable(className, cache.CLASS_TO_GRAMMAR_PRODUCTIONS);
             }
-
             cache.getProductionsForClass = getProductionsForClass;
             cache.CLASS_TO_RESYNC_FOLLOW_SETS = new chevrotain.lang.HashTable();
             function getResyncFollowsForClass(className) {
                 return getFromNestedHashTable(className, cache.CLASS_TO_RESYNC_FOLLOW_SETS);
             }
-
             cache.getResyncFollowsForClass = getResyncFollowsForClass;
             function setResyncFollowsForClass(className, followSet) {
                 cache.CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet);
             }
-
             cache.setResyncFollowsForClass = setResyncFollowsForClass;
             cache.CLASS_TO_LOOKAHEAD_FUNCS = new chevrotain.lang.HashTable();
             function getLookaheadFuncsForClass(className) {
                 return getFromNestedHashTable(className, cache.CLASS_TO_LOOKAHEAD_FUNCS);
             }
-
             cache.getLookaheadFuncsForClass = getLookaheadFuncsForClass;
             cache.CLASS_TO_FIRST_AFTER_REPETITION = new chevrotain.lang.HashTable();
             function getFirstAfterRepForClass(className) {
                 return getFromNestedHashTable(className, cache.CLASS_TO_FIRST_AFTER_REPETITION);
             }
-
             cache.getFirstAfterRepForClass = getFirstAfterRepForClass;
             cache.CLASS_TO_OR_LA_CACHE = new chevrotain.lang.HashTable();
             cache.CLASS_TO_MANY_LA_CACHE = new chevrotain.lang.HashTable();
@@ -1546,14 +1435,12 @@
                 initSingleLookAheadKeyCache(cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[className]);
                 initSingleLookAheadKeyCache(cache.CLASS_TO_OPTION_LA_CACHE[className]);
             }
-
             cache.initLookAheadKeyCache = initLookAheadKeyCache;
             function initSingleLookAheadKeyCache(laCache) {
                 for (var i = 0; i < cache.MAX_OCCURRENCE_INDEX; i++) {
                     laCache[i] = new chevrotain.lang.HashTable();
                 }
             }
-
             function getFromNestedHashTable(className, hashTable) {
                 var result = hashTable.get(className);
                 if (result === undefined) {
@@ -1562,8 +1449,8 @@
                 }
                 return result;
             }
-        })/* istanbul ignore next */(cache = chevrotain.cache || /* istanbul ignore next */ (chevrotain.cache = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+        })/* istanbul ignore next */ (cache = chevrotain.cache || /* istanbul ignore next */ (chevrotain.cache = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var lookahead;
@@ -1571,41 +1458,42 @@
             var gast = chevrotain.gast;
             var interp = chevrotain.interpreter;
             var f = chevrotain.first;
-
             function buildLookaheadForTopLevel(rule) {
                 var restProd = new gast.Flat(rule.definition);
                 var possibleTokTypes = f.first(restProd);
                 return getSimpleLookahead(possibleTokTypes);
             }
-
             lookahead.buildLookaheadForTopLevel = buildLookaheadForTopLevel;
             function buildLookaheadForOption(optionOccurrence, ruleGrammar) {
                 return buildLookAheadForGrammarProd(interp.NextInsideOptionWalker, optionOccurrence, ruleGrammar);
             }
-
             lookahead.buildLookaheadForOption = buildLookaheadForOption;
             function buildLookaheadForMany(manyOccurrence, ruleGrammar) {
                 return buildLookAheadForGrammarProd(interp.NextInsideManyWalker, manyOccurrence, ruleGrammar);
             }
-
             lookahead.buildLookaheadForMany = buildLookaheadForMany;
             function buildLookaheadForAtLeastOne(manyOccurrence, ruleGrammar) {
                 return buildLookAheadForGrammarProd(interp.NextInsideAtLeastOneWalker, manyOccurrence, ruleGrammar);
             }
-
             lookahead.buildLookaheadForAtLeastOne = buildLookaheadForAtLeastOne;
             function buildLookaheadForOr(orOccurrence, ruleGrammar, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 var alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking();
                 if (!ignoreAmbiguities) {
                     var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
                     if (!_.isEmpty(altsAmbiguityErrors)) {
                         var errorMessages = _.map(altsAmbiguityErrors, function (currAmbiguity) {
-                            return ("Ambiguous alternatives " + currAmbiguity.alts.join(" ,") + " in OR" + orOccurrence + " inside " + ruleGrammar.name + " ") + ("Rule, " + chevrotain.tokenName(currAmbiguity.token) + " may appears as the first Terminal in all these alternatives.\n");
+                            return ("Ambiguous alternatives " + currAmbiguity.alts.join(" ,") + " in OR" + orOccurrence + " inside " + ruleGrammar.name + " ") +
+                                ("Rule, " + chevrotain.tokenName(currAmbiguity.token) + " may appears as the first Terminal in all these alternatives.\n");
                         });
-                        throw new Error(errorMessages.join("\n ---------------- \n") + "To Resolve this, either: \n" + "1. refactor your grammar to be LL(1)\n" + "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" + "3. Add ignore arg to this OR Production:\n" + "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" + "In that case the parser will always pick the first alternative that" + " matches and ignore all the others");
+                        throw new Error(errorMessages.join("\n ---------------- \n") +
+                            "To Resolve this, either: \n" +
+                            "1. refactor your grammar to be LL(1)\n" +
+                            "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
+                            "3. Add ignore arg to this OR Production:\n" +
+                            "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
+                            "In that case the parser will always pick the first alternative that" +
+                            " matches and ignore all the others");
                     }
                 }
                 /**
@@ -1624,7 +1512,6 @@
                     return -1;
                 };
             }
-
             lookahead.buildLookaheadForOr = buildLookaheadForOr;
             function checkAlternativesAmbiguities(alternativesTokens) {
                 var allTokensFlat = _.flatten(alternativesTokens);
@@ -1638,26 +1525,24 @@
                     var altsIndicesTokenAppearsIn = _.map(_.keys(altsCurrTokenAppearsIn), function (index) {
                         return parseInt(index, 10) + 1;
                     });
-                    return {token: seekToken, alts: altsIndicesTokenAppearsIn};
+                    return { token: seekToken, alts: altsIndicesTokenAppearsIn };
                 });
                 var tokensToAltsIndicesWithAmbiguity = _.filter(tokensToAltsIndicesItAppearsIn, function (tokAndAltsItAppearsIn) {
                     return tokAndAltsItAppearsIn.alts.length > 1;
                 });
                 return tokensToAltsIndicesWithAmbiguity;
             }
-
             lookahead.checkAlternativesAmbiguities = checkAlternativesAmbiguities;
             function buildLookAheadForGrammarProd(prodWalker, ruleOccurrence, ruleGrammar) {
                 var path = {
-                    ruleStack      : [ruleGrammar.name],
+                    ruleStack: [ruleGrammar.name],
                     occurrenceStack: [1],
-                    occurrence     : ruleOccurrence
+                    occurrence: ruleOccurrence
                 };
                 var walker = new prodWalker(ruleGrammar, path);
                 var possibleNextTokTypes = walker.startWalking();
                 return getSimpleLookahead(possibleNextTokTypes);
             }
-
             function getSimpleLookahead(possibleNextTokTypes) {
                 return function () {
                     var nextToken = this.NEXT_TOKEN();
@@ -1669,9 +1554,9 @@
                     return false;
                 };
             }
-        })/* istanbul ignore next */(lookahead = chevrotain.lookahead || /* istanbul ignore next */ (chevrotain.lookahead = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-// module for building the GAst representation of a Grammar
+        })/* istanbul ignore next */ (lookahead = chevrotain.lookahead || /* istanbul ignore next */ (chevrotain.lookahead = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+// namespace for building the GAst representation of a Grammar
     var chevrotain;
     (function (chevrotain) {
         var gastBuilder;
@@ -1710,51 +1595,39 @@
                 gastBuilder.terminalNameToConstructor = terminals;
                 // the top most range must strictly contain all the other ranges
                 // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
-                impelText = " " + impelText;
-                var txtWithoutComments = removeComments(" " + impelText);
+                var spacedImpelText = " " + impelText;
+                var txtWithoutComments = removeComments(" " + spacedImpelText);
                 // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
                 var prodRanges = createRanges(txtWithoutComments);
                 var topRange = new r.Range(0, impelText.length + 2);
-                return buildTopLevel(name, topRange, prodRanges);
+                return buildTopLevel(name, topRange, prodRanges, impelText);
             }
-
             gastBuilder.buildTopProduction = buildTopProduction;
-            function buildTopLevel(name, topRange, allRanges) {
-                var topLevelProd = new gast.Rule(name, []);
+            function buildTopLevel(name, topRange, allRanges, orgText) {
+                var topLevelProd = new gast.Rule(name, [], orgText);
                 return buildAbstractProd(topLevelProd, topRange, allRanges);
             }
-
             function buildProdGast(prodRange, allRanges) {
                 "use strict";
                 switch (prodRange.type) {
-                    case 3 /* AT_LEAST_ONE */
-                    :
+                    case ProdType.AT_LEAST_ONE:
                         return buildAtLeastOneProd(prodRange, allRanges);
-                    case 2 /* MANY */
-                    :
+                    case ProdType.MANY:
                         return buildManyProd(prodRange, allRanges);
-                    case 0 /* OPTION */
-                    :
+                    case ProdType.OPTION:
                         return buildOptionProd(prodRange, allRanges);
-                    case 1 /* OR */
-                    :
+                    case ProdType.OR:
                         return buildOrProd(prodRange, allRanges);
-                    case 6 /* FLAT */
-                    :
+                    case ProdType.FLAT:
                         return buildAbstractProd(new gast.Flat([]), prodRange.range, allRanges);
-                    case 4 /* REF */
-                    :
+                    case ProdType.REF:
                         return buildRefProd(prodRange);
-                    case 5 /* TERMINAL */
-                    :
+                    case ProdType.TERMINAL:
                         return buildTerminalProd(prodRange);
-                    /* istanbul ignore next */
-                    default:
-                        /* istanbul ignore next */
-                        throw Error("non exhaustive match");
+                    /* istanbul ignore next */ default:
+                    /* istanbul ignore next */ throw Error("non exhaustive match");
                 }
             }
-
             gastBuilder.buildProdGast = buildProdGast;
             function buildRefProd(prodRange) {
                 var reResult = refRegEx.exec(prodRange.text);
@@ -1765,7 +1638,6 @@
                 newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx;
                 return newRef;
             }
-
             function buildTerminalProd(prodRange) {
                 var reResult = terminalRegEx.exec(prodRange.text);
                 var isImplicitOccurrenceIdx = reResult[1] === undefined;
@@ -1779,7 +1651,6 @@
                 newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx;
                 return newTerminal;
             }
-
             function buildProdWithOccurrence(regEx, prodInstance, prodRange, allRanges) {
                 var reResult = regEx.exec(prodRange.text);
                 var isImplicitOccurrenceIdx = reResult[1] === undefined;
@@ -1788,28 +1659,21 @@
                 // <any> due to intellij bugs
                 return buildAbstractProd(prodInstance, prodRange.range, allRanges);
             }
-
             function buildAtLeastOneProd(prodRange, allRanges) {
                 return buildProdWithOccurrence(atLeastOneRegEx, new gast.RepetitionMandatory([]), prodRange, allRanges);
             }
-
             function buildManyProd(prodRange, allRanges) {
                 return buildProdWithOccurrence(manyRegEx, new gast.Repetition([]), prodRange, allRanges);
             }
-
             function buildOptionProd(prodRange, allRanges) {
                 return buildProdWithOccurrence(optionRegEx, new gast.Option([]), prodRange, allRanges);
             }
-
             function buildOrProd(prodRange, allRanges) {
                 return buildProdWithOccurrence(orRegEx, new gast.Alternation([]), prodRange, allRanges);
             }
-
             function buildAbstractProd(prod, topLevelRange, allRanges) {
                 var secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges);
-                var secondLevelInOrder = _.sortBy(secondLevelProds, function (prodRng) {
-                    return prodRng.range.start;
-                });
+                var secondLevelInOrder = _.sortBy(secondLevelProds, function (prodRng) { return prodRng.range.start; });
                 var definition = [];
                 _.forEach(secondLevelInOrder, function (prodRng) {
                     definition.push(buildProdGast(prodRng, allRanges));
@@ -1818,7 +1682,6 @@
                 prod.definition = definition;
                 return prod;
             }
-
             function getDirectlyContainedRanges(y, prodRanges) {
                 return _.filter(prodRanges, function (x) {
                     var isXDescendantOfY = y.strictlyContainsRange(x.range);
@@ -1830,17 +1693,14 @@
                     return isXDescendantOfY && xDoesNotHaveAnyAncestorWhichIsDecendantOfY;
                 });
             }
-
             gastBuilder.getDirectlyContainedRanges = getDirectlyContainedRanges;
             var singleLineCommentRegEx = /\/\/.*/g;
             var multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
-
             function removeComments(text) {
                 var noSingleLine = text.replace(singleLineCommentRegEx, "");
                 var noComments = noSingleLine.replace(multiLineCommentRegEx, "");
                 return noComments;
             }
-
             gastBuilder.removeComments = removeComments;
             function createRanges(text) {
                 var terminalRanges = createTerminalRanges(text);
@@ -1851,49 +1711,41 @@
                 var orRanges = createOrRanges(text);
                 return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneRanges, manyRanges, optionRanges, orRanges);
             }
-
             gastBuilder.createRanges = createRanges;
             function createTerminalRanges(text) {
-                return createRefOrTerminalProdRangeInternal(text, 5 /* TERMINAL */, terminalRegGlobal);
+                return createRefOrTerminalProdRangeInternal(text, ProdType.TERMINAL, terminalRegGlobal);
             }
-
             gastBuilder.createTerminalRanges = createTerminalRanges;
             function createRefsRanges(text) {
-                return createRefOrTerminalProdRangeInternal(text, 4 /* REF */, refRegExGlobal);
+                return createRefOrTerminalProdRangeInternal(text, ProdType.REF, refRegExGlobal);
             }
-
             gastBuilder.createRefsRanges = createRefsRanges;
             function createAtLeastOneRanges(text) {
-                return createOperatorProdRangeParenthesis(text, 3 /* AT_LEAST_ONE */, atLeastOneRegExGlobal);
+                return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE, atLeastOneRegExGlobal);
             }
-
             gastBuilder.createAtLeastOneRanges = createAtLeastOneRanges;
             function createManyRanges(text) {
-                return createOperatorProdRangeParenthesis(text, 2 /* MANY */, manyRegExGlobal);
+                return createOperatorProdRangeParenthesis(text, ProdType.MANY, manyRegExGlobal);
             }
-
             gastBuilder.createManyRanges = createManyRanges;
             function createOptionRanges(text) {
-                return createOperatorProdRangeParenthesis(text, 0 /* OPTION */, optionRegExGlobal);
+                return createOperatorProdRangeParenthesis(text, ProdType.OPTION, optionRegExGlobal);
             }
-
             gastBuilder.createOptionRanges = createOptionRanges;
             function createOrRanges(text) {
-                var orRanges = createOperatorProdRangeParenthesis(text, 1 /* OR */, orRegExGlobal);
+                var orRanges = createOperatorProdRangeParenthesis(text, ProdType.OR, orRegExGlobal);
                 // have to split up the OR cases into separate FLAT productions
                 // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
                 var orSubPartsRanges = createOrPartRanges(orRanges);
                 return _.union(orRanges, orSubPartsRanges);
             }
-
             gastBuilder.createOrRanges = createOrRanges;
             var findClosingCurly = _.partial(findClosingOffset, "{", "}");
             var findClosingParen = _.partial(findClosingOffset, "(", ")");
-
             function createOrPartRanges(orRanges) {
                 var orPartRanges = [];
                 _.forEach(orRanges, function (orRange) {
-                    var currOrParts = createOperatorProdRangeInternal(orRange.text, 6 /* FLAT */, orPartRegEx, findClosingCurly);
+                    var currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly);
                     var currOrRangeStart = orRange.range.start;
                     // fix offsets as we are working on a subset of the text
                     _.forEach(currOrParts, function (orPart) {
@@ -1908,7 +1760,6 @@
                 });
                 return uniqueOrPartRanges;
             }
-
             gastBuilder.createOrPartRanges = createOrPartRanges;
             function createRefOrTerminalProdRangeInternal(text, prodType, pattern) {
                 var prodRanges = [];
@@ -1918,15 +1769,13 @@
                     var stop = pattern.lastIndex;
                     var currRange = new r.Range(start, stop);
                     var currText = matched[0];
-                    prodRanges.push({range: currRange, text: currText, type: prodType});
+                    prodRanges.push({ range: currRange, text: currText, type: prodType });
                 }
                 return prodRanges;
             }
-
             function createOperatorProdRangeParenthesis(text, prodType, pattern) {
                 return createOperatorProdRangeInternal(text, prodType, pattern, findClosingParen);
             }
-
             function createOperatorProdRangeInternal(text, prodType, pattern, findTerminatorOffSet) {
                 var operatorRanges = [];
                 var matched;
@@ -1935,15 +1784,10 @@
                     var stop = findTerminatorOffSet(start + matched[0].length, text);
                     var currRange = new r.Range(start, stop);
                     var currText = text.substr(start, stop - start + 1);
-                    operatorRanges.push({
-                        range: currRange,
-                        text : currText,
-                        type : prodType
-                    });
+                    operatorRanges.push({ range: currRange, text: currText, type: prodType });
                 }
                 return operatorRanges;
             }
-
             function findClosingOffset(opening, closing, start, text) {
                 var parenthesisStack = [1];
                 var i = 0;
@@ -1966,46 +1810,19 @@
                     throw new Error("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS");
                 }
             }
-
             gastBuilder.findClosingOffset = findClosingOffset;
-            var GastRefResolverVisitor = (function (_super) {
-                __extends(GastRefResolverVisitor, _super);
-                function GastRefResolverVisitor(nameToProd) {
-                    _super.call(this);
-                    this.nameToProd = nameToProd;
-                }
-
-                GastRefResolverVisitor.prototype.resolveRefs = function () {
-                    var _this = this;
-                    _.forEach(this.nameToProd.values(), function (prod) {
-                        prod.accept(_this);
-                    });
-                };
-                GastRefResolverVisitor.prototype.visitNonTerminal = function (node) {
-                    var ref = this.nameToProd.get(node.nonTerminalName);
-                    if (!ref) {
-                        throw Error("Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName);
-                    }
-                    node.referencedRule = ref;
-                };
-                return GastRefResolverVisitor;
-            })(gast.GAstVisitor);
-            gastBuilder.GastRefResolverVisitor = GastRefResolverVisitor;
-        })/* istanbul ignore next */(gastBuilder = chevrotain.gastBuilder || /* istanbul ignore next */ (chevrotain.gastBuilder = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-// TODO: rename to validations ?
+        })/* istanbul ignore next */ (gastBuilder = chevrotain.gastBuilder || /* istanbul ignore next */ (chevrotain.gastBuilder = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
-        var validations;
-        (function (validations) {
+        var checks;
+        (function (checks) {
             var gast = chevrotain.gast;
-
             function validateGrammar(topLevels) {
                 var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule);
                 return _.flatten(errorMessagesArrs);
             }
-
-            validations.validateGrammar = validateGrammar;
+            checks.validateGrammar = validateGrammar;
             function validateSingleTopLevelRule(topLevelRule) {
                 var collectorVisitor = new OccurrenceValidationCollector();
                 topLevelRule.accept(collectorVisitor);
@@ -2014,12 +1831,25 @@
                 var duplicates = _.pick(productionGroups, function (currGroup) {
                     return currGroup.length > 1;
                 });
-                var errorMsgs = _.map(duplicates, function (currDuplicates) {
-                    return createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
+                var errors = _.map(duplicates, function (currDuplicates) {
+                    var firstProd = _.first(currDuplicates);
+                    var msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
+                    var dslName = gast.getProductionDslName(firstProd);
+                    var defError = {
+                        message: msg,
+                        type: chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
+                        ruleName: topLevelRule.name,
+                        dslName: dslName,
+                        occurrence: firstProd.occurrenceInParent
+                    };
+                    var param = getExtraProductionArgument(firstProd);
+                    if (param) {
+                        defError.parameter = param;
+                    }
+                    return defError;
                 });
-                return errorMsgs;
+                return errors;
             }
-
             function createDuplicatesErrorMessage(duplicateProds, topLevelName) {
                 var firstProd = _.first(duplicateProds);
                 var index = firstProd.occurrenceInParent;
@@ -2031,12 +1861,10 @@
                 msg = msg.replace(/\s\s+/g, "\n");
                 return msg;
             }
-
             function identifyProductionForDuplicates(prod) {
-                return "" + gast.getProductionDslName(prod) + "_#_" + prod.occurrenceInParent + "_#_" + getExtraProductionArgument(prod);
+                return gast.getProductionDslName(prod) + "_#_" + prod.occurrenceInParent + "_#_" + getExtraProductionArgument(prod);
             }
-
-            validations.identifyProductionForDuplicates = identifyProductionForDuplicates;
+            checks.identifyProductionForDuplicates = identifyProductionForDuplicates;
             function getExtraProductionArgument(prod) {
                 if (prod instanceof gast.Terminal) {
                     return chevrotain.tokenName(prod.terminalType);
@@ -2048,14 +1876,12 @@
                     return "";
                 }
             }
-
             var OccurrenceValidationCollector = (function (_super) {
                 __extends(OccurrenceValidationCollector, _super);
                 function OccurrenceValidationCollector() {
                     _super.apply(this, arguments);
                     this.allProductions = [];
                 }
-
                 OccurrenceValidationCollector.prototype.visitNonTerminal = function (subrule) {
                     this.allProductions.push(subrule);
                 };
@@ -2076,9 +1902,76 @@
                 };
                 return OccurrenceValidationCollector;
             })(gast.GAstVisitor);
-            validations.OccurrenceValidationCollector = OccurrenceValidationCollector;
-        })/* istanbul ignore next */(validations = chevrotain.validations || /* istanbul ignore next */ (chevrotain.validations = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
+            checks.OccurrenceValidationCollector = OccurrenceValidationCollector;
+            var ruleNamePattern = /^[a-zA-Z_]\w*$/;
+            function validateRuleName(ruleName, definedRulesNames, className) {
+                var errors = [];
+                var errMsg;
+                if (!ruleName.match(ruleNamePattern)) {
+                    errMsg = "Invalid Grammar rule name --> " + ruleName + " it must match the pattern: " + ruleNamePattern.toString();
+                    errors.push({
+                        message: errMsg,
+                        type: chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME,
+                        ruleName: ruleName
+                    });
+                }
+                if ((_.contains(definedRulesNames, ruleName))) {
+                    errMsg = "Duplicate definition, rule: " + ruleName + " is already defined in the grammar: " + className;
+                    errors.push({
+                        message: errMsg,
+                        type: chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+                        ruleName: ruleName
+                    });
+                }
+                return errors;
+            }
+            checks.validateRuleName = validateRuleName;
+        })/* istanbul ignore next */ (checks = chevrotain.checks || /* istanbul ignore next */ (chevrotain.checks = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+    var chevrotain;
+    (function (chevrotain) {
+        var resolver;
+        (function (resolver) {
+            var gast = chevrotain.gast;
+            function resolveGrammar(topLevels) {
+                var refResolver = new GastRefResolverVisitor(topLevels);
+                refResolver.resolveRefs();
+                return refResolver.errors;
+            }
+            resolver.resolveGrammar = resolveGrammar;
+            var GastRefResolverVisitor = (function (_super) {
+                __extends(GastRefResolverVisitor, _super);
+                function GastRefResolverVisitor(nameToTopRule) {
+                    _super.call(this);
+                    this.nameToTopRule = nameToTopRule;
+                    this.errors = [];
+                }
+                GastRefResolverVisitor.prototype.resolveRefs = function () {
+                    var _this = this;
+                    _.forEach(this.nameToTopRule.values(), function (prod) {
+                        _this.currTopLevel = prod;
+                        prod.accept(_this);
+                    });
+                };
+                GastRefResolverVisitor.prototype.visitNonTerminal = function (node) {
+                    var ref = this.nameToTopRule.get(node.nonTerminalName);
+                    if (!ref) {
+                        var msg = "Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName;
+                        this.errors.push({
+                            message: msg,
+                            type: chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
+                            ruleName: this.currTopLevel.name
+                        });
+                    }
+                    else {
+                        node.referencedRule = ref;
+                    }
+                };
+                return GastRefResolverVisitor;
+            })(gast.GAstVisitor);
+            resolver.GastRefResolverVisitor = GastRefResolverVisitor;
+        })/* istanbul ignore next */ (resolver = chevrotain.resolver || /* istanbul ignore next */ (chevrotain.resolver = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     var chevrotain;
     (function (chevrotain) {
         var exceptions;
@@ -2089,19 +1982,16 @@
                     chevrotain.lang.functionName(MismatchedTokenException),
                     chevrotain.lang.functionName(NoViableAltException),
                     chevrotain.lang.functionName(EarlyExitException),
-                    chevrotain.lang.functionName(NotAllInputParsedException)
-                ];
+                    chevrotain.lang.functionName(NotAllInputParsedException)];
                 // can't do instanceof on hacked custom js exceptions
                 return _.contains(recognitionExceptions, error.name);
             }
-
             exceptions.isRecognitionException = isRecognitionException;
             function MismatchedTokenException(message, token) {
                 this.name = chevrotain.lang.functionName(MismatchedTokenException);
                 this.message = message;
                 this.token = token;
             }
-
             exceptions.MismatchedTokenException = MismatchedTokenException;
             // must use the "Error.prototype" instead of "new Error"
             // because the stack trace points to where "new Error" was invoked"
@@ -2111,7 +2001,6 @@
                 this.message = message;
                 this.token = token;
             }
-
             exceptions.NoViableAltException = NoViableAltException;
             NoViableAltException.prototype = Error.prototype;
             function NotAllInputParsedException(message, token) {
@@ -2119,7 +2008,6 @@
                 this.message = message;
                 this.token = token;
             }
-
             exceptions.NotAllInputParsedException = NotAllInputParsedException;
             NotAllInputParsedException.prototype = Error.prototype;
             function EarlyExitException(message, token) {
@@ -2127,12 +2015,11 @@
                 this.message = message;
                 this.token = token;
             }
-
             exceptions.EarlyExitException = EarlyExitException;
             EarlyExitException.prototype = Error.prototype;
-        })/* istanbul ignore next */(exceptions = chevrotain.exceptions || /* istanbul ignore next */ (chevrotain.exceptions = {}));
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-// using only root module name ('chevrotain') and not a longer name ('chevrotain.recognizer')
+        })/* istanbul ignore next */ (exceptions = chevrotain.exceptions || /* istanbul ignore next */ (chevrotain.exceptions = {}));
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
+// using only root namespace name ('chevrotain') and not a longer name ('chevrotain.recognizer')
 // because the external and internal API must have the same names for d.ts definition files to be valid
     var chevrotain;
     (function (chevrotain) {
@@ -2143,8 +2030,16 @@
         var gastBuilder = chevrotain.gastBuilder;
         var follows = chevrotain.follow;
         var lookahead = chevrotain.lookahead;
-        var validations = chevrotain.validations;
+        var checks = chevrotain.checks;
+        var resolver = chevrotain.resolver;
         var exceptions = chevrotain.exceptions;
+        (function (ParserDefinitionErrorType) {
+            ParserDefinitionErrorType[ParserDefinitionErrorType["INVALID_RULE_NAME"] = 0] = "INVALID_RULE_NAME";
+            ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_RULE_NAME"] = 1] = "DUPLICATE_RULE_NAME";
+            ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 2] = "DUPLICATE_PRODUCTIONS";
+            ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 3] = "UNRESOLVED_SUBRULE_REF";
+        })(chevrotain.ParserDefinitionErrorType || (chevrotain.ParserDefinitionErrorType = {}));
+        var ParserDefinitionErrorType = chevrotain.ParserDefinitionErrorType;
         var EOF_FOLLOW_KEY = {};
         /**
          * A Recognizer capable of self analysis to determine it's grammar structure
@@ -2160,13 +2055,18 @@
                 this.RULE_STACK = [];
                 this.RULE_OCCURRENCE_STACK = [];
                 this.tokensMap = undefined;
-                // Not worth the hassle to support Unicode characters in rule names...
-                this.ruleNamePattern = /^[a-zA-Z_]\w*$/;
                 this.definedRulesNames = [];
                 this._input = input;
                 this.className = lang.classNameFromInstance(this);
                 this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className);
                 this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className);
+                if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
+                    this.definitionErrors = [];
+                    cache.CLASS_TO_DEFINITION_ERRORS.put(this.className, this.definitionErrors);
+                }
+                else {
+                    this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className);
+                }
                 if (_.isArray(tokensMapOrArr)) {
                     this.tokensMap = _.reduce(tokensMapOrArr, function (acc, tokenClazz) {
                         acc[chevrotain.tokenName(tokenClazz)] = tokenClazz;
@@ -2190,38 +2090,46 @@
                 this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className];
                 this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className];
             }
-
             Parser.performSelfAnalysis = function (classInstance) {
+                var definitionErrors = [];
+                var defErrorsMsgs;
                 var className = lang.classNameFromInstance(classInstance);
-                // this information only needs to be computed once
+                // this information should only be computed once
                 if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
                     var grammarProductions = cache.getProductionsForClass(className);
-                    var refResolver = new gastBuilder.GastRefResolverVisitor(grammarProductions);
-                    refResolver.resolveRefs();
-                    var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
-                    cache.setResyncFollowsForClass(className, allFollows);
+                    // assumes this cache has been initialized (in the relevant parser's constructor)
+                    // TODO: consider making the self analysis a member method to resolve this.
+                    // that way it won't be callable before the constructor has been invoked...
+                    definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className);
+                    var resolverErrors = resolver.resolveGrammar(grammarProductions);
+                    definitionErrors.push.apply(definitionErrors, resolverErrors); // mutability for the win?
                     cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
-                    var validationErrors = validations.validateGrammar(grammarProductions.values());
-                    if (validationErrors.length > 0) {
-                        //cache the validation errors so they can be thrown each time the parser is instantiated
-                        cache.CLASS_TO_VALIDTATION_ERRORS.put(className, validationErrors);
-                        throw new Error(validationErrors.join("-------------------------------\n"));
+                    var validationErrors = checks.validateGrammar(grammarProductions.values());
+                    definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
+                    if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                        defErrorsMsgs = _.map(definitionErrors, function (defError) { return defError.message; });
+                        throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
+                    }
+                    if (_.isEmpty(definitionErrors)) {
+                        var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
+                        cache.setResyncFollowsForClass(className, allFollows);
                     }
                 }
                 // reThrow the validation errors each time an erroneous parser is instantiated
-                if (cache.CLASS_TO_VALIDTATION_ERRORS.containsKey(className)) {
-                    throw new Error(cache.CLASS_TO_VALIDTATION_ERRORS.get(className).join("-------------------------------\n"));
+                if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                    defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
+                    throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
                 }
             };
             Object.defineProperty(Parser.prototype, "input", {
-                get         : function () {
+                get: function () {
                     return _.clone(this._input);
                 },
-                set         : function (newInput) {
+                set: function (newInput) {
                     this.reset();
                     this._input = newInput;
                 },
-                enumerable  : true,
+                enumerable: true,
                 configurable: true
             });
             Parser.prototype.reset = function () {
@@ -2380,9 +2288,7 @@
              * @see SUBRULE1
              */
             Parser.prototype.SUBRULE = function (ruleToCall, args) {
-                if (args === void 0) {
-                    args = [];
-                }
+                if (args === void 0) { args = []; }
                 return this.SUBRULE1(ruleToCall, args);
             };
             /**
@@ -2404,45 +2310,35 @@
              * @returns {*} the result of invoking ruleToCall
              */
             Parser.prototype.SUBRULE1 = function (ruleToCall, args) {
-                if (args === void 0) {
-                    args = [];
-                }
+                if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 1, args);
             };
             /**
              * @see SUBRULE1
              */
             Parser.prototype.SUBRULE2 = function (ruleToCall, args) {
-                if (args === void 0) {
-                    args = [];
-                }
+                if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 2, args);
             };
             /**
              * @see SUBRULE1
              */
             Parser.prototype.SUBRULE3 = function (ruleToCall, args) {
-                if (args === void 0) {
-                    args = [];
-                }
+                if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 3, args);
             };
             /**
              * @see SUBRULE1
              */
             Parser.prototype.SUBRULE4 = function (ruleToCall, args) {
-                if (args === void 0) {
-                    args = [];
-                }
+                if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 4, args);
             };
             /**
              * @see SUBRULE1
              */
             Parser.prototype.SUBRULE5 = function (ruleToCall, args) {
-                if (args === void 0) {
-                    args = [];
-                }
+                if (args === void 0) { args = []; }
                 return ruleToCall.call(this, 5, args);
             };
             /**
@@ -2527,9 +2423,7 @@
              * @see OR1
              */
             Parser.prototype.OR = function (alts, errMsgTypes, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.OR1(alts, errMsgTypes, ignoreAmbiguities);
             };
             /**
@@ -2566,45 +2460,35 @@
              *                                      * only enable this if you know what you are doing!
              */
             Parser.prototype.OR1 = function (alts, errMsgTypes, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 1, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
             Parser.prototype.OR2 = function (alts, errMsgTypes, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 2, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
             Parser.prototype.OR3 = function (alts, errMsgTypes, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 3, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
             Parser.prototype.OR4 = function (alts, errMsgTypes, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 4, ignoreAmbiguities);
             };
             /**
              * @see OR1
              */
             Parser.prototype.OR5 = function (alts, errMsgTypes, ignoreAmbiguities) {
-                if (ignoreAmbiguities === void 0) {
-                    ignoreAmbiguities = false;
-                }
+                if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
                 return this.orInternal(alts, errMsgTypes, 5, ignoreAmbiguities);
             };
             /**
@@ -2723,7 +2607,7 @@
             };
             /**
              *
-             * @param {string} ruleName The name of the Rule. must match the var it is assigned to.
+             * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
              * @param {Function} impl The implementation of the Rule
              * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
              *                   re-sync recovery.
@@ -2732,14 +2616,12 @@
              *                     Parser state / error recovery / ...
              */
             Parser.prototype.RULE = function (ruleName, impl, invalidRet, doReSync) {
-                if (invalidRet === void 0) {
-                    invalidRet = this.defaultInvalidReturn;
-                }
-                if (doReSync === void 0) {
-                    doReSync = true;
-                }
+                if (invalidRet === void 0) { invalidRet = this.defaultInvalidReturn; }
+                if (doReSync === void 0) { doReSync = true; }
                 // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
-                this.validateRuleName(ruleName);
+                var ruleNameErrors = checks.validateRuleName(ruleName, this.definedRulesNames, this.className);
+                this.definedRulesNames.push(ruleName);
+                this.definitionErrors.push.apply(this.definitionErrors, ruleNameErrors); // mutability for the win
                 var parserClassProductions = cache.getProductionsForClass(this.className);
                 // only build the gast representation once
                 if (!(parserClassProductions.containsKey(ruleName))) {
@@ -2747,12 +2629,8 @@
                     parserClassProductions.put(ruleName, gastProduction);
                 }
                 var wrappedGrammarRule = function (idxInCallingRule, args) {
-                    if (idxInCallingRule === void 0) {
-                        idxInCallingRule = 1;
-                    }
-                    if (args === void 0) {
-                        args = [];
-                    }
+                    if (idxInCallingRule === void 0) { idxInCallingRule = 1; }
+                    if (args === void 0) { args = []; }
                     this.ruleInvocationStateUpdate(ruleName, idxInCallingRule);
                     try {
                         // actual parsing happens here
@@ -2772,10 +2650,12 @@
                                 return invalidRet();
                             }
                             else {
+                                // to be handled farther up the call stack
                                 throw e;
                             }
                         }
                         else {
+                            // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
                             throw e;
                         }
                     }
@@ -2818,22 +2698,7 @@
             Parser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
                 return true;
             };
-            Parser.prototype.defaultInvalidReturn = function () {
-                return undefined;
-            };
-            /**
-             * @param ruleFuncName name of the Grammar rule
-             * @throws Grammar validation errors if the name is invalid
-             */
-            Parser.prototype.validateRuleName = function (ruleFuncName) {
-                if (!ruleFuncName.match(this.ruleNamePattern)) {
-                    throw Error("Invalid Grammar rule name --> " + ruleFuncName + " it must match the pattern: " + this.ruleNamePattern.toString());
-                }
-                if ((_.contains(this.definedRulesNames, ruleFuncName))) {
-                    throw Error("Duplicate definition, rule: " + ruleFuncName + " is already defined in the grammar: " + this.className);
-                }
-                this.definedRulesNames.push(ruleFuncName);
-            };
+            Parser.prototype.defaultInvalidReturn = function () { return undefined; };
             Parser.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
                 // TODO: can the resyncTokenType be cached?
                 var reSyncTokType = this.findReSyncTokenType();
@@ -2847,7 +2712,8 @@
                         // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
                         // the error that would have been thrown
                         var expectedTokName = chevrotain.tokenName(expectedTokType);
-                        var msg = "Expecting token of type -->" + expectedTokName + "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
+                        var msg = "Expecting token of type -->" + expectedTokName +
+                            "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
                         this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync));
                         // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
                         grammarRule.apply(this, grammarRuleArgs);
@@ -2889,9 +2755,9 @@
                 var pathRuleStack = _.clone(this.RULE_STACK);
                 var pathOccurrenceStack = _.clone(this.RULE_OCCURRENCE_STACK);
                 var grammarPath = {
-                    ruleStack        : pathRuleStack,
-                    occurrenceStack  : pathOccurrenceStack,
-                    lastTok          : tokClass,
+                    ruleStack: pathRuleStack,
+                    occurrenceStack: pathOccurrenceStack,
+                    lastTok: tokClass,
                     lastTokOccurrence: tokIdxInRule
                 };
                 var topRuleName = _.first(pathRuleStack);
@@ -2914,7 +2780,8 @@
                 throw new InRuleRecoveryException("sad sad panda");
             };
             Parser.prototype.canPerformInRuleRecovery = function (expectedToken, follows) {
-                return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) || this.canRecoverWithSingleTokenDeletion(expectedToken);
+                return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
+                    this.canRecoverWithSingleTokenDeletion(expectedToken);
             };
             Parser.prototype.canRecoverWithSingleTokenInsertion = function (expectedTokType, follows) {
                 if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
@@ -2962,9 +2829,9 @@
                 var currRuleOccIdx = currRuleIdx;
                 var prevRuleIdx = currRuleIdx - 1;
                 return {
-                    ruleName        : this.RULE_STACK[currRuleIdx],
+                    ruleName: this.RULE_STACK[currRuleIdx],
                     idxInCallingRule: this.RULE_OCCURRENCE_STACK[currRuleOccIdx],
-                    inRule          : this.RULE_STACK[prevRuleIdx]
+                    inRule: this.RULE_STACK[prevRuleIdx]
                 };
             };
             Parser.prototype.buildFullFollowKeyStack = function () {
@@ -2974,9 +2841,9 @@
                         return EOF_FOLLOW_KEY;
                     }
                     return {
-                        ruleName        : ruleName,
+                        ruleName: ruleName,
                         idxInCallingRule: _this.RULE_OCCURRENCE_STACK[idx],
-                        inRule          : _this.RULE_STACK[idx - 1]
+                        inRule: _this.RULE_STACK[idx - 1]
                     };
                 });
             };
@@ -3015,7 +2882,9 @@
                 var isEndOfRule = firstAfterRepInfo.isEndOfRule;
                 // special edge case of a TOP most repetition after which the input should END.
                 // this will force an attempt for inRule recovery in that scenario.
-                if (this.RULE_STACK.length === 1 && isEndOfRule && expectTokAfterLastMatch === undefined) {
+                if (this.RULE_STACK.length === 1 &&
+                    isEndOfRule &&
+                    expectTokAfterLastMatch === undefined) {
                     expectTokAfterLastMatch = chevrotain.EOF;
                     nextTokIdx = 1;
                 }
@@ -3101,18 +2970,20 @@
                     // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
                     // but the original syntax could have been parsed successfully without any backtracking + recovery
                     if (eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
-                        var follows = this.getFollowsForInRuleRecovery(tokClass, idx);
+                        var follows_1 = this.getFollowsForInRuleRecovery(tokClass, idx);
                         try {
-                            return this.tryInRuleRecovery(tokClass, follows);
+                            return this.tryInRuleRecovery(tokClass, follows_1);
                         }
                         catch (eFromInRuleRecovery) {
                             /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
                             // it is only needed for the else branch but in tsc 1.4.1 comments
                             // between if and else seem to get swallowed and disappear.
                             if (eFromConsumption instanceof InRuleRecoveryException) {
+                                // throw the original error in order to trigger reSync error recovery
                                 throw eFromConsumption;
                             }
                             else {
+                                // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
                                 throw eFromInRuleRecovery;
                             }
                         }
@@ -3163,9 +3034,7 @@
                 return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne);
             };
             Parser.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, extraArgs) {
-                if (extraArgs === void 0) {
-                    extraArgs = [];
-                }
+                if (extraArgs === void 0) { extraArgs = []; }
                 var ruleName = _.last(this.RULE_STACK);
                 var condition = this.classLAFuncs.get(key);
                 if (condition === undefined) {
@@ -3180,8 +3049,8 @@
                 var savedErrors = _.clone(this.errors);
                 var savedRuleStack = _.clone(this.RULE_STACK);
                 return {
-                    errors    : savedErrors,
-                    inputIdx  : this.inputIdx,
+                    errors: savedErrors,
+                    inputIdx: this.inputIdx,
                     RULE_STACK: savedRuleStack
                 };
             };
@@ -3191,10 +3060,18 @@
                 this.RULE_STACK = newState.RULE_STACK;
             };
             Parser.prototype.raiseNoAltException = function (errMsgTypes) {
-                throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()));
+                throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
+                    " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()));
             };
             Parser.IGNORE_AMBIGUITIES = true;
             Parser.NO_RESYNC = false;
+            // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
+            // (normally during the parser's constructor).
+            // This is a design time flag, it will not affect the runtime error handling of the parser, just design time errors,
+            // for example: duplicate rule names, referencing an unresolved subrule, ect...
+            // This flag should not be enabled during normal usage, it is used in special situations, for example when
+            // needing to display the parser definition errors in some GUI(online playground).
+            Parser.DEFER_DEFINITION_ERRORS_HANDLING = false;
             return Parser;
         })();
         chevrotain.Parser = Parser;
@@ -3202,12 +3079,11 @@
             this.name = lang.functionName(InRuleRecoveryException);
             this.message = message;
         }
-
         InRuleRecoveryException.prototype = Error.prototype;
-    })/* istanbul ignore next */(chevrotain || (chevrotain = {}));
-/// <reference path="../libs/node.d.ts" />
+    })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
     /* istanbul ignore next */
-    var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) || (typeof window === "object" && window.CHEV_TEST_MODE);
+    var testMode = (typeof global === "object" && global.CHEV_TEST_MODE) ||
+        (typeof window === "object" && window.CHEV_TEST_MODE);
     var API = {};
     /* istanbul ignore next */
     if (!testMode) {
@@ -3265,6 +3141,7 @@
 /// <reference path="../src/parse/grammar/lookahead.ts" />
 /// <reference path="../src/parse/gast_builder.ts" />
 /// <reference path="../src/parse/grammar/checks.ts" />
+/// <reference path="../src/parse/grammar/resolver.ts" />
 /// <reference path="../src/parse/exceptions_public.ts" />
 /// <reference path="../src/parse/parser_public.ts" />
 /// <reference path="../src/api.ts" />
