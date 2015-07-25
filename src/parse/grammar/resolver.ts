@@ -10,7 +10,7 @@ namespace chevrotain.resolver {
 
     export class GastRefResolverVisitor extends gast.GAstVisitor {
 
-        public errors:IParserDefinitionError[] = []
+        public errors:IParserUnresolvedRefDefinitionError[] = []
         private currTopLevel:gast.Rule
 
         constructor(private nameToTopRule:lang.HashTable<gast.Rule>) { super() }
@@ -30,7 +30,8 @@ namespace chevrotain.resolver {
                 this.errors.push({
                     message:msg,
                     type:ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
-                    ruleName: this.currTopLevel.name
+                    ruleName: this.currTopLevel.name,
+                    unresolvedRefName: node.nonTerminalName
                 })
             }
             else {
