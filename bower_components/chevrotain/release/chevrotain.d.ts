@@ -104,7 +104,7 @@ declare module chevrotain {
          *     this is usually used for ignoring whitespace/comments
          *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
          *
-         *  3. With a PATTERN property that has the value of the let Lexer.NA defined above.
+         *  3. With a PATTERN property that has the value of the var Lexer.NA defined above.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
          *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *
@@ -178,6 +178,9 @@ declare module chevrotain {
         dslName: string;
         occurrence: number;
         parameter?: string;
+    }
+    interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
+        unresolvedRefName: string;
     }
     interface IFollowKey {
         ruleName: string;
@@ -596,78 +599,78 @@ declare module chevrotain {
         private raiseNoAltException(errMsgTypes);
     }
 
-    module exceptions {
-        function isRecognitionException(error: Error): boolean;
-        function MismatchedTokenException(message: string, token: Token): void;
-        function NoViableAltException(message: string, token: Token): void;
-        function NotAllInputParsedException(message: string, token: Token): void;
-        function EarlyExitException(message: string, token: Token): void;
-    }
+	module exceptions {
+    	function isRecognitionException(error: Error): boolean;
+    	function MismatchedTokenException(message: string, token: Token): void;
+    	function NoViableAltException(message: string, token: Token): void;
+    	function NotAllInputParsedException(message: string, token: Token): void;
+    	function EarlyExitException(message: string, token: Token): void;
+	}
+	
 
-
-    module gast {
-        interface IProduction {
-            accept(visitor: GAstVisitor): void;
-        }
-        interface IProductionWithOccurrence extends IProduction {
-            occurrenceInParent: number;
-            implicitOccurrenceIndex: boolean;
-        }
-        class AbstractProduction implements IProduction {
-            definition: IProduction[];
-            implicitOccurrenceIndex: boolean;
-            constructor(definition: IProduction[]);
-            accept(visitor: GAstVisitor): void;
-        }
-        class NonTerminal extends AbstractProduction implements IProductionWithOccurrence {
-            nonTerminalName: string;
-            referencedRule: Rule;
-            occurrenceInParent: number;
-            constructor(nonTerminalName: string, referencedRule?: Rule, occurrenceInParent?: number);
-            definition: IProduction[];
-            accept(visitor: GAstVisitor): void;
-        }
-        class Rule extends AbstractProduction {
-            name: string;
-            orgText: string;
-            constructor(name: string, definition: IProduction[], orgText?: string);
-        }
-        class Flat extends AbstractProduction {
-            constructor(definition: IProduction[]);
-        }
-        class Option extends AbstractProduction implements IProductionWithOccurrence {
-            occurrenceInParent: number;
-            constructor(definition: IProduction[], occurrenceInParent?: number);
-        }
-        class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence {
-            occurrenceInParent: number;
-            constructor(definition: IProduction[], occurrenceInParent?: number);
-        }
-        class Repetition extends AbstractProduction implements IProductionWithOccurrence {
-            occurrenceInParent: number;
-            constructor(definition: IProduction[], occurrenceInParent?: number);
-        }
-        class Alternation extends AbstractProduction implements IProductionWithOccurrence {
-            occurrenceInParent: number;
-            constructor(definition: IProduction[], occurrenceInParent?: number);
-        }
-        class Terminal implements IProductionWithOccurrence {
-            terminalType: Function;
-            occurrenceInParent: number;
-            implicitOccurrenceIndex: boolean;
-            constructor(terminalType: Function, occurrenceInParent?: number);
-            accept(visitor: GAstVisitor): void;
-        }
-        class GAstVisitor {
-            visit(node: IProduction): void;
-            visitNonTerminal(node: NonTerminal): void;
-            visitFlat(node: Flat): void;
-            visitOption(node: Option): void;
-            visitRepetitionMandatory(node: RepetitionMandatory): void;
-            visitRepetition(node: Repetition): void;
-            visitAlternation(node: Alternation): void;
-            visitTerminal(node: Terminal): void;
-        }
-    }
-
+	module gast {
+    	interface IProduction {
+        	accept(visitor: GAstVisitor): void;
+    	}
+    	interface IProductionWithOccurrence extends IProduction {
+        	occurrenceInParent: number;
+        	implicitOccurrenceIndex: boolean;
+    	}
+    	class AbstractProduction implements IProduction {
+        	definition: IProduction[];
+        	implicitOccurrenceIndex: boolean;
+        	constructor(definition: IProduction[]);
+        	accept(visitor: GAstVisitor): void;
+    	}
+    	class NonTerminal extends AbstractProduction implements IProductionWithOccurrence {
+        	nonTerminalName: string;
+        	referencedRule: Rule;
+        	occurrenceInParent: number;
+        	constructor(nonTerminalName: string, referencedRule?: Rule, occurrenceInParent?: number);
+        	definition: IProduction[];
+        	accept(visitor: GAstVisitor): void;
+    	}
+    	class Rule extends AbstractProduction {
+        	name: string;
+        	orgText: string;
+        	constructor(name: string, definition: IProduction[], orgText?: string);
+    	}
+    	class Flat extends AbstractProduction {
+        	constructor(definition: IProduction[]);
+    	}
+    	class Option extends AbstractProduction implements IProductionWithOccurrence {
+        	occurrenceInParent: number;
+        	constructor(definition: IProduction[], occurrenceInParent?: number);
+    	}
+    	class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence {
+        	occurrenceInParent: number;
+        	constructor(definition: IProduction[], occurrenceInParent?: number);
+    	}
+    	class Repetition extends AbstractProduction implements IProductionWithOccurrence {
+        	occurrenceInParent: number;
+        	constructor(definition: IProduction[], occurrenceInParent?: number);
+    	}
+    	class Alternation extends AbstractProduction implements IProductionWithOccurrence {
+        	occurrenceInParent: number;
+        	constructor(definition: IProduction[], occurrenceInParent?: number);
+    	}
+    	class Terminal implements IProductionWithOccurrence {
+        	terminalType: Function;
+        	occurrenceInParent: number;
+        	implicitOccurrenceIndex: boolean;
+        	constructor(terminalType: Function, occurrenceInParent?: number);
+        	accept(visitor: GAstVisitor): void;
+    	}
+    	class GAstVisitor {
+        	visit(node: IProduction): void;
+        	visitNonTerminal(node: NonTerminal): void;
+        	visitFlat(node: Flat): void;
+        	visitOption(node: Option): void;
+        	visitRepetitionMandatory(node: RepetitionMandatory): void;
+        	visitRepetition(node: Repetition): void;
+        	visitAlternation(node: Alternation): void;
+        	visitTerminal(node: Terminal): void;
+    	}
+	}
+	
 }
