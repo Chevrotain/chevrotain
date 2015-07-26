@@ -1,7 +1,7 @@
 h1 {
     font-family: Arial;
     font-size: 20px;
-    color: #4f93ff;
+    color: #3d3cff;
     text-align: -webkit-auto;
     padding-left: 8px;
     padding-top: 8px;
@@ -11,7 +11,7 @@ h1 {
 h3 {
     font-family: Arial;
     font-size: 13px;
-    color: #4f93ff;
+    color: #3d3cff;
     text-align: -webkit-auto;
 }
 
@@ -20,7 +20,7 @@ h3 {
     text-decoration: underline;
     font-size: 16px;
     margin-bottom: -15px;
-    color: #4f93ff;
+    color: #3d3cff;
     text-align: left;
 }
 
@@ -108,8 +108,8 @@ button {
     margin-right: 8px;
     margin-bottom: 8px;
     margin-top: 0px;
-    color: #4f93ff;
-    background-color: #4f93ff;
+    color: #3d3cff;
+    background-color: #3d3cff;
     height: 1px;
     border: 0;
     opacity: 0.5;
