@@ -71,8 +71,6 @@
         <div class="card">
             <div align="center">
                 <h1 style="float: left">Syntax Diagrams</h1>
-                <label class="checkboxLabel"><input type='checkbox' id="chooseTerminalPrintStyle" onclick='checkboxChanged(this)'>Show
-                    Terminal's RegExp</label>
             </div>
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
@@ -121,12 +119,12 @@
         })
     }
 
-    function renderSyntaxDiagrams(topRules, useTokenNames) {
+    function renderSyntaxDiagrams(topRules) {
         //TODO Use jQuery
         var svgWrapperDiv = document.getElementById("svgWrapper")
         svgWrapperDiv.innerHTML = ""
         _.forEach(topRules, function (production) {
-            var currDiagramHtml = convertProductionToDiagram(production, useTokenNames)
+            var currDiagramHtml = convertProductionToDiagram(production)
             document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
         })
     }
@@ -145,13 +143,7 @@
         parser = new parserConstructor()
         markParserDefinitionErrors(parser)
         var topRules = parser.getGAstProductions().values()
-        renderSyntaxDiagrams(topRules, !$("#chooseTerminalPrintStyle").is(':checked'))
-    }
-
-    function checkboxChanged(cb) {
-        var state = !cb.checked
-        var topRules = parser.getGAstProductions().values()
-        renderSyntaxDiagrams(topRules, state)
+        renderSyntaxDiagrams(topRules)
     }
 
     function initExamplesDropDown() {

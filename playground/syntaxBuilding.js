@@ -1,8 +1,8 @@
 
-function definitionsToSubDiagrams(definitions, useTokenNames) {
+function definitionsToSubDiagrams(definitions) {
     "use strict";
     var subDiagrams = _.map(definitions, function (subProd) {
-        return convertProductionToDiagram(subProd, useTokenNames);
+        return convertProductionToDiagram(subProd);
     });
     return subDiagrams;
 }
@@ -10,11 +10,10 @@ function definitionsToSubDiagrams(definitions, useTokenNames) {
 /**
  *
  * @param prod
- * @param useTokenNames {boolean} if true will display the Token's name in the Terminal's svg element. otherwise will display
- *        it's regExp's literal form.
+ *
  * @returns {*}
  */
-function convertProductionToDiagram(prod, useTokenNames) {
+function convertProductionToDiagram(prod) {
 
     if (prod instanceof chevrotain.gast.NonTerminal) {
         // must handle NonTerminal separately from the other AbstractProductions as we do not want to expand the subDefinition
@@ -22,7 +21,7 @@ function convertProductionToDiagram(prod, useTokenNames) {
         return NonTerminal(prod.nonTerminalName)
     }
     else if (!(prod instanceof chevrotain.gast.Terminal)) {
-        var subDiagrams = definitionsToSubDiagrams(prod.definition, useTokenNames);
+        var subDiagrams = definitionsToSubDiagrams(prod.definition);
         if (prod instanceof chevrotain.gast.Rule) {
             return Diagram.apply(this, subDiagrams)
         }
@@ -68,9 +67,7 @@ function convertProductionToDiagram(prod, useTokenNames) {
         }
     }
     else if (prod instanceof chevrotain.gast.Terminal) {
-        // TODO: TokenName or regexp?
-        var terminalTextContents = useTokenNames ? chevrotain.tokenName(prod.terminalType): prod.terminalType.PATTERN.source
-        return Terminal(terminalTextContents)
+        return Terminal(chevrotain.tokenName(prod.terminalType), undefined, prod.terminalType.PATTERN.source)
     }
     else {
         throw Error("non exhaustive match")

@@ -515,11 +515,12 @@ At runtime, these constants can be found on the Diagram class.
 		return this;
 	}
 
-	function Terminal(text, href) {
-		if(!(this instanceof Terminal)) return new Terminal(text, href);
+	function Terminal(text, href, title) {
+		if(!(this instanceof Terminal)) return new Terminal(text, href, title);
 		FakeSVG.call(this, 'g', {'class': 'terminal'});
 		this.text = text;
 		this.href = href;
+		this.title = title;
 		this.width = text.length * 8 + 20; /* Assume that each char is .5em, and that the em is 16px */
 		this.height = 0;
 		this.offsetX = 0;
@@ -537,10 +538,13 @@ At runtime, these constants can be found on the Diagram class.
 
 		FakeSVG('rect', {x:x, y:y-11, width:this.width, height:this.up+this.down, rx:10, ry:10}).addTo(this);
 		var text = FakeSVG('text', {x:x+this.width/2, y:y+4}, this.text);
+		var title = FakeSVG('title', {}, this.title);
 		if(this.href)
 			FakeSVG('a', {'xlink:href': this.href}, [text]).addTo(this);
-		else
+		else {
 			text.addTo(this);
+			title.addTo(this);
+		}
 		return this;
 	}
 
