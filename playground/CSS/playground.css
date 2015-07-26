@@ -16,13 +16,13 @@ h3 {
 }
 
 .diagramHeader {
-    font-family: Arial;
-    text-decoration: underline;
-    font-size: 16px;
-    margin-bottom: -15px;
-    padding-left: 15px;
-    color: #2b2f8d;
-    text-align: left;
+    font-weight: bold;
+    /*text-decoration: underline;*/
+    font-family: monospace;
+    font-size: 18px;
+    margin-bottom: -11px;
+    /*color: #2b2f8d;*/
+    text-align: center;
 }
 
 .markTextError {
