@@ -116,7 +116,8 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
     var ruleText
     switch (parseErr.type) {
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS:
-            return locateDuplicateProductions()
+            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            return locateDuplicateProductions(parserImplText, ruleText, parseErr, positionHelper)
             break
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME:
         case chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME:
@@ -184,6 +185,37 @@ function locateUnresolvedSubruleRef(fullText, ruleText, unresolvedRefName, posit
     while ((execResult = seekerRegExp.exec(ruleText))) {
         var startOffset = ruleTextStartOffset + execResult.index + execResult[patternPrefixGroup].length
         var endOffset = startOffset + execResult[patternRuleRefGroup].length
+        var startPos = positionHelper.posFromIndex(startOffset)
+        var endPos = positionHelper.posFromIndex(endOffset)
+        unresolvedRefPos.push({start: startPos, end: endPos})
+    }
+
+    return unresolvedRefPos
+}
+
+
+/**
+ * @param {string} fullText - the full text to search in.
+ * @param {string} ruleText - a subset of the full text to search in
+ * @param {chevrotain.IParserDuplicatesDefinitionError} dupError
+ * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
+ *
+ * @return {{start:{line:number, column:number},
+ *             end:{line:number, column:number}}
+ */
+function locateDuplicateProductions(fullText, ruleText, dupError, positionHelper) {
+    var ruleTextStartOffset = fullText.indexOf(ruleText)
+    var dslNameWithOccurrence = dupError.dslName + ( dupError.occurrence === 1 ? '(?:|dupError.occurrence)' : dupError.occurrence)
+    var parameterPart = dupError.parameter ? '\\s*\\(\\s*.*' + dupError.parameter + '\\s*\\)' : ''
+
+    var soughtPattern = dslNameWithOccurrence + parameterPart
+    var seekerRegExp = new RegExp(soughtPattern, "g")
+
+    var unresolvedRefPos = []
+    var execResult
+    while ((execResult = seekerRegExp.exec(ruleText))) {
+        var startOffset = ruleTextStartOffset + execResult.index
+        var endOffset = startOffset + execResult[0].length
         var startPos = positionHelper.posFromIndex(startOffset)
         var endPos = positionHelper.posFromIndex(endOffset)
         unresolvedRefPos.push({start: startPos, end: endPos})
