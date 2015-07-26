@@ -1,5 +1,3 @@
-// TODO: handle case when location was not found
-
 /**
  * @param {chevrotain.ILexerDefinitionError} lexErr
  * @param {string} parserImplText
@@ -39,6 +37,7 @@ function locateRegExpLiteral(regExp, text, positionHelper, times) {
     var fromOffset = 0
     var soughtPattern = regExp.toString()
 
+    // TODO: use regExp with global flag and tons of escaping instead of fixed number of searched, this will make it idiot proof
     return _.map(_.range(times), function () {
         var startOffset = text.indexOf(soughtPattern, fromOffset)
         var endOffset = startOffset + soughtPattern.length
@@ -69,6 +68,7 @@ function locateExtendTokenPos(tokenClass, text, positionHelper) {
     }
 
     var startOffset = execResult.index
+    // TODO: edge case where we failed to locate the closing parenthesis, fail gracefully
     var endOffset = locateClosingParenthesis(startOffset, text)
     var startPos = positionHelper.posFromIndex(startOffset)
     var endPos = positionHelper.posFromIndex(endOffset)
@@ -86,8 +86,8 @@ function locateExtendTokenPos(tokenClass, text, positionHelper) {
  */
 function locateClosingParenthesis(startOffset, text) {
 
-    // TODO: currently ignoring string/regexp literals/comments which makes this very
-    // not robust, however for the basic scenarios for which this is supposed to work.
+    // TODO: currently ignoring string/regexp literals/comments which makes this somewhat
+    // none robust, however for the basic scenarios for which this is supposed to work.
     // missing patterns/invalid patterns types, it should work for the vast majority of
     // cases. This can be upgraded later to be more robust...
     var currOffset = startOffset
@@ -142,7 +142,6 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
  *             end:{line:number, column:number}}
  */
 function locateRuleDefinition(ruleName, text, positionHelper) {
-    // the capturing group for the '.rule(' part of the seekerRegExp
     var patternPrefixGroup = 1
     var patternRuleNameGroup = 2
     var soughtPattern = "(\\.RULE\\s*\\(\\s*)(['\"]" + ruleName + "['\"])"
@@ -171,7 +170,6 @@ function locateRuleDefinition(ruleName, text, positionHelper) {
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-// TODO: extract common logic with locateRuleDefinition ?
 function locateUnresolvedSubruleRef(fullText, ruleText, unresolvedRefName, positionHelper) {
     var ruleTextStartOffset = fullText.indexOf(ruleText)
     // the capturing group for the '.rule(' part of the seekerRegExp
