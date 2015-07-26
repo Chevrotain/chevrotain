@@ -1,5 +1,6 @@
 h1 {
     font-family: Arial;
+    font-weight: normal;
     font-size: 20px;
     color: #2b2f8d;
     text-align: -webkit-auto;
@@ -20,7 +21,7 @@ h3 {
     /*text-decoration: underline;*/
     font-family: monospace;
     font-size: 18px;
-    margin-bottom: -11px;
+    margin-bottom: -8px;
     /*color: #2b2f8d;*/
     text-align: center;
 }
