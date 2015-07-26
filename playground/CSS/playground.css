@@ -15,6 +15,15 @@ h3 {
     text-align: -webkit-auto;
 }
 
+.diagramHeader {
+    font-family: Arial;
+    text-decoration: underline;
+    font-size: 16px;
+    margin-bottom: -15px;
+    color: #4f93ff;
+    text-align: left;
+}
+
 .markTextError {
     display: inline-block;
     position: relative;

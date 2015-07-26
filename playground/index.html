@@ -126,7 +126,8 @@
         var svgWrapperDiv = document.getElementById("svgWrapper")
         svgWrapperDiv.innerHTML = ""
         _.forEach(topRules, function (production) {
-            document.getElementById("svgWrapper").innerHTML += convertProductionToDiagram(production, useTokenNames)
+            var currDiagramHtml = convertProductionToDiagram(production, useTokenNames)
+            document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + ':</h2>' + currDiagramHtml
         })
     }
 
