@@ -31,7 +31,7 @@
         <div class="card">
 
             <div align="center">
-                <h1 style="float: left;">Implement Parser</h1>
+                <h1 style="float: left;">Implementation</h1>
 
                 <div style="float: right; margin-top: 7px;">
                     <h3 style="float: left; margin-top: 4px">Example:</h3>
@@ -125,7 +125,45 @@
         svgWrapperDiv.innerHTML = ""
         _.forEach(topRules, function (production) {
             var currDiagramHtml = convertProductionToDiagram(production)
+
             document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
+        })
+        attachHighlightEvents()
+    }
+
+    function attachHighlightEvents() {
+        var diagramHeaders = $(".diagramHeader")
+        _.forEach(diagramHeaders, function (header) {
+            header.addEventListener("mouseover", onDiagramHeaderMouseOver);
+            header.addEventListener("mouseout", onDiagramHeaderMouseOut);
+        })
+    }
+
+    function onDiagramHeaderMouseOver(mouseEvent) {
+        mouseEvent.target.style.color = "#23B11E"
+
+        var definitionName = mouseEvent.target.innerHTML
+        _.forEach(getUsageSvgRect(definitionName), function (rect) {
+            rect.style.stroke = "#23B11E"
+            rect.style["stroke-width"] = "5"
+        })
+    }
+
+    function onDiagramHeaderMouseOut(mouseEvent) {
+        mouseEvent.target.style.color = "black"
+
+        var definitionName = mouseEvent.target.innerHTML
+        _.forEach(getUsageSvgRect(definitionName), function (rect) {
+            rect.style.stroke = "black"
+            rect.style["stroke-width"] = "3"
+        })
+    }
+
+    function getUsageSvgRect(definitionName) {
+        var rects = $(".non-terminal").find("rect")
+        return _.filter(rects, function (rect) {
+            var textNode = rect.parentNode.getElementsByTagName('text')[0];
+            return textNode.innerHTML === definitionName
         })
     }
 
