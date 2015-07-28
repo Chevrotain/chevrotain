@@ -22,6 +22,7 @@
     <script src="errorMarkers.js"></script>
     <script src="examples.js"></script>
     <script src="syntaxBuilding.js"></script>
+    <script src="diagramsHighlights.js"></script>
     <title>Playground</title>
 </head>
 <body style="background-color: #f1f1f1">
@@ -129,38 +130,6 @@
             document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
         })
         attachHighlightEvents()
-    }
-
-    function attachHighlightEvents() {
-        var diagramHeaders = $(".diagramHeader")
-        _.forEach(diagramHeaders, function (header) {
-            header.addEventListener("mouseover", onDiagramHeaderMouseOver);
-            header.addEventListener("mouseout", onDiagramHeaderMouseOut);
-        })
-    }
-
-    function onDiagramHeaderMouseOver(mouseEvent) {
-        var definitionName = mouseEvent.target.innerHTML
-        mouseEvent.target.style["background-color"] = "#31BA5F"
-        _.forEach(getUsageSvgRect(definitionName), function (rect) {
-            rect.style.fill = "yellow"
-        })
-    }
-
-    function onDiagramHeaderMouseOut(mouseEvent) {
-        var definitionName = mouseEvent.target.innerHTML
-        mouseEvent.target.style["background-color"] = "transparent"
-        _.forEach(getUsageSvgRect(definitionName), function (rect) {
-            rect.style.fill = "#A8C1FF"
-        })
-    }
-
-    function getUsageSvgRect(definitionName) {
-        var rects = $(".non-terminal").find("rect")
-        return _.filter(rects, function (rect) {
-            var textNode = rect.parentNode.getElementsByTagName('text')[0];
-            return textNode.innerHTML === definitionName
-        })
     }
 
     function editorContentsChanged() {
