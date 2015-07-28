@@ -140,22 +140,16 @@
     }
 
     function onDiagramHeaderMouseOver(mouseEvent) {
-        mouseEvent.target.style.color = "#23B11E"
-
         var definitionName = mouseEvent.target.innerHTML
         _.forEach(getUsageSvgRect(definitionName), function (rect) {
-            rect.style.stroke = "#23B11E"
-            rect.style["stroke-width"] = "5"
+            rect.style.fill = "yellow"
         })
     }
 
     function onDiagramHeaderMouseOut(mouseEvent) {
-        mouseEvent.target.style.color = "black"
-
         var definitionName = mouseEvent.target.innerHTML
         _.forEach(getUsageSvgRect(definitionName), function (rect) {
-            rect.style.stroke = "black"
-            rect.style["stroke-width"] = "3"
+            rect.style.fill = "#A8C1FF"
         })
     }
 
