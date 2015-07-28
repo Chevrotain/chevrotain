@@ -141,6 +141,7 @@
 
     function onDiagramHeaderMouseOver(mouseEvent) {
         var definitionName = mouseEvent.target.innerHTML
+        mouseEvent.target.style["background-color"] = "#31BA5F"
         _.forEach(getUsageSvgRect(definitionName), function (rect) {
             rect.style.fill = "yellow"
         })
@@ -148,6 +149,7 @@
 
     function onDiagramHeaderMouseOut(mouseEvent) {
         var definitionName = mouseEvent.target.innerHTML
+        mouseEvent.target.style["background-color"] = "transparent"
         _.forEach(getUsageSvgRect(definitionName), function (rect) {
             rect.style.fill = "#A8C1FF"
         })
