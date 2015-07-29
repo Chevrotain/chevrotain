@@ -57,12 +57,14 @@ function jsonExample() {
         });
 
         this.objectItem = this.RULE("objectItem", function () {
-            var key, value, obj = {};
+            var stringLiteral, key, value, obj = {};
 
-            key = $.CONSUME(StringLiteral).image;
+            stringLiteral = $.CONSUME(StringLiteral).image
             $.CONSUME(Colon);
             value = $.SUBRULE($.value);
 
+            // chop of the quotation marks
+            key =  stringLiteral.substr(1, stringLiteral.length  - 2);
             obj[key] = value;
             return obj;
         });
