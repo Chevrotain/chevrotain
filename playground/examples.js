@@ -15,7 +15,7 @@ function jsonExample() {
     var Comma = extendToken("Comma", /,/);
     var Colon = extendToken("Colon", /:/);
     var StringLiteral = extendToken("StringLiteral",
-        /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
+        /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
     var NumberLiteral = extendToken("NumberLiteral",
         /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
