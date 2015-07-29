@@ -1,4 +1,3 @@
-
 // TODO: use css styles instead of hardcoded values
 function attachHighlightEvents() {
     var diagramHeaders = $(".diagramHeader")
@@ -51,7 +50,10 @@ function onDiagramHeaderMouseOut(mouseEvent) {
 function onDiagramHeaderMouseClick(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
     var definitionPos = locateRuleDefinition(definitionName, javaScriptEditor.getValue(), javaScriptEditor)
-    center(_.first(definitionPos).start.line)
+    var pos = _.first(definitionPos).start
+    center(pos.line)
+    javaScriptEditor.focus()
+    javaScriptEditor.setCursor(pos)
 }
 
 
