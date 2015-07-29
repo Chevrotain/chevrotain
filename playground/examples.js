@@ -57,14 +57,15 @@ function jsonExample() {
         });
 
         this.objectItem = this.RULE("objectItem", function () {
-            var stringLiteral, key, value, obj = {};
+            var lit, key, value, obj = {};
 
-            stringLiteral = $.CONSUME(StringLiteral).image
+            lit = $.CONSUME(StringLiteral)
             $.CONSUME(Colon);
             value = $.SUBRULE($.value);
 
-            // chop of the quotation marks
-            key =  stringLiteral.substr(1, stringLiteral.length  - 2);
+            // an empty json key is not valid, use "BAD_KEY" instead
+            key =  lit.isInsertedInRecovery ?
+                 "BAD_KEY" : lit.image.substr(1, lit.image.length  - 2) ;
             obj[key] = value;
             return obj;
         });
