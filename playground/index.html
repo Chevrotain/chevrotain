@@ -103,82 +103,17 @@
     var lexerErrorsMarkers = []
     var parserErrorsMarkers = []
 
-    function lexAndParse(text, lexer, parser, startRuleName) {
-        var lexResult = lexer.tokenize(text)
-        parser.reset()
-        parser.input = lexResult.tokens
-        var value = parser[startRuleName]()
-        return {value: value, lexErrors: lexResult.errors, parseErrors: parser.errors}
-    }
-
-    function cleanChevrotainCache() {
-        var hashmaps = _.filter(chevrotain.cache, function (prop) {
-            return prop instanceof chevrotain.lang.HashTable
-        })
-
-        _.forEach(hashmaps, function (cacheMap) {
-            cacheMap._state = {}
-        })
-    }
-
-    function renderSyntaxDiagrams(topRules) {
-        //TODO Use jQuery
-        var svgWrapperDiv = document.getElementById("svgWrapper")
-        svgWrapperDiv.innerHTML = ""
-        _.forEach(topRules, function (production) {
-            var currDiagramHtml = convertProductionToDiagram(production)
-
-            document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
-        })
-        attachHighlightEvents()
-    }
-
-    function editorContentsChanged() {
-        cleanChevrotainCache()
-        var editorFuncVal = eval(javaScriptEditor.getValue())
-        var parserConstructor = editorFuncVal.parser
-        lexer = editorFuncVal.lexer
-        markLexerDefinitionErrors(lexer)
-
-
-        defaultRuleName = editorFuncVal.defaultRule
-        var errMsgDiv = $("#errorMessagesDiv")
-        errMsgDiv.empty()
-        parser = new parserConstructor()
-        markParserDefinitionErrors(parser)
-        var topRules = parser.getGAstProductions().values()
-        renderSyntaxDiagrams(topRules)
-    }
-
-    function initExamplesDropDown() {
-        var examplesDropdown = $("#example-choice")
-        examplesDropdown.find("option").remove()
-        _.forEach(_.keys(samples), function (sampleName) {
-            examplesDropdown.append("<option>" + sampleName + "</option>")
-        })
-    }
-
-    function loadExample(exampleName, firstTime) {
-        var samplesDropdown = $("#samples-choice")
-        var sample = samples[exampleName]
-        // reduce whitespace used for Indentation, 2 spaces is also used in the code mirror editor
-        var sampleText = "(" + sample.implementation.toString().replace(/    /g, "  ") + "())"
-
-        javaScriptEditor.setValue(sampleText)
-        updateSamplesDropDown()
-        if (firstTime) {
-            editorContentsChanged() // can't wait for debounce on the first load as loadSamples will trigger lexAndParse
-        }
-        loadSamples(samplesDropdown.val())
-    }
-
-    function loadSamples(exampleName) {
-        var examplesDropdown = $("#example-choice")
-        inputEditor.setValue(samples[examplesDropdown.val()].sampleInputs[exampleName])
-        $("#parserOutput").val("")
-    }
 
     function parseInputAndDisplayResult() {
+
+        function lexAndParse(text, lexer, parser, startRuleName) {
+            var lexResult = lexer.tokenize(text)
+            parser.reset()
+            parser.input = lexResult.tokens
+            var value = parser[startRuleName]()
+            return {value: value, lexErrors: lexResult.errors, parseErrors: parser.errors}
+        }
+
         var parserOutput = $("#parserOutput")
         parserOutput.val("")
         var result = lexAndParse(inputEditor.getValue(), lexer, parser, defaultRuleName)
@@ -194,84 +129,29 @@
         parserOutput.val(processedResult)
     }
 
-    function markInputErrors(lexErrors, parseErrors) {
-        var start, end, marker
-        _.forEach(inputEditorMarkers, function (currMarker) {
-            currMarker.clear()
-        })
-        inputEditorMarkers = []
-
-        _.forEach(lexErrors, function (currLexError) {
-            start = {line: currLexError.line - 1, ch: currLexError.column - 1}
-            end = {line: currLexError.line - 1, ch: currLexError.column - 1 + currLexError.length}
-            marker = inputEditor.markText(start, end, {
-                className: "markTextError",
-                title    : currLexError.message
-            })
-            inputEditorMarkers.push(marker)
+    function cleanChevrotainCache() {
+        var hashmaps = _.filter(chevrotain.cache, function (prop) {
+            return prop instanceof chevrotain.lang.HashTable
         })
 
-        _.forEach(parseErrors, function (currParserError) {
-            start = {line: currParserError.token.startLine - 1, ch: currParserError.token.startColumn - 1}
-            end = {line: currParserError.token.endLine - 1, ch: currParserError.token.endColumn}
-            marker = inputEditor.markText(start, end, {
-                className: "markTextError",
-                title    : currParserError.message
-            })
-            inputEditorMarkers.push(marker)
+        _.forEach(hashmaps, function (cacheMap) {
+            cacheMap._state = {}
         })
     }
 
-    function markLexerDefinitionErrors(lexer) {
-        var marker, errPositions
-        _.forEach(lexerErrorsMarkers, function (currMarker) {
-            currMarker.clear()
-        })
-        lexerErrorsMarkers = []
-
-        // TODO: duplicate errors, mark all RegExp
-        // invalid errors, mark extendToken or the invalid param
-        // missing ? not sure need to be handled maybe mark the extend Token?
-        _.forEach(lexer.lexerDefinitionErrors, function (currLexError) {
-            errPositions = getLexerErrorStartStopPos(currLexError, javaScriptEditor.getValue(), javaScriptEditor)
-            _.forEach(errPositions, function (currPos) {
-                marker = javaScriptEditor.markText(currPos.start, currPos.end, {
-                    className: "markTextError",
-                    title    : currLexError.message
-                })
-                lexerErrorsMarkers.push(marker)
-            })
-        })
+    function editorContentsChanged() {
+        cleanChevrotainCache()
+        var editorFuncVal = eval(javaScriptEditor.getValue())
+        var parserConstructor = editorFuncVal.parser
+        lexer = editorFuncVal.lexer
+        markLexerDefinitionErrors(lexer)
+        defaultRuleName = editorFuncVal.defaultRule
+        parser = new parserConstructor()
+        markParserDefinitionErrors(parser)
+        var topRules = parser.getGAstProductions().values()
+        renderSyntaxDiagrams(topRules)
     }
 
-    // TODO extract common logic with markLexerDefinitonErrors
-    function markParserDefinitionErrors(parser) {
-        var marker, errPositions
-        _.forEach(parserErrorsMarkers, function (currMarker) {
-            currMarker.clear()
-        })
-        parserErrorsMarkers = []
-
-        _.forEach(parser.definitionErrors, function (currParserDefError) {
-            errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), parser.getGAstProductions(), javaScriptEditor)
-            _.forEach(errPositions, function (currPos) {
-                marker = javaScriptEditor.markText(currPos.start, currPos.end, {
-                    className: "markTextError",
-                    title    : currParserDefError.message
-                })
-                parserErrorsMarkers.push(marker)
-            })
-        })
-    }
-
-    function updateSamplesDropDown() {
-        var samplesDropdown = $("#samples-choice")
-        var examplesDropdown = $("#example-choice")
-        samplesDropdown.find("option").remove()
-        _.forOwn(samples[examplesDropdown.val()].sampleInputs, function (exampleValue, exampleName) {
-            samplesDropdown.append("<option>" + exampleName + "</option>")
-        })
-    }
 
     $(document).ready(function () {
 

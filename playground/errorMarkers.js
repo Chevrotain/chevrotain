@@ -1,3 +1,77 @@
+
+function markInputErrors(lexErrors, parseErrors) {
+    var start, end, marker
+    _.forEach(inputEditorMarkers, function (currMarker) {
+        currMarker.clear()
+    })
+    inputEditorMarkers = []
+
+    _.forEach(lexErrors, function (currLexError) {
+        start = {line: currLexError.line - 1, ch: currLexError.column - 1}
+        end = {line: currLexError.line - 1, ch: currLexError.column - 1 + currLexError.length}
+        marker = inputEditor.markText(start, end, {
+            className: "markTextError",
+            title    : currLexError.message
+        })
+        inputEditorMarkers.push(marker)
+    })
+
+    _.forEach(parseErrors, function (currParserError) {
+        start = {line: currParserError.token.startLine - 1, ch: currParserError.token.startColumn - 1}
+        end = {line: currParserError.token.endLine - 1, ch: currParserError.token.endColumn}
+        marker = inputEditor.markText(start, end, {
+            className: "markTextError",
+            title    : currParserError.message
+        })
+        inputEditorMarkers.push(marker)
+    })
+}
+
+
+function markLexerDefinitionErrors(lexer) {
+    var marker, errPositions
+    _.forEach(lexerErrorsMarkers, function (currMarker) {
+        currMarker.clear()
+    })
+    lexerErrorsMarkers = []
+
+    // TODO: duplicate errors, mark all RegExp
+    // invalid errors, mark extendToken or the invalid param
+    // missing ? not sure need to be handled maybe mark the extend Token?
+    _.forEach(lexer.lexerDefinitionErrors, function (currLexError) {
+        errPositions = getLexerErrorStartStopPos(currLexError, javaScriptEditor.getValue(), javaScriptEditor)
+        _.forEach(errPositions, function (currPos) {
+            marker = javaScriptEditor.markText(currPos.start, currPos.end, {
+                className: "markTextError",
+                title    : currLexError.message
+            })
+            lexerErrorsMarkers.push(marker)
+        })
+    })
+}
+
+
+// TODO extract common logic with markLexerDefinitonErrors
+function markParserDefinitionErrors(parser) {
+    var marker, errPositions
+    _.forEach(parserErrorsMarkers, function (currMarker) {
+        currMarker.clear()
+    })
+    parserErrorsMarkers = []
+
+    _.forEach(parser.definitionErrors, function (currParserDefError) {
+        errPositions = getParserErrorStartStopPos(currParserDefError, javaScriptEditor.getValue(), parser.getGAstProductions(), javaScriptEditor)
+        _.forEach(errPositions, function (currPos) {
+            marker = javaScriptEditor.markText(currPos.start, currPos.end, {
+                className: "markTextError",
+                title    : currParserDefError.message
+            })
+            parserErrorsMarkers.push(marker)
+        })
+    })
+}
+
+
 /**
  * @param {chevrotain.ILexerDefinitionError} lexErr
  * @param {string} parserImplText

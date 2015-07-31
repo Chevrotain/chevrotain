@@ -1,3 +1,45 @@
+
+function initExamplesDropDown() {
+    var examplesDropdown = $("#example-choice")
+    examplesDropdown.find("option").remove()
+    _.forEach(_.keys(samples), function (sampleName) {
+        examplesDropdown.append("<option>" + sampleName + "</option>")
+    })
+}
+
+
+function loadExample(exampleName, firstTime) {
+    var samplesDropdown = $("#samples-choice")
+    var sample = samples[exampleName]
+    // reduce whitespace used for Indentation, 2 spaces is also used in the code mirror editor
+    var sampleText = "(" + sample.implementation.toString().replace(/    /g, "  ") + "())"
+
+    javaScriptEditor.setValue(sampleText)
+    updateSamplesDropDown()
+    if (firstTime) {
+        editorContentsChanged() // can't wait for debounce on the first load as loadSamples will trigger lexAndParse
+    }
+    loadSamples(samplesDropdown.val())
+}
+
+
+function loadSamples(exampleName) {
+    var examplesDropdown = $("#example-choice")
+    inputEditor.setValue(samples[examplesDropdown.val()].sampleInputs[exampleName])
+    $("#parserOutput").val("")
+}
+
+
+function updateSamplesDropDown() {
+    var samplesDropdown = $("#samples-choice")
+    var examplesDropdown = $("#example-choice")
+    samplesDropdown.find("option").remove()
+    _.forOwn(samples[examplesDropdown.val()].sampleInputs, function (exampleValue, exampleName) {
+        samplesDropdown.append("<option>" + exampleName + "</option>")
+    })
+}
+
+
 function jsonExample() {
     // ----------------- Lexer -----------------
     var extendToken = chevrotain.extendToken;

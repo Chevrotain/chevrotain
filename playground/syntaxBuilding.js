@@ -1,4 +1,17 @@
 
+function renderSyntaxDiagrams(topRules) {
+    //TODO Use jQuery
+    var svgWrapperDiv = document.getElementById("svgWrapper")
+    svgWrapperDiv.innerHTML = ""
+    _.forEach(topRules, function (production) {
+        var currDiagramHtml = convertProductionToDiagram(production)
+
+        document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
+    })
+    attachHighlightEvents()
+}
+
+
 function definitionsToSubDiagrams(definitions) {
     "use strict";
     var subDiagrams = _.map(definitions, function (subProd) {
@@ -6,6 +19,7 @@ function definitionsToSubDiagrams(definitions) {
     });
     return subDiagrams;
 }
+
 
 /**
  *
