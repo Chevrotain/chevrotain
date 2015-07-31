@@ -62,6 +62,7 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     overflow: hidden;
 }
 
+/* TODO: remove this if we make the output into a code mirror too*/
 .textArea {
     background-color: #ffffff;
     font-family: consolas, "courier new", monospace;
@@ -97,22 +98,10 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     padding-bottom: 8px;
 }
 
+/* TODO: consider removing this width 100% and make the div in which the SVG reside
+   resize to fit its contents width wise */
 svg {
     width: 100%;
-}
-
-.errorMessage {
-    color: #ff0033;
-    font-family: Arial;
-    font-size: 15px;
-    text-align: left;
-    padding-left: 8px;
-    font-weight: normal;
-}
-
-button {
-    font-family: Arial;
-    font-size: 15px;
 }
 
 .hrInCardHeader {

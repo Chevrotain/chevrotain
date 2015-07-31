@@ -85,7 +85,7 @@ function getUsageRectAndDefHeader(target) {
 
 
 function center(line) {
-    var y = javaScriptEditor.charCoords({line: line, ch: 0}, "local").top
-    var halfHeight = javaScriptEditor.getScrollerElement().offsetHeight / 5
-    javaScriptEditor.scrollTo(null, y - halfHeight - 5)
+    var wholeHeight = javaScriptEditor.charCoords({line: line, ch: 0}, "local").top
+    var offsetFromTop = javaScriptEditor.getScrollerElement().offsetHeight / 5
+    javaScriptEditor.scrollTo(null, wholeHeight - offsetFromTop - 5)
 }
