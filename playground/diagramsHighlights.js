@@ -1,4 +1,4 @@
-// TODO: use css styles instead of hardcoded values
+
 function attachHighlightEvents() {
     var diagramHeaders = $(".diagramHeader")
     _.forEach(diagramHeaders, function (header) {
@@ -17,32 +17,32 @@ function attachHighlightEvents() {
 
 function onDiagramNonTerminalMouseOver(mouseEvent) {
     var rectAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
-    rectAndHeader.rect.style.fill = "yellow"
-    rectAndHeader.header.style["background-color"] = "#31BA5F"
+    $(rectAndHeader.rect).toggleClass("diagramRectUsage")
+    $(rectAndHeader.header).toggleClass("diagramHeaderDef")
 }
 
 
 function onDiagramNonTerminalMouseOut(mouseEvent) {
     var rectAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
-    rectAndHeader.rect.style.fill = "#A8C1FF"
-    rectAndHeader.header.style["background-color"] = "transparent"
+    $(rectAndHeader.rect).toggleClass("diagramRectUsage")
+    $(rectAndHeader.header).toggleClass("diagramHeaderDef")
 }
 
 
 function onDiagramHeaderMouseOver(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
-    mouseEvent.target.style["background-color"] = "#31BA5F"
+    $(mouseEvent.target).toggleClass("diagramHeaderDef")
     _.forEach(getUsageSvgRect(definitionName), function (rect) {
-        rect.style.fill = "yellow"
+        $(rect).toggleClass("diagramRectUsage")
     })
 }
 
 
 function onDiagramHeaderMouseOut(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
-    mouseEvent.target.style["background-color"] = "transparent"
+    $(mouseEvent.target).toggleClass("diagramHeaderDef")
     _.forEach(getUsageSvgRect(definitionName), function (rect) {
-        rect.style.fill = "#A8C1FF"
+        $(rect).toggleClass("diagramRectUsage")
     })
 }
 

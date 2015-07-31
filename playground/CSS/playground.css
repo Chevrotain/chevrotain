@@ -35,6 +35,16 @@ h3 {
     max-width: -webkit-fit-content;
 }
 
+.diagramHeaderDef {
+    background-color: #31BA5F;
+}
+
+svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
+    color: green;
+    fill: yellow;
+    stroke: 5;
+}
+
 .markTextError {
     display: inline-block;
     position: relative;
