@@ -64,7 +64,7 @@
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
             <div class="textareawrapper">
-                <label for="parserInput"></label><textarea id="parserInput" class="textArea" rows="6" cols="100"
+                <label for="parserInputEditor"></label><textarea id="parserInputEditor" class="textArea" rows="6" cols="100"
                                                            spellcheck="false"></textarea>
             </div>
         </div>
@@ -122,14 +122,15 @@
         parserOutput = $("#parserOutput")
         diagramsDiv = _.first($("#diagramsDiv"))
 
-        javaScriptEditor = CodeMirror.fromTextArea(document.getElementById("parserImplementationEditor"), {
+        var implTextArea = $("#parserImplementationEditor")
+        javaScriptEditor = CodeMirror.fromTextArea(_.first(implTextArea), {
             lineNumbers   : true,
             viewportMargin: 35
         })
         javaScriptEditor.setSize("100%", "33rem")
         javaScriptEditor.on("change", _.debounce(onImplementationEditorContentChange, 250))
 
-        inputEditor = CodeMirror.fromTextArea(document.getElementById("parserInput"), {
+        inputEditor = CodeMirror.fromTextArea(_.first($("#parserInputEditor")), {
             lineNumbers: true
         })
         inputEditor.setSize("100%", "100%") // 100% height to auto adjust to contents
