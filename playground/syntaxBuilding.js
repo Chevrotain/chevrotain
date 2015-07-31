@@ -1,23 +1,18 @@
-
 function renderSyntaxDiagrams(topRules) {
-    //TODO Use jQuery
-    var svgWrapperDiv = document.getElementById("svgWrapper")
-    svgWrapperDiv.innerHTML = ""
+    diagramsDiv.innerHTML = ""
     _.forEach(topRules, function (production) {
         var currDiagramHtml = convertProductionToDiagram(production)
-
-        document.getElementById("svgWrapper").innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
+        diagramsDiv.innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
     })
     attachHighlightEvents()
 }
 
 
 function definitionsToSubDiagrams(definitions) {
-    "use strict";
     var subDiagrams = _.map(definitions, function (subProd) {
-        return convertProductionToDiagram(subProd);
-    });
-    return subDiagrams;
+        return convertProductionToDiagram(subProd)
+    })
+    return subDiagrams
 }
 
 
@@ -35,7 +30,7 @@ function convertProductionToDiagram(prod) {
         return NonTerminal(prod.nonTerminalName)
     }
     else if (!(prod instanceof chevrotain.gast.Terminal)) {
-        var subDiagrams = definitionsToSubDiagrams(prod.definition);
+        var subDiagrams = definitionsToSubDiagrams(prod.definition)
         if (prod instanceof chevrotain.gast.Rule) {
             return Diagram.apply(this, subDiagrams)
         }

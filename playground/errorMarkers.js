@@ -173,7 +173,7 @@ function locateClosingParenthesis(startOffset, text) {
         currOffset++
     }
 
-    return -1;
+    return -1
 }
 
 

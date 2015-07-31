@@ -2,15 +2,15 @@
 function attachHighlightEvents() {
     var diagramHeaders = $(".diagramHeader")
     _.forEach(diagramHeaders, function (header) {
-        header.addEventListener("mouseover", onDiagramHeaderMouseOver);
-        header.addEventListener("mouseout", onDiagramHeaderMouseOut);
-        header.addEventListener("click", onDiagramHeaderMouseClick);
+        header.addEventListener("mouseover", onDiagramHeaderMouseOver)
+        header.addEventListener("mouseout", onDiagramHeaderMouseOut)
+        header.addEventListener("click", onDiagramHeaderMouseClick)
     })
 
     var noneTerminals = $(".non-terminal")
     _.forEach(noneTerminals, function (nonTerminal) {
-        nonTerminal.addEventListener("mouseover", onDiagramNonTerminalMouseOver);
-        nonTerminal.addEventListener("mouseout", onDiagramNonTerminalMouseOut);
+        nonTerminal.addEventListener("mouseover", onDiagramNonTerminalMouseOver)
+        nonTerminal.addEventListener("mouseout", onDiagramNonTerminalMouseOut)
     })
 }
 
@@ -60,7 +60,7 @@ function onDiagramHeaderMouseClick(mouseEvent) {
 function getUsageSvgRect(definitionName) {
     var rects = $(".non-terminal").find("rect")
     return _.filter(rects, function (rect) {
-        var textNode = rect.parentNode.getElementsByTagName('text')[0];
+        var textNode = rect.parentNode.getElementsByTagName('text')[0]
         return textNode.innerHTML === definitionName
     })
 }
@@ -77,7 +77,7 @@ function getUsageRectAndDefHeader(target) {
         text = target.innerHTML
     }
     var header = _.find($(".diagramHeader"), function (currHeader) {
-        return currHeader.innerHTML === text;
+        return currHeader.innerHTML === text
     })
 
     return {rect: rect, header: header}
@@ -85,7 +85,7 @@ function getUsageRectAndDefHeader(target) {
 
 
 function center(line) {
-    var y = javaScriptEditor.charCoords({line: line, ch: 0}, "local").top;
-    var halfHeight = javaScriptEditor.getScrollerElement().offsetHeight / 5;
-    javaScriptEditor.scrollTo(null, y - halfHeight - 5);
+    var y = javaScriptEditor.charCoords({line: line, ch: 0}, "local").top
+    var halfHeight = javaScriptEditor.getScrollerElement().offsetHeight / 5
+    javaScriptEditor.scrollTo(null, y - halfHeight - 5)
 }

@@ -76,7 +76,7 @@
             </div>
             <div style="clear:both;"></div>
             <hr class="hrInCardHeader">
-            <div id="svgWrapper" class="svgWrapper"></div>
+            <div id="diagramsDiv" class="diagramsDiv"></div>
         </div>
         <div class="card">
             <h1 style="float: left">Output</h1>
@@ -94,6 +94,7 @@
 
 
 <script>
+    // global state
     var lexer = null
     var parser = null
     var defaultRuleName = null
@@ -102,9 +103,13 @@
     var inputEditorMarkers = []
     var lexerErrorsMarkers = []
     var parserErrorsMarkers = []
+    var examplesDropdown = null
+    var samplesDropdown = null
+    var parserOutput = null
+    var diagramsDiv = null
 
 
-    function parseInputAndDisplayResult() {
+    function onInputEditorContentChange() {
 
         function lexAndParse(text, lexer, parser, startRuleName) {
             var lexResult = lexer.tokenize(text)
@@ -114,7 +119,6 @@
             return {value: value, lexErrors: lexResult.errors, parseErrors: parser.errors}
         }
 
-        var parserOutput = $("#parserOutput")
         parserOutput.val("")
         var result = lexAndParse(inputEditor.getValue(), lexer, parser, defaultRuleName)
         markInputErrors(result.lexErrors, result.parseErrors)
@@ -129,6 +133,7 @@
         parserOutput.val(processedResult)
     }
 
+
     function cleanChevrotainCache() {
         var hashmaps = _.filter(chevrotain.cache, function (prop) {
             return prop instanceof chevrotain.lang.HashTable
@@ -139,7 +144,7 @@
         })
     }
 
-    function editorContentsChanged() {
+    function onImplementationEditorContentChange() {
         cleanChevrotainCache()
         var editorFuncVal = eval(javaScriptEditor.getValue())
         var parserConstructor = editorFuncVal.parser
@@ -154,28 +159,33 @@
 
 
     $(document).ready(function () {
-
         // defer error handling so we can display error markers visually
         // instead of using the default chevrotain behavior of throwing exceptions.
         chevrotain.Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
+
+        // init global state
+        examplesDropdown = $("#example-choice")
+        samplesDropdown = $("#samples-choice")
+        parserOutput = $("#parserOutput")
+        diagramsDiv = _.first($("#diagramsDiv"))
 
         javaScriptEditor = CodeMirror.fromTextArea(document.getElementById("parserImplementationEditor"), {
             lineNumbers   : true,
             viewportMargin: 35
         })
         javaScriptEditor.setSize("100%", "33rem")
-        javaScriptEditor.on("change", _.debounce(editorContentsChanged, 250))
+        javaScriptEditor.on("change", _.debounce(onImplementationEditorContentChange, 250))
 
         inputEditor = CodeMirror.fromTextArea(document.getElementById("parserInput"), {
             lineNumbers: true
         })
         inputEditor.setSize("100%", "100%") // 100% height to auto adjust to contents
-        inputEditor.on("change", _.debounce(parseInputAndDisplayResult, 250))
+        inputEditor.on("change", _.debounce(onInputEditorContentChange, 250))
 
         // Workaround... I don't know why the text is aligned center by default...
         $(".CodeMirror").css({"text-align": "left"})
 
-        var examplesDropdown = $("#example-choice")
+
         initExamplesDropDown(examplesDropdown)
         examplesDropdown.change(function () {
             loadExample(examplesDropdown.val())
@@ -184,7 +194,6 @@
         loadExample("json", true)
         updateSamplesDropDown()
 
-        var samplesDropdown = $("#samples-choice")
         samplesDropdown.change(function () {
             loadSamples(samplesDropdown.val())
         })
