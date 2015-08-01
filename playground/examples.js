@@ -56,7 +56,6 @@ function jsonExample() {
     var NumberLiteral = extendToken("NumberLiteral",
         /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-    // marking WhiteSpace as 'SKIPPED' causes the lexer skip such tokens.
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
 
@@ -74,6 +73,8 @@ function jsonExample() {
         var $ = this;
 
         this.object = this.RULE("object", function () {
+            // use debugger statements to add breakpoints (works in chrome/firefox)
+            debugger;
             var obj = {}
 
             $.CONSUME(LCurly);
@@ -188,7 +189,6 @@ function calculatorExample() {
     var RParen = extendToken("RParen", /\)/);
     var NumberLiteral = extendToken("NumberLiteral", /[1-9]\d*/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-    // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
@@ -205,10 +205,12 @@ function calculatorExample() {
         var $ = this;
 
         this.expression = $.RULE("expression", function () {
+            // use debugger statements to add breakpoints (works in chrome/firefox)
+            debugger;
             return $.SUBRULE($.additionExpression)
         });
 
-        //  lowest precedence thus it is first in the rule chain
+        // Lowest precedence thus it is first in the rule chain
         // The precedence of binary expressions is determined by
         // how far down the Parse Tree the binary expression appears.
         this.additionExpression = $.RULE("additionExpression", function () {
