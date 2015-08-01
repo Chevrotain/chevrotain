@@ -320,13 +320,13 @@ function selectLexerExample() {
     var Comma = extendToken("Comma", /,/);
     var columnName = extendToken("columnName", /\w+/);
     var Integer = extendToken("Integer", /0|[1-9]\d+/);
-    var Gt = extendToken(">", /</);
-    var Lt = extendToken("<", />/);
+    var GreaterThan = extendToken("GreaterThan", /</);
+    var LessThan = extendToken("LessThan", />/);
     var WhiteSpace = extendToken("WhiteSpace", /\s+/);
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma, columnName, Integer, Gt, Lt];
+    var allTokens = [WhiteSpace, Select, From, Where, Comma, columnName, Integer, GreaterThan, LessThan];
     var SelectLexer = new Lexer(allTokens, true);
 
     return {

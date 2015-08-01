@@ -23,7 +23,18 @@ function onInputEditorContentChange() {
     }
     else {
         markInputErrors(lexResult.errors, [])
-        printResult = lexResult
+
+        printResult = _.mapValues(lexResult, function (value, key) {
+            if (key === "tokens") {
+                return _.map(value, function (token) {
+                    token.tokenName = chevrotain.tokenName(token.constructor)
+                    return token
+                })
+            }
+            else {
+                return value
+            }
+        })
     }
 
     var processedResult
