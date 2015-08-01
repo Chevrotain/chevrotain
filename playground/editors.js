@@ -1,24 +1,37 @@
-
 function onInputEditorContentChange() {
+    var parseResult, printResult
 
-    function lexAndParse(text, lexer, parser, startRuleName) {
+    function lex(text) {
         var lexResult = lexer.tokenize(text)
+        return lexResult
+    }
+
+    function parse(lexResult, startRuleName) {
         parser.reset()
         parser.input = lexResult.tokens
         var value = parser[startRuleName]()
-        return {value: value, lexErrors: lexResult.errors, parseErrors: parser.errors}
+        return {value: value, parseErrors: parser.errors}
     }
 
     parserOutput.val("")
-    var result = lexAndParse(inputEditor.getValue(), lexer, parser, defaultRuleName)
-    markInputErrors(result.lexErrors, result.parseErrors)
-    var resultValue = result.value
-    var processedResult
-    if (_.isNumber(resultValue) || _.isString(resultValue) || _.isBoolean(resultValue)) {
-        processedResult = resultValue // no processing needed
+    var lexResult = lex(inputEditor.getValue(), defaultRuleName)
+    // may be falsy if the example is for the lexer only
+    if (parser) {
+        parseResult = parse(lexResult, defaultRuleName)
+        markInputErrors(lexResult.errors, parseResult.parseErrors)
+        printResult = parseResult.value
     }
-    else if (_.isObject(resultValue)) {
-        processedResult = JSON.stringify(resultValue, null, "\t") // TODO: any better way to display json?
+    else {
+        markInputErrors(lexResult.errors, [])
+        printResult = lexResult
+    }
+
+    var processedResult
+    if (_.isNumber(printResult) || _.isString(printResult) || _.isBoolean(printResult)) {
+        processedResult = printResult // no processing needed
+    }
+    else if (_.isObject(printResult)) {
+        processedResult = JSON.stringify(printResult, null, "\t")
     }
     parserOutput.val(processedResult)
 }
@@ -42,8 +55,17 @@ function onImplementationEditorContentChange() {
     lexer = editorFuncVal.lexer
     markLexerDefinitionErrors(lexer)
     defaultRuleName = editorFuncVal.defaultRule
-    parser = new parserConstructor()
-    markParserDefinitionErrors(parser)
-    var topRules = parser.getGAstProductions().values()
-    renderSyntaxDiagrams(topRules)
+
+    // may be falsy if the example is for the lexer only
+    if (parserConstructor) {
+        parser = new parserConstructor()
+        markParserDefinitionErrors(parser)
+        var topRules = parser.getGAstProductions().values()
+        renderSyntaxDiagrams(topRules)
+    } else {
+        parser = undefined
+        renderSyntaxDiagrams([])
+    }
+
+    onInputEditorContentChange()
 }

@@ -1,4 +1,3 @@
-
 function initExamplesDropDown() {
     examplesDropdown.find("option").remove()
     _.forEach(_.keys(samples), function (sampleName) {
@@ -102,8 +101,8 @@ function jsonExample() {
             value = $.SUBRULE($.value);
 
             // an empty json key is not valid, use "BAD_KEY" instead
-            key =  lit.isInsertedInRecovery ?
-                 "BAD_KEY" : lit.image.substr(1, lit.image.length  - 2) ;
+            key = lit.isInsertedInRecovery ?
+                "BAD_KEY" : lit.image.substr(1, lit.image.length - 2);
             obj[key] = value;
             return obj;
         });
@@ -159,14 +158,15 @@ function jsonExample() {
     ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
     ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
 
-    // for the playground to work the returned object must contain these two fields
+    // for the playground to work the returned object must contain these fields
     return {
         lexer      : ChevJsonLexer,
         parser     : ChevrotainJsonParser,
         defaultRule: "object"
     };
-
 }
+
+
 function calculatorExample() {
     // ----------------- lexer -----------------
     var extendToken = chevrotain.extendToken;
@@ -298,11 +298,39 @@ function calculatorExample() {
     Calculator.prototype = Object.create(Parser.prototype);
     Calculator.prototype.constructor = Calculator;
 
-    // for the playground to work the returned object must contain these two fields
+    // for the playground to work the returned object must contain these fields
     return {
         lexer      : CalculatorLexer,
         parser     : Calculator,
         defaultRule: "expression"
+    };
+}
+
+
+function selectLexerExample() {
+
+    // This example demonstrates a lexer implementation for a simple SELECT syntax.
+
+    var extendToken = chevrotain.extendToken;
+    var Lexer = chevrotain.Lexer;
+
+    var Select = extendToken("Select", /SELECT/);
+    var From = extendToken("From", /FROM/);
+    var Where = extendToken("Where", /WHERE/);
+    var Comma = extendToken("Comma", /,/);
+    var columnName = extendToken("columnName", /\w+/);
+    var Integer = extendToken("Integer", /0|[1-9]\d+/);
+    var Gt = extendToken(">", /</);
+    var Lt = extendToken("<", />/);
+    var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+    WhiteSpace.GROUP = Lexer.SKIPPED;
+
+    // whitespace is normally very common so it is placed first to speed up the lexer
+    var allTokens = [WhiteSpace, Select, From, Where, Comma, columnName, Integer, Gt, Lt];
+    var SelectLexer = new Lexer(allTokens, true);
+
+    return {
+        lexer: SelectLexer
     };
 }
 
@@ -356,6 +384,14 @@ var samples = {
             "parenthesis precedence"      : "2 * ( 3 + 7)",
             "operator precedence"         : "2 + 4 * 5 / 10",
             "unidentified Token - success": "1 + @@1 + 1"
+        }
+    },
+
+    selectLexer: {
+        implementation: selectLexerExample,
+        sampleInputs  : {
+            "valid"         : "SELECT name, age FROM students where age > 22",
+            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? where wage > 666"
         }
     }
 }
