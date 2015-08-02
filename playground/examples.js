@@ -72,6 +72,7 @@ function jsonExample() {
         ChevrotainParser.call(this, input, jsonTokens);
         var $ = this;
 
+
         this.object = this.RULE("object", function () {
             // use debugger statements to add breakpoints (works in chrome/firefox)
             debugger;
@@ -94,6 +95,7 @@ function jsonExample() {
             return obj;
         });
 
+
         this.objectItem = this.RULE("objectItem", function () {
             var lit, key, value, obj = {};
 
@@ -107,6 +109,7 @@ function jsonExample() {
             obj[key] = value;
             return obj;
         });
+
 
         this.array = this.RULE("array", function () {
             var arr = [];
@@ -122,6 +125,7 @@ function jsonExample() {
 
             return arr;
         });
+
 
         // @formatter:off
         this.value = this.RULE("value", function () {
@@ -210,6 +214,7 @@ function calculatorExample() {
             return $.SUBRULE($.additionExpression)
         });
 
+
         // Lowest precedence thus it is first in the rule chain
         // The precedence of binary expressions is determined by
         // how far down the Parse Tree the binary expression appears.
@@ -272,6 +277,7 @@ function calculatorExample() {
             // @formatter:on
         });
 
+
         this.parenthesisExpression = $.RULE("parenthesisExpression", function () {
             var expValue;
 
@@ -309,7 +315,7 @@ function calculatorExample() {
 }
 
 
-function selectLexerExample() {
+function tutorialLexerExample() {
 
     // This example demonstrates a lexer implementation for a simple SELECT syntax.
 
@@ -320,7 +326,7 @@ function selectLexerExample() {
     var From = extendToken("From", /FROM/);
     var Where = extendToken("Where", /WHERE/);
     var Comma = extendToken("Comma", /,/);
-    var columnName = extendToken("columnName", /\w+/);
+    var identifier = extendToken("identifier", /\w+/);
     var Integer = extendToken("Integer", /0|[1-9]\d+/);
     var GreaterThan = extendToken("GreaterThan", /</);
     var LessThan = extendToken("LessThan", />/);
@@ -328,11 +334,117 @@ function selectLexerExample() {
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma, columnName, Integer, GreaterThan, LessThan];
+    var allTokens = [WhiteSpace, Select, From, Where, Comma, identifier, Integer, GreaterThan, LessThan];
     var SelectLexer = new Lexer(allTokens, true);
 
     return {
         lexer: SelectLexer
+    };
+}
+
+// TODO: avoid duplication of code from step 1
+function tutorialGrammarExample() {
+
+    //  Step 2: A grammar using the Tokens defined in the previous step.
+    var extendToken = chevrotain.extendToken;
+    var Lexer = chevrotain.Lexer;
+    var Parser = chevrotain.Parser;
+
+    var Select = extendToken("Select", /SELECT/);
+    var From = extendToken("From", /FROM/);
+    var Where = extendToken("Where", /WHERE/);
+    var Comma = extendToken("Comma", /,/);
+    var Identifier = extendToken("Identifier", /\w+/);
+    var Integer = extendToken("Integer", /0|[1-9]\d+/);
+    var GreaterThan = extendToken("GreaterThan", /</);
+    var LessThan = extendToken("LessThan", />/);
+    var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+    WhiteSpace.GROUP = Lexer.SKIPPED;
+
+    // whitespace is normally very common so it is placed first to speed up the lexer
+    var allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan];
+    var SelectLexer = new Lexer(allTokens, true);
+
+
+    // ----------------- parser -----------------
+    function SelectParser(input) {
+        Parser.call(this, input, allTokens);
+        var $ = this;
+
+
+        this.selectStatment = $.RULE("selectStatment", function () {
+            $.SUBRULE($.selectClause)
+            $.SUBRULE($.fromClause)
+            $.OPTION(function () {
+                $.SUBRULE($.whereClause)
+            })
+        });
+
+
+        this.selectClause = $.RULE("selectClause", function () {
+            $.CONSUME(Select);
+            $.CONSUME(Identifier);
+            $.MANY(function () {
+                $.CONSUME(Comma);
+                $.CONSUME2(Identifier);
+            });
+        });
+
+
+        this.fromClause = $.RULE("fromClause", function () {
+            $.CONSUME(From);
+            $.CONSUME(Identifier);
+            // exercise: try to add support for multiple tables to select from
+            // (implicit join)
+        });
+
+
+        this.whereClause = $.RULE("whereClause", function () {
+            $.CONSUME(Where)
+            $.SUBRULE($.expression)
+        });
+
+
+        this.expression = $.RULE("expression", function () {
+            $.SUBRULE($.atomicExpression);
+            $.SUBRULE($.relationalOperator);
+            $.SUBRULE2($.atomicExpression);
+        });
+
+
+        this.atomicExpression = $.RULE("atomicExpression", function () {
+            // @formatter:off
+            return $.OR([
+                {ALT: function(){ $.CONSUME(Integer)}},
+                {ALT: function(){ $.CONSUME(Identifier)}}
+            ], "an atomic expression");
+            // @formatter:on
+        });
+
+
+        this.relationalOperator = $.RULE("relationalOperator", function () {
+            // @formatter:off
+            return $.OR([
+                {ALT: function(){ $.CONSUME(GreaterThan)}},
+                {ALT: function(){ $.CONSUME(LessThan)}}
+            ], "a relational operator");
+            // @formatter:on
+        });
+
+
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this);
+    }
+
+    SelectParser.prototype = Object.create(Parser.prototype);
+    SelectParser.prototype.constructor = SelectParser;
+
+    return {
+        lexer      : SelectLexer,
+        parser     : SelectParser,
+        defaultRule: "selectStatment"
     };
 }
 
@@ -389,9 +501,18 @@ var samples = {
         }
     },
 
-    selectLexer: {
-        implementation: selectLexerExample,
+    "tutorial lexer": {
+        implementation: tutorialLexerExample,
         sampleInputs  : {
+            "valid"         : "SELECT name, age FROM students where age > 22",
+            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? where wage > 666"
+        }
+    },
+
+    "tutorial grammar": {
+        implementation: tutorialGrammarExample,
+        sampleInputs  : {
+            // TODO: avoid duplication in tutorial examples
             "valid"         : "SELECT name, age FROM students where age > 22",
             "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? where wage > 666"
         }
