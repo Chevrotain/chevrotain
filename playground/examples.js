@@ -317,7 +317,7 @@ function calculatorExample() {
 
 function tutorialLexerExample() {
 
-    // This example demonstrates a lexer implementation for a simple SELECT syntax.
+    // Step 1: a lexer for a simple SELECT statement syntax
 
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
@@ -346,6 +346,7 @@ function tutorialLexerExample() {
 function tutorialGrammarExample() {
 
     //  Step 2: A grammar using the Tokens defined in the previous step.
+
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
     var Parser = chevrotain.Parser;
@@ -378,6 +379,8 @@ function tutorialGrammarExample() {
             $.OPTION(function () {
                 $.SUBRULE($.whereClause)
             })
+
+            return "No output, grammar only example."
         });
 
 
@@ -428,6 +431,135 @@ function tutorialGrammarExample() {
                 {ALT: function(){ $.CONSUME(GreaterThan)}},
                 {ALT: function(){ $.CONSUME(LessThan)}}
             ], "a relational operator");
+            // @formatter:on
+        });
+
+
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this);
+    }
+
+    SelectParser.prototype = Object.create(Parser.prototype);
+    SelectParser.prototype.constructor = SelectParser;
+
+    return {
+        lexer      : SelectLexer,
+        parser     : SelectParser,
+        defaultRule: "selectStatment"
+    };
+}
+
+function tutorialGrammarActionsExample() {
+
+    //  Step 3: building an AST using the grammar from the previous step.
+
+    var extendToken = chevrotain.extendToken;
+    var Lexer = chevrotain.Lexer;
+    var Parser = chevrotain.Parser;
+
+    var Select = extendToken("Select", /SELECT/);
+    var From = extendToken("From", /FROM/);
+    var Where = extendToken("Where", /WHERE/);
+    var Comma = extendToken("Comma", /,/);
+    var Identifier = extendToken("Identifier", /\w+/);
+    var Integer = extendToken("Integer", /0|[1-9]\d+/);
+    var GreaterThan = extendToken("GreaterThan", /</);
+    var LessThan = extendToken("LessThan", />/);
+    var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+    WhiteSpace.GROUP = Lexer.SKIPPED;
+
+    // whitespace is normally very common so it is placed first to speed up the lexer
+    var allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan];
+    var SelectLexer = new Lexer(allTokens, true);
+
+
+    // ----------------- parser -----------------
+    function SelectParser(input) {
+        Parser.call(this, input, allTokens);
+        var $ = this;
+
+
+        this.selectStatment = $.RULE("selectStatment", function () {
+            var select, from, where
+            select = $.SUBRULE($.selectClause)
+            from = $.SUBRULE($.fromClause)
+            $.OPTION(function () {
+                where = $.SUBRULE($.whereClause)
+            })
+
+            return {
+                type      : "SELECT_STMT", selectClause: select,
+                fromClause: from, whereClause: where
+            }
+        });
+
+
+        this.selectClause = $.RULE("selectClause", function () {
+            var columns = []
+
+            $.CONSUME(Select);
+            columns.push($.CONSUME(Identifier).image);
+            $.MANY(function () {
+                $.CONSUME(Comma);
+                columns.push($.CONSUME2(Identifier).image);
+            });
+
+            return {type: "SELECT_CLAUSE", columns: columns}
+        });
+
+
+        this.fromClause = $.RULE("fromClause", function () {
+            var table
+
+            $.CONSUME(From);
+            table = $.CONSUME(Identifier).image;
+            // exercise: try to add support for multiple tables to select from
+            // (implicit join)
+
+            return {type: "FROM_CLAUSE", table: table}
+        });
+
+
+        this.whereClause = $.RULE("whereClause", function () {
+            var condition
+            debugger;
+
+            $.CONSUME(Where)
+            condition = $.SUBRULE($.expression)
+
+            return {type: "WHERE_CLAUSE", condition: condition}
+        });
+
+
+        this.expression = $.RULE("expression", function () {
+            var lhs, operator, rhs
+
+            lhs = $.SUBRULE($.atomicExpression);
+            operator = $.SUBRULE($.relationalOperator);
+            rhs = $.SUBRULE2($.atomicExpression);
+
+            return {type: "EXPRESSION", lhs: lhs, operator: operator, rhs: rhs}
+        });
+
+
+        this.atomicExpression = $.RULE("atomicExpression", function () {
+            // @formatter:off
+            return $.OR([
+                {ALT: function(){ return $.CONSUME(Integer)}},
+                {ALT: function(){ return $.CONSUME(Identifier)}}
+            ], "an atomic expression").image;
+            // @formatter:on
+        });
+
+
+        this.relationalOperator = $.RULE("relationalOperator", function () {
+            // @formatter:off
+            return $.OR([
+                {ALT: function(){ return $.CONSUME(GreaterThan)}},
+                {ALT: function(){ return $.CONSUME(LessThan)}}
+            ], "a relational operator").image;
             // @formatter:on
         });
 
@@ -504,8 +636,8 @@ var samples = {
     "tutorial lexer": {
         implementation: tutorialLexerExample,
         sampleInputs  : {
-            "valid"         : "SELECT name, age FROM students where age > 22",
-            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? where wage > 666"
+            "valid"         : "SELECT name, age FROM students WHERE age > 22",
+            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
         }
     },
 
@@ -513,8 +645,17 @@ var samples = {
         implementation: tutorialGrammarExample,
         sampleInputs  : {
             // TODO: avoid duplication in tutorial examples
-            "valid"         : "SELECT name, age FROM students where age > 22",
-            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? where wage > 666"
+            "valid"         : "SELECT name, age FROM students WHERE age > 22",
+            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
+        }
+    },
+
+    "tutorial grammar actions": {
+        implementation: tutorialGrammarActionsExample,
+        sampleInputs  : {
+            // TODO: avoid duplication in tutorial examples
+            "valid"         : "SELECT name, age FROM students WHERE age > 22",
+            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
         }
     }
 }
