@@ -1101,7 +1101,9 @@ namespace chevrotain {
 
             if (lookAheadFunc.call(this)) {
                 (<any>action).call(this)
-                this.MANY(<any>lookAheadFunc, <any>action)
+                while (lookAheadFunc.call(this)) {
+                    (<any>action).call(this)
+                }
             }
             else {
                 throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
