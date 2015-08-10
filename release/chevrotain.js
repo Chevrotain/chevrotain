@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.9 - 2015-07-26 */
+/*! chevrotain - v0.4.10 - 2015-08-11 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -2912,7 +2912,9 @@ var chevrotain;
             }
             if (lookAheadFunc.call(this)) {
                 action.call(this);
-                this.MANY(lookAheadFunc, action);
+                while (lookAheadFunc.call(this)) {
+                    action.call(this);
+                }
             }
             else {
                 throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()));
@@ -3089,7 +3091,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.4.9";
+    API.VERSION = "0.4.10";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
