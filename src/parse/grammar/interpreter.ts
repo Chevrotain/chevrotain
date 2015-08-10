@@ -141,6 +141,27 @@ namespace chevrotain.interpreter {
         }
     }
 
+    export class NextInsideManySepWalker extends AbstractNextPossibleTokensWalker {
+
+        private nextOccurrence = 0
+
+        constructor(topProd:g.Rule, protected path:p.IRuleGrammarPath) {
+            super(topProd, path)
+            this.nextOccurrence = this.path.occurrence
+        }
+
+        walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (this.isAtEndOfPath && manySepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
+                let restProd = new g.Flat(manySepProd.definition)
+                this.possibleTokTypes = f.first(restProd)
+                this.found = true
+            }
+            else {
+                super.walkManySep(manySepProd, currRest, prevRest)
+            }
+        }
+    }
+
     export class NextInsideAtLeastOneWalker extends AbstractNextPossibleTokensWalker {
 
         private nextOccurrence = 0
@@ -228,6 +249,24 @@ namespace chevrotain.interpreter {
             }
             else {
                 super.walkMany(manyProd, currRest, prevRest)
+            }
+        }
+    }
+
+    export class NextTerminalAfterManySepWalker extends AbstractNextTerminalAfterProductionWalker {
+
+        walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (manySepProd.occurrenceInParent === this.occurrence) {
+
+                let firstAfterManySep = _.first(currRest.concat(prevRest))
+                this.result.isEndOfRule = firstAfterManySep === undefined
+                if (firstAfterManySep instanceof gast.Terminal) {
+                    this.result.token = firstAfterManySep.terminalType
+                    this.result.occurrence = firstAfterManySep.occurrenceInParent
+                }
+            }
+            else {
+                super.walkManySep(manySepProd, currRest, prevRest)
             }
         }
     }

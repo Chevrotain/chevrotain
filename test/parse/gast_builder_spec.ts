@@ -149,24 +149,26 @@ namespace chevrotain.gastBuilder.spec {
             let ter = ".CONSUME3(tok.one1"
             let option = ".OPTION(2)"
             let many = ".MANY(3)"
-            let ref = ".SUBRULE4(this.other"
-            let atLeastOne = ".AT_LEAST_ONE(5)"
-            let or = ".OR(6)"
+            let many_sep = ".MANY_SEP(Comma,)"
+            let ref = ".SUBRULE5(this.other"
+            let atLeastOne = ".AT_LEAST_ONE(6)"
+            let or = ".OR(7)"
 
             let actual = b.createRanges(
                 ter + ") " +
                 option +
+                many_sep  + " " +
                 many +
                 ref + ") " +
                 atLeastOne +
                 or)
 
-            expect(actual.length).to.equal(6)
+            expect(actual.length).to.equal(7)
             let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).to.equal(6)
+            expect(_.uniq(refTypes).length).to.equal(7)
 
             let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            matchers.setEquality(refText, [ter, option, many, ref, atLeastOne, or])
+            matchers.setEquality(refText, [ter, option, many, many_sep, ref, atLeastOne, or])
         })
 
         it("has a utility function that can remove comments(single line and multiline) from texts", function () {
@@ -260,6 +262,18 @@ namespace chevrotain.gastBuilder.spec {
             let actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.MANY(...)", type: b.ProdType.MANY}, [])
             expect(actual).to.be.an.instanceof(gast.Repetition)
             expect((<gast.Repetition>actual).definition.length).to.equal(0)
+        })
+
+        it("can build a MANY_SEP Production from a RangeProd", function () {
+            // hack, using "toString" because it exists on plain js object as the "separator".
+            let actual = b.buildProdGast({range: new r.Range(1, 2), text: "this.MANY_SEP(toString...)", type: b.ProdType.MANY_SEP}, [])
+            expect(actual).to.be.an.instanceof(gast.RepetitionWithSeparator)
+            expect((<gast.Repetition>actual).definition.length).to.equal(0)
+        })
+
+        it("will fail when building a MANY_SEP Production from a RangeProd in the seperator is not known", function () {
+            expect(() => b.buildProdGast({range: new r.Range(1, 2), text: "this.MANY_SEP(MISSING...)", type: b.ProdType.MANY_SEP}, [])).
+                to.throw("Separator Terminal Token name: MISSING not found")
         })
 
         it("can build an AT_LEAST_ONE Production from a RangeProd", function () {

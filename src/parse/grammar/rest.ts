@@ -1,4 +1,3 @@
-
 namespace chevrotain.rest {
 
     import g = chevrotain.gast
@@ -10,25 +9,28 @@ namespace chevrotain.rest {
                 let currRest = _.drop(prod.definition, index + 1)
 
                 if (subProd instanceof g.NonTerminal) {
-                    this.walkProdRef(<g.NonTerminal>subProd, currRest, prevRest)
+                    this.walkProdRef(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.Terminal) {
-                    this.walkTerminal(<g.Terminal>subProd, currRest, prevRest)
+                    this.walkTerminal(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.Flat) {
-                    this.walkFlat(<g.Flat>subProd, currRest, prevRest)
+                    this.walkFlat(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.Option) {
-                    this.walkOption(<g.Option>subProd, currRest, prevRest)
+                    this.walkOption(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.RepetitionMandatory) {
-                    this.walkAtLeastOne(<g.RepetitionMandatory>subProd, currRest, prevRest)
+                    this.walkAtLeastOne(subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.RepetitionWithSeparator) {
+                    this.walkManySep(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.Repetition) {
-                    this.walkMany(<g.Repetition>subProd, currRest, prevRest)
+                    this.walkMany(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.Alternation) {
-                    this.walkOr(<g.Alternation>subProd, currRest, prevRest)
+                    this.walkOr(subProd, currRest, prevRest)
                 }
                 else {throw Error("non exhaustive match") }
             })
@@ -60,6 +62,14 @@ namespace chevrotain.rest {
             // ABC(DE)*F => after the (DE)* the rest is (DE)?F
             let fullManyRest:g.IProduction[] = [new g.Option(manyProd.definition)].concat(<any>currRest, <any>prevRest)
             this.walk(manyProd, fullManyRest)
+        }
+
+        walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            // ABC(DE)*F => after the (DE)* the rest is (DE)?F
+            let sepRestSuffix = [new g.Option([<any>new g.Terminal(manySepProd.separator)].concat(manySepProd.definition))]
+            let manySepRest = [new g.Option(manySepProd.definition.concat(sepRestSuffix))]
+            let fullManySepRest:g.IProduction[] = manySepRest.concat(<any>currRest, <any>prevRest)
+            this.walk(manySepProd, fullManySepRest)
         }
 
         walkOr(orProd:g.Alternation, currRest:g.IProduction[], prevRest:g.IProduction[]):void {

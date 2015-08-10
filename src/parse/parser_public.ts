@@ -148,6 +148,7 @@ namespace chevrotain {
         private definitionErrors:IParserDefinitionError[]
         private orLookaheadKeys:lang.HashTable<string>[]
         private manyLookaheadKeys:lang.HashTable<string>[]
+        private manySepLookaheadKeys:lang.HashTable<string>[]
         private atLeastOneLookaheadKeys:lang.HashTable<string>[]
         private optionLookaheadKeys:lang.HashTable<string>[]
         private definedRulesNames:string[] = []
@@ -189,6 +190,7 @@ namespace chevrotain {
 
             this.orLookaheadKeys = cache.CLASS_TO_OR_LA_CACHE[this.className]
             this.manyLookaheadKeys = cache.CLASS_TO_MANY_LA_CACHE[this.className]
+            this.manySepLookaheadKeys = cache.CLASS_TO_MANY_SEP_LA_CACHE[this.className]
             this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className]
             this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
         }
@@ -593,9 +595,9 @@ namespace chevrotain {
          * Convenience method equivalent to MANY1
          * @see MANY1
          */
-        protected MANY(lookAheadFunc:LookAheadFunc | GrammarAction,
+        protected MANY(laFuncOrAction:LookAheadFunc | GrammarAction,
                        action?:GrammarAction):void {
-            return this.MANY1.call(this, lookAheadFunc, action)
+            return this.MANY1.call(this, laFuncOrAction, action)
         }
 
         /**
@@ -658,6 +660,83 @@ namespace chevrotain {
         protected MANY5(laFuncOrAction:LookAheadFunc | GrammarAction,
                         action?:GrammarAction):void {
             this.manyInternal(this.MANY5, "MANY5", 5, laFuncOrAction, action)
+        }
+
+        /**
+         * Convenience method equivalent to MANY_SEP1
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+                           action?:GrammarAction):Token[] {
+            return this.MANY_SEP1.call(this, separator, laFuncOrAction, action)
+        }
+
+        /**
+         * Parsing DSL method, that indicates a repetition of zero or more with a separator
+         * Token between the repetitions.
+         *
+         * note that the 'action' param is optional. so both of the following forms are valid:
+         *
+         * short: this.MANY_SEP(Comma, ()=>{
+         *                       this.CONSUME(Number};
+         *                       ...
+         *                       );
+         *
+         * long: this.MANY(Comma, isNumber, ()=>{
+         *                       this.CONSUME(Number}
+         *                       ...
+         *                       );
+         *
+         * using the short form is recommended as it will compute the lookahead function
+         * (for the first iteration) automatically. however this currently has one limitation:
+         * It only works if the lookahead for the grammar is one.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the repetition production in it's top rule.
+         *
+         * @param separator - The Token to use as a seperator between repetitions.
+         * @param {Function} laFuncOrAction - The lookahead function that 'decides'
+         *                                  whether or not the MANY_SEP's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] - The action to optionally invoke.
+         *
+         * @return {Token[]} - The consumed separator Tokens.
+         */
+        protected MANY_SEP1(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+                            action?:GrammarAction):Token[] {
+            return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, laFuncOrAction, action)
+        }
+
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP2(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+                            action?:GrammarAction):Token[] {
+            return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, laFuncOrAction, action)
+        }
+
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP3(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+                            action?:GrammarAction):Token[] {
+            return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, laFuncOrAction, action)
+        }
+
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP4(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+                            action?:GrammarAction):Token[] {
+            return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, laFuncOrAction, action)
+        }
+
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP5(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+                            action?:GrammarAction):Token[] {
+            return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, laFuncOrAction, action)
         }
 
         /**
@@ -992,9 +1071,9 @@ namespace chevrotain {
             if (this.RULE_STACK.length === 1) {
                 return EOF_FOLLOW_KEY
             }
-            let currRuleIdx = this.RULE_STACK.length - 1;
+            let currRuleIdx = this.RULE_STACK.length - 1
             let currRuleOccIdx = currRuleIdx
-            let prevRuleIdx = currRuleIdx - 1;
+            let prevRuleIdx = currRuleIdx - 1
 
             return {
                 ruleName:         this.RULE_STACK[currRuleIdx],
@@ -1094,7 +1173,7 @@ namespace chevrotain {
                                    action:GrammarAction | string,
                                    errMsg?:string):void {
             if (_.isString(action)) {
-                errMsg = <any>action;
+                errMsg = <any>action
                 action = <any>lookAheadFunc
                 lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
             }
@@ -1132,6 +1211,66 @@ namespace chevrotain {
             }
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
                 <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys)
+        }
+
+        private manySepFirstInternal(prodFunc:Function,
+                                     prodName:string,
+                                     prodOccurrence:number,
+                                     separator:TokenConstructor,
+                                     firstIterationLookAheadFunc:LookAheadFunc | GrammarAction,
+                                     action?:GrammarAction):Token[] {
+
+            let separatorsResult = []
+
+            if (action === undefined) {
+                action = <any>firstIterationLookAheadFunc
+                firstIterationLookAheadFunc = this.getLookaheadFuncForManySep(prodOccurrence)
+            }
+
+            let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
+            // 1st iteration
+            if (firstIterationLookAheadFunc.call(this)) {
+                action.call(this)
+
+                // 2nd..nth iterations
+                while (separatorLookAheadFunc()) {
+                    separatorsResult.push(this.CONSUME(separator))
+                    action.call(this)
+                }
+
+                this.attemptInRepetitionRecovery(this.manySepSecondInternal,
+                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult],
+                    separatorLookAheadFunc,
+                    prodName,
+                    prodOccurrence,
+                    interp.NextTerminalAfterManySepWalker,
+                    this.manySepLookaheadKeys)
+            }
+
+            return separatorsResult
+        }
+
+        private manySepSecondInternal(prodName:string,
+                                      prodOccurrence:number,
+                                      separator:TokenConstructor,
+                                      separatorLookAheadFunc:() => boolean,
+                                      action:GrammarAction,
+                                      separatorsResult:Token[]):void {
+
+
+            while (separatorLookAheadFunc()) {
+                separatorsResult.push(this.CONSUME(separator))
+                action.call(this)
+            }
+
+            this.attemptInRepetitionRecovery(this.manySepSecondInternal,
+                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult],
+                separatorLookAheadFunc,
+                prodName,
+                prodOccurrence,
+                interp.NextTerminalAfterManySepWalker,
+                this.manySepLookaheadKeys)
+
         }
 
         private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
@@ -1246,6 +1385,11 @@ namespace chevrotain {
         private getLookaheadFuncForMany(occurence:number):() => boolean {
             let key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence)
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForMany)
+        }
+
+        private getLookaheadFuncForManySep(occurence:number):() => boolean {
+            let key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurence)
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForManySep)
         }
 
         private getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {

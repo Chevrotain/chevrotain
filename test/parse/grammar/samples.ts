@@ -1,4 +1,3 @@
-
 namespace specs.samples {
 
     import gast = chevrotain.gast
@@ -73,6 +72,23 @@ namespace specs.samples {
         new gast.Terminal(SemicolonTok)
     ])
 
+    export let actionDecSep = new gast.Rule("actionDecSep", [
+        new gast.Terminal(ActionTok),
+        new gast.Terminal(IdentTok),
+        new gast.Terminal(LParenTok),
+
+        new gast.RepetitionWithSeparator([
+            new gast.NonTerminal("paramSpec", paramSpec, 2)
+        ], CommaTok),
+
+        new gast.Terminal(RParenTok),
+        new gast.Option([
+            new gast.Terminal(ColonTok),
+            new gast.NonTerminal("qualifiedName", qualifiedName)
+        ], 2),
+        new gast.Terminal(SemicolonTok)
+    ])
+
     export let manyActions = new gast.Rule("manyActions", [
         new gast.Repetition([
             new gast.NonTerminal("actionDec", actionDec, 1)
@@ -121,4 +137,10 @@ namespace specs.samples {
         ]),
     ])
 
+
+    export let callArguments = new gast.Rule("callArguments", [
+        new gast.RepetitionWithSeparator([
+            new gast.Terminal(IdentTok, 1)
+        ], CommaTok)
+    ])
 }

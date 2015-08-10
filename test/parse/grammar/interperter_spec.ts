@@ -416,6 +416,30 @@ namespace chevrotain.interpreter.spec {
                 matchers.setEquality(possibleNextTokTypes, [t.CommaTok])
             })
         })
+
+        describe("The NextInsideManySepWalker", function () {
+            it("can compute the next possible token types inside the MANY_SEP in callArguments", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["callArguments"],
+                    occurrenceStack: [1],
+                    occurrence:      1
+                }
+
+                let possibleNextTokTypes = new NextInsideManySepWalker(samples.callArguments, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.IdentTok])
+            })
+
+            it("can compute the next possible token types inside the MANY_SEP in actionDecSep", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["actionDecSep"],
+                    occurrenceStack: [1],
+                    occurrence:      1
+                }
+
+                let possibleNextTokTypes = new NextInsideManySepWalker(samples.actionDecSep, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.IdentTok])
+            })
+        })
     })
 
     describe("The NextTerminalAfterManyWalker", function () {
@@ -429,6 +453,22 @@ namespace chevrotain.interpreter.spec {
 
         it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", function () {
             let result = new NextTerminalAfterManyWalker(samples.actionDec, 1).startWalking()
+            expect(result.occurrence).to.equal(1)
+            expect(result.token).to.equal(t.RParenTok)
+        })
+    })
+
+    describe("The NextTerminalAfterManySepWalker", function () {
+        it("can compute the next possible token types after the MANY_SEP in QualifiedName", function () {
+            let result = new NextTerminalAfterManySepWalker(samples.callArguments, 1).startWalking()
+            //noinspection BadExpressionStatementJS
+            expect(result.occurrence).to.be.undefined
+            //noinspection BadExpressionStatementJS
+            expect(result.token).to.be.undefined
+        })
+
+        it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", function () {
+            let result = new NextTerminalAfterManySepWalker(samples.actionDecSep, 1).startWalking()
             expect(result.occurrence).to.equal(1)
             expect(result.token).to.equal(t.RParenTok)
         })

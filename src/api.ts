@@ -36,8 +36,9 @@ if (!testMode) {
     API.gast = {}
     API.gast.GAstVisitor = chevrotain.gast.GAstVisitor
     API.gast.Flat = chevrotain.gast.Flat
-    API.gast.RepetitionMandatory = chevrotain.gast.RepetitionMandatory
     API.gast.Repetition = chevrotain.gast.Repetition
+    API.gast.RepetitionWithSeparator = chevrotain.gast.RepetitionWithSeparator
+    API.gast.RepetitionMandatory = chevrotain.gast.RepetitionMandatory
     API.gast.Option = chevrotain.gast.Option
     API.gast.Alternation = chevrotain.gast.Alternation
     API.gast.NonTerminal = chevrotain.gast.NonTerminal

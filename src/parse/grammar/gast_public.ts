@@ -66,6 +66,10 @@ namespace chevrotain.gast {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
+    export class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
+        constructor(definition:IProduction[], public separator:Function, public occurrenceInParent:number = 1) { super(definition) }
+    }
+
     export class Alternation extends AbstractProduction implements IProductionWithOccurrence {
         constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
     }
@@ -95,6 +99,9 @@ namespace chevrotain.gast {
             else if (node instanceof RepetitionMandatory) {
                 this.visitRepetitionMandatory(<RepetitionMandatory>node)
             }
+            else if (node instanceof RepetitionWithSeparator) {
+                this.visitRepetitionWithSeparator(<RepetitionWithSeparator>node)
+            }
             else if (node instanceof Repetition) {
                 this.visitRepetition(<Repetition>node)
             }
@@ -113,9 +120,11 @@ namespace chevrotain.gast {
 
         public visitOption(node:Option):void {}
 
+        public visitRepetition(node:Repetition):void {}
+
         public visitRepetitionMandatory(node:RepetitionMandatory):void {}
 
-        public visitRepetition(node:Repetition):void {}
+        public visitRepetitionWithSeparator(node:RepetitionWithSeparator):void {}
 
         public visitAlternation(node:Alternation):void {}
 

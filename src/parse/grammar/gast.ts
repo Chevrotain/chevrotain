@@ -7,12 +7,15 @@ namespace chevrotain.gast {
             prod instanceof Option ||
             prod instanceof Repetition ||
             prod instanceof RepetitionMandatory ||
+            prod instanceof RepetitionWithSeparator ||
             prod instanceof Terminal ||
             prod instanceof Rule
     }
 
     export function isOptionalProd(prod:IProduction):boolean {
-        let isDirectlyOptional = prod instanceof Option || prod instanceof Repetition
+        let isDirectlyOptional = prod instanceof Option ||
+            prod instanceof Repetition ||
+            prod instanceof RepetitionWithSeparator
         if (isDirectlyOptional) {
             return true
         }
@@ -44,6 +47,7 @@ namespace chevrotain.gast {
     productionToDslName[lang.functionName(NonTerminal)] = "SUBRULE"
     productionToDslName[lang.functionName(Option)] = "OPTION"
     productionToDslName[lang.functionName(RepetitionMandatory)] = "AT_LEAST_ONE"
+    productionToDslName[lang.functionName(RepetitionWithSeparator)] = "MANY_SEP"
     productionToDslName[lang.functionName(Repetition)] = "MANY"
     productionToDslName[lang.functionName(Alternation)] = "OR"
     productionToDslName[lang.functionName(Terminal)] = "CONSUME"
