@@ -149,6 +149,7 @@ namespace chevrotain {
         private orLookaheadKeys:lang.HashTable<string>[]
         private manyLookaheadKeys:lang.HashTable<string>[]
         private manySepLookaheadKeys:lang.HashTable<string>[]
+        private atLeastOneSepLookaheadKeys:lang.HashTable<string>[]
         private atLeastOneLookaheadKeys:lang.HashTable<string>[]
         private optionLookaheadKeys:lang.HashTable<string>[]
         private definedRulesNames:string[] = []
@@ -192,6 +193,7 @@ namespace chevrotain {
             this.manyLookaheadKeys = cache.CLASS_TO_MANY_LA_CACHE[this.className]
             this.manySepLookaheadKeys = cache.CLASS_TO_MANY_SEP_LA_CACHE[this.className]
             this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className]
+            this.atLeastOneSepLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[this.className]
             this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
         }
 
@@ -806,6 +808,84 @@ namespace chevrotain {
         }
 
         /**
+         * Convenience method equivalent to AT_LEAST_ONE_SEP1
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
+                                   laFuncOrAction:LookAheadFunc | GrammarAction,
+                                   action:GrammarAction | string,
+                                   errMsg?:string):Token[] {
+            return this.AT_LEAST_ONE_SEP1.call(this, separator, laFuncOrAction, action, errMsg)
+        }
+
+        /**
+         *
+         * convenience method, same as MANY_SEP but the repetition is of one or more.
+         * failing to match at least one repetition will result in a parsing error and
+         * cause the parser to attempt error recovery.
+         *
+         * @see MANY_SEP1
+         *
+         * @param separator {Token}
+         * @param {Function} laFuncOrAction The lookahead function that 'decides'
+         *                                  whether or not the AT_LEAST_ONE's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] The action to optionally invoke.
+         * @param {string} [errMsg] short title/classification to what is being matched
+         */
+        protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
+                                    laFuncOrAction:LookAheadFunc | GrammarAction,
+                                    action:GrammarAction | string,
+                                    errMsg?:string):Token[] {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator,
+                laFuncOrAction, action, errMsg)
+        }
+
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
+                                    laFuncOrAction:LookAheadFunc | GrammarAction,
+                                    action:GrammarAction | string,
+                                    errMsg?:string):Token[] {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator,
+                laFuncOrAction, action, errMsg)
+        }
+
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
+                                    laFuncOrAction:LookAheadFunc | GrammarAction,
+                                    action:GrammarAction | string,
+                                    errMsg?:string):Token[] {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator,
+                laFuncOrAction, action, errMsg)
+        }
+
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
+                                    laFuncOrAction:LookAheadFunc | GrammarAction,
+                                    action:GrammarAction | string,
+                                    errMsg?:string):Token[] {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator,
+                laFuncOrAction, action, errMsg)
+        }
+
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
+                                    laFuncOrAction:LookAheadFunc | GrammarAction,
+                                    action:GrammarAction | string,
+                                    errMsg?:string):Token[] {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator,
+                laFuncOrAction, action, errMsg)
+        }
+
+        /**
          * Convenience method, same as RULE with doReSync=false
          * @see RULE
          */
@@ -1195,6 +1275,51 @@ namespace chevrotain {
                 <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
         }
 
+        private atLeastOneSepFirstInternal(prodFunc:Function,
+                                           prodName:string,
+                                           prodOccurrence:number,
+                                           separator:TokenConstructor,
+                                           firstIterationLookAheadFunc:LookAheadFunc | GrammarAction,
+                                           action:GrammarAction | string,
+                                           errMsg?:string):Token[] {
+
+            let separatorsResult = []
+
+            if (_.isString(action)) {
+                errMsg = <any>action
+                action = <any>firstIterationLookAheadFunc
+                firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
+            }
+
+            let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
+            // 1st iteration
+            if (firstIterationLookAheadFunc.call(this)) {
+                (<GrammarAction>action).call(this)
+
+                // 2nd..nth iterations
+                while (separatorLookAheadFunc()) {
+                    // note that this CONSUME will never enter recovery because
+                    // the separatorLookAheadFunc checks that the separator really does exist.
+                    separatorsResult.push(this.CONSUME(separator));
+                    (<GrammarAction>action).call(this)
+                }
+
+                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                        this.atLeastOneSepLookaheadKeys, interp.NextTerminalAfterAtLeastOneSepWalker],
+                    separatorLookAheadFunc,
+                    prodName,
+                    prodOccurrence,
+                    interp.NextTerminalAfterAtLeastOneSepWalker,
+                    this.atLeastOneSepLookaheadKeys)
+            }
+            else {
+                throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
+            }
+
+            return separatorsResult
+        }
+
         private manyInternal(prodFunc:Function,
                              prodName:string,
                              prodOccurrence:number,
@@ -1234,12 +1359,15 @@ namespace chevrotain {
 
                 // 2nd..nth iterations
                 while (separatorLookAheadFunc()) {
+                    // note that this CONSUME will never enter recovery because
+                    // the separatorLookAheadFunc checks that the separator really does exist.
                     separatorsResult.push(this.CONSUME(separator))
                     action.call(this)
                 }
 
-                this.attemptInRepetitionRecovery(this.manySepSecondInternal,
-                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult],
+                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                        this.manySepLookaheadKeys, interp.NextTerminalAfterManySepWalker],
                     separatorLookAheadFunc,
                     prodName,
                     prodOccurrence,
@@ -1250,26 +1378,30 @@ namespace chevrotain {
             return separatorsResult
         }
 
-        private manySepSecondInternal(prodName:string,
-                                      prodOccurrence:number,
-                                      separator:TokenConstructor,
-                                      separatorLookAheadFunc:() => boolean,
-                                      action:GrammarAction,
-                                      separatorsResult:Token[]):void {
+        private repetitionSepSecondInternal(prodName:string,
+                                            prodOccurrence:number,
+                                            separator:TokenConstructor,
+                                            separatorLookAheadFunc:() => boolean,
+                                            action:GrammarAction,
+                                            separatorsResult:Token[],
+                                            laKeys:lang.HashTable<string>[],
+                                            nextTerminalAfterWalker:typeof interp.AbstractNextTerminalAfterProductionWalker):void {
 
 
             while (separatorLookAheadFunc()) {
+                // note that this CONSUME will never enter recovery because
+                // the separatorLookAheadFunc checks that the separator really does exist.
                 separatorsResult.push(this.CONSUME(separator))
                 action.call(this)
             }
 
-            this.attemptInRepetitionRecovery(this.manySepSecondInternal,
-                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult],
+            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker],
                 separatorLookAheadFunc,
                 prodName,
                 prodOccurrence,
-                interp.NextTerminalAfterManySepWalker,
-                this.manySepLookaheadKeys)
+                nextTerminalAfterWalker,
+                laKeys)
 
         }
 
@@ -1395,6 +1527,11 @@ namespace chevrotain {
         private getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
             let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence)
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne)
+        }
+
+        private getLookaheadFuncForAtLeastOneSep(occurence:number):() => boolean {
+            let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurence)
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOneSep)
         }
 
         private getLookaheadFuncFor<T>(key:string,

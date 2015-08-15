@@ -27,11 +27,26 @@ namespace specs.samples {
     export let atLeastOneRule = new gast.Rule("atLeastOneRule", [
         new gast.RepetitionMandatory([
             new gast.RepetitionMandatory([
-                new gast.RepetitionMandatory([], 3),
+                new gast.RepetitionMandatory([
+                    new gast.Terminal(EntityTok)
+                ], 3),
                 new gast.Terminal(CommaTok)
             ], 2),
             new gast.Terminal(DotTok, 1)
         ]),
+        new gast.Terminal(DotTok, 2)
+    ])
+
+    export let atLeastOneSepRule = new gast.Rule("atLeastOneSepRule", [
+        new gast.RepetitionMandatoryWithSeparator([
+            new gast.RepetitionMandatoryWithSeparator([
+                new gast.RepetitionMandatoryWithSeparator([
+                    new gast.Terminal(EntityTok)
+                ], SemicolonTok, 3),
+                new gast.Terminal(CommaTok)
+            ], SemicolonTok, 2),
+            new gast.Terminal(DotTok, 1)
+        ], SemicolonTok),
         new gast.Terminal(DotTok, 2)
     ])
 
@@ -41,6 +56,13 @@ namespace specs.samples {
             new gast.Terminal(DotTok),
             new gast.Terminal(IdentTok, 2)
         ])
+    ])
+
+
+    export let qualifiedNameSep = new gast.Rule("qualifiedNameSep", [
+        new gast.RepetitionMandatoryWithSeparator([
+            new gast.Terminal(IdentTok, 1)
+        ], DotTok)
     ])
 
     export let paramSpec = new gast.Rule("paramSpec", [

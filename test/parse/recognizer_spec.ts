@@ -62,6 +62,28 @@ namespace chevrotain.recognizer.spec {
         }
     }
 
+    class AtLeastOneSepRepetitionRecovery extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, <any>chevrotain.recognizer.spec)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
+
+        private parseQualifiedName():string[] {
+            let idents = []
+
+            this.AT_LEAST_ONE_SEP(DotTok, () => {
+                idents.push(this.CONSUME1(IdentTok).image)
+            }, "identifiers")
+
+            this.CONSUME1(EOF)
+
+            return idents
+        }
+    }
+
     export class IdentTok extends Token {
         constructor(image:string) { super(image, 0, 1, 1) }
     }
@@ -245,6 +267,16 @@ namespace chevrotain.recognizer.spec {
             expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
             expect(parser.errors.length).to.equal(1)
         })
+
+        it("can perform in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", function () {
+            // a.b+.c
+            let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                 new PlusTok(), new DotTok(), new IdentTok("c")]
+            let parser = new AtLeastOneSepRepetitionRecovery(input)
+            expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
+            expect(parser.errors.length).to.equal(1)
+        })
+
     })
 
     describe("The BaseRecognizer", function () {

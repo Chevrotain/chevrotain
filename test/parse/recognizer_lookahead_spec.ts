@@ -423,7 +423,7 @@ namespace chevrotain.recognizer.lookahead.spec {
             Parser.performSelfAnalysis(this)
         }
 
-        public manySepRule = this.RULE("manySepRule", this.parseManyRule, () => { return {total:666, separators:[]} })
+        public manySepRule = this.RULE("manySepRule", this.parseManyRule, () => { return {total: 666, separators: []} })
 
         private parseManyRule():any {
 
@@ -455,7 +455,7 @@ namespace chevrotain.recognizer.lookahead.spec {
                 total += "5"
             }))
 
-            return {total:total, separators:separators}
+            return {total: total, separators: separators}
         }
     }
 
@@ -742,6 +742,155 @@ namespace chevrotain.recognizer.lookahead.spec {
 
         it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
             let parser = new AtLeastOneExplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).to.equal(0)
+        })
+    })
+
+
+    class AtLeastOneSepImplicitLookAheadParser extends Parser {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return cache.getLookaheadFuncsForClass(this.className)
+        }
+
+        constructor(input:Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneRule, () => {
+            return {
+                total:      "-666",
+                separators: []
+            }
+        })
+
+        private parseAtLeastOneRule():any {
+            let total = ""
+            let separators = []
+
+            separators = separators.concat(this.AT_LEAST_ONE_SEP1(Comma, () => {
+                this.CONSUME1(OneTok)
+                total += "1"
+            }, "Ones"))
+
+            separators = separators.concat(this.AT_LEAST_ONE_SEP2(Comma, () => {
+                this.CONSUME1(TwoTok)
+                total += "2"
+            }, "Twos"))
+
+            separators = separators.concat(this.AT_LEAST_ONE_SEP3(Comma, () => {
+                this.CONSUME1(ThreeTok)
+                total += "3"
+            }, "Threes"))
+
+            separators = separators.concat(this.AT_LEAST_ONE_SEP4(Comma, () => {
+                this.CONSUME1(FourTok)
+                total += "4"
+            }, "Fours"))
+
+            separators = separators.concat(this.AT_LEAST_ONE_SEP5(Comma, () => {
+                this.CONSUME1(FiveTok)
+                total += "5"
+            }, "Fives"))
+
+            return {total: total, separators: separators}
+        }
+    }
+
+    class AtLeastOneSepExplicitLookAheadParser extends Parser {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return cache.getLookaheadFuncsForClass(this.className)
+        }
+
+        constructor(input:Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneSepRule, () => { return "-666" })
+
+        private parseAtLeastOneSepRule():string {
+            let total = ""
+
+            this.AT_LEAST_ONE_SEP1(Comma, isOneTok, () => {
+                this.CONSUME1(OneTok)
+                total += "1"
+            }, "Ones")
+
+            this.AT_LEAST_ONE_SEP2(Comma, isTwoTok, () => {
+                this.CONSUME1(TwoTok)
+                total += "2"
+            }, "Twos")
+
+            this.AT_LEAST_ONE_SEP3(Comma, isThreeTok, () => {
+                this.CONSUME1(ThreeTok)
+                total += "3"
+            }, "Threes")
+
+            this.AT_LEAST_ONE_SEP4(Comma, isFourTok, () => {
+                this.CONSUME1(FourTok)
+                total += "4"
+            }, "Fours")
+
+            this.AT_LEAST_ONE_SEP5(Comma, isFiveTok, () => {
+                this.CONSUME1(FiveTok)
+                total += "5"
+            }, "Fives")
+
+            return total
+        }
+    }
+
+    describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE_SEP", function () {
+
+        it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", function () {
+            let parser = new AtLeastOneSepImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).to.equal(0)
+        })
+
+        it("can accept lookahead function param for AT_LEAST_ONE_SEP1-5", function () {
+            let input = [new OneTok(), new TwoTok(), new Comma(), new TwoTok(), new ThreeTok(),
+                new FourTok(), new Comma(), new FourTok(), new FiveTok()]
+            let parser = new AtLeastOneSepImplicitLookAheadParser(input)
+            var parseResult = parser.atLeastOneSepRule()
+            expect(parseResult.total).to.equal("1223445")
+            expect(parseResult.separators).to.deep.equal([new Comma(), new Comma()])
+        })
+
+        it("will fail when zero occurrences of AT_LEAST_ONE_SEP in input", function () {
+            let input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
+            let parser = new AtLeastOneSepImplicitLookAheadParser(input)
+            expect(parser.atLeastOneSepRule().total).to.equal("-666")
+        })
+
+        it("will cache the generatedLookAhead functions AFTER (check cache is filled)", function () {
+            let parser = new AtLeastOneSepImplicitLookAheadParser()
+            let lookaheadCache = parser.getLookAheadCache()
+            expect(lookaheadCache.keys().length).to.equal(5)
+        })
+    })
+
+    describe("The Explicit lookahead functionality of the Recognizer for AT_LEAST_ONE_SEP", function () {
+
+        it("can accept lookahead function param for AT_LEAST_ONE_SEP1-5", function () {
+            let input = [new OneTok(), new TwoTok(), new Comma(), new TwoTok(), new ThreeTok(),
+                new FourTok(), new Comma(), new FourTok(), new FiveTok()]
+            let parser = new AtLeastOneSepExplicitLookAheadParser(input)
+            expect(parser.atLeastOneSepRule()).to.equal("1223445")
+        })
+
+        it("will fail when zero occurrences of AT_LEAST_ONE_SEP in input", function () {
+            let input = [new OneTok(), new TwoTok(), /*new ThreeTok(),*/ new FourTok(), new FiveTok()]
+            let parser = new AtLeastOneSepExplicitLookAheadParser(input)
+            expect(parser.atLeastOneSepRule()).to.equal("-666")
+        })
+
+        it("Will not cache any ImplicitLookahead functions when provided with explicit versions", function () {
+            let parser = new AtLeastOneSepExplicitLookAheadParser()
             let lookaheadCache = parser.getLookAheadCache()
             expect(lookaheadCache.keys().length).to.equal(0)
         })

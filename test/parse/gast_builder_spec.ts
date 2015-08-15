@@ -150,6 +150,7 @@ namespace chevrotain.gastBuilder.spec {
             let option = ".OPTION(2)"
             let many = ".MANY(3)"
             let many_sep = ".MANY_SEP(Comma,)"
+            let at_least_one_sep = ".AT_LEAST_ONE_SEP(Comma,)"
             let ref = ".SUBRULE5(this.other"
             let atLeastOne = ".AT_LEAST_ONE(6)"
             let or = ".OR(7)"
@@ -158,17 +159,18 @@ namespace chevrotain.gastBuilder.spec {
                 ter + ") " +
                 option +
                 many_sep  + " " +
+                at_least_one_sep + " " +
                 many +
                 ref + ") " +
                 atLeastOne +
                 or)
 
-            expect(actual.length).to.equal(7)
+            expect(actual.length).to.equal(8)
             let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-            expect(_.uniq(refTypes).length).to.equal(7)
+            expect(_.uniq(refTypes).length).to.equal(8)
 
             let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
-            matchers.setEquality(refText, [ter, option, many, many_sep, ref, atLeastOne, or])
+            matchers.setEquality(refText, [ter, option, many, many_sep, ref, at_least_one_sep, atLeastOne, or])
         })
 
         it("has a utility function that can remove comments(single line and multiline) from texts", function () {

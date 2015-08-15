@@ -440,6 +440,87 @@ namespace chevrotain.interpreter.spec {
                 matchers.setEquality(possibleNextTokTypes, [t.IdentTok])
             })
         })
+
+        describe("The NextInsideAtLeastOneWalker", function () {
+            it("can compute the next possible token types inside the AT_LEAST_ONE in callArguments", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["atLeastOneRule"],
+                    occurrenceStack: [1],
+                    occurrence:      1
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneWalker(samples.atLeastOneRule, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.EntityTok])
+            })
+
+            it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["atLeastOneRule"],
+                    occurrenceStack: [1],
+                    occurrence:      2
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneWalker(samples.atLeastOneRule, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.EntityTok])
+            })
+
+            it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["atLeastOneRule"],
+                    occurrenceStack: [1],
+                    occurrence:      3
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneWalker(samples.atLeastOneRule, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.EntityTok])
+            })
+        })
+
+        describe("The NextInsideAtLeastOneSepWalker", function () {
+            it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["atLeastOneSepRule"],
+                    occurrenceStack: [1],
+                    occurrence:      1
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(samples.atLeastOneSepRule, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.EntityTok])
+            })
+
+            it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 2", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["atLeastOneSepRule"],
+                    occurrenceStack: [1],
+                    occurrence:      2
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(samples.atLeastOneSepRule, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.EntityTok])
+            })
+
+            it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 3", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["atLeastOneSepRule"],
+                    occurrenceStack: [1],
+                    occurrence:      3
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(samples.atLeastOneSepRule, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.EntityTok])
+            })
+
+            it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in qualifiedNameSep", function () {
+                let path:p.IRuleGrammarPath = {
+                    ruleStack:       ["qualifiedNameSep"],
+                    occurrenceStack: [1],
+                    occurrence:      1
+                }
+
+                let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(samples.qualifiedNameSep, path).startWalking()
+                matchers.setEquality(possibleNextTokTypes, [t.IdentTok])
+            })
+        })
     })
 
     describe("The NextTerminalAfterManyWalker", function () {
@@ -487,6 +568,30 @@ namespace chevrotain.interpreter.spec {
             let result3 = new NextTerminalAfterAtLeastOneWalker(samples.atLeastOneRule, 3).startWalking()
             expect(result3.occurrence).to.equal(1)
             expect(result3.token).to.equal(t.CommaTok)
+        })
+    })
+
+    describe("The NextTerminalAfterAtLeastOneSepWalker", function () {
+        it("can compute the next possible token types after an AT_LEAST_ONE_SEP production", function () {
+            let result = new NextTerminalAfterAtLeastOneSepWalker(samples.atLeastOneSepRule, 1).startWalking()
+            expect(result.occurrence).to.equal(2)
+            expect(result.token).to.equal(t.DotTok)
+
+            let result2 = new NextTerminalAfterAtLeastOneSepWalker(samples.atLeastOneSepRule, 2).startWalking()
+            expect(result2.occurrence).to.equal(1)
+            expect(result2.token).to.equal(t.DotTok)
+
+            let result3 = new NextTerminalAfterAtLeastOneSepWalker(samples.atLeastOneSepRule, 3).startWalking()
+            expect(result3.occurrence).to.equal(1)
+            expect(result3.token).to.equal(t.CommaTok)
+        })
+
+        it("can compute the next possible token types after an AT_LEAST_ONE_SEP production EMPTY", function () {
+            let result = new NextTerminalAfterAtLeastOneSepWalker(samples.qualifiedNameSep, 1).startWalking()
+            //noinspection BadExpressionStatementJS
+            expect(result.occurrence).to.be.undefined
+            //noinspection BadExpressionStatementJS
+            expect(result.token).to.be.undefined
         })
     })
 

@@ -7,6 +7,7 @@ namespace chevrotain.gast {
             prod instanceof Option ||
             prod instanceof Repetition ||
             prod instanceof RepetitionMandatory ||
+            prod instanceof RepetitionMandatoryWithSeparator ||
             prod instanceof RepetitionWithSeparator ||
             prod instanceof Terminal ||
             prod instanceof Rule
@@ -47,6 +48,7 @@ namespace chevrotain.gast {
     productionToDslName[lang.functionName(NonTerminal)] = "SUBRULE"
     productionToDslName[lang.functionName(Option)] = "OPTION"
     productionToDslName[lang.functionName(RepetitionMandatory)] = "AT_LEAST_ONE"
+    productionToDslName[lang.functionName(RepetitionMandatoryWithSeparator)] = "AT_LEAST_ONE_SEP"
     productionToDslName[lang.functionName(RepetitionWithSeparator)] = "MANY_SEP"
     productionToDslName[lang.functionName(Repetition)] = "MANY"
     productionToDslName[lang.functionName(Alternation)] = "OR"

@@ -39,6 +39,7 @@ if (!testMode) {
     API.gast.Repetition = chevrotain.gast.Repetition
     API.gast.RepetitionWithSeparator = chevrotain.gast.RepetitionWithSeparator
     API.gast.RepetitionMandatory = chevrotain.gast.RepetitionMandatory
+    API.gast.RepetitionMandatoryWithSeparator = chevrotain.gast.RepetitionMandatoryWithSeparator
     API.gast.Option = chevrotain.gast.Option
     API.gast.Alternation = chevrotain.gast.Alternation
     API.gast.NonTerminal = chevrotain.gast.NonTerminal

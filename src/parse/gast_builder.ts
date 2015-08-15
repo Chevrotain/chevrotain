@@ -11,6 +11,7 @@ namespace chevrotain.gastBuilder {
         MANY,
         MANY_SEP,
         AT_LEAST_ONE,
+        AT_LEAST_ONE_SEP,
         REF,
         TERMINAL,
         FLAT
@@ -38,6 +39,9 @@ namespace chevrotain.gastBuilder {
 
     let manyWithSeparatorRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
     let manyWithSeparatorRegExGlobal = new RegExp(manyWithSeparatorRegEx.source, "g")
+
+    let atLeastOneWithSeparatorRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+    let atLeastOneWithSeparatorRegExGlobal = new RegExp(atLeastOneWithSeparatorRegEx.source, "g")
 
     let atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
     let atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
@@ -77,6 +81,8 @@ namespace chevrotain.gastBuilder {
         switch (prodRange.type) {
             case ProdType.AT_LEAST_ONE:
                 return buildAtLeastOneProd(prodRange, allRanges)
+            case ProdType.AT_LEAST_ONE_SEP:
+                return buildAtLeastOneSepProd(prodRange, allRanges)
             case ProdType.MANY_SEP:
                 return buildManySepProd(prodRange, allRanges)
             case ProdType.MANY:
@@ -140,23 +146,32 @@ namespace chevrotain.gastBuilder {
         return buildProdWithOccurrence(atLeastOneRegEx, new gast.RepetitionMandatory([]), prodRange, allRanges)
     }
 
+    function buildAtLeastOneSepProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.RepetitionWithSeparator {
+        return buildRepetitionWithSep(prodRange, allRanges, gast.RepetitionMandatoryWithSeparator, atLeastOneWithSeparatorRegEx)
+    }
+
     function buildManyProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Repetition {
         return buildProdWithOccurrence(manyRegEx, new gast.Repetition([]), prodRange, allRanges)
     }
 
     function buildManySepProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.RepetitionWithSeparator {
-        let reResult = manyWithSeparatorRegEx.exec(prodRange.text)
+        return buildRepetitionWithSep(prodRange, allRanges, gast.RepetitionWithSeparator, manyWithSeparatorRegEx)
+    }
+
+    function buildRepetitionWithSep(prodRange:IProdRange, allRanges:IProdRange[],
+                                    repConstructor:Function, regExp:RegExp):gast.RepetitionWithSeparator {
+        let reResult = regExp.exec(prodRange.text)
         let isImplicitOccurrenceIdx = reResult[1] === undefined
-        let manySep = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
+        let occurrenceIdx = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
         let sepName = reResult[2]
-        let seperatorType = terminalNameToConstructor[sepName]
-        if (!seperatorType) {
+        let separatorType = terminalNameToConstructor[sepName]
+        if (!separatorType) {
             throw Error("Separator Terminal Token name: " + sepName + " not found")
         }
 
-        let newManySep = new gast.RepetitionWithSeparator([], seperatorType, manySep)
-        newManySep.implicitOccurrenceIndex = isImplicitOccurrenceIdx
-        return <any>buildAbstractProd(newManySep, prodRange.range, allRanges)
+        let repetitionInstance:any = new (<any>repConstructor)([], separatorType, occurrenceIdx)
+        repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
+        return <any>buildAbstractProd(repetitionInstance, prodRange.range, allRanges)
     }
 
     function buildOptionProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Option {
@@ -208,12 +223,13 @@ namespace chevrotain.gastBuilder {
         let terminalRanges = createTerminalRanges(text)
         let refsRanges = createRefsRanges(text)
         let atLeastOneRanges = createAtLeastOneRanges(text)
+        let atLeastOneSepRanges = createAtLeastOneSepRanges(text)
         let manyRanges = createManyRanges(text)
         let manySepRanges = createManySepRanges(text)
         let optionRanges = createOptionRanges(text)
         let orRanges = createOrRanges(text)
 
-        return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneRanges,
+        return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneSepRanges,
             manyRanges, manySepRanges, optionRanges, orRanges)
     }
 
@@ -227,6 +243,10 @@ namespace chevrotain.gastBuilder {
 
     export function createAtLeastOneRanges(text:string):IProdRange[] {
         return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE, atLeastOneRegExGlobal)
+    }
+
+    export function createAtLeastOneSepRanges(text:string):IProdRange[] {
+        return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE_SEP, atLeastOneWithSeparatorRegExGlobal)
     }
 
     export function createManyRanges(text:string):IProdRange[] {

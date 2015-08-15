@@ -28,6 +28,10 @@ namespace chevrotain.lookahead {
         return buildLookAheadForGrammarProd(interp.NextInsideAtLeastOneWalker, manyOccurrence, ruleGrammar)
     }
 
+    export function buildLookaheadForAtLeastOneSep(manyOccurrence:number, ruleGrammar:gast.Rule):() => boolean {
+        return buildLookAheadForGrammarProd(interp.NextInsideAtLeastOneSepWalker, manyOccurrence, ruleGrammar)
+    }
+
     export function buildLookaheadForOr(orOccurrence:number, ruleGrammar:gast.Rule, ignoreAmbiguities:boolean = false):() => number {
 
         let alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking()

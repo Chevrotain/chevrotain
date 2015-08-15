@@ -39,6 +39,7 @@ namespace chevrotain.cache {
     export let CLASS_TO_MANY_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
     export let CLASS_TO_MANY_SEP_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
     export let CLASS_TO_AT_LEAST_ONE_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
+    export let CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
     export let CLASS_TO_OPTION_LA_CACHE = new lang.HashTable<lang.HashTable<string>[]>()
 
     // TODO: CONST in typescript 1.5
@@ -50,12 +51,14 @@ namespace chevrotain.cache {
         CLASS_TO_MANY_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
         CLASS_TO_MANY_SEP_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
         CLASS_TO_AT_LEAST_ONE_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
+        CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
         CLASS_TO_OPTION_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
 
         initSingleLookAheadKeyCache(CLASS_TO_OR_LA_CACHE[className])
         initSingleLookAheadKeyCache(CLASS_TO_MANY_LA_CACHE[className])
         initSingleLookAheadKeyCache(CLASS_TO_MANY_SEP_LA_CACHE[className])
         initSingleLookAheadKeyCache(CLASS_TO_AT_LEAST_ONE_LA_CACHE[className])
+        initSingleLookAheadKeyCache(CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[className])
         initSingleLookAheadKeyCache(CLASS_TO_OPTION_LA_CACHE[className])
     }
 

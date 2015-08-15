@@ -183,6 +183,27 @@ namespace chevrotain.interpreter {
         }
     }
 
+    export class NextInsideAtLeastOneSepWalker extends AbstractNextPossibleTokensWalker {
+
+        private nextOccurrence = 0
+
+        constructor(topProd:g.Rule, protected path:p.IRuleGrammarPath) {
+            super(topProd, path)
+            this.nextOccurrence = this.path.occurrence
+        }
+
+        walkAtLeastOneSep(atLeastOneSepProd:g.RepetitionMandatoryWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (this.isAtEndOfPath && atLeastOneSepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
+                let restProd = new g.Flat(atLeastOneSepProd.definition)
+                this.possibleTokTypes = f.first(restProd)
+                this.found = true
+            }
+            else {
+                super.walkAtLeastOneSep(atLeastOneSepProd, currRest, prevRest)
+            }
+        }
+    }
+
     export type AlternativesFirstTokens = Function[][]
 
     export class NextInsideOrWalker extends r.RestWalker {
@@ -285,6 +306,25 @@ namespace chevrotain.interpreter {
             }
             else {
                 super.walkAtLeastOne(atLeastOneProd, currRest, prevRest)
+            }
+        }
+    }
+
+    // TODO: reduce code duplication in the AfterWalkers
+    export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAfterProductionWalker {
+
+        walkAtLeastOneSep(atleastOneSepProd:g.RepetitionMandatoryWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            if (atleastOneSepProd.occurrenceInParent === this.occurrence) {
+
+                let firstAfterfirstAfterAtLeastOneSep = _.first(currRest.concat(prevRest))
+                this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === undefined
+                if (firstAfterfirstAfterAtLeastOneSep instanceof gast.Terminal) {
+                    this.result.token = firstAfterfirstAfterAtLeastOneSep.terminalType
+                    this.result.occurrence = firstAfterfirstAfterAtLeastOneSep.occurrenceInParent
+                }
+            }
+            else {
+                super.walkAtLeastOneSep(atleastOneSepProd, currRest, prevRest)
             }
         }
     }

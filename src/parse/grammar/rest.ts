@@ -2,6 +2,7 @@ namespace chevrotain.rest {
 
     import g = chevrotain.gast
 
+
     export class RestWalker {
 
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
@@ -22,6 +23,9 @@ namespace chevrotain.rest {
                 }
                 else if (subProd instanceof g.RepetitionMandatory) {
                     this.walkAtLeastOne(subProd, currRest, prevRest)
+                }
+                else if (subProd instanceof g.RepetitionMandatoryWithSeparator) {
+                    this.walkAtLeastOneSep(subProd, currRest, prevRest)
                 }
                 else if (subProd instanceof g.RepetitionWithSeparator) {
                     this.walkManySep(subProd, currRest, prevRest)
@@ -58,6 +62,12 @@ namespace chevrotain.rest {
             this.walk(atLeastOneProd, fullAtLeastOneRest)
         }
 
+        walkAtLeastOneSep(atLeastOneSepProd:g.RepetitionMandatoryWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
+            // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
+            var fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest)
+            this.walk(atLeastOneSepProd, fullAtLeastOneSepRest)
+        }
+
         walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(DE)*F => after the (DE)* the rest is (DE)?F
             let fullManyRest:g.IProduction[] = [new g.Option(manyProd.definition)].concat(<any>currRest, <any>prevRest)
@@ -66,9 +76,7 @@ namespace chevrotain.rest {
 
         walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC(DE)*F => after the (DE)* the rest is (DE)?F
-            let sepRestSuffix = [new g.Option([<any>new g.Terminal(manySepProd.separator)].concat(manySepProd.definition))]
-            let manySepRest = [new g.Option(manySepProd.definition.concat(sepRestSuffix))]
-            let fullManySepRest:g.IProduction[] = manySepRest.concat(<any>currRest, <any>prevRest)
+            var fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest)
             this.walk(manySepProd, fullManySepRest)
         }
 
@@ -84,7 +92,12 @@ namespace chevrotain.rest {
                 this.walk(prodWrapper, <any>fullOrRest)
             })
         }
-
     }
 
+    function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
+        let sepRestSuffix = [new g.Option([<any>new g.Terminal(repSepProd.separator)].concat(repSepProd.definition))]
+        let repSepRest = [new g.Option(repSepProd.definition.concat(sepRestSuffix))]
+        let fullRepSepRest:g.IProduction[] = repSepRest.concat(<any>currRest, <any>prevRest)
+        return fullRepSepRest
+    }
 }

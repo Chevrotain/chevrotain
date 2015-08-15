@@ -96,6 +96,10 @@ namespace chevrotain.checks {
             this.allProductions.push(atLeastOne)
         }
 
+        public visitRepetitionMandatoryWithSeparator(atLeastOneSep:gast.RepetitionMandatoryWithSeparator):void {
+            this.allProductions.push(atLeastOneSep)
+        }
+
         public visitRepetition(many:gast.Repetition):void {
             this.allProductions.push(many)
         }
