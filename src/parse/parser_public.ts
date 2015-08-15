@@ -694,7 +694,7 @@ namespace chevrotain {
          * As in CONSUME the index in the method name indicates the occurrence
          * of the repetition production in it's top rule.
          *
-         * @param separator - The Token to use as a seperator between repetitions.
+         * @param separator - The Token to use as a separator between repetitions.
          * @param {Function} laFuncOrAction - The lookahead function that 'decides'
          *                                  whether or not the MANY_SEP's action will be
          *                                  invoked or the action to optionally invoke
@@ -784,7 +784,7 @@ namespace chevrotain {
         protected AT_LEAST_ONE3(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE1", 3, laFuncOrAction, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE3", 3, laFuncOrAction, action, errMsg)
         }
 
         /**
@@ -793,7 +793,7 @@ namespace chevrotain {
         protected AT_LEAST_ONE4(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE1", 4, laFuncOrAction, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE4", 4, laFuncOrAction, action, errMsg)
         }
 
         /**
@@ -802,7 +802,7 @@ namespace chevrotain {
         protected AT_LEAST_ONE5(laFuncOrAction:LookAheadFunc | GrammarAction,
                                 action:GrammarAction | string,
                                 errMsg?:string):void {
-            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, laFuncOrAction, action, errMsg)
+            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE5", 5, laFuncOrAction, action, errMsg)
         }
 
         /**
