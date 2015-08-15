@@ -1,4 +1,4 @@
-/*! chevrotain - v0.4.10 - 2015-08-11 */
+/*! chevrotain - v0.5.0 - 2015-08-16 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -240,6 +240,8 @@ declare module chevrotain {
         private definitionErrors;
         private orLookaheadKeys;
         private manyLookaheadKeys;
+        private manySepLookaheadKeys;
+        private atLeastOneSepLookaheadKeys;
         private atLeastOneLookaheadKeys;
         private optionLookaheadKeys;
         private definedRulesNames;
@@ -455,7 +457,7 @@ declare module chevrotain {
          * Convenience method equivalent to MANY1
          * @see MANY1
          */
-        protected MANY(lookAheadFunc: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
         /**
          * Parsing DSL method, that indicates a repetition of zero or more.
          * This is equivalent to EBNF repetition {...}
@@ -499,6 +501,59 @@ declare module chevrotain {
          */
         protected MANY5(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
         /**
+         * Convenience method equivalent to MANY_SEP1
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        /**
+         * Parsing DSL method, that indicates a repetition of zero or more with a separator
+         * Token between the repetitions.
+         *
+         * note that the 'action' param is optional. so both of the following forms are valid:
+         *
+         * short: this.MANY_SEP(Comma, ()=>{
+         *                       this.CONSUME(Number};
+         *                       ...
+         *                       );
+         *
+         * long: this.MANY(Comma, isNumber, ()=>{
+         *                       this.CONSUME(Number}
+         *                       ...
+         *                       );
+         *
+         * using the short form is recommended as it will compute the lookahead function
+         * (for the first iteration) automatically. however this currently has one limitation:
+         * It only works if the lookahead for the grammar is one.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the repetition production in it's top rule.
+         *
+         * @param separator - The Token to use as a separator between repetitions.
+         * @param {Function} laFuncOrAction - The lookahead function that 'decides'
+         *                                  whether or not the MANY_SEP's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] - The action to optionally invoke.
+         *
+         * @return {Token[]} - The consumed separator Tokens.
+         */
+        protected MANY_SEP1(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP2(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP3(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP4(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        /**
+         * @see MANY_SEP1
+         */
+        protected MANY_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        /**
          * Convenience method equivalent to AT_LEAST_ONE1
          * @see AT_LEAST_ONE1
          */
@@ -534,6 +589,43 @@ declare module chevrotain {
          * @see AT_LEAST_ONE1
          */
         protected AT_LEAST_ONE5(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        /**
+         * Convenience method equivalent to AT_LEAST_ONE_SEP1
+         * @see AT_LEAST_ONE1
+         */
+        protected AT_LEAST_ONE_SEP(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        /**
+         *
+         * convenience method, same as MANY_SEP but the repetition is of one or more.
+         * failing to match at least one repetition will result in a parsing error and
+         * cause the parser to attempt error recovery.
+         *
+         * @see MANY_SEP1
+         *
+         * @param separator {Token}
+         * @param {Function} laFuncOrAction The lookahead function that 'decides'
+         *                                  whether or not the AT_LEAST_ONE's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] The action to optionally invoke.
+         * @param {string} [errMsg] short title/classification to what is being matched
+         */
+        protected AT_LEAST_ONE_SEP1(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP2(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP3(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP4(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          * Convenience method, same as RULE with doReSync=false
          * @see RULE
@@ -572,7 +664,10 @@ declare module chevrotain {
         private attemptInRepetitionRecovery(prodFunc, args, lookaheadFunc, prodName, prodOccurrence, nextToksWalker, prodKeys);
         private optionInternal(condition, action);
         private atLeastOneInternal(prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg?);
+        private atLeastOneSepFirstInternal(prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, errMsg?);
         private manyInternal(prodFunc, prodName, prodOccurrence, lookAheadFunc, action?);
+        private manySepFirstInternal(prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action?);
+        private repetitionSepSecondInternal(prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker);
         private orInternal<T>(alts, errMsgTypes, occurrence, ignoreAmbiguities);
         /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
@@ -592,7 +687,9 @@ declare module chevrotain {
         private getLookaheadFuncForOption(occurence);
         private getLookaheadFuncForOr(occurence, ignoreErrors);
         private getLookaheadFuncForMany(occurence);
+        private getLookaheadFuncForManySep(occurence);
         private getLookaheadFuncForAtLeastOne(occurence);
+        private getLookaheadFuncForAtLeastOneSep(occurence);
         private getLookaheadFuncFor<T>(key, occurrence, laFuncBuilder, extraArgs?);
         private saveRecogState();
         private reloadRecogState(newState);
@@ -646,9 +743,19 @@ declare module chevrotain {
         	occurrenceInParent: number;
         	constructor(definition: IProduction[], occurrenceInParent?: number);
     	}
+    	class RepetitionMandatoryWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
+        	separator: Function;
+        	occurrenceInParent: number;
+        	constructor(definition: IProduction[], separator: Function, occurrenceInParent?: number);
+    	}
     	class Repetition extends AbstractProduction implements IProductionWithOccurrence {
         	occurrenceInParent: number;
         	constructor(definition: IProduction[], occurrenceInParent?: number);
+    	}
+    	class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
+        	separator: Function;
+        	occurrenceInParent: number;
+        	constructor(definition: IProduction[], separator: Function, occurrenceInParent?: number);
     	}
     	class Alternation extends AbstractProduction implements IProductionWithOccurrence {
         	occurrenceInParent: number;
@@ -666,8 +773,10 @@ declare module chevrotain {
         	visitNonTerminal(node: NonTerminal): void;
         	visitFlat(node: Flat): void;
         	visitOption(node: Option): void;
-        	visitRepetitionMandatory(node: RepetitionMandatory): void;
         	visitRepetition(node: Repetition): void;
+        	visitRepetitionMandatory(node: RepetitionMandatory): void;
+        	visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): void;
+        	visitRepetitionWithSeparator(node: RepetitionWithSeparator): void;
         	visitAlternation(node: Alternation): void;
         	visitTerminal(node: Terminal): void;
     	}
