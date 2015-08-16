@@ -1291,11 +1291,11 @@ namespace chevrotain {
                 firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
             }
 
-            let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
             // 1st iteration
             if (firstIterationLookAheadFunc.call(this)) {
                 (<GrammarAction>action).call(this)
 
+                let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
                 // 2nd..nth iterations
                 while (separatorLookAheadFunc()) {
                     // note that this CONSUME will never enter recovery because
@@ -1352,11 +1352,11 @@ namespace chevrotain {
                 firstIterationLookAheadFunc = this.getLookaheadFuncForManySep(prodOccurrence)
             }
 
-            let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
             // 1st iteration
             if (firstIterationLookAheadFunc.call(this)) {
                 action.call(this)
 
+                let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
                 // 2nd..nth iterations
                 while (separatorLookAheadFunc()) {
                     // note that this CONSUME will never enter recovery because
