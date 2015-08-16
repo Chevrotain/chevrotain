@@ -17,12 +17,12 @@
     "vendor"
   ],
   "homepage": "https://github.com/lodash/lodash",
-  "version": "3.10.0",
-  "_release": "3.10.0",
+  "version": "3.10.1",
+  "_release": "3.10.1",
   "_resolution": {
     "type": "version",
-    "tag": "3.10.0",
-    "commit": "9d894f90ff020d49bef24aa70c75e513f43049f2"
+    "tag": "3.10.1",
+    "commit": "ef20b4290cc4fe7551c82a552ea7ffa76548eec8"
   },
   "_source": "git://github.com/lodash/lodash.git",
   "_target": "^3.10.0",

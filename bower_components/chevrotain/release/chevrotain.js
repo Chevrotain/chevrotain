@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.4.9 - 2015-07-26 */
+/*! chevrotain - v0.5.0 - 2015-08-16 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -817,6 +817,17 @@ var chevrotain;
             return RepetitionMandatory;
         })(AbstractProduction);
         gast.RepetitionMandatory = RepetitionMandatory;
+        var RepetitionMandatoryWithSeparator = (function (_super) {
+            __extends(RepetitionMandatoryWithSeparator, _super);
+            function RepetitionMandatoryWithSeparator(definition, separator, occurrenceInParent) {
+                if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
+                _super.call(this, definition);
+                this.separator = separator;
+                this.occurrenceInParent = occurrenceInParent;
+            }
+            return RepetitionMandatoryWithSeparator;
+        })(AbstractProduction);
+        gast.RepetitionMandatoryWithSeparator = RepetitionMandatoryWithSeparator;
         var Repetition = (function (_super) {
             __extends(Repetition, _super);
             function Repetition(definition, occurrenceInParent) {
@@ -827,6 +838,17 @@ var chevrotain;
             return Repetition;
         })(AbstractProduction);
         gast.Repetition = Repetition;
+        var RepetitionWithSeparator = (function (_super) {
+            __extends(RepetitionWithSeparator, _super);
+            function RepetitionWithSeparator(definition, separator, occurrenceInParent) {
+                if (occurrenceInParent === void 0) { occurrenceInParent = 1; }
+                _super.call(this, definition);
+                this.separator = separator;
+                this.occurrenceInParent = occurrenceInParent;
+            }
+            return RepetitionWithSeparator;
+        })(AbstractProduction);
+        gast.RepetitionWithSeparator = RepetitionWithSeparator;
         var Alternation = (function (_super) {
             __extends(Alternation, _super);
             function Alternation(definition, occurrenceInParent) {
@@ -866,6 +888,12 @@ var chevrotain;
                 else if (node instanceof RepetitionMandatory) {
                     this.visitRepetitionMandatory(node);
                 }
+                else if (node instanceof RepetitionMandatoryWithSeparator) {
+                    this.visitRepetitionMandatoryWithSeparator(node);
+                }
+                else if (node instanceof RepetitionWithSeparator) {
+                    this.visitRepetitionWithSeparator(node);
+                }
                 else if (node instanceof Repetition) {
                     this.visitRepetition(node);
                 }
@@ -880,8 +908,10 @@ var chevrotain;
             GAstVisitor.prototype.visitNonTerminal = function (node) { };
             GAstVisitor.prototype.visitFlat = function (node) { };
             GAstVisitor.prototype.visitOption = function (node) { };
-            GAstVisitor.prototype.visitRepetitionMandatory = function (node) { };
             GAstVisitor.prototype.visitRepetition = function (node) { };
+            GAstVisitor.prototype.visitRepetitionMandatory = function (node) { };
+            GAstVisitor.prototype.visitRepetitionMandatoryWithSeparator = function (node) { };
+            GAstVisitor.prototype.visitRepetitionWithSeparator = function (node) { };
             GAstVisitor.prototype.visitAlternation = function (node) { };
             GAstVisitor.prototype.visitTerminal = function (node) { };
             return GAstVisitor;
@@ -899,12 +929,16 @@ var chevrotain;
                 prod instanceof gast.Option ||
                 prod instanceof gast.Repetition ||
                 prod instanceof gast.RepetitionMandatory ||
+                prod instanceof gast.RepetitionMandatoryWithSeparator ||
+                prod instanceof gast.RepetitionWithSeparator ||
                 prod instanceof gast.Terminal ||
                 prod instanceof gast.Rule;
         }
         gast.isSequenceProd = isSequenceProd;
         function isOptionalProd(prod) {
-            var isDirectlyOptional = prod instanceof gast.Option || prod instanceof gast.Repetition;
+            var isDirectlyOptional = prod instanceof gast.Option ||
+                prod instanceof gast.Repetition ||
+                prod instanceof gast.RepetitionWithSeparator;
             if (isDirectlyOptional) {
                 return true;
             }
@@ -935,6 +969,8 @@ var chevrotain;
         productionToDslName[lang.functionName(gast.NonTerminal)] = "SUBRULE";
         productionToDslName[lang.functionName(gast.Option)] = "OPTION";
         productionToDslName[lang.functionName(gast.RepetitionMandatory)] = "AT_LEAST_ONE";
+        productionToDslName[lang.functionName(gast.RepetitionMandatoryWithSeparator)] = "AT_LEAST_ONE_SEP";
+        productionToDslName[lang.functionName(gast.RepetitionWithSeparator)] = "MANY_SEP";
         productionToDslName[lang.functionName(gast.Repetition)] = "MANY";
         productionToDslName[lang.functionName(gast.Alternation)] = "OR";
         productionToDslName[lang.functionName(gast.Terminal)] = "CONSUME";
@@ -1037,6 +1073,12 @@ var chevrotain;
                     else if (subProd instanceof g.RepetitionMandatory) {
                         _this.walkAtLeastOne(subProd, currRest, prevRest);
                     }
+                    else if (subProd instanceof g.RepetitionMandatoryWithSeparator) {
+                        _this.walkAtLeastOneSep(subProd, currRest, prevRest);
+                    }
+                    else if (subProd instanceof g.RepetitionWithSeparator) {
+                        _this.walkManySep(subProd, currRest, prevRest);
+                    }
                     else if (subProd instanceof g.Repetition) {
                         _this.walkMany(subProd, currRest, prevRest);
                     }/* istanbul ignore else */ 
@@ -1065,10 +1107,20 @@ var chevrotain;
                 var fullAtLeastOneRest = [new g.Option(atLeastOneProd.definition)].concat(currRest, prevRest);
                 this.walk(atLeastOneProd, fullAtLeastOneRest);
             };
+            RestWalker.prototype.walkAtLeastOneSep = function (atLeastOneSepProd, currRest, prevRest) {
+                // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
+                var fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest);
+                this.walk(atLeastOneSepProd, fullAtLeastOneSepRest);
+            };
             RestWalker.prototype.walkMany = function (manyProd, currRest, prevRest) {
                 // ABC(DE)*F => after the (DE)* the rest is (DE)?F
                 var fullManyRest = [new g.Option(manyProd.definition)].concat(currRest, prevRest);
                 this.walk(manyProd, fullManyRest);
+            };
+            RestWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
+                // ABC(DE)*F => after the (DE)* the rest is (DE)?F
+                var fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest);
+                this.walk(manySepProd, fullManySepRest);
             };
             RestWalker.prototype.walkOr = function (orProd, currRest, prevRest) {
                 var _this = this;
@@ -1086,6 +1138,12 @@ var chevrotain;
             return RestWalker;
         })();
         rest.RestWalker = RestWalker;
+        function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
+            var sepRestSuffix = [new g.Option([new g.Terminal(repSepProd.separator)].concat(repSepProd.definition))];
+            var repSepRest = [new g.Option(repSepProd.definition.concat(sepRestSuffix))];
+            var fullRepSepRest = repSepRest.concat(currRest, prevRest);
+            return fullRepSepRest;
+        }
     })/* istanbul ignore next */ (rest = chevrotain.rest || /* istanbul ignore next */ (chevrotain.rest = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
@@ -1274,6 +1332,27 @@ var chevrotain;
             return NextInsideManyWalker;
         })(AbstractNextPossibleTokensWalker);
         interpreter.NextInsideManyWalker = NextInsideManyWalker;
+        var NextInsideManySepWalker = (function (_super) {
+            __extends(NextInsideManySepWalker, _super);
+            function NextInsideManySepWalker(topProd, path) {
+                _super.call(this, topProd, path);
+                this.path = path;
+                this.nextOccurrence = 0;
+                this.nextOccurrence = this.path.occurrence;
+            }
+            NextInsideManySepWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
+                if (this.isAtEndOfPath && manySepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
+                    var restProd = new g.Flat(manySepProd.definition);
+                    this.possibleTokTypes = f.first(restProd);
+                    this.found = true;
+                }
+                else {
+                    _super.prototype.walkManySep.call(this, manySepProd, currRest, prevRest);
+                }
+            };
+            return NextInsideManySepWalker;
+        })(AbstractNextPossibleTokensWalker);
+        interpreter.NextInsideManySepWalker = NextInsideManySepWalker;
         var NextInsideAtLeastOneWalker = (function (_super) {
             __extends(NextInsideAtLeastOneWalker, _super);
             function NextInsideAtLeastOneWalker(topProd, path) {
@@ -1295,6 +1374,27 @@ var chevrotain;
             return NextInsideAtLeastOneWalker;
         })(AbstractNextPossibleTokensWalker);
         interpreter.NextInsideAtLeastOneWalker = NextInsideAtLeastOneWalker;
+        var NextInsideAtLeastOneSepWalker = (function (_super) {
+            __extends(NextInsideAtLeastOneSepWalker, _super);
+            function NextInsideAtLeastOneSepWalker(topProd, path) {
+                _super.call(this, topProd, path);
+                this.path = path;
+                this.nextOccurrence = 0;
+                this.nextOccurrence = this.path.occurrence;
+            }
+            NextInsideAtLeastOneSepWalker.prototype.walkAtLeastOneSep = function (atLeastOneSepProd, currRest, prevRest) {
+                if (this.isAtEndOfPath && atLeastOneSepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
+                    var restProd = new g.Flat(atLeastOneSepProd.definition);
+                    this.possibleTokTypes = f.first(restProd);
+                    this.found = true;
+                }
+                else {
+                    _super.prototype.walkAtLeastOneSep.call(this, atLeastOneSepProd, currRest, prevRest);
+                }
+            };
+            return NextInsideAtLeastOneSepWalker;
+        })(AbstractNextPossibleTokensWalker);
+        interpreter.NextInsideAtLeastOneSepWalker = NextInsideAtLeastOneSepWalker;
         var NextInsideOrWalker = (function (_super) {
             __extends(NextInsideOrWalker, _super);
             function NextInsideOrWalker(topRule, occurrence) {
@@ -1361,6 +1461,27 @@ var chevrotain;
             return NextTerminalAfterManyWalker;
         })(AbstractNextTerminalAfterProductionWalker);
         interpreter.NextTerminalAfterManyWalker = NextTerminalAfterManyWalker;
+        var NextTerminalAfterManySepWalker = (function (_super) {
+            __extends(NextTerminalAfterManySepWalker, _super);
+            function NextTerminalAfterManySepWalker() {
+                _super.apply(this, arguments);
+            }
+            NextTerminalAfterManySepWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
+                if (manySepProd.occurrenceInParent === this.occurrence) {
+                    var firstAfterManySep = _.first(currRest.concat(prevRest));
+                    this.result.isEndOfRule = firstAfterManySep === undefined;
+                    if (firstAfterManySep instanceof chevrotain.gast.Terminal) {
+                        this.result.token = firstAfterManySep.terminalType;
+                        this.result.occurrence = firstAfterManySep.occurrenceInParent;
+                    }
+                }
+                else {
+                    _super.prototype.walkManySep.call(this, manySepProd, currRest, prevRest);
+                }
+            };
+            return NextTerminalAfterManySepWalker;
+        })(AbstractNextTerminalAfterProductionWalker);
+        interpreter.NextTerminalAfterManySepWalker = NextTerminalAfterManySepWalker;
         var NextTerminalAfterAtLeastOneWalker = (function (_super) {
             __extends(NextTerminalAfterAtLeastOneWalker, _super);
             function NextTerminalAfterAtLeastOneWalker() {
@@ -1382,6 +1503,28 @@ var chevrotain;
             return NextTerminalAfterAtLeastOneWalker;
         })(AbstractNextTerminalAfterProductionWalker);
         interpreter.NextTerminalAfterAtLeastOneWalker = NextTerminalAfterAtLeastOneWalker;
+        // TODO: reduce code duplication in the AfterWalkers
+        var NextTerminalAfterAtLeastOneSepWalker = (function (_super) {
+            __extends(NextTerminalAfterAtLeastOneSepWalker, _super);
+            function NextTerminalAfterAtLeastOneSepWalker() {
+                _super.apply(this, arguments);
+            }
+            NextTerminalAfterAtLeastOneSepWalker.prototype.walkAtLeastOneSep = function (atleastOneSepProd, currRest, prevRest) {
+                if (atleastOneSepProd.occurrenceInParent === this.occurrence) {
+                    var firstAfterfirstAfterAtLeastOneSep = _.first(currRest.concat(prevRest));
+                    this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === undefined;
+                    if (firstAfterfirstAfterAtLeastOneSep instanceof chevrotain.gast.Terminal) {
+                        this.result.token = firstAfterfirstAfterAtLeastOneSep.terminalType;
+                        this.result.occurrence = firstAfterfirstAfterAtLeastOneSep.occurrenceInParent;
+                    }
+                }
+                else {
+                    _super.prototype.walkAtLeastOneSep.call(this, atleastOneSepProd, currRest, prevRest);
+                }
+            };
+            return NextTerminalAfterAtLeastOneSepWalker;
+        })(AbstractNextTerminalAfterProductionWalker);
+        interpreter.NextTerminalAfterAtLeastOneSepWalker = NextTerminalAfterAtLeastOneSepWalker;
     })/* istanbul ignore next */ (interpreter = chevrotain.interpreter || /* istanbul ignore next */ (chevrotain.interpreter = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 /**
@@ -1420,7 +1563,9 @@ var chevrotain;
         cache.getFirstAfterRepForClass = getFirstAfterRepForClass;
         cache.CLASS_TO_OR_LA_CACHE = new chevrotain.lang.HashTable();
         cache.CLASS_TO_MANY_LA_CACHE = new chevrotain.lang.HashTable();
+        cache.CLASS_TO_MANY_SEP_LA_CACHE = new chevrotain.lang.HashTable();
         cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE = new chevrotain.lang.HashTable();
+        cache.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE = new chevrotain.lang.HashTable();
         cache.CLASS_TO_OPTION_LA_CACHE = new chevrotain.lang.HashTable();
         // TODO: CONST in typescript 1.5
         // TODO reflective test to verify this has not changed, for example (OPTION6 added)
@@ -1428,11 +1573,15 @@ var chevrotain;
         function initLookAheadKeyCache(className) {
             cache.CLASS_TO_OR_LA_CACHE[className] = new Array(cache.MAX_OCCURRENCE_INDEX);
             cache.CLASS_TO_MANY_LA_CACHE[className] = new Array(cache.MAX_OCCURRENCE_INDEX);
+            cache.CLASS_TO_MANY_SEP_LA_CACHE[className] = new Array(cache.MAX_OCCURRENCE_INDEX);
             cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[className] = new Array(cache.MAX_OCCURRENCE_INDEX);
+            cache.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[className] = new Array(cache.MAX_OCCURRENCE_INDEX);
             cache.CLASS_TO_OPTION_LA_CACHE[className] = new Array(cache.MAX_OCCURRENCE_INDEX);
             initSingleLookAheadKeyCache(cache.CLASS_TO_OR_LA_CACHE[className]);
             initSingleLookAheadKeyCache(cache.CLASS_TO_MANY_LA_CACHE[className]);
+            initSingleLookAheadKeyCache(cache.CLASS_TO_MANY_SEP_LA_CACHE[className]);
             initSingleLookAheadKeyCache(cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[className]);
+            initSingleLookAheadKeyCache(cache.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[className]);
             initSingleLookAheadKeyCache(cache.CLASS_TO_OPTION_LA_CACHE[className]);
         }
         cache.initLookAheadKeyCache = initLookAheadKeyCache;
@@ -1472,10 +1621,18 @@ var chevrotain;
             return buildLookAheadForGrammarProd(interp.NextInsideManyWalker, manyOccurrence, ruleGrammar);
         }
         lookahead.buildLookaheadForMany = buildLookaheadForMany;
+        function buildLookaheadForManySep(manyOccurrence, ruleGrammar) {
+            return buildLookAheadForGrammarProd(interp.NextInsideManySepWalker, manyOccurrence, ruleGrammar);
+        }
+        lookahead.buildLookaheadForManySep = buildLookaheadForManySep;
         function buildLookaheadForAtLeastOne(manyOccurrence, ruleGrammar) {
             return buildLookAheadForGrammarProd(interp.NextInsideAtLeastOneWalker, manyOccurrence, ruleGrammar);
         }
         lookahead.buildLookaheadForAtLeastOne = buildLookaheadForAtLeastOne;
+        function buildLookaheadForAtLeastOneSep(manyOccurrence, ruleGrammar) {
+            return buildLookAheadForGrammarProd(interp.NextInsideAtLeastOneSepWalker, manyOccurrence, ruleGrammar);
+        }
+        lookahead.buildLookaheadForAtLeastOneSep = buildLookaheadForAtLeastOneSep;
         function buildLookaheadForOr(orOccurrence, ruleGrammar, ignoreAmbiguities) {
             if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
             var alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking();
@@ -1567,10 +1724,12 @@ var chevrotain;
             ProdType[ProdType["OPTION"] = 0] = "OPTION";
             ProdType[ProdType["OR"] = 1] = "OR";
             ProdType[ProdType["MANY"] = 2] = "MANY";
-            ProdType[ProdType["AT_LEAST_ONE"] = 3] = "AT_LEAST_ONE";
-            ProdType[ProdType["REF"] = 4] = "REF";
-            ProdType[ProdType["TERMINAL"] = 5] = "TERMINAL";
-            ProdType[ProdType["FLAT"] = 6] = "FLAT";
+            ProdType[ProdType["MANY_SEP"] = 3] = "MANY_SEP";
+            ProdType[ProdType["AT_LEAST_ONE"] = 4] = "AT_LEAST_ONE";
+            ProdType[ProdType["AT_LEAST_ONE_SEP"] = 5] = "AT_LEAST_ONE_SEP";
+            ProdType[ProdType["REF"] = 6] = "REF";
+            ProdType[ProdType["TERMINAL"] = 7] = "TERMINAL";
+            ProdType[ProdType["FLAT"] = 8] = "FLAT";
         })(gastBuilder.ProdType || (gastBuilder.ProdType = {}));
         var ProdType = gastBuilder.ProdType;
         // TODO: this regexp creates a constraint on names of Terminals (Tokens).
@@ -1581,8 +1740,12 @@ var chevrotain;
         var refRegExGlobal = new RegExp(refRegEx.source, "g");
         var optionRegEx = /\.\s*OPTION(\d)?\s*\(/;
         var optionRegExGlobal = new RegExp(optionRegEx.source, "g");
-        var manyRegEx = /.\s*MANY(\d)?\s*\(/;
+        var manyRegEx = /\.\s*MANY(\d)?\s*\(/;
         var manyRegExGlobal = new RegExp(manyRegEx.source, "g");
+        var manyWithSeparatorRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/;
+        var manyWithSeparatorRegExGlobal = new RegExp(manyWithSeparatorRegEx.source, "g");
+        var atLeastOneWithSeparatorRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/;
+        var atLeastOneWithSeparatorRegExGlobal = new RegExp(atLeastOneWithSeparatorRegEx.source, "g");
         var atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/;
         var atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g");
         var orRegEx = /\.\s*OR(\d)?\s*\(/;
@@ -1612,6 +1775,10 @@ var chevrotain;
             switch (prodRange.type) {
                 case ProdType.AT_LEAST_ONE:
                     return buildAtLeastOneProd(prodRange, allRanges);
+                case ProdType.AT_LEAST_ONE_SEP:
+                    return buildAtLeastOneSepProd(prodRange, allRanges);
+                case ProdType.MANY_SEP:
+                    return buildManySepProd(prodRange, allRanges);
                 case ProdType.MANY:
                     return buildManyProd(prodRange, allRanges);
                 case ProdType.OPTION:
@@ -1662,8 +1829,27 @@ var chevrotain;
         function buildAtLeastOneProd(prodRange, allRanges) {
             return buildProdWithOccurrence(atLeastOneRegEx, new gast.RepetitionMandatory([]), prodRange, allRanges);
         }
+        function buildAtLeastOneSepProd(prodRange, allRanges) {
+            return buildRepetitionWithSep(prodRange, allRanges, gast.RepetitionMandatoryWithSeparator, atLeastOneWithSeparatorRegEx);
+        }
         function buildManyProd(prodRange, allRanges) {
             return buildProdWithOccurrence(manyRegEx, new gast.Repetition([]), prodRange, allRanges);
+        }
+        function buildManySepProd(prodRange, allRanges) {
+            return buildRepetitionWithSep(prodRange, allRanges, gast.RepetitionWithSeparator, manyWithSeparatorRegEx);
+        }
+        function buildRepetitionWithSep(prodRange, allRanges, repConstructor, regExp) {
+            var reResult = regExp.exec(prodRange.text);
+            var isImplicitOccurrenceIdx = reResult[1] === undefined;
+            var occurrenceIdx = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10);
+            var sepName = reResult[2];
+            var separatorType = gastBuilder.terminalNameToConstructor[sepName];
+            if (!separatorType) {
+                throw Error("Separator Terminal Token name: " + sepName + " not found");
+            }
+            var repetitionInstance = new repConstructor([], separatorType, occurrenceIdx);
+            repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx;
+            return buildAbstractProd(repetitionInstance, prodRange.range, allRanges);
         }
         function buildOptionProd(prodRange, allRanges) {
             return buildProdWithOccurrence(optionRegEx, new gast.Option([]), prodRange, allRanges);
@@ -1706,10 +1892,12 @@ var chevrotain;
             var terminalRanges = createTerminalRanges(text);
             var refsRanges = createRefsRanges(text);
             var atLeastOneRanges = createAtLeastOneRanges(text);
+            var atLeastOneSepRanges = createAtLeastOneSepRanges(text);
             var manyRanges = createManyRanges(text);
+            var manySepRanges = createManySepRanges(text);
             var optionRanges = createOptionRanges(text);
             var orRanges = createOrRanges(text);
-            return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneRanges, manyRanges, optionRanges, orRanges);
+            return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneSepRanges, manyRanges, manySepRanges, optionRanges, orRanges);
         }
         gastBuilder.createRanges = createRanges;
         function createTerminalRanges(text) {
@@ -1724,10 +1912,18 @@ var chevrotain;
             return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE, atLeastOneRegExGlobal);
         }
         gastBuilder.createAtLeastOneRanges = createAtLeastOneRanges;
+        function createAtLeastOneSepRanges(text) {
+            return createOperatorProdRangeParenthesis(text, ProdType.AT_LEAST_ONE_SEP, atLeastOneWithSeparatorRegExGlobal);
+        }
+        gastBuilder.createAtLeastOneSepRanges = createAtLeastOneSepRanges;
         function createManyRanges(text) {
             return createOperatorProdRangeParenthesis(text, ProdType.MANY, manyRegExGlobal);
         }
         gastBuilder.createManyRanges = createManyRanges;
+        function createManySepRanges(text) {
+            return createOperatorProdRangeParenthesis(text, ProdType.MANY_SEP, manyWithSeparatorRegExGlobal);
+        }
+        gastBuilder.createManySepRanges = createManySepRanges;
         function createOptionRanges(text) {
             return createOperatorProdRangeParenthesis(text, ProdType.OPTION, optionRegExGlobal);
         }
@@ -1888,8 +2084,14 @@ var chevrotain;
             OccurrenceValidationCollector.prototype.visitOption = function (option) {
                 this.allProductions.push(option);
             };
+            OccurrenceValidationCollector.prototype.visitRepetitionWithSeparator = function (manySep) {
+                this.allProductions.push(manySep);
+            };
             OccurrenceValidationCollector.prototype.visitRepetitionMandatory = function (atLeastOne) {
                 this.allProductions.push(atLeastOne);
+            };
+            OccurrenceValidationCollector.prototype.visitRepetitionMandatoryWithSeparator = function (atLeastOneSep) {
+                this.allProductions.push(atLeastOneSep);
             };
             OccurrenceValidationCollector.prototype.visitRepetition = function (many) {
                 this.allProductions.push(many);
@@ -2088,7 +2290,9 @@ var chevrotain;
             }
             this.orLookaheadKeys = cache.CLASS_TO_OR_LA_CACHE[this.className];
             this.manyLookaheadKeys = cache.CLASS_TO_MANY_LA_CACHE[this.className];
+            this.manySepLookaheadKeys = cache.CLASS_TO_MANY_SEP_LA_CACHE[this.className];
             this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className];
+            this.atLeastOneSepLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[this.className];
             this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className];
         }
         Parser.performSelfAnalysis = function (classInstance) {
@@ -2496,8 +2700,8 @@ var chevrotain;
          * Convenience method equivalent to MANY1
          * @see MANY1
          */
-        Parser.prototype.MANY = function (lookAheadFunc, action) {
-            return this.MANY1.call(this, lookAheadFunc, action);
+        Parser.prototype.MANY = function (laFuncOrAction, action) {
+            return this.MANY1.call(this, laFuncOrAction, action);
         };
         /**
          * Parsing DSL method, that indicates a repetition of zero or more.
@@ -2552,6 +2756,71 @@ var chevrotain;
             this.manyInternal(this.MANY5, "MANY5", 5, laFuncOrAction, action);
         };
         /**
+         * Convenience method equivalent to MANY_SEP1
+         * @see MANY_SEP1
+         */
+        Parser.prototype.MANY_SEP = function (separator, laFuncOrAction, action) {
+            return this.MANY_SEP1.call(this, separator, laFuncOrAction, action);
+        };
+        /**
+         * Parsing DSL method, that indicates a repetition of zero or more with a separator
+         * Token between the repetitions.
+         *
+         * note that the 'action' param is optional. so both of the following forms are valid:
+         *
+         * short: this.MANY_SEP(Comma, ()=>{
+         *                       this.CONSUME(Number};
+         *                       ...
+         *                       );
+         *
+         * long: this.MANY(Comma, isNumber, ()=>{
+         *                       this.CONSUME(Number}
+         *                       ...
+         *                       );
+         *
+         * using the short form is recommended as it will compute the lookahead function
+         * (for the first iteration) automatically. however this currently has one limitation:
+         * It only works if the lookahead for the grammar is one.
+         *
+         * As in CONSUME the index in the method name indicates the occurrence
+         * of the repetition production in it's top rule.
+         *
+         * @param separator - The Token to use as a separator between repetitions.
+         * @param {Function} laFuncOrAction - The lookahead function that 'decides'
+         *                                  whether or not the MANY_SEP's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] - The action to optionally invoke.
+         *
+         * @return {Token[]} - The consumed separator Tokens.
+         */
+        Parser.prototype.MANY_SEP1 = function (separator, laFuncOrAction, action) {
+            return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, laFuncOrAction, action);
+        };
+        /**
+         * @see MANY_SEP1
+         */
+        Parser.prototype.MANY_SEP2 = function (separator, laFuncOrAction, action) {
+            return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, laFuncOrAction, action);
+        };
+        /**
+         * @see MANY_SEP1
+         */
+        Parser.prototype.MANY_SEP3 = function (separator, laFuncOrAction, action) {
+            return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, laFuncOrAction, action);
+        };
+        /**
+         * @see MANY_SEP1
+         */
+        Parser.prototype.MANY_SEP4 = function (separator, laFuncOrAction, action) {
+            return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, laFuncOrAction, action);
+        };
+        /**
+         * @see MANY_SEP1
+         */
+        Parser.prototype.MANY_SEP5 = function (separator, laFuncOrAction, action) {
+            return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, laFuncOrAction, action);
+        };
+        /**
          * Convenience method equivalent to AT_LEAST_ONE1
          * @see AT_LEAST_ONE1
          */
@@ -2585,19 +2854,68 @@ var chevrotain;
          * @see AT_LEAST_ONE1
          */
         Parser.prototype.AT_LEAST_ONE3 = function (laFuncOrAction, action, errMsg) {
-            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE1", 3, laFuncOrAction, action, errMsg);
+            this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE3", 3, laFuncOrAction, action, errMsg);
         };
         /**
          * @see AT_LEAST_ONE1
          */
         Parser.prototype.AT_LEAST_ONE4 = function (laFuncOrAction, action, errMsg) {
-            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE1", 4, laFuncOrAction, action, errMsg);
+            this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE4", 4, laFuncOrAction, action, errMsg);
         };
         /**
          * @see AT_LEAST_ONE1
          */
         Parser.prototype.AT_LEAST_ONE5 = function (laFuncOrAction, action, errMsg) {
-            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE1", 5, laFuncOrAction, action, errMsg);
+            this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE5", 5, laFuncOrAction, action, errMsg);
+        };
+        /**
+         * Convenience method equivalent to AT_LEAST_ONE_SEP1
+         * @see AT_LEAST_ONE1
+         */
+        Parser.prototype.AT_LEAST_ONE_SEP = function (separator, laFuncOrAction, action, errMsg) {
+            return this.AT_LEAST_ONE_SEP1.call(this, separator, laFuncOrAction, action, errMsg);
+        };
+        /**
+         *
+         * convenience method, same as MANY_SEP but the repetition is of one or more.
+         * failing to match at least one repetition will result in a parsing error and
+         * cause the parser to attempt error recovery.
+         *
+         * @see MANY_SEP1
+         *
+         * @param separator {Token}
+         * @param {Function} laFuncOrAction The lookahead function that 'decides'
+         *                                  whether or not the AT_LEAST_ONE's action will be
+         *                                  invoked or the action to optionally invoke
+         * @param {Function} [action] The action to optionally invoke.
+         * @param {string} [errMsg] short title/classification to what is being matched
+         */
+        Parser.prototype.AT_LEAST_ONE_SEP1 = function (separator, laFuncOrAction, action, errMsg) {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator, laFuncOrAction, action, errMsg);
+        };
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        Parser.prototype.AT_LEAST_ONE_SEP2 = function (separator, laFuncOrAction, action, errMsg) {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator, laFuncOrAction, action, errMsg);
+        };
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        Parser.prototype.AT_LEAST_ONE_SEP3 = function (separator, laFuncOrAction, action, errMsg) {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator, laFuncOrAction, action, errMsg);
+        };
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        Parser.prototype.AT_LEAST_ONE_SEP4 = function (separator, laFuncOrAction, action, errMsg) {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator, laFuncOrAction, action, errMsg);
+        };
+        /**
+         * @see AT_LEAST_ONE_SEP1
+         */
+        Parser.prototype.AT_LEAST_ONE_SEP5 = function (separator, laFuncOrAction, action, errMsg) {
+            return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator, laFuncOrAction, action, errMsg);
         };
         /**
          * Convenience method, same as RULE with doReSync=false
@@ -2912,7 +3230,9 @@ var chevrotain;
             }
             if (lookAheadFunc.call(this)) {
                 action.call(this);
-                this.MANY(lookAheadFunc, action);
+                while (lookAheadFunc.call(this)) {
+                    action.call(this);
+                }
             }
             else {
                 throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()));
@@ -2921,6 +3241,33 @@ var chevrotain;
             // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
             // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
+        };
+        Parser.prototype.atLeastOneSepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, errMsg) {
+            var _this = this;
+            var separatorsResult = [];
+            if (_.isString(action)) {
+                errMsg = action;
+                action = firstIterationLookAheadFunc;
+                firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence);
+            }
+            var separatorLookAheadFunc = function () { return _this.NEXT_TOKEN() instanceof separator; };
+            // 1st iteration
+            if (firstIterationLookAheadFunc.call(this)) {
+                action.call(this);
+                // 2nd..nth iterations
+                while (separatorLookAheadFunc()) {
+                    // note that this CONSUME will never enter recovery because
+                    // the separatorLookAheadFunc checks that the separator really does exist.
+                    separatorsResult.push(this.CONSUME(separator));
+                    action.call(this);
+                }
+                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                    this.atLeastOneSepLookaheadKeys, interp.NextTerminalAfterAtLeastOneSepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneSepWalker, this.atLeastOneSepLookaheadKeys);
+            }
+            else {
+                throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()));
+            }
+            return separatorsResult;
         };
         Parser.prototype.manyInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action) {
             if (action === undefined) {
@@ -2931,6 +3278,38 @@ var chevrotain;
                 action.call(this);
             }
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys);
+        };
+        Parser.prototype.manySepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action) {
+            var _this = this;
+            var separatorsResult = [];
+            if (action === undefined) {
+                action = firstIterationLookAheadFunc;
+                firstIterationLookAheadFunc = this.getLookaheadFuncForManySep(prodOccurrence);
+            }
+            var separatorLookAheadFunc = function () { return _this.NEXT_TOKEN() instanceof separator; };
+            // 1st iteration
+            if (firstIterationLookAheadFunc.call(this)) {
+                action.call(this);
+                // 2nd..nth iterations
+                while (separatorLookAheadFunc()) {
+                    // note that this CONSUME will never enter recovery because
+                    // the separatorLookAheadFunc checks that the separator really does exist.
+                    separatorsResult.push(this.CONSUME(separator));
+                    action.call(this);
+                }
+                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                    this.manySepLookaheadKeys, interp.NextTerminalAfterManySepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManySepWalker, this.manySepLookaheadKeys);
+            }
+            return separatorsResult;
+        };
+        Parser.prototype.repetitionSepSecondInternal = function (prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker) {
+            while (separatorLookAheadFunc()) {
+                // note that this CONSUME will never enter recovery because
+                // the separatorLookAheadFunc checks that the separator really does exist.
+                separatorsResult.push(this.CONSUME(separator));
+                action.call(this);
+            }
+            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker], separatorLookAheadFunc, prodName, prodOccurrence, nextTerminalAfterWalker, laKeys);
         };
         Parser.prototype.orInternal = function (alts, errMsgTypes, occurrence, ignoreAmbiguities) {
             // explicit alternatives look ahead
@@ -3030,9 +3409,17 @@ var chevrotain;
             var key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence);
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForMany);
         };
+        Parser.prototype.getLookaheadFuncForManySep = function (occurence) {
+            var key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurence);
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForManySep);
+        };
         Parser.prototype.getLookaheadFuncForAtLeastOne = function (occurence) {
             var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence);
             return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOne);
+        };
+        Parser.prototype.getLookaheadFuncForAtLeastOneSep = function (occurence) {
+            var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurence);
+            return this.getLookaheadFuncFor(key, occurence, lookahead.buildLookaheadForAtLeastOneSep);
         };
         Parser.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, extraArgs) {
             if (extraArgs === void 0) { extraArgs = []; }
@@ -3089,7 +3476,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.4.9";
+    API.VERSION = "0.5.0";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
@@ -3109,8 +3496,10 @@ if (!testMode) {
     API.gast = {};
     API.gast.GAstVisitor = chevrotain.gast.GAstVisitor;
     API.gast.Flat = chevrotain.gast.Flat;
-    API.gast.RepetitionMandatory = chevrotain.gast.RepetitionMandatory;
     API.gast.Repetition = chevrotain.gast.Repetition;
+    API.gast.RepetitionWithSeparator = chevrotain.gast.RepetitionWithSeparator;
+    API.gast.RepetitionMandatory = chevrotain.gast.RepetitionMandatory;
+    API.gast.RepetitionMandatoryWithSeparator = chevrotain.gast.RepetitionMandatoryWithSeparator;
     API.gast.Option = chevrotain.gast.Option;
     API.gast.Alternation = chevrotain.gast.Alternation;
     API.gast.NonTerminal = chevrotain.gast.NonTerminal;
