@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.0 - 2015-08-16 */
+/*! chevrotain - v0.5.1 - 2015-08-17 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -1050,6 +1050,9 @@ var chevrotain;
     var rest;
     (function (rest) {
         var g = chevrotain.gast;
+        /**
+         *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.
+         */
         var RestWalker = (function () {
             function RestWalker() {
             }
@@ -1108,7 +1111,7 @@ var chevrotain;
                 this.walk(atLeastOneProd, fullAtLeastOneRest);
             };
             RestWalker.prototype.walkAtLeastOneSep = function (atLeastOneSepProd, currRest, prevRest) {
-                // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
+                // ABC DE(,DE)* F => after the (,DE)+ the rest is (,DE)?F
                 var fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest);
                 this.walk(atLeastOneSepProd, fullAtLeastOneSepRest);
             };
@@ -1118,7 +1121,7 @@ var chevrotain;
                 this.walk(manyProd, fullManyRest);
             };
             RestWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
-                // ABC(DE)*F => after the (DE)* the rest is (DE)?F
+                // ABC (DE(,DE)*)? F => after the (,DE)* the rest is (,DE)?F
                 var fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest);
                 this.walk(manySepProd, fullManySepRest);
             };
@@ -1139,8 +1142,7 @@ var chevrotain;
         })();
         rest.RestWalker = RestWalker;
         function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
-            var sepRestSuffix = [new g.Option([new g.Terminal(repSepProd.separator)].concat(repSepProd.definition))];
-            var repSepRest = [new g.Option(repSepProd.definition.concat(sepRestSuffix))];
+            var repSepRest = [new g.Option([new g.Terminal(repSepProd.separator)].concat(repSepProd.definition))];
             var fullRepSepRest = repSepRest.concat(currRest, prevRest);
             return fullRepSepRest;
         }
@@ -3250,10 +3252,10 @@ var chevrotain;
                 action = firstIterationLookAheadFunc;
                 firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence);
             }
-            var separatorLookAheadFunc = function () { return _this.NEXT_TOKEN() instanceof separator; };
             // 1st iteration
             if (firstIterationLookAheadFunc.call(this)) {
                 action.call(this);
+                var separatorLookAheadFunc = function () { return _this.NEXT_TOKEN() instanceof separator; };
                 // 2nd..nth iterations
                 while (separatorLookAheadFunc()) {
                     // note that this CONSUME will never enter recovery because
@@ -3286,10 +3288,10 @@ var chevrotain;
                 action = firstIterationLookAheadFunc;
                 firstIterationLookAheadFunc = this.getLookaheadFuncForManySep(prodOccurrence);
             }
-            var separatorLookAheadFunc = function () { return _this.NEXT_TOKEN() instanceof separator; };
             // 1st iteration
             if (firstIterationLookAheadFunc.call(this)) {
                 action.call(this);
+                var separatorLookAheadFunc = function () { return _this.NEXT_TOKEN() instanceof separator; };
                 // 2nd..nth iterations
                 while (separatorLookAheadFunc()) {
                     // note that this CONSUME will never enter recovery because
@@ -3476,7 +3478,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.0";
+    API.VERSION = "0.5.1";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
