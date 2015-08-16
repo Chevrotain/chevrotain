@@ -79,16 +79,8 @@ function jsonExample() {
             var obj = {}
 
             $.CONSUME(LCurly);
-            $.OPTION(function () {
-                _.assign(obj, $.SUBRULE($.objectItem));
-                $.MANY(function () {
-                    $.CONSUME(Comma);
-                    // note the usage of '2' suffix. this is done to distinguish it from
-                    // 'SUBRULE($.objectItem)' three lines above. The combination of index
-                    // and invoked subrule is used as a key to mark the current position
-                    // in the grammar by the parser engine.
-                    _.assign(obj, $.SUBRULE2($.objectItem));
-                });
+            $.MANY_SEP(Comma, function () {
+                _.assign(obj, $.SUBRULE1($.objectItem));
             });
             $.CONSUME(RCurly);
 
@@ -114,12 +106,8 @@ function jsonExample() {
         this.array = this.RULE("array", function () {
             var arr = [];
             $.CONSUME(LSquare);
-            $.OPTION(function () {
-                arr.push($.SUBRULE($.value));
-                $.MANY(function () {
-                    $.CONSUME(Comma);
-                    arr.push($.SUBRULE2($.value)); // note the usage of '2' suffix
-                });
+            $.MANY_SEP(Comma, function () {
+                arr.push($.SUBRULE1($.value));
             });
             $.CONSUME(RSquare);
 
@@ -386,10 +374,8 @@ function tutorialGrammarExample() {
 
         this.selectClause = $.RULE("selectClause", function () {
             $.CONSUME(Select);
-            $.CONSUME(Identifier);
-            $.MANY(function () {
-                $.CONSUME(Comma);
-                $.CONSUME2(Identifier);
+            $.AT_LEAST_ONE_SEP(Comma, function () {
+                $.CONSUME1(Identifier);
             });
         });
 
@@ -500,10 +486,8 @@ function tutorialGrammarActionsExample() {
             var columns = []
 
             $.CONSUME(Select);
-            columns.push($.CONSUME(Identifier).image);
-            $.MANY(function () {
-                $.CONSUME(Comma);
-                columns.push($.CONSUME2(Identifier).image);
+            $.AT_LEAST_ONE_SEP(Comma, function () {
+                columns.push($.CONSUME1(Identifier).image);
             });
 
             return {type: "SELECT_CLAUSE", columns: columns}

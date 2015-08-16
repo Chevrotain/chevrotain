@@ -17,6 +17,27 @@ function definitionsToSubDiagrams(definitions) {
 
 
 /**
+ * @param {chevrotain.gast.Terminal} prod
+ *
+ * @return {RailRoadDiagram.Terminal}
+ */
+function createTerminalFromGastProd(prod) {
+    return Terminal(chevrotain.tokenName(prod.terminalType), undefined, prod.terminalType.PATTERN.source)
+}
+
+
+/**
+ * @param {function} tokenConstructor
+ *
+ * @return {RailRoadDiagram.Terminal}
+ */
+function createTerminalFromToken(tokenConstructor) {
+    var result = Terminal(chevrotain.tokenName(tokenConstructor), undefined, tokenConstructor.PATTERN.source)
+    return result
+}
+
+
+/**
  *
  * @param prod
  *
@@ -74,9 +95,29 @@ function convertProductionToDiagram(prod) {
                 throw new Error("Empty Optional production, WTF!")
             }
         }
+        else if (prod instanceof chevrotain.gast.RepetitionWithSeparator) {
+            if (subDiagrams.length > 0) {
+                // MANY_SEP(separator, definition) === (definition (separator definition)*)?
+                return Optional(Sequence.apply(this, subDiagrams.concat(
+                    [ZeroOrMore(Sequence.apply(this, [createTerminalFromToken(prod.separator)].concat(subDiagrams)))])))
+            }
+            else {
+                throw new Error("Empty Optional production, WTF!")
+            }
+        }
+        else if (prod instanceof chevrotain.gast.RepetitionMandatoryWithSeparator) {
+            if (subDiagrams.length > 0) {
+                // AT_LEAST_ONE_SEP(separator, definition) === definition (separator definition)*
+                return Sequence.apply(this, subDiagrams.concat(
+                    [ZeroOrMore(Sequence.apply(this, [createTerminalFromToken(prod.separator)].concat(subDiagrams)))]))
+            }
+            else {
+                throw new Error("Empty Optional production, WTF!")
+            }
+        }
     }
     else if (prod instanceof chevrotain.gast.Terminal) {
-        return Terminal(chevrotain.tokenName(prod.terminalType), undefined, prod.terminalType.PATTERN.source)
+        return createTerminalFromGastProd(prod)
     }
     else {
         throw Error("non exhaustive match")
