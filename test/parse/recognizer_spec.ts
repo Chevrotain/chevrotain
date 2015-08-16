@@ -1,4 +1,3 @@
-
 namespace chevrotain.recognizer.spec {
 
     export class PlusTok extends Token {
@@ -59,6 +58,39 @@ namespace chevrotain.recognizer.spec {
             this.CONSUME1(EOF)
 
             return idents
+        }
+    }
+
+    class ManySepSubRuleRepetitionRecovery extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, <any>chevrotain.recognizer.spec)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
+        public identifier = this.RULE("identifier", this.parseIdentifier, () => { return undefined })
+        public idents = []
+
+        private parseQualifiedName():string[] {
+            this.idents = []
+
+            this.MANY_SEP(DotTok, () => {
+                this.SUBRULE(this.identifier)
+            })
+
+            this.CONSUME1(EOF)
+
+            return this.idents
+        }
+
+        private parseIdentifier():void {
+            this.idents.push(this.CONSUME1(IdentTok).image)
+        }
+
+        protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
+            // this parser is meant to test a scenario with re-sync recovery and MANY_SEP --> disable TokenInsertion
+            return false
         }
     }
 
@@ -268,10 +300,19 @@ namespace chevrotain.recognizer.spec {
             expect(parser.errors.length).to.equal(1)
         })
 
+        it("can perform in-repetition recovery for MANY_SEP grammar rule #2", function () {
+            // a.b..c...d
+            let input = [new IdentTok("a"), new DotTok(), new DotTok(), new IdentTok("b"),
+                new DotTok(), new IdentTok("c"), new DotTok(), new DotTok(), new DotTok(), new IdentTok("d")]
+            let parser = new ManySepSubRuleRepetitionRecovery(input)
+            expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c", "d"])
+            expect(parser.errors.length).to.equal(3)
+        })
+
         it("can perform in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", function () {
             // a.b+.c
             let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
-                 new PlusTok(), new DotTok(), new IdentTok("c")]
+                new PlusTok(), new DotTok(), new IdentTok("c")]
             let parser = new AtLeastOneSepRepetitionRecovery(input)
             expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
             expect(parser.errors.length).to.equal(1)

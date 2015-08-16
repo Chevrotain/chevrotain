@@ -3,6 +3,9 @@ namespace chevrotain.rest {
     import g = chevrotain.gast
 
 
+    /**
+     *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.
+     */
     export class RestWalker {
 
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
@@ -63,7 +66,7 @@ namespace chevrotain.rest {
         }
 
         walkAtLeastOneSep(atLeastOneSepProd:g.RepetitionMandatoryWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
+            // ABC DE(,DE)* F => after the (,DE)+ the rest is (,DE)?F
             var fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest)
             this.walk(atLeastOneSepProd, fullAtLeastOneSepRest)
         }
@@ -75,7 +78,7 @@ namespace chevrotain.rest {
         }
 
         walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
-            // ABC(DE)*F => after the (DE)* the rest is (DE)?F
+            // ABC (DE(,DE)*)? F => after the (,DE)* the rest is (,DE)?F
             var fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest)
             this.walk(manySepProd, fullManySepRest)
         }
@@ -95,8 +98,7 @@ namespace chevrotain.rest {
     }
 
     function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
-        let sepRestSuffix = [new g.Option([<any>new g.Terminal(repSepProd.separator)].concat(repSepProd.definition))]
-        let repSepRest = [new g.Option(repSepProd.definition.concat(sepRestSuffix))]
+        let repSepRest = [new g.Option([<any>new g.Terminal(repSepProd.separator)].concat(repSepProd.definition))]
         let fullRepSepRest:g.IProduction[] = repSepRest.concat(<any>currRest, <any>prevRest)
         return fullRepSepRest
     }
