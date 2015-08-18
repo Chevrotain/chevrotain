@@ -13,7 +13,7 @@ function onInputEditorContentChange() {
         return {value: value, parseErrors: parser.errors}
     }
 
-    parserOutput.val("")
+    parserOutput.setValue("")
     var lexResult = lex(inputEditor.getValue(), defaultRuleName)
     // may be falsy if the example is for the lexer only
     if (parser) {
@@ -38,13 +38,17 @@ function onInputEditorContentChange() {
     }
 
     var processedResult
-    if (_.isNumber(printResult) || _.isString(printResult) || _.isBoolean(printResult)) {
+    if (_.isString(printResult)) {
         processedResult = printResult // no processing needed
+    }
+    else if (_.isNumber(printResult) || _.isBoolean(printResult)) {
+        processedResult = new String(printResult)
     }
     else if (_.isObject(printResult)) {
         processedResult = JSON.stringify(printResult, null, "\t")
     }
-    parserOutput.val(processedResult)
+
+    parserOutput.setValue(processedResult ? processedResult : "")
 }
 
 

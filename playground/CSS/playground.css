@@ -1,11 +1,12 @@
 h1 {
     font-family: Arial;
+    text-decoration: underline;
     font-weight: normal;
-    font-size: 20px;
+    font-size: 16px;
     color: #2b2f8d;
     text-align: -webkit-auto;
     padding-left: 14px;
-    padding-top: 14px;
+    padding-top: 8px;
     margin-top: 0px;
 }
 
@@ -17,6 +18,7 @@ h3 {
 }
 
 .diagramHeader {
+    text-decoration: underline;
     cursor: pointer;
 
     -webkit-touch-callout: none;
@@ -81,19 +83,11 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-.rightPart {
-    float: right;
-    width: 49.8%;
-}
-
-.leftPart {
-    float: left;
-    width: 49.8%;
-}
-
 .card {
     background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    margin-left: 2px;
+    margin-right: 2px;
     margin-bottom: 8px;
     padding-bottom: 8px;
 }

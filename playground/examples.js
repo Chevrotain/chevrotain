@@ -23,7 +23,7 @@ function loadExample(exampleName, firstTime) {
 function loadSamples(sampleKey) {
     var exampleKey = examplesDropdown.val()
     inputEditor.setValue(samples[exampleKey].sampleInputs[sampleKey])
-    parserOutput.val("")
+    parserOutput.setValue("")
 }
 
 
@@ -40,7 +40,8 @@ function jsonExample() {
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
 
-    // In ES6, custom inheritance implementation (such as the one above) can be replaced
+    // In ES6, custom inheritance implementation
+    // (such as the one above) can be replaced
     // with a more simple: "class X extends Y"...
     var True = extendToken("True", /true/);
     var False = extendToken("False", /false/);
@@ -322,7 +323,8 @@ function tutorialLexerExample() {
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma, identifier, Integer, GreaterThan, LessThan];
+    var allTokens = [WhiteSpace, Select, From, Where, Comma,
+        identifier, Integer, GreaterThan, LessThan];
     var SelectLexer = new Lexer(allTokens, true);
 
     return {
@@ -351,7 +353,8 @@ function tutorialGrammarExample() {
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan];
+    var allTokens = [WhiteSpace, Select, From, Where, Comma,
+        Identifier, Integer, GreaterThan, LessThan];
     var SelectLexer = new Lexer(allTokens, true);
 
 
@@ -376,7 +379,7 @@ function tutorialGrammarExample() {
             $.CONSUME(Select);
             $.AT_LEAST_ONE_SEP(Comma, function () {
                 $.CONSUME1(Identifier);
-            });
+            }, "column name");
         });
 
 
@@ -457,7 +460,8 @@ function tutorialGrammarActionsExample() {
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan];
+    var allTokens = [WhiteSpace, Select, From, Where, Comma,
+        Identifier, Integer, GreaterThan, LessThan];
     var SelectLexer = new Lexer(allTokens, true);
 
 
@@ -488,7 +492,7 @@ function tutorialGrammarActionsExample() {
             $.CONSUME(Select);
             $.AT_LEAST_ONE_SEP(Comma, function () {
                 columns.push($.CONSUME1(Identifier).image);
-            });
+            }, "column name");
 
             return {type: "SELECT_CLAUSE", columns: columns}
         });
@@ -634,7 +638,7 @@ var samples = {
         }
     },
 
-    "tutorial grammar actions": {
+    "tutorial actions": {
         implementation: tutorialGrammarActionsExample,
         sampleInputs  : {
             // TODO: avoid duplication in tutorial examples
