@@ -573,39 +573,39 @@ var samples = {
     json      : {
         implementation: jsonExample,
         sampleInputs  : {
-            'Valid': '{' +
+            'valid': '{' +
             '\n\t"firstName": "John",' +
             '\n\t"lastName": "Smith",' +
             '\n\t"isAlive": true,' +
             '\n\t"age": 25' +
             '\n}',
 
-            'Missing colons': '{' +
+            'missing colons': '{' +
             '\n\t"look" "mom",' +
             '\n\t"no" "colons",' +
             '\n\t"!" "success!",' +
             '\n}',
 
-            'Also missing opening curly': '\t"the" "dog",' +
+            'also missing opening curly': '\t"the" "dog",' +
             '\n\t"ate" "my",' +
             '\n\t"opening" "left",' +
             '\n\t"curly" "success!"' +
             '\n}',
 
-            'Too many commas': '{' +
+            'too many commas': '{' +
             '\n\t"three commas" : 3,,,' +
             '\n\t"five commas": 5,,,,,' +
             '\n\t"!" : "success"' +
             '\n}',
 
-            'Missing comma': '{' +
+            'missing comma': '{' +
             '\n\t"missing ": "comma->" ' +
             '\n\t"I will be lost in": "recovery", ' +
             '\n\t"but I am still": "here",' +
             '\n\t"partial success": "only one property lost"' +
             '\n}',
 
-            'Missing comma in array': '{' +
+            'missing comma in array': '{' +
             '\n\t"name" : "Bobby",' +
             '\n\t"children ages" : [1, 2 3, 4],' +
             '\n\t"partial success": "only one array element lost"' +
