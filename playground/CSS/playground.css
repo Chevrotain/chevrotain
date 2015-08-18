@@ -4,7 +4,7 @@ h1 {
     font-size: 18px;
     color: #2b2f8d;
     text-align: -webkit-auto;
-    padding-left: 14px;
+    padding-left: 7px;
     padding-top: 8px;
     margin-top: 0px;
 }
@@ -60,18 +60,6 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     position: absolute;
     top: 6px;
     overflow: hidden;
-}
-
-/* TODO: remove this if we make the output into a code mirror too*/
-.textArea {
-    background-color: #ffffff;
-    font-family: consolas, "courier new", monospace;
-    font-size: 15px;
-    height: 100%;
-    width: 99%;
-    padding-top: 8px;
-    resize: vertical;
-    border: none;
 }
 
 .textareawrapper {

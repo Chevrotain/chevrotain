@@ -36,7 +36,7 @@
         <h1 style="float: left;">Implementation</h1>
 
         <div style="float: right; margin-top: 7px;">
-            <h3 style="float: left; margin-top: 4px">Example:</h3>
+            <h3 style="float: left; margin-top: 5px">Example:</h3>
             <label for="example-choice"></label><select id="example-choice"
                                                         style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
         </div>
@@ -50,24 +50,25 @@
 
     <div id="diagramsRoot" class="card" style="float: left; width: 50%">
         <h1 style="float: left">Syntax Diagrams</h1>
+
         <div style="clear:both;"></div>
         <div id="diagramsDiv" class="diagramsDiv" style="overflow: auto"></div>
     </div>
 </div>
 
-<div id="bottom">
+<div id="bottom" align="center">
     <div id="input" class="card" style="float: left; width: 50%;">
         <h1 style="float: left">Input</h1>
 
         <div style="float: right; margin-top: 7px;">
-            <h3 style="float: left; margin-top: 4px">Sample:</h3>
+            <h3 style="float: left; margin-top: 5px">Sample:</h3>
             <label for="samples-choice"></label><select id="samples-choice"
                                                         style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
         </div>
         <div style="clear:both;"></div>
         <div class="textareawrapper">
             <label for="parserInputEditor"></label>
-            <textarea id="parserInputEditor" class="textArea" rows="6" cols="100" spellcheck="false"></textarea>
+            <textarea id="parserInputEditor"></textarea>
         </div>
     </div>
 
@@ -77,12 +78,11 @@
 
         <div style="clear:both;"></div>
         <div class="textareawrapper">
-            <label for="parserOutput"></label><textarea id="parserOutput" class="textArea" rows="10" cols="100" spellcheck="false"
-                                                        readonly></textarea>
+            <label for="parserOutput"></label>
+            <textarea id="parserOutput"></textarea>
         </div>
     </div>
 </div>
-
 
 
 <script>
@@ -138,7 +138,7 @@
 
         parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
             lineNumbers: true,
-            readOnly: true
+            readOnly   : true
         })
 
         // Workaround... I don't know why the text is aligned center by default...
