@@ -65,22 +65,29 @@ function onImplementationEditorContentChange() {
     }
 
     cleanChevrotainCache()
-    var editorFuncVal = eval(javaScriptEditor.getValue())
-    var parserConstructor = editorFuncVal.parser
-    lexer = editorFuncVal.lexer
-    markLexerDefinitionErrors(lexer)
-    defaultRuleName = editorFuncVal.defaultRule
+    try {
+        var editorFuncVal = eval(javaScriptEditor.getValue())
+        var parserConstructor = editorFuncVal.parser
+        lexer = editorFuncVal.lexer
+        markLexerDefinitionErrors(lexer)
+        defaultRuleName = editorFuncVal.defaultRule
 
-    // may be falsy if the example is for the lexer only
-    if (parserConstructor) {
-        parser = new parserConstructor()
-        markParserDefinitionErrors(parser)
-        var topRules = parser.getGAstProductions().values()
-        renderSyntaxDiagrams(topRules)
-    } else {
-        parser = undefined
-        renderSyntaxDiagrams([])
+        // may be falsy if the example is for the lexer only
+        if (parserConstructor) {
+            parser = new parserConstructor()
+            markParserDefinitionErrors(parser)
+            var topRules = parser.getGAstProductions().values()
+            renderSyntaxDiagrams(topRules)
+        } else {
+            parser = undefined
+            renderSyntaxDiagrams([])
+        }
+        onInputEditorContentChange()
     }
-
-    onInputEditorContentChange()
+    catch (e){
+        parserOutput.setValue("Error during evaluation of the implementation: \n" + e.toString())
+        parserOutput.markText({line:0, ch:0}, {line:100,ch:100}, {
+            className: "markEvalError"
+        })
+    }
 }

@@ -45,6 +45,12 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     stroke: 5;
 }
 
+.markEvalError {
+    font-size: 1.2em;
+    font-weight: bolder;
+    color: red;
+}
+
 .markTextError {
     display: inline-block;
     position: relative;
