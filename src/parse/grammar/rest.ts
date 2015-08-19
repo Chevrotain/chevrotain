@@ -67,7 +67,7 @@ namespace chevrotain.rest {
 
         walkAtLeastOneSep(atLeastOneSepProd:g.RepetitionMandatoryWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC DE(,DE)* F => after the (,DE)+ the rest is (,DE)?F
-            var fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest)
+            let fullAtLeastOneSepRest = restForRepetitionWithSeparator(atLeastOneSepProd, currRest, prevRest)
             this.walk(atLeastOneSepProd, fullAtLeastOneSepRest)
         }
 
@@ -79,7 +79,7 @@ namespace chevrotain.rest {
 
         walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             // ABC (DE(,DE)*)? F => after the (,DE)* the rest is (,DE)?F
-            var fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest)
+            let fullManySepRest = restForRepetitionWithSeparator(manySepProd, currRest, prevRest)
             this.walk(manySepProd, fullManySepRest)
         }
 

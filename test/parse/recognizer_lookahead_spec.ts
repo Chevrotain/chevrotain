@@ -856,7 +856,7 @@ namespace chevrotain.recognizer.lookahead.spec {
             let input = [new OneTok(), new TwoTok(), new Comma(), new TwoTok(), new ThreeTok(),
                 new FourTok(), new Comma(), new FourTok(), new FiveTok()]
             let parser = new AtLeastOneSepImplicitLookAheadParser(input)
-            var parseResult = parser.atLeastOneSepRule()
+            let parseResult = parser.atLeastOneSepRule()
             expect(parseResult.total).to.equal("1223445")
             expect(parseResult.separators).to.deep.equal([new Comma(), new Comma()])
         })

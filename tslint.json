@@ -4,13 +4,20 @@
     "curly": true,
     "eofline": true,
     "forin": true,
-    "indent": [true, "spaces"],
+    "indent": [
+      true,
+      "spaces"
+    ],
     "label-position": true,
     "label-undefined": true,
-    "max-line-length": [true, 140],
+    "max-line-length": [
+      true,
+      140
+    ],
     "no-arg": true,
     "no-bitwise": true,
-    "no-console": [true,
+    "no-console": [
+      true,
       "debug",
       "info",
       "time",
@@ -19,6 +26,7 @@
     ],
     "no-construct": true,
     "no-debugger": true,
+    "no-var-keyword": true,
     "no-duplicate-key": true,
     "no-duplicate-variable": true,
     "no-eval": true,
@@ -30,17 +38,25 @@
     "no-unused-variable": false,
     "no-unreachable": true,
     "no-use-before-declare": true,
-    "one-line": [true,
+    "one-line": [
+      true,
       "check-open-brace",
       "check-catch",
       "check-whitespace"
     ],
-    "quotemark": [true, "double"],
+    "quotemark": [
+      true,
+      "double"
+    ],
     "radix": true,
     "semicolon": false,
-    "triple-equals": [true, "allow-null-check"],
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
     "variable-name": false,
-    "whitespace": [true,
+    "whitespace": [
+      true,
       "check-branch",
       "check-decl",
       "check-operator",
