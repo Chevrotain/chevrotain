@@ -37,56 +37,58 @@
     </div>
 </div>
 
-<div id="top" align="center">
-    <div class="card" style="float: left; width: 50%">
-        <h1 style="float: left;">Implementation</h1>
+<div id="left" style="float: left; width: 49.8%">
+    <div class="card" style="width: 100%; resize: vertical; overflow:hidden; height: 76vh">
+        <div class="boxHeader">
+            <h1>Implementation</h1>
 
-        <div style="float: right; margin-top: 7px;">
-            <h3 style="float: left; margin-top: 5px">Example:</h3>
-            <label for="example-choice"></label><select id="example-choice"
-                                                        style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+            <div style="float: right; margin-top: 7px;">
+                <h3 style="float: left; margin-top: 5px">Example:</h3>
+                <label for="example-choice"></label><select id="example-choice"
+                                                            style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+            </div>
         </div>
-        <div style="clear:both;"></div>
-        <div class="textareawrapper">
-            <label for="parserImplementationEditor"></label>
-            <textarea id="parserImplementationEditor"></textarea>
-        </div>
+        <label for="parserImplementationEditor"></label>
+        <textarea id="parserImplementationEditor"></textarea>
     </div>
 
+    <div id="middleLeftSeparator" style="width: 100%; height: 5px;"></div>
 
-    <div id="diagramsRoot" class="card" style="float: left; width: 50%">
-        <h1 style="float: left">Syntax Diagrams</h1>
 
-        <div style="clear:both;"></div>
-        <div id="diagramsDiv" class="diagramsDiv" style="overflow: auto"></div>
+    <div id="input" class="card" style="width: 100%; resize: vertical; overflow: hidden; height: 21vh">
+        <div class="boxHeader">
+            <h1>Input</h1>
+
+            <div style="float: right; margin-top: 7px;">
+                <h3 style="float: left; margin-top: 5px">Sample:</h3>
+                <label for="samples-choice"></label><select id="samples-choice"
+                                                            style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+            </div>
+        </div>
+        <label for="parserInputEditor"></label>
+        <textarea id="parserInputEditor"></textarea>
     </div>
 </div>
 
-<div id="bottom" align="center">
-    <div id="input" class="card" style="float: left; width: 50%;">
-        <h1 style="float: left">Input</h1>
+<div id="middle" style="float: left; width: 0.4%; height: 100vh;"></div>
 
-        <div style="float: right; margin-top: 7px;">
-            <h3 style="float: left; margin-top: 5px">Sample:</h3>
-            <label for="samples-choice"></label><select id="samples-choice"
-                                                        style="float: left; margin-left: 8px; margin-right: 8px; margin-top: 2px;"></select>
+<div id="right" style="float: left; width: 49.8%">
+
+    <div id="diagramsRoot" class="card" align="center" style="width: 100%; height:76vh; resize: vertical; overflow: auto">
+        <div class="boxHeader">
+            <h1>Syntax Diagrams</h1>
         </div>
-        <div style="clear:both;"></div>
-        <div class="textareawrapper">
-            <label for="parserInputEditor"></label>
-            <textarea id="parserInputEditor"></textarea>
-        </div>
+        <div id="diagramsDiv" class="diagramsDiv" style="overflow: auto"></div>
     </div>
 
+    <div id="middleRightSeparator" style="width: 100%; height: 5px;"></div>
 
-    <div id="output" class="card" style="float: left; width: 50%;">
-        <h1 style="float: left">Output</h1>
-
-        <div style="clear:both;"></div>
-        <div class="textareawrapper">
-            <label for="parserOutput"></label>
-            <textarea id="parserOutput"></textarea>
+    <div id="output" class="card" style="width: 100%; resize: vertical; overflow: hidden; height: 21vh">
+        <div class="boxHeader">
+            <h1>Output</h1>
         </div>
+        <label for="parserOutput"></label>
+        <textarea id="parserOutput"></textarea>
     </div>
 </div>
 
@@ -105,18 +107,6 @@
     var samplesDropdown = null
     var parserOutput = null
     var diagramsDiv = null
-
-
-    function setBoxesSizes() {
-        var windowHeight = $(window).height() - 120
-        // can't seem to constrain codeMirror to a % of the whole screen otherwise
-        var topHeight = Math.floor(windowHeight * 0.83)
-        var bottomHeight = Math.floor(windowHeight * 0.17)
-        javaScriptEditor.setSize("100%", topHeight)
-        $("#diagramsDiv").first().height(topHeight)
-        inputEditor.setSize("100%", bottomHeight)
-        parserOutput.setSize("100%", bottomHeight)
-    }
 
     $(document).ready(function init() {
         // defer error handling so we can display error markers visually
@@ -137,18 +127,17 @@
         javaScriptEditor.on("change", _.debounce(onImplementationEditorContentChange, 250))
 
         inputEditor = CodeMirror.fromTextArea(_.first($("#parserInputEditor")), {
-            lineNumbers: true
+            lineNumbers   : true,
+            viewportMargin: Infinity
         })
 
         inputEditor.on("change", _.debounce(onInputEditorContentChange, 250))
 
         parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
-            lineNumbers: true,
-            readOnly   : true
+            lineNumbers   : true,
+            viewportMargin: Infinity,
+            readOnly      : true
         })
-
-        // Workaround... I don't know why the text is aligned center by default...
-        $(".CodeMirror").css({"text-align": "left"})
 
         initExamplesDropDown(examplesDropdown)
         examplesDropdown.change(function () {
@@ -162,10 +151,14 @@
             loadSamples(samplesDropdown.val())
         })
 
-        setBoxesSizes()
-        $(window).resize(setBoxesSizes);
+        javaScriptEditor.setSize("100%", "100%")
+        // the input bottom area editors may have issues when Codemirror tries to resize to add a scroll bar
+        // causing the headers to disappear. 80% seems to resolve this issue in common use cases.
+        inputEditor.setSize("100%", "80%")
+        parserOutput.setSize("100%", "100%")
     })
 </script>
 
 </body>
 </html>
+
