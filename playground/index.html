@@ -37,8 +37,8 @@
     </div>
 </div>
 
-<div class="sideEditor leftSide">
-    <div class="card" style="width: 100%; overflow:hidden; height: 76vh">
+<div id="left" class="sideEditor leftSide">
+    <div id="impel" class="card" style="width: 100%; overflow:hidden; height: 76vh">
         <div class="boxHeader">
             <h1>Implementation</h1>
 
@@ -52,7 +52,9 @@
         <textarea id="parserImplementationEditor"></textarea>
     </div>
 
-    <div id="middleLeftSeparator" class="horizontalSeparator"></div>
+    <div id="middleLeftSeparator" class="horizontalSeparator" draggable="true"
+         ondrag="resizeVerticalLeft(event)" ondragend="refreshCodeMirrorInstances(event)">
+    </div>
 
 
     <div id="input" class="card" style="width: 100%; overflow: hidden; height: 21vh">
@@ -71,9 +73,10 @@
 </div>
 
 
-<div id="middle" class="verticalSeparator"></div>
+<div id="middle" class="verticalSeparator" draggable="true"
+     ondrag="resizeHorz(event)" ondragend="refreshCodeMirrorInstances(event)"></div>
 
-<div class="sideEditor rightSide">
+<div id="right" class="sideEditor rightSide">
 
     <div id="diagramsRoot" class="card" align="center" style="width: 100%; height:76vh; overflow: hidden">
         <div class="boxHeader">
@@ -82,7 +85,9 @@
         <div id="diagramsDiv" class="diagramsDiv" style="overflow: auto; height: 100%; width: 100%"></div>
     </div>
 
-    <div id="middleRightSeparator" class="horizontalSeparator"></div>
+    <div id="middleRightSeparator" class="horizontalSeparator" draggable="true"
+         ondrag="resizeVerticalRight(event)" ondragend="refreshCodeMirrorInstances(event)">
+    </div>
 
     <div id="output" class="card" style="width: 100%; overflow: hidden; height: 21vh">
         <div class="boxHeader">
@@ -95,6 +100,47 @@
 
 
 <script>
+
+    // TODO: move to layout.js
+    var resizeHorz = _.throttle(dragMiddleHorz, 30)
+    function dragMiddleHorz(event) {
+        var eventX = event.clientX;
+        var docWidth = $(document).width();
+
+        var percentageLeft = (eventX / docWidth) * 100
+        if (percentageLeft) {
+            var leftFinal = percentageLeft + "%"
+            $("#left").width(leftFinal)
+            // magical number! TODO: get this from CSS
+            var rightFinal = "" + (99.26 - percentageLeft) + "%"
+            $("#right").width(rightFinal)
+        }
+    }
+
+    var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 30)
+    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 30)
+
+    function dragVertical(event, topID, buttomID) {
+        var eventY = event.clientY;
+        var docHeight = $(document).height();
+        var percentageTop = (eventY / docHeight) * 100
+
+        if (percentageTop) {
+            var leftFinal = percentageTop + "vh"
+            $("#" + topID).height(leftFinal)
+            // magical number! TODO: get this from CSS/ dom?
+            var rightFinal = "" + (97 - percentageTop) + "vh"
+            $("#" + buttomID).height(rightFinal)
+        }
+    }
+
+    function refreshCodeMirrorInstances(event) {
+        event.preventDefault()
+        javaScriptEditor.refresh()
+        inputEditor.refresh()
+        parserOutput.refresh()
+    }
+
     // global state
     var lexer = null
     var parser = null

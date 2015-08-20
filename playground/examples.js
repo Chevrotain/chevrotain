@@ -76,7 +76,7 @@ function jsonExample() {
 
         this.object = this.RULE("object", function () {
             // use debugger statements to add breakpoints (works in chrome/firefox)
-            debugger;
+            //debugger;
             var obj = {}
 
             $.CONSUME(LCurly);
