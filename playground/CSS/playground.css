@@ -20,14 +20,14 @@ h3 {
 }
 
 .verticalSeparator {
-    width: 8px;
+    width: 0.7vw;
     height: 100vh;
     float: left;
 }
 
 .horizontalSeparator {
     width: 100%;
-    height: 8px;
+    height: 0.7vw;
 }
 
 .sideEditor {
@@ -35,20 +35,16 @@ h3 {
     padding: 0;
     border: none;
     height: 100%;
-    width: 49.5%;
+    width: 49.63%;
     display: block;
 }
 
 .leftSide {
     float: left;
-    /*position: absolute;*/
-    /*left: 5px;*/
 }
 
 .rightSide {
     float: left;
-    /*position: absolute;*/
-    /*right: 5px;*/
 }
 
 .select {
