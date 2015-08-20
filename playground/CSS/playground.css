@@ -7,6 +7,7 @@ h1 {
     padding-left: 7px;
     padding-top: 8px;
     margin-top: 0px;
+    margin-bottom: 5px;
     float: left;
 }
 
@@ -15,11 +16,22 @@ h3 {
     font-size: 13px;
     color: #201a8d;
     text-align: -webkit-auto;
+    margin-bottom: 5px;
+}
+
+.select {
+    float: left;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-top: 2px;
+    margin-bottom: 5px;
 }
 
 .boxHeader {
     background-color: lightgrey;
     overflow: auto;
+    border-bottom: solid;
+    border-color: #263666;
 }
 
 .diagramHeader {
