@@ -113,6 +113,8 @@
         $("html").addClass("resizeCol");
         // changing codeMirror DOM's css as otherwise it insists or redrawing 'text' cursor while resizing near/on codeMirror area.
         $(".CodeMirror-lines").addClass("resizeCol")
+        $(".CodeMirror-vscrollbar").addClass("resizeCol")
+
         inResizeHorizontalMode = true
     }
 
@@ -120,6 +122,7 @@
         event.preventDefault()
         $("html").addClass("resizeRow");
         $(".CodeMirror-lines").addClass("resizeRow")
+        $(".CodeMirror-vscrollbar").addClass("resizeRow")
         inResizeVerticalLeft = true
     }
 
@@ -127,6 +130,7 @@
         event.preventDefault()
         $("html").addClass("resizeRow");
         $(".CodeMirror-lines").addClass("resizeRow")
+        $(".CodeMirror-vscrollbar").addClass("resizeRow")
         inResizeVerticalRight = true
     }
 
@@ -134,6 +138,7 @@
         event.preventDefault()
         $("html").removeClass("resizeCol resizeRow");
         $(".CodeMirror-lines").removeClass("resizeCol resizeRow")
+        $(".CodeMirror-vscrollbar").addClass("resizeCol resizeRow")
         inResizeHorizontalMode = false
         inResizeVerticalLeft = false
         inResizeVerticalRight = false
