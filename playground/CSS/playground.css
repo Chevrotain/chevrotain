@@ -48,6 +48,8 @@ h3 {
     width: 100%;
     height: 0.7vw;
     cursor: row-resize;
+    /* needed to avoid the '...' icon with the block display to expand outside the separator div */
+    overflow: hidden;
 }
 
 .sideEditor {

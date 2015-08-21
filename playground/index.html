@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html>
+<!--100vh needed for IE 11 (maybe others too) otherwise html.height will return 3 -->
+<html style="height: 100vh">
+
 <head lang="en">
     <link rel="icon"
           type="image/jpeg"
@@ -53,8 +55,8 @@
         <textarea id="parserImplementationEditor"></textarea>
     </div>
 
-    <div id="middleLeftSeparator" class="horizontalSeparator" draggable="true"
-         ondrag="resizeVerticalLeft(event)" ondragend="refreshCodeMirrorInstances(event)">
+    <div class="horizontalSeparator"
+         onmousedown="startVerticalLeft(event)">
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
     </div>
 
@@ -74,11 +76,7 @@
     </div>
 </div>
 
-
-<div id="middle" class="verticalSeparator" draggable="true"
-     ondragstart="event.dataTransfer.setData('text/plain', 'This text may be dragged')"
-     ondrag="resizeHorz(event)" ondragend="refreshCodeMirrorInstances(event)">
-
+<div class="verticalSeparator" onmousedown="startResizeHorizontal(event)">
     <i class="fa fa-ellipsis-v verticalDragHandle"> </i>
 </div>
 
@@ -91,8 +89,7 @@
         <div id="diagramsDiv" class="diagramsDiv" style="overflow: auto; height: 100%; width: 100%"></div>
     </div>
 
-    <div id="middleRightSeparator" class="horizontalSeparator" draggable="true"
-         ondrag="resizeVerticalRight(event)" ondragend="refreshCodeMirrorInstances(event)">
+    <div class="horizontalSeparator" onmousedown="startVerticalRight(event)">
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
     </div>
 
@@ -105,16 +102,56 @@
     </div>
 </div>
 
-
 <script>
+
+    var inResizeHorizontalMode = false;
+    var inResizeVerticalLeft = false;
+    var inResizeVerticalRight = false;
+
+    function startResizeHorizontal(event) {
+        event.preventDefault()
+        inResizeHorizontalMode = true
+    }
+
+    function startVerticalLeft(event) {
+        event.preventDefault()
+        inResizeVerticalLeft = true
+    }
+
+    function startVerticalRight(event) {
+        event.preventDefault()
+        inResizeVerticalRight = true
+    }
+
+    function endResize(event) {
+        event.preventDefault()
+        inResizeHorizontalMode = false
+        inResizeVerticalLeft = false
+        inResizeVerticalRight = false
+        refreshCodeMirrorInstances()
+    }
+
+    function resizeRoot(event) {
+        if (inResizeHorizontalMode) {
+            resizeHorz(event)
+        }
+        else if (inResizeVerticalLeft) {
+            resizeVerticalLeft(event)
+        }
+        else if (inResizeVerticalRight) {
+            resizeVerticalRight(event)
+        }
+
+    }
 
     // TODO: move to layout.js
     var resizeHorz = _.throttle(dragMiddleHorz, 30)
     function dragMiddleHorz(event) {
-        var eventX = event.clientX;
-        var docWidth = $(document).width();
+        event.preventDefault()
 
-        var percentageLeft = (eventX / docWidth) * 100
+        var eventX = event.clientX
+        var htmlWidth = $("html").width()
+        var percentageLeft = (eventX / htmlWidth) * 100
         if (percentageLeft) {
             var leftFinal = percentageLeft + "%"
             $("#left").width(leftFinal)
@@ -124,13 +161,15 @@
         }
     }
 
-    var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 30)
-    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 30)
+    var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 15)
+    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 15)
 
     function dragVertical(event, topID, buttomID) {
-        var eventY = event.clientY;
-        var docHeight = $(document).height();
-        var percentageTop = (eventY / docHeight) * 100
+        event.preventDefault()
+        var eventY = event.clientY
+        var htmlHeight = $("html").height()
+        console.log(htmlHeight)
+        var percentageTop = (eventY / htmlHeight) * 100
 
         if (percentageTop) {
             var leftFinal = percentageTop + "vh"
@@ -141,9 +180,7 @@
         }
     }
 
-    function refreshCodeMirrorInstances(event) {
-        console.log(event.clientX)
-        event.preventDefault()
+    function refreshCodeMirrorInstances() {
         javaScriptEditor.refresh()
         inputEditor.refresh()
         parserOutput.refresh()
@@ -213,15 +250,8 @@
         parserOutput.setSize("100%", "100%")
 
 
-//        var dragItems = document.querySelectorAll('[draggable=true]');
-
-//        for (var i = 0; i < dragItems.length; i++) {
-//            addEvent(dragItems[i], 'dragstart', function (event) {
-//                // store the ID of the element, and collect it on the drop later on
-//
-//                event.dataTransfer.setData('Text', this.id);
-//            });
-//        }
+        $(document).mouseup(endResize)
+        $(document).mousemove(resizeRoot)
     })
 </script>
 
