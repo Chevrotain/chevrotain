@@ -55,7 +55,7 @@
 
     <div id="middleLeftSeparator" class="horizontalSeparator" draggable="true"
          ondrag="resizeVerticalLeft(event)" ondragend="refreshCodeMirrorInstances(event)">
-        <i class="fa fa-ellipsis-h" style="position: relative; top: 0%; left: 50%; font-size: 1vw"> </i>
+        <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
     </div>
 
 
@@ -78,7 +78,8 @@
 <div id="middle" class="verticalSeparator" draggable="true"
      ondragstart="event.dataTransfer.setData('text/plain', 'This text may be dragged')"
      ondrag="resizeHorz(event)" ondragend="refreshCodeMirrorInstances(event)">
-    <i class="fa fa-ellipsis-v" style="position: relative; top: 50%; left: 38%; font-size: 1vw"> </i>
+
+    <i class="fa fa-ellipsis-v verticalDragHandle"> </i>
 </div>
 
 <div id="right" class="sideEditor rightSide">
@@ -92,7 +93,7 @@
 
     <div id="middleRightSeparator" class="horizontalSeparator" draggable="true"
          ondrag="resizeVerticalRight(event)" ondragend="refreshCodeMirrorInstances(event)">
-        <i class="fa fa-ellipsis-h" style="position: relative; top: 0%; left: 50%; font-size: 1vw"> </i>
+        <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
     </div>
 
     <div id="output" class="card" style="width: 100%; overflow: hidden; height: 21vh">
