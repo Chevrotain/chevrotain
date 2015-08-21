@@ -5,6 +5,7 @@
           type="image/jpeg"
           href="../photos/chevrotain.jpg">
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="CSS/playground.css">
     <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
     <link rel="stylesheet" type="text/css" href="CSS/gh-fork-ribbon.css">
@@ -54,6 +55,7 @@
 
     <div id="middleLeftSeparator" class="horizontalSeparator" draggable="true"
          ondrag="resizeVerticalLeft(event)" ondragend="refreshCodeMirrorInstances(event)">
+        <i class="fa fa-ellipsis-h" style="position: relative; top: 0%; left: 50%; font-size: 1vw"> </i>
     </div>
 
 
@@ -74,7 +76,10 @@
 
 
 <div id="middle" class="verticalSeparator" draggable="true"
-     ondrag="resizeHorz(event)" ondragend="refreshCodeMirrorInstances(event)"></div>
+     ondragstart="event.dataTransfer.setData('text/plain', 'This text may be dragged')"
+     ondrag="resizeHorz(event)" ondragend="refreshCodeMirrorInstances(event)">
+    <i class="fa fa-ellipsis-v" style="position: relative; top: 50%; left: 38%; font-size: 1vw"> </i>
+</div>
 
 <div id="right" class="sideEditor rightSide">
 
@@ -87,6 +92,7 @@
 
     <div id="middleRightSeparator" class="horizontalSeparator" draggable="true"
          ondrag="resizeVerticalRight(event)" ondragend="refreshCodeMirrorInstances(event)">
+        <i class="fa fa-ellipsis-h" style="position: relative; top: 0%; left: 50%; font-size: 1vw"> </i>
     </div>
 
     <div id="output" class="card" style="width: 100%; overflow: hidden; height: 21vh">
@@ -135,6 +141,7 @@
     }
 
     function refreshCodeMirrorInstances(event) {
+        console.log(event.clientX)
         event.preventDefault()
         javaScriptEditor.refresh()
         inputEditor.refresh()
@@ -203,6 +210,17 @@
         // causing the headers to disappear. 80% seems to resolve this issue in common use cases.
         inputEditor.setSize("100%", "80%")
         parserOutput.setSize("100%", "100%")
+
+
+//        var dragItems = document.querySelectorAll('[draggable=true]');
+
+//        for (var i = 0; i < dragItems.length; i++) {
+//            addEvent(dragItems[i], 'dragstart', function (event) {
+//                // store the ID of the element, and collect it on the drop later on
+//
+//                event.dataTransfer.setData('Text', this.id);
+//            });
+//        }
     })
 </script>
 
