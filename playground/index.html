@@ -104,41 +104,46 @@
 
 <script>
 
-    var inResizeHorizontalMode = false;
-    var inResizeVerticalLeft = false;
-    var inResizeVerticalRight = false;
+    var inResizeHorizontalMode = false
+    var inResizeVerticalLeft = false
+    var inResizeVerticalRight = false
+
+
+    // changing codeMirror DOM's css as otherwise it insists or redrawing 'text'
+    // cursor while resizing near/on codeMirror area.
+    function modifyCursor(cssStyle) {
+        $("html").addClass(cssStyle)
+        $(".CodeMirror-lines").addClass(cssStyle)
+        $(".CodeMirror-vscrollbar").addClass(cssStyle)
+    }
+
+    function revertToOriginalCursor() {
+        $(".CodeMirror-lines").removeClass("resizeCol resizeRow")
+        $(".CodeMirror-vscrollbar").removeClass("resizeCol resizeRow")
+    }
 
     function startResizeHorizontal(event) {
         event.preventDefault()
-        $("html").addClass("resizeCol");
-        // changing codeMirror DOM's css as otherwise it insists or redrawing 'text' cursor while resizing near/on codeMirror area.
-        $(".CodeMirror-lines").addClass("resizeCol")
-        $(".CodeMirror-vscrollbar").addClass("resizeCol")
-
+        modifyCursor("resizeCol")
         inResizeHorizontalMode = true
     }
 
     function startVerticalLeft(event) {
         event.preventDefault()
-        $("html").addClass("resizeRow");
-        $(".CodeMirror-lines").addClass("resizeRow")
-        $(".CodeMirror-vscrollbar").addClass("resizeRow")
+        modifyCursor("resizeRow")
         inResizeVerticalLeft = true
     }
 
     function startVerticalRight(event) {
         event.preventDefault()
-        $("html").addClass("resizeRow");
-        $(".CodeMirror-lines").addClass("resizeRow")
-        $(".CodeMirror-vscrollbar").addClass("resizeRow")
+        modifyCursor("resizeRow")
         inResizeVerticalRight = true
     }
 
-    function endResize(event) {
-        event.preventDefault()
-        $("html").removeClass("resizeCol resizeRow");
+    function endResize() {
+        $("html").removeClass("resizeCol resizeRow")
         $(".CodeMirror-lines").removeClass("resizeCol resizeRow")
-        $(".CodeMirror-vscrollbar").addClass("resizeCol resizeRow")
+        $(".CodeMirror-vscrollbar").removeClass("resizeCol resizeRow")
         inResizeHorizontalMode = false
         inResizeVerticalLeft = false
         inResizeVerticalRight = false
