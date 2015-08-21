@@ -2,7 +2,7 @@ h1 {
     font-family: Arial;
     font-weight: normal;
     font-size: 18px;
-    color: #2b2f8d;
+    color: #1b138d;
     text-align: -webkit-auto;
     padding-left: 7px;
     padding-top: 8px;
@@ -14,7 +14,7 @@ h1 {
 h3 {
     font-family: Arial;
     font-size: 13px;
-    color: #201a8d;
+    color: #1b138d;
     text-align: -webkit-auto;
     margin-bottom: 5px;
 }
@@ -78,9 +78,10 @@ h3 {
 }
 
 .boxHeader {
-    background-color: lightgrey;
+    background-color: #a8c5d3;
     overflow: auto;
     border-bottom: solid;
+    border-bottom-width: thin;
     border-color: #263666;
 }
 
