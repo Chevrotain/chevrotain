@@ -182,11 +182,9 @@
 
         if (percentageTop) {
             var topFinal = percentageTop + "vh"
-            console.log(topFinal)
             $("#" + topID).height(topFinal)
             // magical number! TODO: get this from CSS/ dom?
             var buttomFinal = "" + (97 - percentageTop) + "vh"
-            console.log(buttomFinal)
             $("#" + buttomID).height(buttomFinal)
         }
     }
@@ -259,7 +257,6 @@
         // causing the headers to disappear. 80% seems to resolve this issue in common use cases.
         inputEditor.setSize("100%", "80%")
         parserOutput.setSize("100%", "100%")
-
 
         $(document).mouseup(endResize)
         $(document).mousemove(resizeRoot)
