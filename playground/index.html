@@ -110,21 +110,30 @@
 
     function startResizeHorizontal(event) {
         event.preventDefault()
+        $("html").addClass("resizeCol");
+        // changing codeMirror DOM's css as otherwise it insists or redrawing 'text' cursor while resizing near/on codeMirror area.
+        $(".CodeMirror-lines").addClass("resizeCol")
         inResizeHorizontalMode = true
     }
 
     function startVerticalLeft(event) {
         event.preventDefault()
+        $("html").addClass("resizeRow");
+        $(".CodeMirror-lines").addClass("resizeRow")
         inResizeVerticalLeft = true
     }
 
     function startVerticalRight(event) {
         event.preventDefault()
+        $("html").addClass("resizeRow");
+        $(".CodeMirror-lines").addClass("resizeRow")
         inResizeVerticalRight = true
     }
 
     function endResize(event) {
         event.preventDefault()
+        $("html").removeClass("resizeCol resizeRow");
+        $(".CodeMirror-lines").removeClass("resizeCol resizeRow")
         inResizeHorizontalMode = false
         inResizeVerticalLeft = false
         inResizeVerticalRight = false
@@ -145,7 +154,7 @@
     }
 
     // TODO: move to layout.js
-    var resizeHorz = _.throttle(dragMiddleHorz, 30)
+    var resizeHorz = _.throttle(dragMiddleHorz, 20)
     function dragMiddleHorz(event) {
         event.preventDefault()
 
@@ -161,22 +170,24 @@
         }
     }
 
-    var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 15)
-    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 15)
+    var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 20)
+    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 20)
 
     function dragVertical(event, topID, buttomID) {
         event.preventDefault()
         var eventY = event.clientY
         var htmlHeight = $("html").height()
         console.log(htmlHeight)
-        var percentageTop = (eventY / htmlHeight) * 100
+        var percentageTop = (eventY / htmlHeight) * 97
 
         if (percentageTop) {
-            var leftFinal = percentageTop + "vh"
-            $("#" + topID).height(leftFinal)
+            var topFinal = percentageTop + "vh"
+            console.log(topFinal)
+            $("#" + topID).height(topFinal)
             // magical number! TODO: get this from CSS/ dom?
-            var rightFinal = "" + (97 - percentageTop) + "vh"
-            $("#" + buttomID).height(rightFinal)
+            var buttomFinal = "" + (97 - percentageTop) + "vh"
+            console.log(buttomFinal)
+            $("#" + buttomID).height(buttomFinal)
         }
     }
 

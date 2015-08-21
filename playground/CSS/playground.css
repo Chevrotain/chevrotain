@@ -156,3 +156,11 @@ svg {
     border: 0;
     opacity: 0.5;
 }
+
+.resizeCol{
+    cursor: col-resize !important;
+}
+
+.resizeRow{
+    cursor: row-resize !important;
+}
