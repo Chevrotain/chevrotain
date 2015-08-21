@@ -1,22 +1,22 @@
 h1 {
     font-family: Arial;
-    font-weight: normal;
-    font-size: 18px;
+    font-size: 2.2vh;
     color: #1b138d;
-    text-align: -webkit-auto;
-    padding-left: 7px;
-    padding-top: 8px;
-    margin-top: 0px;
-    margin-bottom: 5px;
+    padding: 0;
+    margin: 1vh 0 0 1vh;
     float: left;
 }
 
 h3 {
     font-family: Arial;
-    font-size: 13px;
+    font-size: 1.7vh;
     color: #1b138d;
-    text-align: -webkit-auto;
-    margin-bottom: 5px;
+    margin: 1.6vh 0 0 0;
+    padding: 0;
+}
+
+option {
+    padding: 0;
 }
 
 .verticalSeparator {
@@ -70,11 +70,13 @@ h3 {
 }
 
 .select {
+    stroke-width:0 ;
     float: left;
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-top: 4px;
-    margin-bottom: 5px;
+    font-size: 2vh;
+    margin: 1.0vh 1vh 0 0;
+    padding: 0;
+    border: 0.4vh;
+    height: 2.7vh;
 }
 
 .boxHeader {
@@ -83,11 +85,12 @@ h3 {
     border-bottom: solid;
     border-bottom-width: thin;
     border-color: #263666;
+    height: 4.7vh;
 }
 
 .diagramHeader {
     cursor: pointer;
-
+    display: inline-block;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -100,8 +103,6 @@ h3 {
     font-size: 18px;
     margin-bottom: -8px;
     text-align: center;
-    max-width: -moz-fit-content;
-    max-width: -webkit-fit-content;
 }
 
 .diagramHeaderDef {
@@ -144,18 +145,6 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
 
 svg {
     width: 100%;
-}
-
-.hrInCardHeader {
-    margin-left: 8px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    margin-top: 0px;
-    color: #2b2f8d;
-    background-color: #2b2f8d;
-    height: 1px;
-    border: 0;
-    opacity: 0.5;
 }
 
 .resizeCol{

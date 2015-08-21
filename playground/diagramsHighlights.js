@@ -69,8 +69,10 @@ function getUsageSvgRect(definitionName) {
 function getUsageRectAndDefHeader(target) {
     var rects, text
     if (target instanceof SVGRectElement) {
-        rects = $(target).siblings("rect").concat(target)
-        text = _.first($(target).siblings("text")).innerHTML
+        // only mark usages/def on the text
+        // TODO: maybe the code can be refactored and simplified now that we only care about the text?
+        // i.e add event listeners on more specific dom nodes.
+        return {rects: [], header: undefined}
     }
     else {
         rects = $(target).siblings("rect")
