@@ -16,15 +16,15 @@ function attachHighlightEvents() {
 
 
 function onDiagramNonTerminalMouseOver(mouseEvent) {
-    var rectAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
-    $(rectAndHeader.rect).toggleClass("diagramRectUsage")
-    $(rectAndHeader.header).toggleClass("diagramHeaderDef")
+    var rectsAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
+    $(rectsAndHeader.rects).toggleClass("diagramRectUsage")
+    $(rectsAndHeader.header).toggleClass("diagramHeaderDef")
 }
 
 
 function onDiagramNonTerminalMouseOut(mouseEvent) {
     var rectAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
-    $(rectAndHeader.rect).toggleClass("diagramRectUsage")
+    $(rectAndHeader.rects).toggleClass("diagramRectUsage")
     $(rectAndHeader.header).toggleClass("diagramHeaderDef")
 }
 
@@ -67,20 +67,20 @@ function getUsageSvgRect(definitionName) {
 
 
 function getUsageRectAndDefHeader(target) {
-    var rect, text
+    var rects, text
     if (target instanceof SVGRectElement) {
-        rect = target
+        rects = $(target).siblings("rect").concat(target)
         text = _.first($(target).siblings("text")).innerHTML
     }
     else {
-        rect = _.first($(target).siblings("rect"))
+        rects = $(target).siblings("rect")
         text = target.innerHTML
     }
     var header = _.find($(".diagramHeader"), function (currHeader) {
         return currHeader.innerHTML === text
     })
 
-    return {rect: rect, header: header}
+    return {rects: rects, header: header}
 }
 
 
