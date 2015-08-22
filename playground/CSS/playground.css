@@ -7,6 +7,15 @@ h1 {
     float: left;
 }
 
+div {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 h3 {
     font-family: Arial;
     font-size: 1.7vh;
@@ -17,6 +26,10 @@ h3 {
 
 option {
     padding: 0;
+}
+
+body {
+    margin: 0 0.5vw;
 }
 
 .verticalSeparator {
@@ -53,7 +66,7 @@ option {
 }
 
 .sideEditor {
-    margin: 0;
+    margin: 0.7vh 0 0;
     padding: 0;
     border: none;
     height: 100%;
@@ -70,7 +83,7 @@ option {
 }
 
 .select {
-    stroke-width:0 ;
+    stroke-width: 0;
     float: left;
     font-size: 2vh;
     margin: 1.0vh 1vh 0 0;
@@ -91,12 +104,12 @@ option {
 .diagramHeader {
     cursor: pointer;
     display: inline-block;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
     font-weight: bold;
     font-family: monospace;
     font-size: 18px;
@@ -106,6 +119,15 @@ option {
 
 .diagramHeaderDef {
     background-color: #31BA5F;
+}
+
+svg.railroad-diagram text {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
@@ -144,12 +166,4 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
 
 svg {
     width: 100%;
-}
-
-.resizeCol{
-    cursor: col-resize !important;
-}
-
-.resizeRow{
-    cursor: row-resize !important;
 }

@@ -32,10 +32,10 @@
     <script src="diagramsHighlights.js"></script>
     <title>Playground</title>
 </head>
-<body style="background-color: #f1f1f1; margin: 0.8vh">
+<body style="background-color: #f1f1f1; margin-left: 0.7vh; margin-right:0.7vh">
 
 <div class="github-fork-ribbon-wrapper right">
-    <div class="github-fork-ribbon">
+    <div class="github-fork-ribbon ">
         <a href="https://github.com/sap/chevrotain">Fork me on GitHub</a>
     </div>
 </div>
@@ -109,28 +109,23 @@
     var inResizeVerticalRight = false
 
 
-    // changing codeMirror DOM's css as otherwise it insists or redrawing 'text'
-    // cursor while resizing near/on codeMirror area.
-    function modifyCursor(cssStyle) {
-        $("html").addClass(cssStyle)
-        $(".CodeMirror-lines").addClass(cssStyle)
-        $(".CodeMirror-vscrollbar").addClass(cssStyle)
+    function modifyCursor(cursorKeyword) {
+        document.body.style.cursor = cursorKeyword
     }
 
     function revertToOriginalCursor() {
-        $(".CodeMirror-lines").removeClass("resizeCol resizeRow")
-        $(".CodeMirror-vscrollbar").removeClass("resizeCol resizeRow")
+        document.body.style.cursor = "auto"
     }
 
     function startResizeHorizontal(event) {
         event.preventDefault()
-        modifyCursor("resizeCol")
+        modifyCursor("col-resize")
         inResizeHorizontalMode = true
     }
 
     function startVerticalLeft(event) {
         event.preventDefault()
-        modifyCursor("resizeRow")
+        modifyCursor("row-resize")
         inResizeVerticalLeft = true
     }
 
@@ -141,9 +136,7 @@
     }
 
     function endResize() {
-        $("html").removeClass("resizeCol resizeRow")
-        $(".CodeMirror-lines").removeClass("resizeCol resizeRow")
-        $(".CodeMirror-vscrollbar").removeClass("resizeCol resizeRow")
+        revertToOriginalCursor()
         inResizeHorizontalMode = false
         inResizeVerticalLeft = false
         inResizeVerticalRight = false
@@ -170,7 +163,8 @@
 
         var eventX = event.clientX
         var htmlWidth = $("html").width()
-        var percentageLeft = (eventX / htmlWidth) * 100
+        // TODO: more magic numbers!
+        var percentageLeft = (eventX / htmlWidth) * 99.3
         if (percentageLeft) {
             var leftFinal = percentageLeft + "%"
             $("#left").width(leftFinal)
