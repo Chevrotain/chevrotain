@@ -78,9 +78,11 @@ function onImplementationEditorContentChange() {
             markParserDefinitionErrors(parser)
             var topRules = parser.getGAstProductions().values()
             renderSyntaxDiagrams(topRules)
-        } else {
+            showDiagrams()
+        } else { // lexer Only Example
             parser = undefined
             renderSyntaxDiagrams([])
+            hideDiagrams()
         }
         onInputEditorContentChange()
     }

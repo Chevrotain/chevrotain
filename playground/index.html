@@ -166,7 +166,6 @@
         // TODO: more magic numbers!
         var percentageLeft = (eventX / htmlWidth) * 99.3
         if (percentageLeft) {
-            console.log("original " + percentageLeft)
             percentageLeft = percentageLeft < 1 ? 0 : percentageLeft
             percentageLeft = percentageLeft > 98.26 ? 99.26 : percentageLeft
             var leftFinal = percentageLeft + "%"
@@ -178,13 +177,17 @@
     }
 
     var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 20)
-    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 20)
+    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output", true), 20)
 
-    function dragVertical(event, topID, buttomID) {
+    function dragVertical(event, topID, buttomID, rightSide) {
         event.preventDefault()
+
+        if (rightSide) {
+            hasThereBeenManualDiagramsResize = true
+        }
+
         var eventY = event.clientY
         var htmlHeight = $("html").height()
-        console.log(htmlHeight)
         var percentageTop = (eventY / htmlHeight) * 97
 
         if (percentageTop) {
@@ -202,6 +205,85 @@
         javaScriptEditor.refresh()
         inputEditor.refresh()
         parserOutput.refresh()
+    }
+
+    var hasThereBeenManualDiagramsResize = false
+    var areDiagramsHidden = false
+    var lastOutputDivPercentage
+    var lastOutputDivPixels
+    var lastDiagramsDivPixels
+
+    function hideDiagrams() {
+        hasThereBeenManualDiagramsResize = false
+        areDiagramsHidden = true
+        var htmlHeight = $("html").height()
+
+        lastOutputDivPixels = $("#output").height()
+        lastDiagramsDivPixels = $("#diagramsRoot").height()
+        lastOutputDivPercentage = $("#output").height() / htmlHeight * 100
+        var currDiagramsDivPercentage = 97 - lastOutputDivPercentage
+
+        var tickSize = 1;
+        var tickTime = 4;
+
+        function resizeTick() {
+            setTimeout(function () {
+                if (currDiagramsDivPercentage > 0) {
+                    var outputVh = "" + (97 - currDiagramsDivPercentage + tickSize) + "vh"
+                    var diagramsVh = currDiagramsDivPercentage - tickSize + "vh"
+                    $("#output").height(outputVh)
+                    $("#diagramsRoot").height(diagramsVh)
+                    currDiagramsDivPercentage -= tickSize
+                    resizeTick()
+                }
+                else {
+                    refreshCodeMirrorInstances()
+                }
+            }, tickTime)
+        }
+
+        resizeTick()
+    }
+
+    function showDiagrams() {
+        if (hasThereBeenManualDiagramsResize || !areDiagramsHidden) {
+            return
+        }
+        areDiagramsHidden = false
+
+        var tickSize = 1;
+        var tickTime = 4;
+
+        var currOutputDivPercentage = 97
+
+        function resizeTick() {
+            setTimeout(function () {
+                if (currOutputDivPercentage > lastOutputDivPercentage) {
+
+                    // last tick, must be precise
+                    if ((currOutputDivPercentage - tickSize) < lastOutputDivPercentage) {
+                        $("#output").height(lastOutputDivPixels)
+                        $("#diagramsRoot").height(lastDiagramsDivPixels)
+                    }
+                    else {
+                        var diagramsVh = "" + (97 - currOutputDivPercentage + tickSize) + "vh"
+                        var outputVh = currOutputDivPercentage - tickSize + "vh"
+
+                        $("#output").height(outputVh)
+                        $("#diagramsRoot").height(diagramsVh)
+                    }
+
+                    currOutputDivPercentage -= tickSize
+                    resizeTick()
+                }
+                else {
+                    refreshCodeMirrorInstances()
+                }
+            }, tickTime)
+        }
+
+        resizeTick()
+
     }
 
     // global state
