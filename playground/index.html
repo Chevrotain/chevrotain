@@ -166,6 +166,9 @@
         // TODO: more magic numbers!
         var percentageLeft = (eventX / htmlWidth) * 99.3
         if (percentageLeft) {
+            console.log("original " + percentageLeft)
+            percentageLeft = percentageLeft < 1 ? 0 : percentageLeft
+            percentageLeft = percentageLeft > 98.26 ? 99.26 : percentageLeft
             var leftFinal = percentageLeft + "%"
             $("#left").width(leftFinal)
             // magical number! TODO: get this from CSS
@@ -185,6 +188,8 @@
         var percentageTop = (eventY / htmlHeight) * 97
 
         if (percentageTop) {
+            percentageTop = percentageTop < 1 ? 0 : percentageTop
+            percentageTop = percentageTop > 96 ? 97 : percentageTop
             var topFinal = percentageTop + "vh"
             $("#" + topID).height(topFinal)
             // magical number! TODO: get this from CSS/ dom?
