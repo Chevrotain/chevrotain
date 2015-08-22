@@ -18,9 +18,9 @@ div {
 
 h3 {
     font-family: Arial;
-    font-size: 1.7vh;
+    font-size: 1.5vh;
     color: #1b138d;
-    margin: 1.6vh 0 0 0;
+    margin: 1.328vh 0 0 0;
     padding: 0;
 }
 
@@ -85,11 +85,11 @@ body {
 .select {
     stroke-width: 0;
     float: left;
-    font-size: 2vh;
-    margin: 1.0vh 1vh 0 0;
+    font-size: 1.5vh;
+    margin: 1.25vh 1.25vh 0 0;
     padding: 0;
     border: 0.4vh;
-    height: 2.7vh;
+    height: 2.2vh;
 }
 
 .boxHeader {
