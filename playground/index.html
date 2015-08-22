@@ -60,7 +60,6 @@
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
     </div>
 
-
     <div id="input" class="card" style="width: 100%; overflow: hidden; height: 21vh">
         <div class="boxHeader">
             <h1>Input</h1>
@@ -89,7 +88,7 @@
         <div id="diagramsDiv" class="diagramsDiv" style="overflow: auto; height: 71.3vh"></div>
     </div>
 
-    <div class="horizontalSeparator" onmousedown="startVerticalRight(event)">
+    <div id="rightHorizontalSeparator" class="horizontalSeparator" onmousedown="startVerticalRight(event)">
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
     </div>
 
@@ -207,6 +206,8 @@
         parserOutput.refresh()
     }
 
+    var tickSize = 1;
+    var tickTime = 4;
     var hasThereBeenManualDiagramsResize = false
     var areDiagramsHidden = false
     var lastOutputDivPercentage
@@ -214,6 +215,10 @@
     var lastDiagramsDivPixels
 
     function hideDiagrams() {
+        // TODO: don't run this code if already hidden
+        if (areDiagramsHidden) {
+            return
+        }
         hasThereBeenManualDiagramsResize = false
         areDiagramsHidden = true
         var htmlHeight = $("html").height()
@@ -221,10 +226,8 @@
         lastOutputDivPixels = $("#output").height()
         lastDiagramsDivPixels = $("#diagramsRoot").height()
         lastOutputDivPercentage = $("#output").height() / htmlHeight * 100
+        // TODO: magic numbers!
         var currDiagramsDivPercentage = 97 - lastOutputDivPercentage
-
-        var tickSize = 1;
-        var tickTime = 4;
 
         function resizeTick() {
             setTimeout(function () {
@@ -237,6 +240,9 @@
                     resizeTick()
                 }
                 else {
+                    $("#rightHorizontalSeparator").css("display", "none");
+                    $("#output").height("98.4vh")
+                    $("#diagramsRoot").height("0vh")
                     refreshCodeMirrorInstances()
                 }
             }, tickTime)
@@ -246,6 +252,9 @@
     }
 
     function showDiagrams() {
+        // always need to re-enable the separator
+        $("#rightHorizontalSeparator").css("display", "block");
+
         if (hasThereBeenManualDiagramsResize || !areDiagramsHidden) {
             return
         }
@@ -262,6 +271,8 @@
 
                     // last tick, must be precise
                     if ((currOutputDivPercentage - tickSize) < lastOutputDivPercentage) {
+                        // TODO: need to use VH otherwise resize of screen after showDiagrams will
+                        // mess things up
                         $("#output").height(lastOutputDivPixels)
                         $("#diagramsRoot").height(lastDiagramsDivPixels)
                     }
