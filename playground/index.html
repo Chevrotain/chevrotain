@@ -106,6 +106,9 @@
     var inResizeHorizontalMode = false
     var inResizeVerticalLeft = false
     var inResizeVerticalRight = false
+    // TODO: get from css?
+    var PAGE_VH = 97
+    var H_SEPARATOR_VH = 1.12
 
 
     function modifyCursor(cursorKeyword) {
@@ -176,26 +179,21 @@
     }
 
     var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 20)
-    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output", true), 20)
+    var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsRoot", "output"), 20)
 
-    function dragVertical(event, topID, buttomID, rightSide) {
+    function dragVertical(event, topID, buttomID) {
         event.preventDefault()
-
-        if (rightSide) {
-            hasThereBeenManualDiagramsResize = true
-        }
 
         var eventY = event.clientY
         var htmlHeight = $("html").height()
-        var percentageTop = (eventY / htmlHeight) * 97
+        var percentageTop = (eventY / htmlHeight) * PAGE_VH
 
         if (percentageTop) {
             percentageTop = percentageTop < 1 ? 0 : percentageTop
-            percentageTop = percentageTop > 96 ? 97 : percentageTop
+            percentageTop = percentageTop > PAGE_VH - 1 ? PAGE_VH : percentageTop
             var topFinal = percentageTop + "vh"
             $("#" + topID).height(topFinal)
-            // magical number! TODO: get this from CSS/ dom?
-            var buttomFinal = "" + (97 - percentageTop) + "vh"
+            var buttomFinal = "" + (PAGE_VH - percentageTop) + "vh"
             $("#" + buttomID).height(buttomFinal)
         }
     }
@@ -206,33 +204,31 @@
         parserOutput.refresh()
     }
 
-    var tickSize = 1;
+    // TODO: different tick time according to browser... firefox seems slow... :(
+    var tickSize = 2;
     var tickTime = 4;
-    var hasThereBeenManualDiagramsResize = false
     var areDiagramsHidden = false
     var lastOutputDivPercentage
     var lastOutputDivPixels
     var lastDiagramsDivPixels
 
     function hideDiagrams() {
-        // TODO: don't run this code if already hidden
         if (areDiagramsHidden) {
             return
         }
-        hasThereBeenManualDiagramsResize = false
         areDiagramsHidden = true
         var htmlHeight = $("html").height()
 
+        $("#rightHorizontalSeparator").css("visibility", "hidden")
+
         lastOutputDivPixels = $("#output").height()
         lastDiagramsDivPixels = $("#diagramsRoot").height()
-        lastOutputDivPercentage = $("#output").height() / htmlHeight * 100
-        // TODO: magic numbers!
-        var currDiagramsDivPercentage = 97 - lastOutputDivPercentage
-
+        lastOutputDivPercentage = lastOutputDivPixels / htmlHeight * 100
+        var currDiagramsDivPercentage = PAGE_VH - lastOutputDivPercentage
         function resizeTick() {
             setTimeout(function () {
                 if (currDiagramsDivPercentage > 0) {
-                    var outputVh = "" + (97 - currDiagramsDivPercentage + tickSize) + "vh"
+                    var outputVh = "" + (PAGE_VH - currDiagramsDivPercentage + tickSize) + "vh"
                     var diagramsVh = currDiagramsDivPercentage - tickSize + "vh"
                     $("#output").height(outputVh)
                     $("#diagramsRoot").height(diagramsVh)
@@ -240,10 +236,10 @@
                     resizeTick()
                 }
                 else {
-                    $("#rightHorizontalSeparator").css("display", "none");
-                    $("#output").height("98.4vh")
+                    $("#output").height(PAGE_VH + H_SEPARATOR_VH + "vh")
                     $("#diagramsRoot").height("0vh")
                     refreshCodeMirrorInstances()
+                    $("#rightHorizontalSeparator").css("display", "none")
                 }
             }, tickTime)
         }
@@ -254,8 +250,9 @@
     function showDiagrams() {
         // always need to re-enable the separator
         $("#rightHorizontalSeparator").css("display", "block");
+        $("#rightHorizontalSeparator").css("visibility", "visible")
 
-        if (hasThereBeenManualDiagramsResize || !areDiagramsHidden) {
+        if (!areDiagramsHidden) {
             return
         }
         areDiagramsHidden = false
@@ -263,7 +260,7 @@
         var tickSize = 1;
         var tickTime = 4;
 
-        var currOutputDivPercentage = 97
+        var currOutputDivPercentage = PAGE_VH
 
         function resizeTick() {
             setTimeout(function () {
@@ -271,13 +268,21 @@
 
                     // last tick, must be precise
                     if ((currOutputDivPercentage - tickSize) < lastOutputDivPercentage) {
-                        // TODO: need to use VH otherwise resize of screen after showDiagrams will
-                        // mess things up
-                        $("#output").height(lastOutputDivPixels)
-                        $("#diagramsRoot").height(lastDiagramsDivPixels)
+                        var viewportHeight = $(window).height();
+                        var lastOutputDivVh = lastOutputDivPixels / viewportHeight * 100;
+                        var lasDiagramsDivVh = lastDiagramsDivPixels / viewportHeight * 100;
+
+                        // both VH together must equal PAGE_VH
+                        var offset = lastOutputDivVh + lasDiagramsDivVh - PAGE_VH
+                        // assumes offset is positive, TODO: is this assumption safe? ???
+                        lastOutputDivVh = lastOutputDivVh - (offset / 2)
+                        lasDiagramsDivVh = lasDiagramsDivVh - (offset / 2)
+
+                        $("#diagramsRoot").height(lasDiagramsDivVh.toFixed(2) + "vh")
+                        $("#output").height(lastOutputDivVh.toFixed(2) + "vh")
                     }
                     else {
-                        var diagramsVh = "" + (97 - currOutputDivPercentage + tickSize) + "vh"
+                        var diagramsVh = "" + (PAGE_VH - currOutputDivPercentage + tickSize) + "vh"
                         var outputVh = currOutputDivPercentage - tickSize + "vh"
 
                         $("#output").height(outputVh)
@@ -294,7 +299,6 @@
         }
 
         resizeTick()
-
     }
 
     // global state

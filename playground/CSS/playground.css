@@ -50,16 +50,16 @@ body {
 
 .horizontalDragHandle {
     position: relative;
-    top: -0.05vw;
+    top: -0.08vh;
     left: 50%;
-    font-size: 1vw;
+    font-size: 1.6vh;
     display: block;
     color: #777;
 }
 
 .horizontalSeparator {
     width: 100%;
-    height: 0.7vw;
+    height: 1.12vh;
     cursor: row-resize;
     /* needed to avoid the '...' icon with the block display to expand outside the separator div */
     overflow: hidden;
