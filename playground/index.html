@@ -117,6 +117,9 @@
     var parserOutput = null
     var diagramsDiv = null
     var diagramsHeaderOrgHtml = null
+    var impelEditorDiv = null
+    var inputEditorDiv = null
+    var outputEditorDiv = null
 
 
     $(document).ready(function init() {
@@ -166,11 +169,20 @@
         javaScriptEditor.setSize("100%", "100%")
         // the input bottom area editors may have issues when Codemirror tries to resize to add a scroll bar
         // causing the headers to disappear. 80% seems to resolve this issue in common use cases.
-        inputEditor.setSize("100%", "80%")
+        inputEditor.setSize("100%", "100%")
         parserOutput.setSize("100%", "100%")
 
         $(document).mouseup(endResize)
         $(document).mousemove(resizeRoot)
+
+        impelEditorDiv = _.first($("#impel").find(".cm-s-default"))
+        impelEditorDiv.id = "impelEditorDiv"
+        inputEditorDiv = _.first($("#input").find(".cm-s-default"))
+        inputEditorDiv.id = "inputEditorDiv"
+        outputEditorDiv = _.first($("#output").find(".cm-s-default"))
+        outputEditorDiv.id ="outputEditorDiv"
+
+        initCodeMirrorDivsViewPortHeight()
     })
 </script>
 

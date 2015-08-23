@@ -1,11 +1,20 @@
-
 var inResizeHorizontalMode = false
 var inResizeVerticalLeft = false
 var inResizeVerticalRight = false
 // TODO: get from css?
 var PAGE_VH = 97
+var TOP_INITIAL_VH = 76
+var BOTTOM_INITAL_VH = PAGE_VH - TOP_INITIAL_VH
 var H_SEPARATOR_VH = 1.12
+var HEADER_BOX_VH = 4.7
 
+var SNAP_TO_DISTANCE = 2
+
+function initCodeMirrorDivsViewPortHeight() {
+    impelEditorDiv.style.height = TOP_INITIAL_VH - HEADER_BOX_VH + "vh"
+    inputEditorDiv.style.height = BOTTOM_INITAL_VH - HEADER_BOX_VH + "vh"
+    outputEditorDiv.style.height = BOTTOM_INITAL_VH - HEADER_BOX_VH + "vh"
+}
 
 function modifyCursor(cursorKeyword) {
     document.body.style.cursor = cursorKeyword
@@ -64,20 +73,22 @@ function dragMiddleHorz(event) {
     // TODO: more magic numbers!
     var percentageLeft = (eventX / htmlWidth) * 99.3
     if (percentageLeft) {
-        percentageLeft = percentageLeft < 1 ? 0 : percentageLeft
-        percentageLeft = percentageLeft > 98.26 ? 99.26 : percentageLeft
+        percentageLeft = percentageLeft < SNAP_TO_DISTANCE ? 0 : percentageLeft
+        percentageLeft = percentageLeft > 99.26 - SNAP_TO_DISTANCE ? 99.26 : percentageLeft
         var leftFinal = percentageLeft + "%"
         $("#left").width(leftFinal)
         // magical number! TODO: get this from CSS
         var rightFinal = "" + (99.26 - percentageLeft) + "%"
         $("#right").width(rightFinal)
+
+        // TODO: need to hide scroll of DiagramsDiv manually ?
     }
 }
 
-var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input"), 20)
-var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsDiv", "output"), 20)
+var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input", "impelEditorDiv", "inputEditorDiv"), 20)
+var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsDiv", "output", undefined , "outputEditorDiv"), 20)
 
-function dragVertical(event, topID, buttomID, resizeDiagramsDiv) {
+function dragVertical(event, topID, buttomID, topCmID, buttomCmID) {
     event.preventDefault()
 
     var eventY = event.clientY
@@ -85,16 +96,20 @@ function dragVertical(event, topID, buttomID, resizeDiagramsDiv) {
     var percentageTop = (eventY / htmlHeight) * PAGE_VH
 
     if (percentageTop) {
-        percentageTop = percentageTop < 1 ? 0 : percentageTop
-        percentageTop = percentageTop > PAGE_VH - 1 ? PAGE_VH : percentageTop
-        var topFinal = percentageTop + "vh"
-        $("#" + topID).height(topFinal)
-        var buttomFinal = "" + (PAGE_VH - percentageTop) + "vh"
-        $("#" + buttomID).height(buttomFinal)
+        percentageTop = percentageTop < SNAP_TO_DISTANCE ? 0 : percentageTop
+        percentageTop = percentageTop > PAGE_VH - SNAP_TO_DISTANCE ? PAGE_VH : percentageTop
+        $("#" + topID).height( percentageTop + "vh")
+        var buttomFinal = PAGE_VH - percentageTop
+        $("#" + buttomID).height(buttomFinal + "vh")
 
-        //if (resizeDiagramsDiv) {
-        //    $("#diagramsDiv").height(percentageTop - 4.7 + "vh")
-        //}
+        if (topCmID) {
+            $("#" + topCmID).height( percentageTop - HEADER_BOX_VH + "vh")
+        }
+
+        if (buttomCmID) {
+            $("#" + buttomCmID).height(buttomFinal - HEADER_BOX_VH + "vh")
+        }
+
     }
 }
 
@@ -125,12 +140,14 @@ function hideDiagrams() {
     lastDiagramsDivPixels = $("#diagramsDiv").height()
     lastOutputDivPercentage = lastOutputDivPixels / htmlHeight * 100
     var currDiagramsDivPercentage = PAGE_VH - lastOutputDivPercentage
+
     function resizeTick() {
         setTimeout(function () {
             if (currDiagramsDivPercentage > 0) {
                 var outputVh = "" + (PAGE_VH - currDiagramsDivPercentage + tickSize) + "vh"
                 var diagramsVh = currDiagramsDivPercentage - tickSize + "vh"
                 $("#output").height(outputVh)
+                $("#outputEditorDiv").height(outputVh - HEADER_BOX_VH + "vh")
                 $("#diagramsDiv").height(diagramsVh)
                 currDiagramsDivPercentage -= tickSize
                 resizeTick()
@@ -138,6 +155,7 @@ function hideDiagrams() {
             else {
                 $("#output").height(PAGE_VH + H_SEPARATOR_VH + "vh")
                 $("#diagramsDiv").height("0vh")
+                $("#outputEditorDiv").height(PAGE_VH + H_SEPARATOR_VH - HEADER_BOX_VH + "vh")
                 refreshCodeMirrorInstances()
                 $("#rightHorizontalSeparator").css("display", "none")
             }
