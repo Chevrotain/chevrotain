@@ -30,8 +30,6 @@ function initCodeMirrorDivsViewPortHeight() {
     impelEditorDiv.style.height = TOP_INITIAL_VH - HEADER_BOX_VH + "vh"
     inputEditorDiv.style.height = BOTTOM_INITAL_VH - HEADER_BOX_VH + "vh"
     outputEditorDiv.style.height = BOTTOM_INITAL_VH - HEADER_BOX_VH + "vh"
-
-
 }
 
 function modifyCursor(cursorKeyword) {
@@ -111,7 +109,7 @@ function dragMiddleHorz(event) {
 
 
 var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input", "impelEditorDiv", "inputEditorDiv"), 20)
-var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsDiv", "output", undefined, "outputEditorDiv"), 20)
+var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "rightTop", "output", "diagramsDiv", "outputEditorDiv"), 20)
 
 
 function dragVertical(event, topID, buttomID, topCmID, buttomCmID) {
@@ -153,7 +151,7 @@ var tickTime = 4;
 var areDiagramsHidden = false
 var lastOutputDivPercentage
 var lastOutputDivPixels
-var lastDiagramsDivPixels
+var lastRightTopDivPixels
 
 
 function hideDiagrams() {
@@ -166,7 +164,7 @@ function hideDiagrams() {
     $("#rightHorizontalSeparator").css("visibility", "hidden")
 
     lastOutputDivPixels = $("#output").height()
-    lastDiagramsDivPixels = $("#diagramsDiv").height()
+    lastRightTopDivPixels = $("#rightTop").height()
     lastOutputDivPercentage = lastOutputDivPixels / htmlHeight * 100
     var currDiagramsDivPercentage = PAGE_VH - lastOutputDivPercentage
 
@@ -177,13 +175,13 @@ function hideDiagrams() {
                 var diagramsVh = currDiagramsDivPercentage - tickSize + "vh"
                 $("#output").height(outputVh)
                 $("#outputEditorDiv").height(outputVh - HEADER_BOX_VH + "vh")
-                $("#diagramsDiv").height(diagramsVh)
+                $("#rightTop").height(diagramsVh)
                 currDiagramsDivPercentage -= tickSize
                 resizeTick()
             }
             else {
                 $("#output").height(PAGE_VH + H_SEPARATOR_VH + "vh")
-                $("#diagramsDiv").height("0vh")
+                $("#rightTop").height("0vh")
                 $("#outputEditorDiv").height(PAGE_VH + H_SEPARATOR_VH - HEADER_BOX_VH + "vh")
                 refreshCodeMirrorInstances()
                 $("#rightHorizontalSeparator").css("display", "none")
@@ -217,24 +215,24 @@ function showDiagrams() {
                 // last tick, must be precise
                 if ((currOutputDivPercentage - tickSize) < lastOutputDivPercentage) {
                     var viewportHeight = $(window).height();
-                    var lastOutputDivVh = lastOutputDivPixels / viewportHeight * 100;
-                    var lasDiagramsDivVh = lastDiagramsDivPixels / viewportHeight * 100;
+                    var lastOutputEditorVh = lastOutputDivPixels / viewportHeight * 100;
+                    var lastRightTopVh = lastRightTopDivPixels / viewportHeight * 100;
 
                     // both VH together must equal PAGE_VH
-                    var offset = lastOutputDivVh + lasDiagramsDivVh - PAGE_VH
+                    var offset = lastOutputEditorVh + lastRightTopVh - PAGE_VH
                     // assumes offset is positive, TODO: is this assumption safe? ???
-                    lastOutputDivVh = lastOutputDivVh - (offset / 2)
-                    lasDiagramsDivVh = lasDiagramsDivVh - (offset / 2)
+                    lastOutputEditorVh = lastOutputEditorVh - (offset / 2)
+                    lastRightTopVh = lastRightTopVh - (offset / 2)
 
-                    $("#diagramsDiv").height(lasDiagramsDivVh.toFixed(2) + "vh")
-                    $("#output").height(lastOutputDivVh.toFixed(2) + "vh")
+                    $("#rightTop").height(lastRightTopVh.toFixed(2) + "vh")
+                    $("#output").height(lastOutputEditorVh.toFixed(2) + "vh")
                 }
                 else {
-                    var diagramsVh = "" + (PAGE_VH - currOutputDivPercentage + tickSize) + "vh"
                     var outputVh = currOutputDivPercentage - tickSize + "vh"
+                    var diagramsVh = "" + (PAGE_VH - currOutputDivPercentage + tickSize) + "vh"
 
                     $("#output").height(outputVh)
-                    $("#diagramsDiv").height(diagramsVh)
+                    $("#rightTop").height(diagramsVh)
                 }
 
                 currOutputDivPercentage -= tickSize

@@ -82,11 +82,14 @@
 
 <div id="right" class="sideEditor rightSide">
 
-    <div id="diagramsDiv" class="card" align="center" style="width: 100%; height:76vh; overflow-y: scroll">
+    <div id="rightTop" class="card" style="width: 100%; overflow:hidden; height: 76vh">
         <div class="boxHeader">
             <h1>Syntax Diagrams</h1>
         </div>
+
+        <div id="diagramsDiv" class="card" align="center" style="width: 100%; height:71.3vh; overflow-y: scroll"></div>
     </div>
+
 
     <div id="rightHorizontalSeparator" class="horizontalSeparator" onmousedown="startVerticalRight(event)">
         <i class="fa fa-ellipsis-h horizontalDragHandle"> </i>
@@ -180,7 +183,7 @@
         inputEditorDiv = _.first($("#input").find(".cm-s-default"))
         inputEditorDiv.id = "inputEditorDiv"
         outputEditorDiv = _.first($("#output").find(".cm-s-default"))
-        outputEditorDiv.id ="outputEditorDiv"
+        outputEditorDiv.id = "outputEditorDiv"
 
         initCodeMirrorDivsViewPortHeight()
     })
