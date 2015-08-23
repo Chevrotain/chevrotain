@@ -8,7 +8,7 @@ var BOTTOM_INITAL_VH = PAGE_VH - TOP_INITIAL_VH
 var H_SEPARATOR_VH = 1.12
 var HEADER_BOX_VH = 4.7
 
-var SNAP_TO_DISTANCE = 2
+var SNAP_TO_DISTANCE = 1.5
 
 /**
  * for some strange and unfathomable reason codeMirror only draws the vScroll
