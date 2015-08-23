@@ -1,5 +1,6 @@
 function renderSyntaxDiagrams(topRules) {
     diagramsDiv.innerHTML = ""
+    diagramsDiv.innerHTML += diagramsHeaderOrgHtml
     _.forEach(topRules, function (production) {
         var currDiagramHtml = convertProductionToDiagram(production)
         diagramsDiv.innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
