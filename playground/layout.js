@@ -122,7 +122,7 @@ function hideDiagrams() {
     $("#rightHorizontalSeparator").css("visibility", "hidden")
 
     lastOutputDivPixels = $("#output").height()
-    lastDiagramsDivPixels = $("#diagramsRoot").height()
+    lastDiagramsDivPixels = $("#diagramsDiv").height()
     lastOutputDivPercentage = lastOutputDivPixels / htmlHeight * 100
     var currDiagramsDivPercentage = PAGE_VH - lastOutputDivPercentage
     function resizeTick() {
