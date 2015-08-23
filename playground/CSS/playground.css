@@ -167,3 +167,9 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
 svg {
     width: 100%;
 }
+
+.CodeMirror-vscrollbar {
+    position: absolute;
+    z-index: 6;
+    display: block;
+}

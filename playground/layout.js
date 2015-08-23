@@ -10,19 +10,39 @@ var HEADER_BOX_VH = 4.7
 
 var SNAP_TO_DISTANCE = 2
 
+/**
+ * for some strange and unfathomable reason codeMirror only draws the vScroll
+ * after it is needed (overflow). after it is drawn once is will remain forever
+ * due to the "overflow-y : scroll;" css.
+ * This hack forces drawing of the vScrollBar by setting a very large multiline text.
+ */
+function initCodeMirrorVScroll() {
+    var manyLines = _.range(300).map(function () {
+        return "\n"
+    }).join();
+
+    javaScriptEditor.setValue(manyLines)
+    inputEditor.setValue(manyLines);
+    parserOutput.setValue(manyLines);
+}
+
 function initCodeMirrorDivsViewPortHeight() {
     impelEditorDiv.style.height = TOP_INITIAL_VH - HEADER_BOX_VH + "vh"
     inputEditorDiv.style.height = BOTTOM_INITAL_VH - HEADER_BOX_VH + "vh"
     outputEditorDiv.style.height = BOTTOM_INITAL_VH - HEADER_BOX_VH + "vh"
+
+
 }
 
 function modifyCursor(cursorKeyword) {
     document.body.style.cursor = cursorKeyword
 }
 
+
 function revertToOriginalCursor() {
     document.body.style.cursor = "auto"
 }
+
 
 function startResizeHorizontal(event) {
     event.preventDefault()
@@ -30,17 +50,20 @@ function startResizeHorizontal(event) {
     inResizeHorizontalMode = true
 }
 
+
 function startVerticalLeft(event) {
     event.preventDefault()
     modifyCursor("row-resize")
     inResizeVerticalLeft = true
 }
 
+
 function startVerticalRight(event) {
     event.preventDefault()
     modifyCursor("resizeRow")
     inResizeVerticalRight = true
 }
+
 
 function endResize() {
     revertToOriginalCursor()
@@ -49,6 +72,7 @@ function endResize() {
     inResizeVerticalRight = false
     refreshCodeMirrorInstances()
 }
+
 
 function resizeRoot(event) {
     if (inResizeHorizontalMode) {
@@ -60,8 +84,8 @@ function resizeRoot(event) {
     else if (inResizeVerticalRight) {
         resizeVerticalRight(event)
     }
-
 }
+
 
 // TODO: move to layout.js
 var resizeHorz = _.throttle(dragMiddleHorz, 20)
@@ -85,8 +109,10 @@ function dragMiddleHorz(event) {
     }
 }
 
+
 var resizeVerticalLeft = _.throttle(_.partialRight(dragVertical, "impel", "input", "impelEditorDiv", "inputEditorDiv"), 20)
-var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsDiv", "output", undefined , "outputEditorDiv"), 20)
+var resizeVerticalRight = _.throttle(_.partialRight(dragVertical, "diagramsDiv", "output", undefined, "outputEditorDiv"), 20)
+
 
 function dragVertical(event, topID, buttomID, topCmID, buttomCmID) {
     event.preventDefault()
@@ -98,12 +124,12 @@ function dragVertical(event, topID, buttomID, topCmID, buttomCmID) {
     if (percentageTop) {
         percentageTop = percentageTop < SNAP_TO_DISTANCE ? 0 : percentageTop
         percentageTop = percentageTop > PAGE_VH - SNAP_TO_DISTANCE ? PAGE_VH : percentageTop
-        $("#" + topID).height( percentageTop + "vh")
+        $("#" + topID).height(percentageTop + "vh")
         var buttomFinal = PAGE_VH - percentageTop
         $("#" + buttomID).height(buttomFinal + "vh")
 
         if (topCmID) {
-            $("#" + topCmID).height( percentageTop - HEADER_BOX_VH + "vh")
+            $("#" + topCmID).height(percentageTop - HEADER_BOX_VH + "vh")
         }
 
         if (buttomCmID) {
@@ -113,11 +139,13 @@ function dragVertical(event, topID, buttomID, topCmID, buttomCmID) {
     }
 }
 
+
 function refreshCodeMirrorInstances() {
     javaScriptEditor.refresh()
     inputEditor.refresh()
     parserOutput.refresh()
 }
+
 
 // TODO: different tick time according to browser... firefox seems slow... :(
 var tickSize = 2;
@@ -126,6 +154,7 @@ var areDiagramsHidden = false
 var lastOutputDivPercentage
 var lastOutputDivPixels
 var lastDiagramsDivPixels
+
 
 function hideDiagrams() {
     if (areDiagramsHidden) {
@@ -164,6 +193,7 @@ function hideDiagrams() {
 
     resizeTick()
 }
+
 
 function showDiagrams() {
     // always need to re-enable the separator

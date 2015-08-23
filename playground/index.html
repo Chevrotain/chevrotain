@@ -8,10 +8,10 @@
           href="../photos/chevrotain.jpg">
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="CSS/playground.css">
     <link rel="stylesheet" type="text/css" href="CSS/railroad-diagrams.css">
     <link rel="stylesheet" type="text/css" href="CSS/gh-fork-ribbon.css">
     <link rel="stylesheet" href="../bower_components/CodeMirror/lib/codemirror.css">
+    <link rel="stylesheet" type="text/css" href="CSS/playground.css">
 
     <script>
         // expose the whole Chevrotain's API including the 'private' parts to allow cleaning the the cache.
@@ -136,23 +136,29 @@
         var implTextArea = $("#parserImplementationEditor")
         javaScriptEditor = CodeMirror.fromTextArea(_.first(implTextArea), {
             lineNumbers   : true,
-            viewportMargin: Infinity
+            viewportMargin: 10
         })
 
         javaScriptEditor.on("change", _.debounce(onImplementationEditorContentChange, 250))
 
         inputEditor = CodeMirror.fromTextArea(_.first($("#parserInputEditor")), {
             lineNumbers   : true,
-            viewportMargin: Infinity
+            viewportMargin: 10
         })
 
         inputEditor.on("change", _.debounce(onInputEditorContentChange, 250))
 
         parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
             lineNumbers   : true,
-            viewportMargin: Infinity,
+            viewportMargin: 10,
             readOnly      : true
         })
+
+        javaScriptEditor.setSize("100%", "100%")
+        inputEditor.setSize("100%", "100%")
+        parserOutput.setSize("100%", "100%")
+
+        initCodeMirrorVScroll()
 
         initExamplesDropDown(examplesDropdown)
         examplesDropdown.change(function () {
@@ -165,12 +171,6 @@
         samplesDropdown.change(function () {
             loadSamples(samplesDropdown.val())
         })
-
-        javaScriptEditor.setSize("100%", "100%")
-        // the input bottom area editors may have issues when Codemirror tries to resize to add a scroll bar
-        // causing the headers to disappear. 80% seems to resolve this issue in common use cases.
-        inputEditor.setSize("100%", "100%")
-        parserOutput.setSize("100%", "100%")
 
         $(document).mouseup(endResize)
         $(document).mousemove(resizeRoot)
