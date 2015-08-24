@@ -77,7 +77,7 @@ function onImplementationEditorContentChange() {
             throw e
         }
 
-        if (!editorFuncVal.lexer || (editorFuncVal.parser && !editorFuncVal.defaultRule)) {
+        if (!editorFuncVal || !editorFuncVal.lexer || (editorFuncVal.parser && !editorFuncVal.defaultRule)) {
             //noinspection ExceptionCaughtLocallyJS
             throw Error("The Parser Implementation must return an object of the Type\n" +
                 "{\n" +
