@@ -65,8 +65,28 @@ function onImplementationEditorContentChange() {
     }
 
     cleanChevrotainCache()
+    // TODO: refactor this to be less ugly
     try {
-        var editorFuncVal = eval(javaScriptEditor.getValue())
+        try {
+            var editorFuncVal = eval(javaScriptEditor.getValue())
+        }
+        catch (e) {
+            // nothing works, draw empty diagrams
+            renderSyntaxDiagrams([])
+            //noinspection ExceptionCaughtLocallyJS
+            throw e
+        }
+
+        if (!editorFuncVal.lexer || (editorFuncVal.parser && !editorFuncVal.defaultRule)) {
+            //noinspection ExceptionCaughtLocallyJS
+            throw Error("The Parser Implementation must return an object of the Type\n" +
+                "{\n" +
+                "   lexer:chevrotain.Lexer,\n" +
+                "   parser?:constructor for chevrotain.Parser,\n" +
+                "   defaultRule?:string\n" +
+                "}")
+        }
+
         var parserConstructor = editorFuncVal.parser
         lexer = editorFuncVal.lexer
         markLexerDefinitionErrors(lexer)
@@ -79,6 +99,13 @@ function onImplementationEditorContentChange() {
             var topRules = parser.getGAstProductions().values()
             renderSyntaxDiagrams(topRules)
             showDiagrams()
+            if (!_.isEmpty(parser.definitionErrors)) {
+                var defErrorMessages = _.map(parser.definitionErrors, function (currErr, idx) {
+                    return "" + (idx + 1) + ". " + currErr.message.replace(/\n/g, "\n   ")
+                })
+                //noinspection ExceptionCaughtLocallyJS
+                throw Error(defErrorMessages.join("\n"))
+            }
         } else { // lexer Only Example
             parser = undefined
             renderSyntaxDiagrams([])
@@ -86,9 +113,9 @@ function onImplementationEditorContentChange() {
         }
         onInputEditorContentChange()
     }
-    catch (e){
-        parserOutput.setValue("Error during evaluation of the implementation: \n" + e.toString())
-        parserOutput.markText({line:0, ch:0}, {line:100,ch:100}, {
+    catch (e) {
+        parserOutput.setValue("Errors during evaluation of the implementation: \n" + e.message)
+        parserOutput.markText({line: 0, ch: 0}, {line: 100, ch: 100}, {
             className: "markEvalError"
         })
     }
