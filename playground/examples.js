@@ -75,13 +75,14 @@ function jsonExample() {
 
 
         this.object = this.RULE("object", function () {
-            // use debugger statements to add breakpoints (works in chrome/firefox)
-            //debugger;
+            // use debugger statements to add breakpoints
+            // (if your browser supports debugging evaluated code)
+            // debugger;
             var obj = {}
 
             $.CONSUME(LCurly);
             $.MANY_SEP(Comma, function () {
-                _.assign(obj, $.SUBRULE1($.objectItem));
+                _.assign(obj, $.SUBRULE($.objectItem));
             });
             $.CONSUME(RCurly);
 
@@ -108,7 +109,7 @@ function jsonExample() {
             var arr = [];
             $.CONSUME(LSquare);
             $.MANY_SEP(Comma, function () {
-                arr.push($.SUBRULE1($.value));
+                arr.push($.SUBRULE($.value));
             });
             $.CONSUME(RSquare);
 
@@ -306,11 +307,14 @@ function calculatorExample() {
 
 function tutorialLexerExample() {
 
-    // Step 1: a lexer for a simple SELECT statement syntax
-
+    // Tutorial Step 1:
+    // Implementation of A lexer for a simple SELECT statement grammar
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
 
+    // extendToken is used to create a constructor for a Token class
+    // The Lexer's output will contain an array of
+    // instances created by these constructors
     var Select = extendToken("Select", /SELECT/);
     var From = extendToken("From", /FROM/);
     var Where = extendToken("Where", /WHERE/);
@@ -325,9 +329,12 @@ function tutorialLexerExample() {
     // whitespace is normally very common so it is placed first to speed up the lexer
     var allTokens = [WhiteSpace, Select, From, Where, Comma,
         identifier, Integer, GreaterThan, LessThan];
+
     var SelectLexer = new Lexer(allTokens, true);
 
     return {
+        // becuase only a lexer is returned the output will display
+        // the Lexed token array.
         lexer: SelectLexer
     };
 }
@@ -335,7 +342,11 @@ function tutorialLexerExample() {
 // TODO: avoid duplication of code from step 1
 function tutorialGrammarExample() {
 
-    //  Step 2: A grammar using the Tokens defined in the previous step.
+    // Tutorial Step 2:
+
+    // Adding a Parser (grammar only, only reads the input
+    // without any actions) using the Tokens defined in the previous step.
+    // modification to the grammar will be displayed in the syntax diagrams panel.
 
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
@@ -378,7 +389,7 @@ function tutorialGrammarExample() {
         this.selectClause = $.RULE("selectClause", function () {
             $.CONSUME(Select);
             $.AT_LEAST_ONE_SEP(Comma, function () {
-                $.CONSUME1(Identifier);
+                $.CONSUME(Identifier);
             }, "column name");
         });
 
@@ -386,8 +397,15 @@ function tutorialGrammarExample() {
         this.fromClause = $.RULE("fromClause", function () {
             $.CONSUME(From);
             $.CONSUME(Identifier);
-            // exercise: try to add support for multiple tables to select from
-            // (implicit join)
+
+            // example:
+            // replace the contents of this rule with the commented out lines
+            // below to implement multiple tables to select from (implicit join).
+
+            //$.CONSUME(From);
+            //$.AT_LEAST_ONE_SEP(Comma, function () {
+            //    $.CONSUME(Identifier);
+            //}, "table name");
         });
 
 
@@ -400,7 +418,9 @@ function tutorialGrammarExample() {
         this.expression = $.RULE("expression", function () {
             $.SUBRULE($.atomicExpression);
             $.SUBRULE($.relationalOperator);
-            $.SUBRULE2($.atomicExpression);
+            $.SUBRULE2($.atomicExpression); // note the '2' suffix to distinguish
+                                            // from the 'SUBRULE(atomicExpression)'
+                                            // 2 lines above.
         });
 
 
@@ -442,7 +462,10 @@ function tutorialGrammarExample() {
 
 function tutorialGrammarActionsExample() {
 
-    //  Step 3: building an AST using the grammar from the previous step.
+    // Tutorial Step 3:
+
+    // Adding grammar action to build an AST instead of just reading the input.
+    // The output AST can be observed in the output panel.
 
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
@@ -479,6 +502,9 @@ function tutorialGrammarActionsExample() {
                 where = $.SUBRULE($.whereClause)
             })
 
+            // a parsing rule may return a value.
+            // In this case our AST is is a simple javascript object.
+            // Generally the returned value may be any javascript value.
             return {
                 type      : "SELECT_STMT", selectClause: select,
                 fromClause: from, whereClause: where
@@ -491,7 +517,8 @@ function tutorialGrammarActionsExample() {
 
             $.CONSUME(Select);
             $.AT_LEAST_ONE_SEP(Comma, function () {
-                columns.push($.CONSUME1(Identifier).image);
+                // accessing a token's string via .image property
+                columns.push($.CONSUME(Identifier).image);
             }, "column name");
 
             return {type: "SELECT_CLAUSE", columns: columns}
@@ -503,8 +530,6 @@ function tutorialGrammarActionsExample() {
 
             $.CONSUME(From);
             table = $.CONSUME(Identifier).image;
-            // exercise: try to add support for multiple tables to select from
-            // (implicit join)
 
             return {type: "FROM_CLAUSE", table: table}
         });
@@ -515,6 +540,7 @@ function tutorialGrammarActionsExample() {
             debugger;
 
             $.CONSUME(Where)
+            // a SUBRULE call will return the value the called rule returns.
             condition = $.SUBRULE($.expression)
 
             return {type: "WHERE_CLAUSE", condition: condition}
@@ -534,7 +560,7 @@ function tutorialGrammarActionsExample() {
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
             // @formatter:off
-            return $.OR([
+            return $.OR([ // OR returns the value of the chosen alternative.
                 {ALT: function(){ return $.CONSUME(Integer)}},
                 {ALT: function(){ return $.CONSUME(Identifier)}}
             ], "an atomic expression").image;
@@ -632,7 +658,6 @@ var samples = {
     "tutorial grammar": {
         implementation: tutorialGrammarExample,
         sampleInputs  : {
-            // TODO: avoid duplication in tutorial examples
             "valid"         : "SELECT name, age FROM students WHERE age > 22",
             "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
         }
@@ -641,7 +666,6 @@ var samples = {
     "tutorial actions": {
         implementation: tutorialGrammarActionsExample,
         sampleInputs  : {
-            // TODO: avoid duplication in tutorial examples
             "valid"         : "SELECT name, age FROM students WHERE age > 22",
             "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
         }
