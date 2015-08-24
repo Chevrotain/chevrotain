@@ -28,12 +28,18 @@ function onDiagramNonTerminalMouseOut(mouseEvent) {
     $(rectAndHeader.header).toggleClass("diagramHeaderDef")
 }
 
-
+var headerImplTextMarker = null
 function onDiagramHeaderMouseOver(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
     $(mouseEvent.target).toggleClass("diagramHeaderDef")
     _.forEach(getUsageSvgRect(definitionName), function (rect) {
         $(rect).toggleClass("diagramRectUsage")
+    })
+
+    var definitionPos = locateRuleDefinition(definitionName, javaScriptEditor.getValue(), javaScriptEditor)
+    var pos = _.first(definitionPos)
+    headerImplTextMarker = javaScriptEditor.markText(pos.start, pos.end, {
+        className: "markDiagramsTextHover"
     })
 }
 
@@ -44,16 +50,17 @@ function onDiagramHeaderMouseOut(mouseEvent) {
     _.forEach(getUsageSvgRect(definitionName), function (rect) {
         $(rect).toggleClass("diagramRectUsage")
     })
+    headerImplTextMarker.clear()
 }
 
 
 function onDiagramHeaderMouseClick(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
     var definitionPos = locateRuleDefinition(definitionName, javaScriptEditor.getValue(), javaScriptEditor)
-    var pos = _.first(definitionPos).start
-    center(pos.line)
+    var pos = _.first(definitionPos)
+    center(pos.start.line)
     javaScriptEditor.focus()
-    javaScriptEditor.setCursor(pos)
+    javaScriptEditor.setCursor(pos.start)
 }
 
 

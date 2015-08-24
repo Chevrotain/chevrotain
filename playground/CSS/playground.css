@@ -118,7 +118,7 @@ body {
 }
 
 .diagramHeaderDef {
-    background-color: #31BA5F;
+    background-color: yellow;
 }
 
 svg.railroad-diagram text {
@@ -157,6 +157,12 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     position: absolute;
     top: 6px;
     overflow: hidden;
+}
+
+
+.markDiagramsTextHover {
+    background-color: yellow;
+    font-weight: bolder;
 }
 
 .card {
