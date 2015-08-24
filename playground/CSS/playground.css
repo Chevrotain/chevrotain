@@ -118,7 +118,7 @@ body {
 }
 
 .diagramHeaderDef {
-    background-color: yellow;
+    background-color: lightgreen;
 }
 
 svg.railroad-diagram text {
@@ -161,7 +161,7 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
 
 
 .markDiagramsTextHover {
-    background-color: yellow;
+    background-color: lightgreen;
     font-weight: bolder;
 }
 
