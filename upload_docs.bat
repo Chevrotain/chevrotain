@@ -1,2 +1,2 @@
-cd ../Chevrotain.github.io
+cd ../chevrotain_docs
 node scripts/upload_docs.js
