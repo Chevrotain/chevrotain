@@ -25,7 +25,7 @@ the code generation phase.
     * Backtracking support.  
 
   * **High performance** see: 
-    * [performance comparison](http://chevrotain.github.io/performance/)
+    * [performance comparison](http://sap.github.io/chevrotain/performance/)
     * [and on jsPerf](http://jsperf.com/json-parsers-comparison/10)
   
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such as automatically generated syntax diagrams or Syntactic error recovery.
@@ -200,7 +200,7 @@ The best way to start is by looking at some runable (and debugable) examples:
 * [and more](https://github.com/Chevrotain)
 
 ## Documentation
-* [Latest released version's HTML docs](http://chevrotain.github.io/documentation)
+* [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
    * Also packaged in both the github and npm releases.
    
 * Annotated source code (dev version):
