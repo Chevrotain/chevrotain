@@ -28,7 +28,7 @@ the code generation phase.
 
   * **High performance** see: 
     * [performance comparison](http://sap.github.io/chevrotain/performance/)
-    * [and on jsPerf](http://jsperf.com/json-parsers-comparison/10)
+    * [and on jsPerf](http://jsperf.com/json-parsers-comparison/13)
   
   * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such as automatically generated syntax diagrams or Syntactic error recovery.
   
