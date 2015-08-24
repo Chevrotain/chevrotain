@@ -14,8 +14,8 @@ if (!_.isEmpty(status.staged) || !_.isEmpty(status.unstaged) || !_.isEmpty(statu
 
 var branchesInfo = myRepo.getBranchesSync()
 
-if (branchesInfo.current !== 'master') {
-    console.error('Error: can only perform release job from master branch')
+if (branchesInfo.current !== 'gh-pages') {
+    console.error('Error: can only perform docs release job from gh-pages branch')
     process.exit(-1)
 }
 
@@ -48,6 +48,6 @@ wrench.copyDirSyncRecursive(orgDocsLocation, targetDocsDir)
 
 myRepo.addSync([targetDocsDir].concat([docsIndexHtmlPath]))
 myRepo.commitSync("docs for release " + version)
-myRepo.push("origin", "master", function () {
+myRepo.push("origin", "gh-pages", function () {
     console.log("finished push to branch")
 })
