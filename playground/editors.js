@@ -78,6 +78,8 @@ function onImplementationEditorContentChange() {
         }
 
         if (!editorFuncVal || !editorFuncVal.lexer || (editorFuncVal.parser && !editorFuncVal.defaultRule)) {
+            // nothing works, draw empty diagrams
+            renderSyntaxDiagrams([])
             //noinspection ExceptionCaughtLocallyJS
             throw Error("The Parser Implementation must return an object of the Type\n" +
                 "{\n" +
