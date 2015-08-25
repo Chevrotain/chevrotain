@@ -46,10 +46,10 @@ the code generation phase.
 
 Runnable (and debuggable) examples:
 
-* [Json Parser](https://github.com/Chevrotain/examples_nodejs/blob/master/jsonParser.js)
-* [Simple Calculator](https://github.com/Chevrotain/examples_nodejs/blob/master/calculator.js)
-* [ECMAScript5 Parser](https://github.com/Chevrotain/examples_ecma5_typescript/blob/master/src/ecmascript5_parser.ts)
-* [Lexer advanced features](https://github.com/Chevrotain/examples_lexer)
+* [Json Parser](https://github.com/sap/examples_nodejs_chevrotain/blob/master/jsonParser.js)
+* [Simple Calculator](https://github.com/sap/examples_nodejs_chevrotain/blob/master/calculator.js)
+* [ECMAScript5 Parser](https://github.com/sap/examples_ecma5_typescript_chevrotain/blob/master/src/ecmascript5_parser.ts)
+* [Lexer advanced features](https://github.com/sap/examples_lexer_chevrotain/)
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
