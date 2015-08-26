@@ -59,8 +59,22 @@
         <table id="resultsTable">
             <tr>
                 <td style="font-weight: bold">Parser Generator Configuration</td>
-                <td style="font-weight: bold">ops/second</td>
-                <td style="font-weight: bold">Number of Iterations</td>
+                <td style="font-weight: bold">Ops/second</td>
+            </tr>
+            <tr>
+                <td>Jison</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>pegjs</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Chevrotain</td>
+                <td></td>
+                <td></td>
             </tr>
         </table>
         <p id="fastestInResults"></p>
@@ -84,23 +98,14 @@
             }).add('Chevrotain', function () {
                 chevrotainParseWithChevrotainLexer(json_sample10k)
             }).on('cycle', function (event) {
-                console.log(String(event.target));
                 var table = document.getElementById("resultsTable");
 
-                // Create an empty <tr> element and add it to the 1st position of the table:
-                var row = table.insertRow(-1);
+                var row = table.rows[event.target.id];
+                var cell2 = row.cells[1];
 
-                // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-                var cell1 = row.insertCell(0);
-                var cell2 = row.insertCell(1);
-                var cell3 = row.insertCell(2);
-
-                cell1.innerHTML = event.target.name;
                 cell2.innerHTML = event.target.hz.toFixed(2) + "    " + "\xB1" + event.target.stats.rme.toFixed(2) + "%";
-                cell3.innerHTML = event.target.stats.sample.length + " samples ran";
             }).on('complete', function () {
                 var sFastest = 'Fastest is ' + this.filter('fastest').pluck('name');
-                console.log(sFastest);
                 document.getElementById("fastestInResults").innerHTML = sFastest;
                 window.clearInterval(dots);
                 document.getElementById("wait").innerHTML = "";
