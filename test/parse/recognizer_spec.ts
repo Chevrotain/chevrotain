@@ -14,12 +14,12 @@ namespace chevrotain.recognizer.spec {
 
     class ManyRepetitionRecovery extends Parser {
 
-        constructor(input:Token[] = []) {
-            super(input, <any>chevrotain.recognizer.spec)
+        constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
+            super(input, <any>chevrotain.recognizer.spec, isErrorRecoveryEnabled)
             Parser.performSelfAnalysis(this)
         }
 
-        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["666"] })
 
         private parseQualifiedName():string[] {
             let idents = []
@@ -38,12 +38,12 @@ namespace chevrotain.recognizer.spec {
 
     class ManySepRepetitionRecovery extends Parser {
 
-        constructor(input:Token[] = []) {
-            super(input, <any>chevrotain.recognizer.spec)
+        constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
+            super(input, <any>chevrotain.recognizer.spec, isErrorRecoveryEnabled)
             Parser.performSelfAnalysis(this)
         }
 
-        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["333"] })
 
         private parseQualifiedName():string[] {
             let idents = []
@@ -94,14 +94,38 @@ namespace chevrotain.recognizer.spec {
         }
     }
 
-    class AtLeastOneSepRepetitionRecovery extends Parser {
+    class AtLeastOneRepetitionRecovery extends Parser {
 
-        constructor(input:Token[] = []) {
-            super(input, <any>chevrotain.recognizer.spec)
+        constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
+            super(input, <any>chevrotain.recognizer.spec, isErrorRecoveryEnabled)
             Parser.performSelfAnalysis(this)
         }
 
-        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return undefined })
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["777"] })
+
+        private parseQualifiedName():string[] {
+            let idents = []
+
+            idents.push(this.CONSUME1(IdentTok).image)
+            this.AT_LEAST_ONE(isQualifiedNamePart, () => {
+                this.CONSUME1(DotTok)
+                idents.push(this.CONSUME2(IdentTok).image)
+            })
+
+            this.CONSUME1(EOF)
+
+            return idents
+        }
+    }
+
+    class AtLeastOneSepRepetitionRecovery extends Parser {
+
+        constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
+            super(input, <any>chevrotain.recognizer.spec, isErrorRecoveryEnabled)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["999"] })
 
         private parseQualifiedName():string[] {
             let idents = []
@@ -291,12 +315,30 @@ namespace chevrotain.recognizer.spec {
             expect(parser.errors.length).to.equal(1)
         })
 
+        it("can disable in-repetition recovery for MANY grammar rule", function () {
+            // a.b+.c
+            let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                new PlusTok(), new DotTok(), new IdentTok("c")]
+            let parser = new ManyRepetitionRecovery(input, false)
+            expect(parser.qualifiedName()).to.deep.equal(["666"])
+            expect(parser.errors.length).to.equal(1)
+        })
+
         it("can perform in-repetition recovery for MANY_SEP grammar rule", function () {
             // a.b+.c
             let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
                 new PlusTok(), new DotTok(), new IdentTok("c")]
             let parser = new ManySepRepetitionRecovery(input)
             expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
+            expect(parser.errors.length).to.equal(1)
+        })
+
+        it("can disable in-repetition recovery for MANY_SEP grammar rule", function () {
+            // a.b+.c
+            let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                new PlusTok(), new DotTok(), new IdentTok("c")]
+            let parser = new ManySepRepetitionRecovery(input, false)
+            expect(parser.qualifiedName()).to.deep.equal(["333"])
             expect(parser.errors.length).to.equal(1)
         })
 
@@ -309,6 +351,24 @@ namespace chevrotain.recognizer.spec {
             expect(parser.errors.length).to.equal(3)
         })
 
+        it("can perform in-repetition recovery for AT_LEAST_ONE grammar rule", function () {
+            // a.b+.c
+            let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                new PlusTok(), new DotTok(), new IdentTok("c")]
+            let parser = new AtLeastOneRepetitionRecovery(input)
+            expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
+            expect(parser.errors.length).to.equal(1)
+        })
+
+        it("can disable in-repetition recovery for AT_LEAST_ONE grammar rule", function () {
+            // a.b+.c
+            let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                new PlusTok(), new DotTok(), new IdentTok("c")]
+            let parser = new AtLeastOneRepetitionRecovery(input, false)
+            expect(parser.qualifiedName()).to.deep.equal(["777"])
+            expect(parser.errors.length).to.equal(1)
+        })
+
         it("can perform in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", function () {
             // a.b+.c
             let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
@@ -318,6 +378,14 @@ namespace chevrotain.recognizer.spec {
             expect(parser.errors.length).to.equal(1)
         })
 
+        it("can disable in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", function () {
+            // a.b+.c
+            let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
+                new PlusTok(), new DotTok(), new IdentTok("c")]
+            let parser = new AtLeastOneSepRepetitionRecovery(input, false)
+            expect(parser.qualifiedName()).to.deep.equal(["999"])
+            expect(parser.errors.length).to.equal(1)
+        })
     })
 
     describe("The BaseRecognizer", function () {

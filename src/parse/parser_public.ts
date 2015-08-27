@@ -135,6 +135,12 @@ namespace chevrotain {
 
         public errors:Error[] = []
 
+        /**
+         * This flag enables or disables error recovery (fault tolerance) of the parser.
+         * If this flag is disabled the parser will halt on the first error.
+         */
+        public isErrorRecoveryEnabled
+
         protected _input:Token[] = []
         protected inputIdx = -1
         protected isBackTrackingStack = []
@@ -154,8 +160,9 @@ namespace chevrotain {
         private optionLookaheadKeys:lang.HashTable<string>[]
         private definedRulesNames:string[] = []
 
-        constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[]) {
+        constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[], isErrorRecoveryEnabled = true) {
             this._input = input
+            this.isErrorRecoveryEnabled = isErrorRecoveryEnabled
             this.className = lang.classNameFromInstance(this)
             this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
             this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
@@ -933,7 +940,12 @@ namespace chevrotain {
                     // reSync with EOF and just output some INVALID ParseTree
                     // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
                     // path is really the most valid one
-                    let reSyncEnabled = (isFirstInvokedRule || doReSync) && !this.isBackTracking()
+                    let reSyncEnabled = isFirstInvokedRule || (
+                        doReSync
+                        && !this.isBackTracking()
+                        // if errorRecovery is disabled, the exception will be rethrown to the top rule
+                        // (isFirstInvokedRule) and there will resync to EOF and terminate.
+                        && this.isErrorRecoveryEnabled)
 
                     if (reSyncEnabled && exceptions.isRecognitionException(e)) {
                         let reSyncTokType = this.findReSyncTokenType()
@@ -1237,6 +1249,7 @@ namespace chevrotain {
             }
         }
 
+        // Implementation of parsing DSL
         private optionInternal(condition:LookAheadFunc, action:GrammarAction):boolean {
             if (condition.call(this)) {
                 action.call(this)
@@ -1245,7 +1258,6 @@ namespace chevrotain {
             return false
         }
 
-        // Implementation of parsing DSL
         private atLeastOneInternal(prodFunc:Function,
                                    prodName:string,
                                    prodOccurrence:number,
@@ -1271,8 +1283,10 @@ namespace chevrotain {
             // note that while it may seem that this can cause an error because by using a recursive call to
             // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
             // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
-                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
+            if (this.isErrorRecoveryEnabled) {
+                this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
+                    <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
+            }
         }
 
         private atLeastOneSepFirstInternal(prodFunc:Function,
@@ -1304,14 +1318,16 @@ namespace chevrotain {
                     (<GrammarAction>action).call(this)
                 }
 
-                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                        this.atLeastOneSepLookaheadKeys, interp.NextTerminalAfterAtLeastOneSepWalker],
-                    separatorLookAheadFunc,
-                    prodName,
-                    prodOccurrence,
-                    interp.NextTerminalAfterAtLeastOneSepWalker,
-                    this.atLeastOneSepLookaheadKeys)
+                if (this.isErrorRecoveryEnabled) {
+                    this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                        [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                            this.atLeastOneSepLookaheadKeys, interp.NextTerminalAfterAtLeastOneSepWalker],
+                        separatorLookAheadFunc,
+                        prodName,
+                        prodOccurrence,
+                        interp.NextTerminalAfterAtLeastOneSepWalker,
+                        this.atLeastOneSepLookaheadKeys)
+                }
             }
             else {
                 throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
@@ -1334,8 +1350,16 @@ namespace chevrotain {
             while (lookAheadFunc.call(this)) {
                 action.call(this)
             }
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action],
-                <any>lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys)
+
+            if (this.isErrorRecoveryEnabled) {
+                this.attemptInRepetitionRecovery(prodFunc,
+                    [lookAheadFunc, action],
+                    <any>lookAheadFunc
+                    , prodName,
+                    prodOccurrence,
+                    interp.NextTerminalAfterManyWalker,
+                    this.manyLookaheadKeys)
+            }
         }
 
         private manySepFirstInternal(prodFunc:Function,
@@ -1365,14 +1389,16 @@ namespace chevrotain {
                     action.call(this)
                 }
 
-                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                        this.manySepLookaheadKeys, interp.NextTerminalAfterManySepWalker],
-                    separatorLookAheadFunc,
-                    prodName,
-                    prodOccurrence,
-                    interp.NextTerminalAfterManySepWalker,
-                    this.manySepLookaheadKeys)
+                if (this.isErrorRecoveryEnabled) {
+                    this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                        [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                            this.manySepLookaheadKeys, interp.NextTerminalAfterManySepWalker],
+                        separatorLookAheadFunc,
+                        prodName,
+                        prodOccurrence,
+                        interp.NextTerminalAfterManySepWalker,
+                        this.manySepLookaheadKeys)
+                }
             }
 
             return separatorsResult
@@ -1395,14 +1421,21 @@ namespace chevrotain {
                 action.call(this)
             }
 
-            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker],
-                separatorLookAheadFunc,
-                prodName,
-                prodOccurrence,
-                nextTerminalAfterWalker,
-                laKeys)
-
+            // we can only arrive to this function after an error
+            // has occurred (hence the name 'second') so the following
+            // IF will always be entered, its possible to remove it...
+            // however it is kept to avoid confusion and be consistent.
+            /* istanbul ignore else */
+            if (this.isErrorRecoveryEnabled) {
+                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                    [prodName, prodOccurrence, separator, separatorLookAheadFunc,
+                        action, separatorsResult, laKeys, nextTerminalAfterWalker],
+                    separatorLookAheadFunc,
+                    prodName,
+                    prodOccurrence,
+                    nextTerminalAfterWalker,
+                    laKeys)
+            }
         }
 
         private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
@@ -1448,7 +1481,9 @@ namespace chevrotain {
             } catch (eFromConsumption) {
                 // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
                 // but the original syntax could have been parsed successfully without any backtracking + recovery
-                if (eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
+                if (this.isErrorRecoveryEnabled &&
+                    eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
+
                     let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
                     try {
                         return this.tryInRuleRecovery(tokClass, follows)
@@ -1477,7 +1512,7 @@ namespace chevrotain {
             }
         }
 
-        // to enable opimizations this logic has been extract to a method as its caller method contains try/catch
+        // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
         private consumeInternalOptimized(tokClass:Function):Token {
             let nextToken = this.NEXT_TOKEN()
             if (this.NEXT_TOKEN() instanceof tokClass) {
@@ -1492,7 +1527,6 @@ namespace chevrotain {
         }
 
         private getKeyForAutomaticLookahead(prodName:string, prodKeys:lang.HashTable<string>[], occurrence:number):string {
-
             let occuMap = prodKeys[occurrence - 1]
             let currRule = _.last(this.RULE_STACK)
             let key = occuMap[currRule]
