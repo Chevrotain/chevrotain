@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.2 - 2015-08-24 */
+/*! chevrotain - v0.5.3 - 2015-08-28 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -226,6 +226,11 @@ declare module chevrotain {
         static DEFER_DEFINITION_ERRORS_HANDLING: boolean;
         protected static performSelfAnalysis(classInstance: Parser): void;
         errors: Error[];
+        /**
+         * This flag enables or disables error recovery (fault tolerance) of the parser.
+         * If this flag is disabled the parser will halt on the first error.
+         */
+        isErrorRecoveryEnabled: any;
         protected _input: Token[];
         protected inputIdx: number;
         protected isBackTrackingStack: any[];
@@ -247,7 +252,7 @@ declare module chevrotain {
         private definedRulesNames;
         constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
-        } | Function[]);
+        } | Function[], isErrorRecoveryEnabled?: boolean);
         input: Token[];
         reset(): void;
         isAtEndOfInput(): boolean;
