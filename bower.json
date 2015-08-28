@@ -4,7 +4,7 @@
   "description": "Chevrotain is a high performance fault Tolerant Javascript parsing DSL for building recursive decent parsers",
   "main": "release/chevrotain.js",
   "dependencies": {
-    "lodash": "^3.10.0"
+    "lodash": "^3.10.1"
   },
   "devDependencies": {},
   "moduleType": [
