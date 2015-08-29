@@ -1,4 +1,3 @@
-
 function markInputErrors(lexErrors, parseErrors) {
     var start, end, marker
     _.forEach(inputEditorMarkers, function (currMarker) {
@@ -8,7 +7,10 @@ function markInputErrors(lexErrors, parseErrors) {
 
     _.forEach(lexErrors, function (currLexError) {
         start = {line: currLexError.line - 1, ch: currLexError.column - 1}
-        end = {line: currLexError.line - 1, ch: currLexError.column - 1 + currLexError.length}
+        end = {
+            line: currLexError.line - 1,
+            ch  : currLexError.column - 1 + currLexError.length
+        }
         marker = inputEditor.markText(start, end, {
             className: "markTextError",
             title    : currLexError.message
@@ -17,8 +19,14 @@ function markInputErrors(lexErrors, parseErrors) {
     })
 
     _.forEach(parseErrors, function (currParserError) {
-        start = {line: currParserError.token.startLine - 1, ch: currParserError.token.startColumn - 1}
-        end = {line: currParserError.token.endLine - 1, ch: currParserError.token.endColumn}
+        start = {
+            line: currParserError.token.startLine - 1,
+            ch  : currParserError.token.startColumn - 1
+        }
+        end = {
+            line: currParserError.token.endLine - 1,
+            ch  : currParserError.token.endColumn
+        }
         marker = inputEditor.markText(start, end, {
             className: "markTextError",
             title    : currParserError.message
@@ -199,7 +207,7 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
             break
         case chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
-            return locateUnresolvedSubruleRef(parserImplText, ruleText, parseErr.unresolvedRefName, positionHelper)
+            return locateSubruleRef(parserImplText, parseErr.unresolvedRefName, positionHelper, ruleText)
             break
         default:
             throw new Error("none exhaustive match ->" + parseErr.type + "<-")
@@ -237,19 +245,22 @@ function locateRuleDefinition(ruleName, text, positionHelper) {
 
 /**
  * @param {string} fullText - the full text to search in.
- * @param {string} ruleText - a subset of the full text to search in
  * @param {string} unresolvedRefName - the name of the unresolved
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
+ * @param {string} [ruleText=fullText] - a subset of the full text to search in. by default will look in ALL the text.
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateUnresolvedSubruleRef(fullText, ruleText, unresolvedRefName, positionHelper) {
+function locateSubruleRef(fullText, unresolvedRefName, positionHelper, ruleText) {
+    if (ruleText === undefined) {
+        ruleText = fullText
+    }
     var ruleTextStartOffset = fullText.indexOf(ruleText)
     // the capturing group for the '.rule(' part of the seekerRegExp
     var patternPrefixGroup = 1
     var patternRuleRefGroup = 2
-    var soughtPattern = "(\\.SUBRULE(?:\\d)?\\s*\\(.*)(" + unresolvedRefName + ")"
+    var soughtPattern = "(\\.SUBRULE(?:\\d)?\\s*\\(.*)(" + unresolvedRefName + ")\\W"
     var seekerRegExp = new RegExp(soughtPattern, "g")
 
     var unresolvedRefPos = []

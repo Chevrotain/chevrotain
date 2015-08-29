@@ -1,4 +1,3 @@
-
 function attachHighlightEvents() {
     var diagramHeaders = $(".diagramHeader")
     _.forEach(diagramHeaders, function (header) {
@@ -7,18 +6,50 @@ function attachHighlightEvents() {
         header.addEventListener("click", onDiagramHeaderMouseClick)
     })
 
-    var noneTerminals = $(".non-terminal")
+    var noneTerminals = $(".non-terminal text")
     _.forEach(noneTerminals, function (nonTerminal) {
         nonTerminal.addEventListener("mouseover", onDiagramNonTerminalMouseOver)
         nonTerminal.addEventListener("mouseout", onDiagramNonTerminalMouseOut)
     })
 }
 
+var usageMarkers = []
+var headerImplTextMarker = null
+function markUsagesAndDefsInTextEditor(ruleName) {
+    clearUsagesAndDefsInTextEditor()
+
+    var textUsages = locateSubruleRef(javaScriptEditor.getValue(), ruleName, javaScriptEditor)
+    usageMarkers = _.map(textUsages, function (currTextUsagePos) {
+        return javaScriptEditor.markText(currTextUsagePos.start, currTextUsagePos.end, {
+            className: "markDiagramsUsageTextHover"
+        })
+    })
+
+    var definitionPos = locateRuleDefinition(ruleName, javaScriptEditor.getValue(), javaScriptEditor)
+    var pos = _.first(definitionPos)
+    headerImplTextMarker = javaScriptEditor.markText(pos.start, pos.end, {
+        className: "markDiagramsTextHover"
+    })
+}
+
+function clearUsagesAndDefsInTextEditor() {
+    _.forEach(usageMarkers, function (currMarker) {
+        currMarker.clear();
+    })
+    usageMarkers = []
+
+    if (headerImplTextMarker) {
+        headerImplTextMarker.clear()
+    }
+}
+
 
 function onDiagramNonTerminalMouseOver(mouseEvent) {
-    var rectsAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
-    $(rectsAndHeader.rects).toggleClass("diagramRectUsage")
-    $(rectsAndHeader.header).toggleClass("diagramHeaderDef")
+    var rectsHeaderAndRuleName = getUsageRectAndDefHeader(mouseEvent.target)
+    $(rectsHeaderAndRuleName.rects).toggleClass("diagramRectUsage")
+    $(rectsHeaderAndRuleName.header).toggleClass("diagramHeaderDef")
+
+    markUsagesAndDefsInTextEditor(rectsHeaderAndRuleName.ruleName)
 }
 
 
@@ -26,10 +57,11 @@ function onDiagramNonTerminalMouseOut(mouseEvent) {
     var rectAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
     $(rectAndHeader.rects).toggleClass("diagramRectUsage")
     $(rectAndHeader.header).toggleClass("diagramHeaderDef")
+
+    clearUsagesAndDefsInTextEditor()
 }
 
 
-var headerImplTextMarker = null
 function onDiagramHeaderMouseOver(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
     $(mouseEvent.target).toggleClass("diagramHeaderDef")
@@ -37,11 +69,7 @@ function onDiagramHeaderMouseOver(mouseEvent) {
         $(rect).toggleClass("diagramRectUsage")
     })
 
-    var definitionPos = locateRuleDefinition(definitionName, javaScriptEditor.getValue(), javaScriptEditor)
-    var pos = _.first(definitionPos)
-    headerImplTextMarker = javaScriptEditor.markText(pos.start, pos.end, {
-        className: "markDiagramsTextHover"
-    })
+    markUsagesAndDefsInTextEditor(definitionName)
 }
 
 
@@ -51,7 +79,8 @@ function onDiagramHeaderMouseOut(mouseEvent) {
     _.forEach(getUsageSvgRect(definitionName), function (rect) {
         $(rect).toggleClass("diagramRectUsage")
     })
-    headerImplTextMarker.clear()
+
+    clearUsagesAndDefsInTextEditor()
 }
 
 
@@ -76,22 +105,14 @@ function getUsageSvgRect(definitionName) {
 
 function getUsageRectAndDefHeader(target) {
     var rects, text
-    if (target instanceof SVGRectElement) {
-        // only mark usages/def on the text
-        // TODO: maybe the code can be refactored and simplified now that we only care about the text?
-        // i.e add event listeners on more specific dom nodes.
-        return {rects: [], header: undefined}
-    }
-    else {
-        text = target.innerHTML
-        rects = $("g:contains('"+ text + "') .non-terminal rect")
+    text = target.innerHTML
+    rects = getUsageSvgRect(text)
 
-    }
     var header = _.find($(".diagramHeader"), function (currHeader) {
         return currHeader.innerHTML === text
     })
 
-    return {rects: rects, header: header}
+    return {rects: rects, header: header, ruleName: text}
 }
 
 
