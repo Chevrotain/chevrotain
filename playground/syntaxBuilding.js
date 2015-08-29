@@ -19,21 +19,37 @@ function definitionsToSubDiagrams(definitions, topRuleName) {
 
 /**
  * @param {chevrotain.gast.Terminal} prod
+ * @param {string} topRuleName
+ * @param {string} dslRuleName
  *
  * @return {RailRoadDiagram.Terminal}
  */
-function createTerminalFromGastProd(prod) {
-    return Terminal(chevrotain.tokenName(prod.terminalType), undefined, prod.terminalType.PATTERN.source)
+function createTerminalFromGastProd(prod, topRuleName, dslRuleName) {
+    return Terminal(chevrotain.tokenName(prod.terminalType),
+        undefined,
+        prod.terminalType.PATTERN.source,
+        prod.occurrenceInParent,
+        topRuleName,
+        dslRuleName
+    )
 }
 
 
 /**
  * @param {function} tokenConstructor
+ * @param {number} occurrenceInParent
+ * @param {string} topRuleName
+ * @param {string} dslRuleName
  *
  * @return {RailRoadDiagram.Terminal}
  */
-function createTerminalFromToken(tokenConstructor) {
-    var result = Terminal(chevrotain.tokenName(tokenConstructor), undefined, tokenConstructor.PATTERN.source)
+function createTerminalFromToken(tokenConstructor, occurrenceInParent, topRuleName, dslRuleName) {
+    var result = Terminal(chevrotain.tokenName(tokenConstructor),
+        undefined,
+        tokenConstructor.PATTERN.source,
+        occurrenceInParent,
+        topRuleName,
+        dslRuleName)
     return result
 }
 
@@ -41,6 +57,7 @@ function createTerminalFromToken(tokenConstructor) {
 /**
  *
  * @param prod
+ * @param topRuleName
  *
  * @returns {*}
  */
@@ -67,7 +84,7 @@ function convertProductionToDiagram(prod, topRuleName) {
                 return Optional(_.first(subDiagrams))
             }
             else {
-                throw new Error("Empty Optional production, WTF!")
+                throw Error("Empty Optional production, WTF!")
             }
         }
         else if (prod instanceof chevrotain.gast.Repetition) {
@@ -78,7 +95,7 @@ function convertProductionToDiagram(prod, topRuleName) {
                 return ZeroOrMore(_.first(subDiagrams))
             }
             else {
-                throw new Error("Empty Optional production, WTF!")
+                throw Error("Empty Optional production, WTF!")
             }
         }
         else if (prod instanceof chevrotain.gast.Alternation) {
@@ -93,32 +110,34 @@ function convertProductionToDiagram(prod, topRuleName) {
                 return OneOrMore(_.first(subDiagrams))
             }
             else {
-                throw new Error("Empty Optional production, WTF!")
+                throw Error("Empty Optional production, WTF!")
             }
         }
         else if (prod instanceof chevrotain.gast.RepetitionWithSeparator) {
             if (subDiagrams.length > 0) {
                 // MANY_SEP(separator, definition) === (definition (separator definition)*)?
                 return Optional(Sequence.apply(this, subDiagrams.concat(
-                    [ZeroOrMore(Sequence.apply(this, [createTerminalFromToken(prod.separator)].concat(subDiagrams)))])))
+                    [ZeroOrMore(Sequence.apply(this,
+                        [createTerminalFromToken(prod.separator, prod.occurrenceInParent ,topRuleName, "many_sep")].concat(subDiagrams)))])))
             }
             else {
-                throw new Error("Empty Optional production, WTF!")
+                throw Error("Empty Optional production, WTF!")
             }
         }
         else if (prod instanceof chevrotain.gast.RepetitionMandatoryWithSeparator) {
             if (subDiagrams.length > 0) {
                 // AT_LEAST_ONE_SEP(separator, definition) === definition (separator definition)*
                 return Sequence.apply(this, subDiagrams.concat(
-                    [ZeroOrMore(Sequence.apply(this, [createTerminalFromToken(prod.separator)].concat(subDiagrams)))]))
+                    [ZeroOrMore(Sequence.apply(this,
+                        [createTerminalFromToken(prod.separator, prod.occurrenceInParent, topRuleName, "at_least_one_sep")].concat(subDiagrams)))]))
             }
             else {
-                throw new Error("Empty Optional production, WTF!")
+                throw Error("Empty Optional production, WTF!")
             }
         }
     }
     else if (prod instanceof chevrotain.gast.Terminal) {
-        return createTerminalFromGastProd(prod)
+        return createTerminalFromGastProd(prod, topRuleName, "consume")
     }
     else {
         throw Error("non exhaustive match")

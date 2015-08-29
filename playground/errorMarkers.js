@@ -216,48 +216,58 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
 }
 
 
+var locateRuleDefinition = _.partial(locateGrammarDefinition, "RULE")
+var locateTokenDefinition = _.partial(locateGrammarDefinition, "extendToken")
+
 /**
- * @param {string} ruleName - the name of the rule whose definition we are seeking in the text.
+ * @param {string} dslName - the chevrotain DSL name to look for (CONSUME/SUBRULE normally)
+ * @param {string} paramName - the name of the rule whose definition we are seeking in the text.
  * @param {string} text - the text to search in.
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateRuleDefinition(ruleName, text, positionHelper) {
+function locateGrammarDefinition(dslName, paramName, text, positionHelper) {
     var patternPrefixGroup = 1
     var patternRuleNameGroup = 2
-    var soughtPattern = "(\\.RULE\\s*\\(\\s*)(['\"]" + ruleName + "['\"])"
+    var soughtPattern = "(" + dslName + "\\s*\\(\\s*)(['\"]" + paramName + "['\"])"
     var seekerRegExp = RegExp(soughtPattern, "g")
 
-    var ruleDefPositions = []
+    var found = []
     var execResult
     while ((execResult = seekerRegExp.exec(text))) {
         var startOffset = execResult.index + execResult[patternPrefixGroup].length
         var endOffset = startOffset + execResult[patternRuleNameGroup].length
         var startPos = positionHelper.posFromIndex(startOffset)
         var endPos = positionHelper.posFromIndex(endOffset)
-        ruleDefPositions.push({start: startPos, end: endPos})
+        found.push({start: startPos, end: endPos})
     }
 
-    return ruleDefPositions
+    return found
 }
 
 
+var locateSubruleRef = _.partial(locateGrammarUsage, "SUBRULE")
+var locateConsume = _.partial(locateGrammarUsage, "CONSUME")
+var locateManySepSeparator = _.partial(locateGrammarUsage, "MANY_SEP")
+var locateAtLeastOneSepSeparator = _.partial(locateGrammarUsage, "AT_LEAST_ONE_SEP")
+
 /**
+ * @param {string} dslName - the chevrotain DSL name to look for (CONSUME/SUBRULE normally)
  * @param {string} fullText - the full text to search in.
- * @param {string} subRuleName - the name of the unresolved
+ * @param {string} paramName - the name of the parameter for the DSL (CONSUME(XXX))
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
- * @param {string} [ruleText=fullText] - a subset of the full text to search in. by default will look in ALL the text.
- * @param {string} occurrenceIdx - a string which is a number between 1-5. This is the index
+ * @param {string} [text=fullText] - a subset of the full text to search in. by default will look in ALL the text.
+ * @param {string} [occurrenceIdx] - a string which is a number between 1-5. This is the index
  *                                 of the SUBRULE[1-5]?(....)
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateSubruleRef(fullText, subRuleName, positionHelper, ruleText, occurrenceIdx) {
-    if (ruleText === undefined) {
-        ruleText = fullText
+function locateGrammarUsage(dslName, fullText, paramName, positionHelper, text, occurrenceIdx) {
+    if (text === undefined) {
+        text = fullText
     }
 
     if (occurrenceIdx === undefined) {
@@ -268,24 +278,24 @@ function locateSubruleRef(fullText, subRuleName, positionHelper, ruleText, occur
     if (occurrenceIdx === "1") {
         occurrenceIdx = '1?'
     }
-    var ruleTextStartOffset = fullText.indexOf(ruleText)
+    var textStartOffset = fullText.indexOf(text)
     // the capturing group for the '.rule(' part of the seekerRegExp
     var patternPrefixGroup = 1
     var patternRuleRefGroup = 2
-    var soughtPattern = "(\\.SUBRULE" + occurrenceIdx + "\\s*\\(.*)(" + subRuleName + ")\\W"
+    var soughtPattern = "(\\." + dslName + occurrenceIdx + "\\s*\\(.*)(" + paramName + ")\\W"
     var seekerRegExp = RegExp(soughtPattern, "g")
 
-    var unresolvedRefPos = []
+    var found = []
     var execResult
-    while ((execResult = seekerRegExp.exec(ruleText))) {
-        var startOffset = ruleTextStartOffset + execResult.index + execResult[patternPrefixGroup].length
+    while ((execResult = seekerRegExp.exec(text))) {
+        var startOffset = textStartOffset + execResult.index + execResult[patternPrefixGroup].length
         var endOffset = startOffset + execResult[patternRuleRefGroup].length
         var startPos = positionHelper.posFromIndex(startOffset)
         var endPos = positionHelper.posFromIndex(endOffset)
-        unresolvedRefPos.push({start: startPos, end: endPos})
+        found.push({start: startPos, end: endPos})
     }
 
-    return unresolvedRefPos
+    return found
 }
 
 

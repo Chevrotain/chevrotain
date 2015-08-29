@@ -136,6 +136,12 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
     stroke: 5;
 }
 
+svg.railroad-diagram g.terminal rect.diagramRectUsage {
+    color: green;
+    fill: yellow;
+    stroke: 5;
+}
+
 .markEvalError {
     font-size: 1.2em;
     font-weight: bolder;
@@ -177,6 +183,10 @@ svg.railroad-diagram g.non-terminal rect.diagramRectUsage {
 
 svg {
     width: 100%;
+}
+
+svg.railroad-diagram text {
+    cursor: pointer;
 }
 
 .CodeMirror-vscrollbar {
