@@ -28,6 +28,7 @@ function onDiagramNonTerminalMouseOut(mouseEvent) {
     $(rectAndHeader.header).toggleClass("diagramHeaderDef")
 }
 
+
 var headerImplTextMarker = null
 function onDiagramHeaderMouseOver(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
@@ -82,8 +83,9 @@ function getUsageRectAndDefHeader(target) {
         return {rects: [], header: undefined}
     }
     else {
-        rects = $(target).siblings("rect")
         text = target.innerHTML
+        rects = $("g:contains('"+ text + "') .non-terminal rect")
+
     }
     var header = _.find($(".diagramHeader"), function (currHeader) {
         return currHeader.innerHTML === text
