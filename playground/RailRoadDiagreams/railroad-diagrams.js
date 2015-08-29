@@ -548,11 +548,13 @@ At runtime, these constants can be found on the Diagram class.
 		return this;
 	}
 
-	function NonTerminal(text, href) {
-		if(!(this instanceof NonTerminal)) return new NonTerminal(text, href);
+	function NonTerminal(text, href, occurrenceIdx, topRuleName) {
+		if(!(this instanceof NonTerminal)) return new NonTerminal(text, href, occurrenceIdx, topRuleName);
 		FakeSVG.call(this, 'g', {'class': 'non-terminal'});
 		this.text = text;
 		this.href = href;
+		this.occurrenceIdx = occurrenceIdx;
+		this.topRuleName = topRuleName
 		this.width = text.length * 8 + 20;
 		this.height = 0;
 		this.offsetX = 0;
@@ -569,7 +571,8 @@ At runtime, these constants can be found on the Diagram class.
 		x += gaps[0];
 
 		FakeSVG('rect', {x:x, y:y-11, width:this.width, height:this.up+this.down}).addTo(this);
-		var text = FakeSVG('text', {x:x+this.width/2, y:y+4}, this.text);
+		var text = FakeSVG('text', {x:x+this.width/2, y:y+4,
+			occurrenceIdx:this.occurrenceIdx, topRuleName:this.topRuleName}, this.text);
 		if(this.href)
 			FakeSVG('a', {'xlink:href': this.href}, [text]).addTo(this);
 		else

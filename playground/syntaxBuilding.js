@@ -2,16 +2,16 @@ function renderSyntaxDiagrams(topRules) {
     diagramsDiv.innerHTML = ""
     diagramsDiv.innerHTML += diagramsHeaderOrgHtml
     _.forEach(topRules, function (production) {
-        var currDiagramHtml = convertProductionToDiagram(production)
+        var currDiagramHtml = convertProductionToDiagram(production, production.name)
         diagramsDiv.innerHTML += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
     })
     attachHighlightEvents()
 }
 
 
-function definitionsToSubDiagrams(definitions) {
+function definitionsToSubDiagrams(definitions, topRuleName) {
     var subDiagrams = _.map(definitions, function (subProd) {
-        return convertProductionToDiagram(subProd)
+        return convertProductionToDiagram(subProd, topRuleName)
     })
     return subDiagrams
 }
@@ -44,15 +44,15 @@ function createTerminalFromToken(tokenConstructor) {
  *
  * @returns {*}
  */
-function convertProductionToDiagram(prod) {
+function convertProductionToDiagram(prod, topRuleName) {
 
     if (prod instanceof chevrotain.gast.NonTerminal) {
         // must handle NonTerminal separately from the other AbstractProductions as we do not want to expand the subDefinition
         // of a reference and cause infinite loops
-        return NonTerminal(prod.nonTerminalName)
+        return NonTerminal(prod.nonTerminalName, undefined, prod.occurrenceInParent, topRuleName)
     }
     else if (!(prod instanceof chevrotain.gast.Terminal)) {
-        var subDiagrams = definitionsToSubDiagrams(prod.definition)
+        var subDiagrams = definitionsToSubDiagrams(prod.definition, topRuleName)
         if (prod instanceof chevrotain.gast.Rule) {
             return Diagram.apply(this, subDiagrams)
         }

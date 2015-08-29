@@ -10,6 +10,8 @@ function attachHighlightEvents() {
     _.forEach(noneTerminals, function (nonTerminal) {
         nonTerminal.addEventListener("mouseover", onDiagramNonTerminalMouseOver)
         nonTerminal.addEventListener("mouseout", onDiagramNonTerminalMouseOut)
+        nonTerminal.addEventListener("click", onDiagramNonTerminalMouseClick)
+
     })
 }
 
@@ -59,6 +61,19 @@ function onDiagramNonTerminalMouseOut(mouseEvent) {
     $(rectAndHeader.header).toggleClass("diagramHeaderDef")
 
     clearUsagesAndDefsInTextEditor()
+}
+
+function onDiagramNonTerminalMouseClick(mouseEvent) {
+    var ruleName = mouseEvent.target.innerHTML
+    var occurrenceIdx = mouseEvent.target.getAttribute("occurrenceidx")
+    var topRuleName = mouseEvent.target.getAttribute("toprulename")
+    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
+
+    var usagePos = locateSubruleRef(javaScriptEditor.getValue(), ruleName, javaScriptEditor, topRuleText, occurrenceIdx)
+    var pos = _.first(usagePos)
+    center(pos.start.line)
+    javaScriptEditor.focus()
+    javaScriptEditor.setCursor(pos.start)
 }
 
 

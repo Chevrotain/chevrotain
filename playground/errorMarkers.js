@@ -142,7 +142,7 @@ function locateRegExpLiteral(regExp, text, positionHelper, times) {
  */
 function locateExtendTokenPos(tokenClass, text, positionHelper) {
     var tokenName = chevrotain.tokenName(tokenClass)
-    var extendRegExp = new RegExp("extendToken\\s*\\(\\s*('|\")" + tokenName)
+    var extendRegExp = RegExp("extendToken\\s*\\(\\s*('|\")" + tokenName)
     var execResult = extendRegExp.exec(text)
 
     if (!execResult) {
@@ -207,10 +207,11 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
             break
         case chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            //noinspection JSUnresolvedVariable
             return locateSubruleRef(parserImplText, parseErr.unresolvedRefName, positionHelper, ruleText)
             break
         default:
-            throw new Error("none exhaustive match ->" + parseErr.type + "<-")
+            throw Error("none exhaustive match ->" + parseErr.type + "<-")
     }
 }
 
@@ -227,7 +228,7 @@ function locateRuleDefinition(ruleName, text, positionHelper) {
     var patternPrefixGroup = 1
     var patternRuleNameGroup = 2
     var soughtPattern = "(\\.RULE\\s*\\(\\s*)(['\"]" + ruleName + "['\"])"
-    var seekerRegExp = new RegExp(soughtPattern, "g")
+    var seekerRegExp = RegExp(soughtPattern, "g")
 
     var ruleDefPositions = []
     var execResult
@@ -245,23 +246,34 @@ function locateRuleDefinition(ruleName, text, positionHelper) {
 
 /**
  * @param {string} fullText - the full text to search in.
- * @param {string} unresolvedRefName - the name of the unresolved
+ * @param {string} subRuleName - the name of the unresolved
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  * @param {string} [ruleText=fullText] - a subset of the full text to search in. by default will look in ALL the text.
+ * @param {string} occurrenceIdx - a string which is a number between 1-5. This is the index
+ *                                 of the SUBRULE[1-5]?(....)
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateSubruleRef(fullText, unresolvedRefName, positionHelper, ruleText) {
+function locateSubruleRef(fullText, subRuleName, positionHelper, ruleText, occurrenceIdx) {
     if (ruleText === undefined) {
         ruleText = fullText
+    }
+
+    if (occurrenceIdx === undefined) {
+        occurrenceIdx = '\\d?'
+    }
+
+    // occurrenceIdx 1 may be implicit
+    if (occurrenceIdx === "1") {
+        occurrenceIdx = '1?'
     }
     var ruleTextStartOffset = fullText.indexOf(ruleText)
     // the capturing group for the '.rule(' part of the seekerRegExp
     var patternPrefixGroup = 1
     var patternRuleRefGroup = 2
-    var soughtPattern = "(\\.SUBRULE(?:\\d)?\\s*\\(.*)(" + unresolvedRefName + ")\\W"
-    var seekerRegExp = new RegExp(soughtPattern, "g")
+    var soughtPattern = "(\\.SUBRULE" + occurrenceIdx + "\\s*\\(.*)(" + subRuleName + ")\\W"
+    var seekerRegExp = RegExp(soughtPattern, "g")
 
     var unresolvedRefPos = []
     var execResult
@@ -292,7 +304,7 @@ function locateDuplicateProductions(fullText, ruleText, dupError, positionHelper
     var parameterPart = dupError.parameter ? '\\s*\\(\\s*.*' + dupError.parameter + '\\s*\\)' : ''
 
     var soughtPattern = dslNameWithOccurrence + parameterPart
-    var seekerRegExp = new RegExp(soughtPattern, "g")
+    var seekerRegExp = RegExp(soughtPattern, "g")
 
     var unresolvedRefPos = []
     var execResult
