@@ -165,7 +165,6 @@ svg.railroad-diagram g.terminal rect.diagramRectUsage {
     overflow: hidden;
 }
 
-
 .markDiagramsTextHover {
     background-color: lightgreen;
     font-weight: bolder;
@@ -174,6 +173,12 @@ svg.railroad-diagram g.terminal rect.diagramRectUsage {
 .markDiagramsUsageTextHover {
     background-color: yellow;
     font-weight: bolder;
+}
+
+.markSelectedDiagramsUsageTextHover {
+    background-color: yellow;
+    font-weight: bolder;
+    text-decoration: underline;
 }
 
 .card {

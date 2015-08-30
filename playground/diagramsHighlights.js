@@ -25,11 +25,11 @@ var usageMarkers = []
 // we only need one but this simplifies the logic (at the cost of redundant work...)
 var definitionTextMarkers = []
 
-
 var markNonTerminalsUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateSubruleRef, locateRuleDefinition)
 var markTerminalsConsumeUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateConsume, locateTokenDefinition)
 var markTerminalsManySepUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateManySepSeparator, locateTokenDefinition)
 var markTerminalsAtLeastOneUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateAtLeastOneSepSeparator, locateTokenDefinition)
+
 
 function markUsagesAndDefsInTextEditor(ruleName, usagesLocatorFunc, definitionLocatorFunc) {
     var textUsages = usagesLocatorFunc(javaScriptEditor.getValue(), ruleName, javaScriptEditor)
@@ -47,6 +47,7 @@ function markUsagesAndDefsInTextEditor(ruleName, usagesLocatorFunc, definitionLo
     }))
 }
 
+
 function clearUsagesAndDefsInTextEditor() {
     _.forEach(usageMarkers, function (currMarker) {
         currMarker.clear();
@@ -60,6 +61,43 @@ function clearUsagesAndDefsInTextEditor() {
     definitionTextMarkers = []
 }
 
+
+function getMatchingNonTerminalPositionsInText(textNode) {
+    var ruleName = textNode.innerHTML
+    var occurrenceIdx = textNode.getAttribute("occurrenceidx")
+    var topRuleName = textNode.getAttribute("toprulename")
+    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
+
+    var positions = locateSubruleRef(javaScriptEditor.getValue(), ruleName, javaScriptEditor, topRuleText, occurrenceIdx)
+
+    return positions;
+}
+
+
+function getMatchingTerminalPositionsInText(textNode) {
+    var terminalName = textNode.innerHTML
+    var occurrenceIdx = textNode.getAttribute("occurrenceidx")
+    var dslRule = textNode.getAttribute("dslrulename")
+    var topRuleName = textNode.getAttribute("toprulename")
+    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
+
+    var positions
+    switch (dslRule) {
+        case "consume":
+            positions = locateConsume(javaScriptEditor.getValue(), terminalName, javaScriptEditor, topRuleText, occurrenceIdx)
+            break
+        case "many_sep":
+            positions = locateManySepSeparator(javaScriptEditor.getValue(), terminalName, javaScriptEditor, topRuleText, occurrenceIdx)
+            break
+        case "at_least_one_sep":
+            positions = locateAtLeastOneSepSeparator(javaScriptEditor.getValue(), terminalName, javaScriptEditor, topRuleText, occurrenceIdx)
+            break
+    }
+
+    return positions;
+}
+
+
 function onDiagramTerminalMouseOver(mouseEvent) {
     var terminalName = mouseEvent.target.innerHTML
     var rects = getUsageSvgRect(terminalName, ".terminal")
@@ -67,36 +105,30 @@ function onDiagramTerminalMouseOver(mouseEvent) {
     markTerminalsConsumeUsagesAndDefs(terminalName)
     markTerminalsManySepUsagesAndDefs(terminalName)
     markTerminalsAtLeastOneUsagesAndDefs(terminalName)
+
+    // marking the matching text for the diagram we are hovering over
+    // more explicitly with underline. This is done do differentiate it from
+    // other usage markers in the text.
+    var usagePositions = getMatchingTerminalPositionsInText(mouseEvent.target)
+    var pos = _.first(usagePositions)
+    definitionTextMarkers.push(javaScriptEditor.markText(pos.start, pos.end, {
+        className: "markSelectedDiagramsUsageTextHover"
+    }))
 }
 
 function onDiagramTerminalMouseOut(mouseEvent) {
     var terminalName = mouseEvent.target.innerHTML
     var rects = getUsageSvgRect(terminalName, ".terminal")
+    $(mouseEvent.target).toggleClass("textHover")
     $(rects).toggleClass("diagramRectUsage")
     clearUsagesAndDefsInTextEditor()
 }
 
+
 function onDiagramTerminalMouseClick(mouseEvent) {
-    var terminalName = mouseEvent.target.innerHTML
-    var occurrenceIdx = mouseEvent.target.getAttribute("occurrenceidx")
-    var dslRule = mouseEvent.target.getAttribute("dslrulename")
-    var topRuleName = mouseEvent.target.getAttribute("toprulename")
-    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
+    var usagePositions = getMatchingTerminalPositionsInText(mouseEvent.target)
 
-    var usagePos
-    switch (dslRule) {
-        case "consume":
-            usagePos = locateConsume(javaScriptEditor.getValue(), terminalName, javaScriptEditor, topRuleText, occurrenceIdx)
-            break
-        case "many_sep":
-            usagePos = locateManySepSeparator(javaScriptEditor.getValue(), terminalName, javaScriptEditor, topRuleText, occurrenceIdx)
-            break
-        case "at_least_one_sep":
-            usagePos = locateAtLeastOneSepSeparator(javaScriptEditor.getValue(), terminalName, javaScriptEditor, topRuleText, occurrenceIdx)
-            break
-    }
-
-    var pos = _.first(usagePos)
+    var pos = _.first(usagePositions)
     center(pos.start.line)
     javaScriptEditor.focus()
     javaScriptEditor.setCursor(pos.start)
@@ -109,6 +141,15 @@ function onDiagramNonTerminalMouseOver(mouseEvent) {
     $(rectsHeaderAndRuleName.header).toggleClass("diagramHeaderDef")
 
     markNonTerminalsUsagesAndDefs(rectsHeaderAndRuleName.ruleName)
+
+    // marking the matching text for the diagram we are hovering over
+    // more explicitly with underline. This is done do differentiate it from
+    // other usage markers in the text.
+    var usagePositions = getMatchingNonTerminalPositionsInText(mouseEvent.target)
+    var pos = _.first(usagePositions)
+    definitionTextMarkers.push(javaScriptEditor.markText(pos.start, pos.end, {
+        className: "markSelectedDiagramsUsageTextHover"
+    }))
 }
 
 
@@ -120,14 +161,10 @@ function onDiagramNonTerminalMouseOut(mouseEvent) {
     clearUsagesAndDefsInTextEditor()
 }
 
-function onDiagramNonTerminalMouseClick(mouseEvent) {
-    var ruleName = mouseEvent.target.innerHTML
-    var occurrenceIdx = mouseEvent.target.getAttribute("occurrenceidx")
-    var topRuleName = mouseEvent.target.getAttribute("toprulename")
-    var topRuleText = parser.getGAstProductions().get(topRuleName).orgText
 
-    var usagePos = locateSubruleRef(javaScriptEditor.getValue(), ruleName, javaScriptEditor, topRuleText, occurrenceIdx)
-    var pos = _.first(usagePos)
+function onDiagramNonTerminalMouseClick(mouseEvent) {
+    var positions = getMatchingNonTerminalPositionsInText(mouseEvent.target)
+    var pos = _.first(positions)
     center(pos.start.line)
     javaScriptEditor.focus()
     javaScriptEditor.setCursor(pos.start)
