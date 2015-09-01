@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
-[![npm](https://img.shields.io/npm/v/npm.svg)](https://npmjs.org/package/chevrotain)
+[![npm version](https://badge.fury.io/js/chevrotain.svg)](http://badge.fury.io/js/chevrotain)
 
 # Chevrotain
 
