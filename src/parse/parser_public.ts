@@ -1606,14 +1606,14 @@ namespace chevrotain {
         }
 
         private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
-            let errSuffix = " but found '" + this.NEXT_TOKEN().image + "'"
+            let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
             if (errMsgTypes === undefined) {
                 let ruleName = _.last(this.RULE_STACK)
                 let ruleGrammar = this.getGAstProductions().get(ruleName)
                 let nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
                 let nextTokensFlat = _.flatten(nextTokens)
                 let nextTokensNames = _.map(nextTokensFlat, (currTokenClass:Function) => tokenName(currTokenClass))
-                errMsgTypes = `one of: <${nextTokensNames.join(" ,")}}>`
+                errMsgTypes = `one of: <${nextTokensNames.join(" ,")}>`
             }
             throw this.SAVE_ERROR(new exceptions.NoViableAltException(`expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
         }
