@@ -263,7 +263,7 @@ function calculatorExample() {
                 // appears in the "lowest" leaf in the expression ParseTree.
                 {ALT: function(){ return $.SUBRULE($.parenthesisExpression)}},
                 {ALT: function(){ return parseInt($.CONSUME(NumberLiteral).image, 10)}}
-            ], "a number or parenthesis expression");
+            ]);
             // @formatter:on
         });
 
@@ -429,7 +429,7 @@ function tutorialGrammarExample() {
             return $.OR([
                 {ALT: function(){ $.CONSUME(Integer)}},
                 {ALT: function(){ $.CONSUME(Identifier)}}
-            ], "an atomic expression");
+            ]);
             // @formatter:on
         });
 
@@ -439,7 +439,7 @@ function tutorialGrammarExample() {
             return $.OR([
                 {ALT: function(){ $.CONSUME(GreaterThan)}},
                 {ALT: function(){ $.CONSUME(LessThan)}}
-            ], "a relational operator");
+            ]);
             // @formatter:on
         });
 
@@ -563,7 +563,7 @@ function tutorialGrammarActionsExample() {
             return $.OR([ // OR returns the value of the chosen alternative.
                 {ALT: function(){ return $.CONSUME(Integer)}},
                 {ALT: function(){ return $.CONSUME(Identifier)}}
-            ], "an atomic expression").image;
+            ]).image;
             // @formatter:on
         });
 
@@ -573,7 +573,7 @@ function tutorialGrammarActionsExample() {
             return $.OR([
                 {ALT: function(){ return $.CONSUME(GreaterThan)}},
                 {ALT: function(){ return $.CONSUME(LessThan)}}
-            ], "a relational operator").image;
+            ]).image;
             // @formatter:on
         });
 
