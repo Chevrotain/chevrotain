@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.3 - 2015-08-28 */
+/*! chevrotain - v0.5.4 - 2015-09-05 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -2660,13 +2660,19 @@ var chevrotain;
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
          *
-         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts An array of alternatives
-         * @param {string} errMsgTypes A description for the alternatives used in error messages
+         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives
+         *
+         * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
+         *                                 If none is provided, the error message will include the names of the expected
+         *                                 Tokens which may start each alternative.
+         *
+         * @param {boolean} [ignoreAmbiguities] - if true this will ignore ambiguities caused when two alternatives can not
+         *        be distinguished by a lookahead of one. enabling this means the first alternative
+         *        that matches will be taken. This is sometimes the grammar's intent.
+         *        * only enable this if you know what you are doing!
+         *
          * @returns {*} The result of invoking the chosen alternative
-         * @param {boolean} [ignoreAmbiguities] if true this will ignore ambiguities caused when two alternatives can not
-         *                                      be distinguished by a lookahead of one. enabling this means the first alternative
-         *                                      that matches will be taken. This is sometimes the grammar's intent.
-         *                                      * only enable this if you know what you are doing!
+
          */
         Parser.prototype.OR1 = function (alts, errMsgTypes, ignoreAmbiguities) {
             if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
@@ -3342,7 +3348,7 @@ var chevrotain;
                         return res;
                     }
                 }
-                this.raiseNoAltException(errMsgTypes);
+                this.raiseNoAltException(occurrence, errMsgTypes);
             }
             // else implicit lookahead
             var laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities);
@@ -3350,7 +3356,7 @@ var chevrotain;
             if (altToTake !== -1) {
                 return alts[altToTake].ALT.call(this);
             }
-            this.raiseNoAltException(errMsgTypes);
+            this.raiseNoAltException(occurrence, errMsgTypes);
         };
         /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
@@ -3470,9 +3476,17 @@ var chevrotain;
             this.inputIdx = newState.inputIdx;
             this.RULE_STACK = newState.RULE_STACK;
         };
-        Parser.prototype.raiseNoAltException = function (errMsgTypes) {
-            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
-                " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()));
+        Parser.prototype.raiseNoAltException = function (occurrence, errMsgTypes) {
+            var errSuffix = " but found '" + this.NEXT_TOKEN().image + "'";
+            if (errMsgTypes === undefined) {
+                var ruleName = _.last(this.RULE_STACK);
+                var ruleGrammar = this.getGAstProductions().get(ruleName);
+                var nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
+                var nextTokensFlat = _.flatten(nextTokens);
+                var nextTokensNames = _.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
+                errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + "}>";
+            }
+            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
         };
         Parser.IGNORE_AMBIGUITIES = true;
         Parser.NO_RESYNC = false;
@@ -3499,7 +3513,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.3";
+    API.VERSION = "0.5.4";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;

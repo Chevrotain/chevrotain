@@ -12,7 +12,7 @@ let API:any = {}
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.3";
+    API.VERSION = "0.5.4";
 
     // runtime API
     API.Parser = chevrotain.Parser
