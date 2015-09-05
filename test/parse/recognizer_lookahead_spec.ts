@@ -935,7 +935,7 @@ namespace chevrotain.recognizer.lookahead.spec {
                     this.CONSUME1(FiveTok)
                     total += "A5"
                 }},
-            ], "digits")
+            ])
 
             this.OR2([
                 {ALT: () => {

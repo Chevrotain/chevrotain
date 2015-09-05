@@ -531,7 +531,7 @@ namespace chevrotain {
          * Convenience method equivalent to OR1
          * @see OR1
          */
-        protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+        protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
             return this.OR1(alts, errMsgTypes, ignoreAmbiguities)
         }
 
@@ -560,43 +560,49 @@ namespace chevrotain {
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
          *
-         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts An array of alternatives
-         * @param {string} errMsgTypes A description for the alternatives used in error messages
+         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives
+         *
+         * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
+         *                                 If none is provided, the error message will include the names of the expected
+         *                                 Tokens which may start each alternative.
+         *
+         * @param {boolean} [ignoreAmbiguities] - if true this will ignore ambiguities caused when two alternatives can not
+         *        be distinguished by a lookahead of one. enabling this means the first alternative
+         *        that matches will be taken. This is sometimes the grammar's intent.
+         *        * only enable this if you know what you are doing!
+         *
          * @returns {*} The result of invoking the chosen alternative
-         * @param {boolean} [ignoreAmbiguities] if true this will ignore ambiguities caused when two alternatives can not
-         *                                      be distinguished by a lookahead of one. enabling this means the first alternative
-         *                                      that matches will be taken. This is sometimes the grammar's intent.
-         *                                      * only enable this if you know what you are doing!
+
          */
-        protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+        protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
             return this.orInternal(alts, errMsgTypes, 1, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+        protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
             return this.orInternal(alts, errMsgTypes, 2, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+        protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
             return this.orInternal(alts, errMsgTypes, 3, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+        protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
             return this.orInternal(alts, errMsgTypes, 4, ignoreAmbiguities)
         }
 
         /**
          * @see OR1
          */
-        protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes:string, ignoreAmbiguities:boolean = false):T {
+        protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
             return this.orInternal(alts, errMsgTypes, 5, ignoreAmbiguities)
         }
 
@@ -943,8 +949,8 @@ namespace chevrotain {
                     let reSyncEnabled = isFirstInvokedRule || (
                         doReSync
                         && !this.isBackTracking()
-                        // if errorRecovery is disabled, the exception will be rethrown to the top rule
-                        // (isFirstInvokedRule) and there will resync to EOF and terminate.
+                            // if errorRecovery is disabled, the exception will be rethrown to the top rule
+                            // (isFirstInvokedRule) and there will resync to EOF and terminate.
                         && this.isErrorRecoveryEnabled)
 
                     if (reSyncEnabled && exceptions.isRecognitionException(e)) {
@@ -1450,7 +1456,7 @@ namespace chevrotain {
                         return res
                     }
                 }
-                this.raiseNoAltException(errMsgTypes)
+                this.raiseNoAltException(occurrence, errMsgTypes)
             }
 
             // else implicit lookahead
@@ -1460,7 +1466,7 @@ namespace chevrotain {
                 return (<any>alts[altToTake]).ALT.call(this)
             }
 
-            this.raiseNoAltException(errMsgTypes)
+            this.raiseNoAltException(occurrence, errMsgTypes)
         }
 
         /**
@@ -1599,9 +1605,17 @@ namespace chevrotain {
             this.RULE_STACK = newState.RULE_STACK
         }
 
-        private raiseNoAltException(errMsgTypes:string):void {
-            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
-                " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()))
+        private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
+            let errSuffix = " but found '" + this.NEXT_TOKEN().image + "'"
+            if (errMsgTypes === undefined) {
+                let ruleName = _.last(this.RULE_STACK)
+                let ruleGrammar = this.getGAstProductions().get(ruleName)
+                let nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
+                let nextTokensFlat = _.flatten(nextTokens)
+                let nextTokensNames = _.map(nextTokensFlat, (currTokenClass:Function) => tokenName(currTokenClass))
+                errMsgTypes = `one of: <${nextTokensNames.join(" ,")}}>`
+            }
+            throw this.SAVE_ERROR(new exceptions.NoViableAltException(`expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
         }
     }
 

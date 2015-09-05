@@ -147,7 +147,7 @@ namespace chevrotain.examples.recovery.sql {
                 [   // @formatter:off
                     {ALT: () => {value = this.CONSUME1(StringTok)}},
                     {ALT: () => {value = this.CONSUME1(IntTok)}}
-                ], "a String or an Integer")
+                ])
                     // @formatter:on
             return PT(value)
         }
