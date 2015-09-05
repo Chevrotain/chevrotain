@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.4 - 2015-09-05 */
+/*! chevrotain - v0.5.5 - 2015-09-06 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -3477,14 +3477,14 @@ var chevrotain;
             this.RULE_STACK = newState.RULE_STACK;
         };
         Parser.prototype.raiseNoAltException = function (occurrence, errMsgTypes) {
-            var errSuffix = " but found '" + this.NEXT_TOKEN().image + "'";
+            var errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'";
             if (errMsgTypes === undefined) {
                 var ruleName = _.last(this.RULE_STACK);
                 var ruleGrammar = this.getGAstProductions().get(ruleName);
                 var nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
                 var nextTokensFlat = _.flatten(nextTokens);
                 var nextTokensNames = _.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
-                errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + "}>";
+                errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + ">";
             }
             throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
         };
@@ -3513,7 +3513,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.4";
+    API.VERSION = "0.5.5";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
