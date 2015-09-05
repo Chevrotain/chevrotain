@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.1 - 2015-08-17 */
+/*! chevrotain - v0.5.4 - 2015-09-05 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -2252,7 +2252,8 @@ var chevrotain;
      * for example: Error Recovery, Automatic lookahead calculation
      */
     var Parser = (function () {
-        function Parser(input, tokensMapOrArr) {
+        function Parser(input, tokensMapOrArr, isErrorRecoveryEnabled) {
+            if (isErrorRecoveryEnabled === void 0) { isErrorRecoveryEnabled = true; }
             this.errors = [];
             this._input = [];
             this.inputIdx = -1;
@@ -2262,6 +2263,7 @@ var chevrotain;
             this.tokensMap = undefined;
             this.definedRulesNames = [];
             this._input = input;
+            this.isErrorRecoveryEnabled = isErrorRecoveryEnabled;
             this.className = lang.classNameFromInstance(this);
             this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className);
             this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className);
@@ -2658,13 +2660,19 @@ var chevrotain;
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
          *
-         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts An array of alternatives
-         * @param {string} errMsgTypes A description for the alternatives used in error messages
+         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives
+         *
+         * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
+         *                                 If none is provided, the error message will include the names of the expected
+         *                                 Tokens which may start each alternative.
+         *
+         * @param {boolean} [ignoreAmbiguities] - if true this will ignore ambiguities caused when two alternatives can not
+         *        be distinguished by a lookahead of one. enabling this means the first alternative
+         *        that matches will be taken. This is sometimes the grammar's intent.
+         *        * only enable this if you know what you are doing!
+         *
          * @returns {*} The result of invoking the chosen alternative
-         * @param {boolean} [ignoreAmbiguities] if true this will ignore ambiguities caused when two alternatives can not
-         *                                      be distinguished by a lookahead of one. enabling this means the first alternative
-         *                                      that matches will be taken. This is sometimes the grammar's intent.
-         *                                      * only enable this if you know what you are doing!
+
          */
         Parser.prototype.OR1 = function (alts, errMsgTypes, ignoreAmbiguities) {
             if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
@@ -2963,7 +2971,9 @@ var chevrotain;
                     // reSync with EOF and just output some INVALID ParseTree
                     // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
                     // path is really the most valid one
-                    var reSyncEnabled = (isFirstInvokedRule || doReSync) && !this.isBackTracking();
+                    var reSyncEnabled = isFirstInvokedRule || (doReSync
+                        && !this.isBackTracking()
+                        && this.isErrorRecoveryEnabled);
                     if (reSyncEnabled && exceptions.isRecognitionException(e)) {
                         var reSyncTokType = this.findReSyncTokenType();
                         if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
@@ -3216,6 +3226,7 @@ var chevrotain;
                 this.tryInRepetitionRecovery(prodFunc, args, lookaheadFunc, expectTokAfterLastMatch);
             }
         };
+        // Implementation of parsing DSL
         Parser.prototype.optionInternal = function (condition, action) {
             if (condition.call(this)) {
                 action.call(this);
@@ -3223,7 +3234,6 @@ var chevrotain;
             }
             return false;
         };
-        // Implementation of parsing DSL
         Parser.prototype.atLeastOneInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg) {
             if (_.isString(action)) {
                 errMsg = action;
@@ -3242,7 +3252,9 @@ var chevrotain;
             // note that while it may seem that this can cause an error because by using a recursive call to
             // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
             // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
+            if (this.isErrorRecoveryEnabled) {
+                this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
+            }
         };
         Parser.prototype.atLeastOneSepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, errMsg) {
             var _this = this;
@@ -3263,8 +3275,10 @@ var chevrotain;
                     separatorsResult.push(this.CONSUME(separator));
                     action.call(this);
                 }
-                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                    this.atLeastOneSepLookaheadKeys, interp.NextTerminalAfterAtLeastOneSepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneSepWalker, this.atLeastOneSepLookaheadKeys);
+                if (this.isErrorRecoveryEnabled) {
+                    this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                        this.atLeastOneSepLookaheadKeys, interp.NextTerminalAfterAtLeastOneSepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterAtLeastOneSepWalker, this.atLeastOneSepLookaheadKeys);
+                }
             }
             else {
                 throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()));
@@ -3279,7 +3293,9 @@ var chevrotain;
             while (lookAheadFunc.call(this)) {
                 action.call(this);
             }
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys);
+            if (this.isErrorRecoveryEnabled) {
+                this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], lookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManyWalker, this.manyLookaheadKeys);
+            }
         };
         Parser.prototype.manySepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action) {
             var _this = this;
@@ -3299,8 +3315,10 @@ var chevrotain;
                     separatorsResult.push(this.CONSUME(separator));
                     action.call(this);
                 }
-                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                    this.manySepLookaheadKeys, interp.NextTerminalAfterManySepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManySepWalker, this.manySepLookaheadKeys);
+                if (this.isErrorRecoveryEnabled) {
+                    this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                        this.manySepLookaheadKeys, interp.NextTerminalAfterManySepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interp.NextTerminalAfterManySepWalker, this.manySepLookaheadKeys);
+                }
             }
             return separatorsResult;
         };
@@ -3311,7 +3329,15 @@ var chevrotain;
                 separatorsResult.push(this.CONSUME(separator));
                 action.call(this);
             }
-            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker], separatorLookAheadFunc, prodName, prodOccurrence, nextTerminalAfterWalker, laKeys);
+            // we can only arrive to this function after an error
+            // has occurred (hence the name 'second') so the following
+            // IF will always be entered, its possible to remove it...
+            // however it is kept to avoid confusion and be consistent.
+            /* istanbul ignore else */
+            if (this.isErrorRecoveryEnabled) {
+                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc,
+                    action, separatorsResult, laKeys, nextTerminalAfterWalker], separatorLookAheadFunc, prodName, prodOccurrence, nextTerminalAfterWalker, laKeys);
+            }
         };
         Parser.prototype.orInternal = function (alts, errMsgTypes, occurrence, ignoreAmbiguities) {
             // explicit alternatives look ahead
@@ -3322,7 +3348,7 @@ var chevrotain;
                         return res;
                     }
                 }
-                this.raiseNoAltException(errMsgTypes);
+                this.raiseNoAltException(occurrence, errMsgTypes);
             }
             // else implicit lookahead
             var laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities);
@@ -3330,7 +3356,7 @@ var chevrotain;
             if (altToTake !== -1) {
                 return alts[altToTake].ALT.call(this);
             }
-            this.raiseNoAltException(errMsgTypes);
+            this.raiseNoAltException(occurrence, errMsgTypes);
         };
         /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
@@ -3351,7 +3377,8 @@ var chevrotain;
             catch (eFromConsumption) {
                 // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
                 // but the original syntax could have been parsed successfully without any backtracking + recovery
-                if (eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
+                if (this.isErrorRecoveryEnabled &&
+                    eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
                     var follows_1 = this.getFollowsForInRuleRecovery(tokClass, idx);
                     try {
                         return this.tryInRuleRecovery(tokClass, follows_1);
@@ -3375,7 +3402,7 @@ var chevrotain;
                 }
             }
         };
-        // to enable opimizations this logic has been extract to a method as its caller method contains try/catch
+        // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
         Parser.prototype.consumeInternalOptimized = function (tokClass) {
             var nextToken = this.NEXT_TOKEN();
             if (this.NEXT_TOKEN() instanceof tokClass) {
@@ -3449,9 +3476,17 @@ var chevrotain;
             this.inputIdx = newState.inputIdx;
             this.RULE_STACK = newState.RULE_STACK;
         };
-        Parser.prototype.raiseNoAltException = function (errMsgTypes) {
-            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes +
-                " but found '" + this.NEXT_TOKEN().image + "'", this.NEXT_TOKEN()));
+        Parser.prototype.raiseNoAltException = function (occurrence, errMsgTypes) {
+            var errSuffix = " but found '" + this.NEXT_TOKEN().image + "'";
+            if (errMsgTypes === undefined) {
+                var ruleName = _.last(this.RULE_STACK);
+                var ruleGrammar = this.getGAstProductions().get(ruleName);
+                var nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
+                var nextTokensFlat = _.flatten(nextTokens);
+                var nextTokensNames = _.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
+                errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + "}>";
+            }
+            throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
         };
         Parser.IGNORE_AMBIGUITIES = true;
         Parser.NO_RESYNC = false;
@@ -3478,7 +3513,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.1";
+    API.VERSION = "0.5.4";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;

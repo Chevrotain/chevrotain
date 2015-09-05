@@ -25,6 +25,6 @@
     "commit": "ef20b4290cc4fe7551c82a552ea7ffa76548eec8"
   },
   "_source": "git://github.com/lodash/lodash.git",
-  "_target": "^3.10.0",
+  "_target": "^3.10.1",
   "_originalSource": "lodash"
 }

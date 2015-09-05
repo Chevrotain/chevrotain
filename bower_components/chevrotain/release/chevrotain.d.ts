@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.1 - 2015-08-17 */
+/*! chevrotain - v0.5.4 - 2015-09-05 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -226,6 +226,11 @@ declare module chevrotain {
         static DEFER_DEFINITION_ERRORS_HANDLING: boolean;
         protected static performSelfAnalysis(classInstance: Parser): void;
         errors: Error[];
+        /**
+         * This flag enables or disables error recovery (fault tolerance) of the parser.
+         * If this flag is disabled the parser will halt on the first error.
+         */
+        isErrorRecoveryEnabled: any;
         protected _input: Token[];
         protected inputIdx: number;
         protected isBackTrackingStack: any[];
@@ -247,7 +252,7 @@ declare module chevrotain {
         private definedRulesNames;
         constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
-        } | Function[]);
+        } | Function[], isErrorRecoveryEnabled?: boolean);
         input: Token[];
         reset(): void;
         isAtEndOfInput(): boolean;
@@ -402,7 +407,7 @@ declare module chevrotain {
          * Convenience method equivalent to OR1
          * @see OR1
          */
-        protected OR<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes: string, ignoreAmbiguities?: boolean): T;
+        protected OR<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
          * Parsing DSL method that indicates a choice between a set of alternatives must be made.
          * This is equivalent to EBNF alternation (A | B | C | D ...)
@@ -428,31 +433,37 @@ declare module chevrotain {
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
          *
-         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts An array of alternatives
-         * @param {string} errMsgTypes A description for the alternatives used in error messages
+         * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives
+         *
+         * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
+         *                                 If none is provided, the error message will include the names of the expected
+         *                                 Tokens which may start each alternative.
+         *
+         * @param {boolean} [ignoreAmbiguities] - if true this will ignore ambiguities caused when two alternatives can not
+         *        be distinguished by a lookahead of one. enabling this means the first alternative
+         *        that matches will be taken. This is sometimes the grammar's intent.
+         *        * only enable this if you know what you are doing!
+         *
          * @returns {*} The result of invoking the chosen alternative
-         * @param {boolean} [ignoreAmbiguities] if true this will ignore ambiguities caused when two alternatives can not
-         *                                      be distinguished by a lookahead of one. enabling this means the first alternative
-         *                                      that matches will be taken. This is sometimes the grammar's intent.
-         *                                      * only enable this if you know what you are doing!
+
          */
-        protected OR1<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes: string, ignoreAmbiguities?: boolean): T;
+        protected OR1<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
          * @see OR1
          */
-        protected OR2<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes: string, ignoreAmbiguities?: boolean): T;
+        protected OR2<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
          * @see OR1
          */
-        protected OR3<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes: string, ignoreAmbiguities?: boolean): T;
+        protected OR3<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
          * @see OR1
          */
-        protected OR4<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes: string, ignoreAmbiguities?: boolean): T;
+        protected OR4<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
          * @see OR1
          */
-        protected OR5<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes: string, ignoreAmbiguities?: boolean): T;
+        protected OR5<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
          * Convenience method equivalent to MANY1
          * @see MANY1
@@ -693,7 +704,7 @@ declare module chevrotain {
         private getLookaheadFuncFor<T>(key, occurrence, laFuncBuilder, extraArgs?);
         private saveRecogState();
         private reloadRecogState(newState);
-        private raiseNoAltException(errMsgTypes);
+        private raiseNoAltException(occurrence, errMsgTypes);
     }
 
 	module exceptions {
