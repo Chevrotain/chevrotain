@@ -118,7 +118,7 @@ namespace chevrotain {
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
                 if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                     defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
-                    throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
+                    throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
                 }
                 if (_.isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
                     let allFollows = follows.computeAllProdsFollows(grammarProductions.values())
@@ -129,7 +129,7 @@ namespace chevrotain {
             // reThrow the validation errors each time an erroneous parser is instantiated
             if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
-                throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("-------------------------------\n")}`)
+                throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
             }
         }
 
