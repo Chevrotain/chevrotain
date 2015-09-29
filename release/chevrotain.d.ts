@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.5 - 2015-09-06 */
+/*! chevrotain - v0.5.6 - 2015-09-29 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -168,6 +168,7 @@ declare module chevrotain {
         DUPLICATE_RULE_NAME = 1,
         DUPLICATE_PRODUCTIONS = 2,
         UNRESOLVED_SUBRULE_REF = 3,
+        LEFT_RECURSION = 4,
     }
     interface IParserDefinitionError {
         message: string;

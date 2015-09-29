@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.5 - 2015-09-06 */
+/*! chevrotain - v0.5.6 - 2015-09-29 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -935,7 +935,8 @@ var chevrotain;
                 prod instanceof gast.Rule;
         }
         gast.isSequenceProd = isSequenceProd;
-        function isOptionalProd(prod) {
+        function isOptionalProd(prod, alreadyVisited) {
+            if (alreadyVisited === void 0) { alreadyVisited = []; }
             var isDirectlyOptional = prod instanceof gast.Option ||
                 prod instanceof gast.Repetition ||
                 prod instanceof gast.RepetitionWithSeparator;
@@ -948,12 +949,19 @@ var chevrotain;
             if (prod instanceof gast.Alternation) {
                 // for OR its enough for just one of the alternatives to be optional
                 return _.some(prod.definition, function (subProd) {
-                    return isOptionalProd(subProd);
+                    return isOptionalProd(subProd, alreadyVisited);
                 });
             }
+            else if (prod instanceof gast.NonTerminal && _.contains(alreadyVisited, prod)) {
+                // avoiding stack overflow due to infinite recursion
+                return false;
+            }
             else if (prod instanceof gast.AbstractProduction) {
+                if (prod instanceof gast.NonTerminal) {
+                    alreadyVisited.push(prod);
+                }
                 return _.every(prod.definition, function (subProd) {
-                    return isOptionalProd(subProd);
+                    return isOptionalProd(subProd, alreadyVisited);
                 });
             }
             else {
@@ -2017,11 +2025,12 @@ var chevrotain;
     (function (checks) {
         var gast = chevrotain.gast;
         function validateGrammar(topLevels) {
-            var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule);
-            return _.flatten(errorMessagesArrs);
+            var duplicateErrors = _.map(topLevels, validateDuplicateProductions);
+            var leftRecursionErrors = _.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
+            return _.flatten(duplicateErrors.concat(leftRecursionErrors));
         }
         checks.validateGrammar = validateGrammar;
-        function validateSingleTopLevelRule(topLevelRule) {
+        function validateDuplicateProductions(topLevelRule) {
             var collectorVisitor = new OccurrenceValidationCollector();
             topLevelRule.accept(collectorVisitor);
             var allRuleProductions = collectorVisitor.allProductions;
@@ -2130,6 +2139,83 @@ var chevrotain;
             return errors;
         }
         checks.validateRuleName = validateRuleName;
+        function validateNoLeftRecursion(topRule, currRule, path) {
+            if (path === void 0) { path = []; }
+            var errors = [];
+            var nextNonTerminals = getFirstNoneTerminal(currRule.definition);
+            if (_.isEmpty(nextNonTerminals)) {
+                return [];
+            }
+            else {
+                var ruleName = topRule.name;
+                var foundLeftRecursion = _.contains(nextNonTerminals, topRule);
+                var pathNames = _.map(path, function (currRule) { return currRule.name; });
+                var leftRecursivePath = ruleName + " --> " + pathNames.concat([ruleName]).join(" --> ");
+                if (foundLeftRecursion) {
+                    var errMsg = "Left Recursion found in grammar.\n" +
+                        ("rule: <" + ruleName + "> can be invoked from itself (directly or indirectly)\n") +
+                        ("without consuming any Tokens. The grammar path that causes this is: \n " + leftRecursivePath + "\n") +
+                        " To fix this refactor your grammar to remove the left recursion.\n" +
+                        "see: https://en.wikipedia.org/wiki/LL_parser#Left_Factoring.";
+                    errors.push({
+                        message: errMsg,
+                        type: chevrotain.ParserDefinitionErrorType.LEFT_RECURSION,
+                        ruleName: ruleName
+                    });
+                }
+                // we are only looking for cyclic paths leading back to the specific topRule
+                // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
+                var validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]));
+                var errorsFromNextSteps = _.map(validNextSteps, function (currRefRule, key, all) {
+                    var newPath = _.clone(path);
+                    newPath.push(currRefRule);
+                    return validateNoLeftRecursion(topRule, currRefRule, newPath);
+                });
+                return errors.concat(_.flatten(errorsFromNextSteps));
+            }
+        }
+        checks.validateNoLeftRecursion = validateNoLeftRecursion;
+        function getFirstNoneTerminal(definition) {
+            var result = [];
+            if (_.isEmpty(definition)) {
+                return result;
+            }
+            var firstProd = _.first(definition);
+            if (firstProd instanceof gast.NonTerminal) {
+                // this allows the check to be performed on partially valid grammars that have not been completly resolved.
+                if (firstProd.referencedRule === undefined) {
+                    return result;
+                }
+                result.push(firstProd.referencedRule);
+            }
+            else if (firstProd instanceof gast.Flat ||
+                firstProd instanceof gast.Option ||
+                firstProd instanceof gast.RepetitionMandatory ||
+                firstProd instanceof gast.RepetitionMandatoryWithSeparator ||
+                firstProd instanceof gast.RepetitionWithSeparator ||
+                firstProd instanceof gast.Repetition) {
+                result = result.concat(getFirstNoneTerminal(firstProd.definition));
+            }
+            else if (firstProd instanceof gast.Alternation) {
+                // each sub definition in alternation is a FLAT
+                result = _.flatten(_.map(firstProd.definition, function (currSubDef) { return getFirstNoneTerminal(currSubDef.definition); }));
+            }/* istanbul ignore else */ 
+            else if (firstProd instanceof gast.Terminal) {
+            }
+            else {
+                /* istanbul ignore next */ throw Error("non exhaustive match");
+            }
+            var isFirstOptional = gast.isOptionalProd(firstProd);
+            var hasMore = definition.length > 1;
+            if (isFirstOptional && hasMore) {
+                var rest_1 = _.drop(definition);
+                return result.concat(getFirstNoneTerminal(rest_1));
+            }
+            else {
+                return result;
+            }
+        }
+        checks.getFirstNoneTerminal = getFirstNoneTerminal;
     })/* istanbul ignore next */ (checks = chevrotain.checks || /* istanbul ignore next */ (chevrotain.checks = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
@@ -2243,6 +2329,7 @@ var chevrotain;
         ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_RULE_NAME"] = 1] = "DUPLICATE_RULE_NAME";
         ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 2] = "DUPLICATE_PRODUCTIONS";
         ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 3] = "UNRESOLVED_SUBRULE_REF";
+        ParserDefinitionErrorType[ParserDefinitionErrorType["LEFT_RECURSION"] = 4] = "LEFT_RECURSION";
     })(chevrotain.ParserDefinitionErrorType || (chevrotain.ParserDefinitionErrorType = {}));
     var ParserDefinitionErrorType = chevrotain.ParserDefinitionErrorType;
     var EOF_FOLLOW_KEY = {};
@@ -2317,7 +2404,7 @@ var chevrotain;
                 definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
                 if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                     defErrorsMsgs = _.map(definitionErrors, function (defError) { return defError.message; });
-                    throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
+                    throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
                 }
                 if (_.isEmpty(definitionErrors)) {
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
@@ -2327,7 +2414,7 @@ var chevrotain;
             // reThrow the validation errors each time an erroneous parser is instantiated
             if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
-                throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
+                throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
             }
         };
         Object.defineProperty(Parser.prototype, "input", {
@@ -3513,7 +3600,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.5";
+    API.VERSION = "0.5.6";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
