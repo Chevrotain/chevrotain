@@ -1,6 +1,9 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Chevrotain" />
+    <inspection_tool class="BadExpressionStatementJS" enabled="true" level="WARNING" enabled_by_default="true">
+      <scope name="Tests" level="INFO" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="CoffeeScriptUnusedLocalSymbols" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myIgnoreUnusedFunctionParameters" value="true" />
     </inspection_tool>

@@ -145,6 +145,86 @@ namespace chevrotain.checks.spec {
 
     })
 
+    class DummyToken extends Token {}
+    let dummyRule = new gast.Rule("dummyRule", [new gast.Terminal(DummyToken)])
+    let dummyRule2 = new gast.Rule("dummyRule2", [new gast.Terminal(DummyToken)])
+    let dummyRule3 = new gast.Rule("dummyRule3", [new gast.Terminal(DummyToken)])
+
+    describe("the getFirstNoneTerminal function", function () {
+
+        it("can find the firstNoneTerminal of an empty sequence", function () {
+            expect(checks.getFirstNoneTerminal([])).to.be.empty
+        })
+
+        it("can find the firstNoneTerminal of a sequence with only one item", function () {
+            let result = checks.getFirstNoneTerminal([new gast.NonTerminal("dummyRule", dummyRule)])
+            expect(result).to.have.length(1)
+            expect(_.first(result).name).to.equal("dummyRule")
+        })
+
+        it("can find the firstNoneTerminal of a sequence with two items", function () {
+            let sqeuence = [
+                new gast.NonTerminal("dummyRule", dummyRule),
+                new gast.NonTerminal("dummyRule2", dummyRule2)]
+            let result = checks.getFirstNoneTerminal(sqeuence)
+            expect(result).to.have.length(1)
+            expect(_.first(result).name).to.equal("dummyRule")
+        })
+
+        it("can find the firstNoneTerminal of a sequence with two items where the first is optional", function () {
+            let sqeuence = [
+                new gast.Option([
+                    new gast.NonTerminal("dummyRule", dummyRule)
+                ]),
+                new gast.NonTerminal("dummyRule2", dummyRule2)]
+            let result = checks.getFirstNoneTerminal(sqeuence)
+            expect(result).to.have.length(2)
+            let resultRuleNames = _.pluck(result, "name")
+            expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"])
+        })
+
+        it("can find the firstNoneTerminal of an alternation", function () {
+            let alternation = [
+                new gast.Alternation([
+                    new gast.Flat([new gast.NonTerminal("dummyRule", dummyRule)]),
+                    new gast.Flat([new gast.NonTerminal("dummyRule2", dummyRule2)]),
+                    new gast.Flat([new gast.NonTerminal("dummyRule3", dummyRule3)])
+                ]),
+            ]
+            let result = checks.getFirstNoneTerminal(alternation)
+            expect(result).to.have.length(3)
+            let resultRuleNames = _.pluck(result, "name")
+            expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2", "dummyRule3"])
+        })
+
+        it("can find the firstNoneTerminal of an optional repetition", function () {
+            let alternation = [
+                new gast.Repetition([
+                    new gast.Flat([new gast.NonTerminal("dummyRule", dummyRule)]),
+                    new gast.Flat([new gast.NonTerminal("dummyRule2", dummyRule2)]),
+                ]),
+                new gast.NonTerminal("dummyRule3", dummyRule3)
+            ]
+            let result = checks.getFirstNoneTerminal(alternation)
+            expect(result).to.have.length(2)
+            let resultRuleNames = _.pluck(result, "name")
+            expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"])
+        })
+
+        it("can find the firstNoneTerminal of a mandatory repetition", function () {
+            let alternation = [
+                new gast.RepetitionMandatory([
+                    new gast.Flat([new gast.NonTerminal("dummyRule", dummyRule)]),
+                    new gast.Flat([new gast.NonTerminal("dummyRule2", dummyRule2)]),
+                ]),
+                new gast.NonTerminal("dummyRule3", dummyRule3)
+            ]
+            let result = checks.getFirstNoneTerminal(alternation)
+            expect(result).to.have.length(1)
+            let resultRuleNames = _.pluck(result, "name")
+            expect(resultRuleNames).to.include.members(["dummyRule"])
+        })
+    })
 
     export class PlusTok extends Token {
         constructor() { super("+", 0, 1, 1) }
@@ -312,7 +392,7 @@ namespace chevrotain.checks.spec {
         public one = this.RULE("שלום", () => {})
     }
 
-    describe("The rule names  validation full flow", function () {
+    describe("The rule names validation full flow", function () {
 
         it("will throw an error when trying to init a parser with duplicate ruleNames", function () {
             expect(() => new DuplicateRulesParser()).to.throw("is already defined in the grammar")
@@ -334,6 +414,74 @@ namespace chevrotain.checks.spec {
             expect(() => new DuplicateRulesParser()).to.not.throw()
             expect(() => new DuplicateRulesParser()).to.not.throw()
             Parser.DEFER_DEFINITION_ERRORS_HANDLING = false
+        })
+    })
+
+
+    class StarToken extends Token {}
+
+    class DirectlyLeftRecursive extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [StarToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public A = this.RULE("A", () => {
+            this.SUBRULE1(this.A)
+        })
+    }
+
+    class InDirectlyLeftRecursive extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [StarToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public A = this.RULE("A", () => {
+            this.SUBRULE1(this.B)
+        })
+
+        public B = this.RULE("B", () => {
+            this.SUBRULE1(this.A)
+        })
+    }
+
+    class ComplexInDirectlyLeftRecursive extends Parser {
+
+        constructor(input:Token[] = []) {
+            super(input, [StarToken])
+            Parser.performSelfAnalysis(this)
+        }
+
+        public A = this.RULE("A", () => {
+            this.SUBRULE1(this.B)
+        })
+
+        public B = this.RULE("B", () => {
+            this.OPTION(() => {
+                this.SUBRULE1(this.A)
+            })
+            this.CONSUME(StarToken)
+        })
+    }
+
+    describe("The left recursion detection full flow", function () {
+
+        it("will throw an error when trying to init a parser with direct left recursion", function () {
+            expect(() => new DirectlyLeftRecursive()).to.throw("Left Recursion found in grammar")
+            expect(() => new DirectlyLeftRecursive()).to.throw("A --> A")
+        })
+
+        it("will throw an error when trying to init a parser with indirect left recursion", function () {
+            expect(() => new InDirectlyLeftRecursive()).to.throw("Left Recursion found in grammar")
+            expect(() => new InDirectlyLeftRecursive()).to.throw("A --> B --> A")
+        })
+
+        it("will throw an error when trying to init a parser with indirect left recursion", function () {
+            expect(() => new ComplexInDirectlyLeftRecursive()).to.throw("Left Recursion found in grammar")
+            expect(() => new ComplexInDirectlyLeftRecursive()).to.throw("A --> B --> A")
         })
     })
 }

@@ -2,12 +2,13 @@ namespace chevrotain.checks {
 
     import gast = chevrotain.gast
 
-    export function validateGrammar(topLevels:gast.Rule[]):string[] {
-        let errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule)
-        return <string[]>_.flatten(errorMessagesArrs)
+    export function validateGrammar(topLevels:gast.Rule[]):IParserDefinitionError[] {
+        let duplicateErrors = _.map(topLevels, validateDuplicateProductions)
+        let leftRecursionErrors:any = _.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
+        return <any>_.flatten(duplicateErrors.concat(leftRecursionErrors))
     }
 
-    function validateSingleTopLevelRule(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
+    function validateDuplicateProductions(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
         let collectorVisitor = new OccurrenceValidationCollector()
         topLevelRule.accept(collectorVisitor)
         let allRuleProductions = collectorVisitor.allProductions
@@ -113,9 +114,7 @@ namespace chevrotain.checks {
         }
     }
 
-
     let ruleNamePattern = /^[a-zA-Z_]\w*$/
-
     export function validateRuleName(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
         let errors = []
         let errMsg
@@ -141,4 +140,89 @@ namespace chevrotain.checks {
         return errors
     }
 
+    export function validateNoLeftRecursion(topRule:gast.Rule,
+                                            currRule:gast.Rule,
+                                            path:gast.Rule[] = []):IParserDefinitionError[] {
+        let errors = []
+        let nextNonTerminals = getFirstNoneTerminal(currRule.definition)
+        if (_.isEmpty(nextNonTerminals)) {
+            return []
+        }
+        else {
+            let ruleName = topRule.name
+            let foundLeftRecursion = _.contains(<any>nextNonTerminals, topRule)
+            let pathNames = _.map(path, currRule => currRule.name)
+            let leftRecursivePath = `${ruleName} --> ${pathNames.concat([ruleName]).join(" --> ")}`
+            if (foundLeftRecursion) {
+                let errMsg = `Left Recursion found in grammar.\n` +
+                    `rule: <${ruleName}> can be invoked from itself (directly or indirectly)\n` +
+                    `without consuming any Tokens. The grammar path that causes this is: \n ${leftRecursivePath}\n` +
+                    ` To fix this refactor your grammar to remove the left recursion.\n` +
+                    `see: https://en.wikipedia.org/wiki/LL_parser#Left_Factoring.`
+                errors.push({
+                    message:  errMsg,
+                    type:     ParserDefinitionErrorType.LEFT_RECURSION,
+                    ruleName: ruleName
+                })
+            }
+
+            // we are only looking for cyclic paths leading back to the specific topRule
+            // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
+            let validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]))
+            let errorsFromNextSteps = _.map(validNextSteps, (currRefRule, key, all) => {
+                let newPath = _.clone(path)
+                newPath.push(currRefRule)
+                return validateNoLeftRecursion(topRule, currRefRule, newPath)
+            })
+
+            return errors.concat(_.flatten(errorsFromNextSteps))
+        }
+    }
+
+    export function getFirstNoneTerminal(definition:gast.IProduction[]):gast.Rule[] {
+        let result = []
+        if (_.isEmpty(definition)) {
+            return result
+        }
+        let firstProd = _.first(definition)
+
+
+        if (firstProd instanceof gast.NonTerminal) {
+            // this allows the check to be performed on partially valid grammars that have not been completly resolved.
+            if (firstProd.referencedRule === undefined) {
+                return result
+            }
+            result.push(firstProd.referencedRule)
+        }
+        else if (firstProd instanceof gast.Flat ||
+            firstProd instanceof gast.Option ||
+            firstProd instanceof gast.RepetitionMandatory ||
+            firstProd instanceof gast.RepetitionMandatoryWithSeparator ||
+            firstProd instanceof gast.RepetitionWithSeparator ||
+            firstProd instanceof gast.Repetition
+        ) {
+            result = result.concat(getFirstNoneTerminal(<gast.IProduction[]>firstProd.definition))
+        }
+        else if (firstProd instanceof gast.Alternation) {
+            // each sub definition in alternation is a FLAT
+            result = _.flatten(
+                _.map(firstProd.definition, currSubDef => getFirstNoneTerminal((<gast.Flat>currSubDef).definition)))
+        }
+        else if (firstProd instanceof gast.Terminal) {
+            // nothing to see, move along
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+
+        let isFirstOptional = gast.isOptionalProd(firstProd)
+        let hasMore = definition.length > 1
+        if (isFirstOptional && hasMore) {
+            let rest = _.drop(definition)
+            return result.concat(getFirstNoneTerminal(rest))
+        }
+        else {
+            return result
+        }
+    }
 }

@@ -13,7 +13,7 @@ namespace chevrotain.gast {
             prod instanceof Rule
     }
 
-    export function isOptionalProd(prod:IProduction):boolean {
+    export function isOptionalProd(prod:IProduction, alreadyVisited:NonTerminal[] = []):boolean {
         let isDirectlyOptional = prod instanceof Option ||
             prod instanceof Repetition ||
             prod instanceof RepetitionWithSeparator
@@ -27,12 +27,19 @@ namespace chevrotain.gast {
         if (prod instanceof Alternation) {
             // for OR its enough for just one of the alternatives to be optional
             return _.some((<Alternation>prod).definition, (subProd:IProduction) => {
-                return isOptionalProd(subProd)
+                return isOptionalProd(subProd, alreadyVisited)
             })
         }
+        else if (prod instanceof NonTerminal && _.contains(alreadyVisited, prod)) {
+            // avoiding stack overflow due to infinite recursion
+            return false
+        }
         else if (prod instanceof AbstractProduction) {
+            if (prod instanceof NonTerminal) {
+                alreadyVisited.push(prod)
+            }
             return _.every((<AbstractProduction>prod).definition, (subProd:IProduction) => {
-                return isOptionalProd(subProd)
+                return isOptionalProd(subProd, alreadyVisited)
             })
         }
         else {

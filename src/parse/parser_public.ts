@@ -19,7 +19,8 @@ namespace chevrotain {
         INVALID_RULE_NAME,
         DUPLICATE_RULE_NAME,
         DUPLICATE_PRODUCTIONS,
-        UNRESOLVED_SUBRULE_REF
+        UNRESOLVED_SUBRULE_REF,
+        LEFT_RECURSION
     }
 
     export interface IParserDefinitionError {
