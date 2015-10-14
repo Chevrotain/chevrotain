@@ -170,8 +170,11 @@ module.exports = function(grunt) {
                         var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];",
                             "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
 
+                        fixedTypeScriptExtends = fixedTypeScriptExtends.replace("d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());",
+                            "/* istanbul ignore next */ " + " d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());")
+
                         // TODO: typescript compiler swallows comments in certain situations
-                        //       once this is fixed the string replacementss below can be removed.
+                        //       once this is fixed the string replacements below can be removed.
 
                         // very little point in testing this, this is a pattern matching functionality missing in typescript/javascript
                         // if the code reaches that point it will go "boom" which is the purpose, the going boom part is not part
@@ -204,16 +207,16 @@ module.exports = function(grunt) {
                     process: function removeOriginalHeaderAndFooter(src, filePath) {
                         var fixedModuleName, fixedIndentation
                         if (_.contains(filePath, 'gast_public')) {
-                            fixedModuleName = src.replace('declare module chevrotain.gast {', '\nmodule gast {')
+                            fixedModuleName = src.replace('declare namespace chevrotain.gast {', '\nmodule gast {')
                             fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
                             return fixedIndentation
                         }
                         else if (_.contains(filePath, 'exceptions_public')) {
-                            fixedModuleName = src.replace('declare module chevrotain.exceptions {', '\nmodule exceptions {')
+                            fixedModuleName = src.replace('declare namespace chevrotain.exceptions {', '\nmodule exceptions {')
                             fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
                             return fixedIndentation
                         }
-                        var result = src.replace("declare module chevrotain {", "")
+                        var result = src.replace("declare namespace chevrotain {", "")
                         var lastRCurlyIdx = result.lastIndexOf("}")
                         result = result.substring(0, lastRCurlyIdx)
                         result = _.trimRight(result)

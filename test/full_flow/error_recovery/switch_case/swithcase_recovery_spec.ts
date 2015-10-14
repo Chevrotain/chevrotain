@@ -1,14 +1,4 @@
-
-
-
-
-
-
-
-
-
-// long lines for token init seems more readable to me than to break them up
-// into multiple line.
+// long lines for token init seems more readable to me than to break them up into multiple line.
 /* tslint:disable:max-line-length  */
 namespace chevrotain.examples.recovery.switchcase.spec {
 
