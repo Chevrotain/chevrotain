@@ -11,7 +11,7 @@ namespace chevrotain.gast {
         implicitOccurrenceIndex:boolean
     }
 
-    export class AbstractProduction implements IProduction {
+    export abstract class AbstractProduction implements IProduction {
         public implicitOccurrenceIndex = false
 
         constructor(public definition:IProduction[]) {}
@@ -88,7 +88,7 @@ namespace chevrotain.gast {
         }
     }
 
-    export class GAstVisitor {
+    export abstract class GAstVisitor {
 
         public visit(node:IProduction) {
             if (node instanceof NonTerminal) {

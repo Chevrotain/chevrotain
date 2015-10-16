@@ -6,7 +6,7 @@ namespace chevrotain.interpreter {
     import r = chevrotain.rest
     import p = chevrotain.path
 
-    export class AbstractNextPossibleTokensWalker extends r.RestWalker {
+    export abstract class AbstractNextPossibleTokensWalker extends r.RestWalker {
 
         protected possibleTokTypes:Function[] = []
         protected ruleStack:string[]

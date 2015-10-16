@@ -6,7 +6,7 @@ namespace chevrotain.rest {
     /**
      *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.
      */
-    export class RestWalker {
+    export abstract class RestWalker {
 
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
             _.forEach(prod.definition, (subProd:gast.IProduction, index) => {

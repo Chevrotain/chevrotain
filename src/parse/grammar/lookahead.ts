@@ -1,4 +1,3 @@
-
 namespace chevrotain.lookahead {
 
     import gast = chevrotain.gast
@@ -104,7 +103,7 @@ namespace chevrotain.lookahead {
         return tokensToAltsIndicesWithAmbiguity
     }
 
-    function buildLookAheadForGrammarProd(prodWalker:typeof interp.AbstractNextPossibleTokensWalker, ruleOccurrence:number,
+    function buildLookAheadForGrammarProd(prodWalkerConstructor:any, ruleOccurrence:number,
                                           ruleGrammar:gast.Rule):() => boolean {
         let path:p.IRuleGrammarPath = {
             ruleStack:       [ruleGrammar.name],
@@ -112,7 +111,7 @@ namespace chevrotain.lookahead {
             occurrence:      ruleOccurrence
         }
 
-        let walker:interp.AbstractNextPossibleTokensWalker = new prodWalker(ruleGrammar, path)
+        let walker:interp.AbstractNextPossibleTokensWalker = new prodWalkerConstructor(ruleGrammar, path)
         let possibleNextTokTypes = walker.startWalking()
 
         return getSimpleLookahead(possibleNextTokTypes)
