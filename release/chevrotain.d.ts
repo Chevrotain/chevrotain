@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.6 - 2015-09-29 */
+/*! chevrotain - v0.5.7 - 2015-11-30 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -163,6 +163,8 @@ declare module chevrotain {
 
     import gast = chevrotain.gast;
     import lang = chevrotain.lang;
+    import exceptions = chevrotain.exceptions;
+    import IRecognitionException = chevrotain.exceptions.IRecognitionException;
     enum ParserDefinitionErrorType {
         INVALID_RULE_NAME = 0,
         DUPLICATE_RULE_NAME = 1,
@@ -210,7 +212,7 @@ declare module chevrotain {
         ALT: () => T;
     }
     interface IParserState {
-        errors: Error[];
+        errors: exceptions.IRecognitionException[];
         inputIdx: number;
         RULE_STACK: string[];
     }
@@ -226,7 +228,7 @@ declare module chevrotain {
         static NO_RESYNC: boolean;
         static DEFER_DEFINITION_ERRORS_HANDLING: boolean;
         protected static performSelfAnalysis(classInstance: Parser): void;
-        errors: Error[];
+        errors: exceptions.IRecognitionException[];
         /**
          * This flag enables or disables error recovery (fault tolerance) of the parser.
          * If this flag is disabled the parser will halt on the first error.
@@ -259,7 +261,7 @@ declare module chevrotain {
         isAtEndOfInput(): boolean;
         getGAstProductions(): lang.HashTable<gast.Rule>;
         protected isBackTracking(): boolean;
-        protected SAVE_ERROR(error: Error): Error;
+        protected SAVE_ERROR(error: exceptions.IRecognitionException): IRecognitionException;
         protected NEXT_TOKEN(): Token;
         protected LA(howMuch: number): Token;
         protected isNextRule<T>(ruleName: string): boolean;
@@ -709,6 +711,11 @@ declare module chevrotain {
     }
 
 	module exceptions {
+    	interface IRecognitionException {
+        	name: string;
+        	message: string;
+        	token: Token;
+    	}
     	function isRecognitionException(error: Error): boolean;
     	function MismatchedTokenException(message: string, token: Token): void;
     	function NoViableAltException(message: string, token: Token): void;
@@ -725,7 +732,7 @@ declare module chevrotain {
         	occurrenceInParent: number;
         	implicitOccurrenceIndex: boolean;
     	}
-    	class AbstractProduction implements IProduction {
+    	abstract class AbstractProduction implements IProduction {
         	definition: IProduction[];
         	implicitOccurrenceIndex: boolean;
         	constructor(definition: IProduction[]);
@@ -780,7 +787,7 @@ declare module chevrotain {
         	constructor(terminalType: Function, occurrenceInParent?: number);
         	accept(visitor: GAstVisitor): void;
     	}
-    	class GAstVisitor {
+    	abstract class GAstVisitor {
         	visit(node: IProduction): void;
         	visitNonTerminal(node: NonTerminal): void;
         	visitFlat(node: Flat): void;

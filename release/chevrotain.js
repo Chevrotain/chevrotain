@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.6 - 2015-09-29 */
+/*! chevrotain - v0.5.7 - 2015-11-30 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -82,8 +82,7 @@ var chevrotain;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    /* istanbul ignore next */  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 // using only root namespace name ('chevrotain') and not a longer name ('chevrotain.tokens')
 // because the external and internal API must have the same names for d.ts definition files to be valid
@@ -1700,13 +1699,13 @@ var chevrotain;
             return tokensToAltsIndicesWithAmbiguity;
         }
         lookahead.checkAlternativesAmbiguities = checkAlternativesAmbiguities;
-        function buildLookAheadForGrammarProd(prodWalker, ruleOccurrence, ruleGrammar) {
+        function buildLookAheadForGrammarProd(prodWalkerConstructor, ruleOccurrence, ruleGrammar) {
             var path = {
                 ruleStack: [ruleGrammar.name],
                 occurrenceStack: [1],
                 occurrence: ruleOccurrence
             };
-            var walker = new prodWalker(ruleGrammar, path);
+            var walker = new prodWalkerConstructor(ruleGrammar, path);
             var possibleNextTokTypes = walker.startWalking();
             return getSimpleLookahead(possibleNextTokTypes);
         }
@@ -3600,7 +3599,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.6";
+    API.VERSION = "0.5.7";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
