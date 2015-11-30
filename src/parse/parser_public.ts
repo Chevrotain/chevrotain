@@ -13,6 +13,7 @@ namespace chevrotain {
     import checks = chevrotain.checks
     import resolver = chevrotain.resolver
     import exceptions = chevrotain.exceptions
+    import IRecognitionException = chevrotain.exceptions.IRecognitionException
 
 
     export enum ParserDefinitionErrorType {
@@ -71,7 +72,7 @@ namespace chevrotain {
     }
 
     export interface IParserState {
-        errors: Error[]
+        errors: exceptions.IRecognitionException[]
         inputIdx:number
         RULE_STACK:string[]
     }
@@ -134,7 +135,7 @@ namespace chevrotain {
             }
         }
 
-        public errors:Error[] = []
+        public errors:exceptions.IRecognitionException[] = []
 
         /**
          * This flag enables or disables error recovery (fault tolerance) of the parser.
@@ -235,7 +236,7 @@ namespace chevrotain {
             return !(_.isEmpty(this.isBackTrackingStack))
         }
 
-        protected SAVE_ERROR(error:Error):Error {
+        protected SAVE_ERROR(error:exceptions.IRecognitionException):IRecognitionException {
             if (exceptions.isRecognitionException(error)) {
                 this.errors.push(error)
                 return error

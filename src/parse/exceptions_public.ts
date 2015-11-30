@@ -1,5 +1,11 @@
 namespace chevrotain.exceptions {
 
+    export interface IRecognitionException {
+        name:string,
+        message:string,
+        token:Token
+    }
+
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
         let recognitionExceptions = [
