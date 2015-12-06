@@ -64,9 +64,10 @@ namespace chevrotain.gastBuilder {
         // the top most range must strictly contain all the other ranges
         // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
         let spacedImpelText = " " + impelText
+        // TODO: why do we add whitespace twice?
         let txtWithoutComments = removeComments(" " + spacedImpelText)
-        // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
-        let prodRanges = createRanges(txtWithoutComments)
+        let textWithoutCommentsAndStrings = removeStringLiterals(txtWithoutComments)
+        let prodRanges = createRanges(textWithoutCommentsAndStrings)
         let topRange = new r.Range(0, impelText.length + 2)
         return buildTopLevel(name, topRange, prodRanges, impelText)
     }
@@ -212,11 +213,19 @@ namespace chevrotain.gastBuilder {
 
     let singleLineCommentRegEx = /\/\/.*/g
     let multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g
+    let doubleQuoteStringLiteralRegEx = /"([^\\"]+|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g
+    let singleQuoteStringLiteralRegEx = /'([^\\']+|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g
 
     export function removeComments(text:string):string {
         let noSingleLine = text.replace(singleLineCommentRegEx, "")
         let noComments = noSingleLine.replace(multiLineCommentRegEx, "")
         return noComments
+    }
+
+    export function removeStringLiterals(text:string):string {
+        let noDoubleQuotes = text.replace(doubleQuoteStringLiteralRegEx, "")
+        let noSingleQuotes = noDoubleQuotes.replace(singleQuoteStringLiteralRegEx, "")
+        return noSingleQuotes
     }
 
     export function createRanges(text:string):IProdRange[] {

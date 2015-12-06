@@ -186,6 +186,18 @@ namespace chevrotain.gastBuilder.spec {
             expect(actual).to.equal("\nhello world")
         })
 
+        it("has a utility function that can remove string literals from texts", function () {
+            let input = "'single quotes string'" +
+                "\nhello" +
+                "\"\"" +
+                "\"double quotes string\"" +
+                " world" +
+                "'bam\\'ba\"\"'"
+
+            let actual = b.removeStringLiterals(input)
+            expect(actual).to.equal("\nhello world")
+        })
+
         it("can detect missing closing parenthesis in a string", function () {
             let input = " ((()))" // the input is assumed to start right after an opening parenthesis
             expect(() => b.findClosingOffset("(", ")", 0, input)).to.throw("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS")
