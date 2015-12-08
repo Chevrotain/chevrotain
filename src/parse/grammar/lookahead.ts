@@ -55,20 +55,45 @@ namespace chevrotain.lookahead {
             }
         }
 
-        /**
-         * This will return the Index of the alternative to take or -1 if none of the alternatives match
-         */
-        return function ():number {
-            let nextToken = this.NEXT_TOKEN()
-            for (let i = 0; i < alternativesTokens.length; i++) {
-                let currAltTokens = alternativesTokens[i]
-                for (let j = 0; j < (<any>currAltTokens).length; j++) {
-                    if (nextToken instanceof currAltTokens[j]) {
-                        return i
+        let hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens))
+        if (hasLastAnEmptyAlt) {
+            let lastIdx = alternativesTokens.length - 1
+            /**
+             * This will return the Index of the alternative to take or the <lastidx> if only the empty alternative matched
+             */
+            return function chooseAlternativeWithEmptyAlt():number {
+                let nextToken = this.NEXT_TOKEN()
+                // checking only until length - 1 because there is nothing to check in an empty alternative, it is always valid
+                for (let i = 0; i < lastIdx; i++) {
+                    let currAltTokens = alternativesTokens[i]
+                    // 'for' loop for performance reasons.
+                    for (let j = 0; j < (<any>currAltTokens).length; j++) {
+                        if (nextToken instanceof currAltTokens[j]) {
+                            return i
+                        }
                     }
                 }
+                // an OR(alternation) with an empty alternative will always match
+                return lastIdx;
             }
-            return -1;
+        }
+        else {
+            /**
+             * This will return the Index of the alternative to take or -1 if none of the alternatives match
+             */
+            return function chooseAlternative():number {
+                let nextToken = this.NEXT_TOKEN()
+                for (let i = 0; i < alternativesTokens.length; i++) {
+                    let currAltTokens = alternativesTokens[i]
+                    // 'for' loop for performance reasons.
+                    for (let j = 0; j < (<any>currAltTokens).length; j++) {
+                        if (nextToken instanceof currAltTokens[j]) {
+                            return i
+                        }
+                    }
+                }
+                return -1;
+            }
         }
     }
 
@@ -128,5 +153,4 @@ namespace chevrotain.lookahead {
             return false
         }
     }
-
 }

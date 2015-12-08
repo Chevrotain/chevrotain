@@ -25,6 +25,9 @@ if (!testMode) {
     API.extendToken = chevrotain.extendToken
     API.tokenName = chevrotain.tokenName
 
+    // Other Utilities
+    API.EMPTY_ALT = chevrotain.EMPTY_ALT
+
     API.exceptions = {}
     API.exceptions.isRecognitionException = chevrotain.exceptions.isRecognitionException
     API.exceptions.EarlyExitException = chevrotain.exceptions.EarlyExitException

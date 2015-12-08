@@ -159,6 +159,17 @@ namespace specs.samples {
         ]),
     ])
 
+    export let emptyAltOr = new gast.Rule("emptyAltOr", [
+        new gast.Alternation([
+            new gast.Flat([
+                new gast.Terminal(KeyTok, 1)
+            ]),
+            new gast.Flat([
+                new gast.Terminal(EntityTok, 1)
+            ]),
+            new gast.Flat([]) // an empty alternative
+        ])
+    ])
 
     export let callArguments = new gast.Rule("callArguments", [
         new gast.RepetitionWithSeparator([

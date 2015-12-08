@@ -1,4 +1,3 @@
-
 namespace chevrotain.lookahead.spec {
 
     import samples = specs.samples
@@ -41,7 +40,6 @@ namespace chevrotain.lookahead.spec {
         }
     }
 
-
     describe("The Grammar Lookahead namespace", function () {
         "use strict"
 
@@ -66,13 +64,22 @@ namespace chevrotain.lookahead.spec {
             expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
         })
 
-        it("can compute the lookahead function for the first MANY in ActionDec", function () {
+        it("can compute the lookahead function for lots of ORs sample", function () {
             let laFunc = lookahead.buildLookaheadForOr(1, samples.lotsOfOrs)
 
             expect(laFunc.call(new CommaParserMock([], []))).to.equal(0)
             expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
             expect(laFunc.call(new EntityParserMock([], []))).to.equal(1)
             expect(laFunc.call(new ColonParserMock([], []))).to.equal(-1)
+        })
+
+        it("can compute the lookahead function for EMPTY OR sample", function () {
+            let laFunc = lookahead.buildLookaheadForOr(1, samples.emptyAltOr)
+
+            expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
+            expect(laFunc.call(new EntityParserMock([], []))).to.equal(1)
+            // none matches so the last empty alternative should be taken (idx 2)
+            expect(laFunc.call(new CommaParserMock([], []))).to.equal(2)
         })
 
         it("can compute the lookahead function for a Top Level Rule", function () {
@@ -92,7 +99,6 @@ namespace chevrotain.lookahead.spec {
         })
     })
 
-
     class A extends Token {}
     class B extends Token {}
     class C extends Token {}
@@ -109,6 +115,4 @@ namespace chevrotain.lookahead.spec {
             expect(ambiguities[0].alts).to.deep.equal([2, 3])
         })
     })
-
-
 }

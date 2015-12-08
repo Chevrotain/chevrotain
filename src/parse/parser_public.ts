@@ -80,6 +80,50 @@ namespace chevrotain {
     export type LookAheadFunc = () => boolean
     export type GrammarAction = () => void
 
+    /**
+     * convenience used to express an empty alternative in an OR (alternation).
+     * can be used to more clearly describe the intent in a case of empty alternation.
+     *
+     * for example:
+     *
+     * 1. without using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: () => { // implicitly empty because there are no invoked grammar rules (OR/MANY/CONSUME...) inside this alternative.
+     *        return "666"
+     *      }},
+     *    ])
+     *
+     *
+     * * 2. using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: EMPTY_ALT("666")}, // explicitly empty, clearer intent
+     *    ])
+     *
+     */
+    export let EMPTY_ALT = function emptyAlt<T>(value:T):() => T {
+        return function () {
+            return value
+        }
+    }
+
     let EOF_FOLLOW_KEY:any = {}
 
     /**
@@ -557,7 +601,7 @@ namespace chevrotain {
          *
          * using the short form is recommended as it will compute the lookahead function
          * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * It only works if the lookahead for the grammar is one LL(1).
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.

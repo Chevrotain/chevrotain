@@ -1061,6 +1061,53 @@ namespace chevrotain.recognizer.lookahead.spec {
         })
     })
 
+    class OrImplicitEmptyAltLookAheadParser extends Parser {
+
+        public getLookAheadCache():lang.HashTable<Function> {
+            return cache.getLookaheadFuncsForClass(this.className)
+        }
+
+        constructor(input:Token[] = []) {
+            super(input, <any>chevrotain.recognizer.lookahead.spec)
+            Parser.performSelfAnalysis(this)
+        }
+
+        public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+
+        private parseOrRule():string {
+            // @formatter:off
+            return this.OR1([
+                    {ALT: () => {
+                        this.CONSUME1(OneTok)
+                        return "1"
+                    }},
+                    {ALT: () => {
+                        this.CONSUME1(TwoTok)
+                        return "2"
+                    }},
+                    {ALT: chevrotain.EMPTY_ALT("EMPTY_ALT")
+                    },
+                ])
+            // @formatter:on
+        }
+    }
+
+    describe("The support for EMPTY alternative implicit lookahead in OR", function () {
+
+        it("can match an non-empty alternative in an OR with an empty alternative", function () {
+            let input = [new OneTok()]
+            let parser = new OrImplicitEmptyAltLookAheadParser(input)
+            expect(parser.orRule()).to.equal("1")
+        })
+
+        it("can match an empty alternative", function () {
+            let input = []
+            let parser = new OrImplicitEmptyAltLookAheadParser(input)
+            expect(parser.orRule()).to.equal("EMPTY_ALT")
+        })
+
+    })
+
     class OrExplicitLookAheadParser extends Parser {
 
         public getLookAheadCache():lang.HashTable<Function> {
