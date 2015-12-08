@@ -118,7 +118,7 @@ namespace chevrotain {
      *    ])
      *
      */
-    export let EMPTY_ALT = function emptyAlt<T>(value:T):() => T {
+    export function EMPTY_ALT<T>(value:T = undefined):() => T {
         return function () {
             return value
         }

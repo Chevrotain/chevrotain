@@ -1085,8 +1085,7 @@ namespace chevrotain.recognizer.lookahead.spec {
                         this.CONSUME1(TwoTok)
                         return "2"
                     }},
-                    {ALT: chevrotain.EMPTY_ALT("EMPTY_ALT")
-                    },
+                    {ALT: chevrotain.EMPTY_ALT("EMPTY_ALT")}
                 ])
             // @formatter:on
         }
@@ -1104,6 +1103,14 @@ namespace chevrotain.recognizer.lookahead.spec {
             let input = []
             let parser = new OrImplicitEmptyAltLookAheadParser(input)
             expect(parser.orRule()).to.equal("EMPTY_ALT")
+        })
+
+        it("has a utility function for defining EMPTY ALTERNATIVES", function () {
+            let noArgsEmptyAlt = chevrotain.EMPTY_ALT()
+            expect(noArgsEmptyAlt()).to.be.undefined
+
+            let valueEmptyAlt = chevrotain.EMPTY_ALT(666)
+            expect(valueEmptyAlt()).to.equal(666)
         })
 
     })
