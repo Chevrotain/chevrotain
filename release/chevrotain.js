@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.7 - 2015-11-30 */
+/*! chevrotain - v0.5.8 - 2015-12-08 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -1662,21 +1662,46 @@ var chevrotain;
                         " matches and ignore all the others");
                 }
             }
-            /**
-             * This will return the Index of the alternative to take or -1 if none of the alternatives match
-             */
-            return function () {
-                var nextToken = this.NEXT_TOKEN();
-                for (var i = 0; i < alternativesTokens.length; i++) {
-                    var currAltTokens = alternativesTokens[i];
-                    for (var j = 0; j < currAltTokens.length; j++) {
-                        if (nextToken instanceof currAltTokens[j]) {
-                            return i;
+            var hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens));
+            if (hasLastAnEmptyAlt) {
+                var lastIdx = alternativesTokens.length - 1;
+                /**
+                 * This will return the Index of the alternative to take or the <lastidx> if only the empty alternative matched
+                 */
+                return function chooseAlternativeWithEmptyAlt() {
+                    var nextToken = this.NEXT_TOKEN();
+                    // checking only until length - 1 because there is nothing to check in an empty alternative, it is always valid
+                    for (var i = 0; i < lastIdx; i++) {
+                        var currAltTokens = alternativesTokens[i];
+                        // 'for' loop for performance reasons.
+                        for (var j = 0; j < currAltTokens.length; j++) {
+                            if (nextToken instanceof currAltTokens[j]) {
+                                return i;
+                            }
                         }
                     }
-                }
-                return -1;
-            };
+                    // an OR(alternation) with an empty alternative will always match
+                    return lastIdx;
+                };
+            }
+            else {
+                /**
+                 * This will return the Index of the alternative to take or -1 if none of the alternatives match
+                 */
+                return function chooseAlternative() {
+                    var nextToken = this.NEXT_TOKEN();
+                    for (var i = 0; i < alternativesTokens.length; i++) {
+                        var currAltTokens = alternativesTokens[i];
+                        // 'for' loop for performance reasons.
+                        for (var j = 0; j < currAltTokens.length; j++) {
+                            if (nextToken instanceof currAltTokens[j]) {
+                                return i;
+                            }
+                        }
+                    }
+                    return -1;
+                };
+            }
         }
         lookahead.buildLookaheadForOr = buildLookaheadForOr;
         function checkAlternativesAmbiguities(alternativesTokens) {
@@ -1768,9 +1793,10 @@ var chevrotain;
             // the top most range must strictly contain all the other ranges
             // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
             var spacedImpelText = " " + impelText;
+            // TODO: why do we add whitespace twice?
             var txtWithoutComments = removeComments(" " + spacedImpelText);
-            // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
-            var prodRanges = createRanges(txtWithoutComments);
+            var textWithoutCommentsAndStrings = removeStringLiterals(txtWithoutComments);
+            var prodRanges = createRanges(textWithoutCommentsAndStrings);
             var topRange = new r.Range(0, impelText.length + 2);
             return buildTopLevel(name, topRange, prodRanges, impelText);
         }
@@ -1891,12 +1917,20 @@ var chevrotain;
         gastBuilder.getDirectlyContainedRanges = getDirectlyContainedRanges;
         var singleLineCommentRegEx = /\/\/.*/g;
         var multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
+        var doubleQuoteStringLiteralRegEx = /"([^\\"]+|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g;
+        var singleQuoteStringLiteralRegEx = /'([^\\']+|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g;
         function removeComments(text) {
             var noSingleLine = text.replace(singleLineCommentRegEx, "");
             var noComments = noSingleLine.replace(multiLineCommentRegEx, "");
             return noComments;
         }
         gastBuilder.removeComments = removeComments;
+        function removeStringLiterals(text) {
+            var noDoubleQuotes = text.replace(doubleQuoteStringLiteralRegEx, "");
+            var noSingleQuotes = noDoubleQuotes.replace(singleQuoteStringLiteralRegEx, "");
+            return noSingleQuotes;
+        }
+        gastBuilder.removeStringLiterals = removeStringLiterals;
         function createRanges(text) {
             var terminalRanges = createTerminalRanges(text);
             var refsRanges = createRefsRanges(text);
@@ -2331,6 +2365,49 @@ var chevrotain;
         ParserDefinitionErrorType[ParserDefinitionErrorType["LEFT_RECURSION"] = 4] = "LEFT_RECURSION";
     })(chevrotain.ParserDefinitionErrorType || (chevrotain.ParserDefinitionErrorType = {}));
     var ParserDefinitionErrorType = chevrotain.ParserDefinitionErrorType;
+    /**
+     * convenience used to express an empty alternative in an OR (alternation).
+     * can be used to more clearly describe the intent in a case of empty alternation.
+     *
+     * for example:
+     *
+     * 1. without using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: () => { // implicitly empty because there are no invoked grammar rules (OR/MANY/CONSUME...) inside this alternative.
+     *        return "666"
+     *      }},
+     *    ])
+     *
+     *
+     * * 2. using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: EMPTY_ALT("666")}, // explicitly empty, clearer intent
+     *    ])
+     *
+     */
+    chevrotain.EMPTY_ALT = function emptyAlt(value) {
+        return function () {
+            return value;
+        };
+    };
     var EOF_FOLLOW_KEY = {};
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
@@ -2741,7 +2818,7 @@ var chevrotain;
          *
          * using the short form is recommended as it will compute the lookahead function
          * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * It only works if the lookahead for the grammar is one LL(1).
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
@@ -3599,7 +3676,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.7";
+    API.VERSION = "0.5.8";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
@@ -3609,6 +3686,8 @@ if (!testMode) {
     // Tokens utilities
     API.extendToken = chevrotain.extendToken;
     API.tokenName = chevrotain.tokenName;
+    // Other Utilities
+    API.EMPTY_ALT = chevrotain.EMPTY_ALT;
     API.exceptions = {};
     API.exceptions.isRecognitionException = chevrotain.exceptions.isRecognitionException;
     API.exceptions.EarlyExitException = chevrotain.exceptions.EarlyExitException;

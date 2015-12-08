@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.7 - 2015-11-30 */
+/*! chevrotain - v0.5.8 - 2015-12-08 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -219,6 +219,45 @@ declare module chevrotain {
     type LookAheadFunc = () => boolean;
     type GrammarAction = () => void;
     /**
+     * convenience used to express an empty alternative in an OR (alternation).
+     * can be used to more clearly describe the intent in a case of empty alternation.
+     *
+     * for example:
+     *
+     * 1. without using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: () => { // implicitly empty because there are no invoked grammar rules (OR/MANY/CONSUME...) inside this alternative.
+     *        return "666"
+     *      }},
+     *    ])
+     *
+     *
+     * * 2. using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: EMPTY_ALT("666")}, // explicitly empty, clearer intent
+     *    ])
+     *
+     */
+    let EMPTY_ALT: <T>(value: T) => () => T;
+    /**
      * A Recognizer capable of self analysis to determine it's grammar structure
      * This is used for more advanced features requiring such information.
      * for example: Error Recovery, Automatic lookahead calculation
@@ -431,7 +470,7 @@ declare module chevrotain {
          *
          * using the short form is recommended as it will compute the lookahead function
          * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * It only works if the lookahead for the grammar is one LL(1).
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
