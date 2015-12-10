@@ -210,8 +210,11 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
             //noinspection JSUnresolvedVariable
             return locateSubruleRef(parserImplText, parseErr.unresolvedRefName, positionHelper, ruleText)
             break
+        case chevrotain.ParserDefinitionErrorType.LEFT_RECURSION:
+            return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
+            break
         default:
-            throw Error("none exhaustive match ->" + parseErr.type + "<-")
+            throw Error("unknown parser error type ->" + parseErr.type + "<-")
     }
 }
 
