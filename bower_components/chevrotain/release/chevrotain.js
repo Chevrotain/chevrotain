@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.5 - 2015-09-06 */
+/*! chevrotain - v0.5.8 - 2015-12-08 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -82,8 +82,7 @@ var chevrotain;
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    /* istanbul ignore next */  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 // using only root namespace name ('chevrotain') and not a longer name ('chevrotain.tokens')
 // because the external and internal API must have the same names for d.ts definition files to be valid
@@ -935,7 +934,8 @@ var chevrotain;
                 prod instanceof gast.Rule;
         }
         gast.isSequenceProd = isSequenceProd;
-        function isOptionalProd(prod) {
+        function isOptionalProd(prod, alreadyVisited) {
+            if (alreadyVisited === void 0) { alreadyVisited = []; }
             var isDirectlyOptional = prod instanceof gast.Option ||
                 prod instanceof gast.Repetition ||
                 prod instanceof gast.RepetitionWithSeparator;
@@ -948,12 +948,19 @@ var chevrotain;
             if (prod instanceof gast.Alternation) {
                 // for OR its enough for just one of the alternatives to be optional
                 return _.some(prod.definition, function (subProd) {
-                    return isOptionalProd(subProd);
+                    return isOptionalProd(subProd, alreadyVisited);
                 });
             }
+            else if (prod instanceof gast.NonTerminal && _.contains(alreadyVisited, prod)) {
+                // avoiding stack overflow due to infinite recursion
+                return false;
+            }
             else if (prod instanceof gast.AbstractProduction) {
+                if (prod instanceof gast.NonTerminal) {
+                    alreadyVisited.push(prod);
+                }
                 return _.every(prod.definition, function (subProd) {
-                    return isOptionalProd(subProd);
+                    return isOptionalProd(subProd, alreadyVisited);
                 });
             }
             else {
@@ -1655,21 +1662,46 @@ var chevrotain;
                         " matches and ignore all the others");
                 }
             }
-            /**
-             * This will return the Index of the alternative to take or -1 if none of the alternatives match
-             */
-            return function () {
-                var nextToken = this.NEXT_TOKEN();
-                for (var i = 0; i < alternativesTokens.length; i++) {
-                    var currAltTokens = alternativesTokens[i];
-                    for (var j = 0; j < currAltTokens.length; j++) {
-                        if (nextToken instanceof currAltTokens[j]) {
-                            return i;
+            var hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens));
+            if (hasLastAnEmptyAlt) {
+                var lastIdx = alternativesTokens.length - 1;
+                /**
+                 * This will return the Index of the alternative to take or the <lastidx> if only the empty alternative matched
+                 */
+                return function chooseAlternativeWithEmptyAlt() {
+                    var nextToken = this.NEXT_TOKEN();
+                    // checking only until length - 1 because there is nothing to check in an empty alternative, it is always valid
+                    for (var i = 0; i < lastIdx; i++) {
+                        var currAltTokens = alternativesTokens[i];
+                        // 'for' loop for performance reasons.
+                        for (var j = 0; j < currAltTokens.length; j++) {
+                            if (nextToken instanceof currAltTokens[j]) {
+                                return i;
+                            }
                         }
                     }
-                }
-                return -1;
-            };
+                    // an OR(alternation) with an empty alternative will always match
+                    return lastIdx;
+                };
+            }
+            else {
+                /**
+                 * This will return the Index of the alternative to take or -1 if none of the alternatives match
+                 */
+                return function chooseAlternative() {
+                    var nextToken = this.NEXT_TOKEN();
+                    for (var i = 0; i < alternativesTokens.length; i++) {
+                        var currAltTokens = alternativesTokens[i];
+                        // 'for' loop for performance reasons.
+                        for (var j = 0; j < currAltTokens.length; j++) {
+                            if (nextToken instanceof currAltTokens[j]) {
+                                return i;
+                            }
+                        }
+                    }
+                    return -1;
+                };
+            }
         }
         lookahead.buildLookaheadForOr = buildLookaheadForOr;
         function checkAlternativesAmbiguities(alternativesTokens) {
@@ -1692,13 +1724,13 @@ var chevrotain;
             return tokensToAltsIndicesWithAmbiguity;
         }
         lookahead.checkAlternativesAmbiguities = checkAlternativesAmbiguities;
-        function buildLookAheadForGrammarProd(prodWalker, ruleOccurrence, ruleGrammar) {
+        function buildLookAheadForGrammarProd(prodWalkerConstructor, ruleOccurrence, ruleGrammar) {
             var path = {
                 ruleStack: [ruleGrammar.name],
                 occurrenceStack: [1],
                 occurrence: ruleOccurrence
             };
-            var walker = new prodWalker(ruleGrammar, path);
+            var walker = new prodWalkerConstructor(ruleGrammar, path);
             var possibleNextTokTypes = walker.startWalking();
             return getSimpleLookahead(possibleNextTokTypes);
         }
@@ -1761,9 +1793,10 @@ var chevrotain;
             // the top most range must strictly contain all the other ranges
             // which is why we prefix the text with " " (curr Range impel is only for positive ranges)
             var spacedImpelText = " " + impelText;
+            // TODO: why do we add whitespace twice?
             var txtWithoutComments = removeComments(" " + spacedImpelText);
-            // TODO: consider removing literal strings too to avoid future errors (literal string with ')' for example)
-            var prodRanges = createRanges(txtWithoutComments);
+            var textWithoutCommentsAndStrings = removeStringLiterals(txtWithoutComments);
+            var prodRanges = createRanges(textWithoutCommentsAndStrings);
             var topRange = new r.Range(0, impelText.length + 2);
             return buildTopLevel(name, topRange, prodRanges, impelText);
         }
@@ -1884,12 +1917,20 @@ var chevrotain;
         gastBuilder.getDirectlyContainedRanges = getDirectlyContainedRanges;
         var singleLineCommentRegEx = /\/\/.*/g;
         var multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g;
+        var doubleQuoteStringLiteralRegEx = /"([^\\"]+|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g;
+        var singleQuoteStringLiteralRegEx = /'([^\\']+|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g;
         function removeComments(text) {
             var noSingleLine = text.replace(singleLineCommentRegEx, "");
             var noComments = noSingleLine.replace(multiLineCommentRegEx, "");
             return noComments;
         }
         gastBuilder.removeComments = removeComments;
+        function removeStringLiterals(text) {
+            var noDoubleQuotes = text.replace(doubleQuoteStringLiteralRegEx, "");
+            var noSingleQuotes = noDoubleQuotes.replace(singleQuoteStringLiteralRegEx, "");
+            return noSingleQuotes;
+        }
+        gastBuilder.removeStringLiterals = removeStringLiterals;
         function createRanges(text) {
             var terminalRanges = createTerminalRanges(text);
             var refsRanges = createRefsRanges(text);
@@ -2017,11 +2058,12 @@ var chevrotain;
     (function (checks) {
         var gast = chevrotain.gast;
         function validateGrammar(topLevels) {
-            var errorMessagesArrs = _.map(topLevels, validateSingleTopLevelRule);
-            return _.flatten(errorMessagesArrs);
+            var duplicateErrors = _.map(topLevels, validateDuplicateProductions);
+            var leftRecursionErrors = _.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
+            return _.flatten(duplicateErrors.concat(leftRecursionErrors));
         }
         checks.validateGrammar = validateGrammar;
-        function validateSingleTopLevelRule(topLevelRule) {
+        function validateDuplicateProductions(topLevelRule) {
             var collectorVisitor = new OccurrenceValidationCollector();
             topLevelRule.accept(collectorVisitor);
             var allRuleProductions = collectorVisitor.allProductions;
@@ -2130,6 +2172,83 @@ var chevrotain;
             return errors;
         }
         checks.validateRuleName = validateRuleName;
+        function validateNoLeftRecursion(topRule, currRule, path) {
+            if (path === void 0) { path = []; }
+            var errors = [];
+            var nextNonTerminals = getFirstNoneTerminal(currRule.definition);
+            if (_.isEmpty(nextNonTerminals)) {
+                return [];
+            }
+            else {
+                var ruleName = topRule.name;
+                var foundLeftRecursion = _.contains(nextNonTerminals, topRule);
+                var pathNames = _.map(path, function (currRule) { return currRule.name; });
+                var leftRecursivePath = ruleName + " --> " + pathNames.concat([ruleName]).join(" --> ");
+                if (foundLeftRecursion) {
+                    var errMsg = "Left Recursion found in grammar.\n" +
+                        ("rule: <" + ruleName + "> can be invoked from itself (directly or indirectly)\n") +
+                        ("without consuming any Tokens. The grammar path that causes this is: \n " + leftRecursivePath + "\n") +
+                        " To fix this refactor your grammar to remove the left recursion.\n" +
+                        "see: https://en.wikipedia.org/wiki/LL_parser#Left_Factoring.";
+                    errors.push({
+                        message: errMsg,
+                        type: chevrotain.ParserDefinitionErrorType.LEFT_RECURSION,
+                        ruleName: ruleName
+                    });
+                }
+                // we are only looking for cyclic paths leading back to the specific topRule
+                // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
+                var validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]));
+                var errorsFromNextSteps = _.map(validNextSteps, function (currRefRule, key, all) {
+                    var newPath = _.clone(path);
+                    newPath.push(currRefRule);
+                    return validateNoLeftRecursion(topRule, currRefRule, newPath);
+                });
+                return errors.concat(_.flatten(errorsFromNextSteps));
+            }
+        }
+        checks.validateNoLeftRecursion = validateNoLeftRecursion;
+        function getFirstNoneTerminal(definition) {
+            var result = [];
+            if (_.isEmpty(definition)) {
+                return result;
+            }
+            var firstProd = _.first(definition);
+            if (firstProd instanceof gast.NonTerminal) {
+                // this allows the check to be performed on partially valid grammars that have not been completly resolved.
+                if (firstProd.referencedRule === undefined) {
+                    return result;
+                }
+                result.push(firstProd.referencedRule);
+            }
+            else if (firstProd instanceof gast.Flat ||
+                firstProd instanceof gast.Option ||
+                firstProd instanceof gast.RepetitionMandatory ||
+                firstProd instanceof gast.RepetitionMandatoryWithSeparator ||
+                firstProd instanceof gast.RepetitionWithSeparator ||
+                firstProd instanceof gast.Repetition) {
+                result = result.concat(getFirstNoneTerminal(firstProd.definition));
+            }
+            else if (firstProd instanceof gast.Alternation) {
+                // each sub definition in alternation is a FLAT
+                result = _.flatten(_.map(firstProd.definition, function (currSubDef) { return getFirstNoneTerminal(currSubDef.definition); }));
+            }/* istanbul ignore else */ 
+            else if (firstProd instanceof gast.Terminal) {
+            }
+            else {
+                /* istanbul ignore next */ throw Error("non exhaustive match");
+            }
+            var isFirstOptional = gast.isOptionalProd(firstProd);
+            var hasMore = definition.length > 1;
+            if (isFirstOptional && hasMore) {
+                var rest_1 = _.drop(definition);
+                return result.concat(getFirstNoneTerminal(rest_1));
+            }
+            else {
+                return result;
+            }
+        }
+        checks.getFirstNoneTerminal = getFirstNoneTerminal;
     })/* istanbul ignore next */ (checks = chevrotain.checks || /* istanbul ignore next */ (chevrotain.checks = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
@@ -2243,8 +2362,52 @@ var chevrotain;
         ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_RULE_NAME"] = 1] = "DUPLICATE_RULE_NAME";
         ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 2] = "DUPLICATE_PRODUCTIONS";
         ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 3] = "UNRESOLVED_SUBRULE_REF";
+        ParserDefinitionErrorType[ParserDefinitionErrorType["LEFT_RECURSION"] = 4] = "LEFT_RECURSION";
     })(chevrotain.ParserDefinitionErrorType || (chevrotain.ParserDefinitionErrorType = {}));
     var ParserDefinitionErrorType = chevrotain.ParserDefinitionErrorType;
+    /**
+     * convenience used to express an empty alternative in an OR (alternation).
+     * can be used to more clearly describe the intent in a case of empty alternation.
+     *
+     * for example:
+     *
+     * 1. without using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: () => { // implicitly empty because there are no invoked grammar rules (OR/MANY/CONSUME...) inside this alternative.
+     *        return "666"
+     *      }},
+     *    ])
+     *
+     *
+     * * 2. using EMPTY_ALT:
+     *
+     *    this.OR([
+     *      {ALT: () => {
+     *        this.CONSUME1(OneTok)
+     *        return "1"
+     *      }},
+     *      {ALT: () => {
+     *        this.CONSUME1(TwoTok)
+     *        return "2"
+     *      }},
+     *      {ALT: EMPTY_ALT("666")}, // explicitly empty, clearer intent
+     *    ])
+     *
+     */
+    chevrotain.EMPTY_ALT = function emptyAlt(value) {
+        return function () {
+            return value;
+        };
+    };
     var EOF_FOLLOW_KEY = {};
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
@@ -2317,7 +2480,7 @@ var chevrotain;
                 definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
                 if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                     defErrorsMsgs = _.map(definitionErrors, function (defError) { return defError.message; });
-                    throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
+                    throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
                 }
                 if (_.isEmpty(definitionErrors)) {
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
@@ -2327,7 +2490,7 @@ var chevrotain;
             // reThrow the validation errors each time an erroneous parser is instantiated
             if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
-                throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("-------------------------------\n"));
+                throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
             }
         };
         Object.defineProperty(Parser.prototype, "input", {
@@ -2655,7 +2818,7 @@ var chevrotain;
          *
          * using the short form is recommended as it will compute the lookahead function
          * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * It only works if the lookahead for the grammar is one LL(1).
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
@@ -3513,7 +3676,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.5";
+    API.VERSION = "0.5.8";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
@@ -3523,6 +3686,8 @@ if (!testMode) {
     // Tokens utilities
     API.extendToken = chevrotain.extendToken;
     API.tokenName = chevrotain.tokenName;
+    // Other Utilities
+    API.EMPTY_ALT = chevrotain.EMPTY_ALT;
     API.exceptions = {};
     API.exceptions.isRecognitionException = chevrotain.exceptions.isRecognitionException;
     API.exceptions.EarlyExitException = chevrotain.exceptions.EarlyExitException;

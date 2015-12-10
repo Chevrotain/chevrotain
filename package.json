@@ -6,11 +6,11 @@
     "chevrotain": "*"
   },
   "devDependencies": {
-    "gitty": "^3.2.3",
+    "gitty": "^3.3.0",
     "jison": "*",
     "jison-lex": "*",
-    "jsonfile": "^2.2.1",
-    "lodash": "^3.10.0",
+    "jsonfile": "^2.2.3",
+    "lodash": "^3.10.1",
     "wrench": "^1.5.8"
   },
   "private": true
