@@ -106,13 +106,38 @@ namespace chevrotain.lookahead.spec {
     class E extends Token {}
 
     describe("The Grammar Lookahead namespace", function () {
-        "use strict"
 
         it("can detect ambiguities when calculating lookahead functions for OR alternatives", function () {
             let input = [[A, B], [C, D], [E, C]]
             let ambiguities = lookahead.checkAlternativesAmbiguities(input)
             expect(ambiguities.length).to.equal(1)
             expect(ambiguities[0].alts).to.deep.equal([2, 3])
+        })
+
+        describe("can detect empty alternative ambiguities when calculating lookahead functions for OR alternatives", function () {
+            it("simple", function () {
+                let input = [[A, B], [], [E, C]]
+                let ambiguities = lookahead.checkEmptyAlternativeNotLast(input)
+                expect(ambiguities).to.eql([2])
+            })
+
+            it("multiple", function () {
+                let input = [[], [], [E, C]]
+                let ambiguities = lookahead.checkEmptyAlternativeNotLast(input)
+                expect(ambiguities).to.eql([1, 2])
+            })
+
+            it("negative - none empty", function () {
+                let input = [[A], [B], [E, C]]
+                let ambiguities = lookahead.checkEmptyAlternativeNotLast(input)
+                expect(ambiguities).to.be.empty
+            })
+
+            it("negative - last empty", function () {
+                let input = [[A, B], [D], []]
+                let ambiguities = lookahead.checkEmptyAlternativeNotLast(input)
+                expect(ambiguities).to.be.empty
+            })
         })
     })
 }

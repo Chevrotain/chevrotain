@@ -4,6 +4,7 @@ namespace chevrotain.lookahead {
     import p = chevrotain.path
     import interp = chevrotain.interpreter
     import f = chevrotain.first
+    import AlternativesFirstTokens = chevrotain.interpreter.AlternativesFirstTokens
 
     export function buildLookaheadForTopLevel(rule:gast.Rule):() => boolean {
         let restProd = new gast.Flat(rule.definition)
@@ -36,23 +37,21 @@ namespace chevrotain.lookahead {
         let alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking()
 
         if (!ignoreAmbiguities) {
-            let altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens)
+            checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar)
+        }
 
-            if (!_.isEmpty(altsAmbiguityErrors)) {
-                let errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
-                    return `Ambiguous alternatives ${currAmbiguity.alts.join(" ,")} in OR${orOccurrence} inside ${ruleGrammar.name} ` +
-                        `Rule, ${tokenName(currAmbiguity.token)} may appears as the first Terminal in all these alternatives.\n`
-                })
+        // empty alternative check can not be disabled
+        // this is because:
+        // A. an empty alternative always matches, so any alternative after it will never be reached.
+        // B. the lookahead function generated assumes an empty alternative may only be the last one for runtime performance reasons.
+        let emptyAltNotLast = checkEmptyAlternativeNotLast(alternativesTokens)
 
-                throw new Error(errorMessages.join("\n ---------------- \n") +
-                    "To Resolve this, either: \n" +
-                    "1. refactor your grammar to be LL(1)\n" +
-                    "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
-                    "3. Add ignore arg to this OR Production:\n" +
-                    "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
-                    "In that case the parser will always pick the first alternative that" +
-                    " matches and ignore all the others")
-            }
+        if (!_.isEmpty(emptyAltNotLast)) {
+            let errorMessage = `Ambiguous multiple empty alternatives: <${emptyAltNotLast.join(" ,")}>` +
+                ` in <OR${orOccurrence}> inside <${ruleGrammar.name}> Rule.\n` +
+                `Only the last alternative is allowed to be an empty alternative.`
+
+            throw new Error(errorMessage)
         }
 
         let hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens))
@@ -97,6 +96,28 @@ namespace chevrotain.lookahead {
         }
     }
 
+    export function checkForOrAmbiguities(alternativesTokens:AlternativesFirstTokens,
+                                          orOccurrence:number,
+                                          ruleGrammar:gast.Rule):void {
+        let altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens)
+
+        if (!_.isEmpty(altsAmbiguityErrors)) {
+            let errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
+                return `Ambiguous alternatives: <${currAmbiguity.alts.join(" ,")}> in <OR${orOccurrence}> inside <${ruleGrammar.name}> ` +
+                    `Rule, <${tokenName(currAmbiguity.token)}> may appears as the first Terminal in all these alternatives.\n`
+            })
+
+            throw new Error(errorMessages.join("\n ---------------- \n") +
+                "To Resolve this, either: \n" +
+                "1. refactor your grammar to be LL(1)\n" +
+                "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
+                "3. Add ignore arg to this OR Production:\n" +
+                "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
+                "In that case the parser will always pick the first alternative that" +
+                " matches and ignore all the others")
+        }
+    }
+
     export interface IAmbiguityDescriptor {
         alts:number[]
         token:Function
@@ -126,6 +147,16 @@ namespace chevrotain.lookahead {
         })
 
         return tokensToAltsIndicesWithAmbiguity
+    }
+
+    export function checkEmptyAlternativeNotLast(alternativesTokens:Function[][]):number[] {
+        let withoutLastAlt = _.dropRight(alternativesTokens)
+        return _.reduce(withoutLastAlt, (indexes, currAlts, currIdx) => {
+            if (_.isEmpty(currAlts)) {
+                indexes.push(currIdx + 1)
+            }
+            return indexes
+        }, [])
     }
 
     function buildLookAheadForGrammarProd(prodWalkerConstructor:any, ruleOccurrence:number,

@@ -1187,7 +1187,6 @@ namespace chevrotain.recognizer.lookahead.spec {
         })
     })
 
-
     class OrAmbiguityLookAheadParser extends Parser {
 
         constructor(input:Token[] = []) {
@@ -1224,7 +1223,41 @@ namespace chevrotain.recognizer.lookahead.spec {
 
         it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", function () {
             let parser = new OrAmbiguityLookAheadParser()
-            expect(() => parser.ambiguityRule()).to.throw()
+            expect(() => parser.ambiguityRule()).to.throw("Ambiguous alternatives")
+        })
+
+        it("will throw an error when an empty alternative is not the last alternative", function () {
+
+            let emptyAltAmbiguityParser = class extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, <any>chevrotain.recognizer.lookahead.spec)
+                    Parser.performSelfAnalysis(this)
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    // @formatter:off
+                    this.OR1([
+                        {ALT: () => {
+                            this.CONSUME1(OneTok)
+                        }},
+                        {ALT: () => {
+                            this.CONSUME1(ThreeTok)
+                        }},
+                        {ALT: () => {
+                            // empty alternative #3 which is not the last one!
+                        }},
+                        {ALT: () => {
+                            this.CONSUME2(TwoTok)
+                        }}
+                    ], "digits")
+                    // @formatter:on
+                })
+
+            }
+            let parser = new emptyAltAmbiguityParser()
+            expect(() => parser.noneLastEmpty()).to.throw("Ambiguous multiple empty alternatives")
+            expect(() => parser.noneLastEmpty()).to.throw("3")
         })
     })
 
