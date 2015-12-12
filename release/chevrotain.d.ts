@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.8 - 2015-12-08 */
+/*! chevrotain - v0.5.9 - 2015-12-12 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
@@ -171,6 +171,7 @@ declare module chevrotain {
         DUPLICATE_PRODUCTIONS = 2,
         UNRESOLVED_SUBRULE_REF = 3,
         LEFT_RECURSION = 4,
+        NONE_LAST_EMPTY_ALT = 5,
     }
     interface IParserDefinitionError {
         message: string;
@@ -181,6 +182,10 @@ declare module chevrotain {
         dslName: string;
         occurrence: number;
         parameter?: string;
+    }
+    interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
+        occurrence: number;
+        alternative: number;
     }
     interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
         unresolvedRefName: string;
@@ -256,7 +261,7 @@ declare module chevrotain {
      *    ])
      *
      */
-    let EMPTY_ALT: <T>(value: T) => () => T;
+    function EMPTY_ALT<T>(value?: T): () => T;
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
      * This is used for more advanced features requiring such information.
@@ -372,7 +377,7 @@ declare module chevrotain {
          * However using it is mandatory for all sub rule invocations.
          * calling another rule without wrapping in SUBRULE(...)
          * will cause errors/mistakes in the Recognizer's self analysis
-         * which will lead to errors in error recovery/automatic lookahead calcualtion
+         * which will lead to errors in error recovery/automatic lookahead calculation
          * and any other functionality relying on the Recognizer's self analysis
          * output.
          *
