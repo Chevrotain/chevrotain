@@ -40,20 +40,6 @@ namespace chevrotain.lookahead {
             checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar)
         }
 
-        // empty alternative check can not be disabled
-        // this is because:
-        // A. an empty alternative always matches, so any alternative after it will never be reached.
-        // B. the lookahead function generated assumes an empty alternative may only be the last one for runtime performance reasons.
-        let emptyAltNotLast = checkEmptyAlternativeNotLast(alternativesTokens)
-
-        if (!_.isEmpty(emptyAltNotLast)) {
-            let errorMessage = `Ambiguous multiple empty alternatives: <${emptyAltNotLast.join(" ,")}>` +
-                ` in <OR${orOccurrence}> inside <${ruleGrammar.name}> Rule.\n` +
-                `Only the last alternative is allowed to be an empty alternative.`
-
-            throw new Error(errorMessage)
-        }
-
         let hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens))
         if (hasLastAnEmptyAlt) {
             let lastIdx = alternativesTokens.length - 1
@@ -147,16 +133,6 @@ namespace chevrotain.lookahead {
         })
 
         return tokensToAltsIndicesWithAmbiguity
-    }
-
-    export function checkEmptyAlternativeNotLast(alternativesTokens:Function[][]):number[] {
-        let withoutLastAlt = _.dropRight(alternativesTokens)
-        return _.reduce(withoutLastAlt, (indexes, currAlts, currIdx) => {
-            if (_.isEmpty(currAlts)) {
-                indexes.push(currIdx + 1)
-            }
-            return indexes
-        }, [])
     }
 
     function buildLookAheadForGrammarProd(prodWalkerConstructor:any, ruleOccurrence:number,

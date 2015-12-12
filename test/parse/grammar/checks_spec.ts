@@ -234,6 +234,10 @@ namespace chevrotain.checks.spec {
         constructor() { super("+", 0, 1, 1) }
     }
 
+    export class StarTok extends Token {
+        constructor() { super("*", 0, 1, 1) }
+    }
+
     class ErroneousOccurrenceNumUsageParser1 extends Parser {
 
         constructor(input:Token[] = []) {
@@ -484,4 +488,39 @@ namespace chevrotain.checks.spec {
             expect(() => new ComplexInDirectlyLeftRecursive()).to.throw("A --> B --> A")
         })
     })
+
+    describe("The empty alternative detection full flow", () => {
+
+        it("will throw an error when an empty alternative is not the last alternative", () => {
+            let emptyAltAmbiguityParser = class emptyAltAmbiguityParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, <any>chevrotain.checks.spec)
+                    Parser.performSelfAnalysis(this)
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    // @formatter:off
+                    this.OR1([
+                        {ALT: () => {
+                            this.CONSUME1(PlusTok)
+                        }},
+                        {ALT: EMPTY_ALT()},  // empty alternative #2 which is not the last one!
+                        {ALT: () => {
+                            // empty alternative #3 which is not the last one!
+                        }},
+                        {ALT: () => {
+                            this.CONSUME2(StarTok)
+                        }}
+                    ], "digits")
+                    // @formatter:on
+                })
+
+            }
+            expect(() => new emptyAltAmbiguityParser()).to.throw("Ambiguous empty alternative")
+            expect(() => new emptyAltAmbiguityParser()).to.throw("3")
+            expect(() => new emptyAltAmbiguityParser()).to.throw("2")
+        })
+    })
+
 }

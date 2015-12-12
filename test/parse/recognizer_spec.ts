@@ -149,7 +149,7 @@ namespace chevrotain.recognizer.spec {
     }
 
     function isQualifiedNamePart():boolean {
-        return this.NEXT_TOKEN() instanceof  DotTok
+        return this.NEXT_TOKEN() instanceof DotTok
     }
 
     class SubRuleTestParser extends Parser {
@@ -281,6 +281,59 @@ namespace chevrotain.recognizer.spec {
             expect(parser.errors.length).to.equal(1)
             expect(_.contains(parser.errors[0].message, "unicorn")).to.equal(true)
         })
+
+        describe("supports EMPTY(...) alternative convenience function", () => {
+
+            let EmptyAltParser = class EmptyAltParser extends Parser {
+
+                public getLookAheadCache():lang.HashTable<Function> {
+                    return cache.getLookaheadFuncsForClass(this.className)
+                }
+
+                constructor(input:Token[] = []) {
+                    super(input, <any>chevrotain.recognizer.spec)
+                    Parser.performSelfAnalysis(this)
+                }
+
+                public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+
+                private parseOrRule():string {
+                    // @formatter:off
+                    return this.OR1([
+                            {ALT: () => {
+                                this.CONSUME1(PlusTok)
+                                return "+"
+                            }},
+                            {ALT: () => {
+                                this.CONSUME1(MinusTok)
+                                return "-"
+                            }},
+                            {ALT: chevrotain.EMPTY_ALT("EMPTY_ALT")}
+                        ])
+                     // @formatter:on
+                }
+            }
+
+            it("can match an non-empty alternative in an OR with an empty alternative", function () {
+                let input = [new PlusTok()]
+                let parser = new EmptyAltParser(input)
+                expect(parser.orRule()).to.equal("+")
+            })
+
+            it("can match an empty alternative", () => {
+                let input = []
+                let parser = new EmptyAltParser(input)
+                expect(parser.orRule()).to.equal("EMPTY_ALT")
+            })
+
+            it("has a utility function for defining EMPTY ALTERNATIVES", () => {
+                let noArgsEmptyAlt = chevrotain.EMPTY_ALT()
+                expect(noArgsEmptyAlt()).to.be.undefined
+
+                let valueEmptyAlt = chevrotain.EMPTY_ALT(666)
+                expect(valueEmptyAlt()).to.equal(666)
+            })
+        })
     })
 
     describe("The Error Recovery functionality of the IntrospectionParser", function () {
@@ -399,7 +452,7 @@ namespace chevrotain.recognizer.spec {
         it("can only SAVE_ERROR for recognition exceptions", function () {
             let parser:any = new Parser([], [])
             expect(() => parser.SAVE_ERROR(new Error("I am some random Error"))).
-                to.throw("trying to save an Error which is not a RecognitionException")
+            to.throw("trying to save an Error which is not a RecognitionException")
             expect(parser.input).to.be.an.instanceof(Array)
         })
 

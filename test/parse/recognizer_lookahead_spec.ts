@@ -1061,60 +1061,6 @@ namespace chevrotain.recognizer.lookahead.spec {
         })
     })
 
-    class OrImplicitEmptyAltLookAheadParser extends Parser {
-
-        public getLookAheadCache():lang.HashTable<Function> {
-            return cache.getLookaheadFuncsForClass(this.className)
-        }
-
-        constructor(input:Token[] = []) {
-            super(input, <any>chevrotain.recognizer.lookahead.spec)
-            Parser.performSelfAnalysis(this)
-        }
-
-        public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
-
-        private parseOrRule():string {
-            // @formatter:off
-            return this.OR1([
-                    {ALT: () => {
-                        this.CONSUME1(OneTok)
-                        return "1"
-                    }},
-                    {ALT: () => {
-                        this.CONSUME1(TwoTok)
-                        return "2"
-                    }},
-                    {ALT: chevrotain.EMPTY_ALT("EMPTY_ALT")}
-                ])
-            // @formatter:on
-        }
-    }
-
-    describe("The support for EMPTY alternative implicit lookahead in OR", function () {
-
-        it("can match an non-empty alternative in an OR with an empty alternative", function () {
-            let input = [new OneTok()]
-            let parser = new OrImplicitEmptyAltLookAheadParser(input)
-            expect(parser.orRule()).to.equal("1")
-        })
-
-        it("can match an empty alternative", function () {
-            let input = []
-            let parser = new OrImplicitEmptyAltLookAheadParser(input)
-            expect(parser.orRule()).to.equal("EMPTY_ALT")
-        })
-
-        it("has a utility function for defining EMPTY ALTERNATIVES", function () {
-            let noArgsEmptyAlt = chevrotain.EMPTY_ALT()
-            expect(noArgsEmptyAlt()).to.be.undefined
-
-            let valueEmptyAlt = chevrotain.EMPTY_ALT(666)
-            expect(valueEmptyAlt()).to.equal(666)
-        })
-
-    })
-
     class OrExplicitLookAheadParser extends Parser {
 
         public getLookAheadCache():lang.HashTable<Function> {
@@ -1224,40 +1170,6 @@ namespace chevrotain.recognizer.lookahead.spec {
         it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", function () {
             let parser = new OrAmbiguityLookAheadParser()
             expect(() => parser.ambiguityRule()).to.throw("Ambiguous alternatives")
-        })
-
-        it("will throw an error when an empty alternative is not the last alternative", function () {
-
-            let emptyAltAmbiguityParser = class extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, <any>chevrotain.recognizer.lookahead.spec)
-                    Parser.performSelfAnalysis(this)
-                }
-
-                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
-                    // @formatter:off
-                    this.OR1([
-                        {ALT: () => {
-                            this.CONSUME1(OneTok)
-                        }},
-                        {ALT: () => {
-                            this.CONSUME1(ThreeTok)
-                        }},
-                        {ALT: () => {
-                            // empty alternative #3 which is not the last one!
-                        }},
-                        {ALT: () => {
-                            this.CONSUME2(TwoTok)
-                        }}
-                    ], "digits")
-                    // @formatter:on
-                })
-
-            }
-            let parser = new emptyAltAmbiguityParser()
-            expect(() => parser.noneLastEmpty()).to.throw("Ambiguous multiple empty alternatives")
-            expect(() => parser.noneLastEmpty()).to.throw("3")
         })
     })
 

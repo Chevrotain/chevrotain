@@ -21,7 +21,8 @@ namespace chevrotain {
         DUPLICATE_RULE_NAME,
         DUPLICATE_PRODUCTIONS,
         UNRESOLVED_SUBRULE_REF,
-        LEFT_RECURSION
+        LEFT_RECURSION,
+        NONE_LAST_EMPTY_ALT
     }
 
     export interface IParserDefinitionError {
@@ -34,6 +35,11 @@ namespace chevrotain {
         dslName:string
         occurrence:number
         parameter?:string
+    }
+
+    export interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
+        occurrence:number
+        alternative:number
     }
 
     export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
@@ -441,7 +447,7 @@ namespace chevrotain {
          * However using it is mandatory for all sub rule invocations.
          * calling another rule without wrapping in SUBRULE(...)
          * will cause errors/mistakes in the Recognizer's self analysis
-         * which will lead to errors in error recovery/automatic lookahead calcualtion
+         * which will lead to errors in error recovery/automatic lookahead calculation
          * and any other functionality relying on the Recognizer's self analysis
          * output.
          *

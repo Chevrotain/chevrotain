@@ -1,11 +1,14 @@
 namespace chevrotain.checks {
 
     import gast = chevrotain.gast
+    import GAstVisitor = chevrotain.gast.GAstVisitor
+    import IProduction = chevrotain.gast.IProduction
 
     export function validateGrammar(topLevels:gast.Rule[]):IParserDefinitionError[] {
         let duplicateErrors = _.map(topLevels, validateDuplicateProductions)
         let leftRecursionErrors:any = _.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
-        return <any>_.flatten(duplicateErrors.concat(leftRecursionErrors))
+        let emptyAltErrors = _.map(topLevels, validateEmptyOrAlternative)
+        return <any>_.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors))
     }
 
     function validateDuplicateProductions(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
@@ -70,7 +73,7 @@ namespace chevrotain.checks {
         if (prod instanceof gast.Terminal) {
             return tokenName(prod.terminalType)
         }
-        else if (prod instanceof  gast.NonTerminal) {
+        else if (prod instanceof gast.NonTerminal) {
             return prod.nonTerminalName
         }
         else {
@@ -115,6 +118,7 @@ namespace chevrotain.checks {
     }
 
     let ruleNamePattern = /^[a-zA-Z_]\w*$/
+
     export function validateRuleName(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
         let errors = []
         let errMsg
@@ -224,5 +228,43 @@ namespace chevrotain.checks {
         else {
             return result
         }
+    }
+
+    class OrCollector extends GAstVisitor {
+        public alternations = []
+
+        public visitAlternation(node:gast.Alternation):void {
+            this.alternations.push(node)
+        }
+    }
+
+    export function validateEmptyOrAlternative(topLevelRule:gast.Rule):IParserEmptyAlternativeDefinitionError[] {
+        let orCollector = new OrCollector()
+        topLevelRule.accept(orCollector)
+        let ors = orCollector.alternations
+
+        let errors = _.reduce(ors, (errors, currOr) => {
+            let exceptLast = _.dropRight(currOr.definition)
+            let currErrors = _.map(exceptLast, (currAlternative:IProduction, currAltIdx) => {
+                if (_.isEmpty(first.first(currAlternative))) {
+                    return {
+                        message:     `Ambiguous empty alternative: <${currAltIdx + 1}>` +
+                                     ` in <OR${currOr.occurrence}> inside <${topLevelRule.name}> Rule.\n` +
+                                     `Only the last alternative is may be an empty alternative.`,
+                        type:        ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
+                        ruleName:    topLevelRule.name,
+                        occurrence:  currOr.occurrence,
+                        alternative: currAltIdx + 1
+
+                    }
+                }
+                else {
+                    return null
+                }
+            })
+            return errors.concat(_.compact(currErrors))
+        }, [])
+
+        return errors
     }
 }
