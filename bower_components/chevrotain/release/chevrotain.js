@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.8 - 2015-12-08 */
+/*! chevrotain - v0.5.9 - 2015-12-12 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -1646,21 +1646,7 @@ var chevrotain;
             if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
             var alternativesTokens = new interp.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking();
             if (!ignoreAmbiguities) {
-                var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
-                if (!_.isEmpty(altsAmbiguityErrors)) {
-                    var errorMessages = _.map(altsAmbiguityErrors, function (currAmbiguity) {
-                        return ("Ambiguous alternatives " + currAmbiguity.alts.join(" ,") + " in OR" + orOccurrence + " inside " + ruleGrammar.name + " ") +
-                            ("Rule, " + chevrotain.tokenName(currAmbiguity.token) + " may appears as the first Terminal in all these alternatives.\n");
-                    });
-                    throw new Error(errorMessages.join("\n ---------------- \n") +
-                        "To Resolve this, either: \n" +
-                        "1. refactor your grammar to be LL(1)\n" +
-                        "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
-                        "3. Add ignore arg to this OR Production:\n" +
-                        "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
-                        "In that case the parser will always pick the first alternative that" +
-                        " matches and ignore all the others");
-                }
+                checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar);
             }
             var hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens));
             if (hasLastAnEmptyAlt) {
@@ -1704,6 +1690,24 @@ var chevrotain;
             }
         }
         lookahead.buildLookaheadForOr = buildLookaheadForOr;
+        function checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar) {
+            var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
+            if (!_.isEmpty(altsAmbiguityErrors)) {
+                var errorMessages = _.map(altsAmbiguityErrors, function (currAmbiguity) {
+                    return ("Ambiguous alternatives: <" + currAmbiguity.alts.join(" ,") + "> in <OR" + orOccurrence + "> inside <" + ruleGrammar.name + "> ") +
+                        ("Rule, <" + chevrotain.tokenName(currAmbiguity.token) + "> may appears as the first Terminal in all these alternatives.\n");
+                });
+                throw new Error(errorMessages.join("\n ---------------- \n") +
+                    "To Resolve this, either: \n" +
+                    "1. refactor your grammar to be LL(1)\n" +
+                    "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
+                    "3. Add ignore arg to this OR Production:\n" +
+                    "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
+                    "In that case the parser will always pick the first alternative that" +
+                    " matches and ignore all the others");
+            }
+        }
+        lookahead.checkForOrAmbiguities = checkForOrAmbiguities;
         function checkAlternativesAmbiguities(alternativesTokens) {
             var allTokensFlat = _.flatten(alternativesTokens);
             var uniqueTokensFlat = _.uniq(allTokensFlat);
@@ -2057,10 +2061,12 @@ var chevrotain;
     var checks;
     (function (checks) {
         var gast = chevrotain.gast;
+        var GAstVisitor = chevrotain.gast.GAstVisitor;
         function validateGrammar(topLevels) {
             var duplicateErrors = _.map(topLevels, validateDuplicateProductions);
             var leftRecursionErrors = _.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
-            return _.flatten(duplicateErrors.concat(leftRecursionErrors));
+            var emptyAltErrors = _.map(topLevels, validateEmptyOrAlternative);
+            return _.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors));
         }
         checks.validateGrammar = validateGrammar;
         function validateDuplicateProductions(topLevelRule) {
@@ -2249,6 +2255,44 @@ var chevrotain;
             }
         }
         checks.getFirstNoneTerminal = getFirstNoneTerminal;
+        var OrCollector = (function (_super) {
+            __extends(OrCollector, _super);
+            function OrCollector() {
+                _super.apply(this, arguments);
+                this.alternations = [];
+            }
+            OrCollector.prototype.visitAlternation = function (node) {
+                this.alternations.push(node);
+            };
+            return OrCollector;
+        })(GAstVisitor);
+        function validateEmptyOrAlternative(topLevelRule) {
+            var orCollector = new OrCollector();
+            topLevelRule.accept(orCollector);
+            var ors = orCollector.alternations;
+            var errors = _.reduce(ors, function (errors, currOr) {
+                var exceptLast = _.dropRight(currOr.definition);
+                var currErrors = _.map(exceptLast, function (currAlternative, currAltIdx) {
+                    if (_.isEmpty(chevrotain.first.first(currAlternative))) {
+                        return {
+                            message: ("Ambiguous empty alternative: <" + (currAltIdx + 1) + ">") +
+                                (" in <OR" + currOr.occurrence + "> inside <" + topLevelRule.name + "> Rule.\n") +
+                                "Only the last alternative is may be an empty alternative.",
+                            type: chevrotain.ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
+                            ruleName: topLevelRule.name,
+                            occurrence: currOr.occurrence,
+                            alternative: currAltIdx + 1
+                        };
+                    }
+                    else {
+                        return null;
+                    }
+                });
+                return errors.concat(_.compact(currErrors));
+            }, []);
+            return errors;
+        }
+        checks.validateEmptyOrAlternative = validateEmptyOrAlternative;
     })/* istanbul ignore next */ (checks = chevrotain.checks || /* istanbul ignore next */ (chevrotain.checks = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
@@ -2363,6 +2407,7 @@ var chevrotain;
         ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 2] = "DUPLICATE_PRODUCTIONS";
         ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 3] = "UNRESOLVED_SUBRULE_REF";
         ParserDefinitionErrorType[ParserDefinitionErrorType["LEFT_RECURSION"] = 4] = "LEFT_RECURSION";
+        ParserDefinitionErrorType[ParserDefinitionErrorType["NONE_LAST_EMPTY_ALT"] = 5] = "NONE_LAST_EMPTY_ALT";
     })(chevrotain.ParserDefinitionErrorType || (chevrotain.ParserDefinitionErrorType = {}));
     var ParserDefinitionErrorType = chevrotain.ParserDefinitionErrorType;
     /**
@@ -2403,11 +2448,13 @@ var chevrotain;
      *    ])
      *
      */
-    chevrotain.EMPTY_ALT = function emptyAlt(value) {
+    function EMPTY_ALT(value) {
+        if (value === void 0) { value = undefined; }
         return function () {
             return value;
         };
-    };
+    }
+    chevrotain.EMPTY_ALT = EMPTY_ALT;
     var EOF_FOLLOW_KEY = {};
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
@@ -2670,7 +2717,7 @@ var chevrotain;
          * However using it is mandatory for all sub rule invocations.
          * calling another rule without wrapping in SUBRULE(...)
          * will cause errors/mistakes in the Recognizer's self analysis
-         * which will lead to errors in error recovery/automatic lookahead calcualtion
+         * which will lead to errors in error recovery/automatic lookahead calculation
          * and any other functionality relying on the Recognizer's self analysis
          * output.
          *
@@ -3676,7 +3723,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.8";
+    API.VERSION = "0.5.9";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
