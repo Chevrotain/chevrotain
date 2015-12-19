@@ -199,7 +199,7 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
     switch (parseErr.type) {
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
-            return locateDuplicateProductions(parserImplText, ruleText, parseErr, positionHelper)
+            return locateProduction(parserImplText, ruleText, parseErr.dslName, parseErr.occurrence, positionHelper, parseErr.parameter)
             break
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME:
         case chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME:
@@ -212,6 +212,10 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
             break
         case chevrotain.ParserDefinitionErrorType.LEFT_RECURSION:
             return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
+            break
+        case chevrotain.ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT:
+            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            return locateProduction(parserImplText, ruleText, "OR", 1, positionHelper)
             break
         default:
             throw Error("unknown parser error type ->" + parseErr.type + "<-")
@@ -251,6 +255,7 @@ function locateGrammarDefinition(dslName, paramName, text, positionHelper) {
 }
 
 
+var locateOr = _.partial(locateGrammarUsage, "OR")
 var locateSubruleRef = _.partial(locateGrammarUsage, "SUBRULE")
 var locateConsume = _.partial(locateGrammarUsage, "CONSUME")
 var locateManySepSeparator = _.partial(locateGrammarUsage, "MANY_SEP")
@@ -305,16 +310,21 @@ function locateGrammarUsage(dslName, fullText, paramName, positionHelper, text, 
 /**
  * @param {string} fullText - the full text to search in.
  * @param {string} ruleText - a subset of the full text to search in
- * @param {chevrotain.IParserDuplicatesDefinitionError} dupError
+ * @param {string} dslName
+ * @param {number} occurrence
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
- *
+ * @param {string} [parameter='']
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
  */
-function locateDuplicateProductions(fullText, ruleText, dupError, positionHelper) {
+function locateProduction(fullText, ruleText, dslName, occurrence, positionHelper, parameter) {
+    if (parameter === undefined) {
+        parameter = ''
+    }
+
     var ruleTextStartOffset = fullText.indexOf(ruleText)
-    var dslNameWithOccurrence = dupError.dslName + ( dupError.occurrence === 1 ? '(?:|dupError.occurrence)' : dupError.occurrence)
-    var parameterPart = dupError.parameter ? '\\s*\\(\\s*.*' + dupError.parameter + '\\s*\\)' : ''
+    var dslNameWithOccurrence = dslName + ( occurrence === 1 ? '(?:|' + occurrence + ')' : occurrence)
+    var parameterPart = parameter ? '\\s*\\(\\s*.*' + parameter + '\\s*\\)' : ''
 
     var soughtPattern = dslNameWithOccurrence + parameterPart
     var seekerRegExp = RegExp(soughtPattern, "g")
