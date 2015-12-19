@@ -249,13 +249,12 @@ namespace chevrotain.checks {
                 if (_.isEmpty(first.first(currAlternative))) {
                     return {
                         message:     `Ambiguous empty alternative: <${currAltIdx + 1}>` +
-                                     ` in <OR${currOr.occurrence}> inside <${topLevelRule.name}> Rule.\n` +
-                                     `Only the last alternative is may be an empty alternative.`,
+                                     ` in <OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n` +
+                                     `Only the last alternative may be an empty alternative.`,
                         type:        ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
                         ruleName:    topLevelRule.name,
-                        occurrence:  currOr.occurrence,
+                        occurrence:  currOr.occurrenceInParent,
                         alternative: currAltIdx + 1
-
                     }
                 }
                 else {

@@ -521,6 +521,35 @@ namespace chevrotain.checks.spec {
             expect(() => new emptyAltAmbiguityParser()).to.throw("3")
             expect(() => new emptyAltAmbiguityParser()).to.throw("2")
         })
+
+        it("will throw an error when an empty alternative is not the last alternative #2", () => {
+            let emptyAltAmbiguityParser = class emptyAltAmbiguityParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, <any>chevrotain.checks.spec)
+                    Parser.performSelfAnalysis(this)
+                }
+
+                public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                    // @formatter:off
+                    this.OR([ // using OR without occurrence suffix, test to check for fix for https://github.com/SAP/chevrotain/issues/101
+                         {ALT: EMPTY_ALT()},  // empty alternative #1 which is not the last one!
+                        {ALT: () => {
+                            this.CONSUME1(PlusTok)
+                        }},
+                        {ALT: () => {
+                            this.CONSUME2(StarTok)
+                        }}
+                    ], "digits")
+                    // @formatter:on
+                })
+
+            }
+            expect(() => new emptyAltAmbiguityParser()).to.throw("Ambiguous empty alternative")
+            expect(() => new emptyAltAmbiguityParser()).to.throw("1")
+            expect(() => new emptyAltAmbiguityParser()).to.throw("Only the last alternative may be an empty alternative.")
+            expect(() => new emptyAltAmbiguityParser()).to.not.throw("undefined")
+        })
     })
 
 }
