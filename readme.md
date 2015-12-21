@@ -44,14 +44,7 @@ the code generation phase.
 
 **[Online version](http://sap.github.io/chevrotain/playground/)**
 
-**[Related Repos](https://github.com/SAP?utf8=%E2%9C%93&query=chevrotain)**
-
-Runnable (and debuggable) examples:
-
-* [Json Parser](https://github.com/sap/examples_nodejs_chevrotain/blob/master/jsonParser.js)
-* [Simple Calculator](https://github.com/sap/examples_nodejs_chevrotain/blob/master/calculator.js)
-* [ECMAScript5 Parser](https://github.com/sap/examples_ecma5_typescript_chevrotain/blob/master/src/ecmascript5_parser.ts)
-* [Lexer advanced features](https://github.com/sap/examples_lexer_chevrotain/)
+**[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
