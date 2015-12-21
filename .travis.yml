@@ -8,7 +8,9 @@ before_install: npm install -g grunt-cli bower
 install:
 - npm install
 - bower install
-before_script: grunt build
+before_script:
+- grunt build
+- chmod +x ./scripts/test_examples.sh
 after_script: cat ./bin/coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
 deploy:
   - provider: releases

@@ -41,7 +41,7 @@
     "url": "git://github.com/SAP/chevrotain.git"
   },
   "scripts": {
-    "test": "grunt test",
+    "test": "grunt test && npm link && bash ./scripts/test_examples.sh",
     "release_patch": "node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
     "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat"
   },
@@ -75,7 +75,7 @@
     "karma-story-reporter": "~0.3.1",
     "mocha": "^2.3.4",
     "semver": "^5.1.0",
-    "tslint": "~3.0.0",
+    "tslint": "^3.0.0",
     "wrench": "~1.5.8"
   }
 }

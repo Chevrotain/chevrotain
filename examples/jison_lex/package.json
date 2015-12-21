@@ -1,0 +1,22 @@
+{
+  "name": "chevrotain_jison_lexer_example",
+  "version": "0.1.0",
+  "description": "using jison-lex with a chevrotain parser",
+  "license": " Apache-2.0",
+  "author": {
+    "name": "Shahar Soel",
+    "email": "shahar.soel@gmail.com"
+  },
+  "scripts": {
+    "test": "mocha jsonParserTest.js"
+  },
+  "dependencies": {
+    "chevrotain": "*",
+    "lodash": "~3.10.1"
+  },
+  "devDependencies": {
+    "jison-lex": "^0.3.4",
+    "mocha": "^2.2.5"
+  },
+  "private": true
+}
