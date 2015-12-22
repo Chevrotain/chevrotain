@@ -43,6 +43,8 @@ var oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
 var bumpedTravisString = config.travisString.replace(oldVersionRegExpGlobal, newVersion)
 var bumpedApiString = config.apiString.replace(oldVersionRegExpGlobal, newVersion)
 
+var docsOldVersionRegExp = new RegExp(oldVersion.replace(/\./g, "_"), "g")
+var bumpedReadmeString = config.readmeString.replace(docsOldVersionRegExp, newVersion.replace(/\./g, "_"))
 
 jf.spaces = 2
 
@@ -50,3 +52,4 @@ jf.writeFileSync(config.packagePath, bumpedPkgJson)
 jf.writeFileSync(config.bowerPath, bumpBowerJson)
 fs.writeFileSync(config.travisPath, bumpedTravisString)
 fs.writeFileSync(config.apiPath, bumpedApiString)
+fs.writeFileSync(config.readmePath, bumpedReadmeString)

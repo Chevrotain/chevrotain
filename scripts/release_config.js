@@ -7,11 +7,13 @@ apiPath = path.join(__dirname, '../src/api.ts')
 travisPath = path.join(__dirname, '../.travis.yml')
 packagePath = path.join(__dirname, '../package.json')
 bowerPath = path.join(__dirname, '../bower.json')
+readmePath = path.join(__dirname, './readme.md')
 
 var pkgJson = jf.readFileSync(packagePath)
 var bowerJson = jf.readFileSync(bowerPath)
 var travisString = fs.readFileSync(travisPath, 'utf8').toString()
 var apiString = fs.readFileSync(apiPath, 'utf8').toString()
+var readmeString = fs.readFileSync(readmePath, 'utf8').toString()
 
 var mode = ""
 if (_.includes(process.argv, "patch")) {
@@ -30,12 +32,13 @@ module.exports = {
     travisPath:   travisPath,
     packagePath:  packagePath,
     bowerPath:    bowerPath,
+    readmePath:   readmePath,
     pkgJson:      pkgJson,
     bowerJson:    bowerJson,
+    readmeString: readmeString,
     travisString: travisString,
     apiString:    apiString,
     currVersion:  pkgJson.version,
     mode:         mode,
     tagPrefix:    "v"
-
 }
