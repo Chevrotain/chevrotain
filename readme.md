@@ -9,7 +9,7 @@ Chevrotain is a high performance fault Tolerant Javascript parsing DSL for build
 Chevrotain is **NOT** a parser generator. it solves the same kind of problems as a parser generator, just without
 the code generation phase.
 
-## [Try it online](http://sap.github.io/chevrotain/playground/)
+## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
    
 ## Features
   * **Lexer engine** based on RexExps.
@@ -42,7 +42,10 @@ the code generation phase.
 
 ## Getting Started
 
-**[Online version](http://sap.github.io/chevrotain/playground/)**
+**Online tutorial**
+ * [step #1 Building a lexer](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer)
+ * [step #2 Implementing a grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar)
+ * [step #3 Adding actions to the grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions)
 
 **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
@@ -68,5 +71,5 @@ The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 
 * The CI build runs the tests under Node.js.
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.
 * The dependency to lodash is imported via [UMD](https://github.com/umdjs/umd),
-  in order to make chevrotain.js portable to multiple environments.
+  in order to make chevrotain.js portable to multiple environments (browser global / require.js / node.js)
   
