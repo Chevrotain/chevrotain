@@ -1,4 +1,6 @@
 /.idea/workspace.xml
-/node_modules/
+coverage/
 /bin
 /package
+/examples
+/node_modules

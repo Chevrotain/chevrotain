@@ -25,6 +25,7 @@
     <script src="../bower_components/CodeMirror/lib/codemirror.js"></script>
     <script src="../bower_components/CodeMirror/mode/javascript/javascript.js"></script>
     <script src="RailRoadDiagreams/railroad-diagrams.js"></script>
+    <script src="utils.js"></script>
     <script src="editors.js"></script>
     <script src="errorMarkers.js"></script>
     <script src="examples.js"></script>
@@ -138,23 +139,23 @@
 
         var implTextArea = $("#parserImplementationEditor")
         javaScriptEditor = CodeMirror.fromTextArea(_.first(implTextArea), {
-            lineNumbers   : true,
+            lineNumbers: true,
             viewportMargin: 10
         })
 
         javaScriptEditor.on("change", _.debounce(onImplementationEditorContentChange, 250))
 
         inputEditor = CodeMirror.fromTextArea(_.first($("#parserInputEditor")), {
-            lineNumbers   : true,
+            lineNumbers: true,
             viewportMargin: 10
         })
 
         inputEditor.on("change", _.debounce(onInputEditorContentChange, 250))
 
         parserOutput = CodeMirror.fromTextArea(_.first($("#parserOutput")), {
-            lineNumbers   : true,
+            lineNumbers: true,
             viewportMargin: 10,
-            readOnly      : true
+            readOnly: true
         })
 
         inputEditor.setOption("mode", "text")
@@ -166,12 +167,20 @@
 
         initCodeMirrorVScroll()
 
-        initExamplesDropDown(examplesDropdown)
+        initExamplesDropDown()
         examplesDropdown.change(function () {
             loadExample(examplesDropdown.val())
         })
 
-        loadExample("json", true)
+        var urlParamExample = getUrlParameter("example")
+        if (urlParamExample) {
+            examplesDropdown.value = urlParamExample
+            $(examplesDropdown).val(urlParamExample);
+            loadExample(urlParamExample, true)
+        }
+        else {
+            loadExample("json", true)
+        }
         updateSamplesDropDown()
 
         samplesDropdown.change(function () {

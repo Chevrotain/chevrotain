@@ -1,7 +1,7 @@
 function initExamplesDropDown() {
     examplesDropdown.find("option").remove()
-    _.forEach(_.keys(samples), function (sampleName) {
-        examplesDropdown.append("<option>" + sampleName + "</option>")
+    _.forEach(_.keys(samples), function (exampleName, idx) {
+        examplesDropdown.append("<option value=\"" + exampleName + "\">" + exampleName + "</option>")
     })
 }
 
