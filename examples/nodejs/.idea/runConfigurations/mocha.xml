@@ -6,9 +6,8 @@
     <envs />
     <ui>bdd</ui>
     <extra-mocha-options />
-    <test-kind>DIRECTORY</test-kind>
-    <test-directory>$PROJECT_DIR$</test-directory>
-    <recursive>false</recursive>
+    <test-kind>PATTERN</test-kind>
+    <test-pattern>*spec.js</test-pattern>
     <method />
   </configuration>
 </component>

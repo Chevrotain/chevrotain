@@ -329,6 +329,7 @@ namespace chevrotain.gastBuilder {
         let matched:RegExpExecArray
         while (matched = pattern.exec(text)) {
             let start = matched.index
+            // note that (start + matched[0].length) is the first character AFTER the match
             let stop = findTerminatorOffSet(start + matched[0].length, text)
             let currRange = new r.Range(start, stop)
             let currText = text.substr(start, stop - start + 1)
@@ -340,9 +341,8 @@ namespace chevrotain.gastBuilder {
     export function findClosingOffset(opening:string, closing:string, start:number, text:string):number {
         let parenthesisStack = [1]
 
-        let i = 0
+        let i = -1
         while (!(_.isEmpty(parenthesisStack)) && i + start < text.length) {
-            // TODO: verify this is indeed meant to skip the first character?
             i++
             let nextChar = text.charAt(start + i)
             if (nextChar === opening) {

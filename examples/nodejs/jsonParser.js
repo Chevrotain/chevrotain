@@ -20,16 +20,17 @@ var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-
 var WhiteSpace = extendToken("WhiteSpace", /\s+/);
 WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
-
 var allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
-JsonLexer = new Lexer(allTokens);
+var JsonLexer = new Lexer(allTokens);
 
 
 // ----------------- parser -----------------
 
 function JsonParser(input) {
+    // invoke super constructor
     Parser.call(this, input, allTokens);
 
+    // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this;
 
     this.object = this.RULE("object", function () {
@@ -82,9 +83,9 @@ function JsonParser(input) {
     Parser.performSelfAnalysis(this);
 }
 
+// inheritance as implemented in javascript in the previous decade... :(
 JsonParser.prototype = Object.create(Parser.prototype);
 JsonParser.prototype.constructor = JsonParser;
-
 
 // ----------------- wrapping it all together -----------------
 
@@ -102,6 +103,5 @@ module.exports = function (text) {
     if (fullResult.lexErrors.length > 1 || fullResult.parseErrors.length > 1) {
         throw new Error("sad sad panda")
     }
-    // TODO: modify the parser to return a JsonObject...
     return fullResult;
 };
