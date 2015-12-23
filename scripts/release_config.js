@@ -7,7 +7,7 @@ apiPath = path.join(__dirname, '../src/api.ts')
 travisPath = path.join(__dirname, '../.travis.yml')
 packagePath = path.join(__dirname, '../package.json')
 bowerPath = path.join(__dirname, '../bower.json')
-readmePath = path.join(__dirname, './readme.md')
+readmePath = path.join(__dirname, '../readme.md')
 
 var pkgJson = jf.readFileSync(packagePath)
 var bowerJson = jf.readFileSync(bowerPath)
