@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.10 - 2015-12-20 */
+/*! chevrotain - v0.5.11 - 2015-12-23 */
 declare module chevrotain {
     module lang {
         class HashTable<V>{}
