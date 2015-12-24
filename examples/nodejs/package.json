@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "chevrotain": "*",
-    "lodash": "~3.9.3"
+    "lodash": "~3.10.1"
   },
   "devDependencies": {
     "mocha": "^2.2.5"
