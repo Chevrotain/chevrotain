@@ -49,10 +49,10 @@
     "lodash": "^3.10.1"
   },
   "devDependencies": {
-    "typescript": "~1.7.5",
     "chai": "^3.4.1",
     "coveralls": "^2.11.4",
     "gitty": "^3.2.3",
+    "grunt": "^0.4.5",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-clean": "^0.7.0",
     "grunt-contrib-compress": "^0.14.0",
@@ -76,6 +76,7 @@
     "mocha": "^2.3.4",
     "semver": "^5.1.0",
     "tslint": "^3.0.0",
+    "typescript": "~1.7.5",
     "wrench": "~1.5.8"
   }
 }

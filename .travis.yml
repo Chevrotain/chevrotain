@@ -3,14 +3,23 @@ cache:
   directories:
   - node_modules
 node_js:
-- '4'
+ - "4"
+ - "5"
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 before_install: npm install -g grunt-cli bower
 install:
-- npm install
-- bower install
+ - npm install
+ - bower install
 before_script:
-- grunt build
-- chmod +x ./scripts/test_examples.sh
+ - grunt build
+ - chmod +x ./scripts/test_examples.sh
 after_script: cat ./bin/coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
 deploy:
   - provider: releases
