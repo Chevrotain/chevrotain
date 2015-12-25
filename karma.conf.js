@@ -1,4 +1,3 @@
-/*global module process */
 var specsFiles = require('./scripts/findSpecs')("bin/gen/test/", "test")
 var findRefs = require('./scripts/findRefs')
 var _ = require('lodash')
@@ -10,7 +9,7 @@ coreIncludes = _.reject(coreIncludes, function(srcFile) {
 
 coreIncludes = _.map(coreIncludes, function(srcFile) {
     var fixedPath = srcFile.replace('src', 'bin/gen/src')
-    var fixedSuffix  = fixedPath.replace('.ts', '.js')
+    var fixedSuffix = fixedPath.replace('.ts', '.js')
     return fixedSuffix
 })
 
@@ -63,6 +62,13 @@ module.exports = function(config) {
         // - PhantomJS
         // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
         browsers: ['Chrome'],
+
+        customLaunchers: {
+            Chrome_travis_ci: {
+                base:  'Chrome',
+                flags: ['--no-sandbox']
+            }
+        },
 
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout:           10000000,

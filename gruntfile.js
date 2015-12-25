@@ -75,10 +75,10 @@ module.exports = function(grunt) {
 
             dev_build: {},
 
-            tests_on_browsers: {
+            browsers_tests: {
                 options: {
                     files:    ['bower_components/lodash/lodash.js', 'test.config.js', 'bin/chevrotain.js', 'bin/chevrotainSpecs.js'],
-                    browsers: ['Chrome', 'Firefox', 'IE']
+                    browsers: ['Chrome_travis_ci', "Firefox"]
                 }
             }
         },
@@ -362,6 +362,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('integration_tests', integrationTestsTasks)
+    grunt.registerTask('browsers_tests', "karma:browsers_tests")
 
     grunt.registerTask('dev_build_test', [
         'clean:dev',

@@ -5,6 +5,8 @@ cache:
 matrix:
   include:
     - node_js: "5"
+      env: CXX=g++-4.8 GRUNT_TASK=browsers_tests
+    - node_js: "5"
       env: CXX=g++-4.8 GRUNT_TASK=unit_tests DEPLOY=true
     - node_js: "4"
       env: CXX=g++-4.8 GRUNT_TASK=unit_tests
@@ -26,7 +28,13 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-before_install: npm install -g grunt-cli bower
+  firefox: latest
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - npm install -g grunt-cli bower
+  - curl -Lo chrome.zip https://download-chromium.appspot.com/dl/Linux_x64 && unzip chrome.zip
+  - export CHROME_BIN=chrome-linux/chrome
 install:
  - npm install
  - bower install
