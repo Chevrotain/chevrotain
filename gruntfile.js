@@ -1,7 +1,7 @@
 var _ = require('lodash')
 var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
 var srcFiles = require('./scripts/findRefs')('build/chevrotain.ts')
-
+var semver = require("semver")
 
 var githubReleaseFiles = ['./package.json',
     './LICENSE.txt',
@@ -10,6 +10,14 @@ var githubReleaseFiles = ['./package.json',
     './readme.md',
     'bin/docs'
 ]
+
+var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
+
+// Integration tests using older versions of node.js will
+// avoid running tests that require ES6 capabilities only aviliable in node.js >= 4
+var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
+    "mocha *spec.js" :
+    "mocha *spec.js -i -g ES6"
 
 module.exports = function(grunt) {
 
@@ -24,6 +32,39 @@ module.exports = function(grunt) {
     //noinspection UnnecessaryLabelJS
     grunt.initConfig({
         pkg: pkg,
+
+        run: {
+            options:                        {
+                failOnError: true
+            },
+            npm_link:                       {
+                exec: 'npm link'
+            },
+            test_examples_nodejs:           {
+                options: {
+                    cwd: process.cwd() + "/examples/nodejs"
+                },
+                exec:    "npm install && npm link chevrotain && " + nodejs_examples_test_command
+            },
+            test_examples_lexer:            {
+                options: {
+                    cwd: process.cwd() + "/examples/lexer"
+                },
+                exec:    INSTALL_LINK_TEST
+            },
+            test_examples_jison_lex:        {
+                options: {
+                    cwd: process.cwd() + "/examples/jison_lex"
+                },
+                exec:    INSTALL_LINK_TEST
+            },
+            test_examples_typescript_ecma5: {
+                options: {
+                    cwd: process.cwd() + "/examples/typescript_ecma5"
+                },
+                exec:    INSTALL_LINK_TEST
+            }
+        },
 
         karma: {
             options: {
@@ -148,7 +189,7 @@ module.exports = function(grunt) {
             }
         },
 
-        clean:  {
+        clean: {
             release: ['bin/*.*', 'bin/tsc', 'bin/docs'],
             dev:     ['bin/gen']
         },
@@ -239,18 +280,18 @@ module.exports = function(grunt) {
         typedoc: {
             build_docs: {
                 options: {
-                    mode : 'file',
-                    target: 'es5',
-                    out: 'bin/docs',
-                    name: 'Chevrotain',
+                    mode:             'file',
+                    target:           'es5',
+                    out:              'bin/docs',
+                    name:             'Chevrotain',
                     excludeExternals: '',
                     // see: https://github.com/sebastian-lenz/typedoc/issues/73
                     // double negative for the win!
-                    externalPattern: '!**/*public**'
+                    externalPattern:  '!**/*public**'
                 },
                 // must include all the files explicitly instead of just targeting build/chevrotain.ts
                 // otherwise the include(exclude !...) won't work
-                src: srcFiles
+                src:     srcFiles
             }
         },
 
@@ -267,10 +308,28 @@ module.exports = function(grunt) {
                 },
                 files:   [{src: githubReleaseFiles, dest: '/'}]
             }
+        },
+
+        coveralls: {
+            publish: {
+                src: 'bin/coverage/lcov.info'
+            }
         }
     })
 
-    var releaseBuildTasks = [
+    grunt.loadNpmTasks('grunt-karma')
+    grunt.loadNpmTasks('grunt-tslint')
+    grunt.loadNpmTasks("grunt-ts")
+    grunt.loadNpmTasks('grunt-umd')
+    grunt.loadNpmTasks('grunt-contrib-clean')
+    grunt.loadNpmTasks('grunt-contrib-concat')
+    grunt.loadNpmTasks('grunt-contrib-compress')
+    grunt.loadNpmTasks('grunt-mocha-istanbul')
+    grunt.loadNpmTasks('grunt-typedoc')
+    grunt.loadNpmTasks('grunt-run')
+    grunt.loadNpmTasks('grunt-coveralls')
+
+    var buildTasks = [
         'clean:release',
         'ts:release',
         'ts:release_test_code',
@@ -284,25 +343,27 @@ module.exports = function(grunt) {
         'compress'
     ]
 
-    var commonReleaseTasks = releaseBuildTasks.concat(['mocha_istanbul', 'istanbul_check_coverage'])
+    var unitTestsTasks = [
+        'mocha_istanbul',
+        'istanbul_check_coverage'
+    ]
 
-    grunt.loadNpmTasks('grunt-karma')
-    grunt.loadNpmTasks('grunt-tslint')
-    grunt.loadNpmTasks("grunt-ts")
-    grunt.loadNpmTasks('grunt-umd')
-    grunt.loadNpmTasks('grunt-contrib-clean')
-    grunt.loadNpmTasks('grunt-contrib-concat')
-    grunt.loadNpmTasks('grunt-contrib-compress')
-    grunt.loadNpmTasks('grunt-mocha-istanbul')
-    grunt.loadNpmTasks('grunt-typedoc')
+    var integrationTestsTasks = [
+        'run:npm_link',
+        'run:test_examples_nodejs',
+        'run:test_examples_lexer',
+        'run:test_examples_jison_lex',
+        'run:test_examples_typescript_ecma5'
+    ]
 
+    var buildTestTasks = buildTasks.concat(unitTestsTasks)
 
-    grunt.registerTask('build', releaseBuildTasks)
-    grunt.registerTask('build_and_test', commonReleaseTasks)
-    grunt.registerTask('test', ['mocha_istanbul', 'istanbul_check_coverage'])
-    grunt.registerTask('build_and_test_plus_browsers', commonReleaseTasks.concat(['karma:tests_on_browsers']))
+    grunt.registerTask('build', buildTasks)
+    grunt.registerTask('build_test', buildTestTasks)
+    grunt.registerTask('unit_tests', unitTestsTasks)
+    grunt.registerTask('integration_tests', integrationTestsTasks)
 
-    grunt.registerTask('dev_build', [
+    grunt.registerTask('dev_build_test', [
         'clean:dev',
         'ts:dev_build',
         'tslint',

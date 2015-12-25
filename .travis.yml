@@ -2,11 +2,24 @@ language: node_js
 cache:
   directories:
   - node_modules
-node_js:
- - "4"
- - "5"
-env:
-  - CXX=g++-4.8
+matrix:
+  include:
+    - node_js: "5"
+      env: CXX=g++-4.8 GRUNT_TASK=unit_tests DEPLOY=true
+    - node_js: "4"
+      env: CXX=g++-4.8 GRUNT_TASK=unit_tests
+    - node_js: "0.12"
+      env: CXX=g++-4.8 GRUNT_TASK=unit_tests
+    - node_js: "0.10"
+      env: CXX=g++-4.8 GRUNT_TASK=unit_tests
+    - node_js: "5"
+      env: CXX=g++-4.8 GRUNT_TASK=integration_tests
+    - node_js: "4"
+      env: CXX=g++-4.8 GRUNT_TASK=integration_tests
+    - node_js: "0.12"
+      env: CXX=g++-4.8 GRUNT_TASK=integration_tests
+    - node_js: "0.10"
+      env: CXX=g++-4.8 GRUNT_TASK=integration_tests
 addons:
   apt:
     sources:
@@ -19,8 +32,8 @@ install:
  - bower install
 before_script:
  - grunt build
- - chmod +x ./scripts/test_examples.sh
-after_script: cat ./bin/coverage/lcov.info | node ./node_modules/coveralls/bin/coveralls.js
+script:
+ - grunt $GRUNT_TASK
 deploy:
   - provider: releases
     api_key:
@@ -31,6 +44,7 @@ deploy:
     on:
       tags : true
       all_branches: true
+      condition: $DEPLOY = true
     skip_cleanup: true
 
   - provider: npm
@@ -40,4 +54,12 @@ deploy:
     on:
       tags: true
       all_branches: true
+      condition: $DEPLOY = true
+    skip_cleanup: true
+
+  - provider: script
+    script: grunt coveralls:publish
+    on:
+      condition: $DEPLOY = true
+      branch: master
     skip_cleanup: true
