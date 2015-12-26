@@ -4,10 +4,10 @@
 
 # Chevrotain
 
-Chevrotain is a high performance fault Tolerant Javascript parsing DSL for building recursive decent parsers.
+Chevrotain is a **Javascript parsing DSL** for building fault tolerant recursive decent parsers.
 
 Chevrotain is **NOT** a parser generator. it solves the same kind of problems as a parser generator, just without
-the code generation phase.
+any code generation phase.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
    
@@ -23,7 +23,7 @@ the code generation phase.
          makes debugging trivial and provides great flexibility for inserting custom actions into the grammar.
     * Strong **Error Recovery** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for LL(1) grammars.
-    * In addition custom lookahead logic can be provided explicitly.
+    * In addition custom lookahead logic can be provided explicitly for LL(k) grammars.
     * Backtracking support.  
 
   * **High performance** see: 
@@ -60,16 +60,17 @@ the code generation phase.
    *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
    
 *  The aggregated Typescript definitions :
-   * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts) (dev version)
-   * Also packaged in both the github and npm releases.
-   
+   * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts) (latest version)
+
 ## Dependencies
-Only a single dependency to [lodash](https://lodash.com/).
+Only a **single** dependency to [lodash](https://lodash.com/).
 
 ## Compatibility
 The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 runtime. 
-* The CI build runs the tests under Node.js.
+* The CI build runs the tests under 
+  * Node.js (0.10 / 0.12 / 4 / 5).
+  * latest Chromium
+  * latest Firefox
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.
-* The dependency to lodash is imported via [UMD](https://github.com/umdjs/umd),
-  in order to make chevrotain.js portable to multiple environments (browser global / require.js / node.js)
+* Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / require.js / node.js)
   
