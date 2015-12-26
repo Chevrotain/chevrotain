@@ -379,7 +379,7 @@ module.exports = function(grunt) {
         'run:test_examples_typescript_ecma5'
     ]
 
-    var browserTests = [
+    var browserUnitTests = [
         "karma:browsers_tests",
         "karma:browsers_tests_requirejs"
     ]
@@ -390,7 +390,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('integration_tests', integrationTestsTasks)
-    grunt.registerTask('browsers_tests', browserTests)
+    grunt.registerTask('browsers_unit_tests', browserUnitTests)
 
     grunt.registerTask('dev_build_test', [
         'clean:dev',
