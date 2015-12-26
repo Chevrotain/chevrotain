@@ -9,7 +9,7 @@ function chevrotainParseWithChevrotainLexer(text) {
     }
 
     var parser = new ChevrotainJsonParser(lexResult.tokens);
-    parser.object();
+    parser.json();
 
     fullResult.tokens = lexResult.tokens;
     fullResult.parseErrors = parser.errors;

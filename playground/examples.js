@@ -65,7 +65,6 @@ function jsonExample() {
 
     var ChevJsonLexer = new Lexer(jsonTokens, true);
 
-
     // ----------------- parser -----------------
     var ChevrotainParser = chevrotain.Parser;
 
@@ -73,6 +72,14 @@ function jsonExample() {
         ChevrotainParser.call(this, input, jsonTokens);
         var $ = this;
 
+        this.json = this.RULE("json", function () {
+            // @formatter:off
+            return $.OR([
+                { ALT: function () { return $.SUBRULE($.object) }},
+                { ALT: function () { return $.SUBRULE($.array) }}
+            ]);
+            // @formatter:on
+        });
 
         this.object = this.RULE("object", function () {
             // use debugger statements to add breakpoints
@@ -157,7 +164,7 @@ function jsonExample() {
     return {
         lexer      : ChevJsonLexer,
         parser     : ChevrotainJsonParser,
-        defaultRule: "object"
+        defaultRule: "json"
     };
 }
 
@@ -612,10 +619,11 @@ var samples = {
             '\n\t"!" "success!",' +
             '\n}',
 
-            'also missing opening curly': '\t"the" "dog",' +
-            '\n\t"ate" "my",' +
-            '\n\t"opening" "left",' +
-            '\n\t"curly" "success!"' +
+            'missing value': '{' +
+            '\n\t"the": "dog",' +
+            '\n\t"ate": "my",' +
+            '\n\t"will be lost in recovery":,' +
+            '\n\t"value": "success!"' +
             '\n}',
 
             'too many commas': '{' +
