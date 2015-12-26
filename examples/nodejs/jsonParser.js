@@ -33,6 +33,15 @@ function JsonParser(input) {
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this;
 
+    this.json = this.RULE("json", function () {
+        // @formatter:off
+        $.OR([
+            { ALT: function () { $.SUBRULE($.object) }},
+            { ALT: function () { $.SUBRULE($.array) }}
+        ]);
+        // @formatter:on
+    });
+
     this.object = this.RULE("object", function () {
         $.CONSUME(LCurly);
         $.OPTION(function () {
@@ -97,7 +106,7 @@ module.exports = function (text) {
     fullResult.lexErrors = lexResult.errors;
 
     var parser = new JsonParser(lexResult.tokens);
-    parser.object();
+    parser.json();
     fullResult.parseErrors = parser.errors;
 
     if (fullResult.lexErrors.length > 1 || fullResult.parseErrors.length > 1) {

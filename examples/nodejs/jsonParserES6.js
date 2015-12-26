@@ -65,6 +65,15 @@ class JsonParserES6 extends chevrotain.Parser {
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         var $ = this;
 
+        $.json = $.RULE("json", () => {
+            // @formatter:off
+            $.OR([
+                { ALT: () => { $.SUBRULE($.object) }},
+                { ALT: () => { $.SUBRULE($.array) }}
+            ]);
+            // @formatter:on
+        });
+
         // the parsing methods
         $.object = $.RULE("object", () => { // using ES2015 Arrow functions to reduce verbosity.
             $.CONSUME(LCurly);
@@ -126,7 +135,7 @@ module.exports = function (text) {
     fullResult.lexErrors = lexResult.errors;
 
     var parser = new JsonParserES6(lexResult.tokens);
-    parser.object();
+    parser.json();
     fullResult.parseErrors = parser.errors;
 
     if (fullResult.lexErrors.length > 1 || fullResult.parseErrors.length > 1) {

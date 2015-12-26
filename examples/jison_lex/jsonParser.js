@@ -79,6 +79,15 @@ function JsonParser(input) {
 
     var _this = this;
 
+    this.json = this.RULE("json", function () {
+        // @formatter:off
+        _this.OR([
+            { ALT: function () { _this.SUBRULE(_this.object) }},
+            { ALT: function () { _this.SUBRULE(_this.array) }}
+        ]);
+        // @formatter:on
+    });
+
     this.object = this.RULE("object", function () {
         _this.CONSUME(LCurly);
         _this.OPTION(function () {
@@ -152,7 +161,7 @@ module.exports = function (text) {
     }
 
     var parser = new JsonParser(tokens);
-    parser.object();
+    parser.json();
 
     fullResult.tokens = tokens;
     fullResult.parseErrors = parser.errors;
