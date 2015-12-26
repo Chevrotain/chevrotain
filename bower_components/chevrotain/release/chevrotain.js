@@ -15,7 +15,7 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.10 - 2015-12-20 */
+/*! chevrotain - v0.5.11 - 2015-12-23 */
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -2024,6 +2024,7 @@ var chevrotain;
             var matched;
             while (matched = pattern.exec(text)) {
                 var start = matched.index;
+                // note that (start + matched[0].length) is the first character AFTER the match
                 var stop = findTerminatorOffSet(start + matched[0].length, text);
                 var currRange = new r.Range(start, stop);
                 var currText = text.substr(start, stop - start + 1);
@@ -2033,9 +2034,8 @@ var chevrotain;
         }
         function findClosingOffset(opening, closing, start, text) {
             var parenthesisStack = [1];
-            var i = 0;
+            var i = -1;
             while (!(_.isEmpty(parenthesisStack)) && i + start < text.length) {
-                // TODO: verify this is indeed meant to skip the first character?
                 i++;
                 var nextChar = text.charAt(start + i);
                 if (nextChar === opening) {
@@ -3723,7 +3723,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.10";
+    API.VERSION = "0.5.11";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
