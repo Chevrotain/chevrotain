@@ -77,7 +77,28 @@ module.exports = function(grunt) {
 
             browsers_tests: {
                 options: {
-                    files:    ['bower_components/lodash/lodash.js', 'test.config.js', 'bin/chevrotain.js', 'bin/chevrotainSpecs.js'],
+                    files:    [
+                        'bower_components/lodash/lodash.js',
+                        'test.config.js',
+                        'bin/chevrotain.js',
+                        'bin/chevrotainSpecs.js'
+                    ],
+                    browsers: ['Chrome_travis_ci', "Firefox"]
+                }
+            },
+
+            browsers_tests_requirejs: {
+                options: {
+                    frameworks: ["requirejs", 'mocha', 'chai'],
+
+                    files:    [
+                        {pattern: 'bower_components/lodash/lodash.js', included: false},
+                        {pattern: 'bin/chevrotain.js', included: false},
+                        {pattern: 'bin/chevrotainSpecs.js', included: false},
+                        {pattern: 'bin/blahSpec.js', included: false},
+                        'test.config.js',
+                        'test/requirejs_test_main.js'
+                    ],
                     browsers: ['Chrome_travis_ci', "Firefox"]
                 }
             }
@@ -181,7 +202,9 @@ module.exports = function(grunt) {
                     template: 'scripts/umd.hbs',
                     deps:     {
                         'default': ['_', 'config', 'chevrotain'],
-                        amd:       ['lodash', '../test.config.js', 'chevrotain'],
+                        // dummy empty <''> to align arguments and parameters
+                        // (sometimes two sometimes three depending on module loader)
+                        amd:       ['lodash', '', 'chevrotain'],
                         cjs:       ['lodash', '../test.config.js', './chevrotain'],
                         global:    ['_', "undefined", 'chevrotain']
                     }
@@ -356,13 +379,18 @@ module.exports = function(grunt) {
         'run:test_examples_typescript_ecma5'
     ]
 
+    var browserTests = [
+        "karma:browsers_tests",
+        "karma:browsers_tests_requirejs"
+    ]
+
     var buildTestTasks = buildTasks.concat(unitTestsTasks)
 
     grunt.registerTask('build', buildTasks)
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('integration_tests', integrationTestsTasks)
-    grunt.registerTask('browsers_tests', "karma:browsers_tests")
+    grunt.registerTask('browsers_tests', browserTests)
 
     grunt.registerTask('dev_build_test', [
         'clean:dev',
