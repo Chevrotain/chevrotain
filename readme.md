@@ -19,20 +19,26 @@ any code generation phase.
     * **No code generation** The Lexer does not require any code generation phase. 
    
   * **Parsing DSL** for creating the parsing rules.
-    * **No code generation** - the DSL is just javascript not a new external language, what is written is what will be run, this speeds up development, 
-         makes debugging trivial and provides great flexibility for inserting custom actions into the grammar.
-    * Strong **Error Recovery** capabilities based on Antlr3's algorithms.
+    * **No code generation**
+      * The DSL is just javascript not an external language, what is written is what will be run.
+      * Speeds up development, 
+      * Makes debugging trivial. 
+      * Allows great flexibility for inserting custom Parser actions.
+    * **Error Reporting** with full location information. 
+    * Strong **Error Recovery/fault tolerance** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for LL(1) grammars.
-    * In addition custom lookahead logic can be provided explicitly for LL(k) grammars.
+    * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.  
 
   * **High performance** see: 
     * [performance comparison](http://sap.github.io/chevrotain/performance/)
     * [on jsPerf](http://jsperf.com/json-parsers-comparison/19)
   
-  * **Grammar Introspection**, the grammar's structure is known and **exposed** this can be used to implement features such as automatically generated syntax diagrams or Syntactic error recovery.
+  * **Grammar Reflection/Introspection**
+    * A Parser's grammar's structure is known and **exposed** at runtime.
+    * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
   
-  * Well tested with **~100% code coverage** 
+  * Well tested with **~100% code coverage**, Unit & Integration tests
    
 ## Installation
 * **npm**: ```npm install chevrotain```
@@ -42,12 +48,12 @@ any code generation phase.
 
 ## Getting Started
 
-**Online tutorial**
+* **Online tutorial**
  * [step #1 Building a lexer](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer)
  * [step #2 Implementing a grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar)
  * [step #3 Adding actions to the grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions)
 
-**[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
+* **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
