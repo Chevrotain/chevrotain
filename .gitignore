@@ -3,8 +3,6 @@ coverage/
 /bin
 /package
 /examples
-/node_modules/*
-!/node_modules/antlr4
-!/node_modules/antlr4/*
+/node_modules
 
 

@@ -5,8 +5,12 @@
   "dependencies": {
     "chevrotain": "*"
   },
+  "scripts": {
+    "pack_antlr4" : "browserify ./node_modules/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4"
+  },
   "devDependencies": {
     "antlr4": "^4.5.2",
+    "browserify": "^12.0.1",
     "gitty": "^3.3.0",
     "jison": "*",
     "jison-lex": "*",

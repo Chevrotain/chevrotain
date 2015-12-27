@@ -21,12 +21,11 @@
 <script src="jsonParsers/pegjs/pegjs_jison_parser.js"></script>
 
 <script src='lib/lib/require.js'></script>
-<!--hack for loading antlr4-->
-<script>
-    var antlr4 = require('lib/antlr4/index');
-    var antlr4JsonLexer = require('./jsonParsers/antlr/JSON_ANTLRLexer').JSON_ANTLRLexer
-    var antlr4JsonParser = require('./jsonParsers/antlr/JSON_ANTLRParser').JSON_ANTLRParser
-</script>
+<script src="../bower_components/antlr4/antlr4.js"></script>
+<script src="jsonParsers/antlr/JSON_ANTLRLexer.js"></script>
+<script src="jsonParsers/antlr/JSON_ANTLRListener.js"></script>
+<script src="jsonParsers/antlr/JSON_ANTLRParser.js"></script>
+<script src="jsonParsers/antlr/api.js"></script>
 
 <div align="center" class="card center">
     <section style="text-align:left;">
@@ -76,7 +75,6 @@
             <a rel="nofollow" href="https://github.com/sap/chevrotain/tree/gh-pages/performance">repo</a>.
         </p>
 
-        <p>Note that it seems antlr4 javascript runtime has an issue with its unique module loading under IE</p>
     </section>
     <section style="text-align:left;">
         <span id="wait" style="margin-left: auto;margin-right: auto;">Running</span>
@@ -137,12 +135,7 @@
     }).add('Chevrotain', function () {
         chevrotainParseWithChevrotainLexer(json_sample10k)
     }).add('antlr4', function () {
-        var chars = new antlr4.InputStream(json_sample10k);
-        var lexer = new antlr4JsonLexer(chars);
-        var tokens = new antlr4.CommonTokenStream(lexer);
-        var parser = new antlr4JsonParser(tokens);
-        parser.buildParseTrees = false;
-        parser.object();
+        antlr4LexerAndParser(json_sample10k)
     }).add('pegjs', function () {
         pegjsJsonLexerAndParser.parse(json_sample10k)
     }).on('cycle', function (event) {
