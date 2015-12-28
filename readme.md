@@ -30,10 +30,8 @@ any code generation phase.
     * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.  
 
-  * **High performance** see: 
-    * [performance comparison](http://sap.github.io/chevrotain/performance/)
-    * [on jsPerf](http://jsperf.com/json-parsers-comparison/19)
-  
+  * [**High performance**](http://jsperf.com/json-parsers-comparison/)
+
   * **Grammar Reflection/Introspection**
     * A Parser's grammar's structure is known and **exposed** at runtime.
     * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
