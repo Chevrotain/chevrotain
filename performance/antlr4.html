@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+
+    <title></title>
+</head>
+<body>
+<script src="../bower_components/lodash/lodash.min.js"></script>
+<script src="../bower_components/benchmark/benchmark.js"></script>
+<script src="../bower_components/Chart.js/Chart.min.js"></script>
+<script src="samples/10K_json.js"></script>
+
+<script src='lib/lib/require.js'></script>
+<script src="jsonParsers/antlr_require/api.js"></script>
+<!--hack for loading antlr4-->
+<script>
+    var antlr4WithRequire = require('lib/antlr4/index');
+    var antlr4WithRequireJsonLexer = require('./jsonParsers/antlr_require/JSON_ANTLRLexer').JSON_ANTLRLexer
+    var antlr4WithRequireJsonParser = require('./jsonParsers/antlr_require/JSON_ANTLRParser').JSON_ANTLRParser
+</script>
+
+<!--loading packaged antlr4 -->
+<script src="../bower_components/antlr4/antlr4.js"></script>
+<script src="jsonParsers/antlr/JSON_ANTLRLexer.js"></script>
+<script src="jsonParsers/antlr/JSON_ANTLRListener.js"></script>
+<script src="jsonParsers/antlr/JSON_ANTLRParser.js"></script>
+<script src="jsonParsers/antlr/api.js"></script>
+
+<div align="center" class="card center">
+    <section style="text-align:left;">
+        <h1>Comparing Antlr4 in the browser with honey require.js and packaged by browsifiy</h1></p>
+        <p> Test case is a 10k lines Json text</p>
+    </section>
+    <section style="text-align:left;">
+        <span id="wait" style="margin-left: auto;margin-right: auto;">Running</span>
+        <table id="resultsTable">
+            <tr>
+                <td style="font-weight: bold">Scenario</td>
+                <td style="font-weight: bold">Ops/second</td>
+            </tr>
+            <tr>
+                <td>ANTLR4 with honey require.js</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>ANTLR4 packaged with browserify</td>
+                <td></td>
+            </tr>
+        </table>
+        <p id="fastestInResults"></p>
+    </section>
+    <section>
+        <canvas id="parsersResultChart" height="400"></canvas>
+    </section>
+</div>
+<script>
+
+    var dots = window.setInterval(function () {
+        var wait = document.getElementById("wait");
+        var valueBeforeTheDots = "Running";
+        if (wait.innerHTML.length > valueBeforeTheDots.length + 3)
+            wait.innerHTML = "Running";
+        else
+            wait.innerHTML += ".";
+    }, 500);
+    var data = {
+        labels: [],
+        datasets: [
+            {
+                label: "My First dataset",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,0.8)",
+                highlightFill: "rgba(220,220,220,0.75)",
+                highlightStroke: "rgba(220,220,220,1)",
+                data: []
+            }
+        ]
+    };
+    var suite = new Benchmark.Suite;
+    suite.add('ANTLR4 with honey require.js', function () {
+        antlr4WithRequireLexerAndParser(json_sample10k)
+    }).add('ANTLR4 packaged with browserify', function () {
+        antlr4LexerAndParser(json_sample10k)
+    }).on('cycle', function (event) {
+        var table = document.getElementById("resultsTable");
+        data.labels.push(event.target.name);
+        data.datasets[0].data.push(event.target.hz);
+        var row = table.rows[event.target.id];
+        var cell2 = row.cells[1];
+
+        cell2.innerHTML = event.target.hz.toFixed(2) + "    " + "\xB1" + event.target.stats.rme.toFixed(2) + "%";
+    }).on('complete', function () {
+        var sFastest = 'Fastest is ' + this.filter('fastest').pluck('name');
+        document.getElementById("fastestInResults").innerHTML = sFastest;
+        window.clearInterval(dots);
+        document.getElementById("wait").innerHTML = "";
+        // Get the context of the canvas element we want to select
+        var ctx = document.getElementById("parsersResultChart").getContext("2d");
+
+        var myBarChart = new Chart(ctx).Bar(data, {});
+    }).run({'async': true});
+
+</script>
+</body>
+</html>
