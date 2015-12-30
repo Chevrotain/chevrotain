@@ -11,7 +11,7 @@ var grammar = {
     "lex": {
         "rules": [
             ["\\s+", "/* skip whitespace */"],
-            ["-?(:?0|[1-9]\\d*)(:?\\.\\d+)?(:?[eE][+-]?\\d+)?", "return 'NUMBER';"],
+            ["-?(?:0|[1-9]\\d*)(:?\\.\\d+)?(?:[eE][+-]?\\d+)?", "return 'NUMBER';"],
             ["\"(?:\\\\[\"bfnrt/\\\\]|\\\\u[a-fA-F0-9]{4}|[^\"\\\\])*\"", "return 'STRING';"],
             ["\\{", "return '{'"],
             ["\\}", "return '}'"],
@@ -61,9 +61,6 @@ var grammar = {
                              "JSONElementList , JSONValue" ]
     }
 };
-
-var options = {type: "slr", moduleType: "commonjs", moduleName: "jsoncheck"};
-
 
 var Parser = require("jison").Parser;
 var jsonParser = new Parser(grammar);

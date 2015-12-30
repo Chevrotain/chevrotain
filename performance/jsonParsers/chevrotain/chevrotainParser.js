@@ -13,8 +13,8 @@ var LSquare = extendToken("LSquare", /\[/);
 var RSquare = extendToken("RSquare", /]/);
 var Comma = extendToken("Comma", /,/);
 var Colon = extendToken("Colon", /:/);
-var StringLiteral = extendToken("StringLiteral", /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
-var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
+var StringLiteral = extendToken("StringLiteral", /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
+var NumberLiteral = extendToken("NumberLiteral", /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
 var WhiteSpace = extendToken("WhiteSpace", /\s+/);
 WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
