@@ -1,7 +1,7 @@
 ###The Why?
 Parser Generators are rarely used to build commercial grade compilers/editors/tools.
    
-[As Terence Parr said:](https://theantlrguy.atlassian.net/wiki/pages/viewpage.action?pageId=1900547) 
+[As Terence Parr said:](https://github.com/antlr/antlr4/blob/master/doc/faq/general.md) 
 
   1. "A: In my experience, almost no one uses parser generators to build commercial compilers. 
       So, people are using ANTLR for their everyday work, building everything from configuration files to little 
