@@ -340,17 +340,7 @@ module.exports = function(grunt) {
         }
     })
 
-    grunt.loadNpmTasks('grunt-karma')
-    grunt.loadNpmTasks('grunt-tslint')
-    grunt.loadNpmTasks("grunt-ts")
-    grunt.loadNpmTasks('grunt-umd')
-    grunt.loadNpmTasks('grunt-contrib-clean')
-    grunt.loadNpmTasks('grunt-contrib-concat')
-    grunt.loadNpmTasks('grunt-contrib-compress')
-    grunt.loadNpmTasks('grunt-mocha-istanbul')
-    grunt.loadNpmTasks('grunt-typedoc')
-    grunt.loadNpmTasks('grunt-run')
-    grunt.loadNpmTasks('grunt-coveralls')
+    require('load-grunt-tasks')(grunt);
 
     var buildTasks = [
         'clean:release',

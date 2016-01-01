@@ -75,6 +75,7 @@
     "karma-requirejs": "^0.2.2",
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
+    "load-grunt-tasks": "^3.4.0",
     "mocha": "^2.3.4",
     "requirejs": "^2.1.22",
     "semver": "^5.1.0",
