@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="KARMA_DEBUG" type="JavascriptDebugType" factoryName="JavaScript Debug" uri="http://localhost:9979/debug.html">
+    <mapping url="http://localhost:9979/base/bin/gen/src" local-file="$PROJECT_DIR$/bin/gen/src" />
+    <mapping url="http://localhost:9979/base/bin/gen/test" local-file="$PROJECT_DIR$/bin/gen/test" />
+    <mapping url="http://localhost:9979/base/test" local-file="$PROJECT_DIR$/test" />
+    <mapping url="http://localhost:9979/base/src" local-file="$PROJECT_DIR$/src" />
+    <method />
+  </configuration>
+</component>
