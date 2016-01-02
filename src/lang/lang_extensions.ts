@@ -37,7 +37,7 @@ namespace chevrotain.lang {
         private _state = {}
 
         keys():string[] {
-            return _.keys(this._state)
+            return utils.keys(this._state)
         }
 
         values():V[] {

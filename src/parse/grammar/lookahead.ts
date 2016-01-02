@@ -121,7 +121,7 @@ namespace chevrotain.lookahead {
                 })
             })
 
-            let altsIndicesTokenAppearsIn = _.map(_.keys(altsCurrTokenAppearsIn), (index) => {
+            let altsIndicesTokenAppearsIn = _.map(utils.keys(altsCurrTokenAppearsIn), (index) => {
                 return parseInt(index, 10) + 1
             })
 

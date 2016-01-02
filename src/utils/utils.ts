@@ -13,4 +13,8 @@ namespace utils {
     export function isEmpty(arr:any[]) {
         return arr.length === 0
     }
+
+    export function keys(obj:any) {
+        return Object.keys(obj)
+    }
 }
