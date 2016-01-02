@@ -19,6 +19,9 @@ var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
     "mocha *spec.js" :
     "mocha *spec.js -i -g ES6"
 
+var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+    '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
@@ -70,20 +73,24 @@ module.exports = function(grunt) {
             options: {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
-                browsers:   ['Chrome']
+                browsers:   ['Chrome_travis_ci', "Firefox"]
             },
 
-            dev_build: {},
+            dev_build: {
+                options: {
+                    singleRun: false,
+                    browsers:  ['Chrome']
+                }
+            },
 
             browsers_tests: {
                 options: {
-                    files:    [
+                    files: [
                         'bower_components/lodash/lodash.js',
                         'test.config.js',
                         'bin/chevrotain.js',
                         'bin/chevrotainSpecs.js'
-                    ],
-                    browsers: ['Chrome_travis_ci', "Firefox"]
+                    ]
                 }
             },
 
@@ -91,15 +98,38 @@ module.exports = function(grunt) {
                 options: {
                     frameworks: ["requirejs", 'mocha', 'chai'],
 
-                    files:    [
+                    files: [
                         {pattern: 'bower_components/lodash/lodash.js', included: false},
-                        {pattern: 'bin/chevrotain.js', included: false},
-                        {pattern: 'bin/chevrotainSpecs.js', included: false},
-                        {pattern: 'bin/blahSpec.js', included: false},
                         'test.config.js',
-                        'test/requirejs_test_main.js'
-                    ],
-                    browsers: ['Chrome_travis_ci', "Firefox"]
+                        'bin/chevrotain.js',
+                        'test/requirejs_test_main.js',
+                        {pattern: 'bin/chevrotainSpecs.js', included: false}
+                    ]
+                }
+            },
+
+            browsers_tests_minified: {
+                options: {
+                    files: [
+                        'bower_components/lodash/lodash.js',
+                        'test.config.js',
+                        'bin/chevrotain.min.js',
+                        'bin/chevrotainSpecs.js'
+                    ]
+                }
+            },
+
+            browsers_tests_requirejs_minified: {
+                options: {
+                    frameworks: ["requirejs", 'mocha', 'chai'],
+
+                    files: [
+                        {pattern: 'bower_components/lodash/lodash.js', included: false},
+                        'test.config.js',
+                        'bin/chevrotain.min.js',
+                        'test/requirejs_test_main.js',
+                        {pattern: 'bin/chevrotainSpecs.js', included: false}
+                    ]
                 }
             }
         },
@@ -220,8 +250,7 @@ module.exports = function(grunt) {
         concat: {
             release:             {
                 options: {
-                    banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                            '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                    banner: banner,
 
                     process: function fixTSModulePatternForCoverage(src, filePath) {
                         // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
@@ -262,8 +291,7 @@ module.exports = function(grunt) {
             },
             release_definitions: {
                 options: {
-                    banner:  '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                             '<%= grunt.template.today("yyyy-mm-dd") %> */\n' +
+                    banner:  banner +
                              'declare module chevrotain {\n' +
                              '    module lang {\n' +
                              '        class HashTable<V>{}\n' +
@@ -337,6 +365,19 @@ module.exports = function(grunt) {
             publish: {
                 src: 'bin/coverage/lcov.info'
             }
+        },
+
+        uglify: {
+            options: {
+                // not using name mangling because it may break usage of Function.name (functionName utility)
+                mangle: false,
+                banner: banner
+            },
+            release: {
+                files: {
+                    'bin/chevrotain.min.js': ['bin/chevrotain.js']
+                }
+            }
         }
     })
 
@@ -352,6 +393,7 @@ module.exports = function(grunt) {
         'ts:validate_definitions',
         'umd:release',
         'umd:release_specs',
+        'uglify:release',
         'typedoc:build_docs',
         'compress'
     ]
@@ -371,7 +413,9 @@ module.exports = function(grunt) {
 
     var browserUnitTests = [
         "karma:browsers_tests",
-        "karma:browsers_tests_requirejs"
+        "karma:browsers_tests_requirejs",
+        "karma:browsers_tests_minified",
+        "karma:browsers_tests_requirejs_minified"
     ]
 
     var buildTestTasks = buildTasks.concat(unitTestsTasks)

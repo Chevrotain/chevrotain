@@ -3,8 +3,7 @@ require.config({
     baseUrl: '/base',
 
     paths: {
-        'lodash':     'bower_components/lodash/lodash',
-        'chevrotain': 'bin/chevrotain'
+        'lodash':     'bower_components/lodash/lodash'
     },
 
     deps: ['bin/chevrotainSpecs'],
