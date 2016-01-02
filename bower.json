@@ -39,24 +39,11 @@
     "url": "git://github.com/SAP/chevrotain.git"
   },
   "ignore": [
-    ".*",
-    "*.yml",
-    "*.js",
-    "*.md",
-    "*.json",
-    "*.pdf",
-    "*.bat",
-    "bin",
-    "bower_components",
-    "build",
-    "docs",
-    "examples",
-    "libs",
-    "node_modules",
-    "package",
-    "scripts",
-    "src",
-    "test"
+    "**/*",
+    "!release/*.*",
+    "!readme.md",
+    "!LICENSE.txt"
+
   ],
   "license": "Apache-2.0"
 }
