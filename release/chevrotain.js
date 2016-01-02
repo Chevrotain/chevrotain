@@ -15,7 +15,44 @@
   }
 }(this, function (_) {
 
-/*! chevrotain - v0.5.12 - 2016-01-02 */
+/*! chevrotain - v0.5.13 - 2016-01-03 */
+/*
+ Utils using lodash style API. (not necessarily 100% compliant) for functional and other utils.
+ These utils should replace usage of lodash in the production code base. not because they are any better...
+ but for the purpose of being a dependency free library.
+
+ The hotspots in the code are already written in imperative style for performance reasons.
+ so writing several dozen utils which may be slower than the original lodash, does not matter as much
+ considering they will not be invoked in hotspots...
+ */
+var utils;
+(function (utils) {
+    function isEmpty(arr) {
+        return arr.length === 0;
+    }
+    utils.isEmpty = isEmpty;
+    function keys(obj) {
+        return Object.keys(obj);
+    }
+    utils.keys = keys;
+    function values(obj) {
+        var vals = [];
+        var keys = Object.keys(obj);
+        for (var i = 0; i < keys.length; i++) {
+            vals.push(obj[keys[i]]);
+        }
+        return vals;
+    }
+    utils.values = values;
+    function map(arr, callback) {
+        var result = [];
+        for (var idx = 0; idx < arr.length; idx++) {
+            result.push(callback.call(null, arr[idx], idx));
+        }
+        return result;
+    }
+    utils.map = map;
+})(utils || (utils = {}));
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -53,10 +90,10 @@ var chevrotain;
                 this._state = {};
             }
             HashTable.prototype.keys = function () {
-                return _.keys(this._state);
+                return utils.keys(this._state);
             };
             HashTable.prototype.values = function () {
-                return _.values(this._state);
+                return utils.values(this._state);
             };
             HashTable.prototype.put = function (key, value) {
                 this._state[key] = value;
@@ -268,8 +305,8 @@ var chevrotain;
             this.tokenClasses = tokenClasses;
             this.lexerDefinitionErrors = [];
             this.lexerDefinitionErrors = chevrotain.validatePatterns(tokenClasses);
-            if (!_.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
-                var allErrMessages = _.map(this.lexerDefinitionErrors, function (error) {
+            if (!utils.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
+                var allErrMessages = utils.map(this.lexerDefinitionErrors, function (error) {
                     return error.message;
                 });
                 var allErrMessagesString = allErrMessages.join("-----------------------\n");
@@ -278,7 +315,7 @@ var chevrotain;
             // If definition errors were encountered, the analysis phase may fail unexpectedly/
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
-            if (_.isEmpty(this.lexerDefinitionErrors)) {
+            if (utils.isEmpty(this.lexerDefinitionErrors)) {
                 var analyzeResult = chevrotain.analyzeTokenClasses(tokenClasses);
                 this.allPatterns = analyzeResult.allPatterns;
                 this.patternIdxToClass = analyzeResult.patternIdxToClass;
@@ -305,8 +342,8 @@ var chevrotain;
             var line = 1;
             var column = 1;
             var groups = _.clone(this.emptyGroups);
-            if (!_.isEmpty(this.lexerDefinitionErrors)) {
-                var allErrMessages = _.map(this.lexerDefinitionErrors, function (error) {
+            if (!utils.isEmpty(this.lexerDefinitionErrors)) {
+                var allErrMessages = utils.map(this.lexerDefinitionErrors, function (error) {
                     return error.message;
                 });
                 var allErrMessagesString = allErrMessages.join("-----------------------\n");
@@ -432,14 +469,14 @@ var chevrotain;
         var onlyRelevantClasses = _.reject(tokenClasses, function (currClass) {
             return currClass[PATTERN] === chevrotain.Lexer.NA;
         });
-        var allTransformedPatterns = _.map(onlyRelevantClasses, function (currClass) {
+        var allTransformedPatterns = utils.map(onlyRelevantClasses, function (currClass) {
             return addStartOfInput(currClass[PATTERN]);
         });
         var allPatternsToClass = _.zipObject(allTransformedPatterns, onlyRelevantClasses);
-        var patternIdxToClass = _.map(allTransformedPatterns, function (pattern) {
+        var patternIdxToClass = utils.map(allTransformedPatterns, function (pattern) {
             return allPatternsToClass[pattern.toString()];
         });
-        var patternIdxToGroup = _.map(onlyRelevantClasses, function (clazz) {
+        var patternIdxToGroup = utils.map(onlyRelevantClasses, function (clazz) {
             var groupName = clazz.GROUP;
             if (groupName === chevrotain.Lexer.SKIPPED) {
                 return undefined;
@@ -454,14 +491,14 @@ var chevrotain;
                 /* istanbul ignore next */ throw Error("non exhaustive match");
             }
         });
-        var patternIdxToLongerAltIdx = _.map(onlyRelevantClasses, function (clazz, idx) {
+        var patternIdxToLongerAltIdx = utils.map(onlyRelevantClasses, function (clazz) {
             var longerAltClass = clazz.LONGER_ALT;
             if (longerAltClass) {
                 var longerAltIdx = _.indexOf(onlyRelevantClasses, longerAltClass);
                 return longerAltIdx;
             }
         });
-        var patternIdxToCanLineTerminator = _.map(allTransformedPatterns, function (pattern) {
+        var patternIdxToCanLineTerminator = utils.map(allTransformedPatterns, function (pattern) {
             // TODO: unicode escapes of line terminators too?
             return /\\n|\\r|\\s/g.test(pattern.source);
         });
@@ -501,7 +538,7 @@ var chevrotain;
         var tokenClassesWithMissingPattern = _.filter(tokenClasses, function (currClass) {
             return !_.has(currClass, PATTERN);
         });
-        var errors = _.map(tokenClassesWithMissingPattern, function (currClass) {
+        var errors = utils.map(tokenClassesWithMissingPattern, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property",
                 type: chevrotain.LexerDefinitionErrorType.MISSING_PATTERN,
@@ -517,7 +554,7 @@ var chevrotain;
             var pattern = currClass[PATTERN];
             return !_.isRegExp(pattern);
         });
-        var errors = _.map(tokenClassesWithInvalidPattern, function (currClass) {
+        var errors = utils.map(tokenClassesWithInvalidPattern, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
                 type: chevrotain.LexerDefinitionErrorType.INVALID_PATTERN,
@@ -534,7 +571,7 @@ var chevrotain;
             var pattern = currClass[PATTERN];
             return end_of_input.test(pattern.source);
         });
-        var errors = _.map(invalidRegex, function (currClass) {
+        var errors = utils.map(invalidRegex, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
                 type: chevrotain.LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
@@ -549,7 +586,7 @@ var chevrotain;
             var pattern = currClass[PATTERN];
             return pattern instanceof RegExp && (pattern.multiline || pattern.global);
         });
-        var errors = _.map(invalidFlags, function (currClass) {
+        var errors = utils.map(invalidFlags, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) +
                     "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
@@ -563,7 +600,7 @@ var chevrotain;
     // This can only test for identical duplicate RegExps, not semantically equivalent ones.
     function findDuplicatePatterns(tokenClasses) {
         var found = [];
-        var identicalPatterns = _.map(tokenClasses, function (outerClass) {
+        var identicalPatterns = utils.map(tokenClasses, function (outerClass) {
             return _.reduce(tokenClasses, function (result, innerClass) {
                 if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) &&
                     innerClass.PATTERN !== chevrotain.Lexer.NA) {
@@ -579,8 +616,8 @@ var chevrotain;
         var duplicatePatterns = _.filter(identicalPatterns, function (currIdenticalSet) {
             return _.size(currIdenticalSet) > 1;
         });
-        var errors = _.map(duplicatePatterns, function (setOfIdentical) {
-            var classNames = _.map(setOfIdentical, function (currClass) {
+        var errors = utils.map(duplicatePatterns, function (setOfIdentical) {
+            var classNames = utils.map(setOfIdentical, function (currClass) {
                 return chevrotain.tokenName(currClass);
             });
             var dupPatternSrc = _.first(setOfIdentical).PATTERN;
@@ -603,7 +640,7 @@ var chevrotain;
             return group !== chevrotain.Lexer.SKIPPED &&
                 group !== chevrotain.Lexer.NA && !_.isString(group);
         });
-        var errors = _.map(invalidTypes, function (currClass) {
+        var errors = utils.map(invalidTypes, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
                 type: chevrotain.LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
@@ -641,50 +678,6 @@ var chevrotain;
         return lineTerminators;
     }
     chevrotain.countLineTerminators = countLineTerminators;
-})/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
-// todo: consider if this namespace really belongs in chevrotain?
-var chevrotain;
-(function (chevrotain) {
-    var tree;
-    (function (tree) {
-        var ParseTree = (function () {
-            function ParseTree(payload, children) {
-                if (children === void 0) { children = []; }
-                this.payload = payload;
-                this.children = children;
-            }
-            ParseTree.prototype.getImage = function () { return this.payload.image; };
-            ParseTree.prototype.getLine = function () { return this.payload.startLine; };
-            ParseTree.prototype.getColumn = function () { return this.payload.startColumn; };
-            return ParseTree;
-        })();
-        tree.ParseTree = ParseTree;
-        /**
-         * convenience factory for ParseTrees
-         *
-         * @param {Function|Token} tokenOrTokenClass The Token instance to be used as the root node, or a constructor Function
-         *                         that will create the root node.
-         * @param {ParseTree[]} children The sub nodes of the ParseTree to the built
-         * @returns {ParseTree}
-         */
-        function PT(tokenOrTokenClass, children) {
-            if (children === void 0) { children = []; }
-            var childrenCompact = _.compact(children);
-            if (tokenOrTokenClass instanceof chevrotain.Token) {
-                return new ParseTree(tokenOrTokenClass, childrenCompact);
-            }
-            else if (_.isFunction(tokenOrTokenClass)) {
-                return new ParseTree(new tokenOrTokenClass(), childrenCompact);
-            }
-            else if (_.isUndefined(tokenOrTokenClass) || _.isNull(tokenOrTokenClass)) {
-                return null;
-            }
-            else {
-                throw "Invalid parameter " + tokenOrTokenClass + " to PT factory.";
-            }
-        }
-        tree.PT = PT;
-    })/* istanbul ignore next */ (tree = chevrotain.tree || /* istanbul ignore next */ (chevrotain.tree = {}));
 })/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
 (function (chevrotain) {
@@ -1040,7 +1033,7 @@ var chevrotain;
         }
         first_1.firstForSequence = firstForSequence;
         function firstForBranching(prod) {
-            var allAlternativesFirsts = _.map(prod.definition, function (innerProd) {
+            var allAlternativesFirsts = utils.map(prod.definition, function (innerProd) {
                 return first(innerProd);
             });
             return _.uniq(_.flatten(allAlternativesFirsts));
@@ -1262,7 +1255,7 @@ var chevrotain;
             };
             AbstractNextPossibleTokensWalker.prototype.updateExpectedNext = function () {
                 // need to consume the Terminal
-                if (_.isEmpty(this.ruleStack)) {
+                if (utils.isEmpty(this.ruleStack)) {
                     // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
                     // really seeking is the last Terminal...
                     this.nextProductionName = "";
@@ -1418,7 +1411,7 @@ var chevrotain;
             };
             NextInsideOrWalker.prototype.walkOr = function (orProd, currRest, prevRest) {
                 if (orProd.occurrenceInParent === this.occurrence) {
-                    this.result = _.map(orProd.definition, function (alt) {
+                    this.result = utils.map(orProd.definition, function (alt) {
                         var altWrapper = new chevrotain.gast.Flat([alt]);
                         return f.first(altWrapper);
                     });
@@ -1648,7 +1641,7 @@ var chevrotain;
             if (!ignoreAmbiguities) {
                 checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar);
             }
-            var hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens));
+            var hasLastAnEmptyAlt = utils.isEmpty(_.last(alternativesTokens));
             if (hasLastAnEmptyAlt) {
                 var lastIdx = alternativesTokens.length - 1;
                 /**
@@ -1692,8 +1685,8 @@ var chevrotain;
         lookahead.buildLookaheadForOr = buildLookaheadForOr;
         function checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar) {
             var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
-            if (!_.isEmpty(altsAmbiguityErrors)) {
-                var errorMessages = _.map(altsAmbiguityErrors, function (currAmbiguity) {
+            if (!utils.isEmpty(altsAmbiguityErrors)) {
+                var errorMessages = utils.map(altsAmbiguityErrors, function (currAmbiguity) {
                     return ("Ambiguous alternatives: <" + currAmbiguity.alts.join(" ,") + "> in <OR" + orOccurrence + "> inside <" + ruleGrammar.name + "> ") +
                         ("Rule, <" + chevrotain.tokenName(currAmbiguity.token) + "> may appears as the first Terminal in all these alternatives.\n");
                 });
@@ -1711,13 +1704,13 @@ var chevrotain;
         function checkAlternativesAmbiguities(alternativesTokens) {
             var allTokensFlat = _.flatten(alternativesTokens);
             var uniqueTokensFlat = _.uniq(allTokensFlat);
-            var tokensToAltsIndicesItAppearsIn = _.map(uniqueTokensFlat, function (seekToken) {
+            var tokensToAltsIndicesItAppearsIn = utils.map(uniqueTokensFlat, function (seekToken) {
                 var altsCurrTokenAppearsIn = _.pick(alternativesTokens, function (altToLookIn) {
                     return _.find(altToLookIn, function (currToken) {
                         return currToken === seekToken;
                     });
                 });
-                var altsIndicesTokenAppearsIn = _.map(_.keys(altsCurrTokenAppearsIn), function (index) {
+                var altsIndicesTokenAppearsIn = utils.map(utils.keys(altsCurrTokenAppearsIn), function (index) {
                     return parseInt(index, 10) + 1;
                 });
                 return { token: seekToken, alts: altsIndicesTokenAppearsIn };
@@ -2035,7 +2028,7 @@ var chevrotain;
         function findClosingOffset(opening, closing, start, text) {
             var parenthesisStack = [1];
             var i = -1;
-            while (!(_.isEmpty(parenthesisStack)) && i + start < text.length) {
+            while (!(utils.isEmpty(parenthesisStack)) && i + start < text.length) {
                 i++;
                 var nextChar = text.charAt(start + i);
                 if (nextChar === opening) {
@@ -2046,7 +2039,7 @@ var chevrotain;
                 }
             }
             // valid termination of the search loop
-            if (_.isEmpty(parenthesisStack)) {
+            if (utils.isEmpty(parenthesisStack)) {
                 return i + start;
             }
             else {
@@ -2063,9 +2056,9 @@ var chevrotain;
         var gast = chevrotain.gast;
         var GAstVisitor = chevrotain.gast.GAstVisitor;
         function validateGrammar(topLevels) {
-            var duplicateErrors = _.map(topLevels, validateDuplicateProductions);
-            var leftRecursionErrors = _.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
-            var emptyAltErrors = _.map(topLevels, validateEmptyOrAlternative);
+            var duplicateErrors = utils.map(topLevels, validateDuplicateProductions);
+            var leftRecursionErrors = utils.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
+            var emptyAltErrors = utils.map(topLevels, validateEmptyOrAlternative);
             return _.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors));
         }
         checks.validateGrammar = validateGrammar;
@@ -2077,7 +2070,7 @@ var chevrotain;
             var duplicates = _.pick(productionGroups, function (currGroup) {
                 return currGroup.length > 1;
             });
-            var errors = _.map(duplicates, function (currDuplicates) {
+            var errors = utils.map(utils.values(duplicates), function (currDuplicates) {
                 var firstProd = _.first(currDuplicates);
                 var msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
                 var dslName = gast.getProductionDslName(firstProd);
@@ -2182,13 +2175,13 @@ var chevrotain;
             if (path === void 0) { path = []; }
             var errors = [];
             var nextNonTerminals = getFirstNoneTerminal(currRule.definition);
-            if (_.isEmpty(nextNonTerminals)) {
+            if (utils.isEmpty(nextNonTerminals)) {
                 return [];
             }
             else {
                 var ruleName = topRule.name;
                 var foundLeftRecursion = _.contains(nextNonTerminals, topRule);
-                var pathNames = _.map(path, function (currRule) { return currRule.name; });
+                var pathNames = utils.map(path, function (currRule) { return currRule.name; });
                 var leftRecursivePath = ruleName + " --> " + pathNames.concat([ruleName]).join(" --> ");
                 if (foundLeftRecursion) {
                     var errMsg = "Left Recursion found in grammar.\n" +
@@ -2205,7 +2198,7 @@ var chevrotain;
                 // we are only looking for cyclic paths leading back to the specific topRule
                 // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
                 var validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]));
-                var errorsFromNextSteps = _.map(validNextSteps, function (currRefRule, key, all) {
+                var errorsFromNextSteps = utils.map(validNextSteps, function (currRefRule) {
                     var newPath = _.clone(path);
                     newPath.push(currRefRule);
                     return validateNoLeftRecursion(topRule, currRefRule, newPath);
@@ -2216,7 +2209,7 @@ var chevrotain;
         checks.validateNoLeftRecursion = validateNoLeftRecursion;
         function getFirstNoneTerminal(definition) {
             var result = [];
-            if (_.isEmpty(definition)) {
+            if (utils.isEmpty(definition)) {
                 return result;
             }
             var firstProd = _.first(definition);
@@ -2237,7 +2230,7 @@ var chevrotain;
             }
             else if (firstProd instanceof gast.Alternation) {
                 // each sub definition in alternation is a FLAT
-                result = _.flatten(_.map(firstProd.definition, function (currSubDef) { return getFirstNoneTerminal(currSubDef.definition); }));
+                result = _.flatten(utils.map(firstProd.definition, function (currSubDef) { return getFirstNoneTerminal(currSubDef.definition); }));
             }/* istanbul ignore else */ 
             else if (firstProd instanceof gast.Terminal) {
             }
@@ -2272,8 +2265,8 @@ var chevrotain;
             var ors = orCollector.alternations;
             var errors = _.reduce(ors, function (errors, currOr) {
                 var exceptLast = _.dropRight(currOr.definition);
-                var currErrors = _.map(exceptLast, function (currAlternative, currAltIdx) {
-                    if (_.isEmpty(chevrotain.first.first(currAlternative))) {
+                var currErrors = utils.map(exceptLast, function (currAlternative, currAltIdx) {
+                    if (utils.isEmpty(chevrotain.first.first(currAlternative))) {
                         return {
                             message: ("Ambiguous empty alternative: <" + (currAltIdx + 1) + ">") +
                                 (" in <OR" + currOr.occurrenceInParent + "> inside <" + topLevelRule.name + "> Rule.\n") +
@@ -2525,18 +2518,18 @@ var chevrotain;
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
                 var validationErrors = checks.validateGrammar(grammarProductions.values());
                 definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
-                if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                    defErrorsMsgs = _.map(definitionErrors, function (defError) { return defError.message; });
+                if (!utils.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                    defErrorsMsgs = utils.map(definitionErrors, function (defError) { return defError.message; });
                     throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
                 }
-                if (_.isEmpty(definitionErrors)) {
+                if (utils.isEmpty(definitionErrors)) {
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
                     cache.setResyncFollowsForClass(className, allFollows);
                 }
             }
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
+            if (!utils.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                defErrorsMsgs = utils.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
                 throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
             }
         };
@@ -2566,7 +2559,7 @@ var chevrotain;
             return cache.getProductionsForClass(this.className);
         };
         Parser.prototype.isBackTracking = function () {
-            return !(_.isEmpty(this.isBackTrackingStack));
+            return !(utils.isEmpty(this.isBackTrackingStack));
         };
         Parser.prototype.SAVE_ERROR = function (error) {
             if (exceptions.isRecognitionException(error)) {
@@ -3329,7 +3322,7 @@ var chevrotain;
                 return false;
             }
             // must know the possible following tokens to perform single token insertion
-            if (_.isEmpty(follows)) {
+            if (utils.isEmpty(follows)) {
                 return false;
             }
             var mismatchedTok = this.NEXT_TOKEN();
@@ -3377,7 +3370,7 @@ var chevrotain;
         };
         Parser.prototype.buildFullFollowKeyStack = function () {
             var _this = this;
-            return _.map(this.RULE_STACK, function (ruleName, idx) {
+            return utils.map(this.RULE_STACK, function (ruleName, idx) {
                 if (idx === 0) {
                     return EOF_FOLLOW_KEY;
                 }
@@ -3390,7 +3383,7 @@ var chevrotain;
         };
         Parser.prototype.flattenFollowSet = function () {
             var _this = this;
-            var followStack = _.map(this.buildFullFollowKeyStack(), function (currKey) {
+            var followStack = utils.map(this.buildFullFollowKeyStack(), function (currKey) {
                 return _this.getFollowSetFromFollowKey(currKey);
             });
             return _.flatten(followStack);
@@ -3693,7 +3686,7 @@ var chevrotain;
                 var ruleGrammar = this.getGAstProductions().get(ruleName);
                 var nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
                 var nextTokensFlat = _.flatten(nextTokens);
-                var nextTokensNames = _.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
+                var nextTokensNames = utils.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
                 errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + ">";
             }
             throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
@@ -3723,7 +3716,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.12";
+    API.VERSION = "0.5.13";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
@@ -3762,11 +3755,12 @@ else {
 // libs
 /// <reference path="../libs/lodash.d.ts" />
 // production code
+/// <reference path="../src/utils/utils.ts" />
+// TODO: move lang --> utils ?
 /// <reference path="../src/lang/lang_extensions.ts" />
 /// <reference path="../src/scan/tokens_public.ts" />
 /// <reference path="../src/scan/lexer_public.ts" />
 /// <reference path="../src/scan/lexer.ts" />
-/// <reference path="../src/parse/parse_tree.ts" />
 /// <reference path="../src/text/range.ts" />
 /// <reference path="../src/parse/constants.ts" />
 /// <reference path="../src/parse/grammar/path.ts" />
