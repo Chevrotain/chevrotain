@@ -7,6 +7,7 @@ var githubReleaseFiles = ['./package.json',
     './LICENSE.txt',
     "./bin/chevrotain.d.ts",
     "./bin/chevrotain.js",
+    "./bin/chevrotain.min.js",
     './readme.md',
     'bin/docs'
 ]
