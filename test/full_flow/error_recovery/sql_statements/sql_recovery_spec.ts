@@ -3,7 +3,7 @@
 /* tslint:disable:max-line-length  */
 namespace chevrotain.examples.recovery.sql.spec {
 
-    import pt =  chevrotain.tree
+    import pt =  chevrotain.examples.tree
     import exceptions = chevrotain.exceptions
 
 

@@ -7,7 +7,7 @@ namespace chevrotain.examples.recovery.sql {
      * INSERT (32, "SHAHAR") INTO schema2.Persons
      * DELETE (31, "SHAHAR") FROM schema2.Persons
      */
-    import pt = chevrotain.tree
+    import pt = chevrotain.examples.tree
     import gast = chevrotain.gast
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow

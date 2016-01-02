@@ -9,7 +9,6 @@
 /// <reference path="../src/scan/tokens_public.ts" />
 /// <reference path="../src/scan/lexer_public.ts" />
 /// <reference path="../src/scan/lexer.ts" />
-/// <reference path="../src/parse/parse_tree.ts" />
 /// <reference path="../src/text/range.ts" />
 /// <reference path="../src/parse/constants.ts" />
 /// <reference path="../src/parse/grammar/path.ts" />

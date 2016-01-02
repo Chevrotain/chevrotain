@@ -33,7 +33,7 @@ namespace chevrotain.examples.recovery.switchcase {
 
     export interface RetType { [caseValue: string] : number }
 
-    import pt = chevrotain.tree
+    import pt = chevrotain.examples.tree
     import gast = chevrotain.gast
     import gastBuilder = chevrotain.gastBuilder
     import follows = chevrotain.follow

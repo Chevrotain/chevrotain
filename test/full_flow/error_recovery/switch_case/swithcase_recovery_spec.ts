@@ -3,7 +3,7 @@
 namespace chevrotain.examples.recovery.switchcase.spec {
 
     import tok = chevrotain.tokens
-    import pt =  chevrotain.tree
+    import pt =  chevrotain.examples.tree
 
     describe("Error Recovery switch-case Example", function () {
         "use strict"
