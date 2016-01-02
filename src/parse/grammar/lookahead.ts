@@ -40,7 +40,7 @@ namespace chevrotain.lookahead {
             checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar)
         }
 
-        let hasLastAnEmptyAlt = _.isEmpty(_.last(alternativesTokens))
+        let hasLastAnEmptyAlt = utils.isEmpty(_.last(alternativesTokens))
         if (hasLastAnEmptyAlt) {
             let lastIdx = alternativesTokens.length - 1
             /**
@@ -87,7 +87,7 @@ namespace chevrotain.lookahead {
                                           ruleGrammar:gast.Rule):void {
         let altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens)
 
-        if (!_.isEmpty(altsAmbiguityErrors)) {
+        if (!utils.isEmpty(altsAmbiguityErrors)) {
             let errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
                 return `Ambiguous alternatives: <${currAmbiguity.alts.join(" ,")}> in <OR${orOccurrence}> inside <${ruleGrammar.name}> ` +
                     `Rule, <${tokenName(currAmbiguity.token)}> may appears as the first Terminal in all these alternatives.\n`

@@ -149,7 +149,7 @@ namespace chevrotain.checks {
                                             path:gast.Rule[] = []):IParserDefinitionError[] {
         let errors = []
         let nextNonTerminals = getFirstNoneTerminal(currRule.definition)
-        if (_.isEmpty(nextNonTerminals)) {
+        if (utils.isEmpty(nextNonTerminals)) {
             return []
         }
         else {
@@ -185,7 +185,7 @@ namespace chevrotain.checks {
 
     export function getFirstNoneTerminal(definition:gast.IProduction[]):gast.Rule[] {
         let result = []
-        if (_.isEmpty(definition)) {
+        if (utils.isEmpty(definition)) {
             return result
         }
         let firstProd = _.first(definition)
@@ -246,7 +246,7 @@ namespace chevrotain.checks {
         let errors = _.reduce(ors, (errors, currOr) => {
             let exceptLast = _.dropRight(currOr.definition)
             let currErrors = _.map(exceptLast, (currAlternative:IProduction, currAltIdx) => {
-                if (_.isEmpty(first.first(currAlternative))) {
+                if (utils.isEmpty(first.first(currAlternative))) {
                     return {
                         message:     `Ambiguous empty alternative: <${currAltIdx + 1}>` +
                                      ` in <OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n` +

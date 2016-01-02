@@ -62,7 +62,7 @@ namespace chevrotain.interpreter {
 
         updateExpectedNext():void {
             // need to consume the Terminal
-            if (_.isEmpty(this.ruleStack)) {
+            if (utils.isEmpty(this.ruleStack)) {
                 // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
                 // really seeking is the last Terminal...
                 this.nextProductionName = ""

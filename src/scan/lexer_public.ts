@@ -110,7 +110,7 @@ namespace chevrotain {
          */
         constructor(protected tokenClasses:TokenConstructor[], deferDefinitionErrorsHandling:boolean = false) {
             this.lexerDefinitionErrors = validatePatterns(tokenClasses)
-            if (!_.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
+            if (!utils.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
                 let allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
                     return error.message
                 })
@@ -121,7 +121,7 @@ namespace chevrotain {
             // If definition errors were encountered, the analysis phase may fail unexpectedly/
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
-            if (_.isEmpty(this.lexerDefinitionErrors)) {
+            if (utils.isEmpty(this.lexerDefinitionErrors)) {
                 let analyzeResult = analyzeTokenClasses(tokenClasses)
                 this.allPatterns = analyzeResult.allPatterns
                 this.patternIdxToClass = analyzeResult.patternIdxToClass
@@ -151,7 +151,7 @@ namespace chevrotain {
             let column = 1
             let groups:any = _.clone(this.emptyGroups)
 
-            if (!_.isEmpty(this.lexerDefinitionErrors)) {
+            if (!utils.isEmpty(this.lexerDefinitionErrors)) {
                 let allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
                     return error.message
                 })

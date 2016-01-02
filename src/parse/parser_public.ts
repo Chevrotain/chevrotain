@@ -168,18 +168,18 @@ namespace chevrotain {
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
                 let validationErrors = checks.validateGrammar(grammarProductions.values())
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
-                if (!_.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                if (!utils.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                     defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
                     throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
                 }
-                if (_.isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
+                if (utils.isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
                     let allFollows = follows.computeAllProdsFollows(grammarProductions.values())
                     cache.setResyncFollowsForClass(className, allFollows)
                 }
             }
 
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (!_.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+            if (!utils.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
                 throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
             }
@@ -283,7 +283,7 @@ namespace chevrotain {
         }
 
         protected isBackTracking():boolean {
-            return !(_.isEmpty(this.isBackTrackingStack))
+            return !(utils.isEmpty(this.isBackTrackingStack))
         }
 
         protected SAVE_ERROR(error:exceptions.IRecognitionException):IRecognitionException {
@@ -1178,7 +1178,7 @@ namespace chevrotain {
             }
 
             // must know the possible following tokens to perform single token insertion
-            if (_.isEmpty(follows)) {
+            if (utils.isEmpty(follows)) {
                 return false
             }
 

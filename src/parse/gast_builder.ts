@@ -342,7 +342,7 @@ namespace chevrotain.gastBuilder {
         let parenthesisStack = [1]
 
         let i = -1
-        while (!(_.isEmpty(parenthesisStack)) && i + start < text.length) {
+        while (!(utils.isEmpty(parenthesisStack)) && i + start < text.length) {
             i++
             let nextChar = text.charAt(start + i)
             if (nextChar === opening) {
@@ -354,7 +354,7 @@ namespace chevrotain.gastBuilder {
         }
 
         // valid termination of the search loop
-        if (_.isEmpty(parenthesisStack)) {
+        if (utils.isEmpty(parenthesisStack)) {
             return i + start
         }
         else {

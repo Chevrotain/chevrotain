@@ -3,6 +3,8 @@
 /// <reference path="../libs/lodash.d.ts" />
 
 // production code
+/// <reference path="../src/utils/utils.ts" />
+// TODO: move lang --> utils ?
 /// <reference path="../src/lang/lang_extensions.ts" />
 /// <reference path="../src/scan/tokens_public.ts" />
 /// <reference path="../src/scan/lexer_public.ts" />
