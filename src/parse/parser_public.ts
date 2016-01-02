@@ -169,7 +169,7 @@ namespace chevrotain {
                 let validationErrors = checks.validateGrammar(grammarProductions.values())
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
                 if (!utils.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                    defErrorsMsgs = _.map(definitionErrors, defError => defError.message)
+                    defErrorsMsgs = utils.map(definitionErrors, defError => defError.message)
                     throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
                 }
                 if (utils.isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
@@ -180,7 +180,7 @@ namespace chevrotain {
 
             // reThrow the validation errors each time an erroneous parser is instantiated
             if (!utils.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                defErrorsMsgs = _.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
+                defErrorsMsgs = utils.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), defError => defError.message)
                 throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
             }
         }
@@ -1233,7 +1233,7 @@ namespace chevrotain {
         }
 
         private buildFullFollowKeyStack():IFollowKey[] {
-            return _.map(this.RULE_STACK, (ruleName, idx) => {
+            return utils.map(this.RULE_STACK, (ruleName, idx) => {
                 if (idx === 0) {
                     return EOF_FOLLOW_KEY
                 }
@@ -1246,7 +1246,7 @@ namespace chevrotain {
         }
 
         private flattenFollowSet():Function[] {
-            let followStack = _.map(this.buildFullFollowKeyStack(), (currKey) => {
+            let followStack = utils.map(this.buildFullFollowKeyStack(), (currKey) => {
                 return this.getFollowSetFromFollowKey(currKey)
             })
             return <any>_.flatten(followStack)
@@ -1664,7 +1664,7 @@ namespace chevrotain {
                 let ruleGrammar = this.getGAstProductions().get(ruleName)
                 let nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
                 let nextTokensFlat = _.flatten(nextTokens)
-                let nextTokensNames = _.map(nextTokensFlat, (currTokenClass:Function) => tokenName(currTokenClass))
+                let nextTokensNames = utils.map(nextTokensFlat, (currTokenClass:Function) => tokenName(currTokenClass))
                 errMsgTypes = `one of: <${nextTokensNames.join(" ,")}>`
             }
             throw this.SAVE_ERROR(new exceptions.NoViableAltException(`expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))

@@ -21,17 +21,17 @@ namespace chevrotain {
             return currClass[PATTERN] === Lexer.NA
         })
 
-        let allTransformedPatterns = _.map(onlyRelevantClasses, (currClass) => {
+        let allTransformedPatterns = utils.map(onlyRelevantClasses, (currClass) => {
             return addStartOfInput(currClass[PATTERN])
         })
 
         let allPatternsToClass = _.zipObject(<any>allTransformedPatterns, onlyRelevantClasses)
 
-        let patternIdxToClass:any = _.map(allTransformedPatterns, (pattern) => {
+        let patternIdxToClass:any = utils.map(allTransformedPatterns, (pattern) => {
             return allPatternsToClass[pattern.toString()]
         })
 
-        let patternIdxToGroup = _.map(onlyRelevantClasses, (clazz:any) => {
+        let patternIdxToGroup = utils.map(onlyRelevantClasses, (clazz:any) => {
             let groupName = clazz.GROUP
             if (groupName === Lexer.SKIPPED) {
                 return undefined
@@ -47,7 +47,7 @@ namespace chevrotain {
             }
         })
 
-        let patternIdxToLongerAltIdx:any = _.map(onlyRelevantClasses, (clazz:any, idx) => {
+        let patternIdxToLongerAltIdx:any = utils.map(onlyRelevantClasses, (clazz:any) => {
             let longerAltClass = clazz.LONGER_ALT
 
             if (longerAltClass) {
@@ -56,7 +56,7 @@ namespace chevrotain {
             }
         })
 
-        let patternIdxToCanLineTerminator = _.map(allTransformedPatterns, (pattern:RegExp) => {
+        let patternIdxToCanLineTerminator = utils.map(allTransformedPatterns, (pattern:RegExp) => {
             // TODO: unicode escapes of line terminators too?
             return /\\n|\\r|\\s/g.test(pattern.source)
         })
@@ -106,7 +106,7 @@ namespace chevrotain {
             return !_.has(currClass, PATTERN)
         })
 
-        let errors = _.map(tokenClassesWithMissingPattern, (currClass) => {
+        let errors = utils.map(tokenClassesWithMissingPattern, (currClass) => {
             return {
                 message:      "Token class: ->" + tokenName(currClass) + "<- missing static 'PATTERN' property",
                 type:         LexerDefinitionErrorType.MISSING_PATTERN,
@@ -124,7 +124,7 @@ namespace chevrotain {
             return !_.isRegExp(pattern)
         })
 
-        let errors = _.map(tokenClassesWithInvalidPattern, (currClass) => {
+        let errors = utils.map(tokenClassesWithInvalidPattern, (currClass) => {
             return {
                 message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
                 type:         LexerDefinitionErrorType.INVALID_PATTERN,
@@ -144,7 +144,7 @@ namespace chevrotain {
             return end_of_input.test(pattern.source)
         })
 
-        let errors = _.map(invalidRegex, (currClass) => {
+        let errors = utils.map(invalidRegex, (currClass) => {
             return {
                 message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
                 type:         LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
@@ -161,7 +161,7 @@ namespace chevrotain {
             return pattern instanceof RegExp && (pattern.multiline || pattern.global)
         })
 
-        let errors = _.map(invalidFlags, (currClass) => {
+        let errors = utils.map(invalidFlags, (currClass) => {
             return {
                 message:      "Token class: ->" + tokenName(currClass) +
                               "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
@@ -177,7 +177,7 @@ namespace chevrotain {
     export function findDuplicatePatterns(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
 
         let found = []
-        let identicalPatterns = _.map(tokenClasses, (outerClass:any) => {
+        let identicalPatterns = utils.map(tokenClasses, (outerClass:any) => {
             return _.reduce(tokenClasses, (result, innerClass:any) => {
                 if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) &&
                     innerClass.PATTERN !== Lexer.NA) {
@@ -196,8 +196,8 @@ namespace chevrotain {
             return _.size(currIdenticalSet) > 1
         })
 
-        let errors = _.map(duplicatePatterns, (setOfIdentical:any) => {
-            let classNames = _.map(setOfIdentical, (currClass:any) => {
+        let errors = utils.map(duplicatePatterns, (setOfIdentical:any) => {
+            let classNames = utils.map(setOfIdentical, (currClass:any) => {
                 return tokenName(currClass)
             })
 
@@ -224,7 +224,7 @@ namespace chevrotain {
                 group !== Lexer.NA && !_.isString(group)
         })
 
-        let errors = _.map(invalidTypes, (currClass) => {
+        let errors = utils.map(invalidTypes, (currClass) => {
             return {
                 message:      "Token class: ->" + tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
                 type:         LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,

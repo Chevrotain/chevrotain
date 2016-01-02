@@ -111,7 +111,7 @@ namespace chevrotain {
         constructor(protected tokenClasses:TokenConstructor[], deferDefinitionErrorsHandling:boolean = false) {
             this.lexerDefinitionErrors = validatePatterns(tokenClasses)
             if (!utils.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
-                let allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
+                let allErrMessages = utils.map(this.lexerDefinitionErrors, (error) => {
                     return error.message
                 })
                 let allErrMessagesString = allErrMessages.join("-----------------------\n")
@@ -152,7 +152,7 @@ namespace chevrotain {
             let groups:any = _.clone(this.emptyGroups)
 
             if (!utils.isEmpty(this.lexerDefinitionErrors)) {
-                let allErrMessages = _.map(this.lexerDefinitionErrors, (error) => {
+                let allErrMessages = utils.map(this.lexerDefinitionErrors, (error) => {
                     return error.message
                 })
                 let allErrMessagesString = allErrMessages.join("-----------------------\n")

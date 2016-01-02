@@ -221,7 +221,7 @@ namespace chevrotain.interpreter {
 
         walkOr(orProd:g.Alternation, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (orProd.occurrenceInParent === this.occurrence) {
-                this.result = _.map(orProd.definition, (alt) => {
+                this.result = utils.map(orProd.definition, (alt) => {
                     let altWrapper = new gast.Flat([alt])
                     return f.first(altWrapper)
                 })

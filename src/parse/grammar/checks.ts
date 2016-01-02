@@ -5,9 +5,9 @@ namespace chevrotain.checks {
     import IProduction = chevrotain.gast.IProduction
 
     export function validateGrammar(topLevels:gast.Rule[]):IParserDefinitionError[] {
-        let duplicateErrors = _.map(topLevels, validateDuplicateProductions)
-        let leftRecursionErrors:any = _.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
-        let emptyAltErrors = _.map(topLevels, validateEmptyOrAlternative)
+        let duplicateErrors = utils.map(topLevels, validateDuplicateProductions)
+        let leftRecursionErrors:any = utils.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
+        let emptyAltErrors = utils.map(topLevels, validateEmptyOrAlternative)
         return <any>_.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors))
     }
 
@@ -22,7 +22,7 @@ namespace chevrotain.checks {
             return currGroup.length > 1
         })
 
-        let errors = _.map(duplicates, (currDuplicates:any) => {
+        let errors = utils.map(utils.values(duplicates), (currDuplicates:any) => {
             let firstProd:any = _.first(currDuplicates)
             let msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
             let dslName = gast.getProductionDslName(firstProd)
@@ -155,7 +155,7 @@ namespace chevrotain.checks {
         else {
             let ruleName = topRule.name
             let foundLeftRecursion = _.contains(<any>nextNonTerminals, topRule)
-            let pathNames = _.map(path, currRule => currRule.name)
+            let pathNames = utils.map(path, currRule => currRule.name)
             let leftRecursivePath = `${ruleName} --> ${pathNames.concat([ruleName]).join(" --> ")}`
             if (foundLeftRecursion) {
                 let errMsg = `Left Recursion found in grammar.\n` +
@@ -173,7 +173,7 @@ namespace chevrotain.checks {
             // we are only looking for cyclic paths leading back to the specific topRule
             // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
             let validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]))
-            let errorsFromNextSteps = _.map(validNextSteps, (currRefRule, key, all) => {
+            let errorsFromNextSteps = utils.map(validNextSteps, (currRefRule) => {
                 let newPath = _.clone(path)
                 newPath.push(currRefRule)
                 return validateNoLeftRecursion(topRule, currRefRule, newPath)
@@ -210,7 +210,7 @@ namespace chevrotain.checks {
         else if (firstProd instanceof gast.Alternation) {
             // each sub definition in alternation is a FLAT
             result = _.flatten(
-                _.map(firstProd.definition, currSubDef => getFirstNoneTerminal((<gast.Flat>currSubDef).definition)))
+                utils.map(firstProd.definition, currSubDef => getFirstNoneTerminal((<gast.Flat>currSubDef).definition)))
         }
         else if (firstProd instanceof gast.Terminal) {
             // nothing to see, move along
@@ -245,7 +245,7 @@ namespace chevrotain.checks {
 
         let errors = _.reduce(ors, (errors, currOr) => {
             let exceptLast = _.dropRight(currOr.definition)
-            let currErrors = _.map(exceptLast, (currAlternative:IProduction, currAltIdx) => {
+            let currErrors = utils.map(exceptLast, (currAlternative:IProduction, currAltIdx) => {
                 if (utils.isEmpty(first.first(currAlternative))) {
                     return {
                         message:     `Ambiguous empty alternative: <${currAltIdx + 1}>` +

@@ -88,7 +88,7 @@ namespace chevrotain.lookahead {
         let altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens)
 
         if (!utils.isEmpty(altsAmbiguityErrors)) {
-            let errorMessages = _.map(altsAmbiguityErrors, (currAmbiguity) => {
+            let errorMessages = utils.map(altsAmbiguityErrors, (currAmbiguity) => {
                 return `Ambiguous alternatives: <${currAmbiguity.alts.join(" ,")}> in <OR${orOccurrence}> inside <${ruleGrammar.name}> ` +
                     `Rule, <${tokenName(currAmbiguity.token)}> may appears as the first Terminal in all these alternatives.\n`
             })
@@ -114,14 +114,14 @@ namespace chevrotain.lookahead {
         let allTokensFlat = _.flatten(alternativesTokens)
         let uniqueTokensFlat = _.uniq(allTokensFlat)
 
-        let tokensToAltsIndicesItAppearsIn = _.map(uniqueTokensFlat, (seekToken) => {
+        let tokensToAltsIndicesItAppearsIn = utils.map(uniqueTokensFlat, (seekToken) => {
             let altsCurrTokenAppearsIn = _.pick(alternativesTokens, (altToLookIn) => {
                 return <any> _.find(altToLookIn, (currToken) => {
                     return currToken === seekToken
                 })
             })
 
-            let altsIndicesTokenAppearsIn = _.map(utils.keys(altsCurrTokenAppearsIn), (index) => {
+            let altsIndicesTokenAppearsIn = utils.map(utils.keys(altsCurrTokenAppearsIn), (index) => {
                 return parseInt(index, 10) + 1
             })
 

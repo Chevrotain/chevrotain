@@ -10,11 +10,28 @@
 
 namespace utils {
 
-    export function isEmpty(arr:any[]) {
+    export function isEmpty(arr:any[]):boolean {
         return arr.length === 0
     }
 
-    export function keys(obj:any) {
+    export function keys(obj:any):string[] {
         return Object.keys(obj)
+    }
+
+    export function values(obj:any):any[] {
+        let vals = []
+        let keys = Object.keys(obj);
+        for (let i = 0; i < keys.length; i++) {
+            vals.push(obj[keys[i]])
+        }
+        return vals
+    }
+
+    export function map<I, O>(arr:I[], callback:(I, idx?:number) => O):O[] {
+        let result:O[] = []
+        for (let idx = 0; idx < arr.length; idx++) {
+            result.push(callback.call(null, arr[idx], idx))
+        }
+        return result
     }
 }

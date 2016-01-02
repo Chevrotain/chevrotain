@@ -41,7 +41,7 @@ namespace chevrotain.lang {
         }
 
         values():V[] {
-            return <any>_.values(this._state)
+            return <any>utils.values(this._state)
         }
 
         put(key:string, value:V):void {
