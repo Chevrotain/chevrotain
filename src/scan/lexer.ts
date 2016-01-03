@@ -201,7 +201,7 @@ namespace chevrotain {
                 return tokenName(currClass)
             })
 
-            let dupPatternSrc = (<any>_.first(setOfIdentical)).PATTERN
+            let dupPatternSrc = (<any>utils.first(setOfIdentical)).PATTERN
             return {
                 message:      `The same RegExp pattern ->${dupPatternSrc}<-` +
                               `has been used in all the following classes: ${classNames.join(", ")} <-`,

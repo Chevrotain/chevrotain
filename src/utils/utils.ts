@@ -34,4 +34,23 @@ namespace utils {
         }
         return result
     }
+
+    export function flatten<T>(arr:any[]):T[] {
+        let result = []
+
+        for (let idx = 0; idx < arr.length; idx++) {
+            let currItem = arr[idx]
+            if (Array.isArray(currItem)) {
+                result = result.concat(flatten(currItem))
+            }
+            else {
+                result.push(currItem)
+            }
+        }
+        return result
+    }
+
+    export function first<T>(arr:T[]):T {
+        return isEmpty(arr) ? undefined : arr[0]
+    }
 }

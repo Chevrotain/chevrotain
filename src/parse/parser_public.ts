@@ -1143,7 +1143,7 @@ namespace chevrotain {
                 lastTokOccurrence: tokIdxInRule
             }
 
-            let topRuleName = _.first(pathRuleStack)
+            let topRuleName = utils.first(pathRuleStack)
             let gastProductions = this.getGAstProductions()
             let topProduction = gastProductions.get(topRuleName)
             let follows = new interp.NextAfterTokenWalker(topProduction, grammarPath).startWalking()
@@ -1249,7 +1249,7 @@ namespace chevrotain {
             let followStack = utils.map(this.buildFullFollowKeyStack(), (currKey) => {
                 return this.getFollowSetFromFollowKey(currKey)
             })
-            return <any>_.flatten(followStack)
+            return <any>utils.flatten(followStack)
         }
 
         private getFollowSetFromFollowKey(followKey:IFollowKey):Function[] {
@@ -1663,7 +1663,7 @@ namespace chevrotain {
                 let ruleName = _.last(this.RULE_STACK)
                 let ruleGrammar = this.getGAstProductions().get(ruleName)
                 let nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
-                let nextTokensFlat = _.flatten(nextTokens)
+                let nextTokensFlat = utils.flatten(nextTokens)
                 let nextTokensNames = utils.map(nextTokensFlat, (currTokenClass:Function) => tokenName(currTokenClass))
                 errMsgTypes = `one of: <${nextTokensNames.join(" ,")}>`
             }

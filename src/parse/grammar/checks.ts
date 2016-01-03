@@ -8,7 +8,7 @@ namespace chevrotain.checks {
         let duplicateErrors = utils.map(topLevels, validateDuplicateProductions)
         let leftRecursionErrors:any = utils.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
         let emptyAltErrors = utils.map(topLevels, validateEmptyOrAlternative)
-        return <any>_.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors))
+        return <any>utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors))
     }
 
     function validateDuplicateProductions(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
@@ -23,7 +23,7 @@ namespace chevrotain.checks {
         })
 
         let errors = utils.map(utils.values(duplicates), (currDuplicates:any) => {
-            let firstProd:any = _.first(currDuplicates)
+            let firstProd:any = utils.first(currDuplicates)
             let msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name)
             let dslName = gast.getProductionDslName(firstProd)
             let defError:IParserDuplicatesDefinitionError = {
@@ -45,7 +45,7 @@ namespace chevrotain.checks {
     }
 
     function createDuplicatesErrorMessage(duplicateProds:gast.IProductionWithOccurrence[], topLevelName):string {
-        let firstProd = _.first(duplicateProds)
+        let firstProd = utils.first(duplicateProds)
         let index = firstProd.occurrenceInParent
         let dslName = gast.getProductionDslName(firstProd)
         let extraArgument = getExtraProductionArgument(firstProd)
@@ -179,7 +179,7 @@ namespace chevrotain.checks {
                 return validateNoLeftRecursion(topRule, currRefRule, newPath)
             })
 
-            return errors.concat(_.flatten(errorsFromNextSteps))
+            return errors.concat(utils.flatten(errorsFromNextSteps))
         }
     }
 
@@ -188,7 +188,7 @@ namespace chevrotain.checks {
         if (utils.isEmpty(definition)) {
             return result
         }
-        let firstProd = _.first(definition)
+        let firstProd = utils.first(definition)
 
 
         if (firstProd instanceof gast.NonTerminal) {
@@ -209,7 +209,7 @@ namespace chevrotain.checks {
         }
         else if (firstProd instanceof gast.Alternation) {
             // each sub definition in alternation is a FLAT
-            result = _.flatten(
+            result = utils.flatten(
                 utils.map(firstProd.definition, currSubDef => getFirstNoneTerminal((<gast.Flat>currSubDef).definition)))
         }
         else if (firstProd instanceof gast.Terminal) {

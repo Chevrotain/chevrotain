@@ -261,7 +261,7 @@ namespace chevrotain.interpreter {
         walkMany(manyProd:g.Repetition, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (manyProd.occurrenceInParent === this.occurrence) {
 
-                let firstAfterMany = _.first(currRest.concat(prevRest))
+                let firstAfterMany = utils.first(currRest.concat(prevRest))
                 this.result.isEndOfRule = firstAfterMany === undefined
                 if (firstAfterMany instanceof gast.Terminal) {
                     this.result.token = firstAfterMany.terminalType
@@ -279,7 +279,7 @@ namespace chevrotain.interpreter {
         walkManySep(manySepProd:g.RepetitionWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (manySepProd.occurrenceInParent === this.occurrence) {
 
-                let firstAfterManySep = _.first(currRest.concat(prevRest))
+                let firstAfterManySep = utils.first(currRest.concat(prevRest))
                 this.result.isEndOfRule = firstAfterManySep === undefined
                 if (firstAfterManySep instanceof gast.Terminal) {
                     this.result.token = firstAfterManySep.terminalType
@@ -297,7 +297,7 @@ namespace chevrotain.interpreter {
         walkAtLeastOne(atLeastOneProd:g.RepetitionMandatory, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (atLeastOneProd.occurrenceInParent === this.occurrence) {
 
-                let firstAfterAtLeastOne = _.first(currRest.concat(prevRest))
+                let firstAfterAtLeastOne = utils.first(currRest.concat(prevRest))
                 this.result.isEndOfRule = firstAfterAtLeastOne === undefined
                 if (firstAfterAtLeastOne instanceof gast.Terminal) {
                     this.result.token = firstAfterAtLeastOne.terminalType
@@ -316,7 +316,7 @@ namespace chevrotain.interpreter {
         walkAtLeastOneSep(atleastOneSepProd:g.RepetitionMandatoryWithSeparator, currRest:g.IProduction[], prevRest:g.IProduction[]):void {
             if (atleastOneSepProd.occurrenceInParent === this.occurrence) {
 
-                let firstAfterfirstAfterAtLeastOneSep = _.first(currRest.concat(prevRest))
+                let firstAfterfirstAfterAtLeastOneSep = utils.first(currRest.concat(prevRest))
                 this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === undefined
                 if (firstAfterfirstAfterAtLeastOneSep instanceof gast.Terminal) {
                     this.result.token = firstAfterfirstAfterAtLeastOneSep.terminalType

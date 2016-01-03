@@ -54,7 +54,7 @@ namespace chevrotain.first {
         let allAlternativesFirsts:Function[][] = utils.map(prod.definition, (innerProd) => {
             return first(innerProd)
         })
-        return _.uniq(_.flatten<Function>(allAlternativesFirsts))
+        return _.uniq(utils.flatten<Function>(allAlternativesFirsts))
     }
 
     export function firstForTerminal(terminal:gast.Terminal):Function[] {
