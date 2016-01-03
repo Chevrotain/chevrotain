@@ -1,6 +1,6 @@
 {
   "name": "chevrotain",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "description": "Chevrotain is a high performance fault Tolerant Javascript parsing DSL for building recursive decent parsers",
   "main": "release/chevrotain.js",
   "dependencies": {
@@ -39,32 +39,18 @@
     "url": "git://github.com/SAP/chevrotain.git"
   },
   "ignore": [
-    ".*",
-    "*.yml",
-    "*.js",
-    "*.md",
-    "*.json",
-    "*.pdf",
-    "*.bat",
-    "bin",
-    "bower_components",
-    "build",
-    "docs",
-    "examples",
-    "libs",
-    "node_modules",
-    "package",
-    "scripts",
-    "src",
-    "test"
+    "**/*",
+    "!release/*.*",
+    "!readme.md",
+    "!LICENSE.txt"
   ],
   "license": "Apache-2.0",
   "homepage": "https://github.com/SAP/chevrotain",
-  "_release": "0.5.12",
+  "_release": "0.5.13",
   "_resolution": {
     "type": "version",
-    "tag": "v0.5.12",
-    "commit": "79a4cf214aa3b64f61984244ab9962386893030a"
+    "tag": "v0.5.13",
+    "commit": "a5da06ed0807383cefb321c5c009f9215e2f3339"
   },
   "_source": "git://github.com/SAP/chevrotain.git",
   "_target": "*",
