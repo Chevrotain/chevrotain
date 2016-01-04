@@ -1,9 +1,17 @@
 # Getting Started With Lexing
 
-In This tutorial we will implement a Lexerfor a simple SQL Select statement language:
+### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
+
+### On code samples:
+The code samples in the **written** tutorial use ES2015/2016 sytnax (classes/let/static class props)
+As those better convey the intent. The **online** version uses ES5 syntax.
+
+### Lets get started:
+In This tutorial we will implement a Lexer for a simple SQL Select statement language:
  ```SQL
  SELECT column1 FROM table2
  SELECT name, age FROM persons WHERE age > 100
+ ...
 ```
 
 A Lexer transforms a string input into a [Token](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts#L61) vector.
@@ -101,7 +109,7 @@ let SelectLexer = new Lexer(allTokens);
 ```
 
 Note that:
-* The **order** of Token definitions passed to the Lexer is **important**
+* The **order** of Token definitions passed to the Lexer is **important**.
   The first PATTERN to match will be chosen not the longest.
   * See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js)
 
@@ -119,7 +127,9 @@ let lexingResult = SelectLexer.tokenize(inputText)
 The Lexing Result will contain a Token Vector, the lexing errors (if any were encountered)
 and other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js) (if grouping was used)
 
-
+#### What is Next?
+* Try out the **onine** version of [This Tutorial](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer)
+* TBD move to the next phase, building a Parser for our mini SQL grammar.
 
 
 
