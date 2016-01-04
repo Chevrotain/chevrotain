@@ -1279,7 +1279,7 @@ namespace chevrotain {
             let key = this.getKeyForAutomaticLookahead(prodName, prodKeys, prodOccurrence)
             let firstAfterRepInfo = this.firstAfterRepMap.get(key)
             if (firstAfterRepInfo === undefined) {
-                let currRuleName = _.last(this.RULE_STACK)
+                let currRuleName = utils.last(this.RULE_STACK)
                 let ruleGrammar = this.getGAstProductions().get(currRuleName)
                 let walker:interp.AbstractNextTerminalAfterProductionWalker = new nextToksWalker(ruleGrammar, prodOccurrence)
                 firstAfterRepInfo = walker.startWalking()
@@ -1586,7 +1586,7 @@ namespace chevrotain {
 
         private getKeyForAutomaticLookahead(prodName:string, prodKeys:lang.HashTable<string>[], occurrence:number):string {
             let occuMap = prodKeys[occurrence - 1]
-            let currRule = _.last(this.RULE_STACK)
+            let currRule = utils.last(this.RULE_STACK)
             let key = occuMap[currRule]
             if (key === undefined) {
                 key = prodName + occurrence + IN + currRule
@@ -1630,7 +1630,7 @@ namespace chevrotain {
                                        occurrence:number,
                                        laFuncBuilder:(number, any) => () => T,
                                        extraArgs:any[] = []):() => T {
-            let ruleName = _.last(this.RULE_STACK)
+            let ruleName = utils.last(this.RULE_STACK)
             let condition = <any>this.classLAFuncs.get(key)
             if (condition === undefined) {
                 let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -1660,7 +1660,7 @@ namespace chevrotain {
         private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
             let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
             if (errMsgTypes === undefined) {
-                let ruleName = _.last(this.RULE_STACK)
+                let ruleName = utils.last(this.RULE_STACK)
                 let ruleGrammar = this.getGAstProductions().get(ruleName)
                 let nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
                 let nextTokensFlat = utils.flatten(nextTokens)

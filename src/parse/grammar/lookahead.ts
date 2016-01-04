@@ -40,7 +40,7 @@ namespace chevrotain.lookahead {
             checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar)
         }
 
-        let hasLastAnEmptyAlt = utils.isEmpty(_.last(alternativesTokens))
+        let hasLastAnEmptyAlt = utils.isEmpty(utils.last(alternativesTokens))
         if (hasLastAnEmptyAlt) {
             let lastIdx = alternativesTokens.length - 1
             /**

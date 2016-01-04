@@ -8,10 +8,10 @@
  considering they will not be invoked in hotspots...
  */
 
-namespace utils {
+namespace chevrotain.utils {
 
     export function isEmpty(arr:any[]):boolean {
-        return arr.length === 0
+        return arr && arr.length === 0
     }
 
     export function keys(obj:any):string[] {
@@ -52,5 +52,10 @@ namespace utils {
 
     export function first<T>(arr:T[]):T {
         return isEmpty(arr) ? undefined : arr[0]
+    }
+
+    export function last<T>(arr:T[]):T {
+        let len = arr && arr.length
+        return len ? arr[len - 1] : undefined
     }
 }
