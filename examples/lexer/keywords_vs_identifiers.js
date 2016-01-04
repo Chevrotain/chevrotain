@@ -7,6 +7,7 @@ var Lexer = chevrotain.Lexer;
 // using extendToken utility to create the Token constructors and hierarchy
 var Identifier = extendToken("Identifier", /[a-zA-z]\w+/);
 var Keyword = extendToken("Keyword", Lexer.NA);
+// LONGER_ALT will make the Lexer perfer a longer Identifier over a Keyword.
 Keyword.LONGER_ALT = Identifier;
 
 var While = extendToken("While", /while/, Keyword);
