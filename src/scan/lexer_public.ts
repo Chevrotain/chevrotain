@@ -53,17 +53,12 @@ namespace chevrotain {
 
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
-         *                     These constructors must be in one of three forms:
+         *                     These constructors must be in one of THESE forms:
          *
          *  1. With a PATTERN property that has a RegExp value for tokens to match:
          *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
          *
-         *  2. With a PATTERN property that has a RegExp value AND an IGNORE property with boolean value true.
-         *     These tokens will be matched but not as part of the main token vector.
-         *     this is usually used for ignoring whitespace/comments
-         *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
-         *
-         *  3. With a PATTERN property that has the value of the var Lexer.NA defined above.
+         *  2. With a PATTERN property that has the value of the var Lexer.NA defined above.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
          *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *
