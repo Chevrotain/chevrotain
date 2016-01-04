@@ -326,7 +326,7 @@ function tutorialLexerExample() {
     var From = extendToken("From", /FROM/);
     var Where = extendToken("Where", /WHERE/);
     var Comma = extendToken("Comma", /,/);
-    var identifier = extendToken("identifier", /\w+/);
+    var Identifier = extendToken("identifier", /\w+/);
     var Integer = extendToken("Integer", /0|[1-9]\d+/);
     var GreaterThan = extendToken("GreaterThan", /</);
     var LessThan = extendToken("LessThan", />/);
@@ -335,7 +335,7 @@ function tutorialLexerExample() {
 
     // whitespace is normally very common so it is placed first to speed up the lexer
     var allTokens = [WhiteSpace, Select, From, Where, Comma,
-        identifier, Integer, GreaterThan, LessThan];
+        Identifier, Integer, GreaterThan, LessThan];
 
     var SelectLexer = new Lexer(allTokens, true);
 
