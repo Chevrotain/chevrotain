@@ -9,7 +9,7 @@ namespace chevrotain.rest {
     export abstract class RestWalker {
 
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
-            _.forEach(prod.definition, (subProd:gast.IProduction, index) => {
+            utils.forEach(prod.definition, (subProd:gast.IProduction, index) => {
                 let currRest = _.drop(prod.definition, index + 1)
 
                 if (subProd instanceof g.NonTerminal) {
@@ -87,7 +87,7 @@ namespace chevrotain.rest {
             // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
             let fullOrRest = currRest.concat(prevRest)
             // walk all different alternatives
-            _.forEach(orProd.definition, (alt) => {
+            utils.forEach(orProd.definition, (alt) => {
                 // wrapping each alternative in a single definition wrapper
                 // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
                 // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1

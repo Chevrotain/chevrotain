@@ -35,7 +35,7 @@ namespace chevrotain.follow {
     export function computeAllProdsFollows(topProductions:g.Rule[]):lang.HashTable<Function[]> {
         let reSyncFollows = new lang.HashTable<Function[]>()
 
-        _.forEach(topProductions, (topProd) => {
+        utils.forEach(topProductions, (topProd) => {
             let currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()
             reSyncFollows.putAll(currRefsFollow)
         })

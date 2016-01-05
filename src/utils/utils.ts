@@ -58,4 +58,12 @@ namespace chevrotain.utils {
         let len = arr && arr.length
         return len ? arr[len - 1] : undefined
     }
+
+    export function forEach(arr:any[], iteratorCallback:Function):void {
+        if (Array.isArray(arr)) {
+            for (let i = 0; i < arr.length; i++) {
+                iteratorCallback.call(null, arr[i], i)
+            }
+        }
+    }
 }

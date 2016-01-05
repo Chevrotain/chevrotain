@@ -18,7 +18,7 @@ namespace chevrotain.gast {
 
         accept(visitor:GAstVisitor):void {
             visitor.visit(this)
-            _.forEach(this.definition, (prod) => {
+            utils.forEach(this.definition, (prod) => {
                 prod.accept(visitor)
             })
         }

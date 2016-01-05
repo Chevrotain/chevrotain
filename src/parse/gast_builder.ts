@@ -190,7 +190,7 @@ namespace chevrotain.gastBuilder {
         let secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
 
         let definition:gast.IProduction[] = []
-        _.forEach(secondLevelInOrder, (prodRng) => {
+        utils.forEach(secondLevelInOrder, (prodRng) => {
             definition.push(buildProdGast(prodRng, allRanges))
         });
 
@@ -284,11 +284,11 @@ namespace chevrotain.gastBuilder {
 
     export function createOrPartRanges(orRanges:IProdRange[]):IProdRange[] {
         let orPartRanges:IProdRange[] = []
-        _.forEach(orRanges, (orRange) => {
+        utils.forEach(orRanges, (orRange) => {
             let currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly)
             let currOrRangeStart = orRange.range.start
             // fix offsets as we are working on a subset of the text
-            _.forEach(currOrParts, (orPart) => {
+            utils.forEach(currOrParts, (orPart) => {
                 orPart.range.start += currOrRangeStart
                 orPart.range.end += currOrRangeStart
             })

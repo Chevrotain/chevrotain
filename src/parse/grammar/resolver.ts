@@ -16,7 +16,7 @@ namespace chevrotain.resolver {
         constructor(private nameToTopRule:lang.HashTable<gast.Rule>) { super() }
 
         public resolveRefs():void {
-            _.forEach(this.nameToTopRule.values(), (prod) => {
+            utils.forEach(this.nameToTopRule.values(), (prod) => {
                 this.currTopLevel = prod
                 prod.accept(this)
             })
