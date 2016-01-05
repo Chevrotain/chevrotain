@@ -66,4 +66,8 @@ namespace chevrotain.utils {
             }
         }
     }
+
+    export function isString(item:any):boolean {
+        return typeof item === "string"
+    }
 }

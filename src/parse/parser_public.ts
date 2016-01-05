@@ -1322,7 +1322,7 @@ namespace chevrotain {
                                    lookAheadFunc:LookAheadFunc | GrammarAction,
                                    action:GrammarAction | string,
                                    errMsg?:string):void {
-            if (_.isString(action)) {
+            if (utils.isString(action)) {
                 errMsg = <any>action
                 action = <any>lookAheadFunc
                 lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
@@ -1357,7 +1357,7 @@ namespace chevrotain {
 
             let separatorsResult = []
 
-            if (_.isString(action)) {
+            if (utils.isString(action)) {
                 errMsg = <any>action
                 action = <any>firstIterationLookAheadFunc
                 firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)

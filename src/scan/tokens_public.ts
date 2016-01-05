@@ -8,7 +8,7 @@ namespace chevrotain {
         // used to support js inheritance patterns that do not use named functions
         // in that situation setting a property tokenName on a token constructor will
         // enable producing readable error messages.
-        if (_.isString((<any>clazz).tokenName)) {
+        if (utils.isString((<any>clazz).tokenName)) {
             return (<any>clazz).tokenName
         }
         else {

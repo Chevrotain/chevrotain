@@ -21,5 +21,13 @@ namespace chevrotain.utils.spec {
                 throw Error("call back should not be invoked for empty array")
             })
         })
+
+        it("exports a isString utility", () => {
+            expect(isString("")).to.be.true
+            expect(isString("bamba")).to.be.true
+            expect(isString(66)).to.be.false
+            expect(isString(null)).to.be.false
+        })
+
     })
 }

@@ -36,7 +36,7 @@ namespace chevrotain {
             if (groupName === Lexer.SKIPPED) {
                 return undefined
             }
-            else if (_.isString(groupName)) {
+            else if (utils.isString(groupName)) {
                 return groupName
             }
             else if (_.isUndefined(groupName)) {
@@ -63,7 +63,7 @@ namespace chevrotain {
 
         let emptyGroups = _.reduce(onlyRelevantClasses, (acc, clazz:any) => {
             let groupName = clazz.GROUP
-            if (_.isString(groupName)) {
+            if (utils.isString(groupName)) {
                 acc[groupName] = []
             }
             return acc
@@ -221,7 +221,7 @@ namespace chevrotain {
             let group = clazz.GROUP
 
             return group !== Lexer.SKIPPED &&
-                group !== Lexer.NA && !_.isString(group)
+                group !== Lexer.NA && !utils.isString(group)
         })
 
         let errors = utils.map(invalidTypes, (currClass) => {
