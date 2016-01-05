@@ -10,7 +10,7 @@ namespace chevrotain.rest {
 
         walk(prod:g.AbstractProduction, prevRest:any[] = []):void {
             utils.forEach(prod.definition, (subProd:gast.IProduction, index) => {
-                let currRest = _.drop(prod.definition, index + 1)
+                let currRest = utils.drop(prod.definition, index + 1)
 
                 if (subProd instanceof g.NonTerminal) {
                     this.walkProdRef(subProd, currRest, prevRest)

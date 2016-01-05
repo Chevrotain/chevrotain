@@ -39,7 +39,7 @@ namespace chevrotain {
             else if (utils.isString(groupName)) {
                 return groupName
             }
-            else if (_.isUndefined(groupName)) {
+            else if (utils.isUndefined(groupName)) {
                 return "default"
             }
             else {
@@ -193,7 +193,7 @@ namespace chevrotain {
         identicalPatterns = _.compact(identicalPatterns)
 
         let duplicatePatterns = _.filter(identicalPatterns, (currIdenticalSet) => {
-            return _.size(currIdenticalSet) > 1
+            return currIdenticalSet.length > 1
         })
 
         let errors = utils.map(duplicatePatterns, (setOfIdentical:any) => {

@@ -222,7 +222,7 @@ namespace chevrotain.checks {
         let isFirstOptional = gast.isOptionalProd(firstProd)
         let hasMore = definition.length > 1
         if (isFirstOptional && hasMore) {
-            let rest = _.drop(definition)
+            let rest = utils.drop(definition)
             return result.concat(getFirstNoneTerminal(rest))
         }
         else {
@@ -244,7 +244,7 @@ namespace chevrotain.checks {
         let ors = orCollector.alternations
 
         let errors = _.reduce(ors, (errors, currOr) => {
-            let exceptLast = _.dropRight(currOr.definition)
+            let exceptLast = utils.dropRight(currOr.definition)
             let currErrors = utils.map(exceptLast, (currAlternative:IProduction, currAltIdx) => {
                 if (utils.isEmpty(first.first(currAlternative))) {
                     return {

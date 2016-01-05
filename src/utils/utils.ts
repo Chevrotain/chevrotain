@@ -70,4 +70,20 @@ namespace chevrotain.utils {
     export function isString(item:any):boolean {
         return typeof item === "string"
     }
+
+    export function isUndefined(item:any):boolean {
+        return item === undefined
+    }
+
+    export function isFunction(item:any):boolean {
+        return item instanceof Function
+    }
+
+    export function drop<T>(arr:T[], howMuch:number = 1):T[] {
+        return arr.slice(howMuch, arr.length)
+    }
+
+    export function dropRight<T>(arr:T[], howMuch:number = 1):T[] {
+        return arr.slice(0, arr.length - howMuch)
+    }
 }

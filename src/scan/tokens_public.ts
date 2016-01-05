@@ -33,7 +33,7 @@ namespace chevrotain {
             patternOrParent === chevrotain.Lexer.NA) {
             pattern = patternOrParent
         }
-        else if (_.isFunction(patternOrParent)) {
+        else if (utils.isFunction(patternOrParent)) {
             parentConstructor = patternOrParent
             pattern = undefined
         }
@@ -51,7 +51,7 @@ namespace chevrotain {
         derivedCostructor.tokenName = tokenName
         derivedCostructor.prototype = Object.create(parentConstructor.prototype)
         derivedCostructor.prototype.constructor = derivedCostructor
-        if (!_.isUndefined(pattern)) {
+        if (!utils.isUndefined(pattern)) {
             derivedCostructor.PATTERN = pattern
         }
 
