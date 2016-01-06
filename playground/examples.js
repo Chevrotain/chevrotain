@@ -433,7 +433,7 @@ function tutorialGrammarExample() {
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
             // @formatter:off
-            return $.OR([
+            $.OR([
                 {ALT: function(){ $.CONSUME(Integer)}},
                 {ALT: function(){ $.CONSUME(Identifier)}}
             ]);
@@ -443,7 +443,7 @@ function tutorialGrammarExample() {
 
         this.relationalOperator = $.RULE("relationalOperator", function () {
             // @formatter:off
-            return $.OR([
+            $.OR([
                 {ALT: function(){ $.CONSUME(GreaterThan)}},
                 {ALT: function(){ $.CONSUME(LessThan)}}
             ]);
