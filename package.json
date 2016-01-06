@@ -11,7 +11,7 @@
   "devDependencies": {
     "antlr4": "^4.5.2",
     "browserify": "^12.0.1",
-    "gitty": "^3.3.0",
+    "gitty": "^3.3.2",
     "jison": "*",
     "jison-lex": "*",
     "jsonfile": "^2.2.3",
