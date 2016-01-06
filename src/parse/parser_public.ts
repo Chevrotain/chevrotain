@@ -1198,7 +1198,7 @@ namespace chevrotain {
         private isInCurrentRuleReSyncSet(token:Function):boolean {
             let followKey = this.getCurrFollowKey()
             let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
-            return _.contains(currentRuleReSyncSet, token)
+            return utils.contains(currentRuleReSyncSet, token)
         }
 
         private findReSyncTokenType():Function {
@@ -1208,7 +1208,7 @@ namespace chevrotain {
             let k = 2
             while (true) {
                 let nextTokenType:any = (<any>nextToken).constructor
-                if (_.contains(allPossibleReSyncTokTypes, nextTokenType)) {
+                if (utils.contains(allPossibleReSyncTokTypes, nextTokenType)) {
                     return nextTokenType
                 }
                 nextToken = this.LA(k)

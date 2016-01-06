@@ -103,4 +103,16 @@ namespace chevrotain.utils {
     export function has(obj:any, prop:string):boolean {
         return obj.hasOwnProperty(prop)
     }
+
+    export function contains<T>(arr:T[], item):boolean {
+        let i = 0
+        while (i < arr.length) {
+            let currItem = arr[i]
+            if (currItem === item) {
+                return true
+            }
+            i++
+        }
+        return false
+    }
 }

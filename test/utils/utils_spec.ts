@@ -53,10 +53,16 @@ namespace chevrotain.utils.spec {
         })
 
         it("exports a has utility", () => {
-            expect(has([1, 2, 3], "0")).to.to.true
-            expect(has([1, 2, 3], "5")).to.to.false
-            expect(has({}, "bamba")).to.to.false
-            expect(has({bamba: 666}, "bamba")).to.to.true
+            expect(has([1, 2, 3], "0")).to.be.true
+            expect(has([1, 2, 3], "5")).to.be.false
+            expect(has({}, "bamba")).to.be.false
+            expect(has({bamba: 666}, "bamba")).to.be.true
+        })
+
+        it("exports a contains utility", () => {
+            expect(contains([1, 2, 3], 4)).to.be.false
+            expect(contains([1, 2, 3], 2)).to.be.true
+            expect(contains([], 2)).to.be.false
         })
 
     })

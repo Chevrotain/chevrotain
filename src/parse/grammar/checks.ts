@@ -132,7 +132,7 @@ namespace chevrotain.checks {
             })
         }
 
-        if ((_.contains(definedRulesNames, ruleName))) {
+        if ((utils.contains(definedRulesNames, ruleName))) {
             errMsg = `Duplicate definition, rule: ${ruleName} is already defined in the grammar: ${className}`
             errors.push({
                 message:  errMsg,
@@ -154,7 +154,7 @@ namespace chevrotain.checks {
         }
         else {
             let ruleName = topRule.name
-            let foundLeftRecursion = _.contains(<any>nextNonTerminals, topRule)
+            let foundLeftRecursion = utils.contains(<any>nextNonTerminals, topRule)
             let pathNames = utils.map(path, currRule => currRule.name)
             let leftRecursivePath = `${ruleName} --> ${pathNames.concat([ruleName]).join(" --> ")}`
             if (foundLeftRecursion) {

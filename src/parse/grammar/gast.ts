@@ -30,7 +30,7 @@ namespace chevrotain.gast {
                 return isOptionalProd(subProd, alreadyVisited)
             })
         }
-        else if (prod instanceof NonTerminal && _.contains(alreadyVisited, prod)) {
+        else if (prod instanceof NonTerminal && utils.contains(alreadyVisited, prod)) {
             // avoiding stack overflow due to infinite recursion
             return false
         }

@@ -14,7 +14,7 @@ namespace chevrotain.exceptions {
             lang.functionName(EarlyExitException),
             lang.functionName(NotAllInputParsedException)]
         // can't do instanceof on hacked custom js exceptions
-        return _.contains(recognitionExceptions, error.name)
+        return utils.contains(recognitionExceptions, error.name)
     }
 
     export function MismatchedTokenException(message:string, token:Token) {
