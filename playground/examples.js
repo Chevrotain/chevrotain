@@ -382,7 +382,7 @@ function tutorialGrammarExample() {
         var $ = this;
 
 
-        this.selectStatment = $.RULE("selectStatment", function () {
+        this.selectStatement = $.RULE("selectStatement", function () {
             $.SUBRULE($.selectClause)
             $.SUBRULE($.fromClause)
             $.OPTION(function () {
@@ -463,7 +463,7 @@ function tutorialGrammarExample() {
     return {
         lexer      : SelectLexer,
         parser     : SelectParser,
-        defaultRule: "selectStatment"
+        defaultRule: "selectStatement"
     };
 }
 
@@ -501,7 +501,7 @@ function tutorialGrammarActionsExample() {
         var $ = this;
 
 
-        this.selectStatment = $.RULE("selectStatment", function () {
+        this.selectStatement = $.RULE("selectStatement", function () {
             var select, from, where
             select = $.SUBRULE($.selectClause)
             from = $.SUBRULE($.fromClause)
@@ -597,7 +597,7 @@ function tutorialGrammarActionsExample() {
     return {
         lexer      : SelectLexer,
         parser     : SelectParser,
-        defaultRule: "selectStatment"
+        defaultRule: "selectStatement"
     };
 }
 
