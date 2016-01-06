@@ -103,7 +103,7 @@ namespace chevrotain {
 
     export function findMissingPatterns(tokenClasses:TokenConstructor[]) {
         let tokenClassesWithMissingPattern = utils.filter(tokenClasses, (currClass) => {
-            return !_.has(currClass, PATTERN)
+            return !utils.has(currClass, PATTERN)
         })
 
         let errors = utils.map(tokenClassesWithMissingPattern, (currClass) => {
@@ -215,7 +215,7 @@ namespace chevrotain {
 
     export function findInvalidGroupType(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
         let invalidTypes = utils.filter(tokenClasses, (clazz:any) => {
-            if (!_.has(clazz, "GROUP")) {
+            if (!utils.has(clazz, "GROUP")) {
                 return false
             }
             let group = clazz.GROUP

@@ -52,5 +52,12 @@ namespace chevrotain.utils.spec {
             expect(filter(null, (item) => {return item % 2 === 1})).to.deep.equal([])
         })
 
+        it("exports a has utility", () => {
+            expect(has([1, 2, 3], "0")).to.to.true
+            expect(has([1, 2, 3], "5")).to.to.false
+            expect(has({}, "bamba")).to.to.false
+            expect(has({bamba: 666}, "bamba")).to.to.true
+        })
+
     })
 }

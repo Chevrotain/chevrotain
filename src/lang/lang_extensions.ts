@@ -61,7 +61,7 @@ namespace chevrotain.lang {
         }
 
         containsKey(key:string):boolean {
-            return _.has(this._state, key)
+            return utils.has(this._state, key)
         }
 
     }

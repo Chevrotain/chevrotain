@@ -20,7 +20,7 @@ namespace chevrotain.utils {
 
     export function values(obj:any):any[] {
         let vals = []
-        let keys = Object.keys(obj);
+        let keys = Object.keys(obj)
         for (let i = 0; i < keys.length; i++) {
             vals.push(obj[keys[i]])
         }
@@ -98,5 +98,9 @@ namespace chevrotain.utils {
             }
         }
         return result
+    }
+
+    export function has(obj:any, prop:string):boolean {
+        return obj.hasOwnProperty(prop)
     }
 }
