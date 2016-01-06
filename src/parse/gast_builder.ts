@@ -238,7 +238,7 @@ namespace chevrotain.gastBuilder {
         let optionRanges = createOptionRanges(text)
         let orRanges = createOrRanges(text)
 
-        return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneSepRanges,
+        return [].concat(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneSepRanges,
             manyRanges, manySepRanges, optionRanges, orRanges)
     }
 
@@ -275,7 +275,7 @@ namespace chevrotain.gastBuilder {
         // have to split up the OR cases into separate FLAT productions
         // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
         let orSubPartsRanges = createOrPartRanges(orRanges)
-        return _.union(orRanges, orSubPartsRanges)
+        return orRanges.concat(orSubPartsRanges)
     }
 
     let findClosingCurly:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "{", "}")
@@ -292,7 +292,7 @@ namespace chevrotain.gastBuilder {
                 orPart.range.start += currOrRangeStart
                 orPart.range.end += currOrRangeStart
             })
-            orPartRanges = _.union(orPartRanges, currOrParts)
+            orPartRanges = orPartRanges.concat(currOrParts)
         })
 
         let uniqueOrPartRanges = _.uniq(orPartRanges, (prodRange:IProdRange) => {

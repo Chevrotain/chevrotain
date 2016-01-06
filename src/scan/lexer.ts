@@ -179,12 +179,14 @@ namespace chevrotain {
         let found = []
         let identicalPatterns = utils.map(tokenClasses, (outerClass:any) => {
             return _.reduce(tokenClasses, (result, innerClass:any) => {
-                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !utils.contains(found, innerClass) &&
+                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) &&
+                    !utils.contains(found, innerClass) &&
                     innerClass.PATTERN !== Lexer.NA) {
                     // this avoids duplicates in the result, each class may only appear in one "set"
                     // in essence we are creating Equivalence classes on equality relation.
                     found.push(innerClass)
-                    return _.union(result, [innerClass])
+                    result.push(innerClass)
+                    return result
                 }
                 return result
             }, [])
