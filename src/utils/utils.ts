@@ -86,4 +86,17 @@ namespace chevrotain.utils {
     export function dropRight<T>(arr:T[], howMuch:number = 1):T[] {
         return arr.slice(0, arr.length - howMuch)
     }
+
+    export function filter<T>(arr:T[], predicate:(T) => boolean):T[] {
+        let result = []
+        if (Array.isArray(arr)) {
+            for (let i = 0; i < arr.length; i++) {
+                let item = arr[i]
+                if (predicate.call(null, item)) {
+                    result.push(item)
+                }
+            }
+        }
+        return result
+    }
 }

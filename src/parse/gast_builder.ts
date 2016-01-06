@@ -200,7 +200,7 @@ namespace chevrotain.gastBuilder {
     }
 
     export function getDirectlyContainedRanges(y:r.IRange, prodRanges:IProdRange[]):IProdRange[] {
-        return _.filter(prodRanges, (x:IProdRange) => {
+        return utils.filter(prodRanges, (x:IProdRange) => {
             let isXDescendantOfY = y.strictlyContainsRange(x.range)
             let xDoesNotHaveAnyAncestorWhichIsDecendantOfY = _.every(prodRanges, (maybeAnotherParent:IProdRange) => {
                 let isParentOfX = maybeAnotherParent.range.strictlyContainsRange(x.range)

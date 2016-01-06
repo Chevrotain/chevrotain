@@ -102,7 +102,7 @@ namespace chevrotain {
     }
 
     export function findMissingPatterns(tokenClasses:TokenConstructor[]) {
-        let tokenClassesWithMissingPattern = _.filter(tokenClasses, (currClass) => {
+        let tokenClassesWithMissingPattern = utils.filter(tokenClasses, (currClass) => {
             return !_.has(currClass, PATTERN)
         })
 
@@ -119,7 +119,7 @@ namespace chevrotain {
     }
 
     export function findInvalidPatterns(tokenClasses:TokenConstructor[]) {
-        let tokenClassesWithInvalidPattern = _.filter(tokenClasses, (currClass) => {
+        let tokenClassesWithInvalidPattern = utils.filter(tokenClasses, (currClass) => {
             let pattern = currClass[PATTERN]
             return !_.isRegExp(pattern)
         })
@@ -139,7 +139,7 @@ namespace chevrotain {
     let end_of_input = /[^\\][\$]/
 
     export function findEndOfInputAnchor(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
-        let invalidRegex = _.filter(tokenClasses, (currClass) => {
+        let invalidRegex = utils.filter(tokenClasses, (currClass) => {
             let pattern = currClass[PATTERN]
             return end_of_input.test(pattern.source)
         })
@@ -156,7 +156,7 @@ namespace chevrotain {
     }
 
     export function findUnsupportedFlags(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
-        let invalidFlags = _.filter(tokenClasses, (currClass) => {
+        let invalidFlags = utils.filter(tokenClasses, (currClass) => {
             let pattern = currClass[PATTERN]
             return pattern instanceof RegExp && (pattern.multiline || pattern.global)
         })
@@ -192,7 +192,7 @@ namespace chevrotain {
 
         identicalPatterns = _.compact(identicalPatterns)
 
-        let duplicatePatterns = _.filter(identicalPatterns, (currIdenticalSet) => {
+        let duplicatePatterns = utils.filter(identicalPatterns, (currIdenticalSet) => {
             return currIdenticalSet.length > 1
         })
 
@@ -214,7 +214,7 @@ namespace chevrotain {
     }
 
     export function findInvalidGroupType(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
-        let invalidTypes = _.filter(tokenClasses, (clazz:any) => {
+        let invalidTypes = utils.filter(tokenClasses, (clazz:any) => {
             if (!_.has(clazz, "GROUP")) {
                 return false
             }

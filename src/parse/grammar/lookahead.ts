@@ -128,7 +128,7 @@ namespace chevrotain.lookahead {
             return {token: seekToken, alts: altsIndicesTokenAppearsIn}
         })
 
-        let tokensToAltsIndicesWithAmbiguity:any = _.filter(tokensToAltsIndicesItAppearsIn, (tokAndAltsItAppearsIn) => {
+        let tokensToAltsIndicesWithAmbiguity:any = utils.filter(tokensToAltsIndicesItAppearsIn, (tokAndAltsItAppearsIn) => {
             return tokAndAltsItAppearsIn.alts.length > 1
         })
 

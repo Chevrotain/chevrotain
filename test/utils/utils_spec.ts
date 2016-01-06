@@ -43,5 +43,14 @@ namespace chevrotain.utils.spec {
             expect(dropRight([1, 2, 3], 3)).to.deep.equal([])
         })
 
+        it("exports a filter utility", () => {
+            expect(filter([], (item) => {return true})).to.deep.equal([])
+            expect(filter([1, 2, 3], (item) => {return true})).to.deep.equal([1, 2, 3])
+            expect(filter([1, 2, 3], (item) => {return false})).to.deep.equal([])
+            expect(filter([1, 2, 3], (item) => {return item % 2 === 0})).to.deep.equal([2])
+            expect(filter([1, 2, 3], (item) => {return item % 2 === 1})).to.deep.equal([1, 3])
+            expect(filter(null, (item) => {return item % 2 === 1})).to.deep.equal([])
+        })
+
     })
 }
