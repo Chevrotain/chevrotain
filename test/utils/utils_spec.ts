@@ -65,5 +65,21 @@ namespace chevrotain.utils.spec {
             expect(contains([], 2)).to.be.false
         })
 
+        it("exports a cloneArr utility", () => {
+            expect(cloneArr([1, 2, 3])).to.deep.equal([1, 2, 3])
+            expect(cloneArr([])).to.deep.equal([])
+            let arr = []
+            expect(cloneArr(arr)).to.not.equal(arr)
+        })
+
+        it("exports a cloneObj utility", () => {
+            expect(cloneObj({bamba: 666, bisli: 777})).to.deep.equal({bamba: 666, bisli: 777})
+            let obj = {bamba: 666, bisli: 777}
+            expect(cloneObj(obj)).to.not.equal(obj)
+            expect(cloneObj(["bamba"])).to.not.have.property("length")
+            expect(cloneObj(["bamba"])).to.deep.equal({"0": "bamba"})
+        })
+
     })
 }
+

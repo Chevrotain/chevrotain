@@ -144,7 +144,7 @@ namespace chevrotain {
             let errors:ILexingError[] = []
             let line = 1
             let column = 1
-            let groups:any = _.clone(this.emptyGroups)
+            let groups:any = utils.cloneObj(this.emptyGroups)
 
             if (!utils.isEmpty(this.lexerDefinitionErrors)) {
                 let allErrMessages = utils.map(this.lexerDefinitionErrors, (error) => {

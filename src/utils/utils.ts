@@ -115,4 +115,25 @@ namespace chevrotain.utils {
         }
         return false
     }
+
+    /**
+     * shallow clone
+     */
+    export function cloneArr<T>(arr:T[]):T[] {
+        return map(arr, (item) => item)
+    }
+
+    /**
+     * shallow clone
+     */
+    export function cloneObj(obj:Object):any {
+        let clonedObj = {}
+        for (let key in obj) {
+            /* istanbul ignore else */
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                clonedObj[key] = obj[key]
+            }
+        }
+        return clonedObj
+    }
 }

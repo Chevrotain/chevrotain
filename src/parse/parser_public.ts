@@ -234,7 +234,7 @@ namespace chevrotain {
                 }, {})
             }
             else if (_.isObject(tokensMapOrArr)) {
-                this.tokensMap = _.clone(<any>tokensMapOrArr)
+                this.tokensMap = utils.cloneObj(tokensMapOrArr)
             }
             else {
                 throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.")
@@ -262,7 +262,7 @@ namespace chevrotain {
         }
 
         public get input():Token[] {
-            return _.clone(this._input)
+            return utils.cloneArr(this._input)
         }
 
         public reset():void {
@@ -1134,8 +1134,8 @@ namespace chevrotain {
 
         // Error Recovery functionality
         private getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule):Function[] {
-            let pathRuleStack:string[] = _.clone(this.RULE_STACK)
-            let pathOccurrenceStack:number[] = _.clone(this.RULE_OCCURRENCE_STACK)
+            let pathRuleStack:string[] = utils.cloneArr(this.RULE_STACK)
+            let pathOccurrenceStack:number[] = utils.cloneArr(this.RULE_OCCURRENCE_STACK)
             let grammarPath:any = {
                 ruleStack:         pathRuleStack,
                 occurrenceStack:   pathOccurrenceStack,
@@ -1642,8 +1642,8 @@ namespace chevrotain {
 
         // other functionality
         private saveRecogState():IParserState {
-            let savedErrors = _.clone(this.errors)
-            let savedRuleStack = _.clone(this.RULE_STACK)
+            let savedErrors = utils.cloneArr(this.errors)
+            let savedRuleStack = utils.cloneArr(this.RULE_STACK)
             return {
                 errors:     savedErrors,
                 inputIdx:   this.inputIdx,

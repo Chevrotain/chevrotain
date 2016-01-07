@@ -174,7 +174,7 @@ namespace chevrotain.checks {
             // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
             let validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]))
             let errorsFromNextSteps = utils.map(validNextSteps, (currRefRule) => {
-                let newPath = _.clone(path)
+                let newPath = utils.cloneArr(path)
                 newPath.push(currRefRule)
                 return validateNoLeftRecursion(topRule, currRefRule, newPath)
             })

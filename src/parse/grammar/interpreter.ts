@@ -28,8 +28,8 @@ namespace chevrotain.interpreter {
             }
 
             // immutable for the win
-            this.ruleStack = (<any>_.clone(this.path.ruleStack)).reverse() // intelij bug requires assertion
-            this.occurrenceStack = (<any>_.clone(this.path.occurrenceStack)).reverse() // intelij bug requires assertion
+            this.ruleStack = (utils.cloneArr(this.path.ruleStack)).reverse() // intelij bug requires assertion
+            this.occurrenceStack = (utils.cloneArr(this.path.occurrenceStack)).reverse() // intelij bug requires assertion
 
             // already verified that the first production is valid, we now seek the 2nd production
             this.ruleStack.pop()
