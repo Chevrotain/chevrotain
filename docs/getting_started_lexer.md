@@ -127,6 +127,6 @@ let lexingResult = SelectLexer.tokenize(inputText)
 The Lexing Result will contain a Token Vector, the lexing errors (if any were encountered)
 and other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js) (if grouping was used)
 
-
-
-
+#### What is Next?
+* Try out the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of This Tutorial
+* Move to the next step: [Getting Started With Parsing](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_parser.md).
