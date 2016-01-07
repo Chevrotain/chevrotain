@@ -136,4 +136,14 @@ namespace chevrotain.utils {
         }
         return clonedObj
     }
+
+    export function find<T>(arr:T[], predicate:(item:T) => boolean):T {
+        for (let i = 0; i < arr.length; i++) {
+            let item = arr[i]
+            if (predicate.call(null, item)) {
+                return item
+            }
+        }
+        return undefined
+    }
 }

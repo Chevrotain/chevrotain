@@ -80,6 +80,13 @@ namespace chevrotain.utils.spec {
             expect(cloneObj(["bamba"])).to.deep.equal({"0": "bamba"})
         })
 
+        it("exports a find utility", () => {
+            expect(find([1, 2, 3], (item) => item === 2)).to.equal(2)
+            expect(find([], (item) => item === 2)).to.be.undefined
+            let a = {}
+            let b = {}
+            expect(find([a, b], (item) => item === b)).to.equal(b)
+        })
     })
 }
 

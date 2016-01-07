@@ -1183,7 +1183,7 @@ namespace chevrotain {
             }
 
             let mismatchedTok = this.NEXT_TOKEN()
-            let isMisMatchedTokInFollows = _.find(follows, (possibleFollowsTokType:Function) => {
+            let isMisMatchedTokInFollows = utils.find(follows, (possibleFollowsTokType:Function) => {
                     return mismatchedTok instanceof possibleFollowsTokType
                 }) !== undefined
 
