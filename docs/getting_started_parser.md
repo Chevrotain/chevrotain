@@ -251,5 +251,5 @@ if (parser.parseErrors.length > 1) {
   There is no 'special' top level entry rule.
 
 #### What is Next?
-* Play around in the **onine** version (ES5) of [This Tutorial](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar)
+* Play around in the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of This Tutorial.
 * TBD: Next step in the tutorial: [Getting Started With Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_actions.md).
