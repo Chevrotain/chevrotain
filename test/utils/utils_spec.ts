@@ -52,6 +52,15 @@ namespace chevrotain.utils.spec {
             expect(filter(null, (item) => {return item % 2 === 1})).to.deep.equal([])
         })
 
+        it("exports a reject utility", () => {
+            expect(reject([], (item) => {return true})).to.deep.equal([])
+            expect(reject([1, 2, 3], (item) => {return false})).to.deep.equal([1, 2, 3])
+            expect(reject([1, 2, 3], (item) => {return true})).to.deep.equal([])
+            expect(reject([1, 2, 3], (item) => {return item % 2 === 0})).to.deep.equal([1, 3])
+            expect(reject([1, 2, 3], (item) => {return item % 2 === 1})).to.deep.equal([2])
+            expect(reject(null, (item) => {return item % 2 === 1})).to.deep.equal([])
+        })
+
         it("exports a has utility", () => {
             expect(has([1, 2, 3], "0")).to.be.true
             expect(has([1, 2, 3], "5")).to.be.false
@@ -96,6 +105,13 @@ namespace chevrotain.utils.spec {
             expect(reduce({one: 1, two: 2, three: 3}, (result, item) => {
                 return result.concat([item * 2])
             }, [])).to.deep.equal([2, 4, 6])
+        })
+
+        it("exports a compact utility", () => {
+            expect(compact([1, 2, null, 3])).to.deep.equal([1, 2, 3])
+            expect(compact([1, undefined, 2, 3])).to.deep.equal([1, 2, 3])
+            expect(compact([])).to.deep.equal([])
+            expect(compact([1, 2, 3])).to.deep.equal([1, 2, 3])
         })
     })
 }

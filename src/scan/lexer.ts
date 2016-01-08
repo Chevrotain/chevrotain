@@ -17,7 +17,7 @@ namespace chevrotain {
 
     export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
 
-        let onlyRelevantClasses = _.reject(tokenClasses, (currClass) => {
+        let onlyRelevantClasses = utils.reject(tokenClasses, (currClass) => {
             return currClass[PATTERN] === Lexer.NA
         })
 
@@ -192,7 +192,7 @@ namespace chevrotain {
             }, [])
         })
 
-        identicalPatterns = _.compact(identicalPatterns)
+        identicalPatterns = utils.compact(identicalPatterns)
 
         let duplicatePatterns = utils.filter(identicalPatterns, (currIdenticalSet) => {
             return currIdenticalSet.length > 1

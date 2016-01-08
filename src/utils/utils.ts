@@ -100,6 +100,10 @@ namespace chevrotain.utils {
         return result
     }
 
+    export function reject<T>(arr:T[], predicate:(T) => boolean):T[] {
+        return filter(arr, (item) => !predicate(item))
+    }
+
     export function has(obj:any, prop:string):boolean {
         return obj.hasOwnProperty(prop)
     }
@@ -155,5 +159,9 @@ namespace chevrotain.utils {
             accumulator = iterator.call(null, accumulator, vals[i])
         }
         return accumulator
+    }
+
+    export function compact<T>(arr:T[]):T[] {
+        return reject(arr, (item) => item === null || item === undefined)
     }
 }

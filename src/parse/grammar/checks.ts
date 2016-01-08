@@ -261,7 +261,7 @@ namespace chevrotain.checks {
                     return null
                 }
             })
-            return errors.concat(_.compact(currErrors))
+            return errors.concat(utils.compact(currErrors))
         }, [])
 
         return errors
