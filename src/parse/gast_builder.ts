@@ -296,7 +296,7 @@ namespace chevrotain.gastBuilder {
             orPartRanges = orPartRanges.concat(currOrParts)
         })
 
-        let uniqueOrPartRanges = _.uniq(orPartRanges, (prodRange:IProdRange) => {
+        let uniqueOrPartRanges = utils.uniq(orPartRanges, (prodRange:IProdRange) => {
             // using "~" as a separator for the identify function as its not a valid char in javascript
             return prodRange.type + "~" + prodRange.range.start + "~" + prodRange.range.end + "~" + prodRange.text
         })

@@ -164,4 +164,18 @@ namespace chevrotain.utils {
     export function compact<T>(arr:T[]):T[] {
         return reject(arr, (item) => item === null || item === undefined)
     }
+
+    export function uniq<T>(arr:T[], identity:(item:T) => any = (item) => item):T[] {
+        let identities = []
+        return reduce(arr, (result, currItem) => {
+            let currIdentity = identity(currItem)
+            if (contains(identities, currIdentity)) {
+                return result
+            }
+            else {
+                identities.push(currIdentity)
+                return result.concat(currItem)
+            }
+        }, [])
+    }
 }

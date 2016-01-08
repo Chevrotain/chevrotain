@@ -112,7 +112,7 @@ namespace chevrotain.lookahead {
     export function checkAlternativesAmbiguities(alternativesTokens:Function[][]):IAmbiguityDescriptor[] {
 
         let allTokensFlat = utils.flatten(alternativesTokens)
-        let uniqueTokensFlat = _.uniq(allTokensFlat)
+        let uniqueTokensFlat = utils.uniq(allTokensFlat)
 
         let tokensToAltsIndicesItAppearsIn = utils.map(uniqueTokensFlat, (seekToken) => {
             let altsCurrTokenAppearsIn = _.pick(alternativesTokens, (altToLookIn) => {

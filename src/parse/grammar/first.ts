@@ -47,14 +47,14 @@ namespace chevrotain.first {
             hasInnerProdsRemaining = seq.length > nextSubProdIdx
         }
 
-        return _.uniq(firstSet)
+        return utils.uniq(firstSet)
     }
 
     export function firstForBranching(prod:gast.AbstractProduction):Function[] {
         let allAlternativesFirsts:Function[][] = utils.map(prod.definition, (innerProd) => {
             return first(innerProd)
         })
-        return _.uniq(utils.flatten<Function>(allAlternativesFirsts))
+        return utils.uniq(utils.flatten<Function>(allAlternativesFirsts))
     }
 
     export function firstForTerminal(terminal:gast.Terminal):Function[] {

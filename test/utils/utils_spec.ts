@@ -113,6 +113,12 @@ namespace chevrotain.utils.spec {
             expect(compact([])).to.deep.equal([])
             expect(compact([1, 2, 3])).to.deep.equal([1, 2, 3])
         })
+
+        it("exports a uniq utility", () => {
+            expect(uniq([1, 2, 3, 2])).to.contain.members([1, 2, 3])
+            expect(uniq([2, 2, 4, 2], (item) => { return 666 })).to.have.length(1)
+            expect(uniq([])).to.deep.equal([])
+        })
     })
 }
 
