@@ -27,42 +27,29 @@ This can be accomplished using two features of the Parsing DSL:
 ### A simple contrived example:
   
 ```Typescript
-
-    class Decimal extends Token {
-        static PATTERN = /(0|[1-9]\d+)\.\d+/  
+this.topRule = $.RULE("topRule", () => {
+    let result = 0
+    
+    $.MANY(() => {
+        $.OR([
+            {ALT: () => { result += $.SUBRULE($.decimalRule)}},
+            {ALT: () => { result += $.SUBRULE($.IntegerRule)}}
+            ])
     }
     
-    class Integer extends Token {
-        static PATTERN = /0|[1-9]\d+/
-        static LONGER_ALT = Decimal //
-    }
-    
-    let SelectLexer = new Lexer([Integer, Decimal]);
-    
-    this.topRule = $.RULE("topRule", () => {
-        let result = 0
-        
-        $.MANY(() => {
-            $.OR([
-                {ALT: () => { result += $.SUBRULE($.decimalRule)}},
-                {ALT: () => { result += $.SUBRULE($.IntegerRule)}}
-                ]);
-        }
-        
-        return result
-    })
-       
-    this.decimalRule = $.RULE("decimalRule", () => {
-        let decToken = $.CONSUME(Decimal)
-        return parseFloat(decimalToken.image)
-      
-    })
+    return result
+})
    
-    this.IntegerRule = $.RULE("IntegerRule", () => {
-        let intToken = $.CONSUME(Integer)
-        return parseInt(intToken.image)
-    })
+this.decimalRule = $.RULE("decimalRule", () => {
+    let decToken = $.CONSUME(Decimal)
+    return parseFloat(decimalToken.image)
   
+})
+
+this.IntegerRule = $.RULE("IntegerRule", () => {
+    let intToken = $.CONSUME(Integer)
+    return parseInt(intToken.image)
+})
 ```
 
 The **decimalRule** and **IntegerRule** both return a javascript number (using parseInt/parseFloat).
@@ -74,22 +61,22 @@ For this parser lets build a more complex data structure instead of simply retur
 Our selectStatement rule will now return an object with four properties:
  
 ```Typescript
-    this.selectStatement = $.RULE("selectStatement", () => {
-        let select, from, where
-        
-        select = $.SUBRULE($.selectClause)
-        from = $.SUBRULE($.fromClause)
-        $.OPTION(function () {
-        where = $.SUBRULE($.whereClause)
-        })
-        
-        return {
-            type         : "SELECT_STMT", 
-            selectClause : select,
-            fromClause   : from, 
-            whereClause  : where
-        }
-    });
+this.selectStatement = $.RULE("selectStatement", () => {
+    let select, from, where
+    
+    select = $.SUBRULE($.selectClause)
+    from = $.SUBRULE($.fromClause)
+    $.OPTION(() => {
+    where = $.SUBRULE($.whereClause)
+    })
+    
+    return {
+        type         : "SELECT_STMT", 
+        selectClause : select,
+        fromClause   : from, 
+        whereClause  : where
+    }
+})
 ```
 
 Three of those properties (selectClause / fromClause / whereClause) are the results of invoking
