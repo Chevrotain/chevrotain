@@ -1,12 +1,14 @@
-# Getting Started With Lexing
+# Tutorial Step 1 - Building a Lexer.
 
 ### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
 
+
 ### On code samples:
-The code samples in the **written** tutorial use ES2015/2016 sytnax (classes/let/static class props)
+The code samples in the **written** tutorial use ES2015/2016 syntax (classes/let/static class props)
 As those better convey the intent. The **online** version uses ES5 syntax.
 
-### Lets get started:
+
+### Introduction:
 In This tutorial we will implement a Lexer for a simple SQL Select statement language:
  ```SQL
  SELECT column1 FROM table2
@@ -29,6 +31,7 @@ class From extends Token {
 There is nothing much to it. The static **PATTERN** property is a RegExp which will be used when splitting up the input string
 into separate Tokens.
  
+ 
 #### What about a slightly more complex Tokens? 
 
 How can we define Tokens for Identifiers or Integers?
@@ -44,6 +47,7 @@ class Integer extends Token {
 }
 ```
 
+
 #### What about skipping certain Tokens? 
 The obvious use case in this language (and many others) is **whitespace**. skipping certain Tokens is easily
 accomplished by marking them with the SKIP group.
@@ -55,6 +59,7 @@ class WhiteSpace extends Token {
   static GROUP = chevrotain.lexer.SKIPPED
 }
 ```
+
 
 #### Let us define all our nine Tokens:
 
@@ -99,7 +104,8 @@ class WhiteSpace extends Token {
  
 ```
 
-#### Allright, we have Token definitions, how do we use them to create a Lexer?
+
+#### All right, we have Token definitions, how do we use them to create a Lexer?
 
 ```Typescript
 
@@ -114,8 +120,7 @@ Note that:
   * See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js)
 
 * The SelectLexer is **stateless**, thus only a **single one** should be created.    
-  
-                            
+                          
 
 #### But how do we actually use this lexer?
 
@@ -127,6 +132,7 @@ let lexingResult = SelectLexer.tokenize(inputText)
 The Lexing Result will contain a Token Vector, the lexing errors (if any were encountered)
 and other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js) (if grouping was used)
 
+
 #### What is Next?
-* Try out the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of This Tutorial
+* Try out the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of this tutorial
 * Move to the next step: [Step 2 -  Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).

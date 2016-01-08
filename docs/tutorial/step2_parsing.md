@@ -1,16 +1,19 @@
 * Previous tutorial step - [Step 1 - Lexing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md)
 
-# Getting Started With Parsing - Grammar
+# Tutorial Step 2 - Building a Parser.
+
 
 ### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) <---
 
+
 ### On code samples:
-The code samples in the **written** tutorial use ES2015/2016/Typescript sytnax (classes/let/static class props)
+The code samples in the **written** tutorial use ES2015/2016/Typescript syntax (classes/let/static class props)
 As those better convey the intent. The **online** version uses ES5 syntax.
+
 
 ### Introduction:
 In This tutorial we will implement a Parser for a simple SQL Select statement language
-introduced in the [previous](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_lexer.md) tutorial chapter. 
+introduced in the [previous](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_lexer.md) tutorial step. 
 
 The grammar for our language:
 
@@ -72,6 +75,7 @@ this.selectStatement =
 
 fairly simple...
 
+
 #### What is 'this'? where do we write the grammar rules?
 
 Each grammar rule is a property of a class that extends chevrotain.Parser.
@@ -122,11 +126,13 @@ this.atomicExpression =
  
 ```
 
+
 #### How can the Parser be debugged? 
 The grammar rules above do not only define the grammar, they are also the code that will be run
 during parsing. This means that debugging the parser **simply means adding a break
 point in the grammar**. There **do not** exist two different representations for for the grammar
 and the runnable implementation (for example grammar file vs generated code in the case of parser generators).
+
 
 #### But how does it work? (skip if you don't care :) )
 The code above will be executed as is. Yet we have not implemented a lookahead function to
@@ -157,6 +163,7 @@ Thus the parser can dynamically create(and cache) the lookahead function to choo
 The same applies for any grammar rule where the parser has a choice, and even in some where there is no choice
 as that same in memory representation of the grammar can be used for fault tolerance as well as deciding which path
 to take.
+
 
 #### Lets finish implementing the whole SelectParser:
 
@@ -232,7 +239,6 @@ class SelectParser extends chevrotain.Parser {
  * Such errors will be detected during self analysis, and will prevent
    the creation of parser instances with a descriptive error message (fail fast...).
 
-                            
 
 #### But how do we actually use this Parser?
 
@@ -250,6 +256,7 @@ if (parser.parseErrors.length > 1) {
 * Note that any of the grammar rules can be invoked as the starting rule.
   There is no 'special' top level entry rule.
 
+
 #### What is Next?
-* Play around in the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of This Tutorial.
-* TBD: Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_actions.md).
+* Play around in the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of this tutorial.
+* Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
