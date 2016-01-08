@@ -88,7 +88,7 @@ module.exports = function(grunt) {
                 options: {
                     files: [
                         'bower_components/lodash/lodash.js',
-                        'test.config.js',
+                        'test/test.config.js',
                         'bin/chevrotain.js',
                         'bin/chevrotainSpecs.js'
                     ]
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
 
                     files: [
                         {pattern: 'bower_components/lodash/lodash.js', included: false},
-                        'test.config.js',
+                        'test/test.config.js',
                         'bin/chevrotain.js',
                         'test/requirejs_test_main.js',
                         {pattern: 'bin/chevrotainSpecs.js', included: false}
@@ -113,7 +113,7 @@ module.exports = function(grunt) {
                 options: {
                     files: [
                         'bower_components/lodash/lodash.js',
-                        'test.config.js',
+                        'test/test.config.js',
                         'bin/chevrotain.min.js',
                         'bin/chevrotainSpecs.js'
                     ]
@@ -126,7 +126,7 @@ module.exports = function(grunt) {
 
                     files: [
                         {pattern: 'bower_components/lodash/lodash.js', included: false},
-                        'test.config.js',
+                        'test/test.config.js',
                         'bin/chevrotain.min.js',
                         'test/requirejs_test_main.js',
                         {pattern: 'bin/chevrotainSpecs.js', included: false}
@@ -236,7 +236,7 @@ module.exports = function(grunt) {
                         // dummy empty <''> to align arguments and parameters
                         // (sometimes two sometimes three depending on module loader)
                         amd:       ['lodash', '', 'chevrotain'],
-                        cjs:       ['lodash', '../test.config.js', './chevrotain'],
+                        cjs:       ['lodash', '../test/test.config.js', './chevrotain'],
                         global:    ['_', "undefined", 'chevrotain']
                     }
                 }
