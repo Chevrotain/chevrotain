@@ -61,7 +61,7 @@ namespace chevrotain {
             return /\\n|\\r|\\s/g.test(pattern.source)
         })
 
-        let emptyGroups = _.reduce(onlyRelevantClasses, (acc, clazz:any) => {
+        let emptyGroups = utils.reduce(onlyRelevantClasses, (acc, clazz:any) => {
             let groupName = clazz.GROUP
             if (utils.isString(groupName)) {
                 acc[groupName] = []
@@ -178,7 +178,7 @@ namespace chevrotain {
 
         let found = []
         let identicalPatterns = utils.map(tokenClasses, (outerClass:any) => {
-            return _.reduce(tokenClasses, (result, innerClass:any) => {
+            return utils.reduce(tokenClasses, (result, innerClass:any) => {
                 if ((outerClass.PATTERN.source === innerClass.PATTERN.source) &&
                     !utils.contains(found, innerClass) &&
                     innerClass.PATTERN !== Lexer.NA) {

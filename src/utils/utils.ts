@@ -146,4 +146,14 @@ namespace chevrotain.utils {
         }
         return undefined
     }
+
+    export function reduce<T, A>(arrOrObj:Array<T>|Object, iterator:(result:A, item) => A, initial:A):A {
+        let vals = Array.isArray(arrOrObj) ? arrOrObj : values(arrOrObj)
+
+        let accumulator = initial
+        for (let i = 0; i < vals.length; i++) {
+            accumulator = iterator.call(null, accumulator, vals[i])
+        }
+        return accumulator
+    }
 }

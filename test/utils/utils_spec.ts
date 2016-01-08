@@ -87,6 +87,16 @@ namespace chevrotain.utils.spec {
             let b = {}
             expect(find([a, b], (item) => item === b)).to.equal(b)
         })
+
+        it("exports a reduce utility", () => {
+            expect(reduce([1, 2, 3], (result, item) => {
+                return result.concat([item * 2])
+            }, [])).to.deep.equal([2, 4, 6])
+
+            expect(reduce({one: 1, two: 2, three: 3}, (result, item) => {
+                return result.concat([item * 2])
+            }, [])).to.deep.equal([2, 4, 6])
+        })
     })
 }
 

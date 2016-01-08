@@ -243,7 +243,7 @@ namespace chevrotain.checks {
         topLevelRule.accept(orCollector)
         let ors = orCollector.alternations
 
-        let errors = _.reduce(ors, (errors, currOr) => {
+        let errors = utils.reduce(ors, (errors, currOr) => {
             let exceptLast = utils.dropRight(currOr.definition)
             let currErrors = utils.map(exceptLast, (currAlternative:IProduction, currAltIdx) => {
                 if (utils.isEmpty(first.first(currAlternative))) {

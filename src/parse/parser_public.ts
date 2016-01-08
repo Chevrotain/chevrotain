@@ -228,7 +228,7 @@ namespace chevrotain {
             }
 
             if (_.isArray(tokensMapOrArr)) {
-                this.tokensMap = <any>_.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
+                this.tokensMap = <any>utils.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
                     acc[tokenName(tokenClazz)] = tokenClazz
                     return acc
                 }, {})
