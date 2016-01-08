@@ -98,6 +98,7 @@ namespace chevrotain.gastBuilder {
                 return buildRefProd(prodRange)
             case ProdType.TERMINAL:
                 return buildTerminalProd(prodRange)
+            /* istanbul ignore next */
             default:
                 throw Error("non exhaustive match")
         }

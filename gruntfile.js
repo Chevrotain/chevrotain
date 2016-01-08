@@ -273,10 +273,7 @@ module.exports = function(grunt) {
                         // very little point in testing this, this is a pattern matching functionality missing in typescript/javascript
                         // if the code reaches that point it will go "boom" which is the purpose, the going boom part is not part
                         // of the contract, it just makes sure we fail fast if we supply invalid arguments.
-                        var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(default\s*:\s*throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
-                            "/* istanbul ignore next */ $1")
-
-                        fixedNoneExhaustive = fixedNoneExhaustive.replace(/(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
+                        var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
                             "/* istanbul ignore else */ $1$2")
 
                         fixedNoneExhaustive = fixedNoneExhaustive.replace(/(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
