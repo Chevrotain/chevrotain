@@ -1,4 +1,4 @@
-* Previous tutorial step - [Getting Started With Lexing](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_lexer.md)
+* Previous tutorial step - [Step 1 - Lexing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md)
 
 # Getting Started With Parsing - Grammar
 
@@ -252,4 +252,4 @@ if (parser.parseErrors.length > 1) {
 
 #### What is Next?
 * Play around in the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of This Tutorial.
-* TBD: Next step in the tutorial: [Getting Started With Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_actions.md).
+* TBD: Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_actions.md).
