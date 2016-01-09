@@ -115,7 +115,7 @@ namespace chevrotain.lookahead {
         let uniqueTokensFlat = utils.uniq(allTokensFlat)
 
         let tokensToAltsIndicesItAppearsIn = utils.map(uniqueTokensFlat, (seekToken) => {
-            let altsCurrTokenAppearsIn = _.pick(alternativesTokens, (altToLookIn) => {
+            let altsCurrTokenAppearsIn = utils.pick(alternativesTokens, (altToLookIn) => {
                 return <any> utils.find(altToLookIn, (currToken) => {
                     return currToken === seekToken
                 })

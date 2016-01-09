@@ -18,7 +18,7 @@ namespace chevrotain.checks {
 
         let productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates)
 
-        let duplicates:any = _.pick(productionGroups, (currGroup) => {
+        let duplicates:any = utils.pick(productionGroups, (currGroup) => {
             return currGroup.length > 1
         })
 

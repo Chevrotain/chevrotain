@@ -104,6 +104,21 @@ namespace chevrotain.utils {
         return filter(arr, (item) => !predicate(item))
     }
 
+    export function pick(obj:Object, predicate:(item) => boolean) {
+        let keys = Object.keys(obj)
+        let result = {}
+
+        for (let i = 0; i < keys.length; i++) {
+            let currKey = keys[i]
+            let currItem = obj[currKey]
+            if (predicate(currItem)) {
+                result[currKey] = currItem
+            }
+        }
+
+        return result
+    }
+
     export function has(obj:any, prop:string):boolean {
         return obj.hasOwnProperty(prop)
     }

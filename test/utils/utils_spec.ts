@@ -119,6 +119,12 @@ namespace chevrotain.utils.spec {
             expect(uniq([2, 2, 4, 2], (item) => { return 666 })).to.have.length(1)
             expect(uniq([])).to.deep.equal([])
         })
+
+        it("exports a pick utility", () => {
+            expect(pick({bamba: true, bisli: false}, (item) => item)).to.deep.equal({bamba: true})
+            expect(pick({}, (item) => item)).to.be.empty
+        })
+
     })
 }
 
