@@ -1,6 +1,6 @@
 * Previous tutorial step - [Step 2 - Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md)
 
-# Tutorial Step 3 - Adding Actions to the Grammar.
+# Tutorial Step 3 - Adding Actions to the Parser.
 
 
 ### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) <---
