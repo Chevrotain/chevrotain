@@ -172,7 +172,7 @@ namespace chevrotain.checks {
 
             // we are only looking for cyclic paths leading back to the specific topRule
             // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
-            let validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]))
+            let validNextSteps = utils.difference(nextNonTerminals, path.concat([topRule]))
             let errorsFromNextSteps = utils.map(validNextSteps, (currRefRule) => {
                 let newPath = utils.cloneArr(path)
                 newPath.push(currRefRule)

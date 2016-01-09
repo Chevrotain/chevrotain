@@ -114,7 +114,7 @@ namespace chevrotain {
             }
         })
 
-        let validTokenClasses = _.difference(tokenClasses, tokenClassesWithMissingPattern)
+        let validTokenClasses = utils.difference(tokenClasses, tokenClassesWithMissingPattern)
         return {errors: errors, validTokenClasses}
     }
 
@@ -132,7 +132,7 @@ namespace chevrotain {
             }
         })
 
-        let validTokenClasses = _.difference(tokenClasses, tokenClassesWithInvalidPattern)
+        let validTokenClasses = utils.difference(tokenClasses, tokenClassesWithInvalidPattern)
         return {errors: errors, validTokenClasses}
     }
 

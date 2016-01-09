@@ -220,4 +220,8 @@ namespace chevrotain.utils {
         }
         return true
     }
+
+    export function difference<T>(arr:T[], values:T[]):T[] {
+        return reject(arr, (item) => contains(values, item))
+    }
 }
