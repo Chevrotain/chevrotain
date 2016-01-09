@@ -148,6 +148,13 @@ namespace chevrotain.utils.spec {
             expect(difference([1, 2, 3], [])).to.deep.equal([1, 2, 3])
             expect(difference([], [1, 2])).to.deep.equal([])
         })
+
+        it("exports an some utility", () => {
+            expect(some([], (item) => {return true})).to.be.false
+            expect(some([], (item) => {return false})).to.be.false
+            expect(some([1, 2, 3], (item) => {return item % 2 === 0})).to.be.true
+            expect(some([1, 3, 5], (item) => {return item % 2 === 0})).to.be.false
+        })
     })
 }
 

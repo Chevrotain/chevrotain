@@ -224,4 +224,13 @@ namespace chevrotain.utils {
     export function difference<T>(arr:T[], values:T[]):T[] {
         return reject(arr, (item) => contains(values, item))
     }
+
+    export function some<T>(arr:T[], predicate:(item:T) => boolean):boolean {
+        for (let i = 0; i < arr.length; i++) {
+            if (predicate(arr[i])) {
+                return true
+            }
+        }
+        return false
+    }
 }

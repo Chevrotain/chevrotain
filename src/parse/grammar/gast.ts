@@ -26,7 +26,7 @@ namespace chevrotain.gast {
         // may be indirectly optional ((A?B?C?) | (D?E?F?))
         if (prod instanceof Alternation) {
             // for OR its enough for just one of the alternatives to be optional
-            return _.some((<Alternation>prod).definition, (subProd:IProduction) => {
+            return utils.some((<Alternation>prod).definition, (subProd:IProduction) => {
                 return isOptionalProd(subProd, alreadyVisited)
             })
         }
