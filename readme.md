@@ -16,7 +16,7 @@ any code generation phase.
 ## Features
   * **Lexer engine** based on RexExps.
     * Supports Token location tracking.
-    * Supports Token skipping (whitespace/comments/...)
+    * Supports Token skipping (whitespace/comments/...).
     * Allows prioritising shorter matches (Keywords vs Identifiers).
     * **No code generation** The Lexer does not require any code generation phase. 
    
@@ -49,10 +49,10 @@ any code generation phase.
 ## Getting Started
 
 **Online tutorial**
- * Step #1 Building a Lexer - [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md)
+ * Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
     
- * Step #2 Building a Parser - [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md)
- * Step #3 Adding actions to the Parser -[online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md)
+ * Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
+ * Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
 
 **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
