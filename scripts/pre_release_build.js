@@ -4,7 +4,7 @@ var _ = require('lodash')
 var semver = require('semver')
 var jf = require('jsonfile')
 var fs = require('fs')
-
+var wrench = require("wrench")
 
 var myRepo = git('')
 var status = myRepo.statusSync()
@@ -34,7 +34,6 @@ if (_.uniq([pkgVersion, bowerVersion, travisVersion]).length !== 1) {
 var oldVersion = config.currVersion
 var newVersion = semver.inc(config.currVersion, config.mode)
 
-// bump versions
 var bumpedPkgJson = _.clone(config.pkgJson)
 var bumpBowerJson = _.clone(config.bowerJson)
 bumpedPkgJson.version = newVersion
@@ -43,13 +42,16 @@ var oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
 var bumpedTravisString = config.travisString.replace(oldVersionRegExpGlobal, newVersion)
 var bumpedApiString = config.apiString.replace(oldVersionRegExpGlobal, newVersion)
 
-var docsOldVersionRegExp = new RegExp(oldVersion.replace(/\./g, "_"), "g")
-var bumpedReadmeString = config.readmeString.replace(docsOldVersionRegExp, newVersion.replace(/\./g, "_"))
-
 jf.spaces = 2
-
 jf.writeFileSync(config.packagePath, bumpedPkgJson)
 jf.writeFileSync(config.bowerPath, bumpBowerJson)
 fs.writeFileSync(config.travisPath, bumpedTravisString)
 fs.writeFileSync(config.apiPath, bumpedApiString)
-fs.writeFileSync(config.readmePath, bumpedReadmeString)
+
+var docsOldVersionRegExp = new RegExp(oldVersion.replace(/\./g, "_"), "g")
+_.forEach(config.docFilesPaths, function(currDocPath) {
+    console.log("bumping file: <" + currDocPath + ">")
+    var currItemContents = fs.readFileSync(currDocPath, 'utf8').toString()
+    var bumpedItemContents = currItemContents.replace(docsOldVersionRegExp, newVersion.replace(/\./g, "_"))
+    fs.writeFileSync(currDocPath, bumpedItemContents)
+})

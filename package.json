@@ -83,6 +83,6 @@
     "semver": "^5.1.0",
     "tslint": "^3.2.1",
     "typescript": "~1.7.5",
-    "wrench": "~1.5.8"
+    "wrench": "^1.5.8"
   }
 }

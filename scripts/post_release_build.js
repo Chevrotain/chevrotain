@@ -23,11 +23,10 @@ myRepo.addSync([
     config.travisPath,
     config.packagePath,
     config.bowerPath,
-    config.readmePath,
     chevrotainJSPath_release,
     chevrotainJSPath_release_min,
     chevrotainDTSPath_release
-])
+].concat(config.docFilesPaths))
 
 myRepo.commitSync("release " + config.currVersion) // version has already been increased...
 myRepo.createTagSync(newTagName)
@@ -37,5 +36,3 @@ myRepo.push("origin", "master", function() {
 myRepo.push("origin", newTagName, function() {
     console.log("finished push tag")
 })
-
-
