@@ -193,4 +193,10 @@ namespace chevrotain.utils {
             }
         }, [])
     }
+
+    export function partial(func:Function, ...restArgs:any[]):Function {
+        let firstArg = [null]
+        let allArgs  = firstArg.concat(restArgs)
+        return Function.bind.apply(func, allArgs)
+    }
 }

@@ -279,9 +279,9 @@ namespace chevrotain.gastBuilder {
         return orRanges.concat(orSubPartsRanges)
     }
 
-    let findClosingCurly:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "{", "}")
+    let findClosingCurly:(start:number, text:string) => number = <any>utils.partial(findClosingOffset, "{", "}")
 
-    let findClosingParen:(start:number, text:string) => number = <any>_.partial(findClosingOffset, "(", ")")
+    let findClosingParen:(start:number, text:string) => number = <any>utils.partial(findClosingOffset, "(", ")")
 
     export function createOrPartRanges(orRanges:IProdRange[]):IProdRange[] {
         let orPartRanges:IProdRange[] = []

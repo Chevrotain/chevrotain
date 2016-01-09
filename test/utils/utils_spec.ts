@@ -125,6 +125,14 @@ namespace chevrotain.utils.spec {
             expect(pick({}, (item) => item)).to.be.empty
         })
 
+        it("exports a partial utility", () => {
+            let add = function (x, y) {
+                return x + y
+            }
+            expect(partial(add)(2, 3)).to.equal(5)
+            expect(partial(add, 2)(3)).to.equal(5)
+            expect(partial(add, 2, 3)()).to.equal(5)
+        })
     })
 }
 
