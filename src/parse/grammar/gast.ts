@@ -38,7 +38,7 @@ namespace chevrotain.gast {
             if (prod instanceof NonTerminal) {
                 alreadyVisited.push(prod)
             }
-            return _.every((<AbstractProduction>prod).definition, (subProd:IProduction) => {
+            return utils.every((<AbstractProduction>prod).definition, (subProd:IProduction) => {
                 return isOptionalProd(subProd, alreadyVisited)
             })
         }

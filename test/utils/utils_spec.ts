@@ -133,6 +133,14 @@ namespace chevrotain.utils.spec {
             expect(partial(add, 2)(3)).to.equal(5)
             expect(partial(add, 2, 3)()).to.equal(5)
         })
+
+        it("exports an every utility", () => {
+            expect(every([], (item) => {return true})).to.be.true
+            // empty set always true...
+            expect(every([], (item) => {return false})).to.be.true
+            expect(every([1, 2, 3], (item) => {return item % 2 === 0})).to.be.false
+            expect(every([2, 4, 6], (item) => {return item % 2 === 0})).to.be.true
+        })
     })
 }
 

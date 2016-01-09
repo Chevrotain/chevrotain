@@ -227,13 +227,13 @@ namespace chevrotain {
                 this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className)
             }
 
-            if (_.isArray(tokensMapOrArr)) {
+            if (utils.isArray(tokensMapOrArr)) {
                 this.tokensMap = <any>utils.reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
                     acc[tokenName(tokenClazz)] = tokenClazz
                     return acc
                 }, {})
             }
-            else if (_.isObject(tokensMapOrArr)) {
+            else if (utils.isObject(tokensMapOrArr)) {
                 this.tokensMap = utils.cloneObj(tokensMapOrArr)
             }
             else {

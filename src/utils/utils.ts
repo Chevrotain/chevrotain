@@ -196,7 +196,28 @@ namespace chevrotain.utils {
 
     export function partial(func:Function, ...restArgs:any[]):Function {
         let firstArg = [null]
-        let allArgs  = firstArg.concat(restArgs)
+        let allArgs = firstArg.concat(restArgs)
         return Function.bind.apply(func, allArgs)
+    }
+
+    export function isArray(obj:any):boolean {
+        return Array.isArray(obj)
+    }
+
+    export function isRegExp(obj:any):boolean {
+        return obj instanceof RegExp
+    }
+
+    export function isObject(obj:any):boolean {
+        return obj instanceof Object
+    }
+
+    export function every<T>(arr:T[], predicate:(item:T) => boolean):boolean {
+        for (let i = 0; i < arr.length; i++) {
+            if (!predicate(arr[i])) {
+                return false
+            }
+        }
+        return true
     }
 }

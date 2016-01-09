@@ -28,7 +28,7 @@ namespace chevrotain {
     export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token) {
         let pattern
 
-        if (_.isRegExp(patternOrParent) ||
+        if (utils.isRegExp(patternOrParent) ||
             patternOrParent === chevrotain.Lexer.SKIPPED ||
             patternOrParent === chevrotain.Lexer.NA) {
             pattern = patternOrParent

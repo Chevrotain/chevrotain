@@ -121,7 +121,7 @@ namespace chevrotain {
     export function findInvalidPatterns(tokenClasses:TokenConstructor[]) {
         let tokenClassesWithInvalidPattern = utils.filter(tokenClasses, (currClass) => {
             let pattern = currClass[PATTERN]
-            return !_.isRegExp(pattern)
+            return !utils.isRegExp(pattern)
         })
 
         let errors = utils.map(tokenClassesWithInvalidPattern, (currClass) => {
