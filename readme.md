@@ -48,12 +48,13 @@ any code generation phase.
 
 ## Getting Started
 
-* **Online tutorial**
- * [step #1 Building a lexer](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer)
- * [step #2 Implementing a grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar)
- * [step #3 Adding actions to the grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions)
+**Online tutorial**
+ * Step #1 Building a Lexer - [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md)
+    
+ * Step #2 Building a Parser - [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md)
+ * Step #3 Adding actions to the Parser -[online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md)
 
-* **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
+**[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
