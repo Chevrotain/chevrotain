@@ -124,15 +124,7 @@ namespace chevrotain.utils {
     }
 
     export function contains<T>(arr:T[], item):boolean {
-        let i = 0
-        while (i < arr.length) {
-            let currItem = arr[i]
-            if (currItem === item) {
-                return true
-            }
-            i++
-        }
-        return false
+        return find(arr, (currItem) => currItem === item) ? true : false
     }
 
     /**
