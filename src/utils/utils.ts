@@ -233,4 +233,13 @@ namespace chevrotain.utils {
         }
         return false
     }
+
+    export function indexOf<T>(arr:T[], value:T):number {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] === value) {
+                return i
+            }
+        }
+        return -1
+    }
 }

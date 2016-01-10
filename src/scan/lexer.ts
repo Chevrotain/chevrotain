@@ -51,7 +51,7 @@ namespace chevrotain {
             let longerAltClass = clazz.LONGER_ALT
 
             if (longerAltClass) {
-                let longerAltIdx = _.indexOf(onlyRelevantClasses, longerAltClass)
+                let longerAltIdx = utils.indexOf(onlyRelevantClasses, longerAltClass)
                 return longerAltIdx
             }
         })

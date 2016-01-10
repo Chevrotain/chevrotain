@@ -155,6 +155,12 @@ namespace chevrotain.utils.spec {
             expect(some([1, 2, 3], (item) => {return item % 2 === 0})).to.be.true
             expect(some([1, 3, 5], (item) => {return item % 2 === 0})).to.be.false
         })
+
+        it("exports an indexOf utility", () => {
+            expect(indexOf([1, 2, 3], 2)).to.equal(1)
+            expect(indexOf([1, 2, 3], 3)).to.equal(2)
+            expect(indexOf([1, 2, 3], 0)).to.equal(-1)
+            expect(indexOf([], -2)).to.equal(-1)
+        })
     })
 }
-
