@@ -188,7 +188,7 @@ namespace chevrotain.gastBuilder {
                                                                                            topLevelRange:r.IRange,
                                                                                            allRanges:IProdRange[]):T {
         let secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
-        let secondLevelInOrder = _.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
+        let secondLevelInOrder = utils.sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
 
         let definition:gast.IProduction[] = []
         utils.forEach(secondLevelInOrder, (prodRng) => {

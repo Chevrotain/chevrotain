@@ -234,4 +234,10 @@ namespace chevrotain.utils {
         }
         return -1
     }
+
+    export function sortBy<T>(arr:T[], orderFunc:(item:T) => number):T[] {
+        let result = cloneArr(arr)
+        result.sort((a, b) => orderFunc(a) - orderFunc(b))
+        return result
+    }
 }

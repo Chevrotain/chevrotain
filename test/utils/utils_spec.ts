@@ -162,5 +162,11 @@ namespace chevrotain.utils.spec {
             expect(indexOf([1, 2, 3], 0)).to.equal(-1)
             expect(indexOf([], -2)).to.equal(-1)
         })
+
+        it("exports a sortBy utility", () => {
+            expect(sortBy([1, 2, 3], (num) => num)).to.deep.equal([1, 2, 3])
+            expect(sortBy([3, 2, 1], (num) => num)).to.deep.equal([1, 2, 3])
+
+        })
     })
 }
