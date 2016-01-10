@@ -173,5 +173,11 @@ namespace chevrotain.utils.spec {
             expect(() => zipObject(["ima", "aba"], [1, 2, 3])).to.throw("can't zipObject")
             expect(zipObject([], [])).to.deep.equal({})
         })
+
+        it("exports an assign utility", () => {
+            expect(assign(["ima", "aba", "bamba"], [1, 2, 3])).to.deep.equal([1, 2, 3])
+            expect(assign({}, {"ima": 666}, {"aba": 333})).to.deep.equal({"ima": 666, "aba": 333})
+            expect(assign({}, {"ima": 666}, {"aba": 333}, {"ima": 999})).to.deep.equal({"ima": 999, "aba": 333})
+        })
     })
 }

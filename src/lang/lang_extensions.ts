@@ -49,7 +49,7 @@ namespace chevrotain.lang {
         }
 
         putAll(other:HashTable<V>):void {
-            this._state = _.assign(this._state, other._state)
+            this._state = utils.assign(this._state, other._state)
         }
 
         get(key:string):V {

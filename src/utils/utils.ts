@@ -252,4 +252,19 @@ namespace chevrotain.utils {
         }
         return result
     }
+
+    /**
+     * mutates! (and returns) target
+     */
+    export function assign(target:Object, ...sources:Object[]):Object {
+        for (let i = 0; i < sources.length; i++) {
+            let curSource = sources[i]
+            let currSourceKeys = keys(curSource)
+            for (let j = 0; j < currSourceKeys.length; j++) {
+                let currKey = currSourceKeys[j]
+                target[currKey] = curSource[currKey]
+            }
+        }
+        return target
+    }
 }

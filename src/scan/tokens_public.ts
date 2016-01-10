@@ -43,9 +43,7 @@ namespace chevrotain {
         }
 
         // static properties mixing
-        _.forOwn(parentConstructor, (v, k) => {
-            derivedCostructor[k] = v
-        })
+        derivedCostructor = utils.assign(derivedCostructor, parentConstructor)
 
         // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
         derivedCostructor.tokenName = tokenName
