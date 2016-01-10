@@ -25,7 +25,7 @@ namespace chevrotain {
             return addStartOfInput(currClass[PATTERN])
         })
 
-        let allPatternsToClass = _.zipObject(<any>allTransformedPatterns, onlyRelevantClasses)
+        let allPatternsToClass = utils.zipObject(<any>allTransformedPatterns, onlyRelevantClasses)
 
         let patternIdxToClass:any = utils.map(allTransformedPatterns, (pattern) => {
             return allPatternsToClass[pattern.toString()]

@@ -166,7 +166,12 @@ namespace chevrotain.utils.spec {
         it("exports a sortBy utility", () => {
             expect(sortBy([1, 2, 3], (num) => num)).to.deep.equal([1, 2, 3])
             expect(sortBy([3, 2, 1], (num) => num)).to.deep.equal([1, 2, 3])
+        })
 
+        it("exports a zipObject utility", () => {
+            expect(zipObject(["ima", "aba", "bamba"], [1, 2, 3])).to.deep.equal({"ima": 1, "aba": 2, "bamba": 3})
+            expect(() => zipObject(["ima", "aba"], [1, 2, 3])).to.throw("can't zipObject")
+            expect(zipObject([], [])).to.deep.equal({})
         })
     })
 }
