@@ -179,5 +179,10 @@ namespace chevrotain.utils.spec {
             expect(assign({}, {"ima": 666}, {"aba": 333})).to.deep.equal({"ima": 666, "aba": 333})
             expect(assign({}, {"ima": 666}, {"aba": 333}, {"ima": 999})).to.deep.equal({"ima": 999, "aba": 333})
         })
+
+        it("exports a groupBy utility", () => {
+            expect(groupBy([1, 2, 3, 4], (num) => "" + num % 2)).to.deep.equal({0: [2, 4], 1: [1, 3]})
+            expect(groupBy([1, 2, 3, 4], (num) => "" + num)).to.deep.equal({1: [1], 2: [2], 3: [3], 4: [4]})
+        })
     })
 }

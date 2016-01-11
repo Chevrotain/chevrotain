@@ -16,7 +16,7 @@ namespace chevrotain.checks {
         topLevelRule.accept(collectorVisitor)
         let allRuleProductions = collectorVisitor.allProductions
 
-        let productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates)
+        let productionGroups = utils.groupBy(allRuleProductions, identifyProductionForDuplicates)
 
         let duplicates:any = utils.pick(productionGroups, (currGroup) => {
             return currGroup.length > 1

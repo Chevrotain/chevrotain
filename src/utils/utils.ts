@@ -267,4 +267,22 @@ namespace chevrotain.utils {
         }
         return target
     }
+
+    export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey: string] : T[]} {
+        let result:{ [groupKey: string] : T[]} = {}
+
+        forEach(arr, (item) => {
+            let currGroupKey = groupKeyFunc(item)
+            let currGroupArr = result[currGroupKey]
+
+            if (currGroupArr) {
+                currGroupArr.push(item)
+            }
+            else {
+                result[currGroupKey] = [item]
+            }
+        })
+
+        return result
+    }
 }
