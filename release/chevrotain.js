@@ -2,20 +2,20 @@
   /* istanbul ignore next */
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define('chevrotain', ["lodash"], function (a0) {
-      return (root['API'] = factory(a0));
+    define('chevrotain', [], function () {
+      return (root['API'] = factory());
     });
   } else if (typeof exports === 'object') {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("lodash"));
+    module.exports = factory();
   } else {
-    root['chevrotain'] = factory(_);
+    root['chevrotain'] = factory();
   }
-}(this, function (_) {
+}(this, function () {
 
-/*! chevrotain - v0.5.13 - 2016-01-03 */
+/*! chevrotain - v0.5.14 - 2016-01-11 */
 /*
  Utils using lodash style API. (not necessarily 100% compliant) for functional and other utils.
  These utils should replace usage of lodash in the production code base. not because they are any better...
@@ -25,34 +25,291 @@
  so writing several dozen utils which may be slower than the original lodash, does not matter as much
  considering they will not be invoked in hotspots...
  */
-var utils;
-(function (utils) {
-    function isEmpty(arr) {
-        return arr.length === 0;
-    }
-    utils.isEmpty = isEmpty;
-    function keys(obj) {
-        return Object.keys(obj);
-    }
-    utils.keys = keys;
-    function values(obj) {
-        var vals = [];
-        var keys = Object.keys(obj);
-        for (var i = 0; i < keys.length; i++) {
-            vals.push(obj[keys[i]]);
+var chevrotain;
+(function (chevrotain) {
+    var utils;
+    (function (utils) {
+        function isEmpty(arr) {
+            return arr && arr.length === 0;
         }
-        return vals;
-    }
-    utils.values = values;
-    function map(arr, callback) {
-        var result = [];
-        for (var idx = 0; idx < arr.length; idx++) {
-            result.push(callback.call(null, arr[idx], idx));
+        utils.isEmpty = isEmpty;
+        function keys(obj) {
+            return Object.keys(obj);
         }
-        return result;
-    }
-    utils.map = map;
-})(utils || (utils = {}));
+        utils.keys = keys;
+        function values(obj) {
+            var vals = [];
+            var keys = Object.keys(obj);
+            for (var i = 0; i < keys.length; i++) {
+                vals.push(obj[keys[i]]);
+            }
+            return vals;
+        }
+        utils.values = values;
+        function map(arr, callback) {
+            var result = [];
+            for (var idx = 0; idx < arr.length; idx++) {
+                result.push(callback.call(null, arr[idx], idx));
+            }
+            return result;
+        }
+        utils.map = map;
+        function flatten(arr) {
+            var result = [];
+            for (var idx = 0; idx < arr.length; idx++) {
+                var currItem = arr[idx];
+                if (Array.isArray(currItem)) {
+                    result = result.concat(flatten(currItem));
+                }
+                else {
+                    result.push(currItem);
+                }
+            }
+            return result;
+        }
+        utils.flatten = flatten;
+        function first(arr) {
+            return isEmpty(arr) ? undefined : arr[0];
+        }
+        utils.first = first;
+        function last(arr) {
+            var len = arr && arr.length;
+            return len ? arr[len - 1] : undefined;
+        }
+        utils.last = last;
+        function forEach(arr, iteratorCallback) {
+            if (Array.isArray(arr)) {
+                for (var i = 0; i < arr.length; i++) {
+                    iteratorCallback.call(null, arr[i], i);
+                }
+            }
+        }
+        utils.forEach = forEach;
+        function isString(item) {
+            return typeof item === "string";
+        }
+        utils.isString = isString;
+        function isUndefined(item) {
+            return item === undefined;
+        }
+        utils.isUndefined = isUndefined;
+        function isFunction(item) {
+            return item instanceof Function;
+        }
+        utils.isFunction = isFunction;
+        function drop(arr, howMuch) {
+            if (howMuch === void 0) { howMuch = 1; }
+            return arr.slice(howMuch, arr.length);
+        }
+        utils.drop = drop;
+        function dropRight(arr, howMuch) {
+            if (howMuch === void 0) { howMuch = 1; }
+            return arr.slice(0, arr.length - howMuch);
+        }
+        utils.dropRight = dropRight;
+        function filter(arr, predicate) {
+            var result = [];
+            if (Array.isArray(arr)) {
+                for (var i = 0; i < arr.length; i++) {
+                    var item = arr[i];
+                    if (predicate.call(null, item)) {
+                        result.push(item);
+                    }
+                }
+            }
+            return result;
+        }
+        utils.filter = filter;
+        function reject(arr, predicate) {
+            return filter(arr, function (item) { return !predicate(item); });
+        }
+        utils.reject = reject;
+        function pick(obj, predicate) {
+            var keys = Object.keys(obj);
+            var result = {};
+            for (var i = 0; i < keys.length; i++) {
+                var currKey = keys[i];
+                var currItem = obj[currKey];
+                if (predicate(currItem)) {
+                    result[currKey] = currItem;
+                }
+            }
+            return result;
+        }
+        utils.pick = pick;
+        function has(obj, prop) {
+            return obj.hasOwnProperty(prop);
+        }
+        utils.has = has;
+        function contains(arr, item) {
+            return find(arr, function (currItem) { return currItem === item; }) ? true : false;
+        }
+        utils.contains = contains;
+        /**
+         * shallow clone
+         */
+        function cloneArr(arr) {
+            return map(arr, function (item) { return item; });
+        }
+        utils.cloneArr = cloneArr;
+        /**
+         * shallow clone
+         */
+        function cloneObj(obj) {
+            var clonedObj = {};
+            for (var key in obj) {
+                /* istanbul ignore else */
+                if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                    clonedObj[key] = obj[key];
+                }
+            }
+            return clonedObj;
+        }
+        utils.cloneObj = cloneObj;
+        function find(arr, predicate) {
+            for (var i = 0; i < arr.length; i++) {
+                var item = arr[i];
+                if (predicate.call(null, item)) {
+                    return item;
+                }
+            }
+            return undefined;
+        }
+        utils.find = find;
+        function reduce(arrOrObj, iterator, initial) {
+            var vals = Array.isArray(arrOrObj) ? arrOrObj : values(arrOrObj);
+            var accumulator = initial;
+            for (var i = 0; i < vals.length; i++) {
+                accumulator = iterator.call(null, accumulator, vals[i]);
+            }
+            return accumulator;
+        }
+        utils.reduce = reduce;
+        function compact(arr) {
+            return reject(arr, function (item) { return item === null || item === undefined; });
+        }
+        utils.compact = compact;
+        function uniq(arr, identity) {
+            if (identity === void 0) { identity = function (item) { return item; }; }
+            var identities = [];
+            return reduce(arr, function (result, currItem) {
+                var currIdentity = identity(currItem);
+                if (contains(identities, currIdentity)) {
+                    return result;
+                }
+                else {
+                    identities.push(currIdentity);
+                    return result.concat(currItem);
+                }
+            }, []);
+        }
+        utils.uniq = uniq;
+        function partial(func) {
+            var restArgs = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                restArgs[_i - 1] = arguments[_i];
+            }
+            var firstArg = [null];
+            var allArgs = firstArg.concat(restArgs);
+            return Function.bind.apply(func, allArgs);
+        }
+        utils.partial = partial;
+        function isArray(obj) {
+            return Array.isArray(obj);
+        }
+        utils.isArray = isArray;
+        function isRegExp(obj) {
+            return obj instanceof RegExp;
+        }
+        utils.isRegExp = isRegExp;
+        function isObject(obj) {
+            return obj instanceof Object;
+        }
+        utils.isObject = isObject;
+        function every(arr, predicate) {
+            for (var i = 0; i < arr.length; i++) {
+                if (!predicate(arr[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        utils.every = every;
+        function difference(arr, values) {
+            return reject(arr, function (item) { return contains(values, item); });
+        }
+        utils.difference = difference;
+        function some(arr, predicate) {
+            for (var i = 0; i < arr.length; i++) {
+                if (predicate(arr[i])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        utils.some = some;
+        function indexOf(arr, value) {
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === value) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        utils.indexOf = indexOf;
+        function sortBy(arr, orderFunc) {
+            var result = cloneArr(arr);
+            result.sort(function (a, b) { return orderFunc(a) - orderFunc(b); });
+            return result;
+        }
+        utils.sortBy = sortBy;
+        function zipObject(keys, values) {
+            if (keys.length !== values.length) {
+                throw Error("can't zipObject with different number of keys and values!");
+            }
+            var result = {};
+            for (var i = 0; i < keys.length; i++) {
+                result[keys[i]] = values[i];
+            }
+            return result;
+        }
+        utils.zipObject = zipObject;
+        /**
+         * mutates! (and returns) target
+         */
+        function assign(target) {
+            var sources = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                sources[_i - 1] = arguments[_i];
+            }
+            for (var i = 0; i < sources.length; i++) {
+                var curSource = sources[i];
+                var currSourceKeys = keys(curSource);
+                for (var j = 0; j < currSourceKeys.length; j++) {
+                    var currKey = currSourceKeys[j];
+                    target[currKey] = curSource[currKey];
+                }
+            }
+            return target;
+        }
+        utils.assign = assign;
+        function groupBy(arr, groupKeyFunc) {
+            var result = {};
+            forEach(arr, function (item) {
+                var currGroupKey = groupKeyFunc(item);
+                var currGroupArr = result[currGroupKey];
+                if (currGroupArr) {
+                    currGroupArr.push(item);
+                }
+                else {
+                    result[currGroupKey] = [item];
+                }
+            });
+            return result;
+        }
+        utils.groupBy = groupBy;
+    })/* istanbul ignore next */ (utils = chevrotain.utils || /* istanbul ignore next */ (chevrotain.utils = {}));
+})/* istanbul ignore next */ (chevrotain || (chevrotain = {}));
 var chevrotain;
 (function (chevrotain) {
     var lang;
@@ -90,16 +347,16 @@ var chevrotain;
                 this._state = {};
             }
             HashTable.prototype.keys = function () {
-                return utils.keys(this._state);
+                return chevrotain.utils.keys(this._state);
             };
             HashTable.prototype.values = function () {
-                return utils.values(this._state);
+                return chevrotain.utils.values(this._state);
             };
             HashTable.prototype.put = function (key, value) {
                 this._state[key] = value;
             };
             HashTable.prototype.putAll = function (other) {
-                this._state = _.assign(this._state, other._state);
+                this._state = chevrotain.utils.assign(this._state, other._state);
             };
             HashTable.prototype.get = function (key) {
                 // To avoid edge case with a key called "hasOwnProperty" we need to perform the commented out check below
@@ -109,7 +366,7 @@ var chevrotain;
                 return this._state[key];
             };
             HashTable.prototype.containsKey = function (key) {
-                return _.has(this._state, key);
+                return chevrotain.utils.has(this._state, key);
             };
             return HashTable;
         })();
@@ -130,7 +387,7 @@ var chevrotain;
         // used to support js inheritance patterns that do not use named functions
         // in that situation setting a property tokenName on a token constructor will
         // enable producing readable error messages.
-        if (_.isString(clazz.tokenName)) {
+        if (chevrotain.utils.isString(clazz.tokenName)) {
             return clazz.tokenName;
         }
         else {
@@ -151,12 +408,12 @@ var chevrotain;
         if (patternOrParent === void 0) { patternOrParent = undefined; }
         if (parentConstructor === void 0) { parentConstructor = Token; }
         var pattern;
-        if (_.isRegExp(patternOrParent) ||
+        if (chevrotain.utils.isRegExp(patternOrParent) ||
             patternOrParent === chevrotain.Lexer.SKIPPED ||
             patternOrParent === chevrotain.Lexer.NA) {
             pattern = patternOrParent;
         }
-        else if (_.isFunction(patternOrParent)) {
+        else if (chevrotain.utils.isFunction(patternOrParent)) {
             parentConstructor = patternOrParent;
             pattern = undefined;
         }
@@ -164,14 +421,12 @@ var chevrotain;
             parentConstructor.apply(this, arguments);
         };
         // static properties mixing
-        _.forOwn(parentConstructor, function (v, k) {
-            derivedCostructor[k] = v;
-        });
+        derivedCostructor = chevrotain.utils.assign(derivedCostructor, parentConstructor);
         // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
         derivedCostructor.tokenName = tokenName;
         derivedCostructor.prototype = Object.create(parentConstructor.prototype);
         derivedCostructor.prototype.constructor = derivedCostructor;
-        if (!_.isUndefined(pattern)) {
+        if (!chevrotain.utils.isUndefined(pattern)) {
             derivedCostructor.PATTERN = pattern;
         }
         return derivedCostructor;
@@ -245,17 +500,12 @@ var chevrotain;
     var Lexer = (function () {
         /**
          * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
-         *                     These constructors must be in one of three forms:
+         *                     These constructors must be in one of THESE forms:
          *
          *  1. With a PATTERN property that has a RegExp value for tokens to match:
          *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
          *
-         *  2. With a PATTERN property that has a RegExp value AND an IGNORE property with boolean value true.
-         *     These tokens will be matched but not as part of the main token vector.
-         *     this is usually used for ignoring whitespace/comments
-         *     example: -->    class Whitespace extends Token { static PATTERN = /(\t| )/; static IGNORE = true}<--
-         *
-         *  3. With a PATTERN property that has the value of the var Lexer.NA defined above.
+         *  2. With a PATTERN property that has the value of the var Lexer.NA defined above.
          *     This is a convenience form used to avoid matching Token classes that only act as categories.
          *     example: -->class Keyword extends Token { static PATTERN = NA }<--
          *
@@ -305,8 +555,8 @@ var chevrotain;
             this.tokenClasses = tokenClasses;
             this.lexerDefinitionErrors = [];
             this.lexerDefinitionErrors = chevrotain.validatePatterns(tokenClasses);
-            if (!utils.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
-                var allErrMessages = utils.map(this.lexerDefinitionErrors, function (error) {
+            if (!chevrotain.utils.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
+                var allErrMessages = chevrotain.utils.map(this.lexerDefinitionErrors, function (error) {
                     return error.message;
                 });
                 var allErrMessagesString = allErrMessages.join("-----------------------\n");
@@ -315,7 +565,7 @@ var chevrotain;
             // If definition errors were encountered, the analysis phase may fail unexpectedly/
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
-            if (utils.isEmpty(this.lexerDefinitionErrors)) {
+            if (chevrotain.utils.isEmpty(this.lexerDefinitionErrors)) {
                 var analyzeResult = chevrotain.analyzeTokenClasses(tokenClasses);
                 this.allPatterns = analyzeResult.allPatterns;
                 this.patternIdxToClass = analyzeResult.patternIdxToClass;
@@ -341,9 +591,9 @@ var chevrotain;
             var errors = [];
             var line = 1;
             var column = 1;
-            var groups = _.clone(this.emptyGroups);
-            if (!utils.isEmpty(this.lexerDefinitionErrors)) {
-                var allErrMessages = utils.map(this.lexerDefinitionErrors, function (error) {
+            var groups = chevrotain.utils.cloneObj(this.emptyGroups);
+            if (!chevrotain.utils.isEmpty(this.lexerDefinitionErrors)) {
+                var allErrMessages = chevrotain.utils.map(this.lexerDefinitionErrors, function (error) {
                     return error.message;
                 });
                 var allErrMessagesString = allErrMessages.join("-----------------------\n");
@@ -466,45 +716,45 @@ var chevrotain;
 (function (chevrotain) {
     var PATTERN = "PATTERN";
     function analyzeTokenClasses(tokenClasses) {
-        var onlyRelevantClasses = _.reject(tokenClasses, function (currClass) {
+        var onlyRelevantClasses = chevrotain.utils.reject(tokenClasses, function (currClass) {
             return currClass[PATTERN] === chevrotain.Lexer.NA;
         });
-        var allTransformedPatterns = utils.map(onlyRelevantClasses, function (currClass) {
+        var allTransformedPatterns = chevrotain.utils.map(onlyRelevantClasses, function (currClass) {
             return addStartOfInput(currClass[PATTERN]);
         });
-        var allPatternsToClass = _.zipObject(allTransformedPatterns, onlyRelevantClasses);
-        var patternIdxToClass = utils.map(allTransformedPatterns, function (pattern) {
+        var allPatternsToClass = chevrotain.utils.zipObject(allTransformedPatterns, onlyRelevantClasses);
+        var patternIdxToClass = chevrotain.utils.map(allTransformedPatterns, function (pattern) {
             return allPatternsToClass[pattern.toString()];
         });
-        var patternIdxToGroup = utils.map(onlyRelevantClasses, function (clazz) {
+        var patternIdxToGroup = chevrotain.utils.map(onlyRelevantClasses, function (clazz) {
             var groupName = clazz.GROUP;
             if (groupName === chevrotain.Lexer.SKIPPED) {
                 return undefined;
             }
-            else if (_.isString(groupName)) {
+            else if (chevrotain.utils.isString(groupName)) {
                 return groupName;
             }/* istanbul ignore else */ 
-            else if (_.isUndefined(groupName)) {
+            else if (chevrotain.utils.isUndefined(groupName)) {
                 return "default";
             }
             else {
                 /* istanbul ignore next */ throw Error("non exhaustive match");
             }
         });
-        var patternIdxToLongerAltIdx = utils.map(onlyRelevantClasses, function (clazz) {
+        var patternIdxToLongerAltIdx = chevrotain.utils.map(onlyRelevantClasses, function (clazz) {
             var longerAltClass = clazz.LONGER_ALT;
             if (longerAltClass) {
-                var longerAltIdx = _.indexOf(onlyRelevantClasses, longerAltClass);
+                var longerAltIdx = chevrotain.utils.indexOf(onlyRelevantClasses, longerAltClass);
                 return longerAltIdx;
             }
         });
-        var patternIdxToCanLineTerminator = utils.map(allTransformedPatterns, function (pattern) {
+        var patternIdxToCanLineTerminator = chevrotain.utils.map(allTransformedPatterns, function (pattern) {
             // TODO: unicode escapes of line terminators too?
             return /\\n|\\r|\\s/g.test(pattern.source);
         });
-        var emptyGroups = _.reduce(onlyRelevantClasses, function (acc, clazz) {
+        var emptyGroups = chevrotain.utils.reduce(onlyRelevantClasses, function (acc, clazz) {
             var groupName = clazz.GROUP;
-            if (_.isString(groupName)) {
+            if (chevrotain.utils.isString(groupName)) {
                 acc[groupName] = [];
             }
             return acc;
@@ -535,43 +785,43 @@ var chevrotain;
     }
     chevrotain.validatePatterns = validatePatterns;
     function findMissingPatterns(tokenClasses) {
-        var tokenClassesWithMissingPattern = _.filter(tokenClasses, function (currClass) {
-            return !_.has(currClass, PATTERN);
+        var tokenClassesWithMissingPattern = chevrotain.utils.filter(tokenClasses, function (currClass) {
+            return !chevrotain.utils.has(currClass, PATTERN);
         });
-        var errors = utils.map(tokenClassesWithMissingPattern, function (currClass) {
+        var errors = chevrotain.utils.map(tokenClassesWithMissingPattern, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- missing static 'PATTERN' property",
                 type: chevrotain.LexerDefinitionErrorType.MISSING_PATTERN,
                 tokenClasses: [currClass]
             };
         });
-        var validTokenClasses = _.difference(tokenClasses, tokenClassesWithMissingPattern);
+        var validTokenClasses = chevrotain.utils.difference(tokenClasses, tokenClassesWithMissingPattern);
         return { errors: errors, validTokenClasses: validTokenClasses };
     }
     chevrotain.findMissingPatterns = findMissingPatterns;
     function findInvalidPatterns(tokenClasses) {
-        var tokenClassesWithInvalidPattern = _.filter(tokenClasses, function (currClass) {
+        var tokenClassesWithInvalidPattern = chevrotain.utils.filter(tokenClasses, function (currClass) {
             var pattern = currClass[PATTERN];
-            return !_.isRegExp(pattern);
+            return !chevrotain.utils.isRegExp(pattern);
         });
-        var errors = utils.map(tokenClassesWithInvalidPattern, function (currClass) {
+        var errors = chevrotain.utils.map(tokenClassesWithInvalidPattern, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
                 type: chevrotain.LexerDefinitionErrorType.INVALID_PATTERN,
                 tokenClasses: [currClass]
             };
         });
-        var validTokenClasses = _.difference(tokenClasses, tokenClassesWithInvalidPattern);
+        var validTokenClasses = chevrotain.utils.difference(tokenClasses, tokenClassesWithInvalidPattern);
         return { errors: errors, validTokenClasses: validTokenClasses };
     }
     chevrotain.findInvalidPatterns = findInvalidPatterns;
     var end_of_input = /[^\\][\$]/;
     function findEndOfInputAnchor(tokenClasses) {
-        var invalidRegex = _.filter(tokenClasses, function (currClass) {
+        var invalidRegex = chevrotain.utils.filter(tokenClasses, function (currClass) {
             var pattern = currClass[PATTERN];
             return end_of_input.test(pattern.source);
         });
-        var errors = utils.map(invalidRegex, function (currClass) {
+        var errors = chevrotain.utils.map(invalidRegex, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
                 type: chevrotain.LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
@@ -582,11 +832,11 @@ var chevrotain;
     }
     chevrotain.findEndOfInputAnchor = findEndOfInputAnchor;
     function findUnsupportedFlags(tokenClasses) {
-        var invalidFlags = _.filter(tokenClasses, function (currClass) {
+        var invalidFlags = chevrotain.utils.filter(tokenClasses, function (currClass) {
             var pattern = currClass[PATTERN];
             return pattern instanceof RegExp && (pattern.multiline || pattern.global);
         });
-        var errors = utils.map(invalidFlags, function (currClass) {
+        var errors = chevrotain.utils.map(invalidFlags, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) +
                     "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
@@ -600,27 +850,29 @@ var chevrotain;
     // This can only test for identical duplicate RegExps, not semantically equivalent ones.
     function findDuplicatePatterns(tokenClasses) {
         var found = [];
-        var identicalPatterns = utils.map(tokenClasses, function (outerClass) {
-            return _.reduce(tokenClasses, function (result, innerClass) {
-                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) && !_.contains(found, innerClass) &&
+        var identicalPatterns = chevrotain.utils.map(tokenClasses, function (outerClass) {
+            return chevrotain.utils.reduce(tokenClasses, function (result, innerClass) {
+                if ((outerClass.PATTERN.source === innerClass.PATTERN.source) &&
+                    !chevrotain.utils.contains(found, innerClass) &&
                     innerClass.PATTERN !== chevrotain.Lexer.NA) {
                     // this avoids duplicates in the result, each class may only appear in one "set"
                     // in essence we are creating Equivalence classes on equality relation.
                     found.push(innerClass);
-                    return _.union(result, [innerClass]);
+                    result.push(innerClass);
+                    return result;
                 }
                 return result;
             }, []);
         });
-        identicalPatterns = _.compact(identicalPatterns);
-        var duplicatePatterns = _.filter(identicalPatterns, function (currIdenticalSet) {
-            return _.size(currIdenticalSet) > 1;
+        identicalPatterns = chevrotain.utils.compact(identicalPatterns);
+        var duplicatePatterns = chevrotain.utils.filter(identicalPatterns, function (currIdenticalSet) {
+            return currIdenticalSet.length > 1;
         });
-        var errors = utils.map(duplicatePatterns, function (setOfIdentical) {
-            var classNames = utils.map(setOfIdentical, function (currClass) {
+        var errors = chevrotain.utils.map(duplicatePatterns, function (setOfIdentical) {
+            var classNames = chevrotain.utils.map(setOfIdentical, function (currClass) {
                 return chevrotain.tokenName(currClass);
             });
-            var dupPatternSrc = _.first(setOfIdentical).PATTERN;
+            var dupPatternSrc = chevrotain.utils.first(setOfIdentical).PATTERN;
             return {
                 message: ("The same RegExp pattern ->" + dupPatternSrc + "<-") +
                     ("has been used in all the following classes: " + classNames.join(", ") + " <-"),
@@ -632,15 +884,15 @@ var chevrotain;
     }
     chevrotain.findDuplicatePatterns = findDuplicatePatterns;
     function findInvalidGroupType(tokenClasses) {
-        var invalidTypes = _.filter(tokenClasses, function (clazz) {
-            if (!_.has(clazz, "GROUP")) {
+        var invalidTypes = chevrotain.utils.filter(tokenClasses, function (clazz) {
+            if (!chevrotain.utils.has(clazz, "GROUP")) {
                 return false;
             }
             var group = clazz.GROUP;
             return group !== chevrotain.Lexer.SKIPPED &&
-                group !== chevrotain.Lexer.NA && !_.isString(group);
+                group !== chevrotain.Lexer.NA && !chevrotain.utils.isString(group);
         });
-        var errors = utils.map(invalidTypes, function (currClass) {
+        var errors = chevrotain.utils.map(invalidTypes, function (currClass) {
             return {
                 message: "Token class: ->" + chevrotain.tokenName(currClass) + "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
                 type: chevrotain.LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
@@ -733,7 +985,7 @@ var chevrotain;
             }
             AbstractProduction.prototype.accept = function (visitor) {
                 visitor.visit(this);
-                _.forEach(this.definition, function (prod) {
+                chevrotain.utils.forEach(this.definition, function (prod) {
                     prod.accept(visitor);
                 });
             };
@@ -940,11 +1192,11 @@ var chevrotain;
             // may be indirectly optional ((A?B?C?) | (D?E?F?))
             if (prod instanceof gast.Alternation) {
                 // for OR its enough for just one of the alternatives to be optional
-                return _.some(prod.definition, function (subProd) {
+                return chevrotain.utils.some(prod.definition, function (subProd) {
                     return isOptionalProd(subProd, alreadyVisited);
                 });
             }
-            else if (prod instanceof gast.NonTerminal && _.contains(alreadyVisited, prod)) {
+            else if (prod instanceof gast.NonTerminal && chevrotain.utils.contains(alreadyVisited, prod)) {
                 // avoiding stack overflow due to infinite recursion
                 return false;
             }
@@ -952,7 +1204,7 @@ var chevrotain;
                 if (prod instanceof gast.NonTerminal) {
                     alreadyVisited.push(prod);
                 }
-                return _.every(prod.definition, function (subProd) {
+                return chevrotain.utils.every(prod.definition, function (subProd) {
                     return isOptionalProd(subProd, alreadyVisited);
                 });
             }
@@ -1029,14 +1281,14 @@ var chevrotain;
                 nextSubProdIdx = nextSubProdIdx + 1;
                 hasInnerProdsRemaining = seq.length > nextSubProdIdx;
             }
-            return _.uniq(firstSet);
+            return chevrotain.utils.uniq(firstSet);
         }
         first_1.firstForSequence = firstForSequence;
         function firstForBranching(prod) {
-            var allAlternativesFirsts = utils.map(prod.definition, function (innerProd) {
+            var allAlternativesFirsts = chevrotain.utils.map(prod.definition, function (innerProd) {
                 return first(innerProd);
             });
-            return _.uniq(_.flatten(allAlternativesFirsts));
+            return chevrotain.utils.uniq(chevrotain.utils.flatten(allAlternativesFirsts));
         }
         first_1.firstForBranching = firstForBranching;
         function firstForTerminal(terminal) {
@@ -1059,8 +1311,8 @@ var chevrotain;
             RestWalker.prototype.walk = function (prod, prevRest) {
                 var _this = this;
                 if (prevRest === void 0) { prevRest = []; }
-                _.forEach(prod.definition, function (subProd, index) {
-                    var currRest = _.drop(prod.definition, index + 1);
+                chevrotain.utils.forEach(prod.definition, function (subProd, index) {
+                    var currRest = chevrotain.utils.drop(prod.definition, index + 1);
                     if (subProd instanceof g.NonTerminal) {
                         _this.walkProdRef(subProd, currRest, prevRest);
                     }
@@ -1130,7 +1382,7 @@ var chevrotain;
                 // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
                 var fullOrRest = currRest.concat(prevRest);
                 // walk all different alternatives
-                _.forEach(orProd.definition, function (alt) {
+                chevrotain.utils.forEach(orProd.definition, function (alt) {
                     // wrapping each alternative in a single definition wrapper
                     // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
                     // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
@@ -1185,7 +1437,7 @@ var chevrotain;
         follow.ResyncFollowsWalker = ResyncFollowsWalker;
         function computeAllProdsFollows(topProductions) {
             var reSyncFollows = new lang.HashTable();
-            _.forEach(topProductions, function (topProd) {
+            chevrotain.utils.forEach(topProductions, function (topProd) {
                 var currRefsFollow = new ResyncFollowsWalker(topProd).startWalking();
                 reSyncFollows.putAll(currRefsFollow);
             });
@@ -1228,8 +1480,8 @@ var chevrotain;
                     throw Error("The path does not start with the walker's top Rule!");
                 }
                 // immutable for the win
-                this.ruleStack = _.clone(this.path.ruleStack).reverse(); // intelij bug requires assertion
-                this.occurrenceStack = _.clone(this.path.occurrenceStack).reverse(); // intelij bug requires assertion
+                this.ruleStack = (chevrotain.utils.cloneArr(this.path.ruleStack)).reverse(); // intelij bug requires assertion
+                this.occurrenceStack = (chevrotain.utils.cloneArr(this.path.occurrenceStack)).reverse(); // intelij bug requires assertion
                 // already verified that the first production is valid, we now seek the 2nd production
                 this.ruleStack.pop();
                 this.occurrenceStack.pop();
@@ -1255,7 +1507,7 @@ var chevrotain;
             };
             AbstractNextPossibleTokensWalker.prototype.updateExpectedNext = function () {
                 // need to consume the Terminal
-                if (utils.isEmpty(this.ruleStack)) {
+                if (chevrotain.utils.isEmpty(this.ruleStack)) {
                     // must reset nextProductionXXX to avoid walking down another Top Level production while what we are
                     // really seeking is the last Terminal...
                     this.nextProductionName = "";
@@ -1411,7 +1663,7 @@ var chevrotain;
             };
             NextInsideOrWalker.prototype.walkOr = function (orProd, currRest, prevRest) {
                 if (orProd.occurrenceInParent === this.occurrence) {
-                    this.result = utils.map(orProd.definition, function (alt) {
+                    this.result = chevrotain.utils.map(orProd.definition, function (alt) {
                         var altWrapper = new chevrotain.gast.Flat([alt]);
                         return f.first(altWrapper);
                     });
@@ -1449,7 +1701,7 @@ var chevrotain;
             }
             NextTerminalAfterManyWalker.prototype.walkMany = function (manyProd, currRest, prevRest) {
                 if (manyProd.occurrenceInParent === this.occurrence) {
-                    var firstAfterMany = _.first(currRest.concat(prevRest));
+                    var firstAfterMany = chevrotain.utils.first(currRest.concat(prevRest));
                     this.result.isEndOfRule = firstAfterMany === undefined;
                     if (firstAfterMany instanceof chevrotain.gast.Terminal) {
                         this.result.token = firstAfterMany.terminalType;
@@ -1470,7 +1722,7 @@ var chevrotain;
             }
             NextTerminalAfterManySepWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
                 if (manySepProd.occurrenceInParent === this.occurrence) {
-                    var firstAfterManySep = _.first(currRest.concat(prevRest));
+                    var firstAfterManySep = chevrotain.utils.first(currRest.concat(prevRest));
                     this.result.isEndOfRule = firstAfterManySep === undefined;
                     if (firstAfterManySep instanceof chevrotain.gast.Terminal) {
                         this.result.token = firstAfterManySep.terminalType;
@@ -1491,7 +1743,7 @@ var chevrotain;
             }
             NextTerminalAfterAtLeastOneWalker.prototype.walkAtLeastOne = function (atLeastOneProd, currRest, prevRest) {
                 if (atLeastOneProd.occurrenceInParent === this.occurrence) {
-                    var firstAfterAtLeastOne = _.first(currRest.concat(prevRest));
+                    var firstAfterAtLeastOne = chevrotain.utils.first(currRest.concat(prevRest));
                     this.result.isEndOfRule = firstAfterAtLeastOne === undefined;
                     if (firstAfterAtLeastOne instanceof chevrotain.gast.Terminal) {
                         this.result.token = firstAfterAtLeastOne.terminalType;
@@ -1513,7 +1765,7 @@ var chevrotain;
             }
             NextTerminalAfterAtLeastOneSepWalker.prototype.walkAtLeastOneSep = function (atleastOneSepProd, currRest, prevRest) {
                 if (atleastOneSepProd.occurrenceInParent === this.occurrence) {
-                    var firstAfterfirstAfterAtLeastOneSep = _.first(currRest.concat(prevRest));
+                    var firstAfterfirstAfterAtLeastOneSep = chevrotain.utils.first(currRest.concat(prevRest));
                     this.result.isEndOfRule = firstAfterfirstAfterAtLeastOneSep === undefined;
                     if (firstAfterfirstAfterAtLeastOneSep instanceof chevrotain.gast.Terminal) {
                         this.result.token = firstAfterfirstAfterAtLeastOneSep.terminalType;
@@ -1641,7 +1893,7 @@ var chevrotain;
             if (!ignoreAmbiguities) {
                 checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar);
             }
-            var hasLastAnEmptyAlt = utils.isEmpty(_.last(alternativesTokens));
+            var hasLastAnEmptyAlt = chevrotain.utils.isEmpty(chevrotain.utils.last(alternativesTokens));
             if (hasLastAnEmptyAlt) {
                 var lastIdx = alternativesTokens.length - 1;
                 /**
@@ -1685,8 +1937,8 @@ var chevrotain;
         lookahead.buildLookaheadForOr = buildLookaheadForOr;
         function checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar) {
             var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
-            if (!utils.isEmpty(altsAmbiguityErrors)) {
-                var errorMessages = utils.map(altsAmbiguityErrors, function (currAmbiguity) {
+            if (!chevrotain.utils.isEmpty(altsAmbiguityErrors)) {
+                var errorMessages = chevrotain.utils.map(altsAmbiguityErrors, function (currAmbiguity) {
                     return ("Ambiguous alternatives: <" + currAmbiguity.alts.join(" ,") + "> in <OR" + orOccurrence + "> inside <" + ruleGrammar.name + "> ") +
                         ("Rule, <" + chevrotain.tokenName(currAmbiguity.token) + "> may appears as the first Terminal in all these alternatives.\n");
                 });
@@ -1702,20 +1954,20 @@ var chevrotain;
         }
         lookahead.checkForOrAmbiguities = checkForOrAmbiguities;
         function checkAlternativesAmbiguities(alternativesTokens) {
-            var allTokensFlat = _.flatten(alternativesTokens);
-            var uniqueTokensFlat = _.uniq(allTokensFlat);
-            var tokensToAltsIndicesItAppearsIn = utils.map(uniqueTokensFlat, function (seekToken) {
-                var altsCurrTokenAppearsIn = _.pick(alternativesTokens, function (altToLookIn) {
-                    return _.find(altToLookIn, function (currToken) {
+            var allTokensFlat = chevrotain.utils.flatten(alternativesTokens);
+            var uniqueTokensFlat = chevrotain.utils.uniq(allTokensFlat);
+            var tokensToAltsIndicesItAppearsIn = chevrotain.utils.map(uniqueTokensFlat, function (seekToken) {
+                var altsCurrTokenAppearsIn = chevrotain.utils.pick(alternativesTokens, function (altToLookIn) {
+                    return chevrotain.utils.find(altToLookIn, function (currToken) {
                         return currToken === seekToken;
                     });
                 });
-                var altsIndicesTokenAppearsIn = utils.map(utils.keys(altsCurrTokenAppearsIn), function (index) {
+                var altsIndicesTokenAppearsIn = chevrotain.utils.map(chevrotain.utils.keys(altsCurrTokenAppearsIn), function (index) {
                     return parseInt(index, 10) + 1;
                 });
                 return { token: seekToken, alts: altsIndicesTokenAppearsIn };
             });
-            var tokensToAltsIndicesWithAmbiguity = _.filter(tokensToAltsIndicesItAppearsIn, function (tokAndAltsItAppearsIn) {
+            var tokensToAltsIndicesWithAmbiguity = chevrotain.utils.filter(tokensToAltsIndicesItAppearsIn, function (tokAndAltsItAppearsIn) {
                 return tokAndAltsItAppearsIn.alts.length > 1;
             });
             return tokensToAltsIndicesWithAmbiguity;
@@ -1823,7 +2075,8 @@ var chevrotain;
                     return buildRefProd(prodRange);
                 case ProdType.TERMINAL:
                     return buildTerminalProd(prodRange);
-                /* istanbul ignore next */ default:
+                /* istanbul ignore next */
+                default:
                     /* istanbul ignore next */ throw Error("non exhaustive match");
             }
         }
@@ -1891,9 +2144,9 @@ var chevrotain;
         }
         function buildAbstractProd(prod, topLevelRange, allRanges) {
             var secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges);
-            var secondLevelInOrder = _.sortBy(secondLevelProds, function (prodRng) { return prodRng.range.start; });
+            var secondLevelInOrder = chevrotain.utils.sortBy(secondLevelProds, function (prodRng) { return prodRng.range.start; });
             var definition = [];
-            _.forEach(secondLevelInOrder, function (prodRng) {
+            chevrotain.utils.forEach(secondLevelInOrder, function (prodRng) {
                 definition.push(buildProdGast(prodRng, allRanges));
             });
             // IntelliJ bug workaround
@@ -1901,9 +2154,9 @@ var chevrotain;
             return prod;
         }
         function getDirectlyContainedRanges(y, prodRanges) {
-            return _.filter(prodRanges, function (x) {
+            return chevrotain.utils.filter(prodRanges, function (x) {
                 var isXDescendantOfY = y.strictlyContainsRange(x.range);
-                var xDoesNotHaveAnyAncestorWhichIsDecendantOfY = _.every(prodRanges, function (maybeAnotherParent) {
+                var xDoesNotHaveAnyAncestorWhichIsDecendantOfY = chevrotain.utils.every(prodRanges, function (maybeAnotherParent) {
                     var isParentOfX = maybeAnotherParent.range.strictlyContainsRange(x.range);
                     var isChildOfY = maybeAnotherParent.range.isStrictlyContainedInRange(y);
                     return !(isParentOfX && isChildOfY);
@@ -1937,7 +2190,7 @@ var chevrotain;
             var manySepRanges = createManySepRanges(text);
             var optionRanges = createOptionRanges(text);
             var orRanges = createOrRanges(text);
-            return _.union(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneSepRanges, manyRanges, manySepRanges, optionRanges, orRanges);
+            return [].concat(terminalRanges, refsRanges, atLeastOneRanges, atLeastOneSepRanges, manyRanges, manySepRanges, optionRanges, orRanges);
         }
         gastBuilder.createRanges = createRanges;
         function createTerminalRanges(text) {
@@ -1973,24 +2226,24 @@ var chevrotain;
             // have to split up the OR cases into separate FLAT productions
             // (A |BB | CDE) ==> or.def[0] --> FLAT(A) , or.def[1] --> FLAT(BB) , or.def[2] --> FLAT(CCDE)
             var orSubPartsRanges = createOrPartRanges(orRanges);
-            return _.union(orRanges, orSubPartsRanges);
+            return orRanges.concat(orSubPartsRanges);
         }
         gastBuilder.createOrRanges = createOrRanges;
-        var findClosingCurly = _.partial(findClosingOffset, "{", "}");
-        var findClosingParen = _.partial(findClosingOffset, "(", ")");
+        var findClosingCurly = chevrotain.utils.partial(findClosingOffset, "{", "}");
+        var findClosingParen = chevrotain.utils.partial(findClosingOffset, "(", ")");
         function createOrPartRanges(orRanges) {
             var orPartRanges = [];
-            _.forEach(orRanges, function (orRange) {
+            chevrotain.utils.forEach(orRanges, function (orRange) {
                 var currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly);
                 var currOrRangeStart = orRange.range.start;
                 // fix offsets as we are working on a subset of the text
-                _.forEach(currOrParts, function (orPart) {
+                chevrotain.utils.forEach(currOrParts, function (orPart) {
                     orPart.range.start += currOrRangeStart;
                     orPart.range.end += currOrRangeStart;
                 });
-                orPartRanges = _.union(orPartRanges, currOrParts);
+                orPartRanges = orPartRanges.concat(currOrParts);
             });
-            var uniqueOrPartRanges = _.uniq(orPartRanges, function (prodRange) {
+            var uniqueOrPartRanges = chevrotain.utils.uniq(orPartRanges, function (prodRange) {
                 // using "~" as a separator for the identify function as its not a valid char in javascript
                 return prodRange.type + "~" + prodRange.range.start + "~" + prodRange.range.end + "~" + prodRange.text;
             });
@@ -2028,7 +2281,7 @@ var chevrotain;
         function findClosingOffset(opening, closing, start, text) {
             var parenthesisStack = [1];
             var i = -1;
-            while (!(utils.isEmpty(parenthesisStack)) && i + start < text.length) {
+            while (!(chevrotain.utils.isEmpty(parenthesisStack)) && i + start < text.length) {
                 i++;
                 var nextChar = text.charAt(start + i);
                 if (nextChar === opening) {
@@ -2039,7 +2292,7 @@ var chevrotain;
                 }
             }
             // valid termination of the search loop
-            if (utils.isEmpty(parenthesisStack)) {
+            if (chevrotain.utils.isEmpty(parenthesisStack)) {
                 return i + start;
             }
             else {
@@ -2056,22 +2309,22 @@ var chevrotain;
         var gast = chevrotain.gast;
         var GAstVisitor = chevrotain.gast.GAstVisitor;
         function validateGrammar(topLevels) {
-            var duplicateErrors = utils.map(topLevels, validateDuplicateProductions);
-            var leftRecursionErrors = utils.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
-            var emptyAltErrors = utils.map(topLevels, validateEmptyOrAlternative);
-            return _.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors));
+            var duplicateErrors = chevrotain.utils.map(topLevels, validateDuplicateProductions);
+            var leftRecursionErrors = chevrotain.utils.map(topLevels, function (currTopRule) { return validateNoLeftRecursion(currTopRule, currTopRule); });
+            var emptyAltErrors = chevrotain.utils.map(topLevels, validateEmptyOrAlternative);
+            return chevrotain.utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors));
         }
         checks.validateGrammar = validateGrammar;
         function validateDuplicateProductions(topLevelRule) {
             var collectorVisitor = new OccurrenceValidationCollector();
             topLevelRule.accept(collectorVisitor);
             var allRuleProductions = collectorVisitor.allProductions;
-            var productionGroups = _.groupBy(allRuleProductions, identifyProductionForDuplicates);
-            var duplicates = _.pick(productionGroups, function (currGroup) {
+            var productionGroups = chevrotain.utils.groupBy(allRuleProductions, identifyProductionForDuplicates);
+            var duplicates = chevrotain.utils.pick(productionGroups, function (currGroup) {
                 return currGroup.length > 1;
             });
-            var errors = utils.map(utils.values(duplicates), function (currDuplicates) {
-                var firstProd = _.first(currDuplicates);
+            var errors = chevrotain.utils.map(chevrotain.utils.values(duplicates), function (currDuplicates) {
+                var firstProd = chevrotain.utils.first(currDuplicates);
                 var msg = createDuplicatesErrorMessage(currDuplicates, topLevelRule.name);
                 var dslName = gast.getProductionDslName(firstProd);
                 var defError = {
@@ -2090,7 +2343,7 @@ var chevrotain;
             return errors;
         }
         function createDuplicatesErrorMessage(duplicateProds, topLevelName) {
-            var firstProd = _.first(duplicateProds);
+            var firstProd = chevrotain.utils.first(duplicateProds);
             var index = firstProd.occurrenceInParent;
             var dslName = gast.getProductionDslName(firstProd);
             var extraArgument = getExtraProductionArgument(firstProd);
@@ -2160,7 +2413,7 @@ var chevrotain;
                     ruleName: ruleName
                 });
             }
-            if ((_.contains(definedRulesNames, ruleName))) {
+            if ((chevrotain.utils.contains(definedRulesNames, ruleName))) {
                 errMsg = "Duplicate definition, rule: " + ruleName + " is already defined in the grammar: " + className;
                 errors.push({
                     message: errMsg,
@@ -2175,13 +2428,13 @@ var chevrotain;
             if (path === void 0) { path = []; }
             var errors = [];
             var nextNonTerminals = getFirstNoneTerminal(currRule.definition);
-            if (utils.isEmpty(nextNonTerminals)) {
+            if (chevrotain.utils.isEmpty(nextNonTerminals)) {
                 return [];
             }
             else {
                 var ruleName = topRule.name;
-                var foundLeftRecursion = _.contains(nextNonTerminals, topRule);
-                var pathNames = utils.map(path, function (currRule) { return currRule.name; });
+                var foundLeftRecursion = chevrotain.utils.contains(nextNonTerminals, topRule);
+                var pathNames = chevrotain.utils.map(path, function (currRule) { return currRule.name; });
                 var leftRecursivePath = ruleName + " --> " + pathNames.concat([ruleName]).join(" --> ");
                 if (foundLeftRecursion) {
                     var errMsg = "Left Recursion found in grammar.\n" +
@@ -2197,22 +2450,22 @@ var chevrotain;
                 }
                 // we are only looking for cyclic paths leading back to the specific topRule
                 // other cyclic paths are ignored, we still need this difference to avoid infinite loops...
-                var validNextSteps = _.difference(nextNonTerminals, path.concat([topRule]));
-                var errorsFromNextSteps = utils.map(validNextSteps, function (currRefRule) {
-                    var newPath = _.clone(path);
+                var validNextSteps = chevrotain.utils.difference(nextNonTerminals, path.concat([topRule]));
+                var errorsFromNextSteps = chevrotain.utils.map(validNextSteps, function (currRefRule) {
+                    var newPath = chevrotain.utils.cloneArr(path);
                     newPath.push(currRefRule);
                     return validateNoLeftRecursion(topRule, currRefRule, newPath);
                 });
-                return errors.concat(_.flatten(errorsFromNextSteps));
+                return errors.concat(chevrotain.utils.flatten(errorsFromNextSteps));
             }
         }
         checks.validateNoLeftRecursion = validateNoLeftRecursion;
         function getFirstNoneTerminal(definition) {
             var result = [];
-            if (utils.isEmpty(definition)) {
+            if (chevrotain.utils.isEmpty(definition)) {
                 return result;
             }
-            var firstProd = _.first(definition);
+            var firstProd = chevrotain.utils.first(definition);
             if (firstProd instanceof gast.NonTerminal) {
                 // this allows the check to be performed on partially valid grammars that have not been completly resolved.
                 if (firstProd.referencedRule === undefined) {
@@ -2230,7 +2483,7 @@ var chevrotain;
             }
             else if (firstProd instanceof gast.Alternation) {
                 // each sub definition in alternation is a FLAT
-                result = _.flatten(utils.map(firstProd.definition, function (currSubDef) { return getFirstNoneTerminal(currSubDef.definition); }));
+                result = chevrotain.utils.flatten(chevrotain.utils.map(firstProd.definition, function (currSubDef) { return getFirstNoneTerminal(currSubDef.definition); }));
             }/* istanbul ignore else */ 
             else if (firstProd instanceof gast.Terminal) {
             }
@@ -2240,7 +2493,7 @@ var chevrotain;
             var isFirstOptional = gast.isOptionalProd(firstProd);
             var hasMore = definition.length > 1;
             if (isFirstOptional && hasMore) {
-                var rest_1 = _.drop(definition);
+                var rest_1 = chevrotain.utils.drop(definition);
                 return result.concat(getFirstNoneTerminal(rest_1));
             }
             else {
@@ -2263,10 +2516,10 @@ var chevrotain;
             var orCollector = new OrCollector();
             topLevelRule.accept(orCollector);
             var ors = orCollector.alternations;
-            var errors = _.reduce(ors, function (errors, currOr) {
-                var exceptLast = _.dropRight(currOr.definition);
-                var currErrors = utils.map(exceptLast, function (currAlternative, currAltIdx) {
-                    if (utils.isEmpty(chevrotain.first.first(currAlternative))) {
+            var errors = chevrotain.utils.reduce(ors, function (errors, currOr) {
+                var exceptLast = chevrotain.utils.dropRight(currOr.definition);
+                var currErrors = chevrotain.utils.map(exceptLast, function (currAlternative, currAltIdx) {
+                    if (chevrotain.utils.isEmpty(chevrotain.first.first(currAlternative))) {
                         return {
                             message: ("Ambiguous empty alternative: <" + (currAltIdx + 1) + ">") +
                                 (" in <OR" + currOr.occurrenceInParent + "> inside <" + topLevelRule.name + "> Rule.\n") +
@@ -2281,7 +2534,7 @@ var chevrotain;
                         return null;
                     }
                 });
-                return errors.concat(_.compact(currErrors));
+                return errors.concat(chevrotain.utils.compact(currErrors));
             }, []);
             return errors;
         }
@@ -2308,7 +2561,7 @@ var chevrotain;
             }
             GastRefResolverVisitor.prototype.resolveRefs = function () {
                 var _this = this;
-                _.forEach(this.nameToTopRule.values(), function (prod) {
+                chevrotain.utils.forEach(this.nameToTopRule.values(), function (prod) {
                     _this.currTopLevel = prod;
                     prod.accept(_this);
                 });
@@ -2345,7 +2598,7 @@ var chevrotain;
                 chevrotain.lang.functionName(EarlyExitException),
                 chevrotain.lang.functionName(NotAllInputParsedException)];
             // can't do instanceof on hacked custom js exceptions
-            return _.contains(recognitionExceptions, error.name);
+            return chevrotain.utils.contains(recognitionExceptions, error.name);
         }
         exceptions.isRecognitionException = isRecognitionException;
         function MismatchedTokenException(message, token) {
@@ -2477,14 +2730,14 @@ var chevrotain;
             else {
                 this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className);
             }
-            if (_.isArray(tokensMapOrArr)) {
-                this.tokensMap = _.reduce(tokensMapOrArr, function (acc, tokenClazz) {
+            if (chevrotain.utils.isArray(tokensMapOrArr)) {
+                this.tokensMap = chevrotain.utils.reduce(tokensMapOrArr, function (acc, tokenClazz) {
                     acc[chevrotain.tokenName(tokenClazz)] = tokenClazz;
                     return acc;
                 }, {});
             }
-            else if (_.isObject(tokensMapOrArr)) {
-                this.tokensMap = _.clone(tokensMapOrArr);
+            else if (chevrotain.utils.isObject(tokensMapOrArr)) {
+                this.tokensMap = chevrotain.utils.cloneObj(tokensMapOrArr);
             }
             else {
                 throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.");
@@ -2518,24 +2771,24 @@ var chevrotain;
                 cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
                 var validationErrors = checks.validateGrammar(grammarProductions.values());
                 definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
-                if (!utils.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                    defErrorsMsgs = utils.map(definitionErrors, function (defError) { return defError.message; });
+                if (!chevrotain.utils.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                    defErrorsMsgs = chevrotain.utils.map(definitionErrors, function (defError) { return defError.message; });
                     throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
                 }
-                if (utils.isEmpty(definitionErrors)) {
+                if (chevrotain.utils.isEmpty(definitionErrors)) {
                     var allFollows = follows.computeAllProdsFollows(grammarProductions.values());
                     cache.setResyncFollowsForClass(className, allFollows);
                 }
             }
             // reThrow the validation errors each time an erroneous parser is instantiated
-            if (!utils.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
-                defErrorsMsgs = utils.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
+            if (!chevrotain.utils.isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
+                defErrorsMsgs = chevrotain.utils.map(cache.CLASS_TO_DEFINITION_ERRORS.get(className), function (defError) { return defError.message; });
                 throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
             }
         };
         Object.defineProperty(Parser.prototype, "input", {
             get: function () {
-                return _.clone(this._input);
+                return chevrotain.utils.cloneArr(this._input);
             },
             set: function (newInput) {
                 this.reset();
@@ -2559,7 +2812,7 @@ var chevrotain;
             return cache.getProductionsForClass(this.className);
         };
         Parser.prototype.isBackTracking = function () {
-            return !(utils.isEmpty(this.isBackTrackingStack));
+            return !(chevrotain.utils.isEmpty(this.isBackTrackingStack));
         };
         Parser.prototype.SAVE_ERROR = function (error) {
             if (exceptions.isRecognitionException(error)) {
@@ -3286,15 +3539,15 @@ var chevrotain;
         };
         // Error Recovery functionality
         Parser.prototype.getFollowsForInRuleRecovery = function (tokClass, tokIdxInRule) {
-            var pathRuleStack = _.clone(this.RULE_STACK);
-            var pathOccurrenceStack = _.clone(this.RULE_OCCURRENCE_STACK);
+            var pathRuleStack = chevrotain.utils.cloneArr(this.RULE_STACK);
+            var pathOccurrenceStack = chevrotain.utils.cloneArr(this.RULE_OCCURRENCE_STACK);
             var grammarPath = {
                 ruleStack: pathRuleStack,
                 occurrenceStack: pathOccurrenceStack,
                 lastTok: tokClass,
                 lastTokOccurrence: tokIdxInRule
             };
-            var topRuleName = _.first(pathRuleStack);
+            var topRuleName = chevrotain.utils.first(pathRuleStack);
             var gastProductions = this.getGAstProductions();
             var topProduction = gastProductions.get(topRuleName);
             var follows = new interp.NextAfterTokenWalker(topProduction, grammarPath).startWalking();
@@ -3322,11 +3575,11 @@ var chevrotain;
                 return false;
             }
             // must know the possible following tokens to perform single token insertion
-            if (utils.isEmpty(follows)) {
+            if (chevrotain.utils.isEmpty(follows)) {
                 return false;
             }
             var mismatchedTok = this.NEXT_TOKEN();
-            var isMisMatchedTokInFollows = _.find(follows, function (possibleFollowsTokType) {
+            var isMisMatchedTokInFollows = chevrotain.utils.find(follows, function (possibleFollowsTokType) {
                 return mismatchedTok instanceof possibleFollowsTokType;
             }) !== undefined;
             return isMisMatchedTokInFollows;
@@ -3338,7 +3591,7 @@ var chevrotain;
         Parser.prototype.isInCurrentRuleReSyncSet = function (token) {
             var followKey = this.getCurrFollowKey();
             var currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey);
-            return _.contains(currentRuleReSyncSet, token);
+            return chevrotain.utils.contains(currentRuleReSyncSet, token);
         };
         Parser.prototype.findReSyncTokenType = function () {
             var allPossibleReSyncTokTypes = this.flattenFollowSet();
@@ -3347,7 +3600,7 @@ var chevrotain;
             var k = 2;
             while (true) {
                 var nextTokenType = nextToken.constructor;
-                if (_.contains(allPossibleReSyncTokTypes, nextTokenType)) {
+                if (chevrotain.utils.contains(allPossibleReSyncTokTypes, nextTokenType)) {
                     return nextTokenType;
                 }
                 nextToken = this.LA(k);
@@ -3370,7 +3623,7 @@ var chevrotain;
         };
         Parser.prototype.buildFullFollowKeyStack = function () {
             var _this = this;
-            return utils.map(this.RULE_STACK, function (ruleName, idx) {
+            return chevrotain.utils.map(this.RULE_STACK, function (ruleName, idx) {
                 if (idx === 0) {
                     return EOF_FOLLOW_KEY;
                 }
@@ -3383,10 +3636,10 @@ var chevrotain;
         };
         Parser.prototype.flattenFollowSet = function () {
             var _this = this;
-            var followStack = utils.map(this.buildFullFollowKeyStack(), function (currKey) {
+            var followStack = chevrotain.utils.map(this.buildFullFollowKeyStack(), function (currKey) {
                 return _this.getFollowSetFromFollowKey(currKey);
             });
-            return _.flatten(followStack);
+            return chevrotain.utils.flatten(followStack);
         };
         Parser.prototype.getFollowSetFromFollowKey = function (followKey) {
             if (followKey === EOF_FOLLOW_KEY) {
@@ -3405,7 +3658,7 @@ var chevrotain;
             var key = this.getKeyForAutomaticLookahead(prodName, prodKeys, prodOccurrence);
             var firstAfterRepInfo = this.firstAfterRepMap.get(key);
             if (firstAfterRepInfo === undefined) {
-                var currRuleName = _.last(this.RULE_STACK);
+                var currRuleName = chevrotain.utils.last(this.RULE_STACK);
                 var ruleGrammar = this.getGAstProductions().get(currRuleName);
                 var walker = new nextToksWalker(ruleGrammar, prodOccurrence);
                 firstAfterRepInfo = walker.startWalking();
@@ -3438,7 +3691,7 @@ var chevrotain;
             return false;
         };
         Parser.prototype.atLeastOneInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg) {
-            if (_.isString(action)) {
+            if (chevrotain.utils.isString(action)) {
                 errMsg = action;
                 action = lookAheadFunc;
                 lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence);
@@ -3462,7 +3715,7 @@ var chevrotain;
         Parser.prototype.atLeastOneSepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, errMsg) {
             var _this = this;
             var separatorsResult = [];
-            if (_.isString(action)) {
+            if (chevrotain.utils.isString(action)) {
                 errMsg = action;
                 action = firstIterationLookAheadFunc;
                 firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence);
@@ -3620,7 +3873,7 @@ var chevrotain;
         };
         Parser.prototype.getKeyForAutomaticLookahead = function (prodName, prodKeys, occurrence) {
             var occuMap = prodKeys[occurrence - 1];
-            var currRule = _.last(this.RULE_STACK);
+            var currRule = chevrotain.utils.last(this.RULE_STACK);
             var key = occuMap[currRule];
             if (key === undefined) {
                 key = prodName + occurrence + IN + currRule;
@@ -3655,7 +3908,7 @@ var chevrotain;
         };
         Parser.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, extraArgs) {
             if (extraArgs === void 0) { extraArgs = []; }
-            var ruleName = _.last(this.RULE_STACK);
+            var ruleName = chevrotain.utils.last(this.RULE_STACK);
             var condition = this.classLAFuncs.get(key);
             if (condition === undefined) {
                 var ruleGrammar = this.getGAstProductions().get(ruleName);
@@ -3666,8 +3919,8 @@ var chevrotain;
         };
         // other functionality
         Parser.prototype.saveRecogState = function () {
-            var savedErrors = _.clone(this.errors);
-            var savedRuleStack = _.clone(this.RULE_STACK);
+            var savedErrors = chevrotain.utils.cloneArr(this.errors);
+            var savedRuleStack = chevrotain.utils.cloneArr(this.RULE_STACK);
             return {
                 errors: savedErrors,
                 inputIdx: this.inputIdx,
@@ -3682,11 +3935,11 @@ var chevrotain;
         Parser.prototype.raiseNoAltException = function (occurrence, errMsgTypes) {
             var errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'";
             if (errMsgTypes === undefined) {
-                var ruleName = _.last(this.RULE_STACK);
+                var ruleName = chevrotain.utils.last(this.RULE_STACK);
                 var ruleGrammar = this.getGAstProductions().get(ruleName);
                 var nextTokens = new interp.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
-                var nextTokensFlat = _.flatten(nextTokens);
-                var nextTokensNames = utils.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
+                var nextTokensFlat = chevrotain.utils.flatten(nextTokens);
+                var nextTokensNames = chevrotain.utils.map(nextTokensFlat, function (currTokenClass) { return chevrotain.tokenName(currTokenClass); });
                 errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + ">";
             }
             throw this.SAVE_ERROR(new exceptions.NoViableAltException("expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
@@ -3716,7 +3969,7 @@ var API = {};
 /* istanbul ignore next */
 if (!testMode) {
     // semantic version
-    API.VERSION = "0.5.13";
+    API.VERSION = "0.5.14";
     // runtime API
     API.Parser = chevrotain.Parser;
     API.Lexer = chevrotain.Lexer;
@@ -3752,8 +4005,6 @@ else {
     console.log("running in TEST_MODE");
     API = chevrotain;
 }
-// libs
-/// <reference path="../libs/lodash.d.ts" />
 // production code
 /// <reference path="../src/utils/utils.ts" />
 // TODO: move lang --> utils ?
