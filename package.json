@@ -45,9 +45,7 @@
     "release_patch": "node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
     "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat"
   },
-  "dependencies": {
-    "lodash": "^3.10.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "chai": "^3.4.1",
     "coveralls": "^2.11.6",
@@ -78,6 +76,7 @@
     "karma-script-launcher": "~0.1.0",
     "karma-story-reporter": "~0.3.1",
     "load-grunt-tasks": "^3.4.0",
+    "lodash": "^3.10.1",
     "mocha": "^2.3.4",
     "requirejs": "^2.1.22",
     "semver": "^5.1.0",

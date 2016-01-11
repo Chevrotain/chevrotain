@@ -27,12 +27,6 @@ module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
 
-    // this helps reduce mistakes caused by the interface between the screen and the chair :)
-    var bower = grunt.file.readJSON('bower.json')
-    if (pkg.dependencies.lodash !== bower.dependencies.lodash) {
-        throw Error("mismatch in bower and npm lodash dependency version")
-    }
-
     //noinspection UnnecessaryLabelJS
     grunt.initConfig({
         pkg: pkg,
@@ -87,9 +81,9 @@ module.exports = function(grunt) {
             browsers_tests: {
                 options: {
                     files: [
-                        'bower_components/lodash/lodash.js',
                         'test/test.config.js',
                         'bin/chevrotain.js',
+                        'bower_components/lodash/lodash.js',
                         'bin/chevrotainSpecs.js'
                     ]
                 }
@@ -100,10 +94,10 @@ module.exports = function(grunt) {
                     frameworks: ["requirejs", 'mocha', 'chai'],
 
                     files: [
-                        {pattern: 'bower_components/lodash/lodash.js', included: false},
                         'test/test.config.js',
                         'bin/chevrotain.js',
                         'test/requirejs_test_main.js',
+                        {pattern: 'bower_components/lodash/lodash.js', included: false},
                         {pattern: 'bin/chevrotainSpecs.js', included: false}
                     ]
                 }
@@ -112,9 +106,9 @@ module.exports = function(grunt) {
             browsers_tests_minified: {
                 options: {
                     files: [
-                        'bower_components/lodash/lodash.js',
                         'test/test.config.js',
                         'bin/chevrotain.min.js',
+                        'bower_components/lodash/lodash.js',
                         'bin/chevrotainSpecs.js'
                     ]
                 }
@@ -125,10 +119,10 @@ module.exports = function(grunt) {
                     frameworks: ["requirejs", 'mocha', 'chai'],
 
                     files: [
-                        {pattern: 'bower_components/lodash/lodash.js', included: false},
                         'test/test.config.js',
                         'bin/chevrotain.min.js',
                         'test/requirejs_test_main.js',
+                        {pattern: 'bower_components/lodash/lodash.js', included: false},
                         {pattern: 'bin/chevrotainSpecs.js', included: false}
                     ]
                 }
@@ -219,10 +213,10 @@ module.exports = function(grunt) {
                     amdModuleId:    'chevrotain',
                     globalAlias:    'chevrotain',
                     deps:           {
-                        'default': ['_'],
-                        amd:       ['lodash'],
-                        cjs:       ['lodash'],
-                        global:    ['_']
+                        'default': [],
+                        amd:       [],
+                        cjs:       [],
+                        global:    []
                     }
                 }
             },

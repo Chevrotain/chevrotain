@@ -1,7 +1,4 @@
 
-// libs
-/// <reference path="../libs/lodash.d.ts" />
-
 // production code
 /// <reference path="../src/utils/utils.ts" />
 // TODO: move lang --> utils ?
