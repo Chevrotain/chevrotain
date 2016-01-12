@@ -32,7 +32,7 @@ any code generation phase.
     * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.  
 
-  * [**High performance.**](http://jsperf.com/json-parsers-comparison/20)
+  * [**High performance.**](http://jsperf.com/json-parsers-comparison/21)
 
   * **Grammar Reflection/Introspection**
     * A Parser's grammar's structure is known and **exposed** at runtime.
