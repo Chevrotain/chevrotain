@@ -16,7 +16,7 @@ any code generation phase.
 ## Features
   * **Lexer engine** based on RexExps.
     * Supports Token location tracking.
-    * Supports Token skipping (whitespace/comments/...)
+    * Supports Token skipping (whitespace/comments/...).
     * Allows prioritising shorter matches (Keywords vs Identifiers).
     * **No code generation** The Lexer does not require any code generation phase. 
    
@@ -48,16 +48,16 @@ any code generation phase.
 
 ## Getting Started
 
-* **Online tutorial**
- * [step #1 Building a lexer](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer)
- * [step #2 Implementing a grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar)
- * [step #3 Adding actions to the grammar](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions)
+**Online tutorial**
+ * Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
+ * Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
+ * Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
 
-* **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
+**[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_13/classes/chevrotain.parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_14/classes/chevrotain.parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
@@ -69,7 +69,7 @@ any code generation phase.
    * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts) (latest version)
 
 ## Dependencies
-Only a **single** dependency to [lodash](https://lodash.com/).
+None.
 
 ## Compatibility
 The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 runtime. 
