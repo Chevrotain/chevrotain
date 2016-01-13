@@ -1,7 +1,6 @@
-namespace chevrotain.gast {
+import {forEach} from "../../utils/utils"
 
-    import lang = chevrotain.lang
-
+export namespace gast {
     export interface IProduction {
         accept(visitor:GAstVisitor):void
     }
@@ -18,7 +17,7 @@ namespace chevrotain.gast {
 
         accept(visitor:GAstVisitor):void {
             visitor.visit(this)
-            utils.forEach(this.definition, (prod) => {
+            forEach(this.definition, (prod) => {
                 prod.accept(visitor)
             })
         }

@@ -1,7 +1,6 @@
 var _ = require('lodash')
-var specsFiles = require('./scripts/findSpecs')("bin/tsc/test/", "test")
-var srcFiles = require('./scripts/findRefs')('build/chevrotain.ts')
 var semver = require("semver")
+var webpack = require("webpack")
 
 var githubReleaseFiles = ['./package.json',
     './LICENSE.txt',
@@ -12,7 +11,20 @@ var githubReleaseFiles = ['./package.json',
     'bin/docs'
 ]
 
+var PUBLIC_API_DTS_FILES = [
+    'bin/src/scan/tokens_public.d.ts',
+    'bin/src/scan/lexer_public.d.ts',
+    'bin/src/parse/parser_public.d.ts',
+    'bin/src/parse/exceptions_public.d.ts',
+    'bin/src/parse/grammar/gast_public.d.ts']
+
+var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
+    return binDefFile.replace("bin/", "").replace(".d", "")
+})
+
 var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
+
+var fourSpaces = "    "
 
 // Integration tests using older versions of node.js will
 // avoid running tests that require ES6 capabilities only aviliable in node.js >= 4
@@ -71,34 +83,22 @@ module.exports = function(grunt) {
                 browsers:   ['Chrome_travis_ci', "Firefox"]
             },
 
-            dev_build: {
-                options: {
-                    singleRun: false,
-                    browsers:  ['Chrome']
-                }
-            },
-
             browsers_tests: {
                 options: {
                     files: [
                         'test/test.config.js',
-                        'bin/chevrotain.js',
-                        'bower_components/lodash/lodash.js',
                         'bin/chevrotainSpecs.js'
                     ]
                 }
             },
 
-            browsers_tests_requirejs: {
+            browsers_tests_local: {
                 options: {
-                    frameworks: ["requirejs", 'mocha', 'chai'],
+                    browsers: ['Chrome', "Firefox", "IE"],
 
                     files: [
                         'test/test.config.js',
-                        'bin/chevrotain.js',
-                        'test/requirejs_test_main.js',
-                        {pattern: 'bower_components/lodash/lodash.js', included: false},
-                        {pattern: 'bin/chevrotainSpecs.js', included: false}
+                        'bin/chevrotainSpecs.js'
                     ]
                 }
             },
@@ -107,36 +107,19 @@ module.exports = function(grunt) {
                 options: {
                     files: [
                         'test/test.config.js',
-                        'bin/chevrotain.min.js',
-                        'bower_components/lodash/lodash.js',
-                        'bin/chevrotainSpecs.js'
-                    ]
-                }
-            },
-
-            browsers_tests_requirejs_minified: {
-                options: {
-                    frameworks: ["requirejs", 'mocha', 'chai'],
-
-                    files: [
-                        'test/test.config.js',
-                        'bin/chevrotain.min.js',
-                        'test/requirejs_test_main.js',
-                        {pattern: 'bower_components/lodash/lodash.js', included: false},
-                        {pattern: 'bin/chevrotainSpecs.js', included: false}
+                        'bin/chevrotainSpecs.min.js'
                     ]
                 }
             }
+
         },
 
         mocha_istanbul: {
             coverage: {
-                src:     'bin/chevrotain.js',
+                src:     'bin/test',
                 options: {
-                    root:           './bin/',
-                    mask:           '*tainSpecs.js',
-                    coverageFolder: 'bin/coverage',
-                    excludes:       ['*tainSpecs.js']
+                    mask:           '**/*spec.js',
+                    coverageFolder: 'bin/coverage'
                 }
             }
         },
@@ -167,73 +150,35 @@ module.exports = function(grunt) {
 
         ts: {
             options: {
-                bin:  "ES5",
-                fast: "never"
+                target:    "ES5",
+                fast:      "never",
+                sourceMap: false
 
-            },
-
-            dev_build: {
-                src:    ["**/*.ts", "!node_modules/**/*.ts", "!build/**/*.ts", "!bin/**/*.ts", "!release/**/*.ts"],
-                outDir: "bin/gen"
             },
 
             release: {
-                src:     ['build/chevrotain.ts'],
-                out:     'bin/chevrotain.js',
+                src:     ["src/**/*.ts", "test/**/*.ts", "libs/**/*.ts"],
+                outDir:  'bin',
                 options: {
-                    removeComments: false,
-                    sourceMap:      false // due to UMD and concat generated headers the original source map will be invalid.
+                    module:         "commonjs",
+                    declaration:    true,
+                    removeComments: false
                 }
             },
 
             validate_definitions: {
-                src:    ["bin/chevrotain.d.ts"],
+                src:     ["tests_integration/definitions/es6_modules.ts"],
+                outDir:  "bin/garbage",
+                options: {
+                    module: "commonjs"
+                }
+            },
+
+            // the created d.ts should work with both Typescript projects using ES6
+            // modules syntax or those using the old namespace syntax.
+            validate_definitions_namespace: {
+                src:    ["tests_integration/definitions/namespaces.ts"],
                 outDir: "bin/garbage"
-            },
-
-            // this is the same as the 'build' process, all .ts --> .js in gen directory
-            // in a later step those files will be aggregated into separate components
-            release_test_code: {
-                src:     ["src/**/*.ts", "test/**/*.ts", "libs/**/*.ts"],
-                outDir:  "bin/tsc",
-                options: {
-                    declaration:    true,
-                    removeComments: false,
-                    sourceMap:      false // due to UMD and concat generated headers the original source map will be invalid.
-                }
-            }
-        },
-
-        umd: {
-            release: {
-                options: {
-                    src:            'bin/chevrotain.js',
-                    template:       'scripts/umd.hbs',
-                    objectToExport: 'API',
-                    amdModuleId:    'chevrotain',
-                    globalAlias:    'chevrotain',
-                    deps:           {
-                        'default': [],
-                        amd:       [],
-                        cjs:       [],
-                        global:    []
-                    }
-                }
-            },
-
-            release_specs: {
-                options: {
-                    src:      'bin/chevrotainSpecs.js',
-                    template: 'scripts/umd.hbs',
-                    deps:     {
-                        'default': ['_', 'config', 'chevrotain'],
-                        // dummy empty <''> to align arguments and parameters
-                        // (sometimes two sometimes three depending on module loader)
-                        amd:       ['lodash', '', 'chevrotain'],
-                        cjs:       ['lodash', '../test/test.config.js', './chevrotain'],
-                        global:    ['_', "undefined", 'chevrotain']
-                    }
-                }
             }
         },
 
@@ -242,80 +187,60 @@ module.exports = function(grunt) {
             dev:     ['bin/gen']
         },
 
-        concat: {
-            release:             {
-                options: {
-                    banner: banner,
-
-                    process: function fixTSModulePatternForCoverage(src, filePath) {
-                        // prefix (lang = chevrotain.lang || (chevrotain.lang = {}) with /* istanbul ignore next */
-                        var fixed2PartsModules = src.replace(
-                            /(\((\w+) = (\w+\.\2) \|\|) (\(\3 = \{}\)\))/g, "/* istanbul ignore next */ $1 /* istanbul ignore next */ $4")
-
-                        var fixedAllModulesPattern = fixed2PartsModules.replace(
-                            /(\(chevrotain \|\| \(chevrotain = \{}\)\);)/g, "/* istanbul ignore next */ $1")
-
-                        var fixedTypeScriptExtends = fixedAllModulesPattern.replace("if (b.hasOwnProperty(p)) d[p] = b[p];",
-                            "/* istanbul ignore next */ " + " if (b.hasOwnProperty(p)) d[p] = b[p];")
-
-                        fixedTypeScriptExtends = fixedTypeScriptExtends.replace("d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());",
-                            "/* istanbul ignore next */ " + " d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());")
-
-                        // TODO: typescript compiler swallows comments in certain situations
-                        //       once this is fixed the string replacements below can be removed.
-
-                        // very little point in testing this, this is a pattern matching functionality missing in typescript/javascript
-                        // if the code reaches that point it will go "boom" which is the purpose, the going boom part is not part
-                        // of the contract, it just makes sure we fail fast if we supply invalid arguments.
-                        var fixedNoneExhaustive = fixedTypeScriptExtends.replace(/(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
-                            "/* istanbul ignore else */ $1$2")
-
-                        fixedNoneExhaustive = fixedNoneExhaustive.replace(/(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
-                            "/* istanbul ignore next */ $1")
-
-                        return fixedNoneExhaustive
-                    }
-                },
+        "string-replace": {
+            coverage_ignore: {
                 files:   {
-                    'bin/chevrotain.js':      ['bin/chevrotain.js'],
-                    'bin/chevrotainSpecs.js': specsFiles
+                    'bin/src/': 'bin/src/**'
+                },
+                options: {
+                    replacements: [{
+                        pattern:     'if (b.hasOwnProperty(p)) d[p] = b[p];',
+                        replacement: '/* istanbul ignore next */ ' + ' if (b.hasOwnProperty(p)) d[p] = b[p];'
+                    }, {
+                        pattern:     'd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());',
+                        replacement: '/* istanbul ignore next */ ' + ' d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());'
+                    }, {
+                        pattern:     /(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
+                        replacement: '/* istanbul ignore else */ $1$2'
+                    }, {
+                        pattern:     /(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
+                        replacement: '/* istanbul ignore next */ $1'
+                    }]
                 }
-            },
+            }
+        },
+
+        concat: {
             release_definitions: {
                 options: {
-                    banner:  banner +
-                             'declare module chevrotain {\n' +
-                             '    module lang {\n' +
-                             '        class HashTable<V>{}\n' +
-                             '    }\n',
-                    process: function removeOriginalHeaderAndFooter(src, filePath) {
-                        var fixedModuleName, fixedIndentation
-                        if (_.contains(filePath, 'gast_public')) {
-                            fixedModuleName = src.replace('declare namespace chevrotain.gast {', '\nmodule gast {')
-                            fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
-                            return fixedIndentation
-                        }
-                        else if (_.contains(filePath, 'exceptions_public')) {
-                            fixedModuleName = src.replace('declare namespace chevrotain.exceptions {', '\nmodule exceptions {')
-                            fixedIndentation = fixedModuleName.replace(/([\n\r]+\s*)/g, '$1\t')
-                            return fixedIndentation
-                        }
-                        var result = src.replace("declare namespace chevrotain {", "")
-                        var lastRCurlyIdx = result.lastIndexOf("}")
-                        result = result.substring(0, lastRCurlyIdx)
-                        result = _.trimRight(result)
-                        return result
+                    // TODO: seems like the HashTable class may need to be included in the public API
+                    banner: banner +
+                            'declare namespace chevrotain {\n' +
+                            'class HashTable<V>{}\n',
+
+                    process: function processDefinitions(src, filePath) {
+                        var withOutImports = src.replace(/import.*;(\n|\r\n)/g, '')
+                        // TODO: investigate why do Typescript definition files include private members.
+                        var withoutPrivate = withOutImports.replace(/private.*;(\n|\r\n)/g, '')
+
+                        // need to remove inner declares as we are wrapping in a namespace
+                        var withoutDeclare = withoutPrivate.replace(/declare /g, '')
+                        var fixedInnerIdent = withoutDeclare.replace(/(\r\n|\n)/g, grunt.util.linefeed + fourSpaces)
+                        return fixedInnerIdent
                     },
 
-                    footer: '\n}'
+                    // this syntax allows usage of chevrotain.d.ts from either
+                    // ES6 modules / older namespaces style in typescript.
+                    footer: '}\n' +
+                            'declare module "chevrotain" {\n' +
+                            '    export = chevrotain;\n' +
+                            '}\n',
+
+                    // extra spaces needed to fix indentation.
+                    separator: grunt.util.linefeed + fourSpaces
                 },
                 files:   {
-                    'bin/chevrotain.d.ts': [
-                        'bin/tsc/src/scan/tokens_public.d.ts',
-                        'bin/tsc/src/scan/lexer_public.d.ts',
-                        'bin/tsc/src/parse/parser_public.d.ts',
-                        'bin/tsc/src/parse/exceptions_public.d.ts',
-                        'bin/tsc/src/parse/grammar/gast_public.d.ts']
+                    'bin/chevrotain.d.ts': PUBLIC_API_DTS_FILES
                 }
             }
         },
@@ -326,15 +251,45 @@ module.exports = function(grunt) {
                     mode:             'file',
                     target:           'es5',
                     out:              'bin/docs',
+                    module:           'commonjs',
                     name:             'Chevrotain',
-                    excludeExternals: '',
-                    // see: https://github.com/sebastian-lenz/typedoc/issues/73
-                    // double negative for the win!
-                    externalPattern:  '!**/*public**'
+                    excludeExternals: ''
                 },
-                // must include all the files explicitly instead of just targeting build/chevrotain.ts
-                // otherwise the include(exclude !...) won't work
-                src:     srcFiles
+                src:     PUBLIC_API_TS_FILES
+            }
+        },
+
+        webpack: {
+            options : {
+                stats:       {
+                    colors:  true,
+                    modules: true,
+                    reasons: true
+                },
+                failOnError: true
+            },
+
+            release: {
+                entry:  "./bin/src/api.js",
+                output: {
+                    path:           "bin/",
+                    filename:       "chevrotain.js",
+                    library:        "chevrotain",
+                    libraryTarget:  "umd",
+                    umdNamedDefine: true
+                },
+
+                plugins: [
+                    new webpack.BannerPlugin(banner, {raw: true})
+                ]
+            },
+
+            specs: {
+                entry: "./bin/test/all.js",
+                output: {
+                    path:           "bin/",
+                    filename:       "chevrotainSpecs.js"
+                }
             }
         },
 
@@ -362,12 +317,19 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 // not using name mangling because it may break usage of Function.name (functionName utility)
-                mangle: false,
-                banner: banner
+                mangle: false
             },
             release: {
-                files: {
+                options: {
+                    banner: banner
+                },
+                files:   {
                     'bin/chevrotain.min.js': ['bin/chevrotain.js']
+                }
+            },
+            specs:   {
+                files: {
+                    'bin/chevrotainSpecs.min.js': ['bin/chevrotainSpecs.js']
                 }
             }
         }
@@ -377,15 +339,16 @@ module.exports = function(grunt) {
 
     var buildTasks = [
         'clean:release',
-        'ts:release',
-        'ts:release_test_code',
         'tslint',
-        'concat:release',
+        'ts:release',
+        'string-replace:coverage_ignore',
         'concat:release_definitions',
         'ts:validate_definitions',
-        'umd:release',
-        'umd:release_specs',
+        'ts:validate_definitions_namespace',
+        'webpack:release',
+        'webpack:specs',
         'uglify:release',
+        'uglify:specs',
         'typedoc:build_docs',
         'compress'
     ]
@@ -405,9 +368,7 @@ module.exports = function(grunt) {
 
     var browserUnitTests = [
         "karma:browsers_tests",
-        "karma:browsers_tests_requirejs",
-        "karma:browsers_tests_minified",
-        "karma:browsers_tests_requirejs_minified"
+        "karma:browsers_tests_minified"
     ]
 
     var buildTestTasks = buildTasks.concat(unitTestsTasks)
@@ -417,10 +378,4 @@ module.exports = function(grunt) {
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('integration_tests', integrationTestsTasks)
     grunt.registerTask('browsers_unit_tests', browserUnitTests)
-
-    grunt.registerTask('dev_build_test', [
-        'clean:dev',
-        'ts:dev_build',
-        'tslint',
-        'karma:dev_build'])
 }

@@ -1,20 +1,3 @@
-var specsFiles = require('./scripts/findSpecs')("bin/gen/test/", "test")
-var findRefs = require('./scripts/findRefs')
-var _ = require('lodash')
-
-var coreIncludes = findRefs('./build/chevrotain.ts', "bin/gen/");
-coreIncludes = _.reject(coreIncludes, function(srcFile) {
-    return /libs\//.test(srcFile)
-})
-
-coreIncludes = _.map(coreIncludes, function(srcFile) {
-    var fixedPath = srcFile.replace('src', 'bin/gen/src')
-    var fixedSuffix = fixedPath.replace('.ts', '.js')
-    return fixedSuffix
-})
-
-var allSrcsIncludes = coreIncludes.concat(specsFiles)
-
 module.exports = function(config) {
     "use strict";
 
@@ -26,14 +9,10 @@ module.exports = function(config) {
         // frameworks to use
         frameworks: ['mocha', 'chai'],
 
-        // list of files / patterns to load in the browser
-        files: ['bower_components/lodash/lodash.js'].concat(
-            [
-                {pattern: 'bin/gen/**/*.map', included: false},
-                {pattern: 'src/**/*.ts', included: false},
-                {pattern: 'test/**/*.ts', included: false}
-            ],
-            allSrcsIncludes),
+        files: [
+            'test/test.config.js',
+            'bin/chevrotainSpecs.js'
+        ],
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
@@ -48,7 +27,6 @@ module.exports = function(config) {
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
         logLevel: config.LOG_INFO,
-
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: false,

@@ -1,34 +1,37 @@
-namespace chevrotain.exceptions {
+import {Token} from "../scan/tokens_public"
+import {functionName} from "../lang/lang_extensions"
+import {contains} from "../utils/utils"
 
+export namespace exceptions {
     export interface IRecognitionException {
         name:string,
         message:string,
         token:Token
     }
 
-    // hacks to bypass no support for custom Errors in javascript/typescript
+// hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
         let recognitionExceptions = [
-            lang.functionName(MismatchedTokenException),
-            lang.functionName(NoViableAltException),
-            lang.functionName(EarlyExitException),
-            lang.functionName(NotAllInputParsedException)]
+            functionName(MismatchedTokenException),
+            functionName(NoViableAltException),
+            functionName(EarlyExitException),
+            functionName(NotAllInputParsedException)]
         // can't do instanceof on hacked custom js exceptions
-        return utils.contains(recognitionExceptions, error.name)
+        return contains(recognitionExceptions, error.name)
     }
 
     export function MismatchedTokenException(message:string, token:Token) {
-        this.name = lang.functionName(MismatchedTokenException)
+        this.name = functionName(MismatchedTokenException)
         this.message = message
         this.token = token
     }
 
-    // must use the "Error.prototype" instead of "new Error"
-    // because the stack trace points to where "new Error" was invoked"
+// must use the "Error.prototype" instead of "new Error"
+// because the stack trace points to where "new Error" was invoked"
     MismatchedTokenException.prototype = Error.prototype
 
     export function NoViableAltException(message:string, token:Token) {
-        this.name = lang.functionName(NoViableAltException)
+        this.name = functionName(NoViableAltException)
         this.message = message
         this.token = token
     }
@@ -36,7 +39,7 @@ namespace chevrotain.exceptions {
     NoViableAltException.prototype = Error.prototype
 
     export function NotAllInputParsedException(message:string, token:Token) {
-        this.name = lang.functionName(NotAllInputParsedException)
+        this.name = functionName(NotAllInputParsedException)
         this.message = message
         this.token = token
     }
@@ -45,12 +48,10 @@ namespace chevrotain.exceptions {
 
 
     export function EarlyExitException(message:string, token:Token) {
-        this.name = lang.functionName(EarlyExitException)
+        this.name = functionName(EarlyExitException)
         this.message = message
         this.token = token
     }
 
     EarlyExitException.prototype = Error.prototype
-
-
 }

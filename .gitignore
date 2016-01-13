@@ -4,7 +4,7 @@
 
 /bin
 /.tscache
-/src/parse/.baseDir.ts
+.baseDir.ts
 /bower_components
 /package
 
