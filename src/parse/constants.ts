@@ -1,5 +1,2 @@
-namespace chevrotain.constants {
-
-    export let IN = "_~IN~_"
-}
-
+// TODO: can this be removed? where is it used?
+export let IN = "_~IN~_"

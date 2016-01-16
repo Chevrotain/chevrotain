@@ -1,78 +1,80 @@
+import {gast} from "../../../src/parse/grammar/gast_public"
 
-namespace chevrotain.first.spec {
+let Terminal = gast.Terminal
+let Option = gast.Option
+let Alternation = gast.Alternation
+let Flat = gast.Flat
 
-    import t = specs.samples
-    import gast = chevrotain.gast
-    import matchers = specs.matchers
+import {first} from "../../../src/parse/grammar/first"
+import {EntityTok, CommaTok, NamespaceTok, TypeTok, ColonTok, ConstTok} from "./samples"
+import {setEquality} from "../../utils/matchers"
 
-    describe("The Grammar Ast first model", function () {
-        "use strict"
+describe("The Grammar Ast first model", function () {
+    "use strict"
 
-        it("can compute the first for a terminal", function () {
-            let terminal = new gast.Terminal(t.EntityTok)
-            let actual = first(terminal)
-            expect(actual.length).to.equal(1)
-            expect(actual[0]).to.equal(t.EntityTok)
+    it("can compute the first for a terminal", function () {
+        let terminal = new Terminal(EntityTok)
+        let actual = first(terminal)
+        expect(actual.length).to.equal(1)
+        expect(actual[0]).to.equal(EntityTok)
 
-            let terminal2 = new gast.Terminal(t.CommaTok)
-            let actual2 = first(terminal2)
-            expect(actual2.length).to.equal(1)
-            expect(actual2[0]).to.equal(t.CommaTok)
-        })
+        let terminal2 = new Terminal(CommaTok)
+        let actual2 = first(terminal2)
+        expect(actual2.length).to.equal(1)
+        expect(actual2[0]).to.equal(CommaTok)
+    })
 
-        it("can compute the first for a Sequence production ", function () {
-            let seqProduction = new gast.Flat([new gast.Terminal(t.EntityTok)])
-            let actual = first(seqProduction)
-            expect(actual.length).to.equal(1)
-            expect(actual[0]).to.equal(t.EntityTok)
+    it("can compute the first for a Sequence production ", function () {
+        let seqProduction = new Flat([new Terminal(EntityTok)])
+        let actual = first(seqProduction)
+        expect(actual.length).to.equal(1)
+        expect(actual[0]).to.equal(EntityTok)
 
-            let seqProduction2 = new gast.Flat(
-                [
-                    new gast.Terminal(t.EntityTok),
-                    new gast.Option([new gast.Terminal(t.NamespaceTok)])
-                ])
-            let actual2 = first(seqProduction2)
-            expect(actual2.length).to.equal(1)
-            expect(actual2[0]).to.equal(t.EntityTok)
-        })
+        let seqProduction2 = new Flat(
+            [
+                new Terminal(EntityTok),
+                new Option([new Terminal(NamespaceTok)])
+            ])
+        let actual2 = first(seqProduction2)
+        expect(actual2.length).to.equal(1)
+        expect(actual2[0]).to.equal(EntityTok)
+    })
 
-        it("can compute the first for an alternatives production ", function () {
-            let altProduction = new gast.Alternation(
-                [
-                    new gast.Terminal(t.EntityTok),
-                    new gast.Terminal(t.NamespaceTok),
-                    new gast.Terminal(t.TypeTok)
+    it("can compute the first for an alternatives production ", function () {
+        let altProduction = new Alternation(
+            [
+                new Terminal(EntityTok),
+                new Terminal(NamespaceTok),
+                new Terminal(TypeTok)
 
-                ])
-            let actual = first(altProduction)
-            expect(actual.length).to.equal(3)
-            expect(actual[0]).to.equal(t.EntityTok)
-            expect(actual[1]).to.equal(t.NamespaceTok)
-            expect(actual[2]).to.equal(t.TypeTok)
-
-        })
-
-        it("can compute the first for an production with optional prefix", function () {
-            let withOptionalPrefix = new gast.Flat(
-                [
-                    new gast.Option([new gast.Terminal(t.NamespaceTok)]),
-                    new gast.Terminal(t.EntityTok)
-                ])
-            let actual = first(withOptionalPrefix)
-            matchers.setEquality(actual, [t.NamespaceTok, t.EntityTok])
-
-
-            let withTwoOptPrefix = new gast.Flat(
-                [
-                    new gast.Option([new gast.Terminal(t.NamespaceTok)]),
-                    new gast.Option([new gast.Terminal(t.ColonTok)]),
-                    new gast.Terminal(t.EntityTok),
-                    new gast.Option([new gast.Terminal(t.ConstTok)])
-                ])
-            let actual2 = first(withTwoOptPrefix)
-            matchers.setEquality(actual2, [t.NamespaceTok, t.ColonTok, t.EntityTok])
-        })
+            ])
+        let actual = first(altProduction)
+        expect(actual.length).to.equal(3)
+        expect(actual[0]).to.equal(EntityTok)
+        expect(actual[1]).to.equal(NamespaceTok)
+        expect(actual[2]).to.equal(TypeTok)
 
     })
 
-}
+    it("can compute the first for an production with optional prefix", function () {
+        let withOptionalPrefix = new Flat(
+            [
+                new Option([new Terminal(NamespaceTok)]),
+                new Terminal(EntityTok)
+            ])
+        let actual = first(withOptionalPrefix)
+        setEquality(actual, [NamespaceTok, EntityTok])
+
+
+        let withTwoOptPrefix = new Flat(
+            [
+                new Option([new Terminal(NamespaceTok)]),
+                new Option([new Terminal(ColonTok)]),
+                new Terminal(EntityTok),
+                new Option([new Terminal(ConstTok)])
+            ])
+        let actual2 = first(withTwoOptPrefix)
+        setEquality(actual2, [NamespaceTok, ColonTok, EntityTok])
+    })
+
+})
