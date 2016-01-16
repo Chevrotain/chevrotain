@@ -9,7 +9,7 @@ describe("The HashTable implementation", function () {
 
         expect(hashTable.get("one")).to.equal(1)
         expect(hashTable.get("two")).to.equal(2)
-        expect(hashTable.get("three")).to.equal(undefined)
+        expect(hashTable.get("three")).to.be.undefined
     })
 
     it("support property names that are also names of built in properties on javascript Object", function () {
@@ -19,5 +19,19 @@ describe("The HashTable implementation", function () {
 
         expect(hashTable.get("toString")).to.equal(1)
         expect(hashTable.get("hasOwnProperty")).to.equal(2)
+    })
+
+    it("can be cleared", () => {
+        let hashTable = new HashTable<number>();
+        hashTable.put("one", 1)
+        hashTable.put("two", 2)
+
+        expect(hashTable.get("one")).to.equal(1)
+        expect(hashTable.get("two")).to.equal(2)
+
+        hashTable.clear()
+
+        expect(hashTable.get("one")).to.be.undefined
+        expect(hashTable.get("two")).to.be.undefined
     })
 })

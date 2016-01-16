@@ -62,5 +62,9 @@ export class HashTable<V> {
     containsKey(key:string):boolean {
         return utils.has(this._state, key)
     }
+
+    clear():void {
+        this._state = {}
+    }
 }
 
