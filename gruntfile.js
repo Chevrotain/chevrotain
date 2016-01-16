@@ -83,11 +83,20 @@ module.exports = function(grunt) {
                 browsers:   ['Chrome_travis_ci', "Firefox"]
             },
 
-            browsers_tests: {
+            browsers_unit_tests: {
                 options: {
                     files: [
                         'test/test.config.js',
                         'bin/chevrotainSpecs.js'
+                    ]
+                }
+            },
+
+            browsers_unit_tests_minified: {
+                options: {
+                    files: [
+                        'test/test.config.js',
+                        'bin/chevrotainSpecs.min.js'
                     ]
                 }
             },
@@ -103,15 +112,49 @@ module.exports = function(grunt) {
                 }
             },
 
-            browsers_tests_minified: {
+            browsers_integration_tests_globals: {
                 options: {
                     files: [
+                        'bin/chevrotain.js',
                         'test/test.config.js',
-                        'bin/chevrotainSpecs.min.js'
+                        'test_integration/**/*spec.js'
+                    ]
+                }
+            },
+
+            browsers_integration_tests_amd: {
+                options: {
+                    frameworks: ["requirejs", 'mocha', 'chai'],
+                    files: [
+                        'bin/chevrotain.js',
+                        'test/test.config.js',
+                        {pattern: 'test_integration/*/*.js', included: false},
+                        'test_integration/integration_tests_main.js'
+                    ]
+                }
+            },
+
+            browsers_integration_tests_globals_minified: {
+                options: {
+                    files: [
+                        'bin/chevrotain.min.js',
+                        'test/test.config.js',
+                        'test_integration/**/*spec.js'
+                    ]
+                }
+            },
+
+            browsers_integration_tests_amd_minified: {
+                options: {
+                    frameworks: ["requirejs", 'mocha', 'chai'],
+                    files: [
+                        'bin/chevrotain.min.js',
+                        'test/test.config.js',
+                        {pattern: 'test_integration/*/*.js', included: false},
+                        'test_integration/integration_tests_main.js'
                     ]
                 }
             }
-
         },
 
         mocha_istanbul: {
@@ -167,7 +210,7 @@ module.exports = function(grunt) {
             },
 
             validate_definitions: {
-                src:     ["tests_integration/definitions/es6_modules.ts"],
+                src:     ["test_integration/definitions/es6_modules.ts"],
                 outDir:  "bin/garbage",
                 options: {
                     module: "commonjs"
@@ -177,7 +220,7 @@ module.exports = function(grunt) {
             // the created d.ts should work with both Typescript projects using ES6
             // modules syntax or those using the old namespace syntax.
             validate_definitions_namespace: {
-                src:    ["tests_integration/definitions/namespaces.ts"],
+                src:    ["test_integration/definitions/namespaces.ts"],
                 outDir: "bin/garbage"
             }
         },
@@ -260,7 +303,7 @@ module.exports = function(grunt) {
         },
 
         webpack: {
-            options : {
+            options: {
                 stats:       {
                     colors:  true,
                     modules: true,
@@ -285,10 +328,10 @@ module.exports = function(grunt) {
             },
 
             specs: {
-                entry: "./bin/test/all.js",
+                entry:  "./bin/test/all.js",
                 output: {
-                    path:           "bin/",
-                    filename:       "chevrotainSpecs.js"
+                    path:     "bin/",
+                    filename: "chevrotainSpecs.js"
                 }
             }
         },
@@ -358,7 +401,7 @@ module.exports = function(grunt) {
         'istanbul_check_coverage'
     ]
 
-    var integrationTestsTasks = [
+    var integrationTestsNodeTasks = [
         'run:npm_link',
         'run:test_examples_nodejs',
         'run:test_examples_lexer',
@@ -367,15 +410,24 @@ module.exports = function(grunt) {
     ]
 
     var browserUnitTests = [
-        "karma:browsers_tests",
-        "karma:browsers_tests_minified"
+        'karma:browsers_unit_tests',
+        'karma:browsers_unit_tests_minified'
     ]
+
+    var browserIntegrationTests = [
+        'karma:browsers_integration_tests_globals',
+        'karma:browsers_integration_tests_globals_minified',
+        'karma:browsers_integration_tests_amd',
+        'karma:browsers_integration_tests_amd_minified'
+    ]
+
+    var allBrowserTests = browserUnitTests.concat(browserIntegrationTests)
 
     var buildTestTasks = buildTasks.concat(unitTestsTasks)
 
     grunt.registerTask('build', buildTasks)
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
-    grunt.registerTask('integration_tests', integrationTestsTasks)
-    grunt.registerTask('browsers_unit_tests', browserUnitTests)
+    grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
+    grunt.registerTask('browsers_tests', allBrowserTests)
 }
