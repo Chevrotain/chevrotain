@@ -8,7 +8,7 @@ var githubReleaseFiles = ['./package.json',
     "./bin/chevrotain.js",
     "./bin/chevrotain.min.js",
     './readme.md',
-    'bin/docs'
+    'bin/docs/**/*'
 ]
 
 var PUBLIC_API_DTS_FILES = [
