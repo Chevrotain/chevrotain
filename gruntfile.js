@@ -125,7 +125,7 @@ module.exports = function(grunt) {
             browsers_integration_tests_amd: {
                 options: {
                     frameworks: ["requirejs", 'mocha', 'chai'],
-                    files: [
+                    files:      [
                         'bin/chevrotain.js',
                         'test/test.config.js',
                         {pattern: 'test_integration/*/*.js', included: false},
@@ -147,7 +147,7 @@ module.exports = function(grunt) {
             browsers_integration_tests_amd_minified: {
                 options: {
                     frameworks: ["requirejs", 'mocha', 'chai'],
-                    files: [
+                    files:      [
                         'bin/chevrotain.min.js',
                         'test/test.config.js',
                         {pattern: 'test_integration/*/*.js', included: false},
@@ -333,6 +333,33 @@ module.exports = function(grunt) {
                     path:     "bin/",
                     filename: "chevrotainSpecs.js"
                 }
+            },
+
+            release_uglify: {
+                entry:  "./bin/src/api.js",
+                output: {
+                    path:           "bin/",
+                    filename:       "chevrotain.min.js",
+                    library:        "chevrotain",
+                    libraryTarget:  "umd",
+                    umdNamedDefine: true
+                },
+
+                plugins: [
+                    new webpack.BannerPlugin(banner, {raw: true}),
+                    new webpack.optimize.UglifyJsPlugin({
+                        // not using name mangling because it may break usage of Function.name (functionName utility)
+                        mangle: false
+                    })
+                ]
+            },
+
+            specs_uglify: {
+                entry:  "./bin/test/all.js",
+                output: {
+                    path:     "bin/",
+                    filename: "chevrotainSpecs.min.js"
+                }
             }
         },
 
@@ -355,26 +382,6 @@ module.exports = function(grunt) {
             publish: {
                 src: 'bin/coverage/lcov.info'
             }
-        },
-
-        uglify: {
-            options: {
-                // not using name mangling because it may break usage of Function.name (functionName utility)
-                mangle: false
-            },
-            release: {
-                options: {
-                    banner: banner
-                },
-                files:   {
-                    'bin/chevrotain.min.js': ['bin/chevrotain.js']
-                }
-            },
-            specs:   {
-                files: {
-                    'bin/chevrotainSpecs.min.js': ['bin/chevrotainSpecs.js']
-                }
-            }
         }
     })
 
@@ -390,8 +397,8 @@ module.exports = function(grunt) {
         'ts:validate_definitions_namespace',
         'webpack:release',
         'webpack:specs',
-        'uglify:release',
-        'uglify:specs',
+        'webpack:release_uglify',
+        'webpack:specs_uglify',
         'typedoc:build_docs',
         'compress'
     ]
@@ -430,4 +437,5 @@ module.exports = function(grunt) {
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
     grunt.registerTask('browsers_tests', allBrowserTests)
+
 }
