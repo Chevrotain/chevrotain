@@ -73,10 +73,10 @@ None.
 
 ## Compatibility
 The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 runtime. 
-* The CI build runs the tests under 
+* The CI build runs the tests under: 
   * Node.js (0.10 / 0.12 / 4 / 5).
-  * latest Chromium
-  * latest Firefox
+  * latest stable Chrome.
+  * latest stable Firefox.
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.
-* Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / require.js / node.js)
+* Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
