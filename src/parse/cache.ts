@@ -6,6 +6,7 @@ import {IParserDefinitionError} from "./parser_public"
 import {HashTable} from "../lang/lang_extensions"
 import {gast} from "./grammar/gast_public"
 import {IFirstAfterRepetition} from "./grammar/interpreter"
+import {filter, forEach, values} from "./../utils/utils"
 
 export let CLASS_TO_DEFINITION_ERRORS = new HashTable<IParserDefinitionError[]>()
 
@@ -79,4 +80,9 @@ function getFromNestedHashTable(className:string, hashTable:HashTable<any>) {
         result = hashTable.get(className)
     }
     return result
+}
+
+export function clearCache():void {
+    let hasTables = filter(values(module.exports), (currHashTable) => currHashTable instanceof HashTable)
+    forEach(hasTables, (currHashTable) => currHashTable.clear())
 }
