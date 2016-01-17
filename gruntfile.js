@@ -16,11 +16,16 @@ var PUBLIC_API_DTS_FILES = [
     'bin/src/scan/lexer_public.d.ts',
     'bin/src/parse/parser_public.d.ts',
     'bin/src/parse/exceptions_public.d.ts',
-    'bin/src/parse/grammar/gast_public.d.ts']
+    'bin/src/parse/grammar/gast_public.d.ts',
+    'bin/src/parse/cache_public.d.ts'
+]
+
 
 var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
     return binDefFile.replace("bin/", "").replace(".d", "")
 })
+// so typedoc can compile "module.exports" in cache_public
+PUBLIC_API_TS_FILES.push("src/env.d.ts")
 
 var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
 
@@ -259,7 +264,7 @@ module.exports = function(grunt) {
                     // TODO: seems like the HashTable class may need to be included in the public API
                     banner: banner +
                             'declare namespace chevrotain {\n' +
-                            'class HashTable<V>{}\n',
+                            '    class HashTable<V>{}\n    ',
 
                     process: function processDefinitions(src, filePath) {
                         var withOutImports = src.replace(/import.*;(\n|\r\n)/g, '')
@@ -274,7 +279,7 @@ module.exports = function(grunt) {
 
                     // this syntax allows usage of chevrotain.d.ts from either
                     // ES6 modules / older namespaces style in typescript.
-                    footer: '}\n' +
+                    footer: '\n}\n\n' +
                             'declare module "chevrotain" {\n' +
                             '    export = chevrotain;\n' +
                             '}\n',
@@ -384,7 +389,7 @@ module.exports = function(grunt) {
         'clean:release',
         'tslint',
         'ts:release',
-        'string-replace:coverage_ignore',
+        //'string-replace:coverage_ignore',
         'concat:release_definitions',
         'ts:validate_definitions',
         'ts:validate_definitions_namespace',
@@ -392,8 +397,8 @@ module.exports = function(grunt) {
         'webpack:specs',
         'uglify:release',
         'uglify:specs',
-        'typedoc:build_docs',
-        'compress'
+        //'typedoc:build_docs',
+        //'compress'
     ]
 
     var unitTestsTasks = [
@@ -410,15 +415,15 @@ module.exports = function(grunt) {
     ]
 
     var browserUnitTests = [
-        'karma:browsers_unit_tests',
-        'karma:browsers_unit_tests_minified'
+        //'karma:browsers_unit_tests',
+        //'karma:browsers_unit_tests_minified'
     ]
 
     var browserIntegrationTests = [
         'karma:browsers_integration_tests_globals',
         'karma:browsers_integration_tests_globals_minified',
-        'karma:browsers_integration_tests_amd',
-        'karma:browsers_integration_tests_amd_minified'
+        //'karma:browsers_integration_tests_amd',
+        //'karma:browsers_integration_tests_amd_minified'
     ]
 
     var allBrowserTests = browserUnitTests.concat(browserIntegrationTests)
