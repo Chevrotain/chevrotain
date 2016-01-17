@@ -16,11 +16,16 @@ var PUBLIC_API_DTS_FILES = [
     'bin/src/scan/lexer_public.d.ts',
     'bin/src/parse/parser_public.d.ts',
     'bin/src/parse/exceptions_public.d.ts',
-    'bin/src/parse/grammar/gast_public.d.ts']
+    'bin/src/parse/grammar/gast_public.d.ts',
+    'bin/src/parse/cache_public.d.ts'
+]
+
 
 var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
     return binDefFile.replace("bin/", "").replace(".d", "")
 })
+// so typedoc can compile "module.exports" in cache_public
+PUBLIC_API_TS_FILES.push("src/env.d.ts")
 
 var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
 
@@ -259,7 +264,7 @@ module.exports = function(grunt) {
                     // TODO: seems like the HashTable class may need to be included in the public API
                     banner: banner +
                             'declare namespace chevrotain {\n' +
-                            'class HashTable<V>{}\n',
+                            '    class HashTable<V>{}\n    ',
 
                     process: function processDefinitions(src, filePath) {
                         var withOutImports = src.replace(/import.*;(\n|\r\n)/g, '')
@@ -274,7 +279,7 @@ module.exports = function(grunt) {
 
                     // this syntax allows usage of chevrotain.d.ts from either
                     // ES6 modules / older namespaces style in typescript.
-                    footer: '}\n' +
+                    footer: '\n}\n\n' +
                             'declare module "chevrotain" {\n' +
                             '    export = chevrotain;\n' +
                             '}\n',

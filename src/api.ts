@@ -3,6 +3,7 @@ import {Lexer} from "./scan/lexer_public"
 import {Token, VirtualToken, EOF, extendToken, tokenName} from "./scan/tokens_public"
 import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
+import {clearCache} from "./parse/cache_public"
 
 /**
  * defines the public API of
@@ -34,7 +35,6 @@ API.exceptions.MismatchedTokenException = exceptions.MismatchedTokenException
 API.exceptions.NotAllInputParsedException = exceptions.NotAllInputParsedException
 API.exceptions.NoViableAltException = exceptions.NoViableAltException
 
-
 // grammar reflection API
 API.gast = {}
 API.gast.GAstVisitor = gast.GAstVisitor
@@ -49,4 +49,6 @@ API.gast.NonTerminal = gast.NonTerminal
 API.gast.Terminal = gast.Terminal
 API.gast.Rule = gast.Rule
 
-module.exports =  API
+API.clearCache = clearCache
+
+module.exports = API
