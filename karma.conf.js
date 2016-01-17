@@ -44,7 +44,8 @@ module.exports = function(config) {
         customLaunchers: {
             Chrome_travis_ci: {
                 base:  'Chrome',
-                flags: ['--no-sandbox']
+                // using incognito to disable caching
+                flags: ['--no-sandbox', '--incognito']
             }
         },
 

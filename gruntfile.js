@@ -16,11 +16,16 @@ var PUBLIC_API_DTS_FILES = [
     'bin/src/scan/lexer_public.d.ts',
     'bin/src/parse/parser_public.d.ts',
     'bin/src/parse/exceptions_public.d.ts',
-    'bin/src/parse/grammar/gast_public.d.ts']
+    'bin/src/parse/grammar/gast_public.d.ts',
+    'bin/src/parse/cache_public.d.ts'
+]
+
 
 var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
     return binDefFile.replace("bin/", "").replace(".d", "")
 })
+// so typedoc can compile "module.exports" in cache_public
+PUBLIC_API_TS_FILES.push("src/env.d.ts")
 
 var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
 
@@ -80,7 +85,9 @@ module.exports = function(grunt) {
             options: {
                 configFile: 'karma.conf.js',
                 singleRun:  true,
-                browsers:   ['Chrome_travis_ci', "Firefox"]
+                browsers:   ['Chrome_travis_ci', "Firefox"],
+                // may help with strange failures on travis-ci "some of your tests did a full page reload"
+                concurrency: 1
             },
 
             browsers_unit_tests: {
@@ -259,7 +266,7 @@ module.exports = function(grunt) {
                     // TODO: seems like the HashTable class may need to be included in the public API
                     banner: banner +
                             'declare namespace chevrotain {\n' +
-                            'class HashTable<V>{}\n',
+                            '    class HashTable<V>{}\n    ',
 
                     process: function processDefinitions(src, filePath) {
                         var withOutImports = src.replace(/import.*;(\n|\r\n)/g, '')
@@ -274,7 +281,7 @@ module.exports = function(grunt) {
 
                     // this syntax allows usage of chevrotain.d.ts from either
                     // ES6 modules / older namespaces style in typescript.
-                    footer: '}\n' +
+                    footer: '\n}\n\n' +
                             'declare module "chevrotain" {\n' +
                             '    export = chevrotain;\n' +
                             '}\n',
@@ -382,6 +389,26 @@ module.exports = function(grunt) {
             publish: {
                 src: 'bin/coverage/lcov.info'
             }
+        },
+
+        uglify: {
+            options: {
+                // not using name mangling because it may break usage of Function.name (functionName utility)
+                mangle: false
+            },
+            release: {
+                options: {
+                    banner: banner
+                },
+                files:   {
+                    'bin/chevrotain.min.js': ['bin/chevrotain.js']
+                }
+            },
+            specs:   {
+                files: {
+                    'bin/chevrotainSpecs.min.js': ['bin/chevrotainSpecs.js']
+                }
+            }
         }
     })
 
@@ -428,14 +455,13 @@ module.exports = function(grunt) {
         'karma:browsers_integration_tests_amd_minified'
     ]
 
-    var allBrowserTests = browserUnitTests.concat(browserIntegrationTests)
-
     var buildTestTasks = buildTasks.concat(unitTestsTasks)
 
     grunt.registerTask('build', buildTasks)
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
-    grunt.registerTask('browsers_tests', allBrowserTests)
+    grunt.registerTask('browsers_unit_tests', browserUnitTests)
+    grunt.registerTask('browsers_integration_tests', browserIntegrationTests)
 
 }
