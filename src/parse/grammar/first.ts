@@ -1,5 +1,5 @@
 import {gast} from "./gast_public"
-import {getProductionDslName, isSequenceProd, isBranchingProd, isOptionalProd} from "./gast"
+import {isSequenceProd, isBranchingProd, isOptionalProd} from "./gast"
 import {uniq, map, flatten} from "../../utils/utils"
 
 export function first(prod:gast.IProduction):Function[] {
