@@ -32,7 +32,7 @@ any code generation phase.
     * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.  
 
-  * [**High performance.**](http://jsperf.com/json-parsers-comparison/20)
+  * [**High performance.**](http://jsperf.com/json-parsers-comparison/21)
 
   * **Grammar Reflection/Introspection**
     * A Parser's grammar's structure is known and **exposed** at runtime.
@@ -57,7 +57,7 @@ any code generation phase.
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_14/classes/chevrotain.parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_15/classes/chevrotain.parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
@@ -72,11 +72,11 @@ any code generation phase.
 None.
 
 ## Compatibility
-The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 runtime. 
-* The CI build runs the tests under 
+Chevrotain should run on any modern Javascript ES5.1 runtime. 
+* The CI build runs the tests under: 
   * Node.js (0.10 / 0.12 / 4 / 5).
-  * latest Chromium
-  * latest Firefox
+  * latest stable Chrome.
+  * latest stable Firefox.
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.
-* Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / require.js / node.js)
+* Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   

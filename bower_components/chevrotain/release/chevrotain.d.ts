@@ -1,10 +1,7 @@
-/*! chevrotain - v0.5.14 - 2016-01-11 */
-declare module chevrotain {
-    module lang {
-        class HashTable<V>{}
-    }
-
-    function tokenName(clazz: Function): string;
+/*! chevrotain - v0.5.15 - 2016-01-18 */
+declare namespace chevrotain {
+    class HashTable<V>{}
+    export function tokenName(clazz: Function): string;
     /**
      * utility to help the poor souls who are still stuck writing pure javascript 5.1
      * extend and create Token subclasses in a less verbose manner
@@ -14,8 +11,8 @@ declare module chevrotain {
      * @param {Function} parentConstructor - the Token class to be extended
      * @returns {Function} - a constructor for the new extended Token subclass
      */
-    function extendToken(tokenName: string, patternOrParent?: any, parentConstructor?: Function): any;
-    class Token {
+    export function extendToken(tokenName: string, patternOrParent?: any, parentConstructor?: Function): any;
+    export class Token {
         image: string;
         offset: number;
         startLine: number;
@@ -44,21 +41,21 @@ declare module chevrotain {
      * (hence the 'Virtual' prefix). These type of Tokens can be used as special markers:
      * for example, EOF (end-of-file).
      */
-    class VirtualToken extends Token {
+    export class VirtualToken extends Token {
         constructor();
     }
-    class EOF extends VirtualToken {
+    export class EOF extends VirtualToken {
     }
-
-    type TokenConstructor = Function;
-    interface ILexingResult {
+    
+    export type TokenConstructor = Function;
+    export interface ILexingResult {
         tokens: Token[];
         groups: {
             [groupName: string]: Token;
         };
         errors: ILexingError[];
     }
-    enum LexerDefinitionErrorType {
+    export enum LexerDefinitionErrorType {
         MISSING_PATTERN = 0,
         INVALID_PATTERN = 1,
         EOI_ANCHOR_FOUND = 2,
@@ -66,18 +63,18 @@ declare module chevrotain {
         DUPLICATE_PATTERNS_FOUND = 4,
         INVALID_GROUP_TYPE_FOUND = 5,
     }
-    interface ILexerDefinitionError {
+    export interface ILexerDefinitionError {
         message: string;
         type: LexerDefinitionErrorType;
         tokenClasses: Function[];
     }
-    interface ILexingError {
+    export interface ILexingError {
         line: number;
         column: number;
         length: number;
         message: string;
     }
-    class Lexer {
+    export class Lexer {
         protected tokenClasses: TokenConstructor[];
         static SKIPPED: {
             description: string;
@@ -155,12 +152,8 @@ declare module chevrotain {
          */
         tokenize(text: string): ILexingResult;
     }
-
-    import gast = chevrotain.gast;
-    import lang = chevrotain.lang;
-    import exceptions = chevrotain.exceptions;
-    import IRecognitionException = chevrotain.exceptions.IRecognitionException;
-    enum ParserDefinitionErrorType {
+    
+    export enum ParserDefinitionErrorType {
         INVALID_RULE_NAME = 0,
         DUPLICATE_RULE_NAME = 1,
         DUPLICATE_PRODUCTIONS = 2,
@@ -168,24 +161,24 @@ declare module chevrotain {
         LEFT_RECURSION = 4,
         NONE_LAST_EMPTY_ALT = 5,
     }
-    interface IParserDefinitionError {
+    export interface IParserDefinitionError {
         message: string;
         type: ParserDefinitionErrorType;
         ruleName: string;
     }
-    interface IParserDuplicatesDefinitionError extends IParserDefinitionError {
+    export interface IParserDuplicatesDefinitionError extends IParserDefinitionError {
         dslName: string;
         occurrence: number;
         parameter?: string;
     }
-    interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
+    export interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
         occurrence: number;
         alternative: number;
     }
-    interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
+    export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
         unresolvedRefName: string;
     }
-    interface IFollowKey {
+    export interface IFollowKey {
         ruleName: string;
         idxInCallingRule: number;
         inRule: string;
@@ -197,7 +190,7 @@ declare module chevrotain {
      *  { WHEN:LA3, THEN_DO:ZZZ },
      * ])
      */
-    interface IOrAlt<T> {
+    export interface IOrAlt<T> {
         WHEN: () => boolean;
         THEN_DO: () => T;
     }
@@ -208,16 +201,16 @@ declare module chevrotain {
      *  {ALT:ZZZ }
      * ])
      */
-    interface IOrAltImplicit<T> {
+    export interface IOrAltImplicit<T> {
         ALT: () => T;
     }
-    interface IParserState {
+    export interface IParserState {
         errors: exceptions.IRecognitionException[];
         inputIdx: number;
         RULE_STACK: string[];
     }
-    type LookAheadFunc = () => boolean;
-    type GrammarAction = () => void;
+    export type LookAheadFunc = () => boolean;
+    export type GrammarAction = () => void;
     /**
      * convenience used to express an empty alternative in an OR (alternation).
      * can be used to more clearly describe the intent in a case of empty alternation.
@@ -256,13 +249,13 @@ declare module chevrotain {
      *    ])
      *
      */
-    function EMPTY_ALT<T>(value?: T): () => T;
+    export function EMPTY_ALT<T>(value?: T): () => T;
     /**
      * A Recognizer capable of self analysis to determine it's grammar structure
      * This is used for more advanced features requiring such information.
      * for example: Error Recovery, Automatic lookahead calculation
      */
-    class Parser {
+    export class Parser {
         static IGNORE_AMBIGUITIES: boolean;
         static NO_RESYNC: boolean;
         static DEFER_DEFINITION_ERRORS_HANDLING: boolean;
@@ -282,25 +275,15 @@ declare module chevrotain {
         protected tokensMap: {
             [fqn: string]: Function;
         };
-        private firstAfterRepMap;
-        private classLAFuncs;
-        private definitionErrors;
-        private orLookaheadKeys;
-        private manyLookaheadKeys;
-        private manySepLookaheadKeys;
-        private atLeastOneSepLookaheadKeys;
-        private atLeastOneLookaheadKeys;
-        private optionLookaheadKeys;
-        private definedRulesNames;
-        constructor(input: Token[], tokensMapOrArr: {
+                                                constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
         } | Function[], isErrorRecoveryEnabled?: boolean);
         input: Token[];
         reset(): void;
         isAtEndOfInput(): boolean;
-        getGAstProductions(): lang.HashTable<gast.Rule>;
+        getGAstProductions(): HashTable<gast.Rule>;
         protected isBackTracking(): boolean;
-        protected SAVE_ERROR(error: exceptions.IRecognitionException): IRecognitionException;
+        protected SAVE_ERROR(error: exceptions.IRecognitionException): exceptions.IRecognitionException;
         protected NEXT_TOKEN(): Token;
         protected LA(howMuch: number): Token;
         protected isNextRule<T>(ruleName: string): boolean;
@@ -341,7 +324,7 @@ declare module chevrotain {
          * @param {Function} tokClass A constructor function specifying the type of token
          *        to be consumed.
          *
-         * @returns {chevrotain.tokens.Token} The consumed token.
+         * @returns {Token} The consumed token.
          */
         protected CONSUME1(tokClass: Function): Token;
         /**
@@ -487,7 +470,7 @@ declare module chevrotain {
          *        * only enable this if you know what you are doing!
          *
          * @returns {*} The result of invoking the chosen alternative
-
+    
          */
         protected OR1<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
         /**
@@ -565,12 +548,12 @@ declare module chevrotain {
          * note that the 'action' param is optional. so both of the following forms are valid:
          *
          * short: this.MANY_SEP(Comma, ()=>{
-         *                       this.CONSUME(Number};
+         *                          this.CONSUME(Number};
          *                       ...
          *                       );
          *
          * long: this.MANY(Comma, isNumber, ()=>{
-         *                       this.CONSUME(Number}
+         *                           this.CONSUME(Number}
          *                       ...
          *                       );
          *
@@ -699,30 +682,7 @@ declare module chevrotain {
         protected ruleFinallyStateUpdate(): void;
         protected getTokenToInsert(tokClass: Function): Token;
         protected canTokenTypeBeInsertedInRecovery(tokClass: Function): boolean;
-        private defaultInvalidReturn();
-        private tryInRepetitionRecovery(grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType);
-        private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?, nextTokIdx?);
-        private getFollowsForInRuleRecovery(tokClass, tokIdxInRule);
-        private tryInRuleRecovery(expectedTokType, follows);
-        private canPerformInRuleRecovery(expectedToken, follows);
-        private canRecoverWithSingleTokenInsertion(expectedTokType, follows);
-        private canRecoverWithSingleTokenDeletion(expectedTokType);
-        private isInCurrentRuleReSyncSet(token);
-        private findReSyncTokenType();
-        private getCurrFollowKey();
-        private buildFullFollowKeyStack();
-        private flattenFollowSet();
-        private getFollowSetFromFollowKey(followKey);
-        private reSyncTo(tokClass);
-        private attemptInRepetitionRecovery(prodFunc, args, lookaheadFunc, prodName, prodOccurrence, nextToksWalker, prodKeys);
-        private optionInternal(condition, action);
-        private atLeastOneInternal(prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg?);
-        private atLeastOneSepFirstInternal(prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, errMsg?);
-        private manyInternal(prodFunc, prodName, prodOccurrence, lookAheadFunc, action?);
-        private manySepFirstInternal(prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action?);
-        private repetitionSepSecondInternal(prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, laKeys, nextTerminalAfterWalker);
-        private orInternal<T>(alts, errMsgTypes, occurrence, ignoreAmbiguities);
-        /**
+                                                                                                    /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
          * @param idx occurrence index of consumed token in the invoking parser rule text
          *         for example:
@@ -734,110 +694,108 @@ declare module chevrotain {
          *
          * @returns the consumed Token
          */
-        private consumeInternal(tokClass, idx);
-        private consumeInternalOptimized(tokClass);
-        private getKeyForAutomaticLookahead(prodName, prodKeys, occurrence);
-        private getLookaheadFuncForOption(occurence);
-        private getLookaheadFuncForOr(occurence, ignoreErrors);
-        private getLookaheadFuncForMany(occurence);
-        private getLookaheadFuncForManySep(occurence);
-        private getLookaheadFuncForAtLeastOne(occurence);
-        private getLookaheadFuncForAtLeastOneSep(occurence);
-        private getLookaheadFuncFor<T>(key, occurrence, laFuncBuilder, extraArgs?);
-        private saveRecogState();
-        private reloadRecogState(newState);
-        private raiseNoAltException(occurrence, errMsgTypes);
+                                                        }
+    
+    export namespace exceptions {
+        interface IRecognitionException {
+            name: string;
+            message: string;
+            token: Token;
+        }
+        function isRecognitionException(error: Error): boolean;
+        function MismatchedTokenException(message: string, token: Token): void;
+        function NoViableAltException(message: string, token: Token): void;
+        function NotAllInputParsedException(message: string, token: Token): void;
+        function EarlyExitException(message: string, token: Token): void;
     }
+    
+    export namespace gast {
+        interface IProduction {
+            accept(visitor: GAstVisitor): void;
+        }
+        interface IProductionWithOccurrence extends IProduction {
+            occurrenceInParent: number;
+            implicitOccurrenceIndex: boolean;
+        }
+        abstract class AbstractProduction implements IProduction {
+            definition: IProduction[];
+            implicitOccurrenceIndex: boolean;
+            constructor(definition: IProduction[]);
+            accept(visitor: GAstVisitor): void;
+        }
+        class NonTerminal extends AbstractProduction implements IProductionWithOccurrence {
+            nonTerminalName: string;
+            referencedRule: Rule;
+            occurrenceInParent: number;
+            constructor(nonTerminalName: string, referencedRule?: Rule, occurrenceInParent?: number);
+            definition: IProduction[];
+            accept(visitor: GAstVisitor): void;
+        }
+        class Rule extends AbstractProduction {
+            name: string;
+            orgText: string;
+            constructor(name: string, definition: IProduction[], orgText?: string);
+        }
+        class Flat extends AbstractProduction {
+            constructor(definition: IProduction[]);
+        }
+        class Option extends AbstractProduction implements IProductionWithOccurrence {
+            occurrenceInParent: number;
+            constructor(definition: IProduction[], occurrenceInParent?: number);
+        }
+        class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence {
+            occurrenceInParent: number;
+            constructor(definition: IProduction[], occurrenceInParent?: number);
+        }
+        class RepetitionMandatoryWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
+            separator: Function;
+            occurrenceInParent: number;
+            constructor(definition: IProduction[], separator: Function, occurrenceInParent?: number);
+        }
+        class Repetition extends AbstractProduction implements IProductionWithOccurrence {
+            occurrenceInParent: number;
+            constructor(definition: IProduction[], occurrenceInParent?: number);
+        }
+        class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
+            separator: Function;
+            occurrenceInParent: number;
+            constructor(definition: IProduction[], separator: Function, occurrenceInParent?: number);
+        }
+        class Alternation extends AbstractProduction implements IProductionWithOccurrence {
+            occurrenceInParent: number;
+            constructor(definition: IProduction[], occurrenceInParent?: number);
+        }
+        class Terminal implements IProductionWithOccurrence {
+            terminalType: Function;
+            occurrenceInParent: number;
+            implicitOccurrenceIndex: boolean;
+            constructor(terminalType: Function, occurrenceInParent?: number);
+            accept(visitor: GAstVisitor): void;
+        }
+        abstract class GAstVisitor {
+            visit(node: IProduction): void;
+            visitNonTerminal(node: NonTerminal): void;
+            visitFlat(node: Flat): void;
+            visitOption(node: Option): void;
+            visitRepetition(node: Repetition): void;
+            visitRepetitionMandatory(node: RepetitionMandatory): void;
+            visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): void;
+            visitRepetitionWithSeparator(node: RepetitionWithSeparator): void;
+            visitAlternation(node: Alternation): void;
+            visitTerminal(node: Terminal): void;
+        }
+    }
+    
+    /**
+     * Clears the chevrotain internal cache.
+     * This should not be used in regular work flows, This is intended for
+     * unique use cases for example: online playground where the a parser with the same name is initialized with
+     * different implementations multiple times.
+     */
+    export function clearCache(): void;
+    
+}
 
-	module exceptions {
-    	interface IRecognitionException {
-        	name: string;
-        	message: string;
-        	token: Token;
-    	}
-    	function isRecognitionException(error: Error): boolean;
-    	function MismatchedTokenException(message: string, token: Token): void;
-    	function NoViableAltException(message: string, token: Token): void;
-    	function NotAllInputParsedException(message: string, token: Token): void;
-    	function EarlyExitException(message: string, token: Token): void;
-	}
-	
-
-	module gast {
-    	interface IProduction {
-        	accept(visitor: GAstVisitor): void;
-    	}
-    	interface IProductionWithOccurrence extends IProduction {
-        	occurrenceInParent: number;
-        	implicitOccurrenceIndex: boolean;
-    	}
-    	abstract class AbstractProduction implements IProduction {
-        	definition: IProduction[];
-        	implicitOccurrenceIndex: boolean;
-        	constructor(definition: IProduction[]);
-        	accept(visitor: GAstVisitor): void;
-    	}
-    	class NonTerminal extends AbstractProduction implements IProductionWithOccurrence {
-        	nonTerminalName: string;
-        	referencedRule: Rule;
-        	occurrenceInParent: number;
-        	constructor(nonTerminalName: string, referencedRule?: Rule, occurrenceInParent?: number);
-        	definition: IProduction[];
-        	accept(visitor: GAstVisitor): void;
-    	}
-    	class Rule extends AbstractProduction {
-        	name: string;
-        	orgText: string;
-        	constructor(name: string, definition: IProduction[], orgText?: string);
-    	}
-    	class Flat extends AbstractProduction {
-        	constructor(definition: IProduction[]);
-    	}
-    	class Option extends AbstractProduction implements IProductionWithOccurrence {
-        	occurrenceInParent: number;
-        	constructor(definition: IProduction[], occurrenceInParent?: number);
-    	}
-    	class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence {
-        	occurrenceInParent: number;
-        	constructor(definition: IProduction[], occurrenceInParent?: number);
-    	}
-    	class RepetitionMandatoryWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
-        	separator: Function;
-        	occurrenceInParent: number;
-        	constructor(definition: IProduction[], separator: Function, occurrenceInParent?: number);
-    	}
-    	class Repetition extends AbstractProduction implements IProductionWithOccurrence {
-        	occurrenceInParent: number;
-        	constructor(definition: IProduction[], occurrenceInParent?: number);
-    	}
-    	class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
-        	separator: Function;
-        	occurrenceInParent: number;
-        	constructor(definition: IProduction[], separator: Function, occurrenceInParent?: number);
-    	}
-    	class Alternation extends AbstractProduction implements IProductionWithOccurrence {
-        	occurrenceInParent: number;
-        	constructor(definition: IProduction[], occurrenceInParent?: number);
-    	}
-    	class Terminal implements IProductionWithOccurrence {
-        	terminalType: Function;
-        	occurrenceInParent: number;
-        	implicitOccurrenceIndex: boolean;
-        	constructor(terminalType: Function, occurrenceInParent?: number);
-        	accept(visitor: GAstVisitor): void;
-    	}
-    	abstract class GAstVisitor {
-        	visit(node: IProduction): void;
-        	visitNonTerminal(node: NonTerminal): void;
-        	visitFlat(node: Flat): void;
-        	visitOption(node: Option): void;
-        	visitRepetition(node: Repetition): void;
-        	visitRepetitionMandatory(node: RepetitionMandatory): void;
-        	visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): void;
-        	visitRepetitionWithSeparator(node: RepetitionWithSeparator): void;
-        	visitAlternation(node: Alternation): void;
-        	visitTerminal(node: Terminal): void;
-    	}
-	}
-	
+declare module "chevrotain" {
+    export = chevrotain;
 }

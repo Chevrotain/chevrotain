@@ -4,5 +4,6 @@ coverage/
 /package
 /examples
 /node_modules
+.baseDir.ts
 
 

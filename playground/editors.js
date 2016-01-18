@@ -54,17 +54,7 @@ function onInputEditorContentChange() {
 
 function onImplementationEditorContentChange() {
 
-    function cleanChevrotainCache() {
-        var hashmaps = _.filter(chevrotain.cache, function (prop) {
-            return prop instanceof chevrotain.lang.HashTable
-        })
-
-        _.forEach(hashmaps, function (cacheMap) {
-            cacheMap._state = {}
-        })
-    }
-
-    cleanChevrotainCache()
+    chevrotain.clearCache()
     // TODO: refactor this to be less ugly
     try {
         try {
