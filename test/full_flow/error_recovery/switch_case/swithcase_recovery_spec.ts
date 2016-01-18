@@ -20,10 +20,10 @@ import {exceptions} from "../../../../src/parse/exceptions_public"
 import * as _ from "lodash"
 
 
-describe("Error Recovery switch-case Example", function () {
+describe("Error Recovery switch-case Example", () => {
     "use strict"
 
-    it("can parse a valid text successfully", function () {
+    it("can parse a valid text successfully", () => {
         let input = [
             // switch (name) {
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -48,7 +48,7 @@ describe("Error Recovery switch-case Example", function () {
         })
     })
 
-    it("can perform re-sync recovery to the next case stmt", function () {
+    it("can perform re-sync recovery to the next case stmt", () => {
         let input = [
             // switch (name) {
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -73,7 +73,7 @@ describe("Error Recovery switch-case Example", function () {
         })
     })
 
-    it("will detect an error if missing AT_LEAST_ONCE occurrence", function () {
+    it("will detect an error if missing AT_LEAST_ONCE occurrence", () => {
         let input = [
             // switch (name) { }
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1), new RCurlyTok(1, 1)
@@ -89,7 +89,7 @@ describe("Error Recovery switch-case Example", function () {
     })
 
 
-    it("can perform re-sync recovery to the next case stmt even if the unexpected tokens are between valid case stmts", function () {
+    it("can perform re-sync recovery to the next case stmt even if the unexpected tokens are between valid case stmts", () => {
         let input = [
             // switch (name) {
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -118,7 +118,7 @@ describe("Error Recovery switch-case Example", function () {
         })
     })
 
-    it("can also sometimes fail in automatic error recovery :)", function () {
+    it("can also sometimes fail in automatic error recovery :)", () => {
         let input = [
             // switch (name) {
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -142,7 +142,7 @@ describe("Error Recovery switch-case Example", function () {
         expect(parseResult).to.deep.equal({})
     })
 
-    it("can perform single token deletion recovery", function () {
+    it("can perform single token deletion recovery", () => {
         let input = [
             // switch (name) {
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -167,7 +167,7 @@ describe("Error Recovery switch-case Example", function () {
         })
     })
 
-    it("will perform single token insertion for a missing colon", function () {
+    it("will perform single token insertion for a missing colon", () => {
         let input = [
             // case "Terry" return 2 <-- missing the colon between "Terry" and return
             new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), /* new ColonTok(1, 1) ,*/ new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
@@ -181,7 +181,7 @@ describe("Error Recovery switch-case Example", function () {
         expect(parseResult).to.deep.equal({"Terry": 2})
     })
 
-    it("will NOT perform single token insertion for a missing string", function () {
+    it("will NOT perform single token insertion for a missing string", () => {
         let input = [
             // case  : return 2 <-- missing the string for the case's value
             new CaseTok(1, 1), /* new StringTok("Terry" , 0, 1, 1),*/  new ColonTok(1, 1), new ReturnTok(1, 1),

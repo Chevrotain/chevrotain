@@ -41,12 +41,12 @@ import {
 } from "../../../src/parse/grammar/interpreter"
 import {setEquality} from "../../utils/matchers"
 
-describe("The Grammar Interpeter namespace", function () {
+describe("The Grammar Interpeter namespace", () => {
     "use strict"
 
-    describe("The NextAfterTokenWalker", function () {
+    describe("The NextAfterTokenWalker", () => {
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #1", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #1", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -59,7 +59,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(IdentTok)
         })
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #2", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #2", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -72,7 +72,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(LParenTok)
         })
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #3", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -85,7 +85,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [IdentTok, RParenTok])
         })
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #4", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #4", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -98,7 +98,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(IdentTok)
         })
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #5", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #5", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -111,7 +111,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [SemicolonTok, ColonTok])
         })
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #6", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #6", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -124,7 +124,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(IdentTok)
         })
 
-        it("can compute the next possible token types From ActionDec in scope of ActionDec #7", function () {
+        it("can compute the next possible token types From ActionDec in scope of ActionDec #7", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec"],
                 occurrenceStack:   [1],
@@ -136,7 +136,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes.length).to.equal(0)
         })
 
-        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #1", function () {
+        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #1", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -151,7 +151,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(ColonTok)
         })
 
-        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #2", function () {
+        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #2", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -166,7 +166,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(IdentTok)
         })
 
-        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #3", function () {
+        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -181,7 +181,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(RSquareTok)
         })
 
-        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #4", function () {
+        it("can compute the next possible token types From the first paramSpec INSIDE ActionDec #4", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -196,7 +196,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [CommaTok, RParenTok])
         })
 
-        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #1", function () {
+        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #1", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -211,7 +211,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(ColonTok)
         })
 
-        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #2", function () {
+        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #2", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -226,7 +226,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(IdentTok)
         })
 
-        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #3", function () {
+        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -241,7 +241,7 @@ describe("The Grammar Interpeter namespace", function () {
             expect(possibleNextTokTypes[0]).to.equal(RSquareTok)
         })
 
-        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #4", function () {
+        it("can compute the next possible token types From the second paramSpec INSIDE ActionDec #4", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec"
@@ -257,7 +257,7 @@ describe("The Grammar Interpeter namespace", function () {
         })
 
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
-            " inside an paramSpec INSIDE ActionDec #1", function () {
+            " inside an paramSpec INSIDE ActionDec #1", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec",
@@ -274,7 +274,7 @@ describe("The Grammar Interpeter namespace", function () {
         })
 
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
-            " inside an paramSpec INSIDE ActionDec #2", function () {
+            " inside an paramSpec INSIDE ActionDec #2", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec",
@@ -291,7 +291,7 @@ describe("The Grammar Interpeter namespace", function () {
         })
 
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
-            " inside an paramSpec INSIDE ActionDec #3", function () {
+            " inside an paramSpec INSIDE ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["actionDec",
                     "paramSpec",
@@ -308,7 +308,7 @@ describe("The Grammar Interpeter namespace", function () {
         })
 
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
-            " inside an paramSpec INSIDE ActionDec #3", function () {
+            " inside an paramSpec INSIDE ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["paramSpec",
                     "qualifiedName"
@@ -324,7 +324,7 @@ describe("The Grammar Interpeter namespace", function () {
         })
 
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
-            " inside an paramSpec INSIDE ActionDec #3", function () {
+            " inside an paramSpec INSIDE ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["paramSpec",
                     "qualifiedName"
@@ -340,7 +340,7 @@ describe("The Grammar Interpeter namespace", function () {
         })
 
         it("can compute the next possible token types From a fqn inside an actionParamSpec" +
-            " inside an paramSpec INSIDE ActionDec #3", function () {
+            " inside an paramSpec INSIDE ActionDec #3", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["paramSpec",
                     "qualifiedName"
@@ -355,7 +355,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [DotTok, LSquareTok])
         })
 
-        it("will fail if we try to compute the next token starting from a rule that does not match the path", function () {
+        it("will fail if we try to compute the next token starting from a rule that does not match the path", () => {
             let caPath:ITokenGrammarPath = {
                 ruleStack:         ["I_WILL_FAIL_THE_WALKER",
                     "qualifiedName"
@@ -371,8 +371,8 @@ describe("The Grammar Interpeter namespace", function () {
     })
 
 
-    describe("The NextInsideOptionWalker", function () {
-        it("can compute the next possible token types inside the OPTION in paramSpec", function () {
+    describe("The NextInsideOptionWalker", () => {
+        it("can compute the next possible token types inside the OPTION in paramSpec", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["paramSpec"],
                 occurrenceStack: [1],
@@ -383,7 +383,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [LSquareTok])
         })
 
-        it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", function () {
+        it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["actionDec", "paramSpec"],
                 occurrenceStack: [1, 1],
@@ -394,7 +394,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [LSquareTok])
         })
 
-        it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", function () {
+        it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["actionDec"],
                 occurrenceStack: [1],
@@ -406,8 +406,8 @@ describe("The Grammar Interpeter namespace", function () {
         })
     })
 
-    describe("The NextInsideManyWalker", function () {
-        it("can compute the next possible token types inside the MANY in QualifiedName", function () {
+    describe("The NextInsideManyWalker", () => {
+        it("can compute the next possible token types inside the MANY in QualifiedName", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["qualifiedName"],
                 occurrenceStack: [1],
@@ -418,7 +418,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [DotTok])
         })
 
-        it("can compute the next possible token types inside the MANY in paramSpec inside ActionDec", function () {
+        it("can compute the next possible token types inside the MANY in paramSpec inside ActionDec", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["actionDec"],
                 occurrenceStack: [1],
@@ -429,7 +429,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [CommaTok])
         })
 
-        it("can compute the next possible token types inside the MANY in paramSpec inside ParamSpec --> QualifiedName", function () {
+        it("can compute the next possible token types inside the MANY in paramSpec inside ParamSpec --> QualifiedName", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["paramSpec", "qualifiedName"],
                 occurrenceStack: [1, 1],
@@ -440,7 +440,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [DotTok])
         })
 
-        it("can compute the next possible token types inside the MANY inside: manyActions --> actionDec ", function () {
+        it("can compute the next possible token types inside the MANY inside: manyActions --> actionDec ", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["manyActions", "actionDec"],
                 occurrenceStack: [1, 1],
@@ -452,8 +452,8 @@ describe("The Grammar Interpeter namespace", function () {
         })
     })
 
-    describe("The NextInsideManySepWalker", function () {
-        it("can compute the next possible token types inside the MANY_SEP in callArguments", function () {
+    describe("The NextInsideManySepWalker", () => {
+        it("can compute the next possible token types inside the MANY_SEP in callArguments", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["callArguments"],
                 occurrenceStack: [1],
@@ -464,7 +464,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [IdentTok])
         })
 
-        it("can compute the next possible token types inside the MANY_SEP in actionDecSep", function () {
+        it("can compute the next possible token types inside the MANY_SEP in actionDecSep", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["actionDecSep"],
                 occurrenceStack: [1],
@@ -476,8 +476,8 @@ describe("The Grammar Interpeter namespace", function () {
         })
     })
 
-    describe("The NextInsideAtLeastOneWalker", function () {
-        it("can compute the next possible token types inside the AT_LEAST_ONE in callArguments", function () {
+    describe("The NextInsideAtLeastOneWalker", () => {
+        it("can compute the next possible token types inside the AT_LEAST_ONE in callArguments", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["atLeastOneRule"],
                 occurrenceStack: [1],
@@ -488,7 +488,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [EntityTok])
         })
 
-        it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", function () {
+        it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["atLeastOneRule"],
                 occurrenceStack: [1],
@@ -499,7 +499,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [EntityTok])
         })
 
-        it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", function () {
+        it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["atLeastOneRule"],
                 occurrenceStack: [1],
@@ -511,8 +511,8 @@ describe("The Grammar Interpeter namespace", function () {
         })
     })
 
-    describe("The NextInsideAtLeastOneSepWalker", function () {
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule", function () {
+    describe("The NextInsideAtLeastOneSepWalker", () => {
+        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["atLeastOneSepRule"],
                 occurrenceStack: [1],
@@ -523,7 +523,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [EntityTok])
         })
 
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 2", function () {
+        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 2", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["atLeastOneSepRule"],
                 occurrenceStack: [1],
@@ -534,7 +534,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [EntityTok])
         })
 
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 3", function () {
+        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 3", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["atLeastOneSepRule"],
                 occurrenceStack: [1],
@@ -545,7 +545,7 @@ describe("The Grammar Interpeter namespace", function () {
             setEquality(possibleNextTokTypes, [EntityTok])
         })
 
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in qualifiedNameSep", function () {
+        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in qualifiedNameSep", () => {
             let path:IRuleGrammarPath = {
                 ruleStack:       ["qualifiedNameSep"],
                 occurrenceStack: [1],
@@ -558,8 +558,8 @@ describe("The Grammar Interpeter namespace", function () {
     })
 })
 
-describe("The NextTerminalAfterManyWalker", function () {
-    it("can compute the next possible token types after the MANY in QualifiedName", function () {
+describe("The NextTerminalAfterManyWalker", () => {
+    it("can compute the next possible token types after the MANY in QualifiedName", () => {
         let result = new NextTerminalAfterManyWalker(qualifiedName, 1).startWalking()
         //noinspection BadExpressionStatementJS
         expect(result.occurrence).to.be.undefined
@@ -567,15 +567,15 @@ describe("The NextTerminalAfterManyWalker", function () {
         expect(result.token).to.be.undefined
     })
 
-    it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", function () {
+    it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", () => {
         let result = new NextTerminalAfterManyWalker(actionDec, 1).startWalking()
         expect(result.occurrence).to.equal(1)
         expect(result.token).to.equal(RParenTok)
     })
 })
 
-describe("The NextTerminalAfterManySepWalker", function () {
-    it("can compute the next possible token types after the MANY_SEP in QualifiedName", function () {
+describe("The NextTerminalAfterManySepWalker", () => {
+    it("can compute the next possible token types after the MANY_SEP in QualifiedName", () => {
         let result = new NextTerminalAfterManySepWalker(callArguments, 1).startWalking()
         //noinspection BadExpressionStatementJS
         expect(result.occurrence).to.be.undefined
@@ -583,15 +583,15 @@ describe("The NextTerminalAfterManySepWalker", function () {
         expect(result.token).to.be.undefined
     })
 
-    it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", function () {
+    it("can compute the next possible token types after the MANY in paramSpec inside ActionDec", () => {
         let result = new NextTerminalAfterManySepWalker(actionDecSep, 1).startWalking()
         expect(result.occurrence).to.equal(1)
         expect(result.token).to.equal(RParenTok)
     })
 })
 
-describe("The NextTerminalAfterAtLeastOneWalker", function () {
-    it("can compute the next possible token types after an AT_LEAST_ONE production", function () {
+describe("The NextTerminalAfterAtLeastOneWalker", () => {
+    it("can compute the next possible token types after an AT_LEAST_ONE production", () => {
         let result = new NextTerminalAfterAtLeastOneWalker(atLeastOneRule, 1).startWalking()
         expect(result.occurrence).to.equal(2)
         expect(result.token).to.equal(DotTok)
@@ -606,8 +606,8 @@ describe("The NextTerminalAfterAtLeastOneWalker", function () {
     })
 })
 
-describe("The NextTerminalAfterAtLeastOneSepWalker", function () {
-    it("can compute the next possible token types after an AT_LEAST_ONE_SEP production", function () {
+describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
+    it("can compute the next possible token types after an AT_LEAST_ONE_SEP production", () => {
         let result = new NextTerminalAfterAtLeastOneSepWalker(atLeastOneSepRule, 1).startWalking()
         expect(result.occurrence).to.equal(2)
         expect(result.token).to.equal(DotTok)
@@ -621,7 +621,7 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", function () {
         expect(result3.token).to.equal(CommaTok)
     })
 
-    it("can compute the next possible token types after an AT_LEAST_ONE_SEP production EMPTY", function () {
+    it("can compute the next possible token types after an AT_LEAST_ONE_SEP production EMPTY", () => {
         let result = new NextTerminalAfterAtLeastOneSepWalker(qualifiedNameSep, 1).startWalking()
         //noinspection BadExpressionStatementJS
         expect(result.occurrence).to.be.undefined
@@ -630,16 +630,16 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", function () {
     })
 })
 
-describe("The NextInsideOrWalker", function () {
+describe("The NextInsideOrWalker", () => {
 
-    it("can compute the First Tokens for all alternatives of an OR", function () {
+    it("can compute the First Tokens for all alternatives of an OR", () => {
         let result = new NextInsideOrWalker(cardinality, 1).startWalking()
         expect(result.length).to.equal(2)
         setEquality(<any>result[0], [UnsignedIntegerLiteralTok])
         setEquality(<any>result[1], [AsteriskTok])
     })
 
-    it("can compute the First Tokens for all alternatives of an OR (complex)", function () {
+    it("can compute the First Tokens for all alternatives of an OR (complex)", () => {
         let result1 = new NextInsideOrWalker(lotsOfOrs, 1).startWalking()
         expect(result1.length).to.equal(2)
         setEquality(<any>result1[0], [CommaTok, KeyTok])

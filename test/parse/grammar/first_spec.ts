@@ -9,10 +9,10 @@ import {first} from "../../../src/parse/grammar/first"
 import {EntityTok, CommaTok, NamespaceTok, TypeTok, ColonTok, ConstTok} from "./samples"
 import {setEquality} from "../../utils/matchers"
 
-describe("The Grammar Ast first model", function () {
+describe("The Grammar Ast first model", () => {
     "use strict"
 
-    it("can compute the first for a terminal", function () {
+    it("can compute the first for a terminal", () => {
         let terminal = new Terminal(EntityTok)
         let actual = first(terminal)
         expect(actual.length).to.equal(1)
@@ -24,7 +24,7 @@ describe("The Grammar Ast first model", function () {
         expect(actual2[0]).to.equal(CommaTok)
     })
 
-    it("can compute the first for a Sequence production ", function () {
+    it("can compute the first for a Sequence production ", () => {
         let seqProduction = new Flat([new Terminal(EntityTok)])
         let actual = first(seqProduction)
         expect(actual.length).to.equal(1)
@@ -40,7 +40,7 @@ describe("The Grammar Ast first model", function () {
         expect(actual2[0]).to.equal(EntityTok)
     })
 
-    it("can compute the first for an alternatives production ", function () {
+    it("can compute the first for an alternatives production ", () => {
         let altProduction = new Alternation(
             [
                 new Terminal(EntityTok),
@@ -56,7 +56,7 @@ describe("The Grammar Ast first model", function () {
 
     })
 
-    it("can compute the first for an production with optional prefix", function () {
+    it("can compute the first for an production with optional prefix", () => {
         let withOptionalPrefix = new Flat(
             [
                 new Option([new Terminal(NamespaceTok)]),

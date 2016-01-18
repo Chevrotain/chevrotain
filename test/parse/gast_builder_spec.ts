@@ -43,7 +43,7 @@ import {
 import * as _ from "lodash"
 
 
-describe("The GAst Builder namespace", function () {
+describe("The GAst Builder namespace", () => {
     "use strict"
 
     let typeDefText = "// parse\r\n" +
@@ -94,7 +94,7 @@ describe("The GAst Builder namespace", function () {
         "            let rSquare = this.CONSUME1(RSquareTok)"
 
 
-    it("can extract Terminals IPRODRanges from a text", function () {
+    it("can extract Terminals IPRODRanges from a text", () => {
         let actual = createTerminalRanges(typeDefText)
         expect(actual.length).to.equal(4)
         let terminalTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
@@ -108,7 +108,7 @@ describe("The GAst Builder namespace", function () {
         expect(terminalTexts[3]).to.equal(".CONSUME2(SemicolonTok")
     })
 
-    it("can extract SubRule references IPRODRanges from a text", function () {
+    it("can extract SubRule references IPRODRanges from a text", () => {
         let actual = createRefsRanges(typeDefText)
         expect(actual.length).to.equal(2)
         let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
@@ -120,7 +120,7 @@ describe("The GAst Builder namespace", function () {
         expect(refText[1]).to.equal(".SUBRULE(this.assignedTypeSpec")
     })
 
-    it("can extract Option IPRODRanges from a text", function () {
+    it("can extract Option IPRODRanges from a text", () => {
         let actual = createOptionRanges(elementDefText)
         expect(actual.length).to.equal(2)
         let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
@@ -136,7 +136,7 @@ describe("The GAst Builder namespace", function () {
             "            })")
     })
 
-    it("can extract 'at least one' IPRODRanges from a text", function () {
+    it("can extract 'at least one' IPRODRanges from a text", () => {
         let actual = createAtLeastOneRanges("this.MANY(...) this.AT_LEAST_ONE(bamba) this.AT_LEAST_ONE(THIS.OPTION(bisli))")
         expect(actual.length).to.equal(2)
         let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
@@ -148,7 +148,7 @@ describe("The GAst Builder namespace", function () {
         expect(refText[1]).to.equal(".AT_LEAST_ONE(THIS.OPTION(bisli))")
     })
 
-    it("can extract 'many' IPRODRanges from a text", function () {
+    it("can extract 'many' IPRODRanges from a text", () => {
         let actual = createManyRanges(literalArrayText)
         expect(actual.length).to.equal(1)
         let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
@@ -163,7 +163,7 @@ describe("The GAst Builder namespace", function () {
             "            )")
     })
 
-    it("can extract 'or' IPRODRanges from a text", function () {
+    it("can extract 'or' IPRODRanges from a text", () => {
         let actual = createOrRanges(elementDefText)
         // 1 or range + 2 orPart ranges (flat ranges)
         expect(actual.length).to.equal(3)
@@ -182,7 +182,7 @@ describe("The GAst Builder namespace", function () {
             "            ], \"\")")
     })
 
-    it("can extract all IPRODRanges from a text", function () {
+    it("can extract all IPRODRanges from a text", () => {
         let ter = ".CONSUME3(one1"
         let option = ".OPTION(2)"
         let many = ".MANY(3)"
@@ -210,7 +210,7 @@ describe("The GAst Builder namespace", function () {
         setEquality(refText, [ter, option, many, many_sep, ref, at_least_one_sep, atLeastOne, or])
     })
 
-    it("has a utility function that can remove comments(single line and multiline) from texts", function () {
+    it("has a utility function that can remove comments(single line and multiline) from texts", () => {
         let input = "// single line comment" +
             "\nhello" +
             "/* multi line comment \n" +
@@ -223,7 +223,7 @@ describe("The GAst Builder namespace", function () {
         expect(actual).to.equal("\nhello world")
     })
 
-    it("has a utility function that can remove string literals from texts", function () {
+    it("has a utility function that can remove string literals from texts", () => {
         let input = "'single quotes string'" +
             "\nhello" +
             "\"\"" +
@@ -235,12 +235,12 @@ describe("The GAst Builder namespace", function () {
         expect(actual).to.equal("\nhello world")
     })
 
-    it("can detect missing closing parenthesis in a string", function () {
+    it("can detect missing closing parenthesis in a string", () => {
         let input = " ((()))" // the input is assumed to start right after an opening parenthesis
         expect(() => findClosingOffset("(", ")", 0, input)).to.throw("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS")
     })
 
-    it("can find the direct 'childs' of another Production from an IProd representation", function () {
+    it("can find the direct 'childs' of another Production from an IProd representation", () => {
         let allProdRanges:IProdRange[] = [
             {range: new Range(1, 10), text: "1.1", type: ProdType.TERMINAL},
             {range: new Range(11, 200), text: "1.2", type: ProdType.OR},
@@ -269,7 +269,7 @@ describe("The GAst Builder namespace", function () {
         expect(manyRange[1].text).to.equal("1.2.1.2")
     })
 
-    it("can build a Terminal Production from a RangeProd", function () {
+    it("can build a Terminal Production from a RangeProd", () => {
         gastBuilder.terminalNameToConstructor = <any>tok
         let actual = buildProdGast({
             range: new Range(1, 2),
@@ -281,7 +281,7 @@ describe("The GAst Builder namespace", function () {
         expect((<gast.Terminal>actual).terminalType).to.equal(IdentTok)
     })
 
-    it("will fail building a terminal if it cannot find it's constructor", function () {
+    it("will fail building a terminal if it cannot find it's constructor", () => {
         gastBuilder.terminalNameToConstructor = {}
         let buildMissingTerminal = () => buildProdGast({
             range: new Range(1, 2),
@@ -292,7 +292,7 @@ describe("The GAst Builder namespace", function () {
         expect(buildMissingTerminal).to.throw("Terminal Token name: " + "IdentTok" + " not found")
     })
 
-    it("can build a Ref Production from a RangeProd", function () {
+    it("can build a Ref Production from a RangeProd", () => {
         let actual = buildProdGast({
             range: new Range(1, 2),
             text:  "this.SUBRULE(this.bamba(1))",
@@ -303,19 +303,19 @@ describe("The GAst Builder namespace", function () {
         expect((<gast.NonTerminal>actual).nonTerminalName).to.equal("bamba")
     })
 
-    it("can build an OR Production from a RangeProd", function () {
+    it("can build an OR Production from a RangeProd", () => {
         let actual = buildProdGast({range: new Range(1, 2), text: "this.OR(...)", type: ProdType.OR}, [])
         expect(actual).to.be.an.instanceof(Alternation)
         expect((<gast.Alternation>actual).definition.length).to.equal(0)
     })
 
-    it("can build a MANY Production from a RangeProd", function () {
+    it("can build a MANY Production from a RangeProd", () => {
         let actual = buildProdGast({range: new Range(1, 2), text: "this.MANY(...)", type: ProdType.MANY}, [])
         expect(actual).to.be.an.instanceof(Repetition)
         expect((<gast.Repetition>actual).definition.length).to.equal(0)
     })
 
-    it("can build a MANY_SEP Production from a RangeProd", function () {
+    it("can build a MANY_SEP Production from a RangeProd", () => {
         // hack, using "toString" because it exists on plain js object as the "separator".
         let actual = buildProdGast({
             range: new Range(1, 2),
@@ -326,7 +326,7 @@ describe("The GAst Builder namespace", function () {
         expect((<gast.Repetition>actual).definition.length).to.equal(0)
     })
 
-    it("will fail when building a MANY_SEP Production from a RangeProd in the seperator is not known", function () {
+    it("will fail when building a MANY_SEP Production from a RangeProd in the seperator is not known", () => {
         expect(() => buildProdGast({
             range: new Range(1, 2),
             text:  "this.MANY_SEP(MISSING...)",
@@ -334,7 +334,7 @@ describe("The GAst Builder namespace", function () {
         }, [])).to.throw("Separator Terminal Token name: MISSING not found")
     })
 
-    it("can build an AT_LEAST_ONE Production from a RangeProd", function () {
+    it("can build an AT_LEAST_ONE Production from a RangeProd", () => {
         let actual = buildProdGast({
             range: new Range(1, 2),
             text:  "this.AT_LEAST_ONE(...)",
@@ -344,7 +344,7 @@ describe("The GAst Builder namespace", function () {
         expect((<gast.RepetitionMandatory>actual).definition.length).to.equal(0)
     })
 
-    it("can build an OPTION Production from a RangeProd", function () {
+    it("can build an OPTION Production from a RangeProd", () => {
         let actual = buildProdGast({
             range: new Range(1, 2),
             text:  "this.OPTION(...)",
@@ -354,13 +354,13 @@ describe("The GAst Builder namespace", function () {
         expect((<gast.Option>actual).definition.length).to.equal(0)
     })
 
-    it("can build an OR Production from a RangeProd", function () {
+    it("can build an OR Production from a RangeProd", () => {
         let actual = buildProdGast({range: new Range(1, 2), text: "this.OR(...)", type: ProdType.OR}, [])
         expect(actual).to.be.an.instanceof(Alternation)
         expect((<gast.Alternation>actual).definition.length).to.equal(0)
     })
 
-    it("can build The Gast representation of a literalArray Grammar Rule", function () {
+    it("can build The Gast representation of a literalArray Grammar Rule", () => {
         let actual = buildTopProduction(literalArrayText, "literalArray", <any>tok)
         expect(actual.name).to.equal("literalArray")
         expect(actual.orgText).to.equal(literalArrayText)
@@ -394,7 +394,7 @@ describe("The GAst Builder namespace", function () {
     })
 
 
-    it("can build The Gast representation of an elementDefinition Grammar Rule", function () {
+    it("can build The Gast representation of an elementDefinition Grammar Rule", () => {
         let actual = buildTopProduction(elementDefText, "elementDef", <any>tok)
         expect(actual.orgText).to.equal(elementDefText)
         expect(actual.name).to.equal("elementDef")
@@ -445,7 +445,7 @@ describe("The GAst Builder namespace", function () {
     })
 
 
-    it("can build nested OR grammar successfully", function () {
+    it("can build nested OR grammar successfully", () => {
 
         let input = " let max = this.OR([\n\
                 {WHEN: isExpression, THEN_DO: ()=> {\n\

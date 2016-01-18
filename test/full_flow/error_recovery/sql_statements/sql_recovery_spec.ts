@@ -32,7 +32,7 @@ import {exceptions} from "../../../../src/parse/exceptions_public"
 import {ParseTree} from "../../parse_tree"
 import * as _ from "lodash"
 
-describe("Error Recovery SQL DDL Example", function () {
+describe("Error Recovery SQL DDL Example", () => {
     "use strict"
 
     let schemaFQN = [new IdentTok(1, 1, "schema2"), new DotTok(1, 1), new IdentTok(1, 1, "Persons")]
@@ -42,7 +42,7 @@ describe("Error Recovery SQL DDL Example", function () {
     let shahar31Record = [new LParenTok(1, 1), new IntTok(1, 9, "31"), new CommaTok(1, 1), new StringTok(1, 1, '"SHAHAR"'), new RParenTok(1, 1)]
     /* tslint:enable:quotemark  */
 
-    it("can parse a series of three statements successfully", function () {
+    it("can parse a series of three statements successfully", () => {
         let input:any = _.flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
@@ -70,7 +70,7 @@ describe("Error Recovery SQL DDL Example", function () {
             new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
         ])
 
-        it("can perform single token insertion for a missing semicolon", function () {
+        it("can perform single token insertion for a missing semicolon", () => {
             let parser = new DDLExampleRecoveryParser(input)
             let ptResult:any = parser.ddl()
             // one error encountered
@@ -85,7 +85,7 @@ describe("Error Recovery SQL DDL Example", function () {
             expect(insertedSemiColon.isInsertedInRecovery).to.equal(true)
         })
 
-        it("can disable single token insertion for a missing semicolon", function () {
+        it("can disable single token insertion for a missing semicolon", () => {
             let parser = new DDLExampleRecoveryParser(input, false)
             let ptResult:any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
@@ -106,7 +106,7 @@ describe("Error Recovery SQL DDL Example", function () {
             new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
         ])
 
-        it("can perform single token deletion for a redundant keyword", function () {
+        it("can perform single token deletion for a redundant keyword", () => {
             let parser = new DDLExampleRecoveryParser(input)
             let ptResult = parser.ddl()
             // one error encountered
@@ -117,7 +117,7 @@ describe("Error Recovery SQL DDL Example", function () {
             assertAllThreeStatementsPresentAndValid(ptResult)
         })
 
-        it("can disable single token deletion for a redundant keyword", function () {
+        it("can disable single token deletion for a redundant keyword", () => {
             let parser = new DDLExampleRecoveryParser(input, false)
             let ptResult:any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
@@ -130,7 +130,7 @@ describe("Error Recovery SQL DDL Example", function () {
 
     describe("resync recovery mechanism", () => {
 
-        it("can perform re-sync recovery and only 'lose' part of the input", function () {
+        it("can perform re-sync recovery and only 'lose' part of the input", () => {
             let input:any = _.flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
@@ -172,7 +172,7 @@ describe("Error Recovery SQL DDL Example", function () {
             new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
         ])
 
-        it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", function () {
+        it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
             let parser = new DDLExampleRecoveryParser(input)
             let ptResult:any = parser.ddl()
             // one error encountered
@@ -191,7 +191,7 @@ describe("Error Recovery SQL DDL Example", function () {
             expect(ptResult.children[2].payload).not.to.be.an.instanceof(INVALID_DELETE_STMT)
         })
 
-        it("can disable re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", function () {
+        it("can disable re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
             let parser = new DDLExampleRecoveryParser(input, false)
             let ptResult:any = parser.ddl()
             // one error encountered
@@ -217,7 +217,7 @@ describe("Error Recovery SQL DDL Example", function () {
     }
 
 
-    it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", function () {
+    it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", () => {
         let input:any = _.flatten([
             // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1)])
@@ -228,7 +228,7 @@ describe("Error Recovery SQL DDL Example", function () {
         expect(parser.errors[0]).to.be.an.instanceof(exceptions.NotAllInputParsedException)
     })
 
-    it("can use the same parser instance to parse multiple inputs", function () {
+    it("can use the same parser instance to parse multiple inputs", () => {
         let input1:any = _.flatten([
             // CREATE TABLE schema2.Persons;
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
@@ -254,7 +254,7 @@ describe("Error Recovery SQL DDL Example", function () {
         expect(ptResult.children[0].payload).not.to.be.an.instanceof(INVALID_DELETE_STMT)
     })
 
-    it("can re-sync to the next iteration in a MANY rule", function () {
+    it("can re-sync to the next iteration in a MANY rule", () => {
         let input:any = _.flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),

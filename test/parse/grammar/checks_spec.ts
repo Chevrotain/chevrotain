@@ -22,9 +22,9 @@ import {
 import {Token, extendToken} from "../../../src/scan/tokens_public"
 import * as _ from "lodash"
 
-describe("the grammar validations", function () {
+describe("the grammar validations", () => {
 
-    it("validates every one of the TOP_RULEs in the input", function () {
+    it("validates every one of the TOP_RULEs in the input", () => {
 
         let expectedErrorsNoMsg = [{
             "type":       ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
@@ -79,7 +79,7 @@ describe("the grammar validations", function () {
         expect(expectedErrorsNoMsg).to.deep.include.members(actualErrorsNoMsg)
     })
 
-    it("does not allow duplicate grammar rule names", function () {
+    it("does not allow duplicate grammar rule names", () => {
         let noErrors = validateRuleName("A", ["B", "C"], "className")
         //noinspection BadExpressionStatementJS
         expect(noErrors).to.be.empty
@@ -92,7 +92,7 @@ describe("the grammar validations", function () {
         expect(duplicateErr[0]).to.have.property("ruleName", "A")
     })
 
-    it("only allows a subset of ECMAScript identifiers as rule names", function () {
+    it("only allows a subset of ECMAScript identifiers as rule names", () => {
         let res1 = validateRuleName("1baa", [], "className")
         expect(res1).to.have.lengthOf(1)
         expect(res1[0]).to.have.property("message")
@@ -114,42 +114,42 @@ describe("the grammar validations", function () {
 })
 
 
-describe("identifyProductionForDuplicates function", function () {
-    it("generates DSL code for a ProdRef", function () {
+describe("identifyProductionForDuplicates function", () => {
+    it("generates DSL code for a ProdRef", () => {
         let dslCode = identifyProductionForDuplicates(new NonTerminal("ActionDeclaration"))
         expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration")
     })
 
-    it("generates DSL code for a OPTION", function () {
+    it("generates DSL code for a OPTION", () => {
         let dslCode = identifyProductionForDuplicates(new Option([], 3))
         expect(dslCode).to.equal("OPTION_#_3_#_")
     })
 
-    it("generates DSL code for a AT_LEAST_ONE", function () {
+    it("generates DSL code for a AT_LEAST_ONE", () => {
         let dslCode = identifyProductionForDuplicates(new RepetitionMandatory([]))
         expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_")
     })
 
-    it("generates DSL code for a MANY", function () {
+    it("generates DSL code for a MANY", () => {
         let dslCode = identifyProductionForDuplicates(new Repetition([], 5))
         expect(dslCode).to.equal("MANY_#_5_#_")
     })
 
-    it("generates DSL code for a OR", function () {
+    it("generates DSL code for a OR", () => {
         let dslCode = identifyProductionForDuplicates(new Alternation([], 1))
         expect(dslCode).to.equal("OR_#_1_#_")
     })
 
-    it("generates DSL code for a Terminal", function () {
+    it("generates DSL code for a Terminal", () => {
         let dslCode = identifyProductionForDuplicates(new Terminal(IdentTok, 4))
         expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
     })
 })
 
 
-describe("OccurrenceValidationCollector GASTVisitor class", function () {
+describe("OccurrenceValidationCollector GASTVisitor class", () => {
 
-    it("collects all the productions relevant to occurrence validation", function () {
+    it("collects all the productions relevant to occurrence validation", () => {
         let qualifiedNameVisitor = new OccurrenceValidationCollector()
         qualifiedName.accept(qualifiedNameVisitor)
         expect(qualifiedNameVisitor.allProductions.length).to.equal(4)
@@ -170,19 +170,19 @@ let dummyRule = new Rule("dummyRule", [new Terminal(DummyToken)])
 let dummyRule2 = new Rule("dummyRule2", [new Terminal(DummyToken)])
 let dummyRule3 = new Rule("dummyRule3", [new Terminal(DummyToken)])
 
-describe("the getFirstNoneTerminal function", function () {
+describe("the getFirstNoneTerminal function", () => {
 
-    it("can find the firstNoneTerminal of an empty sequence", function () {
+    it("can find the firstNoneTerminal of an empty sequence", () => {
         expect(getFirstNoneTerminal([])).to.be.empty
     })
 
-    it("can find the firstNoneTerminal of a sequence with only one item", function () {
+    it("can find the firstNoneTerminal of a sequence with only one item", () => {
         let result = getFirstNoneTerminal([new NonTerminal("dummyRule", dummyRule)])
         expect(result).to.have.length(1)
         expect(_.first(result).name).to.equal("dummyRule")
     })
 
-    it("can find the firstNoneTerminal of a sequence with two items", function () {
+    it("can find the firstNoneTerminal of a sequence with two items", () => {
         let sqeuence = [
             new NonTerminal("dummyRule", dummyRule),
             new NonTerminal("dummyRule2", dummyRule2)]
@@ -191,7 +191,7 @@ describe("the getFirstNoneTerminal function", function () {
         expect(_.first(result).name).to.equal("dummyRule")
     })
 
-    it("can find the firstNoneTerminal of a sequence with two items where the first is optional", function () {
+    it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
         let sqeuence = [
             new Option([
                 new NonTerminal("dummyRule", dummyRule)
@@ -203,7 +203,7 @@ describe("the getFirstNoneTerminal function", function () {
         expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"])
     })
 
-    it("can find the firstNoneTerminal of an alternation", function () {
+    it("can find the firstNoneTerminal of an alternation", () => {
         let alternation = [
             new Alternation([
                 new Flat([new NonTerminal("dummyRule", dummyRule)]),
@@ -217,7 +217,7 @@ describe("the getFirstNoneTerminal function", function () {
         expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2", "dummyRule3"])
     })
 
-    it("can find the firstNoneTerminal of an optional repetition", function () {
+    it("can find the firstNoneTerminal of an optional repetition", () => {
         let alternation = [
             new Repetition([
                 new Flat([new NonTerminal("dummyRule", dummyRule)]),
@@ -231,7 +231,7 @@ describe("the getFirstNoneTerminal function", function () {
         expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"])
     })
 
-    it("can find the firstNoneTerminal of a mandatory repetition", function () {
+    it("can find the firstNoneTerminal of a mandatory repetition", () => {
         let alternation = [
             new RepetitionMandatory([
                 new Flat([new NonTerminal("dummyRule", dummyRule)]),
@@ -321,9 +321,9 @@ class ValidOccurrenceNumUsageParser extends Parser {
     })
 }
 
-describe("The duplicate occurrence validations full flow", function () {
+describe("The duplicate occurrence validations full flow", () => {
 
-    it("will throw errors on duplicate Terminals consumption in the same top level rule", function () {
+    it("will throw errors on duplicate Terminals consumption in the same top level rule", () => {
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("SUBRULE")
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("1")
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("duplicateRef")
@@ -331,21 +331,21 @@ describe("The duplicate occurrence validations full flow", function () {
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw("both have the same occurrence index 1")
     })
 
-    it("will throw errors on duplicate Subrules references in the same top level rule", function () {
+    it("will throw errors on duplicate Subrules references in the same top level rule", () => {
         expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("CONSUME")
         expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("3")
         expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("PlusTok")
         expect(() => new ErroneousOccurrenceNumUsageParser2()).to.throw("duplicateTerminal")
     })
 
-    it("will throw errors on duplicate MANY productions in the same top level rule", function () {
+    it("will throw errors on duplicate MANY productions in the same top level rule", () => {
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("MANY")
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("1")
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("duplicateMany")
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("both have the same occurrence index 1")
     })
 
-    it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", function () {
+    it("won't detect issues in a Parser using Tokens created by extendToken(...) utility (anonymous)", () => {
         //noinspection JSUnusedLocalSymbols
         let parser = new ValidOccurrenceNumUsageParser()
     })
@@ -376,16 +376,16 @@ class InvalidRefParser2 extends Parser {
     })
 }
 
-describe("The reference resolver validation full flow", function () {
+describe("The reference resolver validation full flow", () => {
 
-    it("will throw an error when trying to init a parser with unresolved rule references", function () {
+    it("will throw an error when trying to init a parser with unresolved rule references", () => {
         expect(() => new InvalidRefParser()).to.throw("oopsTypo")
         expect(() => new InvalidRefParser()).to.throw("Parser Definition Errors detected")
         expect(() => new InvalidRefParser()).to.throw("reference to rule which is not defined")
     })
 
     it("won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +
-        "of definition errors", function () {
+        "of definition errors", () => {
         Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
         expect(() => new InvalidRefParser2()).to.not.throw()
         expect(() => new InvalidRefParser2()).to.not.throw()
@@ -416,22 +416,22 @@ class InvalidRuleNameParser extends Parser {
     public one = this.RULE("שלום", () => {})
 }
 
-describe("The rule names validation full flow", function () {
+describe("The rule names validation full flow", () => {
 
-    it("will throw an error when trying to init a parser with duplicate ruleNames", function () {
+    it("will throw an error when trying to init a parser with duplicate ruleNames", () => {
         expect(() => new DuplicateRulesParser()).to.throw("is already defined in the grammar")
         expect(() => new DuplicateRulesParser()).to.throw("DuplicateRulesParser")
         expect(() => new DuplicateRulesParser()).to.throw("oops_duplicate")
     })
 
-    it("will throw an error when trying to init a parser with an invalid rule names", function () {
+    it("will throw an error when trying to init a parser with an invalid rule names", () => {
         expect(() => new InvalidRuleNameParser()).to.throw("it must match the pattern")
         expect(() => new InvalidRuleNameParser()).to.throw("Invalid Grammar rule name")
         expect(() => new InvalidRuleNameParser()).to.throw("שלום")
     })
 
     it("won't throw an errors when trying to init a parser with definition errors but with a flag active to defer handling" +
-        "of definition errors (ruleName validation", function () {
+        "of definition errors (ruleName validation", () => {
         Parser.DEFER_DEFINITION_ERRORS_HANDLING = true
         expect(() => new InvalidRuleNameParser()).to.not.throw()
         expect(() => new InvalidRuleNameParser()).to.not.throw()
@@ -491,19 +491,19 @@ class ComplexInDirectlyLeftRecursive extends Parser {
     })
 }
 
-describe("The left recursion detection full flow", function () {
+describe("The left recursion detection full flow", () => {
 
-    it("will throw an error when trying to init a parser with direct left recursion", function () {
+    it("will throw an error when trying to init a parser with direct left recursion", () => {
         expect(() => new DirectlyLeftRecursive()).to.throw("Left Recursion found in grammar")
         expect(() => new DirectlyLeftRecursive()).to.throw("A --> A")
     })
 
-    it("will throw an error when trying to init a parser with indirect left recursion", function () {
+    it("will throw an error when trying to init a parser with indirect left recursion", () => {
         expect(() => new InDirectlyLeftRecursive()).to.throw("Left Recursion found in grammar")
         expect(() => new InDirectlyLeftRecursive()).to.throw("A --> B --> A")
     })
 
-    it("will throw an error when trying to init a parser with indirect left recursion", function () {
+    it("will throw an error when trying to init a parser with indirect left recursion", () => {
         expect(() => new ComplexInDirectlyLeftRecursive()).to.throw("Left Recursion found in grammar")
         expect(() => new ComplexInDirectlyLeftRecursive()).to.throw("A --> B --> A")
     })

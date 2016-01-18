@@ -251,16 +251,16 @@ class CustomLookaheadParser extends Parser {
     })
 }
 
-describe("The Parsing DSL", function () {
+describe("The Parsing DSL", () => {
 
-    it("provides a production SUBRULE1-5 that invokes another rule", function () {
+    it("provides a production SUBRULE1-5 that invokes another rule", () => {
         let input = [new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok()]
         let parser = new SubRuleTestParser(input)
         let result = parser.topRule()
         expect(result).to.equal("12345")
     })
 
-    it("provides a production SUBRULE1-5 that can accept arguments from its caller", function () {
+    it("provides a production SUBRULE1-5 that can accept arguments from its caller", () => {
         let input = [new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok(), new PlusTok()]
         let parser = new SubRuleArgsParser(input)
         let result = parser.topRule()
@@ -268,7 +268,7 @@ describe("The Parsing DSL", function () {
         expect(result.numbers).to.equal("54321")
     })
 
-    it("allows using automatic lookahead even as part of custom lookahead functions valid", function () {
+    it("allows using automatic lookahead even as part of custom lookahead functions valid", () => {
         let input1 = [new PlusTok()]
         let parser = new CustomLookaheadParser(input1)
         let result = parser.topRule()
@@ -280,7 +280,7 @@ describe("The Parsing DSL", function () {
         expect(result2).to.equal("minus")
     })
 
-    it("allows using automatic lookahead even as part of custom lookahead functions invalid", function () {
+    it("allows using automatic lookahead even as part of custom lookahead functions invalid", () => {
         let input1 = [new PlusTok()]
         let parser = new CustomLookaheadParser(input1)
         parser.plusAllowed = false
@@ -322,7 +322,7 @@ describe("The Parsing DSL", function () {
             }
         }
 
-        it("can match an non-empty alternative in an OR with an empty alternative", function () {
+        it("can match an non-empty alternative in an OR with an empty alternative", () => {
             let input = [new PlusTok()]
             let parser = new EmptyAltParser(input)
             expect(parser.orRule()).to.equal("+")
@@ -344,9 +344,9 @@ describe("The Parsing DSL", function () {
     })
 })
 
-describe("The Error Recovery functionality of the IntrospectionParser", function () {
+describe("The Error Recovery functionality of the IntrospectionParser", () => {
 
-    it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", function () {
+    it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", () => {
         let parser:any = new Parser([], ALL_TOKENS)
         parser.reset()
         let testInput = [new IntToken("1"), new PlusTok(),
@@ -361,13 +361,13 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
     })
 
-    it("will not perform inRepetition recovery while in backtracking mode", function () {
+    it("will not perform inRepetition recovery while in backtracking mode", () => {
         let parser:any = new Parser([], {})
         parser.isBackTrackingStack.push(1)
         expect(parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)).to.equal(false)
     })
 
-    it("can perform in-repetition recovery for MANY grammar rule", function () {
+    it("can perform in-repetition recovery for MANY grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -376,7 +376,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can disable in-repetition recovery for MANY grammar rule", function () {
+    it("can disable in-repetition recovery for MANY grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -385,7 +385,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can perform in-repetition recovery for MANY_SEP grammar rule", function () {
+    it("can perform in-repetition recovery for MANY_SEP grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -394,7 +394,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can disable in-repetition recovery for MANY_SEP grammar rule", function () {
+    it("can disable in-repetition recovery for MANY_SEP grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -403,7 +403,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can perform in-repetition recovery for MANY_SEP grammar rule #2", function () {
+    it("can perform in-repetition recovery for MANY_SEP grammar rule #2", () => {
         // a.b..c...d
         let input = [new IdentTok("a"), new DotTok(), new DotTok(), new IdentTok("b"),
             new DotTok(), new IdentTok("c"), new DotTok(), new DotTok(), new DotTok(), new IdentTok("d")]
@@ -412,7 +412,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(3)
     })
 
-    it("can perform in-repetition recovery for AT_LEAST_ONE grammar rule", function () {
+    it("can perform in-repetition recovery for AT_LEAST_ONE grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -421,7 +421,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can disable in-repetition recovery for AT_LEAST_ONE grammar rule", function () {
+    it("can disable in-repetition recovery for AT_LEAST_ONE grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -430,7 +430,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can perform in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", function () {
+    it("can perform in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -439,7 +439,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
         expect(parser.errors.length).to.equal(1)
     })
 
-    it("can disable in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", function () {
+    it("can disable in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", () => {
         // a.b+.c
         let input = [new IdentTok("a"), new DotTok(), new IdentTok("b"),
             new PlusTok(), new DotTok(), new IdentTok("c")]
@@ -449,22 +449,22 @@ describe("The Error Recovery functionality of the IntrospectionParser", function
     })
 })
 
-describe("The BaseRecognizer", function () {
+describe("The BaseRecognizer", () => {
 
-    it("can be initialized without supplying an input vector", function () {
+    it("can be initialized without supplying an input vector", () => {
         let parser = new Parser([], [])
         expect(parser.input).to.deep.equal([])
         expect(parser.input).to.be.an.instanceof(Array)
     })
 
-    it("can only SAVE_ERROR for recognition exceptions", function () {
+    it("can only SAVE_ERROR for recognition exceptions", () => {
         let parser:any = new Parser([], [])
         expect(() => parser.SAVE_ERROR(new Error("I am some random Error")))
             .to.throw("trying to save an Error which is not a RecognitionException")
         expect(parser.input).to.be.an.instanceof(Array)
     })
 
-    it("when it runs out of input EOF will be returned", function () {
+    it("when it runs out of input EOF will be returned", () => {
         let parser:any = new Parser([new IntToken("1"), new PlusTok()], [])
         parser.CONSUME(IntToken)
         parser.CONSUME(PlusTok)
@@ -476,7 +476,7 @@ describe("The BaseRecognizer", function () {
         // see: http://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
     })
 
-    it("invoking an OPTION will return true/false depending if it succeeded or not", function () {
+    it("invoking an OPTION will return true/false depending if it succeeded or not", () => {
         let parser:any = new Parser([new IntToken("1"), new PlusTok()], {})
 
         let successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
@@ -493,7 +493,7 @@ describe("The BaseRecognizer", function () {
     })
 
     it("will return false if a RecognitionException is thrown during " +
-        "backtracking and rethrow any other kind of Exception", function () {
+        "backtracking and rethrow any other kind of Exception", () => {
         let parser:any = new Parser([], [])
         let backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
         expect(() => backTrackingThrows()).to.throw("division by zero, boom")
@@ -505,9 +505,9 @@ describe("The BaseRecognizer", function () {
 
 })
 
-describe("The BaseRecognizer", function () {
+describe("The BaseRecognizer", () => {
 
-    it("can be initialized with a vector of Tokens", function () {
+    it("can be initialized with a vector of Tokens", () => {
         let parser:any = new Parser([], [PlusTok, MinusTok, IntToken])
         let tokensMap = (<any>parser).tokensMap
         expect(tokensMap.PlusTok).to.equal(PlusTok)
@@ -515,7 +515,7 @@ describe("The BaseRecognizer", function () {
         expect(tokensMap.IntToken).to.equal(IntToken)
     })
 
-    it("can be initialized with a Dictionary of Tokens", function () {
+    it("can be initialized with a Dictionary of Tokens", () => {
         let initTokenDictionary = {PlusTok: PlusTok, MinusTok: MinusTok, IntToken: IntToken}
         let parser:any = new Parser([], {
             PlusTok:  PlusTok,
@@ -530,7 +530,7 @@ describe("The BaseRecognizer", function () {
         expect(tokensMap.IntToken).to.equal(IntToken)
     })
 
-    it("cannot be initialized with other parameters", function () {
+    it("cannot be initialized with other parameters", () => {
         expect(() => {
             return new Parser([], null)
         }).to.throw()

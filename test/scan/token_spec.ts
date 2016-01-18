@@ -3,10 +3,10 @@ import {extendToken, tokenName, Token} from "../../src/scan/tokens_public"
 let TrueLiteral = extendToken("TrueLiteral")
 class FalseLiteral extends Token {}
 
-describe("The Chevrotain Tokens namespace", function () {
+describe("The Chevrotain Tokens namespace", () => {
     "use strict"
 
-    it("exports a utility function that returns a token's name", function () {
+    it("exports a utility function that returns a token's name", () => {
         // FalseLiteral was created with an anonymous function as its constructor yet tokenName(...)
         // should still work correctly on it if the 'tokenName' property has been set on its constructor.
         expect(tokenName(FalseLiteral)).to.equal("FalseLiteral")
@@ -20,7 +20,7 @@ describe("The Chevrotain Tokens namespace", function () {
     let C = extendToken("C", /\d+/, B)
     let D = extendToken("D", /\w+/, B)
 
-    it("provides an extendToken utility - creating an instance", function () {
+    it("provides an extendToken utility - creating an instance", () => {
         let aInstance = new A("Hello", 0, 1, 1)
         expect(aInstance.image).to.equal("Hello")
         expect(aInstance.offset).to.equal(0)
@@ -30,7 +30,7 @@ describe("The Chevrotain Tokens namespace", function () {
         expect(aInstance.endColumn).to.equal(5)
     })
 
-    it("provides an extendToken utility - creating a subclass instance", function () {
+    it("provides an extendToken utility - creating a subclass instance", () => {
         let aInstance = new C("world", 0, 1, 1)
         expect(aInstance.image).to.equal("world")
         expect(aInstance.offset).to.equal(0)
@@ -40,7 +40,7 @@ describe("The Chevrotain Tokens namespace", function () {
         expect(aInstance.endColumn).to.equal(5)
     })
 
-    it("provides an extendToken utility - inheritance chain", function () {
+    it("provides an extendToken utility - inheritance chain", () => {
         let dInstance = new D("world", 0, 1, 1)
         expect(dInstance).to.be.an.instanceof(A)
         expect(dInstance).to.be.an.instanceof(B)
@@ -54,7 +54,7 @@ describe("The Chevrotain Tokens namespace", function () {
         expect(bInstance).to.be.an.instanceof(A)
     })
 
-    it("provides an extendToken utility - static properties inheritance", function () {
+    it("provides an extendToken utility - static properties inheritance", () => {
         expect(D.GROUP).to.equal("Special")
         expect(C.GROUP).to.equal("Special")
     })

@@ -12,9 +12,9 @@ import {
 } from "../../../src/parse/grammar/follow"
 import {setEquality} from "../../utils/matchers"
 
-describe("The Grammar Ast Follows model", function () {
+describe("The Grammar Ast Follows model", () => {
 
-    it("can build a followNamePrefix from a Terminal", function () {
+    it("can build a followNamePrefix from a Terminal", () => {
         let terminal = new Terminal(IdentTok)
         let actual = buildInProdFollowPrefix(terminal)
         expect(actual).to.equal("IdentTok1_~IN~_")
@@ -25,7 +25,7 @@ describe("The Grammar Ast Follows model", function () {
         expect(actual2).to.equal("EntityTok3_~IN~_")
     })
 
-    it("can build a followName prefix from a TopLevel Production and index", function () {
+    it("can build a followName prefix from a TopLevel Production and index", () => {
         let prod = new Rule("bamba", [])
         let index = 5
 
@@ -33,7 +33,7 @@ describe("The Grammar Ast Follows model", function () {
         expect(actual).to.equal("bamba5_~IN~_")
     })
 
-    it("can compute the follows for Top level production ref in ActionDec", function () {
+    it("can compute the follows for Top level production ref in ActionDec", () => {
         let actual:any = new ResyncFollowsWalker(actionDec).startWalking()
         let actualFollowNames = actual.keys()
         expect(actualFollowNames.length).to.equal(3)
@@ -45,7 +45,7 @@ describe("The Grammar Ast Follows model", function () {
         setEquality(actual.get("qualifiedName1_~IN~_actionDec"), [SemicolonTok])
     })
 
-    it("can compute all follows for a set of top level productions", function () {
+    it("can compute all follows for a set of top level productions", () => {
         let actual = computeAllProdsFollows([actionDec])
         expect(actual.keys().length).to.equal(3)
     })

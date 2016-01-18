@@ -1,13 +1,13 @@
 import {Range} from "../../src/text/range"
 
-describe("The Chevrotain Range namespace", function () {
+describe("The Chevrotain Range namespace", () => {
 
-    it("an invalid range can not be created", function () {
+    it("an invalid range can not be created", () => {
         expect(() => { return new Range(5, 1)}).to.throw("INVALID RANGE")
         expect(() => { return new Range(-1, 2)}).to.throw("INVALID RANGE")
     })
 
-    it("can check if a number is contained in a give range", function () {
+    it("can check if a number is contained in a give range", () => {
         let r = new Range(90, 110)
         expect(r.contains(-4)).to.equal(false)
         expect(r.contains(30)).to.equal(false)
@@ -20,7 +20,7 @@ describe("The Chevrotain Range namespace", function () {
         expect(r.contains(999)).to.equal(false)
     })
 
-    it("can check if it is contained in another range", function () {
+    it("can check if it is contained in another range", () => {
         let _10_50 = new Range(10, 50)
         let _1_6 = new Range(1, 6)
         let _5_15 = new Range(5, 15)
@@ -36,7 +36,7 @@ describe("The Chevrotain Range namespace", function () {
         expect(_51_100.isContainedInRange(_10_50)).to.equal(false)
     })
 
-    it("can check if it is strictly contained in another range", function () {
+    it("can check if it is strictly contained in another range", () => {
         let _10_50 = new Range(10, 50)
 
         let _1_6 = new Range(1, 6)

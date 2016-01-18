@@ -30,9 +30,9 @@ let patterns:RegExp[] = <any>_.collect(_.values(patternsToClass), "PATTERN")
 
 let testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok])
 
-describe("The Chevrotain Simple Lexer", function () {
+describe("The Chevrotain Simple Lexer", () => {
 
-    it("can create a token from a string with priority to the First Token class with the longest match #1", function () {
+    it("can create a token from a string with priority to the First Token class with the longest match #1", () => {
         // this can match either IdentifierTok or BambaTok but should match BambaTok has its pattern is defined before IdentifierTok
         let input = "bamba"
         let result = testLexer.tokenize(input)
@@ -42,7 +42,7 @@ describe("The Chevrotain Simple Lexer", function () {
         expect(result.tokens[0].startColumn).to.equal(1)
     })
 
-    it("can create a token from a string with priority to the First Token class with the longest match #2", function () {
+    it("can create a token from a string with priority to the First Token class with the longest match #2", () => {
         let input = "bambaMIA"
         let result = testLexer.tokenize(input)
         expect(result.tokens[0]).to.be.an.instanceof(IdentifierTok)
@@ -51,7 +51,7 @@ describe("The Chevrotain Simple Lexer", function () {
         expect(result.tokens[0].startColumn).to.equal(1)
     })
 
-    it("can create a token from a string", function () {
+    it("can create a token from a string", () => {
         let input = "6666543221231"
         let result = testLexer.tokenize(input)
         expect(result.tokens[0]).to.be.an.instanceof(IntegerTok)
@@ -113,16 +113,16 @@ class InvalidGroupNumber extends Token {
     static GROUP = 666
 }
 
-describe("The Simple Lexer Validations", function () {
+describe("The Simple Lexer Validations", () => {
 
-    it("won't detect valid patterns as missing", function () {
+    it("won't detect valid patterns as missing", () => {
         let result = findMissingPatterns([BambaTok, IntegerTok, IdentifierTok])
         //noinspection BadExpressionStatementJS
         expect(result.errors).to.be.empty
         expect(result.validTokenClasses).to.deep.equal([BambaTok, IntegerTok, IdentifierTok])
     })
 
-    it("will detect missing patterns", function () {
+    it("will detect missing patterns", () => {
         let tokenClasses = [ValidNaPattern, MissingPattern]
         let result = findMissingPatterns(tokenClasses)
         expect(result.errors.length).to.equal(1)
@@ -132,14 +132,14 @@ describe("The Simple Lexer Validations", function () {
         expect(result.validTokenClasses).to.deep.equal([ValidNaPattern])
     })
 
-    it("won't detect valid patterns as invalid", function () {
+    it("won't detect valid patterns as invalid", () => {
         let result = findInvalidPatterns([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
         //noinspection BadExpressionStatementJS
         expect(result.errors).to.be.empty
         expect(result.validTokenClasses).to.deep.equal([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
     })
 
-    it("will detect invalid patterns as invalid", function () {
+    it("will detect invalid patterns as invalid", () => {
         let tokenClasses = [ValidNaPattern, InvalidPattern]
         let result = findInvalidPatterns(tokenClasses)
         expect(result.errors.length).to.equal(1)
@@ -149,13 +149,13 @@ describe("The Simple Lexer Validations", function () {
         expect(result.validTokenClasses).to.deep.equal([ValidNaPattern])
     })
 
-    it("won't detect valid patterns as using unsupported flags", function () {
+    it("won't detect valid patterns as using unsupported flags", () => {
         let errors = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
         //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
-    it("will detect patterns using unsupported multiline flag", function () {
+    it("will detect patterns using unsupported multiline flag", () => {
         let tokenClasses = [ValidNaPattern, MultiLinePattern]
         let errors = findUnsupportedFlags(tokenClasses)
         expect(errors.length).to.equal(1)
@@ -164,7 +164,7 @@ describe("The Simple Lexer Validations", function () {
         expect(errors[0].message).to.contain("MultiLinePattern")
     })
 
-    it("will detect patterns using unsupported global flag", function () {
+    it("will detect patterns using unsupported global flag", () => {
         let tokenClasses = [ValidNaPattern, GlobalPattern]
         let errors = findUnsupportedFlags(tokenClasses)
         expect(errors.length).to.equal(1)
@@ -173,19 +173,19 @@ describe("The Simple Lexer Validations", function () {
         expect(errors[0].message).to.contain("GlobalPattern")
     })
 
-    it("won't detect valid patterns as duplicates", function () {
+    it("won't detect valid patterns as duplicates", () => {
         let errors = findDuplicatePatterns([MultiLinePattern, IntegerValid])
         //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
-    it("won't detect NA patterns as duplicates", function () {
+    it("won't detect NA patterns as duplicates", () => {
         let errors = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
         //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
-    it("will detect patterns using unsupported end of input anchor", function () {
+    it("will detect patterns using unsupported end of input anchor", () => {
         let tokenClasses = [ValidNaPattern, EndOfInputAnchor]
         let errors = findEndOfInputAnchor(tokenClasses)
         expect(errors.length).to.equal(1)
@@ -194,13 +194,13 @@ describe("The Simple Lexer Validations", function () {
         expect(errors[0].message).to.contain("EndOfInputAnchor")
     })
 
-    it("won't detect valid patterns as using unsupported end of input anchor", function () {
+    it("won't detect valid patterns as using unsupported end of input anchor", () => {
         let errors = findEndOfInputAnchor([IntegerTok, IntegerValid])
         //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
-    it("will detect identical patterns for different classes", function () {
+    it("will detect identical patterns for different classes", () => {
         let tokenClasses = [DecimalInvalid, IntegerValid]
         let errors = findDuplicatePatterns(tokenClasses)
         expect(errors.length).to.equal(1)
@@ -210,13 +210,13 @@ describe("The Simple Lexer Validations", function () {
         expect(errors[0].message).to.contain("DecimalInvalid")
     })
 
-    it("won't detect valid groups as unsupported", function () {
+    it("won't detect valid groups as unsupported", () => {
         let errors = findInvalidGroupType([IntegerTok, Skipped, Special])
         //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
-    it("will detect unsupported group types", function () {
+    it("will detect unsupported group types", () => {
         let tokenClasses = [InvalidGroupNumber]
         let errors = findInvalidGroupType(tokenClasses)
         expect(errors.length).to.equal(1)
@@ -261,23 +261,23 @@ class WhitespaceOrAmp extends Token {
 }
 
 
-describe("The Simple Lexer transformations", function () {
+describe("The Simple Lexer transformations", () => {
 
-    it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", function () {
+    it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", () => {
         let orgSource = BambaTok.PATTERN.source
         let transPattern = addStartOfInput(BambaTok.PATTERN)
         expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
         expect(_.startsWith(transPattern.source, "^")).to.equal(true)
     })
 
-    it("can transform a pattern to one with startOfInput mark ('^') #2", function () {
+    it("can transform a pattern to one with startOfInput mark ('^') #2", () => {
         let orgSource = PatternNoStart.PATTERN.source
         let transPattern = addStartOfInput(PatternNoStart.PATTERN)
         expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
         expect(_.startsWith(transPattern.source, "^")).to.equal(true)
     })
 
-    it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", function () {
+    it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
         let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
         let analyzeResult = analyzeTokenClasses(tokenClasses)
         expect(analyzeResult.allPatterns.length).to.equal(8)
@@ -299,16 +299,16 @@ describe("The Simple Lexer transformations", function () {
         expect(patternIdxToClass[7]).to.equal(NewLine);
     })
 
-    it("can count the number of line terminators in a string", function () {
+    it("can count the number of line terminators in a string", () => {
         expect(countLineTerminators("bamba\r\nbisli\r")).to.equal(2)
         expect(countLineTerminators("\r\r\r1234\r\n")).to.equal(4)
         expect(countLineTerminators("aaaa\raaa\n\r1234\n")).to.equal(4)
     })
 })
 
-describe("The Simple Lexer Full flow", function () {
+describe("The Simple Lexer Full flow", () => {
 
-    it("can create a simple Lexer from a List of Token Classes", function () {
+    it("can create a simple Lexer from a List of Token Classes", () => {
         let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
         //noinspection BadExpressionStatementJS
         expect(ifElseLexer.lexerDefinitionErrors).to.be.empty
@@ -326,12 +326,12 @@ describe("The Simple Lexer Full flow", function () {
         //    new NewLine(1, 18, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
     })
 
-    it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", function () {
+    it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
         expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/Errors detected in definition of Lexer/)
         expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/EndOfInputAnchor/)
     })
 
-    it("can defer the throwing of errors during the creation of a Lexer if the Lexer's definition is invalid", function () {
+    it("can defer the throwing of errors during the creation of a Lexer if the Lexer's definition is invalid", () => {
         expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/Errors detected in definition of Lexer/)
         expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/EndOfInputAnchor/)
 
@@ -343,7 +343,7 @@ describe("The Simple Lexer Full flow", function () {
         expect(() => lexerWithErrs.tokenize("else")).to.throw(/EndOfInputAnchor/)
     })
 
-    it("can skip invalid character inputs and only report one error per sequence of characters skipped", function () {
+    it("can skip invalid character inputs and only report one error per sequence of characters skipped", () => {
         let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
 
@@ -365,7 +365,7 @@ describe("The Simple Lexer Full flow", function () {
         //    new NewLine(1, 24, "\n"), new Whitespace(2, 1, "\t"), new Whitespace(2, 6, " "), new Whitespace(2, 13, " ")])
     })
 
-    it("won't go into infinite loops when skipping at end of input", function () {
+    it("won't go into infinite loops when skipping at end of input", () => {
         let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
 
         let input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
@@ -378,7 +378,7 @@ describe("The Simple Lexer Full flow", function () {
         expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1)])
     })
 
-    it("can deal with line terminators during resync", function () {
+    it("can deal with line terminators during resync", () => {
         let ifElseLexer = new Lexer([If, Else]) // no newLine tokens those will be resynced
 
         let input = "if\r\nelse\rif\r"
@@ -401,7 +401,7 @@ describe("The Simple Lexer Full flow", function () {
         expect(lexResult.tokens).to.deep.equal([new If("if", 0, 1, 1), new Else("else", 4, 2, 1), new If("if", 9, 3, 1)])
     })
 
-    it("can deal with line terminators inside multi-line Tokens", function () {
+    it("can deal with line terminators inside multi-line Tokens", () => {
         let ifElseLexer = new Lexer([If, Else, WhitespaceNotSkipped])
 
         let input = "if\r\r\telse\rif\n"
@@ -417,7 +417,7 @@ describe("The Simple Lexer Full flow", function () {
         ])
     })
 
-    it("can deal with Tokens which may or may not be a lineTerminator", function () {
+    it("can deal with Tokens which may or may not be a lineTerminator", () => {
         let ifElseLexer = new Lexer([If, Else, WhitespaceOrAmp])
 
         let input = "if\r\r\telse&if"
@@ -432,7 +432,7 @@ describe("The Simple Lexer Full flow", function () {
         ])
     })
 
-    it("supports Token groups", function () {
+    it("supports Token groups", () => {
 
         let ifElseLexer = new Lexer([If, Else, Comment])
         let input = "if//else"

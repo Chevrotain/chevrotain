@@ -3,9 +3,9 @@ import {HashTable} from "../../../src/lang/lang_extensions"
 import {GastRefResolverVisitor} from "../../../src/parse/grammar/resolver"
 import {ParserDefinitionErrorType} from "../../../src/parse/parser_public"
 
-describe("The RefResolverVisitor", function () {
+describe("The RefResolverVisitor", () => {
 
-    it("will fail when trying to resolve a ref to a grammar rule that does not exist", function () {
+    it("will fail when trying to resolve a ref to a grammar rule that does not exist", () => {
         let ref = new gast.NonTerminal("missingRule")
         let topLevel = new gast.Rule("TOP", [ref])
         let topLevelRules = new HashTable<gast.Rule>()

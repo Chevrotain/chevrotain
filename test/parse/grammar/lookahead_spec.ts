@@ -45,31 +45,31 @@ class ActionParserMock extends Parser {
     }
 }
 
-describe("The Grammar Lookahead namespace", function () {
+describe("The Grammar Lookahead namespace", () => {
     "use strict"
 
-    it("can compute the lookahead function for the first OPTION in ActionDec", function () {
+    it("can compute the lookahead function for the first OPTION in ActionDec", () => {
         let laFunc = buildLookaheadForOption(1, actionDec)
 
         expect(laFunc.call(new ColonParserMock([], []))).to.equal(false)
         expect(laFunc.call(new IdentParserMock([], []))).to.equal(true)
     })
 
-    it("can compute the lookahead function for the second OPTION in ActionDec", function () {
+    it("can compute the lookahead function for the second OPTION in ActionDec", () => {
         let laFunc = buildLookaheadForOption(2, actionDec)
 
         expect(laFunc.call(new ColonParserMock([], []))).to.equal(true)
         expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
     })
 
-    it("can compute the lookahead function for the first MANY in ActionDec", function () {
+    it("can compute the lookahead function for the first MANY in ActionDec", () => {
         let laFunc = buildLookaheadForMany(1, actionDec)
 
         expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
         expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
     })
 
-    it("can compute the lookahead function for lots of ORs sample", function () {
+    it("can compute the lookahead function for lots of ORs sample", () => {
         let laFunc = buildLookaheadForOr(1, lotsOfOrs)
 
         expect(laFunc.call(new CommaParserMock([], []))).to.equal(0)
@@ -78,7 +78,7 @@ describe("The Grammar Lookahead namespace", function () {
         expect(laFunc.call(new ColonParserMock([], []))).to.equal(-1)
     })
 
-    it("can compute the lookahead function for EMPTY OR sample", function () {
+    it("can compute the lookahead function for EMPTY OR sample", () => {
         let laFunc = buildLookaheadForOr(1, emptyAltOr)
 
         expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
@@ -87,14 +87,14 @@ describe("The Grammar Lookahead namespace", function () {
         expect(laFunc.call(new CommaParserMock([], []))).to.equal(2)
     })
 
-    it("can compute the lookahead function for a Top Level Rule", function () {
+    it("can compute the lookahead function for a Top Level Rule", () => {
         let laFunc = buildLookaheadForTopLevel(actionDec)
 
         expect(laFunc.call(new ActionParserMock([], []))).to.equal(true)
         expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
     })
 
-    it("can compute the lookahead function for a Top Level Rule #2", function () {
+    it("can compute the lookahead function for a Top Level Rule #2", () => {
         let laFunc = buildLookaheadForTopLevel(lotsOfOrs)
 
         expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
@@ -110,9 +110,9 @@ class C extends Token {}
 class D extends Token {}
 class E extends Token {}
 
-describe("The Grammar Lookahead namespace", function () {
+describe("The Grammar Lookahead namespace", () => {
 
-    it("can detect ambiguities when calculating lookahead functions for OR alternatives", function () {
+    it("can detect ambiguities when calculating lookahead functions for OR alternatives", () => {
         let input = [[A, B], [C, D], [E, C]]
         let ambiguities = checkAlternativesAmbiguities(input)
         expect(ambiguities.length).to.equal(1)
