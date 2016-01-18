@@ -72,7 +72,7 @@ any code generation phase.
 None.
 
 ## Compatibility
-The Generated artifact(chevrotain.js) should run on any modern Javascript ES5.1 runtime. 
+Chevrotain should run on any modern Javascript ES5.1 runtime. 
 * The CI build runs the tests under: 
   * Node.js (0.10 / 0.12 / 4 / 5).
   * latest stable Chrome.
