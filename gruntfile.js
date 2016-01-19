@@ -83,9 +83,9 @@ module.exports = function(grunt) {
 
         karma: {
             options: {
-                configFile: 'karma.conf.js',
-                singleRun:  true,
-                browsers:   ['Chrome_travis_ci', "Firefox"],
+                configFile:  'karma.conf.js',
+                singleRun:   true,
+                browsers:    ['Chrome_travis_ci', "Firefox"],
                 // may help with strange failures on travis-ci "some of your tests did a full page reload"
                 concurrency: 1
             },
@@ -355,8 +355,10 @@ module.exports = function(grunt) {
                 plugins: [
                     new webpack.BannerPlugin(banner, {raw: true}),
                     new webpack.optimize.UglifyJsPlugin({
-                        // not using name mangling because it may break usage of Function.name (functionName utility)
-                        mangle: false
+                        mangle: {
+                            // because chevrotain relies on Function.name
+                            keep_fnames : true
+                        }
                     })
                 ]
             },
