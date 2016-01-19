@@ -82,3 +82,5 @@ deploy:
       condition: $DEPLOY = true
       branch: master
     skip_cleanup: true
+notifications:
+  email: false
