@@ -3,7 +3,7 @@ import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
-import * as _ from "lodash"
+import {contains} from "../../src/utils/utils";
 
 
 export class PlusTok extends Token {
@@ -287,7 +287,7 @@ describe("The Parsing DSL", () => {
         let result = parser.topRule()
         expect(result).to.equal(undefined)
         expect(parser.errors.length).to.equal(1)
-        expect(_.contains(parser.errors[0].message, "unicorn")).to.equal(true)
+        expect(parser.errors[0].message).to.contain("unicorn")
     })
 
     describe("supports EMPTY(...) alternative convenience function", () => {

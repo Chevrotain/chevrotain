@@ -17,7 +17,6 @@ import {
 } from "./Switchcase_recovery_tokens"
 import {SwitchCaseRecoveryParser} from "./switchcase_recovery_parser"
 import {exceptions} from "../../../../src/parse/exceptions_public"
-import * as _ from "lodash"
 
 
 describe("Error Recovery switch-case Example", () => {

@@ -1,4 +1,5 @@
 import {Token} from "../../src/scan/tokens_public"
+import {compact, isFunction, isUndefined} from "../../src/utils/utils";
 
 export class ParseTree {
     getImage():string { return this.payload.image }
@@ -19,15 +20,15 @@ export class ParseTree {
  * @returns {ParseTree}
  */
 export function PT(tokenOrTokenClass:Function|Token, children:ParseTree[] = []):ParseTree {
-    let childrenCompact = _.compact(children)
+    let childrenCompact = compact(children)
 
     if (tokenOrTokenClass instanceof Token) {
         return new ParseTree(tokenOrTokenClass, childrenCompact)
     }
-    else if (_.isFunction(tokenOrTokenClass)) {
+    else if (isFunction(tokenOrTokenClass)) {
         return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
     }
-    else if (_.isUndefined(tokenOrTokenClass) || _.isNull(tokenOrTokenClass)) {
+    else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
         return null
     }
     else {

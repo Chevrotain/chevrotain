@@ -45,7 +45,7 @@ import {
     ReturnTok,
     SemiColonTok
 } from "./Switchcase_recovery_tokens"
-import * as _ from "lodash"
+import {contains, assign} from "../../../../src/utils/utils";
 
 
 export interface RetType { [caseValue: string] : number }
@@ -80,7 +80,7 @@ export class SwitchCaseRecoveryParser extends Parser {
     // DOCS: overriding this method allows us to customize the logic for which tokens may not be automaticaly inserted
     // during error recovery.
     public canTokenTypeBeInsertedInRecovery(tokType:Function) {
-        return !_.contains(this.tokTypesThatCannotBeInsertedInRecovery, tokType)
+        return !contains(this.tokTypesThatCannotBeInsertedInRecovery, tokType)
     }
 
     public parseSwitchStmt():RetType {
@@ -97,7 +97,7 @@ export class SwitchCaseRecoveryParser extends Parser {
         this.CONSUME(LCurlyTok)
 
         this.AT_LEAST_ONE(() => {
-                _.assign(retObj, this.SUBRULE(this.caseStmt))
+                assign(retObj, this.SUBRULE(this.caseStmt))
             }
             // DOCS: currently the following token and its index must be specified to enable error recovery
             //       inside repetition rules (MANY/AT_LEAST_ONCE), if this information is not provided

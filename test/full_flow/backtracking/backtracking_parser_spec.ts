@@ -10,7 +10,7 @@ import {
     DefaultTok,
     RET_TYPE
 } from "./backtracking_parser"
-import * as _ from "lodash"
+import {flatten} from "../../../src/utils/utils"
 
 
 describe("Simple backtracking example", () => {
@@ -29,7 +29,7 @@ describe("Simple backtracking example", () => {
     // largeFqnTokenVector,new DefaultTok(1,1), new NumberTok(1,1,"666"), new SemiColonTok(";", 0, 1, 1)
 
     it("can parse an element with Equals and a very long qualified name", () => {
-        let input:any = _.flatten([
+        let input:any = flatten([
             // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 = 666;
             new ElementTok("element", 0, 1, 1), new IdentTok("A", 0, 1, 1), new ColonTok(":", 0, 1, 1),
             largeFqnTokenVector, new EqualsTok("=", 0, 1, 1), new NumberTok("666", 0, 1, 1), new SemiColonTok(";", 0, 1, 1),
@@ -44,7 +44,7 @@ describe("Simple backtracking example", () => {
     })
 
     it("can parse an element with Default and a very long qualified name", () => {
-        let input:any = _.flatten([
+        let input:any = flatten([
             // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 default 666;
             new ElementTok("element", 0, 1, 1), new IdentTok("A", 0, 1, 1), new ColonTok(":", 0, 1, 1), largeFqnTokenVector,
             new DefaultTok("deafult", 0, 1, 1), new NumberTok("666", 0, 1, 1), new SemiColonTok(";", 0, 1, 1),

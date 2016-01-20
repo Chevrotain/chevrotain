@@ -30,7 +30,7 @@ import {DDLExampleRecoveryParser} from "./sql_recovery_parser"
 import {Token} from "../../../../src/scan/tokens_public"
 import {exceptions} from "../../../../src/parse/exceptions_public"
 import {ParseTree} from "../../parse_tree"
-import * as _ from "lodash"
+import {flatten} from "../../../../src/utils/utils";
 
 describe("Error Recovery SQL DDL Example", () => {
     "use strict"
@@ -43,7 +43,7 @@ describe("Error Recovery SQL DDL Example", () => {
     /* tslint:enable:quotemark  */
 
     it("can parse a series of three statements successfully", () => {
-        let input:any = _.flatten([
+        let input:any = flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
             // INSERT (32, "SHAHAR") INTO schema2.Persons
@@ -61,7 +61,7 @@ describe("Error Recovery SQL DDL Example", () => {
 
 
     describe("Single Token insertion recovery mechanism", () => {
-        let input:any = _.flatten([
+        let input:any = flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
             // INSERT (32, "SHAHAR") INTO schema2.Persons
@@ -97,7 +97,7 @@ describe("Error Recovery SQL DDL Example", () => {
 
     describe("Single Token deletion recovery mechanism", () => {
 
-        let input:any = _.flatten([
+        let input:any = flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
             // INSERT (32, "SHAHAR") INTO INTO schema2.Persons
@@ -131,7 +131,7 @@ describe("Error Recovery SQL DDL Example", () => {
     describe("resync recovery mechanism", () => {
 
         it("can perform re-sync recovery and only 'lose' part of the input", () => {
-            let input:any = _.flatten([
+            let input:any = flatten([
                 // CREATE TABLE schema2.Persons
                 new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
                 // INSERT (32, "SHAHAR") FROM (( schema2.Persons <-- this can't be recovered with a single token insertion of deletion, must do re-sync
@@ -161,7 +161,7 @@ describe("Error Recovery SQL DDL Example", () => {
         let badShahar32Record = [
             new LParenTok(1, 1), new IntTok(1, 9, "32"), new CommaTok(1, 1), new StringTok(1, 1, "\"SHAHAR\""), new LParenTok(1, 1)]
 
-        let input:any = _.flatten([
+        let input:any = flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
             // issues:
@@ -218,7 +218,7 @@ describe("Error Recovery SQL DDL Example", () => {
 
 
     it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", () => {
-        let input:any = _.flatten([
+        let input:any = flatten([
             // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1)])
         let parser = new DDLExampleRecoveryParser(input)
@@ -229,7 +229,7 @@ describe("Error Recovery SQL DDL Example", () => {
     })
 
     it("can use the same parser instance to parse multiple inputs", () => {
-        let input1:any = _.flatten([
+        let input1:any = flatten([
             // CREATE TABLE schema2.Persons;
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
         let parser = new DDLExampleRecoveryParser(input1)
@@ -238,7 +238,7 @@ describe("Error Recovery SQL DDL Example", () => {
         expect(parser.isAtEndOfInput()).to.equal(true)
 
 
-        let input2:any = _.flatten([
+        let input2:any = flatten([
             // DELETE (31, "SHAHAR") FROM schema2.Persons
             new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
         // the parser is being reset instead of creating a new instance for each new input
@@ -255,7 +255,7 @@ describe("Error Recovery SQL DDL Example", () => {
     })
 
     it("can re-sync to the next iteration in a MANY rule", () => {
-        let input:any = _.flatten([
+        let input:any = flatten([
             // CREATE TABLE schema2.Persons
             new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
             // INSERT (32, "SHAHAR") INTO schema2.Persons TABLE <-- the redundant 'TABLE' should trigger in repetition recovery

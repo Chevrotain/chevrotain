@@ -40,7 +40,7 @@ import {
     ElementTok,
     KeyTok
 } from "./grammar/samples"
-import * as _ from "lodash"
+import {map, uniq, filter} from "../../src/utils/utils"
 
 
 describe("The GAst Builder namespace", () => {
@@ -97,11 +97,11 @@ describe("The GAst Builder namespace", () => {
     it("can extract Terminals IPRODRanges from a text", () => {
         let actual = createTerminalRanges(typeDefText)
         expect(actual.length).to.equal(4)
-        let terminalTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(terminalTypes).length).to.equal(1)
+        let terminalTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(terminalTypes).length).to.equal(1)
         expect(terminalTypes[0]).to.equal(ProdType.TERMINAL)
 
-        let terminalTexts = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let terminalTexts = map(actual, (rangeProd) => { return rangeProd.text})
         expect(terminalTexts[0]).to.equal(".CONSUME1(TypeTok")
         expect(terminalTexts[1]).to.equal(".CONSUME1(IdentTok")
         expect(terminalTexts[2]).to.equal(".CONSUME1(SemicolonTok")
@@ -111,11 +111,11 @@ describe("The GAst Builder namespace", () => {
     it("can extract SubRule references IPRODRanges from a text", () => {
         let actual = createRefsRanges(typeDefText)
         expect(actual.length).to.equal(2)
-        let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(refTypes).length).to.equal(1)
+        let refTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(refTypes).length).to.equal(1)
         expect(refTypes[0]).to.equal(ProdType.REF)
 
-        let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let refText = map(actual, (rangeProd) => { return rangeProd.text})
         expect(refText[0]).to.equal(".SUBRULE(this.structuredType")
         expect(refText[1]).to.equal(".SUBRULE(this.assignedTypeSpec")
     })
@@ -123,11 +123,11 @@ describe("The GAst Builder namespace", () => {
     it("can extract Option IPRODRanges from a text", () => {
         let actual = createOptionRanges(elementDefText)
         expect(actual.length).to.equal(2)
-        let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(refTypes).length).to.equal(1)
+        let refTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(refTypes).length).to.equal(1)
         expect(refTypes[0]).to.equal(ProdType.OPTION)
 
-        let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let refText = map(actual, (rangeProd) => { return rangeProd.text})
         expect(refText[0]).to.equal(".OPTION(this.isRequiredKw, ()=> {\r\n" +
             "                requiredKW = this.CONSUME1(RequiredTok)\r\n" +
             "            })")
@@ -139,11 +139,11 @@ describe("The GAst Builder namespace", () => {
     it("can extract 'at least one' IPRODRanges from a text", () => {
         let actual = createAtLeastOneRanges("this.MANY(...) this.AT_LEAST_ONE(bamba) this.AT_LEAST_ONE(THIS.OPTION(bisli))")
         expect(actual.length).to.equal(2)
-        let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(refTypes).length).to.equal(1)
+        let refTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(refTypes).length).to.equal(1)
         expect(refTypes[0]).to.equal(ProdType.AT_LEAST_ONE)
 
-        let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let refText = map(actual, (rangeProd) => { return rangeProd.text})
         expect(refText[0]).to.equal(".AT_LEAST_ONE(bamba)")
         expect(refText[1]).to.equal(".AT_LEAST_ONE(THIS.OPTION(bisli))")
     })
@@ -151,11 +151,11 @@ describe("The GAst Builder namespace", () => {
     it("can extract 'many' IPRODRanges from a text", () => {
         let actual = createManyRanges(literalArrayText)
         expect(actual.length).to.equal(1)
-        let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(refTypes).length).to.equal(1)
+        let refTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(refTypes).length).to.equal(1)
         expect(refTypes[0]).to.equal(ProdType.MANY)
 
-        let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let refText = map(actual, (rangeProd) => { return rangeProd.text})
         expect(refText[0]).to.equal(".MANY(this.isAdditionalArgument, () => {\r\n" +
             "                    commas.push(this.CONSUME1(CommaTok))\r\n" +
             "                    arrValues.push(this.SUBRULE2(this.expression))\r\n" +
@@ -167,11 +167,11 @@ describe("The GAst Builder namespace", () => {
         let actual = createOrRanges(elementDefText)
         // 1 or range + 2 orPart ranges (flat ranges)
         expect(actual.length).to.equal(3)
-        let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(refTypes).length).to.equal(2)
-        setEquality(_.uniq(refTypes), [ProdType.OR, ProdType.FLAT])
+        let refTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(refTypes).length).to.equal(2)
+        setEquality(uniq(refTypes), [ProdType.OR, ProdType.FLAT])
 
-        let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let refText = map(actual, (rangeProd) => { return rangeProd.text})
         expect(refText[0]).to.equal(".OR([\r\n" +
             "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
             "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
@@ -203,10 +203,10 @@ describe("The GAst Builder namespace", () => {
             or)
 
         expect(actual.length).to.equal(8)
-        let refTypes = _.map(actual, (rangeProd) => { return rangeProd.type})
-        expect(_.uniq(refTypes).length).to.equal(8)
+        let refTypes = map(actual, (rangeProd) => { return rangeProd.type})
+        expect(uniq(refTypes).length).to.equal(8)
 
-        let refText = _.map(actual, (rangeProd) => { return rangeProd.text})
+        let refText = map(actual, (rangeProd) => { return rangeProd.text})
         setEquality(refText, [ter, option, many, many_sep, ref, at_least_one_sep, atLeastOne, or])
     })
 
@@ -462,12 +462,12 @@ describe("The GAst Builder namespace", () => {
         let orRanges = createOrRanges(input)
         expect(orRanges.length).to.equal(4)
 
-        let allFlatRanges = _.filter(orRanges, (prodRange:IProdRange) => {
+        let allFlatRanges = filter(orRanges, (prodRange:IProdRange) => {
             return prodRange.type === ProdType.FLAT
         })
         expect(allFlatRanges.length).to.equal(2)
 
-        let allOrRanges = _.filter(orRanges, (prodRange:IProdRange) => {
+        let allOrRanges = filter(orRanges, (prodRange:IProdRange) => {
             return prodRange.type === ProdType.FLAT
         })
         expect(allOrRanges.length).to.equal(2)

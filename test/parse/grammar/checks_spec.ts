@@ -20,7 +20,7 @@ import {
     getFirstNoneTerminal
 } from "../../../src/parse/grammar/checks"
 import {Token, extendToken} from "../../../src/scan/tokens_public"
-import * as _ from "lodash"
+import {forEach, first, map} from "../../../src/utils/utils"
 
 describe("the grammar validations", () => {
 
@@ -74,9 +74,9 @@ describe("the grammar validations", () => {
         let actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
         expect(actualErrors.length).to.equal(4)
 
-        let actualErrorsNoMsg = _.map(actualErrors, err => _.omit(err, "message"))
-        expect(actualErrorsNoMsg).to.deep.include.members(expectedErrorsNoMsg)
-        expect(expectedErrorsNoMsg).to.deep.include.members(actualErrorsNoMsg)
+        forEach(actualErrors, err => delete err.message)
+        expect(actualErrors).to.deep.include.members(expectedErrorsNoMsg)
+        expect(expectedErrorsNoMsg).to.deep.include.members(actualErrors)
     })
 
     it("does not allow duplicate grammar rule names", () => {
@@ -179,7 +179,7 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of a sequence with only one item", () => {
         let result = getFirstNoneTerminal([new NonTerminal("dummyRule", dummyRule)])
         expect(result).to.have.length(1)
-        expect(_.first(result).name).to.equal("dummyRule")
+        expect(first(result).name).to.equal("dummyRule")
     })
 
     it("can find the firstNoneTerminal of a sequence with two items", () => {
@@ -188,7 +188,7 @@ describe("the getFirstNoneTerminal function", () => {
             new NonTerminal("dummyRule2", dummyRule2)]
         let result = getFirstNoneTerminal(sqeuence)
         expect(result).to.have.length(1)
-        expect(_.first(result).name).to.equal("dummyRule")
+        expect(first(result).name).to.equal("dummyRule")
     })
 
     it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
@@ -199,7 +199,7 @@ describe("the getFirstNoneTerminal function", () => {
             new NonTerminal("dummyRule2", dummyRule2)]
         let result = getFirstNoneTerminal(sqeuence)
         expect(result).to.have.length(2)
-        let resultRuleNames = _.pluck(result, "name")
+        let resultRuleNames = map(result, (currItem) => currItem.name)
         expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2"])
     })
 
@@ -213,7 +213,7 @@ describe("the getFirstNoneTerminal function", () => {
         ]
         let result = getFirstNoneTerminal(alternation)
         expect(result).to.have.length(3)
-        let resultRuleNames = _.pluck(result, "name")
+        let resultRuleNames = map(result, (currItem) => currItem.name)
         expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule2", "dummyRule3"])
     })
 
@@ -227,7 +227,7 @@ describe("the getFirstNoneTerminal function", () => {
         ]
         let result = getFirstNoneTerminal(alternation)
         expect(result).to.have.length(2)
-        let resultRuleNames = _.pluck(result, "name")
+        let resultRuleNames = map(result, (currItem) => currItem.name)
         expect(resultRuleNames).to.include.members(["dummyRule", "dummyRule3"])
     })
 
@@ -241,7 +241,7 @@ describe("the getFirstNoneTerminal function", () => {
         ]
         let result = getFirstNoneTerminal(alternation)
         expect(result).to.have.length(1)
-        let resultRuleNames = _.pluck(result, "name")
+        let resultRuleNames = map(result, (currItem) => currItem.name)
         expect(resultRuleNames).to.include.members(["dummyRule"])
     })
 })

@@ -12,7 +12,7 @@ import {
     findInvalidPatterns
 } from "../../src/scan/lexer"
 import {setEquality} from "../utils/matchers"
-import * as _ from "lodash"
+import {map, values, keys} from "../../src/utils/utils"
 
 
 export class IntegerTok extends Token { static PATTERN = /^[1-9]\d*/ }
@@ -26,7 +26,7 @@ let patternsToClass = {}
 patternsToClass[BambaTok.PATTERN.toString()] = BambaTok
 patternsToClass[IntegerTok.PATTERN.toString()] = IntegerTok
 patternsToClass[IdentifierTok.PATTERN.toString()] = IdentifierTok
-let patterns:RegExp[] = <any>_.collect(_.values(patternsToClass), "PATTERN")
+let patterns:RegExp[] = map(values(patternsToClass), (item) => item.PATTERN)
 
 let testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok])
 
@@ -60,7 +60,6 @@ describe("The Chevrotain Simple Lexer", () => {
         expect(result.tokens[0].startColumn).to.equal(1)
     })
 })
-
 
 class ValidNaPattern extends Token {
     static PATTERN = Lexer.NA
@@ -267,28 +266,28 @@ describe("The Simple Lexer transformations", () => {
         let orgSource = BambaTok.PATTERN.source
         let transPattern = addStartOfInput(BambaTok.PATTERN)
         expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
-        expect(_.startsWith(transPattern.source, "^")).to.equal(true)
+        expect(/^\^/.test(transPattern.source)).to.equal(true)
     })
 
     it("can transform a pattern to one with startOfInput mark ('^') #2", () => {
         let orgSource = PatternNoStart.PATTERN.source
         let transPattern = addStartOfInput(PatternNoStart.PATTERN)
         expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
-        expect(_.startsWith(transPattern.source, "^")).to.equal(true)
+        expect(/^\^/.test(transPattern.source)).to.equal(true)
     })
 
     it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
         let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
         let analyzeResult = analyzeTokenClasses(tokenClasses)
         expect(analyzeResult.allPatterns.length).to.equal(8)
-        let allPatternsString = _.map(analyzeResult.allPatterns, (pattern) => {
+        let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
             return pattern.source
         })
         setEquality(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
             "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
         let patternIdxToClass = analyzeResult.patternIdxToClass
-        expect(_.keys(patternIdxToClass).length).to.equal(8)
+        expect(keys(patternIdxToClass).length).to.equal(8)
         expect(patternIdxToClass[0]).to.equal(If);
         expect(patternIdxToClass[1]).to.equal(Else);
         expect(patternIdxToClass[2]).to.equal(Return);
