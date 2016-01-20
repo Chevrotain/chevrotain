@@ -121,7 +121,7 @@ export function has(obj:any, prop:string):boolean {
 }
 
 export function contains<T>(arr:T[], item):boolean {
-    return find(arr, (currItem) => currItem === item) ? true : false
+    return find(arr, (currItem) => currItem === item) !== undefined ? true : false
 }
 
 /**

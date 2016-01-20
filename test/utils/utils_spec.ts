@@ -98,6 +98,7 @@ describe("The Utils functions namespace", () => {
         expect(contains([1, 2, 3], 4)).to.be.false
         expect(contains([1, 2, 3], 2)).to.be.true
         expect(contains([], 2)).to.be.false
+        expect(contains([0], 0)).to.be.true
     })
 
     it("exports a cloneArr utility", () => {
