@@ -132,5 +132,10 @@
             expect(lexAndParseResult.parseErrors).to.be.empty
         })
 
+        // attempt to resolve random failures when running multiple (separate) karma tests
+        // on travis-ci + chrome.
+        after(function(done) {
+            setTimeout(done, 1000)
+        })
     })
 }))
