@@ -63,7 +63,7 @@ module ecma5 {
         }
 
         protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
-            var tokInstance = new (<any>tokClass)()
+            var tokInstance = new (<any>tokClass)("")
             // Literals and Identifiers tokens carry additional information.
             // Thus inserting them automatically can cause other errors "down the line"
             // for example, inserting a variable Identifier may cause duplicate identifiers,

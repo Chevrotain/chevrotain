@@ -544,4 +544,22 @@ describe("The BaseRecognizer", () => {
         }).to.throw()
     })
 
+    it("will not swallow none Recognizer errors when attempting 'in rule error recovery'", () => {
+
+        let InRuleParser = class InRuleParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS)
+                Parser.performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => {
+                this.CONSUME1(DotTok)
+            })
+        }
+        let parser:any = new InRuleParser([new IntToken("1")])
+        parser.tryInRuleRecovery = () => { throw Error("oops")}
+        expect(() => parser.someRule()).to.throw("oops");
+    })
+
 })

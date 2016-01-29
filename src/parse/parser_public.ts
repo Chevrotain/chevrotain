@@ -1573,20 +1573,12 @@ export class Parser {
                 try {
                     return this.tryInRuleRecovery(tokClass, follows)
                 } catch (eFromInRuleRecovery) {
-                    /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
-                    // it is only needed for the else branch but in tsc 1.4.1 comments
-                    // between if and else seem to get swallowed and disappear.
-                    if (eFromConsumption instanceof InRuleRecoveryException) {
+                    if (eFromInRuleRecovery.name === functionName(InRuleRecoveryException)) {
+                        // failed in RuleRecovery.
                         // throw the original error in order to trigger reSync error recovery
                         throw eFromConsumption
                     }
-                    // this is not part of the contract, just a workaround javascript weak error handling
-                    // for a test to reach this code one would have to extend the BaseErrorRecoveryParser
-                    // and override some of the recovery code to be faulty (example: throw undefined is not a function error)
-                    // this is not a useful use case that needs to be tested...
-                    /* istanbul ignore next */
                     else {
-                        // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
                         throw eFromInRuleRecovery
                     }
                 }
