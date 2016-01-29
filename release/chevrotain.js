@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.15 - 2016-01-18 */
+/*! chevrotain - v0.5.16 - 2016-01-29 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.15";
+	API.VERSION = "0.5.16";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -1707,7 +1707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.has = has;
 	function contains(arr, item) {
-	    return find(arr, function (currItem) { return currItem === item; }) ? true : false;
+	    return find(arr, function (currItem) { return currItem === item; }) !== undefined ? true : false;
 	}
 	exports.contains = contains;
 	/**

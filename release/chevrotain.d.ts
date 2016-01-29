@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.15 - 2016-01-18 */
+/*! chevrotain - v0.5.16 - 2016-01-29 */
 declare namespace chevrotain {
     class HashTable<V>{}
     export function tokenName(clazz: Function): string;

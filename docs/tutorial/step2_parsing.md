@@ -44,16 +44,16 @@ relationalOperator
 
 A Chevrotain Parser analyses a [Token](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts#L61) vector
 that conforms to some grammar.
-The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#at_least_one),
+The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#at_least_one),
 Which includes the following methods.
 
-*   [CONSUME](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#consume1) - 'eat' a Token.
-*   [SUBRULE](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#subrule1) - reference to another rule.
-*   [OPTION](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#option1) - optional production. 
-*   [MANY](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#many1) - repetition zero or more.
-*   [AT_LEAST_ONE](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#at_least_one1) - repetition one or more.
-*   [MANY_SEP](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items 
-*   [AT_LEAST_ONE_SEP](http://sap.github.io/chevrotain/documentation/0_5_15/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
+*   [CONSUME](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#consume1) - 'eat' a Token.
+*   [SUBRULE](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#subrule1) - reference to another rule.
+*   [OPTION](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#option1) - optional production. 
+*   [MANY](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#many1) - repetition zero or more.
+*   [AT_LEAST_ONE](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#at_least_one1) - repetition one or more.
+*   [MANY_SEP](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items 
+*   [AT_LEAST_ONE_SEP](http://sap.github.io/chevrotain/documentation/0_5_16/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
 
 
 #### Lets implement our first grammar rule. 
