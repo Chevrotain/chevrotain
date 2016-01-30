@@ -1,0 +1,20 @@
+{
+  "name": "chevrotain_custom_lookahead",
+  "version": "0.1.0",
+  "license": " Apache-2.0",
+  "author": {
+    "name": "Shahar Soel",
+    "email": "shahar.soel@gmail.com"
+  },
+  "scripts": {
+    "test": "mocha *spec.js"
+  },
+  "dependencies": {
+    "chevrotain": "*",
+    "lodash": "~3.10.1"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  },
+  "private": true
+}

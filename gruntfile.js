@@ -55,6 +55,12 @@ module.exports = function(grunt) {
             npm_link:                       {
                 exec: 'npm link'
             },
+            test_examples_custom_lookahead:           {
+                options: {
+                    cwd: process.cwd() + "/examples/custom_lookahead"
+                },
+                exec:    INSTALL_LINK_TEST
+            },
             test_examples_nodejs:           {
                 options: {
                     cwd: process.cwd() + "/examples/nodejs"
@@ -439,6 +445,7 @@ module.exports = function(grunt) {
 
     var integrationTestsNodeTasks = [
         'run:npm_link',
+        'run:test_examples_custom_lookahead',
         'run:test_examples_nodejs',
         'run:test_examples_lexer',
         'run:test_examples_jison_lex',

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/chevrotain.iml" filepath="$PROJECT_DIR$/.idea/chevrotain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/custom_lookahead.iml" filepath="$PROJECT_DIR$/.idea/custom_lookahead.iml" />
     </modules>
   </component>
 </project>
