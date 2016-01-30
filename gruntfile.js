@@ -55,7 +55,7 @@ module.exports = function(grunt) {
             npm_link:                       {
                 exec: 'npm link'
             },
-            test_examples_custom_lookahead:           {
+            test_examples_custom_lookahead: {
                 options: {
                     cwd: process.cwd() + "/examples/custom_lookahead"
                 },
@@ -98,6 +98,7 @@ module.exports = function(grunt) {
 
             browsers_unit_tests: {
                 options: {
+                    port : 9980,
                     files: [
                         'test/test.config.js',
                         'bin/chevrotainSpecs.js'
@@ -107,6 +108,7 @@ module.exports = function(grunt) {
 
             browsers_unit_tests_minified: {
                 options: {
+                    port : 9981,
                     files: [
                         'test/test.config.js',
                         'bin/chevrotainSpecs.min.js'
@@ -127,6 +129,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_globals: {
                 options: {
+                    port : 9982,
                     files: [
                         'bin/chevrotain.js',
                         'test/test.config.js',
@@ -137,6 +140,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_amd: {
                 options: {
+                    port : 9983,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
                         'bin/chevrotain.js',
@@ -149,6 +153,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_globals_minified: {
                 options: {
+                    port : 9984,
                     files: [
                         'bin/chevrotain.min.js',
                         'test/test.config.js',
@@ -159,6 +164,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_amd_minified: {
                 options: {
+                    port : 9985,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
                         'bin/chevrotain.min.js',
@@ -363,7 +369,7 @@ module.exports = function(grunt) {
                     new webpack.optimize.UglifyJsPlugin({
                         mangle: {
                             // because chevrotain relies on Function.name
-                            keep_fnames : true
+                            keep_fnames: true
                         }
                     })
                 ]
@@ -459,7 +465,11 @@ module.exports = function(grunt) {
 
     var browserIntegrationTests = [
         'karma:browsers_integration_tests_globals',
-        'karma:browsers_integration_tests_globals_minified',
+        'karma:browsers_integration_tests_globals_minified'
+    ]
+
+    // splitting up the browsers integration tests due to random failures in travis-ci
+    var browserIntegrationTests2 = [
         'karma:browsers_integration_tests_amd',
         'karma:browsers_integration_tests_amd_minified'
     ]
@@ -472,5 +482,6 @@ module.exports = function(grunt) {
     grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
     grunt.registerTask('browsers_unit_tests', browserUnitTests)
     grunt.registerTask('browsers_integration_tests', browserIntegrationTests)
+    grunt.registerTask('browsers_integration_tests2', browserIntegrationTests2)
 
 }
