@@ -124,13 +124,13 @@ Calculator.prototype.constructor = Calculator;
 
 module.exports = function (text) {
     var lexResult = CalculatorLexer.tokenize(text);
-    if (lexResult.errors.length > 1) {
+    if (lexResult.errors.length >= 1) {
         throw new Error("sad sad panda, lexing errors detected")
     }
 
     var parser = new Calculator(lexResult.tokens);
     var value = parser.expression(); // any exposed top level rule may be used as an entry point
-    if (parser.errors.length > 1) {
+    if (parser.errors.length >= 1) {
         throw new Error("sad sad panda, parsing errors detected!")
     }
 

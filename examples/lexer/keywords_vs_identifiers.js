@@ -42,7 +42,7 @@ module.exports = {
     tokenize: function (text) {
         var lexResult = keywordsVsIdentifiersLexer.tokenize(text);
 
-        if (lexResult.errors.length > 1) {
+        if (lexResult.errors.length >= 1) {
             throw new Error("sad sad panda lexing errors detected")
         }
         return lexResult;

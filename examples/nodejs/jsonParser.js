@@ -109,7 +109,7 @@ module.exports = function (text) {
     parser.json();
     fullResult.parseErrors = parser.errors;
 
-    if (fullResult.lexErrors.length > 1 || fullResult.parseErrors.length > 1) {
+    if (fullResult.lexErrors.length >= 1 || fullResult.parseErrors.length >= 1) {
         throw new Error("sad sad panda")
     }
     return fullResult;

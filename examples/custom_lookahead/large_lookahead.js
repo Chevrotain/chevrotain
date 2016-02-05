@@ -49,7 +49,7 @@ function LargeLookaheadParser(input) {
 
     var $ = this;
 
-    this.twoTokensLookAheadRule = $.RULE("twoTokensLookAheadRule", function () {
+    this.twoTokensLookAheadRule = $.RULE("twoTokensLookAheadRule", function() {
         // @formatter:off
         return $.OR([
             // both alternatives start with the same Token (Export).
@@ -77,19 +77,18 @@ function LargeLookaheadParser(input) {
     Parser.performSelfAnalysis(this);
 }
 
-
 LargeLookaheadParser.prototype = Object.create(Parser.prototype);
 LargeLookaheadParser.prototype.constructor = LargeLookaheadParser;
 
-module.exports = function (text) {
+module.exports = function(text) {
     var lexResult = LargeLookaheadLexer.tokenize(text);
-    if (lexResult.errors.length > 1) {
+    if (lexResult.errors.length >= 1) {
         throw new Error("sad sad panda, lexing errors detected")
     }
 
     var parser = new LargeLookaheadParser(lexResult.tokens);
     var value = parser.twoTokensLookAheadRule();
-    if (parser.errors.length > 1) {
+    if (parser.errors.length >= 1) {
         throw new Error("sad sad panda, parsing errors detected!")
     }
 
