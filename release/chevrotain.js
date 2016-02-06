@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.16 - 2016-01-29 */
+/*! chevrotain - v0.5.17 - 2016-02-06 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.16";
+	API.VERSION = "0.5.17";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -1312,15 +1312,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return this.tryInRuleRecovery(tokClass, follows);
 	                }
 	                catch (eFromInRuleRecovery) {
-	                    /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
-	                    // it is only needed for the else branch but in tsc 1.4.1 comments
-	                    // between if and else seem to get swallowed and disappear.
-	                    if (eFromConsumption instanceof InRuleRecoveryException) {
+	                    if (eFromInRuleRecovery.name === lang_extensions_1.functionName(InRuleRecoveryException)) {
+	                        // failed in RuleRecovery.
 	                        // throw the original error in order to trigger reSync error recovery
 	                        throw eFromConsumption;
 	                    }
 	                    else {
-	                        // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
 	                        throw eFromInRuleRecovery;
 	                    }
 	                }
