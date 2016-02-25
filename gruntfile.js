@@ -249,26 +249,23 @@ module.exports = function(grunt) {
             dev:     ['bin/gen']
         },
 
-        "string-replace": {
+        replace: {
             coverage_ignore: {
-                files:   {
-                    'bin/src/': 'bin/src/**'
-                },
-                options: {
-                    replacements: [{
-                        pattern:     'if (b.hasOwnProperty(p)) d[p] = b[p];',
-                        replacement: '/* istanbul ignore next */ ' + ' if (b.hasOwnProperty(p)) d[p] = b[p];'
-                    }, {
-                        pattern:     'd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());',
-                        replacement: '/* istanbul ignore next */ ' + ' d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());'
-                    }, {
-                        pattern:     /(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
-                        replacement: '/* istanbul ignore else */ $1$2'
-                    }, {
-                        pattern:     /(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
-                        replacement: '/* istanbul ignore next */ $1'
-                    }]
-                }
+                src:          ['bin/src/**/*.js'],
+                overwrite:    true,
+                replacements: [{
+                    from: 'if (b.hasOwnProperty(p)) d[p] = b[p];',
+                    to:   '/* istanbul ignore next */ ' + ' if (b.hasOwnProperty(p)) d[p] = b[p];'
+                }, {
+                    from: 'd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());',
+                    to:   '/* istanbul ignore next */ ' + ' d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());'
+                }, {
+                    from: /(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
+                    to:   '/* istanbul ignore else */ $1$2'
+                }, {
+                    from: /(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
+                    to:   '/* istanbul ignore next */ $1'
+                }]
             }
         },
 
@@ -432,7 +429,7 @@ module.exports = function(grunt) {
         'clean:release',
         'tslint',
         'ts:release',
-        'string-replace:coverage_ignore',
+        'replace:coverage_ignore',
         'concat:release_definitions',
         'ts:validate_definitions',
         'ts:validate_definitions_namespace',
