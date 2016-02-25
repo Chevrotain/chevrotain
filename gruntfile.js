@@ -98,7 +98,7 @@ module.exports = function(grunt) {
 
             browsers_unit_tests: {
                 options: {
-                    port : 9980,
+                    port:  9980,
                     files: [
                         'test/test.config.js',
                         'bin/chevrotainSpecs.js'
@@ -108,7 +108,7 @@ module.exports = function(grunt) {
 
             browsers_unit_tests_minified: {
                 options: {
-                    port : 9981,
+                    port:  9981,
                     files: [
                         'test/test.config.js',
                         'bin/chevrotainSpecs.min.js'
@@ -129,7 +129,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_globals: {
                 options: {
-                    port : 9982,
+                    port:  9982,
                     files: [
                         'bin/chevrotain.js',
                         'test/test.config.js',
@@ -140,7 +140,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_amd: {
                 options: {
-                    port : 9983,
+                    port:       9983,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
                         'bin/chevrotain.js',
@@ -153,7 +153,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_globals_minified: {
                 options: {
-                    port : 9984,
+                    port:  9984,
                     files: [
                         'bin/chevrotain.min.js',
                         'test/test.config.js',
@@ -164,7 +164,7 @@ module.exports = function(grunt) {
 
             browsers_integration_tests_amd_minified: {
                 options: {
-                    port : 9985,
+                    port:       9985,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
                         'bin/chevrotain.min.js',
