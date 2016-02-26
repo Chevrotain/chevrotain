@@ -244,7 +244,7 @@ export class Lexer {
                     }
 
                     text = text.substr(1)
-                    offset++;
+                    offset++
                     for (j = 0; j < this.allPatterns.length; j++) {
                         foundResyncPoint = this.allPatterns[j].test(text)
                         if (foundResyncPoint) {

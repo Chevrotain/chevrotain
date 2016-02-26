@@ -1,5 +1,5 @@
 import {Token} from "../../src/scan/tokens_public"
-import {compact, isFunction, isUndefined} from "../../src/utils/utils";
+import {compact, isFunction, isUndefined} from "../../src/utils/utils"
 
 export class ParseTree {
     getImage():string { return this.payload.image }

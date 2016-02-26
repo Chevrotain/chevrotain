@@ -48,7 +48,10 @@
       "double"
     ],
     "radix": true,
-    "semicolon": false,
+    "semicolon": [
+      true,
+      "never"
+    ],
     "trailing-comma": [
       true,
       "never"

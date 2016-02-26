@@ -181,7 +181,7 @@ function buildOrProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Alternat
     return buildProdWithOccurrence(orRegEx, new gast.Alternation([]), prodRange, allRanges)
 }
 
-function buildAbstractProd<T extends AbsProdWithOccurrence | gast.AbstractProduction >(prod:T,
+function buildAbstractProd<T extends gast.AbstractProduction >(prod:T,
                                                                                   topLevelRange:IRange,
                                                                                   allRanges:IProdRange[]):T {
     let secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
@@ -190,10 +190,9 @@ function buildAbstractProd<T extends AbsProdWithOccurrence | gast.AbstractProduc
     let definition:gast.IProduction[] = []
     forEach(secondLevelInOrder, (prodRng) => {
         definition.push(buildProdGast(prodRng, allRanges))
-    });
+    })
 
-    // IntelliJ bug workaround
-    (<any>prod).definition = definition
+    prod.definition = definition
     return prod
 }
 

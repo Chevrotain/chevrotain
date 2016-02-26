@@ -3,8 +3,6 @@ import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
-import {contains} from "../../src/utils/utils";
-
 
 export class PlusTok extends Token {
     constructor() { super("+", 0, 1, 1) }
@@ -163,7 +161,7 @@ function isQualifiedNamePart():boolean {
 class SubRuleTestParser extends Parser {
 
     private result = ""
-    private index = 1;
+    private index = 1
 
     constructor(input:Token[] = []) {
         super(input, ALL_TOKENS)
@@ -559,7 +557,7 @@ describe("The BaseRecognizer", () => {
         }
         let parser:any = new InRuleParser([new IntToken("1")])
         parser.tryInRuleRecovery = () => { throw Error("oops")}
-        expect(() => parser.someRule()).to.throw("oops");
+        expect(() => parser.someRule()).to.throw("oops")
     })
 
 })

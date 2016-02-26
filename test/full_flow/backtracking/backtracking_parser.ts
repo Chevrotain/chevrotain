@@ -50,7 +50,7 @@ export class BackTrackingParser extends Parser {
     public qualifiedName = this.RULE_NO_RESYNC("qualifiedName", this.parseQualifiedName, INVALID(RET_TYPE.INVALID_FQN))
 
     private parseStatement():RET_TYPE {
-        let statementTypeFound:RET_TYPE = undefined;
+        let statementTypeFound:RET_TYPE = undefined
         this.OR(
             [
                 // both statements have the same prefix which may be of "infinite" length, this means there is no K for which

@@ -1,2 +1,2 @@
-declare let module:any;
+declare let module:any
 

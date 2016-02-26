@@ -288,14 +288,14 @@ describe("The Simple Lexer transformations", () => {
 
         let patternIdxToClass = analyzeResult.patternIdxToClass
         expect(keys(patternIdxToClass).length).to.equal(8)
-        expect(patternIdxToClass[0]).to.equal(If);
-        expect(patternIdxToClass[1]).to.equal(Else);
-        expect(patternIdxToClass[2]).to.equal(Return);
-        expect(patternIdxToClass[3]).to.equal(Integer);
-        expect(patternIdxToClass[4]).to.equal(LParen);
-        expect(patternIdxToClass[5]).to.equal(RParen);
-        expect(patternIdxToClass[6]).to.equal(Whitespace);
-        expect(patternIdxToClass[7]).to.equal(NewLine);
+        expect(patternIdxToClass[0]).to.equal(If)
+        expect(patternIdxToClass[1]).to.equal(Else)
+        expect(patternIdxToClass[2]).to.equal(Return)
+        expect(patternIdxToClass[3]).to.equal(Integer)
+        expect(patternIdxToClass[4]).to.equal(LParen)
+        expect(patternIdxToClass[5]).to.equal(RParen)
+        expect(patternIdxToClass[6]).to.equal(Whitespace)
+        expect(patternIdxToClass[7]).to.equal(NewLine)
     })
 
     it("can count the number of line terminators in a string", () => {

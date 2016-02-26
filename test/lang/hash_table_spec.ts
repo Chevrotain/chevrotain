@@ -3,7 +3,7 @@ import {HashTable} from "../../src/lang/lang_extensions"
 describe("The HashTable implementation", () => {
 
     it("will return undefined for a key that does not exist, and the value for a key that does exist", () => {
-        let hashTable = new HashTable<number>();
+        let hashTable = new HashTable<number>()
         hashTable.put("one", 1)
         hashTable.put("two", 2)
 
@@ -13,7 +13,7 @@ describe("The HashTable implementation", () => {
     })
 
     it("support property names that are also names of built in properties on javascript Object", () => {
-        let hashTable = new HashTable<number>();
+        let hashTable = new HashTable<number>()
         hashTable.put("toString", 1)
         hashTable.put("hasOwnProperty", 2)
 
@@ -22,7 +22,7 @@ describe("The HashTable implementation", () => {
     })
 
     it("can be cleared", () => {
-        let hashTable = new HashTable<number>();
+        let hashTable = new HashTable<number>()
         hashTable.put("one", 1)
         hashTable.put("two", 2)
 

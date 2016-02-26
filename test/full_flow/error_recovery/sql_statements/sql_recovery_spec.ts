@@ -30,7 +30,7 @@ import {DDLExampleRecoveryParser} from "./sql_recovery_parser"
 import {Token} from "../../../../src/scan/tokens_public"
 import {exceptions} from "../../../../src/parse/exceptions_public"
 import {ParseTree} from "../../parse_tree"
-import {flatten} from "../../../../src/utils/utils";
+import {flatten} from "../../../../src/utils/utils"
 
 describe("Error Recovery SQL DDL Example", () => {
     "use strict"
@@ -242,7 +242,7 @@ describe("Error Recovery SQL DDL Example", () => {
             // DELETE (31, "SHAHAR") FROM schema2.Persons
             new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
         // the parser is being reset instead of creating a new instance for each new input
-        parser.reset();
+        parser.reset()
         parser.input = input2
         let ptResult:any = parser.ddl()
         expect(parser.errors.length).to.equal(0)

@@ -45,7 +45,7 @@ import {
     ReturnTok,
     SemiColonTok
 } from "./Switchcase_recovery_tokens"
-import {contains, assign} from "../../../../src/utils/utils";
+import {contains, assign} from "../../../../src/utils/utils"
 
 
 export interface RetType { [caseValue: string] : number }
@@ -86,7 +86,7 @@ export class SwitchCaseRecoveryParser extends Parser {
     public parseSwitchStmt():RetType {
         // house keeping so the invalid property names will not be dependent on
         // previous grammar rule invocations.
-        this.invalidIdx = 1;
+        this.invalidIdx = 1
 
         let retObj:RetType = {}
 
@@ -137,7 +137,7 @@ export class SwitchCaseRecoveryParser extends Parser {
     private INVALID():() => RetType {
         return () => {
             let retObj:RetType = {}
-            retObj["invalid" + this.invalidIdx++] = undefined;
+            retObj["invalid" + this.invalidIdx++] = undefined
             return retObj
         }
     }
