@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.17 - 2016-02-06 */
+/*! chevrotain - v0.5.18 - 2016-02-26 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.17";
+	API.VERSION = "0.5.18";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -231,6 +231,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var definitionErrors = [];
 	        var defErrorsMsgs;
 	        var className = lang_extensions_1.classNameFromInstance(classInstance);
+	        if (className === "") {
+	            // just a simple "throw Error" without any fancy "definition error" because the logic below relies on a unique parser name to
+	            // save/access those definition errors...
+	            throw Error("A Parser's constructor may not be an anonymous Function, it must be a named function\n" +
+	                "The constructor's name is used at runtime for performance (caching) purposes.");
+	        }
 	        // this information should only be computed once
 	        if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
 	            var grammarProductions = cache.getProductionsForClass(className);
@@ -3933,7 +3939,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    utils_1.forEach(secondLevelInOrder, function (prodRng) {
 	        definition.push(buildProdGast(prodRng, allRanges));
 	    });
-	    // IntelliJ bug workaround
 	    prod.definition = definition;
 	    return prod;
 	}
