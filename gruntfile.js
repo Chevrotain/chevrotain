@@ -40,6 +40,17 @@ var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
     '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
 
+var browsers = [];
+
+if (process.env.BROWSER) {
+    console.log("using karma browser config from env (travis-ci build)")
+    browsers.push(process.env.BROWSER)
+}
+else {
+    console.log("using default karma browser config from env (local testing)")
+    browsers = ['Chrome_travis_ci', "Firefox"]
+}
+
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
@@ -91,13 +102,13 @@ module.exports = function(grunt) {
             options: {
                 configFile:  'karma.conf.js',
                 singleRun:   true,
-                browsers:    ['Chrome_travis_ci', "Firefox"],
+                browsers:    browsers,
                 // may help with strange failures on travis-ci "some of your tests did a full page reload"
                 concurrency: 1,
-                client: {
+                client:      {
                     captureConsole: true
                 },
-                retryLimit : 3
+                retryLimit:  3
             },
 
             browsers_unit_tests: {
@@ -459,18 +470,11 @@ module.exports = function(grunt) {
         'run:test_examples_typescript_ecma5'
     ]
 
-    var browserUnitTests = [
+    var browsers_tests = [
         'karma:browsers_unit_tests',
-        'karma:browsers_unit_tests_minified'
-    ]
-
-    var browserIntegrationTests = [
+        'karma:browsers_unit_tests_minified',
         'karma:browsers_integration_tests_globals',
-        'karma:browsers_integration_tests_globals_minified'
-    ]
-
-    // splitting up the browsers integration tests due to random failures in travis-ci
-    var browserIntegrationTests2 = [
+        'karma:browsers_integration_tests_globals_minified',
         'karma:browsers_integration_tests_amd',
         'karma:browsers_integration_tests_amd_minified'
     ]
@@ -481,8 +485,6 @@ module.exports = function(grunt) {
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
-    grunt.registerTask('browsers_unit_tests', browserUnitTests)
-    grunt.registerTask('browsers_integration_tests', browserIntegrationTests)
-    grunt.registerTask('browsers_integration_tests2', browserIntegrationTests2)
+    grunt.registerTask('browsers_tests', browsers_tests)
 
 }

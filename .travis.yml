@@ -21,15 +21,15 @@ matrix:
       env: GRUNT_TASK=node_integration_tests
     - node_js: "0.12"
       env: GRUNT_TASK=node_integration_tests
-    #   seems like Travis + karma + chrome + many different karma tests can cause random faliures with
-    #   "some of your tests did a full page reload" or random lockups
-    allow_failures:
     - node_js: "5"
-      env: GRUNT_TASK=browsers_unit_tests
+      env: GRUNT_TASK=browsers_tests BROWSER=Firefox
     - node_js: "5"
-      env: GRUNT_TASK=browsers_integration_tests
+      env: GRUNT_TASK=browsers_tests BROWSER=Chrome_travis_ci
+  # seems like Travis + karma + chrome + many different karma tests can cause random faliures with
+  # "some of your tests did a full page reload" or random lockups
+  allow_failures:
     - node_js: "5"
-      env: GRUNT_TASK=browsers_integration_tests2
+      env: GRUNT_TASK=browsers_tests BROWSER=Chrome_travis_ci
 addons:
   apt:
     sources:
