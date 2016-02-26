@@ -181,6 +181,14 @@ export class Parser {
         let defErrorsMsgs
 
         let className = classNameFromInstance(classInstance)
+
+        if (className === "") {
+            // just a simple "throw Error" without any fancy "definition error" because the logic below relies on a unique parser name to
+            // save/access those definition errors...
+            throw Error("A Parser's constructor may not be an anonymous Function, it must be a named function\n" +
+                "The constructor's name is used at runtime for performance (caching) purposes.")
+        }
+
         // this information should only be computed once
         if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
             let grammarProductions = cache.getProductionsForClass(className)
@@ -1355,9 +1363,9 @@ export class Parser {
             lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
         }
 
-        if (lookAheadFunc.call(this)) {
+        if ((<Function>lookAheadFunc).call(this)) {
             (<any>action).call(this)
-            while (lookAheadFunc.call(this)) {
+            while ((<Function>lookAheadFunc).call(this)) {
                 (<any>action).call(this)
             }
         }
@@ -1391,7 +1399,7 @@ export class Parser {
         }
 
         // 1st iteration
-        if (firstIterationLookAheadFunc.call(this)) {
+        if ((<Function>firstIterationLookAheadFunc).call(this)) {
             (<GrammarAction>action).call(this)
 
             let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
@@ -1432,7 +1440,7 @@ export class Parser {
             lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
         }
 
-        while (lookAheadFunc.call(this)) {
+        while ((<Function>lookAheadFunc).call(this)) {
             action.call(this)
         }
 
@@ -1462,7 +1470,7 @@ export class Parser {
         }
 
         // 1st iteration
-        if (firstIterationLookAheadFunc.call(this)) {
+        if ((<Function>firstIterationLookAheadFunc).call(this)) {
             action.call(this)
 
             let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
