@@ -93,7 +93,11 @@ module.exports = function(grunt) {
                 singleRun:   true,
                 browsers:    ['Chrome_travis_ci', "Firefox"],
                 // may help with strange failures on travis-ci "some of your tests did a full page reload"
-                concurrency: 1
+                concurrency: 1,
+                client: {
+                    captureConsole: true
+                },
+                retryLimit : 3
             },
 
             browsers_unit_tests: {
