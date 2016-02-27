@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.16 - 2016-01-29 */
+/*! chevrotain - v0.5.18 - 2016-02-26 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.16";
+	API.VERSION = "0.5.18";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -231,6 +231,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var definitionErrors = [];
 	        var defErrorsMsgs;
 	        var className = lang_extensions_1.classNameFromInstance(classInstance);
+	        if (className === "") {
+	            // just a simple "throw Error" without any fancy "definition error" because the logic below relies on a unique parser name to
+	            // save/access those definition errors...
+	            throw Error("A Parser's constructor may not be an anonymous Function, it must be a named function\n" +
+	                "The constructor's name is used at runtime for performance (caching) purposes.");
+	        }
 	        // this information should only be computed once
 	        if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
 	            var grammarProductions = cache.getProductionsForClass(className);
@@ -1312,15 +1318,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return this.tryInRuleRecovery(tokClass, follows);
 	                }
 	                catch (eFromInRuleRecovery) {
-	                    /* istanbul ignore next */ // TODO: try removing this istanbul ignore with tsc 1.5.
-	                    // it is only needed for the else branch but in tsc 1.4.1 comments
-	                    // between if and else seem to get swallowed and disappear.
-	                    if (eFromConsumption instanceof InRuleRecoveryException) {
+	                    if (eFromInRuleRecovery.name === lang_extensions_1.functionName(InRuleRecoveryException)) {
+	                        // failed in RuleRecovery.
 	                        // throw the original error in order to trigger reSync error recovery
 	                        throw eFromConsumption;
 	                    }
 	                    else {
-	                        // some other error Type (built in JS error) this needs to be rethrown, we don't want to swallow it
 	                        throw eFromInRuleRecovery;
 	                    }
 	                }
@@ -3936,7 +3939,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    utils_1.forEach(secondLevelInOrder, function (prodRng) {
 	        definition.push(buildProdGast(prodRng, allRanges));
 	    });
-	    // IntelliJ bug workaround
 	    prod.definition = definition;
 	    return prod;
 	}
