@@ -107,4 +107,4 @@ returned from **CONSUME**, and push each of these strings to the **columns** arr
 
 #### What is Next?
 * Play around in the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) of This tutorial.
-* TBD: Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
+* Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
