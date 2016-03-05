@@ -829,7 +829,7 @@ var samples = {
         }
     },
 
-    "tutorial recovery": {
+    "tutorial fault tolerance": {
         implementation: tutorialErrorRecoveryExample,
         sampleInputs  : {
             "single token insertion"         : '{ "key"   666}',
