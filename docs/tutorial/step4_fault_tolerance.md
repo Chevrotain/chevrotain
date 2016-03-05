@@ -3,7 +3,7 @@
 # Tutorial Step 4 - Fault tolerance and Error recovery.
 
 
-### ---> [Try This Tutorial Online - TBD]() <---
+### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) <---
 
 
 ### Introduction:
@@ -228,4 +228,4 @@ To the parser's constructor [constructor](http://sap.github.io/chevrotain/docume
    
    
 #### What is Next?
-* Play around in the [**online** version](TBD) of This tutorial.
+* Play around in the [**online** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) of this tutorial.
