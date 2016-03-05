@@ -601,6 +601,156 @@ function tutorialGrammarActionsExample() {
     };
 }
 
+function tutorialErrorRecoveryExample() {
+    // ----------------- Lexer -----------------
+    var extendToken = chevrotain.extendToken;
+    var Lexer = chevrotain.Lexer;
+
+    // In ES6, custom inheritance implementation
+    // (such as the one above) can be replaced
+    // with a more simple: "class X extends Y"...
+    var True = extendToken("True", /true/);
+    var False = extendToken("False", /false/);
+    var Null = extendToken("Null", /null/);
+    var LCurly = extendToken("LCurly", /{/);
+    var RCurly = extendToken("RCurly", /}/);
+    var LSquare = extendToken("LSquare", /\[/);
+    var RSquare = extendToken("RSquare", /]/);
+    var Comma = extendToken("Comma", /,/);
+    var Colon = extendToken("Colon", /:/);
+    var StringLiteral = extendToken("StringLiteral",
+        /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
+    var NumberLiteral = extendToken("NumberLiteral",
+        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
+    var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+    WhiteSpace.GROUP = Lexer.SKIPPED;
+
+
+    var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
+        LSquare, RSquare, Comma, Colon, True, False, Null];
+
+    var ChevJsonLexer = new Lexer(jsonTokens, true);
+
+    // ----------------- parser -----------------
+    var ChevrotainParser = chevrotain.Parser;
+
+    function ChevrotainJsonParser(input) {
+        // change to false to completely disable error recovery.
+        var isRecoveryEnabled = true
+        ChevrotainParser.call(this, input, jsonTokens, isRecoveryEnabled);
+        var $ = this;
+
+        this.json = this.RULE("json", function () {
+            // @formatter:off
+            return $.OR([
+                { ALT: function () { return $.SUBRULE($.object) }},
+                { ALT: function () { return $.SUBRULE($.array) }}
+            ]);
+            // @formatter:on
+        });
+
+        this.object = this.RULE("object", function () {
+            // use debugger statements to add breakpoints
+            // (if your browser supports debugging evaluated code)
+            // debugger;
+            var obj = {}
+
+            $.CONSUME(LCurly);
+            $.MANY_SEP(Comma, function () {
+                _.assign(obj, $.SUBRULE($.objectItem));
+            });
+            $.CONSUME(RCurly);
+
+            return obj;
+        });
+
+
+        function invalidObjectItem() {
+            return { ALARM: "recovered objectItem" }
+        }
+
+        this.objectItem = this.RULE("objectItem", function () {
+            var lit, key, value, obj = {};
+
+            lit = $.CONSUME(StringLiteral)
+            $.CONSUME(Colon);
+            value = $.SUBRULE($.value);
+
+            // an empty json key is not valid, use "BAD_KEY" instead
+            key = lit.isInsertedInRecovery ?
+                "BAD_KEY" : lit.image.substr(1, lit.image.length - 2);
+            obj[key] = value;
+            return obj;
+            // InvalidObjectItem will be invoked to replace the returned value of objectItem in case of
+            // between rules re-sync recovery.
+        }, invalidObjectItem);
+
+
+        this.array = this.RULE("array", function () {
+            var arr = [];
+            $.CONSUME(LSquare);
+            $.MANY_SEP(Comma, function () {
+                arr.push($.SUBRULE($.value));
+            });
+            $.CONSUME(RSquare);
+
+            return arr;
+        });
+
+
+        // @formatter:off
+        this.value = this.RULE("value", function () {
+            return $.OR([
+                { ALT: function () {
+                    var stringLiteral = $.CONSUME(StringLiteral).image
+                    // chop of the quotation marks
+                    return stringLiteral.substr(1, stringLiteral.length  - 2);
+                }},
+                { ALT: function () { return Number($.CONSUME(NumberLiteral).image) }},
+                { ALT: function () { return $.SUBRULE($.object) }},
+                { ALT: function () { return $.SUBRULE($.array) }},
+                { ALT: function () {
+                    $.CONSUME(True);
+                    return true;
+                }},
+                { ALT: function () {
+                    $.CONSUME(False);
+                    return false;
+                }},
+                { ALT: function () {
+                    $.CONSUME(Null);
+                    return null;
+                }}
+            ], "a value");
+        });
+        // @formatter:on
+
+        // very important to call this after all the rules have been setup.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived from the self analysis.
+        ChevrotainParser.performSelfAnalysis(this);
+    }
+
+    ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
+    ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
+
+    // customize the allowed types of tokens which are allowed to be inserted in single token insertion
+    ChevrotainJsonParser.prototype.canTokenTypeBeInsertedInRecovery = function(tokClass) {
+        // comment in to disable insertion for colons
+        // if (tokClass === Colon) {
+        //     return false;
+        // }
+
+        return true;
+    }
+
+    // for the playground to work the returned object must contain these fields
+    return {
+        lexer      : ChevJsonLexer,
+        parser     : ChevrotainJsonParser,
+        defaultRule: "json"
+    };
+}
 
 var samples = {
     json      : {
@@ -676,6 +826,16 @@ var samples = {
         sampleInputs  : {
             "valid"         : "SELECT name, age FROM students WHERE age > 22",
             "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
+        }
+    },
+
+    "tutorial recovery": {
+        implementation: tutorialErrorRecoveryExample,
+        sampleInputs  : {
+            "single token insertion"         : '{ "key"   666}',
+            "single token deletion": '{ "key" }: 666}',
+            "in rule repetition re-sync recovery:": '{\n"key1" : 1, \n"key2" : 2 666 \n"key3"  : 3, \n"key4"  : 4 }',
+            "between rules re-sync recovery": '{ \n"firstName": "John",\n "someData": { "bad" :: "part" }, \n "isAlive": true, \n"age": 25 }'
         }
     }
 }
