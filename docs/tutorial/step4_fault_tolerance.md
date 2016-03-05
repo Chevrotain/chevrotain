@@ -7,10 +7,10 @@
 
 
 ### Introduction:
-After the previous tutorial steps we now know how to build a parser for a simple grammar.
+In the previous tutorial steps we leared how to build a parser for a simple grammar.
 Our parser can handle valid inputs just fine, but what happens if the input is not perfectly valid?
-For example when building an Editor for a programing language, the input is often not completely valid,
-yet an editor is still expected to provide functionality (outline/auto-complete/navigation/error locations...)
+For example when building an editor for a programing language, the input is often not completely valid,
+yet the editor is still expected to provide functionality (outline/auto-complete/navigation/error locations...)
 even for invalid inputs.
 
 Chevrotain uses several fault tolerance / error recovery heuristics, which generally follow error recovery heuristics
@@ -34,7 +34,7 @@ For example: in a JSON text colons are used between keys and values.
 { "key"   666}
 ```
 
-after consuming:
+If we try parsing the "bad" example, after consuming:
 ```javascript
 { "key"
 ```
@@ -69,16 +69,16 @@ For example: lets look at the case of a
 { "key" }: 666}
 ```
 
-after consuming:
+If we try parsing the "bad" example, after consuming:
 ```javascript
 { "key" 
 ```
 
 * We are expecting a colon token (Y).
 * But we found right brackets (X) instead.
-* The next token (":") is a colon token (Y) which the one we expected.
+* The next token (":") is a colon token (Y) which the one we originally expected.
 
-Therefore the redundant right brackets "}" will be skipped and the parser will consume the number Token
+Therefore the redundant right brackets "}" will be skipped (deleted) and the parser will consume the number token.
 
 
 ### The following re-sync recovery examples use this sample json like grammar:
@@ -107,8 +107,8 @@ the repetition.
 
 There are a couple of edge cases in which **other** recovery methods will be preferred:
 * If single token insertion/deletion can be performed, it is always preferred as it skips fewer tokens.
-* If between rules re-sync recovery can be performed (see below) **and** it can be done by skipping **fewer** tokens
-  between rules re-sync will be preferred over repetition re-sync recovery. The same principle applies, the heuristics are greedy
+* If between rules re-sync recovery can be performed (see below) **and** it can be done by skipping **fewer** tokens.
+  Between rules re-sync will be preferred over repetition re-sync recovery. The same principle applies, the heuristics are greedy
   and "prefer" to skip the fewest number of tokens.
 
 Example:
@@ -120,7 +120,12 @@ Example:
   "key4  : 4 
 }
 ```
-
+If we try parsing this input example, after consuming:
+```javascript
+{ 
+  "key1" : 1,
+  "key2" : 2
+```
 * The parser in in a repetition of **(comma objectItem)* **
 * After consuming '"key2" : 2' the parser "thinks" it has consumed the last iteration as the next comma is missing.
 * The next token (X) encountered is "666" which is invalid in that position as the parser expected a "}" after the repetition ends.
@@ -192,7 +197,7 @@ For the following invalid json input:
 * Thus the next two items will appear be parsed successfully even though they were preceded by a syntax error! 
 
 
-**Regarding return values of re-synced rules:**
+####Regarding return values of re-synced rules:
 Just being able to continue parsing is not enough, as "someone" probably expects a returned value
 from the sub-rule we have recovered from.
 
@@ -203,14 +208,14 @@ Customization is done during the definition of the grammar [RULE](http://sap.git
 The third parameter(**invalidRet**) is a function which will be invoked to produce the returned value in case of re-sync recovery. 
 
 
-**Disabling Re-Sync Recovery:**
+####Disabling Re-Sync Recovery:
 Re-Sync recovery is enabled by default for all rules.
 In some cases it may be appropriate to disable re-sync recovery for a specific rule.
 This is (once again) done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_5_18/classes/parser.html#rule).
 The fourth argument is a boolean which can be controls whether or not re-sync is enabled for the defined rule.
  
 
-### Difference between "In-Rule" and "Between Rules" recovery.
+#### Difference between "In-Rule" and "Between Rules" recovery.
 The main difference is that "In-Rule" recovery fixes the problem in the scope of a single rule, while Between Rules recovery will fail at 
 least one parsing rule (and perhaps many more). Thus the latter tends to "lose" more of the original input and requires 
 additional definitions (what should be returned value of a re-synced rule?).
