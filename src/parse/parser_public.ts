@@ -1082,7 +1082,7 @@ export class Parser {
         }
     }
 
-    /*
+    /**
      * Returns an "imaginary" Token to insert when Single Token Insertion is done
      * Override this if you require special behavior in your grammar
      * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
@@ -1091,7 +1091,7 @@ export class Parser {
         return new (<any>tokClass)(-1, -1)
     }
 
-    /*
+    /**
      * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
      * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
      * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
