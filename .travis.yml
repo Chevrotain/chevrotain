@@ -57,8 +57,8 @@ deploy:
     api_key:
       secure: DNq1wbqLPHVpJPDx9O89HZM+RJB6v2R7/wk8pok7Z8NT72kUWdvbqcThGhczPO4sZ8cUTJ3ergTCE8hs9mynlR/lX6932U4fj4+uICQL9+G+deBB/t2SNyTBllkE64WrJ9BKmQvIk/Chh7ZJOM0Fro3p2BIq3JsVnfYg1tZ3U5o=
     file:
-      - package/chevrotain-binaries-0.5.18.zip
-      - package/chevrotain-binaries-0.5.18.tar.gz
+      - package/chevrotain-binaries-0.5.19.zip
+      - package/chevrotain-binaries-0.5.19.tar.gz
     on:
       tags : true
       all_branches: true
