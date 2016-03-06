@@ -1114,16 +1114,25 @@ export class Parser {
         let nextTokenWithoutResync = this.NEXT_TOKEN()
         let currToken = this.NEXT_TOKEN()
         let passedResyncPoint = false
+
+        let generateErrorMessage = () => {
+            // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
+            // the error that would have been thrown
+            let expectedTokName = tokenName(expectedTokType)
+            let msg = "Expecting token of type -->" + expectedTokName +
+                "<-- but found -->'" + nextTokenWithoutResync.image + "'<--"
+            this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync))
+        }
+
         while (!passedResyncPoint) {
+            // re-synced to a point where we can safely exit the repetition/
+            if (currToken instanceof expectedTokType) {
+                generateErrorMessage()
+                return // must return here to avoid reverting the inputIdx
+            }
             // we skipped enough tokens so we can resync right back into another iteration of the repetition grammar rule
             if (lookAheadFunc.call(this)) {
-                // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
-                // the error that would have been thrown
-                let expectedTokName = tokenName(expectedTokType)
-                let msg = "Expecting token of type -->" + expectedTokName +
-                    "<-- but found -->'" + nextTokenWithoutResync.image + "'<--"
-                this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync))
-
+                generateErrorMessage()
                 // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
                 grammarRule.apply(this, grammarRuleArgs)
                 return // must return here to avoid reverting the inputIdx

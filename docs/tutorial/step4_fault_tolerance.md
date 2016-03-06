@@ -103,7 +103,7 @@ Repetition re-sync recovery happens when:
 * The next token X is invalid right after the repetition ended.
 
 In such a situation the parser will attempt to skip tokens until it detects the beginning of a another iteration of
-the repetition.
+the repetition **or** the token it originally expected after the last iteration.
 
 There are a couple of edge cases in which **other** recovery methods will be preferred:
 * If single token insertion/deletion can be performed, it is always preferred as it skips fewer tokens.

@@ -117,7 +117,7 @@ describe("Error Recovery switch-case Example", () => {
         })
     })
 
-    it("can also sometimes fail in automatic error recovery :)", () => {
+    it("can perform re-sync recovery to the right curly after the case statements repetition", () => {
         let input = [
             // switch (name) {
             new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
@@ -138,7 +138,11 @@ describe("Error Recovery switch-case Example", () => {
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.isAtEndOfInput()).to.equal(true)
-        expect(parseResult).to.deep.equal({})
+        expect(parseResult).to.deep.equal({
+            "Terry":   2,
+            "Robert":  4,
+            "Brandon": 6
+        })
     })
 
     it("can perform single token deletion recovery", () => {
