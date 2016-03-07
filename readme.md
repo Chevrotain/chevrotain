@@ -14,28 +14,28 @@ any code generation phase.
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
    
 ## Features
-  * **Lexer engine** based on RexExps.
+  * **Lexer engine** based on Regular Expression.
     * Supports Token location tracking.
     * Supports Token skipping (whitespace/comments/...).
     * Allows prioritising shorter matches (Keywords vs Identifiers).
     * **No code generation** The Lexer does not require any code generation phase. 
    
   * **Parsing DSL** for defining the grammar.
-    * **No code generation**
-      * The DSL is just javascript not an external language, what is written is what will be run.
-      * Speeds up development, 
-      * Makes debugging trivial. 
+    * **No code generation**.
+      * The DSL is just Javascript, not an external language.
+      * The Parsing flow is easily debuggable.
+      * Short feedback loops.
       * Allows great flexibility for inserting custom Parser actions.
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for LL(1) grammars.
     * Supports Custom lookahead logic for LL(k) grammars.
-    * Backtracking support.  
+    * Backtracking support.
 
   * [**High performance - JSPerf.**](http://jsperf.com/json-parsers-comparison/21)
 
   * **Grammar Reflection/Introspection**
-    * A Parser's grammar's structure is known and **exposed** at runtime.
+    * The Grammar's structure is known and **exposed** at runtime.
     * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
   
   * Well tested with **~100% code coverage**, Unit & Integration tests
