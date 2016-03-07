@@ -6,9 +6,9 @@
 
 # Chevrotain
 
-Chevrotain is a **Javascript parsing DSL** for building fault tolerant recursive decent parsers.
+Chevrotain is a **Javascript parsing DSL** for building **[high performance](http://jsperf.com/json-parsers-comparison/21)** **fault-tolerant** recursive decent parsers.
 
-Chevrotain is **NOT** a parser generator. it solves the same kind of problems as a parser generator, just without
+Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
@@ -20,19 +20,19 @@ any code generation phase.
     * Allows prioritising shorter matches (Keywords vs Identifiers).
     * **No code generation** The Lexer does not require any code generation phase. 
    
-  * **Parsing DSL** for creating the parsing rules.
+  * **Parsing DSL** for defining the grammar.
     * **No code generation**
       * The DSL is just javascript not an external language, what is written is what will be run.
       * Speeds up development, 
       * Makes debugging trivial. 
       * Allows great flexibility for inserting custom Parser actions.
     * **Error Reporting** with full location information. 
-    * Strong **Error Recovery/fault tolerance** capabilities based on Antlr3's algorithms.
+    * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for LL(1) grammars.
     * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.  
 
-  * [**High performance.**](http://jsperf.com/json-parsers-comparison/21)
+  * [**High performance - JSPerf.**](http://jsperf.com/json-parsers-comparison/21)
 
   * **Grammar Reflection/Introspection**
     * A Parser's grammar's structure is known and **exposed** at runtime.
@@ -43,8 +43,7 @@ any code generation phase.
 ## Installation
 * **npm**: ```npm install chevrotain```
 * **Bower** ```bower install chevrotain```
-* or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest):
-  * the 'chevrotain-binaries-...' files contain the compiled javascript code.
+* or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest)
 
 ## Getting Started
 
