@@ -313,6 +313,8 @@ function calculatorExample() {
 
 
 function tutorialLexerExample() {
+    // Written Docs for this tutorial step can be found here:
+    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md
 
     // Tutorial Step 1:
     // Implementation of A lexer for a simple SELECT statement grammar
@@ -348,6 +350,8 @@ function tutorialLexerExample() {
 
 // TODO: avoid duplication of code from step 1
 function tutorialGrammarExample() {
+    // Written Docs for this tutorial step can be found here:
+    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md
 
     // Tutorial Step 2:
 
@@ -468,6 +472,8 @@ function tutorialGrammarExample() {
 }
 
 function tutorialGrammarActionsExample() {
+    // Written Docs for this tutorial step can be found here:
+    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md
 
     // Tutorial Step 3:
 
@@ -602,6 +608,9 @@ function tutorialGrammarActionsExample() {
 }
 
 function tutorialErrorRecoveryExample() {
+    // Written Docs for this tutorial step can be found here:
+    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md
+
     // ----------------- Lexer -----------------
     var extendToken = chevrotain.extendToken;
     var Lexer = chevrotain.Lexer;
