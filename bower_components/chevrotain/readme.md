@@ -52,12 +52,13 @@ any code generation phase.
  * Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
  * Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
  * Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
+ * Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/edit/master/docs/tutorial/step4_fault_tolerance.md).
 
 **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_18/classes/parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_19/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
@@ -74,7 +75,7 @@ None.
 ## Compatibility
 Chevrotain should run on any modern Javascript ES5.1 runtime. 
 * The CI build runs the tests under: 
-  * Node.js (0.10 / 0.12 / 4 / 5).
+  * Node.js (0.12 / 4 / 5).
   * latest stable Chrome.
   * latest stable Firefox.
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.

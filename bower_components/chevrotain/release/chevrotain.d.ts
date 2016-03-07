@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.18 - 2016-02-26 */
+/*! chevrotain - v0.5.19 - 2016-03-07 */
 declare namespace chevrotain {
     class HashTable<V>{}
     export function tokenName(clazz: Function): string;
@@ -680,7 +680,19 @@ declare namespace chevrotain {
         protected RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, invalidRet?: () => T, doReSync?: boolean): (idxInCallingRule?: number, ...args: any[]) => T;
         protected ruleInvocationStateUpdate(ruleName: string, idxInCallingRule: number): void;
         protected ruleFinallyStateUpdate(): void;
+        /**
+         * Returns an "imaginary" Token to insert when Single Token Insertion is done
+         * Override this if you require special behavior in your grammar
+         * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
+         */
         protected getTokenToInsert(tokClass: Function): Token;
+        /**
+         * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
+         * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
+         * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
+         * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
+         * as the max of the cardinality will be greater than the min value. (and this is a false error!)
+         */
         protected canTokenTypeBeInsertedInRecovery(tokClass: Function): boolean;
                                                                                                     /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)

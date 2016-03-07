@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.18 - 2016-02-26 */
+/*! chevrotain - v0.5.19 - 2016-03-07 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -56,6 +56,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var parser_public_1 = __webpack_require__(1);
 	var lexer_public_1 = __webpack_require__(11);
 	var tokens_public_1 = __webpack_require__(10);
@@ -68,7 +69,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.18";
+	API.VERSION = "0.5.19";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -107,6 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var cache = __webpack_require__(2);
 	var exceptions_public_1 = __webpack_require__(5);
 	var lang_extensions_1 = __webpack_require__(3);
@@ -945,7 +947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.SAVE_ERROR(new exceptions_public_1.exceptions.NotAllInputParsedException("Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok));
 	        }
 	    };
-	    /*
+	    /**
 	     * Returns an "imaginary" Token to insert when Single Token Insertion is done
 	     * Override this if you require special behavior in your grammar
 	     * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
@@ -953,7 +955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Parser.prototype.getTokenToInsert = function (tokClass) {
 	        return new tokClass(-1, -1);
 	    };
-	    /*
+	    /**
 	     * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
 	     * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
 	     * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
@@ -965,21 +967,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Parser.prototype.defaultInvalidReturn = function () { return undefined; };
 	    Parser.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
+	        var _this = this;
 	        // TODO: can the resyncTokenType be cached?
 	        var reSyncTokType = this.findReSyncTokenType();
 	        var orgInputIdx = this.inputIdx;
 	        var nextTokenWithoutResync = this.NEXT_TOKEN();
 	        var currToken = this.NEXT_TOKEN();
 	        var passedResyncPoint = false;
+	        var generateErrorMessage = function () {
+	            // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
+	            // the error that would have been thrown
+	            var expectedTokName = tokens_public_1.tokenName(expectedTokType);
+	            var msg = "Expecting token of type -->" + expectedTokName +
+	                "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
+	            _this.SAVE_ERROR(new exceptions_public_1.exceptions.MismatchedTokenException(msg, nextTokenWithoutResync));
+	        };
 	        while (!passedResyncPoint) {
+	            // re-synced to a point where we can safely exit the repetition/
+	            if (currToken instanceof expectedTokType) {
+	                generateErrorMessage();
+	                return; // must return here to avoid reverting the inputIdx
+	            }
 	            // we skipped enough tokens so we can resync right back into another iteration of the repetition grammar rule
 	            if (lookAheadFunc.call(this)) {
-	                // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
-	                // the error that would have been thrown
-	                var expectedTokName = tokens_public_1.tokenName(expectedTokType);
-	                var msg = "Expecting token of type -->" + expectedTokName +
-	                    "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
-	                this.SAVE_ERROR(new exceptions_public_1.exceptions.MismatchedTokenException(msg, nextTokenWithoutResync));
+	                generateErrorMessage();
 	                // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
 	                grammarRule.apply(this, grammarRuleArgs);
 	                return; // must return here to avoid reverting the inputIdx
@@ -1429,7 +1440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // needing to display the parser definition errors in some GUI(online playground).
 	    Parser.DEFER_DEFINITION_ERRORS_HANDLING = false;
 	    return Parser;
-	})();
+	}());
 	exports.Parser = Parser;
 	function InRuleRecoveryException(message) {
 	    this.name = lang_extensions_1.functionName(InRuleRecoveryException);
@@ -1445,6 +1456,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * module used to cache static information about parsers,
 	 */
+	"use strict";
 	var lang_extensions_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(4);
 	exports.CLASS_TO_DEFINITION_ERRORS = new lang_extensions_1.HashTable();
@@ -1521,6 +1533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var utils = __webpack_require__(4);
 	var nameRegex = /^\s*function\s*(\S*)\s*\(/;
 	/* istanbul ignore next */
@@ -1580,7 +1593,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._state = {};
 	    };
 	    return HashTable;
-	})();
+	}());
 	exports.HashTable = HashTable;
 
 
@@ -1588,6 +1601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports) {
 
+	"use strict";
 	/*
 	 Utils using lodash style API. (not necessarily 100% compliant) for functional and other utils.
 	 These utils should replace usage of lodash in the production code base. not because they are any better...
@@ -1882,6 +1896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var lang_extensions_1 = __webpack_require__(3);
 	var utils_1 = __webpack_require__(4);
 	var exceptions;
@@ -1934,6 +1949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -1978,7 +1994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return GastRefResolverVisitor;
-	})(gast_public_1.gast.GAstVisitor);
+	}(gast_public_1.gast.GAstVisitor));
 	exports.GastRefResolverVisitor = GastRefResolverVisitor;
 
 
@@ -1986,6 +2002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -2006,7 +2023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        };
 	        return AbstractProduction;
-	    })();
+	    }());
 	    gast.AbstractProduction = AbstractProduction;
 	    var NonTerminal = (function (_super) {
 	        __extends(NonTerminal, _super);
@@ -2036,7 +2053,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // don't visit children of a reference, we will get cyclic infinite loops if we do so
 	        };
 	        return NonTerminal;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.NonTerminal = NonTerminal;
 	    var Rule = (function (_super) {
 	        __extends(Rule, _super);
@@ -2047,7 +2064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.orgText = orgText;
 	        }
 	        return Rule;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.Rule = Rule;
 	    var Flat = (function (_super) {
 	        __extends(Flat, _super);
@@ -2055,7 +2072,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _super.call(this, definition);
 	        }
 	        return Flat;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.Flat = Flat;
 	    var Option = (function (_super) {
 	        __extends(Option, _super);
@@ -2065,7 +2082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.occurrenceInParent = occurrenceInParent;
 	        }
 	        return Option;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.Option = Option;
 	    var RepetitionMandatory = (function (_super) {
 	        __extends(RepetitionMandatory, _super);
@@ -2075,7 +2092,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.occurrenceInParent = occurrenceInParent;
 	        }
 	        return RepetitionMandatory;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.RepetitionMandatory = RepetitionMandatory;
 	    var RepetitionMandatoryWithSeparator = (function (_super) {
 	        __extends(RepetitionMandatoryWithSeparator, _super);
@@ -2086,7 +2103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.occurrenceInParent = occurrenceInParent;
 	        }
 	        return RepetitionMandatoryWithSeparator;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.RepetitionMandatoryWithSeparator = RepetitionMandatoryWithSeparator;
 	    var Repetition = (function (_super) {
 	        __extends(Repetition, _super);
@@ -2096,7 +2113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.occurrenceInParent = occurrenceInParent;
 	        }
 	        return Repetition;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.Repetition = Repetition;
 	    var RepetitionWithSeparator = (function (_super) {
 	        __extends(RepetitionWithSeparator, _super);
@@ -2107,7 +2124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.occurrenceInParent = occurrenceInParent;
 	        }
 	        return RepetitionWithSeparator;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.RepetitionWithSeparator = RepetitionWithSeparator;
 	    var Alternation = (function (_super) {
 	        __extends(Alternation, _super);
@@ -2117,7 +2134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.occurrenceInParent = occurrenceInParent;
 	        }
 	        return Alternation;
-	    })(AbstractProduction);
+	    }(AbstractProduction));
 	    gast.Alternation = Alternation;
 	    var Terminal = (function () {
 	        function Terminal(terminalType, occurrenceInParent) {
@@ -2130,7 +2147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            visitor.visit(this);
 	        };
 	        return Terminal;
-	    })();
+	    }());
 	    gast.Terminal = Terminal;
 	    var GAstVisitor = (function () {
 	        function GAstVisitor() {
@@ -2175,7 +2192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        GAstVisitor.prototype.visitAlternation = function (node) { };
 	        GAstVisitor.prototype.visitTerminal = function (node) { };
 	        return GAstVisitor;
-	    })();
+	    }());
 	    gast.GAstVisitor = GAstVisitor;
 	})(gast = exports.gast || (exports.gast = {}));
 
@@ -2184,6 +2201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -2286,7 +2304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.allProductions.push(terminal);
 	    };
 	    return OccurrenceValidationCollector;
-	})(gast_public_1.gast.GAstVisitor);
+	}(gast_public_1.gast.GAstVisitor));
 	exports.OccurrenceValidationCollector = OccurrenceValidationCollector;
 	var ruleNamePattern = /^[a-zA-Z_]\w*$/;
 	function validateRuleName(ruleName, definedRulesNames, className) {
@@ -2398,7 +2416,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.alternations.push(node);
 	    };
 	    return OrCollector;
-	})(gast_public_1.gast.GAstVisitor);
+	}(gast_public_1.gast.GAstVisitor));
 	function validateEmptyOrAlternative(topLevelRule) {
 	    var orCollector = new OrCollector();
 	    topLevelRule.accept(orCollector);
@@ -2432,6 +2450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var gast_public_1 = __webpack_require__(7);
 	var utils_1 = __webpack_require__(4);
 	var lang_extensions_1 = __webpack_require__(3);
@@ -2505,6 +2524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -2590,7 +2610,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.isInsertedInRecovery = false;
 	    }
 	    return Token;
-	})();
+	}());
 	exports.Token = Token;
 	/**
 	 * a special kind of Token which does not really exist in the input
@@ -2603,7 +2623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _super.call(this, "", -1, -1, -1, -1, -1);
 	    }
 	    return VirtualToken;
-	})(Token);
+	}(Token));
 	exports.VirtualToken = VirtualToken;
 	var EOF = (function (_super) {
 	    __extends(EOF, _super);
@@ -2611,7 +2631,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _super.apply(this, arguments);
 	    }
 	    return EOF;
-	})(VirtualToken);
+	}(VirtualToken));
 	exports.EOF = EOF;
 
 
@@ -2619,6 +2639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var lexer_1 = __webpack_require__(12);
 	var utils_1 = __webpack_require__(4);
 	(function (LexerDefinitionErrorType) {
@@ -2840,7 +2861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Lexer.NA = /NOT_APPLICABLE/;
 	    return Lexer;
-	})();
+	}());
 	exports.Lexer = Lexer;
 
 
@@ -2848,6 +2869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var tokens_public_1 = __webpack_require__(10);
 	var lexer_public_1 = __webpack_require__(11);
 	var utils_1 = __webpack_require__(4);
@@ -3072,6 +3094,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var gast_public_1 = __webpack_require__(7);
 	var gast_1 = __webpack_require__(9);
 	var utils_1 = __webpack_require__(4);
@@ -3137,6 +3160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -3173,7 +3197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.follows.put(followName, t_in_topProd_follows);
 	    };
 	    return ResyncFollowsWalker;
-	})(rest_1.RestWalker);
+	}(rest_1.RestWalker));
 	exports.ResyncFollowsWalker = ResyncFollowsWalker;
 	function computeAllProdsFollows(topProductions) {
 	    var reSyncFollows = new lang_extensions_1.HashTable();
@@ -3199,6 +3223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var gast_public_1 = __webpack_require__(7);
 	var utils_1 = __webpack_require__(4);
 	/**
@@ -3290,7 +3315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	    };
 	    return RestWalker;
-	})();
+	}());
 	exports.RestWalker = RestWalker;
 	function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
 	    var repSepRest = [new gast_public_1.gast.Option([new gast_public_1.gast.Terminal(repSepProd.separator)].concat(repSepProd.definition))];
@@ -3303,6 +3328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 16 */
 /***/ function(module, exports) {
 
+	"use strict";
 	// TODO: can this be removed? where is it used?
 	exports.IN = "_~IN~_";
 
@@ -3311,6 +3337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var gast_public_1 = __webpack_require__(7);
 	var first_1 = __webpack_require__(13);
 	var interpreter_1 = __webpack_require__(18);
@@ -3350,14 +3377,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    var hasLastAnEmptyAlt = utils_1.isEmpty(utils_1.last(alternativesTokens));
 	    if (hasLastAnEmptyAlt) {
-	        var lastIdx = alternativesTokens.length - 1;
+	        var lastIdx_1 = alternativesTokens.length - 1;
 	        /**
 	         * This will return the Index of the alternative to take or the <lastidx> if only the empty alternative matched
 	         */
 	        return function chooseAlternativeWithEmptyAlt() {
 	            var nextToken = this.NEXT_TOKEN();
 	            // checking only until length - 1 because there is nothing to check in an empty alternative, it is always valid
-	            for (var i = 0; i < lastIdx; i++) {
+	            for (var i = 0; i < lastIdx_1; i++) {
 	                var currAltTokens = alternativesTokens[i];
 	                // 'for' loop for performance reasons.
 	                for (var j = 0; j < currAltTokens.length; j++) {
@@ -3367,7 +3394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	            // an OR(alternation) with an empty alternative will always match
-	            return lastIdx;
+	            return lastIdx_1;
 	        };
 	    }
 	    else {
@@ -3455,6 +3482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -3525,7 +3553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return AbstractNextPossibleTokensWalker;
-	})(rest_1.RestWalker);
+	}(rest_1.RestWalker));
 	exports.AbstractNextPossibleTokensWalker = AbstractNextPossibleTokensWalker;
 	var NextAfterTokenWalker = (function (_super) {
 	    __extends(NextAfterTokenWalker, _super);
@@ -3547,7 +3575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextAfterTokenWalker;
-	})(AbstractNextPossibleTokensWalker);
+	}(AbstractNextPossibleTokensWalker));
 	exports.NextAfterTokenWalker = NextAfterTokenWalker;
 	var NextInsideOptionWalker = (function (_super) {
 	    __extends(NextInsideOptionWalker, _super);
@@ -3568,7 +3596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextInsideOptionWalker;
-	})(AbstractNextPossibleTokensWalker);
+	}(AbstractNextPossibleTokensWalker));
 	exports.NextInsideOptionWalker = NextInsideOptionWalker;
 	var NextInsideManyWalker = (function (_super) {
 	    __extends(NextInsideManyWalker, _super);
@@ -3589,7 +3617,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextInsideManyWalker;
-	})(AbstractNextPossibleTokensWalker);
+	}(AbstractNextPossibleTokensWalker));
 	exports.NextInsideManyWalker = NextInsideManyWalker;
 	var NextInsideManySepWalker = (function (_super) {
 	    __extends(NextInsideManySepWalker, _super);
@@ -3610,7 +3638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextInsideManySepWalker;
-	})(AbstractNextPossibleTokensWalker);
+	}(AbstractNextPossibleTokensWalker));
 	exports.NextInsideManySepWalker = NextInsideManySepWalker;
 	var NextInsideAtLeastOneWalker = (function (_super) {
 	    __extends(NextInsideAtLeastOneWalker, _super);
@@ -3631,7 +3659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextInsideAtLeastOneWalker;
-	})(AbstractNextPossibleTokensWalker);
+	}(AbstractNextPossibleTokensWalker));
 	exports.NextInsideAtLeastOneWalker = NextInsideAtLeastOneWalker;
 	var NextInsideAtLeastOneSepWalker = (function (_super) {
 	    __extends(NextInsideAtLeastOneSepWalker, _super);
@@ -3652,7 +3680,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextInsideAtLeastOneSepWalker;
-	})(AbstractNextPossibleTokensWalker);
+	}(AbstractNextPossibleTokensWalker));
 	exports.NextInsideAtLeastOneSepWalker = NextInsideAtLeastOneSepWalker;
 	var NextInsideOrWalker = (function (_super) {
 	    __extends(NextInsideOrWalker, _super);
@@ -3678,7 +3706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextInsideOrWalker;
-	})(rest_1.RestWalker);
+	}(rest_1.RestWalker));
 	exports.NextInsideOrWalker = NextInsideOrWalker;
 	/**
 	 * This walker only "walks" a single "TOP" level in the Grammar Ast, this means
@@ -3697,7 +3725,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.result;
 	    };
 	    return AbstractNextTerminalAfterProductionWalker;
-	})(rest_1.RestWalker);
+	}(rest_1.RestWalker));
 	exports.AbstractNextTerminalAfterProductionWalker = AbstractNextTerminalAfterProductionWalker;
 	var NextTerminalAfterManyWalker = (function (_super) {
 	    __extends(NextTerminalAfterManyWalker, _super);
@@ -3718,7 +3746,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextTerminalAfterManyWalker;
-	})(AbstractNextTerminalAfterProductionWalker);
+	}(AbstractNextTerminalAfterProductionWalker));
 	exports.NextTerminalAfterManyWalker = NextTerminalAfterManyWalker;
 	var NextTerminalAfterManySepWalker = (function (_super) {
 	    __extends(NextTerminalAfterManySepWalker, _super);
@@ -3739,7 +3767,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextTerminalAfterManySepWalker;
-	})(AbstractNextTerminalAfterProductionWalker);
+	}(AbstractNextTerminalAfterProductionWalker));
 	exports.NextTerminalAfterManySepWalker = NextTerminalAfterManySepWalker;
 	var NextTerminalAfterAtLeastOneWalker = (function (_super) {
 	    __extends(NextTerminalAfterAtLeastOneWalker, _super);
@@ -3760,7 +3788,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextTerminalAfterAtLeastOneWalker;
-	})(AbstractNextTerminalAfterProductionWalker);
+	}(AbstractNextTerminalAfterProductionWalker));
 	exports.NextTerminalAfterAtLeastOneWalker = NextTerminalAfterAtLeastOneWalker;
 	// TODO: reduce code duplication in the AfterWalkers
 	var NextTerminalAfterAtLeastOneSepWalker = (function (_super) {
@@ -3782,7 +3810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return NextTerminalAfterAtLeastOneSepWalker;
-	})(AbstractNextTerminalAfterProductionWalker);
+	}(AbstractNextTerminalAfterProductionWalker));
 	exports.NextTerminalAfterAtLeastOneSepWalker = NextTerminalAfterAtLeastOneSepWalker;
 
 
@@ -3790,6 +3818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var range_1 = __webpack_require__(20);
 	var gast_public_1 = __webpack_require__(7);
 	var utils_1 = __webpack_require__(4);
@@ -4095,6 +4124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 20 */
 /***/ function(module, exports) {
 
+	"use strict";
 	var Range = (function () {
 	    function Range(start, end) {
 	        this.start = start;
@@ -4119,7 +4149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return other.strictlyContainsRange(this);
 	    };
 	    return Range;
-	})();
+	}());
 	exports.Range = Range;
 	function isValidRange(start, end) {
 	    return !(start < 0 || end < start);
@@ -4131,6 +4161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
 	var cache_1 = __webpack_require__(2);
 	/**
 	 * Clears the chevrotain internal cache.
