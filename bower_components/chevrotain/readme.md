@@ -6,45 +6,44 @@
 
 # Chevrotain
 
-Chevrotain is a **Javascript parsing DSL** for building fault tolerant recursive decent parsers.
+Chevrotain is a **Javascript parsing DSL** for building **[high performance](http://jsperf.com/json-parsers-comparison/21)** **fault-tolerant** recursive decent parsers.
 
-Chevrotain is **NOT** a parser generator. it solves the same kind of problems as a parser generator, just without
+Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
    
 ## Features
-  * **Lexer engine** based on RexExps.
+  1. **Lexer Engine** based on Regular Expression.
     * Supports Token location tracking.
     * Supports Token skipping (whitespace/comments/...).
     * Allows prioritising shorter matches (Keywords vs Identifiers).
     * **No code generation** The Lexer does not require any code generation phase. 
    
-  * **Parsing DSL** for creating the parsing rules.
-    * **No code generation**
-      * The DSL is just javascript not an external language, what is written is what will be run.
-      * Speeds up development, 
-      * Makes debugging trivial. 
+  2. **Parsing DSL** for defining the grammar.
+    * **No code generation**.
+      * The DSL is just Javascript, not an external language.
+      * The Parsing flow is easily debuggable.
+      * Short feedback loops.
       * Allows great flexibility for inserting custom Parser actions.
     * **Error Reporting** with full location information. 
-    * Strong **Error Recovery/fault tolerance** capabilities based on Antlr3's algorithms.
+    * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for LL(1) grammars.
     * Supports Custom lookahead logic for LL(k) grammars.
-    * Backtracking support.  
+    * Backtracking support.
 
-  * [**High performance.**](http://jsperf.com/json-parsers-comparison/21)
+  3. [**High performance - (see on JSPerf)**](http://jsperf.com/json-parsers-comparison/21).
 
-  * **Grammar Reflection/Introspection**
-    * A Parser's grammar's structure is known and **exposed** at runtime.
+  4. **Grammar Reflection/Introspection**.
+    * The Grammar's structure is known and **exposed** at runtime.
     * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
   
-  * Well tested with **~100% code coverage**, Unit & Integration tests
+  5. Well tested with **~100% code coverage**, Unit & Integration tests
    
 ## Installation
 * **npm**: ```npm install chevrotain```
 * **Bower** ```bower install chevrotain```
-* or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest):
-  * the 'chevrotain-binaries-...' files contain the compiled javascript code.
+* or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest)
 
 ## Getting Started
 
@@ -52,13 +51,13 @@ any code generation phase.
  * Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
  * Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
  * Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
- * Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/edit/master/docs/tutorial/step4_fault_tolerance.md).
+ * Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
 
 **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_19/classes/parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_5_20/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)

@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.19 - 2016-03-07 */
+/*! chevrotain - v0.5.20 - 2016-03-09 */
 declare namespace chevrotain {
     class HashTable<V>{}
     export function tokenName(clazz: Function): string;
@@ -795,6 +795,7 @@ declare namespace chevrotain {
             visitRepetitionWithSeparator(node: RepetitionWithSeparator): void;
             visitAlternation(node: Alternation): void;
             visitTerminal(node: Terminal): void;
+            visitRule(node: Rule): void;
         }
     }
     
