@@ -90,36 +90,42 @@ export namespace gast {
     export abstract class GAstVisitor {
 
         public visit(node:IProduction) {
+
             if (node instanceof NonTerminal) {
-                this.visitNonTerminal(<NonTerminal>node)
+                this.visitNonTerminal(node)
             }
             else if (node instanceof Flat) {
-                this.visitFlat(<Flat>node)
+                this.visitFlat(node)
             }
             else if (node instanceof Option) {
-                this.visitOption(<Option>node)
+                this.visitOption(node)
             }
             else if (node instanceof RepetitionMandatory) {
-                this.visitRepetitionMandatory(<RepetitionMandatory>node)
+                this.visitRepetitionMandatory(node)
             }
             else if (node instanceof RepetitionMandatoryWithSeparator) {
-                this.visitRepetitionMandatoryWithSeparator(<RepetitionMandatoryWithSeparator>node)
+                this.visitRepetitionMandatoryWithSeparator(node)
             }
             else if (node instanceof RepetitionWithSeparator) {
-                this.visitRepetitionWithSeparator(<RepetitionWithSeparator>node)
+                this.visitRepetitionWithSeparator(node)
             }
             else if (node instanceof Repetition) {
-                this.visitRepetition(<Repetition>node)
+                this.visitRepetition(node)
             }
             else if (node instanceof Alternation) {
-                this.visitAlternation(<Alternation>node)
+                this.visitAlternation(node)
             }
             else if (node instanceof Terminal) {
-                this.visitTerminal(<Terminal>node)
+                this.visitTerminal(node)
+            }
+            else if (node instanceof Rule) {
+                this.visitRule(node)
+            }
+            else {
+                throw Error("non exhaustive match")
             }
         }
 
-        /* istanbul ignore next */ // this is an "Abstract" method that does nothing, testing it is pointless.
         public visitNonTerminal(node:NonTerminal):void {}
 
         public visitFlat(node:Flat):void {}
@@ -137,5 +143,7 @@ export namespace gast {
         public visitAlternation(node:Alternation):void {}
 
         public visitTerminal(node:Terminal):void {}
+
+        public visitRule(node:Rule):void {}
     }
 }
