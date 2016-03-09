@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.19 - 2016-03-07 */
+/*! chevrotain - v0.5.20 - 2016-03-09 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -69,7 +69,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.19";
+	API.VERSION = "0.5.20";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -2179,9 +2179,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else if (node instanceof Terminal) {
 	                this.visitTerminal(node);
+	            }/* istanbul ignore else */ 
+	            else if (node instanceof Rule) {
+	                this.visitRule(node);
+	            }
+	            else {
+	                /* istanbul ignore next */ throw Error("non exhaustive match");
 	            }
 	        };
-	        /* istanbul ignore next */ // this is an "Abstract" method that does nothing, testing it is pointless.
 	        GAstVisitor.prototype.visitNonTerminal = function (node) { };
 	        GAstVisitor.prototype.visitFlat = function (node) { };
 	        GAstVisitor.prototype.visitOption = function (node) { };
@@ -2191,6 +2196,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        GAstVisitor.prototype.visitRepetitionWithSeparator = function (node) { };
 	        GAstVisitor.prototype.visitAlternation = function (node) { };
 	        GAstVisitor.prototype.visitTerminal = function (node) { };
+	        GAstVisitor.prototype.visitRule = function (node) { };
 	        return GAstVisitor;
 	    }());
 	    gast.GAstVisitor = GAstVisitor;
