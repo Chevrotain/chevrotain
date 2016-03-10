@@ -62,14 +62,14 @@ function onImplementationEditorContentChange() {
         }
         catch (e) {
             // nothing works, draw empty diagrams
-            renderSyntaxDiagrams([])
+            renderDiagramsAndAttachHighlightEvents([])
             //noinspection ExceptionCaughtLocallyJS
             throw e
         }
 
         if (!editorFuncVal || !editorFuncVal.lexer || (editorFuncVal.parser && !editorFuncVal.defaultRule)) {
             // nothing works, draw empty diagrams
-            renderSyntaxDiagrams([])
+            renderDiagramsAndAttachHighlightEvents([])
             //noinspection ExceptionCaughtLocallyJS
             throw Error("The Parser Implementation must return an object of the Type\n" +
                 "{\n" +
@@ -89,7 +89,7 @@ function onImplementationEditorContentChange() {
             parser = new parserConstructor()
             markParserDefinitionErrors(parser)
             var topRules = parser.getGAstProductions().values()
-            renderSyntaxDiagrams(topRules)
+            renderDiagramsAndAttachHighlightEvents(topRules)
             showDiagrams()
             if (!_.isEmpty(parser.definitionErrors)) {
                 var defErrorMessages = _.map(parser.definitionErrors, function (currErr, idx) {
@@ -100,7 +100,7 @@ function onImplementationEditorContentChange() {
             }
         } else { // lexer Only Example
             parser = undefined
-            renderSyntaxDiagrams([])
+            renderDiagramsAndAttachHighlightEvents([])
             hideDiagrams()
         }
         onInputEditorContentChange()
@@ -111,4 +111,11 @@ function onImplementationEditorContentChange() {
             className: "markEvalError"
         })
     }
+}
+
+function renderDiagramsAndAttachHighlightEvents(topRules) {
+    var diagramsHtml = diagramsHeaderOrgHtml
+    diagramsHtml += buildSyntaxDiagramsText(topRules)
+    diagramsDiv.innerHTML = diagramsHtml
+    attachHighlightEvents()
 }
