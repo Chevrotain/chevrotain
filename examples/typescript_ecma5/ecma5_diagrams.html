@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    body {
+        background-color: hsl(30, 20%, 95%)
+    }
+</style>
+
+<!-- references when using npm and chevrotain is in node_modules/chevrotain-->
+<link rel='stylesheet' href='node_modules/chevrotain/diagrams/diagrams.css'>
+<script src='node_modules/chevrotain/diagrams/vendor/railroad-diagrams.js'></script>
+<script src='node_modules/chevrotain/bin/chevrotain.js'></script>
+<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>
+<script src='node_modules/chevrotain/diagrams/src/diagrams_behavior.js'></script>
+<script src='node_modules/chevrotain/diagrams/src/main.js'></script>
+
+
+<!--This Parser implementation has a runtime dependency to lodash -->
+<script src='bower_components/lodash/lodash.js'></script>
+<!-- custom grammar implementation -->
+<script src='bin/ecma5.js'></script>
+
+<body>
+<div id="diagrams" align="center"></div>
+
+<script>
+    // Replaced the DUMMY_PARSER initialization with the custom parser.
+    var parserInstanceToDraw = new ecma5.ECMAScript5Parser([]);
+
+    var diagramsDiv = document.getElementById("diagrams");
+
+    main.drawDiagramsFromParserInstance(parserInstanceToDraw, diagramsDiv)
+</script>
+</body>

@@ -39,6 +39,7 @@
   "ignore": [
     "**/*",
     "!release/*.*",
+    "!diagrams/*.*",
     "!readme.md",
     "!LICENSE.txt"
   ],

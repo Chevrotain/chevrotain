@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/Chevrotain/examples_ecma5_typescript.svg?branch=master)](https://travis-ci.org/Chevrotain/examples_ecma5_typescript)
-
 # examples_ecma5_typescript
 
 An example of using Chevrotain to parse ECMAScript 5.1.
@@ -10,5 +8,11 @@ This example is still a work in progress and thus it is not perfectly aligned to
 
 To run this example:
 
-    ```npm update```  (only once)
-    ```npm test```
+1. ```npm update```
+2. ```npm test```
+
+To view the syntax Diagrams additional setup steps are needed:
+1. ```npm install -g bower```
+2. ```bower update```
+
+Now open ```ecma5_diagrams.html``` in your favorite browser.
