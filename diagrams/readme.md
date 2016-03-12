@@ -19,15 +19,17 @@ An example of the railroad diagrams can be found on the chevrotain [Playground](
 The template will runs as is, but it will render a sample grammar instead of your custom grammar.
 
 There are **only** three steps needed to render a custom grammar:        
-1. Copy diagrams.html into a source controlled folder (root of your project is recommended).
-2. Modify the references to the resources in **root/diagrams.html** so they will still be valid.
+* Copy diagrams.html into a source controlled folder (root of your project is recommended).
+ 
+* Modify the references to the resources in **root/diagrams.html** so they will still be valid.
    * For example, assuming chevrotain is installed to **node_modules/chevrotain**: 
      ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
      ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```
    * For convenience the diagrams.html contains three blocks of references, comment/uncomment the relevant one for your needs. 
    * Modifying the references is not mandatory, instead the whole diagrams directory may be copied.
      However this will automatic updates to those resources(npm update/bower update)
-3. Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
+
+* Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
    the custom Parser whose grammar should be rendered.
    
 [Example](https://github.com/SAP/chevrotain/blob/master/examples/typescript_ecma5/ecma5_diagrams.html) of a modified html with a custom grammar.
