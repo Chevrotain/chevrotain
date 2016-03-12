@@ -1,6 +1,6 @@
 {
   "name": "chevrotain",
-  "version": "0.5.20",
+  "version": "0.5.21",
   "description": "Chevrotain is a high performance fault tolerant javascript parsing DSL for building recursive decent parsers",
   "keywords": [
     "parser",

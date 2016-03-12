@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.20 - 2016-03-09 */
+/*! chevrotain - v0.5.21 - 2016-03-12 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -69,7 +69,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.20";
+	API.VERSION = "0.5.21";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
