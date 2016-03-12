@@ -1,4 +1,4 @@
-import {extendToken, tokenName, Token} from "../../src/scan/tokens_public"
+import {extendToken, tokenName, tokenLabel, Token} from "../../src/scan/tokens_public"
 
 let TrueLiteral = extendToken("TrueLiteral")
 class FalseLiteral extends Token {}
@@ -19,6 +19,8 @@ describe("The Chevrotain Tokens namespace", () => {
 
     let C = extendToken("C", /\d+/, B)
     let D = extendToken("D", /\w+/, B)
+    let Plus = extendToken("Plus", /\+/)
+    Plus.LABEL = "+"
 
     it("provides an extendToken utility - creating an instance", () => {
         let aInstance = new A("Hello", 0, 1, 1)
@@ -57,5 +59,12 @@ describe("The Chevrotain Tokens namespace", () => {
     it("provides an extendToken utility - static properties inheritance", () => {
         expect(D.GROUP).to.equal("Special")
         expect(C.GROUP).to.equal("Special")
+    })
+
+    it("Allows customization of the label", () => {
+        // Default to class name
+        expect(tokenLabel(B)).to.equal("B")
+        // Unless there's a LABEL property
+        expect(tokenLabel(Plus)).to.equal("+")
     })
 })

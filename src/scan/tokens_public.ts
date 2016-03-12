@@ -2,6 +2,17 @@ import {isString, isRegExp, isFunction, assign, isUndefined} from "../utils/util
 import {functionName} from "../lang/lang_extensions"
 import {Lexer} from "./lexer_public"
 
+export function tokenLabel(clazz:Function):string {
+    // Used to customize the token label for diagramming.
+    if (isString((<any>clazz).LABEL)) {
+        return (<any>clazz).LABEL
+    }
+    else {
+        return tokenName(clazz)
+    }
+}
+
+
 export function tokenName(clazz:Function):string {
     // used to support js inheritance patterns that do not use named functions
     // in that situation setting a property tokenName on a token constructor will

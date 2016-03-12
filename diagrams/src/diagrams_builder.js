@@ -58,7 +58,7 @@
         var pattern = prod.terminalType.PATTERN
         // PATTERN static property will not exist when using custom lexers (hand built or other lexer generators)
         var toolTipTitle = pattern ? pattern.source : undefined
-        return railroad.Terminal(chevrotain.tokenName(prod.terminalType),
+        return railroad.Terminal(chevrotain.tokenLabel(prod.terminalType),
             undefined,
             toolTipTitle,
             prod.occurrenceInParent,
@@ -76,7 +76,7 @@
      * @return {RailRoadDiagram.Terminal}
      */
     function createTerminalFromToken(tokenConstructor, occurrenceInParent, topRuleName, dslRuleName) {
-        var result = Terminal(chevrotain.tokenName(tokenConstructor),
+        var result = Terminal(chevrotain.tokenLabel(tokenConstructor),
             undefined,
             tokenConstructor.PATTERN.source,
             occurrenceInParent,
