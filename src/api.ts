@@ -1,6 +1,6 @@
 import {Parser, EMPTY_ALT} from "./parse/parser_public"
 import {Lexer} from "./scan/lexer_public"
-import {Token, VirtualToken, EOF, extendToken, tokenName} from "./scan/tokens_public"
+import {Token, VirtualToken, EOF, extendToken, tokenName, tokenLabel} from "./scan/tokens_public"
 import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
 import {clearCache} from "./parse/cache_public"
@@ -24,6 +24,7 @@ API.EOF = EOF
 // Tokens utilities
 API.extendToken = extendToken
 API.tokenName = tokenName
+API.tokenLabel = tokenLabel
 
 // Other Utilities
 API.EMPTY_ALT = EMPTY_ALT
