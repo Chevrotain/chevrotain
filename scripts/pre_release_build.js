@@ -21,6 +21,12 @@ if (branchesInfo.current !== "master") {
     process.exit(-1)
 }
 
+var dateTemplateRegExp = /^(## \d+\.\d+\.\d+ )\(INSERT_DATE_HERE\)/
+if (!dateTemplateRegExp.test(config.changeLogString)) {
+    console.log("CHANGELOG.md must have first line in the format '## X.Y.Z (INSERT_DATE_HERE)'")
+    process.exit(-1)
+}
+
 var versionRegExp = /\d+\.\d+\.\d+/
 var pkgVersion = config.pkgJson.version
 var bowerVersion = config.bowerJson.version
@@ -47,6 +53,14 @@ jf.writeFileSync(config.packagePath, bumpedPkgJson)
 jf.writeFileSync(config.bowerPath, bumpBowerJson)
 fs.writeFileSync(config.travisPath, bumpedTravisString)
 fs.writeFileSync(config.apiPath, bumpedApiString)
+
+
+// updating CHANGELOG.md date
+var nowDate = new Date()
+var nowDateString = nowDate.toLocaleDateString().replace(/\//g, "-")
+var changeLogDate = config.changeLogString.replace(/^(## \d+\.\d+\.\d+ )\(INSERT_DATE_HERE\)/, "$1" + nowDateString)
+fs.writeFileSync(config.changeLogPath, changeLogDate)
+
 
 var docsOldVersionRegExp = new RegExp(oldVersion.replace(/\./g, "_"), "g")
 _.forEach(config.docFilesPaths, function(currDocPath) {

@@ -41,7 +41,8 @@
     "!release/*.*",
     "!diagrams/**/*.*",
     "!readme.md",
-    "!LICENSE.txt"
+    "!LICENSE.txt",
+    "!CHANGELOG.md"
   ],
   "license": "Apache-2.0"
 }

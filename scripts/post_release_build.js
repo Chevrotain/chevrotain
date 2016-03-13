@@ -7,6 +7,7 @@ var chevrotainJSPath_bin = path.join(__dirname, '../bin/chevrotain.js')
 var chevrotainJSPath_bin_min = path.join(__dirname, '../bin/chevrotain.min.js')
 var chevrotainDTSPath_bin = path.join(__dirname, '../bin/chevrotain.d.ts')
 
+// copy resources for bower release
 var chevrotainJSPath_release = path.join(__dirname, '../release/chevrotain.js')
 var chevrotainJSPath_release_min = path.join(__dirname, '../release/chevrotain.min.js')
 var chevrotainDTSPath_release = path.join(__dirname, '../release/chevrotain.d.ts')
@@ -23,6 +24,7 @@ myRepo.addSync([
     config.travisPath,
     config.packagePath,
     config.bowerPath,
+    config.changeLogPath,
     chevrotainJSPath_release,
     chevrotainJSPath_release_min,
     chevrotainDTSPath_release

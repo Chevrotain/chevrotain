@@ -36,7 +36,8 @@
     "bin/chevrotain.js",
     "readme.md",
     "LICENSE.TXT",
-    "diagrams/**/*.*"
+    "diagrams/**/*.*",
+    "CHANGELOG.md"
   ],
   "main": "bin/src/api.js",
   "repository": {
