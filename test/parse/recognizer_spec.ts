@@ -3,8 +3,13 @@ import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
+import MismatchedTokenException = exceptions.MismatchedTokenException
+import NoViableAltException = exceptions.NoViableAltException;
+import {EqualsTok} from "../full_flow/backtracking/backtracking_parser";
 
 export class PlusTok extends Token {
+    static LABEL = "+"
+
     constructor() { super("+", 0, 1, 1) }
 }
 
@@ -458,7 +463,7 @@ describe("The BaseRecognizer", () => {
     it("can only SAVE_ERROR for recognition exceptions", () => {
         let parser:any = new Parser([], [])
         expect(() => parser.SAVE_ERROR(new Error("I am some random Error")))
-            .to.throw("trying to save an Error which is not a RecognitionException")
+            .to.throw("Trying to save an Error which is not a RecognitionException")
         expect(parser.input).to.be.an.instanceof(Array)
     })
 
@@ -558,6 +563,74 @@ describe("The BaseRecognizer", () => {
         let parser:any = new InRuleParser([new IntToken("1")])
         parser.tryInRuleRecovery = () => { throw Error("oops")}
         expect(() => parser.someRule()).to.throw("oops")
+    })
+
+    it("Will use Token LABELS for mismatch error messages when available", () => {
+
+        let LabelTokParser = class LabelTokParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("rule", () => {
+                this.CONSUME1(PlusTok)
+            })
+        }
+
+        let parser = new LabelTokParser([new MinusTok()])
+        parser.rule()
+        expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
+        expect(parser.errors[0].message).to.include("+")
+        expect(parser.errors[0].message).to.not.include("token of type")
+    })
+
+    it("Will not use Token LABELS for mismatch error messages when unavailable", () => {
+
+        let NoLabelTokParser = class NoLabelTokParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("rule", () => {
+                this.CONSUME1(MinusTok)
+            })
+        }
+
+        let parser = new NoLabelTokParser([new PlusTok()])
+        parser.rule()
+        expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
+        expect(parser.errors[0].message).to.include("MinusTok")
+        expect(parser.errors[0].message).to.include("token of type")
+    })
+
+
+    it("Will use Token LABELS for noViableAlt error messages when unavailable", () => {
+
+        let LabelAltParser = class LabelAltParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("rule", () => {
+                this.OR([
+                    {ALT: () => {this.CONSUME1(PlusTok)}},
+                    {ALT: () => {this.CONSUME1(MinusTok)}},
+                ])
+            })
+        }
+
+        let parser = new LabelAltParser([])
+        parser.rule()
+        expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
+        expect(parser.errors[0].message).to.include("MinusTok")
+        expect(parser.errors[0].message).to.include("+")
+        expect(parser.errors[0].message).to.not.include("PlusTok")
     })
 
 })

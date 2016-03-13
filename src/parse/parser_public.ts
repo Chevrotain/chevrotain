@@ -19,7 +19,7 @@ import {
     isString
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
-import {Token, tokenName, EOF} from "../scan/tokens_public"
+import {Token, tokenName, EOF, tokenLabel, hasTokenLabel} from "../scan/tokens_public"
 import {gast} from "./grammar/gast_public"
 import {
     buildLookaheadForTopLevel,
@@ -327,7 +327,7 @@ export class Parser {
             return error
         }
         else {
-            throw Error("trying to save an Error which is not a RecognitionException")
+            throw Error("Trying to save an Error which is not a RecognitionException")
         }
     }
 
@@ -1036,8 +1036,8 @@ export class Parser {
                 let reSyncEnabled = isFirstInvokedRule || (
                     doReSync
                     && !this.isBackTracking()
-                        // if errorRecovery is disabled, the exception will be rethrown to the top rule
-                        // (isFirstInvokedRule) and there will resync to EOF and terminate.
+                    // if errorRecovery is disabled, the exception will be rethrown to the top rule
+                    // (isFirstInvokedRule) and there will resync to EOF and terminate.
                     && this.isErrorRecoveryEnabled)
 
                 if (reSyncEnabled && exceptions.isRecognitionException(e)) {
@@ -1102,6 +1102,22 @@ export class Parser {
         return true
     }
 
+    /**
+     * @param {Token} actualToken - The actual unexpected (mismatched) Token instance encountered.
+     * @param {Function} expectedTokType - The Class of the expected Token.
+     * @returns {string} The error message saved as part of a MismatchedTokenException.
+     */
+    protected getMisMatchTokenErrorMessage(expectedTokType:Function, actualToken:Token):string {
+        let hasLabel = hasTokenLabel(expectedTokType)
+        let expectedMsg = hasLabel ?
+            `--> ${tokenLabel(expectedTokType)} <--` :
+            `token of type --> ${tokenName(expectedTokType)} <--`
+
+        let msg = `Expecting ${expectedMsg} but found --> '${actualToken.image}' + <--`
+
+        return msg
+    }
+
     private defaultInvalidReturn():any { return undefined }
 
     private tryInRepetitionRecovery(grammarRule:Function,
@@ -1118,9 +1134,7 @@ export class Parser {
         let generateErrorMessage = () => {
             // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
             // the error that would have been thrown
-            let expectedTokName = tokenName(expectedTokType)
-            let msg = "Expecting token of type -->" + expectedTokName +
-                "<-- but found -->'" + nextTokenWithoutResync.image + "'<--"
+            let msg = this.getMisMatchTokenErrorMessage(expectedTokType, nextTokenWithoutResync)
             this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync))
         }
 
@@ -1379,7 +1393,7 @@ export class Parser {
             }
         }
         else {
-            throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
+            throw this.SAVE_ERROR(new exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()))
         }
 
         // note that while it may seem that this can cause an error because by using a recursive call to
@@ -1432,7 +1446,7 @@ export class Parser {
             }
         }
         else {
-            throw this.SAVE_ERROR(new exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()))
+            throw this.SAVE_ERROR(new exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()))
         }
 
         return separatorsResult
@@ -1607,15 +1621,14 @@ export class Parser {
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
-    private consumeInternalOptimized(tokClass:Function):Token {
+    private consumeInternalOptimized(expectedTokClass:Function):Token {
         let nextToken = this.NEXT_TOKEN()
-        if (this.NEXT_TOKEN() instanceof tokClass) {
+        if (this.NEXT_TOKEN() instanceof expectedTokClass) {
             this.inputIdx++
             return nextToken
         }
         else {
-            let expectedTokType = tokenName(tokClass)
-            let msg = "Expecting token of type -->" + expectedTokType + "<-- but found -->'" + nextToken.image + "'<--"
+            let msg = this.getMisMatchTokenErrorMessage(expectedTokClass, nextToken)
             throw this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextToken))
         }
     }
@@ -1700,11 +1713,12 @@ export class Parser {
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             let nextTokens = new NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
             let nextTokensFlat = flatten(nextTokens)
-            let nextTokensNames = map(nextTokensFlat, (currTokenClass:Function) => tokenName(currTokenClass))
+            let nextTokensNames = map(nextTokensFlat, (currTokenClass:Function) => tokenLabel(currTokenClass))
             errMsgTypes = `one of: <${nextTokensNames.join(" ,")}>`
         }
-        throw this.SAVE_ERROR(new exceptions.NoViableAltException(`expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
+        throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
     }
+
 }
 
 function InRuleRecoveryException(message:string) {

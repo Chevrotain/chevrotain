@@ -2,9 +2,14 @@ import {isString, isRegExp, isFunction, assign, isUndefined} from "../utils/util
 import {functionName} from "../lang/lang_extensions"
 import {Lexer} from "./lexer_public"
 
+/**
+ *  This can be used to improve the quality/readability of error messages or syntax diagrams.
+ *
+ * @param {Function} clazz - A constructor for a Token subclass
+ * @returns {string} the Human readable label a Token if it exists.
+ */
 export function tokenLabel(clazz:Function):string {
-    // Used to customize the token label for diagramming.
-    if (isString((<any>clazz).LABEL)) {
+    if (hasTokenLabel(clazz)) {
         return (<any>clazz).LABEL
     }
     else {
@@ -12,6 +17,9 @@ export function tokenLabel(clazz:Function):string {
     }
 }
 
+export function hasTokenLabel(clazz:Function):boolean {
+    return isString((<any>clazz).LABEL) && (<any>clazz).LABEL !== ""
+}
 
 export function tokenName(clazz:Function):string {
     // used to support js inheritance patterns that do not use named functions
@@ -66,6 +74,22 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
 }
 
 export class Token {
+
+    /**
+     * A "human readable" Label for a Token.
+     * Subclasses of Token may define their own static LABEL property.
+     * This label will be used in error messages and drawing syntax diagrams.
+     *
+     * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
+     * or too unwieldy to be used in error messages.
+     *
+     * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
+     *
+     * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
+     * "expecting '{' but found ')'"
+     */
+    static LABEL:string = undefined
+
     // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
     public isInsertedInRecovery:boolean = false
 
