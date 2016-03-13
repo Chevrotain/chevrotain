@@ -4,8 +4,7 @@ import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
 import MismatchedTokenException = exceptions.MismatchedTokenException
-import NoViableAltException = exceptions.NoViableAltException;
-import {EqualsTok} from "../full_flow/backtracking/backtracking_parser";
+import NoViableAltException = exceptions.NoViableAltException
 
 export class PlusTok extends Token {
     static LABEL = "+"

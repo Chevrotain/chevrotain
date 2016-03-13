@@ -1113,7 +1113,7 @@ export class Parser {
             `--> ${tokenLabel(expectedTokType)} <--` :
             `token of type --> ${tokenName(expectedTokType)} <--`
 
-        let msg = `Expecting ${expectedMsg} but found --> '${actualToken.image}' + <--`
+        let msg = `Expecting ${expectedMsg} but found --> '${actualToken.image}' <--`
 
         return msg
     }

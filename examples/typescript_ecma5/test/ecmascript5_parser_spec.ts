@@ -79,7 +79,7 @@ module ecma5.spec {
             var parseResult = parser.Statement()
             expect(parser.errors.length).to.equal(1)
             var errMessage = _.first(parser.errors).message
-            expect(errMessage).to.equal("Expecting token of type -->Semicolon<-- but found -->'+='<--")
+            expect(errMessage).to.equal("Expecting token of type --> Semicolon <-- but found --> '+=' <--")
             expect(parseResult.payload).to.be.an.instanceof(InvalidStatement)
         })
 
