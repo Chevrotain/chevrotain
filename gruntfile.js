@@ -31,7 +31,7 @@ var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
     '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
 
-var browsers = [];
+var browsers = []
 
 if (process.env.BROWSER) {
     console.log("using karma browser config from env (travis-ci build)")
@@ -414,7 +414,7 @@ module.exports = function(grunt) {
         }
     })
 
-    require('load-grunt-tasks')(grunt);
+    require('load-grunt-tasks')(grunt)
 
     var buildTasks = [
         'clean:release',
@@ -430,6 +430,14 @@ module.exports = function(grunt) {
         'webpack:specs_uglify',
         'typedoc:build_docs'
     ]
+
+    grunt.registerTask('verify_bower_files', function() {
+        require("./scripts/release_validations").verifyBowerRelease()
+    })
+
+    if (process.env.TRAVIS_TAG) {
+        buildTasks.push("verify_bower_files")
+    }
 
     var unitTestsTasks = [
         'mocha_istanbul',
@@ -461,5 +469,4 @@ module.exports = function(grunt) {
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
     grunt.registerTask('browsers_tests', browsers_tests)
-
 }
