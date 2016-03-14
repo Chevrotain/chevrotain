@@ -39,11 +39,12 @@ any code generation phase.
     * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
   
   5. Well tested with **~100% code coverage**, Unit & Integration tests
+  
+  6. Generated [**Railroad Diagrams**](https://github.com/SAP/chevrotain/tree/master/diagrams).
    
 ## Installation
 * **npm**: ```npm install chevrotain```
 * **Bower** ```bower install chevrotain```
-* or download directly from [github releases](https://github.com/SAP/chevrotain/releases/latest)
 
 ## Getting Started
 
