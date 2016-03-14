@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.20 - 2016-03-09 */
+/*! chevrotain - v0.5.22 - 2016-03-15 */
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -69,7 +69,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.5.20";
+	API.VERSION = "0.5.22";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.Lexer = lexer_public_1.Lexer;
@@ -79,6 +79,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Tokens utilities
 	API.extendToken = tokens_public_1.extendToken;
 	API.tokenName = tokens_public_1.tokenName;
+	API.tokenLabel = tokens_public_1.tokenLabel;
 	// Other Utilities
 	API.EMPTY_ALT = parser_public_1.EMPTY_ALT;
 	API.exceptions = {};
@@ -300,7 +301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return error;
 	        }
 	        else {
-	            throw Error("trying to save an Error which is not a RecognitionException");
+	            throw Error("Trying to save an Error which is not a RecognitionException");
 	        }
 	    };
 	    Parser.prototype.NEXT_TOKEN = function () {
@@ -965,6 +966,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Parser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
 	        return true;
 	    };
+	    /**
+	     * @param {Token} actualToken - The actual unexpected (mismatched) Token instance encountered.
+	     * @param {Function} expectedTokType - The Class of the expected Token.
+	     * @returns {string} The error message saved as part of a MismatchedTokenException.
+	     */
+	    Parser.prototype.getMisMatchTokenErrorMessage = function (expectedTokType, actualToken) {
+	        var hasLabel = tokens_public_1.hasTokenLabel(expectedTokType);
+	        var expectedMsg = hasLabel ?
+	            "--> " + tokens_public_1.tokenLabel(expectedTokType) + " <--" :
+	            "token of type --> " + tokens_public_1.tokenName(expectedTokType) + " <--";
+	        var msg = "Expecting " + expectedMsg + " but found --> '" + actualToken.image + "' <--";
+	        return msg;
+	    };
 	    Parser.prototype.defaultInvalidReturn = function () { return undefined; };
 	    Parser.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
 	        var _this = this;
@@ -977,9 +991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var generateErrorMessage = function () {
 	            // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
 	            // the error that would have been thrown
-	            var expectedTokName = tokens_public_1.tokenName(expectedTokType);
-	            var msg = "Expecting token of type -->" + expectedTokName +
-	                "<-- but found -->'" + nextTokenWithoutResync.image + "'<--";
+	            var msg = _this.getMisMatchTokenErrorMessage(expectedTokType, nextTokenWithoutResync);
 	            _this.SAVE_ERROR(new exceptions_public_1.exceptions.MismatchedTokenException(msg, nextTokenWithoutResync));
 	        };
 	        while (!passedResyncPoint) {
@@ -1192,7 +1204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()));
+	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()));
 	        }
 	        // note that while it may seem that this can cause an error because by using a recursive call to
 	        // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
@@ -1226,7 +1238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException("expecting at least one: " + errMsg, this.NEXT_TOKEN()));
+	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()));
 	        }
 	        return separatorsResult;
 	    };
@@ -1345,15 +1357,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
-	    Parser.prototype.consumeInternalOptimized = function (tokClass) {
+	    Parser.prototype.consumeInternalOptimized = function (expectedTokClass) {
 	        var nextToken = this.NEXT_TOKEN();
-	        if (this.NEXT_TOKEN() instanceof tokClass) {
+	        if (this.NEXT_TOKEN() instanceof expectedTokClass) {
 	            this.inputIdx++;
 	            return nextToken;
 	        }
 	        else {
-	            var expectedTokType = tokens_public_1.tokenName(tokClass);
-	            var msg = "Expecting token of type -->" + expectedTokType + "<-- but found -->'" + nextToken.image + "'<--";
+	            var msg = this.getMisMatchTokenErrorMessage(expectedTokClass, nextToken);
 	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.MismatchedTokenException(msg, nextToken));
 	        }
 	    };
@@ -1425,10 +1436,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var ruleGrammar = this.getGAstProductions().get(ruleName);
 	            var nextTokens = new interpreter_1.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
 	            var nextTokensFlat = utils_1.flatten(nextTokens);
-	            var nextTokensNames = utils_1.map(nextTokensFlat, function (currTokenClass) { return tokens_public_1.tokenName(currTokenClass); });
+	            var nextTokensNames = utils_1.map(nextTokensFlat, function (currTokenClass) { return tokens_public_1.tokenLabel(currTokenClass); });
 	            errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + ">";
 	        }
-	        throw this.SAVE_ERROR(new exceptions_public_1.exceptions.NoViableAltException("expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
+	        throw this.SAVE_ERROR(new exceptions_public_1.exceptions.NoViableAltException("Expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
 	    };
 	    Parser.IGNORE_AMBIGUITIES = true;
 	    Parser.NO_RESYNC = false;
@@ -2539,6 +2550,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils_1 = __webpack_require__(4);
 	var lang_extensions_1 = __webpack_require__(3);
 	var lexer_public_1 = __webpack_require__(11);
+	/**
+	 *  This can be used to improve the quality/readability of error messages or syntax diagrams.
+	 *
+	 * @param {Function} clazz - A constructor for a Token subclass
+	 * @returns {string} the Human readable label a Token if it exists.
+	 */
+	function tokenLabel(clazz) {
+	    if (hasTokenLabel(clazz)) {
+	        return clazz.LABEL;
+	    }
+	    else {
+	        return tokenName(clazz);
+	    }
+	}
+	exports.tokenLabel = tokenLabel;
+	function hasTokenLabel(clazz) {
+	    return utils_1.isString(clazz.LABEL) && clazz.LABEL !== "";
+	}
+	exports.hasTokenLabel = hasTokenLabel;
 	function tokenName(clazz) {
 	    // used to support js inheritance patterns that do not use named functions
 	    // in that situation setting a property tokenName on a token constructor will
@@ -2615,6 +2645,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
 	        this.isInsertedInRecovery = false;
 	    }
+	    /**
+	     * A "human readable" Label for a Token.
+	     * Subclasses of Token may define their own static LABEL property.
+	     * This label will be used in error messages and drawing syntax diagrams.
+	     *
+	     * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
+	     * or too unwieldy to be used in error messages.
+	     *
+	     * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
+	     *
+	     * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
+	     * "expecting '{' but found ')'"
+	     */
+	    Token.LABEL = undefined;
 	    return Token;
 	}());
 	exports.Token = Token;
