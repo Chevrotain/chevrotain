@@ -58,7 +58,7 @@ fs.writeFileSync(config.apiPath, bumpedApiString)
 // updating CHANGELOG.md date
 var nowDate = new Date()
 var nowDateString = nowDate.toLocaleDateString().replace(/\//g, "-")
-var changeLogDate = config.changeLogString.replace(/^(## \d+\.\d+\.\d+ )\(INSERT_DATE_HERE\)/, "$1" + nowDateString)
+var changeLogDate = config.changeLogString.replace(/^(## \d+\.\d+\.\d+ )\(INSERT_DATE_HERE\)/, "$1" + "(" + nowDateString + ")")
 fs.writeFileSync(config.changeLogPath, changeLogDate)
 
 
