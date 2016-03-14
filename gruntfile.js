@@ -2,15 +2,6 @@ var _ = require('lodash')
 var semver = require("semver")
 var webpack = require("webpack")
 
-var githubReleaseFiles = ['./package.json',
-    './LICENSE.txt',
-    "./bin/chevrotain.d.ts",
-    "./bin/chevrotain.js",
-    "./bin/chevrotain.min.js",
-    './readme.md',
-    'bin/docs/**/*'
-]
-
 var PUBLIC_API_DTS_FILES = [
     'bin/src/scan/tokens_public.d.ts',
     'bin/src/scan/lexer_public.d.ts',
@@ -396,21 +387,6 @@ module.exports = function(grunt) {
             }
         },
 
-        compress: {
-            github_release_zip: {
-                options: {
-                    archive: 'package/chevrotain-binaries-' + pkg.version + '.zip'
-                },
-                files:   [{src: githubReleaseFiles, dest: '/'}]
-            },
-            github_release_tgz: {
-                options: {
-                    archive: 'package/chevrotain-binaries-' + pkg.version + '.tar.gz'
-                },
-                files:   [{src: githubReleaseFiles, dest: '/'}]
-            }
-        },
-
         coveralls: {
             publish: {
                 src: 'bin/coverage/lcov.info'
@@ -452,8 +428,7 @@ module.exports = function(grunt) {
         'webpack:specs',
         'webpack:release_uglify',
         'webpack:specs_uglify',
-        'typedoc:build_docs',
-        'compress'
+        'typedoc:build_docs'
     ]
 
     var unitTestsTasks = [

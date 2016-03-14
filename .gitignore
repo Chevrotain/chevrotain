@@ -6,6 +6,5 @@
 /.tscache
 .baseDir.ts
 /bower_components
-/package
 
 /npm-debug.log

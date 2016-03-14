@@ -56,7 +56,6 @@
     "grunt": "^0.4.5",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-compress": "^1.0.0",
     "grunt-contrib-concat": "^1.0.0",
     "grunt-contrib-uglify": "^1.0.0",
     "grunt-coveralls": "^1.0.0",
