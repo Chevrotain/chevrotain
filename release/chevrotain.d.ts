@@ -1,6 +1,14 @@
-/*! chevrotain - v0.5.21 - 2016-03-12 */
+/*! chevrotain - v0.5.22 */
 declare namespace chevrotain {
     class HashTable<V>{}
+    /**
+     *  This can be used to improve the quality/readability of error messages or syntax diagrams.
+     *
+     * @param {Function} clazz - A constructor for a Token subclass
+     * @returns {string} the Human readable label a Token if it exists.
+     */
+    export function tokenLabel(clazz: Function): string;
+    export function hasTokenLabel(clazz: Function): boolean;
     export function tokenName(clazz: Function): string;
     /**
      * utility to help the poor souls who are still stuck writing pure javascript 5.1
@@ -19,6 +27,20 @@ declare namespace chevrotain {
         startColumn: number;
         endLine: number;
         endColumn: number;
+        /**
+         * A "human readable" Label for a Token.
+         * Subclasses of Token may define their own static LABEL property.
+         * This label will be used in error messages and drawing syntax diagrams.
+         *
+         * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
+         * or too unwieldy to be used in error messages.
+         *
+         * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
+         *
+         * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
+         * "expecting '{' but found ')'"
+         */
+        static LABEL: string;
         isInsertedInRecovery: boolean;
         /**
          * @param {string} image the textual representation of the Token as it appeared in the text
@@ -694,6 +716,12 @@ declare namespace chevrotain {
          * as the max of the cardinality will be greater than the min value. (and this is a false error!)
          */
         protected canTokenTypeBeInsertedInRecovery(tokClass: Function): boolean;
+        /**
+         * @param {Token} actualToken - The actual unexpected (mismatched) Token instance encountered.
+         * @param {Function} expectedTokType - The Class of the expected Token.
+         * @returns {string} The error message saved as part of a MismatchedTokenException.
+         */
+        protected getMisMatchTokenErrorMessage(expectedTokType: Function, actualToken: Token): string;
                                                                                                     /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
          * @param idx occurrence index of consumed token in the invoking parser rule text

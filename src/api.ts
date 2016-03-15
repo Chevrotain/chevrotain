@@ -12,7 +12,7 @@ import {clearCache} from "./parse/cache_public"
 let API:any = {}
 
 // semantic version
-API.VERSION = "0.5.21"
+API.VERSION = "0.5.22"
 
 // runtime API
 API.Parser = Parser

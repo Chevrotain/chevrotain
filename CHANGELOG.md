@@ -1,4 +1,4 @@
-## 0.5.22 (INSERT_DATE_HERE)
+## 0.5.22 (3-15-2016)
 
 ### Minor Changes
 - [Human Readable Token Labels in Syntax Diagrams.](#144)
