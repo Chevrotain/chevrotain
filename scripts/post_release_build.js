@@ -21,7 +21,6 @@ var newTagName = config.tagPrefix + config.currVersion
 var myRepo = git('')
 myRepo.addSync([
     config.apiPath,
-    config.travisPath,
     config.packagePath,
     config.bowerPath,
     config.changeLogPath,

@@ -5,7 +5,6 @@ var _ = require('lodash')
 var wrench = require('wrench')
 
 var apiPath = path.join(__dirname, '../src/api.ts')
-var travisPath = path.join(__dirname, '../.travis.yml')
 var packagePath = path.join(__dirname, '../package.json')
 var bowerPath = path.join(__dirname, '../bower.json')
 var changeLogPath = path.join(__dirname, '../CHANGELOG.md')
@@ -24,7 +23,6 @@ docFilesPaths.push(readmePath)
 
 var pkgJson = jf.readFileSync(packagePath)
 var bowerJson = jf.readFileSync(bowerPath)
-var travisString = fs.readFileSync(travisPath, 'utf8').toString()
 var apiString = fs.readFileSync(apiPath, 'utf8').toString()
 var changeLogString = fs.readFileSync(changeLogPath, 'utf8').toString()
 
@@ -42,14 +40,12 @@ else {
 
 module.exports = {
     apiPath:         apiPath,
-    travisPath:      travisPath,
     packagePath:     packagePath,
     bowerPath:       bowerPath,
     changeLogPath:   changeLogPath,
     docFilesPaths:   docFilesPaths,
     pkgJson:         pkgJson,
     bowerJson:       bowerJson,
-    travisString:    travisString,
     apiString:       apiString,
     changeLogString: changeLogString,
     currVersion:     pkgJson.version,

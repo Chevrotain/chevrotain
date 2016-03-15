@@ -27,13 +27,11 @@ if (!dateTemplateRegExp.test(config.changeLogString)) {
     process.exit(-1)
 }
 
-var versionRegExp = /\d+\.\d+\.\d+/
 var pkgVersion = config.pkgJson.version
 var bowerVersion = config.bowerJson.version
-var travisVersion = versionRegExp.exec(config.travisString)[0]
 
-if (_.uniq([pkgVersion, bowerVersion, travisVersion]).length !== 1) {
-    console.log("Error: package.json / bower.json / .travis.yml versions must be identical")
+if (_.uniq([pkgVersion, bowerVersion]).length !== 1) {
+    console.log("Error: package.json / bower.json versions must be identical")
     process.exit(-1)
 }
 
@@ -45,13 +43,11 @@ var bumpBowerJson = _.clone(config.bowerJson)
 bumpedPkgJson.version = newVersion
 bumpBowerJson.version = newVersion
 var oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
-var bumpedTravisString = config.travisString.replace(oldVersionRegExpGlobal, newVersion)
 var bumpedApiString = config.apiString.replace(oldVersionRegExpGlobal, newVersion)
 
 jf.spaces = 2
 jf.writeFileSync(config.packagePath, bumpedPkgJson)
 jf.writeFileSync(config.bowerPath, bumpBowerJson)
-fs.writeFileSync(config.travisPath, bumpedTravisString)
 fs.writeFileSync(config.apiPath, bumpedApiString)
 
 
