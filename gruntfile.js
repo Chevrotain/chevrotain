@@ -11,7 +11,6 @@ var PUBLIC_API_DTS_FILES = [
     'bin/src/parse/cache_public.d.ts'
 ]
 
-
 var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
     return binDefFile.replace("bin/", "").replace(".d", "")
 })
@@ -23,13 +22,12 @@ var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
 var fourSpaces = "    "
 
 // Integration tests using older versions of node.js will
-// avoid running tests that require ES6 capabilities only aviliable in node.js >= 4
+// avoid running tests that require ES6 capabilities only available in node.js >= 4
 var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
     "mocha *spec.js" :
     "mocha *spec.js -i -g ES6"
 
-var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-    '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
 
 var browsers = []
 
@@ -279,7 +277,7 @@ module.exports = function(grunt) {
             release_definitions: {
                 options: {
                     // TODO: seems like the HashTable class may need to be included in the public API
-                    banner: banner +
+                    banner: banner + '\n' +
                             'declare namespace chevrotain {\n' +
                             '    class HashTable<V>{}\n    ',
 
@@ -435,7 +433,7 @@ module.exports = function(grunt) {
         require("./scripts/release_validations").verifyBowerRelease()
     })
 
-    if (process.env.TRAVIS_TAG) {
+    if (process.env.TRAVIS_TAG && process.env.DEPLOY) {
         buildTasks.push("verify_bower_files")
     }
 
