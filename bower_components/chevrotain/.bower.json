@@ -50,7 +50,7 @@
   "_resolution": {
     "type": "version",
     "tag": "v0.5.22",
-    "commit": "469efa24f302365613adb0ed64a64204c16e466b"
+    "commit": "3a490a75865935e81a3738279672f50a39f07478"
   },
   "_source": "git://github.com/SAP/chevrotain.git",
   "_target": "*",
