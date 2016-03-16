@@ -1,4 +1,4 @@
-function attachHighlightEvents() {
+function attachEditorEvents() {
     var diagramHeaders = $(".diagramHeader")
     _.forEach(diagramHeaders, function (header) {
         header.addEventListener("mouseover", onDiagramHeaderMouseOver)
@@ -30,7 +30,6 @@ var markTerminalsConsumeUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEd
 var markTerminalsManySepUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateManySepSeparator, locateTokenDefinition)
 var markTerminalsAtLeastOneUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateAtLeastOneSepSeparator, locateTokenDefinition)
 
-
 function markUsagesAndDefsInTextEditor(ruleName, usagesLocatorFunc, definitionLocatorFunc) {
     var textUsages = usagesLocatorFunc(javaScriptEditor.getValue(), ruleName, javaScriptEditor)
     var newMarkers = _.map(textUsages, function (currTextUsagePos) {
@@ -47,7 +46,6 @@ function markUsagesAndDefsInTextEditor(ruleName, usagesLocatorFunc, definitionLo
     }))
 }
 
-
 function clearUsagesAndDefsInTextEditor() {
     _.forEach(usageMarkers, function (currMarker) {
         currMarker.clear();
@@ -61,7 +59,6 @@ function clearUsagesAndDefsInTextEditor() {
     definitionTextMarkers = []
 }
 
-
 function getMatchingNonTerminalPositionsInText(textNode) {
     var ruleName = textNode.innerHTML
     var occurrenceIdx = textNode.getAttribute("occurrenceidx")
@@ -72,7 +69,6 @@ function getMatchingNonTerminalPositionsInText(textNode) {
 
     return positions;
 }
-
 
 function getMatchingTerminalPositionsInText(textNode) {
     var terminalName = textNode.innerHTML
@@ -97,11 +93,8 @@ function getMatchingTerminalPositionsInText(textNode) {
     return positions;
 }
 
-
 function onDiagramTerminalMouseOver(mouseEvent) {
     var terminalName = mouseEvent.target.innerHTML
-    var rects = getUsageSvgRect(terminalName, ".terminal")
-    $(rects).toggleClass("diagramRectUsage")
     markTerminalsConsumeUsagesAndDefs(terminalName)
     markTerminalsManySepUsagesAndDefs(terminalName)
     markTerminalsAtLeastOneUsagesAndDefs(terminalName)
@@ -117,10 +110,6 @@ function onDiagramTerminalMouseOver(mouseEvent) {
 }
 
 function onDiagramTerminalMouseOut(mouseEvent) {
-    var terminalName = mouseEvent.target.innerHTML
-    var rects = getUsageSvgRect(terminalName, ".terminal")
-    $(mouseEvent.target).toggleClass("textHover")
-    $(rects).toggleClass("diagramRectUsage")
     clearUsagesAndDefsInTextEditor()
 }
 
@@ -134,13 +123,8 @@ function onDiagramTerminalMouseClick(mouseEvent) {
     javaScriptEditor.setCursor(pos.start)
 }
 
-
 function onDiagramNonTerminalMouseOver(mouseEvent) {
-    var rectsHeaderAndRuleName = getUsageRectAndDefHeader(mouseEvent.target)
-    $(rectsHeaderAndRuleName.rects).toggleClass("diagramRectUsage")
-    $(rectsHeaderAndRuleName.header).toggleClass("diagramHeaderDef")
-
-    markNonTerminalsUsagesAndDefs(rectsHeaderAndRuleName.ruleName)
+    markNonTerminalsUsagesAndDefs(mouseEvent.target.innerHTML)
 
     // marking the matching text for the diagram we are hovering over
     // more explicitly with underline. This is done do differentiate it from
@@ -152,15 +136,9 @@ function onDiagramNonTerminalMouseOver(mouseEvent) {
     }))
 }
 
-
 function onDiagramNonTerminalMouseOut(mouseEvent) {
-    var rectAndHeader = getUsageRectAndDefHeader(mouseEvent.target)
-    $(rectAndHeader.rects).toggleClass("diagramRectUsage")
-    $(rectAndHeader.header).toggleClass("diagramHeaderDef")
-
     clearUsagesAndDefsInTextEditor()
 }
-
 
 function onDiagramNonTerminalMouseClick(mouseEvent) {
     var positions = getMatchingNonTerminalPositionsInText(mouseEvent.target)
@@ -170,28 +148,14 @@ function onDiagramNonTerminalMouseClick(mouseEvent) {
     javaScriptEditor.setCursor(pos.start)
 }
 
-
 function onDiagramHeaderMouseOver(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
-    $(mouseEvent.target).toggleClass("diagramHeaderDef")
-    _.forEach(getUsageSvgRect(definitionName, ".non-terminal"), function (rect) {
-        $(rect).toggleClass("diagramRectUsage")
-    })
-
     markNonTerminalsUsagesAndDefs(definitionName)
 }
 
-
 function onDiagramHeaderMouseOut(mouseEvent) {
-    var definitionName = mouseEvent.target.innerHTML
-    $(mouseEvent.target).toggleClass("diagramHeaderDef")
-    _.forEach(getUsageSvgRect(definitionName, ".non-terminal"), function (rect) {
-        $(rect).toggleClass("diagramRectUsage")
-    })
-
     clearUsagesAndDefsInTextEditor()
 }
-
 
 function onDiagramHeaderMouseClick(mouseEvent) {
     var definitionName = mouseEvent.target.innerHTML
@@ -201,29 +165,6 @@ function onDiagramHeaderMouseClick(mouseEvent) {
     javaScriptEditor.focus()
     javaScriptEditor.setCursor(pos.start)
 }
-
-
-function getUsageSvgRect(definitionName, query) {
-    var rects = $(query).find("rect")
-    return _.filter(rects, function (rect) {
-        var textNode = rect.parentNode.getElementsByTagName('text')[0]
-        return textNode.innerHTML === definitionName
-    })
-}
-
-
-function getUsageRectAndDefHeader(target) {
-    var rects, text
-    text = target.innerHTML
-    rects = getUsageSvgRect(text, ".non-terminal")
-
-    var header = _.find($(".diagramHeader"), function (currHeader) {
-        return currHeader.innerHTML === text
-    })
-
-    return {rects: rects, header: header, ruleName: text}
-}
-
 
 function center(line) {
     var wholeHeight = javaScriptEditor.charCoords({line: line, ch: 0}, "local").top

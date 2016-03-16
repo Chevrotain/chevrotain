@@ -115,7 +115,8 @@ function onImplementationEditorContentChange() {
 
 function renderDiagramsAndAttachHighlightEvents(topRules) {
     var diagramsHtml = diagramsHeaderOrgHtml
-    diagramsHtml += buildSyntaxDiagramsText(topRules)
+    diagramsHtml += diagrams_builder.buildSyntaxDiagramsText(topRules)
     diagramsDiv.innerHTML = diagramsHtml
-    attachHighlightEvents()
+    attachEditorEvents()
+    diagrams_behavior.initDiagramsBehavior(false)
 }
