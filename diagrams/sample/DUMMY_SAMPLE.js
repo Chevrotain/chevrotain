@@ -44,13 +44,9 @@ function DUMMY_SAMPLE_PARSER(input) {
 
     this.object = this.RULE("object", function () {
         $.CONSUME(LCurly);
-        $.OPTION(function () {
-            $.SUBRULE($.objectItem);
-            $.MANY(function () {
-                $.CONSUME(Comma);
-                $.SUBRULE2($.objectItem);
-            });
-        });
+        $.MANY_SEP(Comma, function() {
+            $.SUBRULE2($.objectItem);
+        })
         $.CONSUME(RCurly);
     });
 
