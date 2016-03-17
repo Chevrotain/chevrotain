@@ -1,3 +1,10 @@
+## 0.5.23 (3-17-2016)
+
+### Bug Fixes
+- [Syntax Diagrams usage highlights issues.](#149) 
+
+
+
 ## 0.5.22 (3-15-2016)
 
 ### Minor Changes

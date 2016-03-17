@@ -7,7 +7,7 @@ This folder contains a template which can be easily modified to render and displ
 A grammar as railroad syntax diagrams using the [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams)
 library by @tabatkins.
 
-An example of the railroad diagrams can be found on the chevrotain [Playground](http://sap.github.io/chevrotain/playground/).
+[Example of generated diagrams](http://sap.github.io/chevrotain/diagrams_sample/diagrams_sample.html).
  
  
 ### Features:
@@ -37,7 +37,7 @@ Setup instructions to run that example can be found [here](https://github.com/SA
    
    
 #### What about grammars written with commonjs (node.js) modules.
-Because The diagrams are rendered in a browser, it's implementation must be runnable in a browser.
+Because The diagrams are rendered in a browser, The grammar's implementation must be runnable in a browser.
 This means the commonjs code must be wrapped / transformed to be browser compatible.
 Some options to accomplish this:
  * [UMD](https://github.com/umdjs/umd)

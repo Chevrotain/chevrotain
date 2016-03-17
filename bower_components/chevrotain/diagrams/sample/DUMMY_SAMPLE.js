@@ -10,11 +10,17 @@ var True = extendToken("True", /true/);
 var False = extendToken("False", /false/);
 var Null = extendToken("Null", /null/);
 var LCurly = extendToken("LCurly", /{/);
+LCurly.LABEL = "'{'";
 var RCurly = extendToken("RCurly", /}/);
+RCurly.LABEL = "'}'";
 var LSquare = extendToken("LSquare", /\[/);
+LSquare.LABEL = "'['";
 var RSquare = extendToken("RSquare", /]/);
+RSquare.LABEL = "']'";
 var Comma = extendToken("Comma", /,/);
+Comma.LABEL = "','";
 var Colon = extendToken("Colon", /:/);
+Colon.LABEL = "':'";
 var StringLiteral = extendToken("StringLiteral", /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
 var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
 var WhiteSpace = extendToken("WhiteSpace", /\s+/);
@@ -44,13 +50,9 @@ function DUMMY_SAMPLE_PARSER(input) {
 
     this.object = this.RULE("object", function () {
         $.CONSUME(LCurly);
-        $.OPTION(function () {
-            $.SUBRULE($.objectItem);
-            $.MANY(function () {
-                $.CONSUME(Comma);
-                $.SUBRULE2($.objectItem);
-            });
-        });
+        $.MANY_SEP(Comma, function() {
+            $.SUBRULE2($.objectItem);
+        })
         $.CONSUME(RCurly);
     });
 

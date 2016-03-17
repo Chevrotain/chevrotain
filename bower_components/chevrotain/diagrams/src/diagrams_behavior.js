@@ -31,12 +31,7 @@
         })
 
         var noneTerminals = toArr(document.getElementsByClassName("non-terminal"))
-        var noneTerminalsText = noneTerminals.map(function(currDomNode) {
-            return toArr(currDomNode.children).find(function(currChild) {
-                return currChild.tagName === "text"
-            })
-        })
-
+        var noneTerminalsText = findDomChildrenByTagName(noneTerminals, "text")
         noneTerminalsText.forEach(function(nonTerminal) {
             nonTerminal.addEventListener("mouseover", toggleNonTerminalUsageAndDef_fromNoneTerminal)
             nonTerminal.addEventListener("mouseout", toggleNonTerminalUsageAndDef_fromNoneTerminal)
@@ -47,12 +42,7 @@
         })
 
         var terminals = toArr(document.getElementsByClassName("terminal"))
-        var terminalsText = terminals.map(function(currDomNode) {
-            return toArr(currDomNode.children).find(function(currChild) {
-                return currChild.tagName === "text"
-            })
-        })
-
+        var terminalsText = findDomChildrenByTagName(terminals, "text")
         terminalsText.forEach(function(terminal) {
             terminal.addEventListener("mouseover", toggleTerminalUsage)
             terminal.addEventListener("mouseout", toggleTerminalUsage)
@@ -85,11 +75,7 @@
 
     function getUsageSvgRect(definitionName, className) {
         var classDomElements = toArr(document.getElementsByClassName(className))
-        var rects = classDomElements.map(function(currDomNode) {
-            return toArr(currDomNode.children).find(function(currChild) {
-                return currChild.tagName === "rect"
-            })
-        })
+        var rects = findDomChildrenByTagName(classDomElements, "rect")
         return rects.filter(function(currRect) {
             var textNode = currRect.parentNode.getElementsByTagName('text')[0]
             return textNode.innerHTML === definitionName
@@ -197,6 +183,18 @@
         tick();
     }
 
+
+    function findDomChildrenByTagName(domElements, tagName) {
+        var elemsFound = []
+        domElements.forEach(function(currDomNode) {
+            toArr(currDomNode.children).forEach(function(currChild) {
+                if (currChild.tagName === tagName) {
+                    elemsFound.push(currChild)
+                }
+            })
+        })
+        return elemsFound
+    }
     return {
         initDiagramsBehavior: initDiagramsBehavior
     }

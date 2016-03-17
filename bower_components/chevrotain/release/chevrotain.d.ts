@@ -1,4 +1,4 @@
-/*! chevrotain - v0.5.22 */
+/*! chevrotain - v0.5.23 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
