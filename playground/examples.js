@@ -65,6 +65,15 @@ function jsonExample() {
 
     var ChevJsonLexer = new Lexer(jsonTokens, true);
 
+    // Labels only affect error messages and Diagrams.
+    LCurly.LABEL = "'{'";
+    RCurly.LABEL = "'}'";
+    LSquare.LABEL = "'['";
+    RSquare.LABEL = "']'";
+    Comma.LABEL = "','";
+    Colon.LABEL = "':'";
+
+
     // ----------------- parser -----------------
     var ChevrotainParser = chevrotain.Parser;
 

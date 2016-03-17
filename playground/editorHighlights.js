@@ -31,7 +31,8 @@ var markTerminalsManySepUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEd
 var markTerminalsAtLeastOneUsagesAndDefs = _.partialRight(markUsagesAndDefsInTextEditor, locateAtLeastOneSepSeparator, locateTokenDefinition)
 
 function markUsagesAndDefsInTextEditor(ruleName, usagesLocatorFunc, definitionLocatorFunc) {
-    var textUsages = usagesLocatorFunc(javaScriptEditor.getValue(), ruleName, javaScriptEditor)
+    var escapedRuleName = _.escapeRegExp(ruleName)
+    var textUsages = usagesLocatorFunc(javaScriptEditor.getValue(), escapedRuleName, javaScriptEditor)
     var newMarkers = _.map(textUsages, function (currTextUsagePos) {
         return javaScriptEditor.markText(currTextUsagePos.start, currTextUsagePos.end, {
             className: "markDiagramsUsageTextHover"
@@ -39,7 +40,7 @@ function markUsagesAndDefsInTextEditor(ruleName, usagesLocatorFunc, definitionLo
     })
     usageMarkers = usageMarkers.concat(newMarkers)
 
-    var definitionPos = definitionLocatorFunc(ruleName, javaScriptEditor.getValue(), javaScriptEditor)
+    var definitionPos = definitionLocatorFunc(escapedRuleName, javaScriptEditor.getValue(), javaScriptEditor)
     var pos = _.first(definitionPos)
     definitionTextMarkers.push(javaScriptEditor.markText(pos.start, pos.end, {
         className: "markDiagramsTextHover"
@@ -71,7 +72,8 @@ function getMatchingNonTerminalPositionsInText(textNode) {
 }
 
 function getMatchingTerminalPositionsInText(textNode) {
-    var terminalName = textNode.innerHTML
+    // the tokenName attribute is the actual Token name instead of the label.
+    var terminalName = textNode.getAttribute("tokenname")
     var occurrenceIdx = textNode.getAttribute("occurrenceidx")
     var dslRule = textNode.getAttribute("dslrulename")
     var topRuleName = textNode.getAttribute("toprulename")
@@ -94,7 +96,8 @@ function getMatchingTerminalPositionsInText(textNode) {
 }
 
 function onDiagramTerminalMouseOver(mouseEvent) {
-    var terminalName = mouseEvent.target.innerHTML
+    // the tokenName attribute is the actual Token name instead of the label.
+    var terminalName = mouseEvent.target.getAttribute("tokenname")
     markTerminalsConsumeUsagesAndDefs(terminalName)
     markTerminalsManySepUsagesAndDefs(terminalName)
     markTerminalsAtLeastOneUsagesAndDefs(terminalName)
