@@ -32,7 +32,6 @@
 
         topRules.forEach(function(production) {
             var currDiagramHtml = convertProductionToDiagram(production, production.name)
-            // TODO: diagramsHeader class
             diagramsHtml += '<h2 class="diagramHeader">' + production.name + '</h2>' + currDiagramHtml
         })
 
@@ -63,7 +62,8 @@
             toolTipTitle,
             prod.occurrenceInParent,
             topRuleName,
-            dslRuleName
+            dslRuleName,
+            chevrotain.tokenName(prod.terminalType)
         )
     }
 
@@ -81,7 +81,8 @@
             tokenConstructor.PATTERN.source,
             occurrenceInParent,
             topRuleName,
-            dslRuleName)
+            dslRuleName,
+            chevrotain.tokenName(tokenConstructor))
         return result
     }
 

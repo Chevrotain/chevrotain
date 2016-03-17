@@ -515,8 +515,8 @@
         return this;
     }
 
-    function Terminal(text, href, title, occurrenceIdx, topRuleName, dslRuleName) {
-        if(!(this instanceof Terminal)) return new Terminal(text, href, title, occurrenceIdx, topRuleName, dslRuleName);
+    function Terminal(text, href, title, occurrenceIdx, topRuleName, dslRuleName, tokenName) {
+        if(!(this instanceof Terminal)) return new Terminal(text, href, title, occurrenceIdx, topRuleName, dslRuleName, tokenName);
         FakeSVG.call(this, 'g', {'class': 'terminal'});
         this.text = text;
         this.href = href;
@@ -524,6 +524,7 @@
         this.occurrenceIdx = occurrenceIdx;
         this.topRuleName = topRuleName;
         this.dslRuleName = dslRuleName;
+        this.tokenName = tokenName;
         this.width = text.length * 8 + 20; /* Assume that each char is .5em, and that the em is 16px */
         this.height = 0;
         this.offsetX = 0;
@@ -544,7 +545,9 @@
         var text = FakeSVG('text', {x:x+this.width/2, y:y+4,
             occurrenceIdx:this.occurrenceIdx,
             topRuleName:this.topRuleName,
-            dslRuleName:this.dslRuleName}, this.text);
+            dslRuleName:this.dslRuleName,
+            tokenName:this.tokenName,
+        }, this.text);
         var title = FakeSVG('title', {}, this.title);
         if(this.href)
             FakeSVG('a', {'xlink:href': this.href}, [text]).addTo(this);
