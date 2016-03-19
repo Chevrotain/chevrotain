@@ -1,8 +1,8 @@
 {
   "name": "chevrotain",
-  "version": "0.5.23",
+  "version": "0.6.0",
   "description": "Chevrotain is a high performance fault Tolerant Javascript parsing DSL for building recursive decent parsers",
-  "main": "release/chevrotain.js",
+  "main": "lib/chevrotain.js",
   "dependencies": {},
   "devDependencies": {},
   "moduleType": [
@@ -38,7 +38,7 @@
   },
   "ignore": [
     "**/*",
-    "!release/*.*",
+    "!lib/*.*",
     "!diagrams/**/*.*",
     "!readme.md",
     "!LICENSE.txt",

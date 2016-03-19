@@ -10,17 +10,12 @@ var True = extendToken("True", /true/);
 var False = extendToken("False", /false/);
 var Null = extendToken("Null", /null/);
 var LCurly = extendToken("LCurly", /{/);
-LCurly.LABEL = "'{'";
 var RCurly = extendToken("RCurly", /}/);
-RCurly.LABEL = "'}'";
 var LSquare = extendToken("LSquare", /\[/);
-LSquare.LABEL = "'['";
 var RSquare = extendToken("RSquare", /]/);
-RSquare.LABEL = "']'";
 var Comma = extendToken("Comma", /,/);
-Comma.LABEL = "','";
 var Colon = extendToken("Colon", /:/);
-Colon.LABEL = "':'";
+
 var StringLiteral = extendToken("StringLiteral", /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
 var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
 var WhiteSpace = extendToken("WhiteSpace", /\s+/);
@@ -29,6 +24,13 @@ WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the l
 var allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
 var JsonLexer = new Lexer(allTokens);
 
+// Labels only affect error messages and Diagrams.
+LCurly.LABEL = "'{'";
+RCurly.LABEL = "'}'";
+LSquare.LABEL = "'['";
+RSquare.LABEL = "']'";
+Comma.LABEL = "','";
+Colon.LABEL = "':'";
 
 // ----------------- parser -----------------
 
