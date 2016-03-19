@@ -29,17 +29,16 @@
     }
   ],
   "files": [
-    "bin/src/**/*.js",
-    "bin/docs",
-    "bin/chevrotain.d.ts",
-    "bin/chevrotain.min.js",
-    "bin/chevrotain.js",
+    "lib/src/**/*.js",
+    "lib/chevrotain.d.ts",
+    "lib/chevrotain.min.js",
+    "lib/chevrotain.js",
     "readme.md",
     "LICENSE.TXT",
     "diagrams/**/*.*",
     "CHANGELOG.md"
   ],
-  "main": "bin/src/api.js",
+  "main": "lib/src/api.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/SAP/chevrotain.git"
@@ -57,7 +56,6 @@
     "grunt-cli": "~0.1.13",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.0",
-    "grunt-contrib-uglify": "^1.0.0",
     "grunt-coveralls": "^1.0.0",
     "grunt-karma": "~0.12.1",
     "grunt-mocha-istanbul": "^3.0.1",

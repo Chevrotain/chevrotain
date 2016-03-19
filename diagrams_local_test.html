@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    body {
+        background-color: hsl(30, 20%, 95%)
+    }
+</style>
+
+<!-- references when running the sample html directly-->
+<link rel='stylesheet' href='diagrams/diagrams.css'>
+<script src='diagrams/vendor/railroad-diagrams.js'></script>
+<!-- used for local testing, as lib/chevrotain.js contains the latest released version and not the master/development version-->
+<script src='dev/chevrotain.js'></script>
+<script src='diagrams/src/diagrams_builder.js'></script>
+<script src='diagrams/src/diagrams_behavior.js'></script>
+<script src='diagrams/src/main.js'></script>
+
+<body>
+<div id="diagrams" align="center"></div>
+
+<!-- TODO: The DUMMY_SAMPLE script should be replaced with your custom grammar script.-->
+<script src='diagrams/sample/DUMMY_SAMPLE.js'></script>
+
+<script>
+    // TODO: replace DUMMY_SAMPLE_PARSER initialization with your parser implementation
+    var parserInstanceToDraw = new DUMMY_SAMPLE_PARSER([]);
+
+    var diagramsDiv = document.getElementById("diagrams");
+
+    main.drawDiagramsFromParserInstance(parserInstanceToDraw, diagramsDiv)
+</script>
+</body>

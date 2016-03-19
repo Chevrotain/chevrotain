@@ -3,16 +3,16 @@ var semver = require("semver")
 var webpack = require("webpack")
 
 var PUBLIC_API_DTS_FILES = [
-    'bin/src/scan/tokens_public.d.ts',
-    'bin/src/scan/lexer_public.d.ts',
-    'bin/src/parse/parser_public.d.ts',
-    'bin/src/parse/exceptions_public.d.ts',
-    'bin/src/parse/grammar/gast_public.d.ts',
-    'bin/src/parse/cache_public.d.ts'
+    'lib/src/scan/tokens_public.d.ts',
+    'lib/src/scan/lexer_public.d.ts',
+    'lib/src/parse/parser_public.d.ts',
+    'lib/src/parse/exceptions_public.d.ts',
+    'lib/src/parse/grammar/gast_public.d.ts',
+    'lib/src/parse/cache_public.d.ts'
 ]
 
 var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
-    return binDefFile.replace("bin/", "").replace(".d", "")
+    return binDefFile.replace("lib/", "").replace(".d", "")
 })
 // so typedoc can compile "module.exports" in cache_public
 PUBLIC_API_TS_FILES.push("src/env.d.ts")
@@ -105,7 +105,7 @@ module.exports = function(grunt) {
                     port:  9980,
                     files: [
                         'test/test.config.js',
-                        'bin/chevrotainSpecs.js'
+                        'dev/chevrotainSpecs.js'
                     ]
                 }
             },
@@ -115,7 +115,7 @@ module.exports = function(grunt) {
                     port:  9981,
                     files: [
                         'test/test.config.js',
-                        'bin/chevrotainSpecs.min.js'
+                        'dev/chevrotainSpecs.min.js'
                     ]
                 }
             },
@@ -126,7 +126,7 @@ module.exports = function(grunt) {
 
                     files: [
                         'test/test.config.js',
-                        'bin/chevrotainSpecs.js'
+                        'dev/chevrotainSpecs.js'
                     ]
                 }
             },
@@ -135,7 +135,7 @@ module.exports = function(grunt) {
                 options: {
                     port:  9982,
                     files: [
-                        'bin/chevrotain.js',
+                        'dev/chevrotain.js',
                         'test/test.config.js',
                         'test_integration/**/*spec.js'
                     ]
@@ -147,7 +147,7 @@ module.exports = function(grunt) {
                     port:       9983,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
-                        'bin/chevrotain.js',
+                        'dev/chevrotain.js',
                         'test/test.config.js',
                         {pattern: 'test_integration/*/*.js', included: false},
                         'test_integration/integration_tests_main.js'
@@ -159,7 +159,7 @@ module.exports = function(grunt) {
                 options: {
                     port:  9984,
                     files: [
-                        'bin/chevrotain.min.js',
+                        'dev/chevrotain.min.js',
                         'test/test.config.js',
                         'test_integration/**/*spec.js'
                     ]
@@ -171,7 +171,7 @@ module.exports = function(grunt) {
                     port:       9985,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
-                        'bin/chevrotain.min.js',
+                        'dev/chevrotain.min.js',
                         'test/test.config.js',
                         {pattern: 'test_integration/*/*.js', included: false},
                         'test_integration/integration_tests_main.js'
@@ -182,10 +182,10 @@ module.exports = function(grunt) {
 
         mocha_istanbul: {
             coverage: {
-                src:     'bin/test',
+                src:     'lib/test',
                 options: {
                     mask:           '**/*spec.js',
-                    coverageFolder: 'bin/coverage'
+                    coverageFolder: 'dev/coverage'
                 }
             }
         },
@@ -193,7 +193,7 @@ module.exports = function(grunt) {
         istanbul_check_coverage: {
             default: {
                 options: {
-                    coverageFolder: 'bin/coverage',
+                    coverageFolder: 'dev/coverage',
                     check:          {
                         statements: 100,
                         branches:   100,
@@ -224,7 +224,7 @@ module.exports = function(grunt) {
 
             release: {
                 src:     ["src/**/*.ts", "test/**/*.ts", "libs/**/*.ts"],
-                outDir:  'bin',
+                outDir:  'lib',
                 options: {
                     module:         "commonjs",
                     declaration:    true,
@@ -234,7 +234,7 @@ module.exports = function(grunt) {
 
             validate_definitions: {
                 src:     ["test_integration/definitions/es6_modules.ts"],
-                outDir:  "bin/garbage",
+                outDir:  "dev/garbage",
                 options: {
                     module: "commonjs"
                 }
@@ -244,18 +244,17 @@ module.exports = function(grunt) {
             // modules syntax or those using the old namespace syntax.
             validate_definitions_namespace: {
                 src:    ["test_integration/definitions/namespaces.ts"],
-                outDir: "bin/garbage"
+                outDir: "dev/garbage"
             }
         },
 
         clean: {
-            release: ['bin/*.*', 'bin/tsc', 'bin/docs'],
-            dev:     ['bin/gen']
+            release: ['lib/src/**/*', 'lib/test/**/*', 'dev/**/*']
         },
 
         replace: {
             coverage_ignore: {
-                src:          ['bin/src/**/*.js'],
+                src:          ['lib/src/**/*.js'],
                 overwrite:    true,
                 replacements: [{
                     from: 'if (b.hasOwnProperty(p)) d[p] = b[p];',
@@ -303,7 +302,7 @@ module.exports = function(grunt) {
                     separator: grunt.util.linefeed + fourSpaces
                 },
                 files:   {
-                    'bin/chevrotain.d.ts': PUBLIC_API_DTS_FILES
+                    'dev/chevrotain.d.ts': PUBLIC_API_DTS_FILES
                 }
             }
         },
@@ -313,7 +312,7 @@ module.exports = function(grunt) {
                 options: {
                     mode:             'file',
                     target:           'es5',
-                    out:              'bin/docs',
+                    out:              'dev/docs',
                     module:           'commonjs',
                     name:             'Chevrotain',
                     excludeExternals: ''
@@ -333,9 +332,9 @@ module.exports = function(grunt) {
             },
 
             release: {
-                entry:  "./bin/src/api.js",
+                entry:  "./lib/src/api.js",
                 output: {
-                    path:           "bin/",
+                    path:           "dev/",
                     filename:       "chevrotain.js",
                     library:        "chevrotain",
                     libraryTarget:  "umd",
@@ -348,17 +347,17 @@ module.exports = function(grunt) {
             },
 
             specs: {
-                entry:  "./bin/test/all.js",
+                entry:  "./lib/test/all.js",
                 output: {
-                    path:     "bin/",
+                    path:     "dev/",
                     filename: "chevrotainSpecs.js"
                 }
             },
 
             release_uglify: {
-                entry:  "./bin/src/api.js",
+                entry:  "./lib/src/api.js",
                 output: {
-                    path:           "bin/",
+                    path:           "dev/",
                     filename:       "chevrotain.min.js",
                     library:        "chevrotain",
                     libraryTarget:  "umd",
@@ -377,9 +376,9 @@ module.exports = function(grunt) {
             },
 
             specs_uglify: {
-                entry:  "./bin/test/all.js",
+                entry:  "./lib/test/all.js",
                 output: {
-                    path:     "bin/",
+                    path:     "dev/",
                     filename: "chevrotainSpecs.min.js"
                 }
             }
@@ -387,27 +386,7 @@ module.exports = function(grunt) {
 
         coveralls: {
             publish: {
-                src: 'bin/coverage/lcov.info'
-            }
-        },
-
-        uglify: {
-            options: {
-                // not using name mangling because it may break usage of Function.name (functionName utility)
-                mangle: false
-            },
-            release: {
-                options: {
-                    banner: banner
-                },
-                files:   {
-                    'bin/chevrotain.min.js': ['bin/chevrotain.js']
-                }
-            },
-            specs:   {
-                files: {
-                    'bin/chevrotainSpecs.min.js': ['bin/chevrotainSpecs.js']
-                }
+                src: 'dev/coverage/lcov.info'
             }
         }
     })
@@ -429,12 +408,12 @@ module.exports = function(grunt) {
         'typedoc:build_docs'
     ]
 
-    grunt.registerTask('verify_bower_files', function() {
-        require("./scripts/release_validations").verifyBowerRelease()
+    grunt.registerTask('verify_aggregated_files', function() {
+        require("./scripts/release_validations").verifyAggregatedReleaseFile()
     })
 
     if (process.env.TRAVIS_TAG && process.env.DEPLOY) {
-        buildTasks.push("verify_bower_files")
+        buildTasks.push("verify_aggregated_files")
     }
 
     var unitTestsTasks = [

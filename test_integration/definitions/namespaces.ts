@@ -1,4 +1,4 @@
-/// <reference path="../../bin/chevrotain.d.ts" />
+/// <reference path="../../dev/chevrotain.d.ts" />
 import Lexer = chevrotain.Lexer
 import Parser = chevrotain.Parser
 

@@ -2,7 +2,11 @@
 /node_modules
 /.idea/dictionaries/
 
-/bin
+/dev
+/lib
+!/lib/chevrotain.d.ts
+!/lib/chevrotain.js
+!/lib/chevrotain.min.js
 /.tscache
 .baseDir.ts
 /bower_components
