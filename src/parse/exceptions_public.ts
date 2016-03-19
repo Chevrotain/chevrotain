@@ -9,7 +9,7 @@ export namespace exceptions {
         token:Token
     }
 
-// hacks to bypass no support for custom Errors in javascript/typescript
+    // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
         let recognitionExceptions = [
             functionName(MismatchedTokenException),
@@ -26,8 +26,8 @@ export namespace exceptions {
         this.token = token
     }
 
-// must use the "Error.prototype" instead of "new Error"
-// because the stack trace points to where "new Error" was invoked"
+    // must use the "Error.prototype" instead of "new Error"
+    // because the stack trace points to where "new Error" was invoked"
     MismatchedTokenException.prototype = Error.prototype
 
     export function NoViableAltException(message:string, token:Token) {
