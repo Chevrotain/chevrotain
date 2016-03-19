@@ -6,7 +6,7 @@
 
 # Chevrotain
 
-Chevrotain is a **Javascript parsing DSL** for building **[high performance](http://jsperf.com/json-parsers-comparison/21)** **fault-tolerant** recursive decent parsers.
+Chevrotain is a **Javascript parsing DSL** for building [**high performance**][benchmark] **fault-tolerant** recursive decent parsers.
 
 Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
@@ -32,7 +32,7 @@ any code generation phase.
     * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.
 
-  3. [**High performance - (see on JSPerf)**](http://jsperf.com/json-parsers-comparison/21).
+  3. [**High performance - (see on JSPerf)**][benchmark].
 
   4. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
@@ -81,3 +81,4 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
+[benchmark]: http://jsperf.com/json-parsers-comparison/22
