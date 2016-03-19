@@ -43,7 +43,7 @@ var docsIndexHtmlString = fs.readFileSync(docsIndexHtmlPath, 'utf8').toString()
 var bumpedDocsIndexHtmlString = docsIndexHtmlString.replace(/\d+_\d+_\d+/, noDotsVersion)
 fs.writeFileSync(docsIndexHtmlPath, bumpedDocsIndexHtmlString)
 
-var orgDocsLocation = path.join(__dirname, '../../chevrotain/bin/docs')
+var orgDocsLocation = path.join(__dirname, '../../chevrotain/dev/docs')
 wrench.copyDirSyncRecursive(orgDocsLocation, targetDocsDir)
 
 myRepo.addSync([targetDocsDir].concat([docsIndexHtmlPath]))
