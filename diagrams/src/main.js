@@ -16,7 +16,7 @@
         drawDiagramsFromParserInstance: function(parserInstanceToDraw, targetDiv) {
             var topRules = parserInstanceToDraw.getGAstProductions().values()
             targetDiv.innerHTML = builder.buildSyntaxDiagramsText(topRules);
-            builder.initDiagramsBehavior()
+            behavior.initDiagramsBehavior()
         }
     };
 }));
