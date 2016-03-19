@@ -1,4 +1,4 @@
-/// <reference path="../../bin/chevrotain.d.ts" />
+/// <reference path="../../dev/chevrotain.d.ts" />
 import {Parser, Lexer, gast} from "chevrotain"
 
 /**

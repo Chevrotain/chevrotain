@@ -1,13 +1,14 @@
 var fs = require("fs")
 var path = require("path")
 
-var chevrotainJSPath_bin = path.join(__dirname, '../bin/chevrotain.js')
-var chevrotainJSPath_bin_min = path.join(__dirname, '../bin/chevrotain.min.js')
-var chevrotainDTSPath_bin = path.join(__dirname, '../bin/chevrotain.d.ts')
+// TODO: duplicate code regarding paths, also appears in one of the other scripts
+var chevrotainJSPath_dev = path.join(__dirname, '../dev/chevrotain.js')
+var chevrotainJSPath_bin_dev = path.join(__dirname, '../dev/chevrotain.min.js')
+var chevrotainDTSPath_dev = path.join(__dirname, '../dev/chevrotain.d.ts')
 
-var chevrotainJSPath_release = path.join(__dirname, '../release/chevrotain.js')
-var chevrotainJSPath_release_min = path.join(__dirname, '../release/chevrotain.min.js')
-var chevrotainDTSPath_release = path.join(__dirname, '../release/chevrotain.d.ts')
+var chevrotainJSPath_lib = path.join(__dirname, '../lib/chevrotain.js')
+var chevrotainJSPath_lib_min = path.join(__dirname, '../lib/chevrotain.min.js')
+var chevrotainDTSPath_lib = path.join(__dirname, '../lib/chevrotain.d.ts')
 
 /**
  * Ignores line terminator differences
@@ -22,18 +23,19 @@ function compareFileContents(path1, path2) {
 }
 
 /**
- * The files released to bower have to be submitted to the source control
- * But the aggregated files released to NPM are generated during the release build.
- *
- * This makes sure they are identical.
+ * The files released to bower have to be submitted to the source control.
+ * In addition to avoid issues with modified tracked files and to keep the folder structure for npm and bower release identical
+ * The NPM aggregated files are the same as the bower ones (submitted in source control)
+ * 
+ * This will verify that the released aggregated files are identical to the generated files during the central(travis) release build.
  */
-function verifyBowerReleaseFile() {
-    console.log("verifying bower release files.")
-    compareFileContents(chevrotainJSPath_bin, chevrotainJSPath_release)
-    compareFileContents(chevrotainJSPath_bin_min, chevrotainJSPath_release_min)
-    compareFileContents(chevrotainDTSPath_bin, chevrotainDTSPath_release)
+function verifyAggregatedReleaseFile() {
+    console.log("verifying aggregated release files.")
+    compareFileContents(chevrotainJSPath_dev, chevrotainJSPath_lib)
+    compareFileContents(chevrotainJSPath_bin_dev, chevrotainJSPath_lib_min)
+    compareFileContents(chevrotainDTSPath_dev, chevrotainDTSPath_lib)
 }
 
 module.exports = {
-    verifyBowerRelease: verifyBowerReleaseFile
+    verifyAggregatedReleaseFile: verifyAggregatedReleaseFile
 }

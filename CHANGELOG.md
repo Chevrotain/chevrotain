@@ -1,4 +1,4 @@
-## 0.5.23 (3-17-2016)
+## 0.6.0 (3-17-2016)
 
 ### Bug Fixes
 - [Syntax Diagrams usage highlights issues.](#149) 

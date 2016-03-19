@@ -3,18 +3,18 @@ var git = require('gitty')
 var fs = require('fs')
 var path = require('path')
 
-var chevrotainJSPath_bin = path.join(__dirname, '../bin/chevrotain.js')
-var chevrotainJSPath_bin_min = path.join(__dirname, '../bin/chevrotain.min.js')
-var chevrotainDTSPath_bin = path.join(__dirname, '../bin/chevrotain.d.ts')
+var chevrotainJSPath_dev = path.join(__dirname, '../dev/chevrotain.js')
+var chevrotainJSPath_dev_min = path.join(__dirname, '../dev/chevrotain.min.js')
+var chevrotainDTSPath_dev = path.join(__dirname, '../dev/chevrotain.d.ts')
 
-// copy resources for bower release
-var chevrotainJSPath_release = path.join(__dirname, '../release/chevrotain.js')
-var chevrotainJSPath_release_min = path.join(__dirname, '../release/chevrotain.min.js')
-var chevrotainDTSPath_release = path.join(__dirname, '../release/chevrotain.d.ts')
+// copy resources for bower + npm release
+var chevrotainJSPath_lib = path.join(__dirname, '../lib/chevrotain.js')
+var chevrotainJSPath_release_lib = path.join(__dirname, '../lib/chevrotain.min.js')
+var chevrotainDTSPath_lib = path.join(__dirname, '../lib/chevrotain.d.ts')
 
-fs.writeFileSync(chevrotainJSPath_release, fs.readFileSync(chevrotainJSPath_bin))
-fs.writeFileSync(chevrotainJSPath_release_min, fs.readFileSync(chevrotainJSPath_bin_min))
-fs.writeFileSync(chevrotainDTSPath_release, fs.readFileSync(chevrotainDTSPath_bin))
+fs.writeFileSync(chevrotainJSPath_lib, fs.readFileSync(chevrotainJSPath_dev))
+fs.writeFileSync(chevrotainJSPath_release_lib, fs.readFileSync(chevrotainJSPath_dev_min))
+fs.writeFileSync(chevrotainDTSPath_lib, fs.readFileSync(chevrotainDTSPath_dev))
 
 var newTagName = config.tagPrefix + config.currVersion
 
@@ -24,9 +24,9 @@ myRepo.addSync([
     config.packagePath,
     config.bowerPath,
     config.changeLogPath,
-    chevrotainJSPath_release,
-    chevrotainJSPath_release_min,
-    chevrotainDTSPath_release
+    chevrotainJSPath_lib,
+    chevrotainJSPath_release_lib,
+    chevrotainDTSPath_lib
 ].concat(config.docFilesPaths))
 
 myRepo.commitSync("release " + config.currVersion) // version has already been increased...

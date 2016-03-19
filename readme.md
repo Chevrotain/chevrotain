@@ -67,7 +67,7 @@ any code generation phase.
    *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
    
 *  The aggregated Typescript definitions :
-   * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/release/chevrotain.d.ts) (latest version)
+   * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/lib/chevrotain.d.ts) (latest version)
 
 ## Dependencies
 None.
