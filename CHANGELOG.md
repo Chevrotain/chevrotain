@@ -1,4 +1,4 @@
-## 0.6.00 (INSERT_DATE_HERE)
+## 0.6.00 (3-20-2016)
 
 #### Breaking Changes
 - [Reorganized projected structure to be consistent and use "lib" folder](#155)
