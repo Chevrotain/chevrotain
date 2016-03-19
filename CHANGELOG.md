@@ -14,7 +14,7 @@
   
 
 #### Bug Fixes
-- [Syntax Diagrams usage highlights issues.](#149) 
+- [Diagrams - Fixed global references to permit UMD loading.](#152) 
 
 
 
