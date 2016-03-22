@@ -1,4 +1,5 @@
 [![npm version](https://badge.fury.io/js/chevrotain.svg)](http://badge.fury.io/js/chevrotain)
+[![Bower version](https://badge.fury.io/bo/chevrotain.svg)](https://badge.fury.io/bo/chevrotain)
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
