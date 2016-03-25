@@ -1,4 +1,4 @@
-## 0.6.2 (INSERT_DATE_HERE)
+## 0.6.2 (3-25-2016)
 
 #### Bug Fixes
 - [LexerDefinitionErrorType enum was not exported as part of the public API.](#158)
