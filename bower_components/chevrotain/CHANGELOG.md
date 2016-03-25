@@ -1,3 +1,9 @@
+## 0.6.2 (3-25-2016)
+
+#### Bug Fixes
+- [LexerDefinitionErrorType enum was not exported as part of the public API.](#158)
+
+
 ## 0.6.1 (3-25-2016)
 
 #### Bug Fixes
