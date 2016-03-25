@@ -1,4 +1,5 @@
 [![npm version](https://badge.fury.io/js/chevrotain.svg)](http://badge.fury.io/js/chevrotain)
+[![Bower version](https://badge.fury.io/bo/chevrotain.svg)](https://badge.fury.io/bo/chevrotain)
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
@@ -6,7 +7,7 @@
 
 # Chevrotain
 
-Chevrotain is a **Javascript parsing DSL** for building **[high performance](http://jsperf.com/json-parsers-comparison/21)** **fault-tolerant** recursive decent parsers.
+Chevrotain is a **Javascript parsing DSL** for building [**high performance**][benchmark] **fault-tolerant** recursive decent parsers.
 
 Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
@@ -32,7 +33,7 @@ any code generation phase.
     * Supports Custom lookahead logic for LL(k) grammars.
     * Backtracking support.
 
-  3. [**High performance - (see on JSPerf)**](http://jsperf.com/json-parsers-comparison/21).
+  3. [**High performance - (see on JSPerf)**][benchmark].
 
   4. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
@@ -58,7 +59,7 @@ any code generation phase.
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_6_0/classes/parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_6_1/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
@@ -81,3 +82,4 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 * Additionally local testing is done on latest versions of Chrome/Firefox/IE.
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
+[benchmark]: http://jsperf.com/json-parsers-comparison/22

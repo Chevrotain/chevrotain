@@ -1,4 +1,4 @@
-/*! chevrotain - v0.6.0 */
+/*! chevrotain - v0.6.1 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -68,9 +68,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.6.0";
+	API.VERSION = "0.6.1";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
+	API.ParserDefinitionErrorType = parser_public_1.ParserDefinitionErrorType;
 	API.Lexer = lexer_public_1.Lexer;
 	API.Token = tokens_public_1.Token;
 	API.VirtualToken = tokens_public_1.VirtualToken;

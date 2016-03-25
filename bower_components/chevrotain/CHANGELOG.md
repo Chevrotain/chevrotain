@@ -1,4 +1,10 @@
-## 0.6.00 (3-20-2016)
+## 0.6.1 (3-25-2016)
+
+#### Bug Fixes
+- [ParserDefinitionError enum was not exported.](https://github.com/SAP/chevrotain/commit/96edf7fe26d41f25272ea2a39d27fd7eb27991b2)
+
+
+## 0.6.0 (3-20-2016)
 
 #### Breaking Changes
 - [Reorganized projected structure to be consistent and use "lib" folder](#155)
