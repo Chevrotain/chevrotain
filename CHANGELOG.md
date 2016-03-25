@@ -1,4 +1,4 @@
-## 0.6.1 (INSERT_DATE_HERE)
+## 0.6.1 (3-25-2016)
 
 #### Bug Fixes
 - [ParserDefinitionError enum was not exported.](https://github.com/SAP/chevrotain/commit/96edf7fe26d41f25272ea2a39d27fd7eb27991b2)
