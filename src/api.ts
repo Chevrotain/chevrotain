@@ -1,5 +1,5 @@
 import {Parser, EMPTY_ALT, ParserDefinitionErrorType} from "./parse/parser_public"
-import {Lexer} from "./scan/lexer_public"
+import {Lexer, LexerDefinitionErrorType} from "./scan/lexer_public"
 import {Token, VirtualToken, EOF, extendToken, tokenName, tokenLabel} from "./scan/tokens_public"
 import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
@@ -18,6 +18,7 @@ API.VERSION = "0.6.1"
 API.Parser = Parser
 API.ParserDefinitionErrorType = ParserDefinitionErrorType
 API.Lexer = Lexer
+API.LexerDefinitionErrorType = LexerDefinitionErrorType
 API.Token = Token
 API.VirtualToken = VirtualToken
 API.EOF = EOF
