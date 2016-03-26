@@ -10,7 +10,8 @@ function loadExample(exampleName, firstTime) {
     var sample = samples[exampleName]
     // reduce whitespace used for Indentation, 2 spaces is also used in the code mirror editor
     var sampleText = "(" + sample.implementation.toString().replace(/    /g, "  ") + "())"
-
+    // the users of the playground don't care about the @formatter tag of intellij...
+    sampleText = sampleText.replace(/\s*\/\/ @formatter:(on|off)/g, "")
     javaScriptEditor.setValue(sampleText)
     updateSamplesDropDown()
     if (firstTime) {
@@ -1318,21 +1319,21 @@ var samples = {
         }
     },
 
-    css: {
-        implementation: cssExample,
-        sampleInputs: {
-            simpleCss: "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
-            " {\r\n  font-family: Arial, sans-serif;\r\n  margin: 0;\r\n  font-size: 14px;\r\n}\r\n\r\n#system-error" +
-            " {\r\n  font-size: 1.5em;\r\n  text-align: center;\r\n}"
-        }
-    },
-
     calculator: {
         implementation: calculatorExample,
         sampleInputs: {
             "parenthesis precedence": "2 * ( 3 + 7)",
             "operator precedence": "2 + 4 * 5 / 10",
             "unidentified Token - success": "1 + @@1 + 1"
+        }
+    },
+
+    css: {
+        implementation: cssExample,
+        sampleInputs: {
+            simpleCss: "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
+            " {\r\n  font-family: Arial, sans-serif;\r\n  margin: 0;\r\n  font-size: 14px;\r\n}\r\n\r\n#system-error" +
+            " {\r\n  font-size: 1.5em;\r\n  text-align: center;\r\n}"
         }
     },
 
