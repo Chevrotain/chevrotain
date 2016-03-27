@@ -47,6 +47,20 @@ function onInputEditorContentChange() {
     else if (_.isObject(printResult)) {
         processedResult = JSON.stringify(printResult, null, "\t")
     }
+    // pure grammar example without output, report status.
+    else {
+        processedResult = JSON.stringify({
+            Lexing :{
+                result: lexResult.errors.length > 0 ? "FAILURE" : "SUCCESS",
+                num_of_tokens: lexResult.tokens.length,
+                lexing_errors: lexResult.errors
+            },
+            Parsing  :{
+                result: parser.errors.length > 0 ? "FAILURE" : "SUCCESS",
+                parsing_errors: parser.errors
+            }
+        }, null, "\t")
+    }
 
     parserOutput.setValue(processedResult ? processedResult : "")
 }

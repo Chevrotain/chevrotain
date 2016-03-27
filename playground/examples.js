@@ -905,8 +905,6 @@ function tutorialGrammarExample() {
             $.OPTION(function () {
                 $.SUBRULE($.whereClause)
             })
-
-            return "No output, grammar only example."
         });
 
 
