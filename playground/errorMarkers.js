@@ -23,10 +23,19 @@ function markInputErrors(lexErrors, parseErrors) {
             line: currParserError.token.startLine - 1,
             ch  : currParserError.token.startColumn - 1
         }
-        end = {
-            line: currParserError.token.endLine - 1,
-            ch  : currParserError.token.endColumn
+
+        var lastToken = currParserError.token
+        if (!_.isEmpty(currParserError.resyncedTokens)) {
+            lastToken = _.max(currParserError.resyncedTokens, function(tok) {
+                return tok.offset
+            })
         }
+
+        end = {
+            line: lastToken.endLine - 1,
+            ch  : lastToken.endColumn
+        }
+
         marker = inputEditor.markText(start, end, {
             className: "markTextError",
             title    : currParserError.message
