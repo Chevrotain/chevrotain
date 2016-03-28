@@ -1,4 +1,4 @@
-/*! chevrotain - v0.6.2 */
+/*! chevrotain - v0.6.3 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -722,7 +722,7 @@ declare namespace chevrotain {
          * @returns {string} The error message saved as part of a MismatchedTokenException.
          */
         protected getMisMatchTokenErrorMessage(expectedTokType: Function, actualToken: Token): string;
-                                                                                                    /**
+                                                                                                        /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
          * @param idx occurrence index of consumed token in the invoking parser rule text
          *         for example:
@@ -740,7 +740,16 @@ declare namespace chevrotain {
         interface IRecognitionException {
             name: string;
             message: string;
+            /**
+             * The token which caused the parser error.
+             */
             token: Token;
+            /**
+             * Additional tokens which have been re-synced in error recovery due to the original error.
+             * This information can be used the calculate the whole text area which has been skipped due to an error.
+             * For example for displaying with a red underline in a text editor.
+             */
+            resyncedTokens: Token[];
         }
         function isRecognitionException(error: Error): boolean;
         function MismatchedTokenException(message: string, token: Token): void;

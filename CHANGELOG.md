@@ -1,4 +1,4 @@
-## 0.6.3 (INSERT_DATE_HERE)
+## 0.6.3 (3-28-2016)
 
 #### Minor Changes
 - [Re-synced tokens should be reported to the user.](#154)
