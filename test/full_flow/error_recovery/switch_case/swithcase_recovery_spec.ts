@@ -62,7 +62,6 @@ describe("Error Recovery switch-case Example", () => {
 
         let parser = new SwitchCaseRecoveryParser(input)
         let parseResult = parser.switchStmt()
-        expect(parser.errors.length).to.equal(1)
         expect(parser.isAtEndOfInput()).to.equal(true)
 
         expect(parseResult).to.deep.equal({
@@ -70,6 +69,13 @@ describe("Error Recovery switch-case Example", () => {
             "invalid1": undefined,
             "Brandon":  6
         })
+
+        expect(parser.errors.length).to.equal(1)
+        expect(parser.errors[0].resyncedTokens).to.have.lengthOf(4)
+        expect(parser.errors[0].resyncedTokens[0].image).to.equal(":")
+        expect(parser.errors[0].resyncedTokens[1].image).to.equal("return")
+        expect(parser.errors[0].resyncedTokens[2].image).to.equal("4")
+        expect(parser.errors[0].resyncedTokens[3].image).to.equal(";")
     })
 
     it("will detect an error if missing AT_LEAST_ONCE occurrence", () => {
@@ -127,9 +133,6 @@ describe("Error Recovery switch-case Example", () => {
             new CaseTok(1, 1), new StringTok("Robert", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("4", 0, 1, 1), new SemiColonTok(1, 1),
             // case "Brandon" : return 6;
             new CaseTok(1, 1), new StringTok("Brandon", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("6", 0, 1, 1), new SemiColonTok(1, 1),
-            // in this sample input the "bad" input is after a valid iteration of a caseStmt
-            // so inRepetition recovery won't work because we have no other iteration to re-sync to, and because
-            // "switchStmt" is the top rule the re-sync is to EOF.
             new StringTok("ima", 0, 1, 1), new StringTok("aba", 0, 1, 1), new StringTok("bamba", 0, 1, 1),
             new RCurlyTok(1, 1)
         ]
@@ -143,6 +146,12 @@ describe("Error Recovery switch-case Example", () => {
             "Robert":  4,
             "Brandon": 6
         })
+
+        expect(parser.errors.length).to.equal(1)
+        expect(parser.errors[0].resyncedTokens).to.have.lengthOf(2)
+        expect(parser.errors[0].token.image).to.equal("ima")
+        expect(parser.errors[0].resyncedTokens[0].image).to.equal("aba")
+        expect(parser.errors[0].resyncedTokens[1].image).to.equal("bamba")
     })
 
     it("can perform single token deletion recovery", () => {

@@ -16,7 +16,8 @@ import {
     contains,
     flatten,
     last,
-    isString
+    isString,
+    dropRight
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {Token, tokenName, EOF, tokenLabel, hasTokenLabel} from "../scan/tokens_public"
@@ -1043,7 +1044,7 @@ export class Parser {
                 if (reSyncEnabled && exceptions.isRecognitionException(e)) {
                     let reSyncTokType = this.findReSyncTokenType()
                     if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-                        this.reSyncTo(reSyncTokType)
+                        e.resyncedTokens = this.reSyncTo(reSyncTokType)
                         return invalidRet()
                     }
                     else {
@@ -1127,15 +1128,20 @@ export class Parser {
         // TODO: can the resyncTokenType be cached?
         let reSyncTokType = this.findReSyncTokenType()
         let orgInputIdx = this.inputIdx
+        let resyncedTokens = []
+        let passedResyncPoint = false
+
         let nextTokenWithoutResync = this.NEXT_TOKEN()
         let currToken = this.NEXT_TOKEN()
-        let passedResyncPoint = false
 
         let generateErrorMessage = () => {
             // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
             // the error that would have been thrown
             let msg = this.getMisMatchTokenErrorMessage(expectedTokType, nextTokenWithoutResync)
-            this.SAVE_ERROR(new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync))
+            let error = new exceptions.MismatchedTokenException(msg, nextTokenWithoutResync)
+            // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
+            error.resyncedTokens = dropRight(resyncedTokens)
+            this.SAVE_ERROR(error)
         }
 
         while (!passedResyncPoint) {
@@ -1145,20 +1151,24 @@ export class Parser {
                 return // must return here to avoid reverting the inputIdx
             }
             // we skipped enough tokens so we can resync right back into another iteration of the repetition grammar rule
-            if (lookAheadFunc.call(this)) {
+            else if (lookAheadFunc.call(this)) {
                 generateErrorMessage()
                 // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
                 grammarRule.apply(this, grammarRuleArgs)
                 return // must return here to avoid reverting the inputIdx
             }
-            if (currToken instanceof reSyncTokType) {
+            else if (currToken instanceof reSyncTokType) {
                 passedResyncPoint = true
             }
-            currToken = this.SKIP_TOKEN()
+            else {
+                currToken = this.SKIP_TOKEN()
+                this.addToResyncTokens(currToken, resyncedTokens)
+            }
         }
 
-        // we were unable to find a CLOSER point to resync inside the MANY, reset the state and
-        // rethrow the exception for farther recovery attempts into rules deeper in the rules stack
+        // we were unable to find a CLOSER point to resync inside the Repetition, reset the state.
+        // The parsing exception we were trying to prevent will happen in the NEXT parsing step. it may be handled by
+        // "between rules" resync recovery later in the flow.
         this.inputIdx = orgInputIdx
     }
 
@@ -1319,11 +1329,24 @@ export class Parser {
         return cache.getResyncFollowsForClass(this.className).get(followName)
     }
 
-    private reSyncTo(tokClass:Function):void {
+    // It does not make any sense to include a virtual EOF token in the list of resynced tokens
+    // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
+    private addToResyncTokens(token:Token, resyncTokens:Token[]):Token[] {
+        if (!(token instanceof EOF)) {
+            resyncTokens.push(token)
+        }
+        return resyncTokens
+    }
+
+    private reSyncTo(tokClass:Function):Token[] {
+        let resyncedTokens = []
         let nextTok = this.NEXT_TOKEN()
         while ((nextTok instanceof tokClass) === false) {
             nextTok = this.SKIP_TOKEN()
+            this.addToResyncTokens(nextTok, resyncedTokens)
         }
+        // the last token is not part of the error.
+        return dropRight(resyncedTokens)
     }
 
     private attemptInRepetitionRecovery(prodFunc:Function,

@@ -15,7 +15,7 @@ export class CaseTok extends Keyword {
 }
 
 export class ReturnTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("INTO", -1, startLine, startColumn) }
+    constructor(startLine:number, startColumn:number) { super("return", -1, startLine, startColumn) }
 }
 
 export class LParenTok extends Token {
