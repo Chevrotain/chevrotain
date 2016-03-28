@@ -21,7 +21,7 @@ if (branchesInfo.current !== "master") {
     process.exit(-1)
 }
 
-var dateTemplateRegExp = /^(## \d+\.\d+\.\d+ )\(INSERT_DATE_HERE\)/
+var dateTemplateRegExp = /^(## X\.Y\.Z )\(INSERT_DATE_HERE\)/
 if (!dateTemplateRegExp.test(config.changeLogString)) {
     console.log("CHANGELOG.md must have first line in the format '## X.Y.Z (INSERT_DATE_HERE)'")
     process.exit(-1)
@@ -54,7 +54,7 @@ fs.writeFileSync(config.apiPath, bumpedApiString)
 // updating CHANGELOG.md date
 var nowDate = new Date()
 var nowDateString = nowDate.toLocaleDateString().replace(/\//g, "-")
-var changeLogDate = config.changeLogString.replace(dateTemplateRegExp, "$1" + "(" + nowDateString + ")")
+var changeLogDate = config.changeLogString.replace(dateTemplateRegExp, "## " + newVersion + " " + "(" + nowDateString + ")")
 fs.writeFileSync(config.changeLogPath, changeLogDate)
 
 
