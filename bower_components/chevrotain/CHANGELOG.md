@@ -1,3 +1,9 @@
+## 0.6.3 (3-28-2016)
+
+#### Minor Changes
+- [Re-synced tokens should be reported to the user.](#154)
+
+
 ## 0.6.2 (3-25-2016)
 
 #### Bug Fixes
