@@ -56,11 +56,22 @@ export function last<T>(arr:T[]):T {
     return len ? arr[len - 1] : undefined
 }
 
-export function forEach(arr:any[], iteratorCallback:Function):void {
-    if (Array.isArray(arr)) {
-        for (let i = 0; i < arr.length; i++) {
-            iteratorCallback.call(null, arr[i], i)
+export function forEach(collection:any, iteratorCallback:Function):void {
+    if (Array.isArray(collection)) {
+        for (let i = 0; i < collection.length; i++) {
+            iteratorCallback.call(null, collection[i], i)
         }
+    }
+    else if (isObject(collection)) {
+        let colKeys = keys(collection)
+        for (let i = 0; i < colKeys.length; i++) {
+            let key = colKeys[i]
+            let value = collection[key]
+            iteratorCallback.call(null, value, key)
+        }
+    }
+    else {
+        throw Error("non exhaustive match")
     }
 }
 
@@ -265,8 +276,8 @@ export function assign(target:Object, ...sources:Object[]):Object {
     return target
 }
 
-export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey: string] : T[]} {
-    let result:{ [groupKey: string] : T[]} = {}
+export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey:string]:T[]} {
+    let result:{ [groupKey:string]:T[]} = {}
 
     forEach(arr, (item) => {
         let currGroupKey = groupKeyFunc(item)
@@ -279,6 +290,22 @@ export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey
             result[currGroupKey] = [item]
         }
     })
+
+    return result
+}
+
+/**
+ * Merge obj2 into obj1.
+ * Will overwrite existing properties with the same name
+ */
+export function merge(obj1:Object, obj2:Object):any {
+    let result = cloneObj(obj1)
+    let keys2 = keys(obj2)
+    for (let i = 0; i < keys2.length; i++) {
+        let key = keys2[i]
+        let value = obj2[key]
+        result[key] = value
+    }
 
     return result
 }

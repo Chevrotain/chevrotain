@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Lexer multi "modes" support.](#134)
+
+
 ## 0.6.3 (3-28-2016)
 
 #### Minor Changes

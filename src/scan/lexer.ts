@@ -20,12 +20,14 @@ import {
 let PATTERN = "PATTERN"
 
 export interface IAnalyzeResult {
-    allPatterns: RegExp[]
-    patternIdxToClass: Function[]
-    patternIdxToGroup : any[]
-    patternIdxToLongerAltIdx : number[]
-    patternIdxToCanLineTerminator: boolean[]
-    emptyGroups: { [groupName: string] : Token }
+    allPatterns:RegExp[]
+    patternIdxToClass:Function[]
+    patternIdxToGroup:any[]
+    patternIdxToLongerAltIdx:number[]
+    patternIdxToCanLineTerminator:boolean[]
+    patternIdxToPushMode:string[]
+    patternIdxToPopMode:boolean[]
+    emptyGroups:{ [groupName:string]:Token[] }
 }
 
 export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
@@ -69,6 +71,10 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
         }
     })
 
+    let patternIdxToPushMode = map(onlyRelevantClasses, (clazz:any) => clazz.PUSH_MODE)
+
+    let patternIdxToPopMode = map(onlyRelevantClasses, (clazz:any) => has(clazz, "POP_MODE"))
+
     let patternIdxToCanLineTerminator = map(allTransformedPatterns, (pattern:RegExp) => {
         // TODO: unicode escapes of line terminators too?
         return /\\n|\\r|\\s/g.test(pattern.source)
@@ -88,19 +94,21 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
         patternIdxToGroup:             patternIdxToGroup,
         patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
         patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
+        patternIdxToPushMode:          patternIdxToPushMode,
+        patternIdxToPopMode:           patternIdxToPopMode,
         emptyGroups:                   emptyGroups
     }
 }
 
-export function validatePatterns(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
+export function validatePatterns(tokenClasses:TokenConstructor[], validModesNames:string[]):ILexerDefinitionError[] {
     let errors = []
 
     let missingResult = findMissingPatterns(tokenClasses)
-    let validTokenClasses = missingResult.validTokenClasses
+    let validTokenClasses = missingResult.valid
     errors = errors.concat(missingResult.errors)
 
     let invalidResult = findInvalidPatterns(validTokenClasses)
-    validTokenClasses = invalidResult.validTokenClasses
+    validTokenClasses = invalidResult.valid
     errors = errors.concat(invalidResult.errors)
 
     errors = errors.concat(findEndOfInputAnchor(validTokenClasses))
@@ -111,10 +119,17 @@ export function validatePatterns(tokenClasses:TokenConstructor[]):ILexerDefiniti
 
     errors = errors.concat(findInvalidGroupType(validTokenClasses))
 
+    errors = errors.concat(findModesThatDoNotExist(validTokenClasses, validModesNames))
+
     return errors
 }
 
-export function findMissingPatterns(tokenClasses:TokenConstructor[]) {
+export interface ILexerFilterResult {
+    errors:ILexerDefinitionError[]
+    valid:TokenConstructor[]
+}
+
+export function findMissingPatterns(tokenClasses:TokenConstructor[]):ILexerFilterResult {
     let tokenClassesWithMissingPattern = filter(tokenClasses, (currClass) => {
         return !has(currClass, PATTERN)
     })
@@ -127,11 +142,11 @@ export function findMissingPatterns(tokenClasses:TokenConstructor[]) {
         }
     })
 
-    let validTokenClasses = difference(tokenClasses, tokenClassesWithMissingPattern)
-    return {errors: errors, validTokenClasses}
+    let valid = difference(tokenClasses, tokenClassesWithMissingPattern)
+    return {errors, valid}
 }
 
-export function findInvalidPatterns(tokenClasses:TokenConstructor[]) {
+export function findInvalidPatterns(tokenClasses:TokenConstructor[]):ILexerFilterResult {
     let tokenClassesWithInvalidPattern = filter(tokenClasses, (currClass) => {
         let pattern = currClass[PATTERN]
         return !isRegExp(pattern)
@@ -145,8 +160,8 @@ export function findInvalidPatterns(tokenClasses:TokenConstructor[]) {
         }
     })
 
-    let validTokenClasses = difference(tokenClasses, tokenClassesWithInvalidPattern)
-    return {errors: errors, validTokenClasses}
+    let valid = difference(tokenClasses, tokenClassesWithInvalidPattern)
+    return {errors, valid}
 }
 
 let end_of_input = /[^\\][\$]/
@@ -249,6 +264,24 @@ export function findInvalidGroupType(tokenClasses:TokenConstructor[]):ILexerDefi
     return errors
 }
 
+export function findModesThatDoNotExist(tokenClasses:TokenConstructor[], validModes:string[]):ILexerDefinitionError[] {
+    let invalidModes = filter(tokenClasses, (clazz:any) => {
+        return clazz.PUSH_MODE !== undefined && !contains(validModes, clazz.PUSH_MODE)
+    })
+
+    let errors = map(invalidModes, (clazz) => {
+        let msg = `Token class: ->${tokenName(clazz)}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${clazz.PUSH_MODE}<-` +
+            `which does not exist`
+        return {
+            message:      msg,
+            type:         LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
+            tokenClasses: [clazz]
+        }
+    })
+
+    return errors
+}
+
 export function addStartOfInput(pattern:RegExp):RegExp {
     let flags = pattern.ignoreCase ? "i" : ""
     // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
@@ -279,4 +312,3 @@ export function countLineTerminators(text:string):number {
 
     return lineTerminators
 }
-

@@ -1,12 +1,12 @@
 import {Token} from "./tokens_public"
 import {validatePatterns, analyzeTokenClasses, countLineTerminators} from "./lexer"
-import {cloneObj, isEmpty, map} from "../utils/utils"
+import {cloneObj, isEmpty, map, isArray, first, forEach, merge, last, keys} from "../utils/utils"
 
 export type TokenConstructor = Function
 
 export interface ILexingResult {
     tokens:Token[]
-    groups:{ [groupName: string] : Token }
+    groups:{ [groupName:string]:Token }
     errors:ILexingError[]
 }
 
@@ -16,7 +16,8 @@ export enum LexerDefinitionErrorType {
     EOI_ANCHOR_FOUND,
     UNSUPPORTED_FLAGS_FOUND,
     DUPLICATE_PATTERNS_FOUND,
-    INVALID_GROUP_TYPE_FOUND
+    INVALID_GROUP_TYPE_FOUND,
+    PUSH_MODE_DOES_NOT_EXIST
 }
 
 export interface ILexerDefinitionError {
@@ -32,6 +33,9 @@ export interface ILexingError {
     message:string
 }
 
+export type SingleModeLexerDefinition = TokenConstructor[]
+export type MultiModeLexerWDefinition = { [modeName:string]:TokenConstructor[] }
+
 export class Lexer {
 
     public static SKIPPED = {
@@ -42,16 +46,52 @@ export class Lexer {
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors = []
 
-    protected allPatterns:RegExp[]
-    protected patternIdxToClass:Function[]
-    protected patternIdxToGroup:boolean[]
-    protected patternIdxToLongerAltIdx:number[]
-    protected patternIdxToCanLineTerminator:boolean[]
-    protected emptyGroups:{ [groupName: string] : Token }
+    protected modes:string[] = []
+    protected allPatterns:{ [modeName:string]:RegExp[] } = {}
+    protected patternIdxToClass:{ [modeName:string]:Function[] } = {}
+    protected patternIdxToGroup:{ [modeName:string]:string[] } = {}
+    protected patternIdxToLongerAltIdx:{ [modeName:string]:number[] } = {}
+    protected patternIdxToCanLineTerminator:{ [modeName:string]:boolean[] } = {}
+    protected patternIdxToPushMode:{ [modeName:string]:string[] } = {}
+    protected patternIdxToPopMode:{ [modeName:string]:boolean[] } = {}
+    protected emptyGroups:{ [groupName:string]:Token } = {}
+
 
     /**
-     * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
-     *                     These constructors must be in one of THESE forms:
+     * @param {SingleModeLexerDefinition | MultiModeLexerWDefinition} lexerDefinition -
+     *  Structure composed of  constructor functions for the Tokens types this lexer will support.
+     *
+     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
+     *  In the case of {MultiModeLexerWDefinition} the structure is an object where each value is an array of Token constructors.
+     *
+     *  for example:
+     *  {
+     *     "modeX" : [Token1, Token2]
+     *     "modeY" : [Token3, Token4]
+     *  }
+     *
+     *  A lexer with {MultiModeLexerWDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
+     *  This is useful for lexing languages where there are different lexing rules depending on context.
+     *
+     *  The current lexing mode is selected via a "mode stack".
+     *  The last (peek) value in the stack will be the current mode of the lexer.
+     *
+     *  Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token)
+     *  1. PUSH_MODE : push a new mode to the "mode stack"
+     *  2. POP_MODE  : pop the last mode from the "mode stack"
+     *
+     *  Examples:
+     *       export class Attribute extends Token {
+     *          static PATTERN = ...
+     *          static PUSH_MODE = "modeY"
+     *       }
+     *
+     *       export class EndAttribute extends Token {
+     *          static PATTERN = ...
+     *          static POP_MODE = true
+     *       }
+     *
+     *  The Token constructors must be in one of these forms:
      *
      *  1. With a PATTERN property that has a RegExp value for tokens to match:
      *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
@@ -66,21 +106,20 @@ export class Lexer {
      *   b. /b global flag
      *   c. /m multi-line flag
      *
-     *   The Lexer will identify the first pattern the matches, Therefor the order of Token Constructors passed
-     *   To the SimpleLexer's constructor is meaningful. If two patterns may match the same string, the longer one
-     *   should be before the shorter one.
+     *   The Lexer will identify the first pattern that matches, Therefor the order of Token Constructors may be significant.
+     *   For example when one pattern may match a prefix of another pattern.
      *
-     *   Note that there are situations in which we may wish to place the longer pattern after the shorter one.
+     *   Note that there are situations in which we may wish to order the longer pattern after the shorter one.
      *   For example: keywords vs Identifiers.
-     *   'do'(/do/) and 'done'(/w+)
+     *   'do'(/do/) and 'donald'(/w+)
      *
-     *   * If the Identifier pattern appears before the 'do' pattern both 'do' and 'done'
+     *   * If the Identifier pattern appears before the 'do' pattern, both 'do' and 'donald'
      *     will be lexed as an Identifier.
      *
      *   * If the 'do' pattern appears before the Identifier pattern 'do' will be lexed correctly as a keyword.
-     *     however 'done' will be lexed as TWO tokens keyword 'do' and identifier 'ne'.
+     *     however 'donald' will be lexed as TWO separate tokens: keyword 'do' and identifier 'nald'.
      *
-     *   To resolve this problem, add a static property on the keyword's Tokens constructor named: LONGER_ALT
+     *   To resolve this problem, add a static property on the keyword's constructor named: LONGER_ALT
      *   example:
      *
      *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
@@ -92,7 +131,7 @@ export class Lexer {
      *       export class While extends Keyword { static PATTERN = /while/ }
      *       export class Return extends Keyword { static PATTERN = /return/ }
      *
-     *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched
+     *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.
      *
      *
      * @param {boolean} [deferDefinitionErrorsHandling=false]
@@ -101,27 +140,45 @@ export class Lexer {
      *                  This can be useful when wishing to indicate lexer errors in another manner
      *                  than simply throwing an error (for example in an online playground).
      */
-    constructor(protected tokenClasses:TokenConstructor[], deferDefinitionErrorsHandling:boolean = false) {
-        this.lexerDefinitionErrors = validatePatterns(tokenClasses)
+    constructor(protected lexerDefinition:SingleModeLexerDefinition | MultiModeLexerWDefinition,
+                deferDefinitionErrorsHandling:boolean = false) {
+
+
+        // Convert SingleModeLexerDefinition into a MultiModeLexerDefinition with
+        if (isArray(lexerDefinition)) {
+            lexerDefinition = {
+                "default_mode": <SingleModeLexerDefinition>lexerDefinition
+            }
+        }
+
+        let allModeNames = keys(lexerDefinition)
+        forEach(lexerDefinition, (currModDef:TokenConstructor[], currModName) => {
+            this.modes.push(currModName)
+            this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
+                validatePatterns(<SingleModeLexerDefinition>currModDef, allModeNames))
+
+            // If definition errors were encountered, the analysis phase may fail unexpectedly/
+            // Considering a lexer with definition errors may never be used, there is no point
+            // to performing the analysis anyhow...
+            if (isEmpty(this.lexerDefinitionErrors)) {
+                let currAnalyzeResult = analyzeTokenClasses(currModDef)
+                this.allPatterns[currModName] = currAnalyzeResult.allPatterns
+                this.patternIdxToClass[currModName] = currAnalyzeResult.patternIdxToClass
+                this.patternIdxToGroup[currModName] = currAnalyzeResult.patternIdxToGroup
+                this.patternIdxToLongerAltIdx[currModName] = currAnalyzeResult.patternIdxToLongerAltIdx
+                this.patternIdxToCanLineTerminator[currModName] = currAnalyzeResult.patternIdxToCanLineTerminator
+                this.patternIdxToPushMode[currModName] = currAnalyzeResult.patternIdxToPushMode
+                this.patternIdxToPopMode[currModName] = currAnalyzeResult.patternIdxToPopMode
+                this.emptyGroups = merge(this.emptyGroups, currAnalyzeResult.emptyGroups)
+            }
+        })
+
         if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
                 return error.message
             })
             let allErrMessagesString = allErrMessages.join("-----------------------\n")
             throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString)
-        }
-
-        // If definition errors were encountered, the analysis phase may fail unexpectedly/
-        // Considering a lexer with definition errors may never be used, there is no point
-        // to performing the analysis anyhow...
-        if (isEmpty(this.lexerDefinitionErrors)) {
-            let analyzeResult = analyzeTokenClasses(tokenClasses)
-            this.allPatterns = analyzeResult.allPatterns
-            this.patternIdxToClass = analyzeResult.patternIdxToClass
-            this.patternIdxToGroup = analyzeResult.patternIdxToGroup
-            this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx
-            this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator
-            this.emptyGroups = analyzeResult.emptyGroups
         }
     }
 
@@ -130,19 +187,14 @@ export class Lexer {
      * Note that this can be called repeatedly on different strings as this method
      * does not modify the state of the Lexer.
      *
-     * @param {string} text the string to lex
+     * @param {string} text - the string to lex
+     * @param {string} [initialMode] - The initial Lexer Mode to start with, by default this will be the first mode in the lexer's
+     *                                 definition. If the lexer has no explicit modes it will be the implicit single 'default_mode' mode.
+     *
      * @returns {{tokens: {Token}[], errors: string[]}}
      */
-    public tokenize(text:string):ILexingResult {
-        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
-            canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT
-        let orgInput = text
-        let offset = 0
-        let matchedTokens = []
-        let errors:ILexingError[] = []
-        let line = 1
-        let column = 1
-        let groups:any = cloneObj(this.emptyGroups)
+    public tokenize(text:string,
+                    initialMode:string = first(this.modes)):ILexingResult {
 
         if (!isEmpty(this.lexerDefinitionErrors)) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
@@ -152,24 +204,69 @@ export class Lexer {
             throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString)
         }
 
-        // "caching" to avoid property access in the loop which is entered once for each token.
-        let allPatterns = this.allPatterns
-        let patternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx
-        let patternIdxToGroup = this.patternIdxToGroup
-        let patternIdxToClass = this.patternIdxToClass
-        let patternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator
+        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
+            fixForEndingInLT, c, droppedChar, lastLTIdx, msg, lastCharIsLT
+        let orgInput = text
+        let offset = 0
+        let matchedTokens = []
+        let errors:ILexingError[] = []
+        let line = 1
+        let column = 1
+        let groups:any = cloneObj(this.emptyGroups)
+
+        let currModePatterns = []
+        let currModePatternIdxToLongerAltIdx = []
+        let currModePatternIdxToGroup = []
+        let currModePatternIdxToClass = []
+        let currModePatternIdxToCanLineTerminator = []
+        let patternIdxToPushMode = []
+        let patternIdxToPopMode = []
+
+        let modeStack = []
+        let pop_mode = (popToken) => {
+            // TODO: perhaps avoid this error in the edge case there is no more input?
+            if (modeStack.length === 1) {
+                // if we try to pop the last mode there lexer will no longer have ANY mode.
+                // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
+                let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
+                errors.push({line: popToken.startLine, column: popToken.startColumn, length: popToken.image.length, message: msg})
+            }
+            else {
+                modeStack.pop()
+                let newMode = last(modeStack)
+                currModePatterns = this.allPatterns[newMode]
+                currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
+                currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
+                currModePatternIdxToClass = this.patternIdxToClass[newMode]
+                currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
+                patternIdxToPushMode = this.patternIdxToPushMode[newMode]
+                patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+            }
+        }
+
+        let push_mode = (newMode) => {
+            modeStack.push(newMode)
+            currModePatterns = this.allPatterns[newMode]
+            currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
+            currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
+            currModePatternIdxToClass = this.patternIdxToClass[newMode]
+            currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
+            patternIdxToPushMode = this.patternIdxToPushMode[newMode]
+            patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+        }
+
+        push_mode(initialMode)
 
         while (text.length > 0) {
-
             match = null
-            for (i = 0; i < allPatterns.length; i++) {
-                match = allPatterns[i].exec(text)
+            for (i = 0; i < currModePatterns.length; i++) {
+                match = currModePatterns[i].exec(text)
                 if (match !== null) {
                     // even though this pattern matched we must try a another longer alternative.
-                    // this can be used to prioritize keywords over identifers
-                    longerAltIdx = patternIdxToLongerAltIdx[i]
+                    // this can be used to prioritize keywords over identifiers
+                    longerAltIdx = currModePatternIdxToLongerAltIdx[i]
                     if (longerAltIdx) {
-                        matchAlt = allPatterns[longerAltIdx].exec(text)
+                        matchAlt = currModePatterns[longerAltIdx].exec(text)
                         if (matchAlt && matchAlt[0].length > match[0].length) {
                             match = matchAlt
                             i = longerAltIdx
@@ -178,12 +275,13 @@ export class Lexer {
                     break
                 }
             }
+            // successful match
             if (match !== null) {
                 matchedImage = match[0]
                 imageLength = matchedImage.length
-                group = patternIdxToGroup[i]
+                group = currModePatternIdxToGroup[i]
                 if (group !== undefined) {
-                    tokClass = patternIdxToClass[i]
+                    tokClass = currModePatternIdxToClass[i]
                     newToken = new tokClass(matchedImage, offset, line, column)
                     if (group === "default") {
                         matchedTokens.push(newToken)
@@ -195,8 +293,8 @@ export class Lexer {
                 text = text.slice(imageLength)
                 offset = offset + imageLength
                 column = column + imageLength // TODO: with newlines the column may be assigned twice
-                canMatchedContainLineTerminator = patternIdxToCanLineTerminator[i]
-                if (canMatchedContainLineTerminator) {
+
+                if (currModePatternIdxToCanLineTerminator[i]) {
                     let lineTerminatorsInMatch = countLineTerminators(matchedImage)
                     // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
                     if (lineTerminatorsInMatch !== 0) {
@@ -229,6 +327,14 @@ export class Lexer {
                     }
                 }
 
+                // mode handling, must pop before pushing if a Token both acts as both
+                // otherwise it would be a NO-OP
+                if (patternIdxToPopMode[i]) {
+                    pop_mode(newToken)
+                }
+                if (patternIdxToPushMode[i]) {
+                    push_mode(patternIdxToPushMode[i])
+                }
             }
             else { // error recovery, drop characters until we identify a valid token's start point
                 let errorStartOffset = offset
@@ -252,8 +358,8 @@ export class Lexer {
 
                     text = text.substr(1)
                     offset++
-                    for (j = 0; j < allPatterns.length; j++) {
-                        foundResyncPoint = allPatterns[j].test(text)
+                    for (j = 0; j < currModePatterns.length; j++) {
+                        foundResyncPoint = currModePatterns[j].test(text)
                         if (foundResyncPoint) {
                             break
                         }
@@ -262,9 +368,9 @@ export class Lexer {
 
                 errLength = offset - errorStartOffset
                 // at this point we either re-synced or reached the end of the input text
-                errorMessage = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
+                msg = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
                     ` skipped ${offset - errorStartOffset} characters.`
-                errors.push({line: errorLine, column: errorColumn, length: errLength, message: errorMessage})
+                errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
             }
         }
 

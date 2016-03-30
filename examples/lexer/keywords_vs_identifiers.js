@@ -1,7 +1,5 @@
 var chevrotain = require("chevrotain");
 var extendToken = chevrotain.extendToken;
-
-// ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer;
 
 // using extendToken utility to create the Token constructors and hierarchy
