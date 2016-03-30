@@ -152,17 +152,24 @@ export class Lexer {
             throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString)
         }
 
+        // "caching" to avoid property access in the loop which is entered once for each token.
+        let allPatterns = this.allPatterns
+        let patternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx
+        let patternIdxToGroup = this.patternIdxToGroup
+        let patternIdxToClass = this.patternIdxToClass
+        let patternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator
+
         while (text.length > 0) {
 
             match = null
-            for (i = 0; i < this.allPatterns.length; i++) {
-                match = this.allPatterns[i].exec(text)
+            for (i = 0; i < allPatterns.length; i++) {
+                match = allPatterns[i].exec(text)
                 if (match !== null) {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifers
-                    longerAltIdx = this.patternIdxToLongerAltIdx[i]
+                    longerAltIdx = patternIdxToLongerAltIdx[i]
                     if (longerAltIdx) {
-                        matchAlt = this.allPatterns[longerAltIdx].exec(text)
+                        matchAlt = allPatterns[longerAltIdx].exec(text)
                         if (matchAlt && matchAlt[0].length > match[0].length) {
                             match = matchAlt
                             i = longerAltIdx
@@ -174,9 +181,9 @@ export class Lexer {
             if (match !== null) {
                 matchedImage = match[0]
                 imageLength = matchedImage.length
-                group = this.patternIdxToGroup[i]
+                group = patternIdxToGroup[i]
                 if (group !== undefined) {
-                    tokClass = this.patternIdxToClass[i]
+                    tokClass = patternIdxToClass[i]
                     newToken = new tokClass(matchedImage, offset, line, column)
                     if (group === "default") {
                         matchedTokens.push(newToken)
@@ -188,7 +195,7 @@ export class Lexer {
                 text = text.slice(imageLength)
                 offset = offset + imageLength
                 column = column + imageLength // TODO: with newlines the column may be assigned twice
-                canMatchedContainLineTerminator = this.patternIdxToCanLineTerminator[i]
+                canMatchedContainLineTerminator = patternIdxToCanLineTerminator[i]
                 if (canMatchedContainLineTerminator) {
                     let lineTerminatorsInMatch = countLineTerminators(matchedImage)
                     // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
@@ -245,8 +252,8 @@ export class Lexer {
 
                     text = text.substr(1)
                     offset++
-                    for (j = 0; j < this.allPatterns.length; j++) {
-                        foundResyncPoint = this.allPatterns[j].test(text)
+                    for (j = 0; j < allPatterns.length; j++) {
+                        foundResyncPoint = allPatterns[j].test(text)
                         if (foundResyncPoint) {
                             break
                         }
