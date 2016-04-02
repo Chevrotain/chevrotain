@@ -1,4 +1,4 @@
-/*! chevrotain - v0.7.0 */
+/*! chevrotain - v0.7.1 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -671,7 +671,7 @@ declare namespace chevrotain {
          * Convenience method equivalent to AT_LEAST_ONE1
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          *
          * convenience method, same as MANY but the repetition is of one or more.
@@ -686,28 +686,28 @@ declare namespace chevrotain {
          * @param {Function} [action] The action to optionally invoke.
          * @param {string} [errMsg] short title/classification to what is being matched
          */
-        protected AT_LEAST_ONE1(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE1(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE2(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE2(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE3(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE3(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE4(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE4(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE5(laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE5(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * Convenience method equivalent to AT_LEAST_ONE_SEP1
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE_SEP(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          *
          * convenience method, same as MANY_SEP but the repetition is of one or more.
@@ -723,23 +723,23 @@ declare namespace chevrotain {
          * @param {Function} [action] The action to optionally invoke.
          * @param {string} [errMsg] short title/classification to what is being matched
          */
-        protected AT_LEAST_ONE_SEP1(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP1(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP2(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP2(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP3(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP3(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP4(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP4(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          * Convenience method, same as RULE with doReSync=false
          * @see RULE
@@ -790,9 +790,21 @@ declare namespace chevrotain {
          *
          * @returns the consumed Token
          */
-                                                        }
+                                                            }
     
     export namespace exceptions {
+        interface IRecognizerContext {
+            /**
+             * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
+             * This can be used to help debug parsing errors (How did we get here?)
+             */
+            ruleStack: string[];
+            /**
+             * A copy of the parser's rule occurrence stack at the "time" the RecognitionException occurred.
+             * This can be used to help debug parsing errors (How did we get here?)
+             */
+            ruleOccurrenceStack: number[];
+        }
         interface IRecognitionException {
             name: string;
             message: string;
@@ -806,6 +818,7 @@ declare namespace chevrotain {
              * For example for displaying with a red underline in a text editor.
              */
             resyncedTokens: Token[];
+            context: IRecognizerContext;
         }
         function isRecognitionException(error: Error): boolean;
         function MismatchedTokenException(message: string, token: Token): void;
