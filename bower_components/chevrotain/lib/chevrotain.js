@@ -1,4 +1,4 @@
-/*! chevrotain - v0.6.3 */
+/*! chevrotain - v0.7.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.6.3";
+	API.VERSION = "0.7.0";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.ParserDefinitionErrorType = parser_public_1.ParserDefinitionErrorType;
@@ -1690,11 +1690,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return len ? arr[len - 1] : undefined;
 	}
 	exports.last = last;
-	function forEach(arr, iteratorCallback) {
-	    if (Array.isArray(arr)) {
-	        for (var i = 0; i < arr.length; i++) {
-	            iteratorCallback.call(null, arr[i], i);
+	function forEach(collection, iteratorCallback) {
+	    if (Array.isArray(collection)) {
+	        for (var i = 0; i < collection.length; i++) {
+	            iteratorCallback.call(null, collection[i], i);
 	        }
+	    }
+	    else if (isObject(collection)) {
+	        var colKeys = keys(collection);
+	        for (var i = 0; i < colKeys.length; i++) {
+	            var key = colKeys[i];
+	            var value = collection[key];
+	            iteratorCallback.call(null, value, key);
+	        }
+	    }
+	    else {
+	        /* istanbul ignore next */ throw Error("non exhaustive match");
 	    }
 	}
 	exports.forEach = forEach;
@@ -1921,6 +1932,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	}
 	exports.groupBy = groupBy;
+	/**
+	 * Merge obj2 into obj1.
+	 * Will overwrite existing properties with the same name
+	 */
+	function merge(obj1, obj2) {
+	    var result = cloneObj(obj1);
+	    var keys2 = keys(obj2);
+	    for (var i = 0; i < keys2.length; i++) {
+	        var key = keys2[i];
+	        var value = obj2[key];
+	        result[key] = value;
+	    }
+	    return result;
+	}
+	exports.merge = merge;
 
 
 /***/ },
@@ -2723,12 +2749,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    LexerDefinitionErrorType[LexerDefinitionErrorType["UNSUPPORTED_FLAGS_FOUND"] = 3] = "UNSUPPORTED_FLAGS_FOUND";
 	    LexerDefinitionErrorType[LexerDefinitionErrorType["DUPLICATE_PATTERNS_FOUND"] = 4] = "DUPLICATE_PATTERNS_FOUND";
 	    LexerDefinitionErrorType[LexerDefinitionErrorType["INVALID_GROUP_TYPE_FOUND"] = 5] = "INVALID_GROUP_TYPE_FOUND";
+	    LexerDefinitionErrorType[LexerDefinitionErrorType["PUSH_MODE_DOES_NOT_EXIST"] = 6] = "PUSH_MODE_DOES_NOT_EXIST";
 	})(exports.LexerDefinitionErrorType || (exports.LexerDefinitionErrorType = {}));
 	var LexerDefinitionErrorType = exports.LexerDefinitionErrorType;
 	var Lexer = (function () {
 	    /**
-	     * @param {Function[]} tokenClasses constructor functions for the Tokens types this scanner will support
-	     *                     These constructors must be in one of THESE forms:
+	     * @param {SingleModeLexerDefinition | MultiModeLexerWDefinition} lexerDefinition -
+	     *  Structure composed of  constructor functions for the Tokens types this lexer will support.
+	     *
+	     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
+	     *  In the case of {MultiModeLexerWDefinition} the structure is an object where each value is an array of Token constructors.
+	     *
+	     *  for example:
+	     *  {
+	     *     "modeX" : [Token1, Token2]
+	     *     "modeY" : [Token3, Token4]
+	     *  }
+	     *
+	     *  A lexer with {MultiModeLexerWDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
+	     *  This is useful for lexing languages where there are different lexing rules depending on context.
+	     *
+	     *  The current lexing mode is selected via a "mode stack".
+	     *  The last (peek) value in the stack will be the current mode of the lexer.
+	     *
+	     *  Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token)
+	     *  1. PUSH_MODE : push a new mode to the "mode stack"
+	     *  2. POP_MODE  : pop the last mode from the "mode stack"
+	     *
+	     *  Examples:
+	     *       export class Attribute extends Token {
+	     *          static PATTERN = ...
+	     *          static PUSH_MODE = "modeY"
+	     *       }
+	     *
+	     *       export class EndAttribute extends Token {
+	     *          static PATTERN = ...
+	     *          static POP_MODE = true
+	     *       }
+	     *
+	     *  The Token constructors must be in one of these forms:
 	     *
 	     *  1. With a PATTERN property that has a RegExp value for tokens to match:
 	     *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
@@ -2743,21 +2802,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *   b. /b global flag
 	     *   c. /m multi-line flag
 	     *
-	     *   The Lexer will identify the first pattern the matches, Therefor the order of Token Constructors passed
-	     *   To the SimpleLexer's constructor is meaningful. If two patterns may match the same string, the longer one
-	     *   should be before the shorter one.
+	     *   The Lexer will identify the first pattern that matches, Therefor the order of Token Constructors may be significant.
+	     *   For example when one pattern may match a prefix of another pattern.
 	     *
-	     *   Note that there are situations in which we may wish to place the longer pattern after the shorter one.
+	     *   Note that there are situations in which we may wish to order the longer pattern after the shorter one.
 	     *   For example: keywords vs Identifiers.
-	     *   'do'(/do/) and 'done'(/w+)
+	     *   'do'(/do/) and 'donald'(/w+)
 	     *
-	     *   * If the Identifier pattern appears before the 'do' pattern both 'do' and 'done'
+	     *   * If the Identifier pattern appears before the 'do' pattern, both 'do' and 'donald'
 	     *     will be lexed as an Identifier.
 	     *
 	     *   * If the 'do' pattern appears before the Identifier pattern 'do' will be lexed correctly as a keyword.
-	     *     however 'done' will be lexed as TWO tokens keyword 'do' and identifier 'ne'.
+	     *     however 'donald' will be lexed as TWO separate tokens: keyword 'do' and identifier 'nald'.
 	     *
-	     *   To resolve this problem, add a static property on the keyword's Tokens constructor named: LONGER_ALT
+	     *   To resolve this problem, add a static property on the keyword's constructor named: LONGER_ALT
 	     *   example:
 	     *
 	     *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
@@ -2769,7 +2827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *       export class While extends Keyword { static PATTERN = /while/ }
 	     *       export class Return extends Keyword { static PATTERN = /return/ }
 	     *
-	     *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched
+	     *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.
 	     *
 	     *
 	     * @param {boolean} [deferDefinitionErrorsHandling=false]
@@ -2778,11 +2836,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *                  This can be useful when wishing to indicate lexer errors in another manner
 	     *                  than simply throwing an error (for example in an online playground).
 	     */
-	    function Lexer(tokenClasses, deferDefinitionErrorsHandling) {
+	    function Lexer(lexerDefinition, deferDefinitionErrorsHandling) {
+	        var _this = this;
 	        if (deferDefinitionErrorsHandling === void 0) { deferDefinitionErrorsHandling = false; }
-	        this.tokenClasses = tokenClasses;
+	        this.lexerDefinition = lexerDefinition;
 	        this.lexerDefinitionErrors = [];
-	        this.lexerDefinitionErrors = lexer_1.validatePatterns(tokenClasses);
+	        this.modes = [];
+	        this.allPatterns = {};
+	        this.patternIdxToClass = {};
+	        this.patternIdxToGroup = {};
+	        this.patternIdxToLongerAltIdx = {};
+	        this.patternIdxToCanLineTerminator = {};
+	        this.patternIdxToPushMode = {};
+	        this.patternIdxToPopMode = {};
+	        this.emptyGroups = {};
+	        // Convert SingleModeLexerDefinition into a MultiModeLexerDefinition with
+	        if (utils_1.isArray(lexerDefinition)) {
+	            lexerDefinition = {
+	                "default_mode": lexerDefinition
+	            };
+	        }
+	        var allModeNames = utils_1.keys(lexerDefinition);
+	        utils_1.forEach(lexerDefinition, function (currModDef, currModName) {
+	            _this.modes.push(currModName);
+	            _this.lexerDefinitionErrors = _this.lexerDefinitionErrors.concat(lexer_1.validatePatterns(currModDef, allModeNames));
+	            // If definition errors were encountered, the analysis phase may fail unexpectedly/
+	            // Considering a lexer with definition errors may never be used, there is no point
+	            // to performing the analysis anyhow...
+	            if (utils_1.isEmpty(_this.lexerDefinitionErrors)) {
+	                var currAnalyzeResult = lexer_1.analyzeTokenClasses(currModDef);
+	                _this.allPatterns[currModName] = currAnalyzeResult.allPatterns;
+	                _this.patternIdxToClass[currModName] = currAnalyzeResult.patternIdxToClass;
+	                _this.patternIdxToGroup[currModName] = currAnalyzeResult.patternIdxToGroup;
+	                _this.patternIdxToLongerAltIdx[currModName] = currAnalyzeResult.patternIdxToLongerAltIdx;
+	                _this.patternIdxToCanLineTerminator[currModName] = currAnalyzeResult.patternIdxToCanLineTerminator;
+	                _this.patternIdxToPushMode[currModName] = currAnalyzeResult.patternIdxToPushMode;
+	                _this.patternIdxToPopMode[currModName] = currAnalyzeResult.patternIdxToPopMode;
+	                _this.emptyGroups = utils_1.merge(_this.emptyGroups, currAnalyzeResult.emptyGroups);
+	            }
+	        });
 	        if (!utils_1.isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
 	            var allErrMessages = utils_1.map(this.lexerDefinitionErrors, function (error) {
 	                return error.message;
@@ -2790,36 +2882,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var allErrMessagesString = allErrMessages.join("-----------------------\n");
 	            throw new Error("Errors detected in definition of Lexer:\n" + allErrMessagesString);
 	        }
-	        // If definition errors were encountered, the analysis phase may fail unexpectedly/
-	        // Considering a lexer with definition errors may never be used, there is no point
-	        // to performing the analysis anyhow...
-	        if (utils_1.isEmpty(this.lexerDefinitionErrors)) {
-	            var analyzeResult = lexer_1.analyzeTokenClasses(tokenClasses);
-	            this.allPatterns = analyzeResult.allPatterns;
-	            this.patternIdxToClass = analyzeResult.patternIdxToClass;
-	            this.patternIdxToGroup = analyzeResult.patternIdxToGroup;
-	            this.patternIdxToLongerAltIdx = analyzeResult.patternIdxToLongerAltIdx;
-	            this.patternIdxToCanLineTerminator = analyzeResult.patternIdxToCanLineTerminator;
-	            this.emptyGroups = analyzeResult.emptyGroups;
-	        }
 	    }
 	    /**
 	     * Will lex(Tokenize) a string.
 	     * Note that this can be called repeatedly on different strings as this method
 	     * does not modify the state of the Lexer.
 	     *
-	     * @param {string} text the string to lex
+	     * @param {string} text - the string to lex
+	     * @param {string} [initialMode] - The initial Lexer Mode to start with, by default this will be the first mode in the lexer's
+	     *                                 definition. If the lexer has no explicit modes it will be the implicit single 'default_mode' mode.
+	     *
 	     * @returns {{tokens: {Token}[], errors: string[]}}
 	     */
-	    Lexer.prototype.tokenize = function (text) {
-	        var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength, canMatchedContainLineTerminator, fixForEndingInLT, c, droppedChar, lastLTIdx, errorMessage, lastCharIsLT;
-	        var orgInput = text;
-	        var offset = 0;
-	        var matchedTokens = [];
-	        var errors = [];
-	        var line = 1;
-	        var column = 1;
-	        var groups = utils_1.cloneObj(this.emptyGroups);
+	    Lexer.prototype.tokenize = function (text, initialMode) {
+	        var _this = this;
+	        if (initialMode === void 0) { initialMode = utils_1.first(this.modes); }
 	        if (!utils_1.isEmpty(this.lexerDefinitionErrors)) {
 	            var allErrMessages = utils_1.map(this.lexerDefinitionErrors, function (error) {
 	                return error.message;
@@ -2827,16 +2904,66 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var allErrMessagesString = allErrMessages.join("-----------------------\n");
 	            throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString);
 	        }
+	        var match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength, fixForEndingInLT, c, droppedChar, lastLTIdx, msg, lastCharIsLT;
+	        var orgInput = text;
+	        var offset = 0;
+	        var matchedTokens = [];
+	        var errors = [];
+	        var line = 1;
+	        var column = 1;
+	        var groups = utils_1.cloneObj(this.emptyGroups);
+	        var currModePatterns = [];
+	        var currModePatternsLength = 0;
+	        var currModePatternIdxToLongerAltIdx = [];
+	        var currModePatternIdxToGroup = [];
+	        var currModePatternIdxToClass = [];
+	        var currModePatternIdxToCanLineTerminator = [];
+	        var patternIdxToPushMode = [];
+	        var patternIdxToPopMode = [];
+	        var modeStack = [];
+	        var pop_mode = function (popToken) {
+	            // TODO: perhaps avoid this error in the edge case there is no more input?
+	            if (modeStack.length === 1) {
+	                // if we try to pop the last mode there lexer will no longer have ANY mode.
+	                // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
+	                var msg_1 = "Unable to pop Lexer Mode after encountering Token ->" + popToken.image + "<- The Mode Stack is empty";
+	                errors.push({ line: popToken.startLine, column: popToken.startColumn, length: popToken.image.length, message: msg_1 });
+	            }
+	            else {
+	                modeStack.pop();
+	                var newMode = utils_1.last(modeStack);
+	                currModePatterns = _this.allPatterns[newMode];
+	                currModePatternsLength = currModePatterns.length;
+	                currModePatternIdxToLongerAltIdx = _this.patternIdxToLongerAltIdx[newMode];
+	                currModePatternIdxToGroup = _this.patternIdxToGroup[newMode];
+	                currModePatternIdxToClass = _this.patternIdxToClass[newMode];
+	                currModePatternIdxToCanLineTerminator = _this.patternIdxToCanLineTerminator[newMode];
+	                patternIdxToPushMode = _this.patternIdxToPushMode[newMode];
+	                patternIdxToPopMode = _this.patternIdxToPopMode[newMode];
+	            }
+	        };
+	        var push_mode = function (newMode) {
+	            modeStack.push(newMode);
+	            currModePatterns = _this.allPatterns[newMode];
+	            currModePatternsLength = currModePatterns.length;
+	            currModePatternIdxToLongerAltIdx = _this.patternIdxToLongerAltIdx[newMode];
+	            currModePatternIdxToGroup = _this.patternIdxToGroup[newMode];
+	            currModePatternIdxToClass = _this.patternIdxToClass[newMode];
+	            currModePatternIdxToCanLineTerminator = _this.patternIdxToCanLineTerminator[newMode];
+	            patternIdxToPushMode = _this.patternIdxToPushMode[newMode];
+	            patternIdxToPopMode = _this.patternIdxToPopMode[newMode];
+	        };
+	        push_mode(initialMode);
 	        while (text.length > 0) {
 	            match = null;
-	            for (i = 0; i < this.allPatterns.length; i++) {
-	                match = this.allPatterns[i].exec(text);
+	            for (i = 0; i < currModePatternsLength; i++) {
+	                match = currModePatterns[i].exec(text);
 	                if (match !== null) {
 	                    // even though this pattern matched we must try a another longer alternative.
-	                    // this can be used to prioritize keywords over identifers
-	                    longerAltIdx = this.patternIdxToLongerAltIdx[i];
+	                    // this can be used to prioritize keywords over identifiers
+	                    longerAltIdx = currModePatternIdxToLongerAltIdx[i];
 	                    if (longerAltIdx) {
-	                        matchAlt = this.allPatterns[longerAltIdx].exec(text);
+	                        matchAlt = currModePatterns[longerAltIdx].exec(text);
 	                        if (matchAlt && matchAlt[0].length > match[0].length) {
 	                            match = matchAlt;
 	                            i = longerAltIdx;
@@ -2845,12 +2972,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    break;
 	                }
 	            }
+	            // successful match
 	            if (match !== null) {
 	                matchedImage = match[0];
 	                imageLength = matchedImage.length;
-	                group = this.patternIdxToGroup[i];
+	                group = currModePatternIdxToGroup[i];
 	                if (group !== undefined) {
-	                    tokClass = this.patternIdxToClass[i];
+	                    tokClass = currModePatternIdxToClass[i];
 	                    newToken = new tokClass(matchedImage, offset, line, column);
 	                    if (group === "default") {
 	                        matchedTokens.push(newToken);
@@ -2862,8 +2990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                text = text.slice(imageLength);
 	                offset = offset + imageLength;
 	                column = column + imageLength; // TODO: with newlines the column may be assigned twice
-	                canMatchedContainLineTerminator = this.patternIdxToCanLineTerminator[i];
-	                if (canMatchedContainLineTerminator) {
+	                if (currModePatternIdxToCanLineTerminator[i]) {
 	                    var lineTerminatorsInMatch = lexer_1.countLineTerminators(matchedImage);
 	                    // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
 	                    if (lineTerminatorsInMatch !== 0) {
@@ -2891,6 +3018,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	                    }
 	                }
+	                // mode handling, must pop before pushing if a Token both acts as both
+	                // otherwise it would be a NO-OP
+	                if (patternIdxToPopMode[i]) {
+	                    pop_mode(newToken);
+	                }
+	                if (patternIdxToPushMode[i]) {
+	                    push_mode(patternIdxToPushMode[i]);
+	                }
 	            }
 	            else {
 	                var errorStartOffset = offset;
@@ -2913,8 +3048,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                    text = text.substr(1);
 	                    offset++;
-	                    for (j = 0; j < this.allPatterns.length; j++) {
-	                        foundResyncPoint = this.allPatterns[j].test(text);
+	                    for (j = 0; j < currModePatterns.length; j++) {
+	                        foundResyncPoint = currModePatterns[j].test(text);
 	                        if (foundResyncPoint) {
 	                            break;
 	                        }
@@ -2922,9 +3057,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	                errLength = offset - errorStartOffset;
 	                // at this point we either re-synced or reached the end of the input text
-	                errorMessage = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") +
+	                msg = ("unexpected character: ->" + orgInput.charAt(errorStartOffset) + "<- at offset: " + errorStartOffset + ",") +
 	                    (" skipped " + (offset - errorStartOffset) + " characters.");
-	                errors.push({ line: errorLine, column: errorColumn, length: errLength, message: errorMessage });
+	                errors.push({ line: errorLine, column: errorColumn, length: errLength, message: msg });
 	            }
 	        }
 	        return { tokens: matchedTokens, groups: groups, errors: errors };
@@ -2981,6 +3116,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return longerAltIdx;
 	        }
 	    });
+	    var patternIdxToPushMode = utils_1.map(onlyRelevantClasses, function (clazz) { return clazz.PUSH_MODE; });
+	    var patternIdxToPopMode = utils_1.map(onlyRelevantClasses, function (clazz) { return utils_1.has(clazz, "POP_MODE"); });
 	    var patternIdxToCanLineTerminator = utils_1.map(allTransformedPatterns, function (pattern) {
 	        // TODO: unicode escapes of line terminators too?
 	        return /\\n|\\r|\\s/g.test(pattern.source);
@@ -2998,22 +3135,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        patternIdxToGroup: patternIdxToGroup,
 	        patternIdxToLongerAltIdx: patternIdxToLongerAltIdx,
 	        patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
+	        patternIdxToPushMode: patternIdxToPushMode,
+	        patternIdxToPopMode: patternIdxToPopMode,
 	        emptyGroups: emptyGroups
 	    };
 	}
 	exports.analyzeTokenClasses = analyzeTokenClasses;
-	function validatePatterns(tokenClasses) {
+	function validatePatterns(tokenClasses, validModesNames) {
 	    var errors = [];
 	    var missingResult = findMissingPatterns(tokenClasses);
-	    var validTokenClasses = missingResult.validTokenClasses;
+	    var validTokenClasses = missingResult.valid;
 	    errors = errors.concat(missingResult.errors);
 	    var invalidResult = findInvalidPatterns(validTokenClasses);
-	    validTokenClasses = invalidResult.validTokenClasses;
+	    validTokenClasses = invalidResult.valid;
 	    errors = errors.concat(invalidResult.errors);
 	    errors = errors.concat(findEndOfInputAnchor(validTokenClasses));
 	    errors = errors.concat(findUnsupportedFlags(validTokenClasses));
 	    errors = errors.concat(findDuplicatePatterns(validTokenClasses));
 	    errors = errors.concat(findInvalidGroupType(validTokenClasses));
+	    errors = errors.concat(findModesThatDoNotExist(validTokenClasses, validModesNames));
 	    return errors;
 	}
 	exports.validatePatterns = validatePatterns;
@@ -3028,8 +3168,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            tokenClasses: [currClass]
 	        };
 	    });
-	    var validTokenClasses = utils_1.difference(tokenClasses, tokenClassesWithMissingPattern);
-	    return { errors: errors, validTokenClasses: validTokenClasses };
+	    var valid = utils_1.difference(tokenClasses, tokenClassesWithMissingPattern);
+	    return { errors: errors, valid: valid };
 	}
 	exports.findMissingPatterns = findMissingPatterns;
 	function findInvalidPatterns(tokenClasses) {
@@ -3044,8 +3184,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            tokenClasses: [currClass]
 	        };
 	    });
-	    var validTokenClasses = utils_1.difference(tokenClasses, tokenClassesWithInvalidPattern);
-	    return { errors: errors, validTokenClasses: validTokenClasses };
+	    var valid = utils_1.difference(tokenClasses, tokenClassesWithInvalidPattern);
+	    return { errors: errors, valid: valid };
 	}
 	exports.findInvalidPatterns = findInvalidPatterns;
 	var end_of_input = /[^\\][\$]/;
@@ -3134,6 +3274,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return errors;
 	}
 	exports.findInvalidGroupType = findInvalidGroupType;
+	function findModesThatDoNotExist(tokenClasses, validModes) {
+	    var invalidModes = utils_1.filter(tokenClasses, function (clazz) {
+	        return clazz.PUSH_MODE !== undefined && !utils_1.contains(validModes, clazz.PUSH_MODE);
+	    });
+	    var errors = utils_1.map(invalidModes, function (clazz) {
+	        var msg = ("Token class: ->" + tokens_public_1.tokenName(clazz) + "<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->" + clazz.PUSH_MODE + "<-") +
+	            "which does not exist";
+	        return {
+	            message: msg,
+	            type: lexer_public_1.LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
+	            tokenClasses: [clazz]
+	        };
+	    });
+	    return errors;
+	}
+	exports.findModesThatDoNotExist = findModesThatDoNotExist;
 	function addStartOfInput(pattern) {
 	    var flags = pattern.ignoreCase ? "i" : "";
 	    // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
