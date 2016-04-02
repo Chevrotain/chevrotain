@@ -4,6 +4,20 @@ import {contains} from "../utils/utils"
 
 export namespace exceptions {
 
+    export interface IRecognizerContext {
+        /**
+         * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
+         * This can be used to help debug parsing errors (How did we get here?)
+         */
+        ruleStack:string[]
+
+        /**
+         * A copy of the parser's rule occurrence stack at the "time" the RecognitionException occurred.
+         * This can be used to help debug parsing errors (How did we get here?)
+         */
+        ruleOccurrenceStack:number[]
+    }
+
     export interface IRecognitionException {
         name:string,
         message:string,
@@ -18,11 +32,7 @@ export namespace exceptions {
          */
         resyncedTokens:Token[]
 
-        /**
-         * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
-         * This can be used to help debug parsing errors (How did we get here?)
-         */
-        ruleStack:string[]
+        context:IRecognizerContext
     }
 
     // hacks to bypass no support for custom Errors in javascript/typescript

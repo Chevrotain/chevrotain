@@ -605,10 +605,8 @@ describe("The BaseRecognizer", () => {
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
         expect(parser.errors[0].message).to.include("MinusTok")
         expect(parser.errors[0].message).to.include("token of type")
-        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
-
+        expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
     })
-
 
     it("Will use Token LABELS for noViableAlt error messages when unavailable", () => {
 
@@ -630,7 +628,7 @@ describe("The BaseRecognizer", () => {
         let parser = new LabelAltParser([])
         parser.rule()
         expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
-        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
+        expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
         expect(parser.errors[0].message).to.include("MinusTok")
         expect(parser.errors[0].message).to.include("+")
         expect(parser.errors[0].message).to.not.include("PlusTok")
@@ -648,13 +646,13 @@ describe("The BaseRecognizer", () => {
 
             public rule = this.RULE("rule", () => {
                 this.OPTION(() => {
-                    this.SUBRULE(this.rule2)
+                    this.SUBRULE2(this.rule2)
                 })
             })
 
             public rule2 = this.RULE("rule2", () => {
                 this.OPTION(() => {
-                    this.SUBRULE(this.rule3)
+                    this.SUBRULE5(this.rule3)
                 })
             })
 
@@ -667,7 +665,8 @@ describe("The BaseRecognizer", () => {
         let parser = new NestedRulesParser([new MinusTok(), new MinusTok()])
         parser.rule()
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
-        expect(parser.errors[0].ruleStack).to.deep.equal(["rule", "rule2", "rule3"])
+        expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule", "rule2", "rule3"])
+        expect(parser.errors[0].context.ruleOccurrenceStack).to.deep.equal([1, 2, 5])
     })
 
     it("Will build an error message for AT_LEAST_ONE automatically", () => {
@@ -700,7 +699,7 @@ describe("The BaseRecognizer", () => {
         expect(parser.errors[0].message).to.contain("MinusTok")
         expect(parser.errors[0].message).to.contain("+")
         expect(parser.errors[0].message).to.contain("but found: '666'")
-        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
+        expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
     })
 
     it("Will build an error message for AT_LEAST_ONE_SEP automatically", () => {
@@ -733,6 +732,7 @@ describe("The BaseRecognizer", () => {
         expect(parser.errors[0].message).to.contain("MinusTok")
         expect(parser.errors[0].message).to.contain("+")
         expect(parser.errors[0].message).to.contain("but found: '666'")
-        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
+        expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
+        expect(parser.errors[0].context.ruleOccurrenceStack).to.deep.equal([1])
     })
 })
