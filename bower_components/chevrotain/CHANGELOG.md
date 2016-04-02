@@ -1,3 +1,10 @@
+## 0.7.1 (4-3-2016)
+
+#### Minor Changes
+- [Parsing Errors should include Parser context information.](#165)
+- [AT_LEAST_ONE dsl rule, errMsg param should be optional.](#91)
+
+
 ## 0.7.0 (4-2-2016)
 
 #### Major Changes

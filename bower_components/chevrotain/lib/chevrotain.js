@@ -1,4 +1,4 @@
-/*! chevrotain - v0.7.0 */
+/*! chevrotain - v0.7.1 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.7.0";
+	API.VERSION = "0.7.1";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.ParserDefinitionErrorType = parser_public_1.ParserDefinitionErrorType;
@@ -298,6 +298,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Parser.prototype.SAVE_ERROR = function (error) {
 	        if (exceptions_public_1.exceptions.isRecognitionException(error)) {
+	            error.context = {
+	                ruleStack: utils_1.cloneArr(this.RULE_STACK),
+	                ruleOccurrenceStack: utils_1.cloneArr(this.RULE_OCCURRENCE_STACK)
+	            };
 	            this.errors.push(error);
 	            return error;
 	        }
@@ -1211,9 +1215,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return false;
 	    };
-	    Parser.prototype.atLeastOneInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action, errMsg) {
-	        if (utils_1.isString(action)) {
-	            errMsg = action;
+	    Parser.prototype.atLeastOneInternal = function (prodFunc, prodName, prodOccurrence, lookAheadFunc, action, userDefinedErrMsg) {
+	        if (!utils_1.isFunction(action)) {
+	            userDefinedErrMsg = action;
 	            action = lookAheadFunc;
 	            lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence);
 	        }
@@ -1224,20 +1228,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()));
+	            throw this.raiseEarlyExitException(prodOccurrence, interpreter_1.NextInsideAtLeastOneWalker, userDefinedErrMsg);
 	        }
 	        // note that while it may seem that this can cause an error because by using a recursive call to
 	        // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
 	        // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
 	        if (this.isErrorRecoveryEnabled) {
-	            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg], lookAheadFunc, prodName, prodOccurrence, interpreter_1.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
+	            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg], lookAheadFunc, prodName, prodOccurrence, interpreter_1.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
 	        }
 	    };
-	    Parser.prototype.atLeastOneSepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, errMsg) {
+	    Parser.prototype.atLeastOneSepFirstInternal = function (prodFunc, prodName, prodOccurrence, separator, firstIterationLookAheadFunc, action, userDefinedErrMsg) {
 	        var _this = this;
 	        var separatorsResult = [];
-	        if (utils_1.isString(action)) {
-	            errMsg = action;
+	        if (!utils_1.isFunction(action)) {
+	            userDefinedErrMsg = action;
 	            action = firstIterationLookAheadFunc;
 	            firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence);
 	        }
@@ -1258,7 +1262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()));
+	            throw this.raiseEarlyExitException(prodOccurrence, interpreter_1.NextInsideAtLeastOneSepWalker, userDefinedErrMsg);
 	        }
 	        return separatorsResult;
 	    };
@@ -1460,6 +1464,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	            errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + ">";
 	        }
 	        throw this.SAVE_ERROR(new exceptions_public_1.exceptions.NoViableAltException("Expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
+	    };
+	    Parser.prototype.raiseEarlyExitException = function (occurrence, nextWalkerConstructor, userDefinedErrMsg) {
+	        var errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'";
+	        if (userDefinedErrMsg === undefined) {
+	            var ruleName = utils_1.last(this.RULE_STACK);
+	            var ruleGrammar = this.getGAstProductions().get(ruleName);
+	            var grammarPath = {
+	                ruleStack: this.RULE_STACK,
+	                occurrenceStack: this.RULE_OCCURRENCE_STACK,
+	                occurrence: occurrence
+	            };
+	            var nextTokens = new nextWalkerConstructor(ruleGrammar, grammarPath).startWalking();
+	            var nextTokensFlat = utils_1.flatten(nextTokens);
+	            var nextTokensNames = utils_1.map(nextTokensFlat, function (currTokenClass) { return tokens_public_1.tokenLabel(currTokenClass); });
+	            userDefinedErrMsg = "expecting at least one iteration which starts with one of: <" + nextTokensNames.join(" ,") + ">";
+	        }
+	        else {
+	            userDefinedErrMsg = "Expecting at least one " + userDefinedErrMsg;
+	        }
+	        throw this.SAVE_ERROR(new exceptions_public_1.exceptions.EarlyExitException(userDefinedErrMsg + errSuffix, this.NEXT_TOKEN()));
 	    };
 	    Parser.IGNORE_AMBIGUITIES = true;
 	    Parser.NO_RESYNC = false;
