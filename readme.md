@@ -16,15 +16,16 @@ any code generation phase.
    
 ## Features
   1. **Lexer Engine** based on Regular Expression.
-    * Supports Token location tracking.
-    * Supports Token skipping (whitespace/comments/...).
+    * Full Token position information.
+    * Token skipping (whitespace/comments/...).
     * Allows prioritising shorter matches (Keywords vs Identifiers).
+    * [Multiple Lexer Modes](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer.js) depending on the context.
     * **No code generation** The Lexer does not require any code generation phase. 
    
   2. **Parsing DSL** for defining the grammar.
     * **No code generation**.
       * The DSL is just Javascript, not an external language.
-      * The Parsing flow is easily debuggable.
+      * Easily debuggable.
       * Short feedback loops.
       * Allows great flexibility for inserting custom Parser actions.
     * **Error Reporting** with full location information. 
