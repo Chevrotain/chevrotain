@@ -1,5 +1,5 @@
 import {Token} from "../../src/scan/tokens_public"
-import {Lexer, LexerDefinitionErrorType} from "../../src/scan/lexer_public"
+import {Lexer, LexerDefinitionErrorType, MultiModeLexerWDefinition} from "../../src/scan/lexer_public"
 import {
     findMissingPatterns,
     countLineTerminators,
@@ -116,9 +116,8 @@ describe("The Simple Lexer Validations", () => {
 
     it("won't detect valid patterns as missing", () => {
         let result = findMissingPatterns([BambaTok, IntegerTok, IdentifierTok])
-        //noinspection BadExpressionStatementJS
         expect(result.errors).to.be.empty
-        expect(result.validTokenClasses).to.deep.equal([BambaTok, IntegerTok, IdentifierTok])
+        expect(result.valid).to.deep.equal([BambaTok, IntegerTok, IdentifierTok])
     })
 
     it("will detect missing patterns", () => {
@@ -128,14 +127,13 @@ describe("The Simple Lexer Validations", () => {
         expect(result.errors[0].tokenClasses).to.deep.equal([MissingPattern])
         expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.MISSING_PATTERN)
         expect(result.errors[0].message).to.contain("MissingPattern")
-        expect(result.validTokenClasses).to.deep.equal([ValidNaPattern])
+        expect(result.valid).to.deep.equal([ValidNaPattern])
     })
 
     it("won't detect valid patterns as invalid", () => {
         let result = findInvalidPatterns([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
-        //noinspection BadExpressionStatementJS
         expect(result.errors).to.be.empty
-        expect(result.validTokenClasses).to.deep.equal([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
+        expect(result.valid).to.deep.equal([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
     })
 
     it("will detect invalid patterns as invalid", () => {
@@ -145,12 +143,11 @@ describe("The Simple Lexer Validations", () => {
         expect(result.errors[0].tokenClasses).to.deep.equal([InvalidPattern])
         expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_PATTERN)
         expect(result.errors[0].message).to.contain("InvalidPattern")
-        expect(result.validTokenClasses).to.deep.equal([ValidNaPattern])
+        expect(result.valid).to.deep.equal([ValidNaPattern])
     })
 
     it("won't detect valid patterns as using unsupported flags", () => {
         let errors = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
-        //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
@@ -174,13 +171,11 @@ describe("The Simple Lexer Validations", () => {
 
     it("won't detect valid patterns as duplicates", () => {
         let errors = findDuplicatePatterns([MultiLinePattern, IntegerValid])
-        //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
     it("won't detect NA patterns as duplicates", () => {
         let errors = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
-        //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
@@ -195,7 +190,6 @@ describe("The Simple Lexer Validations", () => {
 
     it("won't detect valid patterns as using unsupported end of input anchor", () => {
         let errors = findEndOfInputAnchor([IntegerTok, IntegerValid])
-        //noinspection BadExpressionStatementJS
         expect(errors).to.be.empty
     })
 
@@ -432,7 +426,6 @@ describe("The Simple Lexer Full flow", () => {
     })
 
     it("supports Token groups", () => {
-
         let ifElseLexer = new Lexer([If, Else, Comment])
         let input = "if//else"
         let lexResult = ifElseLexer.tokenize(input)
@@ -445,4 +438,160 @@ describe("The Simple Lexer Full flow", () => {
             new Comment("//else", 2, 1, 3, 1, 8),
         ])
     })
+
+    context("lexer modes", () => {
+
+        class One extends Token { static PATTERN = /1/ }
+        class Two extends Token { static PATTERN = /2/ }
+        class Three extends Token { static PATTERN = /3/ }
+
+        class Alpha extends Token { static PATTERN = /A/ }
+        class Beta extends Token { static PATTERN = /B/ }
+        class Gamma extends Token { static PATTERN = /G/ }
+
+        class Hash extends Token { static PATTERN = /#/ }
+        class Caret extends Token { static PATTERN = /\^/ }
+        class Amp extends Token { static PATTERN = /&/ }
+
+        class NUMBERS extends Token {
+            static PATTERN = /NUMBERS/
+            static PUSH_MODE = "numbers"
+        }
+
+        class LETTERS extends Token {
+            static PATTERN = /LETTERS/
+            static PUSH_MODE = "letters"
+        }
+
+        class SIGNS extends Token {
+            static PATTERN = /SIGNS/
+            static PUSH_MODE = "signs"
+        }
+
+        class ExitNumbers extends Token {
+            static PATTERN = /EXIT_NUMBERS/
+            static POP_MODE = true
+        }
+
+        class ExitLetters extends Token {
+            static PATTERN = /EXIT_LETTERS/
+            static POP_MODE = true
+        }
+
+        class ExitSigns extends Token {
+            static PATTERN = /EXIT_SIGNS/
+            static POP_MODE = true
+        }
+
+        class Whitespace extends Token {
+            static PATTERN = /(\t| )/
+            static GROUP = Lexer.SKIPPED
+        }
+
+        let modeLexerDefinition:MultiModeLexerWDefinition = {
+            "numbers": [One, Two, Three, ExitNumbers, LETTERS, Whitespace],
+            "letters": [Alpha, Beta, Gamma, ExitLetters, SIGNS, Whitespace],
+            "signs":   [Hash, Caret, Amp, ExitSigns, NUMBERS, Whitespace]
+        }
+
+        let ModeLexer = new Lexer(modeLexerDefinition)
+
+        it("supports 'context' lexer modes full flow", () => {
+            let input = "1 LETTERS G A G SIGNS & EXIT_SIGNS B EXIT_LETTERS 3"
+            let lexResult = ModeLexer.tokenize(input)
+            expect(lexResult.errors).to.be.empty
+
+            let images = map(lexResult.tokens, (currTok) => currTok.image)
+            expect(images).to.deep.equal([
+                "1",
+                "LETTERS",
+                "G",
+                "A",
+                "G",
+                "SIGNS",
+                "&",
+                "EXIT_SIGNS",
+                "B", // back in letters mode
+                "EXIT_LETTERS",
+                "3" // back in numbers mode
+            ])
+        })
+
+        it("allows choosing the initial Mode", () => {
+            let input = "A G SIGNS ^"
+            let lexResult = ModeLexer.tokenize(input, "letters")
+            expect(lexResult.errors).to.be.empty
+
+            let images = map(lexResult.tokens, (currTok) => currTok.image)
+            expect(images).to.deep.equal([
+                "A",
+                "G",
+                "SIGNS",
+                "^"
+            ])
+        })
+
+        it("won't allow lexing tokens that are not in the current mode's set", () => {
+            let input = "1 LETTERS 1 A"
+            let lexResult = ModeLexer.tokenize(input)
+            expect(lexResult.errors).to.have.lengthOf(1)
+            expect(lexResult.errors[0].message).to.include("skipped 1")
+            expect(lexResult.errors[0].message).to.include(">1<")
+
+            let images = map(lexResult.tokens, (currTok) => currTok.image)
+
+            expect(images).to.deep.equal([
+                "1",
+                "LETTERS",
+                "A" // the second "1" is missing because its not allowed in the "letters" mode
+            ])
+        })
+
+        it("Will create a lexer error and skip the mode popping when there is no lexer mode to pop", () => {
+            let input = "1 EXIT_NUMBERS 2"
+            let lexResult = ModeLexer.tokenize(input)
+            expect(lexResult.errors).to.have.lengthOf(1)
+            expect(lexResult.errors[0].message).to.include(">EXIT_NUMBERS<")
+            expect(lexResult.errors[0].message).to.include("Unable to pop")
+            expect(lexResult.errors[0].line).to.equal(1)
+            expect(lexResult.errors[0].column).to.equal(3)
+            expect(lexResult.errors[0].length).to.equal(12)
+
+            let images = map(lexResult.tokens, (currTok) => currTok.image)
+            expect(images).to.deep.equal([
+                "1",
+                "EXIT_NUMBERS",
+                "2"
+            ])
+        })
+
+        it("Will detect Token definitions with push modes values that does not exist", () => {
+            class One extends Token { static PATTERN = /1/ }
+            class Two extends Token { static PATTERN = /2/ }
+
+            class Alpha extends Token { static PATTERN = /A/ }
+            class Beta extends Token { static PATTERN = /B/ }
+            class Gamma extends Token { static PATTERN = /G/ }
+
+            class EnterNumbers extends Token {
+                static PATTERN = /NUMBERS/
+                static PUSH_MODE = "numbers"
+            }
+
+            let lexerDef:MultiModeLexerWDefinition = {
+                "letters":      [Alpha, Beta, Gamma, Whitespace, EnterNumbers],
+                // the numbers mode has a typo! so the PUSH_MODE in the 'EnterNumbers' is invalid
+                "nuMbers_TYPO": [One, Two, Whitespace]
+            }
+
+            let badLexer = new Lexer(lexerDef, true)
+            expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+            expect(badLexer.lexerDefinitionErrors[0].tokenClasses).to.deep.equal([EnterNumbers])
+            expect(badLexer.lexerDefinitionErrors[0].type).to.equal(LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST)
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("PUSH_MODE")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("EnterNumbers")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("which does not exist")
+        })
+    })
+
 })

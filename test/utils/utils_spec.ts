@@ -39,9 +39,7 @@ describe("The Utils functions namespace", () => {
             expect(item).to.equal(idx + 1)
         })
 
-        forEach(null, (item) => {
-            throw Error("call back should not be invoked for none array")
-        })
+        expect(() => forEach(null, (item) => {})).to.throw("non exhaustive match")
 
         forEach([], (item) => {
             throw Error("call back should not be invoked for empty array")
