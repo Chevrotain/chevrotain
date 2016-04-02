@@ -294,7 +294,7 @@ describe("The Parsing DSL", () => {
 
     describe("supports EMPTY(...) alternative convenience function", () => {
 
-        let EmptyAltParser = class EmptyAltParser extends Parser {
+        class EmptyAltParser extends Parser {
 
             public getLookAheadCache():HashTable<Function> {
                 return getLookaheadFuncsForClass(this.className)
@@ -548,7 +548,7 @@ describe("The BaseRecognizer", () => {
 
     it("will not swallow none Recognizer errors when attempting 'in rule error recovery'", () => {
 
-        let InRuleParser = class InRuleParser extends Parser {
+        class InRuleParser extends Parser {
 
             constructor(input:Token[] = []) {
                 super(input, ALL_TOKENS)
@@ -566,7 +566,7 @@ describe("The BaseRecognizer", () => {
 
     it("Will use Token LABELS for mismatch error messages when available", () => {
 
-        let LabelTokParser = class LabelTokParser extends Parser {
+        class LabelTokParser extends Parser {
 
             constructor(input:Token[] = []) {
                 super(input, [PlusTok, MinusTok])
@@ -587,7 +587,7 @@ describe("The BaseRecognizer", () => {
 
     it("Will not use Token LABELS for mismatch error messages when unavailable", () => {
 
-        let NoLabelTokParser = class NoLabelTokParser extends Parser {
+        class NoLabelTokParser extends Parser {
 
             constructor(input:Token[] = []) {
                 super(input, [PlusTok, MinusTok])
@@ -604,12 +604,14 @@ describe("The BaseRecognizer", () => {
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
         expect(parser.errors[0].message).to.include("MinusTok")
         expect(parser.errors[0].message).to.include("token of type")
+        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
+
     })
 
 
     it("Will use Token LABELS for noViableAlt error messages when unavailable", () => {
 
-        let LabelAltParser = class LabelAltParser extends Parser {
+        class LabelAltParser extends Parser {
 
             constructor(input:Token[] = []) {
                 super(input, [PlusTok, MinusTok])
@@ -627,9 +629,43 @@ describe("The BaseRecognizer", () => {
         let parser = new LabelAltParser([])
         parser.rule()
         expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
+        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
         expect(parser.errors[0].message).to.include("MinusTok")
         expect(parser.errors[0].message).to.include("+")
         expect(parser.errors[0].message).to.not.include("PlusTok")
     })
 
+
+    it("Will include the ruleStack in a recognition Exception", () => {
+
+        class NestedRulesParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("rule", () => {
+                this.OPTION(() => {
+                    this.SUBRULE(this.rule2)
+                })
+            })
+
+            public rule2 = this.RULE("rule2", () => {
+                this.OPTION(() => {
+                    this.SUBRULE(this.rule3)
+                })
+            })
+
+            public rule3 = this.RULE("rule3", () => {
+                this.CONSUME1(MinusTok)
+                this.CONSUME1(PlusTok)
+            })
+        }
+
+        let parser = new NestedRulesParser([new MinusTok(), new MinusTok()])
+        parser.rule()
+        expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
+        expect(parser.errors[0].ruleStack).to.deep.equal(["rule", "rule2", "rule3"])
+    })
 })

@@ -324,6 +324,7 @@ export class Parser {
 
     protected SAVE_ERROR(error:exceptions.IRecognitionException):exceptions.IRecognitionException {
         if (exceptions.isRecognitionException(error)) {
+            error.ruleStack = cloneArr(this.RULE_STACK)
             this.errors.push(error)
             return error
         }

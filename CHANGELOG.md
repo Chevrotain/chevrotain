@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+- [Parsing Errors should include Parser context information.](#165)
+
+
+#### Minor Changes
+- [Re-synced tokens should be reported to the user.](#154)
+
+
 ## 0.7.0 (4-2-2016)
 
 #### Major Changes

@@ -17,6 +17,12 @@ export namespace exceptions {
          * For example for displaying with a red underline in a text editor.
          */
         resyncedTokens:Token[]
+
+        /**
+         * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
+         * This can be used to help debug parsing errors (How did we get here?)
+         */
+        ruleStack:string[]
     }
 
     // hacks to bypass no support for custom Errors in javascript/typescript
