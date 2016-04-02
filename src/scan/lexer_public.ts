@@ -215,6 +215,7 @@ export class Lexer {
         let groups:any = cloneObj(this.emptyGroups)
 
         let currModePatterns = []
+        let currModePatternsLength = 0
         let currModePatternIdxToLongerAltIdx = []
         let currModePatternIdxToGroup = []
         let currModePatternIdxToClass = []
@@ -235,6 +236,7 @@ export class Lexer {
                 modeStack.pop()
                 let newMode = last(modeStack)
                 currModePatterns = this.allPatterns[newMode]
+                currModePatternsLength = currModePatterns.length
                 currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
                 currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
                 currModePatternIdxToClass = this.patternIdxToClass[newMode]
@@ -247,6 +249,7 @@ export class Lexer {
         let push_mode = (newMode) => {
             modeStack.push(newMode)
             currModePatterns = this.allPatterns[newMode]
+            currModePatternsLength = currModePatterns.length
             currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
             currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
             currModePatternIdxToClass = this.patternIdxToClass[newMode]
@@ -259,7 +262,7 @@ export class Lexer {
 
         while (text.length > 0) {
             match = null
-            for (i = 0; i < currModePatterns.length; i++) {
+            for (i = 0; i < currModePatternsLength; i++) {
                 match = currModePatterns[i].exec(text)
                 if (match !== null) {
                     // even though this pattern matched we must try a another longer alternative.
