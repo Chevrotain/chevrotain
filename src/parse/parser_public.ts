@@ -16,8 +16,8 @@ import {
     contains,
     flatten,
     last,
-    isString,
-    dropRight
+    dropRight,
+    isFunction
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {Token, tokenName, EOF, tokenLabel, hasTokenLabel} from "../scan/tokens_public"
@@ -40,7 +40,10 @@ import {
     NextTerminalAfterAtLeastOneSepWalker,
     NextTerminalAfterManyWalker,
     NextTerminalAfterManySepWalker,
-    NextInsideOrWalker
+    NextInsideOrWalker,
+    NextInsideAtLeastOneWalker,
+    AbstractNextPossibleTokensWalker,
+    NextInsideAtLeastOneSepWalker
 } from "./grammar/interpreter"
 import {IN} from "./constants"
 
@@ -76,8 +79,8 @@ export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionEr
 
 // parameters needed to compute the key in the FOLLOW_SET map.
 export interface IFollowKey {
-    ruleName: string
-    idxInCallingRule: number
+    ruleName:string
+    idxInCallingRule:number
     inRule:string
 }
 
@@ -106,7 +109,7 @@ export interface IOrAltImplicit<T> {
 }
 
 export interface IParserState {
-    errors: exceptions.IRecognitionException[]
+    errors:exceptions.IRecognitionException[]
     inputIdx:number
     RULE_STACK:string[]
 }
@@ -235,7 +238,7 @@ export class Parser {
     protected className:string
     protected RULE_STACK:string[] = []
     protected RULE_OCCURRENCE_STACK:number[] = []
-    protected tokensMap:{ [fqn: string] : Function } = undefined
+    protected tokensMap:{ [fqn:string]:Function } = undefined
 
     private firstAfterRepMap
     private classLAFuncs
@@ -248,7 +251,7 @@ export class Parser {
     private optionLookaheadKeys:HashTable<string>[]
     private definedRulesNames:string[] = []
 
-    constructor(input:Token[], tokensMapOrArr:{ [fqn: string] : Function; } | Function[], isErrorRecoveryEnabled = true) {
+    constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:Function; } | Function[], isErrorRecoveryEnabled = true) {
         this._input = input
         this.isErrorRecoveryEnabled = isErrorRecoveryEnabled
         this.className = classNameFromInstance(this)
@@ -848,7 +851,7 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE(laFuncOrAction:LookAheadFunc | GrammarAction,
-                           action:GrammarAction | string,
+                           action?:GrammarAction | string,
                            errMsg?:string):void {
         return this.AT_LEAST_ONE1.call(this, laFuncOrAction, action, errMsg)
     }
@@ -868,7 +871,7 @@ export class Parser {
      * @param {string} [errMsg] short title/classification to what is being matched
      */
     protected AT_LEAST_ONE1(laFuncOrAction:LookAheadFunc | GrammarAction,
-                            action:GrammarAction | string,
+                            action?:GrammarAction | string,
                             errMsg?:string):void {
         this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, laFuncOrAction, action, errMsg)
     }
@@ -877,7 +880,7 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE2(laFuncOrAction:LookAheadFunc | GrammarAction,
-                            action:GrammarAction | string,
+                            action?:GrammarAction | string,
                             errMsg?:string):void {
         this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, laFuncOrAction, action, errMsg)
     }
@@ -886,7 +889,7 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE3(laFuncOrAction:LookAheadFunc | GrammarAction,
-                            action:GrammarAction | string,
+                            action?:GrammarAction | string,
                             errMsg?:string):void {
         this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE3", 3, laFuncOrAction, action, errMsg)
     }
@@ -895,7 +898,7 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE4(laFuncOrAction:LookAheadFunc | GrammarAction,
-                            action:GrammarAction | string,
+                            action?:GrammarAction | string,
                             errMsg?:string):void {
         this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE4", 4, laFuncOrAction, action, errMsg)
     }
@@ -904,7 +907,7 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE5(laFuncOrAction:LookAheadFunc | GrammarAction,
-                            action:GrammarAction | string,
+                            action?:GrammarAction | string,
                             errMsg?:string):void {
         this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE5", 5, laFuncOrAction, action, errMsg)
     }
@@ -915,7 +918,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
                                laFuncOrAction:LookAheadFunc | GrammarAction,
-                               action:GrammarAction | string,
+                               action?:GrammarAction | string,
                                errMsg?:string):Token[] {
         return this.AT_LEAST_ONE_SEP1.call(this, separator, laFuncOrAction, action, errMsg)
     }
@@ -937,7 +940,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
                                 laFuncOrAction:LookAheadFunc | GrammarAction,
-                                action:GrammarAction | string,
+                                action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator,
             laFuncOrAction, action, errMsg)
@@ -948,7 +951,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
                                 laFuncOrAction:LookAheadFunc | GrammarAction,
-                                action:GrammarAction | string,
+                                action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator,
             laFuncOrAction, action, errMsg)
@@ -959,7 +962,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
                                 laFuncOrAction:LookAheadFunc | GrammarAction,
-                                action:GrammarAction | string,
+                                action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator,
             laFuncOrAction, action, errMsg)
@@ -970,7 +973,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
                                 laFuncOrAction:LookAheadFunc | GrammarAction,
-                                action:GrammarAction | string,
+                                action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator,
             laFuncOrAction, action, errMsg)
@@ -981,7 +984,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
                                 laFuncOrAction:LookAheadFunc | GrammarAction,
-                                action:GrammarAction | string,
+                                action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator,
             laFuncOrAction, action, errMsg)
@@ -1403,9 +1406,9 @@ export class Parser {
                                prodOccurrence:number,
                                lookAheadFunc:LookAheadFunc | GrammarAction,
                                action:GrammarAction | string,
-                               errMsg?:string):void {
-        if (isString(action)) {
-            errMsg = <any>action
+                               userDefinedErrMsg?:string):void {
+        if (!isFunction(action)) {
+            userDefinedErrMsg = <any>action
             action = <any>lookAheadFunc
             lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
         }
@@ -1417,14 +1420,14 @@ export class Parser {
             }
         }
         else {
-            throw this.SAVE_ERROR(new exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()))
+            throw this.raiseEarlyExitException(prodOccurrence, NextInsideAtLeastOneWalker, userDefinedErrMsg)
         }
 
         // note that while it may seem that this can cause an error because by using a recursive call to
         // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
         // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
         if (this.isErrorRecoveryEnabled) {
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, errMsg],
+            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg],
                 <any>lookAheadFunc, prodName, prodOccurrence, NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
         }
     }
@@ -1435,12 +1438,12 @@ export class Parser {
                                        separator:TokenConstructor,
                                        firstIterationLookAheadFunc:LookAheadFunc | GrammarAction,
                                        action:GrammarAction | string,
-                                       errMsg?:string):Token[] {
+                                       userDefinedErrMsg?:string):Token[] {
 
         let separatorsResult = []
 
-        if (isString(action)) {
-            errMsg = <any>action
+        if (!isFunction(action)) {
+            userDefinedErrMsg = <any>action
             action = <any>firstIterationLookAheadFunc
             firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
         }
@@ -1470,7 +1473,7 @@ export class Parser {
             }
         }
         else {
-            throw this.SAVE_ERROR(new exceptions.EarlyExitException("Expecting at least one: " + errMsg, this.NEXT_TOKEN()))
+            throw this.raiseEarlyExitException(prodOccurrence, NextInsideAtLeastOneSepWalker, userDefinedErrMsg)
         }
 
         return separatorsResult
@@ -1743,6 +1746,28 @@ export class Parser {
         throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
     }
 
+    private raiseEarlyExitException(occurrence:number,
+                                    nextWalkerConstructor:typeof AbstractNextPossibleTokensWalker,
+                                    userDefinedErrMsg:string):void {
+        let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
+        if (userDefinedErrMsg === undefined) {
+            let ruleName = last(this.RULE_STACK)
+            let ruleGrammar = this.getGAstProductions().get(ruleName)
+            let grammarPath = {
+                ruleStack:       this.RULE_STACK,
+                occurrenceStack: this.RULE_OCCURRENCE_STACK,
+                occurrence:      occurrence
+            }
+            let nextTokens = new (<any>nextWalkerConstructor)(ruleGrammar, grammarPath).startWalking()
+            let nextTokensFlat = flatten(nextTokens)
+            let nextTokensNames = map(nextTokensFlat, (currTokenClass:Function) => tokenLabel(currTokenClass))
+            userDefinedErrMsg = `expecting at least one iteration which starts with one of: <${nextTokensNames.join(" ,")}>`
+        }
+        else {
+            userDefinedErrMsg = `Expecting at least one ${userDefinedErrMsg}`
+        }
+        throw this.SAVE_ERROR(new exceptions.EarlyExitException(userDefinedErrMsg + errSuffix, this.NEXT_TOKEN()))
+    }
 }
 
 function InRuleRecoveryException(message:string) {

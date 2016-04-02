@@ -5,6 +5,7 @@ import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
 import MismatchedTokenException = exceptions.MismatchedTokenException
 import NoViableAltException = exceptions.NoViableAltException
+import EarlyExitException = exceptions.EarlyExitException
 
 export class PlusTok extends Token {
     static LABEL = "+"
@@ -667,5 +668,71 @@ describe("The BaseRecognizer", () => {
         parser.rule()
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
         expect(parser.errors[0].ruleStack).to.deep.equal(["rule", "rule2", "rule3"])
+    })
+
+    it("Will build an error message for AT_LEAST_ONE automatically", () => {
+
+        class ImplicitAtLeastOneErrParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("rule", () => {
+                this.AT_LEAST_ONE(() => {
+                    this.SUBRULE(this.rule2)
+                })
+            })
+
+            public rule2 = this.RULE("rule2", () => {
+                this.OR([
+                    {ALT: () => { this.CONSUME1(MinusTok) }},
+                    {ALT: () => { this.CONSUME1(PlusTok) }}
+                ])
+            })
+        }
+
+        let parser = new ImplicitAtLeastOneErrParser([new IntToken("666"), new MinusTok(), new MinusTok()])
+        parser.rule()
+        expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
+        expect(parser.errors[0].message).to.contain("expecting at least one iteration")
+        expect(parser.errors[0].message).to.contain("MinusTok")
+        expect(parser.errors[0].message).to.contain("+")
+        expect(parser.errors[0].message).to.contain("but found: '666'")
+        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
+    })
+
+    it("Will build an error message for AT_LEAST_ONE_SEP automatically", () => {
+
+        class ImplicitAtLeastOneSepErrParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok, IdentTok])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("rule", () => {
+                this.AT_LEAST_ONE_SEP(IdentTok, () => {
+                    this.SUBRULE(this.rule2)
+                })
+            })
+
+            public rule2 = this.RULE("rule2", () => {
+                this.OR([
+                    {ALT: () => { this.CONSUME1(MinusTok) }},
+                    {ALT: () => { this.CONSUME1(PlusTok) }}
+                ])
+            })
+        }
+
+        let parser = new ImplicitAtLeastOneSepErrParser([new IntToken("666"), new MinusTok(), new MinusTok()])
+        parser.rule()
+        expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
+        expect(parser.errors[0].message).to.contain("expecting at least one iteration")
+        expect(parser.errors[0].message).to.contain("MinusTok")
+        expect(parser.errors[0].message).to.contain("+")
+        expect(parser.errors[0].message).to.contain("but found: '666'")
+        expect(parser.errors[0].ruleStack).to.deep.equal(["rule"])
     })
 })
