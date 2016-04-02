@@ -5,10 +5,6 @@
 - [AT_LEAST_ONE dsl rule, errMsg param should be optional.](#91)
 
 
-#### Minor Changes
-- [Re-synced tokens should be reported to the user.](#154)
-
-
 ## 0.7.0 (4-2-2016)
 
 #### Major Changes
