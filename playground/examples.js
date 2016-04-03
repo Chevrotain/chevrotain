@@ -1331,7 +1331,12 @@ var samples = {
         sampleInputs: {
             simpleCss: "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
             " {\r\n  font-family: Arial, sans-serif;\r\n  margin: 0;\r\n  font-size: 14px;\r\n}\r\n\r\n#system-error" +
-            " {\r\n  font-size: 1.5em;\r\n  text-align: center;\r\n}"
+            " {\r\n  font-size: 1.5em;\r\n  text-align: center;\r\n}",
+
+
+            "won't stop on first error": "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
+            " {\r\n  font-family Arial, sans-serif;\r\n  margin: 0;\r\n  font-size: 14px;\r\n}\r\n\r\n#system-error" +
+            " {\r\n  font-size 1.5em;\r\n  text-align: center;\r\n}"
         }
     },
 
