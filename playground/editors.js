@@ -50,14 +50,16 @@ function onInputEditorContentChange() {
     // pure grammar example without output, report status.
     else {
         processedResult = JSON.stringify({
-            Lexing :{
+            Lexing: {
                 result: lexResult.errors.length > 0 ? "FAILURE" : "SUCCESS",
                 num_of_tokens: lexResult.tokens.length,
                 lexing_errors: lexResult.errors
             },
-            Parsing  :{
+            Parsing: {
                 result: parser.errors.length > 0 ? "FAILURE" : "SUCCESS",
-                parsing_errors: parser.errors
+                parsing_errors: _.map(parser.errors, function (currError) {
+                    return _.omit(currError, ["context"])
+                })
             }
         }, null, "\t")
     }
