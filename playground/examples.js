@@ -92,8 +92,8 @@ function jsonExample() {
         });
 
         this.object = this.RULE("object", function () {
-            // use debugger statements to add breakpoints
-            // (if your browser supports debugging evaluated code)
+            // uncomment the debugger statement and open dev tools in chrome/firefox
+            // to debug the parsing flow.
             // debugger;
             var obj = {}
 
@@ -719,8 +719,9 @@ function calculatorExample() {
         var $ = this;
 
         this.expression = $.RULE("expression", function () {
-            // use debugger statements to add breakpoints (works in chrome/firefox)
-            debugger;
+            // uncomment the debugger statement and open dev tools in chrome/firefox
+            // to debug the parsing flow.
+            // debugger;
             return $.SUBRULE($.additionExpression)
         });
 
@@ -1061,7 +1062,9 @@ function tutorialGrammarActionsExample() {
 
         this.whereClause = $.RULE("whereClause", function () {
             var condition
-            debugger;
+            // uncomment the debugger statement and open dev tools in chrome/firefox
+            // to debug the parsing flow.
+            // debugger;
 
             $.CONSUME(Where)
             // a SUBRULE call will return the value the called rule returns.
@@ -1170,8 +1173,8 @@ function tutorialErrorRecoveryExample() {
         });
 
         this.object = this.RULE("object", function () {
-            // use debugger statements to add breakpoints
-            // (if your browser supports debugging evaluated code)
+            // uncomment the debugger statement and open dev tools in chrome/firefox
+            // to debug the parsing flow.
             // debugger;
             var obj = {}
 
