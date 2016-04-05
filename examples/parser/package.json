@@ -1,5 +1,5 @@
 {
-  "name": "chevrotain_examples_lexer",
+  "name": "chevrotain_custom_lookahead",
   "version": "0.1.0",
   "scripts": {
     "test": "mocha **/*spec.js"
@@ -10,7 +10,6 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "extend": "^2.0.1",
     "mocha": "^2.2.5"
   },
   "private": true

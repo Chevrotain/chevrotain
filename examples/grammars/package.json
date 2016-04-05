@@ -1,5 +1,5 @@
 {
-  "name": "chevrotain_examples_lexer",
+  "name": "chevrotain_examples_grammars",
   "version": "0.1.0",
   "scripts": {
     "test": "mocha **/*spec.js"
@@ -9,9 +9,8 @@
     "lodash": "~3.10.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "extend": "^2.0.1",
-    "mocha": "^2.2.5"
+    "mocha": "^2.2.5",
+    "xregexp": "^3.1.0"
   },
   "private": true
 }

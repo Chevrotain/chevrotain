@@ -23,9 +23,9 @@ var fourSpaces = "    "
 
 // Integration tests using older versions of node.js will
 // avoid running tests that require ES6 capabilities only available in node.js >= 4
-var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
-    "mocha *spec.js" :
-    "mocha *spec.js -i -g ES6"
+var grammar_examples_test_command = semver.gte(process.version, "4.0.0") ?
+    "mocha **/*spec.js" :
+    "mocha **/*spec.js -i -g ES6"
 
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
 
@@ -55,33 +55,21 @@ module.exports = function(grunt) {
             npm_link:                       {
                 exec: 'npm link'
             },
-            test_examples_custom_lookahead: {
-                options: {
-                    cwd: process.cwd() + "/examples/custom_lookahead"
-                },
-                exec:    INSTALL_LINK_TEST
-            },
-            test_examples_nodejs:           {
-                options: {
-                    cwd: process.cwd() + "/examples/nodejs"
-                },
-                exec:    "npm install && npm link chevrotain && " + nodejs_examples_test_command
-            },
-            test_examples_lexer:            {
+            test_examples_lexer: {
                 options: {
                     cwd: process.cwd() + "/examples/lexer"
                 },
                 exec:    INSTALL_LINK_TEST
             },
-            test_examples_jison_lex:        {
+            test_examples_grammars:           {
                 options: {
-                    cwd: process.cwd() + "/examples/jison_lex"
+                    cwd: process.cwd() + "/examples/grammars"
                 },
-                exec:    INSTALL_LINK_TEST
+                exec:    "npm install && npm link chevrotain && " + grammar_examples_test_command
             },
-            test_examples_typescript_ecma5: {
+            test_examples_parser:            {
                 options: {
-                    cwd: process.cwd() + "/examples/typescript_ecma5"
+                    cwd: process.cwd() + "/examples/parser"
                 },
                 exec:    INSTALL_LINK_TEST
             }
@@ -423,11 +411,9 @@ module.exports = function(grunt) {
 
     var integrationTestsNodeTasks = [
         'run:npm_link',
-        'run:test_examples_custom_lookahead',
-        'run:test_examples_nodejs',
-        'run:test_examples_lexer',
-        'run:test_examples_jison_lex',
-        'run:test_examples_typescript_ecma5'
+        'run:test_examples_grammars',
+        'run:test_examples_parser',
+        'run:test_examples_lexer'
     ]
 
     var browsers_tests = [
