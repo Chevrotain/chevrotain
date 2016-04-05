@@ -24,8 +24,8 @@ var fourSpaces = "    "
 // Integration tests using older versions of node.js will
 // avoid running tests that require ES6 capabilities only available in node.js >= 4
 var nodejs_examples_test_command = semver.gte(process.version, "4.0.0") ?
-    "mocha *spec.js" :
-    "mocha *spec.js -i -g ES6"
+    "mocha **/*spec.js" :
+    "mocha **/*spec.js -i -g ES6"
 
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
 
@@ -57,31 +57,19 @@ module.exports = function(grunt) {
             },
             test_examples_custom_lookahead: {
                 options: {
-                    cwd: process.cwd() + "/examples/custom_lookahead"
+                    cwd: process.cwd() + "/examples/lexer"
                 },
                 exec:    INSTALL_LINK_TEST
             },
             test_examples_nodejs:           {
                 options: {
-                    cwd: process.cwd() + "/examples/nodejs"
+                    cwd: process.cwd() + "/examples/grammars"
                 },
                 exec:    "npm install && npm link chevrotain && " + nodejs_examples_test_command
             },
             test_examples_lexer:            {
                 options: {
-                    cwd: process.cwd() + "/examples/lexer"
-                },
-                exec:    INSTALL_LINK_TEST
-            },
-            test_examples_jison_lex:        {
-                options: {
-                    cwd: process.cwd() + "/examples/jison_lex"
-                },
-                exec:    INSTALL_LINK_TEST
-            },
-            test_examples_typescript_ecma5: {
-                options: {
-                    cwd: process.cwd() + "/examples/typescript_ecma5"
+                    cwd: process.cwd() + "/examples/parser"
                 },
                 exec:    INSTALL_LINK_TEST
             }
