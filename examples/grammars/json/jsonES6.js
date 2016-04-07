@@ -66,44 +66,44 @@ class JsonParserES6 extends chevrotain.Parser {
         var $ = this;
 
         $.json = $.RULE("json", () => {
-                // @formatter:off
+            // @formatter:off
             $.OR([
                 { ALT: () => { $.SUBRULE($.object) }},
                 { ALT: () => { $.SUBRULE($.array) }}
             ]);
             // @formatter:on
-    });
+        });
 
         // the parsing methods
         $.object = $.RULE("object", () => { // using ES2015 Arrow functions to reduce verbosity.
-                $.CONSUME(LCurly);
-        $.OPTION(() => {
-            $.SUBRULE($.objectItem);
-        $.MANY(() => {
-            $.CONSUME(Comma);
-        $.SUBRULE2($.objectItem);
-    });
-    });
-        $.CONSUME(RCurly);
-    });
+            $.CONSUME(LCurly);
+            $.OPTION(() => {
+                $.SUBRULE($.objectItem);
+                $.MANY(() => {
+                    $.CONSUME(Comma);
+                    $.SUBRULE2($.objectItem);
+                });
+            });
+            $.CONSUME(RCurly);
+        });
 
         $.objectItem = $.RULE("objectItem", () => {
-                $.CONSUME(StringLiteral);
-        $.CONSUME(Colon);
-        $.SUBRULE($.value);
-    });
+            $.CONSUME(StringLiteral);
+            $.CONSUME(Colon);
+            $.SUBRULE($.value);
+        });
 
         $.array = $.RULE("array", () => {
-                $.CONSUME(LSquare);
-        $.OPTION(() => {
-            $.SUBRULE($.value);
-        $.MANY(() => {
-            $.CONSUME(Comma);
-        $.SUBRULE2($.value);
-    });
-    });
-        $.CONSUME(RSquare);
-    });
+            $.CONSUME(LSquare);
+            $.OPTION(() => {
+                $.SUBRULE($.value);
+                $.MANY(() => {
+                    $.CONSUME(Comma);
+                    $.SUBRULE2($.value);
+                });
+            });
+            $.CONSUME(RSquare);
+        });
 
         // @formatter:off
         $.value = $.RULE("value", () => {
@@ -138,7 +138,7 @@ module.exports = function (text) {
     parser.json();
     fullResult.parseErrors = parser.errors;
 
-    if (fullResult.lexErrors.length >= 1 || fullResult.parseErrors.length >= 1) {
+    if (fullResult.lexErrors.length > 1 || fullResult.parseErrors.length > 1) {
         throw new Error("sad sad panda")
     }
     return fullResult;
