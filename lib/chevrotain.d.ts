@@ -1,4 +1,4 @@
-/*! chevrotain - v0.7.1 */
+/*! chevrotain - v0.7.2 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -234,10 +234,11 @@ declare namespace chevrotain {
     export enum ParserDefinitionErrorType {
         INVALID_RULE_NAME = 0,
         DUPLICATE_RULE_NAME = 1,
-        DUPLICATE_PRODUCTIONS = 2,
-        UNRESOLVED_SUBRULE_REF = 3,
-        LEFT_RECURSION = 4,
-        NONE_LAST_EMPTY_ALT = 5,
+        INVALID_RULE_OVERRIDE = 2,
+        DUPLICATE_PRODUCTIONS = 3,
+        UNRESOLVED_SUBRULE_REF = 4,
+        LEFT_RECURSION = 5,
+        NONE_LAST_EMPTY_ALT = 6,
     }
     export interface IParserDefinitionError {
         message: string;
@@ -741,11 +742,6 @@ declare namespace chevrotain {
          */
         protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
-         * Convenience method, same as RULE with doReSync=false
-         * @see RULE
-         */
-        protected RULE_NO_RESYNC<T>(ruleName: string, impl: () => T, invalidRet: () => T): (idxInCallingRule: number, isEntryPoint?: boolean) => T;
-        /**
          *
          * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
          * @param {Function} impl The implementation of the Rule
@@ -756,6 +752,19 @@ declare namespace chevrotain {
          *                     Parser state / error recovery / ...
          */
         protected RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, invalidRet?: () => T, doReSync?: boolean): (idxInCallingRule?: number, ...args: any[]) => T;
+        /**
+         *
+         * @See RULE
+         * same as RULE, but should only be used in "extending" grammars to override rules/productions
+         * from the super grammar.
+         *
+         */
+        protected OVERRIDE_RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, invalidRet?: () => T, doReSync?: boolean): (idxInCallingRule?: number, ...args: any[]) => T;
+        /**
+         * Convenience method, same as RULE with doReSync=false
+         * @see RULE
+         */
+        protected RULE_NO_RESYNC<T>(ruleName: string, impl: () => T, invalidRet: () => T): (idxInCallingRule: number, isEntryPoint?: boolean) => T;
         protected ruleInvocationStateUpdate(ruleName: string, idxInCallingRule: number): void;
         protected ruleFinallyStateUpdate(): void;
         /**
@@ -778,7 +787,7 @@ declare namespace chevrotain {
          * @returns {string} The error message saved as part of a MismatchedTokenException.
          */
         protected getMisMatchTokenErrorMessage(expectedTokType: Function, actualToken: Token): string;
-                                                                                                        /**
+                                                                                                            /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
          * @param idx occurrence index of consumed token in the invoking parser rule text
          *         for example:

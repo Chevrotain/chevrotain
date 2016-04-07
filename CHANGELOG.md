@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.7.2 (4-7-2016)
 
 #### Minor Changes
 - [Support Overriding Rule implementations in inheriting grammars.](#169)
