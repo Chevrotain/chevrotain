@@ -3,6 +3,9 @@
 #### Minor Changes
 - [Support Overriding Rule implementations in inheriting grammars.](#169)
 
+#### Documentation 
+- [Bring order to the chaos of the examples folder.] (https://github.com/SAP/chevrotain/tree/master/examples)
+
 ## 0.7.1 (4-3-2016)
 
 #### Minor Changes
