@@ -1,8 +1,17 @@
 import * as cache from "./cache"
 import {exceptions} from "./exceptions_public"
-import {classNameFromInstance, HashTable, functionName} from "../lang/lang_extensions"
+import {
+    classNameFromInstance,
+    HashTable,
+    functionName
+} from "../lang/lang_extensions"
 import {resolveGrammar} from "./grammar/resolver"
-import {validateGrammar, validateRuleName} from "./grammar/checks"
+import {
+    validateGrammar,
+    validateRuleName,
+    validateRuleDoesNotAlreadyExist,
+    validateRuleIsOverridden
+} from "./grammar/checks"
 import {
     isEmpty,
     map,
@@ -50,6 +59,7 @@ import {IN} from "./constants"
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
     DUPLICATE_RULE_NAME,
+    INVALID_RULE_OVERRIDE,
     DUPLICATE_PRODUCTIONS,
     UNRESOLVED_SUBRULE_REF,
     LEFT_RECURSION,
@@ -994,17 +1004,6 @@ export class Parser {
     }
 
     /**
-     * Convenience method, same as RULE with doReSync=false
-     * @see RULE
-     */
-    protected RULE_NO_RESYNC<T>(ruleName:string,
-                                impl:() => T,
-                                invalidRet:() => T):(idxInCallingRule:number,
-                                                     isEntryPoint?:boolean) => T {
-        return this.RULE(ruleName, impl, invalidRet, false)
-    }
-
-    /**
      *
      * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
      * @param {Function} impl The implementation of the Rule
@@ -1019,59 +1018,57 @@ export class Parser {
                       invalidRet:() => T = this.defaultInvalidReturn,
                       doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
         // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
-        let ruleNameErrors = validateRuleName(ruleName, this.definedRulesNames, this.className)
+        let ruleErrors = validateRuleName(ruleName, this.className)
+        ruleErrors = ruleErrors.concat(validateRuleDoesNotAlreadyExist(ruleName, this.definedRulesNames, this.className))
         this.definedRulesNames.push(ruleName)
-        this.definitionErrors.push.apply(this.definitionErrors, ruleNameErrors) // mutability for the win
+        this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
+
         let parserClassProductions = cache.getProductionsForClass(this.className)
         // only build the gast representation once
         if (!(parserClassProductions.containsKey(ruleName))) {
             let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
             parserClassProductions.put(ruleName, gastProduction)
         }
-
-        let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
-            this.ruleInvocationStateUpdate(ruleName, idxInCallingRule)
-
-            try {
-                // actual parsing happens here
-                return impl.apply(this, args)
-            } catch (e) {
-                let isFirstInvokedRule = (this.RULE_STACK.length === 1)
-                // note the reSync is always enabled for the first rule invocation, because we must always be able to
-                // reSync with EOF and just output some INVALID ParseTree
-                // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
-                // path is really the most valid one
-                let reSyncEnabled = isFirstInvokedRule || (
-                    doReSync
-                    && !this.isBackTracking()
-                    // if errorRecovery is disabled, the exception will be rethrown to the top rule
-                    // (isFirstInvokedRule) and there will resync to EOF and terminate.
-                    && this.isErrorRecoveryEnabled)
-
-                if (reSyncEnabled && exceptions.isRecognitionException(e)) {
-                    let reSyncTokType = this.findReSyncTokenType()
-                    if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-                        e.resyncedTokens = this.reSyncTo(reSyncTokType)
-                        return invalidRet()
-                    }
-                    else {
-                        // to be handled farther up the call stack
-                        throw e
-                    }
-                }
-                else {
-                    // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
-                    throw e
-                }
-            }
-            finally {
-                this.ruleFinallyStateUpdate()
-            }
-        }
-        let ruleNamePropName = "ruleName"
-        wrappedGrammarRule[ruleNamePropName] = ruleName
-        return wrappedGrammarRule
+        return this.defineRule(ruleName, impl, invalidRet, doReSync)
     }
+
+    /**
+     *
+     * @See RULE
+     * same as RULE, but should only be used in "extending" grammars to override rules/productions
+     * from the super grammar.
+     * 
+     */
+    protected OVERRIDE_RULE<T>(ruleName:string,
+                               impl:(...implArgs:any[]) => T,
+                               invalidRet:() => T = this.defaultInvalidReturn,
+                               doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
+
+        let ruleErrors = validateRuleName(ruleName, this.className)
+        ruleErrors = ruleErrors.concat(validateRuleIsOverridden(ruleName, this.definedRulesNames, this.className))
+        this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
+
+
+        let parserClassProductions = cache.getProductionsForClass(this.className)
+        // when overriding always rebuilt the gast
+        // TODO: this will slightly slow down the construction of a parser with OVERRIDEN rules, how to mitigate ?
+        let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
+        parserClassProductions.put(ruleName, gastProduction)
+
+        return this.defineRule(ruleName, impl, invalidRet, doReSync)
+    }
+
+    /**
+     * Convenience method, same as RULE with doReSync=false
+     * @see RULE
+     */
+    protected RULE_NO_RESYNC<T>(ruleName:string,
+                                impl:() => T,
+                                invalidRet:() => T):(idxInCallingRule:number,
+                                                     isEntryPoint?:boolean) => T {
+        return this.RULE(ruleName, impl, invalidRet, false)
+    }
+
 
     protected ruleInvocationStateUpdate(ruleName:string, idxInCallingRule:number):void {
         this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
@@ -1125,6 +1122,57 @@ export class Parser {
 
         return msg
     }
+
+    private defineRule<T>(ruleName:string,
+                          impl:(...implArgs:any[]) => T,
+                          invalidRet:() => T,
+                          doReSync):(idxInCallingRule?:number, ...args:any[]) => T {
+        // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
+
+        let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
+            this.ruleInvocationStateUpdate(ruleName, idxInCallingRule)
+
+            try {
+                // actual parsing happens here
+                return impl.apply(this, args)
+            } catch (e) {
+                let isFirstInvokedRule = (this.RULE_STACK.length === 1)
+                // note the reSync is always enabled for the first rule invocation, because we must always be able to
+                // reSync with EOF and just output some INVALID ParseTree
+                // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
+                // path is really the most valid one
+                let reSyncEnabled = isFirstInvokedRule || (
+                    doReSync
+                    && !this.isBackTracking()
+                    // if errorRecovery is disabled, the exception will be rethrown to the top rule
+                    // (isFirstInvokedRule) and there will resync to EOF and terminate.
+                    && this.isErrorRecoveryEnabled)
+
+                if (reSyncEnabled && exceptions.isRecognitionException(e)) {
+                    let reSyncTokType = this.findReSyncTokenType()
+                    if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
+                        e.resyncedTokens = this.reSyncTo(reSyncTokType)
+                        return invalidRet()
+                    }
+                    else {
+                        // to be handled farther up the call stack
+                        throw e
+                    }
+                }
+                else {
+                    // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
+                    throw e
+                }
+            }
+            finally {
+                this.ruleFinallyStateUpdate()
+            }
+        }
+        let ruleNamePropName = "ruleName"
+        wrappedGrammarRule[ruleNamePropName] = ruleName
+        return wrappedGrammarRule
+    }
+
 
     private defaultInvalidReturn():any { return undefined }
 

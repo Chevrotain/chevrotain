@@ -17,7 +17,7 @@ import {
     validateGrammar,
     identifyProductionForDuplicates,
     OccurrenceValidationCollector,
-    getFirstNoneTerminal
+    getFirstNoneTerminal, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden
 } from "../../../src/parse/grammar/checks"
 import {Token, extendToken} from "../../../src/scan/tokens_public"
 import {forEach, first, map} from "../../../src/utils/utils"
@@ -80,11 +80,11 @@ describe("the grammar validations", () => {
     })
 
     it("does not allow duplicate grammar rule names", () => {
-        let noErrors = validateRuleName("A", ["B", "C"], "className")
+        let noErrors = validateRuleDoesNotAlreadyExist("A", ["B", "C"], "className")
         //noinspection BadExpressionStatementJS
         expect(noErrors).to.be.empty
 
-        let duplicateErr = validateRuleName("A", ["A", "B", "C"], "className")
+        let duplicateErr = validateRuleDoesNotAlreadyExist("A", ["A", "B", "C"], "className")
         //noinspection BadExpressionStatementJS
         expect(duplicateErr).to.have.length(1)
         expect(duplicateErr[0]).to.have.property("message")
@@ -93,24 +93,36 @@ describe("the grammar validations", () => {
     })
 
     it("only allows a subset of ECMAScript identifiers as rule names", () => {
-        let res1 = validateRuleName("1baa", [], "className")
+        let res1 = validateRuleName("1baa", "className")
         expect(res1).to.have.lengthOf(1)
         expect(res1[0]).to.have.property("message")
         expect(res1[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
         expect(res1[0]).to.have.property("ruleName", "1baa")
 
-        let res2 = validateRuleName("שלום", [], "className")
+        let res2 = validateRuleName("שלום", "className")
         expect(res2).to.have.lengthOf(1)
         expect(res2[0]).to.have.property("message")
         expect(res2[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
         expect(res2[0]).to.have.property("ruleName", "שלום")
 
-        let res3 = validateRuleName("$bamba", [], "className")
+        let res3 = validateRuleName("$bamba", "className")
         expect(res3).to.have.lengthOf(1)
         expect(res3[0]).to.have.property("message")
         expect(res3[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
         expect(res3[0]).to.have.property("ruleName", "$bamba")
     })
+
+    it("does not allow overriding a rule which does not already exist", () => {
+        let positive = validateRuleIsOverridden("AAA", ["BBB", "CCC"], "className")
+        expect(positive).to.have.lengthOf(1)
+        expect(positive[0].message).to.contain("Invalid rule override")
+        expect(positive[0].type).to.equal(ParserDefinitionErrorType.INVALID_RULE_OVERRIDE)
+        expect(positive[0].ruleName).to.equal("AAA")
+
+        let negative = validateRuleIsOverridden("AAA", ["BBB", "CCC", "AAA"], "className")
+        expect(negative).to.have.lengthOf(0)
+    })
+
 })
 
 
