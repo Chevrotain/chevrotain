@@ -48,7 +48,7 @@ import {
 import {contains, assign} from "../../../../src/utils/utils"
 
 
-export interface RetType { [caseValue: string] : number }
+export interface RetType { [caseValue:string]:number }
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class SwitchCaseRecoveryParser extends Parser {
@@ -64,9 +64,8 @@ export class SwitchCaseRecoveryParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public switchStmt = this.RULE("switchStmt", this.parseSwitchStmt, () => { return {} })
-    public caseStmt = this.RULE("caseStmt", this.parseCaseStmt, this.INVALID())
-
+    public switchStmt = this.RULE("switchStmt", this.parseSwitchStmt, {recoveryValueFunc: () => { return {} }})
+    public caseStmt = this.RULE("caseStmt", this.parseCaseStmt, {recoveryValueFunc: this.INVALID()})
 
     // DOCS: in this example we avoid automatic missing token insertion for tokens that have additional semantic meaning.
     //       to understand this first consider the positive case, which tokens can we safely insert?
@@ -75,7 +74,6 @@ export class SwitchCaseRecoveryParser extends Parser {
     //       an empty string? in the grammar this could lead to an empty key in the created object...
     //       what about a string with some random value? this could still lead to duplicate keys in the returned parse result
     private tokTypesThatCannotBeInsertedInRecovery = [IdentTok, StringTok, IntTok]
-
 
     // DOCS: overriding this method allows us to customize the logic for which tokens may not be automaticaly inserted
     // during error recovery.

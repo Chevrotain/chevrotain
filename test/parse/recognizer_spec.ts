@@ -38,7 +38,7 @@ class ManyRepetitionRecovery extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["666"] })
+    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {recoveryValueFunc: () => ["666"]})
 
     private parseQualifiedName():string[] {
         let idents = []
@@ -62,7 +62,7 @@ class ManySepRepetitionRecovery extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["333"] })
+    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {recoveryValueFunc: () => ["333"]})
 
     private parseQualifiedName():string[] {
         let idents = []
@@ -120,7 +120,7 @@ class AtLeastOneRepetitionRecovery extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["777"] })
+    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {recoveryValueFunc: () => ["777"]})
 
     private parseQualifiedName():string[] {
         let idents = []
@@ -144,7 +144,7 @@ class AtLeastOneSepRepetitionRecovery extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, () => { return ["999"] })
+    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {recoveryValueFunc: () => ["999"]})
 
     private parseQualifiedName():string[] {
         let idents = []

@@ -1,3 +1,36 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [Remove RULE_NO_RESYNC DSL method.](#172)
+- [Use a config object for RULE DSL method.](#168)
+
+  The [RULE method's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters 
+  have been been replaced with a single configuration object of the type [IRuleConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html)
+  Therefore any RULE invocation with more than two arguments must be refactored to the new form.
+  For example:
+  
+  ```Typescript
+      // old deprecated form  
+      this.RULE("createStmt", function(){ /* ... */}, function(){ return 666 })
+      
+      // new form
+      this.RULE("createStmt", function(){ /* ... */}, {recoveryValueFunc: function(){ return 666 }})
+  ```
+  
+  Additionally the RULE_NO_RESYNC convenience method has been removed.
+  All usages of it must be replaced with an equivalent RULE call using the IRuleconfig [resyncEnabled](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
+  property.
+  
+  For example:
+  ```Typescript
+      // old deprecated form  
+      this.RULE_NO_RESYNC("createStmt", function(){ /* ... */})
+    
+      // new form
+      this.RULE("createStmt", function(){ /* ... */}, {resyncEnabled: false})
+   ```
+  
+
 ## 0.7.2 (4-7-2016)
 
 #### Minor Changes

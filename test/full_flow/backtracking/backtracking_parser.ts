@@ -42,12 +42,14 @@ export class BackTrackingParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public statement = this.RULE("statement", this.parseStatement, INVALID(RET_TYPE.INVALID_STATEMENT))
-    public withEqualsStatement = this.RULE("withEqualsStatement", this.parseWithEqualsStatement, INVALID(RET_TYPE.INVALID_WITH_EQUALS))
-    public withDefaultStatement = this.RULE("withDefaultStatement",
-        this.parseWithDefaultStatement, INVALID(RET_TYPE.INVALID_WITH_DEFAULT))
-    // DOCs: example for a rule which will never try re-sync recovery as it is defined with 'RULE_NO_RESYNC'
-    public qualifiedName = this.RULE_NO_RESYNC("qualifiedName", this.parseQualifiedName, INVALID(RET_TYPE.INVALID_FQN))
+    public statement = this.RULE("statement", this.parseStatement,
+        {recoveryValueFunc: INVALID(RET_TYPE.INVALID_STATEMENT)})
+    public withEqualsStatement = this.RULE("withEqualsStatement", this.parseWithEqualsStatement,
+        {recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_EQUALS)})
+    public withDefaultStatement = this.RULE("withDefaultStatement", this.parseWithDefaultStatement,
+        {recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_DEFAULT)})
+    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName,
+        {recoveryValueFunc: INVALID(RET_TYPE.INVALID_FQN), resyncEnabled: false})
 
     private parseStatement():RET_TYPE {
         let statementTypeFound:RET_TYPE = undefined
