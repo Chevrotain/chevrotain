@@ -125,12 +125,12 @@ export class OccurrenceValidationCollector extends gast.GAstVisitor {
 
 let ruleNamePattern = /^[a-zA-Z_]\w*$/
 
-export function validateRuleName(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
+export function validateRuleName(ruleName:string, className):IParserDefinitionError[] {
     let errors = []
     let errMsg
 
     if (!ruleName.match(ruleNamePattern)) {
-        errMsg = `Invalid Grammar rule name --> ${ruleName} it must match the pattern: ${ruleNamePattern.toString()}`
+        errMsg = `Invalid Grammar rule name: ->${ruleName}<- it must match the pattern: ->${ruleNamePattern.toString()}<-`
         errors.push({
             message:  errMsg,
             type:     ParserDefinitionErrorType.INVALID_RULE_NAME,
@@ -138,11 +138,36 @@ export function validateRuleName(ruleName:string, definedRulesNames:string[], cl
         })
     }
 
+    return errors
+}
+
+export function validateRuleDoesNotAlreadyExist(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
+    let errors = []
+    let errMsg
+
     if ((utils.contains(definedRulesNames, ruleName))) {
-        errMsg = `Duplicate definition, rule: ${ruleName} is already defined in the grammar: ${className}`
+        errMsg = `Duplicate definition, rule: ->${ruleName}<- is already defined in the grammar: ->${className}<-`
         errors.push({
             message:  errMsg,
             type:     ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+            ruleName: ruleName
+        })
+    }
+
+    return errors
+}
+
+// TODO: is there anyway to get only the rule names of rules inherited from the super grammars?
+export function validateRuleIsOverridden(ruleName:string, definedRulesNames:string[], className):IParserDefinitionError[] {
+    let errors = []
+    let errMsg
+
+    if (!(utils.contains(definedRulesNames, ruleName))) {
+        errMsg = `Invalid rule override, rule: ->${ruleName}<- cannot be overridden in the grammar: ->${className}<-` +
+            `as it is not defined in any of the super grammars `
+        errors.push({
+            message:  errMsg,
+            type:     ParserDefinitionErrorType.INVALID_RULE_OVERRIDE,
             ruleName: ruleName
         })
     }

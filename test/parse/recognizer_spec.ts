@@ -14,7 +14,7 @@ export class PlusTok extends Token {
 }
 
 export class MinusTok extends Token {
-    constructor() { super("+", 0, 1, 1) }
+    constructor() { super("-", 0, 1, 1) }
 }
 
 export class IntToken extends Token {
