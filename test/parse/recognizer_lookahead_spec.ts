@@ -623,7 +623,7 @@ class AtLeastOneImplicitLookAheadParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
+    public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, {recoveryValueFunc: () => { return "-666" }})
 
     private parseAtLeastOneRule():string {
         let total = ""
@@ -668,7 +668,7 @@ class AtLeastOneExplicitLookAheadParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, () => { return "-666" })
+    public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, {recoveryValueFunc: () => { return "-666" }})
 
     private parseAtLeastOneRule():string {
         let total = ""
@@ -764,12 +764,8 @@ class AtLeastOneSepImplicitLookAheadParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneRule, () => {
-        return {
-            total:      "-666",
-            separators: []
-        }
-    })
+    public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneRule,
+        {recoveryValueFunc: () => { return {total: "-666", separators: []}}})
 
     private parseAtLeastOneRule():any {
         let total = ""
@@ -815,7 +811,7 @@ class AtLeastOneSepExplicitLookAheadParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneSepRule, () => { return "-666" })
+    public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneSepRule, {recoveryValueFunc: () => "-666"})
 
     private parseAtLeastOneSepRule():string {
         let total = ""
@@ -913,7 +909,7 @@ class OrImplicitLookAheadParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+    public orRule = this.RULE("orRule", this.parseOrRule, {recoveryValueFunc: () => "-666"})
 
     private parseOrRule():string {
         let total = ""
@@ -1077,7 +1073,7 @@ class OrExplicitLookAheadParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+    public orRule = this.RULE("orRule", this.parseOrRule, {recoveryValueFunc: () => "-666"})
 
     private parseOrRule():string {
         let total = ""
@@ -1189,7 +1185,7 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
         Parser.performSelfAnalysis(this)
     }
 
-    public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
+    public orRule = this.RULE("orRule", this.parseOrRule, {recoveryValueFunc: () => "-666"})
 
     private parseOrRule():string {
         let total = ""

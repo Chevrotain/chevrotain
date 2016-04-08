@@ -69,7 +69,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
             public oops = this.OVERRIDE_RULE("oops", () => {
                 this.CONSUME(PlusTok)
                 return "poof"
-            }, () => "boom", true)
+            }, {recoveryValueFunc: () => "boom"})
         }
 
         expect(() => new InvalidOverrideParser([])).to.throw("Parser Definition Errors detected")

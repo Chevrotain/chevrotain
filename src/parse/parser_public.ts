@@ -26,7 +26,8 @@ import {
     flatten,
     last,
     dropRight,
-    isFunction
+    isFunction,
+    has
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {Token, tokenName, EOF, tokenLabel, hasTokenLabel} from "../scan/tokens_public"
@@ -65,6 +66,20 @@ export enum ParserDefinitionErrorType {
     LEFT_RECURSION,
     NONE_LAST_EMPTY_ALT
 }
+
+export interface IRuleConfig<T> {
+    // The function which will be invoked to produce the returned value for a production that have not been
+    // successfully executed and the parser recovered from.
+    recoveryValueFunc?:() => T
+
+    // Enable/Disable re-sync error recovery for this specific production.
+    resyncEnabled?:boolean
+}
+
+const DEFAULT_RULE_CONFIG:IRuleConfig<any> = Object.freeze({
+    recoveryValueFunc: () => undefined,
+    resyncEnabled:     true
+})
 
 export interface IParserDefinitionError {
     message:string
@@ -1005,31 +1020,29 @@ export class Parser {
 
     /**
      *
-     * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
-     * @param {Function} impl The implementation of the Rule
-     * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
-     *                   re-sync recovery.
-     * @param {boolean} [doReSync] enable or disable re-sync recovery for this rule. defaults to true
-     * @returns {Function} The parsing rule which is the impl Function wrapped with the parsing logic that handles
-     *                     Parser state / error recovery / ...
+     * @param {string} name - The name of the rule.
+     * @param {Function} implementation - The implementation of the rule.
+     * @param {IRuleConfig} [config] - The rule's optionalconfigurationn
+     *
+     * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
+     *                     Parser state / error recovery&reporting/ ...
      */
-    protected RULE<T>(ruleName:string,
-                      impl:(...implArgs:any[]) => T,
-                      invalidRet:() => T = this.defaultInvalidReturn,
-                      doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
-        // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
-        let ruleErrors = validateRuleName(ruleName, this.className)
-        ruleErrors = ruleErrors.concat(validateRuleDoesNotAlreadyExist(ruleName, this.definedRulesNames, this.className))
-        this.definedRulesNames.push(ruleName)
+    protected RULE<T>(name:string,
+                      implementation:(...implArgs:any[]) => T,
+                      config:IRuleConfig<T> = DEFAULT_RULE_CONFIG):(idxInCallingRule?:number, ...args:any[]) => T {
+
+        let ruleErrors = validateRuleName(name, this.className)
+        ruleErrors = ruleErrors.concat(validateRuleDoesNotAlreadyExist(name, this.definedRulesNames, this.className))
+        this.definedRulesNames.push(name)
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
         let parserClassProductions = cache.getProductionsForClass(this.className)
-        // only build the gast representation once
-        if (!(parserClassProductions.containsKey(ruleName))) {
-            let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
-            parserClassProductions.put(ruleName, gastProduction)
+        // only build the gast representation once.
+        if (!(parserClassProductions.containsKey(name))) {
+            let gastProduction = buildTopProduction(implementation.toString(), name, this.tokensMap)
+            parserClassProductions.put(name, gastProduction)
         }
-        return this.defineRule(ruleName, impl, invalidRet, doReSync)
+        return this.defineRule(name, implementation, config)
     }
 
     /**
@@ -1037,12 +1050,11 @@ export class Parser {
      * @See RULE
      * same as RULE, but should only be used in "extending" grammars to override rules/productions
      * from the super grammar.
-     * 
+     *
      */
     protected OVERRIDE_RULE<T>(ruleName:string,
                                impl:(...implArgs:any[]) => T,
-                               invalidRet:() => T = this.defaultInvalidReturn,
-                               doReSync = true):(idxInCallingRule?:number, ...args:any[]) => T {
+                               config:IRuleConfig<T> = DEFAULT_RULE_CONFIG):(idxInCallingRule?:number, ...args:any[]) => T {
 
         let ruleErrors = validateRuleName(ruleName, this.className)
         ruleErrors = ruleErrors.concat(validateRuleIsOverridden(ruleName, this.definedRulesNames, this.className))
@@ -1055,20 +1067,8 @@ export class Parser {
         let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
         parserClassProductions.put(ruleName, gastProduction)
 
-        return this.defineRule(ruleName, impl, invalidRet, doReSync)
+        return this.defineRule(ruleName, impl, config)
     }
-
-    /**
-     * Convenience method, same as RULE with doReSync=false
-     * @see RULE
-     */
-    protected RULE_NO_RESYNC<T>(ruleName:string,
-                                impl:() => T,
-                                invalidRet:() => T):(idxInCallingRule:number,
-                                                     isEntryPoint?:boolean) => T {
-        return this.RULE(ruleName, impl, invalidRet, false)
-    }
-
 
     protected ruleInvocationStateUpdate(ruleName:string, idxInCallingRule:number):void {
         this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
@@ -1125,9 +1125,10 @@ export class Parser {
 
     private defineRule<T>(ruleName:string,
                           impl:(...implArgs:any[]) => T,
-                          invalidRet:() => T,
-                          doReSync):(idxInCallingRule?:number, ...args:any[]) => T {
-        // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
+                          config:IRuleConfig<T>):(idxInCallingRule?:number, ...args:any[]) => T {
+
+        let resyncEnabled = has(config, "resyncEnabled") ? config.resyncEnabled : DEFAULT_RULE_CONFIG.resyncEnabled
+        let recoveryValueFunc = has(config, "recoveryValueFunc") ? config.recoveryValueFunc : DEFAULT_RULE_CONFIG.recoveryValueFunc
 
         let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
             this.ruleInvocationStateUpdate(ruleName, idxInCallingRule)
@@ -1142,7 +1143,7 @@ export class Parser {
                 // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
                 // path is really the most valid one
                 let reSyncEnabled = isFirstInvokedRule || (
-                    doReSync
+                    resyncEnabled
                     && !this.isBackTracking()
                     // if errorRecovery is disabled, the exception will be rethrown to the top rule
                     // (isFirstInvokedRule) and there will resync to EOF and terminate.
@@ -1152,7 +1153,7 @@ export class Parser {
                     let reSyncTokType = this.findReSyncTokenType()
                     if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
                         e.resyncedTokens = this.reSyncTo(reSyncTokType)
-                        return invalidRet()
+                        return recoveryValueFunc()
                     }
                     else {
                         // to be handled farther up the call stack
@@ -1172,9 +1173,6 @@ export class Parser {
         wrappedGrammarRule[ruleNamePropName] = ruleName
         return wrappedGrammarRule
     }
-
-
-    private defaultInvalidReturn():any { return undefined }
 
     private tryInRepetitionRecovery(grammarRule:Function,
                                     grammarRuleArgs:any[],
