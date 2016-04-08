@@ -1,4 +1,4 @@
-/*! chevrotain - v0.7.2 */
+/*! chevrotain - v0.8.0 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -240,6 +240,13 @@ declare namespace chevrotain {
         LEFT_RECURSION = 5,
         NONE_LAST_EMPTY_ALT = 6,
     }
+    export interface IParserConfig {
+        recoveryEnabled?: boolean;
+    }
+    export interface IRuleConfig<T> {
+        recoveryValueFunc?: () => T;
+        resyncEnabled?: boolean;
+    }
     export interface IParserDefinitionError {
         message: string;
         type: ParserDefinitionErrorType;
@@ -344,7 +351,7 @@ declare namespace chevrotain {
          * This flag enables or disables error recovery (fault tolerance) of the parser.
          * If this flag is disabled the parser will halt on the first error.
          */
-        isErrorRecoveryEnabled: any;
+        recoveryEnabled: any;
         protected _input: Token[];
         protected inputIdx: number;
         protected isBackTrackingStack: any[];
@@ -356,7 +363,7 @@ declare namespace chevrotain {
         };
                                                 constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
-        } | Function[], isErrorRecoveryEnabled?: boolean);
+        } | Function[], config?: IParserConfig);
         input: Token[];
         reset(): void;
         isAtEndOfInput(): boolean;
@@ -743,15 +750,14 @@ declare namespace chevrotain {
         protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
          *
-         * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
-         * @param {Function} impl The implementation of the Rule
-         * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
-         *                   re-sync recovery.
-         * @param {boolean} [doReSync] enable or disable re-sync recovery for this rule. defaults to true
-         * @returns {Function} The parsing rule which is the impl Function wrapped with the parsing logic that handles
-         *                     Parser state / error recovery / ...
+         * @param {string} name - The name of the rule.
+         * @param {Function} implementation - The implementation of the rule.
+         * @param {IRuleConfig} [config] - The rule's optionalconfigurationn
+         *
+         * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
+         *                     Parser state / error recovery&reporting/ ...
          */
-        protected RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, invalidRet?: () => T, doReSync?: boolean): (idxInCallingRule?: number, ...args: any[]) => T;
+        protected RULE<T>(name: string, implementation: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         /**
          *
          * @See RULE
@@ -759,12 +765,7 @@ declare namespace chevrotain {
          * from the super grammar.
          *
          */
-        protected OVERRIDE_RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, invalidRet?: () => T, doReSync?: boolean): (idxInCallingRule?: number, ...args: any[]) => T;
-        /**
-         * Convenience method, same as RULE with doReSync=false
-         * @see RULE
-         */
-        protected RULE_NO_RESYNC<T>(ruleName: string, impl: () => T, invalidRet: () => T): (idxInCallingRule: number, isEntryPoint?: boolean) => T;
+        protected OVERRIDE_RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         protected ruleInvocationStateUpdate(ruleName: string, idxInCallingRule: number): void;
         protected ruleFinallyStateUpdate(): void;
         /**
@@ -787,7 +788,7 @@ declare namespace chevrotain {
          * @returns {string} The error message saved as part of a MismatchedTokenException.
          */
         protected getMisMatchTokenErrorMessage(expectedTokType: Function, actualToken: Token): string;
-                                                                                                            /**
+                                                                                                        /**
          * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
          * @param idx occurrence index of consumed token in the invoking parser rule text
          *         for example:
