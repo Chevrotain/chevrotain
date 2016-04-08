@@ -68,7 +68,6 @@ export let qualifiedName = new Rule("qualifiedName", [
     ])
 ])
 
-
 export let qualifiedNameSep = new Rule("qualifiedNameSep", [
     new RepetitionMandatoryWithSeparator([
         new Terminal(IdentTok, 1)
@@ -184,5 +183,9 @@ export let emptyAltOr = new Rule("emptyAltOr", [
 export let callArguments = new Rule("callArguments", [
     new RepetitionWithSeparator([
         new Terminal(IdentTok, 1)
-    ], CommaTok)
+    ], CommaTok),
+    new RepetitionWithSeparator([
+        new Terminal(IdentTok, 2)
+    ], CommaTok, 2)
+
 ])

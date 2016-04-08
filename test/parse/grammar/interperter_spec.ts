@@ -41,6 +41,12 @@ import {
 } from "../../../src/parse/grammar/interpreter"
 import {setEquality} from "../../utils/matchers"
 
+import {gast} from "../../../src/parse/grammar/gast_public"
+let RepetitionMandatory = gast.RepetitionMandatory
+let Terminal = gast.Terminal
+let Repetition = gast.Repetition
+let Rule = gast.Rule
+
 describe("The Grammar Interpeter namespace", () => {
     "use strict"
 
@@ -560,7 +566,19 @@ describe("The Grammar Interpeter namespace", () => {
 
 describe("The NextTerminalAfterManyWalker", () => {
     it("can compute the next possible token types after the MANY in QualifiedName", () => {
-        let result = new NextTerminalAfterManyWalker(qualifiedName, 1).startWalking()
+
+        let rule = new Rule("TwoRepetitionRule", [
+            new Repetition([
+                new Terminal(IdentTok, 1)
+            ], 2),
+            new Terminal(IdentTok, 2),
+            new Repetition([
+                new Terminal(DotTok),
+                new Terminal(IdentTok, 3)
+            ])
+        ])
+
+        let result = new NextTerminalAfterManyWalker(rule, 1).startWalking()
         //noinspection BadExpressionStatementJS
         expect(result.occurrence).to.be.undefined
         //noinspection BadExpressionStatementJS
@@ -603,6 +621,19 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
         let result3 = new NextTerminalAfterAtLeastOneWalker(atLeastOneRule, 3).startWalking()
         expect(result3.occurrence).to.equal(1)
         expect(result3.token).to.equal(CommaTok)
+    })
+
+    it("can compute the next possible token types after an AT_LEAST_ONE production - EMPTY", () => {
+
+        let atLeastOneRule = new Rule("atLeastOneRule", [
+            new RepetitionMandatory([
+                new Terminal(DotTok, 1)
+            ]),
+        ])
+
+        let result = new NextTerminalAfterAtLeastOneWalker(atLeastOneRule, 1).startWalking()
+        expect(result.occurrence).to.be.undefined
+        expect(result.token).to.be.undefined
     })
 })
 

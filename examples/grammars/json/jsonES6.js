@@ -10,6 +10,7 @@ var Parser = chevrotain.Parser;
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
 class True extends Token {}
+
 True.PATTERN = /true/;
 
 class False extends Token {}
@@ -60,7 +61,10 @@ class JsonParserES6 extends chevrotain.Parser {
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor(input) {
-        super(input, allTokens);
+        super(input, allTokens,
+            // by default the error recovery / fault tolerance capabilities are disabled
+            // use this flag to enable them
+            {recoveryEnabled: true});
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         var $ = this;
@@ -127,7 +131,7 @@ class JsonParserES6 extends chevrotain.Parser {
 }
 
 // ----------------- wrapping it all together -----------------
-module.exports = function (text) {
+module.exports = function(text) {
     var fullResult = {};
     var lexResult = JsonLexer.tokenize(text);
     fullResult.tokens = lexResult.tokens;
