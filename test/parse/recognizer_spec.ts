@@ -34,7 +34,7 @@ const ALL_TOKENS = [PlusTok, MinusTok, IntToken, IdentTok, DotTok]
 class ManyRepetitionRecovery extends Parser {
 
     constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
-        super(input, ALL_TOKENS, isErrorRecoveryEnabled)
+        super(input, ALL_TOKENS, {recoveryEnabled: isErrorRecoveryEnabled})
         Parser.performSelfAnalysis(this)
     }
 
@@ -58,7 +58,7 @@ class ManyRepetitionRecovery extends Parser {
 class ManySepRepetitionRecovery extends Parser {
 
     constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
-        super(input, ALL_TOKENS, isErrorRecoveryEnabled)
+        super(input, ALL_TOKENS, {recoveryEnabled: isErrorRecoveryEnabled})
         Parser.performSelfAnalysis(this)
     }
 
@@ -83,7 +83,7 @@ class ManySepRepetitionRecovery extends Parser {
 class ManySepSubRuleRepetitionRecovery extends Parser {
 
     constructor(input:Token[] = []) {
-        super(input, ALL_TOKENS)
+        super(input, ALL_TOKENS, {recoveryEnabled: true})
         Parser.performSelfAnalysis(this)
     }
 
@@ -116,7 +116,7 @@ class ManySepSubRuleRepetitionRecovery extends Parser {
 class AtLeastOneRepetitionRecovery extends Parser {
 
     constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
-        super(input, ALL_TOKENS, isErrorRecoveryEnabled)
+        super(input, ALL_TOKENS, {recoveryEnabled: isErrorRecoveryEnabled})
         Parser.performSelfAnalysis(this)
     }
 
@@ -140,7 +140,7 @@ class AtLeastOneRepetitionRecovery extends Parser {
 class AtLeastOneSepRepetitionRecovery extends Parser {
 
     constructor(input:Token[] = [], isErrorRecoveryEnabled = true) {
-        super(input, ALL_TOKENS, isErrorRecoveryEnabled)
+        super(input, ALL_TOKENS, {recoveryEnabled: isErrorRecoveryEnabled})
         Parser.performSelfAnalysis(this)
     }
 
@@ -169,7 +169,7 @@ class SubRuleTestParser extends Parser {
     private index = 1
 
     constructor(input:Token[] = []) {
-        super(input, ALL_TOKENS)
+        super(input, ALL_TOKENS, {})
         Parser.performSelfAnalysis(this)
     }
 
@@ -350,7 +350,7 @@ describe("The Parsing DSL", () => {
 describe("The Error Recovery functionality of the IntrospectionParser", () => {
 
     it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", () => {
-        let parser:any = new Parser([], ALL_TOKENS)
+        let parser:any = new Parser([], ALL_TOKENS, {recoveryEnabled: true})
         parser.reset()
         let testInput = [new IntToken("1"), new PlusTok(),
             new IntToken("2"), new PlusTok(), new IntToken("3")]
@@ -552,7 +552,7 @@ describe("The BaseRecognizer", () => {
         class InRuleParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, ALL_TOKENS)
+                super(input, ALL_TOKENS, {recoveryEnabled: true})
                 Parser.performSelfAnalysis(this)
             }
 

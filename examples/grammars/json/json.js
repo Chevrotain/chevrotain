@@ -28,7 +28,11 @@ var JsonLexer = new Lexer(allTokens);
 
 function JsonParser(input) {
     // invoke super constructor
-    Parser.call(this, input, allTokens);
+    Parser.call(this, input, allTokens, {
+        // by default the error recovery / fault tolerance capabilities are disabled
+        // use this flag to enable them
+        recoveryEnabled: true}
+    );
 
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this;

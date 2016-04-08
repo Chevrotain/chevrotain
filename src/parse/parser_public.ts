@@ -67,6 +67,14 @@ export enum ParserDefinitionErrorType {
     NONE_LAST_EMPTY_ALT
 }
 
+export interface IParserConfig {
+    recoveryEnabled?:boolean
+}
+
+const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
+    recoveryEnabled: false,
+})
+
 export interface IRuleConfig<T> {
     // The function which will be invoked to produce the returned value for a production that have not been
     // successfully executed and the parser recovered from.
@@ -255,7 +263,8 @@ export class Parser {
      * This flag enables or disables error recovery (fault tolerance) of the parser.
      * If this flag is disabled the parser will halt on the first error.
      */
-    public isErrorRecoveryEnabled
+    // TODO: should this become protected? and / or replaced with an IParserConfig object?
+    public recoveryEnabled
 
     protected _input:Token[] = []
     protected inputIdx = -1
@@ -276,9 +285,10 @@ export class Parser {
     private optionLookaheadKeys:HashTable<string>[]
     private definedRulesNames:string[] = []
 
-    constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:Function; } | Function[], isErrorRecoveryEnabled = true) {
+    constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:Function; } | Function[],
+                config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
-        this.isErrorRecoveryEnabled = isErrorRecoveryEnabled
+        this.recoveryEnabled = has(config, "recoveryEnabled") ? config.recoveryEnabled : DEFAULT_PARSER_CONFIG.recoveryEnabled
         this.className = classNameFromInstance(this)
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
@@ -1147,7 +1157,7 @@ export class Parser {
                     && !this.isBackTracking()
                     // if errorRecovery is disabled, the exception will be rethrown to the top rule
                     // (isFirstInvokedRule) and there will resync to EOF and terminate.
-                    && this.isErrorRecoveryEnabled)
+                    && this.recoveryEnabled)
 
                 if (reSyncEnabled && exceptions.isRecognitionException(e)) {
                     let reSyncTokType = this.findReSyncTokenType()
@@ -1475,7 +1485,7 @@ export class Parser {
         // note that while it may seem that this can cause an error because by using a recursive call to
         // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
         // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-        if (this.isErrorRecoveryEnabled) {
+        if (this.recoveryEnabled) {
             this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg],
                 <any>lookAheadFunc, prodName, prodOccurrence, NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
         }
@@ -1510,7 +1520,7 @@ export class Parser {
                 (<GrammarAction>action).call(this)
             }
 
-            if (this.isErrorRecoveryEnabled) {
+            if (this.recoveryEnabled) {
                 this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
                     [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
                         this.atLeastOneSepLookaheadKeys, NextTerminalAfterAtLeastOneSepWalker],
@@ -1543,7 +1553,7 @@ export class Parser {
             action.call(this)
         }
 
-        if (this.isErrorRecoveryEnabled) {
+        if (this.recoveryEnabled) {
             this.attemptInRepetitionRecovery(prodFunc,
                 [lookAheadFunc, action],
                 <any>lookAheadFunc
@@ -1581,7 +1591,7 @@ export class Parser {
                 action.call(this)
             }
 
-            if (this.isErrorRecoveryEnabled) {
+            if (this.recoveryEnabled) {
                 this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
                     [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
                         this.manySepLookaheadKeys, NextTerminalAfterManySepWalker],
@@ -1618,7 +1628,7 @@ export class Parser {
         // IF will always be entered, its possible to remove it...
         // however it is kept to avoid confusion and be consistent.
         /* istanbul ignore else */
-        if (this.isErrorRecoveryEnabled) {
+        if (this.recoveryEnabled) {
             this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
                 [prodName, prodOccurrence, separator, separatorLookAheadFunc,
                     action, separatorsResult, laKeys, nextTerminalAfterWalker],
@@ -1673,7 +1683,7 @@ export class Parser {
         } catch (eFromConsumption) {
             // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
             // but the original syntax could have been parsed successfully without any backtracking + recovery
-            if (this.isErrorRecoveryEnabled &&
+            if (this.recoveryEnabled &&
                 eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
 
                 let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
