@@ -1,10 +1,14 @@
 ## X.Y.Z (INSERT_DATE_HERE)
 
 #### Breaking Changes
+
+Some breaking API changes in this version. Most have the changes have been to optional arguments,
+so not many changes will be needed (if at all) for most users.
+
 - [Use a config object for RULE DSL method.](https://github.com/SAP/chevrotain/issues/168)
 
   The [RULE method's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters 
-  have been been replaced with a single configuration object of the type [IRuleConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html)
+  have been been replaced with a single configuration object of the type [IRuleConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html).
   Therefore any RULE invocation with more than two arguments must be refactored to the new form.
   For example:
   
@@ -19,7 +23,7 @@
 - [Remove RULE_NO_RESYNC DSL method.](https://github.com/SAP/chevrotain/issues/172)
 
   The RULE_NO_RESYNC convenience method has been removed.
-  All usages of it must be replaced with an equivalent RULE call using the IRuleconfig [resyncEnabled](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
+  All usages of it must be replaced with an equivalent RULE call using the IRuleConfig [resyncEnabled](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
   property.
   
   For example:
@@ -34,13 +38,14 @@
 - [Error Recovery / Fault Tolerance abilities should be disabled by default.](https://github.com/SAP/chevrotain/issues/174)
   
   The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.
+
   [example](https://github.com/SAP/chevrotain/blob/refactor_parser_const/examples/grammars/json/json.js#L34)
   
 - [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175) 
   
    The [Parser constructors's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional parameter
    has been been replaced with a single configuration object of the type [IParserConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iparserconfig.html)
-   Therefore any Parser super constructor invocation must be updated:
+   Therefore any Base Parser super invocation which uses the optional parameter must be updated.
    
    [example(same as above)](https://github.com/SAP/chevrotain/blob/refactor_parser_const/examples/grammars/json/json.js#L34)
     
