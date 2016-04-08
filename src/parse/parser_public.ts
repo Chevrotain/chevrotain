@@ -68,19 +68,26 @@ export enum ParserDefinitionErrorType {
 }
 
 export interface IParserConfig {
+    /**
+    * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
+    */
     recoveryEnabled?:boolean
 }
 
 const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
-    recoveryEnabled: false,
+    recoveryEnabled: false
 })
 
 export interface IRuleConfig<T> {
-    // The function which will be invoked to produce the returned value for a production that have not been
-    // successfully executed and the parser recovered from.
+    /**
+     * The function which will be invoked to produce the returned value for a production that have not been
+     * successfully executed and the parser recovered from.
+     */
     recoveryValueFunc?:() => T
 
-    // Enable/Disable re-sync error recovery for this specific production.
+    /**
+     * Enable/Disable re-sync error recovery for this specific production.
+     */
     resyncEnabled?:boolean
 }
 
