@@ -27,27 +27,41 @@ so not many changes will be needed (if at all) for most users.
   property.
   
   For example:
-  ```Typescript
+  ```javascript
       // old deprecated form  
       this.RULE_NO_RESYNC("createStmt", function(){ /* ... */})
     
       // new form
       this.RULE("createStmt", function(){ /* ... */}, {resyncEnabled: false})
    ```
-   
-- [Error Recovery / Fault Tolerance abilities should be disabled by default.](https://github.com/SAP/chevrotain/issues/174)
-  
-  The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.
 
-  [example](https://github.com/SAP/chevrotain/blob/refactor_parser_const/examples/grammars/json/json.js#L34)
-  
-- [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175) 
-  
-   The [Parser constructors's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional parameter
+- [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175)    
+- [Error Recovery / Fault Tolerance abilities should be disabled by default.](https://github.com/SAP/chevrotain/issues/174)
+
+   The [Parser constructors's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) third (optional) parameter
    has been been replaced with a single configuration object of the type [IParserConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iparserconfig.html)
    Therefore any Base Parser super invocation which uses the optional parameter must be updated.
+   Additionaly The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.  
+   For example:
    
-   [example(same as above)](https://github.com/SAP/chevrotain/blob/refactor_parser_const/examples/grammars/json/json.js#L34)
+   ```javascript
+   // old deprecated form  
+   function JsonParser(input) {
+      // The third argument was used to enable/disable error recovery
+      // and was **true** by default.
+      Parser.call(this, input, true)
+    }
+    
+    // new form
+    function JsonParser(input) {
+      // invoke super constructor
+      Parser.call(this, input, allTokens, {
+        // by default the error recovery flag is **false**
+        // use recoveryEnabled flag in the IParserConfig object to enable enable it.
+        recoveryEnabled: true}
+      );
+   }
+   ```
     
 
 
