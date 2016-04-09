@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+- [Avoid rebuilding the GAST on parser construction when using RULE_OVERRIDE.](https://github.com/SAP/chevrotain/issues/171)
+
+
+
 ## 0.8.0 (4-8-2016)
 
 #### Breaking Changes
@@ -74,11 +81,13 @@ so not many changes will be needed (if at all) for most users.
 - [Bring order to the chaos of the examples folder.] (https://github.com/SAP/chevrotain/tree/master/examples)
 
 
+
 ## 0.7.1 (4-3-2016)
 
 #### Minor Changes
 - [Parsing Errors should include Parser context information.](#165)
 - [AT_LEAST_ONE dsl rule, errMsg param should be optional.](#91)
+
 
 
 ## 0.7.0 (4-2-2016)
@@ -87,10 +96,12 @@ so not many changes will be needed (if at all) for most users.
 - [Lexer multi "modes" support.](#134)
 
 
+
 ## 0.6.3 (3-28-2016)
 
 #### Minor Changes
 - [Re-synced tokens should be reported to the user.](#154)
+
 
 
 ## 0.6.2 (3-25-2016)
@@ -99,10 +110,12 @@ so not many changes will be needed (if at all) for most users.
 - [LexerDefinitionErrorType enum was not exported as part of the public API.](#158)
 
 
+
 ## 0.6.1 (3-25-2016)
 
 #### Bug Fixes
 - [ParserDefinitionError enum was not exported.](https://github.com/SAP/chevrotain/commit/96edf7fe26d41f25272ea2a39d27fd7eb27991b2)
+
 
 
 ## 0.6.0 (3-20-2016)

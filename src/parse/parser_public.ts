@@ -1039,7 +1039,7 @@ export class Parser {
      *
      * @param {string} name - The name of the rule.
      * @param {Function} implementation - The implementation of the rule.
-     * @param {IRuleConfig} [config] - The rule's optionalconfigurationn
+     * @param {IRuleConfig} [config] - The rule's optional configurationn
      *
      * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
@@ -1078,11 +1078,15 @@ export class Parser {
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
 
+        let alreadyOverridden = cache.getProductionOverriddenForClass(this.className)
         let parserClassProductions = cache.getProductionsForClass(this.className)
-        // when overriding always rebuilt the gast
-        // TODO: this will slightly slow down the construction of a parser with OVERRIDEN rules, how to mitigate ?
-        let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
-        parserClassProductions.put(ruleName, gastProduction)
+
+        // only build the GAST of an overridden rule once.
+        if (!alreadyOverridden.containsKey(ruleName)) {
+            alreadyOverridden.put(ruleName, true)
+            let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
+            parserClassProductions.put(ruleName, gastProduction)
+        }
 
         return this.defineRule(ruleName, impl, config)
     }
