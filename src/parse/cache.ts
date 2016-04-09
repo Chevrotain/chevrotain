@@ -40,6 +40,12 @@ export function getFirstAfterRepForClass(className:string):HashTable<IFirstAfter
     return getFromNestedHashTable(className, CLASS_TO_FIRST_AFTER_REPETITION)
 }
 
+export let CLASS_TO_PRODUCTION_OVERRIDEN = new HashTable<HashTable<boolean>>()
+
+export function getProductionOverriddenForClass(className:string):HashTable<boolean> {
+    return getFromNestedHashTable(className, CLASS_TO_PRODUCTION_OVERRIDEN)
+}
+
 export let CLASS_TO_OR_LA_CACHE = new HashTable<HashTable<string>[]>()
 export let CLASS_TO_MANY_LA_CACHE = new HashTable<HashTable<string>[]>()
 export let CLASS_TO_MANY_SEP_LA_CACHE = new HashTable<HashTable<string>[]>()
@@ -47,9 +53,8 @@ export let CLASS_TO_AT_LEAST_ONE_LA_CACHE = new HashTable<HashTable<string>[]>()
 export let CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE = new HashTable<HashTable<string>[]>()
 export let CLASS_TO_OPTION_LA_CACHE = new HashTable<HashTable<string>[]>()
 
-// TODO: CONST in typescript 1.5
 // TODO reflective test to verify this has not changed, for example (OPTION6 added)
-export let MAX_OCCURRENCE_INDEX = 5
+export const MAX_OCCURRENCE_INDEX = 5
 
 export function initLookAheadKeyCache(className) {
     CLASS_TO_OR_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
