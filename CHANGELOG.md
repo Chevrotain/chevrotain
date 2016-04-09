@@ -75,39 +75,39 @@ so not many changes will be needed (if at all) for most users.
 ## 0.7.2 (4-7-2016)
 
 #### Minor Changes
-- [Support Overriding Rule implementations in inheriting grammars.](#169)
+- [Support Overriding Rule implementations in inheriting grammars.](https://github.com/SAP/chevrotain/issues/169)
 
 #### Documentation 
-- [Bring order to the chaos of the examples folder.] (https://github.com/SAP/chevrotain/tree/master/examples)
+- [Bring order to the chaos of the examples folder.](https://github.com/SAP/chevrotain/tree/master/examples)
 
 
 
 ## 0.7.1 (4-3-2016)
 
 #### Minor Changes
-- [Parsing Errors should include Parser context information.](#165)
-- [AT_LEAST_ONE dsl rule, errMsg param should be optional.](#91)
+- [Parsing Errors should include Parser context information.](https://github.com/SAP/chevrotain/issues/165)
+- [AT_LEAST_ONE dsl rule, errMsg param should be optional.](https://github.com/SAP/chevrotain/issues/91)
 
 
 
 ## 0.7.0 (4-2-2016)
 
 #### Major Changes
-- [Lexer multi "modes" support.](#134)
+- [Lexer multi "modes" support.](https://github.com/SAP/chevrotain/issues/134)
 
 
 
 ## 0.6.3 (3-28-2016)
 
 #### Minor Changes
-- [Re-synced tokens should be reported to the user.](#154)
+- [Re-synced tokens should be reported to the user.](https://github.com/SAP/chevrotain/issues/154)
 
 
 
 ## 0.6.2 (3-25-2016)
 
 #### Bug Fixes
-- [LexerDefinitionErrorType enum was not exported as part of the public API.](#158)
+- [LexerDefinitionErrorType enum was not exported as part of the public API.](https://github.com/SAP/chevrotain/issues/158)
 
 
 
@@ -134,24 +134,24 @@ so not many changes will be needed (if at all) for most users.
   
 
 #### Bug Fixes
-- [Diagrams - Fixed global references to permit UMD loading.](#152) 
+- [Diagrams - Fixed global references to permit UMD loading.](https://github.com/SAP/chevrotain/issues/152) 
 
 
 
 ## 0.5.23 (3-17-2016)
 
 #### Bug Fixes
-- [Syntax Diagrams usage highlights issues.](#149) 
+- [Syntax Diagrams usage highlights issues.](https://github.com/SAP/chevrotain/issues/149) 
 
 
 
 ## 0.5.22 (3-15-2016)
 
 #### Minor Changes
-- [Human Readable Token Labels in Syntax Diagrams.](#144)
-- [Use Token Labels in error messages.](#146)
+- [Human Readable Token Labels in Syntax Diagrams.](https://github.com/SAP/chevrotain/issues/144)
+- [Use Token Labels in error messages.](#https://github.com/SAP/chevrotain/issues/146)
 
 #### Bug Fixes
-- [Diagrams template resources were not fully included in bower "package".](#145) 
+- [Diagrams template resources were not fully included in bower "package".](https://github.com/SAP/chevrotain/issues/145) 
 
 **Older Releases** changelog is available on [Github Releases.](https://github.com/SAP/chevrotain/releases)
