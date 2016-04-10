@@ -1,32 +1,124 @@
+## 0.8.1 (4-11-2016)
+
+#### Minor Changes
+- [Avoid rebuilding the GAST on parser construction when using RULE_OVERRIDE.](https://github.com/SAP/chevrotain/issues/171)
+
+#### Bug Fixes
+- [GAST Production cache does not take into account grammar inheritance](https://github.com/SAP/chevrotain/issues/181)
+
+
+
+## 0.8.0 (4-8-2016)
+
+#### Breaking Changes
+
+Some breaking API changes in this version. Most have the changes have been to optional arguments,
+so not many changes will be needed (if at all) for most users.
+
+- [Use a config object for RULE DSL method.](https://github.com/SAP/chevrotain/issues/168)
+
+  The [RULE method's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters 
+  have been been replaced with a single configuration object of the type [IRuleConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html).
+  Therefore any RULE invocation with more than two arguments must be refactored to the new form.
+  For example:
+  
+  ```Typescript
+      // old deprecated form  
+      this.RULE("createStmt", function(){ /* ... */}, function(){ return 666 })
+      
+      // new form
+      this.RULE("createStmt", function(){ /* ... */}, {recoveryValueFunc: function(){ return 666 }})
+  ```
+  
+- [Remove RULE_NO_RESYNC DSL method.](https://github.com/SAP/chevrotain/issues/172)
+
+  The RULE_NO_RESYNC convenience method has been removed.
+  All usages of it must be replaced with an equivalent RULE call using the IRuleConfig [resyncEnabled](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
+  property.
+  
+  For example:
+  ```javascript
+      // old deprecated form  
+      this.RULE_NO_RESYNC("createStmt", function(){ /* ... */})
+    
+      // new form
+      this.RULE("createStmt", function(){ /* ... */}, {resyncEnabled: false})
+   ```
+
+- [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175)    
+- [Error Recovery / Fault Tolerance abilities should be disabled by default.](https://github.com/SAP/chevrotain/issues/174)
+
+   The [Parser constructors's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) third (optional) parameter
+   has been been replaced with a single configuration object of the type [IParserConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iparserconfig.html)
+   Therefore any Base Parser super invocation which uses the optional parameter must be updated.
+   Additionaly The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.  
+   For example:
+   
+   ```javascript
+   // old deprecated form  
+   function JsonParser(input) {
+      // The third argument was used to enable/disable error recovery
+      // and was **true** by default.
+      Parser.call(this, input, true)
+    }
+    
+    // new form
+    function JsonParser(input) {
+      // invoke super constructor
+      Parser.call(this, input, allTokens, {
+        // by default the error recovery flag is **false**
+        // use recoveryEnabled flag in the IParserConfig object to enable enable it.
+        recoveryEnabled: true}
+      );
+   }
+   ```
+    
+
+
+## 0.7.2 (4-7-2016)
+
+#### Minor Changes
+- [Support Overriding Rule implementations in inheriting grammars.](https://github.com/SAP/chevrotain/issues/169)
+
+#### Documentation 
+- [Bring order to the chaos of the examples folder.](https://github.com/SAP/chevrotain/tree/master/examples)
+
+
+
 ## 0.7.1 (4-3-2016)
 
 #### Minor Changes
-- [Parsing Errors should include Parser context information.](#165)
-- [AT_LEAST_ONE dsl rule, errMsg param should be optional.](#91)
+- [Parsing Errors should include Parser context information.](https://github.com/SAP/chevrotain/issues/165)
+- [AT_LEAST_ONE dsl rule, errMsg param should be optional.](https://github.com/SAP/chevrotain/issues/91)
+
 
 
 ## 0.7.0 (4-2-2016)
 
 #### Major Changes
-- [Lexer multi "modes" support.](#134)
+- [Lexer multi "modes" support.](https://github.com/SAP/chevrotain/issues/134)
+
 
 
 ## 0.6.3 (3-28-2016)
 
 #### Minor Changes
-- [Re-synced tokens should be reported to the user.](#154)
+- [Re-synced tokens should be reported to the user.](https://github.com/SAP/chevrotain/issues/154)
+
 
 
 ## 0.6.2 (3-25-2016)
 
 #### Bug Fixes
-- [LexerDefinitionErrorType enum was not exported as part of the public API.](#158)
+- [LexerDefinitionErrorType enum was not exported as part of the public API.](https://github.com/SAP/chevrotain/issues/158)
+
 
 
 ## 0.6.1 (3-25-2016)
 
 #### Bug Fixes
 - [ParserDefinitionError enum was not exported.](https://github.com/SAP/chevrotain/commit/96edf7fe26d41f25272ea2a39d27fd7eb27991b2)
+
 
 
 ## 0.6.0 (3-20-2016)
@@ -45,24 +137,24 @@
   
 
 #### Bug Fixes
-- [Diagrams - Fixed global references to permit UMD loading.](#152) 
+- [Diagrams - Fixed global references to permit UMD loading.](https://github.com/SAP/chevrotain/issues/152) 
 
 
 
 ## 0.5.23 (3-17-2016)
 
 #### Bug Fixes
-- [Syntax Diagrams usage highlights issues.](#149) 
+- [Syntax Diagrams usage highlights issues.](https://github.com/SAP/chevrotain/issues/149) 
 
 
 
 ## 0.5.22 (3-15-2016)
 
 #### Minor Changes
-- [Human Readable Token Labels in Syntax Diagrams.](#144)
-- [Use Token Labels in error messages.](#146)
+- [Human Readable Token Labels in Syntax Diagrams.](https://github.com/SAP/chevrotain/issues/144)
+- [Use Token Labels in error messages.](#https://github.com/SAP/chevrotain/issues/146)
 
 #### Bug Fixes
-- [Diagrams template resources were not fully included in bower "package".](#145) 
+- [Diagrams template resources were not fully included in bower "package".](https://github.com/SAP/chevrotain/issues/145) 
 
 **Older Releases** changelog is available on [Github Releases.](https://github.com/SAP/chevrotain/releases)

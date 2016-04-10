@@ -18,8 +18,9 @@ any code generation phase.
   1. **Lexer Engine** based on Regular Expression.
     * Full Token position information.
     * Token skipping (whitespace/comments/...).
-    * Allows prioritising shorter matches (Keywords vs Identifiers).
+    * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
     * [Multiple Lexer Modes](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer.js) depending on the context.
+    * [Tokens Grouping][lexer_groups]
     * **No code generation** The Lexer does not require any code generation phase. 
    
   2. **Parsing DSL** for defining the grammar.
@@ -31,7 +32,7 @@ any code generation phase.
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for LL(1) grammars.
-    * Supports Custom lookahead logic for LL(k) grammars.
+    * Supports [Custom lookahead logic][custom_lookahead] for LL(k) grammars.
     * Backtracking support.
 
   3. [**High performance - (see on JSPerf)**][benchmark].
@@ -60,7 +61,7 @@ any code generation phase.
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_7_1/classes/parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_8_1/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
@@ -84,3 +85,6 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
 [benchmark]: http://jsperf.com/json-parsers-comparison/22
+[lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js
+[keywords_vs_idents]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js
+[custom_lookahead]: https://github.com/SAP/chevrotain/blob/master/examples/custom_lookahead/large_lookahead.js

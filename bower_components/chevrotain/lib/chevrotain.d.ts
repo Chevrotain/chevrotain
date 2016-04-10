@@ -1,4 +1,4 @@
-/*! chevrotain - v0.7.1 */
+/*! chevrotain - v0.8.1 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -234,10 +234,28 @@ declare namespace chevrotain {
     export enum ParserDefinitionErrorType {
         INVALID_RULE_NAME = 0,
         DUPLICATE_RULE_NAME = 1,
-        DUPLICATE_PRODUCTIONS = 2,
-        UNRESOLVED_SUBRULE_REF = 3,
-        LEFT_RECURSION = 4,
-        NONE_LAST_EMPTY_ALT = 5,
+        INVALID_RULE_OVERRIDE = 2,
+        DUPLICATE_PRODUCTIONS = 3,
+        UNRESOLVED_SUBRULE_REF = 4,
+        LEFT_RECURSION = 5,
+        NONE_LAST_EMPTY_ALT = 6,
+    }
+    export interface IParserConfig {
+        /**
+         * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
+         */
+        recoveryEnabled?: boolean;
+    }
+    export interface IRuleConfig<T> {
+        /**
+         * The function which will be invoked to produce the returned value for a production that have not been
+         * successfully executed and the parser recovered from.
+         */
+        recoveryValueFunc?: () => T;
+        /**
+         * Enable/Disable re-sync error recovery for this specific production.
+         */
+        resyncEnabled?: boolean;
     }
     export interface IParserDefinitionError {
         message: string;
@@ -343,7 +361,7 @@ declare namespace chevrotain {
          * This flag enables or disables error recovery (fault tolerance) of the parser.
          * If this flag is disabled the parser will halt on the first error.
          */
-        isErrorRecoveryEnabled: any;
+        recoveryEnabled: any;
         protected _input: Token[];
         protected inputIdx: number;
         protected isBackTrackingStack: any[];
@@ -353,9 +371,13 @@ declare namespace chevrotain {
         protected tokensMap: {
             [fqn: string]: Function;
         };
-                                                constructor(input: Token[], tokensMapOrArr: {
+                                                /**
+         * Only used internally for storing productions as they are built for the first time.
+         * The final productions should be accessed from the static cache.
+         */
+            constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
-        } | Function[], isErrorRecoveryEnabled?: boolean);
+        } | Function[], config?: IParserConfig);
         input: Token[];
         reset(): void;
         isAtEndOfInput(): boolean;
@@ -741,21 +763,23 @@ declare namespace chevrotain {
          */
         protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
         /**
-         * Convenience method, same as RULE with doReSync=false
-         * @see RULE
+         *
+         * @param {string} name - The name of the rule.
+         * @param {Function} implementation - The implementation of the rule.
+         * @param {IRuleConfig} [config] - The rule's optional configurationn
+         *
+         * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
+         *                     Parser state / error recovery&reporting/ ...
          */
-        protected RULE_NO_RESYNC<T>(ruleName: string, impl: () => T, invalidRet: () => T): (idxInCallingRule: number, isEntryPoint?: boolean) => T;
+        protected RULE<T>(name: string, implementation: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         /**
          *
-         * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
-         * @param {Function} impl The implementation of the Rule
-         * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
-         *                   re-sync recovery.
-         * @param {boolean} [doReSync] enable or disable re-sync recovery for this rule. defaults to true
-         * @returns {Function} The parsing rule which is the impl Function wrapped with the parsing logic that handles
-         *                     Parser state / error recovery / ...
+         * @See RULE
+         * same as RULE, but should only be used in "extending" grammars to override rules/productions
+         * from the super grammar.
+         *
          */
-        protected RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, invalidRet?: () => T, doReSync?: boolean): (idxInCallingRule?: number, ...args: any[]) => T;
+        protected OVERRIDE_RULE<T>(name: string, impl: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         protected ruleInvocationStateUpdate(ruleName: string, idxInCallingRule: number): void;
         protected ruleFinallyStateUpdate(): void;
         /**
@@ -891,17 +915,17 @@ declare namespace chevrotain {
             accept(visitor: GAstVisitor): void;
         }
         abstract class GAstVisitor {
-            visit(node: IProduction): void;
-            visitNonTerminal(node: NonTerminal): void;
-            visitFlat(node: Flat): void;
-            visitOption(node: Option): void;
-            visitRepetition(node: Repetition): void;
-            visitRepetitionMandatory(node: RepetitionMandatory): void;
-            visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): void;
-            visitRepetitionWithSeparator(node: RepetitionWithSeparator): void;
-            visitAlternation(node: Alternation): void;
-            visitTerminal(node: Terminal): void;
-            visitRule(node: Rule): void;
+            visit(node: IProduction): any;
+            visitNonTerminal(node: NonTerminal): any;
+            visitFlat(node: Flat): any;
+            visitOption(node: Option): any;
+            visitRepetition(node: Repetition): any;
+            visitRepetitionMandatory(node: RepetitionMandatory): any;
+            visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): any;
+            visitRepetitionWithSeparator(node: RepetitionWithSeparator): any;
+            visitAlternation(node: Alternation): any;
+            visitTerminal(node: Terminal): any;
+            visitRule(node: Rule): any;
         }
     }
     

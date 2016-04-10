@@ -1,4 +1,4 @@
-/*! chevrotain - v0.7.1 */
+/*! chevrotain - v0.8.1 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -68,7 +68,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.7.1";
+	API.VERSION = "0.8.1";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.ParserDefinitionErrorType = parser_public_1.ParserDefinitionErrorType;
@@ -123,15 +123,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	var gast_builder_1 = __webpack_require__(19);
 	var interpreter_1 = __webpack_require__(18);
 	var constants_1 = __webpack_require__(16);
+	var gast_1 = __webpack_require__(9);
 	(function (ParserDefinitionErrorType) {
 	    ParserDefinitionErrorType[ParserDefinitionErrorType["INVALID_RULE_NAME"] = 0] = "INVALID_RULE_NAME";
 	    ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_RULE_NAME"] = 1] = "DUPLICATE_RULE_NAME";
-	    ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 2] = "DUPLICATE_PRODUCTIONS";
-	    ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 3] = "UNRESOLVED_SUBRULE_REF";
-	    ParserDefinitionErrorType[ParserDefinitionErrorType["LEFT_RECURSION"] = 4] = "LEFT_RECURSION";
-	    ParserDefinitionErrorType[ParserDefinitionErrorType["NONE_LAST_EMPTY_ALT"] = 5] = "NONE_LAST_EMPTY_ALT";
+	    ParserDefinitionErrorType[ParserDefinitionErrorType["INVALID_RULE_OVERRIDE"] = 2] = "INVALID_RULE_OVERRIDE";
+	    ParserDefinitionErrorType[ParserDefinitionErrorType["DUPLICATE_PRODUCTIONS"] = 3] = "DUPLICATE_PRODUCTIONS";
+	    ParserDefinitionErrorType[ParserDefinitionErrorType["UNRESOLVED_SUBRULE_REF"] = 4] = "UNRESOLVED_SUBRULE_REF";
+	    ParserDefinitionErrorType[ParserDefinitionErrorType["LEFT_RECURSION"] = 5] = "LEFT_RECURSION";
+	    ParserDefinitionErrorType[ParserDefinitionErrorType["NONE_LAST_EMPTY_ALT"] = 6] = "NONE_LAST_EMPTY_ALT";
 	})(exports.ParserDefinitionErrorType || (exports.ParserDefinitionErrorType = {}));
 	var ParserDefinitionErrorType = exports.ParserDefinitionErrorType;
+	var DEFAULT_PARSER_CONFIG = Object.freeze({
+	    recoveryEnabled: false
+	});
+	var DEFAULT_RULE_CONFIG = Object.freeze({
+	    recoveryValueFunc: function () { return undefined; },
+	    resyncEnabled: true
+	});
 	/**
 	 * convenience used to express an empty alternative in an OR (alternation).
 	 * can be used to more clearly describe the intent in a case of empty alternation.
@@ -184,8 +193,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * for example: Error Recovery, Automatic lookahead calculation
 	 */
 	var Parser = (function () {
-	    function Parser(input, tokensMapOrArr, isErrorRecoveryEnabled) {
-	        if (isErrorRecoveryEnabled === void 0) { isErrorRecoveryEnabled = true; }
+	    function Parser(input, tokensMapOrArr, config) {
+	        if (config === void 0) { config = DEFAULT_PARSER_CONFIG; }
 	        this.errors = [];
 	        this._input = [];
 	        this.inputIdx = -1;
@@ -194,8 +203,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.RULE_OCCURRENCE_STACK = [];
 	        this.tokensMap = undefined;
 	        this.definedRulesNames = [];
+	        /**
+	         * Only used internally for storing productions as they are built for the first time.
+	         * The final productions should be accessed from the static cache.
+	         */
+	        this._productions = new lang_extensions_1.HashTable();
 	        this._input = input;
-	        this.isErrorRecoveryEnabled = isErrorRecoveryEnabled;
+	        this.recoveryEnabled = utils_1.has(config, "recoveryEnabled") ? config.recoveryEnabled : DEFAULT_PARSER_CONFIG.recoveryEnabled;
 	        this.className = lang_extensions_1.classNameFromInstance(this);
 	        this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className);
 	        this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className);
@@ -243,22 +257,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        // this information should only be computed once
 	        if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-	            var grammarProductions = cache.getProductionsForClass(className);
+	            // clone here
+	            var orgProductions_1 = classInstance._productions;
+	            var clonedProductions_1 = new lang_extensions_1.HashTable();
+	            // clone the grammar productions to support grammar inheritance. requirements:
+	            // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
+	            // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
+	            //    so the myGast variable is used.
+	            // 3. If a Production has been overridden references to it in the GAST must also be updated.
+	            utils_1.forEach(orgProductions_1.keys(), function (key) {
+	                var value = orgProductions_1.get(key);
+	                clonedProductions_1.put(key, gast_1.cloneProduction(value));
+	            });
+	            cache.getProductionsForClass(className).putAll(clonedProductions_1);
 	            // assumes this cache has been initialized (in the relevant parser's constructor)
 	            // TODO: consider making the self analysis a member method to resolve this.
 	            // that way it won't be callable before the constructor has been invoked...
 	            definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className);
-	            var resolverErrors = resolver_1.resolveGrammar(grammarProductions);
+	            var resolverErrors = resolver_1.resolveGrammar(clonedProductions_1);
 	            definitionErrors.push.apply(definitionErrors, resolverErrors); // mutability for the win?
 	            cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true);
-	            var validationErrors = checks_1.validateGrammar(grammarProductions.values());
+	            var validationErrors = checks_1.validateGrammar(clonedProductions_1.values());
 	            definitionErrors.push.apply(definitionErrors, validationErrors); // mutability for the win?
 	            if (!utils_1.isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
 	                defErrorsMsgs = utils_1.map(definitionErrors, function (defError) { return defError.message; });
 	                throw new Error("Parser Definition Errors detected\n: " + defErrorsMsgs.join("\n-------------------------------\n"));
 	            }
 	            if (utils_1.isEmpty(definitionErrors)) {
-	                var allFollows = follow_1.computeAllProdsFollows(grammarProductions.values());
+	                var allFollows = follow_1.computeAllProdsFollows(clonedProductions_1.values());
 	                cache.setResyncFollowsForClass(className, allFollows);
 	            }
 	        }
@@ -870,75 +896,63 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator, laFuncOrAction, action, errMsg);
 	    };
 	    /**
-	     * Convenience method, same as RULE with doReSync=false
-	     * @see RULE
+	     *
+	     * @param {string} name - The name of the rule.
+	     * @param {Function} implementation - The implementation of the rule.
+	     * @param {IRuleConfig} [config] - The rule's optional configurationn
+	     *
+	     * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
+	     *                     Parser state / error recovery&reporting/ ...
 	     */
-	    Parser.prototype.RULE_NO_RESYNC = function (ruleName, impl, invalidRet) {
-	        return this.RULE(ruleName, impl, invalidRet, false);
+	    Parser.prototype.RULE = function (name, implementation, config) {
+	        if (config === void 0) { config = DEFAULT_RULE_CONFIG; }
+	        var ruleErrors = checks_1.validateRuleName(name, this.className);
+	        ruleErrors = ruleErrors.concat(checks_1.validateRuleDoesNotAlreadyExist(name, this.definedRulesNames, this.className));
+	        this.definedRulesNames.push(name);
+	        this.definitionErrors.push.apply(this.definitionErrors, ruleErrors); // mutability for the win
+	        // only build the gast representation once.
+	        if (!(this._productions.containsKey(name))) {
+	            var gastProduction = gast_builder_1.buildTopProduction(implementation.toString(), name, this.tokensMap);
+	            this._productions.put(name, gastProduction);
+	        }
+	        else {
+	            var parserClassProductions = cache.getProductionsForClass(this.className);
+	            var cachedProduction = parserClassProductions.get(name);
+	            // in case of duplicate rules the cache will not be filled at this point.
+	            if (!utils_1.isUndefined(cachedProduction)) {
+	                // filling up the _productions is always needed to inheriting grammars can access it (as an instance member)
+	                // otherwise they will be unaware of productions defined in super grammars.
+	                this._productions.put(name, cachedProduction);
+	            }
+	        }
+	        return this.defineRule(name, implementation, config);
 	    };
 	    /**
 	     *
-	     * @param {string} ruleName The name of the Rule. must match the let it is assigned to.
-	     * @param {Function} impl The implementation of the Rule
-	     * @param {Function} [invalidRet] A function that will return the chosen invalid value for the rule in case of
-	     *                   re-sync recovery.
-	     * @param {boolean} [doReSync] enable or disable re-sync recovery for this rule. defaults to true
-	     * @returns {Function} The parsing rule which is the impl Function wrapped with the parsing logic that handles
-	     *                     Parser state / error recovery / ...
+	     * @See RULE
+	     * same as RULE, but should only be used in "extending" grammars to override rules/productions
+	     * from the super grammar.
+	     *
 	     */
-	    Parser.prototype.RULE = function (ruleName, impl, invalidRet, doReSync) {
-	        if (invalidRet === void 0) { invalidRet = this.defaultInvalidReturn; }
-	        if (doReSync === void 0) { doReSync = true; }
-	        // TODO: isEntryPoint by default true? SUBRULE explicitly pass false?
-	        var ruleNameErrors = checks_1.validateRuleName(ruleName, this.definedRulesNames, this.className);
-	        this.definedRulesNames.push(ruleName);
-	        this.definitionErrors.push.apply(this.definitionErrors, ruleNameErrors); // mutability for the win
-	        var parserClassProductions = cache.getProductionsForClass(this.className);
-	        // only build the gast representation once
-	        if (!(parserClassProductions.containsKey(ruleName))) {
-	            var gastProduction = gast_builder_1.buildTopProduction(impl.toString(), ruleName, this.tokensMap);
-	            parserClassProductions.put(ruleName, gastProduction);
+	    Parser.prototype.OVERRIDE_RULE = function (name, impl, config) {
+	        if (config === void 0) { config = DEFAULT_RULE_CONFIG; }
+	        var ruleErrors = checks_1.validateRuleName(name, this.className);
+	        ruleErrors = ruleErrors.concat(checks_1.validateRuleIsOverridden(name, this.definedRulesNames, this.className));
+	        this.definitionErrors.push.apply(this.definitionErrors, ruleErrors); // mutability for the win
+	        var alreadyOverridden = cache.getProductionOverriddenForClass(this.className);
+	        // only build the GAST of an overridden rule once.
+	        if (!alreadyOverridden.containsKey(name)) {
+	            alreadyOverridden.put(name, true);
+	            var gastProduction = gast_builder_1.buildTopProduction(impl.toString(), name, this.tokensMap);
+	            this._productions.put(name, gastProduction);
 	        }
-	        var wrappedGrammarRule = function (idxInCallingRule, args) {
-	            if (idxInCallingRule === void 0) { idxInCallingRule = 1; }
-	            if (args === void 0) { args = []; }
-	            this.ruleInvocationStateUpdate(ruleName, idxInCallingRule);
-	            try {
-	                // actual parsing happens here
-	                return impl.apply(this, args);
-	            }
-	            catch (e) {
-	                var isFirstInvokedRule = (this.RULE_STACK.length === 1);
-	                // note the reSync is always enabled for the first rule invocation, because we must always be able to
-	                // reSync with EOF and just output some INVALID ParseTree
-	                // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
-	                // path is really the most valid one
-	                var reSyncEnabled = isFirstInvokedRule || (doReSync
-	                    && !this.isBackTracking()
-	                    && this.isErrorRecoveryEnabled);
-	                if (reSyncEnabled && exceptions_public_1.exceptions.isRecognitionException(e)) {
-	                    var reSyncTokType = this.findReSyncTokenType();
-	                    if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-	                        e.resyncedTokens = this.reSyncTo(reSyncTokType);
-	                        return invalidRet();
-	                    }
-	                    else {
-	                        // to be handled farther up the call stack
-	                        throw e;
-	                    }
-	                }
-	                else {
-	                    // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
-	                    throw e;
-	                }
-	            }
-	            finally {
-	                this.ruleFinallyStateUpdate();
-	            }
-	        };
-	        var ruleNamePropName = "ruleName";
-	        wrappedGrammarRule[ruleNamePropName] = ruleName;
-	        return wrappedGrammarRule;
+	        else {
+	            var parserClassProductions = cache.getProductionsForClass(this.className);
+	            // filling up the _productions is always needed to inheriting grammars can access it (as an instance member)
+	            // otherwise they will be unaware of productions defined in super grammars.
+	            this._productions.put(name, parserClassProductions.get(name));
+	        }
+	        return this.defineRule(name, impl, config);
 	    };
 	    Parser.prototype.ruleInvocationStateUpdate = function (ruleName, idxInCallingRule) {
 	        this.RULE_OCCURRENCE_STACK.push(idxInCallingRule);
@@ -984,7 +998,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var msg = "Expecting " + expectedMsg + " but found --> '" + actualToken.image + "' <--";
 	        return msg;
 	    };
-	    Parser.prototype.defaultInvalidReturn = function () { return undefined; };
+	    Parser.prototype.defineRule = function (ruleName, impl, config) {
+	        var resyncEnabled = utils_1.has(config, "resyncEnabled") ? config.resyncEnabled : DEFAULT_RULE_CONFIG.resyncEnabled;
+	        var recoveryValueFunc = utils_1.has(config, "recoveryValueFunc") ? config.recoveryValueFunc : DEFAULT_RULE_CONFIG.recoveryValueFunc;
+	        var wrappedGrammarRule = function (idxInCallingRule, args) {
+	            if (idxInCallingRule === void 0) { idxInCallingRule = 1; }
+	            if (args === void 0) { args = []; }
+	            this.ruleInvocationStateUpdate(ruleName, idxInCallingRule);
+	            try {
+	                // actual parsing happens here
+	                return impl.apply(this, args);
+	            }
+	            catch (e) {
+	                var isFirstInvokedRule = (this.RULE_STACK.length === 1);
+	                // note the reSync is always enabled for the first rule invocation, because we must always be able to
+	                // reSync with EOF and just output some INVALID ParseTree
+	                // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
+	                // path is really the most valid one
+	                var reSyncEnabled = isFirstInvokedRule || (resyncEnabled
+	                    && !this.isBackTracking()
+	                    && this.recoveryEnabled);
+	                if (reSyncEnabled && exceptions_public_1.exceptions.isRecognitionException(e)) {
+	                    var reSyncTokType = this.findReSyncTokenType();
+	                    if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
+	                        e.resyncedTokens = this.reSyncTo(reSyncTokType);
+	                        return recoveryValueFunc();
+	                    }
+	                    else {
+	                        // to be handled farther up the call stack
+	                        throw e;
+	                    }
+	                }
+	                else {
+	                    // some other Error type which we don't know how to handle (for example a built in JavaScript Error)
+	                    throw e;
+	                }
+	            }
+	            finally {
+	                this.ruleFinallyStateUpdate();
+	            }
+	        };
+	        var ruleNamePropName = "ruleName";
+	        wrappedGrammarRule[ruleNamePropName] = ruleName;
+	        return wrappedGrammarRule;
+	    };
 	    Parser.prototype.tryInRepetitionRecovery = function (grammarRule, grammarRuleArgs, lookAheadFunc, expectedTokType) {
 	        var _this = this;
 	        // TODO: can the resyncTokenType be cached?
@@ -1233,7 +1290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // note that while it may seem that this can cause an error because by using a recursive call to
 	        // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
 	        // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-	        if (this.isErrorRecoveryEnabled) {
+	        if (this.recoveryEnabled) {
 	            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg], lookAheadFunc, prodName, prodOccurrence, interpreter_1.NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys);
 	        }
 	    };
@@ -1256,7 +1313,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                separatorsResult.push(this.CONSUME(separator));
 	                action.call(this);
 	            }
-	            if (this.isErrorRecoveryEnabled) {
+	            if (this.recoveryEnabled) {
 	                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
 	                    this.atLeastOneSepLookaheadKeys, interpreter_1.NextTerminalAfterAtLeastOneSepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interpreter_1.NextTerminalAfterAtLeastOneSepWalker, this.atLeastOneSepLookaheadKeys);
 	            }
@@ -1274,7 +1331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        while (lookAheadFunc.call(this)) {
 	            action.call(this);
 	        }
-	        if (this.isErrorRecoveryEnabled) {
+	        if (this.recoveryEnabled) {
 	            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action], lookAheadFunc, prodName, prodOccurrence, interpreter_1.NextTerminalAfterManyWalker, this.manyLookaheadKeys);
 	        }
 	    };
@@ -1296,7 +1353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                separatorsResult.push(this.CONSUME(separator));
 	                action.call(this);
 	            }
-	            if (this.isErrorRecoveryEnabled) {
+	            if (this.recoveryEnabled) {
 	                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
 	                    this.manySepLookaheadKeys, interpreter_1.NextTerminalAfterManySepWalker], separatorLookAheadFunc, prodName, prodOccurrence, interpreter_1.NextTerminalAfterManySepWalker, this.manySepLookaheadKeys);
 	            }
@@ -1315,7 +1372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // IF will always be entered, its possible to remove it...
 	        // however it is kept to avoid confusion and be consistent.
 	        /* istanbul ignore else */
-	        if (this.isErrorRecoveryEnabled) {
+	        if (this.recoveryEnabled) {
 	            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal, [prodName, prodOccurrence, separator, separatorLookAheadFunc,
 	                action, separatorsResult, laKeys, nextTerminalAfterWalker], separatorLookAheadFunc, prodName, prodOccurrence, nextTerminalAfterWalker, laKeys);
 	        }
@@ -1358,7 +1415,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        catch (eFromConsumption) {
 	            // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
 	            // but the original syntax could have been parsed successfully without any backtracking + recovery
-	            if (this.isErrorRecoveryEnabled &&
+	            if (this.recoveryEnabled &&
 	                eFromConsumption instanceof exceptions_public_1.exceptions.MismatchedTokenException && !this.isBackTracking()) {
 	                var follows = this.getFollowsForInRuleRecovery(tokClass, idx);
 	                try {
@@ -1540,13 +1597,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return getFromNestedHashTable(className, exports.CLASS_TO_FIRST_AFTER_REPETITION);
 	}
 	exports.getFirstAfterRepForClass = getFirstAfterRepForClass;
+	exports.CLASS_TO_PRODUCTION_OVERRIDEN = new lang_extensions_1.HashTable();
+	function getProductionOverriddenForClass(className) {
+	    return getFromNestedHashTable(className, exports.CLASS_TO_PRODUCTION_OVERRIDEN);
+	}
+	exports.getProductionOverriddenForClass = getProductionOverriddenForClass;
 	exports.CLASS_TO_OR_LA_CACHE = new lang_extensions_1.HashTable();
 	exports.CLASS_TO_MANY_LA_CACHE = new lang_extensions_1.HashTable();
 	exports.CLASS_TO_MANY_SEP_LA_CACHE = new lang_extensions_1.HashTable();
 	exports.CLASS_TO_AT_LEAST_ONE_LA_CACHE = new lang_extensions_1.HashTable();
 	exports.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE = new lang_extensions_1.HashTable();
 	exports.CLASS_TO_OPTION_LA_CACHE = new lang_extensions_1.HashTable();
-	// TODO: CONST in typescript 1.5
 	// TODO reflective test to verify this has not changed, for example (OPTION6 added)
 	exports.MAX_OCCURRENCE_INDEX = 5;
 	function initLookAheadKeyCache(className) {
@@ -2239,34 +2300,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        GAstVisitor.prototype.visit = function (node) {
 	            if (node instanceof NonTerminal) {
-	                this.visitNonTerminal(node);
+	                return this.visitNonTerminal(node);
 	            }
 	            else if (node instanceof Flat) {
-	                this.visitFlat(node);
+	                return this.visitFlat(node);
 	            }
 	            else if (node instanceof Option) {
-	                this.visitOption(node);
+	                return this.visitOption(node);
 	            }
 	            else if (node instanceof RepetitionMandatory) {
-	                this.visitRepetitionMandatory(node);
+	                return this.visitRepetitionMandatory(node);
 	            }
 	            else if (node instanceof RepetitionMandatoryWithSeparator) {
-	                this.visitRepetitionMandatoryWithSeparator(node);
+	                return this.visitRepetitionMandatoryWithSeparator(node);
 	            }
 	            else if (node instanceof RepetitionWithSeparator) {
-	                this.visitRepetitionWithSeparator(node);
+	                return this.visitRepetitionWithSeparator(node);
 	            }
 	            else if (node instanceof Repetition) {
-	                this.visitRepetition(node);
+	                return this.visitRepetition(node);
 	            }
 	            else if (node instanceof Alternation) {
-	                this.visitAlternation(node);
+	                return this.visitAlternation(node);
 	            }
 	            else if (node instanceof Terminal) {
-	                this.visitTerminal(node);
+	                return this.visitTerminal(node);
 	            }/* istanbul ignore else */ 
 	            else if (node instanceof Rule) {
-	                this.visitRule(node);
+	                return this.visitRule(node);
 	            }
 	            else {
 	                /* istanbul ignore next */ throw Error("non exhaustive match");
@@ -2398,19 +2459,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	}(gast_public_1.gast.GAstVisitor));
 	exports.OccurrenceValidationCollector = OccurrenceValidationCollector;
 	var ruleNamePattern = /^[a-zA-Z_]\w*$/;
-	function validateRuleName(ruleName, definedRulesNames, className) {
+	function validateRuleName(ruleName, className) {
 	    var errors = [];
 	    var errMsg;
 	    if (!ruleName.match(ruleNamePattern)) {
-	        errMsg = "Invalid Grammar rule name --> " + ruleName + " it must match the pattern: " + ruleNamePattern.toString();
+	        errMsg = "Invalid Grammar rule name: ->" + ruleName + "<- it must match the pattern: ->" + ruleNamePattern.toString() + "<-";
 	        errors.push({
 	            message: errMsg,
 	            type: parser_public_1.ParserDefinitionErrorType.INVALID_RULE_NAME,
 	            ruleName: ruleName
 	        });
 	    }
+	    return errors;
+	}
+	exports.validateRuleName = validateRuleName;
+	function validateRuleDoesNotAlreadyExist(ruleName, definedRulesNames, className) {
+	    var errors = [];
+	    var errMsg;
 	    if ((utils.contains(definedRulesNames, ruleName))) {
-	        errMsg = "Duplicate definition, rule: " + ruleName + " is already defined in the grammar: " + className;
+	        errMsg = "Duplicate definition, rule: ->" + ruleName + "<- is already defined in the grammar: ->" + className + "<-";
 	        errors.push({
 	            message: errMsg,
 	            type: parser_public_1.ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
@@ -2419,7 +2486,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return errors;
 	}
-	exports.validateRuleName = validateRuleName;
+	exports.validateRuleDoesNotAlreadyExist = validateRuleDoesNotAlreadyExist;
+	// TODO: is there anyway to get only the rule names of rules inherited from the super grammars?
+	function validateRuleIsOverridden(ruleName, definedRulesNames, className) {
+	    var errors = [];
+	    var errMsg;
+	    if (!(utils.contains(definedRulesNames, ruleName))) {
+	        errMsg = ("Invalid rule override, rule: ->" + ruleName + "<- cannot be overridden in the grammar: ->" + className + "<-") +
+	            "as it is not defined in any of the super grammars ";
+	        errors.push({
+	            message: errMsg,
+	            type: parser_public_1.ParserDefinitionErrorType.INVALID_RULE_OVERRIDE,
+	            ruleName: ruleName
+	        });
+	    }
+	    return errors;
+	}
+	exports.validateRuleIsOverridden = validateRuleIsOverridden;
 	function validateNoLeftRecursion(topRule, currRule, path) {
 	    if (path === void 0) { path = []; }
 	    var errors = [];
@@ -2542,6 +2625,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    /* istanbul ignore next */  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 	var gast_public_1 = __webpack_require__(7);
 	var utils_1 = __webpack_require__(4);
 	var lang_extensions_1 = __webpack_require__(3);
@@ -2609,6 +2697,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return productionToDslName[prodName];
 	}
 	exports.getProductionDslName = getProductionDslName;
+	var GastCloneVisitor = (function (_super) {
+	    __extends(GastCloneVisitor, _super);
+	    function GastCloneVisitor() {
+	        _super.apply(this, arguments);
+	    }
+	    GastCloneVisitor.prototype.visitNonTerminal = function (node) {
+	        return new gast_public_1.gast.NonTerminal(node.nonTerminalName, undefined, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitFlat = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.Flat(definition);
+	    };
+	    GastCloneVisitor.prototype.visitOption = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.Option(definition, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitRepetition = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.Repetition(definition, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitRepetitionMandatory = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.RepetitionMandatory(definition, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitRepetitionMandatoryWithSeparator = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.RepetitionMandatoryWithSeparator(definition, node.separator, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitRepetitionWithSeparator = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.RepetitionWithSeparator(definition, node.separator, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitAlternation = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.Alternation(definition, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitTerminal = function (node) {
+	        return new gast_public_1.gast.Terminal(node.terminalType, node.occurrenceInParent);
+	    };
+	    GastCloneVisitor.prototype.visitRule = function (node) {
+	        var _this = this;
+	        var definition = utils_1.map(node.definition, function (currSubDef) { return _this.visit(currSubDef); });
+	        return new gast_public_1.gast.Rule(node.name, definition, node.orgText);
+	    };
+	    return GastCloneVisitor;
+	}(gast_public_1.gast.GAstVisitor));
+	function cloneProduction(prod) {
+	    var cloningVisitor = new GastCloneVisitor();
+	    return cloningVisitor.visit(prod);
+	}
+	exports.cloneProduction = cloneProduction;
 
 
 /***/ },

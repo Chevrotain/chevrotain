@@ -79,7 +79,7 @@ function jsonExample() {
     var ChevrotainParser = chevrotain.Parser;
 
     function ChevrotainJsonParser(input) {
-        ChevrotainParser.call(this, input, jsonTokens);
+        ChevrotainParser.call(this, input, jsonTokens, {recoveryEnabled: true});
         var $ = this;
 
         this.json = this.RULE("json", function () {
@@ -157,7 +157,7 @@ function jsonExample() {
                     $.CONSUME(Null);
                     return null;
                 }}
-            ], "a value");
+            ]);
         });
         // @formatter:on
 
@@ -323,7 +323,7 @@ function cssExample() {
     var ChevrotainParser = chevrotain.Parser;
 
     function CssParser(input) {
-        ChevrotainParser.call(this, input, cssTokens);
+        ChevrotainParser.call(this, input, cssTokens, {recoveryEnabled: true});
         var $ = this;
 
         this.stylesheet = this.RULE('stylesheet', function () {
@@ -521,7 +521,7 @@ function cssExample() {
                 {ALT: function() {
                     $.AT_LEAST_ONE(function() {
                         $.SUBRULE2($.simple_selector_suffix)
-                    }, "selector suffix")
+                    })
                 }}
             ]);
             // @formatter:on
@@ -714,6 +714,8 @@ function calculatorExample() {
 
     // ----------------- parser -----------------
     function Calculator(input) {
+        // By default if {recoveryEnabled: true} is not passed in the config object
+        // error recovery / fault tolerance capabilities will be disabled
         Parser.call(this, input, allTokens);
 
         var $ = this;
@@ -896,6 +898,8 @@ function tutorialGrammarExample() {
 
     // ----------------- parser -----------------
     function SelectParser(input) {
+        // By default if {recoveryEnabled: true} is not passed in the config object
+        // error recovery / fault tolerance capabilities will be disabled
         Parser.call(this, input, allTokens);
         var $ = this;
 
@@ -913,7 +917,7 @@ function tutorialGrammarExample() {
             $.CONSUME(Select);
             $.AT_LEAST_ONE_SEP(Comma, function () {
                 $.CONSUME(Identifier);
-            }, "column name");
+            });
         });
 
 
@@ -928,7 +932,7 @@ function tutorialGrammarExample() {
             //$.CONSUME(From);
             //$.AT_LEAST_ONE_SEP(Comma, function () {
             //    $.CONSUME(Identifier);
-            //}, "table name");
+            //});
         });
 
 
@@ -1044,7 +1048,7 @@ function tutorialGrammarActionsExample() {
             $.AT_LEAST_ONE_SEP(Comma, function () {
                 // accessing a token's string via .image property
                 columns.push($.CONSUME(Identifier).image);
-            }, "column name");
+            });
 
             return {type: "SELECT_CLAUSE", columns: columns}
         });
@@ -1160,7 +1164,7 @@ function tutorialErrorRecoveryExample() {
     function ChevrotainJsonParser(input) {
         // change to false to completely disable error recovery.
         var isRecoveryEnabled = true
-        ChevrotainParser.call(this, input, jsonTokens, isRecoveryEnabled);
+        ChevrotainParser.call(this, input, jsonTokens, {recoveryEnabled: isRecoveryEnabled});
         var $ = this;
 
         this.json = this.RULE("json", function () {
@@ -1204,9 +1208,11 @@ function tutorialErrorRecoveryExample() {
                 "BAD_KEY" : lit.image.substr(1, lit.image.length - 2);
             obj[key] = value;
             return obj;
-            // InvalidObjectItem will be invoked to replace the returned value of objectItem in case of
+
+            // CUSTOM returned value from recovered production:
+            // <InvalidObjectItem> will be invoked to replace the returned value of objectItem in case of
             // between rules re-sync recovery.
-        }, invalidObjectItem);
+        }, {recoveryValueFunc: invalidObjectItem});
 
 
         this.array = this.RULE("array", function () {
@@ -1244,7 +1250,7 @@ function tutorialErrorRecoveryExample() {
                     $.CONSUME(Null);
                     return null;
                 }}
-            ], "a value");
+            ]);
         });
         // @formatter:on
 
