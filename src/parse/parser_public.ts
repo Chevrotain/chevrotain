@@ -27,11 +27,18 @@ import {
     last,
     dropRight,
     isFunction,
-    has
+    has,
+    isUndefined,
+    forEach
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
-import {Token, tokenName, EOF, tokenLabel, hasTokenLabel} from "../scan/tokens_public"
-import {gast} from "./grammar/gast_public"
+import {
+    Token,
+    tokenName,
+    EOF,
+    tokenLabel,
+    hasTokenLabel
+} from "../scan/tokens_public"
 import {
     buildLookaheadForTopLevel,
     buildLookaheadForOption,
@@ -56,6 +63,8 @@ import {
     NextInsideAtLeastOneSepWalker
 } from "./grammar/interpreter"
 import {IN} from "./constants"
+import {gast} from "./grammar/gast_public"
+import {cloneProduction} from "./grammar/gast"
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -69,8 +78,8 @@ export enum ParserDefinitionErrorType {
 
 export interface IParserConfig {
     /**
-    * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
-    */
+     * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
+     */
     recoveryEnabled?:boolean
 }
 
@@ -235,24 +244,36 @@ export class Parser {
 
         // this information should only be computed once
         if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-            let grammarProductions = cache.getProductionsForClass(className)
+            // clone here
+            let orgProductions = classInstance._productions
+            let clonedProductions = new HashTable<gast.Rule>()
+            // clone the grammar productions to support grammar inheritance. requirements:
+            // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
+            // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
+            //    so the myGast variable is used.
+            // 3. If a Production has been overridden references to it in the GAST must also be updated.
+            forEach(orgProductions.keys(), (key) => {
+                let value = orgProductions.get(key)
+                clonedProductions.put(key, cloneProduction(value))
+            })
+            cache.getProductionsForClass(className).putAll(clonedProductions)
 
             // assumes this cache has been initialized (in the relevant parser's constructor)
             // TODO: consider making the self analysis a member method to resolve this.
             // that way it won't be callable before the constructor has been invoked...
             definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className)
 
-            let resolverErrors = resolveGrammar(grammarProductions)
+            let resolverErrors = resolveGrammar(clonedProductions)
             definitionErrors.push.apply(definitionErrors, resolverErrors) // mutability for the win?
             cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
-            let validationErrors = validateGrammar(grammarProductions.values())
+            let validationErrors = validateGrammar(clonedProductions.values())
             definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
             if (!isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = map(definitionErrors, defError => defError.message)
                 throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
             }
             if (isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
-                let allFollows = computeAllProdsFollows(grammarProductions.values())
+                let allFollows = computeAllProdsFollows(clonedProductions.values())
                 cache.setResyncFollowsForClass(className, allFollows)
             }
         }
@@ -291,6 +312,12 @@ export class Parser {
     private atLeastOneLookaheadKeys:HashTable<string>[]
     private optionLookaheadKeys:HashTable<string>[]
     private definedRulesNames:string[] = []
+
+    /**
+     * Only used internally for storing productions as they are built for the first time.
+     * The final productions should be accessed from the static cache.
+     */
+    private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
     constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:Function; } | Function[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
@@ -1053,12 +1080,22 @@ export class Parser {
         this.definedRulesNames.push(name)
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
-        let parserClassProductions = cache.getProductionsForClass(this.className)
         // only build the gast representation once.
-        if (!(parserClassProductions.containsKey(name))) {
+        if (!(this._productions.containsKey(name))) {
             let gastProduction = buildTopProduction(implementation.toString(), name, this.tokensMap)
-            parserClassProductions.put(name, gastProduction)
+            this._productions.put(name, gastProduction)
         }
+        else {
+            let parserClassProductions = cache.getProductionsForClass(this.className)
+            let cachedProduction = parserClassProductions.get(name)
+            // in case of duplicate rules the cache will not be filled at this point.
+            if (!isUndefined(cachedProduction)) {
+                // filling up the _productions is always needed to inheriting grammars can access it (as an instance member)
+                // otherwise they will be unaware of productions defined in super grammars.
+                this._productions.put(name, cachedProduction)
+            }
+        }
+
         return this.defineRule(name, implementation, config)
     }
 
@@ -1069,26 +1106,30 @@ export class Parser {
      * from the super grammar.
      *
      */
-    protected OVERRIDE_RULE<T>(ruleName:string,
+    protected OVERRIDE_RULE<T>(name:string,
                                impl:(...implArgs:any[]) => T,
                                config:IRuleConfig<T> = DEFAULT_RULE_CONFIG):(idxInCallingRule?:number, ...args:any[]) => T {
 
-        let ruleErrors = validateRuleName(ruleName, this.className)
-        ruleErrors = ruleErrors.concat(validateRuleIsOverridden(ruleName, this.definedRulesNames, this.className))
+        let ruleErrors = validateRuleName(name, this.className)
+        ruleErrors = ruleErrors.concat(validateRuleIsOverridden(name, this.definedRulesNames, this.className))
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
-
         let alreadyOverridden = cache.getProductionOverriddenForClass(this.className)
-        let parserClassProductions = cache.getProductionsForClass(this.className)
 
         // only build the GAST of an overridden rule once.
-        if (!alreadyOverridden.containsKey(ruleName)) {
-            alreadyOverridden.put(ruleName, true)
-            let gastProduction = buildTopProduction(impl.toString(), ruleName, this.tokensMap)
-            parserClassProductions.put(ruleName, gastProduction)
+        if (!alreadyOverridden.containsKey(name)) {
+            alreadyOverridden.put(name, true)
+            let gastProduction = buildTopProduction(impl.toString(), name, this.tokensMap)
+            this._productions.put(name, gastProduction)
+        }
+        else {
+            let parserClassProductions = cache.getProductionsForClass(this.className)
+            // filling up the _productions is always needed to inheriting grammars can access it (as an instance member)
+            // otherwise they will be unaware of productions defined in super grammars.
+            this._productions.put(name, parserClassProductions.get(name))
         }
 
-        return this.defineRule(ruleName, impl, config)
+        return this.defineRule(name, impl, config)
     }
 
     protected ruleInvocationStateUpdate(ruleName:string, idxInCallingRule:number):void {

@@ -22,7 +22,12 @@ var SelectLexer = new Lexer(allTokens, true);
 
 
 // ----------------- parser -----------------
-function SelectParserVersion1(input) {
+function SelectParserVersion1(input, isInvokedByChildConstructor) {
+
+    if (isInvokedByChildConstructor === undefined) {
+        isInvokedByChildConstructor = false
+    }
+
     Parser.call(this, input, allTokens);
     var $ = this;
 
@@ -84,11 +89,15 @@ function SelectParserVersion1(input) {
         ]);
     });
 
-
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this);
+    // the selfAnalysis must only be performed ONCE during grammar construction.
+    // that invocation should be the in the LAST (bottom of the hierarchy) grammar.
+    // of in inheritance chain.
+    if (!isInvokedByChildConstructor) {
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this);
+    }
 }
 
 
@@ -101,7 +110,7 @@ SelectParserVersion1.prototype.constructor = SelectParserVersion1;
 // this means that different grammar versions require separate implementing classes with different names.
 function SelectParserVersion2(input) {
     // V2 extends V1
-    SelectParserVersion1.call(this, input);
+    SelectParserVersion1.call(this, input, true);
     var $ = this;
 
     // "fromClause" production in version2 is overridden to allow multiple table names.

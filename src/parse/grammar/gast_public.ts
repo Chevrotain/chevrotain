@@ -89,61 +89,61 @@ export namespace gast {
 
     export abstract class GAstVisitor {
 
-        public visit(node:IProduction) {
+        public visit(node:IProduction):any {
 
             if (node instanceof NonTerminal) {
-                this.visitNonTerminal(node)
+                return this.visitNonTerminal(node)
             }
             else if (node instanceof Flat) {
-                this.visitFlat(node)
+                return this.visitFlat(node)
             }
             else if (node instanceof Option) {
-                this.visitOption(node)
+                return this.visitOption(node)
             }
             else if (node instanceof RepetitionMandatory) {
-                this.visitRepetitionMandatory(node)
+                return this.visitRepetitionMandatory(node)
             }
             else if (node instanceof RepetitionMandatoryWithSeparator) {
-                this.visitRepetitionMandatoryWithSeparator(node)
+                return this.visitRepetitionMandatoryWithSeparator(node)
             }
             else if (node instanceof RepetitionWithSeparator) {
-                this.visitRepetitionWithSeparator(node)
+                return this.visitRepetitionWithSeparator(node)
             }
             else if (node instanceof Repetition) {
-                this.visitRepetition(node)
+                return this.visitRepetition(node)
             }
             else if (node instanceof Alternation) {
-                this.visitAlternation(node)
+                return this.visitAlternation(node)
             }
             else if (node instanceof Terminal) {
-                this.visitTerminal(node)
+                return this.visitTerminal(node)
             }
             else if (node instanceof Rule) {
-                this.visitRule(node)
+                return this.visitRule(node)
             }
             else {
                 throw Error("non exhaustive match")
             }
         }
 
-        public visitNonTerminal(node:NonTerminal):void {}
+        public visitNonTerminal(node:NonTerminal):any {}
 
-        public visitFlat(node:Flat):void {}
+        public visitFlat(node:Flat):any {}
 
-        public visitOption(node:Option):void {}
+        public visitOption(node:Option):any {}
 
-        public visitRepetition(node:Repetition):void {}
+        public visitRepetition(node:Repetition):any {}
 
-        public visitRepetitionMandatory(node:RepetitionMandatory):void {}
+        public visitRepetitionMandatory(node:RepetitionMandatory):any {}
 
-        public visitRepetitionMandatoryWithSeparator(node:RepetitionMandatoryWithSeparator):void {}
+        public visitRepetitionMandatoryWithSeparator(node:RepetitionMandatoryWithSeparator):any {}
 
-        public visitRepetitionWithSeparator(node:RepetitionWithSeparator):void {}
+        public visitRepetitionWithSeparator(node:RepetitionWithSeparator):any {}
 
-        public visitAlternation(node:Alternation):void {}
+        public visitAlternation(node:Alternation):any {}
 
-        public visitTerminal(node:Terminal):void {}
+        public visitTerminal(node:Terminal):any {}
 
-        public visitRule(node:Rule):void {}
+        public visitRule(node:Rule):any {}
     }
 }
