@@ -1,3 +1,7 @@
+/*
+* Example Of using Grammar inheritance to support multiple versions of the same grammar.
+*/
+
 var chevrotain = require("chevrotain");
 
 // ----------------- lexer -----------------
