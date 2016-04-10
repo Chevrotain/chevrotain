@@ -3,6 +3,9 @@
 #### Minor Changes
 - [Avoid rebuilding the GAST on parser construction when using RULE_OVERRIDE.](https://github.com/SAP/chevrotain/issues/171)
 
+#### Bug Fixes
+- [GAST Production cache does not take into account grammar inheritance](https://github.com/SAP/chevrotain/issues/181)
+
 
 
 ## 0.8.0 (4-8-2016)
