@@ -1,4 +1,4 @@
-/*! chevrotain - v0.8.0 */
+/*! chevrotain - v0.8.1 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -241,10 +241,20 @@ declare namespace chevrotain {
         NONE_LAST_EMPTY_ALT = 6,
     }
     export interface IParserConfig {
+        /**
+         * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
+         */
         recoveryEnabled?: boolean;
     }
     export interface IRuleConfig<T> {
+        /**
+         * The function which will be invoked to produce the returned value for a production that have not been
+         * successfully executed and the parser recovered from.
+         */
         recoveryValueFunc?: () => T;
+        /**
+         * Enable/Disable re-sync error recovery for this specific production.
+         */
         resyncEnabled?: boolean;
     }
     export interface IParserDefinitionError {
@@ -361,7 +371,11 @@ declare namespace chevrotain {
         protected tokensMap: {
             [fqn: string]: Function;
         };
-                                                constructor(input: Token[], tokensMapOrArr: {
+                                                /**
+         * Only used internally for storing productions as they are built for the first time.
+         * The final productions should be accessed from the static cache.
+         */
+            constructor(input: Token[], tokensMapOrArr: {
             [fqn: string]: Function;
         } | Function[], config?: IParserConfig);
         input: Token[];
@@ -752,7 +766,7 @@ declare namespace chevrotain {
          *
          * @param {string} name - The name of the rule.
          * @param {Function} implementation - The implementation of the rule.
-         * @param {IRuleConfig} [config] - The rule's optionalconfigurationn
+         * @param {IRuleConfig} [config] - The rule's optional configurationn
          *
          * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
          *                     Parser state / error recovery&reporting/ ...
@@ -765,7 +779,7 @@ declare namespace chevrotain {
          * from the super grammar.
          *
          */
-        protected OVERRIDE_RULE<T>(ruleName: string, impl: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
+        protected OVERRIDE_RULE<T>(name: string, impl: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         protected ruleInvocationStateUpdate(ruleName: string, idxInCallingRule: number): void;
         protected ruleFinallyStateUpdate(): void;
         /**
@@ -901,17 +915,17 @@ declare namespace chevrotain {
             accept(visitor: GAstVisitor): void;
         }
         abstract class GAstVisitor {
-            visit(node: IProduction): void;
-            visitNonTerminal(node: NonTerminal): void;
-            visitFlat(node: Flat): void;
-            visitOption(node: Option): void;
-            visitRepetition(node: Repetition): void;
-            visitRepetitionMandatory(node: RepetitionMandatory): void;
-            visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): void;
-            visitRepetitionWithSeparator(node: RepetitionWithSeparator): void;
-            visitAlternation(node: Alternation): void;
-            visitTerminal(node: Terminal): void;
-            visitRule(node: Rule): void;
+            visit(node: IProduction): any;
+            visitNonTerminal(node: NonTerminal): any;
+            visitFlat(node: Flat): any;
+            visitOption(node: Option): any;
+            visitRepetition(node: Repetition): any;
+            visitRepetitionMandatory(node: RepetitionMandatory): any;
+            visitRepetitionMandatoryWithSeparator(node: RepetitionMandatoryWithSeparator): any;
+            visitRepetitionWithSeparator(node: RepetitionWithSeparator): any;
+            visitAlternation(node: Alternation): any;
+            visitTerminal(node: Terminal): any;
+            visitRule(node: Rule): any;
         }
     }
     
