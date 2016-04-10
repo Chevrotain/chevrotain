@@ -14,13 +14,21 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
     it("Can override an existing rule", () => {
         class SuperOverrideParser extends Parser {
 
-            constructor(input:Token[] = []) {
+            constructor(input:Token[] = [], isInvokedByChildConstructor = false) {
                 super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+
+                // performSelfAnalysis should only be invoked once.
+                if (!isInvokedByChildConstructor) {
+                    Parser.performSelfAnalysis(this)
+                }
             }
 
             public topRule = this.RULE("topRule", () => {
-                return this.SUBRULE(this.nestedRule)
+                let result
+                this.OPTION(() => {
+                    result = this.SUBRULE(this.nestedRule)
+                })
+                return result
             })
 
             public nestedRule = this.RULE("nestedRule", () => {
@@ -32,7 +40,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
         class ChildOverrideParser extends SuperOverrideParser {
 
             constructor(input:Token[] = []) {
-                super(input)
+                super(input, true)
                 Parser.performSelfAnalysis(this)
             }
 
