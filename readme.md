@@ -34,8 +34,8 @@ any code generation phase.
     * Automatic lookahead calculation for LL(1) grammars.
     * Supports [Custom lookahead logic][custom_lookahead] for LL(k) grammars.
     * Backtracking support.
-    * [Grammar Inheritance.][grammar_inheritance].
-    * [Multiple starting rules.][starting_rules].
+    * [Grammar Inheritance.][grammar_inheritance]
+    * [Multiple starting rules.][starting_rules]
 
   3. [**High performance - (see on JSPerf)**][benchmark].
 
