@@ -35,6 +35,7 @@ any code generation phase.
     * Supports [Custom lookahead logic][custom_lookahead] for LL(k) grammars.
     * Backtracking support.
     * [Grammar Inheritance.][grammar_inheritance].
+    * [Multiple starting rules.][starting_rules].
 
   3. [**High performance - (see on JSPerf)**][benchmark].
 
@@ -90,3 +91,4 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 [keywords_vs_idents]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js
 [custom_lookahead]: https://github.com/SAP/chevrotain/blob/master/examples/custom_lookahead/large_lookahead.js
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
+[starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js

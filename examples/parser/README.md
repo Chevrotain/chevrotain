@@ -9,6 +9,11 @@ or to implement predicates/gates.
 
 * [Predicate/Gate lookahead](predicate_lookahead/predicate_lookahead.js)
 
+* [Multiple grammar versions using grammar inheritance](versioning/versioning.js)
+
+* [Multiple starting/top rules](multi_start_rules/multi_start_rules.js)
+
+
 to run all the parser examples's tests:
 * ```npm update``` (only once)
 * ```npm test```
