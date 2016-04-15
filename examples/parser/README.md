@@ -11,6 +11,8 @@ or to implement predicates/gates.
 
 * [Multiple grammar versions using grammar inheritance](versioning/versioning.js)
 
+* ['Structured natural language' supporting multiple 'spoken languages' using grammar inheritance](inheriance/inheritance.js)
+
 * [Multiple starting/top rules](multi_start_rules/multi_start_rules.js)
 
 
