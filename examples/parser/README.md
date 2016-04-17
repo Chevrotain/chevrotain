@@ -1,9 +1,6 @@
 # Parser Examples
 
-A few simple examples of using the Chevrotain Parser to resolve some common parsing problems/scenarios.
-
-Example how to use custom lookahead functions to handle grammars that are LL(>1),
-or to implement predicates/gates.
+A few simple examples of using the Chevrotain Parser to resolve some common parsing problems/scenarios:
 
 * [Lookahead(K) > 1](large_lookahead/large_lookahead.js)
 
