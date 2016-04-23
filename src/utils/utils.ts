@@ -166,12 +166,12 @@ export function find<T>(arr:T[], predicate:(item:T) => boolean):T {
     return undefined
 }
 
-export function reduce<T, A>(arrOrObj:Array<T>|Object, iterator:(result:A, item) => A, initial:A):A {
-    let vals = Array.isArray(arrOrObj) ? arrOrObj : values(arrOrObj)
+export function reduce<T, A>(arrOrObj:Array<T>|Object, iterator:(result:A, item, idx?) => A, initial:A):A {
+    let vals:T[] = Array.isArray(arrOrObj) ? <Array<T>>arrOrObj : values(arrOrObj)
 
     let accumulator = initial
     for (let i = 0; i < vals.length; i++) {
-        accumulator = iterator.call(null, accumulator, vals[i])
+        accumulator = iterator.call(null, accumulator, vals[i], i)
     }
     return accumulator
 }
@@ -212,9 +212,9 @@ export function isObject(obj:any):boolean {
     return obj instanceof Object
 }
 
-export function every<T>(arr:T[], predicate:(item:T) => boolean):boolean {
+export function every<T>(arr:T[], predicate:(item:T, idx?) => boolean):boolean {
     for (let i = 0; i < arr.length; i++) {
-        if (!predicate(arr[i])) {
+        if (!predicate(arr[i], i)) {
             return false
         }
     }

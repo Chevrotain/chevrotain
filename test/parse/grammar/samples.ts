@@ -131,8 +131,12 @@ export let cardinality = new Rule("cardinality", [
     new Terminal(UnsignedIntegerLiteralTok),
     new Terminal(DotDotTok),
     new Alternation([
-        new Terminal(UnsignedIntegerLiteralTok, 2),
-        new Terminal(AsteriskTok)
+        new Flat([
+            new Terminal(UnsignedIntegerLiteralTok, 2),
+        ]),
+        new Flat([
+            new Terminal(AsteriskTok)
+        ])
     ]),
     new Terminal(RSquareTok)
 ])
@@ -152,20 +156,26 @@ export let assignedTypeSpec = new Rule("assignedTypeSpec", [
 ])
 
 export let lotsOfOrs = new Rule("lotsOfOrs", [
-    new Option([
-        new Alternation([
-            new Flat([
-                new Alternation([
+    new Alternation([
+        new Flat([
+            new Alternation([
+                new Flat([
                     new Terminal(CommaTok, 1),
+                ]),
+                new Flat([
                     new Terminal(KeyTok, 1)
-                ], 2)
-            ]),
-            new Terminal(EntityTok, 1)
+                ])
+            ], 2)
         ]),
-        new Alternation([
-            new Terminal(DotTok, 1),
-        ], 3)
+        new Flat([
+            new Terminal(EntityTok, 1)
+        ])
     ]),
+    new Alternation([
+        new Flat([
+            new Terminal(DotTok, 1)
+        ])
+    ], 3)
 ])
 
 export let emptyAltOr = new Rule("emptyAltOr", [

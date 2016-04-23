@@ -40,14 +40,17 @@ import {
     hasTokenLabel
 } from "../scan/tokens_public"
 import {
-    buildLookaheadForTopLevel,
     buildLookaheadForOption,
-    buildLookaheadForOr,
     buildLookaheadForMany,
     buildLookaheadForManySep,
     buildLookaheadForAtLeastOne,
-    buildLookaheadForAtLeastOneSep
+    buildLookaheadForAtLeastOneSep,
+    buildLookaheadFuncForOr,
+    getLookaheadPathsForOr,
+    PROD_TYPE,
+    getLookaheadPathsForOptionalProd, buildLookaheadForTopLevel
 } from "./grammar/lookahead"
+
 import {TokenConstructor} from "../scan/lexer_public"
 import {buildTopProduction} from "./gast_builder"
 import {
@@ -56,11 +59,7 @@ import {
     NextTerminalAfterAtLeastOneWalker,
     NextTerminalAfterAtLeastOneSepWalker,
     NextTerminalAfterManyWalker,
-    NextTerminalAfterManySepWalker,
-    NextInsideOrWalker,
-    NextInsideAtLeastOneWalker,
-    AbstractNextPossibleTokensWalker,
-    NextInsideAtLeastOneSepWalker
+    NextTerminalAfterManySepWalker
 } from "./grammar/interpreter"
 import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
@@ -80,11 +79,16 @@ export interface IParserConfig {
     /**
      * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
      */
-    recoveryEnabled?:boolean
+    recoveryEnabled?:boolean,
+    /**
+     * Maximum number of tokens the parser will use to choose between alternatives.
+     */
+    maxLookahead?:number
 }
 
 const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
-    recoveryEnabled: false
+    recoveryEnabled: false,
+    maxLookahead:    5
 })
 
 export interface IRuleConfig<T> {
@@ -291,8 +295,8 @@ export class Parser {
      * This flag enables or disables error recovery (fault tolerance) of the parser.
      * If this flag is disabled the parser will halt on the first error.
      */
-    // TODO: should this become protected? and / or replaced with an IParserConfig object?
-    public recoveryEnabled
+    protected recoveryEnabled:boolean
+    protected maxLookahead:number
 
     protected _input:Token[] = []
     protected inputIdx = -1
@@ -322,7 +326,11 @@ export class Parser {
     constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:Function; } | Function[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
+
+        // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled") ? config.recoveryEnabled : DEFAULT_PARSER_CONFIG.recoveryEnabled
+        this.maxLookahead = has(config, "maxLookahead") ? config.maxLookahead : DEFAULT_PARSER_CONFIG.maxLookahead
+
         this.className = classNameFromInstance(this)
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
@@ -426,10 +434,9 @@ export class Parser {
         let condition = <any>classLAFuncs.get(ruleName)
         if (condition === undefined) {
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            condition = buildLookaheadForTopLevel(ruleGrammar)
+            condition = buildLookaheadForTopLevel(ruleGrammar, this.maxLookahead)
             classLAFuncs.put(ruleName, condition)
         }
-
         return condition.call(this)
     }
 
@@ -854,7 +861,7 @@ export class Parser {
      * Parsing DSL method, that indicates a repetition of zero or more with a separator
      * Token between the repetitions.
      *
-     * note that the 'action' param is optional. so both of the following forms are valid:
+     * Note that the 'action' param is optional. so both of the following forms are valid:
      *
      * short: this.MANY_SEP(Comma, ()=>{
      *                          this.CONSUME(Number};
@@ -866,9 +873,13 @@ export class Parser {
      *                       ...
      *                       );
      *
-     * using the short form is recommended as it will compute the lookahead function
-     * (for the first iteration) automatically. however this currently has one limitation:
-     * It only works if the lookahead for the grammar is one.
+     * Using the short form is recommended as it will compute the lookahead function automatically.
+     *
+     * Note that for the purposes of deciding on whether  or not another iteration exists
+     * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
+     * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
+     * to implement it.
+     *
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
@@ -1531,7 +1542,7 @@ export class Parser {
             }
         }
         else {
-            throw this.raiseEarlyExitException(prodOccurrence, NextInsideAtLeastOneWalker, userDefinedErrMsg)
+            throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY, userDefinedErrMsg)
         }
 
         // note that while it may seem that this can cause an error because by using a recursive call to
@@ -1584,7 +1595,7 @@ export class Parser {
             }
         }
         else {
-            throw this.raiseEarlyExitException(prodOccurrence, NextInsideAtLeastOneSepWalker, userDefinedErrMsg)
+            throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, userDefinedErrMsg)
         }
 
         return separatorsResult
@@ -1785,43 +1796,44 @@ export class Parser {
     // Automatic lookahead calculation
     private getLookaheadFuncForOption(occurence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForOption)
+        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForOption, this.maxLookahead)
     }
 
     private getLookaheadFuncForOr(occurence:number, ignoreErrors:boolean):() => number {
         let key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForOr, [ignoreErrors])
+        return this.getLookaheadFuncFor(key, occurence, buildLookaheadFuncForOr, this.maxLookahead, [ignoreErrors])
     }
 
     private getLookaheadFuncForMany(occurence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForMany)
+        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForMany, this.maxLookahead)
     }
 
     private getLookaheadFuncForManySep(occurence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForManySep)
+        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForManySep, this.maxLookahead)
     }
 
     private getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForAtLeastOne)
+        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForAtLeastOne, this.maxLookahead)
     }
 
     private getLookaheadFuncForAtLeastOneSep(occurence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForAtLeastOneSep)
+        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
     }
 
     private getLookaheadFuncFor<T>(key:string,
                                    occurrence:number,
-                                   laFuncBuilder:(number, any) => () => T,
+                                   laFuncBuilder:(number, rule, k) => () => T,
+                                   maxLookahead:number,
                                    extraArgs:any[] = []):() => T {
         let ruleName = last(this.RULE_STACK)
         let condition = <any>this.classLAFuncs.get(key)
         if (condition === undefined) {
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar].concat(extraArgs))
+            condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead].concat(extraArgs))
             this.classLAFuncs.put(key, condition)
         }
         return condition
@@ -1844,35 +1856,35 @@ export class Parser {
         this.RULE_STACK = newState.RULE_STACK
     }
 
+    // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
         let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
         if (errMsgTypes === undefined) {
             let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            let nextTokens = new NextInsideOrWalker(ruleGrammar, occurrence).startWalking()
-            let nextTokensFlat = flatten(nextTokens)
-            let nextTokensNames = map(nextTokensFlat, (currTokenClass:Function) => tokenLabel(currTokenClass))
-            errMsgTypes = `one of: <${nextTokensNames.join(" ,")}>`
+            let lookAheadPathsPerAlternative = getLookaheadPathsForOr(occurrence, ruleGrammar, this.maxLookahead)
+            let allLookAheadPaths = reduce(lookAheadPathsPerAlternative, (result, currAltPaths) => result.concat(currAltPaths), [])
+            let nextValidTokenSequences = map(allLookAheadPaths, (currPath) =>
+                `[${map(currPath, (currTokenClass) => tokenLabel(currTokenClass)).join(",")}]`)
+            errMsgTypes = `one of these possible Token sequences:\n  <${nextValidTokenSequences.join(" ,")}>`
         }
         throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
     }
 
+    // TODO: consider caching the error message computed information
     private raiseEarlyExitException(occurrence:number,
-                                    nextWalkerConstructor:typeof AbstractNextPossibleTokensWalker,
+                                    prodType:PROD_TYPE,
                                     userDefinedErrMsg:string):void {
         let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
         if (userDefinedErrMsg === undefined) {
             let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            let grammarPath = {
-                ruleStack:       this.RULE_STACK,
-                occurrenceStack: this.RULE_OCCURRENCE_STACK,
-                occurrence:      occurrence
-            }
-            let nextTokens = new (<any>nextWalkerConstructor)(ruleGrammar, grammarPath).startWalking()
-            let nextTokensFlat = flatten(nextTokens)
-            let nextTokensNames = map(nextTokensFlat, (currTokenClass:Function) => tokenLabel(currTokenClass))
-            userDefinedErrMsg = `expecting at least one iteration which starts with one of: <${nextTokensNames.join(" ,")}>`
+            let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, this.maxLookahead)
+            let insideProdPaths = lookAheadPathsPerAlternative[0]
+            let nextValidTokenSequences = map(insideProdPaths, (currPath) =>
+                `[${map(currPath, (currTokenClass) => tokenLabel(currTokenClass)).join(",")}]`)
+            userDefinedErrMsg = `expecting at least one iteration which starts with one of these possible Token sequences::\n  ` +
+                `<${nextValidTokenSequences.join(" ,")}>`
         }
         else {
             userDefinedErrMsg = `Expecting at least one ${userDefinedErrMsg}`

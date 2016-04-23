@@ -302,8 +302,8 @@ describe("The Parsing DSL", () => {
             }
 
             constructor(input:Token[] = []) {
-                super(input, ALL_TOKENS)
-                Parser.performSelfAnalysis(this)
+                super(input, ALL_TOKENS);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public orRule = this.RULE("orRule", this.parseOrRule, () => { return "-666" })
@@ -552,8 +552,8 @@ describe("The BaseRecognizer", () => {
         class InRuleParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, ALL_TOKENS, {recoveryEnabled: true})
-                Parser.performSelfAnalysis(this)
+                super(input, ALL_TOKENS, {recoveryEnabled: true});
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public someRule = this.RULE("someRule", () => {
@@ -570,8 +570,8 @@ describe("The BaseRecognizer", () => {
         class LabelTokParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, MinusTok]);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public rule = this.RULE("rule", () => {
@@ -591,8 +591,8 @@ describe("The BaseRecognizer", () => {
         class NoLabelTokParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, MinusTok]);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public rule = this.RULE("rule", () => {
@@ -613,8 +613,8 @@ describe("The BaseRecognizer", () => {
         class LabelAltParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, MinusTok]);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public rule = this.RULE("rule", () => {
@@ -640,8 +640,8 @@ describe("The BaseRecognizer", () => {
         class NestedRulesParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, MinusTok]);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public rule = this.RULE("rule", () => {
@@ -674,8 +674,8 @@ describe("The BaseRecognizer", () => {
         class ImplicitAtLeastOneErrParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, MinusTok]);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public rule = this.RULE("rule", () => {
@@ -707,8 +707,8 @@ describe("The BaseRecognizer", () => {
         class ImplicitAtLeastOneSepErrParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, MinusTok, IdentTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, MinusTok, IdentTok]);
+                (Parser as any).performSelfAnalysis(this)
             }
 
             public rule = this.RULE("rule", () => {
