@@ -1,4 +1,4 @@
-/*! chevrotain - v0.8.1 */
+/*! chevrotain - v0.9.0 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -245,6 +245,10 @@ declare namespace chevrotain {
          * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
          */
         recoveryEnabled?: boolean;
+        /**
+         * Maximum number of tokens the parser will use to choose between alternatives.
+         */
+        maxLookahead?: number;
     }
     export interface IRuleConfig<T> {
         /**
@@ -361,7 +365,8 @@ declare namespace chevrotain {
          * This flag enables or disables error recovery (fault tolerance) of the parser.
          * If this flag is disabled the parser will halt on the first error.
          */
-        recoveryEnabled: any;
+        protected recoveryEnabled: boolean;
+        protected maxLookahead: number;
         protected _input: Token[];
         protected inputIdx: number;
         protected isBackTrackingStack: any[];
@@ -645,7 +650,7 @@ declare namespace chevrotain {
          * Parsing DSL method, that indicates a repetition of zero or more with a separator
          * Token between the repetitions.
          *
-         * note that the 'action' param is optional. so both of the following forms are valid:
+         * Note that the 'action' param is optional. so both of the following forms are valid:
          *
          * short: this.MANY_SEP(Comma, ()=>{
          *                          this.CONSUME(Number};
@@ -657,9 +662,13 @@ declare namespace chevrotain {
          *                       ...
          *                       );
          *
-         * using the short form is recommended as it will compute the lookahead function
-         * (for the first iteration) automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * Using the short form is recommended as it will compute the lookahead function automatically.
+         *
+         * Note that for the purposes of deciding on whether  or not another iteration exists
+         * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
+         * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
+         * to implement it.
+         *
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the repetition production in it's top rule.
@@ -905,7 +914,7 @@ declare namespace chevrotain {
         }
         class Alternation extends AbstractProduction implements IProductionWithOccurrence {
             occurrenceInParent: number;
-            constructor(definition: IProduction[], occurrenceInParent?: number);
+            constructor(definition: Flat[], occurrenceInParent?: number);
         }
         class Terminal implements IProductionWithOccurrence {
             terminalType: Function;

@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.9.0 (4-29-2016)
 
 #### Major Changes
 - [Support LL(k) grammars.](https://github.com/SAP/chevrotain/issues/184)
