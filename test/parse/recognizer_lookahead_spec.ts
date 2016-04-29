@@ -1134,26 +1134,28 @@ describe("The Explicit lookahead functionality of the Recognizer for OR", () => 
     })
 })
 
-class OrAmbiguityLookAheadParser extends Parser {
+describe("OR production ambiguity detection when using implicit lookahead calculation", () => {
 
-    constructor(input:Token[] = []) {
-        super(input, ALL_TOKENS)
-        Parser.performSelfAnalysis(this)
-    }
+    it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", () => {
 
-    public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
+        class OrAmbiguityLookAheadParser extends Parser {
 
-    private parseAmbiguityRule():void {
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
 
-        // @formatter:off
+            public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
+
+            private parseAmbiguityRule():void {
+
+                // @formatter:off
             this.OR1([
                 {ALT: () => {
                     this.CONSUME1(OneTok)
-                    this.CONSUME1(TwoTok)
                 }},
                 {ALT: () => { // <-- this alternative starts with the same token as the previous one, ambiguity!
                     this.CONSUME2(OneTok)
-                    this.CONSUME1(ThreeTok)
                 }},
                 {ALT: () => {
                     this.CONSUME2(TwoTok)
@@ -1163,14 +1165,50 @@ class OrAmbiguityLookAheadParser extends Parser {
                 }}
             ], "digits")
             // @formatter:on
-    }
-}
+            }
+        }
 
-describe("OR production ambiguity detection when using implicit lookahead calculation", () => {
-
-    it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", () => {
         let parser = new OrAmbiguityLookAheadParser()
         expect(() => parser.ambiguityRule()).to.throw("Ambiguous alternatives")
+        expect(() => parser.ambiguityRule()).to.throw("OneTok")
+
+    })
+
+    it("will throw an error when two alternatives have the same multi token (lookahead > 1) prefix", () => {
+
+        class OrAmbiguityMultiTokenLookAheadParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
+
+            private parseAmbiguityRule():void {
+
+                // @formatter:off
+            this.OR1([
+                {ALT: () => {
+                    this.CONSUME1(OneTok)
+                }},
+                {ALT: () => {
+                    this.CONSUME1(TwoTok)
+                    this.CONSUME1(ThreeTok)
+                    this.CONSUME1(FourTok)
+                }},
+                {ALT: () => {
+                    this.CONSUME2(TwoTok)
+                    this.CONSUME2(ThreeTok)
+                    this.CONSUME2(FourTok)
+                }}
+            ], "digits")
+            // @formatter:on
+            }
+        }
+        let parser = new OrAmbiguityMultiTokenLookAheadParser()
+        expect(() => parser.ambiguityRule()).to.throw("Ambiguous alternatives")
+        expect(() => parser.ambiguityRule()).to.throw("TwoTok, ThreeTok, FourTok")
     })
 })
 
@@ -1334,3 +1372,245 @@ describe("The implicit lookahead calculation functionality of the Recognizer For
     })
 })
 
+
+describe("The support for MultiToken (K>1) implicit lookahead capabilities in DSL Production:", () => {
+
+    it("OPTION", () => {
+        class MultiTokenLookAheadForOptionParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("orRule", () => {
+                let result = "OPTION Not Taken"
+                this.OPTION(() => {
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(TwoTok)
+                    this.CONSUME1(ThreeTok)
+                    result = "OPTION Taken"
+                })
+                this.CONSUME2(OneTok)
+                this.CONSUME2(TwoTok)
+                return result
+            })
+        }
+
+        let parser = new MultiTokenLookAheadForOptionParser([new OneTok(), new TwoTok()])
+        expect(parser.rule()).to.equal("OPTION Not Taken")
+
+        let parser2 = new MultiTokenLookAheadForOptionParser([new OneTok(), new TwoTok(), new ThreeTok(), new OneTok(), new TwoTok()])
+        expect(parser2.rule()).to.equal("OPTION Taken")
+    })
+
+    it("MANY", () => {
+        class MultiTokenLookAheadForManyParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("orRule", () => {
+                let numOfIterations = 0
+                this.MANY(() => {
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(TwoTok)
+                    this.CONSUME1(ThreeTok)
+                    numOfIterations++
+                })
+                this.CONSUME2(OneTok)
+                this.CONSUME2(TwoTok)
+                return numOfIterations
+            })
+        }
+
+        let parser = new MultiTokenLookAheadForManyParser([new OneTok(), new TwoTok()])
+        expect(parser.rule()).to.equal(0)
+
+        let oneIterationParser = new MultiTokenLookAheadForManyParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()
+        ])
+        expect(oneIterationParser.rule()).to.equal(1)
+
+        let twoIterationsParser = new MultiTokenLookAheadForManyParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+
+        expect(twoIterationsParser.rule()).to.equal(2)
+    })
+
+    it("MANY_SEP", () => {
+        class MultiTokenLookAheadForManySepParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("orRule", () => {
+                let numOfIterations = 0
+                this.MANY_SEP(Comma, () => {
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(TwoTok)
+                    this.CONSUME1(ThreeTok)
+                    numOfIterations++
+                })
+                this.CONSUME2(OneTok)
+                this.CONSUME2(TwoTok)
+                return numOfIterations
+            })
+        }
+
+        let parser = new MultiTokenLookAheadForManySepParser([new OneTok(), new TwoTok()])
+        expect(parser.rule()).to.equal(0)
+
+        let oneIterationParser = new MultiTokenLookAheadForManySepParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+        expect(oneIterationParser.rule()).to.equal(1)
+
+        let twoIterationsParser = new MultiTokenLookAheadForManySepParser([
+            new OneTok(), new TwoTok(), new ThreeTok(), new Comma(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+        expect(twoIterationsParser.rule()).to.equal(2)
+    })
+
+    it("OR", () => {
+        class MultiTokenLookAheadForOrParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public orRule = this.RULE("orRule", () => {
+                return this.OR([
+                    // @formatter:off
+                    {ALT: () => {
+                        this.CONSUME1(OneTok)
+                        this.CONSUME2(OneTok)
+                        return "alt1 Taken"
+                    }},
+                    {ALT: () => {
+                        this.CONSUME3(OneTok)
+                        this.CONSUME1(TwoTok)
+                        this.CONSUME1(ThreeTok)
+                        return "alt2 Taken"
+                    }},
+                    {ALT: () => {
+                        this.CONSUME4(OneTok)
+                        this.CONSUME2(TwoTok)
+                        return "alt3 Taken"
+                    }},
+                    {ALT: () => {
+                        this.CONSUME1(FourTok)
+                        return "alt4 Taken"
+                    }}
+                    // @formatter:on
+                ])
+            })
+        }
+
+        let alt1Parser = new MultiTokenLookAheadForOrParser([new OneTok(), new OneTok()])
+        expect(alt1Parser.orRule()).to.equal("alt1 Taken")
+
+        let alt2Parser = new MultiTokenLookAheadForOrParser([new OneTok(), new TwoTok(), new ThreeTok()])
+        expect(alt2Parser.orRule()).to.equal("alt2 Taken")
+
+        let alt3Parser = new MultiTokenLookAheadForOrParser([new OneTok(), new TwoTok()])
+        expect(alt3Parser.orRule()).to.equal("alt3 Taken")
+
+        let alt4Parser = new MultiTokenLookAheadForOrParser([new FourTok()])
+        expect(alt4Parser.orRule()).to.equal("alt4 Taken")
+    })
+
+    it("AT_LEAST_ONE", () => {
+        class MultiTokenLookAheadForAtLeastOneParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("orRule", () => {
+                let numOfIterations = 0
+                this.AT_LEAST_ONE(() => {
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(TwoTok)
+                    this.CONSUME1(ThreeTok)
+                    numOfIterations++
+                })
+                this.CONSUME2(OneTok)
+                this.CONSUME2(TwoTok)
+                return numOfIterations
+            })
+        }
+
+        let oneIterationParser = new MultiTokenLookAheadForAtLeastOneParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()
+        ])
+        expect(oneIterationParser.rule()).to.equal(1)
+
+        let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+
+        expect(twoIterationsParser.rule()).to.equal(2)
+
+        let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+
+        expect(threeIterationsParser.rule()).to.equal(3)
+    })
+
+    it("AT_LEAST_ONE_SEP", () => {
+        class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public rule = this.RULE("orRule", () => {
+                let numOfIterations = 0
+                this.AT_LEAST_ONE_SEP(Comma, () => {
+                    this.CONSUME1(OneTok)
+                    this.CONSUME1(TwoTok)
+                    this.CONSUME1(ThreeTok)
+                    numOfIterations++
+                })
+                this.CONSUME2(OneTok)
+                this.CONSUME2(TwoTok)
+                return numOfIterations
+            })
+        }
+
+        let oneIterationParser = new MultiTokenLookAheadForAtLeastOneSepParser([
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+        expect(oneIterationParser.rule()).to.equal(1)
+
+        let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser([
+            new OneTok(), new TwoTok(), new ThreeTok(), new Comma(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+        expect(twoIterationsParser.rule()).to.equal(2)
+
+        let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser([
+            new OneTok(), new TwoTok(), new ThreeTok(), new Comma(),
+            new OneTok(), new TwoTok(), new ThreeTok(), new Comma(),
+            new OneTok(), new TwoTok(), new ThreeTok(),
+            new OneTok(), new TwoTok()])
+        expect(threeIterationsParser.rule()).to.equal(3)
+    })
+})

@@ -1,8 +1,15 @@
 import {RestWalker} from "./rest"
 import {gast} from "./gast_public"
-import {IGrammarPath, ITokenGrammarPath, IRuleGrammarPath} from "./path"
+import {
+    IGrammarPath,
+    ITokenGrammarPath
+} from "./path"
 /* tslint:disable:no-use-before-declare */
-import {cloneArr, isEmpty, map, first as _first} from "../../utils/utils"
+import {
+    cloneArr,
+    isEmpty,
+    first as _first, forEach, drop
+} from "../../utils/utils"
 /* tslint:enable:no-use-before-declare */
 import {tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
@@ -100,140 +107,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
     }
 }
 
-export class NextInsideOptionWalker extends AbstractNextPossibleTokensWalker {
-
-    private nextOptionOccurrence = 0
-
-    constructor(topProd:gast.Rule, protected path:IRuleGrammarPath) {
-        super(topProd, path)
-        this.nextOptionOccurrence = this.path.occurrence
-    }
-
-    walkOption(optionProd:gast.Option, currRest:gast.IProduction[], prevRest:gast.IProduction[]):void {
-        if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
-            let restProd = new gast.Flat(optionProd.definition)
-            this.possibleTokTypes = first(restProd)
-            this.found = true
-        }
-        else {
-            super.walkOption(optionProd, currRest, prevRest)
-        }
-    }
-}
-
-export class NextInsideManyWalker extends AbstractNextPossibleTokensWalker {
-
-    private nextOccurrence = 0
-
-    constructor(topProd:gast.Rule, protected path:IRuleGrammarPath) {
-        super(topProd, path)
-        this.nextOccurrence = this.path.occurrence
-    }
-
-    walkMany(manyProd:gast.Repetition, currRest:gast.IProduction[], prevRest:gast.IProduction[]):void {
-        if (this.isAtEndOfPath && manyProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-            let restProd = new gast.Flat(manyProd.definition)
-            this.possibleTokTypes = first(restProd)
-            this.found = true
-        }
-        else {
-            super.walkMany(manyProd, currRest, prevRest)
-        }
-    }
-}
-
-export class NextInsideManySepWalker extends AbstractNextPossibleTokensWalker {
-
-    private nextOccurrence = 0
-
-    constructor(topProd:gast.Rule, protected path:IRuleGrammarPath) {
-        super(topProd, path)
-        this.nextOccurrence = this.path.occurrence
-    }
-
-    walkManySep(manySepProd:gast.RepetitionWithSeparator, currRest:gast.IProduction[], prevRest:gast.IProduction[]):void {
-        if (this.isAtEndOfPath && manySepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-            let restProd = new gast.Flat(manySepProd.definition)
-            this.possibleTokTypes = first(restProd)
-            this.found = true
-        }
-        else {
-            super.walkManySep(manySepProd, currRest, prevRest)
-        }
-    }
-}
-
-export class NextInsideAtLeastOneWalker extends AbstractNextPossibleTokensWalker {
-
-    private nextOccurrence = 0
-
-    constructor(topProd:gast.Rule, protected path:IRuleGrammarPath) {
-        super(topProd, path)
-        this.nextOccurrence = this.path.occurrence
-    }
-
-    walkAtLeastOne(atLeastOneProd:gast.RepetitionMandatory, currRest:gast.IProduction[], prevRest:gast.IProduction[]):void {
-        if (this.isAtEndOfPath && atLeastOneProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-            let restProd = new gast.Flat(atLeastOneProd.definition)
-            this.possibleTokTypes = first(restProd)
-            this.found = true
-        }
-        else {
-            super.walkAtLeastOne(atLeastOneProd, currRest, prevRest)
-        }
-    }
-}
-
-export class NextInsideAtLeastOneSepWalker extends AbstractNextPossibleTokensWalker {
-
-    private nextOccurrence = 0
-
-    constructor(topProd:gast.Rule, protected path:IRuleGrammarPath) {
-        super(topProd, path)
-        this.nextOccurrence = this.path.occurrence
-    }
-
-    walkAtLeastOneSep(atLeastOneSepProd:gast.RepetitionMandatoryWithSeparator,
-                      currRest:gast.IProduction[],
-                      prevRest:gast.IProduction[]):void {
-        if (this.isAtEndOfPath && atLeastOneSepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-            let restProd = new gast.Flat(atLeastOneSepProd.definition)
-            this.possibleTokTypes = first(restProd)
-            this.found = true
-        }
-        else {
-            super.walkAtLeastOneSep(atLeastOneSepProd, currRest, prevRest)
-        }
-    }
-}
-
 export type AlternativesFirstTokens = Function[][]
-
-export class NextInsideOrWalker extends RestWalker {
-
-    public result:AlternativesFirstTokens = []
-
-    constructor(protected topRule:gast.Rule, protected occurrence:number) {
-        super()
-    }
-
-    startWalking():AlternativesFirstTokens {
-        this.walk(this.topRule)
-        return this.result
-    }
-
-    walkOr(orProd:gast.Alternation, currRest:gast.IProduction[], prevRest:gast.IProduction[]):void {
-        if (orProd.occurrenceInParent === this.occurrence) {
-            this.result = map(orProd.definition, (alt) => {
-                let altWrapper = new gast.Flat([alt])
-                return first(altWrapper)
-            })
-        }
-        else {
-            super.walkOr(orProd, currRest, prevRest)
-        }
-    }
-}
 
 export interface IFirstAfterRepetition {
     token:Function
@@ -332,4 +206,69 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
             super.walkAtLeastOneSep(atleastOneSepProd, currRest, prevRest)
         }
     }
+}
+
+export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number, currPath = []):Function[][] {
+    // avoid side effects
+    currPath = cloneArr(currPath)
+    let result = []
+    let i = 0
+
+    function remainingPathWith(nextDef:gast.IProduction[]) {
+        return nextDef.concat(drop(targetDef, i + 1))
+    }
+
+    function getAlternativesForProd(prod:gast.AbstractProduction) {
+        let alternatives = possiblePathsFrom(remainingPathWith(prod.definition), maxLength, currPath)
+        return result.concat(alternatives)
+    }
+    /**
+     * Mandatory productions will halt the loop as the paths computed from their recursive calls will already contain the
+     * following (rest) of the targetDef.
+     *
+     * For optional productions (Option/Repetition/...) the loop will continue to represent the paths that do not include the
+     * the optional production.
+     */
+    while (currPath.length < maxLength && i < targetDef.length) {
+        let prod = targetDef[i]
+
+        if (prod instanceof gast.Flat) {
+            return getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.NonTerminal) {
+            return getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.Option) {
+            result = getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.RepetitionMandatory) {
+            return getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+            return getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.RepetitionWithSeparator) {
+            result = getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.Repetition) {
+            result = getAlternativesForProd(prod)
+        }
+        else if (prod instanceof gast.Alternation) {
+            forEach(prod.definition, (currAlt) => {
+                result = getAlternativesForProd(currAlt)
+            })
+            return result
+        }
+        else if (prod instanceof gast.Terminal) {
+            currPath.push(prod.terminalType)
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+
+        i++
+    }
+    result.push(currPath)
+
+    return result
 }

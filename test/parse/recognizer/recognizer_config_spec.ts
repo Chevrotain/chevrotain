@@ -2,7 +2,7 @@ import {Parser} from "../../../src/parse/parser_public"
 
 describe("The Recognizer's Configuration", () => {
 
-    it("has a default false value for 'recoveryEnabled' - empty config", () => {
+    it("default config values - empty config", () => {
 
         class EmptyConfigParser extends Parser {
             constructor() {
@@ -11,11 +11,12 @@ describe("The Recognizer's Configuration", () => {
         }
 
         let parser = new EmptyConfigParser()
-        expect(parser.recoveryEnabled).to.be.false
+        expect((<any>parser).recoveryEnabled).to.be.false
+        expect((<any>parser).maxLookahead).to.equal(5)
 
     })
 
-    it("has a default false value for 'recoveryEnabled' - no config", () => {
+    it("default config values - no config", () => {
 
         class NoConfigParser extends Parser {
             constructor() {
@@ -24,7 +25,8 @@ describe("The Recognizer's Configuration", () => {
         }
 
         let parser = new NoConfigParser()
-        expect(parser.recoveryEnabled).to.be.false
+        expect((<any>parser).recoveryEnabled).to.be.false
+        expect((<any>parser).maxLookahead).to.equal(5)
     })
 
 })

@@ -43,10 +43,15 @@ describe("The Grammar Ast first model", () => {
     it("can compute the first for an alternatives production ", () => {
         let altProduction = new Alternation(
             [
-                new Terminal(EntityTok),
-                new Terminal(NamespaceTok),
-                new Terminal(TypeTok)
-
+                new Flat([
+                    new Terminal(EntityTok),
+                ]),
+                new Flat([
+                    new Terminal(NamespaceTok),
+                ]),
+                new Flat([
+                    new Terminal(TypeTok)
+                ])
             ])
         let actual = first(altProduction)
         expect(actual.length).to.equal(3)

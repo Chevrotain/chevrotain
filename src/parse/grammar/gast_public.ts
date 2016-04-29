@@ -74,7 +74,7 @@ export namespace gast {
     }
 
     export class Alternation extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
+        constructor(definition:Flat[], public occurrenceInParent:number = 1) { super(definition) }
     }
 
     export class Terminal implements IProductionWithOccurrence {

@@ -1,4 +1,4 @@
-import {ITokenGrammarPath, IRuleGrammarPath} from "../../../src/parse/grammar/path"
+import {ITokenGrammarPath} from "../../../src/parse/grammar/path"
 import {
     ActionTok,
     actionDec,
@@ -12,36 +12,24 @@ import {
     DotTok,
     CommaTok,
     paramSpec,
-    qualifiedName,
     callArguments,
     actionDecSep,
     atLeastOneRule,
-    EntityTok,
-    UnsignedIntegerLiteralTok,
-    AsteriskTok,
-    cardinality,
-    lotsOfOrs,
-    KeyTok,
     qualifiedNameSep,
-    atLeastOneSepRule,
-    manyActions
+    atLeastOneSepRule
 } from "./samples"
 import {
     NextAfterTokenWalker,
-    NextInsideOptionWalker,
-    NextInsideManyWalker,
-    NextInsideManySepWalker,
-    NextInsideOrWalker,
     NextTerminalAfterAtLeastOneWalker,
     NextTerminalAfterManyWalker,
     NextTerminalAfterManySepWalker,
-    NextInsideAtLeastOneWalker,
-    NextInsideAtLeastOneSepWalker,
-    NextTerminalAfterAtLeastOneSepWalker
+    NextTerminalAfterAtLeastOneSepWalker, possiblePathsFrom
 } from "../../../src/parse/grammar/interpreter"
 import {setEquality} from "../../utils/matchers"
 
 import {gast} from "../../../src/parse/grammar/gast_public"
+import {Token} from "../../../src/scan/tokens_public"
+
 let RepetitionMandatory = gast.RepetitionMandatory
 let Terminal = gast.Terminal
 let Repetition = gast.Repetition
@@ -375,193 +363,6 @@ describe("The Grammar Interpeter namespace", () => {
             expect(() => walker.startWalking()).to.throw("The path does not start with the walker's top Rule!")
         })
     })
-
-
-    describe("The NextInsideOptionWalker", () => {
-        it("can compute the next possible token types inside the OPTION in paramSpec", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["paramSpec"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideOptionWalker(paramSpec, path).startWalking()
-            setEquality(possibleNextTokTypes, [LSquareTok])
-        })
-
-        it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["actionDec", "paramSpec"],
-                occurrenceStack: [1, 1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideOptionWalker(actionDec, path).startWalking()
-            setEquality(possibleNextTokTypes, [LSquareTok])
-        })
-
-        it("can compute the next possible token types inside the OPTION in paramSpec inside ActionDec", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["actionDec"],
-                occurrenceStack: [1],
-                occurrence:      2
-            }
-
-            let possibleNextTokTypes = new NextInsideOptionWalker(actionDec, path).startWalking()
-            setEquality(possibleNextTokTypes, [ColonTok])
-        })
-    })
-
-    describe("The NextInsideManyWalker", () => {
-        it("can compute the next possible token types inside the MANY in QualifiedName", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["qualifiedName"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideManyWalker(qualifiedName, path).startWalking()
-            setEquality(possibleNextTokTypes, [DotTok])
-        })
-
-        it("can compute the next possible token types inside the MANY in paramSpec inside ActionDec", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["actionDec"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideManyWalker(actionDec, path).startWalking()
-            setEquality(possibleNextTokTypes, [CommaTok])
-        })
-
-        it("can compute the next possible token types inside the MANY in paramSpec inside ParamSpec --> QualifiedName", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["paramSpec", "qualifiedName"],
-                occurrenceStack: [1, 1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideManyWalker(paramSpec, path).startWalking()
-            setEquality(possibleNextTokTypes, [DotTok])
-        })
-
-        it("can compute the next possible token types inside the MANY inside: manyActions --> actionDec ", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["manyActions", "actionDec"],
-                occurrenceStack: [1, 1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideManyWalker(manyActions, path).startWalking()
-            setEquality(possibleNextTokTypes, [CommaTok])
-        })
-    })
-
-    describe("The NextInsideManySepWalker", () => {
-        it("can compute the next possible token types inside the MANY_SEP in callArguments", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["callArguments"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideManySepWalker(callArguments, path).startWalking()
-            setEquality(possibleNextTokTypes, [IdentTok])
-        })
-
-        it("can compute the next possible token types inside the MANY_SEP in actionDecSep", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["actionDecSep"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideManySepWalker(actionDecSep, path).startWalking()
-            setEquality(possibleNextTokTypes, [IdentTok])
-        })
-    })
-
-    describe("The NextInsideAtLeastOneWalker", () => {
-        it("can compute the next possible token types inside the AT_LEAST_ONE in callArguments", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["atLeastOneRule"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneWalker(atLeastOneRule, path).startWalking()
-            setEquality(possibleNextTokTypes, [EntityTok])
-        })
-
-        it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["atLeastOneRule"],
-                occurrenceStack: [1],
-                occurrence:      2
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneWalker(atLeastOneRule, path).startWalking()
-            setEquality(possibleNextTokTypes, [EntityTok])
-        })
-
-        it("can compute the next possible token types inside the AT_LEAST_ONE in actionDecSep", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["atLeastOneRule"],
-                occurrenceStack: [1],
-                occurrence:      3
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneWalker(atLeastOneRule, path).startWalking()
-            setEquality(possibleNextTokTypes, [EntityTok])
-        })
-    })
-
-    describe("The NextInsideAtLeastOneSepWalker", () => {
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["atLeastOneSepRule"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(atLeastOneSepRule, path).startWalking()
-            setEquality(possibleNextTokTypes, [EntityTok])
-        })
-
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 2", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["atLeastOneSepRule"],
-                occurrenceStack: [1],
-                occurrence:      2
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(atLeastOneSepRule, path).startWalking()
-            setEquality(possibleNextTokTypes, [EntityTok])
-        })
-
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in atLeastOneSepRule 3", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["atLeastOneSepRule"],
-                occurrenceStack: [1],
-                occurrence:      3
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(atLeastOneSepRule, path).startWalking()
-            setEquality(possibleNextTokTypes, [EntityTok])
-        })
-
-        it("can compute the next possible token types inside the AT_LEAST_ONE_SEP in qualifiedNameSep", () => {
-            let path:IRuleGrammarPath = {
-                ruleStack:       ["qualifiedNameSep"],
-                occurrenceStack: [1],
-                occurrence:      1
-            }
-
-            let possibleNextTokTypes = new NextInsideAtLeastOneSepWalker(qualifiedNameSep, path).startWalking()
-            setEquality(possibleNextTokTypes, [IdentTok])
-        })
-    })
 })
 
 describe("The NextTerminalAfterManyWalker", () => {
@@ -661,19 +462,144 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
     })
 })
 
-describe("The NextInsideOrWalker", () => {
+describe("The chevrotain grammar interpreter capabilities", () => {
 
-    it("can compute the First Tokens for all alternatives of an OR", () => {
-        let result = new NextInsideOrWalker(cardinality, 1).startWalking()
-        expect(result.length).to.equal(2)
-        setEquality(<any>result[0], [UnsignedIntegerLiteralTok])
-        setEquality(<any>result[1], [AsteriskTok])
+    context("can calculate the next possible paths in a", () => {
+
+        class Alpha extends Token {}
+
+        class Beta extends Token {}
+
+        class Gamma extends Token {}
+
+        class Comma extends Token {}
+
+        it("Sequence", () => {
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(seq, 1)).to.deep.equal([[Alpha]])
+            expect(possiblePathsFrom(seq, 2)).to.deep.equal([[Alpha, Beta]])
+            expect(possiblePathsFrom(seq, 3)).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(possiblePathsFrom(seq, 4)).to.deep.equal([[Alpha, Beta, Gamma]])
+        })
+
+        it("Optional", () => {
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.Option([
+                    new gast.Terminal(Beta)
+                ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(seq, 1)).to.deep.equal([[Alpha]])
+            expect(possiblePathsFrom(seq, 2)).to.deep.equal([[Alpha, Beta], [Alpha, Gamma]])
+            expect(possiblePathsFrom(seq, 3)).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
+            expect(possiblePathsFrom(seq, 4)).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
+        })
+
+        it("Alternation", () => {
+            let alts = [new gast.Alternation([
+                new gast.Flat([
+                    new gast.Terminal(Alpha)
+                ]),
+                new gast.Flat([
+                    new gast.Terminal(Beta),
+                    new gast.Terminal(Beta)
+                ]),
+                new gast.Flat([
+                    new gast.Terminal(Beta),
+                    new gast.Terminal(Alpha),
+                    new gast.Terminal(Gamma)
+                ])
+            ])]
+
+            expect(possiblePathsFrom(alts, 1)).to.deep.equal([[Alpha], [Beta], [Beta]])
+            expect(possiblePathsFrom(alts, 2)).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha]])
+            expect(possiblePathsFrom(alts, 3)).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
+            expect(possiblePathsFrom(alts, 4)).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
+        })
+
+        it("Repetition", () => {
+            let rep = [new gast.Repetition([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Alpha)
+            ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(rep, 1)).to.deep.equal([[Alpha], [Gamma]])
+            expect(possiblePathsFrom(rep, 2)).to.deep.equal([[Alpha, Alpha], [Gamma]])
+            expect(possiblePathsFrom(rep, 3)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(possiblePathsFrom(rep, 4)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+        })
+
+        it("Mandatory Repetition", () => {
+            let repMand = [new gast.RepetitionMandatory([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Alpha)
+            ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(repMand, 1)).to.deep.equal([[Alpha]])
+            expect(possiblePathsFrom(repMand, 2)).to.deep.equal([[Alpha, Alpha]])
+            expect(possiblePathsFrom(repMand, 3)).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(possiblePathsFrom(repMand, 4)).to.deep.equal([[Alpha, Alpha, Gamma]])
+        })
+
+        it("Repetition with Separator", () => {
+            // same as Mandatory Repetition because currently possiblePaths only cares about
+            // the first repetition.
+            let rep = [new gast.RepetitionWithSeparator([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Alpha)
+            ], Comma),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(rep, 1)).to.deep.equal([[Alpha], [Gamma]])
+            expect(possiblePathsFrom(rep, 2)).to.deep.equal([[Alpha, Alpha], [Gamma]])
+            expect(possiblePathsFrom(rep, 3)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(possiblePathsFrom(rep, 4)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+        })
+
+        it("Mandatory Repetition with Separator", () => {
+            // same as Mandatory Repetition because currently possiblePaths only cares about
+            // the first repetition.
+            let repMandSep = [new gast.RepetitionMandatoryWithSeparator([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Alpha)
+            ], Comma),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(repMandSep, 1)).to.deep.equal([[Alpha]])
+            expect(possiblePathsFrom(repMandSep, 2)).to.deep.equal([[Alpha, Alpha]])
+            expect(possiblePathsFrom(repMandSep, 3)).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(possiblePathsFrom(repMandSep, 4)).to.deep.equal([[Alpha, Alpha, Gamma]])
+        })
+
+        it("NonTerminal", () => {
+            let someSubRule = new gast.Rule("blah", [
+                new gast.Terminal(Beta)
+            ])
+
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.NonTerminal("blah", someSubRule),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(possiblePathsFrom(seq, 1)).to.deep.equal([[Alpha]])
+            expect(possiblePathsFrom(seq, 2)).to.deep.equal([[Alpha, Beta]])
+            expect(possiblePathsFrom(seq, 3)).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(possiblePathsFrom(seq, 4)).to.deep.equal([[Alpha, Beta, Gamma]])
+        })
     })
 
-    it("can compute the First Tokens for all alternatives of an OR (complex)", () => {
-        let result1 = new NextInsideOrWalker(lotsOfOrs, 1).startWalking()
-        expect(result1.length).to.equal(2)
-        setEquality(<any>result1[0], [CommaTok, KeyTok])
-        setEquality(<any>result1[1], [EntityTok])
-    })
 })
