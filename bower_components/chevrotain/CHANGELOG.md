@@ -1,3 +1,10 @@
+## 0.9.0 (4-29-2016)
+
+#### Major Changes
+- [Support LL(k) grammars.](https://github.com/SAP/chevrotain/issues/184)
+
+
+
 ## 0.8.1 (4-11-2016)
 
 #### Minor Changes

@@ -35,8 +35,7 @@
     "tag": "v3.1.0",
     "commit": "c2cf2674aaab698c336a7ba9c774d8b5b6ae8c5c"
   },
-  "_source": "git://github.com/slevithan/xregexp.git",
+  "_source": "https://github.com/slevithan/xregexp.git",
   "_target": "~3.1.0",
-  "_originalSource": "xregexp",
-  "_direct": true
+  "_originalSource": "xregexp"
 }

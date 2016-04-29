@@ -5,11 +5,10 @@
   "_release": "1.0.0",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.0",
-    "commit": "f3c1476cfac950b186b167843077f2cf7014f080"
+    "tag": "1.0.0",
+    "commit": "1e984b32ca883f6a33110bd0b85aa4431f91f7f9"
   },
-  "_source": "git://github.com/bestiejs/benchmark.js.git",
+  "_source": "https://github.com/bestiejs/benchmark.js.git",
   "_target": "~1.0.0",
-  "_originalSource": "benchmark",
-  "_direct": true
+  "_originalSource": "benchmark"
 }

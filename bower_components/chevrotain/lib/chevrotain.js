@@ -1,4 +1,4 @@
-/*! chevrotain - v0.8.1 */
+/*! chevrotain - v0.9.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -61,14 +61,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var tokens_public_1 = __webpack_require__(10);
 	var exceptions_public_1 = __webpack_require__(5);
 	var gast_public_1 = __webpack_require__(7);
-	var cache_public_1 = __webpack_require__(21);
+	var cache_public_1 = __webpack_require__(22);
 	/**
 	 * defines the public API of
 	 * changes here may require major version change. (semVer)
 	 */
 	var API = {};
 	// semantic version
-	API.VERSION = "0.8.1";
+	API.VERSION = "0.9.0";
 	// runtime API
 	API.Parser = parser_public_1.Parser;
 	API.ParserDefinitionErrorType = parser_public_1.ParserDefinitionErrorType;
@@ -120,7 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var follow_1 = __webpack_require__(14);
 	var tokens_public_1 = __webpack_require__(10);
 	var lookahead_1 = __webpack_require__(17);
-	var gast_builder_1 = __webpack_require__(19);
+	var gast_builder_1 = __webpack_require__(20);
 	var interpreter_1 = __webpack_require__(18);
 	var constants_1 = __webpack_require__(16);
 	var gast_1 = __webpack_require__(9);
@@ -135,7 +135,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(exports.ParserDefinitionErrorType || (exports.ParserDefinitionErrorType = {}));
 	var ParserDefinitionErrorType = exports.ParserDefinitionErrorType;
 	var DEFAULT_PARSER_CONFIG = Object.freeze({
-	    recoveryEnabled: false
+	    recoveryEnabled: false,
+	    maxLookahead: 5
 	});
 	var DEFAULT_RULE_CONFIG = Object.freeze({
 	    recoveryValueFunc: function () { return undefined; },
@@ -209,7 +210,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        this._productions = new lang_extensions_1.HashTable();
 	        this._input = input;
+	        // configuration
 	        this.recoveryEnabled = utils_1.has(config, "recoveryEnabled") ? config.recoveryEnabled : DEFAULT_PARSER_CONFIG.recoveryEnabled;
+	        this.maxLookahead = utils_1.has(config, "maxLookahead") ? config.maxLookahead : DEFAULT_PARSER_CONFIG.maxLookahead;
 	        this.className = lang_extensions_1.classNameFromInstance(this);
 	        this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className);
 	        this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className);
@@ -351,7 +354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var condition = classLAFuncs.get(ruleName);
 	        if (condition === undefined) {
 	            var ruleGrammar = this.getGAstProductions().get(ruleName);
-	            condition = lookahead_1.buildLookaheadForTopLevel(ruleGrammar);
+	            condition = lookahead_1.buildLookaheadForTopLevel(ruleGrammar, this.maxLookahead);
 	            classLAFuncs.put(ruleName, condition);
 	        }
 	        return condition.call(this);
@@ -744,7 +747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Parsing DSL method, that indicates a repetition of zero or more with a separator
 	     * Token between the repetitions.
 	     *
-	     * note that the 'action' param is optional. so both of the following forms are valid:
+	     * Note that the 'action' param is optional. so both of the following forms are valid:
 	     *
 	     * short: this.MANY_SEP(Comma, ()=>{
 	     *                          this.CONSUME(Number};
@@ -756,9 +759,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     *                       ...
 	     *                       );
 	     *
-	     * using the short form is recommended as it will compute the lookahead function
-	     * (for the first iteration) automatically. however this currently has one limitation:
-	     * It only works if the lookahead for the grammar is one.
+	     * Using the short form is recommended as it will compute the lookahead function automatically.
+	     *
+	     * Note that for the purposes of deciding on whether  or not another iteration exists
+	     * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
+	     * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
+	     * to implement it.
+	     *
 	     *
 	     * As in CONSUME the index in the method name indicates the occurrence
 	     * of the repetition production in it's top rule.
@@ -1285,7 +1292,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            throw this.raiseEarlyExitException(prodOccurrence, interpreter_1.NextInsideAtLeastOneWalker, userDefinedErrMsg);
+	            throw this.raiseEarlyExitException(prodOccurrence, lookahead_1.PROD_TYPE.REPETITION_MANDATORY, userDefinedErrMsg);
 	        }
 	        // note that while it may seem that this can cause an error because by using a recursive call to
 	        // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
@@ -1319,7 +1326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            throw this.raiseEarlyExitException(prodOccurrence, interpreter_1.NextInsideAtLeastOneSepWalker, userDefinedErrMsg);
+	            throw this.raiseEarlyExitException(prodOccurrence, lookahead_1.PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, userDefinedErrMsg);
 	        }
 	        return separatorsResult;
 	    };
@@ -1462,35 +1469,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Automatic lookahead calculation
 	    Parser.prototype.getLookaheadFuncForOption = function (occurence) {
 	        var key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurence);
-	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForOption);
+	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForOption, this.maxLookahead);
 	    };
 	    Parser.prototype.getLookaheadFuncForOr = function (occurence, ignoreErrors) {
 	        var key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurence);
-	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForOr, [ignoreErrors]);
+	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadFuncForOr, this.maxLookahead, [ignoreErrors]);
 	    };
 	    Parser.prototype.getLookaheadFuncForMany = function (occurence) {
 	        var key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence);
-	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForMany);
+	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForMany, this.maxLookahead);
 	    };
 	    Parser.prototype.getLookaheadFuncForManySep = function (occurence) {
 	        var key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurence);
-	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForManySep);
+	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForManySep, this.maxLookahead);
 	    };
 	    Parser.prototype.getLookaheadFuncForAtLeastOne = function (occurence) {
 	        var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence);
-	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForAtLeastOne);
+	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForAtLeastOne, this.maxLookahead);
 	    };
 	    Parser.prototype.getLookaheadFuncForAtLeastOneSep = function (occurence) {
 	        var key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurence);
-	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForAtLeastOneSep);
+	        return this.getLookaheadFuncFor(key, occurence, lookahead_1.buildLookaheadForAtLeastOneSep, this.maxLookahead);
 	    };
-	    Parser.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, extraArgs) {
+	    Parser.prototype.getLookaheadFuncFor = function (key, occurrence, laFuncBuilder, maxLookahead, extraArgs) {
 	        if (extraArgs === void 0) { extraArgs = []; }
 	        var ruleName = utils_1.last(this.RULE_STACK);
 	        var condition = this.classLAFuncs.get(key);
 	        if (condition === undefined) {
 	            var ruleGrammar = this.getGAstProductions().get(ruleName);
-	            condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar].concat(extraArgs));
+	            condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead].concat(extraArgs));
 	            this.classLAFuncs.put(key, condition);
 	        }
 	        return condition;
@@ -1510,32 +1517,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.inputIdx = newState.inputIdx;
 	        this.RULE_STACK = newState.RULE_STACK;
 	    };
+	    // TODO: consider caching the error message computed information
 	    Parser.prototype.raiseNoAltException = function (occurrence, errMsgTypes) {
 	        var errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'";
 	        if (errMsgTypes === undefined) {
 	            var ruleName = utils_1.last(this.RULE_STACK);
 	            var ruleGrammar = this.getGAstProductions().get(ruleName);
-	            var nextTokens = new interpreter_1.NextInsideOrWalker(ruleGrammar, occurrence).startWalking();
-	            var nextTokensFlat = utils_1.flatten(nextTokens);
-	            var nextTokensNames = utils_1.map(nextTokensFlat, function (currTokenClass) { return tokens_public_1.tokenLabel(currTokenClass); });
-	            errMsgTypes = "one of: <" + nextTokensNames.join(" ,") + ">";
+	            var lookAheadPathsPerAlternative = lookahead_1.getLookaheadPathsForOr(occurrence, ruleGrammar, this.maxLookahead);
+	            var allLookAheadPaths = utils_1.reduce(lookAheadPathsPerAlternative, function (result, currAltPaths) { return result.concat(currAltPaths); }, []);
+	            var nextValidTokenSequences = utils_1.map(allLookAheadPaths, function (currPath) {
+	                return ("[" + utils_1.map(currPath, function (currTokenClass) { return tokens_public_1.tokenLabel(currTokenClass); }).join(",") + "]");
+	            });
+	            errMsgTypes = "one of these possible Token sequences:\n  <" + nextValidTokenSequences.join(" ,") + ">";
 	        }
 	        throw this.SAVE_ERROR(new exceptions_public_1.exceptions.NoViableAltException("Expecting: " + errMsgTypes + " " + errSuffix, this.NEXT_TOKEN()));
 	    };
-	    Parser.prototype.raiseEarlyExitException = function (occurrence, nextWalkerConstructor, userDefinedErrMsg) {
+	    // TODO: consider caching the error message computed information
+	    Parser.prototype.raiseEarlyExitException = function (occurrence, prodType, userDefinedErrMsg) {
 	        var errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'";
 	        if (userDefinedErrMsg === undefined) {
 	            var ruleName = utils_1.last(this.RULE_STACK);
 	            var ruleGrammar = this.getGAstProductions().get(ruleName);
-	            var grammarPath = {
-	                ruleStack: this.RULE_STACK,
-	                occurrenceStack: this.RULE_OCCURRENCE_STACK,
-	                occurrence: occurrence
-	            };
-	            var nextTokens = new nextWalkerConstructor(ruleGrammar, grammarPath).startWalking();
-	            var nextTokensFlat = utils_1.flatten(nextTokens);
-	            var nextTokensNames = utils_1.map(nextTokensFlat, function (currTokenClass) { return tokens_public_1.tokenLabel(currTokenClass); });
-	            userDefinedErrMsg = "expecting at least one iteration which starts with one of: <" + nextTokensNames.join(" ,") + ">";
+	            var lookAheadPathsPerAlternative = lookahead_1.getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, this.maxLookahead);
+	            var insideProdPaths = lookAheadPathsPerAlternative[0];
+	            var nextValidTokenSequences = utils_1.map(insideProdPaths, function (currPath) {
+	                return ("[" + utils_1.map(currPath, function (currTokenClass) { return tokens_public_1.tokenLabel(currTokenClass); }).join(",") + "]");
+	            });
+	            userDefinedErrMsg = "expecting at least one iteration which starts with one of these possible Token sequences::\n  " +
+	                ("<" + nextValidTokenSequences.join(" ,") + ">");
 	        }
 	        else {
 	            userDefinedErrMsg = "Expecting at least one " + userDefinedErrMsg;
@@ -1889,7 +1898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var vals = Array.isArray(arrOrObj) ? arrOrObj : values(arrOrObj);
 	    var accumulator = initial;
 	    for (var i = 0; i < vals.length; i++) {
-	        accumulator = iterator.call(null, accumulator, vals[i]);
+	        accumulator = iterator.call(null, accumulator, vals[i], i);
 	    }
 	    return accumulator;
 	}
@@ -1937,7 +1946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isObject = isObject;
 	function every(arr, predicate) {
 	    for (var i = 0; i < arr.length; i++) {
-	        if (!predicate(arr[i])) {
+	        if (!predicate(arr[i], i)) {
 	            return false;
 	        }
 	    }
@@ -3738,144 +3747,299 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var gast_public_1 = __webpack_require__(7);
-	var first_1 = __webpack_require__(13);
-	var interpreter_1 = __webpack_require__(18);
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) /* istanbul ignore next */  if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    /* istanbul ignore next */  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 	var utils_1 = __webpack_require__(4);
-	var tokens_public_1 = __webpack_require__(10);
-	function buildLookaheadForTopLevel(rule) {
-	    var restProd = new gast_public_1.gast.Flat(rule.definition);
-	    var possibleTokTypes = first_1.first(restProd);
-	    return getSimpleLookahead(possibleTokTypes);
+	var gast_public_1 = __webpack_require__(7);
+	var interpreter_1 = __webpack_require__(18);
+	var rest_1 = __webpack_require__(15);
+	var ambiguities_1 = __webpack_require__(19);
+	(function (PROD_TYPE) {
+	    PROD_TYPE[PROD_TYPE["OPTION"] = 0] = "OPTION";
+	    PROD_TYPE[PROD_TYPE["REPETITION"] = 1] = "REPETITION";
+	    PROD_TYPE[PROD_TYPE["REPETITION_MANDATORY"] = 2] = "REPETITION_MANDATORY";
+	    PROD_TYPE[PROD_TYPE["REPETITION_MANDATORY_WITH_SEPARATOR"] = 3] = "REPETITION_MANDATORY_WITH_SEPARATOR";
+	    PROD_TYPE[PROD_TYPE["REPETITION_WITH_SEPARATOR"] = 4] = "REPETITION_WITH_SEPARATOR";
+	    PROD_TYPE[PROD_TYPE["ALTERNATION"] = 5] = "ALTERNATION";
+	})(exports.PROD_TYPE || (exports.PROD_TYPE = {}));
+	var PROD_TYPE = exports.PROD_TYPE;
+	function buildLookaheadFuncForOr(occurrence, ruleGrammar, k, ignoreAmbiguities) {
+	    if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
+	    var lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k);
+	    if (!ignoreAmbiguities) {
+	        ambiguities_1.checkForOrAmbiguities(lookAheadPaths, occurrence, ruleGrammar.name);
+	    }
+	    return buildAlternativesLookAheadFunc(lookAheadPaths);
+	}
+	exports.buildLookaheadFuncForOr = buildLookaheadFuncForOr;
+	function buildLookaheadForTopLevel(rule, k) {
+	    var paths = interpreter_1.possiblePathsFrom(rule.definition, k);
+	    var lookAheadPaths = lookAheadSequenceFromAlternatives([paths]);
+	    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0]);
 	}
 	exports.buildLookaheadForTopLevel = buildLookaheadForTopLevel;
-	function buildLookaheadForOption(optionOccurrence, ruleGrammar) {
-	    return buildLookAheadForGrammarProd(interpreter_1.NextInsideOptionWalker, optionOccurrence, ruleGrammar);
+	/**
+	 *  When dealing with an Optional production (OPTION/MANY/2nd iteration of AT_LEAST_ONE/...) we need to compare
+	 *  the lookahead "inside" the production and the lookahead immediately "after" it in the same top level rule (context free).
+	 *
+	 *  Example: given a production:
+	 *  ABC(DE)?DF
+	 *
+	 *  The optional '(DE)?' should only be entered if we see 'DE'. a single Token 'D' is not sufficient to distinguish between the two
+	 *  alternatives.
+	 *
+	 *  @returns A Lookahead function which will return true IFF the parser should parse the Optional production.
+	 */
+	function buildLookaheadFuncForOptionalProd(occurrence, ruleGrammar, prodType, k) {
+	    var lookAheadPaths = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k);
+	    // TODO: ambiguity checks may go here?
+	    // we only need the lookaheadPaths from the "insideDef" to build the actual lookahead function.
+	    // the alternative of NOT taking the optional path is always valid and requires no lookahead.
+	    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0]);
+	}
+	exports.buildLookaheadFuncForOptionalProd = buildLookaheadFuncForOptionalProd;
+	function buildLookaheadForOption(optionOccurrence, ruleGrammar, k) {
+	    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.OPTION, k);
 	}
 	exports.buildLookaheadForOption = buildLookaheadForOption;
-	function buildLookaheadForMany(manyOccurrence, ruleGrammar) {
-	    return buildLookAheadForGrammarProd(interpreter_1.NextInsideManyWalker, manyOccurrence, ruleGrammar);
+	function buildLookaheadForMany(optionOccurrence, ruleGrammar, k) {
+	    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION, k);
 	}
 	exports.buildLookaheadForMany = buildLookaheadForMany;
-	function buildLookaheadForManySep(manyOccurrence, ruleGrammar) {
-	    return buildLookAheadForGrammarProd(interpreter_1.NextInsideManySepWalker, manyOccurrence, ruleGrammar);
+	function buildLookaheadForManySep(optionOccurrence, ruleGrammar, k) {
+	    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION_WITH_SEPARATOR, k);
 	}
 	exports.buildLookaheadForManySep = buildLookaheadForManySep;
-	function buildLookaheadForAtLeastOne(manyOccurrence, ruleGrammar) {
-	    return buildLookAheadForGrammarProd(interpreter_1.NextInsideAtLeastOneWalker, manyOccurrence, ruleGrammar);
+	function buildLookaheadForAtLeastOne(optionOccurrence, ruleGrammar, k) {
+	    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION_MANDATORY, k);
 	}
 	exports.buildLookaheadForAtLeastOne = buildLookaheadForAtLeastOne;
-	function buildLookaheadForAtLeastOneSep(manyOccurrence, ruleGrammar) {
-	    return buildLookAheadForGrammarProd(interpreter_1.NextInsideAtLeastOneSepWalker, manyOccurrence, ruleGrammar);
+	function buildLookaheadForAtLeastOneSep(optionOccurrence, ruleGrammar, k) {
+	    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, k);
 	}
 	exports.buildLookaheadForAtLeastOneSep = buildLookaheadForAtLeastOneSep;
-	function buildLookaheadForOr(orOccurrence, ruleGrammar, ignoreAmbiguities) {
-	    if (ignoreAmbiguities === void 0) { ignoreAmbiguities = false; }
-	    var alternativesTokens = new interpreter_1.NextInsideOrWalker(ruleGrammar, orOccurrence).startWalking();
-	    if (!ignoreAmbiguities) {
-	        checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar);
-	    }
-	    var hasLastAnEmptyAlt = utils_1.isEmpty(utils_1.last(alternativesTokens));
-	    if (hasLastAnEmptyAlt) {
-	        var lastIdx_1 = alternativesTokens.length - 1;
-	        /**
-	         * This will return the Index of the alternative to take or the <lastidx> if only the empty alternative matched
-	         */
-	        return function chooseAlternativeWithEmptyAlt() {
-	            var nextToken = this.NEXT_TOKEN();
-	            // checking only until length - 1 because there is nothing to check in an empty alternative, it is always valid
-	            for (var i = 0; i < lastIdx_1; i++) {
-	                var currAltTokens = alternativesTokens[i];
-	                // 'for' loop for performance reasons.
-	                for (var j = 0; j < currAltTokens.length; j++) {
-	                    if (nextToken instanceof currAltTokens[j]) {
-	                        return i;
-	                    }
-	                }
-	            }
-	            // an OR(alternation) with an empty alternative will always match
-	            return lastIdx_1;
-	        };
-	    }
-	    else {
-	        /**
-	         * This will return the Index of the alternative to take or -1 if none of the alternatives match
-	         */
-	        return function chooseAlternative() {
-	            var nextToken = this.NEXT_TOKEN();
-	            for (var i = 0; i < alternativesTokens.length; i++) {
-	                var currAltTokens = alternativesTokens[i];
-	                // 'for' loop for performance reasons.
-	                for (var j = 0; j < currAltTokens.length; j++) {
-	                    if (nextToken instanceof currAltTokens[j]) {
-	                        return i;
-	                    }
-	                }
-	            }
-	            return -1;
-	        };
-	    }
-	}
-	exports.buildLookaheadForOr = buildLookaheadForOr;
-	function checkForOrAmbiguities(alternativesTokens, orOccurrence, ruleGrammar) {
-	    var altsAmbiguityErrors = checkAlternativesAmbiguities(alternativesTokens);
-	    if (!utils_1.isEmpty(altsAmbiguityErrors)) {
-	        var errorMessages = utils_1.map(altsAmbiguityErrors, function (currAmbiguity) {
-	            return ("Ambiguous alternatives: <" + currAmbiguity.alts.join(" ,") + "> in <OR" + orOccurrence + "> inside <" + ruleGrammar.name + "> ") +
-	                ("Rule, <" + tokens_public_1.tokenName(currAmbiguity.token) + "> may appears as the first Terminal in all these alternatives.\n");
-	        });
-	        throw new Error(errorMessages.join("\n ---------------- \n") +
-	            "To Resolve this, either: \n" +
-	            "1. refactor your grammar to be LL(1)\n" +
-	            "2. provide explicit lookahead functions in the form {WHEN:laFunc, THEN_DO:...}\n" +
-	            "3. Add ignore arg to this OR Production:\n" +
-	            "OR([], 'msg', recognizer.IGNORE_AMBIGUITIES)\n" +
-	            "In that case the parser will always pick the first alternative that" +
-	            " matches and ignore all the others");
-	    }
-	}
-	exports.checkForOrAmbiguities = checkForOrAmbiguities;
-	function checkAlternativesAmbiguities(alternativesTokens) {
-	    var allTokensFlat = utils_1.flatten(alternativesTokens);
-	    var uniqueTokensFlat = utils_1.uniq(allTokensFlat);
-	    var tokensToAltsIndicesItAppearsIn = utils_1.map(uniqueTokensFlat, function (seekToken) {
-	        var altsCurrTokenAppearsIn = utils_1.pick(alternativesTokens, function (altToLookIn) {
-	            return utils_1.find(altToLookIn, function (currToken) {
-	                return currToken === seekToken;
+	/**
+	 * @param alternatives - a Sequence of possible paths for each alternative. example:
+	 *                       input:
+	 *                       [
+	 *                         [[A, B] [B]],  // alternative 1, with 2 paths
+	 *                         [[C]]            // alternative 2, with 1 Path
+	 *                         [[C, D, E], [C, D, F]] // // alternative 3, with 2 Path
+	 *                       ]
+	 *
+	 *                       output:
+	 *                       [
+	 *                         [[A] [B]],  // one Token is enough to identify alternative 1 so [A, B] --> [A]
+	 *                         [[C]]       // no changes for alternative 2
+	 *                         [[C, D]] // // the third Tokens (E/F) are not needed to identify this alternative
+	 *                       ]
+	 */
+	function lookAheadSequenceFromAlternatives(alternatives) {
+	    function isUniquePrefix(arr, item) {
+	        return utils_1.find(arr, function (currOtherPath) {
+	            return utils_1.every(item, function (currPathTok, idx) {
+	                return currPathTok === currOtherPath[idx];
 	            });
-	        });
-	        var altsIndicesTokenAppearsIn = utils_1.map(utils_1.keys(altsCurrTokenAppearsIn), function (index) {
-	            return parseInt(index, 10) + 1;
-	        });
-	        return { token: seekToken, alts: altsIndicesTokenAppearsIn };
+	        }) === undefined;
+	    }
+	    var result = utils_1.map(alternatives, function (currAlt, currIdx) {
+	        var otherAlts = utils_1.reject(alternatives, function (curAltInner) { return curAltInner === currAlt; });
+	        var allOtherPaths = utils_1.reduce(otherAlts, function (result, currOtherAlt) {
+	            return result.concat(currOtherAlt);
+	        }, []);
+	        return utils_1.reduce(currAlt, function (currAltResult, currPath) {
+	            var minimalPath = [];
+	            for (var i = 0; i < currPath.length; i++) {
+	                minimalPath.push(currPath[i]);
+	                var isUnique = isUniquePrefix(allOtherPaths, minimalPath);
+	                if (isUnique) {
+	                    break;
+	                }
+	            }
+	            // At this point we either have a distinguishing path (unique) or a path the may be ambiguous
+	            // If it is a identical to a path from another alternative it is ambiguous, but if it is a strict prefix of a path from another
+	            // alternative than its ambiguous nature depends on the order of alternatives.
+	            if (!containsPath(currAltResult, minimalPath)) {
+	                // found one minimal path to distinguish this alternative.
+	                currAltResult.push(minimalPath);
+	                return currAltResult;
+	            }
+	            return currAltResult;
+	        }, []);
 	    });
-	    var tokensToAltsIndicesWithAmbiguity = utils_1.filter(tokensToAltsIndicesItAppearsIn, function (tokAndAltsItAppearsIn) {
-	        return tokAndAltsItAppearsIn.alts.length > 1;
-	    });
-	    return tokensToAltsIndicesWithAmbiguity;
+	    return result;
 	}
-	exports.checkAlternativesAmbiguities = checkAlternativesAmbiguities;
-	function buildLookAheadForGrammarProd(prodWalkerConstructor, ruleOccurrence, ruleGrammar) {
-	    var path = {
-	        ruleStack: [ruleGrammar.name],
-	        occurrenceStack: [1],
-	        occurrence: ruleOccurrence
-	    };
-	    var walker = new prodWalkerConstructor(ruleGrammar, path);
-	    var possibleNextTokTypes = walker.startWalking();
-	    return getSimpleLookahead(possibleNextTokTypes);
-	}
-	function getSimpleLookahead(possibleNextTokTypes) {
+	exports.lookAheadSequenceFromAlternatives = lookAheadSequenceFromAlternatives;
+	function buildAlternativesLookAheadFunc(alts) {
+	    // TODO: performance optimizations for the (common) edge case of K == 1
+	    var numOfAlts = alts.length;
+	    /**
+	     * @returns {number} - The chosen alternative index
+	     */
 	    return function () {
-	        var nextToken = this.NEXT_TOKEN();
-	        for (var j = 0; j < possibleNextTokTypes.length; j++) {
-	            if (nextToken instanceof possibleNextTokTypes[j]) {
-	                return true;
+	        for (var t = 0; t < numOfAlts; t++) {
+	            var currAlt = alts[t];
+	            var currNumOfPaths = currAlt.length;
+	            nextPath: for (var j = 0; j < currNumOfPaths; j++) {
+	                var currPath = currAlt[j];
+	                var currPathLength = currPath.length;
+	                for (var i = 0; i < currPathLength; i++) {
+	                    var nextToken = this.LA(i + 1);
+	                    if (!(nextToken instanceof currPath[i])) {
+	                        // mismatch in current path
+	                        // try the next pth
+	                        continue nextPath;
+	                    }
+	                }
+	                // found a full path that matches.
+	                // this will also work for an empty ALT as the loop will be skipped
+	                return t;
 	            }
 	        }
+	        // none of the alternatives could be matched
+	        return -1;
+	    };
+	}
+	exports.buildAlternativesLookAheadFunc = buildAlternativesLookAheadFunc;
+	function buildSingleAlternativeLookaheadFunction(alt) {
+	    // TODO: performance optimizations for the (common) edge case of K == 1
+	    var numOfPaths = alt.length;
+	    return function () {
+	        nextPath: for (var j = 0; j < numOfPaths; j++) {
+	            var currPath = alt[j];
+	            var currPathLength = currPath.length;
+	            for (var i = 0; i < currPathLength; i++) {
+	                var nextToken = this.LA(i + 1);
+	                if (!(nextToken instanceof currPath[i])) {
+	                    // mismatch in current path
+	                    // try the next pth
+	                    continue nextPath;
+	                }
+	            }
+	            // found a full path that matches.
+	            return true;
+	        }
+	        // none of the paths matched
 	        return false;
 	    };
 	}
+	exports.buildSingleAlternativeLookaheadFunction = buildSingleAlternativeLookaheadFunction;
+	var RestDefinitionFinderWalker = (function (_super) {
+	    __extends(RestDefinitionFinderWalker, _super);
+	    function RestDefinitionFinderWalker(topProd, targetOccurrence, targetProdType) {
+	        _super.call(this);
+	        this.topProd = topProd;
+	        this.targetOccurrence = targetOccurrence;
+	        this.targetProdType = targetProdType;
+	    }
+	    RestDefinitionFinderWalker.prototype.startWalking = function () {
+	        this.walk(this.topProd);
+	        return this.restDef;
+	    };
+	    RestDefinitionFinderWalker.prototype.checkIsTarget = function (node, expectedProdType, currRest, prevRest) {
+	        if (node.occurrenceInParent === this.targetOccurrence &&
+	            this.targetProdType === expectedProdType) {
+	            this.restDef = currRest.concat(prevRest);
+	            return true;
+	        }
+	        // performance optimization, do not iterate over the entire Grammar ast after we have found the target
+	        return false;
+	    };
+	    RestDefinitionFinderWalker.prototype.walkOption = function (optionProd, currRest, prevRest) {
+	        if (!this.checkIsTarget(optionProd, PROD_TYPE.OPTION, currRest, prevRest)) {
+	            _super.prototype.walkOption.call(this, optionProd, currRest, prevRest);
+	        }
+	    };
+	    RestDefinitionFinderWalker.prototype.walkAtLeastOne = function (atLeastOneProd, currRest, prevRest) {
+	        if (!this.checkIsTarget(atLeastOneProd, PROD_TYPE.REPETITION_MANDATORY, currRest, prevRest)) {
+	            _super.prototype.walkOption.call(this, atLeastOneProd, currRest, prevRest);
+	        }
+	    };
+	    RestDefinitionFinderWalker.prototype.walkAtLeastOneSep = function (atLeastOneSepProd, currRest, prevRest) {
+	        if (!this.checkIsTarget(atLeastOneSepProd, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, currRest, prevRest)) {
+	            _super.prototype.walkOption.call(this, atLeastOneSepProd, currRest, prevRest);
+	        }
+	    };
+	    RestDefinitionFinderWalker.prototype.walkMany = function (manyProd, currRest, prevRest) {
+	        if (!this.checkIsTarget(manyProd, PROD_TYPE.REPETITION, currRest, prevRest)) {
+	            _super.prototype.walkOption.call(this, manyProd, currRest, prevRest);
+	        }
+	    };
+	    RestDefinitionFinderWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
+	        if (!this.checkIsTarget(manySepProd, PROD_TYPE.REPETITION_WITH_SEPARATOR, currRest, prevRest)) {
+	            _super.prototype.walkOption.call(this, manySepProd, currRest, prevRest);
+	        }
+	    };
+	    return RestDefinitionFinderWalker;
+	}(rest_1.RestWalker));
+	/**
+	 * Returns the definition of a target production in a top level level rule.
+	 */
+	var InsideDefinitionFinderVisitor = (function (_super) {
+	    __extends(InsideDefinitionFinderVisitor, _super);
+	    function InsideDefinitionFinderVisitor(targetOccurrence, targetProdType) {
+	        _super.call(this);
+	        this.targetOccurrence = targetOccurrence;
+	        this.targetProdType = targetProdType;
+	        this.result = [];
+	    }
+	    InsideDefinitionFinderVisitor.prototype.checkIsTarget = function (node, expectedProdName) {
+	        if (node.occurrenceInParent === this.targetOccurrence &&
+	            this.targetProdType === expectedProdName) {
+	            this.result = node.definition;
+	        }
+	    };
+	    InsideDefinitionFinderVisitor.prototype.visitOption = function (node) {
+	        this.checkIsTarget(node, PROD_TYPE.OPTION);
+	    };
+	    InsideDefinitionFinderVisitor.prototype.visitRepetition = function (node) {
+	        this.checkIsTarget(node, PROD_TYPE.REPETITION);
+	    };
+	    InsideDefinitionFinderVisitor.prototype.visitRepetitionMandatory = function (node) {
+	        this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY);
+	    };
+	    InsideDefinitionFinderVisitor.prototype.visitRepetitionMandatoryWithSeparator = function (node) {
+	        this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR);
+	    };
+	    InsideDefinitionFinderVisitor.prototype.visitRepetitionWithSeparator = function (node) {
+	        this.checkIsTarget(node, PROD_TYPE.REPETITION_WITH_SEPARATOR);
+	    };
+	    InsideDefinitionFinderVisitor.prototype.visitAlternation = function (node) {
+	        this.checkIsTarget(node, PROD_TYPE.ALTERNATION);
+	    };
+	    return InsideDefinitionFinderVisitor;
+	}(gast_public_1.gast.GAstVisitor));
+	function getLookaheadPathsForOr(occurrence, ruleGrammar, k) {
+	    var visitor = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION);
+	    ruleGrammar.accept(visitor);
+	    var alternatives = utils_1.map(visitor.result, function (currAlt) { return interpreter_1.possiblePathsFrom([currAlt], k); });
+	    return lookAheadSequenceFromAlternatives(alternatives);
+	}
+	exports.getLookaheadPathsForOr = getLookaheadPathsForOr;
+	function getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k) {
+	    var insideDefVisitor = new InsideDefinitionFinderVisitor(occurrence, prodType);
+	    ruleGrammar.accept(insideDefVisitor);
+	    var insideDef = insideDefVisitor.result;
+	    var afterDefWalker = new RestDefinitionFinderWalker(ruleGrammar, occurrence, prodType);
+	    var afterDef = afterDefWalker.startWalking();
+	    var insidePaths = interpreter_1.possiblePathsFrom(insideDef, k);
+	    var afterPaths = interpreter_1.possiblePathsFrom(afterDef, k);
+	    return lookAheadSequenceFromAlternatives([insidePaths, afterPaths]);
+	}
+	exports.getLookaheadPathsForOptionalProd = getLookaheadPathsForOptionalProd;
+	function containsPath(alternative, path) {
+	    var found = utils_1.find(alternative, function (otherPath) {
+	        return path.length === otherPath.length &&
+	            utils_1.every(path, function (targetItem, idx) {
+	                return targetItem === otherPath[idx];
+	            });
+	    });
+	    return found !== undefined;
+	}
+	exports.containsPath = containsPath;
 
 
 /***/ },
@@ -3977,137 +4141,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return NextAfterTokenWalker;
 	}(AbstractNextPossibleTokensWalker));
 	exports.NextAfterTokenWalker = NextAfterTokenWalker;
-	var NextInsideOptionWalker = (function (_super) {
-	    __extends(NextInsideOptionWalker, _super);
-	    function NextInsideOptionWalker(topProd, path) {
-	        _super.call(this, topProd, path);
-	        this.path = path;
-	        this.nextOptionOccurrence = 0;
-	        this.nextOptionOccurrence = this.path.occurrence;
-	    }
-	    NextInsideOptionWalker.prototype.walkOption = function (optionProd, currRest, prevRest) {
-	        if (this.isAtEndOfPath && optionProd.occurrenceInParent === this.nextOptionOccurrence && !(this.found)) {
-	            var restProd = new gast_public_1.gast.Flat(optionProd.definition);
-	            this.possibleTokTypes = first_1.first(restProd);
-	            this.found = true;
-	        }
-	        else {
-	            _super.prototype.walkOption.call(this, optionProd, currRest, prevRest);
-	        }
-	    };
-	    return NextInsideOptionWalker;
-	}(AbstractNextPossibleTokensWalker));
-	exports.NextInsideOptionWalker = NextInsideOptionWalker;
-	var NextInsideManyWalker = (function (_super) {
-	    __extends(NextInsideManyWalker, _super);
-	    function NextInsideManyWalker(topProd, path) {
-	        _super.call(this, topProd, path);
-	        this.path = path;
-	        this.nextOccurrence = 0;
-	        this.nextOccurrence = this.path.occurrence;
-	    }
-	    NextInsideManyWalker.prototype.walkMany = function (manyProd, currRest, prevRest) {
-	        if (this.isAtEndOfPath && manyProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-	            var restProd = new gast_public_1.gast.Flat(manyProd.definition);
-	            this.possibleTokTypes = first_1.first(restProd);
-	            this.found = true;
-	        }
-	        else {
-	            _super.prototype.walkMany.call(this, manyProd, currRest, prevRest);
-	        }
-	    };
-	    return NextInsideManyWalker;
-	}(AbstractNextPossibleTokensWalker));
-	exports.NextInsideManyWalker = NextInsideManyWalker;
-	var NextInsideManySepWalker = (function (_super) {
-	    __extends(NextInsideManySepWalker, _super);
-	    function NextInsideManySepWalker(topProd, path) {
-	        _super.call(this, topProd, path);
-	        this.path = path;
-	        this.nextOccurrence = 0;
-	        this.nextOccurrence = this.path.occurrence;
-	    }
-	    NextInsideManySepWalker.prototype.walkManySep = function (manySepProd, currRest, prevRest) {
-	        if (this.isAtEndOfPath && manySepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-	            var restProd = new gast_public_1.gast.Flat(manySepProd.definition);
-	            this.possibleTokTypes = first_1.first(restProd);
-	            this.found = true;
-	        }
-	        else {
-	            _super.prototype.walkManySep.call(this, manySepProd, currRest, prevRest);
-	        }
-	    };
-	    return NextInsideManySepWalker;
-	}(AbstractNextPossibleTokensWalker));
-	exports.NextInsideManySepWalker = NextInsideManySepWalker;
-	var NextInsideAtLeastOneWalker = (function (_super) {
-	    __extends(NextInsideAtLeastOneWalker, _super);
-	    function NextInsideAtLeastOneWalker(topProd, path) {
-	        _super.call(this, topProd, path);
-	        this.path = path;
-	        this.nextOccurrence = 0;
-	        this.nextOccurrence = this.path.occurrence;
-	    }
-	    NextInsideAtLeastOneWalker.prototype.walkAtLeastOne = function (atLeastOneProd, currRest, prevRest) {
-	        if (this.isAtEndOfPath && atLeastOneProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-	            var restProd = new gast_public_1.gast.Flat(atLeastOneProd.definition);
-	            this.possibleTokTypes = first_1.first(restProd);
-	            this.found = true;
-	        }
-	        else {
-	            _super.prototype.walkAtLeastOne.call(this, atLeastOneProd, currRest, prevRest);
-	        }
-	    };
-	    return NextInsideAtLeastOneWalker;
-	}(AbstractNextPossibleTokensWalker));
-	exports.NextInsideAtLeastOneWalker = NextInsideAtLeastOneWalker;
-	var NextInsideAtLeastOneSepWalker = (function (_super) {
-	    __extends(NextInsideAtLeastOneSepWalker, _super);
-	    function NextInsideAtLeastOneSepWalker(topProd, path) {
-	        _super.call(this, topProd, path);
-	        this.path = path;
-	        this.nextOccurrence = 0;
-	        this.nextOccurrence = this.path.occurrence;
-	    }
-	    NextInsideAtLeastOneSepWalker.prototype.walkAtLeastOneSep = function (atLeastOneSepProd, currRest, prevRest) {
-	        if (this.isAtEndOfPath && atLeastOneSepProd.occurrenceInParent === this.nextOccurrence && !(this.found)) {
-	            var restProd = new gast_public_1.gast.Flat(atLeastOneSepProd.definition);
-	            this.possibleTokTypes = first_1.first(restProd);
-	            this.found = true;
-	        }
-	        else {
-	            _super.prototype.walkAtLeastOneSep.call(this, atLeastOneSepProd, currRest, prevRest);
-	        }
-	    };
-	    return NextInsideAtLeastOneSepWalker;
-	}(AbstractNextPossibleTokensWalker));
-	exports.NextInsideAtLeastOneSepWalker = NextInsideAtLeastOneSepWalker;
-	var NextInsideOrWalker = (function (_super) {
-	    __extends(NextInsideOrWalker, _super);
-	    function NextInsideOrWalker(topRule, occurrence) {
-	        _super.call(this);
-	        this.topRule = topRule;
-	        this.occurrence = occurrence;
-	        this.result = [];
-	    }
-	    NextInsideOrWalker.prototype.startWalking = function () {
-	        this.walk(this.topRule);
-	        return this.result;
-	    };
-	    NextInsideOrWalker.prototype.walkOr = function (orProd, currRest, prevRest) {
-	        if (orProd.occurrenceInParent === this.occurrence) {
-	            this.result = utils_1.map(orProd.definition, function (alt) {
-	                var altWrapper = new gast_public_1.gast.Flat([alt]);
-	                return first_1.first(altWrapper);
-	            });
-	        }
-	        else {
-	            _super.prototype.walkOr.call(this, orProd, currRest, prevRest);
-	        }
-	    };
-	    return NextInsideOrWalker;
-	}(rest_1.RestWalker));
-	exports.NextInsideOrWalker = NextInsideOrWalker;
 	/**
 	 * This walker only "walks" a single "TOP" level in the Grammar Ast, this means
 	 * it never "follows" production refs
@@ -4212,6 +4245,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return NextTerminalAfterAtLeastOneSepWalker;
 	}(AbstractNextTerminalAfterProductionWalker));
 	exports.NextTerminalAfterAtLeastOneSepWalker = NextTerminalAfterAtLeastOneSepWalker;
+	function possiblePathsFrom(targetDef, maxLength, currPath) {
+	    if (currPath === void 0) { currPath = []; }
+	    // avoid side effects
+	    currPath = utils_1.cloneArr(currPath);
+	    var result = [];
+	    var i = 0;
+	    function remainingPathWith(nextDef) {
+	        return nextDef.concat(utils_1.drop(targetDef, i + 1));
+	    }
+	    function getAlternativesForProd(prod) {
+	        var alternatives = possiblePathsFrom(remainingPathWith(prod.definition), maxLength, currPath);
+	        return result.concat(alternatives);
+	    }
+	    /**
+	     * Mandatory productions will halt the loop as the paths computed from their recursive calls will already contain the
+	     * following (rest) of the targetDef.
+	     *
+	     * For optional productions (Option/Repetition/...) the loop will continue to represent the paths that do not include the
+	     * the optional production.
+	     */
+	    while (currPath.length < maxLength && i < targetDef.length) {
+	        var prod = targetDef[i];
+	        if (prod instanceof gast_public_1.gast.Flat) {
+	            return getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.NonTerminal) {
+	            return getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.Option) {
+	            result = getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.RepetitionMandatory) {
+	            return getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.RepetitionMandatoryWithSeparator) {
+	            return getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.RepetitionWithSeparator) {
+	            result = getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.Repetition) {
+	            result = getAlternativesForProd(prod);
+	        }
+	        else if (prod instanceof gast_public_1.gast.Alternation) {
+	            utils_1.forEach(prod.definition, function (currAlt) {
+	                result = getAlternativesForProd(currAlt);
+	            });
+	            return result;
+	        }/* istanbul ignore else */ 
+	        else if (prod instanceof gast_public_1.gast.Terminal) {
+	            currPath.push(prod.terminalType);
+	        }
+	        else {
+	            /* istanbul ignore next */ throw Error("non exhaustive match");
+	        }
+	        i++;
+	    }
+	    result.push(currPath);
+	    return result;
+	}
+	exports.possiblePathsFrom = possiblePathsFrom;
 
 
 /***/ },
@@ -4219,7 +4313,59 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var range_1 = __webpack_require__(20);
+	var utils_1 = __webpack_require__(4);
+	var tokens_public_1 = __webpack_require__(10);
+	var lookahead_1 = __webpack_require__(17);
+	function checkForOrAmbiguities(alternatives, orOccurrence, ruleName) {
+	    var altsAmbiguityErrors = checkAlternativesAmbiguities(alternatives);
+	    if (!utils_1.isEmpty(altsAmbiguityErrors)) {
+	        var errorMessages = utils_1.map(altsAmbiguityErrors, function (currAmbiguity) {
+	            // From the user's prospective the alternatives are counted from one (1 , 2 , 3 ...)
+	            var ambgIndices = utils_1.map(currAmbiguity.alts, function (currAltIdx) { return currAltIdx + 1; });
+	            var pathMsg = utils_1.map(currAmbiguity.path, function (currtok) { return tokens_public_1.tokenLabel(currtok); }).join(", ");
+	            return ("Ambiguous alternatives: <" + ambgIndices.join(" ,") + "> in <OR" + orOccurrence + "> inside <" + ruleName + "> Rule,\n") +
+	                ("<" + pathMsg + "> may appears as a prefix path in all these alternatives.\n");
+	        });
+	        throw new Error(errorMessages.join("\n ---------------- \n") +
+	            "To Resolve this, try one of of the following: \n" +
+	            "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
+	            "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
+	            "3. Add ignore ambiguities argument to this OR Production:\n" +
+	            "OR([], 'msg', Parser.IGNORE_AMBIGUITIES)\n" +
+	            "This will cause the parser to always pick the first alternative that matches and ignore all others");
+	    }
+	}
+	exports.checkForOrAmbiguities = checkForOrAmbiguities;
+	function checkAlternativesAmbiguities(alternatives) {
+	    var foundAmbiguousPaths = [];
+	    var identicalAmbiguities = utils_1.reduce(alternatives, function (result, currAlt, currAltIdx) {
+	        utils_1.forEach(currAlt, function (currPath) {
+	            var altsCurrPathAppearsIn = [currAltIdx];
+	            utils_1.forEach(alternatives, function (currOtherAlt, currOtherAltIdx) {
+	                if (currAltIdx !== currOtherAltIdx && lookahead_1.containsPath(currOtherAlt, currPath)) {
+	                    altsCurrPathAppearsIn.push(currOtherAltIdx);
+	                }
+	            });
+	            if (altsCurrPathAppearsIn.length > 1 && !lookahead_1.containsPath(foundAmbiguousPaths, currPath)) {
+	                foundAmbiguousPaths.push(currPath);
+	                result.push({
+	                    alts: altsCurrPathAppearsIn,
+	                    path: currPath
+	                });
+	            }
+	        });
+	        return result;
+	    }, []);
+	    return identicalAmbiguities;
+	}
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var range_1 = __webpack_require__(21);
 	var gast_public_1 = __webpack_require__(7);
 	var utils_1 = __webpack_require__(4);
 	(function (ProdType) {
@@ -4521,7 +4667,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -4558,7 +4704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
