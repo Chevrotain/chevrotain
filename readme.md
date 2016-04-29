@@ -37,7 +37,7 @@ any code generation phase.
     * [Grammar Inheritance.][grammar_inheritance]
     * [Multiple starting rules.][starting_rules]
 
-  3. [**High performance)**][benchmark].
+  3. [**High performance**][benchmark].
     * [And on JSPerf][benchmark_jsperf]
 
   4. **Grammar Reflection/Introspection**.
