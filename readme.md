@@ -31,7 +31,7 @@ any code generation phase.
       * Allows great flexibility for inserting custom Parser actions.
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
-    * Automatic lookahead calculation for LL(k) grammars.
+    * Automatic lookahead calculation for **LL(k)** grammars.
     * Supports [User defined lookahead logic][custom_lookahead] for complex grammars.
     * Backtracking support.
     * [Grammar Inheritance.][grammar_inheritance]
