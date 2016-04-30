@@ -643,11 +643,7 @@ export class Parser {
      */
     protected OPTION1(laFuncOrAction:LookAheadFunc | GrammarAction,
                       action?:GrammarAction):boolean {
-        if (action === undefined) {
-            action = <any>laFuncOrAction
-            laFuncOrAction = this.getLookaheadFuncForOption(1)
-        }
-        return this.optionInternal(<any>laFuncOrAction, <any>action)
+        return this.optionInternal(laFuncOrAction, action, 1)
     }
 
     /**
@@ -655,11 +651,7 @@ export class Parser {
      */
     protected OPTION2(laFuncOrAction:LookAheadFunc | GrammarAction,
                       action?:GrammarAction):boolean {
-        if (action === undefined) {
-            action = <any>laFuncOrAction
-            laFuncOrAction = this.getLookaheadFuncForOption(2)
-        }
-        return this.optionInternal(<any>laFuncOrAction, <any>action)
+        return this.optionInternal(laFuncOrAction, action, 2)
     }
 
     /**
@@ -667,11 +659,7 @@ export class Parser {
      */
     protected OPTION3(laFuncOrAction:LookAheadFunc | GrammarAction,
                       action?:GrammarAction):boolean {
-        if (action === undefined) {
-            action = <any>laFuncOrAction
-            laFuncOrAction = this.getLookaheadFuncForOption(3)
-        }
-        return this.optionInternal(<any>laFuncOrAction, <any>action)
+        return this.optionInternal(laFuncOrAction, action, 3)
     }
 
     /**
@@ -679,11 +667,7 @@ export class Parser {
      */
     protected OPTION4(laFuncOrAction:LookAheadFunc | GrammarAction,
                       action?:GrammarAction):boolean {
-        if (action === undefined) {
-            action = <any>laFuncOrAction
-            laFuncOrAction = this.getLookaheadFuncForOption(4)
-        }
-        return this.optionInternal(<any>laFuncOrAction, <any>action)
+        return this.optionInternal(laFuncOrAction, action, 4)
     }
 
     /**
@@ -691,11 +675,7 @@ export class Parser {
      */
     protected OPTION5(laFuncOrAction:LookAheadFunc | GrammarAction,
                       action?:GrammarAction):boolean {
-        if (action === undefined) {
-            action = <any>laFuncOrAction
-            laFuncOrAction = this.getLookaheadFuncForOption(5)
-        }
-        return this.optionInternal(<any>laFuncOrAction, <any>action)
+        return this.optionInternal(laFuncOrAction, action, 5)
     }
 
     /**
@@ -1515,8 +1495,13 @@ export class Parser {
     }
 
     // Implementation of parsing DSL
-    private optionInternal(condition:LookAheadFunc, action:GrammarAction):boolean {
-        if (condition.call(this)) {
+    private optionInternal(condition:LookAheadFunc | GrammarAction, action:GrammarAction, occurrence:number):boolean {
+        if (action === undefined) {
+            action = <any>condition
+            condition = this.getLookaheadFuncForOption(occurrence)
+        }
+
+        if ((condition as LookAheadFunc).call(this)) {
             action.call(this)
             return true
         }
