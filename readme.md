@@ -1,5 +1,5 @@
-[![npm](https://img.shields.io/npm/v/chevrotain.svg?maxAge=2592000)](https://www.npmjs.com/package/chevrotain)
-[![Bower](https://img.shields.io/bower/v/chevrotain.svg?maxAge=2592000)](https://github.com/SAP/chevrotain)
+[![npm](https://img.shields.io/npm/v/chevrotain.svg)](https://www.npmjs.com/package/chevrotain)
+[![Bower](https://img.shields.io/bower/v/chevrotain.svg)](https://github.com/SAP/chevrotain)
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
