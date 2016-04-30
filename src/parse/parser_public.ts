@@ -47,8 +47,7 @@ import {
     buildLookaheadForAtLeastOneSep,
     buildLookaheadFuncForOr,
     getLookaheadPathsForOr,
-    PROD_TYPE,
-    getLookaheadPathsForOptionalProd, buildLookaheadForTopLevel
+    getLookaheadPathsForOptionalProd, PROD_TYPE
 } from "./grammar/lookahead"
 
 import {TokenConstructor} from "../scan/lexer_public"
@@ -157,9 +156,11 @@ export interface IOrAlt<T> {
  *  {ALT:ZZZ }
  * ])
  */
-export interface IOrAltImplicit<T> {
+export interface IOrAltWithPredicate<T> {
     ALT:() => T
 }
+
+export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithPredicate<T>
 
 export interface IParserState {
     errors:exceptions.IRecognitionException[]
@@ -167,14 +168,14 @@ export interface IParserState {
     RULE_STACK:string[]
 }
 
-export type LookAheadFunc = () => boolean
+export type Predicate = () => boolean
 export type GrammarAction = () => void
 
 /**
- * convenience used to express an empty alternative in an OR (alternation).
+ * Convenience used to express an empty alternative in an OR (alternation).
  * can be used to more clearly describe the intent in a case of empty alternation.
  *
- * for example:
+ * For example:
  *
  * 1. without using EMPTY_ALT:
  *
@@ -193,7 +194,7 @@ export type GrammarAction = () => void
  *    ])
  *
  *
- * * 2. using EMPTY_ALT:
+ * 2. using EMPTY_ALT:
  *
  *    this.OR([
  *      {ALT: () => {
@@ -429,25 +430,14 @@ export class Parser {
         }
     }
 
-    protected isNextRule<T>(ruleName:string):boolean {
-        let classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
-        let condition = <any>classLAFuncs.get(ruleName)
-        if (condition === undefined) {
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
-            condition = buildLookaheadForTopLevel(ruleGrammar, this.maxLookahead)
-            classLAFuncs.put(ruleName, condition)
-        }
-        return condition.call(this)
-    }
-
     /**
+     * @param grammarRule - the rule to try and parse in backtracking mode
+     * @param isValid - a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
      *
-     * @param grammarRule the rule to try and parse in backtracking mode
-     * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
      * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
      */
     protected BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
-        return () => {
+        return function() {
             // save org state
             this.isBackTrackingStack.push(1)
             let orgState = this.saveRecogState()
@@ -514,8 +504,7 @@ export class Parser {
      *                                  //     the rule 'parseQualifiedName'
      * }
      *
-     * @param {Function} tokClass A constructor function specifying the type of token
-     *        to be consumed.
+     * @param {Function} tokClass - A constructor function specifying the type of token to be consumed.
      *
      * @returns {Token} The consumed token.
      */
@@ -573,8 +562,8 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the sub rule invocation in its rule.
      *
-     * @param {Function} ruleToCall the rule to invoke
-     * @param {*[]} args the arguments to pass to the invoked subrule
+     * @param {Function} ruleToCall - the rule to invoke
+     * @param {*[]} args - the arguments to pass to the invoked subrule
      * @returns {*} the result of invoking ruleToCall
      */
     protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = []):T {
@@ -613,9 +602,9 @@ export class Parser {
      * Convenience method equivalent to OPTION1
      * @see OPTION1
      */
-    protected OPTION(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected OPTION(predicateOrAction:Predicate | GrammarAction,
                      action?:GrammarAction):boolean {
-        return this.OPTION1.call(this, laFuncOrAction, action)
+        return this.OPTION1.call(this, predicateOrAction, action)
     }
 
     /**
@@ -625,64 +614,62 @@ export class Parser {
      * note that the 'action' param is optional. so both of the following forms are valid:
      *
      * short: this.OPTION(()=>{ this.CONSUME(Digit});
-     * long: this.OPTION(isDigit, ()=>{ this.CONSUME(Digit});
+     * long: this.OPTION(predicateFunc, ()=>{ this.CONSUME(Digit});
      *
-     * using the short form is recommended as it will compute the lookahead function
-     * automatically. however this currently has one limitation:
-     * It only works if the lookahead for the grammar is one.
+     * The 'predicateFunc' in the long form can be used to add constraints (none grammar related)
+     * to optionally invoking the grammar action.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the optional production in it's top rule.
      *
-     * @param {Function} laFuncOrAction The lookahead function that 'decides'
-     *                                  whether or not the OPTION's action will be
-     *                                  invoked or the action to optionally invoke
-     * @param {Function} [action] The action to optionally invoke.
+     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
+     *                                       or the grammar action to optionally invoke once.
+     * @param {Function} [action] - The action to optionally invoke.
      *
      * @returns {boolean} true iff the OPTION's action has been invoked
      */
-    protected OPTION1(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected OPTION1(predicateOrAction:Predicate | GrammarAction,
                       action?:GrammarAction):boolean {
-        return this.optionInternal(laFuncOrAction, action, 1)
+        return this.optionInternal(predicateOrAction, action, 1)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION2(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected OPTION2(predicateOrAction:Predicate | GrammarAction,
                       action?:GrammarAction):boolean {
-        return this.optionInternal(laFuncOrAction, action, 2)
+        return this.optionInternal(predicateOrAction, action, 2)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION3(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected OPTION3(predicateOrAction:Predicate | GrammarAction,
                       action?:GrammarAction):boolean {
-        return this.optionInternal(laFuncOrAction, action, 3)
+        return this.optionInternal(predicateOrAction, action, 3)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION4(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected OPTION4(predicateOrAction:Predicate | GrammarAction,
                       action?:GrammarAction):boolean {
-        return this.optionInternal(laFuncOrAction, action, 4)
+        return this.optionInternal(predicateOrAction, action, 4)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION5(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected OPTION5(predicateOrAction:Predicate | GrammarAction,
                       action?:GrammarAction):boolean {
-        return this.optionInternal(laFuncOrAction, action, 5)
+        return this.optionInternal(predicateOrAction, action, 5)
     }
 
     /**
      * Convenience method equivalent to OR1
      * @see OR1
      */
-    protected OR<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
+    protected OR<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
         return this.OR1(alts, errMsgTypes, ignoreAmbiguities)
     }
 
@@ -699,14 +686,19 @@ export class Parser {
      *        ], "a number")
      *
      * long: this.OR([
-     *           {WHEN: isOne, THEN_DO:()=>{this.CONSUME(One)}},
-     *           {WHEN: isTwo, THEN_DO:()=>{this.CONSUME(Two)}},
-     *           {WHEN: isThree, THEN_DO:()=>{this.CONSUME(Three)}},
+     *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
+     *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Two)}},
+     *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Three)}},
      *        ], "a number")
      *
-     * using the short form is recommended as it will compute the lookahead function
-     * automatically. however this currently has one limitation:
-     * It only works if the lookahead for the grammar is one LL(1).
+     * They can also be mixed:
+     * mixed: this.OR([
+     *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
+     *           {ALT:()=>{this.CONSUME(Two)}},
+     *           {ALT:()=>{this.CONSUME(Three)}}
+     *        ], "a number")
+     *
+     * The 'predicateFuncX' in the long form can be used to add constraints (none grammar related) to choosing the alternative.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the alternation production in it's top rule.
@@ -715,45 +707,41 @@ export class Parser {
      *
      * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
      *                                 If none is provided, the error message will include the names of the expected
-     *                                 Tokens which may start each alternative.
+     *                                 Tokens sequences which may start each alternative.
      *
-     * @param {boolean} [ignoreAmbiguities] - if true this will ignore ambiguities caused when two alternatives can not
-     *        be distinguished by a lookahead of one. enabling this means the first alternative
-     *        that matches will be taken. This is sometimes the grammar's intent.
-     *        * only enable this if you know what you are doing!
+     * @param {boolean} [ignoreAmbiguities] - if true this will ignore grammar ambiguities between the provides alternatives.
      *
      * @returns {*} The result of invoking the chosen alternative
-
      */
-    protected OR1<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
+    protected OR1<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
         return this.orInternal(alts, errMsgTypes, 1, ignoreAmbiguities)
     }
 
     /**
      * @see OR1
      */
-    protected OR2<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
+    protected OR2<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
         return this.orInternal(alts, errMsgTypes, 2, ignoreAmbiguities)
     }
 
     /**
      * @see OR1
      */
-    protected OR3<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
+    protected OR3<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
         return this.orInternal(alts, errMsgTypes, 3, ignoreAmbiguities)
     }
 
     /**
      * @see OR1
      */
-    protected OR4<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
+    protected OR4<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
         return this.orInternal(alts, errMsgTypes, 4, ignoreAmbiguities)
     }
 
     /**
      * @see OR1
      */
-    protected OR5<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
+    protected OR5<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
         return this.orInternal(alts, errMsgTypes, 5, ignoreAmbiguities)
     }
 
@@ -761,9 +749,9 @@ export class Parser {
      * Convenience method equivalent to MANY1
      * @see MANY1
      */
-    protected MANY(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY(predicateOrAction:Predicate | GrammarAction,
                    action?:GrammarAction):void {
-        return this.MANY1.call(this, laFuncOrAction, action)
+        return this.MANY1.call(this, predicateOrAction, action)
     }
 
     /**
@@ -775,66 +763,64 @@ export class Parser {
      * short: this.MANY(()=>{
      *                       this.CONSUME(Comma};
      *                       this.CONSUME(Digit});
-     * long: this.MANY(isComma, ()=>{
+     *
+     * long: this.MANY(predicateFunc, () => {
      *                       this.CONSUME(Comma};
      *                       this.CONSUME(Digit});
      *
-     * using the short form is recommended as it will compute the lookahead function
-     * automatically. however this currently has one limitation:
-     * It only works if the lookahead for the grammar is one.
+     * The 'predicateFunc' in the long form can be used to add constraints (none grammar related) taking another iteration.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * @param {Function} laFuncOrAction The lookahead function that 'decides'
-     *                                  whether or not the MANY's action will be
-     *                                  invoked or the action to optionally invoke
-     * @param {Function} [action] The action to optionally invoke.
+     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
+       *                                   or the grammar action to optionally invoke multiple times.
+     * @param {Function} [action] - The action to optionally invoke multiple times.
      */
-    protected MANY1(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY1(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY1, "MANY1", 1, laFuncOrAction, action)
+        this.manyInternal(this.MANY1, "MANY1", 1, predicateOrAction, action)
     }
 
     /**
      * @see MANY1
      */
-    protected MANY2(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY2(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY2, "MANY2", 2, laFuncOrAction, action)
+        this.manyInternal(this.MANY2, "MANY2", 2, predicateOrAction, action)
     }
 
     /**
      * @see MANY1
      */
-    protected MANY3(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY3(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY3, "MANY3", 3, laFuncOrAction, action)
+        this.manyInternal(this.MANY3, "MANY3", 3, predicateOrAction, action)
     }
 
     /**
      * @see MANY1
      */
-    protected MANY4(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY4(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY4, "MANY4", 4, laFuncOrAction, action)
+        this.manyInternal(this.MANY4, "MANY4", 4, predicateOrAction, action)
     }
 
     /**
      * @see MANY1
      */
-    protected MANY5(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY5(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY5, "MANY5", 5, laFuncOrAction, action)
+        this.manyInternal(this.MANY5, "MANY5", 5, predicateOrAction, action)
     }
 
     /**
      * Convenience method equivalent to MANY_SEP1
      * @see MANY_SEP1
      */
-    protected MANY_SEP(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY_SEP(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
                        action?:GrammarAction):Token[] {
-        return this.MANY_SEP1.call(this, separator, laFuncOrAction, action)
+        return this.MANY_SEP1.call(this, separator, predicateOrAction, action)
     }
 
     /**
@@ -848,14 +834,13 @@ export class Parser {
      *                       ...
      *                       );
      *
-     * long: this.MANY(Comma, isNumber, ()=>{
+     * long: this.MANY(Comma, predicateFunc, () => {
      *                           this.CONSUME(Number}
      *                       ...
      *                       );
      *
-     * Using the short form is recommended as it will compute the lookahead function automatically.
      *
-     * Note that for the purposes of deciding on whether  or not another iteration exists
+     * Note that for the purposes of deciding on whether or not another iteration exists
      * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
      * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
      * to implement it.
@@ -865,58 +850,57 @@ export class Parser {
      * of the repetition production in it's top rule.
      *
      * @param separator - The Token to use as a separator between repetitions.
-     * @param {Function} laFuncOrAction - The lookahead function that 'decides'
-     *                                  whether or not the MANY_SEP's action will be
-     *                                  invoked or the action to optionally invoke
+     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
+     *                                       or the grammar action to optionally invoke
      * @param {Function} [action] - The action to optionally invoke.
      *
      * @return {Token[]} - The consumed separator Tokens.
      */
-    protected MANY_SEP1(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY_SEP1(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
                         action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, laFuncOrAction, action)
+        return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, predicateOrAction, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP2(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY_SEP2(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
                         action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, laFuncOrAction, action)
+        return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, predicateOrAction, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP3(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY_SEP3(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
                         action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, laFuncOrAction, action)
+        return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, predicateOrAction, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP4(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY_SEP4(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
                         action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, laFuncOrAction, action)
+        return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, predicateOrAction, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP5(separator:TokenConstructor, laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected MANY_SEP5(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
                         action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, laFuncOrAction, action)
+        return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, predicateOrAction, action)
     }
 
     /**
      * Convenience method equivalent to AT_LEAST_ONE1
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected AT_LEAST_ONE(predicateOrAction:Predicate | GrammarAction,
                            action?:GrammarAction | string,
                            errMsg?:string):void {
-        return this.AT_LEAST_ONE1.call(this, laFuncOrAction, action, errMsg)
+        return this.AT_LEAST_ONE1.call(this, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -927,52 +911,51 @@ export class Parser {
      *
      * @see MANY1
      *
-     * @param {Function} laFuncOrAction The lookahead function that 'decides'
-     *                                  whether or not the AT_LEAST_ONE's action will be
-     *                                  invoked or the action to optionally invoke
-     * @param {Function} [action] The action to optionally invoke.
+     * @param {Function} predicateOrAction  - The predicate / gate function that implements the constraint on the grammar
+     *                                        or the grammar action to invoke at least once.
+     * @param {Function} [action] - The action to optionally invoke.
      * @param {string} [errMsg] short title/classification to what is being matched
      */
-    protected AT_LEAST_ONE1(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected AT_LEAST_ONE1(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, laFuncOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE2(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected AT_LEAST_ONE2(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, laFuncOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE3(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected AT_LEAST_ONE3(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE3", 3, laFuncOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE3", 3, predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE4(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected AT_LEAST_ONE4(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE4", 4, laFuncOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE4", 4, predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE5(laFuncOrAction:LookAheadFunc | GrammarAction,
+    protected AT_LEAST_ONE5(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE5", 5, laFuncOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE5", 5, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -980,10 +963,10 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
-                               laFuncOrAction:LookAheadFunc | GrammarAction,
+                               predicateOrAction:Predicate | GrammarAction,
                                action?:GrammarAction | string,
                                errMsg?:string):Token[] {
-        return this.AT_LEAST_ONE_SEP1.call(this, separator, laFuncOrAction, action, errMsg)
+        return this.AT_LEAST_ONE_SEP1.call(this, separator, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -995,69 +978,68 @@ export class Parser {
      * @see MANY_SEP1
      *
      * @param separator {Token}
-     * @param {Function} laFuncOrAction The lookahead function that 'decides'
-     *                                  whether or not the AT_LEAST_ONE's action will be
-     *                                  invoked or the action to optionally invoke
-     * @param {Function} [action] The action to optionally invoke.
-     * @param {string} [errMsg] short title/classification to what is being matched
+     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
+     *                                       invoked or the grammar action to invoke at least once.
+     * @param {Function} [action] - The action to optionally invoke.
+     * @param {string} [errMsg] - short title/classification to what is being matched
      */
     protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
-                                laFuncOrAction:LookAheadFunc | GrammarAction,
+                                predicateOrAction:Predicate | GrammarAction,
                                 action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator,
-            laFuncOrAction, action, errMsg)
+            predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
-                                laFuncOrAction:LookAheadFunc | GrammarAction,
+                                predicateOrAction:Predicate | GrammarAction,
                                 action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator,
-            laFuncOrAction, action, errMsg)
+            predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
-                                laFuncOrAction:LookAheadFunc | GrammarAction,
+                                predicateOrAction:Predicate | GrammarAction,
                                 action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator,
-            laFuncOrAction, action, errMsg)
+            predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
-                                laFuncOrAction:LookAheadFunc | GrammarAction,
+                                predicateOrAction:Predicate | GrammarAction,
                                 action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator,
-            laFuncOrAction, action, errMsg)
+            predicateOrAction, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
-                                laFuncOrAction:LookAheadFunc | GrammarAction,
+                                predicateOrAction:Predicate | GrammarAction,
                                 action?:GrammarAction | string,
                                 errMsg?:string):Token[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator,
-            laFuncOrAction, action, errMsg)
+            predicateOrAction, action, errMsg)
     }
 
     /**
      *
      * @param {string} name - The name of the rule.
      * @param {Function} implementation - The implementation of the rule.
-     * @param {IRuleConfig} [config] - The rule's optional configurationn
+     * @param {IRuleConfig} [config] - The rule's optional configuration
      *
      * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
@@ -1091,11 +1073,9 @@ export class Parser {
     }
 
     /**
-     *
      * @See RULE
      * same as RULE, but should only be used in "extending" grammars to override rules/productions
      * from the super grammar.
-     *
      */
     protected OVERRIDE_RULE<T>(name:string,
                                impl:(...implArgs:any[]) => T,
@@ -1495,13 +1475,15 @@ export class Parser {
     }
 
     // Implementation of parsing DSL
-    private optionInternal(condition:LookAheadFunc | GrammarAction, action:GrammarAction, occurrence:number):boolean {
+    private optionInternal(predicateOrAction:Predicate | GrammarAction, action:GrammarAction, occurrence:number):boolean {
         if (action === undefined) {
-            action = <any>condition
-            condition = this.getLookaheadFuncForOption(occurrence)
+            action = <any>predicateOrAction
+            predicateOrAction = this.getLookaheadFuncForOption(occurrence)
+        } else {
+            predicateOrAction = this.getLookaheadFuncForOption(occurrence, <Predicate>predicateOrAction)
         }
 
-        if ((condition as LookAheadFunc).call(this)) {
+        if ((predicateOrAction as Predicate).call(this)) {
             action.call(this)
             return true
         }
@@ -1511,13 +1493,16 @@ export class Parser {
     private atLeastOneInternal(prodFunc:Function,
                                prodName:string,
                                prodOccurrence:number,
-                               lookAheadFunc:LookAheadFunc | GrammarAction,
+                               lookAheadFunc:Predicate | GrammarAction,
                                action:GrammarAction | string,
                                userDefinedErrMsg?:string):void {
         if (!isFunction(action)) {
             userDefinedErrMsg = <any>action
             action = <any>lookAheadFunc
             lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
+        }
+        else {
+            lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence, <Predicate>lookAheadFunc)
         }
 
         if ((<Function>lookAheadFunc).call(this)) {
@@ -1543,7 +1528,7 @@ export class Parser {
                                        prodName:string,
                                        prodOccurrence:number,
                                        separator:TokenConstructor,
-                                       firstIterationLookAheadFunc:LookAheadFunc | GrammarAction,
+                                       firstIterationPredicateOrAction:Predicate | GrammarAction,
                                        action:GrammarAction | string,
                                        userDefinedErrMsg?:string):Token[] {
 
@@ -1551,12 +1536,15 @@ export class Parser {
 
         if (!isFunction(action)) {
             userDefinedErrMsg = <any>action
-            action = <any>firstIterationLookAheadFunc
-            firstIterationLookAheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
+            action = <any>firstIterationPredicateOrAction
+            firstIterationPredicateOrAction = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
+        } else {
+            firstIterationPredicateOrAction =
+                this.getLookaheadFuncForAtLeastOneSep(prodOccurrence, <Predicate>firstIterationPredicateOrAction)
         }
 
         // 1st iteration
-        if ((<Function>firstIterationLookAheadFunc).call(this)) {
+        if ((<Function>firstIterationPredicateOrAction).call(this)) {
             (<GrammarAction>action).call(this)
 
             let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
@@ -1589,22 +1577,26 @@ export class Parser {
     private manyInternal(prodFunc:Function,
                          prodName:string,
                          prodOccurrence:number,
-                         lookAheadFunc:LookAheadFunc | GrammarAction,
+                         predicate:Predicate | GrammarAction,
                          action?:GrammarAction):void {
 
         if (action === undefined) {
-            action = <any>lookAheadFunc
-            lookAheadFunc = this.getLookaheadFuncForMany(prodOccurrence)
+            action = <any>predicate
+            predicate = this.getLookaheadFuncForMany(prodOccurrence)
+        }
+        else {
+            predicate = this.getLookaheadFuncForMany(prodOccurrence, <Predicate>predicate)
         }
 
-        while ((<Function>lookAheadFunc).call(this)) {
+
+        while ((<Function>predicate).call(this)) {
             action.call(this)
         }
 
         if (this.recoveryEnabled) {
             this.attemptInRepetitionRecovery(prodFunc,
-                [lookAheadFunc, action],
-                <any>lookAheadFunc
+                [predicate, action],
+                <any>predicate
                 , prodName,
                 prodOccurrence,
                 NextTerminalAfterManyWalker,
@@ -1616,18 +1608,20 @@ export class Parser {
                                  prodName:string,
                                  prodOccurrence:number,
                                  separator:TokenConstructor,
-                                 firstIterationLookAheadFunc:LookAheadFunc | GrammarAction,
+                                 firstPredicateOrAction:Predicate | GrammarAction,
                                  action?:GrammarAction):Token[] {
 
         let separatorsResult = []
 
         if (action === undefined) {
-            action = <any>firstIterationLookAheadFunc
-            firstIterationLookAheadFunc = this.getLookaheadFuncForManySep(prodOccurrence)
+            action = <any>firstPredicateOrAction
+            firstPredicateOrAction = this.getLookaheadFuncForManySep(prodOccurrence)
+        } else {
+            firstPredicateOrAction = this.getLookaheadFuncForManySep(prodOccurrence, <Predicate>firstPredicateOrAction)
         }
 
         // 1st iteration
-        if ((<Function>firstIterationLookAheadFunc).call(this)) {
+        if ((<Function>firstPredicateOrAction).call(this)) {
             action.call(this)
 
             let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
@@ -1688,34 +1682,27 @@ export class Parser {
         }
     }
 
-    private orInternal<T>(alts:IOrAlt<T>[] | IOrAltImplicit<T>[],
+    private orInternal<T>(alts:IAnyOrAlt<T>[],
                           errMsgTypes:string,
                           occurrence:number,
                           ignoreAmbiguities:boolean):T {
-        // explicit alternatives look ahead
-        if ((<any>alts[0]).WHEN !== undefined) {
-            for (let i = 0; i < alts.length; i++) {
-                if ((<any>alts[i]).WHEN.call(this)) {
-                    let res = (<any>alts[i]).THEN_DO()
-                    return res
-                }
-            }
-            this.raiseNoAltException(occurrence, errMsgTypes)
-        }
-
         // else implicit lookahead
-        let laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities)
+        // TODO: expand this to also support the predicates
+        let laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities, alts)
         let altToTake = laFunc.call(this)
         if (altToTake !== -1) {
-            return (<any>alts[altToTake]).ALT.call(this)
+            let chosenAlternative:any = alts[altToTake]
+            // TODO: should THEN_DO should be renamed to ALT to avoid this ternary  expression and to provide a consistent API.
+            let grammarAction = chosenAlternative.ALT ? chosenAlternative.ALT : chosenAlternative.THEN_DO
+            return grammarAction.call(this)
         }
 
         this.raiseNoAltException(occurrence, errMsgTypes)
     }
 
     /**
-     * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
-     * @param idx occurrence index of consumed token in the invoking parser rule text
+     * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function)
+     * @param idx - occurrence index of consumed token in the invoking parser rule text
      *         for example:
      *         IDENT (DOT IDENT)*
      *         the first ident will have idx 1 and the second one idx 2
@@ -1778,50 +1765,76 @@ export class Parser {
         return key
     }
 
+    private getLookaheadFuncForOr(occurrence:number, ignoreAmbiguities:boolean, alts:IAnyOrAlt<any>[]):() => number {
+
+        let key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurrence)
+        let laFunc = <any>this.classLAFuncs.get(key)
+        if (laFunc === undefined) {
+            let ruleName = last(this.RULE_STACK)
+            let ruleGrammar = this.getGAstProductions().get(ruleName)
+            let predicates = map(alts, (currAlt) => currAlt.WHEN)
+
+            laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, ignoreAmbiguities, predicates)
+            this.classLAFuncs.put(key, laFunc)
+            return laFunc
+        }
+        else {
+            return laFunc
+        }
+    }
+
     // Automatic lookahead calculation
-    private getLookaheadFuncForOption(occurence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForOption, this.maxLookahead)
+    private getLookaheadFuncForOption(occurrence:number, predicate?:Predicate):() => boolean {
+        let key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurrence)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForOption, this.maxLookahead, predicate)
     }
 
-    private getLookaheadFuncForOr(occurence:number, ignoreErrors:boolean):() => number {
-        let key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadFuncForOr, this.maxLookahead, [ignoreErrors])
+    private getLookaheadFuncForMany(occurrence:number, predicate?:Predicate):() => boolean {
+        let key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurrence)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForMany, this.maxLookahead, predicate)
     }
 
-    private getLookaheadFuncForMany(occurence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForMany, this.maxLookahead)
+    private getLookaheadFuncForManySep(occurrence:number, predicate?:Predicate):() => boolean {
+        let key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurrence)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForManySep, this.maxLookahead, predicate)
     }
 
-    private getLookaheadFuncForManySep(occurence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForManySep, this.maxLookahead)
+    private getLookaheadFuncForAtLeastOne(occurrence:number, predicate?:Predicate):() => boolean {
+        let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurrence)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOne, this.maxLookahead, predicate)
     }
 
-    private getLookaheadFuncForAtLeastOne(occurence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForAtLeastOne, this.maxLookahead)
-    }
-
-    private getLookaheadFuncForAtLeastOneSep(occurence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurence)
-        return this.getLookaheadFuncFor(key, occurence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
+    private getLookaheadFuncForAtLeastOneSep(occurrence:number, predicate?:Predicate):() => boolean {
+        let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurrence)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead, predicate)
     }
 
     private getLookaheadFuncFor<T>(key:string,
                                    occurrence:number,
                                    laFuncBuilder:(number, rule, k) => () => T,
                                    maxLookahead:number,
-                                   extraArgs:any[] = []):() => T {
-        let ruleName = last(this.RULE_STACK)
-        let condition = <any>this.classLAFuncs.get(key)
-        if (condition === undefined) {
+                                   predicate?:Predicate):() => T {
+        let laFunc = <any>this.classLAFuncs.get(key)
+        if (laFunc === undefined) {
+            let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            condition = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead].concat(extraArgs))
-            this.classLAFuncs.put(key, condition)
+            laFunc = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead])
+            if (predicate) {
+                let laFuncWithGate = function () {
+                    return predicate.call(this) && laFunc.call(this)
+                }
+                this.classLAFuncs.put(key, laFuncWithGate)
+                return laFuncWithGate
+            }
+            else {
+                this.classLAFuncs.put(key, laFunc)
+            }
+            return laFunc
         }
-        return condition
+        else {
+            return laFunc
+        }
+
     }
 
     // other functionality

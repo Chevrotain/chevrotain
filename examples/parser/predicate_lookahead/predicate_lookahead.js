@@ -22,26 +22,27 @@ var allTokens = [
 var PredicateLookaheadLexer = new Lexer(allTokens);
 
 /**
- * A custom lookahead function is invoked with context (this)
- * of the Parser. Thus it can access the Parser's internal state. (this.LA)
- * In this example we also limit some of the available alternatives using 'global' flag
+ * A Predicate / Gate function is invoked with context (this)
+ * of the Parser. Thus it can access the Parser's internal state if needed.
+ * In this example we limit some of the available alternatives using 'global' flag
  * 'maxNumberAllowed'
  *
- * A custom lookahead function should return true if the path should be taken
- * or false otherwise.
+ * A custom Predicate / Gate function should return true if the path should be taken or false otherwise.
+ * Note that this logic is in addition to the built in grammar lookahead function (choosing the alternative according to the next tokens)
+ * Not instead of it.
  */
 var maxNumberAllowed = 3;
 
 function isOne() {
-    return this.LA(1) instanceof One && maxNumberAllowed >= 1;
+    return maxNumberAllowed >= 1;
 }
 
 function isTwo() {
-    return this.LA(1) instanceof Two && maxNumberAllowed >= 2;
+    return maxNumberAllowed >= 2;
 }
 
 function isThree() {
-    return this.LA(1) instanceof Three && maxNumberAllowed >= 3;
+    return maxNumberAllowed >= 3;
 }
 
 // ----------------- parser -----------------
@@ -54,8 +55,8 @@ function PredicateLookaheadParser(input) {
         // @formatter:off
         return $.OR([
             // In this example we disable some of the alternatives depending on the value of the
-            // "maxNumberAllowed" flag. For each alternative a custom lookahead function is provided
-            // A lookahead function may also be provided for other grammar DSL rules.
+            // "maxNumberAllowed" flag. For each alternative a custom Predicate / Gate function is provided
+            // A Predicate / Gate function may also be provided for other grammar DSL rules.
             // (OPTION/MANY/AT_LEAST_ONE/...)
             {WHEN: isOne, THEN_DO: function() {
                 $.CONSUME(One);

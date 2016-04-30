@@ -66,7 +66,10 @@ export class BackTrackingParser extends Parser {
                     WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
                     THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement) }
                 },
-            ], " a statement")
+                // IGNORE_AMBIGUITIES is needed when backtracking is used
+                // Because the parser always performs the standard lookahead calculation anyhow
+                // and will thus detect an ambiguity issue.
+            ], " a statement", Parser.IGNORE_AMBIGUITIES)
 
         return statementTypeFound
     }
