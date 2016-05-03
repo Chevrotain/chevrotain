@@ -3,7 +3,9 @@ import {
     reduce,
     reject,
     find,
-    every
+    every,
+    isFunction,
+    some
 } from "../../utils/utils"
 
 import {gast} from "./gast_public"
@@ -12,23 +14,25 @@ import {RestWalker} from "./rest"
 import {checkForOrAmbiguities} from "./ambiguities"
 
 
-export enum PROD_TYPE {OPTION,
-REPETITION,
-REPETITION_MANDATORY,
-REPETITION_MANDATORY_WITH_SEPARATOR,
-REPETITION_WITH_SEPARATOR,
-ALTERNATION
+export enum PROD_TYPE {
+    OPTION,
+    REPETITION,
+    REPETITION_MANDATORY,
+    REPETITION_MANDATORY_WITH_SEPARATOR,
+    REPETITION_WITH_SEPARATOR,
+    ALTERNATION
 }
 
 export function buildLookaheadFuncForOr(occurrence:number,
                                         ruleGrammar:gast.Rule,
                                         k:number,
-                                        ignoreAmbiguities:boolean = false):() => number {
+                                        ignoreAmbiguities:boolean = false,
+                                        predicates:{():boolean}[] = []):() => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
     if (!ignoreAmbiguities) {
         checkForOrAmbiguities(lookAheadPaths, occurrence, ruleGrammar.name)
     }
-    return buildAlternativesLookAheadFunc(lookAheadPaths)
+    return buildAlternativesLookAheadFunc(lookAheadPaths, predicates)
 }
 
 export function buildLookaheadForTopLevel(rule:gast.Rule, k:number):() => boolean {
@@ -140,45 +144,96 @@ export function lookAheadSequenceFromAlternatives(alternatives:Alternative[]):lo
     return result
 }
 
-export function buildAlternativesLookAheadFunc(alts:Alternative[]):() => number {
+/**
+ * @param alts
+ * @param predicates - An array of predicates, an alternative can only match if its lookahead sequence matches AND
+ *                     Its predicate matches. Note that some alternatives may not have any predicates while some do
+ *                     in the same set of alternatives.
+ *
+ * @returns {function(): number}
+ */
+export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], predicates:{():boolean}[] = []):() => number {
     // TODO: performance optimizations for the (common) edge case of K == 1
 
     let numOfAlts = alts.length
 
-    /**
-     * @returns {number} - The chosen alternative index
-     */
-    return function ():number {
-        for (let t = 0; t < numOfAlts; t++) {
-            let currAlt = alts[t]
-            let currNumOfPaths = currAlt.length
-            nextPath:
-                for (let j = 0; j < currNumOfPaths; j++) {
-                    let currPath = currAlt[j]
-                    let currPathLength = currPath.length
-                    for (let i = 0; i < currPathLength; i++) {
-                        let nextToken = this.LA(i + 1)
-                        if (!(nextToken instanceof currPath[i])) {
-                            // mismatch in current path
-                            // try the next pth
-                            continue nextPath
-                        }
-                    }
-                    // found a full path that matches.
-                    // this will also work for an empty ALT as the loop will be skipped
-                    return t
-                }
 
-            // none of the paths for the current alternative matched
-            // try the next alternative
+    // This version takes into account the predicates as well.
+    if (some(predicates, (currPred) => isFunction(currPred))) {
+        /**
+         * @returns {number} - The chosen alternative index
+         */
+        return function ():number {
+            for (let t = 0; t < numOfAlts; t++) {
+                let currAlt = alts[t]
+                let currNumOfPaths = currAlt.length
+
+                let currPredicate = predicates[t]
+                if (currPredicate && !currPredicate.call(this)) {
+                    // if the predicate does not match there is no point in checking the paths
+                    continue
+                }
+                nextPath:
+                    for (let j = 0; j < currNumOfPaths; j++) {
+                        let currPath = currAlt[j]
+                        let currPathLength = currPath.length
+                        for (let i = 0; i < currPathLength; i++) {
+                            let nextToken = this.LA(i + 1)
+                            if (!(nextToken instanceof currPath[i])) {
+                                // mismatch in current path
+                                // try the next pth
+                                continue nextPath
+                            }
+                        }
+                        // found a full path that matches.
+                        // this will also work for an empty ALT as the loop will be skipped
+                        return t
+                    }
+                // none of the paths for the current alternative matched
+                // try the next alternative
+            }
+            // none of the alternatives could be matched
+            return -1
+        }
+    }
+    // optimized lookahead without needing to check for predicates at all.
+    // this causes code duplication which is intentional...
+    else {
+        /**
+         * @returns {number} - The chosen alternative index
+         */
+        return function ():number {
+            for (let t = 0; t < numOfAlts; t++) {
+                let currAlt = alts[t]
+                let currNumOfPaths = currAlt.length
+                nextPath:
+                    for (let j = 0; j < currNumOfPaths; j++) {
+                        let currPath = currAlt[j]
+                        let currPathLength = currPath.length
+                        for (let i = 0; i < currPathLength; i++) {
+                            let nextToken = this.LA(i + 1)
+                            if (!(nextToken instanceof currPath[i])) {
+                                // mismatch in current path
+                                // try the next pth
+                                continue nextPath
+                            }
+                        }
+                        // found a full path that matches.
+                        // this will also work for an empty ALT as the loop will be skipped
+                        return t
+                    }
+                // none of the paths for the current alternative matched
+                // try the next alternative
+            }
+            // none of the alternatives could be matched
+            return -1
         }
 
-        // none of the alternatives could be matched
-        return -1
     }
+
 }
 
-export function buildSingleAlternativeLookaheadFunction(alt:Alternative):() => boolean {
+export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):() => boolean {
 
     // TODO: performance optimizations for the (common) edge case of K == 1
 

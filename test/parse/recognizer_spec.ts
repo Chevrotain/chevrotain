@@ -214,46 +214,6 @@ class SubRuleArgsParser extends Parser {
     })
 }
 
-class CustomLookaheadParser extends Parser {
-
-    private result = ""
-    public plusAllowed = true
-    public minusAllowed = true
-
-    constructor(input:Token[] = []) {
-        super(input, ALL_TOKENS)
-        Parser.performSelfAnalysis(this)
-    }
-
-    private isPlus():boolean {
-        return this.isNextRule("plusRule") && this.plusAllowed
-    }
-
-    private isMinus():boolean {
-        return this.isNextRule("minusRule") && this.minusAllowed
-    }
-
-    public topRule = this.RULE("topRule", () => {
-        this.OR([
-            {WHEN: this.isPlus, THEN_DO: () => { this.SUBRULE1(this.plusRule) }},
-            {WHEN: this.isMinus, THEN_DO: () => { this.SUBRULE1(this.minusRule) }}
-        ], "a unicorn")
-
-
-        return this.result
-    })
-
-    public plusRule = this.RULE("plusRule", () => {
-        this.CONSUME(PlusTok)
-        this.result += "plus"
-    })
-
-    public minusRule = this.RULE("minusRule", () => {
-        this.CONSUME(MinusTok)
-        this.result += "minus"
-    })
-}
-
 describe("The Parsing DSL", () => {
 
     it("provides a production SUBRULE1-5 that invokes another rule", () => {
@@ -269,28 +229,6 @@ describe("The Parsing DSL", () => {
         let result = parser.topRule()
         expect(result.letters).to.equal("abcde")
         expect(result.numbers).to.equal("54321")
-    })
-
-    it("allows using automatic lookahead even as part of custom lookahead functions valid", () => {
-        let input1 = [new PlusTok()]
-        let parser = new CustomLookaheadParser(input1)
-        let result = parser.topRule()
-        expect(result).to.equal("plus")
-
-        let input2 = [new MinusTok()]
-        let parser2 = new CustomLookaheadParser(input2)
-        let result2 = parser2.topRule()
-        expect(result2).to.equal("minus")
-    })
-
-    it("allows using automatic lookahead even as part of custom lookahead functions invalid", () => {
-        let input1 = [new PlusTok()]
-        let parser = new CustomLookaheadParser(input1)
-        parser.plusAllowed = false
-        let result = parser.topRule()
-        expect(result).to.equal(undefined)
-        expect(parser.errors.length).to.equal(1)
-        expect(parser.errors[0].message).to.contain("unicorn")
     })
 
     describe("supports EMPTY(...) alternative convenience function", () => {
@@ -480,30 +418,42 @@ describe("The BaseRecognizer", () => {
     })
 
     it("invoking an OPTION will return true/false depending if it succeeded or not", () => {
-        let parser:any = new Parser([new IntToken("1"), new PlusTok()], {})
 
-        let successfulOption = parser.OPTION(function () { return this.NEXT_TOKEN() instanceof IntToken }, () => {
-            parser.CONSUME1(IntToken)
-        })
+        class OptionsReturnValueParser extends Parser {
+
+            constructor(input:Token[] = [new IntToken("666")]) {
+                super(input, ALL_TOKENS);
+                (Parser as any).performSelfAnalysis(this)
+            }
+
+            public trueOptionRule = this.RULE("trueOptionRule", () => {
+                return this.OPTION(() => true, () => {
+                    this.CONSUME(IntToken)
+                })
+            })
+
+            public falseOptionRule = this.RULE("falseOptionRule", () => {
+                return this.OPTION(() => false, () => {
+                    this.CONSUME(IntToken)
+                })
+            })
+        }
+
+        let successfulOption = new OptionsReturnValueParser().trueOptionRule()
         expect(successfulOption).to.equal(true)
 
-        let failedOption = parser.OPTION(function () {
-            // this lookahead should fail because the first token has been consumed and
-            // now the next one is a PlusTok
-            return this.NEXT_TOKEN() instanceof IntToken
-        }, () => { parser.CONSUME1(IntToken) })
+        let failedOption = new OptionsReturnValueParser().falseOptionRule()
         expect(failedOption).to.equal(false)
     })
 
-    it("will return false if a RecognitionException is thrown during " +
-        "backtracking and rethrow any other kind of Exception", () => {
+    it("will return false if a RecognitionException is thrown during backtracking and rethrow any other kind of Exception", () => {
         let parser:any = new Parser([], [])
         let backTrackingThrows = parser.BACKTRACK(() => {throw new Error("division by zero, boom")}, () => { return true })
-        expect(() => backTrackingThrows()).to.throw("division by zero, boom")
+        expect(() => backTrackingThrows.call(parser)).to.throw("division by zero, boom")
 
-        let throwExceptionFunc = () => { throw new exceptions.NotAllInputParsedException("sad sad panda", new PlusTok()) }
-        let backTrackingFalse = parser.BACKTRACK(() => { throwExceptionFunc() }, () => { return true })
-        expect(backTrackingFalse()).to.equal(false)
+        let throwsRecogError = () => { throw new exceptions.NotAllInputParsedException("sad sad panda", new PlusTok()) }
+        let backTrackingFalse = parser.BACKTRACK(throwsRecogError, () => { return true })
+        expect(backTrackingFalse.call(parser)).to.equal(false)
     })
 
 })

@@ -1,3 +1,14 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Predicates / Gates on productions should be in addition to standard lookahead.](https://github.com/SAP/chevrotain/issues/189)
+
+#### Breaking Changes
+**IsNextRule** method was removed from the Parser class. It's functionality is no longer needed as usage of predicates / gates
+no longer also requires manually implementing the lookahead function.
+
+
+
 ## 0.9.0 (4-29-2016)
 
 #### Major Changes
