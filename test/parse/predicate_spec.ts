@@ -91,42 +91,6 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         expect(gateClosedInputBad).to.equal("not entered!")
     })
 
-    it("MANY_SEP", () => {
-        function gateFunc() {
-            return this.gate
-        }
-
-        class PredicateManySepParser extends Parser {
-
-            constructor(input:Token[] = [], private gate:boolean) {
-                super(input, ALL_TOKENS);
-                (Parser as any).performSelfAnalysis(this)
-            }
-
-            public manySepRule = this.RULE("manySepRule", () => {
-                let result = "not entered!"
-                this.MANY_SEP(B, gateFunc, () => {
-                    this.CONSUME(A)
-                    result = "entered!"
-                })
-
-                return result
-            })
-        }
-
-        let gateOpenInputGood = new PredicateManySepParser([new A(), new B(), new A()], true).manySepRule()
-        expect(gateOpenInputGood).to.equal("entered!")
-
-        let gateOpenInputBad = new PredicateManySepParser([new B()], true).manySepRule()
-        expect(gateOpenInputBad).to.equal("not entered!")
-
-        let gateClosedInputGood = new PredicateManySepParser([new A(), new B(), new A()], false).manySepRule()
-        expect(gateClosedInputGood).to.equal("not entered!")
-
-        let gateClosedInputBad = new PredicateManySepParser([new B()], false).manySepRule()
-        expect(gateClosedInputBad).to.equal("not entered!")
-    })
-
     it("AT_LEAST_ONE", () => {
         function gateFunc() {
             return this.gate
@@ -165,48 +129,6 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
         let gateClosedInputBad = new PredicateAtLeastOneParser([new B()], false)
         gateClosedInputBad.atLeastOneRule()
-        expect(gateClosedInputBad.errors).to.have.lengthOf(1)
-        expect(gateClosedInputBad.errors[0]).to.be.an.instanceOf(exceptions.EarlyExitException)
-    })
-
-    it("AT_LEAST_ONE_SEP", () => {
-        function gateFunc() {
-            return this.gate
-        }
-
-        class PredicateAtLeastOneSepParser extends Parser {
-
-            constructor(input:Token[] = [], private gate:boolean) {
-                super(input, ALL_TOKENS);
-                (Parser as any).performSelfAnalysis(this)
-            }
-
-            public atLeastOneSepRule = this.RULE("atLeastOneSepRule", () => {
-                let result = "not entered!"
-                this.AT_LEAST_ONE_SEP(B, gateFunc, () => {
-                    this.CONSUME(A)
-                    result = "entered!"
-                })
-
-                return result
-            })
-        }
-
-        let gateOpenInputGood = new PredicateAtLeastOneSepParser([new A(), new B(), new A()], true).atLeastOneSepRule()
-        expect(gateOpenInputGood).to.equal("entered!")
-
-        let gateOpenInputBadParser = new PredicateAtLeastOneSepParser([new B()], true)
-        gateOpenInputBadParser.atLeastOneSepRule()
-        expect(gateOpenInputBadParser.errors).to.have.lengthOf(1)
-        expect(gateOpenInputBadParser.errors[0]).to.be.an.instanceOf(exceptions.EarlyExitException)
-
-        let gateClosedInputGood = new PredicateAtLeastOneSepParser([new A(), new B(), new A()], false)
-        gateClosedInputGood.atLeastOneSepRule()
-        expect(gateClosedInputGood.errors).to.have.lengthOf(1)
-        expect(gateClosedInputGood.errors[0]).to.be.an.instanceOf(exceptions.EarlyExitException)
-
-        let gateClosedInputBad = new PredicateAtLeastOneSepParser([new B()], false)
-        gateClosedInputBad.atLeastOneSepRule()
         expect(gateClosedInputBad.errors).to.have.lengthOf(1)
         expect(gateClosedInputBad.errors[0]).to.be.an.instanceOf(exceptions.EarlyExitException)
     })

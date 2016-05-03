@@ -4,8 +4,10 @@
 - [Predicates / Gates on productions should be in addition to standard lookahead.](https://github.com/SAP/chevrotain/issues/189)
 
 #### Breaking Changes
-**IsNextRule** method was removed from the Parser class. It's functionality is no longer needed as usage of predicates / gates
-no longer also requires manually implementing the lookahead function.
+- **IsNextRule** method was removed from the Parser class. It's functionality is no longer needed as usage of predicates / gates
+  no longer also requires manually implementing the lookahead function.
+
+- [DSL methods with separators should not support predicates.](https://github.com/SAP/chevrotain/issues/191)
 
 
 

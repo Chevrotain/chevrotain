@@ -818,79 +818,64 @@ export class Parser {
      * Convenience method equivalent to MANY_SEP1
      * @see MANY_SEP1
      */
-    protected MANY_SEP(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
-                       action?:GrammarAction):Token[] {
-        return this.MANY_SEP1.call(this, separator, predicateOrAction, action)
+    protected MANY_SEP(separator:TokenConstructor, action:GrammarAction):Token[] {
+        return this.MANY_SEP1.call(this, separator, action)
     }
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more with a separator
      * Token between the repetitions.
      *
-     * Note that the 'action' param is optional. so both of the following forms are valid:
+     * Example:
      *
-     * short: this.MANY_SEP(Comma, ()=>{
-     *                          this.CONSUME(Number};
-     *                       ...
-     *                       );
-     *
-     * long: this.MANY(Comma, predicateFunc, () => {
-     *                           this.CONSUME(Number}
-     *                       ...
-     *                       );
-     *
+     * this.MANY_SEP(Comma, () => {
+     *                     this.CONSUME(Number};
+     *                     ...
+     *                   );
      *
      * Note that for the purposes of deciding on whether or not another iteration exists
      * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
      * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
      * to implement it.
      *
-     *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * @param separator - The Token to use as a separator between repetitions.
-     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
-     *                                       or the grammar action to optionally invoke
+     * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
      * @param {Function} [action] - The action to optionally invoke.
      *
      * @return {Token[]} - The consumed separator Tokens.
      */
-    protected MANY_SEP1(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
-                        action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, predicateOrAction, action)
+    protected MANY_SEP1(separator:TokenConstructor, action:GrammarAction):Token[] {
+        return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP2(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
-                        action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, predicateOrAction, action)
+    protected MANY_SEP2(separator:TokenConstructor, action:GrammarAction):Token[] {
+        return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP3(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
-                        action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, predicateOrAction, action)
+    protected MANY_SEP3(separator:TokenConstructor, action:GrammarAction):Token[] {
+        return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP4(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
-                        action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, predicateOrAction, action)
+    protected MANY_SEP4(separator:TokenConstructor, action:GrammarAction):Token[] {
+        return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP5(separator:TokenConstructor, predicateOrAction:Predicate | GrammarAction,
-                        action?:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, predicateOrAction, action)
+    protected MANY_SEP5(separator:TokenConstructor, action:GrammarAction):Token[] {
+        return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, action)
     }
 
     /**
@@ -963,10 +948,9 @@ export class Parser {
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
-                               predicateOrAction:Predicate | GrammarAction,
-                               action?:GrammarAction | string,
+                               action:GrammarAction | string,
                                errMsg?:string):Token[] {
-        return this.AT_LEAST_ONE_SEP1.call(this, separator, predicateOrAction, action, errMsg)
+        return this.AT_LEAST_ONE_SEP1.call(this, separator, action, errMsg)
     }
 
     /**
@@ -977,62 +961,50 @@ export class Parser {
      *
      * @see MANY_SEP1
      *
-     * @param separator {Token}
-     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
-     *                                       invoked or the grammar action to invoke at least once.
+     * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
      * @param {Function} [action] - The action to optionally invoke.
      * @param {string} [errMsg] - short title/classification to what is being matched
      */
     protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
-                                predicateOrAction:Predicate | GrammarAction,
-                                action?:GrammarAction | string,
+                                action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator,
-            predicateOrAction, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
-                                predicateOrAction:Predicate | GrammarAction,
-                                action?:GrammarAction | string,
+                                action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator,
-            predicateOrAction, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
-                                predicateOrAction:Predicate | GrammarAction,
-                                action?:GrammarAction | string,
+                                action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator,
-            predicateOrAction, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
-                                predicateOrAction:Predicate | GrammarAction,
-                                action?:GrammarAction | string,
+                                action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator,
-            predicateOrAction, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator, action, errMsg)
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
     protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
-                                predicateOrAction:Predicate | GrammarAction,
-                                action?:GrammarAction | string,
+                                action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator,
-            predicateOrAction, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator, action, errMsg)
     }
 
     /**
@@ -1528,23 +1500,14 @@ export class Parser {
                                        prodName:string,
                                        prodOccurrence:number,
                                        separator:TokenConstructor,
-                                       firstIterationPredicateOrAction:Predicate | GrammarAction,
                                        action:GrammarAction | string,
                                        userDefinedErrMsg?:string):Token[] {
 
         let separatorsResult = []
-
-        if (!isFunction(action)) {
-            userDefinedErrMsg = <any>action
-            action = <any>firstIterationPredicateOrAction
-            firstIterationPredicateOrAction = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
-        } else {
-            firstIterationPredicateOrAction =
-                this.getLookaheadFuncForAtLeastOneSep(prodOccurrence, <Predicate>firstIterationPredicateOrAction)
-        }
+        let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
 
         // 1st iteration
-        if ((<Function>firstIterationPredicateOrAction).call(this)) {
+        if (firstIterationLookaheadFunc.call(this)) {
             (<GrammarAction>action).call(this)
 
             let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
@@ -1608,20 +1571,13 @@ export class Parser {
                                  prodName:string,
                                  prodOccurrence:number,
                                  separator:TokenConstructor,
-                                 firstPredicateOrAction:Predicate | GrammarAction,
-                                 action?:GrammarAction):Token[] {
+                                 action:GrammarAction):Token[] {
 
         let separatorsResult = []
 
-        if (action === undefined) {
-            action = <any>firstPredicateOrAction
-            firstPredicateOrAction = this.getLookaheadFuncForManySep(prodOccurrence)
-        } else {
-            firstPredicateOrAction = this.getLookaheadFuncForManySep(prodOccurrence, <Predicate>firstPredicateOrAction)
-        }
-
+        let firstIterationLaFunc = this.getLookaheadFuncForManySep(prodOccurrence)
         // 1st iteration
-        if ((<Function>firstPredicateOrAction).call(this)) {
+        if (firstIterationLaFunc.call(this)) {
             action.call(this)
 
             let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
@@ -1687,7 +1643,6 @@ export class Parser {
                           occurrence:number,
                           ignoreAmbiguities:boolean):T {
         // else implicit lookahead
-        // TODO: expand this to also support the predicates
         let laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities, alts)
         let altToTake = laFunc.call(this)
         if (altToTake !== -1) {
