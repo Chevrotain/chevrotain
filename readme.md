@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
-[![devDependency Status](https://img.shields.io/david/dev/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain#info=devDependencies)
 
 # Chevrotain
 
