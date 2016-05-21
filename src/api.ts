@@ -4,6 +4,7 @@ import {Token, VirtualToken, EOF, extendToken, tokenName, tokenLabel} from "./sc
 import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
 import {clearCache} from "./parse/cache_public"
+import {NextAfterTokenWalker} from "./parse/grammar/interpreter"
 
 /**
  * defines the public API of
@@ -51,6 +52,9 @@ API.gast.Alternation = gast.Alternation
 API.gast.NonTerminal = gast.NonTerminal
 API.gast.Terminal = gast.Terminal
 API.gast.Rule = gast.Rule
+
+API.interperter = {}
+API.interperter.NextAfterTokenWalker = NextAfterTokenWalker
 
 API.clearCache = clearCache
 

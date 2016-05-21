@@ -12,7 +12,6 @@ Chevrotain is **NOT** a parser generator. It solves the same kind of problems as
 any code generation phase.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
-   
 ## Features
   1. **Lexer Engine** based on Regular Expressions.
     * Full Token position information.

@@ -1,4 +1,4 @@
-import {ITokenGrammarPath} from "../../../src/parse/grammar/path"
+import {ITokenGrammarPath} from "../../../src/parse/grammar/path_public"
 import {
     ActionTok,
     actionDec,

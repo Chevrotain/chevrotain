@@ -3,7 +3,7 @@ import {gast} from "./gast_public"
 import {
     IGrammarPath,
     ITokenGrammarPath
-} from "./path"
+} from "./path_public"
 /* tslint:disable:no-use-before-declare */
 import {
     cloneArr,
