@@ -7,6 +7,7 @@ var PUBLIC_API_DTS_FILES = [
     'lib/src/scan/lexer_public.d.ts',
     'lib/src/parse/parser_public.d.ts',
     'lib/src/parse/exceptions_public.d.ts',
+    'lib/src/parse/grammar/path_public.d.ts',
     'lib/src/parse/grammar/gast_public.d.ts',
     'lib/src/parse/cache_public.d.ts'
 ]
@@ -17,15 +18,15 @@ var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
 // so typedoc can compile "module.exports" in cache_public
 PUBLIC_API_TS_FILES.push("src/env.d.ts")
 
-var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && npm test'
-
 var fourSpaces = "    "
 
 // Integration tests using older versions of node.js will
 // avoid running tests that require ES6 capabilities only available in node.js >= 4
-var grammar_examples_test_command = semver.gte(process.version, "4.0.0") ?
+var examples_test_command = semver.gte(process.version, "4.0.0") ?
     "mocha **/*spec.js" :
     "mocha **/*spec.js -i -g ES6"
+
+var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && ' + examples_test_command
 
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
 
@@ -65,7 +66,7 @@ module.exports = function(grunt) {
                 options: {
                     cwd: process.cwd() + "/examples/grammars"
                 },
-                exec:    "npm install && npm link chevrotain && " + grammar_examples_test_command
+                exec:   INSTALL_LINK_TEST
             },
             test_examples_parser:            {
                 options: {

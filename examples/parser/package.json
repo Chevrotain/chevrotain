@@ -1,5 +1,5 @@
 {
-  "name": "chevrotain_custom_lookahead",
+  "name": "chevrotain_examples_parser",
   "version": "0.1.0",
   "scripts": {
     "test": "mocha **/*spec.js"

@@ -9,7 +9,8 @@
 
 - [DSL methods with separators should not support predicates.](https://github.com/SAP/chevrotain/issues/191)
 
-
+#### Documentation
+- [Example implementing syntactic & semantic content assist.](https://github.com/SAP/chevrotain/issues/194)
 
 ## 0.9.0 (4-29-2016)
 

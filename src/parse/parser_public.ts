@@ -63,6 +63,7 @@ import {
 import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
+import {ITokenGrammarPath} from "./grammar/path_public"
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -437,7 +438,7 @@ export class Parser {
      * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
      */
     protected BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
-        return function() {
+        return function () {
             // save org state
             this.isBackTrackingStack.push(1)
             let orgState = this.saveRecogState()
@@ -774,7 +775,7 @@ export class Parser {
      * of the repetition production in it's top rule.
      *
      * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
-       *                                   or the grammar action to optionally invoke multiple times.
+     *                                   or the grammar action to optionally invoke multiple times.
      * @param {Function} [action] - The action to optionally invoke multiple times.
      */
     protected MANY1(predicateOrAction:Predicate | GrammarAction,
@@ -1128,6 +1129,70 @@ export class Parser {
         return msg
     }
 
+    protected getCurrentGrammarPath(tokClass:Function, tokIdxInRule:number):ITokenGrammarPath {
+        let pathRuleStack:string[] = cloneArr(this.RULE_STACK)
+        let pathOccurrenceStack:number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
+        let grammarPath:any = {
+            ruleStack:         pathRuleStack,
+            occurrenceStack:   pathOccurrenceStack,
+            lastTok:           tokClass,
+            lastTokOccurrence: tokIdxInRule
+        }
+
+        return grammarPath
+    }
+
+    // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
+    // TODO: should this be more explicitly part of the public API?
+    protected getNextPossibleTokenTypes(grammarPath:ITokenGrammarPath) {
+        let topRuleName = first(grammarPath.ruleStack)
+        let gastProductions = this.getGAstProductions()
+        let topProduction = gastProductions.get(topRuleName)
+        let nextPossibleTokenTypes = new NextAfterTokenWalker(topProduction, grammarPath).startWalking()
+        return nextPossibleTokenTypes
+    }
+
+    /**
+     * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function)
+     * @param idx - occurrence index of consumed token in the invoking parser rule text
+     *         for example:
+     *         IDENT (DOT IDENT)*
+     *         the first ident will have idx 1 and the second one idx 2
+     *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
+     *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
+     *           details
+     *
+     * @returns the consumed Token
+     */
+    protected consumeInternal(tokClass:Function, idx:number):Token {
+        try {
+            return this.consumeInternalOptimized(tokClass)
+        } catch (eFromConsumption) {
+            // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
+            // but the original syntax could have been parsed successfully without any backtracking + recovery
+            if (this.recoveryEnabled &&
+                eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
+
+                let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
+                try {
+                    return this.tryInRuleRecovery(tokClass, follows)
+                } catch (eFromInRuleRecovery) {
+                    if (eFromInRuleRecovery.name === functionName(InRuleRecoveryException)) {
+                        // failed in RuleRecovery.
+                        // throw the original error in order to trigger reSync error recovery
+                        throw eFromConsumption
+                    }
+                    else {
+                        throw eFromInRuleRecovery
+                    }
+                }
+            }
+            else {
+                throw eFromConsumption
+            }
+        }
+    }
+
     private defineRule<T>(ruleName:string,
                           impl:(...implArgs:any[]) => T,
                           config:IRuleConfig<T>):(idxInCallingRule?:number, ...args:any[]) => T {
@@ -1259,20 +1324,9 @@ export class Parser {
     }
 
     // Error Recovery functionality
-    private getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule):Function[] {
-        let pathRuleStack:string[] = cloneArr(this.RULE_STACK)
-        let pathOccurrenceStack:number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
-        let grammarPath:any = {
-            ruleStack:         pathRuleStack,
-            occurrenceStack:   pathOccurrenceStack,
-            lastTok:           tokClass,
-            lastTokOccurrence: tokIdxInRule
-        }
-
-        let topRuleName = first(pathRuleStack)
-        let gastProductions = this.getGAstProductions()
-        let topProduction = gastProductions.get(topRuleName)
-        let follows = new NextAfterTokenWalker(topProduction, grammarPath).startWalking()
+    private getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule:number):Function[] {
+        let grammarPath = this.getCurrentGrammarPath(tokClass, tokIdxInRule)
+        let follows = this.getNextPossibleTokenTypes(grammarPath)
         return follows
     }
 
@@ -1653,47 +1707,6 @@ export class Parser {
         }
 
         this.raiseNoAltException(occurrence, errMsgTypes)
-    }
-
-    /**
-     * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function)
-     * @param idx - occurrence index of consumed token in the invoking parser rule text
-     *         for example:
-     *         IDENT (DOT IDENT)*
-     *         the first ident will have idx 1 and the second one idx 2
-     *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
-     *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
-     *           details
-     *
-     * @returns the consumed Token
-     */
-    private consumeInternal(tokClass:Function, idx:number):Token {
-        try {
-            return this.consumeInternalOptimized(tokClass)
-        } catch (eFromConsumption) {
-            // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
-            // but the original syntax could have been parsed successfully without any backtracking + recovery
-            if (this.recoveryEnabled &&
-                eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
-
-                let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
-                try {
-                    return this.tryInRuleRecovery(tokClass, follows)
-                } catch (eFromInRuleRecovery) {
-                    if (eFromInRuleRecovery.name === functionName(InRuleRecoveryException)) {
-                        // failed in RuleRecovery.
-                        // throw the original error in order to trigger reSync error recovery
-                        throw eFromConsumption
-                    }
-                    else {
-                        throw eFromInRuleRecovery
-                    }
-                }
-            }
-            else {
-                throw eFromConsumption
-            }
-        }
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
