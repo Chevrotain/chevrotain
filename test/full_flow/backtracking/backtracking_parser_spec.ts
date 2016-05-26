@@ -12,7 +12,6 @@ import {
 } from "./backtracking_parser"
 import {flatten} from "../../../src/utils/utils"
 
-
 describe("Simple backtracking example", () => {
 
     // TODO: modify example to use the Chevrotain Lexer to increase readability

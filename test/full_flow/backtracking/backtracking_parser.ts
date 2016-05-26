@@ -5,7 +5,7 @@
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
 import {Token} from "../../../src/scan/tokens_public"
-import {Parser} from "../../../src/parse/parser_public"
+import {Parser, IParserConfig} from "../../../src/parse/parser_public"
 
 export enum RET_TYPE {
     WITH_DEFAULT,
@@ -27,6 +27,12 @@ export class SemiColonTok extends Token {}
 export class IdentTok extends Token {}
 
 
+const configuration:IParserConfig = {
+    ignoredIssues: {
+        statement: {OR1: true}
+    }
+}
+
 // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
 // that needs to be tested too.
 export class BackTrackingParser extends Parser {
@@ -35,7 +41,7 @@ export class BackTrackingParser extends Parser {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
-        super(input, [NumberTok, ElementTok, DefaultTok, DotTok, ColonTok, EqualsTok, SemiColonTok, IdentTok])
+        super(input, [NumberTok, ElementTok, DefaultTok, DotTok, ColonTok, EqualsTok, SemiColonTok, IdentTok], configuration)
         // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
         //       The typescript compiler places the constructor body last after initializations in the class's body
         //       which is why place the call here meets the criteria.
@@ -66,10 +72,7 @@ export class BackTrackingParser extends Parser {
                     WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
                     THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement) }
                 },
-                // IGNORE_AMBIGUITIES is needed when backtracking is used
-                // Because the parser always performs the standard lookahead calculation anyhow
-                // and will thus detect an ambiguity issue.
-            ], " a statement", Parser.IGNORE_AMBIGUITIES)
+            ], " a statement")
 
         return statementTypeFound
     }

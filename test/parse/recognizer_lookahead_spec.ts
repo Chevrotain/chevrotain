@@ -78,26 +78,6 @@ class OptionsImplicitLookAheadParser extends Parser {
     }
 }
 
-function isOneTok():boolean {
-    return this.NEXT_TOKEN() instanceof OneTok
-}
-
-function isTwoTok():boolean {
-    return this.NEXT_TOKEN() instanceof TwoTok
-}
-
-function isThreeTok():boolean {
-    return this.NEXT_TOKEN() instanceof ThreeTok
-}
-
-function isFourTok():boolean {
-    return this.NEXT_TOKEN() instanceof FourTok
-}
-
-function isFiveTok():boolean {
-    return this.NEXT_TOKEN() instanceof FiveTok
-}
-
 describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", () => {
 
     it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
@@ -691,10 +671,8 @@ describe("OR production ambiguity detection when using implicit lookahead calcul
             }
         }
 
-        let parser = new OrAmbiguityLookAheadParser()
-        expect(() => parser.ambiguityRule()).to.throw("Ambiguous alternatives")
-        expect(() => parser.ambiguityRule()).to.throw("OneTok")
-
+        expect(() => new OrAmbiguityLookAheadParser()).to.throw("Ambiguous alternatives")
+        expect(() => new OrAmbiguityLookAheadParser()).to.throw("OneTok")
     })
 
     it("will throw an error when two alternatives have the same multi token (lookahead > 1) prefix", () => {
@@ -729,9 +707,8 @@ describe("OR production ambiguity detection when using implicit lookahead calcul
             // @formatter:on
             }
         }
-        let parser = new OrAmbiguityMultiTokenLookAheadParser()
-        expect(() => parser.ambiguityRule()).to.throw("Ambiguous alternatives")
-        expect(() => parser.ambiguityRule()).to.throw("TwoTok, ThreeTok, FourTok")
+        expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw("Ambiguous alternatives")
+        expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw("TwoTok, ThreeTok, FourTok")
     })
 })
 
@@ -742,7 +719,13 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
     }
 
     constructor(input:Token[] = []) {
-        super(input, ALL_TOKENS)
+        super(input, ALL_TOKENS, {ignoredIssues: {orRule: {
+            OR1:true,
+            OR2:true,
+            OR3:true,
+            OR4:true,
+            OR5:true
+        }}})
         Parser.performSelfAnalysis(this)
     }
 
@@ -773,7 +756,7 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
                     this.CONSUME1(FiveTok)
                     total += "A5"
                 }},
-            ], "digits", Parser.IGNORE_AMBIGUITIES)
+            ], "digits")
 
             this.OR2([
                 {ALT: () => {
@@ -796,7 +779,7 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
                     this.CONSUME2(FiveTok)
                     total += "B5"
                 }},
-            ], "digits", Parser.IGNORE_AMBIGUITIES)
+            ], "digits")
 
             this.OR3([
                 {ALT: () => {
@@ -819,7 +802,7 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
                     this.CONSUME3(OneTok)
                     total += "C1"
                 }}
-            ], "digits", Parser.IGNORE_AMBIGUITIES)
+            ], "digits")
 
             this.OR4([
                 {ALT: () => {
@@ -838,7 +821,7 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
                     this.CONSUME4(TwoTok)
                     total += "D2"
                 }},
-            ], "digits", Parser.IGNORE_AMBIGUITIES)
+            ], "digits")
 
             this.OR5([
                 {ALT: () => {
@@ -861,7 +844,7 @@ class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
                     this.CONSUME5(FiveTok)
                     total += "OOPS!"
                 }},
-            ], "digits", Parser.IGNORE_AMBIGUITIES)
+            ], "digits")
 
             // @formatter:on
         return total

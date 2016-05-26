@@ -72,8 +72,12 @@ export enum ParserDefinitionErrorType {
     DUPLICATE_PRODUCTIONS,
     UNRESOLVED_SUBRULE_REF,
     LEFT_RECURSION,
-    NONE_LAST_EMPTY_ALT
+    NONE_LAST_EMPTY_ALT,
+    AMBIGUOUS_ALTS
 }
+
+export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
+export type IgnoredParserIssues = { [ruleName:string]:IgnoredRuleIssues }
 
 export interface IParserConfig {
     /**
@@ -84,11 +88,31 @@ export interface IParserConfig {
      * Maximum number of tokens the parser will use to choose between alternatives.
      */
     maxLookahead?:number
+
+    /**
+     * Used to mark parser definition errors that should be ignored.
+     * For example:
+     *
+     * {
+     *   myCustomRule : {
+     *                   OR3 : true
+     *                  },
+     *
+     *   myOtherRule : {
+     *                  OPTION1 : true,
+     *                  OR4 : true
+     *                 }
+     * }
+     *
+     * Be careful when ignoring errors, they are usually there for a reason :).
+     */
+    ignoredIssues?:IgnoredParserIssues
 }
 
 const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
     recoveryEnabled: false,
-    maxLookahead:    5
+    maxLookahead:    5,
+    ignoredIssues:   <any>{}
 })
 
 export interface IRuleConfig<T> {
@@ -124,6 +148,11 @@ export interface IParserDuplicatesDefinitionError extends IParserDefinitionError
 export interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
     occurrence:number
     alternative:number
+}
+
+export interface IParserAmbiguousAlternativesDefinitionError extends IParserDefinitionError {
+    occurrence:number
+    alternatives:number[]
 }
 
 export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
@@ -225,7 +254,6 @@ let EOF_FOLLOW_KEY:any = {}
  */
 export class Parser {
 
-    static IGNORE_AMBIGUITIES:boolean = true
     static NO_RESYNC:boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
     // (normally during the parser's constructor).
@@ -235,11 +263,11 @@ export class Parser {
     // needing to display the parser definition errors in some GUI(online playground).
     static DEFER_DEFINITION_ERRORS_HANDLING:boolean = false
 
-    protected static performSelfAnalysis(classInstance:Parser) {
+    protected static performSelfAnalysis(parserInstance:Parser) {
         let definitionErrors = []
         let defErrorsMsgs
 
-        let className = classNameFromInstance(classInstance)
+        let className = classNameFromInstance(parserInstance)
 
         if (className === "") {
             // just a simple "throw Error" without any fancy "definition error" because the logic below relies on a unique parser name to
@@ -251,7 +279,7 @@ export class Parser {
         // this information should only be computed once
         if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
             // clone here
-            let orgProductions = classInstance._productions
+            let orgProductions = parserInstance._productions
             let clonedProductions = new HashTable<gast.Rule>()
             // clone the grammar productions to support grammar inheritance. requirements:
             // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
@@ -272,7 +300,11 @@ export class Parser {
             let resolverErrors = resolveGrammar(clonedProductions)
             definitionErrors.push.apply(definitionErrors, resolverErrors) // mutability for the win?
             cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
-            let validationErrors = validateGrammar(clonedProductions.values())
+            let validationErrors = validateGrammar(
+                clonedProductions.values(),
+                parserInstance.maxLookahead,
+                parserInstance.ignoredIssues)
+
             definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
             if (!isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = map(definitionErrors, defError => defError.message)
@@ -299,6 +331,7 @@ export class Parser {
      */
     protected recoveryEnabled:boolean
     protected maxLookahead:number
+    protected ignoredIssues:IgnoredParserIssues
 
     protected _input:Token[] = []
     protected inputIdx = -1
@@ -330,8 +363,17 @@ export class Parser {
         this._input = input
 
         // configuration
-        this.recoveryEnabled = has(config, "recoveryEnabled") ? config.recoveryEnabled : DEFAULT_PARSER_CONFIG.recoveryEnabled
-        this.maxLookahead = has(config, "maxLookahead") ? config.maxLookahead : DEFAULT_PARSER_CONFIG.maxLookahead
+        this.recoveryEnabled = has(config, "recoveryEnabled") ?
+            config.recoveryEnabled :
+            DEFAULT_PARSER_CONFIG.recoveryEnabled
+
+        this.maxLookahead = has(config, "maxLookahead") ?
+            config.maxLookahead :
+            DEFAULT_PARSER_CONFIG.maxLookahead
+
+        this.ignoredIssues = has(config, "ignoredIssues") ?
+            config.ignoredIssues :
+            DEFAULT_PARSER_CONFIG.ignoredIssues
 
         this.className = classNameFromInstance(this)
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
@@ -670,8 +712,8 @@ export class Parser {
      * Convenience method equivalent to OR1
      * @see OR1
      */
-    protected OR<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
-        return this.OR1(alts, errMsgTypes, ignoreAmbiguities)
+    protected OR<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
+        return this.OR1(alts, errMsgTypes)
     }
 
     /**
@@ -710,40 +752,38 @@ export class Parser {
      *                                 If none is provided, the error message will include the names of the expected
      *                                 Tokens sequences which may start each alternative.
      *
-     * @param {boolean} [ignoreAmbiguities] - if true this will ignore grammar ambiguities between the provides alternatives.
-     *
      * @returns {*} The result of invoking the chosen alternative
      */
-    protected OR1<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
-        return this.orInternal(alts, errMsgTypes, 1, ignoreAmbiguities)
+    protected OR1<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
+        return this.orInternal(alts, errMsgTypes, 1)
     }
 
     /**
      * @see OR1
      */
-    protected OR2<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
-        return this.orInternal(alts, errMsgTypes, 2, ignoreAmbiguities)
+    protected OR2<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
+        return this.orInternal(alts, errMsgTypes, 2)
     }
 
     /**
      * @see OR1
      */
-    protected OR3<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
-        return this.orInternal(alts, errMsgTypes, 3, ignoreAmbiguities)
+    protected OR3<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
+        return this.orInternal(alts, errMsgTypes, 3)
     }
 
     /**
      * @see OR1
      */
-    protected OR4<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
-        return this.orInternal(alts, errMsgTypes, 4, ignoreAmbiguities)
+    protected OR4<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
+        return this.orInternal(alts, errMsgTypes, 4)
     }
 
     /**
      * @see OR1
      */
-    protected OR5<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string, ignoreAmbiguities:boolean = false):T {
-        return this.orInternal(alts, errMsgTypes, 5, ignoreAmbiguities)
+    protected OR5<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
+        return this.orInternal(alts, errMsgTypes, 5)
     }
 
     /**
@@ -1197,8 +1237,12 @@ export class Parser {
                           impl:(...implArgs:any[]) => T,
                           config:IRuleConfig<T>):(idxInCallingRule?:number, ...args:any[]) => T {
 
-        let resyncEnabled = has(config, "resyncEnabled") ? config.resyncEnabled : DEFAULT_RULE_CONFIG.resyncEnabled
-        let recoveryValueFunc = has(config, "recoveryValueFunc") ? config.recoveryValueFunc : DEFAULT_RULE_CONFIG.recoveryValueFunc
+        let resyncEnabled = has(config, "resyncEnabled") ?
+            config.resyncEnabled :
+            DEFAULT_RULE_CONFIG.resyncEnabled
+        let recoveryValueFunc = has(config, "recoveryValueFunc") ?
+            config.recoveryValueFunc :
+            DEFAULT_RULE_CONFIG.recoveryValueFunc
 
         let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
             this.ruleInvocationStateUpdate(ruleName, idxInCallingRule)
@@ -1694,15 +1738,16 @@ export class Parser {
 
     private orInternal<T>(alts:IAnyOrAlt<T>[],
                           errMsgTypes:string,
-                          occurrence:number,
-                          ignoreAmbiguities:boolean):T {
+                          occurrence:number):T {
         // else implicit lookahead
-        let laFunc = this.getLookaheadFuncForOr(occurrence, ignoreAmbiguities, alts)
+        let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
         let altToTake = laFunc.call(this)
         if (altToTake !== -1) {
             let chosenAlternative:any = alts[altToTake]
             // TODO: should THEN_DO should be renamed to ALT to avoid this ternary  expression and to provide a consistent API.
-            let grammarAction = chosenAlternative.ALT ? chosenAlternative.ALT : chosenAlternative.THEN_DO
+            let grammarAction = chosenAlternative.ALT ?
+                chosenAlternative.ALT :
+                chosenAlternative.THEN_DO
             return grammarAction.call(this)
         }
 
@@ -1733,7 +1778,7 @@ export class Parser {
         return key
     }
 
-    private getLookaheadFuncForOr(occurrence:number, ignoreAmbiguities:boolean, alts:IAnyOrAlt<any>[]):() => number {
+    private getLookaheadFuncForOr(occurrence:number, alts:IAnyOrAlt<any>[]):() => number {
 
         let key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurrence)
         let laFunc = <any>this.classLAFuncs.get(key)
@@ -1742,7 +1787,7 @@ export class Parser {
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             let predicates = map(alts, (currAlt) => currAlt.WHEN)
 
-            laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, ignoreAmbiguities, predicates)
+            laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, predicates)
             this.classLAFuncs.put(key, laFunc)
             return laFunc
         }

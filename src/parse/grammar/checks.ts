@@ -3,18 +3,39 @@ import {
     IParserDefinitionError,
     IParserDuplicatesDefinitionError,
     ParserDefinitionErrorType,
-    IParserEmptyAlternativeDefinitionError
+    IParserEmptyAlternativeDefinitionError,
+    IParserAmbiguousAlternativesDefinitionError, IgnoredParserIssues
 } from "../parser_public"
 import {gast} from "./gast_public"
-import {getProductionDslName, isOptionalProd} from "./gast"
-import {tokenName} from "../../scan/tokens_public"
+import {
+    getProductionDslName,
+    isOptionalProd
+} from "./gast"
+import {
+    tokenName,
+    tokenLabel
+} from "../../scan/tokens_public"
 import {first} from "./first"
+import {
+    Alternative,
+    containsPath,
+    getLookaheadPathsForOr
+} from "./lookahead"
+import {
+    forEach,
+    reduce,
+    map,
+    reject
+} from "../../utils/utils"
 
-export function validateGrammar(topLevels:gast.Rule[]):IParserDefinitionError[] {
+export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
     let duplicateErrors = utils.map(topLevels, validateDuplicateProductions)
     let leftRecursionErrors:any = utils.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
-    let emptyAltErrors = utils.map(topLevels, validateEmptyOrAlternative)
-    return <any>utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors))
+    let emptyAltErrors = map(topLevels, validateEmptyOrAlternative)
+    let ambiguousAltsErrors = map(topLevels, currTopRule =>
+        validateAmbiguousAlternationAlternatives(currTopRule, maxLookahead, ignoredIssues))
+
+    return <any>utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors, ambiguousAltsErrors))
 }
 
 function validateDuplicateProductions(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
@@ -296,4 +317,84 @@ export function validateEmptyOrAlternative(topLevelRule:gast.Rule):IParserEmptyA
     }, [])
 
     return errors
+}
+
+export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
+                                                         maxLookahead:number,
+                                                         ignoredIssues:IgnoredParserIssues):IParserAmbiguousAlternativesDefinitionError[] {
+
+    let orCollector = new OrCollector()
+    topLevelRule.accept(orCollector)
+    let ors = orCollector.alternations
+
+    let ignoredIssuesForCurrentRule = ignoredIssues[topLevelRule.name]
+    if (ignoredIssuesForCurrentRule) {
+        ors = reject(ors, (currOr) => ignoredIssuesForCurrentRule[getProductionDslName(currOr) + currOr.occurrenceInParent])
+    }
+
+    let errors = utils.reduce(ors, (result, currOr) => {
+
+        let currOccurrence = currOr.occurrenceInParent
+        let alternatives = getLookaheadPathsForOr(currOccurrence, topLevelRule, maxLookahead)
+        let altsAmbiguityErrors = checkAlternativesAmbiguities(alternatives)
+
+        let currErrors = utils.map(altsAmbiguityErrors, (currAmbDescriptor) => {
+            let ambgIndices = map(currAmbDescriptor.alts, (currAltIdx) => currAltIdx + 1)
+            let pathMsg = map(currAmbDescriptor.path, (currtok) => tokenLabel(currtok)).join(", ")
+            let currMessage = `Ambiguous alternatives: <${ambgIndices.join(" ,")}> in <OR${currOccurrence}>` +
+                ` inside <${topLevelRule.name}> Rule,\n` +
+                `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
+
+
+            // Should this information be on the error message or in some common errors docs?
+            currMessage = currMessage + "To Resolve this, try one of of the following: \n" +
+                "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
+                "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
+                "3. This issue can be ignored (if you know what you are doing...), see" +
+                " http://sap.github.io/chevrotain/documentation/0_9_0/interfaces/iparserconfig.html for\n"
+
+            return {
+                message:      currMessage,
+                type:         ParserDefinitionErrorType.AMBIGUOUS_ALTS,
+                ruleName:     topLevelRule.name,
+                occurrence:   currOr.occurrence,
+                alternatives: [currAmbDescriptor.alts]
+            }
+        })
+        return result.concat(currErrors)
+    }, [])
+
+    return errors
+}
+
+export interface IAmbiguityDescriptor {
+    alts:number[]
+    path:Function[]
+}
+
+function checkAlternativesAmbiguities(alternatives:Alternative[]):IAmbiguityDescriptor[] {
+
+    let foundAmbiguousPaths = []
+    let identicalAmbiguities = reduce(alternatives, (result, currAlt, currAltIdx) => {
+        forEach(currAlt, (currPath) => {
+
+            let altsCurrPathAppearsIn = [currAltIdx]
+            forEach(alternatives, (currOtherAlt, currOtherAltIdx) => {
+                if (currAltIdx !== currOtherAltIdx && containsPath(currOtherAlt, currPath)) {
+                    altsCurrPathAppearsIn.push(currOtherAltIdx)
+                }
+            })
+
+            if (altsCurrPathAppearsIn.length > 1 && !containsPath(foundAmbiguousPaths, currPath)) {
+                foundAmbiguousPaths.push(currPath)
+                result.push({
+                    alts: altsCurrPathAppearsIn,
+                    path: currPath
+                })
+            }
+        })
+        return result
+    }, [])
+
+    return identicalAmbiguities
 }

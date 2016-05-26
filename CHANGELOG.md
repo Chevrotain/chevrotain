@@ -3,14 +3,20 @@
 #### Major Changes
 - [Predicates / Gates on productions should be in addition to standard lookahead.](https://github.com/SAP/chevrotain/issues/189)
 
+- [Capability to ignore parser definition issues at construction time.](https://github.com/SAP/chevrotain/issues/197)
+
 #### Breaking Changes
 - **IsNextRule** method was removed from the Parser class. It's functionality is no longer needed as usage of predicates / gates
-  no longer also requires manually implementing the lookahead function.
+  no longer requires manually (re)implementing the lookahead function.
 
 - [DSL methods with separators should not support predicates.](https://github.com/SAP/chevrotain/issues/191)
 
+- [Move all "parse time" grammar validations to the initialization phase (grammar construction).](https://github.com/SAP/chevrotain/issues/103)
+     
 #### Documentation
 - [Example implementing syntactic & semantic content assist.](https://github.com/SAP/chevrotain/issues/194)
+
+
 
 ## 0.9.0 (4-29-2016)
 
