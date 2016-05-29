@@ -30,7 +30,7 @@ any code generation phase.
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     * Automatic lookahead calculation for **LL(k)** grammars.
-    * Supports [User defined lookahead logic][custom_lookahead] for complex grammars.
+    * Supports [gates/predicates][gates].
     * Backtracking support.
     * [Grammar Inheritance.][grammar_inheritance]
     * [Multiple starting rules.][starting_rules]
@@ -89,8 +89,8 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 [benchmark_jsperf]: http://jsperf.com/json-parsers-comparison/22
 
 
-[lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js
-[keywords_vs_idents]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js
-[custom_lookahead]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
+[lexer_groups]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
+[keywords_vs_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
+[gates]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
