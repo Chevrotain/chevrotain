@@ -17,7 +17,7 @@ any code generation phase.
     * Full Token position information.
     * Token skipping (whitespace/comments/...).
     * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
-    * [Multiple Lexer Modes](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer.js) depending on the context.
+    * [Multiple Lexer Modes][lexer_modes] depending on the context.
     * [Tokens Grouping][lexer_groups]
     * **No code generation** The Lexer does not require any code generation phase. 
    
@@ -88,8 +88,8 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 [benchmark]: http://sap.github.io/chevrotain/performance/
 [benchmark_jsperf]: http://jsperf.com/json-parsers-comparison/22
 
-
-[lexer_groups]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
+[lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
+[lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js
 [keywords_vs_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 [gates]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
