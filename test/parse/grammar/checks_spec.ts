@@ -71,7 +71,7 @@ describe("the grammar validations", () => {
                 new Terminal(IdentTok, 2)
             ])
         ])
-        let actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2])
+        let actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2], 5, {})
         expect(actualErrors.length).to.equal(4)
 
         forEach(actualErrors, err => delete err.message)
@@ -524,11 +524,11 @@ describe("The left recursion detection full flow", () => {
 describe("The empty alternative detection full flow", () => {
 
     it("will throw an error when an empty alternative is not the last alternative", () => {
-        let emptyAltAmbiguityParser = class emptyAltAmbiguityParser extends Parser {
+        class EmptyAltAmbiguityParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, StarTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, StarTok]);
+                (<any>Parser).performSelfAnalysis(this)
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
@@ -549,17 +549,17 @@ describe("The empty alternative detection full flow", () => {
             })
 
         }
-        expect(() => new emptyAltAmbiguityParser()).to.throw("Ambiguous empty alternative")
-        expect(() => new emptyAltAmbiguityParser()).to.throw("3")
-        expect(() => new emptyAltAmbiguityParser()).to.throw("2")
+        expect(() => new EmptyAltAmbiguityParser()).to.throw("Ambiguous empty alternative")
+        expect(() => new EmptyAltAmbiguityParser()).to.throw("3")
+        expect(() => new EmptyAltAmbiguityParser()).to.throw("2")
     })
 
     it("will throw an error when an empty alternative is not the last alternative #2", () => {
-        let emptyAltAmbiguityParser = class emptyAltAmbiguityParser extends Parser {
+        class EmptyAltAmbiguityParser extends Parser {
 
             constructor(input:Token[] = []) {
-                super(input, [PlusTok, StarTok])
-                Parser.performSelfAnalysis(this)
+                super(input, [PlusTok, StarTok]);
+                (<any>Parser).performSelfAnalysis(this)
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
@@ -577,10 +577,10 @@ describe("The empty alternative detection full flow", () => {
             })
 
         }
-        expect(() => new emptyAltAmbiguityParser()).to.throw("Ambiguous empty alternative")
-        expect(() => new emptyAltAmbiguityParser()).to.throw("1")
-        expect(() => new emptyAltAmbiguityParser()).to.throw("Only the last alternative may be an empty alternative.")
-        expect(() => new emptyAltAmbiguityParser()).to.not.throw("undefined")
+        expect(() => new EmptyAltAmbiguityParser()).to.throw("Ambiguous empty alternative")
+        expect(() => new EmptyAltAmbiguityParser()).to.throw("1")
+        expect(() => new EmptyAltAmbiguityParser()).to.throw("Only the last alternative may be an empty alternative.")
+        expect(() => new EmptyAltAmbiguityParser()).to.not.throw("undefined")
     })
 })
 

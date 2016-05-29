@@ -11,7 +11,6 @@ import {
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
-import {checkForOrAmbiguities} from "./ambiguities"
 
 
 export enum PROD_TYPE {
@@ -26,12 +25,8 @@ export enum PROD_TYPE {
 export function buildLookaheadFuncForOr(occurrence:number,
                                         ruleGrammar:gast.Rule,
                                         k:number,
-                                        ignoreAmbiguities:boolean = false,
                                         predicates:{():boolean}[] = []):() => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
-    if (!ignoreAmbiguities) {
-        checkForOrAmbiguities(lookAheadPaths, occurrence, ruleGrammar.name)
-    }
     return buildAlternativesLookAheadFunc(lookAheadPaths, predicates)
 }
 
