@@ -1,4 +1,4 @@
-/*! chevrotain - v0.9.0 */
+/*! chevrotain - v0.10.0 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -239,7 +239,14 @@ declare namespace chevrotain {
         UNRESOLVED_SUBRULE_REF = 4,
         LEFT_RECURSION = 5,
         NONE_LAST_EMPTY_ALT = 6,
+        AMBIGUOUS_ALTS = 7,
     }
+    export type IgnoredRuleIssues = {
+        [dslNameAndOccurrence: string]: boolean;
+    };
+    export type IgnoredParserIssues = {
+        [ruleName: string]: IgnoredRuleIssues;
+    };
     export interface IParserConfig {
         /**
          * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
@@ -249,6 +256,24 @@ declare namespace chevrotain {
          * Maximum number of tokens the parser will use to choose between alternatives.
          */
         maxLookahead?: number;
+        /**
+         * Used to mark parser definition errors that should be ignored.
+         * For example:
+         *
+         * {
+         *   myCustomRule : {
+         *                   OR3 : true
+         *                  },
+         *
+         *   myOtherRule : {
+         *                  OPTION1 : true,
+         *                  OR4 : true
+         *                 }
+         * }
+         *
+         * Be careful when ignoring errors, they are usually there for a reason :).
+         */
+        ignoredIssues?: IgnoredParserIssues;
     }
     export interface IRuleConfig<T> {
         /**
@@ -274,6 +299,10 @@ declare namespace chevrotain {
     export interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
         occurrence: number;
         alternative: number;
+    }
+    export interface IParserAmbiguousAlternativesDefinitionError extends IParserDefinitionError {
+        occurrence: number;
+        alternatives: number[];
     }
     export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
         unresolvedRefName: string;
@@ -301,21 +330,22 @@ declare namespace chevrotain {
      *  {ALT:ZZZ }
      * ])
      */
-    export interface IOrAltImplicit<T> {
+    export interface IOrAltWithPredicate<T> {
         ALT: () => T;
     }
+    export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithPredicate<T>;
     export interface IParserState {
         errors: exceptions.IRecognitionException[];
         inputIdx: number;
         RULE_STACK: string[];
     }
-    export type LookAheadFunc = () => boolean;
+    export type Predicate = () => boolean;
     export type GrammarAction = () => void;
     /**
-     * convenience used to express an empty alternative in an OR (alternation).
+     * Convenience used to express an empty alternative in an OR (alternation).
      * can be used to more clearly describe the intent in a case of empty alternation.
      *
-     * for example:
+     * For example:
      *
      * 1. without using EMPTY_ALT:
      *
@@ -334,7 +364,7 @@ declare namespace chevrotain {
      *    ])
      *
      *
-     * * 2. using EMPTY_ALT:
+     * 2. using EMPTY_ALT:
      *
      *    this.OR([
      *      {ALT: () => {
@@ -356,10 +386,9 @@ declare namespace chevrotain {
      * for example: Error Recovery, Automatic lookahead calculation
      */
     export class Parser {
-        static IGNORE_AMBIGUITIES: boolean;
         static NO_RESYNC: boolean;
         static DEFER_DEFINITION_ERRORS_HANDLING: boolean;
-        protected static performSelfAnalysis(classInstance: Parser): void;
+        protected static performSelfAnalysis(parserInstance: Parser): void;
         errors: exceptions.IRecognitionException[];
         /**
          * This flag enables or disables error recovery (fault tolerance) of the parser.
@@ -367,6 +396,7 @@ declare namespace chevrotain {
          */
         protected recoveryEnabled: boolean;
         protected maxLookahead: number;
+        protected ignoredIssues: IgnoredParserIssues;
         protected _input: Token[];
         protected inputIdx: number;
         protected isBackTrackingStack: any[];
@@ -391,11 +421,10 @@ declare namespace chevrotain {
         protected SAVE_ERROR(error: exceptions.IRecognitionException): exceptions.IRecognitionException;
         protected NEXT_TOKEN(): Token;
         protected LA(howMuch: number): Token;
-        protected isNextRule<T>(ruleName: string): boolean;
         /**
+         * @param grammarRule - the rule to try and parse in backtracking mode
+         * @param isValid - a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
          *
-         * @param grammarRule the rule to try and parse in backtracking mode
-         * @param isValid a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
          * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
          */
         protected BACKTRACK<T>(grammarRule: (...args) => T, isValid: (T) => boolean): () => boolean;
@@ -426,8 +455,7 @@ declare namespace chevrotain {
          *                                  //     the rule 'parseQualifiedName'
          * }
          *
-         * @param {Function} tokClass A constructor function specifying the type of token
-         *        to be consumed.
+         * @param {Function} tokClass - A constructor function specifying the type of token to be consumed.
          *
          * @returns {Token} The consumed token.
          */
@@ -467,8 +495,8 @@ declare namespace chevrotain {
          * As in CONSUME the index in the method name indicates the occurrence
          * of the sub rule invocation in its rule.
          *
-         * @param {Function} ruleToCall the rule to invoke
-         * @param {*[]} args the arguments to pass to the invoked subrule
+         * @param {Function} ruleToCall - the rule to invoke
+         * @param {*[]} args - the arguments to pass to the invoked subrule
          * @returns {*} the result of invoking ruleToCall
          */
         protected SUBRULE1<T>(ruleToCall: (number) => T, args?: any[]): T;
@@ -492,7 +520,7 @@ declare namespace chevrotain {
          * Convenience method equivalent to OPTION1
          * @see OPTION1
          */
-        protected OPTION(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): boolean;
+        protected OPTION(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): boolean;
         /**
          * Parsing DSL Method that Indicates an Optional production
          * in EBNF notation: [...]
@@ -500,44 +528,42 @@ declare namespace chevrotain {
          * note that the 'action' param is optional. so both of the following forms are valid:
          *
          * short: this.OPTION(()=>{ this.CONSUME(Digit});
-         * long: this.OPTION(isDigit, ()=>{ this.CONSUME(Digit});
+         * long: this.OPTION(predicateFunc, ()=>{ this.CONSUME(Digit});
          *
-         * using the short form is recommended as it will compute the lookahead function
-         * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * The 'predicateFunc' in the long form can be used to add constraints (none grammar related)
+         * to optionally invoking the grammar action.
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the optional production in it's top rule.
          *
-         * @param {Function} laFuncOrAction The lookahead function that 'decides'
-         *                                  whether or not the OPTION's action will be
-         *                                  invoked or the action to optionally invoke
-         * @param {Function} [action] The action to optionally invoke.
+         * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
+         *                                       or the grammar action to optionally invoke once.
+         * @param {Function} [action] - The action to optionally invoke.
          *
          * @returns {boolean} true iff the OPTION's action has been invoked
          */
-        protected OPTION1(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): boolean;
+        protected OPTION1(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): boolean;
         /**
          * @see OPTION1
          */
-        protected OPTION2(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): boolean;
+        protected OPTION2(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): boolean;
         /**
          * @see OPTION1
          */
-        protected OPTION3(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): boolean;
+        protected OPTION3(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): boolean;
         /**
          * @see OPTION1
          */
-        protected OPTION4(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): boolean;
+        protected OPTION4(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): boolean;
         /**
          * @see OPTION1
          */
-        protected OPTION5(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): boolean;
+        protected OPTION5(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): boolean;
         /**
          * Convenience method equivalent to OR1
          * @see OR1
          */
-        protected OR<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
+        protected OR<T>(alts: IAnyOrAlt<T>[], errMsgTypes?: string): T;
         /**
          * Parsing DSL method that indicates a choice between a set of alternatives must be made.
          * This is equivalent to EBNF alternation (A | B | C | D ...)
@@ -551,14 +577,19 @@ declare namespace chevrotain {
          *        ], "a number")
          *
          * long: this.OR([
-         *           {WHEN: isOne, THEN_DO:()=>{this.CONSUME(One)}},
-         *           {WHEN: isTwo, THEN_DO:()=>{this.CONSUME(Two)}},
-         *           {WHEN: isThree, THEN_DO:()=>{this.CONSUME(Three)}},
+         *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
+         *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Two)}},
+         *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Three)}},
          *        ], "a number")
          *
-         * using the short form is recommended as it will compute the lookahead function
-         * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one LL(1).
+         * They can also be mixed:
+         * mixed: this.OR([
+         *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
+         *           {ALT:()=>{this.CONSUME(Two)}},
+         *           {ALT:()=>{this.CONSUME(Three)}}
+         *        ], "a number")
+         *
+         * The 'predicateFuncX' in the long form can be used to add constraints (none grammar related) to choosing the alternative.
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the alternation production in it's top rule.
@@ -567,38 +598,32 @@ declare namespace chevrotain {
          *
          * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
          *                                 If none is provided, the error message will include the names of the expected
-         *                                 Tokens which may start each alternative.
-         *
-         * @param {boolean} [ignoreAmbiguities] - if true this will ignore ambiguities caused when two alternatives can not
-         *        be distinguished by a lookahead of one. enabling this means the first alternative
-         *        that matches will be taken. This is sometimes the grammar's intent.
-         *        * only enable this if you know what you are doing!
+         *                                 Tokens sequences which may start each alternative.
          *
          * @returns {*} The result of invoking the chosen alternative
-    
          */
-        protected OR1<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
+        protected OR1<T>(alts: IAnyOrAlt<T>[], errMsgTypes?: string): T;
         /**
          * @see OR1
          */
-        protected OR2<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
+        protected OR2<T>(alts: IAnyOrAlt<T>[], errMsgTypes?: string): T;
         /**
          * @see OR1
          */
-        protected OR3<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
+        protected OR3<T>(alts: IAnyOrAlt<T>[], errMsgTypes?: string): T;
         /**
          * @see OR1
          */
-        protected OR4<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
+        protected OR4<T>(alts: IAnyOrAlt<T>[], errMsgTypes?: string): T;
         /**
          * @see OR1
          */
-        protected OR5<T>(alts: IOrAlt<T>[] | IOrAltImplicit<T>[], errMsgTypes?: string, ignoreAmbiguities?: boolean): T;
+        protected OR5<T>(alts: IAnyOrAlt<T>[], errMsgTypes?: string): T;
         /**
          * Convenience method equivalent to MANY1
          * @see MANY1
          */
-        protected MANY(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): void;
         /**
          * Parsing DSL method, that indicates a repetition of zero or more.
          * This is equivalent to EBNF repetition {...}
@@ -608,101 +633,88 @@ declare namespace chevrotain {
          * short: this.MANY(()=>{
          *                       this.CONSUME(Comma};
          *                       this.CONSUME(Digit});
-         * long: this.MANY(isComma, ()=>{
+         *
+         * long: this.MANY(predicateFunc, () => {
          *                       this.CONSUME(Comma};
          *                       this.CONSUME(Digit});
          *
-         * using the short form is recommended as it will compute the lookahead function
-         * automatically. however this currently has one limitation:
-         * It only works if the lookahead for the grammar is one.
+         * The 'predicateFunc' in the long form can be used to add constraints (none grammar related) taking another iteration.
          *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the repetition production in it's top rule.
          *
-         * @param {Function} laFuncOrAction The lookahead function that 'decides'
-         *                                  whether or not the MANY's action will be
-         *                                  invoked or the action to optionally invoke
-         * @param {Function} [action] The action to optionally invoke.
+         * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
+         *                                   or the grammar action to optionally invoke multiple times.
+         * @param {Function} [action] - The action to optionally invoke multiple times.
          */
-        protected MANY1(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY1(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): void;
         /**
          * @see MANY1
          */
-        protected MANY2(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY2(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): void;
         /**
          * @see MANY1
          */
-        protected MANY3(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY3(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): void;
         /**
          * @see MANY1
          */
-        protected MANY4(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY4(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): void;
         /**
          * @see MANY1
          */
-        protected MANY5(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): void;
+        protected MANY5(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction): void;
         /**
          * Convenience method equivalent to MANY_SEP1
          * @see MANY_SEP1
          */
-        protected MANY_SEP(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        protected MANY_SEP(separator: TokenConstructor, action: GrammarAction): Token[];
         /**
          * Parsing DSL method, that indicates a repetition of zero or more with a separator
          * Token between the repetitions.
          *
-         * Note that the 'action' param is optional. so both of the following forms are valid:
+         * Example:
          *
-         * short: this.MANY_SEP(Comma, ()=>{
-         *                          this.CONSUME(Number};
-         *                       ...
-         *                       );
+         * this.MANY_SEP(Comma, () => {
+         *                     this.CONSUME(Number};
+         *                     ...
+         *                   );
          *
-         * long: this.MANY(Comma, isNumber, ()=>{
-         *                           this.CONSUME(Number}
-         *                       ...
-         *                       );
-         *
-         * Using the short form is recommended as it will compute the lookahead function automatically.
-         *
-         * Note that for the purposes of deciding on whether  or not another iteration exists
+         * Note that for the purposes of deciding on whether or not another iteration exists
          * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
          * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
          * to implement it.
          *
-         *
          * As in CONSUME the index in the method name indicates the occurrence
          * of the repetition production in it's top rule.
          *
-         * @param separator - The Token to use as a separator between repetitions.
-         * @param {Function} laFuncOrAction - The lookahead function that 'decides'
-         *                                  whether or not the MANY_SEP's action will be
-         *                                  invoked or the action to optionally invoke
+         * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
          * @param {Function} [action] - The action to optionally invoke.
          *
          * @return {Token[]} - The consumed separator Tokens.
          */
-        protected MANY_SEP1(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        protected MANY_SEP1(separator: TokenConstructor, action: GrammarAction): Token[];
         /**
          * @see MANY_SEP1
          */
-        protected MANY_SEP2(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        protected MANY_SEP2(separator: TokenConstructor, action: GrammarAction): Token[];
         /**
          * @see MANY_SEP1
          */
-        protected MANY_SEP3(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        protected MANY_SEP3(separator: TokenConstructor, action: GrammarAction): Token[];
         /**
          * @see MANY_SEP1
          */
-        protected MANY_SEP4(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        protected MANY_SEP4(separator: TokenConstructor, action: GrammarAction): Token[];
         /**
          * @see MANY_SEP1
          */
-        protected MANY_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction): Token[];
+        protected MANY_SEP5(separator: TokenConstructor, action: GrammarAction): Token[];
         /**
          * Convenience method equivalent to AT_LEAST_ONE1
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          *
          * convenience method, same as MANY but the repetition is of one or more.
@@ -711,34 +723,33 @@ declare namespace chevrotain {
          *
          * @see MANY1
          *
-         * @param {Function} laFuncOrAction The lookahead function that 'decides'
-         *                                  whether or not the AT_LEAST_ONE's action will be
-         *                                  invoked or the action to optionally invoke
-         * @param {Function} [action] The action to optionally invoke.
+         * @param {Function} predicateOrAction  - The predicate / gate function that implements the constraint on the grammar
+         *                                        or the grammar action to invoke at least once.
+         * @param {Function} [action] - The action to optionally invoke.
          * @param {string} [errMsg] short title/classification to what is being matched
          */
-        protected AT_LEAST_ONE1(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE1(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE2(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE2(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE3(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE3(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE4(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE4(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE5(laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
+        protected AT_LEAST_ONE5(predicateOrAction: Predicate | GrammarAction, action?: GrammarAction | string, errMsg?: string): void;
         /**
          * Convenience method equivalent to AT_LEAST_ONE_SEP1
          * @see AT_LEAST_ONE1
          */
-        protected AT_LEAST_ONE_SEP(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP(separator: TokenConstructor, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          *
          * convenience method, same as MANY_SEP but the repetition is of one or more.
@@ -747,46 +758,41 @@ declare namespace chevrotain {
          *
          * @see MANY_SEP1
          *
-         * @param separator {Token}
-         * @param {Function} laFuncOrAction The lookahead function that 'decides'
-         *                                  whether or not the AT_LEAST_ONE's action will be
-         *                                  invoked or the action to optionally invoke
-         * @param {Function} [action] The action to optionally invoke.
-         * @param {string} [errMsg] short title/classification to what is being matched
+         * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
+         * @param {Function} [action] - The action to optionally invoke.
+         * @param {string} [errMsg] - short title/classification to what is being matched
          */
-        protected AT_LEAST_ONE_SEP1(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP1(separator: TokenConstructor, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP2(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP2(separator: TokenConstructor, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP3(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP3(separator: TokenConstructor, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP4(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP4(separator: TokenConstructor, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          * @see AT_LEAST_ONE_SEP1
          */
-        protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, laFuncOrAction: LookAheadFunc | GrammarAction, action?: GrammarAction | string, errMsg?: string): Token[];
+        protected AT_LEAST_ONE_SEP5(separator: TokenConstructor, action: GrammarAction | string, errMsg?: string): Token[];
         /**
          *
          * @param {string} name - The name of the rule.
          * @param {Function} implementation - The implementation of the rule.
-         * @param {IRuleConfig} [config] - The rule's optional configurationn
+         * @param {IRuleConfig} [config] - The rule's optional configuration
          *
          * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
          *                     Parser state / error recovery&reporting/ ...
          */
         protected RULE<T>(name: string, implementation: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         /**
-         *
          * @See RULE
          * same as RULE, but should only be used in "extending" grammars to override rules/productions
          * from the super grammar.
-         *
          */
         protected OVERRIDE_RULE<T>(name: string, impl: (...implArgs: any[]) => T, config?: IRuleConfig<T>): (idxInCallingRule?: number, ...args: any[]) => T;
         protected ruleInvocationStateUpdate(ruleName: string, idxInCallingRule: number): void;
@@ -811,9 +817,11 @@ declare namespace chevrotain {
          * @returns {string} The error message saved as part of a MismatchedTokenException.
          */
         protected getMisMatchTokenErrorMessage(expectedTokType: Function, actualToken: Token): string;
-                                                                                                        /**
-         * @param tokClass The Type of Token we wish to consume (Reference to its constructor function)
-         * @param idx occurrence index of consumed token in the invoking parser rule text
+        protected getCurrentGrammarPath(tokClass: Function, tokIdxInRule: number): ITokenGrammarPath;
+        protected getNextPossibleTokenTypes(grammarPath: ITokenGrammarPath): Function[];
+        /**
+         * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function)
+         * @param idx - occurrence index of consumed token in the invoking parser rule text
          *         for example:
          *         IDENT (DOT IDENT)*
          *         the first ident will have idx 1 and the second one idx 2
@@ -823,7 +831,8 @@ declare namespace chevrotain {
          *
          * @returns the consumed Token
          */
-                                                            }
+        protected consumeInternal(tokClass: Function, idx: number): Token;
+                                                                                                                                                        }
     
     export namespace exceptions {
         interface IRecognizerContext {
@@ -858,6 +867,22 @@ declare namespace chevrotain {
         function NoViableAltException(message: string, token: Token): void;
         function NotAllInputParsedException(message: string, token: Token): void;
         function EarlyExitException(message: string, token: Token): void;
+    }
+    
+    /**
+     * this interfaces defines the path the parser "took" to reach a certain position
+     * in the grammar.
+     */
+    export interface IGrammarPath {
+        ruleStack: string[];
+        occurrenceStack: number[];
+    }
+    export interface ITokenGrammarPath extends IGrammarPath {
+        lastTok: Function;
+        lastTokOccurrence: number;
+    }
+    export interface IRuleGrammarPath extends IGrammarPath {
+        occurrence: number;
     }
     
     export namespace gast {
