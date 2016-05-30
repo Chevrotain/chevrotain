@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.10.1 (5-30-2016)
 
 Fixes issue with previous release automation.
 
