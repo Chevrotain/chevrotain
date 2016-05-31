@@ -46,31 +46,35 @@ Whitespace.GROUP = Lexer.SKIPPED;
 // Each key defines a Lexer mode's name.
 // And each value is an array of Tokens which are valid in this Lexer mode.
 var multiModeLexerDefinition = {
-    // the default (inital) mode is "numbers_mode"
-    "numbers_mode": [
-        One,
-        Two,
-        Three,
-        ExitNumbers, // encountering an ExitNumbers Token will cause the lexer to revert to the previous mode
-        EnterLetters, // switch to "Letter_mode" after encountering "ENTER_Letter" while in "numbers_mode"
-        Whitespace
-    ],
-    "Letter_mode":  [
-        Alpha,
-        Beta,
-        Gamma,
-        ExitLetter, // encountering an ExitNumbers Token will cause the lexer to revert to the previous mode
-        EnterSigns,  // switch to "signs_mode" after encountering "ENTER_SIGNS" while in "numbers_mode"
-        Whitespace
-    ],
-    "signs_mode":   [
-        Hash,
-        Caret,
-        Amp,
-        ExitSigns, // encountering an ExitSigns Token will cause the lexer to revert to the previous mode
-        EnterNumbers, // switch to "numbers_mode" after encountering "ENTER_NUMBERS" while in "signs_mode"
-        Whitespace
-    ]
+
+    modes : {
+        "numbers_mode": [
+            One,
+            Two,
+            Three,
+            ExitNumbers, // encountering an ExitNumbers Token will cause the lexer to revert to the previous mode
+            EnterLetters, // switch to "Letter_mode" after encountering "ENTER_Letter" while in "numbers_mode"
+            Whitespace
+        ],
+        "Letter_mode":  [
+            Alpha,
+            Beta,
+            Gamma,
+            ExitLetter, // encountering an ExitNumbers Token will cause the lexer to revert to the previous mode
+            EnterSigns,  // switch to "signs_mode" after encountering "ENTER_SIGNS" while in "numbers_mode"
+            Whitespace
+        ],
+        "signs_mode":   [
+            Hash,
+            Caret,
+            Amp,
+            ExitSigns, // encountering an ExitSigns Token will cause the lexer to revert to the previous mode
+            EnterNumbers, // switch to "numbers_mode" after encountering "ENTER_NUMBERS" while in "signs_mode"
+            Whitespace
+        ]
+    },
+
+    defaultMode : "numbers_mode"
 };
 
 // Our new lexer now support 3 different modes
