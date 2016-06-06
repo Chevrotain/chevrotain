@@ -623,8 +623,7 @@ describe("The Simple Lexer Full flow", () => {
         it("Will detect a multiMode Lexer definition which is missing the <defaultMode> property", () => {
 
             let lexerDef:any = {
-                modes: {
-                },
+                modes: {},
 
                 defaultMode___: "" //  typo in 'defaultMode' property name
             }
@@ -636,7 +635,35 @@ describe("The Simple Lexer Full flow", () => {
             expect(badLexer.lexerDefinitionErrors[0].message).to.include("without a <defaultMode> property")
         })
 
+        it("Will detect a multiMode Lexer definition which has an invalid (missing the value) of the <defaultMode> property", () => {
 
+            let lexerDef:any = {
+                modes: {
+                    "bamba": []
+                },
+
+                defaultMode: "bisli"
+            }
+            let badLexer = new Lexer(lexerDef, true)
+            expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+            expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
+                LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST)
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("MultiMode Lexer cannot be initialized")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("which does not exist")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("bisli")
+        })
+
+        it("Will detect a Lexer definition which has undefined Token classes", () => {
+
+            let lexerDef:any = [
+                Alpha, Beta, /* this is undefined */, Gamma
+            ]
+            let badLexer = new Lexer(lexerDef, true)
+            expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+            expect(badLexer.lexerDefinitionErrors[0].type).to.equal(LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED)
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("A Lexer cannot be initialized using an undefined Token Class")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("2")
+        })
     })
 
 })

@@ -2,7 +2,9 @@ import {Token} from "./tokens_public"
 import {
     validatePatterns,
     analyzeTokenClasses,
-    countLineTerminators
+    countLineTerminators,
+    DEFAULT_MODE,
+    performRuntimeChecks
 } from "./lexer"
 import {
     cloneObj,
@@ -13,11 +15,9 @@ import {
     merge,
     last,
     keys,
-    has
+    isUndefined,
+    reject, cloneArr
 } from "../utils/utils"
-
-const DEFAULT_MODE = "defaultMode"
-const MODES = "modes"
 
 export type TokenConstructor = Function
 
@@ -36,7 +36,9 @@ export enum LexerDefinitionErrorType {
     INVALID_GROUP_TYPE_FOUND,
     PUSH_MODE_DOES_NOT_EXIST,
     MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE,
-    MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
+    MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY,
+    MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
+    LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
 }
 
 export interface ILexerDefinitionError {
@@ -181,41 +183,28 @@ export class Lexer {
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
             actualDefinition = <any>{modes: {}}
-            actualDefinition.modes[DEFAULT_MODE] = <SingleModeLexerDefinition>lexerDefinition
+            actualDefinition.modes[DEFAULT_MODE] = cloneArr(<SingleModeLexerDefinition>lexerDefinition)
             actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
         }
         // no conversion needed, input should already be a IMultiModeLexerDefinition
         else {
-            // some run time checks to help the end users.
-            if (!has(lexerDefinition, DEFAULT_MODE)) {
-                this.lexerDefinitionErrors.push({
-                    message: "A MultiMode Lexer cannot be initialized without a <" + DEFAULT_MODE + "> property in its definition\n",
-                    type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE
-                })
-            }
-
-            if (!has(lexerDefinition, MODES)) {
-                this.lexerDefinitionErrors.push({
-                    message: "A MultiMode Lexer cannot be initialized without a <" + MODES + "> property in its definition\n",
-                    type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
-                })
-            }
-            actualDefinition = <IMultiModeLexerDefinition>lexerDefinition
+            actualDefinition = cloneObj(<IMultiModeLexerDefinition>lexerDefinition)
         }
 
-        // multiMode
-        // robustness checks to avoid throwing an none informative error message
-        // after an API change (modifying the MultiModeLexer definition's structure).
+        this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(performRuntimeChecks(actualDefinition))
 
-        // @formatter:off
-        let allLexerModes = has(actualDefinition, MODES) ?
-            actualDefinition.modes :
-            {}
-        // @formatter:on
+        // for extra robustness to avoid throwing an none informative error message
+        actualDefinition.modes = actualDefinition.modes ? actualDefinition.modes : {}
 
-        let allModeNames = keys(allLexerModes)
+        // an error of undefined TokenClasses will be detected in "performRuntimeChecks" above.
+        // this transformation is to increase robustness in the case of partially invalid lexer definition.
+        forEach(actualDefinition.modes, (currModeValue, currModeName) => {
+            actualDefinition.modes[currModeName] = reject<Function>(currModeValue, (currTokClass) => isUndefined(currTokClass))
+        })
 
-        forEach(allLexerModes, (currModDef:TokenConstructor[], currModName) => {
+        let allModeNames = keys(actualDefinition.modes)
+
+        forEach(actualDefinition.modes, (currModDef:TokenConstructor[], currModName) => {
             this.modes.push(currModName)
             this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
                 validatePatterns(<SingleModeLexerDefinition>currModDef, allModeNames))

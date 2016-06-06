@@ -1,3 +1,12 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+- Minor version release as the previous version included a breaking change in a patch version.
+ 
+#### Minor Changes
+   - [Better runtime checks for Invalid Lexer definitions.](https://github.com/SAP/chevrotain/issues/204)
+
+
+
 ## 0.10.2 (6-6-2016)
 
 #### Breaking Changes

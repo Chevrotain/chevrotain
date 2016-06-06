@@ -1,5 +1,11 @@
 import {Token, tokenName} from "./tokens_public"
-import {TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer} from "./lexer_public"
+import {
+    TokenConstructor,
+    ILexerDefinitionError,
+    LexerDefinitionErrorType,
+    Lexer,
+    IMultiModeLexerDefinition
+} from "./lexer_public"
 import {
     reject,
     indexOf,
@@ -14,10 +20,12 @@ import {
     isRegExp,
     compact,
     contains,
-    first
+    first, forEach
 } from "../utils/utils"
 
-let PATTERN = "PATTERN"
+const PATTERN = "PATTERN"
+export const DEFAULT_MODE = "defaultMode"
+export const MODES = "modes"
 
 export interface IAnalyzeResult {
     allPatterns:RegExp[]
@@ -283,7 +291,9 @@ export function findModesThatDoNotExist(tokenClasses:TokenConstructor[], validMo
 }
 
 export function addStartOfInput(pattern:RegExp):RegExp {
-    let flags = pattern.ignoreCase ? "i" : ""
+    let flags = pattern.ignoreCase ?
+        "i" :
+        ""
     // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
     // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
     return new RegExp(`^(?:${pattern.source})`, flags)
@@ -311,4 +321,50 @@ export function countLineTerminators(text:string):number {
     }
 
     return lineTerminators
+}
+
+export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):ILexerDefinitionError[] {
+
+    let errors = []
+
+    // some run time checks to help the end users.
+    if (!has(lexerDefinition, DEFAULT_MODE)) {
+        errors.push({
+            message: "A MultiMode Lexer cannot be initialized without a <" + DEFAULT_MODE + "> property in its definition\n",
+            type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE
+        })
+    }
+    if (!has(lexerDefinition, MODES)) {
+        errors.push({
+            message: "A MultiMode Lexer cannot be initialized without a <" + MODES + "> property in its definition\n",
+            type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
+        })
+    }
+
+    if (has(lexerDefinition, MODES) &&
+        has(lexerDefinition, DEFAULT_MODE) && !has(lexerDefinition.modes, lexerDefinition.defaultMode)) {
+        errors.push({
+            message: `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${lexerDefinition.defaultMode}>`
+                     + `which does not exist\n`,
+            type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
+        })
+    }
+
+    if (has(lexerDefinition, MODES)) {
+        forEach(lexerDefinition.modes, (currModeValue, currModeName) => {
+            forEach(currModeValue, (currTokClass, currIdx) => {
+                if (isUndefined(currTokClass)) {
+                    errors.push({
+                        message: `A Lexer cannot be initialized using an undefined Token Class. Mode:` +
+                                 `<${currModeName}> at index: <${currIdx}>\n`,
+                        type:    LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
+                    })
+                }
+            })
+
+            // lexerDefinition.modes[currModeName] = reject<Function>(currModeValue, (currTokClass) => isUndefined(currTokClass))
+        })
+    }
+
+    return errors
 }

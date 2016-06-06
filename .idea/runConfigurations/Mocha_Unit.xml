@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Mocha Unit" type="mocha-javascript-test-runner" factoryName="Mocha">
-    <node-interpreter>/usr/local/bin/node</node-interpreter>
+    <node-interpreter>project</node-interpreter>
     <node-options />
     <working-directory>$PROJECT_DIR$</working-directory>
     <pass-parent-env>true</pass-parent-env>

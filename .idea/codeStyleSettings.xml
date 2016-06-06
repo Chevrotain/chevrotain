@@ -18,12 +18,12 @@
           <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
         </XML>
         <codeStyleSettings language="JavaScript">
-          <option name="TERNARY_OPERATION_WRAP" value="2" />
+          <option name="TERNARY_OPERATION_WRAP" value="5" />
           <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
           <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
         </codeStyleSettings>
         <codeStyleSettings language="TypeScript">
-          <option name="TERNARY_OPERATION_WRAP" value="2" />
+          <option name="TERNARY_OPERATION_WRAP" value="5" />
           <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
           <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
         </codeStyleSettings>
