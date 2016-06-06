@@ -1,6 +1,16 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [MultiMode Lexer defaultMode should not be implicitly defined.](https://github.com/SAP/chevrotain/issues/202)
+
+#### Documentation
+- [XML grammar example.](https://github.com/SAP/chevrotain/issues/201)
+
+
+
 ## 0.10.1 (5-30-2016)
 
-Fixes issue with previous release automation.
+- Fixes issue with previous release automation.
 
 
 

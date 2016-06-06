@@ -1,5 +1,9 @@
 import {Token} from "../../src/scan/tokens_public"
-import {Lexer, LexerDefinitionErrorType, MultiModeLexerWDefinition} from "../../src/scan/lexer_public"
+import {
+    Lexer,
+    LexerDefinitionErrorType,
+    IMultiModeLexerDefinition
+} from "../../src/scan/lexer_public"
 import {
     findMissingPatterns,
     countLineTerminators,
@@ -488,10 +492,13 @@ describe("The Simple Lexer Full flow", () => {
             static GROUP = Lexer.SKIPPED
         }
 
-        let modeLexerDefinition:MultiModeLexerWDefinition = {
-            "numbers": [One, Two, Three, ExitNumbers, LETTERS, Whitespace],
-            "letters": [Alpha, Beta, Gamma, ExitLetters, SIGNS, Whitespace],
-            "signs":   [Hash, Caret, Amp, ExitSigns, NUMBERS, Whitespace]
+        let modeLexerDefinition:IMultiModeLexerDefinition = {
+            modes:       {
+                "numbers": [One, Two, Three, ExitNumbers, LETTERS, Whitespace],
+                "letters": [Alpha, Beta, Gamma, ExitLetters, SIGNS, Whitespace],
+                "signs":   [Hash, Caret, Amp, ExitSigns, NUMBERS, Whitespace]
+            },
+            defaultMode: "numbers"
         }
 
         let ModeLexer = new Lexer(modeLexerDefinition)
@@ -578,10 +585,14 @@ describe("The Simple Lexer Full flow", () => {
                 static PUSH_MODE = "numbers"
             }
 
-            let lexerDef:MultiModeLexerWDefinition = {
-                "letters":      [Alpha, Beta, Gamma, Whitespace, EnterNumbers],
-                // the numbers mode has a typo! so the PUSH_MODE in the 'EnterNumbers' is invalid
-                "nuMbers_TYPO": [One, Two, Whitespace]
+            let lexerDef:IMultiModeLexerDefinition = {
+                modes: {
+                    "letters":      [Alpha, Beta, Gamma, Whitespace, EnterNumbers],
+                    // the numbers mode has a typo! so the PUSH_MODE in the 'EnterNumbers' is invalid
+                    "nuMbers_TYPO": [One, Two, Whitespace]
+                },
+
+                defaultMode: "letters"
             }
 
             let badLexer = new Lexer(lexerDef, true)
@@ -592,6 +603,40 @@ describe("The Simple Lexer Full flow", () => {
             expect(badLexer.lexerDefinitionErrors[0].message).to.include("EnterNumbers")
             expect(badLexer.lexerDefinitionErrors[0].message).to.include("which does not exist")
         })
+
+        it("Will detect a multiMode Lexer definition which is missing the <modes> property", () => {
+
+            let lexerDef:any = {
+                modes___: { //  typo in 'modes' property name
+                },
+
+                defaultMode: ""
+            }
+
+            let badLexer = new Lexer(lexerDef, true)
+            expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+            expect(badLexer.lexerDefinitionErrors[0].type).to.equal(LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY)
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("MultiMode Lexer cannot be initialized")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("without a <modes> property")
+        })
+
+        it("Will detect a multiMode Lexer definition which is missing the <defaultMode> property", () => {
+
+            let lexerDef:any = {
+                modes: {
+                },
+
+                defaultMode___: "" //  typo in 'defaultMode' property name
+            }
+
+            let badLexer = new Lexer(lexerDef, true)
+            expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+            expect(badLexer.lexerDefinitionErrors[0].type).to.equal(LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE)
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("MultiMode Lexer cannot be initialized")
+            expect(badLexer.lexerDefinitionErrors[0].message).to.include("without a <defaultMode> property")
+        })
+
+
     })
 
 })

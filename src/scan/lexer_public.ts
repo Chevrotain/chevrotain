@@ -1,6 +1,23 @@
 import {Token} from "./tokens_public"
-import {validatePatterns, analyzeTokenClasses, countLineTerminators} from "./lexer"
-import {cloneObj, isEmpty, map, isArray, first, forEach, merge, last, keys} from "../utils/utils"
+import {
+    validatePatterns,
+    analyzeTokenClasses,
+    countLineTerminators
+} from "./lexer"
+import {
+    cloneObj,
+    isEmpty,
+    map,
+    isArray,
+    forEach,
+    merge,
+    last,
+    keys,
+    has
+} from "../utils/utils"
+
+const DEFAULT_MODE = "defaultMode"
+const MODES = "modes"
 
 export type TokenConstructor = Function
 
@@ -17,13 +34,15 @@ export enum LexerDefinitionErrorType {
     UNSUPPORTED_FLAGS_FOUND,
     DUPLICATE_PATTERNS_FOUND,
     INVALID_GROUP_TYPE_FOUND,
-    PUSH_MODE_DOES_NOT_EXIST
+    PUSH_MODE_DOES_NOT_EXIST,
+    MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE,
+    MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
 }
 
 export interface ILexerDefinitionError {
     message:string
     type:LexerDefinitionErrorType
-    tokenClasses:Function[]
+    tokenClasses?:Function[]
 }
 
 export interface ILexingError {
@@ -34,7 +53,12 @@ export interface ILexingError {
 }
 
 export type SingleModeLexerDefinition = TokenConstructor[]
-export type MultiModeLexerWDefinition = { [modeName:string]:TokenConstructor[] }
+export type MultiModesDefinition = { [modeName:string]:TokenConstructor[] }
+
+export interface IMultiModeLexerDefinition {
+    modes:MultiModesDefinition
+    defaultMode:string
+}
 
 export class Lexer {
 
@@ -44,9 +68,10 @@ export class Lexer {
     }
 
     public static NA = /NOT_APPLICABLE/
-    public lexerDefinitionErrors = []
+    public lexerDefinitionErrors:ILexerDefinitionError[] = []
 
     protected modes:string[] = []
+    protected defaultMode:string
     protected allPatterns:{ [modeName:string]:RegExp[] } = {}
     protected patternIdxToClass:{ [modeName:string]:Function[] } = {}
     protected patternIdxToGroup:{ [modeName:string]:string[] } = {}
@@ -58,19 +83,27 @@ export class Lexer {
 
 
     /**
-     * @param {SingleModeLexerDefinition | MultiModeLexerWDefinition} lexerDefinition -
+     * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
      *  Structure composed of  constructor functions for the Tokens types this lexer will support.
      *
      *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
-     *  In the case of {MultiModeLexerWDefinition} the structure is an object where each value is an array of Token constructors.
+     *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties
+     *    1. a "modes" property where each value is an array of Token.
+     *    2. a "defaultMode" property specifying the initial lexer mode.
+     *
+     *  constructors.
      *
      *  for example:
      *  {
+     *     "modes" : {
      *     "modeX" : [Token1, Token2]
      *     "modeY" : [Token3, Token4]
+     *     }
+     *
+     *     "defaultMode" : "modeY"
      *  }
      *
-     *  A lexer with {MultiModeLexerWDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
+     *  A lexer with {MultiModesDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
      *  This is useful for lexing languages where there are different lexing rules depending on context.
      *
      *  The current lexing mode is selected via a "mode stack".
@@ -140,19 +173,49 @@ export class Lexer {
      *                  This can be useful when wishing to indicate lexer errors in another manner
      *                  than simply throwing an error (for example in an online playground).
      */
-    constructor(protected lexerDefinition:SingleModeLexerDefinition | MultiModeLexerWDefinition,
+    constructor(protected lexerDefinition:SingleModeLexerDefinition | IMultiModeLexerDefinition,
                 deferDefinitionErrorsHandling:boolean = false) {
 
+        let actualDefinition:IMultiModeLexerDefinition
 
-        // Convert SingleModeLexerDefinition into a MultiModeLexerDefinition with
+        // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
-            lexerDefinition = {
-                "default_mode": <SingleModeLexerDefinition>lexerDefinition
+            actualDefinition = <any>{modes: {}}
+            actualDefinition.modes[DEFAULT_MODE] = <SingleModeLexerDefinition>lexerDefinition
+            actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
+        }
+        // no conversion needed, input should already be a IMultiModeLexerDefinition
+        else {
+            // some run time checks to help the end users.
+            if (!has(lexerDefinition, DEFAULT_MODE)) {
+                this.lexerDefinitionErrors.push({
+                    message: "A MultiMode Lexer cannot be initialized without a <" + DEFAULT_MODE + "> property in its definition\n",
+                    type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE
+                })
             }
+
+            if (!has(lexerDefinition, MODES)) {
+                this.lexerDefinitionErrors.push({
+                    message: "A MultiMode Lexer cannot be initialized without a <" + MODES + "> property in its definition\n",
+                    type:    LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
+                })
+            }
+            actualDefinition = <IMultiModeLexerDefinition>lexerDefinition
         }
 
-        let allModeNames = keys(lexerDefinition)
-        forEach(lexerDefinition, (currModDef:TokenConstructor[], currModName) => {
+        // multiMode
+        // robustness checks to avoid throwing an none informative error message
+        // after an API change (modifying the MultiModeLexer definition's structure).
+
+        // @formatter:off
+        let allLexerModes = has(actualDefinition, MODES) ?
+            actualDefinition.modes :
+            {}
+        // @formatter:on
+
+        let allModeNames = keys(allLexerModes)
+
+        forEach(allLexerModes, (currModDef:TokenConstructor[], currModName) => {
             this.modes.push(currModName)
             this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
                 validatePatterns(<SingleModeLexerDefinition>currModDef, allModeNames))
@@ -172,6 +235,8 @@ export class Lexer {
                 this.emptyGroups = merge(this.emptyGroups, currAnalyzeResult.emptyGroups)
             }
         })
+
+        this.defaultMode = actualDefinition.defaultMode
 
         if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
@@ -194,7 +259,7 @@ export class Lexer {
      * @returns {{tokens: {Token}[], errors: string[]}}
      */
     public tokenize(text:string,
-                    initialMode:string = first(this.modes)):ILexingResult {
+                    initialMode:string = this.defaultMode):ILexingResult {
 
         if (!isEmpty(this.lexerDefinitionErrors)) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
@@ -316,7 +381,9 @@ export class Lexer {
 
                         if (group !== undefined) { // a none skipped multi line Token, need to update endLine/endColumn
                             lastCharIsLT = lastLTIdx === imageLength - 1
-                            fixForEndingInLT = lastCharIsLT ? -1 : 0
+                            fixForEndingInLT = lastCharIsLT ?
+                                -1 :
+                                0
 
                             if (!(lineTerminatorsInMatch === 1 && lastCharIsLT)) {
                                 // if a token ends in a LT that last LT only affects the line numbering of following Tokens

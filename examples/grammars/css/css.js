@@ -205,7 +205,7 @@ function CssParser(input) {
     // [STRING|URI] S* media_list? ';' S*
     this.cssImport = this.RULE('cssImport', function() {
         $.CONSUME(ImportSym)
-        // @formatter:off
+           // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(StringLiteral)}},
                 {ALT: function() { $.CONSUME(Uri)}}
