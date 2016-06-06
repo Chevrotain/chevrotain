@@ -1,4 +1,4 @@
-/*! chevrotain - v0.10.1 */
+/*! chevrotain - v0.10.2 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -85,11 +85,13 @@ declare namespace chevrotain {
         DUPLICATE_PATTERNS_FOUND = 4,
         INVALID_GROUP_TYPE_FOUND = 5,
         PUSH_MODE_DOES_NOT_EXIST = 6,
+        MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE = 7,
+        MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY = 8,
     }
     export interface ILexerDefinitionError {
         message: string;
         type: LexerDefinitionErrorType;
-        tokenClasses: Function[];
+        tokenClasses?: Function[];
     }
     export interface ILexingError {
         line: number;
@@ -98,17 +100,22 @@ declare namespace chevrotain {
         message: string;
     }
     export type SingleModeLexerDefinition = TokenConstructor[];
-    export type MultiModeLexerWDefinition = {
+    export type MultiModesDefinition = {
         [modeName: string]: TokenConstructor[];
     };
+    export interface IMultiModeLexerDefinition {
+        modes: MultiModesDefinition;
+        defaultMode: string;
+    }
     export class Lexer {
-        protected lexerDefinition: SingleModeLexerDefinition | MultiModeLexerWDefinition;
+        protected lexerDefinition: SingleModeLexerDefinition | IMultiModeLexerDefinition;
         static SKIPPED: {
             description: string;
         };
         static NA: RegExp;
-        lexerDefinitionErrors: any[];
+        lexerDefinitionErrors: ILexerDefinitionError[];
         protected modes: string[];
+        protected defaultMode: string;
         protected allPatterns: {
             [modeName: string]: RegExp[];
         };
@@ -134,19 +141,27 @@ declare namespace chevrotain {
             [groupName: string]: Token;
         };
         /**
-         * @param {SingleModeLexerDefinition | MultiModeLexerWDefinition} lexerDefinition -
+         * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
          *  Structure composed of  constructor functions for the Tokens types this lexer will support.
          *
          *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
-         *  In the case of {MultiModeLexerWDefinition} the structure is an object where each value is an array of Token constructors.
+         *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties
+         *    1. a "modes" property where each value is an array of Token.
+         *    2. a "defaultMode" property specifying the initial lexer mode.
+         *
+         *  constructors.
          *
          *  for example:
          *  {
+         *     "modes" : {
          *     "modeX" : [Token1, Token2]
          *     "modeY" : [Token3, Token4]
+         *     }
+         *
+         *     "defaultMode" : "modeY"
          *  }
          *
-         *  A lexer with {MultiModeLexerWDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
+         *  A lexer with {MultiModesDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
          *  This is useful for lexing languages where there are different lexing rules depending on context.
          *
          *  The current lexing mode is selected via a "mode stack".
@@ -216,7 +231,7 @@ declare namespace chevrotain {
          *                  This can be useful when wishing to indicate lexer errors in another manner
          *                  than simply throwing an error (for example in an online playground).
          */
-        constructor(lexerDefinition: SingleModeLexerDefinition | MultiModeLexerWDefinition, deferDefinitionErrorsHandling?: boolean);
+        constructor(lexerDefinition: SingleModeLexerDefinition | IMultiModeLexerDefinition, deferDefinitionErrorsHandling?: boolean);
         /**
          * Will lex(Tokenize) a string.
          * Note that this can be called repeatedly on different strings as this method
