@@ -1,4 +1,4 @@
-/*! chevrotain - v0.10.2 */
+/*! chevrotain - v0.11.0 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -87,6 +87,8 @@ declare namespace chevrotain {
         PUSH_MODE_DOES_NOT_EXIST = 6,
         MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE = 7,
         MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY = 8,
+        MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST = 9,
+        LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED = 10,
     }
     export interface ILexerDefinitionError {
         message: string;

@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.11.0 (6-7-2016)
 
 - Minor version release as the previous version included a breaking change in a patch version.
  
