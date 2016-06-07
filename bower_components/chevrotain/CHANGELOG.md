@@ -1,3 +1,48 @@
+## 0.11.0 (6-7-2016)
+
+- Minor version release as the previous version included a breaking change in a patch version.
+ 
+#### Minor Changes
+   - [Better runtime checks for Invalid Lexer definitions.](https://github.com/SAP/chevrotain/issues/204)
+
+
+
+## 0.10.2 (6-6-2016)
+
+#### Breaking Changes
+- [MultiMode Lexer defaultMode should not be implicitly defined.](https://github.com/SAP/chevrotain/issues/202)
+
+#### Documentation
+- [XML grammar example.](https://github.com/SAP/chevrotain/issues/201)
+
+
+
+## 0.10.1 (5-30-2016)
+
+- Fixes issue with previous release automation.
+
+
+
+## 0.10.0 (5-29-2016)
+
+#### Major Changes
+- [Predicates / Gates on productions should be in addition to standard lookahead.](https://github.com/SAP/chevrotain/issues/189)
+
+- [Capability to ignore parser definition issues at construction time.](https://github.com/SAP/chevrotain/issues/197)
+
+#### Breaking Changes
+- **IsNextRule** method was removed from the Parser class. It's functionality is no longer needed as usage of predicates / gates
+  no longer requires manually (re)implementing the lookahead function.
+
+- [DSL methods with separators should not support predicates.](https://github.com/SAP/chevrotain/issues/191)
+
+- [Move all "parse time" grammar validations to the initialization phase (grammar construction).](https://github.com/SAP/chevrotain/issues/103)
+     
+#### Documentation
+- [Example implementing syntactic & semantic content assist.](https://github.com/SAP/chevrotain/issues/194)
+
+
+
 ## 0.9.0 (4-29-2016)
 
 #### Major Changes

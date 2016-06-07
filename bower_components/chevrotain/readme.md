@@ -1,9 +1,8 @@
-[![npm](https://img.shields.io/npm/v/chevrotain.svg?maxAge=2592000)](https://www.npmjs.com/package/chevrotain)
-[![Bower](https://img.shields.io/bower/v/chevrotain.svg?maxAge=2592000)](https://github.com/SAP/chevrotain)
+[![npm](https://img.shields.io/npm/v/chevrotain.svg)](https://www.npmjs.com/package/chevrotain)
+[![Bower](https://img.shields.io/bower/v/chevrotain.svg)](https://github.com/SAP/chevrotain)
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
-[![devDependency Status](https://img.shields.io/david/dev/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain#info=devDependencies)
 
 # Chevrotain
 
@@ -13,13 +12,12 @@ Chevrotain is **NOT** a parser generator. It solves the same kind of problems as
 any code generation phase.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
-   
 ## Features
   1. **Lexer Engine** based on Regular Expressions.
     * Full Token position information.
     * Token skipping (whitespace/comments/...).
     * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
-    * [Multiple Lexer Modes](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer.js) depending on the context.
+    * [Multiple Lexer Modes][lexer_modes] depending on the context.
     * [Tokens Grouping][lexer_groups]
     * **No code generation** The Lexer does not require any code generation phase. 
    
@@ -31,13 +29,13 @@ any code generation phase.
       * Allows great flexibility for inserting custom Parser actions.
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
-    * Automatic lookahead calculation for LL(k) grammars.
-    * Supports [User defined lookahead logic][custom_lookahead] for complex grammars.
+    * Automatic lookahead calculation for **LL(k)** grammars.
+    * Supports [gates/predicates][gates].
     * Backtracking support.
     * [Grammar Inheritance.][grammar_inheritance]
     * [Multiple starting rules.][starting_rules]
 
-  3. [**High performance)**][benchmark].
+  3. [**High performance**][benchmark].
     * [And on JSPerf][benchmark_jsperf]
 
   4. **Grammar Reflection/Introspection**.
@@ -64,7 +62,7 @@ any code generation phase.
 
 ## Documentation
 * [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_9_0/classes/parser.html#at_least_one)
+   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_11_0/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
@@ -90,9 +88,9 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 [benchmark]: http://sap.github.io/chevrotain/performance/
 [benchmark_jsperf]: http://jsperf.com/json-parsers-comparison/22
 
-
-[lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js
-[keywords_vs_idents]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js
-[custom_lookahead]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
+[lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
+[lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js
+[keywords_vs_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
+[gates]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
