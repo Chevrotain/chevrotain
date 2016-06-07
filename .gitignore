@@ -5,5 +5,7 @@ coverage/
 /examples
 /node_modules
 .baseDir.ts
+/lib
+/dev
 
 
