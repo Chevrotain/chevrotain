@@ -6,7 +6,7 @@ import {Lexer} from "./lexer_public"
  *  This can be used to improve the quality/readability of error messages or syntax diagrams.
  *
  * @param {Function} clazz - A constructor for a Token subclass
- * @returns {string} the Human readable label a Token if it exists.
+ * @returns {string} - The Human readable label a Token if it exists.
  */
 export function tokenLabel(clazz:Function):string {
     if (hasTokenLabel(clazz)) {
@@ -37,10 +37,10 @@ export function tokenName(clazz:Function):string {
  * utility to help the poor souls who are still stuck writing pure javascript 5.1
  * extend and create Token subclasses in a less verbose manner
  *
- * @param {string} tokenName - the name of the new TokenClass
+ * @param {string} tokenName - The name of the new TokenClass
  * @param {RegExp|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
- * @param {Function} parentConstructor - the Token class to be extended
- * @returns {Function} - a constructor for the new extended Token subclass
+ * @param {Function} parentConstructor - The Token class to be extended
+ * @returns {Function} - A constructor for the new extended Token subclass
  */
 export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token) {
     let pattern
@@ -94,12 +94,12 @@ export class Token {
     public isInsertedInRecovery:boolean = false
 
     /**
-     * @param {string} image the textual representation of the Token as it appeared in the text
-     * @param {number} offset offset of the first character of the Token
-     * @param {number} startLine line of the first character of the Token
-     * @param {number} startColumn column of the first character of the Token
-     * @param {number} endLine line of the last character of the Token
-     * @param {number} endColumn column of the last character of the Token
+     * @param {string} image - The textual representation of the Token as it appeared in the text.
+     * @param {number} offset - Offset of the first character of the Token.
+     * @param {number} startLine - Line of the first character of the Token.
+     * @param {number} startColumn - Column of the first character of the Token.
+     * @param {number} endLine - Line of the last character of the Token.
+     * @param {number} endColumn - Column of the last character of the Token.
      *
      * Things to note:
      * * "do"  {startColumn : 1, endColumn: 2} --> the range is inclusive to exclusive 1...2 (2 chars long).
@@ -118,7 +118,7 @@ export class Token {
 }
 
 /**
- * a special kind of Token which does not really exist in the input
+ * A special kind of Token which does not really exist in the input
  * (hence the 'Virtual' prefix). These type of Tokens can be used as special markers:
  * for example, EOF (end-of-file).
  */

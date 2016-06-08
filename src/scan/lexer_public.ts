@@ -86,10 +86,10 @@ export class Lexer {
 
     /**
      * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
-     *  Structure composed of  constructor functions for the Tokens types this lexer will support.
+     *  Structure composed of constructor functions for the Tokens types this lexer will support.
      *
      *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
-     *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties
+     *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties:
      *    1. a "modes" property where each value is an array of Token.
      *    2. a "defaultMode" property specifying the initial lexer mode.
      *
@@ -111,7 +111,7 @@ export class Lexer {
      *  The current lexing mode is selected via a "mode stack".
      *  The last (peek) value in the stack will be the current mode of the lexer.
      *
-     *  Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token)
+     *  Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token):
      *  1. PUSH_MODE : push a new mode to the "mode stack"
      *  2. POP_MODE  : pop the last mode from the "mode stack"
      *
@@ -169,8 +169,8 @@ export class Lexer {
      *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.
      *
      *
-     * @param {boolean} [deferDefinitionErrorsHandling=false]
-     *                  an optional flag indicating that lexer definition errors
+     * @param {boolean} [deferDefinitionErrorsHandling=false] -
+     *                  An optional flag indicating that lexer definition errors
      *                  should not automatically cause an error to be raised.
      *                  This can be useful when wishing to indicate lexer errors in another manner
      *                  than simply throwing an error (for example in an online playground).
@@ -241,7 +241,7 @@ export class Lexer {
      * Note that this can be called repeatedly on different strings as this method
      * does not modify the state of the Lexer.
      *
-     * @param {string} text - the string to lex
+     * @param {string} text - The string to lex
      * @param {string} [initialMode] - The initial Lexer Mode to start with, by default this will be the first mode in the lexer's
      *                                 definition. If the lexer has no explicit modes it will be the implicit single 'default_mode' mode.
      *

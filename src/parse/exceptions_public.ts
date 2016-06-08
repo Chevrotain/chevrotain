@@ -7,13 +7,13 @@ export namespace exceptions {
     export interface IRecognizerContext {
         /**
          * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
-         * This can be used to help debug parsing errors (How did we get here?)
+         * This can be used to help debug parsing errors (How did we get here?).
          */
         ruleStack:string[]
 
         /**
          * A copy of the parser's rule occurrence stack at the "time" the RecognitionException occurred.
-         * This can be used to help debug parsing errors (How did we get here?)
+         * This can be used to help debug parsing errors (How did we get here?).
          */
         ruleOccurrenceStack:number[]
     }

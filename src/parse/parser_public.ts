@@ -250,7 +250,7 @@ let EOF_FOLLOW_KEY:any = {}
 /**
  * A Recognizer capable of self analysis to determine it's grammar structure
  * This is used for more advanced features requiring such information.
- * for example: Error Recovery, Automatic lookahead calculation
+ * For example: Error Recovery, Automatic lookahead calculation.
  */
 export class Parser {
 
@@ -474,10 +474,10 @@ export class Parser {
     }
 
     /**
-     * @param grammarRule - the rule to try and parse in backtracking mode
-     * @param isValid - a predicate that given the result of the parse attempt will "decide" if the parse was successfully or not
+     * @param grammarRule - The rule to try and parse in backtracking mode.
+     * @param isValid - A predicate that given the result of the parse attempt will "decide" if the parse was successfully or not.
      *
-     * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed
+     * @return {Function():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
      */
     protected BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
         return function () {
@@ -519,7 +519,7 @@ export class Parser {
     // Parsing DSL
 
     /**
-     * Convenience method equivalent to CONSUME1
+     * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
      */
     protected CONSUME(tokClass:Function):Token {
@@ -549,7 +549,7 @@ export class Parser {
      *
      * @param {Function} tokClass - A constructor function specifying the type of token to be consumed.
      *
-     * @returns {Token} The consumed token.
+     * @returns {Token} - The consumed token.
      */
     protected CONSUME1(tokClass:Function):Token {
         return this.consumeInternal(tokClass, 1)
@@ -597,7 +597,7 @@ export class Parser {
      * This may seem redundant as it does not actually do much.
      * However using it is mandatory for all sub rule invocations.
      * calling another rule without wrapping in SUBRULE(...)
-     * will cause errors/mistakes in the Recognizer's self analysis
+     * will cause errors/mistakes in the Recognizer's self analysis,
      * which will lead to errors in error recovery/automatic lookahead calculation
      * and any other functionality relying on the Recognizer's self analysis
      * output.
@@ -605,9 +605,9 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the sub rule invocation in its rule.
      *
-     * @param {Function} ruleToCall - the rule to invoke
-     * @param {*[]} args - the arguments to pass to the invoked subrule
-     * @returns {*} the result of invoking ruleToCall
+     * @param {Function} ruleToCall - The rule to invoke.
+     * @param {*[]} args - The arguments to pass to the invoked subrule.
+     * @returns {*} - The result of invoking ruleToCall.
      */
     protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = []):T {
         return ruleToCall.call(this, 1, args)
@@ -642,7 +642,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to OPTION1
+     * Convenience method equivalent to OPTION1.
      * @see OPTION1
      */
     protected OPTION(predicateOrAction:Predicate | GrammarAction,
@@ -652,12 +652,12 @@ export class Parser {
 
     /**
      * Parsing DSL Method that Indicates an Optional production
-     * in EBNF notation: [...]
+     * in EBNF notation: [...].
      *
-     * note that the 'action' param is optional. so both of the following forms are valid:
+     * Note that the 'action' param is optional. so both of the following forms are valid:
      *
-     * short: this.OPTION(()=>{ this.CONSUME(Digit});
-     * long: this.OPTION(predicateFunc, ()=>{ this.CONSUME(Digit});
+     * - short: this.OPTION(()=>{ this.CONSUME(Digit});
+     * - long: this.OPTION(predicateFunc, ()=>{ this.CONSUME(Digit});
      *
      * The 'predicateFunc' in the long form can be used to add constraints (none grammar related)
      * to optionally invoking the grammar action.
@@ -669,7 +669,7 @@ export class Parser {
      *                                       or the grammar action to optionally invoke once.
      * @param {Function} [action] - The action to optionally invoke.
      *
-     * @returns {boolean} true iff the OPTION's action has been invoked
+     * @returns {boolean} - True iff the OPTION's action has been invoked
      */
     protected OPTION1(predicateOrAction:Predicate | GrammarAction,
                       action?:GrammarAction):boolean {
@@ -709,7 +709,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to OR1
+     * Convenience method equivalent to OR1.
      * @see OR1
      */
     protected OR<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
@@ -722,13 +722,13 @@ export class Parser {
      *
      * There are two forms:
      *
-     * short: this.OR([
+     * - short: this.OR([
      *           {ALT:()=>{this.CONSUME(One)}},
      *           {ALT:()=>{this.CONSUME(Two)}},
      *           {ALT:()=>{this.CONSUME(Three)}},
      *        ], "a number")
      *
-     * long: this.OR([
+     * - long: this.OR([
      *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
      *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Two)}},
      *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Three)}},
@@ -746,13 +746,13 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the alternation production in it's top rule.
      *
-     * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives
+     * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives.
      *
      * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
      *                                 If none is provided, the error message will include the names of the expected
      *                                 Tokens sequences which may start each alternative.
      *
-     * @returns {*} The result of invoking the chosen alternative
+     * @returns {*} - The result of invoking the chosen alternative.
      */
     protected OR1<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
         return this.orInternal(alts, errMsgTypes, 1)
@@ -787,7 +787,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to MANY1
+     * Convenience method equivalent to MANY1.
      * @see MANY1
      */
     protected MANY(predicateOrAction:Predicate | GrammarAction,
@@ -797,9 +797,9 @@ export class Parser {
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
-     * This is equivalent to EBNF repetition {...}
+     * This is equivalent to EBNF repetition {...}.
      *
-     * note that the 'action' param is optional. so both of the following forms are valid:
+     * Note that the 'action' param is optional. so both of the following forms are valid:
      *
      * short: this.MANY(()=>{
      *                       this.CONSUME(Comma};
@@ -856,7 +856,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to MANY_SEP1
+     * Convenience method equivalent to MANY_SEP1.
      * @see MANY_SEP1
      */
     protected MANY_SEP(separator:TokenConstructor, action:GrammarAction):Token[] {
@@ -920,7 +920,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to AT_LEAST_ONE1
+     * Convenience method equivalent to AT_LEAST_ONE1.
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE(predicateOrAction:Predicate | GrammarAction,
@@ -930,8 +930,7 @@ export class Parser {
     }
 
     /**
-     *
-     * convenience method, same as MANY but the repetition is of one or more.
+     * Convenience method, same as MANY but the repetition is of one or more.
      * failing to match at least one repetition will result in a parsing error and
      * cause the parser to attempt error recovery.
      *
@@ -940,7 +939,7 @@ export class Parser {
      * @param {Function} predicateOrAction  - The predicate / gate function that implements the constraint on the grammar
      *                                        or the grammar action to invoke at least once.
      * @param {Function} [action] - The action to optionally invoke.
-     * @param {string} [errMsg] short title/classification to what is being matched
+     * @param {string} [errMsg] - Short title/classification to what is being matched.
      */
     protected AT_LEAST_ONE1(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
@@ -985,7 +984,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to AT_LEAST_ONE_SEP1
+     * Convenience method equivalent to AT_LEAST_ONE_SEP1.
      * @see AT_LEAST_ONE1
      */
     protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
@@ -996,7 +995,7 @@ export class Parser {
 
     /**
      *
-     * convenience method, same as MANY_SEP but the repetition is of one or more.
+     * Convenience method, same as MANY_SEP but the repetition is of one or more.
      * failing to match at least one repetition will result in a parsing error and
      * cause the parser to attempt error recovery.
      *
@@ -1004,7 +1003,7 @@ export class Parser {
      *
      * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
      * @param {Function} [action] - The action to optionally invoke.
-     * @param {string} [errMsg] - short title/classification to what is being matched
+     * @param {string} [errMsg] - Short title/classification to what is being matched.
      */
     protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
                                 action:GrammarAction | string,
@@ -1052,9 +1051,9 @@ export class Parser {
      *
      * @param {string} name - The name of the rule.
      * @param {Function} implementation - The implementation of the rule.
-     * @param {IRuleConfig} [config] - The rule's optional configuration
+     * @param {IRuleConfig} [config] - The rule's optional configuration.
      *
-     * @returns {Function} The parsing rule which is the production implementation wrapped with the parsing logic that handles
+     * @returns {Function} - The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
      */
     protected RULE<T>(name:string,
@@ -1087,7 +1086,7 @@ export class Parser {
 
     /**
      * @See RULE
-     * same as RULE, but should only be used in "extending" grammars to override rules/productions
+     * Same as RULE, but should only be used in "extending" grammars to override rules/productions
      * from the super grammar.
      */
     protected OVERRIDE_RULE<T>(name:string,
@@ -1135,8 +1134,8 @@ export class Parser {
 
     /**
      * Returns an "imaginary" Token to insert when Single Token Insertion is done
-     * Override this if you require special behavior in your grammar
-     * for example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically
+     * Override this if you require special behavior in your grammar.
+     * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
     protected getTokenToInsert(tokClass:Function):Token {
         return new (<any>tokClass)(-1, -1)
@@ -1147,7 +1146,7 @@ export class Parser {
      * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
      * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
      * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
-     * as the max of the cardinality will be greater than the min value. (and this is a false error!)
+     * as the max of the cardinality will be greater than the min value (and this is a false error!).
      */
     protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
         return true
@@ -1156,7 +1155,7 @@ export class Parser {
     /**
      * @param {Token} actualToken - The actual unexpected (mismatched) Token instance encountered.
      * @param {Function} expectedTokType - The Class of the expected Token.
-     * @returns {string} The error message saved as part of a MismatchedTokenException.
+     * @returns {string} - The error message saved as part of a MismatchedTokenException.
      */
     protected getMisMatchTokenErrorMessage(expectedTokType:Function, actualToken:Token):string {
         let hasLabel = hasTokenLabel(expectedTokType)
@@ -1193,16 +1192,16 @@ export class Parser {
     }
 
     /**
-     * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function)
-     * @param idx - occurrence index of consumed token in the invoking parser rule text
+     * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function).
+     * @param idx - Occurrence index of consumed token in the invoking parser rule text
      *         for example:
      *         IDENT (DOT IDENT)*
      *         the first ident will have idx 1 and the second one idx 2
      *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
      *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
-     *           details
+     *           details.
      *
-     * @returns the consumed Token
+     * @returns {Token} - The consumed Token.
      */
     protected consumeInternal(tokClass:Function, idx:number):Token {
         try {
