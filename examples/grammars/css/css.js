@@ -142,7 +142,7 @@ var Percentage = extendToken('Percentage', MAKE_PATTERN('{{num}}%', 'i'))
 var Num = extendToken('Num', MAKE_PATTERN('{{num}}'));
 
 
-var CssLexer = new Lexer(cssTokens, true);
+var CssLexer = new Lexer(cssTokens);
 
 // ----------------- parser -----------------
 
