@@ -179,7 +179,7 @@ function CssParser(input) {
     })
 
     this.contents = this.RULE('contents', function() {
-        // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() { $.SUBRULE($.ruleset)}},
                 {ALT: function() { $.SUBRULE($.media)}},
@@ -191,7 +191,7 @@ function CssParser(input) {
 
     // factor out repeating pattern for cdc/cdo
     this.cdcCdo = this.RULE('cdcCdo', function() {
-        // @formatter:off
+            // @formatter:off
             $.MANY(function () {
                 $.OR([
                     {ALT: function() { $.CONSUME(Cdo)}},
@@ -205,7 +205,7 @@ function CssParser(input) {
     // [STRING|URI] S* media_list? ';' S*
     this.cssImport = this.RULE('cssImport', function() {
         $.CONSUME(ImportSym)
-           // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(StringLiteral)}},
                 {ALT: function() { $.CONSUME(Uri)}}
@@ -276,7 +276,7 @@ function CssParser(input) {
 
     // '/' S* | ',' S*
     this.operator = this.RULE('operator', function() {
-        // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Slash)}},
                 {ALT: function() { $.CONSUME(Comma)}}
@@ -286,7 +286,7 @@ function CssParser(input) {
 
     // '+' S* | '>' S*
     this.combinator = this.RULE('combinator', function() {
-        // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Plus)}},
                 {ALT: function() { $.CONSUME(GreaterThan)}}
@@ -296,7 +296,7 @@ function CssParser(input) {
 
     // '-' | '+'
     this.unary_operator = this.RULE('unary_operator', function() {
-        // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Minus)}},
                 {ALT: function() { $.CONSUME(Plus)}}
@@ -333,7 +333,7 @@ function CssParser(input) {
     // element_name [ HASH | class | attrib | pseudo ]*
     // | [ HASH | class | attrib | pseudo ]+
     this.simple_selector = this.RULE('simple_selector', function() {
-        // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() {
                     $.SUBRULE($.element_name)
@@ -361,32 +361,32 @@ function CssParser(input) {
                 {ALT: function() { $.SUBRULE($.attrib) }},
                 {ALT: function() { $.SUBRULE($.pseudo) }}
             ]);
-            // @formatter:off
-        })
+            // @formatter:on
+    })
 
-        // '.' IDENT
-        this.class = this.RULE('class', function () {
-            $.CONSUME(Dot)
-            $.CONSUME(Ident)
-        });
+    // '.' IDENT
+    this.class = this.RULE('class', function() {
+        $.CONSUME(Dot)
+        $.CONSUME(Ident)
+    });
 
-        // IDENT | '*'
-        this.element_name = this.RULE('element_name', function () {
+    // IDENT | '*'
+    this.element_name = this.RULE('element_name', function() {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Ident) }},
                 {ALT: function() { $.CONSUME(Star) }}
             ]);
+            // @formatter:on
+    });
+
+    // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
+    this.attrib = this.RULE('attrib', function() {
+        $.CONSUME(LSquare)
+        $.CONSUME(Ident)
+
+        this.OPTION(function() {
             // @formatter:off
-        });
-
-        // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
-        this.attrib = this.RULE('attrib', function () {
-            $.CONSUME(LSquare)
-            $.CONSUME(Ident)
-
-            this.OPTION(function() {
-                // @formatter:off
                 $.OR([
                     {ALT: function() { $.CONSUME(Equals) }},
                     {ALT: function() { $.CONSUME(Includes) }},
@@ -397,15 +397,15 @@ function CssParser(input) {
                     {ALT: function() { $.CONSUME2(Ident) }},
                     {ALT: function() { $.CONSUME(StringLiteral) }}
                 ]);
-                // @formatter:off
-            })
-            $.CONSUME(RSquare)
-        });
+                // @formatter:on
+        })
+        $.CONSUME(RSquare)
+    });
 
-        // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
-        this.pseudo = this.RULE('pseudo', function () {
-            $.CONSUME(Colon)
-            // @formatter:off
+    // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
+    this.pseudo = this.RULE('pseudo', function() {
+        $.CONSUME(Colon)
+        // @formatter:off
             $.OR([
                 {ALT: function() {
                     $.CONSUME(Ident)
@@ -419,7 +419,7 @@ function CssParser(input) {
                 }}
             ]);
             // @formatter:on
-        });
+    });
 
     // property ':' S* expr prio?
     this.declaration = this.RULE('declaration', function() {
@@ -457,7 +457,7 @@ function CssParser(input) {
             $.SUBRULE($.unary_operator)
         })
 
-        // @formatter:off
+            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Num) }},
                 {ALT: function() { $.CONSUME(Percentage) }},
