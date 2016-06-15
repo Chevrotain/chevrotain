@@ -36,7 +36,6 @@ any code generation phase.
     * [Multiple starting rules.][starting_rules]
 
   3. [**High performance**][benchmark].
-    * [And on JSPerf][benchmark_jsperf]
 
   4. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
@@ -86,8 +85,6 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
 [benchmark]: http://sap.github.io/chevrotain/performance/
-[benchmark_jsperf]: http://jsperf.com/json-parsers-comparison/22
-
 [lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
 [lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js
 [keywords_vs_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
