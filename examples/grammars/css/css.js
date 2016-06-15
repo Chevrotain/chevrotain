@@ -58,8 +58,8 @@ Comment.GROUP = Lexer.SKIPPED;
 
 // This group has to be defined BEFORE Ident as their prefix is a valid Ident
 var Uri = extendToken('Uri', Lexer.NA);
-var UriString = extendToken('UriString', MAKE_PATTERN('url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)'));
-var UriUrl = extendToken('UriUrl', MAKE_PATTERN('url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)'));
+var UriString = extendToken('UriString', MAKE_PATTERN('url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)'), Uri);
+var UriUrl = extendToken('UriUrl', MAKE_PATTERN('url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)'), Uri);
 var Func = extendToken('Func', MAKE_PATTERN('{{ident}}\\('));
 // Ident must be before Minus
 var Ident = extendToken('Ident', MAKE_PATTERN('{{ident}}'));
