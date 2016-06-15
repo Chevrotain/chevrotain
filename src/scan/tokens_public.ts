@@ -1,5 +1,5 @@
 import {isString, isRegExp, isFunction, assign, isUndefined} from "../utils/utils"
-import {functionName} from "../lang/lang_extensions"
+import {functionName, defineNameProp} from "../lang/lang_extensions"
 import {Lexer} from "./lexer_public"
 
 /**
@@ -13,6 +13,7 @@ export function tokenLabel(clazz:Function):string {
         return (<any>clazz).LABEL
     }
     else {
+
         return tokenName(clazz)
     }
 }
@@ -22,9 +23,17 @@ export function hasTokenLabel(clazz:Function):boolean {
 }
 
 export function tokenName(clazz:Function):string {
-    return functionName(clazz)
+    // The tokenName property is needed under some old versions of node.js (0.10/0.12)
+    // where the Function.prototype.name property is not defined as a 'configurable' property
+    // enable producing readable error messages.
+    /* istanbul ignore if -> will only run in old versions of node.js */
+    if (isString((<any>clazz).tokenName)) {
+        return (<any>clazz).tokenName
+    }
+    else {
+        return functionName(clazz)
+    }
 }
-
 /**
  * utility to help the poor souls who are still stuck writing pure javascript 5.1
  * extend and create Token subclasses in a less verbose manner
@@ -57,12 +66,11 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
     // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
-    Object.defineProperty(derivedCostructor, "name", {
-        enumerable:   false,
-        configurable: true,
-        writable:     false,
-        value:        tokenName
-    })
+    /* istanbul ignore if -> will only run in old versions of node.js */
+    if (!defineNameProp(derivedCostructor, tokenName)) {
+        // hack to save the tokenName in situations where the constructor's name property cannot be reconfigured
+        derivedCostructor.tokenName = tokenName
+    }
 
     derivedCostructor.prototype = Object.create(parentConstructor.prototype)
     derivedCostructor.prototype.constructor = derivedCostructor

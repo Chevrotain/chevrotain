@@ -50,25 +50,25 @@ module.exports = function(grunt) {
         pkg: pkg,
 
         run: {
-            options:                        {
+            options:                {
                 failOnError: true
             },
-            npm_link:                       {
+            npm_link:               {
                 exec: 'npm link'
             },
-            test_examples_lexer: {
+            test_examples_lexer:    {
                 options: {
                     cwd: process.cwd() + "/examples/lexer"
                 },
                 exec:    INSTALL_LINK_TEST
             },
-            test_examples_grammars:           {
+            test_examples_grammars: {
                 options: {
                     cwd: process.cwd() + "/examples/grammars"
                 },
-                exec:   INSTALL_LINK_TEST
+                exec:    INSTALL_LINK_TEST
             },
-            test_examples_parser:            {
+            test_examples_parser:   {
                 options: {
                     cwd: process.cwd() + "/examples/parser"
                 },
@@ -406,9 +406,14 @@ module.exports = function(grunt) {
     }
 
     var unitTestsTasks = [
-        'mocha_istanbul',
-        'istanbul_check_coverage'
+        'mocha_istanbul'
     ]
+
+
+    if (!process.env.TRAVIS || // always run coverage checks locally
+        process.env.COVERAGE) { // Flag to enable coverage checks on CI Voter.
+        unitTestsTasks.push('istanbul_check_coverage')
+    }
 
     var integrationTestsNodeTasks = [
         'run:npm_link',

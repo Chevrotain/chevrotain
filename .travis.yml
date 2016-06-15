@@ -10,7 +10,7 @@ env:
 matrix:
   include:
     - node_js: "5"
-      env: GRUNT_TASK=unit_tests DEPLOY=true
+      env: GRUNT_TASK=unit_tests COVERAGE=true DEPLOY=true
     - node_js: "4"
       env: GRUNT_TASK=unit_tests
     - node_js: "0.12"
