@@ -22,15 +22,7 @@ export function hasTokenLabel(clazz:Function):boolean {
 }
 
 export function tokenName(clazz:Function):string {
-    // used to support js inheritance patterns that do not use named functions
-    // in that situation setting a property tokenName on a token constructor will
-    // enable producing readable error messages.
-    if (isString((<any>clazz).tokenName)) {
-        return (<any>clazz).tokenName
-    }
-    else {
-        return functionName(clazz)
-    }
+    return functionName(clazz)
 }
 
 /**
@@ -62,8 +54,16 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
     // static properties mixing
     derivedCostructor = assign(derivedCostructor, parentConstructor)
 
-    // the tokenName property will be used by the Parser for Error Messages if the Token's constructor is anonymous
-    derivedCostructor.tokenName = tokenName
+    // can be overwritten according to:
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
+    // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
+    Object.defineProperty(derivedCostructor, "name", {
+        enumerable:   false,
+        configurable: true,
+        writable:     false,
+        value:        tokenName
+    })
+
     derivedCostructor.prototype = Object.create(parentConstructor.prototype)
     derivedCostructor.prototype.constructor = derivedCostructor
     if (!isUndefined(pattern)) {
