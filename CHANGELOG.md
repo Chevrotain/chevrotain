@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.11.1 (6-16-2016)
 
 #### Minor Changes
    - [extendToken should create constructor functions with meaningful names](https://github.com/SAP/chevrotain/issues/206)
