@@ -1,0 +1,4 @@
+--require ./test/test.config
+--reporter spec
+--ui bdd
+--recursive

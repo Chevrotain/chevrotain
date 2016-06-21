@@ -1,0 +1,12 @@
+/node_modules
+/gen
+/.tscache
+/bin
+.baseDir.ts
+/typings
+
+
+
+
+
+
