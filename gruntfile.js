@@ -26,7 +26,8 @@ var examples_test_command = semver.gte(process.version, "4.0.0") ?
     "mocha **/*spec.js" :
     "mocha **/*spec.js -i -g ES6"
 
-var INSTALL_LINK_TEST = 'npm install && npm link chevrotain && ' + examples_test_command
+var INSTALL_LINK = 'npm install && npm link '
+var INSTALL_LINK_TEST = INSTALL_LINK + ' && ' + examples_test_command
 
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
 
@@ -73,6 +74,13 @@ module.exports = function(grunt) {
                     cwd: process.cwd() + "/examples/parser"
                 },
                 exec:    INSTALL_LINK_TEST
+            },
+
+            test_examples_lang_services: {
+                options: {
+                    cwd: process.cwd() + "/examples/language_services"
+                },
+                exec:    INSTALL_LINK + "&& grunt test"
             }
         },
 
@@ -377,8 +385,13 @@ module.exports = function(grunt) {
             publish: {
                 src: 'dev/coverage/lcov.info'
             }
+        },
+
+        exec: {
+            lang_services: 'node_modules/.bin/grunt --gruntfile examples/language_services/gruntfile.js test'
         }
     })
+
 
     require('load-grunt-tasks')(grunt)
 
@@ -419,7 +432,9 @@ module.exports = function(grunt) {
         'run:npm_link',
         'run:test_examples_grammars',
         'run:test_examples_parser',
-        'run:test_examples_lexer'
+        'run:test_examples_lexer',
+        'run:test_examples_lexer',
+        'run:test_examples_lang_services'
     ]
 
     var browsers_tests = [
