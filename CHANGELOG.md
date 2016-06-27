@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Documentation
+- [Dynamically defined Tokens example.](https://github.com/SAP/chevrotain/issues/208)
+
+
+
 ## 0.11.1 (6-16-2016)
 
 #### Minor Changes

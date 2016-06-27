@@ -10,7 +10,11 @@ A few simple examples of using the Chevrotain Parser to resolve some common pars
 
 * [Multiple starting/top rules](multi_start_rules/multi_start_rules.js)
 
-* [Syntatic and Semantic content assist](content_assist/content_assist.js)
+* [Syntactic and Semantic content assist](content_assist/content_assist.js)
+
+* [Content Assist](content_assist/content_assist.js)
+
+* [Dynamically defined Tokens](dynamic_tokens/dynamic_delimiters.js)
 
 
 to run all the parser examples's tests:
