@@ -393,7 +393,7 @@ describe("The reference resolver validation full flow", () => {
     it("will throw an error when trying to init a parser with unresolved rule references", () => {
         expect(() => new InvalidRefParser()).to.throw("oopsTypo")
         expect(() => new InvalidRefParser()).to.throw("Parser Definition Errors detected")
-        expect(() => new InvalidRefParser()).to.throw("reference to rule which is not defined")
+        expect(() => new InvalidRefParser()).to.throw("reference to a rule which is not defined")
     })
 
     it("won't throw an error when trying to init a parser with definition errors but with a flag active to defer handling" +

@@ -27,7 +27,8 @@ export class GastRefResolverVisitor extends gast.GAstVisitor {
         let ref = this.nameToTopRule.get(node.nonTerminalName)
 
         if (!ref) {
-            let msg = "Invalid grammar, reference to rule which is not defined --> " + node.nonTerminalName
+            let msg = "Invalid grammar, reference to a rule which is not defined: ->" + node.nonTerminalName + "<-\n" +
+                      "inside top level rule: ->" + this.currTopLevel.name + "<-"
             this.errors.push({
                 message:           msg,
                 type:              ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,
