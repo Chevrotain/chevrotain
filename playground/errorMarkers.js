@@ -224,7 +224,11 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
             break
         case chevrotain.ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
-            return locateProduction(parserImplText, ruleText, "OR", 1, positionHelper)
+            return locateProduction(parserImplText, ruleText, "OR", parseErr.occurrence, positionHelper)
+            break
+        case chevrotain.ParserDefinitionErrorType.AMBIGUOUS_ALTS:
+            ruleText = gAstProductions.get(parseErr.ruleName).orgText
+            return locateProduction(parserImplText, ruleText, "OR", parseErr.occurrence, positionHelper)
             break
         default:
             throw Error("unknown parser error type ->" + parseErr.type + "<-")
