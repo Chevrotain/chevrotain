@@ -244,10 +244,6 @@ export function getFirstNoneTerminal(definition:gast.IProduction[]):gast.Rule[] 
 
 
     if (firstProd instanceof gast.NonTerminal) {
-        // this allows the check to be performed on partially valid grammars that have not been completly resolved.
-        if (firstProd.referencedRule === undefined) {
-            return result
-        }
         result.push(firstProd.referencedRule)
     }
     else if (firstProd instanceof gast.Flat ||

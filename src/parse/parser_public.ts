@@ -278,7 +278,8 @@ export class Parser {
 
         // this information should only be computed once
         if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-            // clone here
+            cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
+
             let orgProductions = parserInstance._productions
             let clonedProductions = new HashTable<gast.Rule>()
             // clone the grammar productions to support grammar inheritance. requirements:
@@ -299,13 +300,18 @@ export class Parser {
 
             let resolverErrors = resolveGrammar(clonedProductions)
             definitionErrors.push.apply(definitionErrors, resolverErrors) // mutability for the win?
-            cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
-            let validationErrors = validateGrammar(
-                clonedProductions.values(),
-                parserInstance.maxLookahead,
-                parserInstance.ignoredIssues)
 
-            definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
+            // only perform additional grammar validations IFF no resolving errors have occurred.
+            // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
+            if (isEmpty(resolverErrors)) {
+                let validationErrors = validateGrammar(
+                    clonedProductions.values(),
+                    parserInstance.maxLookahead,
+                    parserInstance.ignoredIssues)
+
+                definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
+            }
+
             if (!isEmpty(definitionErrors) && !Parser.DEFER_DEFINITION_ERRORS_HANDLING) {
                 defErrorsMsgs = map(definitionErrors, defError => defError.message)
                 throw new Error(`Parser Definition Errors detected\n: ${defErrorsMsgs.join("\n-------------------------------\n")}`)
