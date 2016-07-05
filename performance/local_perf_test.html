@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+
+    <title></title>
+</head>
+<body>
+<script src="../bower_components/lodash/lodash.min.js"></script>
+<script src="../bower_components/chevrotain/lib/chevrotain.js"></script>
+<script src="samples/10K_json.js"></script>
+
+<script src="jsonParsers/chevrotain/chevrotainParser.js"></script>
+<script src="jsonParsers/chevrotain/api.js"></script>
+
+<script>
+    var times = 1000;
+    var start = _.now()
+    for (var i=0; i<times; i++) {
+        chevrotainParseWithChevrotainLexer(json_sample10k)
+    }
+    var end = _.now()
+    var average = (end-start) / times;
+    console.log("average: " + average)
+</script>
+</body>
+</html>
