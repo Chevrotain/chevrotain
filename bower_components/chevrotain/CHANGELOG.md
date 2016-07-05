@@ -1,9 +1,27 @@
+## 0.11.2 (7-5-2016)
+
+#### Minor Changes
+- [Unresolved subrule references can cause none descriptive exceptions during follow up validations.](https://github.com/SAP/chevrotain/issues/209)
+- [More descriptive unresolved grammar error message.](https://github.com/SAP/chevrotain/issues/210)
+
+#### Documentation
+- [Dynamically defined Tokens example.](https://github.com/SAP/chevrotain/issues/208)
+
+
+
+## 0.11.1 (6-16-2016)
+
+#### Minor Changes
+- [extendToken should create constructor functions with meaningful names](https://github.com/SAP/chevrotain/issues/206)
+
+
+
 ## 0.11.0 (6-7-2016)
 
 - Minor version release as the previous version included a breaking change in a patch version.
  
 #### Minor Changes
-   - [Better runtime checks for Invalid Lexer definitions.](https://github.com/SAP/chevrotain/issues/204)
+- [Better runtime checks for Invalid Lexer definitions.](https://github.com/SAP/chevrotain/issues/204)
 
 
 
