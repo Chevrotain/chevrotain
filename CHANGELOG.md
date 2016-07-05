@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.11.2 (7-5-2016)
 
 #### Minor Changes
 - [Unresolved subrule references can cause none descriptive exceptions during follow up validations.](https://github.com/SAP/chevrotain/issues/209)
