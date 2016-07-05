@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+- [AmbiguousAlternatives error's <occurence> property was always undefined.](https://github.com/SAP/chevrotain/issues/212)
+
+
+
 ## 0.11.2 (7-5-2016)
 
 #### Minor Changes

@@ -17,9 +17,8 @@ import {
 } from "../../scan/tokens_public"
 import {first} from "./first"
 import {
-    Alternative,
     containsPath,
-    getLookaheadPathsForOr
+    getLookaheadPathsForOr, Alternative
 } from "./lookahead"
 import {
     forEach,
@@ -27,6 +26,7 @@ import {
     map,
     reject
 } from "../../utils/utils"
+
 
 export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
     let duplicateErrors = utils.map(topLevels, validateDuplicateProductions)
@@ -328,7 +328,7 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
         ors = reject(ors, (currOr) => ignoredIssuesForCurrentRule[getProductionDslName(currOr) + currOr.occurrenceInParent])
     }
 
-    let errors = utils.reduce(ors, (result, currOr) => {
+    let errors = utils.reduce(ors, (result, currOr:gast.Alternation) => {
 
         let currOccurrence = currOr.occurrenceInParent
         let alternatives = getLookaheadPathsForOr(currOccurrence, topLevelRule, maxLookahead)
@@ -353,7 +353,7 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
                 message:      currMessage,
                 type:         ParserDefinitionErrorType.AMBIGUOUS_ALTS,
                 ruleName:     topLevelRule.name,
-                occurrence:   currOr.occurrence,
+                occurrence:   currOr.occurrenceInParent,
                 alternatives: [currAmbDescriptor.alts]
             }
         })
