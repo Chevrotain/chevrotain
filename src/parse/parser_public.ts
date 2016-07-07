@@ -194,7 +194,7 @@ export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithPredicate<T>
 
 export interface IParserState {
     errors:exceptions.IRecognitionException[]
-    inputIdx:number
+    lexerState:any
     RULE_STACK:string[]
 }
 
@@ -432,10 +432,11 @@ export class Parser {
     }
 
     public reset():void {
+        this.resetLexerState()
+
         this.isBackTrackingStack = []
         this.errors = []
         this._input = []
-        this.inputIdx = -1
         this.RULE_STACK = []
         this.RULE_OCCURRENCE_STACK = []
     }
@@ -463,19 +464,6 @@ export class Parser {
         }
         else {
             throw Error("Trying to save an Error which is not a RecognitionException")
-        }
-    }
-
-    protected NEXT_TOKEN():Token {
-        return this.LA(1)
-    }
-
-    protected LA(howMuch:number):Token {
-        if (this._input.length <= this.inputIdx + howMuch) {
-            return new EOF()
-        }
-        else {
-            return this._input[this.inputIdx + howMuch]
         }
     }
 
@@ -514,8 +502,8 @@ export class Parser {
         // input[45] which is the 46th item and no longer exists,
         // so in this case the largest valid input index is 43 (input.length - 2 )
         if (this.inputIdx <= this._input.length - 2) {
-            this.inputIdx++
-            return this.NEXT_TOKEN()
+            this.consumeToken()
+            return this.LA(1)
         }
         else {
             return new EOF()
@@ -523,7 +511,6 @@ export class Parser {
     }
 
     // Parsing DSL
-
     /**
      * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
@@ -1130,9 +1117,8 @@ export class Parser {
         this.RULE_STACK.pop()
         this.RULE_OCCURRENCE_STACK.pop()
 
-        let maxInputIdx = this._input.length - 1
-        if ((this.RULE_STACK.length === 0) && this.inputIdx < maxInputIdx) {
-            let firstRedundantTok:Token = this.NEXT_TOKEN()
+        if ((this.RULE_STACK.length === 0) && this.hasAllInputBeenConsumed()) {
+            let firstRedundantTok:Token = this.LA(1)
             this.SAVE_ERROR(new exceptions.NotAllInputParsedException(
                 "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
         }
@@ -1238,6 +1224,57 @@ export class Parser {
         }
     }
 
+    // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
+    // or lexers dependent on parser context.
+    protected LA(howMuch:number):Token {
+        if (this._input.length <= this.inputIdx + howMuch) {
+            return new EOF()
+        }
+        else {
+            return this._input[this.inputIdx + howMuch]
+        }
+    }
+
+    protected consumeToken() {
+        this.inputIdx++
+    }
+
+    protected savedTokenIdx:number
+
+    protected saveLexerState() {
+        this.savedTokenIdx = this.inputIdx
+    }
+
+    protected restoreLexerState() {
+        this.inputIdx = this.savedTokenIdx
+    }
+
+    protected resetLexerState() {
+        this.inputIdx = -1
+    }
+
+    // other functionality
+    private saveRecogState():IParserState {
+        let savedErrors = cloneArr(this.errors)
+        let savedRuleStack = cloneArr(this.RULE_STACK)
+        return {
+            errors:     savedErrors,
+            lexerState: this.inputIdx,
+            RULE_STACK: savedRuleStack
+        }
+    }
+
+    private reloadRecogState(newState:IParserState) {
+        this.errors = newState.errors
+        this.inputIdx = newState.lexerState
+        this.RULE_STACK = newState.RULE_STACK
+    }
+
+    protected hasAllInputBeenConsumed():boolean {
+        let maxInputIdx = this._input.length - 1
+        return this.inputIdx < maxInputIdx
+    }
+
     private defineRule<T>(ruleName:string,
                           impl:(...implArgs:any[]) => T,
                           config:IRuleConfig<T>):(idxInCallingRule?:number, ...args:any[]) => T {
@@ -1299,12 +1336,12 @@ export class Parser {
                                     expectedTokType:Function):void {
         // TODO: can the resyncTokenType be cached?
         let reSyncTokType = this.findReSyncTokenType()
-        let orgInputIdx = this.inputIdx
+        this.saveLexerState()
         let resyncedTokens = []
         let passedResyncPoint = false
 
-        let nextTokenWithoutResync = this.NEXT_TOKEN()
-        let currToken = this.NEXT_TOKEN()
+        let nextTokenWithoutResync = this.LA(1)
+        let currToken = this.LA(1)
 
         let generateErrorMessage = () => {
             // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
@@ -1341,7 +1378,7 @@ export class Parser {
         // we were unable to find a CLOSER point to resync inside the Repetition, reset the state.
         // The parsing exception we were trying to prevent will happen in the NEXT parsing step. it may be handled by
         // "between rules" resync recovery later in the flow.
-        this.inputIdx = orgInputIdx
+        this.restoreLexerState()
     }
 
     private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:Function, nextTokIdx?:number):boolean {
@@ -1351,7 +1388,7 @@ export class Parser {
         }
 
         // no need to recover, next token is what we expect...
-        if (this.NEXT_TOKEN() instanceof expectTokAfterLastMatch) {
+        if (this.LA(1) instanceof expectTokAfterLastMatch) {
             return false
         }
 
@@ -1389,7 +1426,7 @@ export class Parser {
 
         if (this.canRecoverWithSingleTokenDeletion(expectedTokType)) {
             let nextTok = this.SKIP_TOKEN()
-            this.inputIdx++
+            this.consumeToken()
             return nextTok
         }
 
@@ -1411,7 +1448,7 @@ export class Parser {
             return false
         }
 
-        let mismatchedTok = this.NEXT_TOKEN()
+        let mismatchedTok = this.LA(1)
         let isMisMatchedTokInFollows = find(follows, (possibleFollowsTokType:Function) => {
                 return mismatchedTok instanceof possibleFollowsTokType
             }) !== undefined
@@ -1433,7 +1470,7 @@ export class Parser {
     private findReSyncTokenType():Function {
         let allPossibleReSyncTokTypes = this.flattenFollowSet()
         // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
-        let nextToken = this.NEXT_TOKEN()
+        let nextToken = this.LA(1)
         let k = 2
         while (true) {
             let nextTokenType:any = (<any>nextToken).constructor
@@ -1501,7 +1538,7 @@ export class Parser {
 
     private reSyncTo(tokClass:Function):Token[] {
         let resyncedTokens = []
-        let nextTok = this.NEXT_TOKEN()
+        let nextTok = this.LA(1)
         while ((nextTok instanceof tokClass) === false) {
             nextTok = this.SKIP_TOKEN()
             this.addToResyncTokens(nextTok, resyncedTokens)
@@ -1613,7 +1650,7 @@ export class Parser {
         if (firstIterationLookaheadFunc.call(this)) {
             (<GrammarAction>action).call(this)
 
-            let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
+            let separatorLookAheadFunc = () => {return this.LA(1) instanceof separator}
             // 2nd..nth iterations
             while (separatorLookAheadFunc()) {
                 // note that this CONSUME will never enter recovery because
@@ -1683,7 +1720,7 @@ export class Parser {
         if (firstIterationLaFunc.call(this)) {
             action.call(this)
 
-            let separatorLookAheadFunc = () => {return this.NEXT_TOKEN() instanceof separator}
+            let separatorLookAheadFunc = () => {return this.LA(1) instanceof separator}
             // 2nd..nth iterations
             while (separatorLookAheadFunc()) {
                 // note that this CONSUME will never enter recovery because
@@ -1761,9 +1798,9 @@ export class Parser {
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
     private consumeInternalOptimized(expectedTokClass:Function):Token {
-        let nextToken = this.NEXT_TOKEN()
-        if (this.NEXT_TOKEN() instanceof expectedTokClass) {
-            this.inputIdx++
+        let nextToken = this.LA(1)
+        if (nextToken instanceof expectedTokClass) {
+            this.consumeToken()
             return nextToken
         }
         else {
@@ -1855,26 +1892,9 @@ export class Parser {
 
     }
 
-    // other functionality
-    private saveRecogState():IParserState {
-        let savedErrors = cloneArr(this.errors)
-        let savedRuleStack = cloneArr(this.RULE_STACK)
-        return {
-            errors:     savedErrors,
-            inputIdx:   this.inputIdx,
-            RULE_STACK: savedRuleStack
-        }
-    }
-
-    private reloadRecogState(newState:IParserState) {
-        this.errors = newState.errors
-        this.inputIdx = newState.inputIdx
-        this.RULE_STACK = newState.RULE_STACK
-    }
-
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
-        let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
+        let errSuffix = " but found: '" + this.LA(1).image + "'"
         if (errMsgTypes === undefined) {
             let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -1884,14 +1904,14 @@ export class Parser {
                 `[${map(currPath, (currTokenClass) => tokenLabel(currTokenClass)).join(",")}]`)
             errMsgTypes = `one of these possible Token sequences:\n  <${nextValidTokenSequences.join(" ,")}>`
         }
-        throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.NEXT_TOKEN()))
+        throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.LA(1)))
     }
 
     // TODO: consider caching the error message computed information
     private raiseEarlyExitException(occurrence:number,
                                     prodType:PROD_TYPE,
                                     userDefinedErrMsg:string):void {
-        let errSuffix = " but found: '" + this.NEXT_TOKEN().image + "'"
+        let errSuffix = " but found: '" + this.LA(1).image + "'"
         if (userDefinedErrMsg === undefined) {
             let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -1905,7 +1925,7 @@ export class Parser {
         else {
             userDefinedErrMsg = `Expecting at least one ${userDefinedErrMsg}`
         }
-        throw this.SAVE_ERROR(new exceptions.EarlyExitException(userDefinedErrMsg + errSuffix, this.NEXT_TOKEN()))
+        throw this.SAVE_ERROR(new exceptions.EarlyExitException(userDefinedErrMsg + errSuffix, this.LA(1)))
     }
 }
 

@@ -160,7 +160,7 @@ class AtLeastOneSepRepetitionRecovery extends Parser {
 }
 
 function isQualifiedNamePart():boolean {
-    return this.NEXT_TOKEN() instanceof DotTok
+    return this.LA(1) instanceof DotTok
 }
 
 class SubRuleTestParser extends Parser {
@@ -299,7 +299,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", () => {
         expect(parser.CONSUME1(IntToken)).to.equal(testInput[2])
         expect(parser.CONSUME3(PlusTok)).to.equal(testInput[3])
         expect(parser.CONSUME1(IntToken)).to.equal(testInput[4])
-        expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
+        expect(parser.LA(1)).to.be.an.instanceof(EOF)
     })
 
     it("will not perform inRepetition recovery while in backtracking mode", () => {
@@ -409,8 +409,8 @@ describe("The BaseRecognizer", () => {
         let parser:any = new Parser([new IntToken("1"), new PlusTok()], [])
         parser.CONSUME(IntToken)
         parser.CONSUME(PlusTok)
-        expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
-        expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
+        expect(parser.LA(1)).to.be.an.instanceof(EOF)
+        expect(parser.LA(1)).to.be.an.instanceof(EOF)
         expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
         expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
         // and we can go on and on and on... this avoid returning null/undefined
