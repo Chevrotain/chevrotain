@@ -299,7 +299,7 @@ describe("The Error Recovery functionality of the IntrospectionParser", () => {
         expect(parser.CONSUME1(IntToken)).to.equal(testInput[2])
         expect(parser.CONSUME3(PlusTok)).to.equal(testInput[3])
         expect(parser.CONSUME1(IntToken)).to.equal(testInput[4])
-        expect(parser.LA(1)).to.be.an.instanceof(EOF)
+        expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
     })
 
     it("will not perform inRepetition recovery while in backtracking mode", () => {
