@@ -18,22 +18,22 @@ any code generation phase.
     * Token skipping (whitespace/comments/...).
     * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
     * [Multiple Lexer Modes][lexer_modes] depending on the context.
-    * [Tokens Grouping][lexer_groups]
+    * [Tokens Grouping][lexer_groups].
     * **No code generation** The Lexer does not require any code generation phase. 
    
-  2. **Parsing DSL** for defining the grammar.
-    * **No code generation**.
-      * The DSL is just Javascript, not an external language.
-      * Easily debuggable.
-      * Short feedback loops.
-      * Allows great flexibility for inserting custom Parser actions.
+  2. **Parsing DSL**.
+    * **LL(k)** grammars support.  
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
-    * Automatic lookahead calculation for **LL(k)** grammars.
     * Supports [gates/predicates][gates].
     * Backtracking support.
     * [Grammar Inheritance.][grammar_inheritance]
     * [Multiple starting rules.][starting_rules]
+    * **No code generation**.
+      * The DSL is just Javascript, not an external language.
+      * Easily debuggable.
+      * Short feedback loops.
+      * Allows great flexibility for inserting custom Parser actions
 
   3. [**High performance**][benchmark].
 
