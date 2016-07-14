@@ -31,17 +31,6 @@ var INSTALL_LINK_TEST = INSTALL_LINK + ' && ' + examples_test_command
 
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
 
-var browsers = []
-
-if (process.env.BROWSER) {
-    console.log("using karma browser config from env (travis-ci build)")
-    browsers.push(process.env.BROWSER)
-}
-else {
-    console.log("using default karma browser config from env (local testing)")
-    browsers = ['Chrome_travis_ci', "Firefox"]
-}
-
 module.exports = function(grunt) {
 
     var pkg = grunt.file.readJSON('package.json')
@@ -86,15 +75,11 @@ module.exports = function(grunt) {
 
         karma: {
             options: {
-                configFile:  'karma.conf.js',
+                configFile:  'karma_sauce.conf.js',
                 singleRun:   true,
-                browsers:    browsers,
-                // may help with strange failures on travis-ci "some of your tests did a full page reload"
-                concurrency: 1,
                 client:      {
                     captureConsole: true
-                },
-                retryLimit:  3
+                }
             },
 
             browsers_unit_tests: {
@@ -113,17 +98,6 @@ module.exports = function(grunt) {
                     files: [
                         'test/test.config.js',
                         'dev/chevrotainSpecs.min.js'
-                    ]
-                }
-            },
-
-            browsers_tests_local: {
-                options: {
-                    browsers: ['Chrome', "Firefox", "IE"],
-
-                    files: [
-                        'test/test.config.js',
-                        'dev/chevrotainSpecs.js'
                     ]
                 }
             },

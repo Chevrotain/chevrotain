@@ -11,4 +11,6 @@
 .baseDir.ts
 /bower_components
 
+/sauce.json
+
 /npm-debug.log

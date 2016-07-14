@@ -3,6 +3,9 @@
 #### Bug Fixes
 - [AmbiguousAlternatives error's <occurence> property was always undefined.](https://github.com/SAP/chevrotain/issues/212)
 
+#### Quality
+- [Use SauceLabs for browser matrix testing](https://github.com/SAP/chevrotain/issues/217)
+
 
 
 ## 0.11.2 (7-5-2016)

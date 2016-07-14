@@ -1,5 +1,8 @@
+// Karma.conf for local testing on chrome.
 module.exports = function(config) {
     "use strict";
+
+    var fs = require("fs")
 
     config.set({
 
@@ -17,6 +20,7 @@ module.exports = function(config) {
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
         reporters: ['progress'],
+
 
         // web server port
         port: 9979,
@@ -39,15 +43,7 @@ module.exports = function(config) {
         // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
         // - PhantomJS
         // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-        browsers: ['Chrome'],
-
-        customLaunchers: {
-            Chrome_travis_ci: {
-                base:  'Chrome',
-                // using incognito to disable caching
-                flags: ['--no-sandbox', '--incognito']
-            }
-        },
+        browsers: ["Chrome"],
 
         // If browser does not capture in given timeout [ms], kill it
         captureTimeout:           10000000,
