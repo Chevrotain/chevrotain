@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    body {
+        background-color: hsl(30, 20%, 95%)
+    }
+</style>
+
+<!-- references when running the sample html directly-->
+<!--<link rel='stylesheet' href='diagrams.css'>-->
+<!--<script src='vendor/railroad-diagrams.js'></script>-->
+<!--<script src='../lib/chevrotain.js'></script>-->
+<!--<script src='src/diagrams_builder.js'></script>-->
+<!--<script src='src/diagrams_behavior.js'></script>-->
+<!--<script src='src/main.js'></script>-->
+
+<!-- references when using npm and chevrotain is installed node_modules/chevrotain-->
+<!--<link rel='stylesheet' href='../node_modules/chevrotain/diagrams/diagrams.css'>-->
+<!--<script src='../node_modules/chevrotain/diagrams/vendor/railroad-diagrams.js'></script>-->
+<!--<script src='../node_modules/chevrotain/lib/chevrotain.js'></script>-->
+<!--<script src='../node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>-->
+<!--<script src='../node_modules/chevrotain/diagrams/src/diagrams_behavior.js'></script>-->
+<!--<script src='../node_modules/chevrotain/diagrams/src/main.js'></script>-->
+
+
+<!-- references when using bower and chevrotain is installed in bower_components/chevrotain-->
+<!--<link rel='stylesheet' href='bower_components/chevrotain/diagrams/diagrams.css'>-->
+<!--<script src='bower_components/chevrotain/diagrams/vendor/railroad-diagrams.js'></script>-->
+<!--<script src='bower_components/chevrotain/lib/chevrotain.js'></script>-->
+<!--<script src='bower_components/chevrotain/diagrams/src/diagrams_builder.js'></script>-->
+<!--<script src='bower_components/chevrotain/diagrams/src/diagrams_behavior.js'></script>-->
+<!--<script src='bower_components/chevrotain/diagrams/src/main.js'></script>-->
+
+
+<!-- These references will always download the latest version available on npm,
+     only use these if you actually intend to work on the latest version.-->
+<link rel='stylesheet' href='https://npmcdn.com/chevrotain/diagrams/diagrams.css'>
+<script src='https://npmcdn.com/chevrotain/diagrams/vendor/railroad-diagrams.js'></script>
+<script src='https://npmcdn.com/chevrotain/lib/chevrotain.js'></script>
+<script src='https://npmcdn.com/chevrotain/diagrams/src/diagrams_builder.js'></script>
+<script src='https://npmcdn.com/chevrotain/diagrams/src/diagrams_behavior.js'></script>
+<script src='https://npmcdn.com/chevrotain/diagrams/src/main.js'></script>
+
+<body>
+<div id="diagrams" align="center"></div>
+
+<!-- XRegExp dependency, needed as the css grammar uses XRegExp, it is not necessary for all Grammars-->
+<script src='https://bowercdn.net/c/xregexp-3.1.1/xregexp-all.js'></script>
+<!-- DOCS: the template was modified to load  javascript file which defines our Parser -->
+<script src='css.js'></script>
+
+<script>
+    // DOCS: the template was modified to instantiable the CssParser.
+    var parserInstanceToDraw = new CssParser([]);
+
+    var diagramsDiv = document.getElementById("diagrams");
+
+    main.drawDiagramsFromParserInstance(parserInstanceToDraw, diagramsDiv)
+</script>
+</body>

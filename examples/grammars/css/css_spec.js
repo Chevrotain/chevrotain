@@ -1,5 +1,5 @@
 var assert = require("assert");
-var parseCss = require("./css");
+var parseCss = require("./css").parseCss;
 
 describe('The CSS Grammar', function() {
 

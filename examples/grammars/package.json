@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "mocha": "^2.2.5",
-    "xregexp": "^3.1.0"
+    "xregexp": "^3.1.1"
   },
   "private": true
 }

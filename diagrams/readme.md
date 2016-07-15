@@ -7,7 +7,9 @@ This folder contains a template which can be easily modified to render and displ
 A grammar as railroad syntax diagrams using the [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams)
 library by @tabatkins.
 
-[Example of generated diagrams](http://sap.github.io/chevrotain/diagrams_sample/diagrams_sample.html).
+Examples of generated diagrams:
+* [JSON diagrams](http://sap.github.io/chevrotain/diagrams_sample/diagrams_sample.html).
+* [CSS diagrams](http://htmlpreview.github.io/?https://github.com/SAP/chevrotain/blob/master/examples/grammars/css_diagrams.html).
  
  
 ### Features:
@@ -19,21 +21,21 @@ library by @tabatkins.
 The template will runs as is, but it will render a sample grammar instead of your custom grammar.
 
 There are **only** three steps needed to render a custom grammar:        
-* Copy diagrams.html into a source controlled folder (root of your project is recommended).
+1. Copy **diagrams.html** into a source controlled folder (root of your project is recommended).
  
-* Modify the references to the resources in **root/diagrams.html** so they will still be valid.
-   * For example, assuming chevrotain is installed to **node_modules/chevrotain**: 
+2. Modify the references to the resources (script/stylesheet tags) in your copied **diagrams.html** so they will still be valid.
+   * This depends on both your project structure and on how you consume chevrotain (npm/bower/other).
+   * For example, assuming chevrotain is located in **node_modules/chevrotain**: 
      ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
      ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```
-   * For convenience the diagrams.html contains three blocks of references, comment/uncomment the relevant one for your needs. 
-   * Modifying the references is not mandatory, instead the whole diagrams directory may be copied.
-     However this will automatic updates to those resources(npm update/bower update)
+   * For convenience **diagrams.html** contains three blocks of references for common use cases,
+     comment/uncomment the relevant one for your needs. 
 
-* Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
+3. Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
    the custom Parser whose grammar should be rendered.
    
-[Example](https://github.com/SAP/chevrotain/blob/master/examples/typescript_ecma5/ecma5_diagrams.html) of a modified html with a custom grammar.
-Setup instructions to run that example can be found [here](https://github.com/SAP/chevrotain/blob/master/examples/typescript_ecma5/README.md).
+[Example of a modified template](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css_diagrams.html) of a modified html 
+with a custom grammar.
    
    
 #### What about grammars written with commonjs (node.js) modules.
@@ -48,5 +50,5 @@ Some options to accomplish this:
 
 #### What about grammars written with AMD (require.js) modules.
 All the sources used in the template are wrapped using the [UMD](https://github.com/umdjs/umd) pattern.
-Thus they are compatible with AMD modules. In such a case the html can be modified to load require.js and perform
+Thus they are compatible with AMD modules. In such a case the html can be modified to additionally load require.js and perform
 the grammar rendering in the require.js **data-main** script.
