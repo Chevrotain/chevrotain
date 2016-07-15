@@ -4,6 +4,9 @@ coverage/
 /package
 /examples
 /node_modules
+/dev
+/lib
+/sauce.json
 .baseDir.ts
 /lib
 /dev
