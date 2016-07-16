@@ -4,6 +4,8 @@
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
 
+[![Browser Status](https://badges.herokuapp.com/sauce/shahars)](https://saucelabs.com/u/shahars)
+
 # Chevrotain
 
 Chevrotain is a **Javascript parsing DSL** for building [**high performance**][benchmark] **fault-tolerant** recursive decent parsers.
@@ -79,9 +81,8 @@ None.
 Chevrotain should run on any modern Javascript ES5.1 runtime. 
 * The CI build runs the tests under: 
   * Node.js (0.12 / 4 / 5).
-  * latest stable Chrome.
-  * latest stable Firefox.
-* Additionally local testing is done on latest versions of Chrome/Firefox/IE.
+  * Latest stable: Chrome, FireFox, IE Edge, IE 11 and Safari 9.
+  
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
 [benchmark]: http://sap.github.io/chevrotain/performance/
