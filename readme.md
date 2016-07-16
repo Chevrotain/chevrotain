@@ -38,14 +38,14 @@ any code generation phase.
       * Allows great flexibility for inserting custom Parser actions
 
   3. [**High performance**][benchmark].
+  
+  4. Generated [**Railroad Diagrams**](https://github.com/SAP/chevrotain/tree/master/diagrams).
 
-  4. **Grammar Reflection/Introspection**.
+  5. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
     * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
   
-  5. Well tested with **~100% code coverage**, Unit & Integration tests
-  
-  6. Generated [**Railroad Diagrams**](https://github.com/SAP/chevrotain/tree/master/diagrams).
+  6. Well tested with **~100% code coverage**, Unit & Integration tests
    
 ## Installation
 * **npm**: ```npm install chevrotain```
@@ -59,11 +59,11 @@ any code generation phase.
  * Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
  * Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
 
-**[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
-
 ## Documentation
-* [Latest released version's HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [Parsing DSL](http://sap.github.io/chevrotain/documentation/0_11_4/classes/parser.html#at_least_one)
+* **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
+
+* [HTML docs](http://sap.github.io/chevrotain/documentation)
+   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_11_4/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
