@@ -44,8 +44,8 @@
     "url": "git://github.com/SAP/chevrotain.git"
   },
   "scripts": {
-    "release_patch": "node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
-    "release_minor": "node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat"
+    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
+    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && nodescripts/post_release_build.js minor && upload_docs.bat"
   },
   "dependencies": {},
   "devDependencies": {
