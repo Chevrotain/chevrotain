@@ -9,7 +9,7 @@ library by @tabatkins.
 
 Examples of generated diagrams:
 * [JSON diagrams](http://sap.github.io/chevrotain/diagrams_sample/diagrams_sample.html).
-* [CSS diagrams](http://htmlpreview.github.io/?https://github.com/SAP/chevrotain/blob/master/examples/grammars/css_diagrams.html).
+* [CSS diagrams](https://rawgit.com/SAP/chevrotain/master/examples/grammars/css/css_diagrams.html).
  
  
 ### Features:
