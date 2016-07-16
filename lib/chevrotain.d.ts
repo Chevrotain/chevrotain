@@ -1,4 +1,4 @@
-/*! chevrotain - v0.11.2 */
+/*! chevrotain - v0.11.3 */
 declare namespace chevrotain {
     class HashTable<V>{}
     /**
@@ -353,7 +353,7 @@ declare namespace chevrotain {
     export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithPredicate<T>;
     export interface IParserState {
         errors: exceptions.IRecognitionException[];
-        inputIdx: number;
+        lexerState: any;
         RULE_STACK: string[];
     }
     export type Predicate = () => boolean;
@@ -436,8 +436,6 @@ declare namespace chevrotain {
         getGAstProductions(): HashTable<gast.Rule>;
         protected isBackTracking(): boolean;
         protected SAVE_ERROR(error: exceptions.IRecognitionException): exceptions.IRecognitionException;
-        protected NEXT_TOKEN(): Token;
-        protected LA(howMuch: number): Token;
         /**
          * @param grammarRule - The rule to try and parse in backtracking mode.
          * @param isValid - A predicate that given the result of the parse attempt will "decide" if the parse was successfully or not.
@@ -848,7 +846,24 @@ declare namespace chevrotain {
          * @returns {Token} - The consumed Token.
          */
         protected consumeInternal(tokClass: Function, idx: number): Token;
-                                                                                                                                                        }
+        /**
+         * Convenience method equivalent to LA(1)
+         * It is no longer used directly in chevrotain due to
+         * performance considerations (avoid the need for inlining optimizations).
+         *
+         * But it is maintained for backward compatibility reasons.
+         *
+         * @deprecated
+         */
+        protected NEXT_TOKEN(): Token;
+        protected LA(howMuch: number): Token;
+        protected consumeToken(): void;
+        protected savedTokenIdx: number;
+        protected saveLexerState(): void;
+        protected restoreLexerState(): void;
+        protected resetLexerState(): void;
+                protected hasAllInputBeenConsumed(): boolean;
+                                                                                                                                                }
     
     export namespace exceptions {
         interface IRecognizerContext {
