@@ -21,21 +21,21 @@ Examples of generated diagrams:
 The template will runs as is, but it will render a sample grammar instead of your custom grammar.
 
 There are **only** three steps needed to render a custom grammar:        
-1. Copy **diagrams.html** into a source controlled folder (root of your project is recommended).
- 
-2. Modify the references to the resources (script/stylesheet tags) in your copied **diagrams.html** so they will still be valid.
-   * This depends on both your project structure and on how you consume chevrotain (npm/bower/other).
-   * For example, assuming chevrotain is located in **node_modules/chevrotain**: 
-     ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
-     ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```
-   * For convenience **diagrams.html** contains three blocks of references for common use cases,
-     comment/uncomment the relevant one for your needs. 
+- Copy **diagrams.html** into a source controlled folder (root of your project is recommended).
 
-3. Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
+- Modify the references to the resources (script/stylesheet tags) in your copied **diagrams.html** so they will still be valid.
+ * This depends on both your project structure and on how you consume chevrotain (npm/bower/other).
+ * For example, assuming chevrotain is located in **node_modules/chevrotain**: 
+  ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
+  ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```
+ * For convenience **diagrams.html** contains three blocks of references for common use cases,
+  comment/uncomment the relevant one for your needs. 
+
+- Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
    the custom Parser whose grammar should be rendered.
    
-[Example of a modified template](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css_diagrams.html) of a modified html 
-with a custom grammar.
+[Example of a modified template](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css_diagrams.html)
+* This example loads the resources from a npmcdn.com.
    
    
 #### What about grammars written with commonjs (node.js) modules.
