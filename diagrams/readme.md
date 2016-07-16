@@ -7,7 +7,7 @@ This folder contains a template which can be easily modified to render and displ
 A grammar as railroad syntax diagrams using the [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams)
 library by @tabatkins.
 
-Examples of generated diagrams:
+### Examples:
 * [JSON diagrams](http://sap.github.io/chevrotain/diagrams_sample/diagrams_sample.html).
 * [CSS diagrams](https://rawgit.com/SAP/chevrotain/master/examples/grammars/css/css_diagrams.html).
  
@@ -17,7 +17,7 @@ Examples of generated diagrams:
   * Scroll to definition of non-terminal on mouse click. 
  
 
-### Usage Instructions:
+### Instructions:
 The template will runs as is, but it will render a sample grammar instead of your custom grammar.
 
 There are **only** three steps needed to render a custom grammar:        
