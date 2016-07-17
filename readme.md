@@ -31,6 +31,7 @@ any code generation phase.
     * Backtracking support.
     * [Grammar Inheritance.][grammar_inheritance]
     * [Multiple starting rules.][starting_rules]
+    * [Parametrized Rules.][parametrized_rules]
     * **No code generation**.
       * The DSL is just Javascript, not an external language.
       * Easily debuggable.
@@ -92,3 +93,4 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
 [gates]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
+[parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
