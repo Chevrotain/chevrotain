@@ -51,8 +51,8 @@ var germanTokens = [WhiteSpace, RelationWord, Und, Vor, Nach, Kochen,
     Wurstchen, Wurst, Raum, Auf, Den];
 
 // We can define a different Lexer for each of the sub grammars.
-var EnglishLexer = new Lexer(englishTokens, true);
-var GermanLexer = new Lexer(germanTokens, true);
+var EnglishLexer = new Lexer(englishTokens);
+var GermanLexer = new Lexer(germanTokens);
 
 
 // ----------------- parser -----------------

@@ -42,7 +42,7 @@ var WhiteSpace = extendToken("WhiteSpace", /\s+/);
 WhiteSpace.GROUP = Lexer.SKIPPED;
 
 var allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan];
-var SelectLexer = new Lexer(allTokens, true);
+var SelectLexer = new Lexer(allTokens);
 
 
 // ----------------- parser -----------------

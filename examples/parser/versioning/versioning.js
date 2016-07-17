@@ -1,6 +1,6 @@
 /*
-* Example Of using Grammar inheritance to support multiple versions of the same grammar.
-*/
+ * Example Of using Grammar inheritance to support multiple versions of the same grammar.
+ */
 
 var chevrotain = require("chevrotain");
 
@@ -22,7 +22,7 @@ WhiteSpace.GROUP = Lexer.SKIPPED;
 
 var allTokens = [WhiteSpace, Select, From, Where, Comma,
     Identifier, Integer, GreaterThan, LessThan];
-var SelectLexer = new Lexer(allTokens, true);
+var SelectLexer = new Lexer(allTokens);
 
 
 // ----------------- parser -----------------
