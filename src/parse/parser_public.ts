@@ -29,7 +29,7 @@ import {
     isFunction,
     has,
     isUndefined,
-    forEach
+    forEach, some
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {
@@ -1601,14 +1601,15 @@ export class Parser {
 
     // Implementation of parsing DSL
     private optionInternal(predicateOrAction:Predicate | GrammarAction, action:GrammarAction, occurrence:number):boolean {
+        let lookAheadFunc = this.getLookaheadFuncForOption(occurrence)
         if (action === undefined) {
             action = <any>predicateOrAction
-            predicateOrAction = this.getLookaheadFuncForOption(occurrence)
-        } else {
-            predicateOrAction = this.getLookaheadFuncForOption(occurrence, <Predicate>predicateOrAction)
+        } // predicate present
+        else if (!(predicateOrAction as Predicate).call(this)) {
+            return false
         }
 
-        if ((predicateOrAction as Predicate).call(this)) {
+        if ((lookAheadFunc).call(this)) {
             action.call(this)
             return true
         }
@@ -1618,16 +1619,21 @@ export class Parser {
     private atLeastOneInternal(prodFunc:Function,
                                prodName:string,
                                prodOccurrence:number,
-                               lookAheadFunc:Predicate | GrammarAction,
+                               predicate:Predicate | GrammarAction,
                                action:GrammarAction | string,
                                userDefinedErrMsg?:string):void {
+        let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
         if (!isFunction(action)) {
             userDefinedErrMsg = <any>action
-            action = <any>lookAheadFunc
-            lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
+            action = <any>predicate
         }
+        // predicate present
         else {
-            lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence, <Predicate>lookAheadFunc)
+            let orgLookAheadFunc = lookAheadFunc
+            lookAheadFunc = () => {
+                return (predicate as Predicate).call(this) &&
+                    orgLookAheadFunc.call(this)
+            }
         }
 
         if ((<Function>lookAheadFunc).call(this)) {
@@ -1696,23 +1702,27 @@ export class Parser {
                          predicate:Predicate | GrammarAction,
                          action?:GrammarAction):void {
 
+        let lookaheadFunction = this.getLookaheadFuncForMany(prodOccurrence)
         if (action === undefined) {
             action = <any>predicate
-            predicate = this.getLookaheadFuncForMany(prodOccurrence)
         }
+        // predicate present
         else {
-            predicate = this.getLookaheadFuncForMany(prodOccurrence, <Predicate>predicate)
+            let orgLookaheadFunction = lookaheadFunction
+            lookaheadFunction = () => {
+                return (predicate as Predicate).call(this) &&
+                    orgLookaheadFunction.call(this)
+            }
         }
 
-
-        while ((<Function>predicate).call(this)) {
+        while (lookaheadFunction.call(this)) {
             action.call(this)
         }
 
         if (this.recoveryEnabled) {
             this.attemptInRepetitionRecovery(prodFunc,
-                [predicate, action],
-                <any>predicate
+                [lookaheadFunction, action],
+                <any>lookaheadFunction
                 , prodName,
                 prodOccurrence,
                 NextTerminalAfterManyWalker,
@@ -1796,7 +1806,7 @@ export class Parser {
                           occurrence:number):T {
         // else implicit lookahead
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
-        let altToTake = laFunc.call(this)
+        let altToTake = laFunc.call(this, alts)
         if (altToTake !== -1) {
             let chosenAlternative:any = alts[altToTake]
             // TODO: should THEN_DO should be renamed to ALT to avoid this ternary  expression and to provide a consistent API.
@@ -1840,9 +1850,9 @@ export class Parser {
         if (laFunc === undefined) {
             let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            let predicates = map(alts, (currAlt) => currAlt.WHEN)
-
-            laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, predicates)
+            // note that hasPredicates is only computed once.
+            let hasPredicates = some(alts, (currAlt) => isFunction((<any>currAlt).WHEN))
+            laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, hasPredicates)
             this.classLAFuncs.put(key, laFunc)
             return laFunc
         }
@@ -1852,51 +1862,41 @@ export class Parser {
     }
 
     // Automatic lookahead calculation
-    private getLookaheadFuncForOption(occurrence:number, predicate?:Predicate):() => boolean {
+    private getLookaheadFuncForOption(occurrence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurrence)
-        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForOption, this.maxLookahead, predicate)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForOption, this.maxLookahead)
     }
 
-    private getLookaheadFuncForMany(occurrence:number, predicate?:Predicate):() => boolean {
+    private getLookaheadFuncForMany(occurrence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurrence)
-        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForMany, this.maxLookahead, predicate)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForMany, this.maxLookahead)
     }
 
-    private getLookaheadFuncForManySep(occurrence:number, predicate?:Predicate):() => boolean {
+    private getLookaheadFuncForManySep(occurrence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurrence)
-        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForManySep, this.maxLookahead, predicate)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForManySep, this.maxLookahead)
     }
 
-    private getLookaheadFuncForAtLeastOne(occurrence:number, predicate?:Predicate):() => boolean {
+    private getLookaheadFuncForAtLeastOne(occurrence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurrence)
-        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOne, this.maxLookahead, predicate)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOne, this.maxLookahead)
     }
 
-    private getLookaheadFuncForAtLeastOneSep(occurrence:number, predicate?:Predicate):() => boolean {
+    private getLookaheadFuncForAtLeastOneSep(occurrence:number):() => boolean {
         let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurrence)
-        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead, predicate)
+        return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
     }
 
     private getLookaheadFuncFor<T>(key:string,
                                    occurrence:number,
                                    laFuncBuilder:(number, rule, k) => () => T,
-                                   maxLookahead:number,
-                                   predicate?:Predicate):() => T {
+                                   maxLookahead:number):() => T {
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
             let ruleName = last(this.RULE_STACK)
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             laFunc = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead])
-            if (predicate) {
-                let laFuncWithGate = function () {
-                    return predicate.call(this) && laFunc.call(this)
-                }
-                this.classLAFuncs.put(key, laFuncWithGate)
-                return laFuncWithGate
-            }
-            else {
-                this.classLAFuncs.put(key, laFunc)
-            }
+            this.classLAFuncs.put(key, laFunc)
             return laFunc
         }
         else {

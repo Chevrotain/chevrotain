@@ -4,7 +4,6 @@ import {exceptions} from "../../src/parse/exceptions_public"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
 
-
     class A extends Token {
         constructor() { super("a", 0, 1, 1) }
     }
@@ -145,7 +144,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
                 (Parser as any).performSelfAnalysis(this)
             }
 
-            public orRule = this.RULE("manyRule", () => {
+            public orRule = this.RULE("orRule", () => {
                 // @formatter:off
                     return this.OR1([
                         // no predicate
@@ -186,5 +185,129 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
         let gateClosedInputC = new PredicateOrParser([new C()], false).orRule()
         expect(gateClosedInputC).to.equal("C")
+    })
+
+    describe("Predicates shall work with parametrized rules (issue #221)", () => {
+
+        it("predicates in OR", () => {
+            class PredicateWithRuleOrParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, ALL_TOKENS);
+                    (Parser as any).performSelfAnalysis(this)
+                }
+
+                public topRule = this.RULE("topRule", (param) => {
+                    return this.OR1([
+                        {WHEN: () => param, THEN_DO: () => this.CONSUME1(A).image},
+                        {WHEN: () => !param, THEN_DO: () => this.CONSUME1(B).image}
+                    ])
+                })
+            }
+
+            let gateOpenInputA = new PredicateWithRuleOrParser([new A()]).topRule(1, [true])
+            expect(gateOpenInputA).to.equal("a")
+
+            // if the predicate function still kept a reference via a closure to the original param this will not work.
+            let gateOpenInputB = new PredicateWithRuleOrParser([new B()]).topRule(1, [false])
+            expect(gateOpenInputB).to.equal("b")
+        })
+
+        it("predicates in OPTION", () => {
+            class PredicateWithRuleOptionParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, ALL_TOKENS);
+                    (Parser as any).performSelfAnalysis(this)
+                }
+
+                public topRule = this.RULE("topRule", (param) => {
+                    let result = ""
+                    this.OPTION(() => param, () => {
+                        result += this.CONSUME1(A).image
+                    })
+                    result += this.CONSUME1(B).image
+
+                    return result
+                })
+            }
+
+            let gateOpenInputB = new PredicateWithRuleOptionParser([new B()]).topRule(1, [false])
+            expect(gateOpenInputB).to.equal("b")
+
+            // if the predicate function still kept a reference via a closure to the original param this will not work.
+            // because the <() => param> in the OPTION will ALWAYS return false (the original param)
+            let gateOpenInputA = new PredicateWithRuleOptionParser([new A(), new B()]).topRule(1, [true])
+            expect(gateOpenInputA).to.equal("ab")
+        })
+
+        it("predicates in MANY", () => {
+            class PredicateWithRuleManyParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, ALL_TOKENS);
+                    (Parser as any).performSelfAnalysis(this)
+                }
+
+                public topRule = this.RULE("topRule", (param) => {
+                    let result = ""
+                    this.MANY(() => param, () => {
+                        result += this.CONSUME1(A).image
+                    })
+                    result += this.CONSUME1(B).image
+                    return result
+                })
+            }
+
+            let gateOpenInputB = new PredicateWithRuleManyParser([new B()]).topRule(1, [false])
+            expect(gateOpenInputB).to.equal("b")
+
+            // if the predicate function still kept a reference via a closure to the original param this will not work.
+            // because the <() => param> in the MANY will ALWAYS return false (the original param)
+            let gateOpenInputA = new PredicateWithRuleManyParser([new A(), new A(), new A(), new B()]).topRule(1, [true])
+            expect(gateOpenInputA).to.equal("aaab")
+        })
+
+        it("predicates in AT_LEAST_ONE", () => {
+
+
+            class PredicateWithRuleAtLeastOneParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, ALL_TOKENS);
+                    (Parser as any).performSelfAnalysis(this)
+                }
+
+                public topRule = this.RULE("topRule", (param) => {
+                    let times = 0
+
+                    function gateFunc() {
+                        // got to enter at least once...
+                        if (times === 0) {
+                            times++
+                            return true
+                        }
+                        else {
+                            return param
+                        }
+                    }
+
+                    let result = ""
+                    this.AT_LEAST_ONE(gateFunc, () => {
+                        result += this.CONSUME1(A).image
+                    })
+                    result += this.CONSUME1(B).image
+                    return result
+                })
+            }
+
+            let gateOpenInputB = new PredicateWithRuleAtLeastOneParser([new A(), new B()]).topRule(1, [false])
+            expect(gateOpenInputB).to.equal("ab")
+
+            // if the predicate function still kept a reference via a closure to the original param this will not work.
+            // because the <() => param> in the AT_LEAST_ONE will ALWAYS return false (the original param)
+            let gateOpenInputA = new PredicateWithRuleAtLeastOneParser([new A(), new A(), new A(), new B()]).topRule(1, [true])
+            expect(gateOpenInputA).to.equal("aaab")
+        })
     })
 })
