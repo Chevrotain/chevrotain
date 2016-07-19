@@ -4,13 +4,12 @@ import {
     reject,
     find,
     every,
-    isFunction,
-    some
 } from "../../utils/utils"
 
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
+import {Predicate, IAnyOrAlt} from "../parser_public"
 
 
 export enum PROD_TYPE {
@@ -25,9 +24,9 @@ export enum PROD_TYPE {
 export function buildLookaheadFuncForOr(occurrence:number,
                                         ruleGrammar:gast.Rule,
                                         k:number,
-                                        predicates:{():boolean}[] = []):() => number {
+                                        hasPredicates:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
-    return buildAlternativesLookAheadFunc(lookAheadPaths, predicates)
+    return buildAlternativesLookAheadFunc(lookAheadPaths, hasPredicates)
 }
 
 export function buildLookaheadForTopLevel(rule:gast.Rule, k:number):() => boolean {
@@ -53,9 +52,6 @@ export function buildLookaheadFuncForOptionalProd(occurrence:number,
                                                   prodType:PROD_TYPE,
                                                   k:number):() => boolean {
     let lookAheadPaths = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k)
-    // TODO: ambiguity checks may go here?
-    // we only need the lookaheadPaths from the "insideDef" to build the actual lookahead function.
-    // the alternative of NOT taking the optional path is always valid and requires no lookahead.
     return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0])
 }
 
@@ -141,24 +137,24 @@ export function lookAheadSequenceFromAlternatives(alternatives:Alternative[]):lo
 
 /**
  * @param alts
- * @param predicates - An array of predicates, an alternative can only match if its lookahead sequence matches AND
- *                     Its predicate matches. Note that some alternatives may not have any predicates while some do
- *                     in the same set of alternatives.
- *
+ * @param hasPredicates
  * @returns {function(): number}
  */
-export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], predicates:{():boolean}[] = []):() => number {
-    // TODO: performance optimizations for the (common) edge case of K == 1
-
+export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPredicates:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
     let numOfAlts = alts.length
 
-
     // This version takes into account the predicates as well.
-    if (some(predicates, (currPred) => isFunction(currPred))) {
+    if (hasPredicates) {
         /**
          * @returns {number} - The chosen alternative index
          */
-        return function ():number {
+        return function (orAlts:IAnyOrAlt<any>[]):number {
+
+            // unfortunately the predicates must be extracted every single time
+            // as they cannot be cached due to keep references to parameters(vars) which are no longer valid.
+            // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
+            let predicates:Predicate[] = map(orAlts, (currAlt) => currAlt.WHEN)
+
             for (let t = 0; t < numOfAlts; t++) {
                 let currAlt = alts[t]
                 let currNumOfPaths = currAlt.length
@@ -191,8 +187,8 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], predica
             return -1
         }
     }
-    // optimized lookahead without needing to check for predicates at all.
-    // this causes code duplication which is intentional...
+    // optimized lookahead without needing to check the predicates at all.
+    // this causes code duplication which is intentional to improve performance.
     else {
         /**
          * @returns {number} - The chosen alternative index
@@ -223,9 +219,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], predica
             // none of the alternatives could be matched
             return -1
         }
-
     }
-
 }
 
 export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):() => boolean {

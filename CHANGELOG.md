@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+- [Predicates / Gates using closures to parameters will cause unexpected behavior.](https://github.com/SAP/chevrotain/issues/221)
+
+
+
 ## 0.11.4 (7-16-2016)
 
 - Fixes issue with previous release automation.
