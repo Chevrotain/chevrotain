@@ -1,10 +1,15 @@
 var assert = require("assert");
+var semver = require("semver")
+
+var parseXML
+// hack to avoid requiring a file using ES6 syntax during Travis build using older version of node.js
+if (semver.gte(process.version, "4.0.0")) {
+    parseXML = require("./xml_es6")
+}
 
 describe('The XML Grammar - Parser implemented using ES6 syntax', function() {
 
     it('can parse a simple XML without errors', function() {
-        var parseXML = require("./xml_es6");
-        
         var inputText =
             "<?xml version=\"1.0\"?>\n" +
             "<catalog>\n" +
