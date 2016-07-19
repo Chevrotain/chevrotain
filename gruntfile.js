@@ -26,7 +26,7 @@ var examples_test_command = semver.gte(process.version, "4.0.0") ?
     "mocha **/*spec.js" :
     "mocha **/*spec.js -i -g ES6"
 
-var INSTALL_LINK = 'npm install && npm link '
+var INSTALL_LINK = 'npm install && npm link chevrotain'
 var INSTALL_LINK_TEST = INSTALL_LINK + ' && ' + examples_test_command
 
 var banner = '/*! <%= pkg.name %> - v<%= pkg.version %> */'
