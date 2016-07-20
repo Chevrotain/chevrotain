@@ -6,7 +6,6 @@ var wrench = require('wrench')
 
 var apiPath = path.join(__dirname, '../src/api.ts')
 var packagePath = path.join(__dirname, '../package.json')
-var bowerPath = path.join(__dirname, '../bower.json')
 var changeLogPath = path.join(__dirname, '../CHANGELOG.md')
 
 // docs (.md files for bumping versions)
@@ -22,7 +21,6 @@ var readmePath = path.join(__dirname, '../readme.md')
 docFilesPaths.push(readmePath)
 
 var pkgJson = jf.readFileSync(packagePath)
-var bowerJson = jf.readFileSync(bowerPath)
 var apiString = fs.readFileSync(apiPath, 'utf8').toString()
 var changeLogString = fs.readFileSync(changeLogPath, 'utf8').toString()
 
@@ -41,11 +39,9 @@ else {
 module.exports = {
     apiPath:         apiPath,
     packagePath:     packagePath,
-    bowerPath:       bowerPath,
     changeLogPath:   changeLogPath,
     docFilesPaths:   docFilesPaths,
     pkgJson:         pkgJson,
-    bowerJson:       bowerJson,
     apiString:       apiString,
     changeLogString: changeLogString,
     currVersion:     pkgJson.version,

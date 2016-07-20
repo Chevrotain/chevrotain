@@ -24,7 +24,7 @@ There are **only** three steps needed to render a custom grammar:
 - Copy **diagrams.html** into a source controlled folder (root of your project is recommended).
 
 - Modify the references to the resources (script/stylesheet tags) in your copied **diagrams.html** so they will still be valid.
- * This depends on both your project structure and on how you consume chevrotain (npm/bower/other).
+ * This depends on both your project structure and on how you consume chevrotain (npm/other).
  * For example, assuming chevrotain is located in **node_modules/chevrotain**: 
   ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
   ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```

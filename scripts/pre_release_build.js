@@ -27,36 +27,23 @@ if (!dateTemplateRegExp.test(config.changeLogString)) {
     process.exit(-1)
 }
 
-var pkgVersion = config.pkgJson.version
-var bowerVersion = config.bowerJson.version
-
-if (_.uniq([pkgVersion, bowerVersion]).length !== 1) {
-    console.log("Error: package.json / bower.json versions must be identical")
-    process.exit(-1)
-}
-
 var oldVersion = config.currVersion
 var newVersion = semver.inc(config.currVersion, config.mode)
 
 var bumpedPkgJson = _.clone(config.pkgJson)
-var bumpBowerJson = _.clone(config.bowerJson)
 bumpedPkgJson.version = newVersion
-bumpBowerJson.version = newVersion
 var oldVersionRegExpGlobal = new RegExp(oldVersion, "g")
 var bumpedApiString = config.apiString.replace(oldVersionRegExpGlobal, newVersion)
 
 jf.spaces = 2
 jf.writeFileSync(config.packagePath, bumpedPkgJson)
-jf.writeFileSync(config.bowerPath, bumpBowerJson)
 fs.writeFileSync(config.apiPath, bumpedApiString)
-
 
 // updating CHANGELOG.md date
 var nowDate = new Date()
 var nowDateString = nowDate.toLocaleDateString().replace(/\//g, "-")
 var changeLogDate = config.changeLogString.replace(dateTemplateRegExp, "## " + newVersion + " " + "(" + nowDateString + ")")
 fs.writeFileSync(config.changeLogPath, changeLogDate)
-
 
 var docsOldVersionRegExp = new RegExp(oldVersion.replace(/\./g, "_"), "g")
 _.forEach(config.docFilesPaths, function(currDocPath) {
