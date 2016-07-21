@@ -519,6 +519,7 @@
         if(!(this instanceof Terminal)) return new Terminal(text, href, title, occurrenceIdx, topRuleName, dslRuleName, tokenName);
         FakeSVG.call(this, 'g', {'class': 'terminal'});
         this.text = text;
+        this.label = text;
         this.href = href;
         this.title = title;
         this.occurrenceIdx = occurrenceIdx;
@@ -547,6 +548,7 @@
             topRuleName:this.topRuleName,
             dslRuleName:this.dslRuleName,
             tokenName:this.tokenName,
+            label:this.label
         }, this.text);
         var title = FakeSVG('title', {}, this.title);
         if(this.href)
@@ -564,6 +566,7 @@
         if(!(this instanceof NonTerminal)) return new NonTerminal(text, href, occurrenceIdx, topRuleName);
         FakeSVG.call(this, 'g', {'class': 'non-terminal'});
         this.text = text;
+        this.ruleName = text;
         this.href = href;
         this.occurrenceIdx = occurrenceIdx;
         this.topRuleName = topRuleName
@@ -583,8 +586,14 @@
         x += gaps[0];
 
         FakeSVG('rect', {x:x, y:y-11, width:this.width, height:this.up+this.down}).addTo(this);
-        var text = FakeSVG('text', {x:x+this.width/2, y:y+4,
-            occurrenceIdx:this.occurrenceIdx, topRuleName:this.topRuleName}, this.text);
+        var text = FakeSVG('text',
+            {
+                x:x+this.width/2,
+                y:y+4,
+                occurrenceIdx:this.occurrenceIdx,
+                topRuleName:this.topRuleName,
+                ruleName:this.ruleName
+        }, this.text);
         if(this.href)
             FakeSVG('a', {'xlink:href': this.href}, [text]).addTo(this);
         else
