@@ -71,7 +71,7 @@ any code generation phase.
 * **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_11_4/classes/parser.html#at_least_one)
+   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_12_0/classes/parser.html#at_least_one)
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)

@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.12.0 (7-21-2016)
 
 #### Breaking Changes
 - [Removed Bower support.](https://github.com/SAP/chevrotain/issues/226)
