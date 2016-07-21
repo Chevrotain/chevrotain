@@ -1,5 +1,8 @@
 ## X.Y.Z (INSERT_DATE_HERE)
 
+#### Breaking Changes
+- [Removed Bower support.](https://github.com/SAP/chevrotain/issues/226)
+
 #### Bug Fixes
 - [Predicates / Gates using closures to parameters will cause unexpected behavior.](https://github.com/SAP/chevrotain/issues/221)
 

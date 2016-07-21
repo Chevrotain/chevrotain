@@ -87,7 +87,7 @@ module.exports = function(grunt) {
                     port:  9980,
                     files: [
                         'test/test.config.js',
-                        'dev/chevrotainSpecs.js'
+                        'lib/chevrotainSpecs.js'
                     ]
                 }
             },
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
                     port:  9981,
                     files: [
                         'test/test.config.js',
-                        'dev/chevrotainSpecs.min.js'
+                        'lib/chevrotainSpecs.min.js'
                     ]
                 }
             },
@@ -106,7 +106,7 @@ module.exports = function(grunt) {
                 options: {
                     port:  9982,
                     files: [
-                        'dev/chevrotain.js',
+                        'lib/chevrotain.js',
                         'test/test.config.js',
                         'test_integration/**/*spec.js'
                     ]
@@ -118,7 +118,7 @@ module.exports = function(grunt) {
                     port:       9983,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
-                        'dev/chevrotain.js',
+                        'lib/chevrotain.js',
                         'test/test.config.js',
                         {pattern: 'test_integration/*/*.js', included: false},
                         'test_integration/integration_tests_main.js'
@@ -130,7 +130,7 @@ module.exports = function(grunt) {
                 options: {
                     port:  9984,
                     files: [
-                        'dev/chevrotain.min.js',
+                        'lib/chevrotain.min.js',
                         'test/test.config.js',
                         'test_integration/**/*spec.js'
                     ]
@@ -142,7 +142,7 @@ module.exports = function(grunt) {
                     port:       9985,
                     frameworks: ["requirejs", 'mocha', 'chai'],
                     files:      [
-                        'dev/chevrotain.min.js',
+                        'lib/chevrotain.min.js',
                         'test/test.config.js',
                         {pattern: 'test_integration/*/*.js', included: false},
                         'test_integration/integration_tests_main.js'
@@ -220,7 +220,7 @@ module.exports = function(grunt) {
         },
 
         clean: {
-            release: ['lib/src/**/*', 'lib/test/**/*', 'dev/**/*']
+            release: ['lib/**/*', 'dev/**/*']
         },
 
         replace: {
@@ -273,7 +273,7 @@ module.exports = function(grunt) {
                     separator: grunt.util.linefeed + fourSpaces
                 },
                 files:   {
-                    'dev/chevrotain.d.ts': PUBLIC_API_DTS_FILES
+                    'lib/chevrotain.d.ts': PUBLIC_API_DTS_FILES
                 }
             }
         },
@@ -305,7 +305,7 @@ module.exports = function(grunt) {
             release: {
                 entry:  "./lib/src/api.js",
                 output: {
-                    path:           "dev/",
+                    path:           "lib/",
                     filename:       "chevrotain.js",
                     library:        "chevrotain",
                     libraryTarget:  "umd",
@@ -320,7 +320,7 @@ module.exports = function(grunt) {
             specs: {
                 entry:  "./lib/test/all.js",
                 output: {
-                    path:     "dev/",
+                    path:     "lib/",
                     filename: "chevrotainSpecs.js"
                 }
             },
@@ -328,7 +328,7 @@ module.exports = function(grunt) {
             release_uglify: {
                 entry:  "./lib/src/api.js",
                 output: {
-                    path:           "dev/",
+                    path:           "lib/",
                     filename:       "chevrotain.min.js",
                     library:        "chevrotain",
                     libraryTarget:  "umd",
@@ -349,7 +349,7 @@ module.exports = function(grunt) {
             specs_uglify: {
                 entry:  "./lib/test/all.js",
                 output: {
-                    path:     "dev/",
+                    path:     "lib/",
                     filename: "chevrotainSpecs.min.js"
                 }
             }
