@@ -50,8 +50,8 @@
     }
 
     function toggleTerminalUsage(mouseEvent) {
-        var terminalName = mouseEvent.target.innerHTML
-        var rects = getUsageSvgRect(terminalName, "terminal")
+        var terminalName = mouseEvent.target.getAttribute("label")
+        var rects = getUsageSvgRect(terminalName, "terminal", "label")
         toggleClassForNodes(rects, "diagramRectUsage")
     }
 
@@ -62,37 +62,39 @@
     }
 
     function jumpToNoneTerminalDef(mouseEvent) {
-        var header = findHeader(mouseEvent.target.innerHTML)
+        var header = findHeader(mouseEvent.target.getAttribute("rulename"))
         scrollToY(header.offsetTop, 666, 'easeInOutQuint');
     }
 
     function toggleNonTerminalUsageAndDef_fromHeader(mouseEvent) {
         toggleClass(mouseEvent.target, "diagramHeaderDef")
+        // this does not work on an svg DOM element so its ok to use innerHTML.
         var definitionName = mouseEvent.target.innerHTML
-        var rects = getUsageSvgRect(definitionName, "non-terminal")
+        var rects = getUsageSvgRect(definitionName, "non-terminal", "rulename")
         toggleClassForNodes(rects, "diagramRectUsage")
     }
 
-    function getUsageSvgRect(definitionName, className) {
+    function getUsageSvgRect(definitionName, className, attributeName) {
         var classDomElements = toArr(document.getElementsByClassName(className))
         var rects = findDomChildrenByTagName(classDomElements, "rect")
         return rects.filter(function(currRect) {
             var textNode = currRect.parentNode.getElementsByTagName('text')[0]
-            return textNode.innerHTML === definitionName
+            return textNode.getAttribute(attributeName) === definitionName
         })
     }
 
     function findHeader(headerName) {
         var headers = toArr(document.getElementsByClassName("diagramHeader"))
         var header = headers.find(function(currHeader) {
+            // this works on H2 dom elements and not SVG elements so innerHTML usage is safe.
             return currHeader.innerHTML === headerName
         })
         return header
     }
 
     function getUsageRectAndDefHeader(target) {
-        var headerName = target.innerHTML
-        var rects = getUsageSvgRect(headerName, "non-terminal")
+        var headerName = target.getAttribute("rulename")
+        var rects = getUsageSvgRect(headerName, "non-terminal", "rulename")
         var header = findHeader(headerName)
         return {rects: rects, header: header, ruleName: headerName}
     }
