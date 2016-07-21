@@ -50,10 +50,14 @@ any code generation phase.
 ## Installation
 * **npm**: ```npm install chevrotain```
 * **Browser**:
-  The npm package contains Chevrotain as concatenated and minified files ready for browser use.
+  The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
   These can also be accessed directly via [NPMCDN](https://npmcdn.com/) in a script tag.
-  - ```https://npmcdn.com/chevrotain/lib/chevrotain.js```
-  - ```https://npmcdn.com/chevrotain/lib/chevrotain.min.js``` 
+  - Latest:
+    * ```https://npmcdn.com/chevrotain/lib/chevrotain.js```
+    * ```https://npmcdn.com/chevrotain/lib/chevrotain.min.js``` 
+  - Explicit version number:
+    * ```https://npmcdn.com/chevrotain@0.11.4/lib/chevrotain.js```
+    * ```https://npmcdn.com/chevrotain@0.11.4/lib/chevrotain.min.js```
 
 ## Getting Started
 
