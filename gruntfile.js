@@ -366,7 +366,6 @@ module.exports = function(grunt) {
         }
     })
 
-
     require('load-grunt-tasks')(grunt)
 
     var buildTasks = [
@@ -384,18 +383,9 @@ module.exports = function(grunt) {
         'typedoc:build_docs'
     ]
 
-    grunt.registerTask('verify_aggregated_files', function() {
-        require("./scripts/release_validations").verifyAggregatedReleaseFile()
-    })
-
-    if (process.env.TRAVIS_TAG && process.env.DEPLOY) {
-        buildTasks.push("verify_aggregated_files")
-    }
-
     var unitTestsTasks = [
         'mocha_istanbul'
     ]
-
 
     if (!process.env.TRAVIS || // always run coverage checks locally
         process.env.COVERAGE) { // Flag to enable coverage checks on CI Voter.

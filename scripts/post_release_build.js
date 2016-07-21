@@ -3,21 +3,13 @@ var git = require('gitty')
 var fs = require('fs')
 var path = require('path')
 
-var chevrotainJSPath_lib = path.join(__dirname, '../lib/chevrotain.js')
-var chevrotainJSPath_release_lib = path.join(__dirname, '../lib/chevrotain.min.js')
-var chevrotainDTSPath_lib = path.join(__dirname, '../lib/chevrotain.d.ts')
-
 var newTagName = config.tagPrefix + config.currVersion
-
 var myRepo = git('')
 
 myRepo.addSync([
     config.apiPath,
     config.packagePath,
-    config.changeLogPath,
-    chevrotainJSPath_lib,
-    chevrotainJSPath_release_lib,
-    chevrotainDTSPath_lib
+    config.changeLogPath
 ].concat(config.docFilesPaths))
 
 myRepo.commitSync("release " + config.currVersion) // version has already been increased...
