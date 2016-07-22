@@ -93,6 +93,11 @@ Chevrotain should run on any modern Javascript ES5.1 runtime.
   
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
+  
+## Contributions
+Contributions are **greatly** appreciated.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
+  
 [benchmark]: http://sap.github.io/chevrotain/performance/
 [lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
 [lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js
