@@ -24,10 +24,6 @@ export class ObjectNode extends AstNode {
     get items():ObjectItemNode[] {
         return this._items
     }
-
-    get key():ObjectItemNode[] {
-        return this._items
-    }
 }
 
 export class ObjectItemNode extends AstNode {
