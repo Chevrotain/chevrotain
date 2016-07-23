@@ -68,6 +68,9 @@ any code generation phase.
  * Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
 
 ## Documentation
+
+* **[FAQ](docs/faq.md)**
+
 * **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
