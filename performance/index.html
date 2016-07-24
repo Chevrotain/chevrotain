@@ -31,6 +31,11 @@
 <script src="jsonParsers/ohm/ohm_json_grammar.js"></script>
 <script src="jsonParsers/ohm/ohm_json_parser.js"></script>
 
+
+<script src="https://npmcdn.com/parsimmon@0.9.1/build/parsimmon.browser.js"></script>
+<script src="jsonParsers/parsimmon/parsimmon_json_parser.js"></script>
+
+
 <div align="center" class="card center">
     <section style="text-align:left;">
         <h1>Performance comparison of Javascript Parsing Generators/Libraries</h1>
@@ -65,6 +70,12 @@
                 <a rel="nofollow"
                    href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/pegjs_jison_parser.js">generated
                     code</a>
+            </p></li>
+
+            <li><p>
+                <a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a> Parser Combinator
+                <a rel="nofollow"
+                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/parsimmon/parsimmon_json_parser.js">implementation</a>
             </p></li>
 
             <li><p>
@@ -115,6 +126,10 @@
                 <td></td>
             </tr>
             <tr>
+                <td>parsimmon</td>
+                <td></td>
+            </tr>
+            <tr>
                 <td>Ohm</td>
                 <td></td>
             </tr>
@@ -126,6 +141,7 @@
     </section>
 </div>
 <script>
+    parse_json_parsimmon(json_sample1k)
 
     var dots = window.setInterval(function () {
         var wait = document.getElementById("wait");
@@ -157,6 +173,8 @@
         antlr4LexerAndParser(json_sample1k)
     }).add('pegjs', function () {
         pegjsJsonLexerAndParser.parse(json_sample1k)
+    }).add('parsimmon', function () {
+        parse_json_parsimmon(json_sample1k)
     }).add('Ohm', function () {
         parse_json_with_ohm(json_sample1k)
     }).on('cycle', function (event) {
