@@ -1,4 +1,4 @@
-json ->  _ (object | array) _
+json ->  (object | array)
 
 
 object -> "{" (objectItem ( "," objectItem):*):? "}"

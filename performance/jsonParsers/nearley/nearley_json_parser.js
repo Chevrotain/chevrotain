@@ -6,7 +6,7 @@ var grammar = {
     ParserRules: [
     {"name": "json$subexpression$1", "symbols": ["object"]},
     {"name": "json$subexpression$1", "symbols": ["array"]},
-    {"name": "json", "symbols": ["_", "json$subexpression$1", "_"]},
+    {"name": "json", "symbols": ["json$subexpression$1"]},
     {"name": "object$ebnf$1$subexpression$1$ebnf$1", "symbols": []},
     {"name": "object$ebnf$1$subexpression$1$ebnf$1$subexpression$1", "symbols": [{"literal":","}, "objectItem"]},
     {"name": "object$ebnf$1$subexpression$1$ebnf$1", "symbols": ["object$ebnf$1$subexpression$1$ebnf$1$subexpression$1", "object$ebnf$1$subexpression$1$ebnf$1"], "postprocess": function arrconcat(d) {return [d[0]].concat(d[1]);}},
