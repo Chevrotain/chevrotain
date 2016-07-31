@@ -1,5 +1,4 @@
 import {Token} from "../scan/tokens_public"
-import {functionName} from "../lang/lang_extensions"
 import {contains} from "../utils/utils"
 
 export namespace exceptions {
@@ -35,19 +34,28 @@ export namespace exceptions {
         context:IRecognizerContext
     }
 
+    const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"
+    const NO_VIABLE_ALT_EXCEPTION = "NoViableAltException"
+    const EARLY_EXIT_EXCEPTION = "EarlyExitException"
+    const NOT_ALL_INPUT_PARSED_EXCEPTION = "NotAllInputParsedException"
+
+    const RECOGNITION_EXCEPTION_NAMES = [
+        MISMATCHED_TOKEN_EXCEPTION,
+        NO_VIABLE_ALT_EXCEPTION,
+        EARLY_EXIT_EXCEPTION,
+        NOT_ALL_INPUT_PARSED_EXCEPTION
+    ]
+
+    Object.freeze(RECOGNITION_EXCEPTION_NAMES)
+
     // hacks to bypass no support for custom Errors in javascript/typescript
     export function isRecognitionException(error:Error) {
-        let recognitionExceptions = [
-            functionName(MismatchedTokenException),
-            functionName(NoViableAltException),
-            functionName(EarlyExitException),
-            functionName(NotAllInputParsedException)]
         // can't do instanceof on hacked custom js exceptions
-        return contains(recognitionExceptions, error.name)
+        return contains(RECOGNITION_EXCEPTION_NAMES, error.name)
     }
 
     export function MismatchedTokenException(message:string, token:Token) {
-        this.name = functionName(MismatchedTokenException)
+        this.name = MISMATCHED_TOKEN_EXCEPTION
         this.message = message
         this.token = token
         this.resyncedTokens = []
@@ -58,7 +66,7 @@ export namespace exceptions {
     MismatchedTokenException.prototype = Error.prototype
 
     export function NoViableAltException(message:string, token:Token) {
-        this.name = functionName(NoViableAltException)
+        this.name = NO_VIABLE_ALT_EXCEPTION
         this.message = message
         this.token = token
         this.resyncedTokens = []
@@ -67,7 +75,7 @@ export namespace exceptions {
     NoViableAltException.prototype = Error.prototype
 
     export function NotAllInputParsedException(message:string, token:Token) {
-        this.name = functionName(NotAllInputParsedException)
+        this.name = NOT_ALL_INPUT_PARSED_EXCEPTION
         this.message = message
         this.token = token
         this.resyncedTokens = []
@@ -75,9 +83,8 @@ export namespace exceptions {
 
     NotAllInputParsedException.prototype = Error.prototype
 
-
     export function EarlyExitException(message:string, token:Token) {
-        this.name = functionName(EarlyExitException)
+        this.name = EARLY_EXIT_EXCEPTION
         this.message = message
         this.token = token
         this.resyncedTokens = []

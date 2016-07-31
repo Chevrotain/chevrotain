@@ -5,7 +5,6 @@ import {
     contains,
     map
 } from "../../utils/utils"
-import {functionName} from "../../lang/lang_extensions"
 
 
 export function isSequenceProd(prod:gast.IProduction):boolean {
@@ -57,22 +56,35 @@ export function isBranchingProd(prod:gast.IProduction):boolean {
     return prod instanceof gast.Alternation
 }
 
-let productionToDslName = {}
-productionToDslName[functionName(gast.NonTerminal)] = "SUBRULE"
-productionToDslName[functionName(gast.Option)] = "OPTION"
-productionToDslName[functionName(gast.RepetitionMandatory)] = "AT_LEAST_ONE"
-productionToDslName[functionName(gast.RepetitionMandatoryWithSeparator)] = "AT_LEAST_ONE_SEP"
-productionToDslName[functionName(gast.RepetitionWithSeparator)] = "MANY_SEP"
-productionToDslName[functionName(gast.Repetition)] = "MANY"
-productionToDslName[functionName(gast.Alternation)] = "OR"
-productionToDslName[functionName(gast.Terminal)] = "CONSUME"
-
 export function getProductionDslName(prod:gast.IProductionWithOccurrence):string {
-    let clazz = prod.constructor
-    let prodName = functionName(clazz)
-    return productionToDslName[prodName]
+    if (prod instanceof gast.NonTerminal) {
+        return "SUBRULE"
+    }
+    else if (prod instanceof gast.Option) {
+        return "OPTION"
+    }
+    else if (prod instanceof gast.Alternation) {
+        return "OR"
+    }
+    else if (prod instanceof gast.RepetitionMandatory) {
+        return "AT_LEAST_ONE"
+    }
+    else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+        return "AT_LEAST_ONE_SEP"
+    }
+    else if (prod instanceof gast.RepetitionWithSeparator) {
+        return "MANY_SEP"
+    }
+    else if (prod instanceof gast.Repetition) {
+        return "MANY"
+    }
+    else if (prod instanceof gast.Terminal) {
+        return "CONSUME"
+    }
+    else {
+        throw Error("non exhaustive match")
+    }
 }
-
 
 class GastCloneVisitor extends gast.GAstVisitor {
 
