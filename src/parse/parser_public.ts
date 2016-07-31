@@ -1117,7 +1117,7 @@ export class Parser {
         this.RULE_STACK.pop()
         this.RULE_OCCURRENCE_STACK.pop()
 
-        if ((this.RULE_STACK.length === 0) && this.hasAllInputBeenConsumed()) {
+        if ((this.RULE_STACK.length === 0) && !this.isAtEndOfInput()) {
             let firstRedundantTok:Token = this.LA(1)
             this.SAVE_ERROR(new exceptions.NotAllInputParsedException(
                 "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
@@ -1281,11 +1281,6 @@ export class Parser {
         this.errors = newState.errors
         this.inputIdx = newState.lexerState
         this.RULE_STACK = newState.RULE_STACK
-    }
-
-    protected hasAllInputBeenConsumed():boolean {
-        let maxInputIdx = this._input.length - 1
-        return this.inputIdx < maxInputIdx
     }
 
     private defineRule<T>(ruleName:string,
