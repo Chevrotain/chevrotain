@@ -258,5 +258,5 @@ if (parser.parseErrors.length > 1) {
 
 
 #### What is Next?
-* Play around in the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of this tutorial.
+* Play around in the [**online** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of this tutorial.
 * Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
