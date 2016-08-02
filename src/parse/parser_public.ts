@@ -2,8 +2,7 @@ import * as cache from "./cache"
 import {exceptions} from "./exceptions_public"
 import {
     classNameFromInstance,
-    HashTable,
-    functionName
+    HashTable
 } from "../lang/lang_extensions"
 import {resolveGrammar} from "./grammar/resolver"
 import {
@@ -78,6 +77,8 @@ export enum ParserDefinitionErrorType {
 
 export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
 export type IgnoredParserIssues = { [ruleName:string]:IgnoredRuleIssues }
+
+const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
 
 export interface IParserConfig {
     /**
@@ -1208,7 +1209,7 @@ export class Parser {
                 try {
                     return this.tryInRuleRecovery(tokClass, follows)
                 } catch (eFromInRuleRecovery) {
-                    if (eFromInRuleRecovery.name === functionName(InRuleRecoveryException)) {
+                    if (eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION) {
                         // failed in RuleRecovery.
                         // throw the original error in order to trigger reSync error recovery
                         throw eFromConsumption
@@ -1938,7 +1939,7 @@ export class Parser {
 }
 
 function InRuleRecoveryException(message:string) {
-    this.name = functionName(InRuleRecoveryException)
+    this.name = IN_RULE_RECOVERY_EXCEPTION
     this.message = message
 }
 

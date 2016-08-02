@@ -63,9 +63,6 @@ used for many things such as:
 
 ### <a name="Q5"></a> Why does Chevrotain not work correctly after I minified my Grammar?
 Chevrotain relies on **Function.name** property and **Function.toString()**.
-This means that certain aggressive minification options can break it.
-To mitigate this issue, Chevrotain's npm package includes a "safe" [pre-minified version](https://npmcdn.com/chevrotain@0.12.0/lib/chevrotain.min.js).
-Additionally when performing minification of your grammar make sure to disable function names mangling.
-When using UglifyJS2 this can be done using the [**keep_fnames**](https://github.com/mishoo/UglifyJS2#mangle) option.
+This means that certain aggressive minification options can break Chevrotain grammars.
 
- 
+See [related documentation](../examples/parser/minification/README.md) for details & workarounds.

@@ -62,7 +62,7 @@ module.exports = function(grunt) {
                 options: {
                     cwd: process.cwd() + "/examples/parser"
                 },
-                exec:    INSTALL_LINK_TEST
+                exec:    INSTALL_LINK + ' && ' + 'grunt --gruntfile minification/gruntfile.js' + ' && ' + examples_test_command
             },
 
             test_examples_lang_services: {
@@ -88,16 +88,6 @@ module.exports = function(grunt) {
                     files: [
                         'test/test.config.js',
                         'lib/chevrotainSpecs.js'
-                    ]
-                }
-            },
-
-            browsers_unit_tests_minified: {
-                options: {
-                    port:  9981,
-                    files: [
-                        'test/test.config.js',
-                        'lib/chevrotainSpecs.min.js'
                     ]
                 }
             },
@@ -337,22 +327,9 @@ module.exports = function(grunt) {
 
                 plugins: [
                     new webpack.BannerPlugin(banner, {raw: true}),
-                    new webpack.optimize.UglifyJsPlugin({
-                        mangle: {
-                            // because chevrotain relies on Function.name
-                            keep_fnames: true
-                        }
-                    })
+                    new webpack.optimize.UglifyJsPlugin()
                 ]
             },
-
-            specs_uglify: {
-                entry:  "./lib/test/all.js",
-                output: {
-                    path:     "lib/",
-                    filename: "chevrotainSpecs.min.js"
-                }
-            }
         },
 
         coveralls: {
@@ -360,10 +337,6 @@ module.exports = function(grunt) {
                 src: 'dev/coverage/lcov.info'
             }
         },
-
-        exec: {
-            lang_services: 'node_modules/.bin/grunt --gruntfile examples/language_services/gruntfile.js test'
-        }
     })
 
     require('load-grunt-tasks')(grunt)
@@ -379,7 +352,6 @@ module.exports = function(grunt) {
         'webpack:release',
         'webpack:specs',
         'webpack:release_uglify',
-        'webpack:specs_uglify',
         'typedoc:build_docs'
     ]
 
@@ -397,13 +369,11 @@ module.exports = function(grunt) {
         'run:test_examples_grammars',
         'run:test_examples_parser',
         'run:test_examples_lexer',
-        'run:test_examples_lexer',
         'run:test_examples_lang_services'
     ]
 
     var browsers_tests = [
         'karma:browsers_unit_tests',
-        'karma:browsers_unit_tests_minified',
         'karma:browsers_integration_tests_globals',
         'karma:browsers_integration_tests_globals_minified',
         'karma:browsers_integration_tests_amd',

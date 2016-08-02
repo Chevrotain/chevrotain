@@ -16,6 +16,8 @@ A few simple examples of using the Chevrotain Parser to resolve some common pars
 
 * [Dynamically defined Tokens](dynamic_tokens/dynamic_delimiters.js)
 
+* [Minifying Chevrotain Grammars](minification/)
+
 
 to run all the parser examples's tests:
 * ```npm update``` (only once)
