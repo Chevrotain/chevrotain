@@ -2,7 +2,7 @@
 
 * [JSON](https://github.com/SAP/chevrotain/blob/master/examples/grammars/json/json.js)
 
-* [JSON with ES6 syntax](https://github.com/SAP/chevrotain/blob/master/examples/grammars/json/jsonES6.js)
+* [JSON with ES6 syntax](https://github.com/SAP/chevrotain/blob/master/examples/grammars/json/json_es6.js)
 
 * [Calculator](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator.js)
 
