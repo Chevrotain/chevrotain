@@ -75,9 +75,9 @@ module.exports = function(grunt) {
 
         karma: {
             options: {
-                configFile:  'karma_sauce.conf.js',
-                singleRun:   true,
-                client:      {
+                configFile: 'karma_sauce.conf.js',
+                singleRun:  true,
+                client:     {
                     captureConsole: true
                 }
             },
@@ -409,6 +409,14 @@ module.exports = function(grunt) {
         'karma:browsers_integration_tests_amd',
         'karma:browsers_integration_tests_amd_minified'
     ]
+
+    if (process.env.TRAVIS_PULL_REQUEST && !process.env.SAUCE_USERNAME) {
+        browsers_tests = function() {
+            console.log("Skipping browser tests on pull request because \n" +
+                "process.env.SAUCE_USERNAME & process.env.SAUCE_ACCESS_KEY \n" +
+                "are not available on pull requests from external repositories.")
+        }
+    }
 
     var buildTestTasks = buildTasks.concat(unitTestsTasks)
 
