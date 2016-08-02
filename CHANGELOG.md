@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE) 
+
+#### Bug Fixes
+- [Diagrams do not work with custom lexers.](https://github.com/SAP/chevrotain/issues/242)
+
+#### Documentation
+- [Improve support for running minified in the browser.](https://github.com/SAP/chevrotain/issues/239)
+
+
+
 ## 0.12.0 (7-21-2016)
 
 #### Breaking Changes
