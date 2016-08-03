@@ -8,6 +8,8 @@
 
 * [CSS](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css.js)
 
+* [XML](https://github.com/SAP/chevrotain/blob/master/examples/grammars/xml/xml_es6.js)
+
 
 To run the tests for all the grammars
 * ```npm update``` (only once)
