@@ -52,3 +52,8 @@ _.forEach(config.docFilesPaths, function(currDocPath) {
     var bumpedItemContents = currItemContents.replace(docsOldVersionRegExp, newVersion.replace(/\./g, "_"))
     fs.writeFileSync(currDocPath, bumpedItemContents)
 })
+
+console.log("bumping npmcdn link in: <" + config.readmePath + ">")
+var currItemContents = fs.readFileSync(config.readmePath, 'utf8').toString()
+var bumpedReadmeContents = currItemContents.replace(oldVersionRegExpGlobal, newVersion)
+fs.writeFileSync(config.readmePath, bumpedReadmeContents)

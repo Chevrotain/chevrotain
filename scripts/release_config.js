@@ -41,6 +41,7 @@ module.exports = {
     packagePath:     packagePath,
     changeLogPath:   changeLogPath,
     docFilesPaths:   docFilesPaths,
+    readmePath:      readmePath,
     pkgJson:         pkgJson,
     apiString:       apiString,
     changeLogString: changeLogString,

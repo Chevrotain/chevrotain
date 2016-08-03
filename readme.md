@@ -56,8 +56,8 @@ any code generation phase.
     * ```https://npmcdn.com/chevrotain/lib/chevrotain.js```
     * ```https://npmcdn.com/chevrotain/lib/chevrotain.min.js``` 
   - Explicit version number:
-    * ```https://npmcdn.com/chevrotain@0.11.4/lib/chevrotain.js```
-    * ```https://npmcdn.com/chevrotain@0.11.4/lib/chevrotain.min.js```
+    * ```https://npmcdn.com/chevrotain@0.12.0/lib/chevrotain.js```
+    * ```https://npmcdn.com/chevrotain@0.12.0/lib/chevrotain.min.js```
 
 ## Getting Started
 
