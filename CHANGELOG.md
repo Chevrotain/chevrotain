@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE) 
+## 0.12.1 (8-3-2016) 
 
 #### Bug Fixes
 - [Diagrams do not work with custom lexers.](https://github.com/SAP/chevrotain/issues/242)
