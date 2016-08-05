@@ -79,6 +79,8 @@ export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
 export type IgnoredParserIssues = { [ruleName:string]:IgnoredRuleIssues }
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
+const END_OF_FILE = new EOF()
+Object.freeze(END_OF_FILE)
 
 export interface IParserConfig {
     /**
@@ -508,7 +510,7 @@ export class Parser {
             return this.LA(1)
         }
         else {
-            return new EOF()
+            return END_OF_FILE
         }
     }
 
@@ -1243,7 +1245,7 @@ export class Parser {
     // or lexers dependent on parser context.
     protected LA(howMuch:number):Token {
         if (this._input.length <= this.inputIdx + howMuch) {
-            return new EOF()
+            return END_OF_FILE
         }
         else {
             return this._input[this.inputIdx + howMuch]
