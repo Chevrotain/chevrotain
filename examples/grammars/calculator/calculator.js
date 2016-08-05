@@ -118,21 +118,24 @@ Calculator.prototype.canTokenTypeBeInsertedInRecovery = function(tokClass) {
     return tokClass !== NumberLiteral
 };
 
-
 Calculator.prototype = Object.create(Parser.prototype);
 Calculator.prototype.constructor = Calculator;
 
+
+// wrapping it all togater
+// reuse the same parser instance.
+var parser = new Calculator([]);
+
 module.exports = function(text) {
     var lexResult = CalculatorLexer.tokenize(text);
-    if (lexResult.errors.length >= 1) {
-        throw new Error("sad sad panda, lexing errors detected")
-    }
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
+    // any top level rule may be used as an entry point
+    var value = parser.expression();
 
-    var parser = new Calculator(lexResult.tokens);
-    var value = parser.expression(); // any exposed top level rule may be used as an entry point
-    if (parser.errors.length >= 1) {
-        throw new Error("sad sad panda, parsing errors detected!")
-    }
-
-    return value;
+    return {
+        value:      value,
+        lexResult:  lexResult,
+        parseErrors: parser.errors
+    };
 };

@@ -157,7 +157,7 @@
     // ----------------- parser -----------------
 
     function CssParser(input) {
-        Parser.call(this, input, cssTokens);
+        Parser.call(this, input, cssTokens, {maxLookahead: 3});
         var $ = this;
 
         this.stylesheet = this.RULE('stylesheet', function() {
@@ -497,7 +497,6 @@
             $.CONSUME(Hash)
         });
 
-
         // very important to call this after all the rules have been setup.
         // otherwise the parser may not work correctly as it will lack information
         // derived from the self analysis.
@@ -507,25 +506,28 @@
     CssParser.prototype = Object.create(Parser.prototype);
     CssParser.prototype.constructor = CssParser;
 
-    // TODO: repeating pattern for all grammar examples, factor out ?
+
+    // ----------------- wrapping it all together -----------------
+
+    // reuse the same parser instance.
+    var parser = new CssParser([]);
+
     return {
-
         parseCss: function(text) {
-            var fullResult = {};
             var lexResult = CssLexer.tokenize(text);
-            fullResult.tokens = lexResult.tokens;
-            fullResult.ignored = lexResult.ignored;
-            fullResult.lexErrors = lexResult.errors;
+            // setting a new input will RESET the parser instance's state.
+            parser.input = lexResult.tokens;
+            // any top level rule may be used as an entry point
+            var value = parser.stylesheet();
 
-            var parser = new CssParser(lexResult.tokens);
-            parser.stylesheet();
-            fullResult.parseErrors = parser.errors;
-
-            return fullResult;
+            return {
+                value:       value, // this is a pure grammar, the value will always be <undefined>
+                lexErrors:   lexResult.errors,
+                parseErrors: parser.errors
+            };
         },
 
         // exporting a the CSS Parser constructor the enable drawing the diagrams
         CssParser: CssParser
     }
-
 }))

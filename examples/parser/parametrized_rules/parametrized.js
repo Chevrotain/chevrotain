@@ -96,23 +96,25 @@ class HelloParser extends chevrotain.Parser {
 
 
 // ----------------- wrapping it all together -----------------
+
+// reuse the same parser instance.
+var parser = new HelloParser([]);
+
 module.exports = function(text, mood) {
-
-    var fullResult = {}
     var lexResult = HelloLexer.tokenize(text)
-    fullResult.tokens = lexResult.tokens
-    fullResult.ignored = lexResult.ignored
-    fullResult.lexErrors = lexResult.errors
 
-    var parser = new HelloParser(lexResult.tokens)
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
 
     // Passing the argument to the top rule.
     // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
     // with the first parameter provided the value <1>
     // also note that the arguments are passed as an array
-    parser.topRule(1, [mood])
+    var value = parser.topRule(1, [mood])
 
-    fullResult.parseErrors = parser.errors
-
-    return fullResult
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 }

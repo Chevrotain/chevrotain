@@ -332,7 +332,7 @@ export class Parser {
         }
     }
 
-    public errors:exceptions.IRecognitionException[] = []
+    protected _errors:exceptions.IRecognitionException[] = []
 
     /**
      * This flag enables or disables error recovery (fault tolerance) of the parser.
@@ -426,6 +426,14 @@ export class Parser {
         this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
     }
 
+    public get errors():exceptions.IRecognitionException[] {
+        return cloneArr(this._errors)
+    }
+
+    public set errors(newErrors:exceptions.IRecognitionException[]) {
+        this._errors = newErrors
+    }
+
     public set input(newInput:Token[]) {
         this.reset()
         this._input = newInput
@@ -463,7 +471,7 @@ export class Parser {
                 ruleStack:           cloneArr(this.RULE_STACK),
                 ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
             }
-            this.errors.push(error)
+            this._errors.push(error)
             return error
         }
         else {
@@ -1270,7 +1278,8 @@ export class Parser {
 
     // other functionality
     private saveRecogState():IParserState {
-        let savedErrors = cloneArr(this.errors)
+        // errors is a getter which will clone the errors array
+        let savedErrors = this.errors
         let savedRuleStack = cloneArr(this.RULE_STACK)
         return {
             errors:     savedErrors,

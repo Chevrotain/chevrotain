@@ -26,12 +26,13 @@ var JsonLexer = new Lexer(allTokens);
 
 // ----------------- parser -----------------
 
-function JsonParser(input) {
+function JsonParserES5(input) {
     // invoke super constructor
     Parser.call(this, input, allTokens, {
-        // by default the error recovery / fault tolerance capabilities are disabled
-        // use this flag to enable them
-        recoveryEnabled: true}
+            // by default the error recovery / fault tolerance capabilities are disabled
+            // use this flag to enable them
+            recoveryEnabled: true
+        }
     );
 
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
@@ -97,25 +98,26 @@ function JsonParser(input) {
 }
 
 // inheritance as implemented in javascript in the previous decade... :(
-JsonParser.prototype = Object.create(Parser.prototype);
-JsonParser.prototype.constructor = JsonParser;
+JsonParserES5.prototype = Object.create(Parser.prototype);
+JsonParserES5.prototype.constructor = JsonParserES5;
 
 // ----------------- wrapping it all together -----------------
 
-// TODO: repeating pattern for all grammar examples, factor out ?
-module.exports = function(text) {
-    var fullResult = {};
+// reuse the same parser instance.
+var parser = new JsonParserES5([]);
+
+module.exports = function (text) {
     var lexResult = JsonLexer.tokenize(text);
-    fullResult.tokens = lexResult.tokens;
-    fullResult.ignored = lexResult.ignored;
-    fullResult.lexErrors = lexResult.errors;
 
-    var parser = new JsonParser(lexResult.tokens);
-    parser.json();
-    fullResult.parseErrors = parser.errors;
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
 
-    if (fullResult.lexErrors.length >= 1 || fullResult.parseErrors.length >= 1) {
-        throw new Error("sad sad panda")
-    }
-    return fullResult;
+    // any top level rule may be used as an entry point
+    var value = parser.json();
+
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };

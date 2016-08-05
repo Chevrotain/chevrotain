@@ -253,19 +253,20 @@ class XmlParserES6 extends chevrotain.Parser {
 }
 
 // ----------------- wrapping it all together -----------------
-module.exports = function(text) {
-    var fullResult = {};
+
+// reuse the same parser instance.
+var parser = new XmlParserES6([]);
+
+module.exports = function (text) {
     var lexResult = XmlLexer.tokenize(text);
-    fullResult.tokens = lexResult.tokens;
-    fullResult.ignored = lexResult.ignored;
-    fullResult.lexErrors = lexResult.errors;
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
+    // any top level rule may be used as an entry point
+    var value = parser.document();
 
-    var parser = new XmlParserES6(lexResult.tokens);
-    parser.document();
-    fullResult.parseErrors = parser.errors;
-
-    if (fullResult.lexErrors.length >= 1 || fullResult.parseErrors.length >= 1) {
-        throw new Error("sad sad panda")
-    }
-    return fullResult;
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };

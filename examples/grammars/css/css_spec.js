@@ -3,8 +3,6 @@ var parseCss = require("./css").parseCss;
 
 describe('The CSS Grammar', function() {
 
-    // XRegExp can take a while to build the RegExps, particularly on slow CI machines.
-    this.timeout(4000);
     it('can parse a simple CSS without errors', function() {
         var inputText = 'svg.railroad-diagram path {\r\n' +
             '    stroke-width: 3;\r\n' +
@@ -89,10 +87,10 @@ describe('The CSS Grammar', function() {
             '\r\nsvg.railroad-diagram g.non-terminal text {' +
             '\r\n    cursor: pointer;' +
             '\r\n}';
-        var lexAndParseResult = parseCss(inputText);
+        var result = parseCss(inputText);
 
-        assert.equal(lexAndParseResult.lexErrors.length, 0);
-        assert.equal(lexAndParseResult.parseErrors.length, 0);
+        assert.equal(result.lexErrors, 0);
+        assert.equal(result.parseErrors.length, 0);
     });
 
 });

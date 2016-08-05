@@ -137,30 +137,36 @@ SelectParserVersion2.prototype.constructor = SelectParserVersion2;
 
 
 // ----------------- wrapping it all together -----------------
+
+// reuse the same parser instances.
+var version1Parser = new SelectParserVersion1([]);
+var version2Parser = new SelectParserVersion2([]);
+
 module.exports = function(text, version) {
 
-    var fullResult = {};
     var lexResult = SelectLexer.tokenize(text);
-    fullResult.tokens = lexResult.tokens;
-    fullResult.ignored = lexResult.ignored;
-    fullResult.lexErrors = lexResult.errors;
 
     var parser;
 
     // initialize a parser for the specific version version chosen.
     switch (version) {
         case 1:
-            parser = new SelectParserVersion1(lexResult.tokens);
+            parser = version1Parser;
             break;
         case 2:
-            parser = new SelectParserVersion2(lexResult.tokens);
+            parser = version2Parser;
             break;
         default:
-            throw Error("no version chosen")
+            throw Error("no valid version chosen")
     }
 
-    parser.selectStatement();
-    fullResult.parseErrors = parser.errors;
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
+    var value = parser.selectStatement();
 
-    return fullResult;
+     return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };

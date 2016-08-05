@@ -51,7 +51,7 @@ function PredicateLookaheadParser(input) {
 
     var $ = this;
 
-    this.customPredicateRule = $.RULE("customPredicateRule", function () {
+    this.customPredicateRule = $.RULE("customPredicateRule", function() {
         // @formatter:off
         return $.OR([
             // In this example we disable some of the alternatives depending on the value of the
@@ -83,24 +83,29 @@ function PredicateLookaheadParser(input) {
 PredicateLookaheadParser.prototype = Object.create(Parser.prototype);
 PredicateLookaheadParser.prototype.constructor = PredicateLookaheadParser;
 
+
+// ----------------- wrapping it all together -----------------
+
+// reuse the same parser instance.
+var parser = new PredicateLookaheadParser([]);
+
 module.exports = {
 
-    parse: function (text) {
+    parse: function(text) {
         var lexResult = PredicateLookaheadLexer.tokenize(text);
-        if (lexResult.errors.length >= 1) {
-            throw new Error("sad sad panda, lexing errors detected");
-        }
-
-        var parser = new PredicateLookaheadParser(lexResult.tokens);
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens;
+        // any top level rule may be used as an entry point
         var value = parser.customPredicateRule();
-        if (parser.errors.length >= 1) {
-            throw new Error("sad sad panda, parsing errors detected!");
-        }
 
-        return value;
+        return {
+            value:       value,
+            lexErrors:   lexResult.errors,
+            parseErrors: parser.errors
+        };
     },
 
-    setMaxAllowed: function (newMaxAllowed) {
+    setMaxAllowed: function(newMaxAllowed) {
         maxNumberAllowed = newMaxAllowed;
     }
 };

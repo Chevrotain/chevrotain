@@ -156,9 +156,15 @@ GermanCommandsParser.prototype = Object.create(AbstractCommandsParser.prototype)
 GermanCommandsParser.prototype.constructor = GermanCommandsParser;
 
 // ----------------- wrapping it all together -----------------
+
+// reuse the same parser instances.
+var englishParser = new EnglishCommandsParser([]);
+var germanParser = new GermanCommandsParser([]);
+
 module.exports = function(text, language) {
 
-    var lexer
+    // lex
+    var lexer;
     // match language and lexer.
     switch (language) {
         case "english":
@@ -171,27 +177,30 @@ module.exports = function(text, language) {
             throw Error("no valid language chosen")
     }
 
-    var fullResult = {};
     var lexResult = lexer.tokenize(text);
-    fullResult.tokens = lexResult.tokens;
-    fullResult.ignored = lexResult.ignored;
-    fullResult.lexErrors = lexResult.errors;
 
+    // parse
     var parser;
     // match language and parser.
     switch (language) {
         case "english":
-            parser = new EnglishCommandsParser(lexResult.tokens);
+            parser = englishParser;
             break;
         case "german":
-            parser = new GermanCommandsParser(lexResult.tokens);
+            parser = germanParser;
             break;
         default:
-            throw Error("no valid language chosen")
+            throw Error("no valid language chosen");
     }
 
-    parser.commands();
-    fullResult.parseErrors = parser.errors;
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
+    // any top level rule may be used as an entry point
+    var value = parser.commands();
 
-    return fullResult;
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };

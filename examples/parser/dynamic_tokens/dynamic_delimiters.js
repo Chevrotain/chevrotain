@@ -76,6 +76,10 @@ DynamicDelimiterParser.prototype = Object.create(Parser.prototype);
 DynamicDelimiterParser.prototype.constructor = DynamicDelimiterParser;
 
 // ----------------- wrapping it all together -----------------
+
+// reuse the same parser instance.
+var parser = new DynamicDelimiterParser([]);
+
 module.exports = function(text, dynamicDelimiterRegExp) {
 
     // make this parameter optional
@@ -93,8 +97,13 @@ module.exports = function(text, dynamicDelimiterRegExp) {
     var lexResult = dynamicDelimiterLexer.tokenize(text);
 
     // parse
-    var parser = new DynamicDelimiterParser(lexResult.tokens);
-    var result = parser.array();
+    // setting the input will reset the parser's state
+    parser.input = lexResult.tokens;
+    var value = parser.array();
 
-    return result;
+    return {
+        value:       value,
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };
