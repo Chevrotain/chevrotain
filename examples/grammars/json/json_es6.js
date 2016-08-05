@@ -131,19 +131,20 @@ class JsonParserES6 extends chevrotain.Parser {
 }
 
 // ----------------- wrapping it all together -----------------
-module.exports = function(text) {
-    var fullResult = {};
+
+// reuse the same parser instance.
+var parser = new JsonParserES6([]);
+
+module.exports = function (text) {
     var lexResult = JsonLexer.tokenize(text);
-    fullResult.tokens = lexResult.tokens;
-    fullResult.ignored = lexResult.ignored;
-    fullResult.lexErrors = lexResult.errors;
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens;
+    // any top level rule may be used as an entry point
+    var value = parser.json();
 
-    var parser = new JsonParserES6(lexResult.tokens);
-    parser.json();
-    fullResult.parseErrors = parser.errors;
-
-    if (fullResult.lexErrors.length >= 1 || fullResult.parseErrors.length >= 1) {
-        throw new Error("sad sad panda")
-    }
-    return fullResult;
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };

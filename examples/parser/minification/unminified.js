@@ -36,7 +36,7 @@
 
     // ----------------- parser -----------------
 
-    function JsonParser(input) {
+    function JsonParserToMinifiy(input) {
         // invoke super constructor
         Parser.call(this, input, allTokens)
 
@@ -103,31 +103,30 @@
     }
 
     // inheritance as implemented in javascript in the previous decade... :(
-    JsonParser.prototype = Object.create(Parser.prototype)
-    JsonParser.prototype.constructor = JsonParser
+    JsonParserToMinifiy.prototype = Object.create(Parser.prototype)
+    JsonParserToMinifiy.prototype.constructor = JsonParserToMinifiy
 
     // ----------------- wrapping it all together -----------------
 
+    // reuse the same parser instance.
+    var parser = new JsonParserToMinifiy([]);
+
     function parseJson(text) {
-        var fullResult = {}
         var lexResult = JsonLexer.tokenize(text)
-        fullResult.tokens = lexResult.tokens
-        fullResult.ignored = lexResult.ignored
-        fullResult.lexErrors = lexResult.errors
 
-        var parser = new JsonParser(lexResult.tokens)
-        parser.json()
-        fullResult.parseErrors = parser.errors
+        parser.input = lexResult.tokens
+        var value = parser.json()
 
-        if (fullResult.lexErrors.length > 1 || fullResult.parseErrors.length > 1) {
-            throw new Error("sad sad panda")
-        }
-        return fullResult
+        return {
+            value:       value, // this is a pure grammar, the value will always be <undefined>
+            lexErrors:   lexResult.errors,
+            parseErrors: parser.errors
+        };
     }
 
     return {
         parseJson:  parseJson,
-        jsonParser: JsonParser,
+        jsonParser: JsonParserToMinifiy,
         // Must export the names of the Tokens to allow safe minification.
         jsonTokens: allTokens
     }

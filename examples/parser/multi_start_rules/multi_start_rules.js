@@ -66,22 +66,24 @@ MultiStartParser.prototype = Object.create(Parser.prototype);
 MultiStartParser.prototype.constructor = MultiStartParser;
 
 
+// ----------------- wrapping it all together -----------------
+
+// reuse the same parser instance.
+var parser = new MultiStartParser([]);
+
 function parseStartingWithRule(ruleName) {
     return function(text) {
         var lexResult = PhoneticLexer.tokenize(text);
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens
+        // just invoke which ever rule you want as the start rule. its all just plain javascript...
+        var value = parser[ruleName]()
 
-        if (lexResult.errors.length >= 1) {
-            throw new Error("sad sad panda, lexing errors detected")
-        }
-
-        var parser = new MultiStartParser(lexResult.tokens);
-        // just invoke which ever rule you want as the start rule.
-        // its just plain javascript...
-        parser[ruleName]()
-
-        if (parser.errors.length >= 1) {
-            throw new Error("sad sad panda, parsing errors detected!")
-        }
+        return {
+            value:       value, // this is a pure grammar, the value will always be <undefined>
+            lexErrors:   lexResult.errors,
+            parseErrors: parser.errors
+        };
     }
 }
 

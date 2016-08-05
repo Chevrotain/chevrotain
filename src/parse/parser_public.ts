@@ -79,6 +79,8 @@ export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
 export type IgnoredParserIssues = { [ruleName:string]:IgnoredRuleIssues }
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
+const END_OF_FILE = new EOF()
+Object.freeze(END_OF_FILE)
 
 export interface IParserConfig {
     /**
@@ -330,7 +332,7 @@ export class Parser {
         }
     }
 
-    public errors:exceptions.IRecognitionException[] = []
+    protected _errors:exceptions.IRecognitionException[] = []
 
     /**
      * This flag enables or disables error recovery (fault tolerance) of the parser.
@@ -342,6 +344,7 @@ export class Parser {
 
     protected _input:Token[] = []
     protected inputIdx = -1
+    protected savedTokenIdx = -1
     protected isBackTrackingStack = []
     protected className:string
     protected RULE_STACK:string[] = []
@@ -423,6 +426,14 @@ export class Parser {
         this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
     }
 
+    public get errors():exceptions.IRecognitionException[] {
+        return cloneArr(this._errors)
+    }
+
+    public set errors(newErrors:exceptions.IRecognitionException[]) {
+        this._errors = newErrors
+    }
+
     public set input(newInput:Token[]) {
         this.reset()
         this._input = newInput
@@ -460,7 +471,7 @@ export class Parser {
                 ruleStack:           cloneArr(this.RULE_STACK),
                 ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
             }
-            this.errors.push(error)
+            this._errors.push(error)
             return error
         }
         else {
@@ -507,7 +518,7 @@ export class Parser {
             return this.LA(1)
         }
         else {
-            return new EOF()
+            return END_OF_FILE
         }
     }
 
@@ -1242,7 +1253,7 @@ export class Parser {
     // or lexers dependent on parser context.
     protected LA(howMuch:number):Token {
         if (this._input.length <= this.inputIdx + howMuch) {
-            return new EOF()
+            return END_OF_FILE
         }
         else {
             return this._input[this.inputIdx + howMuch]
@@ -1252,8 +1263,6 @@ export class Parser {
     protected consumeToken() {
         this.inputIdx++
     }
-
-    protected savedTokenIdx:number
 
     protected saveLexerState() {
         this.savedTokenIdx = this.inputIdx
@@ -1269,7 +1278,8 @@ export class Parser {
 
     // other functionality
     private saveRecogState():IParserState {
-        let savedErrors = cloneArr(this.errors)
+        // errors is a getter which will clone the errors array
+        let savedErrors = this.errors
         let savedRuleStack = cloneArr(this.RULE_STACK)
         return {
             errors:     savedErrors,

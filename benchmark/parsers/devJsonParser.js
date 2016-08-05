@@ -1,4 +1,5 @@
-var chevrotain = require("chevrotain");
+// requiring the development version
+var chevrotain = require("../../lib/chevrotain");
 
 // ----------------- lexer -----------------
 var extendToken = chevrotain.extendToken;
@@ -26,7 +27,7 @@ var JsonLexer = new Lexer(allTokens);
 
 // ----------------- parser -----------------
 
-function JsonParserES5(input) {
+function JsonParserDev(input) {
     // invoke super constructor
     Parser.call(this, input, allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled
@@ -98,13 +99,13 @@ function JsonParserES5(input) {
 }
 
 // inheritance as implemented in javascript in the previous decade... :(
-JsonParserES5.prototype = Object.create(Parser.prototype);
-JsonParserES5.prototype.constructor = JsonParserES5;
+JsonParserDev.prototype = Object.create(Parser.prototype);
+JsonParserDev.prototype.constructor = JsonParserDev;
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new JsonParserES5([]);
+var parser = new JsonParserDev([]);
 
 module.exports = function (text) {
     var lexResult = JsonLexer.tokenize(text);
