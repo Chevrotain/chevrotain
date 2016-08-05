@@ -342,6 +342,7 @@ export class Parser {
 
     protected _input:Token[] = []
     protected inputIdx = -1
+    protected savedTokenIdx = -1
     protected isBackTrackingStack = []
     protected className:string
     protected RULE_STACK:string[] = []
@@ -1252,8 +1253,6 @@ export class Parser {
     protected consumeToken() {
         this.inputIdx++
     }
-
-    protected savedTokenIdx:number
 
     protected saveLexerState() {
         this.savedTokenIdx = this.inputIdx
