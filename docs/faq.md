@@ -5,6 +5,8 @@
 * [How do I debug my parser?](#Q3)
 * [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](Q4)
 * [Why does Chevrotain now work correctly after I minified my Sources?](#Q5)
+* [How do I Maximize my parser's performance?](#Q6)
+
 
 ### <a name="Q1"></a> Why should I use Chevrotain Parsing DSL instead of a Parser Generator?
 A Parser Generator adds an (unnecessary) level of abstraction between the grammar implementation and the actual parser.
@@ -21,6 +23,7 @@ This is because the grammar is written in a **different** language than the targ
   
 * No need for a special editor to write the Grammar, just use your favorites JavaScript editor.    
 
+
 ### <a name="Q2"></a> Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?
 For building a standard compiler that should only handle completely valid inputs these capabilities are indeed irrelevant.
 But for the use case of building Editor Tools / Language Services the parser must be able to handle partially invalid inputs as well.
@@ -28,6 +31,7 @@ Some examples:
 * All syntax errors should be reported and not just the first one.
 * Refactoring should work even if there is a missing comma somewhere.
 * Autocomplete / Intellisense should work even if there is a syntax error prior to the requested suggestion position. 
+
 
 ### <a name="Q3"></a> How do I debug my parser?
 Just add a breakpoint and debug, same as you would for any other JavaScript code.
@@ -66,3 +70,55 @@ Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive minification options can break Chevrotain grammars.
 
 See [related documentation](../examples/parser/minification/README.md) for details & workarounds.
+
+
+### <a name="Q6"></a> How do I Maximize my parser's performance?
+
+1. **Do not create a new Parser instance for each input**.
+
+   Instead re-use a single instance and reset its state between iterations. For example:
+   
+   ```javascript
+   // reuse the same parser instance.
+   var parser = new JsonParserES5([]);
+   
+   module.exports = function (text) {
+       var lexResult = JsonLexer.tokenize(text);
+    
+       // setting a new input will RESET the parser instance's state.
+       parser.input = lexResult.tokens;
+    
+       var value = parser.json();
+   
+       return {
+           value:       value, 
+           lexErrors:   lexResult.errors,
+           parseErrors: parser.errors
+       };
+   };
+   ```
+   
+   This will avoid the fixed cost of reinitializing a parser instance.
+   But more importantly this pattern seems to help V8 Engine to avoid de-optimizations.
+   Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.
+   
+   Note that this means that if your parser "carries" additional state, that state should also be reset.
+   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_12_1/classes/parser.html#reset) method
+   to accomplish that.
+    
+    
+2. **Avoid creating parsing rules which only parse a single Terminal.**
+
+   There is a certain fixed overhead for the invocation of each parsing rule.
+   Normally there is no reason to pay it for a Rule which only consumes a single Terminal.
+   For example:
+    
+   ```javascript
+       this.myRedundantRule = this.RULE("myRedundantRule", function() {
+           $.CONSUME(StringLiteral);
+       });
+   ``` 
+   
+   Instead such a rule's contents should be (manually) in-lined in its call sites.
+    
+   
