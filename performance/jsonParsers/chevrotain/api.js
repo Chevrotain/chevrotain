@@ -1,24 +1,25 @@
 // ----------------- wrapping it all together -----------------
+var chevrotainJsonParserInstance
 function chevrotainParseWithChevrotainLexer(text) {
-
-    var fullResult = {};
     var lexResult = ChevJsonLexer.tokenize(text);
 
-    if (lexResult.errors.length > 0) {
-        throw "Errors when lexing with Chevrotain lexer + parser"
+    // It is recommended to only initialize a Chevrotain Parser once
+    // and reset it's state instead of re-initializing it
+    if (chevrotainJsonParserInstance === undefined) {
+        chevrotainJsonParserInstance = new ChevrotainJsonParser([])
     }
 
-    var parser = new ChevrotainJsonParser(lexResult.tokens);
-    parser.json();
+    // setting a new input will RESET the parser instance's state.
+    chevrotainJsonParserInstance.input = lexResult.tokens;
 
-    fullResult.tokens = lexResult.tokens;
-    fullResult.parseErrors = parser.errors;
+    // any top level rule may be used as an entry point
+    var value = chevrotainJsonParserInstance.json();
 
-    if (parser.errors.length > 0) {
-        throw "Errors when parsing with Chevrotain lexer + parser"
-    }
-
-    return fullResult;
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: chevrotainJsonParserInstance.errors
+    };
 }
 
 // ----------------- wrapping it all together -----------------
