@@ -323,7 +323,8 @@ function cssExample() {
     var ChevrotainParser = chevrotain.Parser;
 
     function CssParser(input) {
-        ChevrotainParser.call(this, input, cssTokens, {recoveryEnabled: true});
+        ChevrotainParser.call(this, input, cssTokens,
+            {recoveryEnabled: true, maxLookahead: 3});
         var $ = this;
 
         this.stylesheet = this.RULE('stylesheet', function () {
