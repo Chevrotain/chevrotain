@@ -456,6 +456,10 @@ export class Parser {
         return cloneArr(this._input)
     }
 
+    /**
+     * Resets the parser state, should be overridden for custom parsers which "carry" additional state.
+     * When overriding, remember to also invoke the super implementation!
+     */
     public reset():void {
         this.resetLexerState()
 
