@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE) 
+## 0.13.0 (8-6-2016) 
 
 #### Major Changes
 - [0.13.0 Performance Optimizations.](https://github.com/SAP/chevrotain/issues/248)
