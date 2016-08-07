@@ -1,3 +1,17 @@
+## X.Y.Z (INSERT_DATE_HERE) 
+
+#### Major Changes
+- [0.13.0 Performance Optimizations.](https://github.com/SAP/chevrotain/issues/248)
+- [Performance FAQ section docs.](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6)
+
+This release includes **major performance optimizations and guidelines**. 
+Anywhere from 20% to 100% was measured (on V8) depending on the grammar used.
+Please read the Performance FAQ section, as much of the performance gain is achieved by changing
+the way a Chevrotain parser is initialized which will require code changes (not mandatory)
+in user's code.
+  
+   
+
 ## 0.12.1 (8-3-2016) 
 
 #### Bug Fixes
