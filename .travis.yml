@@ -21,6 +21,9 @@ matrix:
       env: GRUNT_TASK=node_integration_tests
     - node_js: "0.12"
       env: GRUNT_TASK=node_integration_tests
+  allow_failures:
+    - node_js: "6"
+      env: GRUNT_TASK=browsers_tests
 addons:
   apt:
     sources:
