@@ -82,6 +82,16 @@ const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
 const END_OF_FILE = new EOF()
 Object.freeze(END_OF_FILE)
 
+// short string used as part of mapping keys.
+// being short (and perhaps also being integer strings) improves the performance.
+const OR_IDX = "1"
+const OPTION_IDX = "2"
+const MANY_IDX = "3"
+const AT_LEAST_ONE_IDX = "4"
+const MANY_SEP_IDX = "5"
+const AT_LEAST_ONE_SEP_IDX = "6"
+
+
 export interface IParserConfig {
     /**
      * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
@@ -362,6 +372,9 @@ export class Parser {
     private optionLookaheadKeys:HashTable<string>[]
     private definedRulesNames:string[] = []
 
+    private shortRuleNameToFull = new HashTable<string>()
+    private ruleShortNameIdx = 0
+
     /**
      * Only used internally for storing productions as they are built for the first time.
      * The final productions should be accessed from the static cache.
@@ -465,10 +478,23 @@ export class Parser {
         return !(isEmpty(this.isBackTrackingStack))
     }
 
+    protected getCurrRuleFullName() {
+        let shortName = last(this.RULE_STACK)
+        return this.shortRuleNameToFull.get(shortName)
+    }
+
+    protected shortRuleNameToFullName(shortName:string) {
+        return this.shortRuleNameToFull.get(shortName)
+    }
+
+    protected getHumanReadableRuleStack() {
+        return map(this.RULE_STACK, (currShortName) => this.shortRuleNameToFullName(currShortName))
+    }
+
     protected SAVE_ERROR(error:exceptions.IRecognitionException):exceptions.IRecognitionException {
         if (exceptions.isRecognitionException(error)) {
             error.context = {
-                ruleStack:           cloneArr(this.RULE_STACK),
+                ruleStack:           this.getHumanReadableRuleStack(),
                 ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
             }
             this._errors.push(error)
@@ -1120,9 +1146,9 @@ export class Parser {
         return this.defineRule(name, impl, config)
     }
 
-    protected ruleInvocationStateUpdate(ruleName:string, idxInCallingRule:number):void {
+    protected ruleInvocationStateUpdate(shortName:string, idxInCallingRule:number):void {
         this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
-        this.RULE_STACK.push(ruleName)
+        this.RULE_STACK.push(shortName)
     }
 
     protected ruleFinallyStateUpdate():void {
@@ -1173,7 +1199,7 @@ export class Parser {
     }
 
     protected getCurrentGrammarPath(tokClass:Function, tokIdxInRule:number):ITokenGrammarPath {
-        let pathRuleStack:string[] = cloneArr(this.RULE_STACK)
+        let pathRuleStack:string[] = this.getHumanReadableRuleStack()
         let pathOccurrenceStack:number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
         let grammarPath:any = {
             ruleStack:         pathRuleStack,
@@ -1305,8 +1331,14 @@ export class Parser {
             config.recoveryValueFunc :
             DEFAULT_RULE_CONFIG.recoveryValueFunc
 
+        // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
+        // this greatly improves Map access time (as much as 8% for some performance benchmarks).
+        let shortName = String(this.ruleShortNameIdx)
+        this.ruleShortNameIdx++
+        this.shortRuleNameToFull.put(shortName, ruleName)
+
         let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
-            this.ruleInvocationStateUpdate(ruleName, idxInCallingRule)
+            this.ruleInvocationStateUpdate(shortName, idxInCallingRule)
 
             try {
                 // actual parsing happens here
@@ -1511,9 +1543,9 @@ export class Parser {
         let prevRuleIdx = currRuleIdx - 1
 
         return {
-            ruleName:         this.RULE_STACK[currRuleIdx],
+            ruleName:         this.shortRuleNameToFullName(this.RULE_STACK[currRuleIdx]),
             idxInCallingRule: this.RULE_OCCURRENCE_STACK[currRuleOccIdx],
-            inRule:           this.RULE_STACK[prevRuleIdx]
+            inRule:           this.shortRuleNameToFullName(this.RULE_STACK[prevRuleIdx])
         }
     }
 
@@ -1523,9 +1555,9 @@ export class Parser {
                 return EOF_FOLLOW_KEY
             }
             return {
-                ruleName:         ruleName,
+                ruleName:         this.shortRuleNameToFullName(ruleName),
                 idxInCallingRule: this.RULE_OCCURRENCE_STACK[idx],
-                inRule:           this.RULE_STACK[idx - 1]
+                inRule:           this.shortRuleNameToFullName(this.RULE_STACK[idx - 1])
             }
         })
     }
@@ -1566,6 +1598,7 @@ export class Parser {
         return dropRight(resyncedTokens)
     }
 
+
     private attemptInRepetitionRecovery(prodFunc:Function,
                                         args:any[],
                                         lookaheadFunc:() => boolean,
@@ -1577,7 +1610,7 @@ export class Parser {
         let key = this.getKeyForAutomaticLookahead(prodName, prodKeys, prodOccurrence)
         let firstAfterRepInfo = this.firstAfterRepMap.get(key)
         if (firstAfterRepInfo === undefined) {
-            let currRuleName = last(this.RULE_STACK)
+            let currRuleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(currRuleName)
             let walker:AbstractNextTerminalAfterProductionWalker = new nextToksWalker(ruleGrammar, prodOccurrence)
             firstAfterRepInfo = walker.startWalking()
@@ -1840,21 +1873,21 @@ export class Parser {
 
     private getKeyForAutomaticLookahead(prodName:string, prodKeys:HashTable<string>[], occurrence:number):string {
         let occuMap = prodKeys[occurrence - 1]
-        let currRule = last(this.RULE_STACK)
-        let key = occuMap[currRule]
+        let currRuleShortName = last(this.RULE_STACK)
+        let key = occuMap[currRuleShortName]
         if (key === undefined) {
-            key = prodName + occurrence + IN + currRule
-            occuMap[currRule] = key
+            key = prodName + occurrence + currRuleShortName
+            occuMap[currRuleShortName] = key
         }
         return key
     }
 
     private getLookaheadFuncForOr(occurrence:number, alts:IAnyOrAlt<any>[]):() => number {
 
-        let key = this.getKeyForAutomaticLookahead("OR", this.orLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(OR_IDX, this.orLookaheadKeys, occurrence)
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
-            let ruleName = last(this.RULE_STACK)
+            let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             // note that hasPredicates is only computed once.
             let hasPredicates = some(alts, (currAlt) => isFunction((<any>currAlt).WHEN))
@@ -1867,29 +1900,30 @@ export class Parser {
         }
     }
 
+
     // Automatic lookahead calculation
     private getLookaheadFuncForOption(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("OPTION", this.optionLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, this.optionLookaheadKeys, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForOption, this.maxLookahead)
     }
 
     private getLookaheadFuncForMany(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("MANY", this.manyLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(MANY_IDX, this.manyLookaheadKeys, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForMany, this.maxLookahead)
     }
 
     private getLookaheadFuncForManySep(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("MANY_SEP", this.manySepLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, this.manySepLookaheadKeys, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForManySep, this.maxLookahead)
     }
 
     private getLookaheadFuncForAtLeastOne(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE", this.atLeastOneLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, this.atLeastOneLookaheadKeys, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOne, this.maxLookahead)
     }
 
     private getLookaheadFuncForAtLeastOneSep(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead("AT_LEAST_ONE_SEP", this.atLeastOneSepLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, this.atLeastOneSepLookaheadKeys, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
     }
 
@@ -1899,7 +1933,7 @@ export class Parser {
                                    maxLookahead:number):() => T {
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
-            let ruleName = last(this.RULE_STACK)
+            let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             laFunc = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead])
             this.classLAFuncs.put(key, laFunc)
@@ -1908,14 +1942,13 @@ export class Parser {
         else {
             return laFunc
         }
-
     }
 
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
         let errSuffix = " but found: '" + this.LA(1).image + "'"
         if (errMsgTypes === undefined) {
-            let ruleName = last(this.RULE_STACK)
+            let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             let lookAheadPathsPerAlternative = getLookaheadPathsForOr(occurrence, ruleGrammar, this.maxLookahead)
             let allLookAheadPaths = reduce(lookAheadPathsPerAlternative, (result, currAltPaths) => result.concat(currAltPaths), [])
@@ -1932,7 +1965,7 @@ export class Parser {
                                     userDefinedErrMsg:string):void {
         let errSuffix = " but found: '" + this.LA(1).image + "'"
         if (userDefinedErrMsg === undefined) {
-            let ruleName = last(this.RULE_STACK)
+            let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, this.maxLookahead)
             let insideProdPaths = lookAheadPathsPerAlternative[0]
