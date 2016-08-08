@@ -300,7 +300,7 @@ export class Lexer {
             }
         }
 
-        let push_mode = (newMode) => {
+        function push_mode(newMode) {
             modeStack.push(newMode)
             currModePatterns = this.allPatterns[newMode]
             currModePatternsLength = currModePatterns.length
@@ -312,7 +312,9 @@ export class Lexer {
             patternIdxToPopMode = this.patternIdxToPopMode[newMode]
         }
 
-        push_mode(initialMode)
+        // this pattern seems to avoid a V8 de-optimization, although that de-optimization does not
+        // seem to matter performance wise.
+        push_mode.call(this, initialMode)
 
         while (text.length > 0) {
             match = null
@@ -392,7 +394,7 @@ export class Lexer {
                     pop_mode(newToken)
                 }
                 if (patternIdxToPushMode[i]) {
-                    push_mode(patternIdxToPushMode[i])
+                    push_mode.call(this, patternIdxToPushMode[i])
                 }
             }
             else { // error recovery, drop characters until we identify a valid token's start point
