@@ -7,7 +7,7 @@
 
 # Chevrotain
 
-Chevrotain is a **Javascript parsing DSL** for building [**high performance**][benchmark] **fault-tolerant** recursive decent parsers.
+Chevrotain is a **JavaScript parsing DSL** for building [**high performance**][benchmark] **fault-tolerant** recursive decent parsers.
 
 Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
@@ -32,8 +32,8 @@ any code generation phase.
     * [Multiple starting rules.][starting_rules]
     * [Parametrized Rules.][parametrized_rules]
     * **No code generation**.
-      * The DSL is just Javascript, not an external language.
-      * Easily debuggable.
+      * The DSL is just JavaScript, not an external language.
+      * The grammar is directly debuggable as a plain JavaScript file .
       * Short feedback loops.
       * Allows great flexibility for inserting custom Parser actions
 
@@ -76,20 +76,20 @@ any code generation phase.
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_0/classes/parser.html#at_least_one)
    
+*  The d.ts Typescript definitions :
+   * [chevrotain.d.ts](https://npmcdn.com/chevrotain@/lib/chevrotain.d.ts)   
+   
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
    *  [lexer_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/lexer_public.ts)
    *  [parser_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/parser_public.ts)
    *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
-   
-*  The aggregated Typescript definitions :
-   * [chevrotain.d.ts](https://github.com/SAP/chevrotain/blob/master/lib/chevrotain.d.ts) (latest version)
 
 ## Dependencies
 None.
 
 ## Compatibility
-Chevrotain should run on any modern Javascript ES5.1 runtime. 
+Chevrotain should run on any modern JavaScript ES5.1 runtime. 
 * The CI build runs the tests under: 
   * Node.js (0.12 / 4 / 6).
   * Latest stable: Chrome, FireFox, IE Edge, IE 11 and Safari 9.
