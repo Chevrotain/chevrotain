@@ -33,11 +33,11 @@ addons:
 before_install:
   - travis_retry npm install -g grunt-cli
 install:
- - npm install
+  - travis_retry npm install
 before_script:
- - grunt build
+  - grunt build
 script:
- - grunt $GRUNT_TASK
+  - grunt $GRUNT_TASK
 deploy:
   - provider: npm
     email: shahar.soel@gmail.com
