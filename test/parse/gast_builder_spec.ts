@@ -270,7 +270,7 @@ describe("The GAst Builder namespace", () => {
     })
 
     it("can build a Terminal Production from a RangeProd", () => {
-        gastBuilder.terminalNameToConstructor = <any>tok
+        (gastBuilder as any).terminalNameToConstructor = <any>tok
         let actual = buildProdGast({
             range: new Range(1, 2),
             text:  "this.CONSUME2(IdentTok)",
@@ -282,7 +282,7 @@ describe("The GAst Builder namespace", () => {
     })
 
     it("will fail building a terminal if it cannot find it's constructor", () => {
-        gastBuilder.terminalNameToConstructor = {}
+        (gastBuilder as any).terminalNameToConstructor = {}
         let buildMissingTerminal = () => buildProdGast({
             range: new Range(1, 2),
             text:  "this.CONSUME2(IdentTok)",

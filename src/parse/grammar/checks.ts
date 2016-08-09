@@ -35,7 +35,8 @@ export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, igno
     let ambiguousAltsErrors = map(topLevels, currTopRule =>
         validateAmbiguousAlternationAlternatives(currTopRule, maxLookahead, ignoredIssues))
 
-    return <any>utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors, ambiguousAltsErrors))
+    return <any>utils.flatten(
+        duplicateErrors.concat(<any>leftRecursionErrors, <any>emptyAltErrors, <any>ambiguousAltsErrors))
 }
 
 function validateDuplicateProductions(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
