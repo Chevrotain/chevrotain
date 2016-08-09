@@ -5,21 +5,21 @@ import {Token} from "chevrotain"
 import {IAstPatternDispatcher} from "./dispatcher"
 
 export interface ITextPosition {
-    startOffset: number
-    startLine: number
-    startColumn: number
-    endOffset: number
-    endLine: number
-    endColumn: number
+    startOffset:number
+    startLine:number
+    startColumn:number
+    endOffset:number
+    endLine:number
+    endColumn:number
 }
 
 export const NO_POSITION:ITextPosition = {
-    startOffset: -1,
-    startLine:   -1,
-    startColumn: -1,
-    endOffset:   -1,
-    endLine:     -1,
-    endColumn:   -1
+    startOffset:-1,
+    startLine:  -1,
+    startColumn:-1,
+    endOffset:  -1,
+    endLine:    -1,
+    endColumn:  -1
 }
 
 // all your state is belong to us.
@@ -54,8 +54,7 @@ export abstract class AstNode {
     children():AstNode[] {
 
         let isDirectChild = (prop) => {
-            return prop instanceof AstNode &&
-                !(prop instanceof Nil) &&
+            return prop instanceof AstNode && !(prop instanceof Nil) &&
                 prop.parent() === this
         }
 
@@ -112,12 +111,12 @@ export abstract class AstNode {
         })
 
         return {
-            startOffset: firstToken.offset,
-            startLine:   firstToken.startLine,
-            startColumn: firstToken.startColumn,
-            endOffset:   lastToken.offset + lastToken.image.length,
-            endLine:     lastToken.endLine,
-            endColumn:   lastToken.endColumn
+            startOffset:firstToken.offset,
+            startLine:  firstToken.startLine,
+            startColumn:firstToken.startColumn,
+            endOffset:  lastToken.offset + lastToken.image.length,
+            endLine:    lastToken.endLine,
+            endColumn:  lastToken.endColumn
         }
     }
 

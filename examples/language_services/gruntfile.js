@@ -11,15 +11,15 @@ module.exports = function(grunt) {
                 src:     'bin/test/pudu',
                 options: {
                     mask:           '**/*spec.js',
-                    coverageFolder: 'bin/coverage'
+                    coverageFolder: 'bin/examples/coverage'
                 }
             },
 
-            jes: {
-                src:     'bin/test/examples/json',
+            examples: {
+                src:     'bin/test/examples',
                 options: {
                     mask:           '**/*spec.js',
-                    coverageFolder: 'bin/coverage'
+                    coverageFolder: 'bin/examples/coverage'
                 }
             }
         },
@@ -42,7 +42,7 @@ module.exports = function(grunt) {
             },
 
             all: {
-                src:     ['src/**/*.ts', 'test/**/*.ts', 'typings/**/*.d.ts'],
+                src:     ['src/**/*.ts', 'test/**/*.ts', 'typings/globals/**/*.d.ts', 'typings/modules/**/*.d.ts'],
                 outDir:  'bin/',
                 options: {
                     module : "commonjs",
@@ -74,7 +74,7 @@ module.exports = function(grunt) {
     grunt.registerTask('test', [
             'build',
             'mocha_istanbul:pudu',
-            'mocha_istanbul:jes'
+            'mocha_istanbul:examples'
         ]
     )
 }

@@ -47,7 +47,7 @@ export class JsonParser extends Parser {
         rCurlyTok = this.CONSUME(RCurly)
 
         return PT(ObjectPT, CHILDREN(objectItemPTs,
-            SYNTAX_BOX([lCurlyTok].concat(commas, [rCurlyTok]))))
+            SYNTAX_BOX(lCurlyTok, commas, rCurlyTok)))
     })
 
     public objectItem = this.RULE("objectItem", () => {
@@ -58,7 +58,7 @@ export class JsonParser extends Parser {
         valuePT = this.SUBRULE(this.value)
 
         return PT(ObjectItemPT, CHILDREN(stringLiteralTok, valuePT,
-            SYNTAX_BOX([colonTok])))
+            SYNTAX_BOX(colonTok)))
     })
 
     public array = this.RULE("array", () => {
@@ -72,7 +72,7 @@ export class JsonParser extends Parser {
         rSquareTok = this.CONSUME(RSquare)
 
         return PT(ArrayPT, CHILDREN(valuePTs,
-            SYNTAX_BOX([lSquareTok].concat(commas, [rSquareTok]))))
+            SYNTAX_BOX(lSquareTok, commas, rSquareTok)))
     })
 
     public value = this.RULE("value", () => {

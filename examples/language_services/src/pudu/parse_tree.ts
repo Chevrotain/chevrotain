@@ -34,15 +34,16 @@ export function PT(tokenOrTokenClass:Function|Token, children:ParseTree[] = []):
         return null
     }
     else {
-        throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`
+        throw Error(`Invalid parameter ${tokenOrTokenClass} to PT factory.`)
     }
 }
 
 export abstract class ParseTreeToken extends VirtualToken {}
 export abstract class SyntaxBoxPT extends ParseTreeToken {}
 
-export function SYNTAX_BOX(tokens:Token[]):ParseTree | any {
-    let tokensCompcat = _.compact(tokens)
+export function SYNTAX_BOX(...tokens:any[]):ParseTree | any {
+    let flatTokens = _.flatten(<any>tokens, false)
+    let tokensCompcat:Token[] = <any>_.compact(flatTokens)
     let tokensTrees = _.map(tokensCompcat, (currToken) => PT(currToken))
     return _.isEmpty(tokensTrees) ? undefined : PT(SyntaxBoxPT, tokensTrees)
 }
