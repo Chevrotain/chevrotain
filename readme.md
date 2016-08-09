@@ -77,7 +77,7 @@ any code generation phase.
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_0/classes/parser.html#at_least_one)
    
 *  The d.ts Typescript definitions :
-   * [chevrotain.d.ts](https://npmcdn.com/chevrotain@/lib/chevrotain.d.ts)   
+   * [chevrotain.d.ts](https://npmcdn.com/chevrotain/lib/chevrotain.d.ts)   
    
 * Annotated source code (dev version):
    *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
