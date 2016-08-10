@@ -48,7 +48,7 @@ Examine the [grunt file][grunt_file] for all the available tasks:
 #### Initial Setup
 
 * ```npm install```
-* ```npm install -g grunt```
+* ```npm install -g grunt-cli```
 
 #### Building
 
