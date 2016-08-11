@@ -510,6 +510,14 @@ module.exports = function (text) {
     // any top level rule may be used as an entry point
     var value = parser.stylesheet();
 
+    if (lexResult.errors.length > 0) {
+        throw "Lexing errors encountered " + lexResult.errors[0].message
+    }
+
+    if (parser.errors.length > 0) {
+        throw "parsing errors encountered " + parser.errors[0].message
+
+    }
     return {
         value:       value, // this is a pure grammar, the value will always be <undefined>
         lexErrors:   lexResult.errors,

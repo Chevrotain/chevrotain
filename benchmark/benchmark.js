@@ -3,11 +3,11 @@ var oldVersion = require("../examples/grammars/node_modules/chevrotain/lib/chevr
 var oldVersionParseJson = require("./parsers/oldJsonParser")
 var devVersionParseJson = require("./parsers/devJsonParser")
 
-var oldVersionParseCss = require("./parsers/cssDevParser")
-var devVersionParseCss = require("./parsers/cssOldParser")
+var devVersionParseCss = require("./parsers/cssDevParser")
+var oldVersionParseCss = require("./parsers/cssOldParser")
 
 var jsonSample = require("./samples/json10k")
-var cssSample = fs.readFileSync('./samples/large_css.css','utf8')
+var cssSample = fs.readFileSync('./samples/large_css.css', 'utf8')
 
 var _ = require("lodash")
 
@@ -20,8 +20,8 @@ function performBenchmark(name, input, devParse, oldParse) {
     console.log("Benchmarking: " + name + " Dev Vs Old")
     // warmup
     for (var z = 0; z < warmupTimes; z++) {
-        devParse(jsonSample)
-        oldParse(jsonSample)
+        devParse(input)
+        oldParse(input)
     }
 
     // Dev version
