@@ -86,6 +86,7 @@
     "typescript": "~1.8.10",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1",
-    "wrench": "^1.5.9"
+    "wrench": "^1.5.9",
+    "xregexp": "^3.1.1"
   }
 }
