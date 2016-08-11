@@ -24,6 +24,16 @@ export function values(obj:any):any[] {
     return vals
 }
 
+export function mapValues<I, O>(obj:Object, callback:(value:I, key?:string) => O):O[] {
+    let result:O[] = []
+    let objKeys = keys(obj)
+    for (let idx = 0; idx < objKeys.length; idx++) {
+        let currKey = objKeys[idx]
+        result.push(callback.call(null, obj[currKey], currKey))
+    }
+    return result
+}
+
 export function map<I, O>(arr:I[], callback:(I, idx?:number) => O):O[] {
     let result:O[] = []
     for (let idx = 0; idx < arr.length; idx++) {

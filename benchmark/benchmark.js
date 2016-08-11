@@ -8,7 +8,7 @@ var oldVersionParseCss = require("./parsers/cssOldParser")
 
 var jsonSample = require("./samples/json10k")
 var cssSample = fs.readFileSync('./samples/large_css.css', 'utf8')
-var isBenchmarkOnlyLexer = true
+var isBenchmarkOnlyLexer = false
 
 var _ = require("lodash")
 
@@ -47,7 +47,6 @@ function performBenchmark(name, input, devParse, oldParse) {
     var endOld = _.now()
     var averageOld = (endOld - startOld) / times
     console.log("average with old version: " + averageOld)
-
 
     // reporting
     if (averageDev < averageOld) {

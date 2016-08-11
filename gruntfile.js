@@ -224,7 +224,7 @@ module.exports = function(grunt) {
                     from: 'd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());',
                     to:   '/* istanbul ignore next */ ' + ' d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());'
                 }, {
-                    from: /(\s+)(else if \(.+\s+.+\s+.+\s+else \{\s+throw Error\("non exhaustive match"\))/g,
+                    from: /(\s+)(else if \(.+\s+.+\s+.+\s+(?:.+\s+)?else \{\s+throw Error\("non exhaustive match"\))/g,
                     to:   '/* istanbul ignore else */ $1$2'
                 }, {
                     from: /(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,

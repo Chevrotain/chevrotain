@@ -1,16 +1,8 @@
 import * as cache from "./cache"
 import {exceptions} from "./exceptions_public"
-import {
-    classNameFromInstance,
-    HashTable
-} from "../lang/lang_extensions"
+import {classNameFromInstance, HashTable} from "../lang/lang_extensions"
 import {resolveGrammar} from "./grammar/resolver"
-import {
-    validateGrammar,
-    validateRuleName,
-    validateRuleDoesNotAlreadyExist,
-    validateRuleIsOverridden
-} from "./grammar/checks"
+import {validateGrammar, validateRuleName, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden} from "./grammar/checks"
 import {
     isEmpty,
     map,
@@ -28,16 +20,11 @@ import {
     isFunction,
     has,
     isUndefined,
-    forEach, some
+    forEach,
+    some
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
-import {
-    Token,
-    tokenName,
-    EOF,
-    tokenLabel,
-    hasTokenLabel
-} from "../scan/tokens_public"
+import {Token, tokenName, EOF, tokenLabel, hasTokenLabel, LazyToken} from "../scan/tokens_public"
 import {
     buildLookaheadForOption,
     buildLookaheadForMany,
@@ -46,9 +33,9 @@ import {
     buildLookaheadForAtLeastOneSep,
     buildLookaheadFuncForOr,
     getLookaheadPathsForOr,
-    getLookaheadPathsForOptionalProd, PROD_TYPE
+    getLookaheadPathsForOptionalProd,
+    PROD_TYPE
 } from "./grammar/lookahead"
-
 import {TokenConstructor} from "../scan/lexer_public"
 import {buildTopProduction} from "./gast_builder"
 import {
@@ -1172,7 +1159,23 @@ export class Parser {
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
     protected getTokenToInsert(tokClass:Function):Token {
-        return new (<any>tokClass)(-1, -1)
+        let tokToInsert
+
+        if (LazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
+            tokToInsert = new (<any>tokClass)(NaN, NaN, {
+                orgText:      "",
+                lineToOffset: []
+            })
+        }
+        else if (Token.prototype.isPrototypeOf(tokClass.prototype)) {
+            tokToInsert = new (<any>tokClass)("", NaN, NaN, NaN, NaN, NaN, NaN)
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+
+        tokToInsert.isInsertedInRecovery = true
+        return tokToInsert
     }
 
     /**
@@ -1474,7 +1477,6 @@ export class Parser {
     private tryInRuleRecovery(expectedTokType:Function, follows:Function[]):Token {
         if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
             let tokToInsert = this.getTokenToInsert(expectedTokType)
-            tokToInsert.isInsertedInRecovery = true
             return tokToInsert
 
         }

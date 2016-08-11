@@ -1,11 +1,5 @@
-import {Token} from "./tokens_public"
-import {
-    validatePatterns,
-    analyzeTokenClasses,
-    countLineTerminators,
-    DEFAULT_MODE,
-    performRuntimeChecks
-} from "./lexer"
+import {Token, LazyTokenCacheData} from "./tokens_public"
+import {validatePatterns, analyzeTokenClasses, countLineTerminators, DEFAULT_MODE, performRuntimeChecks, checkLazyMode} from "./lexer"
 import {
     cloneObj,
     isEmpty,
@@ -16,8 +10,12 @@ import {
     last,
     keys,
     isUndefined,
-    reject, cloneArr
+    reject,
+    cloneArr,
+    flatten,
+    mapValues
 } from "../utils/utils"
+import {fillUpLineToOffset, getStartColumnFromLineToOffset, getStartLineFromLineToOffset} from "./tokens"
 
 export type TokenConstructor = Function
 
@@ -39,6 +37,7 @@ export enum LexerDefinitionErrorType {
     MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY,
     MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
     LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
+    LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY
 }
 
 export interface ILexerDefinitionError {
@@ -72,6 +71,7 @@ export class Lexer {
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors:ILexerDefinitionError[] = []
 
+    protected isLazyTokenMode
     protected modes:string[] = []
     protected defaultMode:string
     protected allPatterns:{ [modeName:string]:RegExp[] } = {}
@@ -227,6 +227,12 @@ export class Lexer {
 
         this.defaultMode = actualDefinition.defaultMode
 
+        // Lazy Mode handling
+        let allTokensTypes:any = flatten(mapValues(actualDefinition.modes, (currModDef) => currModDef))
+        let lazyCheckResult = checkLazyMode(allTokensTypes)
+        this.isLazyTokenMode = lazyCheckResult.isLazy
+        this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(lazyCheckResult.errors)
+
         if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
                 return error.message
@@ -245,7 +251,7 @@ export class Lexer {
      * @param {string} [initialMode] - The initial Lexer Mode to start with, by default this will be the first mode in the lexer's
      *                                 definition. If the lexer has no explicit modes it will be the implicit single 'default_mode' mode.
      *
-     * @returns {{tokens: {Token}[], errors: string[]}}
+     * @returns {ILexingResult}
      */
     public tokenize(text:string,
                     initialMode:string = this.defaultMode):ILexingResult {
@@ -258,6 +264,17 @@ export class Lexer {
             throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString)
         }
 
+        if (this.isLazyTokenMode) {
+            return this.tokenizeInternalLazy(text, initialMode)
+        }
+        else {
+            return this.tokenizeInternal(text, initialMode)
+        }
+    }
+
+    // There is quite a bit of duplication between this and "tokenizeInternalLazy"
+    // This is intentional due to performance considerations.
+    private tokenizeInternal(text:string, initialMode:string):ILexingResult {
         let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
             fixForEndingInLT, c, droppedChar, lastLTIdx, msg, lastCharIsLT
         let orgInput = text
@@ -431,6 +448,146 @@ export class Lexer {
                 // at this point we either re-synced or reached the end of the input text
                 msg = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
                     ` skipped ${offset - errorStartOffset} characters.`
+                errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
+            }
+        }
+
+        return {tokens: matchedTokens, groups: groups, errors: errors}
+    }
+
+    private tokenizeInternalLazy(text:string, initialMode:string):ILexingResult {
+        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength, droppedChar, msg
+
+        let orgInput = text
+        let offset = 0
+        let matchedTokens = []
+        let errors:ILexingError[] = []
+        let groups:any = cloneObj(this.emptyGroups)
+
+        let currModePatterns = []
+        let currModePatternsLength = 0
+        let currModePatternIdxToLongerAltIdx = []
+        let currModePatternIdxToGroup = []
+        let currModePatternIdxToClass = []
+        let patternIdxToPushMode = []
+        let patternIdxToPopMode = []
+
+        let lazyCacheData:LazyTokenCacheData = {
+            orgText:      text,
+            lineToOffset: []
+        }
+
+        let modeStack = []
+        let pop_mode = (popToken) => {
+            // TODO: perhaps avoid this error in the edge case there is no more input?
+            if (modeStack.length === 1) {
+                // if we try to pop the last mode there lexer will no longer have ANY mode.
+                // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
+                let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
+                errors.push({line: popToken.startLine, column: popToken.startColumn, length: popToken.image.length, message: msg})
+            }
+            else {
+                modeStack.pop()
+                let newMode = last(modeStack)
+                currModePatterns = this.allPatterns[newMode]
+                currModePatternsLength = currModePatterns.length
+                currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
+                currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
+                currModePatternIdxToClass = this.patternIdxToClass[newMode]
+                patternIdxToPushMode = this.patternIdxToPushMode[newMode]
+                patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+            }
+        }
+
+        function push_mode(newMode) {
+            modeStack.push(newMode)
+            currModePatterns = this.allPatterns[newMode]
+            currModePatternsLength = currModePatterns.length
+            currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
+            currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
+            currModePatternIdxToClass = this.patternIdxToClass[newMode]
+            patternIdxToPushMode = this.patternIdxToPushMode[newMode]
+            patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+        }
+
+        // this pattern seems to avoid a V8 de-optimization, although that de-optimization does not
+        // seem to matter performance wise.
+        push_mode.call(this, initialMode)
+
+        while (text.length > 0) {
+            match = null
+            for (i = 0; i < currModePatternsLength; i++) {
+                match = currModePatterns[i].exec(text)
+                if (match !== null) {
+                    // even though this pattern matched we must try a another longer alternative.
+                    // this can be used to prioritize keywords over identifiers
+                    longerAltIdx = currModePatternIdxToLongerAltIdx[i]
+                    if (longerAltIdx) {
+                        matchAlt = currModePatterns[longerAltIdx].exec(text)
+                        if (matchAlt && matchAlt[0].length > match[0].length) {
+                            match = matchAlt
+                            i = longerAltIdx
+                        }
+                    }
+                    break
+                }
+            }
+            // successful match
+            if (match !== null) {
+                matchedImage = match[0]
+                imageLength = matchedImage.length
+                group = currModePatternIdxToGroup[i]
+                if (group !== undefined) {
+                    tokClass = currModePatternIdxToClass[i]
+                    // the end offset is non inclusive.
+                    newToken = new tokClass(offset, offset + imageLength - 1, lazyCacheData)
+                    if (group === "default") {
+                        matchedTokens.push(newToken)
+                    }
+                    else {
+                        groups[group].push(newToken)
+                    }
+                }
+                text = text.slice(imageLength)
+                offset = offset + imageLength
+
+                // mode handling, must pop before pushing if a Token both acts as both
+                // otherwise it would be a NO-OP
+                if (patternIdxToPopMode[i]) {
+                    pop_mode(newToken)
+                }
+                if (patternIdxToPushMode[i]) {
+                    push_mode.call(this, patternIdxToPushMode[i])
+                }
+            }
+            else { // error recovery, drop characters until we identify a valid token's start point
+                let errorStartOffset = offset
+                let foundResyncPoint = false
+                while (!foundResyncPoint && text.length > 0) {
+                    // drop chars until we succeed in matching something
+                    droppedChar = text.charCodeAt(0)
+                    text = text.substr(1)
+                    offset++
+                    for (j = 0; j < currModePatterns.length; j++) {
+                        foundResyncPoint = currModePatterns[j].test(text)
+                        if (foundResyncPoint) {
+                            break
+                        }
+                    }
+                }
+
+                errLength = offset - errorStartOffset
+                // at this point we either re-synced or reached the end of the input text
+                msg = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
+                    ` skipped ${offset - errorStartOffset} characters.`
+
+                if (isEmpty(lazyCacheData.lineToOffset)) {
+                        fillUpLineToOffset(lazyCacheData.lineToOffset, lazyCacheData.orgText)
+                }
+
+                let errorLine = getStartLineFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
+                let errorColumn = getStartColumnFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
+
                 errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
             }
         }

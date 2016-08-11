@@ -1,4 +1,4 @@
-import {Token, tokenName} from "./tokens_public"
+import {Token, tokenName, LazyToken} from "./tokens_public"
 import {
     TokenConstructor,
     ILexerDefinitionError,
@@ -20,7 +20,10 @@ import {
     isRegExp,
     compact,
     contains,
-    first, forEach
+    first,
+    forEach,
+    uniq,
+    every
 } from "../utils/utils"
 
 const PATTERN = "PATTERN"
@@ -367,4 +370,45 @@ export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):
     }
 
     return errors
+}
+function isLazyToken(tokType:TokenConstructor):boolean {
+    return LazyToken.prototype.isPrototypeOf(tokType.prototype)
+}
+
+export interface LazyCheckResult {
+    isLazy:boolean
+    errors:ILexerDefinitionError[]
+}
+
+export function checkLazyMode(allTokenTypes:TokenConstructor[]):LazyCheckResult {
+    let errors = []
+    let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
+
+    let areAllLazy = every(allTokensTypeSet, (currTokType) => isLazyToken(currTokType))
+    let areAllNotLazy = every(allTokensTypeSet, (currTokType) => !isLazyToken(currTokType))
+
+    if (!areAllLazy && !areAllNotLazy) {
+
+        let lazyTokens = filter(allTokensTypeSet, (currTokType) => isLazyToken(currTokType))
+        let lazyTokensNames = map(lazyTokens, tokenName)
+        let lazyTokensString = lazyTokensNames.join("\n\t")
+        let notLazyTokens = filter(allTokensTypeSet, (currTokType) => !isLazyToken(currTokType))
+        let notLazyTokensNames = map(notLazyTokens, tokenName)
+        let notLazyTokensString = notLazyTokensNames.join("\n\t")
+
+        errors.push({
+            message: `A Lexer cannot be defined using a mix of both Lazy and Non-Lazy Tokens:\n` +
+                     `Lazy Tokens:\n\t` +
+                     lazyTokensString +
+                     `\nNon-Lazy Tokens:\n\t` +
+                     notLazyTokensString,
+            type:    LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY
+        })
+    }
+
+
+    return {
+        isLazy: areAllLazy,
+        errors: errors
+    }
 }
