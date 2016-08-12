@@ -8,6 +8,7 @@ var oldVersionParseCss = require("./parsers/cssOldParser")
 
 var jsonSample = require("./samples/json10k")
 var cssSample = fs.readFileSync('./samples/large_css.css', 'utf8')
+var isBenchmarkOnlyLexer = true
 
 var _ = require("lodash")
 
@@ -20,8 +21,8 @@ function performBenchmark(name, input, devParse, oldParse) {
     console.log("Benchmarking: " + name + " Dev Vs Old")
     // warmup
     for (var z = 0; z < warmupTimes; z++) {
-        devParse(input)
-        oldParse(input)
+        devParse(input, isBenchmarkOnlyLexer)
+        oldParse(input, isBenchmarkOnlyLexer)
     }
 
     // Dev version
@@ -30,7 +31,7 @@ function performBenchmark(name, input, devParse, oldParse) {
     // dev version
     var startDev = _.now()
     for (var i = 0; i < times; i++) {
-        devParse(input)
+        devParse(input, isBenchmarkOnlyLexer)
     }
     var endDev = _.now()
     var averageDev = (endDev - startDev) / times
@@ -41,7 +42,7 @@ function performBenchmark(name, input, devParse, oldParse) {
     console.log("testing with old version of chevrotain: " + oldVersion)
     var startOld = _.now()
     for (var j = 0; j < times; j++) {
-        oldParse(input)
+        oldParse(input, isBenchmarkOnlyLexer)
     }
     var endOld = _.now()
     var averageOld = (endOld - startOld) / times

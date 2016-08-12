@@ -106,22 +106,24 @@ JsonParserOld.prototype.constructor = JsonParserOld;
 
 // reuse the same parser instance.
 var parser = new JsonParserOld([]);
-module.exports = function (text) {
+module.exports = function (text, lexOnly) {
     var lexResult = JsonLexer.tokenize(text);
-
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens;
-
-    // any top level rule may be used as an entry point
-    var value = parser.json();
-
     if (lexResult.errors.length > 0) {
         throw "Lexing errors encountered " + lexResult.errors[0].message
     }
 
-    if (parser.errors.length > 0) {
-        throw "parsing errors encountered " + parser.errors[0].message
+    var value
+    if (!lexOnly) {
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens;
 
+        // any top level rule may be used as an entry point
+        value = parser.json();
+
+        if (parser.errors.length > 0) {
+            throw "parsing errors encountered " + parser.errors[0].message
+
+        }
     }
 
     return {

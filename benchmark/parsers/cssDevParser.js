@@ -503,24 +503,24 @@ CssParser.prototype.constructor = CssParser;
 // reuse the same parser instance.
 var parser = new CssParser([]);
 
-module.exports = function (text) {
+module.exports = function (text, lexOnly) {
     var lexResult = CssLexer.tokenize(text);
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens;
-    // any top level rule may be used as an entry point
-    var value = parser.stylesheet();
-
     if (lexResult.errors.length > 0) {
         throw "Lexing errors encountered " + lexResult.errors[0].message
     }
 
-    if (parser.errors.length > 0) {
-        throw "parsing errors encountered " + parser.errors[0].message
+    var value
+    if (!lexOnly) {
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens;
 
+        // any top level rule may be used as an entry point
+        value = parser.stylesheet();
+
+
+        if (parser.errors.length > 0) {
+            throw "parsing errors encountered " + parser.errors[0].message
+
+        }
     }
-    return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
-        parseErrors: parser.errors
-    };
 };
