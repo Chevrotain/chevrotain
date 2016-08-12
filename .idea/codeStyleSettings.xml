@@ -12,6 +12,7 @@
         </JSCodeStyleSettings>
         <TypeScriptCodeStyleSettings>
           <option name="USE_SEMICOLON_AFTER_STATEMENT" value="false" />
+          <option name="SPACE_AFTER_TYPE_COLON" value="false" />
           <option name="ALIGN_OBJECT_PROPERTIES" value="1" />
         </TypeScriptCodeStyleSettings>
         <XML>
