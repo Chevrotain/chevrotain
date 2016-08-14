@@ -2,7 +2,7 @@
 
 #### Major Changes
 - [Lexer: Lazy Tokens support.](https://github.com/SAP/chevrotain/issues/258)
-- [Token "startOffset" and "endOffset" properties.](https://github.com/SAP/chevrotain/issues/25)
+- [Token "startOffset" and "endOffset" properties.](https://github.com/SAP/chevrotain/issues/259)
 
 This Release includes a new **performance** feature called **"Lazy Tokens"**.
 These tokens hold much less state and defer the calculation of their properties
