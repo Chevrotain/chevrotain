@@ -93,7 +93,28 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
     return derivedCostructor
 }
 
-export class Token {
+/**
+ *   *
+ * Things to note:
+ * - "do"  {
+ *          startColumn : 1, endColumn: 2,
+ *          startOffset: x, endOffset: x +1} --> the range is inclusive to exclusive 1...2 (2 chars long).
+ *
+ * - "\n"  {startLine : 1, endLine: 1} --> a lineTerminator as the last character does not effect the Token's line numbering.
+ *
+ * - "'hello\tworld\uBBBB'"  {image: "'hello\tworld\uBBBB'"} --> a Token's image is the "literal" text
+ *                                                              (unicode escaping is untouched).
+ */
+export interface IToken {
+    image:string
+    startOffset:number
+    startLine:number
+    startColumn:number
+    endLine:number
+    endColumn:number
+}
+
+export class Token implements IToken {
 
     /**
      * A "human readable" Label for a Token.
@@ -115,33 +136,40 @@ export class Token {
 
     /**
      * @param {string} image - The textual representation of the Token as it appeared in the text.
-     * @param {number} offset - Offset of the first character of the Token.
+     * @param {number} startOffset - Offset of the first character of the Token.
      * @param {number} startLine - Line of the first character of the Token.
      * @param {number} startColumn - Column of the first character of the Token.
      * @param {number} endLine - Line of the last character of the Token.
      * @param {number} endColumn - Column of the last character of the Token.
-     *
-     * Things to note:
-     * - "do"  {
-     *          startColumn : 1, endColumn: 2,
-     *          startOffset: x, endOffset: x +1} --> the range is inclusive to exclusive 1...2 (2 chars long)
-     *          .
-     * - "\n"  {startLine : 1, endLine: 1} --> a lineTerminator as the last character does not effect the Token's line numbering.
-     * - "'hello\tworld\uBBBB'"  {image: "'hello\tworld\uBBBB'"} --> a Token's image is the "literal" text
-     *                                                              (unicode escaping is untouched).
      */
     constructor(public image:string,
-                // TODO: rename to startOffset???
-                public offset:number,
+                public startOffset:number,
                 public startLine:number,
                 public startColumn:number,
                 public endLine:number = startLine,
-                public endColumn:number = startColumn + image.length - 1
-                // TODO: enable this prop in a separate commit
-                // also need to add it to LazyToken
-                // public endOffset:number = offset + image.length - 1
-    ) {}
+                public endColumn:number = startColumn + image.length - 1) {}
 
+    get endOffset():number {
+        return this.startOffset + this.image.length - 1
+    }
+
+    /**
+     * @deprecated
+     * An Alias for getting the startOffset. this is deprecated and remains only to be backwards compatiable.
+     * This API will be removed in future version of Chevrotain.
+     */
+    get offset():number {
+        return this.startOffset
+    }
+
+    /**
+     * @deprecated
+     * An Alias for setting the startOffset. this is deprecated and remains only to be backwards compatiable.
+     * This API will be removed in future version of Chevrotain.
+     */
+    set offset(newOffset:number) {
+        this.startOffset = newOffset
+    }
 }
 
 export interface LazyTokenCacheData {
@@ -149,11 +177,34 @@ export interface LazyTokenCacheData {
     lineToOffset:number[]
 }
 
-export class LazyToken implements Token {
+/**
+ * @see IToken
+ * @see Token
+ *
+ * Same API as a IToken, using a Lazy implementation, with most properties being immutable.
+ * See related doc in: https://github.com/SAP/chevrotain/blob/startO/docs/faq.md#-how-do-i-maximize-my-parsers-performance
+ * ("Use Lazy Tokens" section)
+ */
+export class LazyToken implements IToken {
+
+    /**
+     * A "human readable" Label for a Token.
+     * Subclasses of Token may define their own static LABEL property.
+     * This label will be used in error messages and drawing syntax diagrams.
+     *
+     * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
+     * or too unwieldy to be used in error messages.
+     *
+     * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
+     *
+     * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
+     * "expecting '{' but found ')'"
+     */
+    static LABEL:string = undefined
 
     public isInsertedInRecovery:boolean
 
-    constructor(public offset:number,
+    constructor(public startOffset:number,
                 public endOffset:number,
                 public cacheData:LazyTokenCacheData) {}
 
@@ -161,7 +212,7 @@ export class LazyToken implements Token {
         if (this.isInsertedInRecovery) {
             return ""
         }
-        return this.cacheData.orgText.substring(this.offset, this.endOffset + 1)
+        return this.cacheData.orgText.substring(this.startOffset, this.endOffset + 1)
     }
 
     get startLine():number {
@@ -169,7 +220,7 @@ export class LazyToken implements Token {
             return NaN
         }
         this.ensureLineDataProcessing()
-        return getStartLineFromLineToOffset(this.offset, this.cacheData.lineToOffset)
+        return getStartLineFromLineToOffset(this.startOffset, this.cacheData.lineToOffset)
     }
 
     get startColumn():number {
@@ -177,7 +228,7 @@ export class LazyToken implements Token {
             return NaN
         }
         this.ensureLineDataProcessing()
-        return getStartColumnFromLineToOffset(this.offset, this.cacheData.lineToOffset)
+        return getStartColumnFromLineToOffset(this.startOffset, this.cacheData.lineToOffset)
     }
 
     get endLine():number {

@@ -144,7 +144,7 @@ class SelectContentAssistParser extends SelectParser {
             consumedToken = super.consumeInternal(tokClass, idx);
 
             var nextToken = this.NEXT_TOKEN();
-            var nextTokenEndOffset = nextToken.offset + nextToken.image.length;
+            var nextTokenEndOffset = nextToken.startOffset + nextToken.image.length;
 
             // no prefix scenario (SELECT age FROM ^)
             if (consumedToken !== undefined &&
@@ -152,7 +152,7 @@ class SelectContentAssistParser extends SelectParser {
                 // this means the content assist offset is AFTER the input
                 (this.NEXT_TOKEN() instanceof chevrotain.EOF ||
                     // we consumed the last token BEFORE the content assist of offset
-                    this.NEXT_TOKEN().offset > this.assistOffset
+                    this.NEXT_TOKEN().startOffset > this.assistOffset
                 )) {
                 // reached the content assist point AFTER consuming some token successfully.
                 contentAssistPointReached = true;
@@ -160,11 +160,11 @@ class SelectContentAssistParser extends SelectParser {
             }
             // The prefix scenario (SELECT age FRO^)
             else if (nextTokenEndOffset >= this.assistOffset && // going to reach or pass the assist offset.
-                nextToken.offset < this.assistOffset &&
+                nextToken.startOffset < this.assistOffset &&
                 // only provide suggestions if it was requested after some word like(Ident/Keyword) prefix.
                 (nextToken instanceof Identifier || nextToken instanceof Keyword)) {
                 contentAssistPointReached = true;
-                prefix = nextToken.image.substring(0, this.assistOffset - nextToken.offset);
+                prefix = nextToken.image.substring(0, this.assistOffset - nextToken.startOffset);
                 // we need the last grammar path and not the current one as we need to find out what TokenTypes the prefix
                 // may belong to, and not what may come after the Token the prefix belongs to.
                 pathToTokenBeforeContentAssist = this.lastGrammarPath;

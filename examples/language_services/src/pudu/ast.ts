@@ -103,19 +103,19 @@ export abstract class AstNode {
 
         // this assumes that tokens never overlap
         _.forEach(allActualTokens, (currToken:Token) => {
-            if (currToken.offset < firstToken.offset) {
+            if (currToken.startOffset < firstToken.startOffset) {
                 firstToken = currToken
             }
-            else if (currToken.offset > lastToken.offset) {
+            else if (currToken.startOffset > lastToken.startOffset) {
                 lastToken = currToken
             }
         })
 
         return {
-            startOffset: firstToken.offset,
+            startOffset: firstToken.startOffset,
             startLine:   firstToken.startLine,
             startColumn: firstToken.startColumn,
-            endOffset:   lastToken.offset + lastToken.image.length,
+            endOffset:   lastToken.startOffset + lastToken.image.length,
             endLine:     lastToken.endLine,
             endColumn:   lastToken.endColumn
         }
