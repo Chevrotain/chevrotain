@@ -11,6 +11,7 @@
       <excludeFolder url="file://$MODULE_DIR$/dev" />
       <excludeFolder url="file://$MODULE_DIR$/doc" />
       <excludeFolder url="file://$MODULE_DIR$/examples/grammars/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/language_services/bin/examples/coverage" />
       <excludeFolder url="file://$MODULE_DIR$/examples/language_services/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/examples/lexer/node_modules" />
       <excludeFolder url="file://$MODULE_DIR$/examples/parser/node_modules" />

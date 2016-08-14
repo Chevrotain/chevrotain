@@ -1168,7 +1168,7 @@ export class Parser {
             })
         }
         else if (Token.prototype.isPrototypeOf(tokClass.prototype)) {
-            tokToInsert = new (<any>tokClass)("", NaN, NaN, NaN, NaN, NaN, NaN)
+            tokToInsert = new (<any>tokClass)("", NaN, NaN, NaN, NaN, NaN)
         }
         else {
             throw Error("non exhaustive match")

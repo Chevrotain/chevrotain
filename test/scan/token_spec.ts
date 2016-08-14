@@ -22,10 +22,17 @@ describe("The Chevrotain Tokens namespace", () => {
     let Plus = extendToken("Plus", /\+/)
     Plus.LABEL = "+"
 
+    it("provides an offset property for backwards compatibility", () => {
+        let token = new A("Hello", 5, 4, 1)
+        expect(token.offset).to.equal(5)
+        token.offset = 666
+        expect(token.offset).to.equal(666)
+    })
+
     it("provides an extendToken utility - creating an instance", () => {
         let aInstance = new A("Hello", 0, 1, 1)
         expect(aInstance.image).to.equal("Hello")
-        expect(aInstance.offset).to.equal(0)
+        expect(aInstance.startOffset).to.equal(0)
         expect(aInstance.startLine).to.equal(1)
         expect(aInstance.endLine).to.equal(1)
         expect(aInstance.startColumn).to.equal(1)
@@ -35,7 +42,7 @@ describe("The Chevrotain Tokens namespace", () => {
     it("provides an extendToken utility - creating a subclass instance", () => {
         let aInstance = new C("world", 0, 1, 1)
         expect(aInstance.image).to.equal("world")
-        expect(aInstance.offset).to.equal(0)
+        expect(aInstance.startOffset).to.equal(0)
         expect(aInstance.startLine).to.equal(1)
         expect(aInstance.endLine).to.equal(1)
         expect(aInstance.startColumn).to.equal(1)

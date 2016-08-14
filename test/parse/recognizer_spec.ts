@@ -420,7 +420,7 @@ describe("The Error Recovery functionality of the Chevrotain Parser", () => {
 
         expect(insertedToken.isInsertedInRecovery).to.be.true
         expect(insertedToken.image).to.equal("")
-        expect(insertedToken.offset).to.be.NaN
+        expect(insertedToken.startOffset).to.be.NaN
         // expect(insertedToken.endOffset).to.be.NaN
         expect(insertedToken.startLine).to.be.NaN
         expect(insertedToken.endLine).to.be.NaN
@@ -458,7 +458,7 @@ describe("The Error Recovery functionality of the Chevrotain Parser", () => {
 
         expect(insertedToken.isInsertedInRecovery).to.be.true
         expect(insertedToken.image).to.equal("")
-        expect(insertedToken.offset).to.be.NaN
+        expect(insertedToken.startOffset).to.be.NaN
         // expect(insertedToken.endOffset).to.be.NaN
         expect(insertedToken.startLine).to.be.NaN
         expect(insertedToken.endLine).to.be.NaN

@@ -28,7 +28,7 @@ describe("The Chevrotain Lexer support for both Lazy And Non-Lazy(Regular) Token
             expect(currLazyTok.endLine).to.equal(currRegularTok.endLine)
             expect(currLazyTok.startColumn).to.equal(currRegularTok.startColumn)
             expect(currLazyTok.endColumn).to.equal(currRegularTok.endColumn)
-            expect(currLazyTok.offset).to.equal(currRegularTok.offset)
+            expect(currLazyTok.startOffset).to.equal(currRegularTok.startOffset)
         }
     });
 
