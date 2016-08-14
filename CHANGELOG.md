@@ -5,8 +5,8 @@
 - [Token "startOffset" and "endOffset" properties.](https://github.com/SAP/chevrotain/issues/259)
 
 This Release includes a new **performance** feature called **"Lazy Tokens"**.
-These tokens hold much less state and defer the calculation of their properties
-until needed. Considering most of the time this information is never needed, 
+These tokens contain less actual state and defer the calculation of their properties
+until needed. Considering most of the time this information is never needed (full position information)
 the overall speed boost can be as much as **10-25%** (depending on the grammar used).
  
 [See "2. Use Lazy Tokens"](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6)
