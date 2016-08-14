@@ -116,7 +116,7 @@ See [related documentation](../examples/parser/minification/README.md) for detai
    note that: the larger (and more numerous) your inputs are the greater the benefit as CPU cycles wasted on garbage collection
    may also be avoided due to the reduction in memory consumption.
    
-   [Example of creating a Lazy Tokens Parser](../examples/lexer/lazy_tokens/lazy_tokens.js)
+   [Example of creating a Lazy Tokens Lexer](../examples/lexer/lazy_tokens/)
     
 3. **Avoid creating parsing rules which only parse a single Terminal.**
 
