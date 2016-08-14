@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE) 
+## 0.13.1 (8-15-2016) 
 
 #### Major Changes
 - [Lexer: Lazy Tokens support.](https://github.com/SAP/chevrotain/issues/258)
