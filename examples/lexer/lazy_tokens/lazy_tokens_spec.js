@@ -60,8 +60,7 @@ describe("The Chevrotain Lexer support for both Lazy And Non-Lazy(Regular) Token
             console.log("Regular is faster by: " + ((lazyTime / regularTime)).toFixed(3))
         }
 
-        // TODO: not sure CI(Travis) containers are reliable enough to have an assertion on performance,
-        // may need to only log the result this to the console if this randomly fails
-        expect(lazyTime).to.be.lessThan(regularTime)
+        // CI(Travis) containers are not consistent enough to have an assertion on performance,
+        // expect(lazyTime).to.be.lessThan(regularTime)
     });
 });
