@@ -57,6 +57,7 @@ declare module Chai {
         true: Assertion;
         false: Assertion;
         null: Assertion;
+        NaN: Assertion;
         undefined: Assertion;
         exist: Assertion;
         empty: Assertion;

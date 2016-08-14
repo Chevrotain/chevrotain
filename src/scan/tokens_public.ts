@@ -1,6 +1,13 @@
-import {isString, isRegExp, isFunction, assign, isUndefined} from "../utils/utils"
+import {isString, isRegExp, isFunction, assign, isUndefined, isEmpty} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
 import {Lexer} from "./lexer_public"
+import {
+    fillUpLineToOffset,
+    getStartLineFromLineToOffset,
+    getStartColumnFromLineToOffset,
+    getEndLineFromLineToOffset,
+    getEndColumnFromLineToOffset
+} from "./tokens"
 
 /**
  *  This can be used to improve the quality/readability of error messages or syntax diagrams.
@@ -34,6 +41,11 @@ export function tokenName(clazz:Function):string {
         return functionName(clazz)
     }
 }
+
+export function extendLazyToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = LazyToken) {
+    return extendToken(tokenName, patternOrParent, parentConstructor)
+}
+
 /**
  * utility to help the poor souls who are still stuck writing pure javascript 5.1
  * extend and create Token subclasses in a less verbose manner
@@ -110,19 +122,85 @@ export class Token {
      * @param {number} endColumn - Column of the last character of the Token.
      *
      * Things to note:
-     * * "do"  {startColumn : 1, endColumn: 2} --> the range is inclusive to exclusive 1...2 (2 chars long).
-     * * "\n"  {startLine : 1, endLine: 1} --> a lineTerminator as the last character does not effect the Token's line numbering.
-     * * "'hello\tworld\uBBBB'"  {image: "'hello\tworld\uBBBB'"} --> a Token's image is the "literal" text
+     * - "do"  {
+     *          startColumn : 1, endColumn: 2,
+     *          startOffset: x, endOffset: x +1} --> the range is inclusive to exclusive 1...2 (2 chars long)
+     *          .
+     * - "\n"  {startLine : 1, endLine: 1} --> a lineTerminator as the last character does not effect the Token's line numbering.
+     * - "'hello\tworld\uBBBB'"  {image: "'hello\tworld\uBBBB'"} --> a Token's image is the "literal" text
      *                                                              (unicode escaping is untouched).
      */
     constructor(public image:string,
+                // TODO: rename to startOffset???
                 public offset:number,
                 public startLine:number,
                 public startColumn:number,
                 public endLine:number = startLine,
-                public endColumn:number = startColumn + image.length - 1) {}
+                public endColumn:number = startColumn + image.length - 1
+                // TODO: enable this prop in a separate commit
+                // also need to add it to LazyToken
+                // public endOffset:number = offset + image.length - 1
+    ) {}
 
-    // TODO: getter(computed) for endOffSet
+}
+
+export interface LazyTokenCacheData {
+    orgText:string,
+    lineToOffset:number[]
+}
+
+export class LazyToken implements Token {
+
+    public isInsertedInRecovery:boolean
+
+    constructor(public offset:number,
+                public endOffset:number,
+                public cacheData:LazyTokenCacheData) {}
+
+    get image():string {
+        if (this.isInsertedInRecovery) {
+            return ""
+        }
+        return this.cacheData.orgText.substring(this.offset, this.endOffset + 1)
+    }
+
+    get startLine():number {
+        if (this.isInsertedInRecovery) {
+            return NaN
+        }
+        this.ensureLineDataProcessing()
+        return getStartLineFromLineToOffset(this.offset, this.cacheData.lineToOffset)
+    }
+
+    get startColumn():number {
+        if (this.isInsertedInRecovery) {
+            return NaN
+        }
+        this.ensureLineDataProcessing()
+        return getStartColumnFromLineToOffset(this.offset, this.cacheData.lineToOffset)
+    }
+
+    get endLine():number {
+        if (this.isInsertedInRecovery) {
+            return NaN
+        }
+        this.ensureLineDataProcessing()
+        return getEndLineFromLineToOffset(this.endOffset, this.cacheData.lineToOffset)
+    }
+
+    get endColumn():number {
+        if (this.isInsertedInRecovery) {
+            return NaN
+        }
+        this.ensureLineDataProcessing()
+        return getEndColumnFromLineToOffset(this.endOffset, this.cacheData.lineToOffset)
+    }
+
+    private ensureLineDataProcessing():void {
+        if (isEmpty(this.cacheData.lineToOffset)) {
+            fillUpLineToOffset(this.cacheData.lineToOffset, this.cacheData.orgText)
+        }
+    }
 }
 
 /**
@@ -131,7 +209,7 @@ export class Token {
  * for example, EOF (end-of-file).
  */
 export class VirtualToken extends Token {
-    constructor() {super("", -1, -1, -1, -1, -1) }
+    constructor() {super("", NaN, NaN, NaN, NaN, NaN) }
 }
 
 export class EOF extends VirtualToken {}

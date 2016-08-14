@@ -1,4 +1,5 @@
-import {Token, EOF} from "../../src/scan/tokens_public"
+import {Token, EOF, extendLazyToken, extendToken} from "../../src/scan/tokens_public"
+import {Lexer} from "../../src/scan/lexer_public"
 import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
@@ -285,7 +286,7 @@ describe("The Parsing DSL", () => {
     })
 })
 
-describe("The Error Recovery functionality of the IntrospectionParser", () => {
+describe("The Error Recovery functionality of the Chevrotain Parser", () => {
 
     it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", () => {
         let parser:any = new Parser([], ALL_TOKENS, {recoveryEnabled: true})
@@ -387,6 +388,82 @@ describe("The Error Recovery functionality of the IntrospectionParser", () => {
         let parser = new AtLeastOneSepRepetitionRecovery(input, false)
         expect(parser.qualifiedName()).to.deep.equal(["999"])
         expect(parser.errors.length).to.equal(1)
+    })
+
+    it("can perform single Token insertion with Lazy Tokens", () => {
+        let A = extendLazyToken("A", /A/)
+        let B = extendLazyToken("B", /B/)
+        let C = extendLazyToken("C", /C/)
+        let allTokens = [A, B, C]
+
+        let lexer = new Lexer(allTokens)
+
+        class SingleTokenInsertLazy extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, allTokens, {recoveryEnabled: true})
+                Parser.performSelfAnalysis(this)
+            }
+
+            public topRule = this.RULE("topRule", () => {
+                this.CONSUME(A)
+                let insertedToken = this.CONSUME(B)
+                this.CONSUME(C)
+
+                return insertedToken
+            })
+        }
+
+        let lexResult = lexer.tokenize("AC")
+        let parser = new SingleTokenInsertLazy(lexResult.tokens)
+        let insertedToken = parser.topRule()
+
+        expect(insertedToken.isInsertedInRecovery).to.be.true
+        expect(insertedToken.image).to.equal("")
+        expect(insertedToken.offset).to.be.NaN
+        // expect(insertedToken.endOffset).to.be.NaN
+        expect(insertedToken.startLine).to.be.NaN
+        expect(insertedToken.endLine).to.be.NaN
+        expect(insertedToken.startColumn).to.be.NaN
+        expect(insertedToken.endColumn).to.be.NaN
+    })
+
+    it("can perform single Token insertion with Regular Tokens Tokens", () => {
+        let A = extendToken("A", /A/)
+        let B = extendToken("B", /B/)
+        let C = extendToken("C", /C/)
+        let allTokens = [A, B, C]
+
+        let lexer = new Lexer(allTokens)
+
+        class SingleTokenInsertRegular extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, allTokens, {recoveryEnabled: true})
+                Parser.performSelfAnalysis(this)
+            }
+
+            public topRule = this.RULE("topRule", () => {
+                this.CONSUME(A)
+                let insertedToken = this.CONSUME(B)
+                this.CONSUME(C)
+
+                return insertedToken
+            })
+        }
+
+        let lexResult = lexer.tokenize("AC")
+        let parser = new SingleTokenInsertRegular(lexResult.tokens)
+        let insertedToken = parser.topRule()
+
+        expect(insertedToken.isInsertedInRecovery).to.be.true
+        expect(insertedToken.image).to.equal("")
+        expect(insertedToken.offset).to.be.NaN
+        // expect(insertedToken.endOffset).to.be.NaN
+        expect(insertedToken.startLine).to.be.NaN
+        expect(insertedToken.endLine).to.be.NaN
+        expect(insertedToken.startColumn).to.be.NaN
+        expect(insertedToken.endColumn).to.be.NaN
     })
 })
 

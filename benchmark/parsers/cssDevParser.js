@@ -523,4 +523,10 @@ module.exports = function (text, lexOnly) {
 
         }
     }
+
+    return {
+        value:       value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors:   lexResult.errors,
+        parseErrors: parser.errors
+    };
 };
