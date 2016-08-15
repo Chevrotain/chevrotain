@@ -228,17 +228,20 @@
         }).add('Ohm', function () {
             parse_json_with_ohm(json_sample1k)
         }).on('cycle', function (event) {
+            
             var table = document.getElementById("resultsTable");
             data.labels.push(event.target.name);
             data.datasets[0].data.push(event.target.hz);
-            var rowNum = event.target.id;
-            var numOfRows = table.rows.length;
-            if (rowNum >= numOfRows ) {
-                rowNum = (rowNum + 1) % 8
-            }
+
+            var rowName = event.target.name
+            var rowNum = _.findIndex(table.rows, function(currRow) {
+                // the text domNode
+                return currRow.childNodes[1].innerHTML === rowName
+            })
             var row = table.rows[rowNum];
             var cell2 = row.cells[1];
             cell2.innerHTML = event.target.hz.toFixed(2) + "    " + "\xB1" + event.target.stats.rme.toFixed(2) + "%";
+
         }).on('complete', function () {
             var sFastest = '<B>Fastest is ' + this.filter('fastest').pluck('name') + "</b>";
             document.getElementById("fastestInResults").innerHTML = sFastest;
