@@ -173,7 +173,7 @@
     }
 
     function clearGraph() {
-        $("#parsersResultChart").empty();
+        $("#parsersResultChart").css("visibility", "hidden");
     }
 
     function clearResults() {
@@ -244,6 +244,7 @@
             var ctx = document.getElementById("parsersResultChart").getContext("2d");
 
             var myBarChart = new Chart(ctx).Bar(data, {});
+            $("#parsersResultChart").css("visibility", "visible");
 
             $("#runAllButton").prop('disabled', false);
         }).run({'async': true});
