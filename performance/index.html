@@ -208,6 +208,10 @@
                 }
             ]
         };
+
+        // more minSamples (default=5) for more accurate & consistent results.
+        Benchmark.options.minSamples = 15
+
         var suite = new Benchmark.Suite;
         suite.add('Jison', function () {
             jisonJsonLexerAndParser.parse(json_sample1k)
