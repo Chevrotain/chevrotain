@@ -10,7 +10,7 @@
 <script src="../bower_components/lodash/lodash.min.js"></script>
 <script src="../bower_components/benchmark/benchmark.js"></script>
 <script src="https://npmcdn.com/chevrotain/lib/chevrotain.js"></script>
-<script src="../bower_components/Chart.js/Chart.min.js"></script>
+<script src="https://npmcdn.com/chart.js@2.2.1/dist/Chart.min.js"></script>
 <script src="samples/1K_json.js"></script>
 
 <script src="jsonParsers/chevrotain/chevrotainParser.js"></script>
@@ -124,13 +124,13 @@
 
     </section>
     <section style="text-align:left;">
-        <button onclick="onRunAll()" id="runAllButton">Run All</button>
+        <button onclick="onRunAll()" id="runAllButton">Run</button>
         <span id="wait" style="margin-left: auto;margin-right: auto;"></span>
 
         <table id="resultsTable">
             <tr>
-                <td style="font-weight: bold">Parser Generator/Framework</td>
-                <td style="font-weight: bold">Ops/second</td>
+                <td style="font-weight: bold">Parser Generator/Library</td>
+                <td style="font-weight: bold">Ops/second (higher is better)</td>
             </tr>
             <tr>
                 <td>Jison</td>
@@ -162,12 +162,30 @@
             </tr>
         </table>
         <p id="fastestInResults"></p>
-    </section>
-    <section>
-        <canvas id="parsersResultChart" height="400"></canvas>
+        <canvas id="parsersResultChart"></canvas>
     </section>
 </div>
 <script>
+
+    var orgData = {
+        labels: [],
+        datasets: [
+            {
+                label: "",
+                fillColor: "rgba(220,220,220,0.5)",
+                strokeColor: "rgba(220,220,220,0.8)",
+                highlightFill: "rgba(220,220,220,0.75)",
+                highlightStroke: "rgba(220,220,220,1)",
+                data: []
+            }
+        ]
+    };
+
+    var data = _.cloneDeep(orgData)
+
+    function clearData() {
+        data = _.cloneDeep(orgData)
+    }
     function clearTable() {
         $("#resultsTable td:nth-child(2)").slice(1).empty()
     }
@@ -176,9 +194,15 @@
         $("#parsersResultChart").css("visibility", "hidden");
     }
 
+    function clearFastest() {
+        $("#fastestInResults").css("visibility", "hidden");
+    }
+
     function clearResults() {
         clearTable();
         clearGraph();
+        clearFastest();
+        clearData();
     }
 
     function onRunAll() {
@@ -195,19 +219,6 @@
             else
                 wait.innerHTML += ".";
         }, 500);
-        var data = {
-            labels: [],
-            datasets: [
-                {
-                    label: "My First dataset",
-                    fillColor: "rgba(220,220,220,0.5)",
-                    strokeColor: "rgba(220,220,220,0.8)",
-                    highlightFill: "rgba(220,220,220,0.75)",
-                    highlightStroke: "rgba(220,220,220,1)",
-                    data: []
-                }
-            ]
-        };
 
         // more minSamples (default=5) for more accurate & consistent results.
         Benchmark.options.minSamples = 15
@@ -231,9 +242,9 @@
             
             var table = document.getElementById("resultsTable");
             data.labels.push(event.target.name);
-            data.datasets[0].data.push(event.target.hz);
+            data.datasets[0].data.push(event.target.hz.toFixed(2));
 
-            var rowName = event.target.name
+            var rowName = event.target.name;
             var rowNum = _.findIndex(table.rows, function(currRow) {
                 // the text domNode
                 return currRow.childNodes[1].innerHTML === rowName
@@ -245,13 +256,20 @@
         }).on('complete', function () {
             var sFastest = '<B>Fastest is ' + this.filter('fastest').pluck('name') + "</b>";
             document.getElementById("fastestInResults").innerHTML = sFastest;
+            $("#fastestInResults").css("visibility", "visible");
             window.clearInterval(dots);
             document.getElementById("wait").innerHTML = "";
             // Get the context of the canvas element we want to select
             var ctx = document.getElementById("parsersResultChart").getContext("2d");
 
-            var myBarChart = new Chart(ctx).Bar(data, {});
+            var myBarChart = new Chart(ctx, {
+                type: 'horizontalBar',
+                data: data,
+                options: {}
+            });
+
             $("#parsersResultChart").css("visibility", "visible");
+            $("#runAllButton").html("Re-run")
 
             $("#runAllButton").prop('disabled', false);
         }).run({'async': true});

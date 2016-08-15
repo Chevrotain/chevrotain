@@ -7,6 +7,9 @@
     border-collapse: collapse;
 }
 
+#parsersResultChart {
+    width: 80%;
+}
 table, th, td {
     border: 1px solid black;
 }
