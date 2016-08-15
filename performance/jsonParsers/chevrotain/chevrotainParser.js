@@ -1,6 +1,7 @@
 // ----------------- Lexer -----------------
 var Token = chevrotain.Token;
-var extendToken = chevrotain.extendToken;
+// https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Lazy Tokens)
+var extendToken = chevrotain.extendLazyToken;
 var ChevrotainLexer = chevrotain.Lexer;
 
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
@@ -24,6 +25,9 @@ var ChevJsonLexer = new ChevrotainLexer(jsonTokens);
 
 
 // ----------------- parser -----------------
+
+// https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6
+// (Do not create a new Parser instance for each new input.)
 var ChevrotainParser = chevrotain.Parser;
 
 function ChevrotainJsonParser(input) {

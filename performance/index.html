@@ -227,9 +227,13 @@
             var table = document.getElementById("resultsTable");
             data.labels.push(event.target.name);
             data.datasets[0].data.push(event.target.hz);
-            var row = table.rows[event.target.id];
+            var rowNum = event.target.id;
+            var numOfRows = table.rows.length;
+            if (rowNum >= numOfRows ) {
+                rowNum = (rowNum + 1) % 8
+            }
+            var row = table.rows[rowNum];
             var cell2 = row.cells[1];
-
             cell2.innerHTML = event.target.hz.toFixed(2) + "    " + "\xB1" + event.target.stats.rme.toFixed(2) + "%";
         }).on('complete', function () {
             var sFastest = '<B>Fastest is ' + this.filter('fastest').pluck('name') + "</b>";
