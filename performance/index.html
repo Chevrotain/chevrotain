@@ -40,6 +40,8 @@
 <script src="jsonParsers/nearley/nearley_json_parser_tokenizer.js"></script>
 <script src="jsonParsers/nearley/api.js"></script>
 
+<script   src="https://code.jquery.com/jquery-3.1.0.slim.min.js"   integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8="   crossorigin="anonymous"></script>
+
 
 <div align="center" class="card center">
     <section style="text-align:left;">
@@ -122,7 +124,9 @@
 
     </section>
     <section style="text-align:left;">
-        <span id="wait" style="margin-left: auto;margin-right: auto;">Running</span>
+        <button onclick="onRunAll()" id="runAllButton">Run All</button>
+        <span id="wait" style="margin-left: auto;margin-right: auto;"></span>
+
         <table id="resultsTable">
             <tr>
                 <td style="font-weight: bold">Parser Generator/Framework</td>
@@ -164,60 +168,83 @@
     </section>
 </div>
 <script>
-    var dots = window.setInterval(function () {
-        var wait = document.getElementById("wait");
+    function clearTable() {
+        $("#resultsTable td:nth-child(2)").slice(1).empty()
+    }
+
+    function clearGraph() {
+        $("#parsersResultChart").empty();
+    }
+
+    function clearResults() {
+        clearTable();
+        clearGraph();
+    }
+
+    function onRunAll() {
+        clearResults();
+        $("#runAllButton").prop('disabled', true);
+
+        //handle "Running..."
         var valueBeforeTheDots = "Running";
-        if (wait.innerHTML.length > valueBeforeTheDots.length + 3)
-            wait.innerHTML = "Running";
-        else
-            wait.innerHTML += ".";
-    }, 500);
-    var data = {
-        labels: [],
-        datasets: [
-            {
-                label: "My First dataset",
-                fillColor: "rgba(220,220,220,0.5)",
-                strokeColor: "rgba(220,220,220,0.8)",
-                highlightFill: "rgba(220,220,220,0.75)",
-                highlightStroke: "rgba(220,220,220,1)",
-                data: []
-            }
-        ]
-    };
-    var suite = new Benchmark.Suite;
-    suite.add('Jison', function () {
-        jisonJsonLexerAndParser.parse(json_sample1k)
-    }).add('Chevrotain', function () {
-        chevrotainParseWithChevrotainLexer(json_sample1k)
-    }).add('antlr4', function () {
-        antlr4LexerAndParser(json_sample1k)
-    }).add('pegjs', function () {
-        pegjsJsonLexerAndParser.parse(json_sample1k)
-    }).add('parsimmon', function () {
-        parse_json_parsimmon(json_sample1k)
-    }).add('nearley', function () {
-        parse_json_with_nearley(json_sample1k)
-    }).add('Ohm', function () {
-        parse_json_with_ohm(json_sample1k)
-    }).on('cycle', function (event) {
-        var table = document.getElementById("resultsTable");
-        data.labels.push(event.target.name);
-        data.datasets[0].data.push(event.target.hz);
-        var row = table.rows[event.target.id];
-        var cell2 = row.cells[1];
+        wait.innerHTML = valueBeforeTheDots;
+        var dots = window.setInterval(function () {
+            var wait = document.getElementById("wait");
+            if (wait.innerHTML.length >= valueBeforeTheDots.length + 3)
+                wait.innerHTML = valueBeforeTheDots;
+            else
+                wait.innerHTML += ".";
+        }, 500);
+        var data = {
+            labels: [],
+            datasets: [
+                {
+                    label: "My First dataset",
+                    fillColor: "rgba(220,220,220,0.5)",
+                    strokeColor: "rgba(220,220,220,0.8)",
+                    highlightFill: "rgba(220,220,220,0.75)",
+                    highlightStroke: "rgba(220,220,220,1)",
+                    data: []
+                }
+            ]
+        };
+        var suite = new Benchmark.Suite;
+        suite.add('Jison', function () {
+            jisonJsonLexerAndParser.parse(json_sample1k)
+        }).add('Chevrotain', function () {
+            chevrotainParseWithChevrotainLexer(json_sample1k)
+        }).add('antlr4', function () {
+            antlr4LexerAndParser(json_sample1k)
+        }).add('pegjs', function () {
+            pegjsJsonLexerAndParser.parse(json_sample1k)
+        }).add('parsimmon', function () {
+            parse_json_parsimmon(json_sample1k)
+        }).add('nearley', function () {
+            parse_json_with_nearley(json_sample1k)
+        }).add('Ohm', function () {
+            parse_json_with_ohm(json_sample1k)
+        }).on('cycle', function (event) {
+            var table = document.getElementById("resultsTable");
+            data.labels.push(event.target.name);
+            data.datasets[0].data.push(event.target.hz);
+            var row = table.rows[event.target.id];
+            var cell2 = row.cells[1];
 
-        cell2.innerHTML = event.target.hz.toFixed(2) + "    " + "\xB1" + event.target.stats.rme.toFixed(2) + "%";
-    }).on('complete', function () {
-        var sFastest = '<B>Fastest is ' + this.filter('fastest').pluck('name') + "</b>";
-        document.getElementById("fastestInResults").innerHTML = sFastest;
-        window.clearInterval(dots);
-        document.getElementById("wait").innerHTML = "";
-        // Get the context of the canvas element we want to select
-        var ctx = document.getElementById("parsersResultChart").getContext("2d");
+            cell2.innerHTML = event.target.hz.toFixed(2) + "    " + "\xB1" + event.target.stats.rme.toFixed(2) + "%";
+        }).on('complete', function () {
+            var sFastest = '<B>Fastest is ' + this.filter('fastest').pluck('name') + "</b>";
+            document.getElementById("fastestInResults").innerHTML = sFastest;
+            window.clearInterval(dots);
+            document.getElementById("wait").innerHTML = "";
+            // Get the context of the canvas element we want to select
+            var ctx = document.getElementById("parsersResultChart").getContext("2d");
 
-        var myBarChart = new Chart(ctx).Bar(data, {});
-    }).run({'async': true});
+            var myBarChart = new Chart(ctx).Bar(data, {});
+
+            $("#runAllButton").prop('disabled', false);
+        }).run({'async': true});
+    }
+
 
 </script>
 </body>
