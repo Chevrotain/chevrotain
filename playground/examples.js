@@ -64,7 +64,7 @@ function jsonExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var ChevJsonLexer = new Lexer(jsonTokens, true);
+    var JsonLexer = new Lexer(jsonTokens, true);
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";
@@ -172,7 +172,7 @@ function jsonExample() {
 
     // for the playground to work the returned object must contain these fields
     return {
-        lexer: ChevJsonLexer,
+        lexer: JsonLexer,
         parser: JsonParser,
         defaultRule: "json"
     };
@@ -203,7 +203,7 @@ function jsonGrammarOnlyExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var ChevJsonLexer = new Lexer(jsonTokens, true);
+    var JsonLexer = new Lexer(jsonTokens, true);
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";
@@ -223,9 +223,9 @@ function jsonGrammarOnlyExample() {
 
         this.json = this.RULE("json", function () {
             // @formatter:off
-            return $.OR([
-                { ALT: function () { return $.SUBRULE($.object) }},
-                { ALT: function () { return $.SUBRULE($.array) }}
+            $.OR([
+                { ALT: function () { $.SUBRULE($.object) }},
+                { ALT: function () { $.SUBRULE($.array) }}
             ]);
             // @formatter:on
         });
@@ -257,7 +257,7 @@ function jsonGrammarOnlyExample() {
 
         // @formatter:off
         this.value = this.RULE("value", function () {
-            return $.OR([
+            $.OR([
                 { ALT: function () { $.CONSUME(StringLiteral) }},
                 { ALT: function () { $.CONSUME(NumberLiteral) }},
                 { ALT: function () { $.SUBRULE($.object) }},
@@ -280,7 +280,7 @@ function jsonGrammarOnlyExample() {
 
     // for the playground to work the returned object must contain these fields
     return {
-        lexer: ChevJsonLexer,
+        lexer: JsonLexer,
         parser: JsonParser,
         defaultRule: "json"
     };
@@ -1264,7 +1264,7 @@ function tutorialErrorRecoveryExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var ChevJsonLexer = new Lexer(jsonTokens, true);
+    var JsonLexer = new Lexer(jsonTokens, true);
 
     // ----------------- parser -----------------
     var Parser = chevrotain.Parser;
@@ -1383,7 +1383,7 @@ function tutorialErrorRecoveryExample() {
 
     // for the playground to work the returned object must contain these fields
     return {
-        lexer: ChevJsonLexer,
+        lexer: JsonLexer,
         parser: JsonParser,
         defaultRule: "json"
     };
@@ -1478,7 +1478,7 @@ var samples = {
             '\n}'
         }
     },
-    
+
     calculator: {
         implementation: calculatorExample,
         sampleInputs: {
