@@ -76,10 +76,10 @@ function jsonExample() {
 
 
     // ----------------- parser -----------------
-    var ChevrotainParser = chevrotain.Parser;
+    var Parser = chevrotain.Parser;
 
-    function ChevrotainJsonParser(input) {
-        ChevrotainParser.call(this, input, jsonTokens, {recoveryEnabled: true});
+    function JsonParser(input) {
+        Parser.call(this, input, jsonTokens, {recoveryEnabled: true});
         var $ = this;
 
         this.json = this.RULE("json", function () {
@@ -164,20 +164,127 @@ function jsonExample() {
         // very important to call this after all the rules have been setup.
         // otherwise the parser may not work correctly as it will lack information
         // derived from the self analysis.
-        ChevrotainParser.performSelfAnalysis(this);
+        Parser.performSelfAnalysis(this);
     }
 
-    ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
-    ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
+    JsonParser.prototype = Object.create(Parser.prototype);
+    JsonParser.prototype.constructor = JsonParser;
 
     // for the playground to work the returned object must contain these fields
     return {
         lexer: ChevJsonLexer,
-        parser: ChevrotainJsonParser,
+        parser: JsonParser,
         defaultRule: "json"
     };
 }
 
+function jsonGrammarOnlyExample() {
+    // ----------------- Lexer -----------------
+    var extendToken = chevrotain.extendToken;
+    var Lexer = chevrotain.Lexer;
+
+    var True = extendToken("True", /true/);
+    var False = extendToken("False", /false/);
+    var Null = extendToken("Null", /null/);
+    var LCurly = extendToken("LCurly", /{/);
+    var RCurly = extendToken("RCurly", /}/);
+    var LSquare = extendToken("LSquare", /\[/);
+    var RSquare = extendToken("RSquare", /]/);
+    var Comma = extendToken("Comma", /,/);
+    var Colon = extendToken("Colon", /:/);
+    var StringLiteral = extendToken("StringLiteral",
+        /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
+    var NumberLiteral = extendToken("NumberLiteral",
+        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
+    var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+    WhiteSpace.GROUP = Lexer.SKIPPED;
+
+
+    var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
+        LSquare, RSquare, Comma, Colon, True, False, Null];
+
+    var ChevJsonLexer = new Lexer(jsonTokens, true);
+
+    // Labels only affect error messages and Diagrams.
+    LCurly.LABEL = "'{'";
+    RCurly.LABEL = "'}'";
+    LSquare.LABEL = "'['";
+    RSquare.LABEL = "']'";
+    Comma.LABEL = "','";
+    Colon.LABEL = "':'";
+
+
+    // ----------------- parser -----------------
+    var Parser = chevrotain.Parser;
+
+    function JsonParser(input) {
+        Parser.call(this, input, jsonTokens, {recoveryEnabled: true});
+        var $ = this;
+
+        this.json = this.RULE("json", function () {
+            // @formatter:off
+            return $.OR([
+                { ALT: function () { return $.SUBRULE($.object) }},
+                { ALT: function () { return $.SUBRULE($.array) }}
+            ]);
+            // @formatter:on
+        });
+
+        this.object = this.RULE("object", function () {
+            $.CONSUME(LCurly);
+            $.MANY_SEP(Comma, function () {
+                $.SUBRULE($.objectItem);
+            });
+            $.CONSUME(RCurly);
+        });
+
+
+        this.objectItem = this.RULE("objectItem", function () {
+            $.CONSUME(StringLiteral)
+            $.CONSUME(Colon);
+            $.SUBRULE($.value);
+        });
+
+
+        this.array = this.RULE("array", function () {
+            $.CONSUME(LSquare);
+            $.MANY_SEP(Comma, function () {
+                $.SUBRULE($.value);
+            });
+            $.CONSUME(RSquare);
+        });
+
+
+        // @formatter:off
+        this.value = this.RULE("value", function () {
+            return $.OR([
+                { ALT: function () { $.CONSUME(StringLiteral) }},
+                { ALT: function () { $.CONSUME(NumberLiteral) }},
+                { ALT: function () { $.SUBRULE($.object) }},
+                { ALT: function () { $.SUBRULE($.array) }},
+                { ALT: function () { $.CONSUME(True) }},
+                { ALT: function () { $.CONSUME(False) }},
+                { ALT: function () { $.CONSUME(Null); }}
+            ]);
+        });
+        // @formatter:on
+
+        // very important to call this after all the rules have been setup.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived from the self analysis.
+        Parser.performSelfAnalysis(this);
+    }
+
+    JsonParser.prototype = Object.create(Parser.prototype);
+    JsonParser.prototype.constructor = JsonParser;
+
+    // for the playground to work the returned object must contain these fields
+    return {
+        lexer: ChevJsonLexer,
+        parser: JsonParser,
+        defaultRule: "json"
+    };
+}
 
 function cssExample() {
     // Based on the specs in:
@@ -320,10 +427,10 @@ function cssExample() {
     var CssLexer = new Lexer(cssTokens, true);
 
     // ----------------- parser -----------------
-    var ChevrotainParser = chevrotain.Parser;
+    var Parser = chevrotain.Parser;
 
     function CssParser(input) {
-        ChevrotainParser.call(this, input, cssTokens,
+        Parser.call(this, input, cssTokens,
             {recoveryEnabled: true, maxLookahead: 3});
         var $ = this;
 
@@ -668,10 +775,10 @@ function cssExample() {
         // very important to call this after all the rules have been setup.
         // otherwise the parser may not work correctly as it will lack information
         // derived from the self analysis.
-        ChevrotainParser.performSelfAnalysis(this);
+        Parser.performSelfAnalysis(this);
     }
 
-    CssParser.prototype = Object.create(ChevrotainParser.prototype);
+    CssParser.prototype = Object.create(Parser.prototype);
     CssParser.prototype.constructor = CssParser;
 
     // for the playground to work the returned object must contain these fields
@@ -1160,12 +1267,12 @@ function tutorialErrorRecoveryExample() {
     var ChevJsonLexer = new Lexer(jsonTokens, true);
 
     // ----------------- parser -----------------
-    var ChevrotainParser = chevrotain.Parser;
+    var Parser = chevrotain.Parser;
 
-    function ChevrotainJsonParser(input) {
+    function JsonParser(input) {
         // change to false to completely disable error recovery.
         var isRecoveryEnabled = true
-        ChevrotainParser.call(this, input, jsonTokens, {recoveryEnabled: isRecoveryEnabled});
+        Parser.call(this, input, jsonTokens, {recoveryEnabled: isRecoveryEnabled});
         var $ = this;
 
         this.json = this.RULE("json", function () {
@@ -1258,14 +1365,14 @@ function tutorialErrorRecoveryExample() {
         // very important to call this after all the rules have been setup.
         // otherwise the parser may not work correctly as it will lack information
         // derived from the self analysis.
-        ChevrotainParser.performSelfAnalysis(this);
+        Parser.performSelfAnalysis(this);
     }
 
-    ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype);
-    ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser;
+    JsonParser.prototype = Object.create(Parser.prototype);
+    JsonParser.prototype.constructor = JsonParser;
 
     // customize the allowed types of tokens which are allowed to be inserted in single token insertion
-    ChevrotainJsonParser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
+    JsonParser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
         // comment in to disable insertion for colons
         // if (tokClass === Colon) {
         //     return false;
@@ -1277,14 +1384,15 @@ function tutorialErrorRecoveryExample() {
     // for the playground to work the returned object must contain these fields
     return {
         lexer: ChevJsonLexer,
-        parser: ChevrotainJsonParser,
+        parser: JsonParser,
         defaultRule: "json"
     };
 }
 
 var samples = {
-    json: {
-        implementation: jsonExample,
+
+    "JSON grammar only": {
+        implementation: jsonGrammarOnlyExample,
         sampleInputs: {
             'valid': '{' +
             '\n\t"firstName": "John",' +
@@ -1327,6 +1435,50 @@ var samples = {
         }
     },
 
+    "JSON grammar and actions": {
+        implementation: jsonExample,
+        sampleInputs: {
+            'valid': '{' +
+            '\n\t"firstName": "John",' +
+            '\n\t"lastName": "Smith",' +
+            '\n\t"isAlive": true,' +
+            '\n\t"age": 25' +
+            '\n}',
+
+            'missing colons': '{' +
+            '\n\t"look" "mom",' +
+            '\n\t"no" "colons",' +
+            '\n\t"!" "success!",' +
+            '\n}',
+
+            'missing value': '{' +
+            '\n\t"the": "dog",' +
+            '\n\t"ate": "my",' +
+            '\n\t"will be lost in recovery":,' +
+            '\n\t"value": "success!"' +
+            '\n}',
+
+            'too many commas': '{' +
+            '\n\t"three commas" : 3,,,' +
+            '\n\t"five commas": 5,,,,,' +
+            '\n\t"!" : "success"' +
+            '\n}',
+
+            'missing comma': '{' +
+            '\n\t"missing ": "comma->" ' +
+            '\n\t"I will be lost in": "recovery", ' +
+            '\n\t"but I am still": "here",' +
+            '\n\t"partial success": "only one property lost"' +
+            '\n}',
+
+            'missing comma in array': '{' +
+            '\n\t"name" : "Bobby",' +
+            '\n\t"children ages" : [1, 2 3, 4],' +
+            '\n\t"partial success": "only one array element lost"' +
+            '\n}'
+        }
+    },
+    
     calculator: {
         implementation: calculatorExample,
         sampleInputs: {
@@ -1336,7 +1488,7 @@ var samples = {
         }
     },
 
-    css: {
+    CSS: {
         implementation: cssExample,
         sampleInputs: {
             simpleCss: "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
