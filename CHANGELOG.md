@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE) 
+
+#### Bug Fixes
+- [Diagrams with nodejs fail on instanceof check.](https://github.com/SAP/chevrotain/issues/268)
+
+
+
 ## 0.13.1 (8-15-2016) 
 
 #### Major Changes
