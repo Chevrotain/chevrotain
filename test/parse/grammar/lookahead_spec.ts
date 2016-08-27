@@ -1,21 +1,11 @@
 import {Parser} from "../../../src/parse/parser_public"
 import {Token, EOF} from "../../../src/scan/tokens_public"
-import {
-    ColonTok,
-    IdentTok,
-    CommaTok,
-    EntityTok,
-    KeyTok,
-    ActionTok,
-    actionDec,
-    lotsOfOrs,
-    emptyAltOr
-} from "./samples"
+import {gast} from "../../../src/parse/grammar/gast_public"
+import {ColonTok, IdentTok, CommaTok, EntityTok, KeyTok, ActionTok, actionDec, lotsOfOrs, emptyAltOr} from "./samples"
 import {
     buildLookaheadFuncForOr,
     buildLookaheadForOption,
     buildLookaheadForMany,
-    buildLookaheadForTopLevel,
     lookAheadSequenceFromAlternatives,
     buildAlternativesLookAheadFunc,
     buildSingleAlternativeLookaheadFunction
@@ -98,22 +88,6 @@ describe("The Grammar Lookahead namespace", () => {
         // none matches so the last empty alternative should be taken (idx 2)
         expect(laFunc.call(new CommaParserMock([], []))).to.equal(2)
     })
-
-    it("can compute the lookahead function for a Top Level Rule", () => {
-        let laFunc = buildLookaheadForTopLevel(actionDec, 1)
-
-        expect(laFunc.call(new ActionParserMock([], []))).to.equal(true)
-        expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
-    })
-
-    it("can compute the lookahead function for a Top Level Rule #2", () => {
-        let laFunc = buildLookaheadForTopLevel(lotsOfOrs, 1)
-
-        expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
-        expect(laFunc.call(new EntityParserMock([], []))).to.equal(true)
-        expect(laFunc.call(new KeyParserMock([], []))).to.equal(true)
-        expect(laFunc.call(new ActionParserMock([], []))).to.equal(false)
-    })
 })
 
 describe("The chevrotain grammar lookahead capabilities", () => {
@@ -141,10 +115,14 @@ describe("The chevrotain grammar lookahead capabilities", () => {
     context("computing lookahead sequences for", () => {
 
         it("two simple one token alternatives", () => {
-            let alt1 = [[Alpha], [Beta], [Beta]]
-            let alt2 = [[Gamma]]
+            let alt1 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha)]),
+                new gast.Flat([new gast.Terminal(Beta)]),
+                new gast.Flat([new gast.Terminal(Beta)])
+            ])
+            let alt2 = new gast.Terminal(Gamma)
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2])
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
             expect(actual).to.deep.equal([
                 [[Alpha], [Beta]],
                 [[Gamma]]
@@ -152,11 +130,15 @@ describe("The chevrotain grammar lookahead capabilities", () => {
         })
 
         it("three simple one token alternatives", () => {
-            let alt1 = [[Alpha], [Beta], [Beta]]
-            let alt2 = [[Gamma]]
-            let alt3 = [[Delta, Charlie]]
+            let alt1 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha)]),
+                new gast.Flat([new gast.Terminal(Beta)]),
+                new gast.Flat([new gast.Terminal(Beta)])
+            ])
+            let alt2 = new gast.Terminal(Gamma)
+            let alt3 = new gast.Flat([new gast.Terminal(Delta), new gast.Terminal(Charlie)])
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3])
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3], 5)
             expect(actual).to.deep.equal([
                 [[Alpha], [Beta]],
                 [[Gamma]],
@@ -165,35 +147,66 @@ describe("The chevrotain grammar lookahead capabilities", () => {
         })
 
         it("two complex multi token alternatives", () => {
-            let alt1 = [[Alpha, Beta], [Beta], [Alpha, Gamma, Delta]]
-            let alt2 = [[Alpha, Delta], [Charlie]]
+            let alt1 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha), new gast.Terminal(Beta)]),
+                new gast.Flat([new gast.Terminal(Beta)]),
+                new gast.Flat([new gast.Terminal(Alpha), new gast.Terminal(Gamma), new gast.Terminal(Delta)])
+            ])
+            let alt2 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha), new gast.Terminal(Delta)]),
+                new gast.Flat([new gast.Terminal(Charlie)])
+            ])
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2])
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
             expect(actual).to.deep.equal([
-                [[Alpha, Beta], [Beta], [Alpha, Gamma]],
-                [[Alpha, Delta], [Charlie]]
+                [[Beta], [Alpha, Beta], [Alpha, Gamma]],
+                [[Charlie], [Alpha, Delta]]
             ])
         })
 
         it("three complex multi token alternatives", () => {
-            let alt1 = [[Alpha, Beta, Gamma], [Beta]]
-            let alt2 = [[Alpha, Delta], [Charlie], [Gamma, Gamma]] // [Charlie] is also prefix of alt3
-            let alt3 = [[Alpha, Beta, Delta], [Charlie, Beta]]
+            let alt1 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha), new gast.Terminal(Beta), new gast.Terminal(Gamma)]),
+                new gast.Flat([new gast.Terminal(Beta)])
+            ])
+            let alt2 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha), new gast.Terminal(Delta)]),
+                new gast.Flat([new gast.Terminal(Charlie)]),
+                new gast.Flat([new gast.Terminal(Gamma), new gast.Terminal(Gamma)]),
+            ])
+            let alt3 = new gast.Alternation([
+                new gast.Flat([new gast.Terminal(Alpha), new gast.Terminal(Beta), new gast.Terminal(Delta)]),
+                new gast.Flat([new gast.Terminal(Charlie), new gast.Terminal(Beta)])
+            ])
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3])
+
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2, alt3], 5)
             expect(actual).to.deep.equal([
-                [[Alpha, Beta, Gamma], [Beta]],
-                [[Alpha, Delta], [Charlie], [Gamma]],
-                [[Alpha, Beta, Delta], [Charlie, Beta]]
+                [[Beta], [Alpha, Beta, Gamma]],
+                [[Charlie], [Gamma], [Alpha, Delta]],
+                [[Charlie, Beta], [Alpha, Beta, Delta]]
             ])
 
         })
 
         it("two complex multi token alternatives with shared prefix", () => {
-            let alt1 = [[Alpha, Beta, Charlie, Delta]]
-            let alt2 = [[Alpha, Beta, Charlie, Delta, Gamma, Alpha]]
+            let alt1 = new gast.Flat([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta),
+                new gast.Terminal(Charlie),
+                new gast.Terminal(Delta)
+            ])
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2])
+            let alt2 = new gast.Flat([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta),
+                new gast.Terminal(Charlie),
+                new gast.Terminal(Delta),
+                new gast.Terminal(Gamma),
+                new gast.Terminal(Alpha)
+            ])
+
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
             expect(actual).to.deep.equal([
                 [[Alpha, Beta, Charlie, Delta]],
                 [[Alpha, Beta, Charlie, Delta, Gamma]]
@@ -201,10 +214,10 @@ describe("The chevrotain grammar lookahead capabilities", () => {
         })
 
         it("simple ambiguous alternatives", () => {
-            let alt1 = [[Alpha]]
-            let alt2 = [[Alpha]]
+            let alt1 = new gast.Flat([new gast.Terminal(Alpha)])
+            let alt2 = new gast.Flat([new gast.Terminal(Alpha)])
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2])
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
             expect(actual).to.deep.equal([
                 [[Alpha]],
                 [[Alpha]]
@@ -212,10 +225,19 @@ describe("The chevrotain grammar lookahead capabilities", () => {
         })
 
         it("complex(multi-token) ambiguous alternatives", () => {
-            let alt1 = [[Alpha, Beta, Charlie]]
-            let alt2 = [[Alpha, Beta, Charlie]]
+            let alt1 = new gast.Flat([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta),
+                new gast.Terminal(Charlie)
+            ])
 
-            let actual = lookAheadSequenceFromAlternatives([alt1, alt2])
+            let alt2 = new gast.Flat([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta),
+                new gast.Terminal(Charlie)
+            ])
+
+            let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
             expect(actual).to.deep.equal([
                 [[Alpha, Beta, Charlie]],
                 [[Alpha, Beta, Charlie]]

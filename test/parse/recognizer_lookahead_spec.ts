@@ -889,7 +889,7 @@ describe("The support for MultiToken (K>1) implicit lookahead capabilities in DS
                 (<any>Parser).performSelfAnalysis(this)
             }
 
-            public rule = this.RULE("orRule", () => {
+            public rule = this.RULE("rule", () => {
                 let result = "OPTION Not Taken"
                 this.OPTION(() => {
                     this.CONSUME1(OneTok)

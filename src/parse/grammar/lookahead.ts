@@ -1,11 +1,4 @@
-import {
-    map,
-    reduce,
-    reject,
-    find,
-    every,
-} from "../../utils/utils"
-
+import {map, reduce, find, every, isEmpty} from "../../utils/utils"
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
@@ -27,12 +20,6 @@ export function buildLookaheadFuncForOr(occurrence:number,
                                         hasPredicates:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
     return buildAlternativesLookAheadFunc(lookAheadPaths, hasPredicates)
-}
-
-export function buildLookaheadForTopLevel(rule:gast.Rule, k:number):() => boolean {
-    let paths = possiblePathsFrom(rule.definition, k)
-    let lookAheadPaths = lookAheadSequenceFromAlternatives([paths])
-    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0])
 }
 
 /**
@@ -78,62 +65,6 @@ export function buildLookaheadForAtLeastOneSep(optionOccurrence:number, ruleGram
 export type Alternative = Function[][]
 export type lookAheadSequence = Function[][]
 
-/**
- * @param alternatives - a Sequence of possible paths for each alternative. example:
- *                       input:
- *                       [
- *                         [[A, B] [B]],  // alternative 1, with 2 paths
- *                         [[C]]            // alternative 2, with 1 Path
- *                         [[C, D, E], [C, D, F]] // // alternative 3, with 2 Path
- *                       ]
- *
- *                       output:
- *                       [
- *                         [[A] [B]],  // one Token is enough to identify alternative 1 so [A, B] --> [A]
- *                         [[C]]       // no changes for alternative 2
- *                         [[C, D]] // // the third Tokens (E/F) are not needed to identify this alternative
- *                       ]
- */
-export function lookAheadSequenceFromAlternatives(alternatives:Alternative[]):lookAheadSequence[] {
-
-    function isUniquePrefix<T>(arr:T[][], item:T[]):boolean {
-        return find(arr, (currOtherPath) => {
-                return every(item, (currPathTok, idx) =>
-                currPathTok === currOtherPath[idx])
-            }) === undefined
-    }
-
-    let result = map(alternatives, (currAlt, currIdx) => {
-        let otherAlts = reject(alternatives, (curAltInner) => curAltInner === currAlt)
-        let allOtherPaths:any = reduce(otherAlts, (result, currOtherAlt) => {
-            return result.concat(currOtherAlt)
-        }, [])
-
-        return reduce(currAlt, (currAltResult, currPath) => {
-            let minimalPath = []
-            for (let i = 0; i < currPath.length; i++) {
-                minimalPath.push(currPath[i])
-                let isUnique = isUniquePrefix(allOtherPaths, minimalPath)
-
-                if (isUnique) {
-                    break
-                }
-            }
-
-            // At this point we either have a distinguishing path (unique) or a path the may be ambiguous
-            // If it is a identical to a path from another alternative it is ambiguous, but if it is a strict prefix of a path from another
-            // alternative than its ambiguous nature depends on the order of alternatives.
-            if (!containsPath(currAltResult, minimalPath)) {
-                // found one minimal path to distinguish this alternative.
-                currAltResult.push(minimalPath)
-                return currAltResult
-            }
-            return currAltResult
-        }, [])
-    })
-
-    return result
-}
 
 /**
  * @param alts
@@ -350,11 +281,79 @@ class InsideDefinitionFinderVisitor extends gast.GAstVisitor {
     }
 }
 
+
+export function lookAheadSequenceFromAlternatives(altsDefs:gast.IProduction[], k:number):lookAheadSequence[] {
+
+    function getOtherPaths(pathsAndSuffixes, filterIdx):Function[][] {
+        return reduce(pathsAndSuffixes, (result, currPathsAndSuffixes, currIdx) => {
+            if (currIdx !== filterIdx) {
+                let currPartialPaths = map(currPathsAndSuffixes, (singlePathAndSuffix) => singlePathAndSuffix.partialPath)
+                return result.concat(currPartialPaths)
+            }
+            return result
+        }, [])
+    }
+
+    function isUniquePrefix<T>(arr:T[][], item:T[]):boolean {
+        return find(arr, (currOtherPath) => {
+                return every(item, (currPathTok, idx) =>
+                currPathTok === currOtherPath[idx])
+            }) === undefined
+    }
+
+    function initializeArrayOfArrays(size):any[][] {
+        let result = []
+        for (let i = 0; i < size; i++) {
+            result.push([])
+        }
+        return result
+    }
+
+    let partialAlts = map(altsDefs, (currAlt) => possiblePathsFrom([currAlt], 1))
+    let finalResult = initializeArrayOfArrays(partialAlts.length)
+    let newData = partialAlts
+
+    // maxLookahead loop
+    for (let pathLength = 1; pathLength <= k; pathLength++) {
+        let currDataset = newData
+        newData = initializeArrayOfArrays(currDataset.length)
+
+        // alternatives loop
+        for (let resultIdx = 0; resultIdx < currDataset.length; resultIdx++) {
+            let currAltPathsAndSuffixes = currDataset[resultIdx]
+            let otherPaths = getOtherPaths(currDataset, resultIdx)
+
+            // paths in current alternative loop
+            for (let currPathIdx = 0; currPathIdx < currAltPathsAndSuffixes.length; currPathIdx++) {
+                let currPathPrefix = currAltPathsAndSuffixes[currPathIdx].partialPath
+                let suffixDef = currAltPathsAndSuffixes[currPathIdx].suffixDef
+                let isUnique = isUniquePrefix(otherPaths, currPathPrefix)
+
+                // even if a path is not unique, but there are no longer alternatives to try
+                // or if we have reached the maximum lookahead (k) permitted.
+                if (isUnique ||
+                    isEmpty(suffixDef) ||
+                    currPathPrefix.length === k) {
+                    let currAltResult = finalResult[resultIdx]
+                    if (!containsPath(currAltResult, currPathPrefix)) {
+                        currAltResult.push(currPathPrefix)
+                    }
+                }
+                else {
+                    let newPartialPathsAndSuffixes = possiblePathsFrom(suffixDef, pathLength + 1, currPathPrefix)
+                    newData[resultIdx] = newData[resultIdx].concat(newPartialPathsAndSuffixes)
+                }
+            }
+        }
+    }
+
+    return finalResult
+}
+
 export function getLookaheadPathsForOr(occurrence:number, ruleGrammar:gast.Rule, k:number):lookAheadSequence[] {
     let visitor = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION)
     ruleGrammar.accept(visitor)
-    let alternatives = map(visitor.result, (currAlt) => possiblePathsFrom([currAlt], k))
-    return lookAheadSequenceFromAlternatives(alternatives)
+    return lookAheadSequenceFromAlternatives(visitor.result, k)
 }
 
 export function getLookaheadPathsForOptionalProd(occurrence:number,
@@ -369,10 +368,10 @@ export function getLookaheadPathsForOptionalProd(occurrence:number,
     let afterDefWalker = new RestDefinitionFinderWalker(ruleGrammar, occurrence, prodType)
     let afterDef = afterDefWalker.startWalking()
 
-    let insidePaths = possiblePathsFrom(insideDef, k)
-    let afterPaths = possiblePathsFrom(afterDef, k)
+    let insideFlat = new gast.Flat(insideDef)
+    let afterFlat = new gast.Flat(afterDef)
 
-    return lookAheadSequenceFromAlternatives([insidePaths, afterPaths])
+    return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }
 
 

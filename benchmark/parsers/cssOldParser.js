@@ -147,7 +147,7 @@ var CssLexer = new Lexer(cssTokens);
 // ----------------- parser -----------------
 
 function CssParser(input) {
-    Parser.call(this, input, cssTokens, {maxLookahead: 3});
+    Parser.call(this, input, cssTokens);
     var $ = this;
 
     this.stylesheet = this.RULE('stylesheet', function() {

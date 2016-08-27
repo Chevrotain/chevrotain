@@ -29,6 +29,7 @@ import {setEquality} from "../../utils/matchers"
 
 import {gast} from "../../../src/parse/grammar/gast_public"
 import {Token} from "../../../src/scan/tokens_public"
+import {map} from "../../../src/utils/utils"
 
 let RepetitionMandatory = gast.RepetitionMandatory
 let Terminal = gast.Terminal
@@ -464,6 +465,10 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
 
 describe("The chevrotain grammar interpreter capabilities", () => {
 
+    function extraPartialPaths(newResultFormat) {
+        return map(newResultFormat, (currItem) => currItem.partialPath)
+    }
+
     context("can calculate the next possible paths in a", () => {
 
         class Alpha extends Token {}
@@ -481,10 +486,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(seq, 1)).to.deep.equal([[Alpha]])
-            expect(possiblePathsFrom(seq, 2)).to.deep.equal([[Alpha, Beta]])
-            expect(possiblePathsFrom(seq, 3)).to.deep.equal([[Alpha, Beta, Gamma]])
-            expect(possiblePathsFrom(seq, 4)).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma]])
         })
 
         it("Optional", () => {
@@ -496,10 +501,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(seq, 1)).to.deep.equal([[Alpha]])
-            expect(possiblePathsFrom(seq, 2)).to.deep.equal([[Alpha, Beta], [Alpha, Gamma]])
-            expect(possiblePathsFrom(seq, 3)).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
-            expect(possiblePathsFrom(seq, 4)).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta], [Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
         })
 
         it("Alternation", () => {
@@ -518,10 +523,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 ])
             ])]
 
-            expect(possiblePathsFrom(alts, 1)).to.deep.equal([[Alpha], [Beta], [Beta]])
-            expect(possiblePathsFrom(alts, 2)).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha]])
-            expect(possiblePathsFrom(alts, 3)).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
-            expect(possiblePathsFrom(alts, 4)).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(alts, 1))).to.deep.equal([[Alpha], [Beta], [Beta]])
+            expect(extraPartialPaths(possiblePathsFrom(alts, 2))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(alts, 3))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(alts, 4))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
         })
 
         it("Repetition", () => {
@@ -532,10 +537,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(rep, 1)).to.deep.equal([[Alpha], [Gamma]])
-            expect(possiblePathsFrom(rep, 2)).to.deep.equal([[Alpha, Alpha], [Gamma]])
-            expect(possiblePathsFrom(rep, 3)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
-            expect(possiblePathsFrom(rep, 4)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
         })
 
         it("Mandatory Repetition", () => {
@@ -546,10 +551,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(repMand, 1)).to.deep.equal([[Alpha]])
-            expect(possiblePathsFrom(repMand, 2)).to.deep.equal([[Alpha, Alpha]])
-            expect(possiblePathsFrom(repMand, 3)).to.deep.equal([[Alpha, Alpha, Gamma]])
-            expect(possiblePathsFrom(repMand, 4)).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(repMand, 1))).to.deep.equal([[Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(repMand, 2))).to.deep.equal([[Alpha, Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(repMand, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(repMand, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
         })
 
         it("Repetition with Separator", () => {
@@ -562,10 +567,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(rep, 1)).to.deep.equal([[Alpha], [Gamma]])
-            expect(possiblePathsFrom(rep, 2)).to.deep.equal([[Alpha, Alpha], [Gamma]])
-            expect(possiblePathsFrom(rep, 3)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
-            expect(possiblePathsFrom(rep, 4)).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
         })
 
         it("Mandatory Repetition with Separator", () => {
@@ -578,10 +583,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(repMandSep, 1)).to.deep.equal([[Alpha]])
-            expect(possiblePathsFrom(repMandSep, 2)).to.deep.equal([[Alpha, Alpha]])
-            expect(possiblePathsFrom(repMandSep, 3)).to.deep.equal([[Alpha, Alpha, Gamma]])
-            expect(possiblePathsFrom(repMandSep, 4)).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 1))).to.deep.equal([[Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 2))).to.deep.equal([[Alpha, Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
         })
 
         it("NonTerminal", () => {
@@ -595,10 +600,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(possiblePathsFrom(seq, 1)).to.deep.equal([[Alpha]])
-            expect(possiblePathsFrom(seq, 2)).to.deep.equal([[Alpha, Beta]])
-            expect(possiblePathsFrom(seq, 3)).to.deep.equal([[Alpha, Beta, Gamma]])
-            expect(possiblePathsFrom(seq, 4)).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extraPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma]])
         })
     })
 
