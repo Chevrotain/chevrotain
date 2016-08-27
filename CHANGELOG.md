@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE) 
+
+#### Bug Fixes
+- [Slow Parser Initialization.](https://github.com/SAP/chevrotain/issues/243)
+
+
+
 ## 0.13.2 (8-23-2016) 
 
 #### Bug Fixes

@@ -1,18 +1,11 @@
+/* tslint:disable:no-use-before-declare */
 import {RestWalker} from "./rest"
 import {gast} from "./gast_public"
-import {
-    IGrammarPath,
-    ITokenGrammarPath
-} from "./path_public"
-/* tslint:disable:no-use-before-declare */
-import {
-    cloneArr,
-    isEmpty,
-    first as _first, forEach, drop
-} from "../../utils/utils"
-/* tslint:enable:no-use-before-declare */
+import {IGrammarPath, ITokenGrammarPath} from "./path_public"
+import {cloneArr, isEmpty, first as _first, forEach, drop} from "../../utils/utils"
 import {tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
+/* tslint:enable:no-use-before-declare */
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
 
@@ -208,7 +201,12 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
     }
 }
 
-export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number, currPath = []):Function[][] {
+export interface PartialPathAndSuffixes {
+    partialPath:Function[]
+    suffixDef:gast.IProduction[]
+}
+
+export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number, currPath = []):PartialPathAndSuffixes[] {
     // avoid side effects
     currPath = cloneArr(currPath)
     let result = []
@@ -222,6 +220,7 @@ export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number
         let alternatives = possiblePathsFrom(remainingPathWith(prod.definition), maxLength, currPath)
         return result.concat(alternatives)
     }
+
     /**
      * Mandatory productions will halt the loop as the paths computed from their recursive calls will already contain the
      * following (rest) of the targetDef.
@@ -268,7 +267,10 @@ export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number
 
         i++
     }
-    result.push(currPath)
+    result.push({
+        partialPath: currPath,
+        suffixDef:   drop(targetDef, 1)
+    })
 
     return result
 }

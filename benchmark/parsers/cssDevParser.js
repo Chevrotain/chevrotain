@@ -147,7 +147,7 @@ var CssLexer = new Lexer(cssTokens);
 // ----------------- parser -----------------
 
 function CssParser(input) {
-    Parser.call(this, input, cssTokens, {maxLookahead: 3});
+    Parser.call(this, input, cssTokens);
     var $ = this;
 
     this.stylesheet = this.RULE('stylesheet', function() {
@@ -313,7 +313,7 @@ function CssParser(input) {
     // selector [ ',' S* selector ]*
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
     this.ruleset = this.RULE('ruleset', function() {
-        $.MANY_SEP(Comma, function() {
+        $.AT_LEAST_ONE_SEP(Comma, function() {
             $.SUBRULE($.selector)
         })
 
