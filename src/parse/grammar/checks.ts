@@ -1,31 +1,18 @@
 import * as utils from "../../utils/utils"
+import {forEach, reduce, map, reject} from "../../utils/utils"
 import {
     IParserDefinitionError,
     IParserDuplicatesDefinitionError,
     ParserDefinitionErrorType,
     IParserEmptyAlternativeDefinitionError,
-    IParserAmbiguousAlternativesDefinitionError, IgnoredParserIssues
+    IParserAmbiguousAlternativesDefinitionError,
+    IgnoredParserIssues
 } from "../parser_public"
 import {gast} from "./gast_public"
-import {
-    getProductionDslName,
-    isOptionalProd
-} from "./gast"
-import {
-    tokenName,
-    tokenLabel
-} from "../../scan/tokens_public"
+import {getProductionDslName, isOptionalProd} from "./gast"
+import {tokenName, tokenLabel} from "../../scan/tokens_public"
 import {first} from "./first"
-import {
-    containsPath,
-    getLookaheadPathsForOr, Alternative
-} from "./lookahead"
-import {
-    forEach,
-    reduce,
-    map,
-    reject
-} from "../../utils/utils"
+import {containsPath, getLookaheadPathsForOr, Alternative} from "./lookahead"
 
 
 export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {

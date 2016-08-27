@@ -1,8 +1,4 @@
 import {gast} from "../../../src/parse/grammar/gast_public"
-
-let Rule = gast.Rule
-let Terminal = gast.Terminal
-
 import {IdentTok, EntityTok, actionDec, CommaTok, RParenTok, SemicolonTok} from "./samples"
 import {
     buildInProdFollowPrefix,
@@ -11,6 +7,9 @@ import {
     computeAllProdsFollows
 } from "../../../src/parse/grammar/follow"
 import {setEquality} from "../../utils/matchers"
+
+let Rule = gast.Rule
+let Terminal = gast.Terminal
 
 describe("The Grammar Ast Follows model", () => {
 

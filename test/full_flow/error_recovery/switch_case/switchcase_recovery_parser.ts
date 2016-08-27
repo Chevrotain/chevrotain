@@ -30,7 +30,6 @@
 
 import {Parser} from "../../../../src/parse/parser_public"
 import * as allTokens from "./Switchcase_recovery_tokens"
-import {Token} from "../../../../src/scan/tokens_public"
 import {
     IdentTok,
     StringTok,
@@ -45,6 +44,7 @@ import {
     ReturnTok,
     SemiColonTok
 } from "./Switchcase_recovery_tokens"
+import {Token} from "../../../../src/scan/tokens_public"
 import {contains, assign} from "../../../../src/utils/utils"
 
 

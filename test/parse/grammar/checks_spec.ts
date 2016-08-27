@@ -1,7 +1,17 @@
 import {Parser, ParserDefinitionErrorType, EMPTY_ALT} from "../../../src/parse/parser_public"
 import {IdentTok, DotTok, qualifiedName, actionDec} from "./samples"
-
 import {gast} from "../../../src/parse/grammar/gast_public"
+import {
+    validateRuleName,
+    validateGrammar,
+    identifyProductionForDuplicates,
+    OccurrenceValidationCollector,
+    getFirstNoneTerminal,
+    validateRuleDoesNotAlreadyExist,
+    validateRuleIsOverridden
+} from "../../../src/parse/grammar/checks"
+import {Token, extendToken} from "../../../src/scan/tokens_public"
+import {forEach, first, map} from "../../../src/utils/utils"
 
 let Rule = gast.Rule
 let RepetitionMandatory = gast.RepetitionMandatory
@@ -11,16 +21,6 @@ let Terminal = gast.Terminal
 let Option = gast.Option
 let Alternation = gast.Alternation
 let Flat = gast.Flat
-
-import {
-    validateRuleName,
-    validateGrammar,
-    identifyProductionForDuplicates,
-    OccurrenceValidationCollector,
-    getFirstNoneTerminal, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden
-} from "../../../src/parse/grammar/checks"
-import {Token, extendToken} from "../../../src/scan/tokens_public"
-import {forEach, first, map} from "../../../src/utils/utils"
 
 describe("the grammar validations", () => {
 

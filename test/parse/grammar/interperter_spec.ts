@@ -23,10 +23,10 @@ import {
     NextTerminalAfterAtLeastOneWalker,
     NextTerminalAfterManyWalker,
     NextTerminalAfterManySepWalker,
-    NextTerminalAfterAtLeastOneSepWalker, possiblePathsFrom
+    NextTerminalAfterAtLeastOneSepWalker,
+    possiblePathsFrom
 } from "../../../src/parse/grammar/interpreter"
 import {setEquality} from "../../utils/matchers"
-
 import {gast} from "../../../src/parse/grammar/gast_public"
 import {Token} from "../../../src/scan/tokens_public"
 import {map} from "../../../src/utils/utils"

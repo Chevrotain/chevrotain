@@ -1,14 +1,4 @@
 import {gast} from "../../src/parse/grammar/gast_public"
-
-let RepetitionMandatory = gast.RepetitionMandatory
-let Repetition = gast.Repetition
-let NonTerminal = gast.NonTerminal
-let RepetitionWithSeparator = gast.RepetitionWithSeparator
-let Terminal = gast.Terminal
-let Option = gast.Option
-let Alternation = gast.Alternation
-let Flat = gast.Flat
-
 import * as gastBuilder from "../../src/parse/gast_builder"
 import {
     createTerminalRanges,
@@ -30,17 +20,17 @@ import {
 import {setEquality} from "../utils/matchers"
 import {Range} from "../../src/text/range"
 import * as tok from "./grammar/samples"
-import {
-    IdentTok,
-    LSquareTok,
-    CommaTok,
-    RSquareTok,
-    RequiredTok,
-    SemicolonTok,
-    ElementTok,
-    KeyTok
-} from "./grammar/samples"
+import {IdentTok, LSquareTok, CommaTok, RSquareTok, RequiredTok, SemicolonTok, ElementTok, KeyTok} from "./grammar/samples"
 import {map, uniq, filter} from "../../src/utils/utils"
+
+let RepetitionMandatory = gast.RepetitionMandatory
+let Repetition = gast.Repetition
+let NonTerminal = gast.NonTerminal
+let RepetitionWithSeparator = gast.RepetitionWithSeparator
+let Terminal = gast.Terminal
+let Option = gast.Option
+let Alternation = gast.Alternation
+let Flat = gast.Flat
 
 
 describe("The GAst Builder namespace", () => {

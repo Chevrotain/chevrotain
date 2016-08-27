@@ -1,11 +1,5 @@
 import {Token, tokenName, LazyToken} from "./tokens_public"
-import {
-    TokenConstructor,
-    ILexerDefinitionError,
-    LexerDefinitionErrorType,
-    Lexer,
-    IMultiModeLexerDefinition
-} from "./lexer_public"
+import {TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer, IMultiModeLexerDefinition} from "./lexer_public"
 import {
     reject,
     indexOf,

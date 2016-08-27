@@ -1,10 +1,5 @@
 import {gast} from "./gast_public"
-import {
-    some,
-    every,
-    contains,
-    map
-} from "../../utils/utils"
+import {some, every, contains, map} from "../../utils/utils"
 
 
 export function isSequenceProd(prod:gast.IProduction):boolean {
