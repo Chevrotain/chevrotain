@@ -33,13 +33,13 @@ any code generation phase.
     * [Parametrized Rules.][parametrized_rules]
     * **No code generation**.
       * The DSL is just JavaScript, not an external language.
-      * The grammar is directly debuggable as a plain JavaScript file .
+      * The grammar is directly debuggable as plain JavaScript source.
       * Short feedback loops.
       * Allows great flexibility for inserting custom Parser actions
 
-  3. [**High performance**][benchmark].
+  3. [**High Performance**][benchmark].
   
-  4. Generated [**Railroad Diagrams**](https://github.com/SAP/chevrotain/tree/master/diagrams).
+  4. [**Railroad Diagrams Generation**](https://github.com/SAP/chevrotain/tree/master/diagrams).
 
   5. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
@@ -71,20 +71,13 @@ any code generation phase.
 
 * **[FAQ](docs/faq.md)**
 
-* **[Examples Folder](https://github.com/SAP/chevrotain/blob/master/examples)**
+* **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_3/classes/parser.html#at_least_one)
    
-*  The d.ts Typescript definitions :
-   * [chevrotain.d.ts](https://npmcdn.com/chevrotain/lib/chevrotain.d.ts)   
+*  The [d.ts TypeScript definitions](https://npmcdn.com/chevrotain/lib/chevrotain.d.ts)
    
-* Annotated source code (dev version):
-   *  [tokens_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts)
-   *  [lexer_public.ts](https://github.com/SAP/chevrotain/blob/master/src/scan/lexer_public.ts)
-   *  [parser_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/parser_public.ts)
-   *  [gast_public.ts](https://github.com/SAP/chevrotain/blob/master/src/parse/grammar/gast.ts)
-
 ## Dependencies
 None.
 
