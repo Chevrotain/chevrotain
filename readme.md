@@ -72,6 +72,7 @@ any code generation phase.
 * **[FAQ](docs/faq.md)**
 
 * **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
+  - [Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars) 
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_3/classes/parser.html#at_least_one)
