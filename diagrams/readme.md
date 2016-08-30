@@ -21,7 +21,7 @@ library by @tabatkins.
 The template will runs as is, but it will render a sample grammar instead of your custom grammar.
 
 There are **only** three steps needed to render a custom grammar:        
-- Copy **diagrams.html** into a source controlled folder (root of your project is recommended).
+- Copy **diagrams.html** (from this folder) into a source controlled folder (root of your project is recommended).
 
 - Modify the references to the resources (script/stylesheet tags) in your copied **diagrams.html** so they will still be valid.
  * This depends on both your project structure and on how you consume chevrotain (npm/other).
@@ -29,7 +29,7 @@ There are **only** three steps needed to render a custom grammar:
   ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
   ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```
  * For convenience **diagrams.html** contains three blocks of references for common use cases,
-  comment/uncomment the relevant one for your needs. 
+  comment/uncomment the relevant block for your needs. 
 
 - Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
    the custom Parser whose grammar should be rendered.
