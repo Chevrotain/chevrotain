@@ -46,7 +46,7 @@ let atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
 let orRegEx = /\.\s*OR(\d)?\s*\(/
 let orRegExGlobal = new RegExp(orRegEx.source, "g")
 
-let orPartRegEx = /{\s*(WHEN|ALT)\s*:/g
+let orPartRegEx = /\s*(ALT)\s*:/g
 
 export interface ITerminalNameToConstructor {
     [fqn: string]: Function

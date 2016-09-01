@@ -65,12 +65,12 @@ export class BackTrackingParser extends Parser {
                 // we can build an LL(K) parser that can distinguish the two alternatives as a negative example
                 // would be to simply create a qualifiedName with a length of k+1.
                 {
-                    WHEN:    this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
-                    THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement) }
+                    GATE:    this.BACKTRACK(this.withEqualsStatement, (result) => { return result === RET_TYPE.WITH_EQUALS }),
+                    ALT: () => { statementTypeFound = this.SUBRULE(this.withEqualsStatement) }
                 },
                 {
-                    WHEN:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
-                    THEN_DO: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement) }
+                    GATE:    this.BACKTRACK(this.withDefaultStatement, (result) => { return result === RET_TYPE.WITH_DEFAULT }),
+                    ALT: () => { statementTypeFound = this.SUBRULE(this.withDefaultStatement) }
                 },
             ], " a statement")
 

@@ -58,15 +58,15 @@ function PredicateLookaheadParser(input) {
             // "maxNumberAllowed" flag. For each alternative a custom Predicate / Gate function is provided
             // A Predicate / Gate function may also be provided for other grammar DSL rules.
             // (OPTION/MANY/AT_LEAST_ONE/...)
-            {WHEN: isOne, THEN_DO: function() {
+            {GATE: isOne, ALT: function() {
                 $.CONSUME(One);
                 return 1;
             }},
-            {WHEN: isTwo, THEN_DO: function() {
+            {GATE: isTwo, ALT: function() {
                 $.CONSUME(Two);
                 return 2;
             }},
-            {WHEN: isThree, THEN_DO: function() {
+            {GATE: isThree, ALT: function() {
                 $.CONSUME(Three);
                 return 3;
             }}

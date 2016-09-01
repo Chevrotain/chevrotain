@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE) 
+
+#### Breaking Changes
+- [OR DSL method Syntax should be more consistent. #192](https://github.com/SAP/chevrotain/issues/192)
+
+
+
 ## 0.13.4 (9-1-2016) 
 
 #### Minor Changes
