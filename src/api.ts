@@ -13,7 +13,7 @@ import {NextAfterTokenWalker} from "./parse/grammar/interpreter"
 let API:any = {}
 
 // semantic version
-API.VERSION = "0.13.3"
+API.VERSION = "0.13.4"
 
 // runtime API
 API.Parser = Parser

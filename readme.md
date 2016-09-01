@@ -56,8 +56,8 @@ any code generation phase.
     * ```https://unpkg.com/chevrotain/lib/chevrotain.js```
     * ```https://unpkg.com/chevrotain/lib/chevrotain.min.js``` 
   - Explicit version number:
-    * ```https://unpkg.com/chevrotain@0.13.3/lib/chevrotain.js```
-    * ```https://unpkg.com/chevrotain@0.13.3/lib/chevrotain.min.js```
+    * ```https://unpkg.com/chevrotain@0.13.4/lib/chevrotain.js```
+    * ```https://unpkg.com/chevrotain@0.13.4/lib/chevrotain.min.js```
 
 ## Getting Started
 
@@ -75,7 +75,7 @@ any code generation phase.
   - [Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars) 
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_3/classes/parser.html#at_least_one)
+   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_4/classes/parser.html#at_least_one)
    
 *  The [d.ts TypeScript definitions](https://unpkg.com/chevrotain/lib/chevrotain.d.ts)
    
