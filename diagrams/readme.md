@@ -35,7 +35,7 @@ There are **only** three steps needed to render a custom grammar:
    the custom Parser whose grammar should be rendered.
    
 [Example of a modified template](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css_diagrams.html)
-* This example loads the resources from a npmcdn.com.
+* This example loads the resources from a unpkg.com.
    
    
 #### What about grammars written with commonjs (node.js) modules.

@@ -53,7 +53,7 @@ _.forEach(config.docFilesPaths, function(currDocPath) {
     fs.writeFileSync(currDocPath, bumpedItemContents)
 })
 
-console.log("bumping npmcdn link in: <" + config.readmePath + ">")
+console.log("bumping unpkg link in: <" + config.readmePath + ">")
 var currItemContents = fs.readFileSync(config.readmePath, 'utf8').toString()
 var bumpedReadmeContents = currItemContents.replace(oldVersionRegExpGlobal, newVersion)
 fs.writeFileSync(config.readmePath, bumpedReadmeContents)

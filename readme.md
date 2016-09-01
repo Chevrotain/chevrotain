@@ -51,13 +51,13 @@ any code generation phase.
 * **npm**: ```npm install chevrotain```
 * **Browser**:
   The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
-  These can also be accessed directly via [NPMCDN](https://npmcdn.com/) in a script tag.
+  These can also be accessed directly via [UNPKG](https://unpkg.com/) in a script tag.
   - Latest:
-    * ```https://npmcdn.com/chevrotain/lib/chevrotain.js```
-    * ```https://npmcdn.com/chevrotain/lib/chevrotain.min.js``` 
+    * ```https://unpkg.com/chevrotain/lib/chevrotain.js```
+    * ```https://unpkg.com/chevrotain/lib/chevrotain.min.js``` 
   - Explicit version number:
-    * ```https://npmcdn.com/chevrotain@0.13.3/lib/chevrotain.js```
-    * ```https://npmcdn.com/chevrotain@0.13.3/lib/chevrotain.min.js```
+    * ```https://unpkg.com/chevrotain@0.13.3/lib/chevrotain.js```
+    * ```https://unpkg.com/chevrotain@0.13.3/lib/chevrotain.min.js```
 
 ## Getting Started
 
@@ -77,7 +77,7 @@ any code generation phase.
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_13_3/classes/parser.html#at_least_one)
    
-*  The [d.ts TypeScript definitions](https://npmcdn.com/chevrotain/lib/chevrotain.d.ts)
+*  The [d.ts TypeScript definitions](https://unpkg.com/chevrotain/lib/chevrotain.d.ts)
    
 ## Dependencies
 None.
