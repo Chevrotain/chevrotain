@@ -182,7 +182,7 @@ export interface IOrAlt<T> {
  * OR([
  *  { GATE:condition1, ALT:XXX },
  *  { GATE:condition2, ALT:YYY },
- *  { GATE:condition3, ALT:ZZZ },
+ *  { GATE:condition3, ALT:ZZZ }
  * ])
  */
 export interface IOrAltWithGate<T> extends IOrAlt<T> {
