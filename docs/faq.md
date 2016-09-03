@@ -103,7 +103,7 @@ See [related documentation](../examples/parser/minification/README.md) for detai
    Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.
    
    Note that this means that if your parser "carries" additional state, that state should also be reset.
-   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_13_4/classes/parser.html#reset) method
+   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_14_0/classes/parser.html#reset) method
    to accomplish that.
     
 2. **Use Lazy Tokens.**
