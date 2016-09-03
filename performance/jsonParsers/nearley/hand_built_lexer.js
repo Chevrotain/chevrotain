@@ -62,58 +62,6 @@ var handBuiltLexer;
             case "\"":
                 tokens.push(scanStringLiteral());
                 break;
-            case ",":
-                tokens.push({type: "Comma", startLine: startLine, startColumn: startColumn, image: ","});
-                break;
-            case "{":
-                tokens.push({type: "LCurly", startLine: startLine, startColumn: startColumn, image: "{"});
-                break;
-            case "}":
-                tokens.push({type: "RCurly", startLine: startLine, startColumn: startColumn, image: "}"});
-                break;
-            case "[":
-                tokens.push({type: "LSquare", startLine: startLine, startColumn: startColumn, image: "["});
-                break;
-            case "]":
-                tokens.push({type: "RSquare", startLine: startLine, startColumn: startColumn, image: "]"});
-                break;
-            case ":":
-                tokens.push({type: "Colon", startLine: startLine, startColumn: startColumn, image: ":"});
-                break;
-            case "n":
-                if (source.substring(startOffset, index + 3) === "null") {
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    tokens.push({type: "Null", startLine: startLine, startColumn: startColumn, image: "null"});
-                }
-                else {
-                    throw new Error("invalid character 'n'");
-                }
-                break;
-            case "t":
-                if (source.substring(startOffset, index + 3) === "true") {
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    tokens.push({type: "True", startLine: startLine, startColumn: startColumn, image: "true"});
-                }
-                else {
-                    throw new Error("invalid character 't'");
-                }
-                break;
-            case "f":
-                if (source.substring(startOffset, index + 4) === "false") {
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    NEXT_CHAR();
-                    tokens.push({type: "False", startLine: startLine, startColumn: startColumn, image: "false"});
-                }
-                else {
-                    throw new Error("invalid character 'f'");
-                }
-                break;
             case "-":
                 ch2 = PEEK_CHAR();
                 if (ch2 === '0') {
@@ -173,6 +121,58 @@ var handBuiltLexer;
                     startColumn: startColumn,
                     image: source.substring(startOffset, index)
                 });
+                break;
+            case ",":
+                tokens.push({type: "Comma", startLine: startLine, startColumn: startColumn, image: ","});
+                break;
+            case ":":
+                tokens.push({type: "Colon", startLine: startLine, startColumn: startColumn, image: ":"});
+                break;
+            case "{":
+                tokens.push({type: "LCurly", startLine: startLine, startColumn: startColumn, image: "{"});
+                break;
+            case "}":
+                tokens.push({type: "RCurly", startLine: startLine, startColumn: startColumn, image: "}"});
+                break;
+            case "[":
+                tokens.push({type: "LSquare", startLine: startLine, startColumn: startColumn, image: "["});
+                break;
+            case "]":
+                tokens.push({type: "RSquare", startLine: startLine, startColumn: startColumn, image: "]"});
+                break;
+            case "t":
+                if (source.substring(startOffset, index + 3) === "true") {
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    tokens.push({type: "True", startLine: startLine, startColumn: startColumn, image: "true"});
+                }
+                else {
+                    throw new Error("invalid character 't'");
+                }
+                break;
+            case "f":
+                if (source.substring(startOffset, index + 4) === "false") {
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    tokens.push({type: "False", startLine: startLine, startColumn: startColumn, image: "false"});
+                }
+                else {
+                    throw new Error("invalid character 'f'");
+                }
+                break;
+            case "n":
+                if (source.substring(startOffset, index + 3) === "null") {
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    NEXT_CHAR();
+                    tokens.push({type: "Null", startLine: startLine, startColumn: startColumn, image: "null"});
+                }
+                else {
+                    throw new Error("invalid character 'n'");
+                }
                 break;
             default:
                 throw new Error("sad sad panda, nothing matched");

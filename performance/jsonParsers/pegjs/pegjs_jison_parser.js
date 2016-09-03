@@ -3,21 +3,24 @@
  *
  * http://pegjs.org/
  */
-var pegjsJsonLexerAndParser = (function() {
+var pegjsJsonLexerAndParser = (function () {
     "use strict";
 
     function peg$subclass(child, parent) {
-        function ctor() { this.constructor = child; }
+        function ctor() {
+            this.constructor = child;
+        }
+
         ctor.prototype = parent.prototype;
         child.prototype = new ctor();
     }
 
     function peg$SyntaxError(message, expected, found, location) {
-        this.message  = message;
+        this.message = message;
         this.expected = expected;
-        this.found    = found;
+        this.found = found;
         this.location = location;
-        this.name     = "SyntaxError";
+        this.name = "SyntaxError";
 
         if (typeof Error.captureStackTrace === "function") {
             Error.captureStackTrace(this, peg$SyntaxError);
@@ -26,13 +29,13 @@ var pegjsJsonLexerAndParser = (function() {
 
     peg$subclass(peg$SyntaxError, Error);
 
-    peg$SyntaxError.buildMessage = function(expected, found) {
+    peg$SyntaxError.buildMessage = function (expected, found) {
         var DESCRIBE_EXPECTATION_FNS = {
-            literal: function(expectation) {
+            literal: function (expectation) {
                 return "\"" + literalEscape(expectation.text) + "\"";
             },
 
-            "class": function(expectation) {
+            "class": function (expectation) {
                 var escapedParts = "",
                     i;
 
@@ -45,15 +48,15 @@ var pegjsJsonLexerAndParser = (function() {
                 return "[" + (expectation.inverted ? "^" : "") + escapedParts + "]";
             },
 
-            any: function(expectation) {
+            any: function (expectation) {
                 return "any character";
             },
 
-            end: function(expectation) {
+            end: function (expectation) {
                 return "end of input";
             },
 
-            other: function(expectation) {
+            other: function (expectation) {
                 return expectation.description;
             }
         };
@@ -65,13 +68,17 @@ var pegjsJsonLexerAndParser = (function() {
         function literalEscape(s) {
             return s
                 .replace(/\\/g, '\\\\')
-                .replace(/"/g,  '\\"')
+                .replace(/"/g, '\\"')
                 .replace(/\0/g, '\\0')
                 .replace(/\t/g, '\\t')
                 .replace(/\n/g, '\\n')
                 .replace(/\r/g, '\\r')
-                .replace(/[\x00-\x0F]/g,          function(ch) { return '\\x0' + hex(ch); })
-                .replace(/[\x10-\x1F\x7F-\x9F]/g, function(ch) { return '\\x'  + hex(ch); });
+                .replace(/[\x00-\x0F]/g, function (ch) {
+                    return '\\x0' + hex(ch);
+                })
+                .replace(/[\x10-\x1F\x7F-\x9F]/g, function (ch) {
+                    return '\\x' + hex(ch);
+                });
         }
 
         function classEscape(s) {
@@ -79,13 +86,17 @@ var pegjsJsonLexerAndParser = (function() {
                 .replace(/\\/g, '\\\\')
                 .replace(/\]/g, '\\]')
                 .replace(/\^/g, '\\^')
-                .replace(/-/g,  '\\-')
+                .replace(/-/g, '\\-')
                 .replace(/\0/g, '\\0')
                 .replace(/\t/g, '\\t')
                 .replace(/\n/g, '\\n')
                 .replace(/\r/g, '\\r')
-                .replace(/[\x00-\x0F]/g,          function(ch) { return '\\x0' + hex(ch); })
-                .replace(/[\x10-\x1F\x7F-\x9F]/g, function(ch) { return '\\x'  + hex(ch); });
+                .replace(/[\x00-\x0F]/g, function (ch) {
+                    return '\\x0' + hex(ch);
+                })
+                .replace(/[\x10-\x1F\x7F-\x9F]/g, function (ch) {
+                    return '\\x' + hex(ch);
+                });
         }
 
         function describeExpectation(expectation) {
@@ -138,8 +149,8 @@ var pegjsJsonLexerAndParser = (function() {
 
         var peg$FAILED = {},
 
-            peg$startRuleFunctions = { JSON_text: peg$parseJSON_text },
-            peg$startRuleFunction  = peg$parseJSON_text,
+            peg$startRuleFunctions = {JSON_text: peg$parseJSON_text},
+            peg$startRuleFunction = peg$parseJSON_text,
 
             peg$c0 = "[",
             peg$c1 = peg$literalExpectation("[", false),
@@ -156,12 +167,12 @@ var pegjsJsonLexerAndParser = (function() {
             peg$c12 = peg$otherExpectation("whitespace"),
             peg$c13 = /^[ \t\n\r]/,
             peg$c14 = peg$classExpectation([" ", "\t", "\n", "\r"], false, false),
-            peg$c15 = "false",
-            peg$c16 = peg$literalExpectation("false", false),
-            peg$c17 = "null",
-            peg$c18 = peg$literalExpectation("null", false),
-            peg$c19 = "true",
-            peg$c20 = peg$literalExpectation("true", false),
+            peg$c15 = "true",
+            peg$c16 = peg$literalExpectation("true", false),
+            peg$c17 = "false",
+            peg$c18 = peg$literalExpectation("false", false),
+            peg$c19 = "null",
+            peg$c20 = peg$literalExpectation("null", false),
             peg$c21 = peg$otherExpectation("number"),
             peg$c22 = ".",
             peg$c23 = peg$literalExpectation(".", false),
@@ -201,12 +212,12 @@ var pegjsJsonLexerAndParser = (function() {
             peg$c57 = /^[0-9a-f]/i,
             peg$c58 = peg$classExpectation([["0", "9"], ["a", "f"]], false, true),
 
-            peg$currPos          = 0,
-            peg$savedPos         = 0,
-            peg$posDetailsCache  = [{ line: 1, column: 1 }],
-            peg$maxFailPos       = 0,
-            peg$maxFailExpected  = [],
-            peg$silentFails      = 0,
+            peg$currPos = 0,
+            peg$savedPos = 0,
+            peg$posDetailsCache = [{line: 1, column: 1}],
+            peg$maxFailPos = 0,
+            peg$maxFailExpected = [],
+            peg$silentFails = 0,
 
             peg$result;
 
@@ -243,23 +254,23 @@ var pegjsJsonLexerAndParser = (function() {
         }
 
         function peg$literalExpectation(text, ignoreCase) {
-            return { type: "literal", text: text, ignoreCase: ignoreCase };
+            return {type: "literal", text: text, ignoreCase: ignoreCase};
         }
 
         function peg$classExpectation(parts, inverted, ignoreCase) {
-            return { type: "class", parts: parts, inverted: inverted, ignoreCase: ignoreCase };
+            return {type: "class", parts: parts, inverted: inverted, ignoreCase: ignoreCase};
         }
 
         function peg$anyExpectation() {
-            return { type: "any" };
+            return {type: "any"};
         }
 
         function peg$endExpectation() {
-            return { type: "end" };
+            return {type: "end"};
         }
 
         function peg$otherExpectation(description) {
-            return { type: "other", description: description };
+            return {type: "other", description: description};
         }
 
         function peg$computePosDetails(pos) {
@@ -275,7 +286,7 @@ var pegjsJsonLexerAndParser = (function() {
 
                 details = peg$posDetailsCache[p];
                 details = {
-                    line:   details.line,
+                    line: details.line,
                     column: details.column
                 };
 
@@ -297,24 +308,26 @@ var pegjsJsonLexerAndParser = (function() {
 
         function peg$computeLocation(startPos, endPos) {
             var startPosDetails = peg$computePosDetails(startPos),
-                endPosDetails   = peg$computePosDetails(endPos);
+                endPosDetails = peg$computePosDetails(endPos);
 
             return {
                 start: {
                     offset: startPos,
-                    line:   startPosDetails.line,
+                    line: startPosDetails.line,
                     column: startPosDetails.column
                 },
                 end: {
                     offset: endPos,
-                    line:   endPosDetails.line,
+                    line: endPosDetails.line,
                     column: endPosDetails.column
                 }
             };
         }
 
         function peg$fail(expected) {
-            if (peg$currPos < peg$maxFailPos) { return; }
+            if (peg$currPos < peg$maxFailPos) {
+                return;
+            }
 
             if (peg$currPos > peg$maxFailPos) {
                 peg$maxFailPos = peg$currPos;
@@ -376,7 +389,9 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s2 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c1); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c1);
+                    }
                 }
                 if (s2 !== peg$FAILED) {
                     s3 = peg$parsews();
@@ -410,7 +425,9 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s2 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c3); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c3);
+                    }
                 }
                 if (s2 !== peg$FAILED) {
                     s3 = peg$parsews();
@@ -444,7 +461,9 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s2 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c5); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c5);
+                    }
                 }
                 if (s2 !== peg$FAILED) {
                     s3 = peg$parsews();
@@ -478,7 +497,9 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s2 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c7); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c7);
+                    }
                 }
                 if (s2 !== peg$FAILED) {
                     s3 = peg$parsews();
@@ -512,7 +533,9 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s2 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c9); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c9);
+                    }
                 }
                 if (s2 !== peg$FAILED) {
                     s3 = peg$parsews();
@@ -546,7 +569,9 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s2 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c11); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c11);
+                    }
                 }
                 if (s2 !== peg$FAILED) {
                     s3 = peg$parsews();
@@ -579,7 +604,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s1 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c14); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c14);
+                }
             }
             while (s1 !== peg$FAILED) {
                 s0.push(s1);
@@ -588,13 +615,17 @@ var pegjsJsonLexerAndParser = (function() {
                     peg$currPos++;
                 } else {
                     s1 = peg$FAILED;
-                    if (peg$silentFails === 0) { peg$fail(peg$c14); }
+                    if (peg$silentFails === 0) {
+                        peg$fail(peg$c14);
+                    }
                 }
             }
             peg$silentFails--;
             if (s0 === peg$FAILED) {
                 s1 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c12); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c12);
+                }
             }
 
             return s0;
@@ -603,19 +634,19 @@ var pegjsJsonLexerAndParser = (function() {
         function peg$parsevalue() {
             var s0;
 
-            s0 = peg$parsefalse();
+            s0 = peg$parsestring();
             if (s0 === peg$FAILED) {
-                s0 = peg$parsenull();
+                s0 = peg$parsenumber();
                 if (s0 === peg$FAILED) {
-                    s0 = peg$parsetrue();
+                    s0 = peg$parseobject();
                     if (s0 === peg$FAILED) {
-                        s0 = peg$parseobject();
+                        s0 = peg$parsearray();
                         if (s0 === peg$FAILED) {
-                            s0 = peg$parsearray();
+                            s0 = peg$parsetrue();
                             if (s0 === peg$FAILED) {
-                                s0 = peg$parsenumber();
+                                s0 = peg$parsefalse();
                                 if (s0 === peg$FAILED) {
-                                    s0 = peg$parsestring();
+                                    s0 = peg$parsenull();
                                 }
                             }
                         }
@@ -626,15 +657,33 @@ var pegjsJsonLexerAndParser = (function() {
             return s0;
         }
 
+        function peg$parsetrue() {
+            var s0;
+
+            if (input.substr(peg$currPos, 4) === peg$c15) {
+                s0 = peg$c15;
+                peg$currPos += 4;
+            } else {
+                s0 = peg$FAILED;
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c16);
+                }
+            }
+
+            return s0;
+        }
+
         function peg$parsefalse() {
             var s0;
 
-            if (input.substr(peg$currPos, 5) === peg$c15) {
-                s0 = peg$c15;
+            if (input.substr(peg$currPos, 5) === peg$c17) {
+                s0 = peg$c17;
                 peg$currPos += 5;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c16); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c18);
+                }
             }
 
             return s0;
@@ -643,26 +692,14 @@ var pegjsJsonLexerAndParser = (function() {
         function peg$parsenull() {
             var s0;
 
-            if (input.substr(peg$currPos, 4) === peg$c17) {
-                s0 = peg$c17;
-                peg$currPos += 4;
-            } else {
-                s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c18); }
-            }
-
-            return s0;
-        }
-
-        function peg$parsetrue() {
-            var s0;
-
             if (input.substr(peg$currPos, 4) === peg$c19) {
                 s0 = peg$c19;
                 peg$currPos += 4;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c20); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c20);
+                }
             }
 
             return s0;
@@ -895,7 +932,9 @@ var pegjsJsonLexerAndParser = (function() {
             peg$silentFails--;
             if (s0 === peg$FAILED) {
                 s1 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c21); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c21);
+                }
             }
 
             return s0;
@@ -909,7 +948,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c23); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c23);
+                }
             }
 
             return s0;
@@ -923,7 +964,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c25); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c25);
+                }
             }
 
             return s0;
@@ -937,7 +980,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c27); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c27);
+                }
             }
 
             return s0;
@@ -1055,7 +1100,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c29); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c29);
+                }
             }
 
             return s0;
@@ -1069,7 +1116,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c31); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c31);
+                }
             }
 
             return s0;
@@ -1083,7 +1132,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c33); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c33);
+                }
             }
 
             return s0;
@@ -1122,7 +1173,9 @@ var pegjsJsonLexerAndParser = (function() {
             peg$silentFails--;
             if (s0 === peg$FAILED) {
                 s1 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c34); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c34);
+                }
             }
 
             return s0;
@@ -1141,7 +1194,9 @@ var pegjsJsonLexerAndParser = (function() {
                         peg$currPos++;
                     } else {
                         s2 = peg$FAILED;
-                        if (peg$silentFails === 0) { peg$fail(peg$c36); }
+                        if (peg$silentFails === 0) {
+                            peg$fail(peg$c36);
+                        }
                     }
                     if (s2 === peg$FAILED) {
                         if (input.charCodeAt(peg$currPos) === 92) {
@@ -1149,7 +1204,9 @@ var pegjsJsonLexerAndParser = (function() {
                             peg$currPos++;
                         } else {
                             s2 = peg$FAILED;
-                            if (peg$silentFails === 0) { peg$fail(peg$c38); }
+                            if (peg$silentFails === 0) {
+                                peg$fail(peg$c38);
+                            }
                         }
                         if (s2 === peg$FAILED) {
                             if (input.charCodeAt(peg$currPos) === 47) {
@@ -1157,7 +1214,9 @@ var pegjsJsonLexerAndParser = (function() {
                                 peg$currPos++;
                             } else {
                                 s2 = peg$FAILED;
-                                if (peg$silentFails === 0) { peg$fail(peg$c40); }
+                                if (peg$silentFails === 0) {
+                                    peg$fail(peg$c40);
+                                }
                             }
                             if (s2 === peg$FAILED) {
                                 if (input.charCodeAt(peg$currPos) === 98) {
@@ -1165,7 +1224,9 @@ var pegjsJsonLexerAndParser = (function() {
                                     peg$currPos++;
                                 } else {
                                     s2 = peg$FAILED;
-                                    if (peg$silentFails === 0) { peg$fail(peg$c42); }
+                                    if (peg$silentFails === 0) {
+                                        peg$fail(peg$c42);
+                                    }
                                 }
                                 if (s2 === peg$FAILED) {
                                     if (input.charCodeAt(peg$currPos) === 102) {
@@ -1173,7 +1234,9 @@ var pegjsJsonLexerAndParser = (function() {
                                         peg$currPos++;
                                     } else {
                                         s2 = peg$FAILED;
-                                        if (peg$silentFails === 0) { peg$fail(peg$c44); }
+                                        if (peg$silentFails === 0) {
+                                            peg$fail(peg$c44);
+                                        }
                                     }
                                     if (s2 === peg$FAILED) {
                                         if (input.charCodeAt(peg$currPos) === 110) {
@@ -1181,7 +1244,9 @@ var pegjsJsonLexerAndParser = (function() {
                                             peg$currPos++;
                                         } else {
                                             s2 = peg$FAILED;
-                                            if (peg$silentFails === 0) { peg$fail(peg$c46); }
+                                            if (peg$silentFails === 0) {
+                                                peg$fail(peg$c46);
+                                            }
                                         }
                                         if (s2 === peg$FAILED) {
                                             if (input.charCodeAt(peg$currPos) === 114) {
@@ -1189,7 +1254,9 @@ var pegjsJsonLexerAndParser = (function() {
                                                 peg$currPos++;
                                             } else {
                                                 s2 = peg$FAILED;
-                                                if (peg$silentFails === 0) { peg$fail(peg$c48); }
+                                                if (peg$silentFails === 0) {
+                                                    peg$fail(peg$c48);
+                                                }
                                             }
                                             if (s2 === peg$FAILED) {
                                                 if (input.charCodeAt(peg$currPos) === 116) {
@@ -1197,7 +1264,9 @@ var pegjsJsonLexerAndParser = (function() {
                                                     peg$currPos++;
                                                 } else {
                                                     s2 = peg$FAILED;
-                                                    if (peg$silentFails === 0) { peg$fail(peg$c50); }
+                                                    if (peg$silentFails === 0) {
+                                                        peg$fail(peg$c50);
+                                                    }
                                                 }
                                                 if (s2 === peg$FAILED) {
                                                     s2 = peg$currPos;
@@ -1206,7 +1275,9 @@ var pegjsJsonLexerAndParser = (function() {
                                                         peg$currPos++;
                                                     } else {
                                                         s3 = peg$FAILED;
-                                                        if (peg$silentFails === 0) { peg$fail(peg$c52); }
+                                                        if (peg$silentFails === 0) {
+                                                            peg$fail(peg$c52);
+                                                        }
                                                     }
                                                     if (s3 !== peg$FAILED) {
                                                         s4 = peg$currPos;
@@ -1285,7 +1356,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c38); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c38);
+                }
             }
 
             return s0;
@@ -1299,7 +1372,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c36); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c36);
+                }
             }
 
             return s0;
@@ -1313,7 +1388,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c54); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c54);
+                }
             }
 
             return s0;
@@ -1327,7 +1404,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c56); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c56);
+                }
             }
 
             return s0;
@@ -1341,7 +1420,9 @@ var pegjsJsonLexerAndParser = (function() {
                 peg$currPos++;
             } else {
                 s0 = peg$FAILED;
-                if (peg$silentFails === 0) { peg$fail(peg$c58); }
+                if (peg$silentFails === 0) {
+                    peg$fail(peg$c58);
+                }
             }
 
             return s0;
@@ -1368,6 +1449,6 @@ var pegjsJsonLexerAndParser = (function() {
 
     return {
         SyntaxError: peg$SyntaxError,
-        parse:       peg$parse
+        parse: peg$parse
     };
 })();

@@ -47,13 +47,13 @@ var x
     // This is the main entry point of the parser: a full JSON document.
     var json = P.lazy(function () {
         return whitespace.then(P.alt(
-            object,
-            array,
             stringLiteral,
             numberLiteral,
-            nullLiteral,
+            object,
+            array,
             trueLiteral,
-            falseLiteral
+            falseLiteral,
+            nullLiteral
         ));
     });
 

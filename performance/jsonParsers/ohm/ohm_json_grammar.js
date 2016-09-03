@@ -2,10 +2,10 @@ var ohmJsonGrammar =
     'JSON {\r\n  Start = Value\r\n' +
     '\r\n' +
     '  Value =\r\n' +
-    '    Object\r\n' +
-    '    | Array\r\n' +
-    '    | String\r\n' +
+    '      String\r\n' +
     '    | Number\r\n' +
+    '    | Object\r\n' +
+    '    | Array\r\n' +
     '    | True\r\n' +
     '    | False\r\n' +
     '    | Null\r\n' +

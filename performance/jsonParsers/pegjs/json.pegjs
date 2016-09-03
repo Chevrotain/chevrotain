@@ -18,38 +18,38 @@ ws "whitespace" = [ \t\n\r]*
 /* ----- 3. Values ----- */
 
 value
-  = false
-  / null
-  / true
+  = string
+  / number
   / object
   / array
-  / number
-  / string
+  / true
+  / false
+  / null
 
+true  = "true"
 false = "false"
 null  = "null"
-true  = "true"
 
 /* ----- 4. Objects ----- */
 
 object
   = begin_object
-    members:(
-      first:member
-      rest:(value_separator m:member)*
+    (
+      member
+      (value_separator member)*
     )?
     end_object
 
 member
-  = name:string name_separator value:value
+  = string name_separator value
 
 /* ----- 5. Arrays ----- */
 
 array
   = begin_array
-    values:(
-      first:value
-      rest:(value_separator v:value )*
+    (
+      value
+      (value_separator value )*
     )?
     end_array
 
@@ -71,7 +71,7 @@ zero          = "0"
 /* ----- 7. Strings ----- */
 
 string "string"
-  = quotation_mark chars:char* quotation_mark
+  = quotation_mark char* quotation_mark
 
 char
   = unescaped

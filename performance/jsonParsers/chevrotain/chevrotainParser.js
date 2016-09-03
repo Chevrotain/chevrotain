@@ -20,7 +20,7 @@ var WhiteSpace = extendToken("WhiteSpace", /\s+/);
 WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
 
-var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly, LSquare, RSquare, Comma, Colon, True, False, Null];
+var jsonTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
 var ChevJsonLexer = new ChevrotainLexer(jsonTokens);
 
 

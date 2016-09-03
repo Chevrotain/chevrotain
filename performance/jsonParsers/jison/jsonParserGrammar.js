@@ -11,14 +11,14 @@ var grammar = {
     "lex": {
         "rules": [
             ["\\s+", "/* skip whitespace */"],
-            ["-?(?:0|[1-9]\\d*)(:?\\.\\d+)?(?:[eE][+-]?\\d+)?", "return 'NUMBER';"],
             ["\"(?:\\\\[\"bfnrt/\\\\]|\\\\u[a-fA-F0-9]{4}|[^\"\\\\])*\"", "return 'STRING';"],
+            ["-?(?:0|[1-9]\\d*)(:?\\.\\d+)?(?:[eE][+-]?\\d+)?", "return 'NUMBER';"],
+            [",", "return ','"],
+            [":", "return ':'"],
             ["\\{", "return '{'"],
             ["\\}", "return '}'"],
             ["\\[", "return '['"],
             ["\\]", "return ']'"],
-            [",", "return ','"],
-            [":", "return ':'"],
             ["true", "return 'TRUE'"],
             ["false", "return 'FALSE'"],
             ["null", "return 'NULL'"]
