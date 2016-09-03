@@ -1,4 +1,4 @@
-import {map, reduce, find, every, isEmpty} from "../../utils/utils"
+import {map, reduce, find, every, isEmpty, flatten} from "../../utils/utils"
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
@@ -73,6 +73,11 @@ export type lookAheadSequence = Function[][]
  */
 export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPredicates:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
     let numOfAlts = alts.length
+    let areAllOneTokenLookahead = every(alts, (currAlt) => {
+        return every(currAlt, (currPath) => {
+            return currPath.length === 1
+        })
+    })
 
     // This version takes into account the predicates as well.
     if (hasPredicates) {
@@ -118,6 +123,40 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
             return -1
         }
     }
+    // optimized (common) case of all the lookaheads paths requiring only
+    // a single token lookahead.
+    else if (areAllOneTokenLookahead) {
+
+        let singleTokenAlts = map(alts, (currAlt) => {
+            return flatten(currAlt)
+        })
+
+        /**
+         * @returns {number} - The chosen alternative index
+         */
+        return function ():number {
+            let nextToken = this.LA(1)
+
+            for (let t = 0; t < numOfAlts; t++) {
+                let currSingleTokens = singleTokenAlts[t]
+                let numberOfPossibleTokens = currSingleTokens.length
+                for (let j = 0; j < numberOfPossibleTokens; j++) {
+                    let currExpectedToken = currSingleTokens[j]
+                    if (!(nextToken instanceof (<any>currExpectedToken))) {
+                        // try the next possible token
+                        continue
+                    }
+                    // found a full path that matches.
+                    // this will also work for an empty ALT as the loop will be skipped
+                    return t
+                }
+                // none of the paths for the current alternative matched
+                // try the next alternative
+            }
+            // none of the alternatives could be matched
+            return -1
+        }
+    }
     // optimized lookahead without needing to check the predicates at all.
     // this causes code duplication which is intentional to improve performance.
     else {
@@ -155,29 +194,59 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
 
 export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):() => boolean {
 
-    // TODO: performance optimizations for the (common) edge case of K == 1
+    let areAllOneTokenLookahead = every(alt, (currPath) => {
+        return currPath.length === 1
+    })
 
     let numOfPaths = alt.length
-    return function ():boolean {
-        nextPath:
-            for (let j = 0; j < numOfPaths; j++) {
-                let currPath = alt[j]
-                let currPathLength = currPath.length
-                for (let i = 0; i < currPathLength; i++) {
-                    let nextToken = this.LA(i + 1)
-                    if (!(nextToken instanceof currPath[i])) {
-                        // mismatch in current path
-                        // try the next pth
-                        continue nextPath
-                    }
+
+    // optimized (common) case of all the lookaheads paths requiring only
+    // a single token lookahead.
+    if (areAllOneTokenLookahead) {
+
+        let singleTokens = flatten(alt)
+
+        return function ():boolean {
+            let nextToken = this.LA(1)
+
+            for (let j = 0; j < singleTokens.length; j++) {
+                let currPossibleTok = singleTokens[j]
+                if (!(nextToken instanceof (<any>currPossibleTok))) {
+                    // mismatch in current path
+                    // try the next pth
+                    continue
                 }
                 // found a full path that matches.
                 return true
             }
 
-        // none of the paths matched
-        return false
+            // none of the paths matched
+            return false
+        }
     }
+    else {
+        return function ():boolean {
+            nextPath:
+                for (let j = 0; j < numOfPaths; j++) {
+                    let currPath = alt[j]
+                    let currPathLength = currPath.length
+                    for (let i = 0; i < currPathLength; i++) {
+                        let nextToken = this.LA(i + 1)
+                        if (!(nextToken instanceof currPath[i])) {
+                            // mismatch in current path
+                            // try the next pth
+                            continue nextPath
+                        }
+                    }
+                    // found a full path that matches.
+                    return true
+                }
+
+            // none of the paths matched
+            return false
+        }
+    }
+
 }
 
 class RestDefinitionFinderWalker extends RestWalker {

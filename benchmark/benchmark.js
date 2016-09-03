@@ -18,34 +18,34 @@ var warmupTimes = 10
 function performBenchmark(name, input, devParse, oldParse) {
 
     console.log("----------------------------------------------")
-    console.log("Benchmarking: " + name + " Dev Vs Old")
+    console.log("Benchmarking: " + name + " Dev Vs Old: (" + oldVersion + ")")
     // warmup
     for (var z = 0; z < warmupTimes; z++) {
         devParse(input, isBenchmarkOnlyLexer)
         oldParse(input, isBenchmarkOnlyLexer)
     }
 
-    // Dev version
-    console.log("testing with dev version of chevrotain")
 
-    // dev version
-    var startDev = _.now()
+    var totalDev = 0
+    var totalOld = 0
+
     for (var i = 0; i < times; i++) {
+        var startDev = _.now()
         devParse(input, isBenchmarkOnlyLexer)
+        var endDev = _.now()
+        totalDev += endDev - startDev
+
+        var startOld = _.now()
+        oldParse(input, isBenchmarkOnlyLexer)
+        var endOld = _.now()
+        totalOld += endOld - startOld
     }
-    var endDev = _.now()
-    var averageDev = (endDev - startDev) / times
+
+    var averageDev = totalDev / times
     console.log("average with dev version: " + averageDev)
 
-    // Old version
-    console.log("\n")
-    console.log("testing with old version of chevrotain: " + oldVersion)
-    var startOld = _.now()
-    for (var j = 0; j < times; j++) {
-        oldParse(input, isBenchmarkOnlyLexer)
-    }
-    var endOld = _.now()
-    var averageOld = (endOld - startOld) / times
+
+    var averageOld = totalOld / times
     console.log("average with old version: " + averageOld)
 
     // reporting

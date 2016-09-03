@@ -21,7 +21,8 @@ import {
     has,
     isUndefined,
     forEach,
-    some
+    some,
+    NOOP
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {Token, tokenName, EOF, tokenLabel, hasTokenLabel, LazyToken} from "../scan/tokens_public"
@@ -43,8 +44,8 @@ import {
     AbstractNextTerminalAfterProductionWalker,
     NextTerminalAfterAtLeastOneWalker,
     NextTerminalAfterAtLeastOneSepWalker,
-    NextTerminalAfterManyWalker,
-    NextTerminalAfterManySepWalker
+    NextTerminalAfterManySepWalker,
+    NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
 import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
@@ -77,7 +78,6 @@ const MANY_IDX = "3"
 const AT_LEAST_ONE_IDX = "4"
 const MANY_SEP_IDX = "5"
 const AT_LEAST_ONE_SEP_IDX = "6"
-
 
 export interface IParserConfig {
     /**
@@ -376,6 +376,13 @@ export class Parser {
         this.recoveryEnabled = has(config, "recoveryEnabled") ?
             config.recoveryEnabled :
             DEFAULT_PARSER_CONFIG.recoveryEnabled
+
+        // performance optimization, NOOP will be inlined which
+        // effectively means that this optional feature does not exist
+        // when not used.
+        if (!this.recoveryEnabled) {
+            this.attemptInRepetitionRecovery = NOOP
+        }
 
         this.maxLookahead = has(config, "maxLookahead") ?
             config.maxLookahead :
@@ -1241,13 +1248,26 @@ export class Parser {
      * @returns {Token} - The consumed Token.
      */
     protected consumeInternal(tokClass:Function, idx:number):Token {
+        // TODO: this is an hack to avoid try catch block in V8, should be removed once V8 supports try/catch optimizations.
+        // as the IF/ELSE itself has some overhead.
+        if (!this.recoveryEnabled) {
+            return this.consumeInternalOptimized(tokClass)
+        }
+        else {
+            return this.consumeInternalWithTryCatch(tokClass, idx)
+        }
+    }
+
+    protected consumeInternalWithTryCatch(tokClass:Function, idx:number):Token {
         try {
             return this.consumeInternalOptimized(tokClass)
         } catch (eFromConsumption) {
             // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
             // but the original syntax could have been parsed successfully without any backtracking + recovery
             if (this.recoveryEnabled &&
-                eFromConsumption instanceof exceptions.MismatchedTokenException && !this.isBackTracking()) {
+                // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
+                eFromConsumption.name === "MismatchedTokenException" &&
+                !this.isBackTracking()) {
 
                 let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
                 try {
@@ -1344,13 +1364,29 @@ export class Parser {
         this.ruleShortNameIdx++
         this.shortRuleNameToFull.put(shortName, ruleName)
 
-        let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[] = []) {
-            this.ruleInvocationStateUpdate(shortName, idxInCallingRule)
+        function invokeRuleNoTry(args:any[]) {
+            let result = impl.apply(this, args)
+            this.ruleFinallyStateUpdate()
+            return result
+        }
 
+        function invokeRuleWithTry(args:any[], isFirstRule:boolean) {
             try {
                 // actual parsing happens here
                 return impl.apply(this, args)
             } catch (e) {
+
+                // TODO: this is part of a Performance hack for V8 due to lack of support
+                // of try/catch optimizations. Should be removed once V8 supports that.
+                // This is needed because in case of an error during a nested subRule
+                // there will be no "finally" block to perform the "ruleFinallyStateUpdate"
+                // So this block properly rewinds the parser's state in the case error recovery is disabled.
+                if (isFirstRule) {
+                    for (let i = this.RULE_STACK.length; i > 1; i--) {
+                        this.ruleFinallyStateUpdate()
+                    }
+                }
+
                 let isFirstInvokedRule = (this.RULE_STACK.length === 1)
                 // note the reSync is always enabled for the first rule invocation, because we must always be able to
                 // reSync with EOF and just output some INVALID ParseTree
@@ -1382,6 +1418,22 @@ export class Parser {
             finally {
                 this.ruleFinallyStateUpdate()
             }
+        }
+
+        let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[]) {
+            this.ruleInvocationStateUpdate(shortName, idxInCallingRule)
+
+
+            // TODO: performance hack due to V8 lack of try/catch optimizations.
+            // should be removed once V8 support those.
+            let isFirstRule = this.RULE_STACK.length === 1
+            if (!this.recoveryEnabled && !isFirstRule) {
+                return invokeRuleNoTry.call(this, args)
+            }
+            else {
+                return invokeRuleWithTry.call(this, args, isFirstRule)
+            }
+
         }
         let ruleNamePropName = "ruleName"
         wrappedGrammarRule[ruleNamePropName] = ruleName
@@ -1694,10 +1746,10 @@ export class Parser {
         // note that while it may seem that this can cause an error because by using a recursive call to
         // AT_LEAST_ONE we change the grammar to AT_LEAST_TWO, AT_LEAST_THREE ... , the possible recursive call
         // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
-        if (this.recoveryEnabled) {
-            this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg],
-                <any>lookAheadFunc, prodName, prodOccurrence, NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
-        }
+
+        // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
+        this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg],
+            <any>lookAheadFunc, prodName, prodOccurrence, NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
     }
 
     private atLeastOneSepFirstInternal(prodFunc:Function,
@@ -1723,16 +1775,15 @@ export class Parser {
                 (<GrammarAction>action).call(this)
             }
 
-            if (this.recoveryEnabled) {
-                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                        this.atLeastOneSepLookaheadKeys, NextTerminalAfterAtLeastOneSepWalker],
-                    separatorLookAheadFunc,
-                    prodName,
-                    prodOccurrence,
-                    NextTerminalAfterAtLeastOneSepWalker,
-                    this.atLeastOneSepLookaheadKeys)
-            }
+            // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
+            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                    this.atLeastOneSepLookaheadKeys, NextTerminalAfterAtLeastOneSepWalker],
+                separatorLookAheadFunc,
+                prodName,
+                prodOccurrence,
+                NextTerminalAfterAtLeastOneSepWalker,
+                this.atLeastOneSepLookaheadKeys)
         }
         else {
             throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, userDefinedErrMsg)
@@ -1764,15 +1815,14 @@ export class Parser {
             action.call(this)
         }
 
-        if (this.recoveryEnabled) {
-            this.attemptInRepetitionRecovery(prodFunc,
-                [lookaheadFunction, action],
-                <any>lookaheadFunction
-                , prodName,
-                prodOccurrence,
-                NextTerminalAfterManyWalker,
-                this.manyLookaheadKeys)
-        }
+        // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
+        this.attemptInRepetitionRecovery(prodFunc,
+            [lookaheadFunction, action],
+            <any>lookaheadFunction
+            , prodName,
+            prodOccurrence,
+            NextTerminalAfterManyWalker,
+            this.manyLookaheadKeys)
     }
 
     private manySepFirstInternal(prodFunc:Function,
@@ -1797,16 +1847,15 @@ export class Parser {
                 action.call(this)
             }
 
-            if (this.recoveryEnabled) {
-                this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                    [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                        this.manySepLookaheadKeys, NextTerminalAfterManySepWalker],
-                    separatorLookAheadFunc,
-                    prodName,
-                    prodOccurrence,
-                    NextTerminalAfterManySepWalker,
-                    this.manySepLookaheadKeys)
-            }
+            // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
+            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
+                    this.manySepLookaheadKeys, NextTerminalAfterManySepWalker],
+                separatorLookAheadFunc,
+                prodName,
+                prodOccurrence,
+                NextTerminalAfterManySepWalker,
+                this.manySepLookaheadKeys)
         }
 
         return separatorsResult
@@ -1833,28 +1882,25 @@ export class Parser {
         // has occurred (hence the name 'second') so the following
         // IF will always be entered, its possible to remove it...
         // however it is kept to avoid confusion and be consistent.
+        // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         /* istanbul ignore else */
-        if (this.recoveryEnabled) {
-            this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                [prodName, prodOccurrence, separator, separatorLookAheadFunc,
-                    action, separatorsResult, laKeys, nextTerminalAfterWalker],
-                separatorLookAheadFunc,
-                prodName,
-                prodOccurrence,
-                nextTerminalAfterWalker,
-                laKeys)
-        }
+        this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
+            [prodName, prodOccurrence, separator, separatorLookAheadFunc,
+                action, separatorsResult, laKeys, nextTerminalAfterWalker],
+            separatorLookAheadFunc,
+            prodName,
+            prodOccurrence,
+            nextTerminalAfterWalker,
+            laKeys)
     }
 
     private orInternal<T>(alts:IAnyOrAlt<T>[],
                           errMsgTypes:string,
                           occurrence:number):T {
-        // else implicit lookahead
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
         let altToTake = laFunc.call(this, alts)
         if (altToTake !== -1) {
             let chosenAlternative:any = alts[altToTake]
-            // TODO: should THEN_DO should be renamed to ALT to avoid this ternary  expression and to provide a consistent API.
             return chosenAlternative.ALT.call(this)
         }
 
@@ -1876,7 +1922,8 @@ export class Parser {
 
     private getKeyForAutomaticLookahead(prodName:string, prodKeys:HashTable<string>[], occurrence:number):string {
         let occuMap = prodKeys[occurrence - 1]
-        let currRuleShortName = last(this.RULE_STACK)
+        let ruleStack = this.RULE_STACK
+        let currRuleShortName = ruleStack[ruleStack.length - 1]
         let key = occuMap[currRuleShortName]
         if (key === undefined) {
             key = prodName + occurrence + currRuleShortName
