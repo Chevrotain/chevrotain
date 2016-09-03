@@ -592,6 +592,23 @@ describe("The BaseRecognizer", () => {
         expect(() => parser.someRule()).to.throw("oops")
     })
 
+    it("will not swallow none Recognizer errors during Token consumption", () => {
+        class InRuleParser extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, ALL_TOKENS, {recoveryEnabled: true});
+                (Parser as any).performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => {
+                this.CONSUME1(DotTok)
+            })
+        }
+        let parser:any = new InRuleParser([new IntToken("1")]);
+        (parser as any).consumeInternalOptimized = () => { throw Error("oops")}
+        expect(() => parser.someRule()).to.throw("oops")
+    })
+
     it("Will use Token LABELS for mismatch error messages when available", () => {
 
         class LabelTokParser extends Parser {

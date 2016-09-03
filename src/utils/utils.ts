@@ -319,3 +319,6 @@ export function merge(obj1:Object, obj2:Object):any {
 
     return result
 }
+
+
+export function NOOP() {}
