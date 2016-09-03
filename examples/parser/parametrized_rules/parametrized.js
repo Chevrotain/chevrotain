@@ -64,8 +64,8 @@ class HelloParser extends chevrotain.Parser {
 
             // The mood parameter is used to determine which path to take
             this.OR([
-                {WHEN: () => mood === "positive", THEN_DO: () => this.SUBRULE(this.positive)},
-                {WHEN: () => mood === "negative", THEN_DO: () => this.SUBRULE(this.negative)}
+                {GATE: () => mood === "positive", ALT: () => this.SUBRULE(this.positive)},
+                {GATE: () => mood === "negative", ALT: () => this.SUBRULE(this.negative)}
             ])
 
             this.CONSUME(World)

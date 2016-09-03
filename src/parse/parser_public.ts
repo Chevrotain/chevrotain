@@ -166,18 +166,6 @@ export interface IFollowKey {
     inRule:string
 }
 
-/**
- * OR([
- *  { WHEN:LA1, THEN_DO:XXX },
- *  { WHEN:LA2, THEN_DO:YYY },
- *  { WHEN:LA3, THEN_DO:ZZZ },
- * ])
- */
-export interface IOrAlt<T> {
-    WHEN:() => boolean
-    // TODO: change THEN_DO property to ALT (may need to modify gast builder)
-    THEN_DO:() => T
-}
 
 /**
  * OR([
@@ -186,11 +174,23 @@ export interface IOrAlt<T> {
  *  {ALT:ZZZ }
  * ])
  */
-export interface IOrAltWithPredicate<T> {
+export interface IOrAlt<T> {
     ALT:() => T
 }
 
-export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithPredicate<T>
+/**
+ * OR([
+ *  { GATE:condition1, ALT:XXX },
+ *  { GATE:condition2, ALT:YYY },
+ *  { GATE:condition3, ALT:ZZZ },
+ * ])
+ */
+export interface IOrAltWithGate<T> extends IOrAlt<T> {
+    GATE:() => boolean
+    ALT:() => T
+}
+
+export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithGate<T>
 
 export interface IParserState {
     errors:exceptions.IRecognitionException[]
@@ -751,14 +751,14 @@ export class Parser {
      *        ], "a number")
      *
      * - long: this.OR([
-     *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
-     *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Two)}},
-     *           {WHEN: predicateFuncX, THEN_DO:()=>{this.CONSUME(Three)}},
+     *           {GATE: predicateFunc1, ALT:()=>{this.CONSUME(One)}},
+     *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Two)}},
+     *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Three)}},
      *        ], "a number")
      *
      * They can also be mixed:
      * mixed: this.OR([
-     *           {WHEN: predicateFunc1, THEN_DO:()=>{this.CONSUME(One)}},
+     *           {GATE: predicateFunc1, ALT:()=>{this.CONSUME(One)}},
      *           {ALT:()=>{this.CONSUME(Two)}},
      *           {ALT:()=>{this.CONSUME(Three)}}
      *        ], "a number")
@@ -768,7 +768,7 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the alternation production in it's top rule.
      *
-     * @param {{ALT:Function}[] | {WHEN:Function, THEN_DO:Function}[]} alts - An array of alternatives.
+     * @param {{ALT:Function}[] | {GATE:Function, ALT:Function}[]} alts - An array of alternatives.
      *
      * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
      *                                 If none is provided, the error message will include the names of the expected
@@ -1855,10 +1855,7 @@ export class Parser {
         if (altToTake !== -1) {
             let chosenAlternative:any = alts[altToTake]
             // TODO: should THEN_DO should be renamed to ALT to avoid this ternary  expression and to provide a consistent API.
-            let grammarAction = chosenAlternative.ALT ?
-                chosenAlternative.ALT :
-                chosenAlternative.THEN_DO
-            return grammarAction.call(this)
+            return chosenAlternative.ALT.call(this)
         }
 
         this.raiseNoAltException(occurrence, errMsgTypes)
@@ -1896,7 +1893,7 @@ export class Parser {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             // note that hasPredicates is only computed once.
-            let hasPredicates = some(alts, (currAlt) => isFunction((<any>currAlt).WHEN))
+            let hasPredicates = some(alts, (currAlt) => isFunction((<IOrAltWithGate<any>>currAlt).GATE))
             laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, hasPredicates)
             this.classLAFuncs.put(key, laFunc)
             return laFunc

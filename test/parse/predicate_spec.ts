@@ -152,7 +152,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
                             this.CONSUME1(A)
                             return "A"
                         }}, // Has predicate
-                        {WHEN: gateFunc, THEN_DO: () => {
+                        {GATE: gateFunc, ALT: () => {
                             this.CONSUME1(B)
                             return "B"
                         }},
@@ -199,8 +199,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
                 public topRule = this.RULE("topRule", (param) => {
                     return this.OR1([
-                        {WHEN: () => param, THEN_DO: () => this.CONSUME1(A).image},
-                        {WHEN: () => !param, THEN_DO: () => this.CONSUME1(B).image}
+                        {GATE: () => param, ALT: () => this.CONSUME1(A).image},
+                        {GATE: () => !param, ALT: () => this.CONSUME1(B).image}
                     ])
                 })
             }

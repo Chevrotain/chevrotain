@@ -84,7 +84,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
             // unfortunately the predicates must be extracted every single time
             // as they cannot be cached due to keep references to parameters(vars) which are no longer valid.
             // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
-            let predicates:Predicate[] = map(orAlts, (currAlt) => currAlt.WHEN)
+            let predicates:Predicate[] = map(orAlts, (currAlt) => currAlt.GATE)
 
             for (let t = 0; t < numOfAlts; t++) {
                 let currAlt = alts[t]

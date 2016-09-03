@@ -40,14 +40,14 @@ describe("The GAst Builder namespace", () => {
         "            let typeKw = this.CONSUME1(TypeTok)\r\n" +
         "            let typeName = this.CONSUME1(IdentTok)\r\n" +
         "            let typeSpec = this.OR([\r\n" +
-        "                {WHEN: this.isStructType, THEN_DO: ()=> {\r\n" +
+        "                {ALT: this.isStructType, ALT: ()=> {\r\n" +
         "                    let structType = this.SUBRULE(this.structuredType)\r\n" +
         "                    this.OPTION(()=> {return this.NEXT_TOKEN() instanceof SemicolonTok}, ()=> {\r\n" +
         "                        semiColon = this.CONSUME1(SemicolonTok)\r\n" +
         "                    })\r\n" +
         "                    return structType\r\n" +
         "                }},\r\n" +
-        "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
+        "                {ALT: this.isAssignedTypeSpec, ALT: ()=> {\r\n" +
         "                    let assTypeSpec = this.SUBRULE(this.assignedTypeSpec)\r\n" +
         "                    semiColon = this.CONSUME2(SemicolonTok)\r\n" +
         "                    return assTypeSpec\r\n" +
@@ -64,10 +64,10 @@ describe("The GAst Builder namespace", () => {
         "            let elementName = this.CONSUME1(IdentTok)\r\n" +
         "\r\n" +
         "            let assTypeSpec = this.OR([\r\n" +
-        "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
+        "                {GATE: this.isAssignedTypeSpec, ALT: ()=> {\r\n" +
         "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
         "                }},\r\n" +
-        "                {WHEN: ()=> {return true}, THEN_DO: ()=> {\r\n" +
+        "                {GATE: ()=> {return true}, ALT: ()=> {\r\n" +
         "                    return this.SUBRULE(this.assignedTypeSpecImplicit)\r\n" +
         "                }}\r\n" +
         "            ], \"\").tree\r\n" +
@@ -163,10 +163,10 @@ describe("The GAst Builder namespace", () => {
 
         let refText = map(actual, (rangeProd) => { return rangeProd.text})
         expect(refText[0]).to.equal(".OR([\r\n" +
-            "                {WHEN: this.isAssignedTypeSpec, THEN_DO: ()=> {\r\n" +
+            "                {GATE: this.isAssignedTypeSpec, ALT: ()=> {\r\n" +
             "                    return this.SUBRULE(this.assignedTypeSpec)\r\n" +
             "                }},\r\n" +
-            "                {WHEN: ()=> {return true}, THEN_DO: ()=> {\r\n" +
+            "                {GATE: ()=> {return true}, ALT: ()=> {\r\n" +
             "                    return this.SUBRULE(this.assignedTypeSpecImplicit)\r\n" +
             "                }}\r\n" +
             "            ], \"\")")
@@ -438,10 +438,10 @@ describe("The GAst Builder namespace", () => {
     it("can build nested OR grammar successfully", () => {
 
         let input = " let max = this.OR([\n\
-                {WHEN: isExpression, THEN_DO: ()=> {\n\
+                {GATE: isExpression, ALT: ()=> {\n\
                     this.OR([\n\
                             \n\
-                        {WHEN: isAlias, THEN_DO: ()=> {\n\
+                        {GATE: isAlias, ALT: ()=> {\n\
                             return PT(this.CONSUME1(ViaTok))\n\
                         }}\n\
                     ], 'Expression or Star Token')\n\
