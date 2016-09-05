@@ -73,7 +73,7 @@ export class HashTable<V> {
         return <any>utils.values(this._state)
     }
 
-    put(key:string, value:V):void {
+    put(key:string|number, value:V):void {
         this._state[key] = value
     }
 

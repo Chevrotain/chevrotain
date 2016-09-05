@@ -70,14 +70,25 @@ const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
 const END_OF_FILE = new EOF()
 Object.freeze(END_OF_FILE)
 
+// Lookahead keys are 32Bit integers in the form
+// ZZZZZZZZZZZZZZZZZZZZZZZZ-YYYY-XXXX
+// XXXX -> Occurrence Index bitmap.
+// YYYY -> DSL Method Name bitmap.
+// ZZZZZZZZZZZZZZZZZZZZZZZZ -> Rule short Index bitmap.
+const BITS_FOR_METHOD_IDX = 4
+const BITS_FOR_OCCURRENCE_IDX = 4
+
 // short string used as part of mapping keys.
-// being short (and perhaps also being integer strings) improves the performance.
-const OR_IDX = "1"
-const OPTION_IDX = "2"
-const MANY_IDX = "3"
-const AT_LEAST_ONE_IDX = "4"
-const MANY_SEP_IDX = "5"
-const AT_LEAST_ONE_SEP_IDX = "6"
+// being short improves the performance when composing KEYS for maps out of these
+// The 4 - 7 bits (16 possible values, are reserved for the DSL method indices)
+/* tslint:disable */
+const OR_IDX = 1 << BITS_FOR_METHOD_IDX
+const OPTION_IDX = 2 << BITS_FOR_METHOD_IDX
+const MANY_IDX = 3 << BITS_FOR_METHOD_IDX
+const AT_LEAST_ONE_IDX = 4 << BITS_FOR_METHOD_IDX
+const MANY_SEP_IDX = 5 << BITS_FOR_METHOD_IDX
+const AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_METHOD_IDX
+/* tslint:enable */
 
 export interface IParserConfig {
     /**
@@ -351,16 +362,10 @@ export class Parser {
     private firstAfterRepMap
     private classLAFuncs
     private definitionErrors:IParserDefinitionError[]
-    private orLookaheadKeys:HashTable<string>[]
-    private manyLookaheadKeys:HashTable<string>[]
-    private manySepLookaheadKeys:HashTable<string>[]
-    private atLeastOneSepLookaheadKeys:HashTable<string>[]
-    private atLeastOneLookaheadKeys:HashTable<string>[]
-    private optionLookaheadKeys:HashTable<string>[]
     private definedRulesNames:string[] = []
 
     private shortRuleNameToFull = new HashTable<string>()
-    private ruleShortNameIdx = 0
+    private ruleShortNameIdx = 1
 
     /**
      * Only used internally for storing productions as they are built for the first time.
@@ -420,17 +425,6 @@ export class Parser {
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
         // parsed with a clear error message ("expecting EOF but found ...")
         this.tokensMap[tokenName(EOF)] = EOF
-
-        if (cache.CLASS_TO_OR_LA_CACHE[this.className] === undefined) {
-            cache.initLookAheadKeyCache(this.className)
-        }
-
-        this.orLookaheadKeys = cache.CLASS_TO_OR_LA_CACHE[this.className]
-        this.manyLookaheadKeys = cache.CLASS_TO_MANY_LA_CACHE[this.className]
-        this.manySepLookaheadKeys = cache.CLASS_TO_MANY_SEP_LA_CACHE[this.className]
-        this.atLeastOneLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_LA_CACHE[this.className]
-        this.atLeastOneSepLookaheadKeys = cache.CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[this.className]
-        this.optionLookaheadKeys = cache.CLASS_TO_OPTION_LA_CACHE[this.className]
     }
 
     public get errors():exceptions.IRecognitionException[] {
@@ -849,7 +843,7 @@ export class Parser {
      */
     protected MANY1(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY1, "MANY1", 1, predicateOrAction, action)
+        this.manyInternal(this.MANY1, 1, predicateOrAction, action)
     }
 
     /**
@@ -857,7 +851,7 @@ export class Parser {
      */
     protected MANY2(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY2, "MANY2", 2, predicateOrAction, action)
+        this.manyInternal(this.MANY2, 2, predicateOrAction, action)
     }
 
     /**
@@ -865,7 +859,7 @@ export class Parser {
      */
     protected MANY3(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY3, "MANY3", 3, predicateOrAction, action)
+        this.manyInternal(this.MANY3, 3, predicateOrAction, action)
     }
 
     /**
@@ -873,7 +867,7 @@ export class Parser {
      */
     protected MANY4(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY4, "MANY4", 4, predicateOrAction, action)
+        this.manyInternal(this.MANY4, 4, predicateOrAction, action)
     }
 
     /**
@@ -881,7 +875,7 @@ export class Parser {
      */
     protected MANY5(predicateOrAction:Predicate | GrammarAction,
                     action?:GrammarAction):void {
-        this.manyInternal(this.MANY5, "MANY5", 5, predicateOrAction, action)
+        this.manyInternal(this.MANY5, 5, predicateOrAction, action)
     }
 
     /**
@@ -917,35 +911,35 @@ export class Parser {
      * @return {Token[]} - The consumed separator Tokens.
      */
     protected MANY_SEP1(separator:TokenConstructor, action:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP1, "MANY_SEP1", 1, separator, action)
+        return this.manySepFirstInternal(this.MANY_SEP1, 1, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
     protected MANY_SEP2(separator:TokenConstructor, action:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP2, "MANY_SEP2", 2, separator, action)
+        return this.manySepFirstInternal(this.MANY_SEP2, 2, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
     protected MANY_SEP3(separator:TokenConstructor, action:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP3, "MANY_SEP3", 3, separator, action)
+        return this.manySepFirstInternal(this.MANY_SEP3, 3, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
     protected MANY_SEP4(separator:TokenConstructor, action:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP4, "MANY_SEP4", 4, separator, action)
+        return this.manySepFirstInternal(this.MANY_SEP4, 4, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
     protected MANY_SEP5(separator:TokenConstructor, action:GrammarAction):Token[] {
-        return this.manySepFirstInternal(this.MANY_SEP5, "MANY_SEP5", 5, separator, action)
+        return this.manySepFirstInternal(this.MANY_SEP5, 5, separator, action)
     }
 
     /**
@@ -973,7 +967,7 @@ export class Parser {
     protected AT_LEAST_ONE1(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE1, "AT_LEAST_ONE1", 1, predicateOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE1, 1, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -982,7 +976,7 @@ export class Parser {
     protected AT_LEAST_ONE2(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE2, "AT_LEAST_ONE2", 2, predicateOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE2, 2, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -991,7 +985,7 @@ export class Parser {
     protected AT_LEAST_ONE3(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE3, "AT_LEAST_ONE3", 3, predicateOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE3, 3, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -1000,7 +994,7 @@ export class Parser {
     protected AT_LEAST_ONE4(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE4, "AT_LEAST_ONE4", 4, predicateOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE4, 4, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -1009,7 +1003,7 @@ export class Parser {
     protected AT_LEAST_ONE5(predicateOrAction:Predicate | GrammarAction,
                             action?:GrammarAction | string,
                             errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE5, "AT_LEAST_ONE5", 5, predicateOrAction, action, errMsg)
+        this.atLeastOneInternal(this.AT_LEAST_ONE5, 5, predicateOrAction, action, errMsg)
     }
 
     /**
@@ -1037,7 +1031,7 @@ export class Parser {
     protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
                                 action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP1", 1, separator, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 1, separator, action, errMsg)
     }
 
     /**
@@ -1046,7 +1040,7 @@ export class Parser {
     protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
                                 action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP2", 2, separator, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 2, separator, action, errMsg)
     }
 
     /**
@@ -1055,7 +1049,7 @@ export class Parser {
     protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
                                 action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP3", 3, separator, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 3, separator, action, errMsg)
     }
 
     /**
@@ -1064,7 +1058,7 @@ export class Parser {
     protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
                                 action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP4", 4, separator, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 4, separator, action, errMsg)
     }
 
     /**
@@ -1073,7 +1067,7 @@ export class Parser {
     protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
                                 action:GrammarAction | string,
                                 errMsg?:string):Token[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, "AT_LEAST_ONE_SEP5", 5, separator, action, errMsg)
+        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 5, separator, action, errMsg)
     }
 
     /**
@@ -1266,8 +1260,7 @@ export class Parser {
             // but the original syntax could have been parsed successfully without any backtracking + recovery
             if (this.recoveryEnabled &&
                 // TODO: more robust checking of the exception type. Perhaps Typescript extending expressions?
-                eFromConsumption.name === "MismatchedTokenException" &&
-                !this.isBackTracking()) {
+                eFromConsumption.name === "MismatchedTokenException" && !this.isBackTracking()) {
 
                 let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
                 try {
@@ -1360,7 +1353,10 @@ export class Parser {
 
         // performance optimization: Use small integers as keys for the longer human readable "full" rule names.
         // this greatly improves Map access time (as much as 8% for some performance benchmarks).
-        let shortName = String(this.ruleShortNameIdx)
+        /* tslint:disable */
+        let shortName = this.ruleShortNameIdx << (BITS_FOR_METHOD_IDX + BITS_FOR_OCCURRENCE_IDX)
+        /* tslint:enable */
+
         this.ruleShortNameIdx++
         this.shortRuleNameToFull.put(shortName, ruleName)
 
@@ -1422,7 +1418,6 @@ export class Parser {
 
         let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[]) {
             this.ruleInvocationStateUpdate(shortName, idxInCallingRule)
-
 
             // TODO: performance hack due to V8 lack of try/catch optimizations.
             // should be removed once V8 support those.
@@ -1660,12 +1655,11 @@ export class Parser {
     private attemptInRepetitionRecovery(prodFunc:Function,
                                         args:any[],
                                         lookaheadFunc:() => boolean,
-                                        prodName:string,
+                                        dslMethodIdx:number,
                                         prodOccurrence:number,
-                                        nextToksWalker:typeof AbstractNextTerminalAfterProductionWalker,
-                                        prodKeys:HashTable<string>[]) {
+                                        nextToksWalker:typeof AbstractNextTerminalAfterProductionWalker) {
 
-        let key = this.getKeyForAutomaticLookahead(prodName, prodKeys, prodOccurrence)
+        let key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
         let firstAfterRepInfo = this.firstAfterRepMap.get(key)
         if (firstAfterRepInfo === undefined) {
             let currRuleName = this.getCurrRuleFullName()
@@ -1714,7 +1708,6 @@ export class Parser {
     }
 
     private atLeastOneInternal(prodFunc:Function,
-                               prodName:string,
                                prodOccurrence:number,
                                predicate:Predicate | GrammarAction,
                                action:GrammarAction | string,
@@ -1749,11 +1742,10 @@ export class Parser {
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg],
-            <any>lookAheadFunc, prodName, prodOccurrence, NextTerminalAfterAtLeastOneWalker, this.atLeastOneLookaheadKeys)
+            <any>lookAheadFunc, AT_LEAST_ONE_IDX, prodOccurrence, NextTerminalAfterAtLeastOneWalker)
     }
 
     private atLeastOneSepFirstInternal(prodFunc:Function,
-                                       prodName:string,
                                        prodOccurrence:number,
                                        separator:TokenConstructor,
                                        action:GrammarAction | string,
@@ -1777,13 +1769,12 @@ export class Parser {
 
             // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
             this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                    this.atLeastOneSepLookaheadKeys, NextTerminalAfterAtLeastOneSepWalker],
+                [prodOccurrence, separator, separatorLookAheadFunc,
+                    action, separatorsResult, NextTerminalAfterAtLeastOneSepWalker],
                 separatorLookAheadFunc,
-                prodName,
+                AT_LEAST_ONE_SEP_IDX,
                 prodOccurrence,
-                NextTerminalAfterAtLeastOneSepWalker,
-                this.atLeastOneSepLookaheadKeys)
+                NextTerminalAfterAtLeastOneSepWalker)
         }
         else {
             throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, userDefinedErrMsg)
@@ -1793,7 +1784,6 @@ export class Parser {
     }
 
     private manyInternal(prodFunc:Function,
-                         prodName:string,
                          prodOccurrence:number,
                          predicate:Predicate | GrammarAction,
                          action?:GrammarAction):void {
@@ -1818,15 +1808,13 @@ export class Parser {
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         this.attemptInRepetitionRecovery(prodFunc,
             [lookaheadFunction, action],
-            <any>lookaheadFunction
-            , prodName,
+            <any>lookaheadFunction,
+            MANY_IDX,
             prodOccurrence,
-            NextTerminalAfterManyWalker,
-            this.manyLookaheadKeys)
+            NextTerminalAfterManyWalker)
     }
 
     private manySepFirstInternal(prodFunc:Function,
-                                 prodName:string,
                                  prodOccurrence:number,
                                  separator:TokenConstructor,
                                  action:GrammarAction):Token[] {
@@ -1849,25 +1837,21 @@ export class Parser {
 
             // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
             this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                [prodName, prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult,
-                    this.manySepLookaheadKeys, NextTerminalAfterManySepWalker],
+                [prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, NextTerminalAfterManySepWalker],
                 separatorLookAheadFunc,
-                prodName,
+                MANY_SEP_IDX,
                 prodOccurrence,
-                NextTerminalAfterManySepWalker,
-                this.manySepLookaheadKeys)
+                NextTerminalAfterManySepWalker)
         }
 
         return separatorsResult
     }
 
-    private repetitionSepSecondInternal(prodName:string,
-                                        prodOccurrence:number,
+    private repetitionSepSecondInternal(prodOccurrence:number,
                                         separator:TokenConstructor,
                                         separatorLookAheadFunc:() => boolean,
                                         action:GrammarAction,
                                         separatorsResult:Token[],
-                                        laKeys:HashTable<string>[],
                                         nextTerminalAfterWalker:typeof AbstractNextTerminalAfterProductionWalker):void {
 
 
@@ -1885,13 +1869,12 @@ export class Parser {
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         /* istanbul ignore else */
         this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-            [prodName, prodOccurrence, separator, separatorLookAheadFunc,
-                action, separatorsResult, laKeys, nextTerminalAfterWalker],
+            [prodOccurrence, separator, separatorLookAheadFunc,
+                action, separatorsResult, nextTerminalAfterWalker],
             separatorLookAheadFunc,
-            prodName,
+            AT_LEAST_ONE_SEP_IDX,
             prodOccurrence,
-            nextTerminalAfterWalker,
-            laKeys)
+            nextTerminalAfterWalker)
     }
 
     private orInternal<T>(alts:IAnyOrAlt<T>[],
@@ -1920,21 +1903,17 @@ export class Parser {
         }
     }
 
-    private getKeyForAutomaticLookahead(prodName:string, prodKeys:HashTable<string>[], occurrence:number):string {
-        let occuMap = prodKeys[occurrence - 1]
+    // this actually returns a number, but it is always used as a string (object prop key)
+    private getKeyForAutomaticLookahead(dslMethodIdx:number, occurrence:number):number {
         let ruleStack = this.RULE_STACK
-        let currRuleShortName = ruleStack[ruleStack.length - 1]
-        let key = occuMap[currRuleShortName]
-        if (key === undefined) {
-            key = prodName + occurrence + currRuleShortName
-            occuMap[currRuleShortName] = key
-        }
-        return key
+        let currRuleShortName:any = ruleStack[ruleStack.length - 1]
+        /* tslint:disable */
+        return occurrence | dslMethodIdx | currRuleShortName
+        /* tslint:enable */
     }
 
     private getLookaheadFuncForOr(occurrence:number, alts:IAnyOrAlt<any>[]):() => number {
-
-        let key = this.getKeyForAutomaticLookahead(OR_IDX, this.orLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
@@ -1950,34 +1929,33 @@ export class Parser {
         }
     }
 
-
     // Automatic lookahead calculation
     private getLookaheadFuncForOption(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, this.optionLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForOption, this.maxLookahead)
     }
 
     private getLookaheadFuncForMany(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(MANY_IDX, this.manyLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(MANY_IDX, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForMany, this.maxLookahead)
     }
 
     private getLookaheadFuncForManySep(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, this.manySepLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForManySep, this.maxLookahead)
     }
 
     private getLookaheadFuncForAtLeastOne(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, this.atLeastOneLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOne, this.maxLookahead)
     }
 
     private getLookaheadFuncForAtLeastOneSep(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, this.atLeastOneSepLookaheadKeys, occurrence)
+        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, occurrence)
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
     }
 
-    private getLookaheadFuncFor<T>(key:string,
+    private getLookaheadFuncFor<T>(key:number,
                                    occurrence:number,
                                    laFuncBuilder:(number, rule, k) => () => T,
                                    maxLookahead:number):() => T {
