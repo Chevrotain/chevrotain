@@ -46,37 +46,8 @@ export function getProductionOverriddenForClass(className:string):HashTable<bool
     return getFromNestedHashTable(className, CLASS_TO_PRODUCTION_OVERRIDEN)
 }
 
-export let CLASS_TO_OR_LA_CACHE = new HashTable<HashTable<string>[]>()
-export let CLASS_TO_MANY_LA_CACHE = new HashTable<HashTable<string>[]>()
-export let CLASS_TO_MANY_SEP_LA_CACHE = new HashTable<HashTable<string>[]>()
-export let CLASS_TO_AT_LEAST_ONE_LA_CACHE = new HashTable<HashTable<string>[]>()
-export let CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE = new HashTable<HashTable<string>[]>()
-export let CLASS_TO_OPTION_LA_CACHE = new HashTable<HashTable<string>[]>()
-
 // TODO reflective test to verify this has not changed, for example (OPTION6 added)
 export const MAX_OCCURRENCE_INDEX = 5
-
-export function initLookAheadKeyCache(className) {
-    CLASS_TO_OR_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
-    CLASS_TO_MANY_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
-    CLASS_TO_MANY_SEP_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
-    CLASS_TO_AT_LEAST_ONE_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
-    CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
-    CLASS_TO_OPTION_LA_CACHE[className] = new Array(MAX_OCCURRENCE_INDEX)
-
-    initSingleLookAheadKeyCache(CLASS_TO_OR_LA_CACHE[className])
-    initSingleLookAheadKeyCache(CLASS_TO_MANY_LA_CACHE[className])
-    initSingleLookAheadKeyCache(CLASS_TO_MANY_SEP_LA_CACHE[className])
-    initSingleLookAheadKeyCache(CLASS_TO_AT_LEAST_ONE_LA_CACHE[className])
-    initSingleLookAheadKeyCache(CLASS_TO_AT_LEAST_ONE_SEP_LA_CACHE[className])
-    initSingleLookAheadKeyCache(CLASS_TO_OPTION_LA_CACHE[className])
-}
-
-function initSingleLookAheadKeyCache(laCache:HashTable<string>[]):void {
-    for (let i = 0; i < MAX_OCCURRENCE_INDEX; i++) {
-        laCache[i] = new HashTable<string>()
-    }
-}
 
 function getFromNestedHashTable(className:string, hashTable:HashTable<any>) {
     let result = hashTable.get(className)
