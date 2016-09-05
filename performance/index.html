@@ -228,8 +228,12 @@
         }, 500);
 
         // more minSamples (default=5) for more accurate & consistent results.
-        Benchmark.options.minSamples = 15
+        Benchmark.options.minSamples = 50
+        // some parsers are so slow that they will take too long to finish 50 samples.
+        // this sets a upper bound on the benchmark runtime (at the cost of accuracy for the slower parsers)
+        Benchmark.options.maxTime = 2
 
+        var x= 0
         var suite = new Benchmark.Suite;
         suite.add('Jison', function () {
             jisonJsonLexerAndParser.parse(json_sample1k)
