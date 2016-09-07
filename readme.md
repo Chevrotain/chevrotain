@@ -7,7 +7,7 @@
 
 # Chevrotain
 
-Chevrotain is a **JavaScript parsing DSL** for building [**high performance**][benchmark] **fault-tolerant** recursive decent parsers.
+Chevrotain is a **JavaScript parsing DSL** for building [**fast**][benchmark] LL(k) Parsers with optional **fault-tolerant** capabilities.
 
 Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
@@ -69,10 +69,12 @@ any code generation phase.
 
 ## Documentation
 
-* **[FAQ](docs/faq.md)**
+* **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)** 
+ 
+* **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
-* **[Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
-  - [Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars) 
+* **[FAQ](docs/faq.md)**
+  
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_14_0/classes/parser.html#at_least_one)
