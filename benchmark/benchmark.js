@@ -12,8 +12,8 @@ var isBenchmarkOnlyLexer = false
 
 var _ = require("lodash")
 
-var times = 200
-var warmupTimes = 10
+var times = 400
+var warmupTimes = 50
 
 function performBenchmark(name, input, devParse, oldParse) {
 
@@ -24,7 +24,6 @@ function performBenchmark(name, input, devParse, oldParse) {
         devParse(input, isBenchmarkOnlyLexer)
         oldParse(input, isBenchmarkOnlyLexer)
     }
-
 
     var totalDev = 0
     var totalOld = 0
@@ -44,7 +43,6 @@ function performBenchmark(name, input, devParse, oldParse) {
     var averageDev = totalDev / times
     console.log("average with dev version: " + averageDev)
 
-
     var averageOld = totalOld / times
     console.log("average with old version: " + averageOld)
 
@@ -57,5 +55,5 @@ function performBenchmark(name, input, devParse, oldParse) {
     }
 }
 
-performBenchmark("JSON", jsonSample, devVersionParseJson, oldVersionParseJson)
 performBenchmark("CSS", cssSample, devVersionParseCss, oldVersionParseCss)
+performBenchmark("JSON", jsonSample, devVersionParseJson, oldVersionParseJson)

@@ -1,4 +1,4 @@
-import {Token, tokenName, LazyToken} from "./tokens_public"
+import {Token, tokenName} from "./tokens_public"
 import {TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer, IMultiModeLexerDefinition} from "./lexer_public"
 import {
     reject,
@@ -19,6 +19,7 @@ import {
     uniq,
     every
 } from "../utils/utils"
+import {isLazyToken, isSimpleToken} from "./tokens"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -365,9 +366,6 @@ export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):
 
     return errors
 }
-function isLazyToken(tokType:TokenConstructor):boolean {
-    return LazyToken.prototype.isPrototypeOf(tokType.prototype)
-}
 
 export interface LazyCheckResult {
     isLazy:boolean
@@ -379,6 +377,7 @@ export function checkLazyMode(allTokenTypes:TokenConstructor[]):LazyCheckResult 
     let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
 
     let areAllLazy = every(allTokensTypeSet, (currTokType) => isLazyToken(currTokType))
+    // TODO: why is this second check required?
     let areAllNotLazy = every(allTokensTypeSet, (currTokType) => !isLazyToken(currTokType))
 
     if (!areAllLazy && !areAllNotLazy) {
@@ -400,9 +399,46 @@ export function checkLazyMode(allTokenTypes:TokenConstructor[]):LazyCheckResult 
         })
     }
 
-
     return {
         isLazy: areAllLazy,
         errors: errors
+    }
+}
+
+export interface SimpleCheckResult {
+    isSimple:boolean
+    errors:ILexerDefinitionError[]
+}
+
+export function checkSimpleMode(allTokenTypes:TokenConstructor[]):SimpleCheckResult {
+    let errors = []
+    let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
+
+    let areAllSimple = every(allTokensTypeSet, (currTokType) => isSimpleToken(currTokType))
+    // TODO: why is the second check required?
+    let areAllNotSimple = every(allTokensTypeSet, (currTokType) => !isSimpleToken(currTokType))
+
+    if (!areAllSimple && !areAllNotSimple) {
+
+        let simpleTokens = filter(allTokensTypeSet, (currTokType) => isSimpleToken(currTokType))
+        let simpleTokensNames = map(simpleTokens, tokenName)
+        let simpleTokensString = simpleTokensNames.join("\n\t")
+        let notSimpleTokens = filter(allTokensTypeSet, (currTokType) => !isSimpleToken(currTokType))
+        let notSimpleTokensNames = map(notSimpleTokens, tokenName)
+        let notSimpleTokensString = notSimpleTokensNames.join("\n\t")
+
+        errors.push({
+            message: `A Lexer cannot be defined using a mix of both Simple and Non-Simple Tokens:\n` +
+                     `Simple Tokens:\n\t` +
+                     simpleTokensString +
+                     `\nNon-Simple Tokens:\n\t` +
+                     notSimpleTokensString,
+            type:    LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_SIMPLE_AND_NOT_SIMPLE
+        })
+    }
+
+    return {
+        isSimple: areAllSimple,
+        errors:   errors
     }
 }

@@ -2,10 +2,9 @@ import {map, reduce, find, every, isEmpty, flatten, getSuperClass, forEach, has}
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
-import {Predicate, IAnyOrAlt} from "../parser_public"
+import {Predicate, IAnyOrAlt, TokenMatcher, TokenInstanceIdentityFunc, TokenClassIdentityFunc} from "../parser_public"
 import {isBaseTokenClass} from "../../scan/tokens"
 import {Lexer} from "../../scan/lexer_public"
-
 
 export enum PROD_TYPE {
     OPTION,
@@ -19,9 +18,12 @@ export enum PROD_TYPE {
 export function buildLookaheadFuncForOr(occurrence:number,
                                         ruleGrammar:gast.Rule,
                                         k:number,
-                                        hasPredicates:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
+                                        hasPredicates:boolean,
+                                        tokenMatcher:TokenMatcher,
+                                        tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                        tokenIdentityFunc:TokenInstanceIdentityFunc):(orAlts?:IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
-    return buildAlternativesLookAheadFunc(lookAheadPaths, hasPredicates)
+    return buildAlternativesLookAheadFunc(lookAheadPaths, hasPredicates, tokenMatcher, tokenClassIdentityFunc, tokenIdentityFunc)
 }
 
 /**
@@ -39,40 +41,102 @@ export function buildLookaheadFuncForOr(occurrence:number,
 export function buildLookaheadFuncForOptionalProd(occurrence:number,
                                                   ruleGrammar:gast.Rule,
                                                   prodType:PROD_TYPE,
-                                                  k:number):() => boolean {
+                                                  k:number,
+                                                  tokenMatcher:TokenMatcher,
+                                                  tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                                  tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
     let lookAheadPaths = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k)
-    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0])
+    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0], tokenMatcher, tokenClassIdentityFunc, tokenInstanceIdentityFunc)
 }
 
-export function buildLookaheadForOption(optionOccurrence:number, ruleGrammar:gast.Rule, k:number):() => boolean {
-    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.OPTION, k)
+export function buildLookaheadForOption(optionOccurrence:number,
+                                        ruleGrammar:gast.Rule,
+                                        k:number,
+                                        tokenMatcher:TokenMatcher,
+                                        tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                        tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+    return buildLookaheadFuncForOptionalProd(optionOccurrence,
+        ruleGrammar,
+        PROD_TYPE.OPTION,
+        k,
+        tokenMatcher,
+        tokenClassIdentityFunc,
+        tokenInstanceIdentityFunc)
 }
 
-export function buildLookaheadForMany(optionOccurrence:number, ruleGrammar:gast.Rule, k:number):() => boolean {
-    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION, k)
+export function buildLookaheadForMany(optionOccurrence:number,
+                                      ruleGrammar:gast.Rule,
+                                      k:number,
+                                      tokenMatcher:TokenMatcher,
+                                      tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                      tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+    return buildLookaheadFuncForOptionalProd(
+        optionOccurrence,
+        ruleGrammar,
+        PROD_TYPE.REPETITION,
+        k,
+        tokenMatcher,
+        tokenClassIdentityFunc,
+        tokenInstanceIdentityFunc)
 }
 
-export function buildLookaheadForManySep(optionOccurrence:number, ruleGrammar:gast.Rule, k:number):() => boolean {
-    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION_WITH_SEPARATOR, k)
+export function buildLookaheadForManySep(optionOccurrence:number,
+                                         ruleGrammar:gast.Rule,
+                                         k:number,
+                                         tokenMatcher:TokenMatcher,
+                                         tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                         tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+    return buildLookaheadFuncForOptionalProd(
+        optionOccurrence,
+        ruleGrammar,
+        PROD_TYPE.REPETITION_WITH_SEPARATOR,
+        k,
+        tokenMatcher,
+        tokenClassIdentityFunc,
+        tokenInstanceIdentityFunc)
 }
 
-export function buildLookaheadForAtLeastOne(optionOccurrence:number, ruleGrammar:gast.Rule, k:number):() => boolean {
-    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION_MANDATORY, k)
+export function buildLookaheadForAtLeastOne(optionOccurrence:number,
+                                            ruleGrammar:gast.Rule,
+                                            k:number,
+                                            tokenMatcher:TokenMatcher,
+                                            tokenIdentityFunc:TokenClassIdentityFunc,
+                                            tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+    return buildLookaheadFuncForOptionalProd(
+        optionOccurrence,
+        ruleGrammar,
+        PROD_TYPE.REPETITION_MANDATORY,
+        k,
+        tokenMatcher,
+        tokenIdentityFunc,
+        tokenInstanceIdentityFunc)
 }
 
-export function buildLookaheadForAtLeastOneSep(optionOccurrence:number, ruleGrammar:gast.Rule, k:number):() => boolean {
-    return buildLookaheadFuncForOptionalProd(optionOccurrence, ruleGrammar, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, k)
+export function buildLookaheadForAtLeastOneSep(optionOccurrence:number,
+                                               ruleGrammar:gast.Rule,
+                                               k:number,
+                                               tokenMatcher:TokenMatcher,
+                                               tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                               tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+    return buildLookaheadFuncForOptionalProd(
+        optionOccurrence,
+        ruleGrammar,
+        PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
+        k,
+        tokenMatcher,
+        tokenClassIdentityFunc,
+        tokenInstanceIdentityFunc
+    )
 }
 
 export type Alternative = Function[][]
 export type lookAheadSequence = Function[][]
 
-/**
- * @param alts
- * @param hasPredicates
- * @returns {function(): number}
- */
-export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPredicates:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
+export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[],
+                                               hasPredicates:boolean,
+                                               tokenMatcher:TokenMatcher,
+                                               tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                               tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):(orAlts?:IAnyOrAlt<any>[]) => number {
     let numOfAlts = alts.length
     let areAllOneTokenLookahead = every(alts, (currAlt) => {
         return every(currAlt, (currPath) => {
@@ -88,6 +152,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
                     // "Abstract" classes and that "Abstract" classes always use "Lexer.NA" pattern
                     // TODO: this needs to be verified at runtime in extendToken, which means ES2015 classes can no
                     // longer be safely supported in combination with inheritance.
+                    // or maybe collect more information about the Token inheritance hierarchy at runtime?
                     currTokClass.PATTERN !== Lexer.NA
             })
         })
@@ -120,7 +185,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
                         let currPathLength = currPath.length
                         for (let i = 0; i < currPathLength; i++) {
                             let nextToken = this.LA(i + 1)
-                            if (!(nextToken instanceof currPath[i])) {
+                            if (!tokenMatcher(nextToken, currPath[i])) {
                                 // mismatch in current path
                                 // try the next pth
                                 continue nextPath
@@ -147,8 +212,8 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
 
         let choiceToAlt = reduce(singleTokenAlts, (result, currAlt, idx) => {
             forEach(currAlt, (currTokClass) => {
-                if (!has(result, currTokClass.uniqueTokenTypeShortKey)) {
-                    result[currTokClass.uniqueTokenTypeShortKey] = idx
+                if (!has(result, tokenClassIdentityFunc(currTokClass))) {
+                    result[tokenClassIdentityFunc(currTokClass)] = idx
                 }
             })
 
@@ -160,7 +225,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
          */
         return function ():number {
             let nextToken = this.LA(1)
-            return choiceToAlt[nextToken.constructor.uniqueTokenTypeShortKey]
+            return choiceToAlt[tokenInstanceIdentityFunc(nextToken)]
         }
     }
     // optimized lookahead without needing to check the predicates at all.
@@ -179,7 +244,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
                         let currPathLength = currPath.length
                         for (let i = 0; i < currPathLength; i++) {
                             let nextToken = this.LA(i + 1)
-                            if (!(nextToken instanceof currPath[i])) {
+                            if (!(tokenMatcher(nextToken, currPath[i]))) {
                                 // mismatch in current path
                                 // try the next pth
                                 continue nextPath
@@ -198,7 +263,10 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
     }
 }
 
-export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):() => boolean {
+export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence,
+                                                        tokenMatcher:TokenMatcher,
+                                                        tokenClassIdentityFunc:TokenClassIdentityFunc,
+                                                        tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
 
     let areAllOneTokenLookahead = every(alt, (currPath) => {
         return currPath.length === 1
@@ -220,23 +288,23 @@ export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):(
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead.
     if (areAllOneTokenLookahead && allTokensExtendBaseTokenClassesDirectly) {
-        let singleTokens = flatten(alt)
+        let singleTokensTypes = flatten(alt)
 
-        if (singleTokens.length === 1) {
-            let expectedTokenType = singleTokens[0]
-            let expectedTokenUniqueKey = (<any>expectedTokenType).uniqueTokenTypeShortKey
+        if (singleTokensTypes.length === 1) {
+            let expectedTokenType = singleTokensTypes[0]
+            let expectedTokenUniqueKey = tokenClassIdentityFunc(<any>expectedTokenType)
             return function ():boolean {
-                return this.LA(1).constructor.uniqueTokenTypeShortKey === expectedTokenUniqueKey
+                return tokenInstanceIdentityFunc(this.LA(1)) === expectedTokenUniqueKey
             }
         }
         else {
-            let choiceToAlt = reduce(singleTokens, (result, currTokClass, idx) => {
-                result[currTokClass.uniqueTokenTypeShortKey] = true
+            let choiceToAlt = reduce(singleTokensTypes, (result, currTokClass, idx) => {
+                result[tokenClassIdentityFunc(currTokClass)] = true
                 return result
             }, {})
             return function ():boolean {
                 let nextToken = this.LA(1)
-                return choiceToAlt[nextToken.constructor.uniqueTokenTypeShortKey] === true ? true : false
+                return choiceToAlt[tokenInstanceIdentityFunc(nextToken)] === true ? true : false
             }
         }
     }
@@ -248,7 +316,7 @@ export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):(
                     let currPathLength = currPath.length
                     for (let i = 0; i < currPathLength; i++) {
                         let nextToken = this.LA(i + 1)
-                        if (!(nextToken instanceof currPath[i])) {
+                        if (!(tokenMatcher(nextToken, currPath[i]))) {
                             // mismatch in current path
                             // try the next pth
                             continue nextPath

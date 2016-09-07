@@ -6,7 +6,7 @@
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
 import {Parser} from "../../../../src/parse/parser_public"
-import {Token, VirtualToken} from "../../../../src/scan/tokens_public"
+import {Token, VirtualToken, IToken} from "../../../../src/scan/tokens_public"
 import * as allTokens from "./sql_recovery_tokens"
 import {
     INVALID_DDL,
@@ -167,7 +167,7 @@ export class DDLExampleRecoveryParser extends Parser {
     }
 
     private parseValue():ParseTree {
-        let value:Token = null
+        let value = null
         this.OR(
             [   // @formatter:off
                     {ALT: () => {value = this.CONSUME1(StringTok)}},

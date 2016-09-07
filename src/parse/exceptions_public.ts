@@ -1,4 +1,4 @@
-import {Token} from "../scan/tokens_public"
+import {Token, ISimpleTokenOrIToken} from "../scan/tokens_public"
 import {contains} from "../utils/utils"
 
 export namespace exceptions {
@@ -54,7 +54,7 @@ export namespace exceptions {
         return contains(RECOGNITION_EXCEPTION_NAMES, error.name)
     }
 
-    export function MismatchedTokenException(message:string, token:Token) {
+    export function MismatchedTokenException(message:string, token:ISimpleTokenOrIToken) {
         this.name = MISMATCHED_TOKEN_EXCEPTION
         this.message = message
         this.token = token
@@ -65,7 +65,7 @@ export namespace exceptions {
     // because the stack trace points to where "new Error" was invoked"
     MismatchedTokenException.prototype = Error.prototype
 
-    export function NoViableAltException(message:string, token:Token) {
+    export function NoViableAltException(message:string, token:ISimpleTokenOrIToken) {
         this.name = NO_VIABLE_ALT_EXCEPTION
         this.message = message
         this.token = token
@@ -74,7 +74,7 @@ export namespace exceptions {
 
     NoViableAltException.prototype = Error.prototype
 
-    export function NotAllInputParsedException(message:string, token:Token) {
+    export function NotAllInputParsedException(message:string, token:ISimpleTokenOrIToken) {
         this.name = NOT_ALL_INPUT_PARSED_EXCEPTION
         this.message = message
         this.token = token
@@ -83,7 +83,7 @@ export namespace exceptions {
 
     NotAllInputParsedException.prototype = Error.prototype
 
-    export function EarlyExitException(message:string, token:Token) {
+    export function EarlyExitException(message:string, token:ISimpleTokenOrIToken) {
         this.name = EARLY_EXIT_EXCEPTION
         this.message = message
         this.token = token

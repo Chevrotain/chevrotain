@@ -22,10 +22,25 @@ import {
     isUndefined,
     forEach,
     some,
-    NOOP, values
+    NOOP,
+    values,
+    every,
+    getSuperClass
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
-import {Token, tokenName, EOF, tokenLabel, hasTokenLabel, LazyToken} from "../scan/tokens_public"
+import {
+    Token,
+    tokenName,
+    EOF,
+    tokenLabel,
+    hasTokenLabel,
+    LazyToken,
+    IToken,
+    SimpleLazyToken,
+    getImage,
+    ISimpleTokenOrIToken,
+    getTokenConstructor
+} from "../scan/tokens_public"
 import {
     buildLookaheadForOption,
     buildLookaheadForMany,
@@ -51,7 +66,14 @@ import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
 import {ITokenGrammarPath} from "./grammar/path_public"
-import {augmentTokenClasses} from "../scan/tokens"
+import {
+    augmentTokenClasses,
+    tokenStructuredIdentity,
+    tokenInstanceofMatcher,
+    tokenClassIdentity,
+    tokenInstanceIdentity,
+    tokenStructuredMatcher
+} from "../scan/tokens"
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -68,7 +90,8 @@ export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
 export type IgnoredParserIssues = { [ruleName:string]:IgnoredRuleIssues }
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
-const END_OF_FILE = new EOF()
+const END_OF_FILE = new EOF();
+(<any>END_OF_FILE).tokenType = (<any>EOF).tokenType
 Object.freeze(END_OF_FILE)
 
 // Lookahead keys are 32Bit integers in the form
@@ -90,6 +113,10 @@ const AT_LEAST_ONE_IDX = 4 << BITS_FOR_METHOD_IDX
 const MANY_SEP_IDX = 5 << BITS_FOR_METHOD_IDX
 const AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_METHOD_IDX
 /* tslint:enable */
+
+export type TokenMatcher = (token:ISimpleTokenOrIToken, tokClass:Function) => boolean
+export type TokenInstanceIdentityFunc = (tok:IToken) => string
+export type TokenClassIdentityFunc = (tok:TokenConstructor) => string
 
 export interface IParserConfig {
     /**
@@ -367,6 +394,9 @@ export class Parser {
 
     private shortRuleNameToFull = new HashTable<string>()
     private ruleShortNameIdx = 1
+    private tokenMatcher:TokenMatcher
+    private tokenClassIdentityFunc:TokenClassIdentityFunc
+    private tokenInstanceIdentityFunc:TokenInstanceIdentityFunc
 
     /**
      * Only used internally for storing productions as they are built for the first time.
@@ -423,9 +453,27 @@ export class Parser {
             throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.")
         }
 
+        let allTokens = values(this.tokensMap)
+        let areAllStructuredTokens = every(allTokens, (currTok) => {
+            return getSuperClass(currTok) === SimpleLazyToken
+        })
+
+        if (areAllStructuredTokens) {
+            this.tokenMatcher = tokenStructuredMatcher
+            this.tokenClassIdentityFunc = tokenStructuredIdentity
+            // same IdentityFunc used in structured Mode
+            this.tokenInstanceIdentityFunc = tokenStructuredIdentity
+        } else {
+            this.tokenMatcher = tokenInstanceofMatcher
+            this.tokenClassIdentityFunc = tokenClassIdentity
+            this.tokenInstanceIdentityFunc = tokenInstanceIdentity
+        }
+
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
         // parsed with a clear error message ("expecting EOF but found ...")
-        this.tokensMap[tokenName(EOF)] = EOF
+        /* tslint:disable */
+        this.tokensMap["EOF"] = EOF
+        /* tslint:enable */
 
         // Because ES2015+ syntax should be supported for creating Token classes
         // We cannot assume that the Token classes were created using the "extendToken" utilities
@@ -465,7 +513,7 @@ export class Parser {
     }
 
     public isAtEndOfInput():boolean {
-        return this.LA(1) instanceof EOF
+        return this.tokenMatcher(this.LA(1), EOF)
     }
 
     public getGAstProductions():HashTable<gast.Rule> {
@@ -533,7 +581,7 @@ export class Parser {
     }
 
     // skips a token and returns the next token
-    protected SKIP_TOKEN():Token {
+    protected SKIP_TOKEN():ISimpleTokenOrIToken {
         // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
         // input[45] which is the 46th item and no longer exists,
         // so in this case the largest valid input index is 43 (input.length - 2 )
@@ -551,7 +599,7 @@ export class Parser {
      * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
      */
-    protected CONSUME(tokClass:Function):Token {
+    protected CONSUME(tokClass:Function):ISimpleTokenOrIToken {
         return this.CONSUME1(tokClass)
     }
 
@@ -580,35 +628,36 @@ export class Parser {
      *
      * @returns {Token} - The consumed token.
      */
-    protected CONSUME1(tokClass:Function):Token {
+    // TODO: what is the returned type? ISimpleTokenOrIToken or IToken? or || ?
+    protected CONSUME1(tokClass:Function):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 1)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME2(tokClass:Function):Token {
+    protected CONSUME2(tokClass:Function):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 2)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME3(tokClass:Function):Token {
+    protected CONSUME3(tokClass:Function):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 3)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME4(tokClass:Function):Token {
+    protected CONSUME4(tokClass:Function):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 4)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME5(tokClass:Function):Token {
+    protected CONSUME5(tokClass:Function):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 5)
     }
 
@@ -1154,9 +1203,9 @@ export class Parser {
         this.RULE_OCCURRENCE_STACK.pop()
 
         if ((this.RULE_STACK.length === 0) && !this.isAtEndOfInput()) {
-            let firstRedundantTok:Token = this.LA(1)
+            let firstRedundantTok = this.LA(1)
             this.SAVE_ERROR(new exceptions.NotAllInputParsedException(
-                "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
+                "Redundant input, expecting EOF but found: " + getImage(firstRedundantTok), firstRedundantTok))
         }
     }
 
@@ -1165,7 +1214,7 @@ export class Parser {
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
-    protected getTokenToInsert(tokClass:Function):Token {
+    protected getTokenToInsert(tokClass:TokenConstructor):Token {
         let tokToInsert
 
         if (LazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
@@ -1173,6 +1222,16 @@ export class Parser {
                 orgText:      "",
                 lineToOffset: []
             })
+        }
+        else if (SimpleLazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
+            tokToInsert = {
+                startOffset: NaN,
+                endOffset:   NaN,
+                cacheData:   {
+                    orgText:      "",
+                    lineToOffset: []
+                }
+            }
         }
         else if (Token.prototype.isPrototypeOf(tokClass.prototype)) {
             tokToInsert = new (<any>tokClass)("", NaN, NaN, NaN, NaN, NaN)
@@ -1201,13 +1260,13 @@ export class Parser {
      * @param {Function} expectedTokType - The Class of the expected Token.
      * @returns {string} - The error message saved as part of a MismatchedTokenException.
      */
-    protected getMisMatchTokenErrorMessage(expectedTokType:Function, actualToken:Token):string {
+    protected getMisMatchTokenErrorMessage(expectedTokType:Function, actualToken:ISimpleTokenOrIToken):string {
         let hasLabel = hasTokenLabel(expectedTokType)
         let expectedMsg = hasLabel ?
             `--> ${tokenLabel(expectedTokType)} <--` :
             `token of type --> ${tokenName(expectedTokType)} <--`
 
-        let msg = `Expecting ${expectedMsg} but found --> '${actualToken.image}' <--`
+        let msg = `Expecting ${expectedMsg} but found --> '${getImage(actualToken)}' <--`
 
         return msg
     }
@@ -1247,7 +1306,7 @@ export class Parser {
      *
      * @returns {Token} - The consumed Token.
      */
-    protected consumeInternal(tokClass:Function, idx:number):Token {
+    protected consumeInternal(tokClass:Function, idx:number):ISimpleTokenOrIToken {
         // TODO: this is an hack to avoid try catch block in V8, should be removed once V8 supports try/catch optimizations.
         // as the IF/ELSE itself has some overhead.
         if (!this.recoveryEnabled) {
@@ -1258,7 +1317,7 @@ export class Parser {
         }
     }
 
-    protected consumeInternalWithTryCatch(tokClass:Function, idx:number):Token {
+    protected consumeInternalWithTryCatch(tokClass:Function, idx:number):ISimpleTokenOrIToken {
         try {
             return this.consumeInternalOptimized(tokClass)
         } catch (eFromConsumption) {
@@ -1297,13 +1356,13 @@ export class Parser {
      *
      * @deprecated
      */
-    protected NEXT_TOKEN():Token {
+    protected NEXT_TOKEN():ISimpleTokenOrIToken {
         return this.LA(1)
     }
 
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
-    protected LA(howMuch:number):Token {
+    protected LA(howMuch:number):ISimpleTokenOrIToken {
         if (this._input.length <= this.inputIdx + howMuch) {
             return END_OF_FILE
         }
@@ -1466,7 +1525,7 @@ export class Parser {
 
         while (!passedResyncPoint) {
             // re-synced to a point where we can safely exit the repetition/
-            if (currToken instanceof expectedTokType) {
+            if (this.tokenMatcher(currToken, expectedTokType)) {
                 generateErrorMessage()
                 return // must return here to avoid reverting the inputIdx
             }
@@ -1477,7 +1536,7 @@ export class Parser {
                 grammarRule.apply(this, grammarRuleArgs)
                 return // must return here to avoid reverting the inputIdx
             }
-            else if (currToken instanceof reSyncTokType) {
+            else if (this.tokenMatcher(currToken, reSyncTokType)) {
                 passedResyncPoint = true
             }
             else {
@@ -1499,7 +1558,7 @@ export class Parser {
         }
 
         // no need to recover, next token is what we expect...
-        if (this.LA(1) instanceof expectTokAfterLastMatch) {
+        if (this.tokenMatcher(this.LA(1), expectTokAfterLastMatch)) {
             return false
         }
 
@@ -1527,7 +1586,7 @@ export class Parser {
         return follows
     }
 
-    private tryInRuleRecovery(expectedTokType:Function, follows:Function[]):Token {
+    private tryInRuleRecovery(expectedTokType:Function, follows:Function[]):ISimpleTokenOrIToken {
         if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
             let tokToInsert = this.getTokenToInsert(expectedTokType)
             return tokToInsert
@@ -1560,14 +1619,14 @@ export class Parser {
 
         let mismatchedTok = this.LA(1)
         let isMisMatchedTokInFollows = find(follows, (possibleFollowsTokType:Function) => {
-                return mismatchedTok instanceof possibleFollowsTokType
+                return this.tokenMatcher(mismatchedTok, possibleFollowsTokType)
             }) !== undefined
 
         return isMisMatchedTokInFollows
     }
 
     private canRecoverWithSingleTokenDeletion(expectedTokType:Function):boolean {
-        let isNextTokenWhatIsExpected = this.LA(2) instanceof expectedTokType
+        let isNextTokenWhatIsExpected = this.tokenMatcher(this.LA(2), expectedTokType)
         return isNextTokenWhatIsExpected
     }
 
@@ -1583,7 +1642,7 @@ export class Parser {
         let nextToken = this.LA(1)
         let k = 2
         while (true) {
-            let nextTokenType:any = (<any>nextToken).constructor
+            let nextTokenType:any = getTokenConstructor(nextToken)
             if (contains(allPossibleReSyncTokTypes, nextTokenType)) {
                 return nextTokenType
             }
@@ -1639,8 +1698,8 @@ export class Parser {
 
     // It does not make any sense to include a virtual EOF token in the list of resynced tokens
     // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
-    private addToResyncTokens(token:Token, resyncTokens:Token[]):Token[] {
-        if (!(token instanceof EOF)) {
+    private addToResyncTokens(token:ISimpleTokenOrIToken, resyncTokens:ISimpleTokenOrIToken[]):ISimpleTokenOrIToken[] {
+        if (!this.tokenMatcher(token, EOF)) {
             resyncTokens.push(token)
         }
         return resyncTokens
@@ -1649,7 +1708,7 @@ export class Parser {
     private reSyncTo(tokClass:Function):Token[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
-        while ((nextTok instanceof tokClass) === false) {
+        while ((this.tokenMatcher(nextTok, tokClass)) === false) {
             nextTok = this.SKIP_TOKEN()
             this.addToResyncTokens(nextTok, resyncedTokens)
         }
@@ -1764,7 +1823,7 @@ export class Parser {
         if (firstIterationLookaheadFunc.call(this)) {
             (<GrammarAction>action).call(this)
 
-            let separatorLookAheadFunc = () => {return this.LA(1) instanceof separator}
+            let separatorLookAheadFunc = () => {return this.tokenMatcher(this.LA(1), separator)}
             // 2nd..nth iterations
             while (separatorLookAheadFunc()) {
                 // note that this CONSUME will never enter recovery because
@@ -1832,7 +1891,7 @@ export class Parser {
         if (firstIterationLaFunc.call(this)) {
             action.call(this)
 
-            let separatorLookAheadFunc = () => {return this.LA(1) instanceof separator}
+            let separatorLookAheadFunc = () => {return this.tokenMatcher(this.LA(1), separator)}
             // 2nd..nth iterations
             while (separatorLookAheadFunc()) {
                 // note that this CONSUME will never enter recovery because
@@ -1857,7 +1916,7 @@ export class Parser {
                                         separator:TokenConstructor,
                                         separatorLookAheadFunc:() => boolean,
                                         action:GrammarAction,
-                                        separatorsResult:Token[],
+                                        separatorsResult:ISimpleTokenOrIToken[],
                                         nextTerminalAfterWalker:typeof AbstractNextTerminalAfterProductionWalker):void {
 
 
@@ -1897,9 +1956,9 @@ export class Parser {
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
-    private consumeInternalOptimized(expectedTokClass:Function):Token {
+    private consumeInternalOptimized(expectedTokClass:Function):ISimpleTokenOrIToken {
         let nextToken = this.LA(1)
-        if (nextToken instanceof expectedTokClass) {
+        if (this.tokenMatcher(nextToken, expectedTokClass)) {
             this.consumeToken()
             return nextToken
         }
@@ -1926,7 +1985,14 @@ export class Parser {
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             // note that hasPredicates is only computed once.
             let hasPredicates = some(alts, (currAlt) => isFunction((<IOrAltWithGate<any>>currAlt).GATE))
-            laFunc = buildLookaheadFuncForOr(occurrence, ruleGrammar, this.maxLookahead, hasPredicates)
+            laFunc = buildLookaheadFuncForOr(
+                occurrence,
+                ruleGrammar,
+                this.maxLookahead,
+                hasPredicates,
+                this.tokenMatcher,
+                this.tokenClassIdentityFunc,
+                this.tokenInstanceIdentityFunc)
             this.classLAFuncs.put(key, laFunc)
             return laFunc
         }
@@ -1963,13 +2029,19 @@ export class Parser {
 
     private getLookaheadFuncFor<T>(key:number,
                                    occurrence:number,
-                                   laFuncBuilder:(number, rule, k) => () => T,
+                                   laFuncBuilder:(number,
+                                                  rule,
+                                                  k,
+                                                  tokenMatcher,
+                                                  tokenClassIdentityFunc,
+                                                  tokenInstanceIdentityFunc) => () => T,
                                    maxLookahead:number):() => T {
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            laFunc = laFuncBuilder.apply(null, [occurrence, ruleGrammar, maxLookahead])
+            laFunc = laFuncBuilder.apply(null,
+                [occurrence, ruleGrammar, maxLookahead, this.tokenMatcher, this.tokenClassIdentityFunc, this.tokenInstanceIdentityFunc])
             this.classLAFuncs.put(key, laFunc)
             return laFunc
         }
@@ -1980,7 +2052,7 @@ export class Parser {
 
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
-        let errSuffix = " but found: '" + this.LA(1).image + "'"
+        let errSuffix = " but found: '" + getImage(this.LA(1)) + "'"
         if (errMsgTypes === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -1998,7 +2070,7 @@ export class Parser {
     private raiseEarlyExitException(occurrence:number,
                                     prodType:PROD_TYPE,
                                     userDefinedErrMsg:string):void {
-        let errSuffix = " but found: '" + this.LA(1).image + "'"
+        let errSuffix = " but found: '" + getImage(this.LA(1)) + "'"
         if (userDefinedErrMsg === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2022,3 +2094,4 @@ function InRuleRecoveryException(message:string) {
 }
 
 InRuleRecoveryException.prototype = Error.prototype
+

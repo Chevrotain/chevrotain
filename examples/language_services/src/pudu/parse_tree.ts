@@ -1,6 +1,6 @@
 import chevrotain = require ("chevrotain")
 import * as _ from "lodash"
-import {Token, VirtualToken} from "chevrotain"
+import {Token, VirtualToken, ISimpleTokenOrIToken} from "chevrotain"
 
 export class ParseTree {
     getImage():string { return this.payload.image }
@@ -21,7 +21,7 @@ export class ParseTree {
  * @param {ParseTree[]} children The sub nodes of the ParseTree to the built
  * @returns {ParseTree}
  */
-export function PT(tokenOrTokenClass:Function|Token, children:ParseTree[] = []):ParseTree {
+export function PT(tokenOrTokenClass:Function|ISimpleTokenOrIToken, children:ParseTree[] = []):ParseTree {
     let childrenCompact = _.compact(children)
 
     if (tokenOrTokenClass instanceof Token) {
