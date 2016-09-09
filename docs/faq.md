@@ -1,14 +1,14 @@
 ## FAQ
 
-* [Why should I use Chevrotain instead of some other Javascript Parsing solution?](#Q1)
-* [Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?](#Q2)
-* [How do I debug my parser?](#Q3)
-* [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](Q4)
-* [Why does Chevrotain now work correctly after I minified my Sources?](#Q5)
-* [How do I Maximize my parser's performance?](#Q6)
+* [Why should I use Chevrotain instead of some other Javascript Parsing solution?](#VS_GENERATORS)
+* [Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?](#WHY_ERROR_RECOVERY)
+* [How do I debug my parser?](#DEBUGGING)
+* [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](NUMERICAL_SUFFIXES)
+* [Why does Chevrotain now work correctly after I minified my Sources?](#MINIFIED)
+* [How do I Maximize my parser's performance?](#PERFORMANCE)
 
 
-### <a name="Q1"></a> Why should I use Chevrotain Parsing DSL instead of a Parser Generator?
+### <a name="VS_GENERATORS"></a> Why should I use a Parsing DSL instead of a Parser Generator?
 A Parser Generator adds an (unnecessary) level of abstraction between the grammar implementation and the actual parser.
 This is because the grammar is written in a **different** language than the target runtime. 
  
@@ -24,7 +24,7 @@ This is because the grammar is written in a **different** language than the targ
 * No need for a special editor to write the Grammar, just use your favorites JavaScript editor.    
 
 
-### <a name="Q2"></a> Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?
+### <a name="WHY_ERROR_RECOVERY"></a> Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?
 For building a standard compiler that should only handle completely valid inputs these capabilities are indeed irrelevant.
 But for the use case of building Editor Tools / Language Services the parser must be able to handle partially invalid inputs as well.
 Some examples:
@@ -33,11 +33,11 @@ Some examples:
 * Autocomplete / Intellisense should work even if there is a syntax error prior to the requested suggestion position. 
 
 
-### <a name="Q3"></a> How do I debug my parser?
+### <a name="DEBUGGING"></a> How do I debug my parser?
 Just add a breakpoint and debug, same as you would for any other JavaScript code.
 Chevrotain Grammars are **pure** javascript code. No special handling required.
 
-### <a name="Q4"></a> Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?
+### <a name="NUMERICAL_SUFFIXES"></a> Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?
 Lets look at an example first:
 ```javascript
 this.RULE("someRule", function() {
@@ -65,14 +65,14 @@ used for many things such as:
 * Computing an appropriate error message which includes the list of next valid possible tokens.
 * Performing automatic Error Recovery by figuring out "re-sync" tokens. 
 
-### <a name="Q5"></a> Why does Chevrotain not work correctly after I minified my Grammar?
+### <a name="MINIFIED"></a> Why does Chevrotain not work correctly after I minified my Grammar?
 Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive minification options can break Chevrotain grammars.
 
 See [related documentation](../examples/parser/minification/README.md) for details & workarounds.
 
 
-### <a name="Q6"></a> How do I Maximize my parser's performance?
+### <a name="PERFORMANCE"></a> How do I Maximize my parser's performance?
 
 1. **Do not create a new Parser instance for each new input**.
 
