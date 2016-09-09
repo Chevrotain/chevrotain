@@ -13,7 +13,7 @@ A Parser Generator adds an (unnecessary) level of abstraction between the gramma
 This is because the grammar is written in a **different** language than the target runtime. 
  
 * Debugging a generated parser means looking at **different** code than the actual grammar specifications.
-  This generated generated code is often huge, verbose and hard to understand. On the other hand, when debugging a Parser 
+  This generated code is often huge, verbose and hard to understand. On the other hand, when debugging a Parser 
   implemented using Chevrotain, The **actual Grammar's code** the implementer wrote(not generated code) is debugged.
   So debugging Chevrotain is **just like** debugging any other JavaScript code.
   
