@@ -27,7 +27,7 @@ This is because the grammar is written in a **different** language than the targ
 
 ### <a name="VS_OTHERS"></a> What Differentiates Chevrotain from other JavaScript Parsing Solutions?
 * **Performance**: Chevrotain is generally faster (often much more so) than other existing JavaScript Parsing Solutions.
-  See an [Online Benchmark] that compares the performance of JSON Parser implemented using multipile JavaScript Parsing solutions.
+  See an [Online Benchmark](http://sap.github.io/chevrotain/performance/) that compares the performance of JSON Parser implemented using multipile JavaScript Parsing solutions.
 
 * **Error Recovery/ Fault Tolerance**: With the exception of Antlr4, other JavaScript Parsing Solutions usually do not have Error Recovery capabilities.
 
