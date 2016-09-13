@@ -15,7 +15,7 @@ import {
     flatten,
     mapValues
 } from "../utils/utils"
-import {fillUpLineToOffset, getStartColumnFromLineToOffset, getStartLineFromLineToOffset} from "./tokens"
+import {fillUpLineToOffset, getStartColumnFromLineToOffset, getStartLineFromLineToOffset, augmentTokenClasses} from "./tokens"
 
 export type TokenConstructor = Function
 
@@ -213,6 +213,7 @@ export class Lexer {
             // Considering a lexer with definition errors may never be used, there is no point
             // to performing the analysis anyhow...
             if (isEmpty(this.lexerDefinitionErrors)) {
+                augmentTokenClasses(currModDef)
                 let currAnalyzeResult = analyzeTokenClasses(currModDef)
                 this.allPatterns[currModName] = currAnalyzeResult.allPatterns
                 this.patternIdxToClass[currModName] = currAnalyzeResult.patternIdxToClass

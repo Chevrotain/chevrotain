@@ -1,3 +1,7 @@
+import {TokenConstructor} from "./lexer_public"
+import {has, forEach} from "../utils/utils"
+import {Token, LazyToken} from "./tokens_public"
+
 export function fillUpLineToOffset(lineToOffset:number[], text:string):void {
     let currLine = 0
     let currOffset = 0
@@ -93,4 +97,22 @@ function findColumnOfOffset(offset:number, lineToOffset:number[]):number {
     // +1 because columns always start at 1
     return offset - lineToOffset[line - 1] + 1
 
+}
+
+export function isBaseTokenClass(tokClass:Function):boolean {
+    return tokClass === Token || tokClass === LazyToken
+}
+
+let tokenShortNameIdx = 0
+
+export function augmentTokenClasses(tokenClasses:TokenConstructor[]):void {
+    forEach(tokenClasses, (currTokClass) => {
+        if (!hasShortKeyProperty(currTokClass)) {
+            currTokClass.uniqueTokenTypeShortKey = tokenShortNameIdx++
+        }
+    })
+}
+
+export function hasShortKeyProperty(tokClass:TokenConstructor):boolean {
+    return has(tokClass, "uniqueTokenTypeShortKey")
 }

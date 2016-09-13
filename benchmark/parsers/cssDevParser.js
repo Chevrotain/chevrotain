@@ -26,7 +26,7 @@ function MAKE_PATTERN(def, flags) {
 // array of cssTokens
 var cssTokens = [];
 var extendToken = function() {
-    var newToken = chevrotain.extendToken.apply(null, arguments);
+    var newToken = chevrotain.extendLazyToken.apply(null, arguments);
     cssTokens.push(newToken);
     return newToken;
 }

@@ -1,7 +1,7 @@
 import {Parser} from "../../../src/parse/parser_public"
 import {Token, EOF} from "../../../src/scan/tokens_public"
 import {gast} from "../../../src/parse/grammar/gast_public"
-import {ColonTok, IdentTok, CommaTok, EntityTok, KeyTok, ActionTok, actionDec, lotsOfOrs, emptyAltOr} from "./samples"
+import {ColonTok, IdentTok, CommaTok, EntityTok, KeyTok, actionDec, lotsOfOrs, emptyAltOr} from "./samples"
 import {
     buildLookaheadFuncForOr,
     buildLookaheadForOption,
@@ -11,82 +11,115 @@ import {
     buildSingleAlternativeLookaheadFunction
 } from "../../../src/parse/grammar/lookahead"
 import {map} from "../../../src/utils/utils"
+import {augmentTokenClasses} from "../../../src/scan/tokens"
 
 class ColonParserMock extends Parser {
+    constructor() {
+        super([], [ColonTok])
+    }
+
     protected LA():Token {
         return new ColonTok(":", 0, 1, 1)
     }
 }
 
 class IdentParserMock extends Parser {
+    constructor() {
+        super([], [IdentTok])
+    }
+
     protected LA():Token {
         return new IdentTok("bamba", 0, 1, 1)
     }
 }
 
 class CommaParserMock extends Parser {
+    constructor() {
+        super([], [CommaTok])
+    }
+
     protected LA():Token {
         return new CommaTok(",", 0, 1, 1)
     }
 }
 
 class EntityParserMock extends Parser {
+    constructor() {
+        super([], [EntityTok])
+    }
+
     protected LA():Token {
         return new EntityTok(",", 0, 1, 1)
     }
 }
 
 class KeyParserMock extends Parser {
+    constructor() {
+        super([], [KeyTok])
+    }
+
     protected LA():Token {
         return new KeyTok(",", 0, 1, 1)
-    }
-}
-
-class ActionParserMock extends Parser {
-    protected LA():Token {
-        return new ActionTok(",", 0, 1, 1)
     }
 }
 
 describe("The Grammar Lookahead namespace", () => {
 
     it("can compute the lookahead function for the first OPTION in ActionDec", () => {
+        let colonMock = new ColonParserMock()
+        let indentMock = new IdentParserMock()
+
         let laFunc = buildLookaheadForOption(1, actionDec, 1)
 
-        expect(laFunc.call(new ColonParserMock([], []))).to.equal(false)
-        expect(laFunc.call(new IdentParserMock([], []))).to.equal(true)
+        expect(laFunc.call(colonMock)).to.equal(false)
+        expect(laFunc.call(indentMock)).to.equal(true)
     })
 
     it("can compute the lookahead function for the second OPTION in ActionDec", () => {
+        let colonParserMock = new ColonParserMock()
+        let identParserMock = new IdentParserMock()
+
         let laFunc = buildLookaheadForOption(2, actionDec, 1)
 
-        expect(laFunc.call(new ColonParserMock([], []))).to.equal(true)
-        expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
+        expect(laFunc.call(colonParserMock)).to.equal(true)
+        expect(laFunc.call(identParserMock)).to.equal(false)
     })
 
     it("can compute the lookahead function for the first MANY in ActionDec", () => {
+        let identParserMock = new IdentParserMock()
+        let commaParserMock = new CommaParserMock()
+
         let laFunc = buildLookaheadForMany(1, actionDec, 1)
 
-        expect(laFunc.call(new CommaParserMock([], []))).to.equal(true)
-        expect(laFunc.call(new IdentParserMock([], []))).to.equal(false)
+        expect(laFunc.call(commaParserMock)).to.equal(true)
+        expect(laFunc.call(identParserMock)).to.equal(false)
     })
 
     it("can compute the lookahead function for lots of ORs sample", () => {
+        let keyParserMock = new KeyParserMock()
+        let entityParserMock = new EntityParserMock()
+        let colonParserMock = new ColonParserMock()
+        let commaParserMock = new CommaParserMock()
+
         let laFunc = buildLookaheadFuncForOr(1, lotsOfOrs, 1, false)
 
-        expect(laFunc.call(new CommaParserMock([], []))).to.equal(0)
-        expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
-        expect(laFunc.call(new EntityParserMock([], []))).to.equal(1)
-        expect(laFunc.call(new ColonParserMock([], []))).to.equal(-1)
+        expect(laFunc.call(commaParserMock)).to.equal(0)
+        expect(laFunc.call(keyParserMock)).to.equal(0)
+        expect(laFunc.call(entityParserMock)).to.equal(1)
+        expect(laFunc.call(colonParserMock)).to.equal(undefined)
     })
 
     it("can compute the lookahead function for EMPTY OR sample", () => {
+        let commaParserMock = new CommaParserMock()
+        let keyParserMock = new KeyParserMock()
+        let entityParserMock = new EntityParserMock()
+
         let laFunc = buildLookaheadFuncForOr(1, emptyAltOr, 1, false)
 
-        expect(laFunc.call(new KeyParserMock([], []))).to.equal(0)
-        expect(laFunc.call(new EntityParserMock([], []))).to.equal(1)
+        expect(laFunc.call(keyParserMock)).to.equal(0)
+        expect(laFunc.call(entityParserMock)).to.equal(1)
         // none matches so the last empty alternative should be taken (idx 2)
-        expect(laFunc.call(new CommaParserMock([], []))).to.equal(2)
+        expect(laFunc.call(commaParserMock)).to.equal(2)
     })
 })
 
@@ -94,6 +127,12 @@ describe("The chevrotain grammar lookahead capabilities", () => {
 
     class Alpha extends Token {
         constructor() {super("A", 1, 1, 1, 1)}
+    }
+
+    class ExtendsAlpha extends Alpha {
+    }
+
+    class ExtendsAlphaAlpha extends ExtendsAlpha {
     }
 
     class Beta extends Token {
@@ -111,6 +150,8 @@ describe("The chevrotain grammar lookahead capabilities", () => {
     class Gamma extends Token {
         constructor() {super("A", 1, 1, 1, 1)}
     }
+
+    augmentTokenClasses([Alpha, Beta, Delta, Gamma, Charlie])
 
     context("computing lookahead sequences for", () => {
 
@@ -265,6 +306,20 @@ describe("The chevrotain grammar lookahead capabilities", () => {
             }
         }
 
+        it("inheritance Alternative alternatives - positive", () => {
+            let alternatives = [
+                [[ExtendsAlphaAlpha]],  // 0
+                [[ExtendsAlpha]], // 1
+                [[Alpha]]           // 2
+            ]
+            let laFunc = buildAlternativesLookAheadFunc(alternatives, false)
+
+            expect(laFunc.call(new MockParser([Alpha]))).to.equal(2)
+            expect(laFunc.call(new MockParser([ExtendsAlpha]))).to.equal(1)
+            expect(laFunc.call(new MockParser([ExtendsAlphaAlpha]))).to.equal(0)
+        })
+
+
         it("simple alternatives - positive", () => {
             let alternatives = [
                 [[Alpha], [Beta]],  // 0
@@ -287,8 +342,8 @@ describe("The chevrotain grammar lookahead capabilities", () => {
             ]
             let laFunc = buildAlternativesLookAheadFunc(alternatives, false)
 
-            expect(laFunc.call(new MockParser([]))).to.equal(-1)
-            expect(laFunc.call(new MockParser([Charlie]))).to.equal(-1)
+            expect(laFunc.call(new MockParser([]))).to.be.undefined
+            expect(laFunc.call(new MockParser([Charlie]))).to.be.undefined
         })
 
         it("complex alternatives - positive", () => {
@@ -314,10 +369,10 @@ describe("The chevrotain grammar lookahead capabilities", () => {
             ]
             let laFunc = buildAlternativesLookAheadFunc(alternatives, false)
 
-            expect(laFunc.call(new MockParser([]))).to.equal(-1)
-            expect(laFunc.call(new MockParser([Alpha, Gamma, Gamma]))).to.equal(-1)
-            expect(laFunc.call(new MockParser([Charlie]))).to.equal(-1)
-            expect(laFunc.call(new MockParser([Beta, Alpha, Beta, Gamma]))).to.equal(-1)
+            expect(laFunc.call(new MockParser([]))).to.be.undefined
+            expect(laFunc.call(new MockParser([Alpha, Gamma, Gamma]))).to.be.undefined
+            expect(laFunc.call(new MockParser([Charlie]))).to.be.undefined
+            expect(laFunc.call(new MockParser([Beta, Alpha, Beta, Gamma]))).to.be.undefined
         })
 
         it("Empty alternatives", () => {

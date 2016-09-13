@@ -22,7 +22,7 @@ import {
     isUndefined,
     forEach,
     some,
-    NOOP
+    NOOP, values
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {Token, tokenName, EOF, tokenLabel, hasTokenLabel, LazyToken} from "../scan/tokens_public"
@@ -51,6 +51,7 @@ import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
 import {ITokenGrammarPath} from "./grammar/path_public"
+import {augmentTokenClasses} from "../scan/tokens"
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -425,6 +426,11 @@ export class Parser {
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
         // parsed with a clear error message ("expecting EOF but found ...")
         this.tokensMap[tokenName(EOF)] = EOF
+
+        // Because ES2015+ syntax should be supported for creating Token classes
+        // We cannot assume that the Token classes were created using the "extendToken" utilities
+        // Therefore we must augment the Token classes both on Lexer initialization and on Parser initialization
+        augmentTokenClasses(values(this.tokensMap))
     }
 
     public get errors():exceptions.IRecognitionException[] {
@@ -1882,7 +1888,7 @@ export class Parser {
                           occurrence:number):T {
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
         let altToTake = laFunc.call(this, alts)
-        if (altToTake !== -1) {
+        if (altToTake !== undefined) {
             let chosenAlternative:any = alts[altToTake]
             return chosenAlternative.ALT.call(this)
         }

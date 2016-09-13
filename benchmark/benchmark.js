@@ -12,7 +12,7 @@ var isBenchmarkOnlyLexer = false
 
 var _ = require("lodash")
 
-var times = 100
+var times = 200
 var warmupTimes = 10
 
 function performBenchmark(name, input, devParse, oldParse) {

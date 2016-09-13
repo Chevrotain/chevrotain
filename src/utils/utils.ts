@@ -320,5 +320,8 @@ export function merge(obj1:Object, obj2:Object):any {
     return result
 }
 
-
 export function NOOP() {}
+
+export function getSuperClass(clazz:Function):Function {
+    return Object.getPrototypeOf(clazz.prototype).constructor
+}
