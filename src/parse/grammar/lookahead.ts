@@ -1,8 +1,10 @@
-import {map, reduce, find, every, isEmpty, flatten} from "../../utils/utils"
+import {map, reduce, find, every, isEmpty, flatten, getSuperClass, forEach, has} from "../../utils/utils"
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
 import {Predicate, IAnyOrAlt} from "../parser_public"
+import {isBaseTokenClass} from "../../scan/tokens"
+import {Lexer} from "../../scan/lexer_public"
 
 
 export enum PROD_TYPE {
@@ -65,7 +67,6 @@ export function buildLookaheadForAtLeastOneSep(optionOccurrence:number, ruleGram
 export type Alternative = Function[][]
 export type lookAheadSequence = Function[][]
 
-
 /**
  * @param alts
  * @param hasPredicates
@@ -76,6 +77,19 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
     let areAllOneTokenLookahead = every(alts, (currAlt) => {
         return every(currAlt, (currPath) => {
             return currPath.length === 1
+        })
+    })
+
+    let allTokensExtendBaseTokenClassesDirectly = every(alts, (currAlt) => {
+        return every(currAlt, (currPath) => {
+            return every(currPath, (currTokClass:any) => {
+                return isBaseTokenClass(getSuperClass(currTokClass)) &&
+                    // TODO: this is an assumption that Token inheritance is limited to only extending
+                    // "Abstract" classes and that "Abstract" classes always use "Lexer.NA" pattern
+                    // TODO: this needs to be verified at runtime in extendToken, which means ES2015 classes can no
+                    // longer be safely supported in combination with inheritance.
+                    currTokClass.PATTERN !== Lexer.NA
+            })
         })
     })
 
@@ -120,41 +134,33 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
                 // try the next alternative
             }
             // none of the alternatives could be matched
-            return -1
+            return undefined
         }
     }
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead.
-    else if (areAllOneTokenLookahead) {
+    else if (areAllOneTokenLookahead && allTokensExtendBaseTokenClassesDirectly) {
 
         let singleTokenAlts = map(alts, (currAlt) => {
             return flatten(currAlt)
         })
+
+        let choiceToAlt = reduce(singleTokenAlts, (result, currAlt, idx) => {
+            forEach(currAlt, (currTokClass) => {
+                if (!has(result, currTokClass.uniqueTokenTypeShortKey)) {
+                    result[currTokClass.uniqueTokenTypeShortKey] = idx
+                }
+            })
+
+            return result
+        }, {})
 
         /**
          * @returns {number} - The chosen alternative index
          */
         return function ():number {
             let nextToken = this.LA(1)
-
-            for (let t = 0; t < numOfAlts; t++) {
-                let currSingleTokens = singleTokenAlts[t]
-                let numberOfPossibleTokens = currSingleTokens.length
-                for (let j = 0; j < numberOfPossibleTokens; j++) {
-                    let currExpectedToken = currSingleTokens[j]
-                    if (!(nextToken instanceof (<any>currExpectedToken))) {
-                        // try the next possible token
-                        continue
-                    }
-                    // found a full path that matches.
-                    // this will also work for an empty ALT as the loop will be skipped
-                    return t
-                }
-                // none of the paths for the current alternative matched
-                // try the next alternative
-            }
-            // none of the alternatives could be matched
-            return -1
+            return choiceToAlt[nextToken.constructor.uniqueTokenTypeShortKey]
         }
     }
     // optimized lookahead without needing to check the predicates at all.
@@ -187,7 +193,7 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[], hasPred
                 // try the next alternative
             }
             // none of the alternatives could be matched
-            return -1
+            return undefined
         }
     }
 }
@@ -198,30 +204,40 @@ export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence):(
         return currPath.length === 1
     })
 
+    let allTokensExtendBaseTokenClassesDirectly = every(alt, (currPath) => {
+        return every(currPath, (currTokClass:any) => {
+            return isBaseTokenClass(getSuperClass(currTokClass)) &&
+                // TODO: this is an assumption that Token inheritance is limited to only extending
+                // "Abstract" classes and that "Abstract" classes always use "Lexer.NA" pattern
+                // TODO: this needs to be verified at runtime in extendToken, which means ES2015 classes can no
+                // longer be safely supported in combination with inheritance.
+                currTokClass.PATTERN !== Lexer.NA
+        })
+    })
+
     let numOfPaths = alt.length
 
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead.
-    if (areAllOneTokenLookahead) {
-
+    if (areAllOneTokenLookahead && allTokensExtendBaseTokenClassesDirectly) {
         let singleTokens = flatten(alt)
 
-        return function ():boolean {
-            let nextToken = this.LA(1)
-
-            for (let j = 0; j < singleTokens.length; j++) {
-                let currPossibleTok = singleTokens[j]
-                if (!(nextToken instanceof (<any>currPossibleTok))) {
-                    // mismatch in current path
-                    // try the next pth
-                    continue
-                }
-                // found a full path that matches.
-                return true
+        if (singleTokens.length === 1) {
+            let expectedTokenType = singleTokens[0]
+            let expectedTokenUniqueKey = (<any>expectedTokenType).uniqueTokenTypeShortKey
+            return function ():boolean {
+                return this.LA(1).constructor.uniqueTokenTypeShortKey === expectedTokenUniqueKey
             }
-
-            // none of the paths matched
-            return false
+        }
+        else {
+            let choiceToAlt = reduce(singleTokens, (result, currTokClass, idx) => {
+                result[currTokClass.uniqueTokenTypeShortKey] = true
+                return result
+            }, {})
+            return function ():boolean {
+                let nextToken = this.LA(1)
+                return choiceToAlt[nextToken.constructor.uniqueTokenTypeShortKey] === true ? true : false
+            }
         }
     }
     else {
@@ -443,7 +459,6 @@ export function getLookaheadPathsForOptionalProd(occurrence:number,
     return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }
 
-
 export function containsPath(alternative:Alternative, path:Function[]):boolean {
     let found = find(alternative, (otherPath) => {
         return path.length === otherPath.length &&
@@ -453,3 +468,5 @@ export function containsPath(alternative:Alternative, path:Function[]):boolean {
     })
     return found !== undefined
 }
+
+

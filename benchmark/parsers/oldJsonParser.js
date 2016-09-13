@@ -2,7 +2,7 @@
 var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendToken;
+var extendToken = chevrotain.extendLazyToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
@@ -32,7 +32,7 @@ function JsonParserOld(input) {
     Parser.call(this, input, allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled
             // use this flag to enable them
-            recoveryEnabled: true
+            recoveryEnabled: false
         }
     );
 
