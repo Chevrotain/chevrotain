@@ -71,7 +71,10 @@ module.exports = function(config) {
         recordScreenshots: false
     }
 
-    if (process.env.TRAVIS) {
+    // Avoid updating SauceLabs badge for non Master branch builds.
+    if (process.env.TRAVIS && 
+        process.env.TRAVIS_BRANCH === "master" && 
+        process.env.TRAVIS_PULL_REQUEST !== "false") {
         sauceConfig.build = 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
     }
 
