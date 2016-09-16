@@ -380,7 +380,7 @@ module.exports = function(grunt) {
         'karma:browsers_integration_tests_amd_minified'
     ]
 
-    if (process.env.TRAVIS_PULL_REQUEST) {
+    if (process.env.TRAVIS_PULL_REQUEST !== "false") {
         browsers_tests = function() {
             console.log("Skipping browser tests due to running in a pull request env without the SauceLabs credentials\n"
             )
