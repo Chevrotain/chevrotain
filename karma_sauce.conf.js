@@ -71,11 +71,16 @@ module.exports = function(config) {
         recordScreenshots: false
     }
 
-    // Avoid updating SauceLabs badge for non Master branch builds.
-    if (process.env.TRAVIS && 
-        process.env.TRAVIS_BRANCH === "master" && 
+    if (process.env.TRAVIS) {
+        sauceConfig.build = 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
+
+    }
+
+    // TODO: this does not actually seem to work... if it would work we can use filtering by tag name in the badge.
+    if (process.env.TRAVIS_BRANCH === "master" &&
         process.env.TRAVIS_PULL_REQUEST !== "false") {
-        sauceConfig.build = 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')';
+        console.log("Sauce Labs results will be reported in the badge")
+        sauceConfig.tags = ["master"]
     }
 
     config.set({
