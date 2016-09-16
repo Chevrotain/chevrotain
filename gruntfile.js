@@ -380,11 +380,17 @@ module.exports = function(grunt) {
         'karma:browsers_integration_tests_amd_minified'
     ]
 
-    if (process.env.TRAVIS_PULL_REQUEST && !process.env.SAUCE_USERNAME) {
+    if (process.env.TRAVIS_PULL_REQUEST) {
         browsers_tests = function() {
-            console.log("Skipping browser tests on pull request because \n" +
-                "process.env.SAUCE_USERNAME & process.env.SAUCE_ACCESS_KEY \n" +
-                "are not available on pull requests from external repositories.")
+            console.log("Skipping browser tests due to running in a pull request env without the SauceLabs credentials\n"
+            )
+        }
+    }
+
+    if (process.env.TRAVIS_BRANCH !== "master") {
+        browsers_tests = function() {
+            console.log("Skipping browser tests as they should only run on the 'master' branch\n" +
+            "As there seems to be issues enabling tags and result filtering with the karma-sauce-labs-launcher")
         }
     }
 
