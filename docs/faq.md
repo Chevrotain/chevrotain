@@ -115,17 +115,9 @@ See [related documentation](../examples/parser/minification/README.md) for detai
    Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_14_0/classes/parser.html#reset) method
    to accomplish that.
     
-2. **Use Lazy Tokens.**
-
-   "Lazy" Tokens avoid computing their state (mostly location information) until it is needed.
-   This preserves both memory **and** CPU cycles. Therefor unless your use case **always** requires all the details from every single
-   Token (for example a formatter/beautifier) Use of Lazy Tokens can provide a large boost to your parser's performance.
-   Differences of 10-25% have been measured on Node.js V6 (depending on the specific grammar used).
-   
-   note that: the larger (and more numerous) your inputs are the greater the benefit as CPU cycles wasted on garbage collection
-   may also be avoided due to the reduction in memory consumption.
-   
-   [Example of creating a Lazy Tokens Lexer](../examples/lexer/lazy_tokens/)
+2. **Choose the optimal Token Type for your use case.**
+    
+   See [Token Types Docs](docs/token_types.md) for more details.
     
 3. **Avoid creating parsing rules which only parse a single Terminal.**
 

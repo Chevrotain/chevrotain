@@ -1,12 +1,17 @@
-import {isString, isRegExp, isFunction, assign, isUndefined, isEmpty} from "../utils/utils"
+import {isString, isRegExp, isFunction, assign, isUndefined} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
-import {Lexer} from "./lexer_public"
+import {Lexer, TokenConstructor} from "./lexer_public"
 import {
-    fillUpLineToOffset,
-    getStartLineFromLineToOffset,
-    getStartColumnFromLineToOffset,
-    getEndLineFromLineToOffset,
-    getEndColumnFromLineToOffset
+    isInheritanceBasedToken,
+    getStartLineFromLazyToken,
+    getStartColumnFromLazyToken,
+    getEndLineFromLazyToken,
+    getEndColumnFromLazyToken,
+    getImageFromLazyToken,
+    tokenIdxToClass,
+    tokenInstanceofMatcher,
+    tokenStructuredMatcher,
+    augmentTokenClasses
 } from "./tokens"
 
 /**
@@ -44,6 +49,10 @@ export function tokenName(clazz:Function):string {
 
 export function extendLazyToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = LazyToken) {
     return extendToken(tokenName, patternOrParent, parentConstructor)
+}
+
+export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = undefined) {
+    return extendToken(tokenName, patternOrParent, SimpleLazyToken)
 }
 
 /**
@@ -93,6 +102,16 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
     return derivedCostructor
 }
 
+export interface ISimpleToken {
+    startOffset:number
+    endOffset:number
+    isInsertedInRecovery?:boolean
+}
+
+export interface ISimpleLazyToken extends ISimpleToken {
+    tokenType:number
+}
+
 /**
  *   *
  * Things to note:
@@ -105,13 +124,22 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
  * - "'hello\tworld\uBBBB'"  {image: "'hello\tworld\uBBBB'"} --> a Token's image is the "literal" text
  *                                                              (unicode escaping is untouched).
  */
-export interface IToken {
+export interface IToken extends ISimpleToken {
     image:string
     startOffset:number
     startLine:number
     startColumn:number
+    endOffset:number
     endLine:number
     endColumn:number
+}
+
+export interface ISimpleTokenOrIToken extends ISimpleToken {
+    image?:string
+    startLine?:number
+    startColumn?:number
+    endLine?:number
+    endColumn?:number
 }
 
 export class Token implements IToken {
@@ -206,52 +234,73 @@ export class LazyToken implements IToken {
 
     constructor(public startOffset:number,
                 public endOffset:number,
-                public cacheData:LazyTokenCacheData) {}
+                protected cacheData:LazyTokenCacheData) {}
 
     get image():string {
-        if (this.isInsertedInRecovery) {
-            return ""
-        }
-        return this.cacheData.orgText.substring(this.startOffset, this.endOffset + 1)
+        return getImageFromLazyToken(this)
     }
 
     get startLine():number {
-        if (this.isInsertedInRecovery) {
-            return NaN
-        }
-        this.ensureLineDataProcessing()
-        return getStartLineFromLineToOffset(this.startOffset, this.cacheData.lineToOffset)
+        return getStartLineFromLazyToken(this)
     }
 
     get startColumn():number {
-        if (this.isInsertedInRecovery) {
-            return NaN
-        }
-        this.ensureLineDataProcessing()
-        return getStartColumnFromLineToOffset(this.startOffset, this.cacheData.lineToOffset)
+        return getStartColumnFromLazyToken(this)
     }
 
     get endLine():number {
-        if (this.isInsertedInRecovery) {
-            return NaN
-        }
-        this.ensureLineDataProcessing()
-        return getEndLineFromLineToOffset(this.endOffset, this.cacheData.lineToOffset)
+        return getEndLineFromLazyToken(this)
     }
 
     get endColumn():number {
-        if (this.isInsertedInRecovery) {
-            return NaN
-        }
-        this.ensureLineDataProcessing()
-        return getEndColumnFromLineToOffset(this.endOffset, this.cacheData.lineToOffset)
+        return getEndColumnFromLazyToken(this)
     }
+}
 
-    private ensureLineDataProcessing():void {
-        if (isEmpty(this.cacheData.lineToOffset)) {
-            fillUpLineToOffset(this.cacheData.lineToOffset, this.cacheData.orgText)
-        }
-    }
+/**
+ * @see IToken
+ * @see LazyToken
+ *
+ * A Less complex LazyToken used to increase performance.
+ * Instances of SimpleLazyToken will not actually inherit from it using prototype inheritance.
+ * Instead they will be simple JS Objects (Simple Structures)
+ * {
+ *    startOffset : 10,
+ *    endOffset   : 16,
+ *    tokenType   : 66,
+ *    cacheData   : cacheData
+ * }
+ *
+ * The additional computed properties (startLine/StartColumn/...) of the IToken interface can be computed using
+ * The provided Utility methods (getImage, getStartColumn, getEndLine, ...)
+ *
+ * This makes SimpleLazyTokens slightly less convenient, however this can produce a substantial increase in performance
+ * which may be relevant in certain use cases where performance is of paramount concern.
+ */
+export class SimpleLazyToken implements ISimpleLazyToken {
+    /**
+     * A "human readable" Label for a Token.
+     * Subclasses of Token may define their own static LABEL property.
+     * This label will be used in error messages and drawing syntax diagrams.
+     *
+     * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
+     * or too unwieldy to be used in error messages.
+     *
+     * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
+     *
+     * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
+     * "expecting '{' but found ')'"
+     */
+    static LABEL:string = undefined
+
+    // This constructor is never actually called as simpleLazyToken are just a Structure.
+    // However this class must still exist as the definition and hierarchy of the SimpleLazyTokens
+    // still uses the standard prototype chain.
+    /* istanbul ignore next */
+    constructor(public startOffset:number,
+                public endOffset:number,
+                public tokenType:number,
+                protected cacheData:LazyTokenCacheData) {}
 }
 
 /**
@@ -263,4 +312,88 @@ export class VirtualToken extends Token {
     constructor() {super("", NaN, NaN, NaN, NaN, NaN) }
 }
 
-export class EOF extends VirtualToken {}
+export class EOF extends VirtualToken {
+}
+augmentTokenClasses([EOF])
+
+// Token Getter Utilities
+export function getImage(token:ISimpleTokenOrIToken):string {
+    return isInheritanceBasedToken(token) ?
+        (<IToken>token).image :
+        getImageFromLazyToken(token)
+}
+
+export function getStartOffset(token:ISimpleTokenOrIToken):number {
+    return token.startOffset
+}
+
+export function getStartLine(token:ISimpleTokenOrIToken):number {
+    return isInheritanceBasedToken(token) ?
+        (<IToken>token).startLine :
+        getStartLineFromLazyToken(token)
+}
+
+export function getStartColumn(token:ISimpleTokenOrIToken):number {
+    return isInheritanceBasedToken(token) ?
+        (<IToken>token).startColumn :
+        getStartColumnFromLazyToken(token)
+}
+
+export function getEndOffset(token:ISimpleTokenOrIToken):number {
+    return token.endOffset
+}
+
+export function getEndLine(token:ISimpleTokenOrIToken):number {
+    return isInheritanceBasedToken(token) ?
+        (<IToken>token).endLine :
+        getEndLineFromLazyToken(token)
+}
+
+export function getEndColumn(token:ISimpleTokenOrIToken):number {
+    return isInheritanceBasedToken(token) ?
+        (<IToken>token).endColumn :
+        getEndColumnFromLazyToken(token)
+}
+
+/**
+ * Given a Token instance, will return the Token Constructor.
+ * Note that this function is not just for convenience, Because a SimpleLazyToken "instance'
+ * Does not use standard prototype inheritance and thus it's constructor cannot be accessed
+ * by traversing the prototype chain.
+ *
+ * @param tokenInstance {ISimpleTokenOrIToken}
+ * @returns {TokenConstructor}
+ */
+export function getTokenConstructor(tokenInstance:ISimpleTokenOrIToken):TokenConstructor {
+    let tokenIdx
+    if (isInheritanceBasedToken(tokenInstance)) {
+        tokenIdx = (<any>tokenInstance).constructor.tokenType
+    }
+    else {
+        tokenIdx = (<ISimpleLazyToken>tokenInstance).tokenType
+    }
+
+    return tokenIdxToClass.get(tokenIdx)
+}
+
+/**
+ * A Utility method to check if a token instance of of the type of a specific Token class.
+ * Simply using instanceof is not enough because SimpleLazyToken Implementation does not use
+ * ECMAScript's built-in prototype inheritance.
+ *
+ * @param tokInstance {ISimpleTokenOrIToken}
+ * @param tokClass {TokenConstructor}
+ * @returns {boolean}
+ */
+export function tokenMatcher(tokInstance:ISimpleTokenOrIToken, tokClass:TokenConstructor):boolean {
+    if (LazyToken.prototype.isPrototypeOf(tokClass.prototype) ||
+        Token.prototype.isPrototypeOf(tokClass.prototype)) {
+        return tokenInstanceofMatcher(tokInstance, tokClass)
+    }
+    else if (SimpleLazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
+        return tokenStructuredMatcher(tokInstance, tokClass)
+    }
+    else {
+        throw Error("non exhaustive match")
+    }
+}

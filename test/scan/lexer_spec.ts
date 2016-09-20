@@ -1,5 +1,18 @@
 import {map, keys} from "../../src/utils/utils"
-import {extendLazyToken, LazyToken, Token, extendToken} from "../../src/scan/tokens_public"
+import {
+    extendLazyToken,
+    LazyToken,
+    Token,
+    extendToken,
+    extendSimpleLazyToken,
+    getImage,
+    getStartOffset,
+    getEndOffset,
+    getStartColumn,
+    getStartLine,
+    getEndLine,
+    getEndColumn, SimpleLazyToken
+} from "../../src/scan/tokens_public"
 import {Lexer, LexerDefinitionErrorType, IMultiModeLexerDefinition} from "../../src/scan/lexer_public"
 import {
     findMissingPatterns,
@@ -13,9 +26,10 @@ import {
     countLineTerminators
 } from "../../src/scan/lexer"
 import {setEquality} from "../utils/matchers"
+import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
 
 
-function defineLexerSpecs(contextName, extendToken) {
+function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
 
     context(contextName, () => {
 
@@ -33,28 +47,28 @@ function defineLexerSpecs(contextName, extendToken) {
                 // this can match either IdentifierTok or BambaTok but should match BambaTok has its pattern is defined before IdentifierTok
                 let input = "bamba"
                 let result = testLexer.tokenize(input)
-                expect(result.tokens[0]).to.be.an.instanceof(BambaTok)
-                expect(result.tokens[0].image).to.equal("bamba")
-                expect(result.tokens[0].startLine).to.equal(1)
-                expect(result.tokens[0].startColumn).to.equal(1)
+                expect(tokenMatcher(result.tokens[0], BambaTok)).to.be.true
+                expect(getImage(result.tokens[0])).to.equal("bamba")
+                expect(getStartLine(result.tokens[0])).to.equal(1)
+                expect(getStartColumn(result.tokens[0])).to.equal(1)
             })
 
             it("can create a token from a string with priority to the First Token class with the longest match #2", () => {
                 let input = "bambaMIA"
                 let result = testLexer.tokenize(input)
-                expect(result.tokens[0]).to.be.an.instanceof(IdentifierTok)
-                expect(result.tokens[0].image).to.equal("bambaMIA")
-                expect(result.tokens[0].startLine).to.equal(1)
-                expect(result.tokens[0].startColumn).to.equal(1)
+                expect(tokenMatcher(result.tokens[0], IdentifierTok)).to.be.true
+                expect(getImage(result.tokens[0])).to.equal("bambaMIA")
+                expect(getStartLine(result.tokens[0])).to.equal(1)
+                expect(getStartColumn(result.tokens[0])).to.equal(1)
             })
 
             it("can create a token from a string", () => {
                 let input = "6666543221231"
                 let result = testLexer.tokenize(input)
-                expect(result.tokens[0]).to.be.an.instanceof(IntegerTok)
-                expect(result.tokens[0].image).to.equal("6666543221231")
-                expect(result.tokens[0].startLine).to.equal(1)
-                expect(result.tokens[0].startColumn).to.equal(1)
+                expect(tokenMatcher(result.tokens[0], IntegerTok)).to.be.true
+                expect(getImage(result.tokens[0])).to.equal("6666543221231")
+                expect(getStartLine(result.tokens[0])).to.equal(1)
+                expect(getStartColumn(result.tokens[0])).to.equal(1)
             })
         })
 
@@ -279,68 +293,68 @@ function defineLexerSpecs(contextName, extendToken) {
 
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].endOffset).to.equal(1)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getEndOffset(lexResult.tokens[0])).to.equal(1)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(lexResult.tokens[1].image).to.equal("(")
-                expect(lexResult.tokens[1].startOffset).to.equal(3)
-                expect(lexResult.tokens[1].endOffset).to.equal(3)
-                expect(lexResult.tokens[1].startLine).to.equal(1)
-                expect(lexResult.tokens[1].startColumn).to.equal(4)
-                expect(lexResult.tokens[1]).to.be.an.instanceOf(LParen)
+                expect(getImage(lexResult.tokens[1])).to.equal("(")
+                expect(getStartOffset(lexResult.tokens[1])).to.equal(3)
+                expect(getEndOffset(lexResult.tokens[1])).to.equal(3)
+                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[1])).to.equal(4)
+                expect(tokenMatcher(lexResult.tokens[1], LParen)).to.be.true
 
-                expect(lexResult.tokens[2].image).to.equal("666")
-                expect(lexResult.tokens[2].startOffset).to.equal(4)
-                expect(lexResult.tokens[2].endOffset).to.equal(6)
-                expect(lexResult.tokens[2].startLine).to.equal(1)
-                expect(lexResult.tokens[2].startColumn).to.equal(5)
-                expect(lexResult.tokens[2]).to.be.an.instanceOf(Integer)
+                expect(getImage(lexResult.tokens[2])).to.equal("666")
+                expect(getStartOffset(lexResult.tokens[2])).to.equal(4)
+                expect(getEndOffset(lexResult.tokens[2])).to.equal(6)
+                expect(getStartLine(lexResult.tokens[2])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[2])).to.equal(5)
+                expect(tokenMatcher(lexResult.tokens[2], Integer)).to.be.true
 
-                expect(lexResult.tokens[3].image).to.equal(")")
-                expect(lexResult.tokens[3].startOffset).to.equal(7)
-                expect(lexResult.tokens[3].endOffset).to.equal(7)
-                expect(lexResult.tokens[3].startLine).to.equal(1)
-                expect(lexResult.tokens[3].startColumn).to.equal(8)
-                expect(lexResult.tokens[3]).to.be.an.instanceOf(RParen)
+                expect(getImage(lexResult.tokens[3])).to.equal(")")
+                expect(getStartOffset(lexResult.tokens[3])).to.equal(7)
+                expect(getEndOffset(lexResult.tokens[3])).to.equal(7)
+                expect(getStartLine(lexResult.tokens[3])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[3])).to.equal(8)
+                expect(tokenMatcher(lexResult.tokens[3], RParen)).to.be.true
 
-                expect(lexResult.tokens[4].image).to.equal("return")
-                expect(lexResult.tokens[4].startOffset).to.equal(9)
-                expect(lexResult.tokens[4].endOffset).to.equal(14)
-                expect(lexResult.tokens[4].startLine).to.equal(1)
-                expect(lexResult.tokens[4].startColumn).to.equal(10)
-                expect(lexResult.tokens[4]).to.be.an.instanceOf(Return)
+                expect(getImage(lexResult.tokens[4])).to.equal("return")
+                expect(getStartOffset(lexResult.tokens[4])).to.equal(9)
+                expect(getEndOffset(lexResult.tokens[4])).to.equal(14)
+                expect(getStartLine(lexResult.tokens[4])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[4])).to.equal(10)
+                expect(tokenMatcher(lexResult.tokens[4], Return)).to.be.true
 
-                expect(lexResult.tokens[5].image).to.equal("1")
-                expect(lexResult.tokens[5].startOffset).to.equal(16)
-                expect(lexResult.tokens[5].endOffset).to.equal(16)
-                expect(lexResult.tokens[5].startLine).to.equal(1)
-                expect(lexResult.tokens[5].startColumn).to.equal(17)
-                expect(lexResult.tokens[5]).to.be.an.instanceOf(Integer)
+                expect(getImage(lexResult.tokens[5])).to.equal("1")
+                expect(getStartOffset(lexResult.tokens[5])).to.equal(16)
+                expect(getEndOffset(lexResult.tokens[5])).to.equal(16)
+                expect(getStartLine(lexResult.tokens[5])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[5])).to.equal(17)
+                expect(tokenMatcher(lexResult.tokens[5], Integer)).to.be.true
 
-                expect(lexResult.tokens[6].image).to.equal("else")
-                expect(lexResult.tokens[6].startOffset).to.equal(19)
-                expect(lexResult.tokens[6].endOffset).to.equal(22)
-                expect(lexResult.tokens[6].startLine).to.equal(2)
-                expect(lexResult.tokens[6].startColumn).to.equal(2)
-                expect(lexResult.tokens[6]).to.be.an.instanceOf(Else)
+                expect(getImage(lexResult.tokens[6])).to.equal("else")
+                expect(getStartOffset(lexResult.tokens[6])).to.equal(19)
+                expect(getEndOffset(lexResult.tokens[6])).to.equal(22)
+                expect(getStartLine(lexResult.tokens[6])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[6])).to.equal(2)
+                expect(tokenMatcher(lexResult.tokens[6], Else)).to.be.true
 
-                expect(lexResult.tokens[7].image).to.equal("return")
-                expect(lexResult.tokens[7].startOffset).to.equal(24)
-                expect(lexResult.tokens[7].endOffset).to.equal(29)
-                expect(lexResult.tokens[7].startLine).to.equal(2)
-                expect(lexResult.tokens[7].startColumn).to.equal(7)
-                expect(lexResult.tokens[7]).to.be.an.instanceOf(Return)
+                expect(getImage(lexResult.tokens[7])).to.equal("return")
+                expect(getStartOffset(lexResult.tokens[7])).to.equal(24)
+                expect(getEndOffset(lexResult.tokens[7])).to.equal(29)
+                expect(getStartLine(lexResult.tokens[7])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[7])).to.equal(7)
+                expect(tokenMatcher(lexResult.tokens[7], Return)).to.be.true
 
-                expect(lexResult.tokens[8].image).to.equal("2")
-                expect(lexResult.tokens[8].startOffset).to.equal(31)
-                expect(lexResult.tokens[8].endOffset).to.equal(31)
-                expect(lexResult.tokens[8].startLine).to.equal(2)
-                expect(lexResult.tokens[8].startColumn).to.equal(14)
-                expect(lexResult.tokens[8]).to.be.an.instanceOf(Integer)
+                expect(getImage(lexResult.tokens[8])).to.equal("2")
+                expect(getStartOffset(lexResult.tokens[8])).to.equal(31)
+                expect(getEndOffset(lexResult.tokens[8])).to.equal(31)
+                expect(getStartLine(lexResult.tokens[8])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[8])).to.equal(14)
+                expect(tokenMatcher(lexResult.tokens[8], Integer)).to.be.true
             })
 
             it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
@@ -373,59 +387,59 @@ function defineLexerSpecs(contextName, extendToken) {
                 expect(lexResult.errors[0].column).to.equal(18)
                 expect(lexResult.errors[0].length).to.equal(6)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(lexResult.tokens[1].image).to.equal("(")
-                expect(lexResult.tokens[1].startOffset).to.equal(3)
-                expect(lexResult.tokens[1].startLine).to.equal(1)
-                expect(lexResult.tokens[1].startColumn).to.equal(4)
-                expect(lexResult.tokens[1]).to.be.an.instanceOf(LParen)
+                expect(getImage(lexResult.tokens[1])).to.equal("(")
+                expect(getStartOffset(lexResult.tokens[1])).to.equal(3)
+                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[1])).to.equal(4)
+                expect(tokenMatcher(lexResult.tokens[1], LParen)).to.be.true
 
-                expect(lexResult.tokens[2].image).to.equal("666")
-                expect(lexResult.tokens[2].startOffset).to.equal(4)
-                expect(lexResult.tokens[2].startLine).to.equal(1)
-                expect(lexResult.tokens[2].startColumn).to.equal(5)
-                expect(lexResult.tokens[2]).to.be.an.instanceOf(Integer)
+                expect(getImage(lexResult.tokens[2])).to.equal("666")
+                expect(getStartOffset(lexResult.tokens[2])).to.equal(4)
+                expect(getStartLine(lexResult.tokens[2])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[2])).to.equal(5)
+                expect(tokenMatcher(lexResult.tokens[2], Integer)).to.be.true
 
-                expect(lexResult.tokens[3].image).to.equal(")")
-                expect(lexResult.tokens[3].startOffset).to.equal(7)
-                expect(lexResult.tokens[3].startLine).to.equal(1)
-                expect(lexResult.tokens[3].startColumn).to.equal(8)
-                expect(lexResult.tokens[3]).to.be.an.instanceOf(RParen)
+                expect(getImage(lexResult.tokens[3])).to.equal(")")
+                expect(getStartOffset(lexResult.tokens[3])).to.equal(7)
+                expect(getStartLine(lexResult.tokens[3])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[3])).to.equal(8)
+                expect(tokenMatcher(lexResult.tokens[3], RParen)).to.be.true
 
-                expect(lexResult.tokens[4].image).to.equal("return")
-                expect(lexResult.tokens[4].startOffset).to.equal(9)
-                expect(lexResult.tokens[4].startLine).to.equal(1)
-                expect(lexResult.tokens[4].startColumn).to.equal(10)
-                expect(lexResult.tokens[4]).to.be.an.instanceOf(Return)
+                expect(getImage(lexResult.tokens[4])).to.equal("return")
+                expect(getStartOffset(lexResult.tokens[4])).to.equal(9)
+                expect(getStartLine(lexResult.tokens[4])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[4])).to.equal(10)
+                expect(tokenMatcher(lexResult.tokens[4], Return)).to.be.true
 
-                expect(lexResult.tokens[5].image).to.equal("1")
-                expect(lexResult.tokens[5].startOffset).to.equal(16)
-                expect(lexResult.tokens[5].startLine).to.equal(1)
-                expect(lexResult.tokens[5].startColumn).to.equal(17)
-                expect(lexResult.tokens[5]).to.be.an.instanceOf(Integer)
+                expect(getImage(lexResult.tokens[5])).to.equal("1")
+                expect(getStartOffset(lexResult.tokens[5])).to.equal(16)
+                expect(getStartLine(lexResult.tokens[5])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[5])).to.equal(17)
+                expect(tokenMatcher(lexResult.tokens[5], Integer)).to.be.true
 
-                expect(lexResult.tokens[6].image).to.equal("else")
-                expect(lexResult.tokens[6].startOffset).to.equal(25)
-                expect(lexResult.tokens[6].startLine).to.equal(2)
-                expect(lexResult.tokens[6].startColumn).to.equal(2)
-                expect(lexResult.tokens[6]).to.be.an.instanceOf(Else)
+                expect(getImage(lexResult.tokens[6])).to.equal("else")
+                expect(getStartOffset(lexResult.tokens[6])).to.equal(25)
+                expect(getStartLine(lexResult.tokens[6])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[6])).to.equal(2)
+                expect(tokenMatcher(lexResult.tokens[6], Else)).to.be.true
 
-                expect(lexResult.tokens[7].image).to.equal("return")
-                expect(lexResult.tokens[7].startOffset).to.equal(30)
-                expect(lexResult.tokens[7].startLine).to.equal(2)
-                expect(lexResult.tokens[7].startColumn).to.equal(7)
-                expect(lexResult.tokens[7]).to.be.an.instanceOf(Return)
+                expect(getImage(lexResult.tokens[7])).to.equal("return")
+                expect(getStartOffset(lexResult.tokens[7])).to.equal(30)
+                expect(getStartLine(lexResult.tokens[7])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[7])).to.equal(7)
+                expect(tokenMatcher(lexResult.tokens[7], Return)).to.be.true
 
-                expect(lexResult.tokens[8].image).to.equal("2")
-                expect(lexResult.tokens[8].startOffset).to.equal(37)
-                expect(lexResult.tokens[8].startLine).to.equal(2)
-                expect(lexResult.tokens[8].startColumn).to.equal(14)
-                expect(lexResult.tokens[8]).to.be.an.instanceOf(Integer)
+                expect(getImage(lexResult.tokens[8])).to.equal("2")
+                expect(getStartOffset(lexResult.tokens[8])).to.equal(37)
+                expect(getStartLine(lexResult.tokens[8])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[8])).to.equal(14)
+                expect(tokenMatcher(lexResult.tokens[8], Integer)).to.be.true
             })
 
             it("won't go into infinite loops when skipping at end of input", () => {
@@ -439,11 +453,11 @@ function defineLexerSpecs(contextName, extendToken) {
                 expect(lexResult.errors[0].column).to.equal(3)
                 expect(lexResult.errors[0].length).to.equal(28)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
             })
 
             it("can deal with line terminators during resync", () => {
@@ -467,23 +481,23 @@ function defineLexerSpecs(contextName, extendToken) {
                 expect(lexResult.errors[2].column).to.equal(3)
                 expect(lexResult.errors[2].length).to.equal(1)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(lexResult.tokens[1].image).to.equal("else")
-                expect(lexResult.tokens[1].startOffset).to.equal(4)
-                expect(lexResult.tokens[1].startLine).to.equal(2)
-                expect(lexResult.tokens[1].startColumn).to.equal(1)
-                expect(lexResult.tokens[1]).to.be.an.instanceOf(Else)
+                expect(getImage(lexResult.tokens[1])).to.equal("else")
+                expect(getStartOffset(lexResult.tokens[1])).to.equal(4)
+                expect(getStartLine(lexResult.tokens[1])).to.equal(2)
+                expect(getStartColumn(lexResult.tokens[1])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[1], Else)).to.be.true
 
-                expect(lexResult.tokens[2].image).to.equal("if")
-                expect(lexResult.tokens[2].startOffset).to.equal(9)
-                expect(lexResult.tokens[2].startLine).to.equal(3)
-                expect(lexResult.tokens[2].startColumn).to.equal(1)
-                expect(lexResult.tokens[2]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[2])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[2])).to.equal(9)
+                expect(getStartLine(lexResult.tokens[2])).to.equal(3)
+                expect(getStartColumn(lexResult.tokens[2])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[2], If)).to.be.true
             })
 
 
@@ -493,53 +507,53 @@ function defineLexerSpecs(contextName, extendToken) {
                 let input = "if\r\r\telse\rif\n"
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0].endLine).to.equal(1)
-                expect(lexResult.tokens[0].endColumn).to.equal(2)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(getEndLine(lexResult.tokens[0])).to.equal(1)
+                expect(getEndColumn(lexResult.tokens[0])).to.equal(2)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(lexResult.tokens[1].image).to.equal("\r\r\t")
-                expect(lexResult.tokens[1].startOffset).to.equal(2)
-                expect(lexResult.tokens[1].startLine).to.equal(1)
-                expect(lexResult.tokens[1].startColumn).to.equal(3)
-                expect(lexResult.tokens[1].endLine).to.equal(3)
-                expect(lexResult.tokens[1].endColumn).to.equal(1)
-                expect(lexResult.tokens[1]).to.be.an.instanceOf(WhitespaceNotSkipped)
+                expect(getImage(lexResult.tokens[1])).to.equal("\r\r\t")
+                expect(getStartOffset(lexResult.tokens[1])).to.equal(2)
+                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[1])).to.equal(3)
+                expect(getEndLine(lexResult.tokens[1])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[1])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[1], WhitespaceNotSkipped)).to.be.true
 
-                expect(lexResult.tokens[2].image).to.equal("else")
-                expect(lexResult.tokens[2].startOffset).to.equal(5)
-                expect(lexResult.tokens[2].startLine).to.equal(3)
-                expect(lexResult.tokens[2].startColumn).to.equal(2)
-                expect(lexResult.tokens[2].endLine).to.equal(3)
-                expect(lexResult.tokens[2].endColumn).to.equal(5)
-                expect(lexResult.tokens[2]).to.be.an.instanceOf(Else)
+                expect(getImage(lexResult.tokens[2])).to.equal("else")
+                expect(getStartOffset(lexResult.tokens[2])).to.equal(5)
+                expect(getStartLine(lexResult.tokens[2])).to.equal(3)
+                expect(getStartColumn(lexResult.tokens[2])).to.equal(2)
+                expect(getEndLine(lexResult.tokens[2])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[2])).to.equal(5)
+                expect(tokenMatcher(lexResult.tokens[2], Else)).to.be.true
 
-                expect(lexResult.tokens[3].image).to.equal("\r")
-                expect(lexResult.tokens[3].startOffset).to.equal(9)
-                expect(lexResult.tokens[3].startLine).to.equal(3)
-                expect(lexResult.tokens[3].startColumn).to.equal(6)
-                expect(lexResult.tokens[3].endLine).to.equal(3)
-                expect(lexResult.tokens[3].endColumn).to.equal(6)
-                expect(lexResult.tokens[3]).to.be.an.instanceOf(WhitespaceNotSkipped)
+                expect(getImage(lexResult.tokens[3])).to.equal("\r")
+                expect(getStartOffset(lexResult.tokens[3])).to.equal(9)
+                expect(getStartLine(lexResult.tokens[3])).to.equal(3)
+                expect(getStartColumn(lexResult.tokens[3])).to.equal(6)
+                expect(getEndLine(lexResult.tokens[3])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[3])).to.equal(6)
+                expect(tokenMatcher(lexResult.tokens[3], WhitespaceNotSkipped)).to.be.true
 
-                expect(lexResult.tokens[4].image).to.equal("if")
-                expect(lexResult.tokens[4].startOffset).to.equal(10)
-                expect(lexResult.tokens[4].startLine).to.equal(4)
-                expect(lexResult.tokens[4].startColumn).to.equal(1)
-                expect(lexResult.tokens[4].endLine).to.equal(4)
-                expect(lexResult.tokens[4].endColumn).to.equal(2)
-                expect(lexResult.tokens[4]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[4])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[4])).to.equal(10)
+                expect(getStartLine(lexResult.tokens[4])).to.equal(4)
+                expect(getStartColumn(lexResult.tokens[4])).to.equal(1)
+                expect(getEndLine(lexResult.tokens[4])).to.equal(4)
+                expect(getEndColumn(lexResult.tokens[4])).to.equal(2)
+                expect(tokenMatcher(lexResult.tokens[4], If)).to.be.true
 
-                expect(lexResult.tokens[5].image).to.equal("\n")
-                expect(lexResult.tokens[5].startOffset).to.equal(12)
-                expect(lexResult.tokens[5].startLine).to.equal(4)
-                expect(lexResult.tokens[5].startColumn).to.equal(3)
-                expect(lexResult.tokens[5].endLine).to.equal(4)
-                expect(lexResult.tokens[5].endColumn).to.equal(3)
-                expect(lexResult.tokens[5]).to.be.an.instanceOf(WhitespaceNotSkipped)
+                expect(getImage(lexResult.tokens[5])).to.equal("\n")
+                expect(getStartOffset(lexResult.tokens[5])).to.equal(12)
+                expect(getStartLine(lexResult.tokens[5])).to.equal(4)
+                expect(getStartColumn(lexResult.tokens[5])).to.equal(3)
+                expect(getEndLine(lexResult.tokens[5])).to.equal(4)
+                expect(getEndColumn(lexResult.tokens[5])).to.equal(3)
+                expect(tokenMatcher(lexResult.tokens[5], WhitespaceNotSkipped)).to.be.true
 
             })
 
@@ -549,45 +563,45 @@ function defineLexerSpecs(contextName, extendToken) {
                 let input = "if\r\r\telse&if"
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0].endLine).to.equal(1)
-                expect(lexResult.tokens[0].endColumn).to.equal(2)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(getEndLine(lexResult.tokens[0])).to.equal(1)
+                expect(getEndColumn(lexResult.tokens[0])).to.equal(2)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(lexResult.tokens[1].image).to.equal("\r\r\t")
-                expect(lexResult.tokens[1].startOffset).to.equal(2)
-                expect(lexResult.tokens[1].startLine).to.equal(1)
-                expect(lexResult.tokens[1].startColumn).to.equal(3)
-                expect(lexResult.tokens[1].endLine).to.equal(3)
-                expect(lexResult.tokens[1].endColumn).to.equal(1)
-                expect(lexResult.tokens[1]).to.be.an.instanceOf(WhitespaceOrAmp)
+                expect(getImage(lexResult.tokens[1])).to.equal("\r\r\t")
+                expect(getStartOffset(lexResult.tokens[1])).to.equal(2)
+                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[1])).to.equal(3)
+                expect(getEndLine(lexResult.tokens[1])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[1])).to.equal(1)
+                expect(tokenMatcher(lexResult.tokens[1], WhitespaceOrAmp)).to.be.true
 
-                expect(lexResult.tokens[2].image).to.equal("else")
-                expect(lexResult.tokens[2].startOffset).to.equal(5)
-                expect(lexResult.tokens[2].startLine).to.equal(3)
-                expect(lexResult.tokens[2].startColumn).to.equal(2)
-                expect(lexResult.tokens[2].endLine).to.equal(3)
-                expect(lexResult.tokens[2].endColumn).to.equal(5)
-                expect(lexResult.tokens[2]).to.be.an.instanceOf(Else)
+                expect(getImage(lexResult.tokens[2])).to.equal("else")
+                expect(getStartOffset(lexResult.tokens[2])).to.equal(5)
+                expect(getStartLine(lexResult.tokens[2])).to.equal(3)
+                expect(getStartColumn(lexResult.tokens[2])).to.equal(2)
+                expect(getEndLine(lexResult.tokens[2])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[2])).to.equal(5)
+                expect(tokenMatcher(lexResult.tokens[2], Else)).to.be.true
 
-                expect(lexResult.tokens[3].image).to.equal("&")
-                expect(lexResult.tokens[3].startOffset).to.equal(9)
-                expect(lexResult.tokens[3].startLine).to.equal(3)
-                expect(lexResult.tokens[3].startColumn).to.equal(6)
-                expect(lexResult.tokens[3].endLine).to.equal(3)
-                expect(lexResult.tokens[3].endColumn).to.equal(6)
-                expect(lexResult.tokens[3]).to.be.an.instanceOf(WhitespaceOrAmp)
+                expect(getImage(lexResult.tokens[3])).to.equal("&")
+                expect(getStartOffset(lexResult.tokens[3])).to.equal(9)
+                expect(getStartLine(lexResult.tokens[3])).to.equal(3)
+                expect(getStartColumn(lexResult.tokens[3])).to.equal(6)
+                expect(getEndLine(lexResult.tokens[3])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[3])).to.equal(6)
+                expect(tokenMatcher(lexResult.tokens[3], WhitespaceOrAmp)).to.be.true
 
-                expect(lexResult.tokens[4].image).to.equal("if")
-                expect(lexResult.tokens[4].startOffset).to.equal(10)
-                expect(lexResult.tokens[4].startLine).to.equal(3)
-                expect(lexResult.tokens[4].startColumn).to.equal(7)
-                expect(lexResult.tokens[4].endLine).to.equal(3)
-                expect(lexResult.tokens[4].endColumn).to.equal(8)
-                expect(lexResult.tokens[4]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[4])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[4])).to.equal(10)
+                expect(getStartLine(lexResult.tokens[4])).to.equal(3)
+                expect(getStartColumn(lexResult.tokens[4])).to.equal(7)
+                expect(getEndLine(lexResult.tokens[4])).to.equal(3)
+                expect(getEndColumn(lexResult.tokens[4])).to.equal(8)
+                expect(tokenMatcher(lexResult.tokens[4], If)).to.be.true
 
             })
 
@@ -596,26 +610,26 @@ function defineLexerSpecs(contextName, extendToken) {
                 let input = "if//else"
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                expect(lexResult.tokens[0].startLine).to.equal(1)
-                expect(lexResult.tokens[0].startColumn).to.equal(1)
-                expect(lexResult.tokens[0].endLine).to.equal(1)
-                expect(lexResult.tokens[0].endColumn).to.equal(2)
-                expect(lexResult.tokens[0]).to.be.an.instanceOf(If)
+                expect(getImage(lexResult.tokens[0])).to.equal("if")
+                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
+                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
+                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(getEndLine(lexResult.tokens[0])).to.equal(1)
+                expect(getEndColumn(lexResult.tokens[0])).to.equal(2)
+                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
                 expect(lexResult.groups).to.have.property("comments")
                 // tslint:disable
                 expect(lexResult.groups["comments"]).to.have.length(1)
                 let comment = lexResult.groups["comments"][0]
                 // tslint:enable
-                expect(comment.image).to.equal("//else")
-                expect(comment.startOffset).to.equal(2)
-                expect(comment.startLine).to.equal(1)
-                expect(comment.startColumn).to.equal(3)
-                expect(comment.endLine).to.equal(1)
-                expect(comment.endColumn).to.equal(8)
-                expect(comment).to.be.an.instanceOf(Comment)
+                expect(getImage(comment)).to.equal("//else")
+                expect(getStartOffset(comment)).to.equal(2)
+                expect(getStartLine(comment)).to.equal(1)
+                expect(getStartColumn(comment)).to.equal(3)
+                expect(getEndLine(comment)).to.equal(1)
+                expect(getEndColumn(comment)).to.equal(8)
+                expect(tokenMatcher(comment, Comment)).to.be.true
             })
 
             context("lexer modes", () => {
@@ -671,7 +685,7 @@ function defineLexerSpecs(contextName, extendToken) {
                     let lexResult = ModeLexer.tokenize(input)
                     expect(lexResult.errors).to.be.empty
 
-                    let images = map(lexResult.tokens, (currTok) => currTok.image)
+                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
                     expect(images).to.deep.equal([
                         "1",
                         "LETTERS",
@@ -692,7 +706,7 @@ function defineLexerSpecs(contextName, extendToken) {
                     let lexResult = ModeLexer.tokenize(input, "letters")
                     expect(lexResult.errors).to.be.empty
 
-                    let images = map(lexResult.tokens, (currTok) => currTok.image)
+                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
                     expect(images).to.deep.equal([
                         "A",
                         "G",
@@ -708,7 +722,7 @@ function defineLexerSpecs(contextName, extendToken) {
                     expect(lexResult.errors[0].message).to.include("skipped 1")
                     expect(lexResult.errors[0].message).to.include(">1<")
 
-                    let images = map(lexResult.tokens, (currTok) => currTok.image)
+                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
 
                     expect(images).to.deep.equal([
                         "1",
@@ -727,7 +741,7 @@ function defineLexerSpecs(contextName, extendToken) {
                     expect(lexResult.errors[0].column).to.equal(3)
                     expect(lexResult.errors[0].length).to.equal(12)
 
-                    let images = map(lexResult.tokens, (currTok) => currTok.image)
+                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
                     expect(images).to.deep.equal([
                         "1",
                         "EXIT_NUMBERS",
@@ -853,10 +867,35 @@ function defineLexerSpecs(contextName, extendToken) {
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotLazyTok1")
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotLazyTok2")
                 })
+
+                it("Will detect a Lexer definition which has mixed Simple and None Simple Tokens", () => {
+                    class LazyTok1 extends LazyToken {static PATTERN = /A/}
+                    class LazyTok2 extends LazyToken {static PATTERN = /B/}
+                    class LazyTok3 extends LazyToken {static PATTERN = /C/}
+                    class NotSimpleTok1 extends SimpleLazyToken {static PATTERN = /D/}
+                    class NotSimpleTok2 extends SimpleLazyToken {static PATTERN = /E/}
+
+                    let lexerDef:any = [
+                        LazyTok1, LazyTok2, LazyTok3, NotSimpleTok1, NotSimpleTok2
+                    ]
+
+                    let badLexer = new Lexer(lexerDef, true)
+                    expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
+                    expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
+                        LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_SIMPLE_AND_NOT_SIMPLE)
+                    expect(badLexer.lexerDefinitionErrors[0].message).to.include(
+                        "A Lexer cannot be defined using a mix of both Simple and Non-Simple Tokens:")
+                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok1")
+                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok2")
+                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok3")
+                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotSimpleTok1")
+                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotSimpleTok2")
+                })
             })
         })
     })
 }
 
-defineLexerSpecs("Regular Tokens Mode", extendToken)
-defineLexerSpecs("Lazy Tokens Mode", extendLazyToken)
+defineLexerSpecs("Regular Tokens Mode", extendToken, tokenInstanceofMatcher)
+defineLexerSpecs("Lazy Tokens Mode", extendLazyToken, tokenInstanceofMatcher)
+defineLexerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, tokenStructuredMatcher)

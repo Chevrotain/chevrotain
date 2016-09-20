@@ -1,6 +1,7 @@
 import {TokenConstructor} from "./lexer_public"
-import {has, forEach} from "../utils/utils"
-import {Token, LazyToken} from "./tokens_public"
+import {has, forEach, isEmpty} from "../utils/utils"
+import {Token, LazyToken, IToken, SimpleLazyToken, LazyTokenCacheData, ISimpleToken, ISimpleLazyToken} from "./tokens_public"
+import {HashTable} from "../lang/lang_extensions"
 
 export function fillUpLineToOffset(lineToOffset:number[], text:string):void {
     let currLine = 0
@@ -96,23 +97,128 @@ function findColumnOfOffset(offset:number, lineToOffset:number[]):number {
     let line = findLineOfOffset(offset, lineToOffset)
     // +1 because columns always start at 1
     return offset - lineToOffset[line - 1] + 1
+}
 
+export function tokenStructuredMatcher(tokInstance, tokConstructor) {
+    return tokInstance.tokenType === tokConstructor.tokenType
+}
+
+export function tokenInstanceofMatcher(tokInstance, tokConstructor) {
+    return tokInstance instanceof tokConstructor
+}
+
+export function tokenClassIdentity(tokenConstructor:TokenConstructor):string {
+    // return tokenName(tokenConstructor)
+    return (<any>tokenConstructor).tokenType
+}
+
+export function tokenInstanceIdentity(tokenInstance:IToken):string {
+    return (<any>tokenInstance.constructor).tokenType
+}
+
+export function tokenStructuredIdentity(token:TokenConstructor|IToken):string {
+    return (<any>token).tokenType
 }
 
 export function isBaseTokenClass(tokClass:Function):boolean {
-    return tokClass === Token || tokClass === LazyToken
+    return tokClass === Token || tokClass === LazyToken || tokClass === SimpleLazyToken
 }
 
-let tokenShortNameIdx = 0
+let tokenShortNameIdx = 1
+export const tokenIdxToClass = new HashTable<TokenConstructor>()
 
 export function augmentTokenClasses(tokenClasses:TokenConstructor[]):void {
     forEach(tokenClasses, (currTokClass) => {
         if (!hasShortKeyProperty(currTokClass)) {
-            currTokClass.uniqueTokenTypeShortKey = tokenShortNameIdx++
+            tokenIdxToClass.put(tokenShortNameIdx, currTokClass)
+            currTokClass.tokenType = tokenShortNameIdx++
         }
     })
 }
 
 export function hasShortKeyProperty(tokClass:TokenConstructor):boolean {
-    return has(tokClass, "uniqueTokenTypeShortKey")
+    return has(tokClass, "tokenType")
 }
+
+export type LazyTokenCreator = (startOffset:number,
+                                endOffset:number,
+                                tokClass:TokenConstructor,
+                                cacheData:LazyTokenCacheData) => ISimpleToken
+
+export function createSimpleLazyToken(startOffset:number,
+                                      endOffset:number,
+                                      tokClass:TokenConstructor,
+                                      cacheData:LazyTokenCacheData):ISimpleLazyToken {
+    return <any>{
+        startOffset: startOffset,
+        endOffset:   endOffset,
+        tokenType:   (<any>tokClass).tokenType,
+        cacheData:   cacheData
+    }
+}
+
+export function createLazyTokenInstance(startOffset:number,
+                                        endOffset:number,
+                                        tokClass:TokenConstructor,
+                                        cacheData:LazyTokenCacheData):IToken {
+    return new (<any>tokClass)(startOffset, endOffset, cacheData)
+}
+
+export function isInheritanceBasedToken(token:ISimpleToken):boolean {
+    return token instanceof Token || token instanceof LazyToken
+}
+
+export function getImageFromLazyToken(lazyToken):string {
+    if (lazyToken.isInsertedInRecovery) {
+        return ""
+    }
+    return lazyToken.cacheData.orgText.substring(lazyToken.startOffset, lazyToken.endOffset + 1)
+}
+
+export function getStartLineFromLazyToken(lazyToken):number {
+    if (lazyToken.isInsertedInRecovery) {
+        return NaN
+    }
+    ensureLineDataProcessing(lazyToken.cacheData)
+    return getStartLineFromLineToOffset(lazyToken.startOffset, lazyToken.cacheData.lineToOffset)
+}
+
+export function getStartColumnFromLazyToken(lazyToken):number {
+    if (lazyToken.isInsertedInRecovery) {
+        return NaN
+    }
+    ensureLineDataProcessing(lazyToken.cacheData)
+    return getStartColumnFromLineToOffset(lazyToken.startOffset, lazyToken.cacheData.lineToOffset)
+}
+
+export function getEndLineFromLazyToken(lazyToken):number {
+    if (lazyToken.isInsertedInRecovery) {
+        return NaN
+    }
+    ensureLineDataProcessing(lazyToken.cacheData)
+    return getEndLineFromLineToOffset(lazyToken.endOffset, lazyToken.cacheData.lineToOffset)
+}
+
+export function getEndColumnFromLazyToken(lazyToken):number {
+    if (lazyToken.isInsertedInRecovery) {
+        return NaN
+    }
+    ensureLineDataProcessing(lazyToken.cacheData)
+    return getEndColumnFromLineToOffset(lazyToken.endOffset, lazyToken.cacheData.lineToOffset)
+}
+
+export function ensureLineDataProcessing(cacheData):void {
+    if (isEmpty(cacheData.lineToOffset)) {
+        fillUpLineToOffset(cacheData.lineToOffset, cacheData.orgText)
+    }
+}
+
+export function isLazyToken(tokType:TokenConstructor):boolean {
+    return LazyToken.prototype.isPrototypeOf(tokType.prototype) ||
+        SimpleLazyToken.prototype.isPrototypeOf(tokType.prototype)
+}
+
+export function isSimpleToken(tokType:TokenConstructor):boolean {
+    return SimpleLazyToken.prototype.isPrototypeOf(tokType.prototype)
+}
+

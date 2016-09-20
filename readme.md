@@ -7,7 +7,8 @@
 
 # Chevrotain
 
-Chevrotain is a **JavaScript parsing DSL** for building [**fast**][benchmark] LL(k) Parsers with optional **fault-tolerant** capabilities.
+Chevrotain is a **JavaScript parsing DSL** for building [**High Performance**][benchmark] LL(k) Parsers with optional **fault-tolerant** 
+capabilities.
 
 Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
 any code generation phase.
@@ -20,6 +21,7 @@ any code generation phase.
     * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
     * [Multiple Lexer Modes][lexer_modes] depending on the context.
     * [Tokens Grouping][lexer_groups].
+    * [Different Token types for balancing performance, memory usage and ease of use](docs/token_types.md).
     * **No code generation** The Lexer does not require any code generation phase. 
    
   2. **Parsing DSL**.
@@ -74,7 +76,8 @@ any code generation phase.
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
 * **[FAQ](docs/faq.md)**
-  
+
+* **[Token Types Docs](docs/token_types.md)**
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_14_0/classes/parser.html#at_least_one)

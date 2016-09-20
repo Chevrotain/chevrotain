@@ -2,7 +2,7 @@
 var chevrotain = require("../../lib/chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendLazyToken;
+var extendToken = chevrotain.extendSimpleLazyToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
@@ -123,7 +123,6 @@ module.exports = function(text, lexOnly) {
 
         if (parser.errors.length > 0) {
             throw "parsing errors encountered " + parser.errors[0].message
-
         }
     }
 

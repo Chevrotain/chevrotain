@@ -59,7 +59,6 @@ describe("Error Recovery SQL DDL Example", () => {
         assertAllThreeStatementsPresentAndValid(ptResult)
     })
 
-
     describe("Single Token insertion recovery mechanism", () => {
         let input:any = flatten([
             // CREATE TABLE schema2.Persons

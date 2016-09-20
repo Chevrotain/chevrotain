@@ -1,5 +1,8 @@
-import {Token, LazyTokenCacheData} from "./tokens_public"
-import {validatePatterns, analyzeTokenClasses, countLineTerminators, DEFAULT_MODE, performRuntimeChecks, checkLazyMode} from "./lexer"
+import {Token, LazyTokenCacheData, getImage, getStartLine, getStartColumn} from "./tokens_public"
+import {
+    validatePatterns, analyzeTokenClasses, countLineTerminators, DEFAULT_MODE, performRuntimeChecks, checkLazyMode,
+    checkSimpleMode
+} from "./lexer"
 import {
     cloneObj,
     isEmpty,
@@ -15,7 +18,10 @@ import {
     flatten,
     mapValues
 } from "../utils/utils"
-import {fillUpLineToOffset, getStartColumnFromLineToOffset, getStartLineFromLineToOffset, augmentTokenClasses} from "./tokens"
+import {
+    fillUpLineToOffset, getStartColumnFromLineToOffset, getStartLineFromLineToOffset, augmentTokenClasses,
+    createSimpleLazyToken, LazyTokenCreator, createLazyTokenInstance
+} from "./tokens"
 
 export type TokenConstructor = Function
 
@@ -37,7 +43,8 @@ export enum LexerDefinitionErrorType {
     MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY,
     MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
     LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
-    LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY
+    LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY,
+    LEXER_DEFINITION_CANNOT_MIX_SIMPLE_AND_NOT_SIMPLE
 }
 
 export interface ILexerDefinitionError {
@@ -72,6 +79,7 @@ export class Lexer {
     public lexerDefinitionErrors:ILexerDefinitionError[] = []
 
     protected isLazyTokenMode
+    protected isSimpleTokenMode
     protected modes:string[] = []
     protected defaultMode:string
     protected allPatterns:{ [modeName:string]:RegExp[] } = {}
@@ -227,12 +235,17 @@ export class Lexer {
         })
 
         this.defaultMode = actualDefinition.defaultMode
+        let allTokensTypes:any = flatten(mapValues(actualDefinition.modes, (currModDef) => currModDef))
 
         // Lazy Mode handling
-        let allTokensTypes:any = flatten(mapValues(actualDefinition.modes, (currModDef) => currModDef))
         let lazyCheckResult = checkLazyMode(allTokensTypes)
         this.isLazyTokenMode = lazyCheckResult.isLazy
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(lazyCheckResult.errors)
+
+        // Simple Mode handling
+        let simpleCheckResult = checkSimpleMode(allTokensTypes)
+        this.isSimpleTokenMode = simpleCheckResult.isSimple
+        this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(simpleCheckResult.errors)
 
         if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
@@ -266,7 +279,13 @@ export class Lexer {
         }
 
         if (this.isLazyTokenMode) {
-            return this.tokenizeInternalLazy(text, initialMode)
+            if (this.isSimpleTokenMode) {
+                return this.tokenizeInternalLazy(text, initialMode, createSimpleLazyToken)
+            }
+            else {
+                return this.tokenizeInternalLazy(text, initialMode, createLazyTokenInstance)
+            }
+
         }
         else {
             return this.tokenizeInternal(text, initialMode)
@@ -301,8 +320,13 @@ export class Lexer {
             if (modeStack.length === 1) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-                let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
-                errors.push({line: popToken.startLine, column: popToken.startColumn, length: popToken.image.length, message: msg})
+                let msg = `Unable to pop Lexer Mode after encountering Token ->${getImage(popToken)}<- The Mode Stack is empty`
+                errors.push({
+                    line:    getStartLine(popToken),
+                    column:  getStartColumn(popToken),
+                    length:  getImage(popToken).length,
+                    message: msg
+                })
             }
             else {
                 modeStack.pop()
@@ -456,7 +480,7 @@ export class Lexer {
         return {tokens: matchedTokens, groups: groups, errors: errors}
     }
 
-    private tokenizeInternalLazy(text:string, initialMode:string):ILexingResult {
+    private tokenizeInternalLazy(text:string, initialMode:string, tokenCreator:LazyTokenCreator):ILexingResult {
         let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength, droppedChar, msg
 
         let orgInput = text
@@ -484,8 +508,13 @@ export class Lexer {
             if (modeStack.length === 1) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-                let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
-                errors.push({line: popToken.startLine, column: popToken.startColumn, length: popToken.image.length, message: msg})
+                let msg = `Unable to pop Lexer Mode after encountering Token ->${getImage(popToken)}<- The Mode Stack is empty`
+                errors.push({
+                    line:    getStartLine(popToken),
+                    column:  getStartColumn(popToken),
+                    length:  getImage(popToken).length,
+                    message: msg
+                })
             }
             else {
                 modeStack.pop()
@@ -541,7 +570,7 @@ export class Lexer {
                 if (group !== undefined) {
                     tokClass = currModePatternIdxToClass[i]
                     // the end offset is non inclusive.
-                    newToken = new tokClass(offset, offset + imageLength - 1, lazyCacheData)
+                    newToken = tokenCreator(offset, offset + imageLength - 1, tokClass, lazyCacheData)
                     if (group === "default") {
                         matchedTokens.push(newToken)
                     }
@@ -583,7 +612,7 @@ export class Lexer {
                     ` skipped ${offset - errorStartOffset} characters.`
 
                 if (isEmpty(lazyCacheData.lineToOffset)) {
-                        fillUpLineToOffset(lazyCacheData.lineToOffset, lazyCacheData.orgText)
+                    fillUpLineToOffset(lazyCacheData.lineToOffset, lazyCacheData.orgText)
                 }
 
                 let errorLine = getStartLineFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)

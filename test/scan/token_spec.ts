@@ -1,4 +1,5 @@
-import {extendToken, tokenName, tokenLabel, Token} from "../../src/scan/tokens_public"
+import {extendToken, tokenName, tokenLabel, Token, tokenMatcher, extendLazyToken, extendSimpleLazyToken} from "../../src/scan/tokens_public"
+import {createSimpleLazyToken, augmentTokenClasses} from "../../src/scan/tokens"
 
 let TrueLiteral = extendToken("TrueLiteral")
 class FalseLiteral extends Token {}
@@ -73,5 +74,38 @@ describe("The Chevrotain Tokens namespace", () => {
         expect(tokenLabel(B)).to.equal("B")
         // Unless there's a LABEL property
         expect(tokenLabel(Plus)).to.equal("+")
+    })
+
+    it("provides a utility to verify if a token instance matches a Token Type", () => {
+        let ATokRegular = extendToken("ATokRegular")
+        let BTokRegular = extendToken("BTokRegular")
+        let AInstanceRegular = new ATokRegular("a", -1, -1, -1, -1, -1)
+        let BInstanceRegular = new BTokRegular("b", -1, -1, -1, -1, -1)
+
+        expect(tokenMatcher(AInstanceRegular, ATokRegular)).to.be.true
+        expect(tokenMatcher(AInstanceRegular, BTokRegular)).to.be.false
+        expect(tokenMatcher(BInstanceRegular, BTokRegular)).to.be.true
+        expect(tokenMatcher(BInstanceRegular, ATokRegular)).to.be.false
+
+        let ATokLazy = extendLazyToken("ATokLazy")
+        let BTokLazy = extendLazyToken("BTokLazy")
+        let AInstanceLazy = new ATokLazy(0, 0, {})
+        let BInstanceLazy = new BTokLazy(0, 0, {})
+
+        expect(tokenMatcher(AInstanceLazy, ATokLazy)).to.be.true
+        expect(tokenMatcher(AInstanceLazy, BTokLazy)).to.be.false
+        expect(tokenMatcher(BInstanceLazy, BTokLazy)).to.be.true
+        expect(tokenMatcher(BInstanceLazy, ATokLazy)).to.be.false
+
+        let ATokSimple = extendSimpleLazyToken("ATokSimple")
+        let BTokSimple = extendSimpleLazyToken("BTokSimple")
+        augmentTokenClasses([ATokSimple, BTokSimple])
+        let AInstanceSimple = createSimpleLazyToken(0, 1, ATokSimple, {lineToOffset: [], orgText: ""})
+        let BInstanceSimple = createSimpleLazyToken(0, 1, BTokSimple, {lineToOffset: [], orgText: ""})
+
+        expect(tokenMatcher(AInstanceSimple, ATokSimple)).to.be.true
+        expect(tokenMatcher(AInstanceSimple, BTokSimple)).to.be.false
+        expect(tokenMatcher(BInstanceSimple, BTokSimple)).to.be.true
+        expect(tokenMatcher(BInstanceSimple, ATokSimple)).to.be.false
     })
 })

@@ -313,7 +313,7 @@ function CssParser(input) {
     // selector [ ',' S* selector ]*
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
     this.ruleset = this.RULE('ruleset', function() {
-        $.MANY_SEP(Comma, function() {
+        $.AT_LEAST_ONE_SEP(Comma, function() {
             $.SUBRULE($.selector)
         })
 
@@ -418,6 +418,7 @@ function CssParser(input) {
                     })
                     $.CONSUME(RParen)
                 }}
+
             ]);
             // @formatter:on
     });
@@ -460,19 +461,35 @@ function CssParser(input) {
 
         // @formatter:off
             $.OR([
-                {ALT: function() { $.CONSUME(Num) }},
                 {ALT: function() { $.CONSUME(Percentage) }},
-                {ALT: function() { $.CONSUME(Length) }},
+                {ALT: function() { $.CONSUME(Px) }},
+                {ALT: function() { $.CONSUME(Cm) }},
+                {ALT: function() { $.CONSUME(Mm) }},
+                {ALT: function() { $.CONSUME(In) }},
+                {ALT: function() { $.CONSUME(Pt) }},
+                {ALT: function() { $.CONSUME(Pc) }},
+
                 {ALT: function() { $.CONSUME(Ems) }},
                 {ALT: function() { $.CONSUME(Exs) }},
-                {ALT: function() { $.CONSUME(Angle) }},
-                {ALT: function() { $.CONSUME(Time) }},
-                {ALT: function() { $.CONSUME(Freq) }},
+                {ALT: function() { $.CONSUME(Deg) }},
+                {ALT: function() { $.CONSUME(Rad) }},
+                {ALT: function() { $.CONSUME(Grad) }},
+
+                {ALT: function() { $.CONSUME(Ms) }},
+                {ALT: function() { $.CONSUME(Sec) }},
+
+                {ALT: function() { $.CONSUME(Hz) }},
+                {ALT: function() { $.CONSUME(Khz) }},
+
                 {ALT: function() { $.CONSUME(StringLiteral) }},
                 {ALT: function() { $.CONSUME(Ident) }},
-                {ALT: function() { $.CONSUME(Uri) }},
+
+                {ALT: function() { $.CONSUME(UriString) }},
+                {ALT: function() { $.CONSUME(UriUrl) }},
+
                 {ALT: function() { $.SUBRULE($.hexcolor) }},
-                {ALT: function() { $.SUBRULE($.cssFunction) }}
+                {ALT: function() { $.SUBRULE($.cssFunction) }},
+                {ALT: function() { $.CONSUME(Num) }}
             ]);
             // @formatter:on
     });
@@ -503,7 +520,7 @@ CssParser.prototype.constructor = CssParser;
 // reuse the same parser instance.
 var parser = new CssParser([]);
 
-module.exports = function(text, lexOnly) {
+module.exports = function (text, lexOnly) {
     var lexResult = CssLexer.tokenize(text);
     if (lexResult.errors.length > 0) {
         throw "Lexing errors encountered " + lexResult.errors[0].message
@@ -513,7 +530,6 @@ module.exports = function(text, lexOnly) {
     if (!lexOnly) {
         // setting a new input will RESET the parser instance's state.
         parser.input = lexResult.tokens;
-
         // any top level rule may be used as an entry point
         value = parser.stylesheet();
 
@@ -530,4 +546,3 @@ module.exports = function(text, lexOnly) {
         parseErrors: parser.errors
     };
 };
-
