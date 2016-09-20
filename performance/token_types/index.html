@@ -9,14 +9,10 @@
 <body>
 <script src="../../bower_components/lodash/lodash.min.js"></script>
 <script src="../../bower_components/benchmark/benchmark.js"></script>
-<!--TODO: replace this with chevrotain from CDN-->
-<!-- TODO: need to run all benchmarks in iframes to load different versions of chevrotain
-     or should we use require.js ? -->
-<script src="./../chevrotain.js"></script>
 <script src="https://npmcdn.com/chart.js@2.2.1/dist/Chart.min.js"></script>
 <script src="../samples/1K_json.js"></script>
 
-<script src="parsers/parsers.js"></script>
+<script src="parsers/loader.js"></script>
 <script src="parsers/api.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
@@ -148,11 +144,11 @@ f
 
         var suite = new Benchmark.Suite;
         suite.add('Base Tokens', function () {
-            performSingleLexAndParserBase(json_sample1k)
+            performSingleLexAndParserBase(json_sample1k, base)
         }).add('Lazy Tokens', function () {
-            performSingleLexAndParserLazy(json_sample1k)
+            performSingleLexAndParserBase(json_sample1k, lazy)
         }).add('Simple Lazy Tokens', function () {
-            performSingleLexAndParserSimpleLazy(json_sample1k)
+            performSingleLexAndParserBase(json_sample1k, simpleLazy)
         }).on('cycle', function (event) {
 
             var table = document.getElementById("resultsTable");
