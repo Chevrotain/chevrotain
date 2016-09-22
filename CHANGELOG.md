@@ -1,3 +1,19 @@
+## X.Y.Z (INSERT_DATE_HERE) 
+
+#### Major Changes
+
+- [Performance Improvements: Lookahead functions.](#274)
+- [Performance: SimpleLazyTokens.](#277)
+- ["Smart" Map based lookahead for K = 1 with Token inheritance.](#279)
+
+This release is is focused on performance improvements, with **~20%** boost on V8
+and potentially **~100%** (double) performance on SpiderMonkey (FireFox 49).
+
+To enjoy the maximum performance boost the new **SimpleLazyTokens** should be used.
+See:**[Token Types Docs](docs/token_types.md)** for additional details. 
+
+
+
 ## 0.14.0 (9-3-2016) 
 
 #### Breaking Changes
