@@ -286,6 +286,23 @@ export function assign(target:Object, ...sources:Object[]):Object {
     return target
 }
 
+/**
+ * mutates! (and returns) target
+ */
+export function assignNoOverwrite(target:Object, ...sources:Object[]):Object {
+    for (let i = 0; i < sources.length; i++) {
+        let curSource = sources[i]
+        let currSourceKeys = keys(curSource)
+        for (let j = 0; j < currSourceKeys.length; j++) {
+            let currKey = currSourceKeys[j]
+            if (!has(target, currKey)) {
+                target[currKey] = curSource[currKey]
+            }
+        }
+    }
+    return target
+}
+
 export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey:string]:T[]} {
     let result:{ [groupKey:string]:T[]} = {}
 

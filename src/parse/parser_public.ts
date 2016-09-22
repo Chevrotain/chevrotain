@@ -114,7 +114,7 @@ const MANY_SEP_IDX = 5 << BITS_FOR_METHOD_IDX
 const AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_METHOD_IDX
 /* tslint:enable */
 
-export type TokenMatcher = (token:ISimpleTokenOrIToken, tokClass:Function) => boolean
+export type TokenMatcher = (token:ISimpleTokenOrIToken, tokClass:TokenConstructor) => boolean
 export type TokenInstanceIdentityFunc = (tok:IToken) => string
 export type TokenClassIdentityFunc = (tok:TokenConstructor) => string
 
@@ -123,6 +123,7 @@ export interface IParserConfig {
      * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
      */
     recoveryEnabled?:boolean,
+
     /**
      * Maximum number of tokens the parser will use to choose between alternatives.
      */
@@ -146,12 +147,20 @@ export interface IParserConfig {
      * Be careful when ignoring errors, they are usually there for a reason :).
      */
     ignoredIssues?:IgnoredParserIssues
+
+    /**
+     * Enable This Flag to to support Dynamically defined Tokens via inheritance.
+     * This will disable performance optimizations which cannot work if the whole Token vocabulary is not known
+     * During Parser initialization.
+     */
+    dynamicTokensEnabled?:boolean
 }
 
 const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
-    recoveryEnabled: false,
-    maxLookahead:    5,
-    ignoredIssues:   <any>{}
+    recoveryEnabled:      false,
+    maxLookahead:         5,
+    ignoredIssues:        <any>{},
+    dynamicTokensEnabled: false
 })
 
 export interface IRuleConfig<T> {
@@ -302,7 +311,7 @@ export class Parser {
     // needing to display the parser definition errors in some GUI(online playground).
     static DEFER_DEFINITION_ERRORS_HANDLING:boolean = false
 
-    protected static performSelfAnalysis(parserInstance:Parser) {
+    protected static performSelfAnalysis(parserInstance:Parser):void {
         let definitionErrors = []
         let defErrorsMsgs
 
@@ -375,6 +384,7 @@ export class Parser {
      * If this flag is disabled the parser will halt on the first error.
      */
     protected recoveryEnabled:boolean
+    protected dynamicTokensEnabled:boolean
     protected maxLookahead:number
     protected ignoredIssues:IgnoredParserIssues
 
@@ -419,6 +429,10 @@ export class Parser {
         if (!this.recoveryEnabled) {
             this.attemptInRepetitionRecovery = NOOP
         }
+
+        this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled") ?
+            config.dynamicTokensEnabled :
+            DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
 
         this.maxLookahead = has(config, "maxLookahead") ?
             config.maxLookahead :
@@ -1251,7 +1265,7 @@ export class Parser {
      * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
      * as the max of the cardinality will be greater than the min value (and this is a false error!).
      */
-    protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
+    protected canTokenTypeBeInsertedInRecovery(tokClass:TokenConstructor) {
         return true
     }
 
@@ -1317,7 +1331,7 @@ export class Parser {
         }
     }
 
-    protected consumeInternalWithTryCatch(tokClass:Function, idx:number):ISimpleTokenOrIToken {
+    protected consumeInternalWithTryCatch(tokClass:TokenConstructor, idx:number):ISimpleTokenOrIToken {
         try {
             return this.consumeInternalOptimized(tokClass)
         } catch (eFromConsumption) {
@@ -1586,7 +1600,7 @@ export class Parser {
         return follows
     }
 
-    private tryInRuleRecovery(expectedTokType:Function, follows:Function[]):ISimpleTokenOrIToken {
+    private tryInRuleRecovery(expectedTokType:TokenConstructor, follows:Function[]):ISimpleTokenOrIToken {
         if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
             let tokToInsert = this.getTokenToInsert(expectedTokType)
             return tokToInsert
@@ -1607,7 +1621,7 @@ export class Parser {
             this.canRecoverWithSingleTokenDeletion(expectedToken)
     }
 
-    private canRecoverWithSingleTokenInsertion(expectedTokType:Function, follows:Function[]):boolean {
+    private canRecoverWithSingleTokenInsertion(expectedTokType:TokenConstructor, follows:Function[]):boolean {
         if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
             return false
         }
@@ -1956,7 +1970,7 @@ export class Parser {
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
-    private consumeInternalOptimized(expectedTokClass:Function):ISimpleTokenOrIToken {
+    private consumeInternalOptimized(expectedTokClass:TokenConstructor):ISimpleTokenOrIToken {
         let nextToken = this.LA(1)
         if (this.tokenMatcher(nextToken, expectedTokClass)) {
             this.consumeToken()
@@ -1992,7 +2006,8 @@ export class Parser {
                 hasPredicates,
                 this.tokenMatcher,
                 this.tokenClassIdentityFunc,
-                this.tokenInstanceIdentityFunc)
+                this.tokenInstanceIdentityFunc,
+                this.dynamicTokensEnabled)
             this.classLAFuncs.put(key, laFunc)
             return laFunc
         }
@@ -2027,29 +2042,6 @@ export class Parser {
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
     }
 
-    private getLookaheadFuncFor<T>(key:number,
-                                   occurrence:number,
-                                   laFuncBuilder:(number,
-                                                  rule,
-                                                  k,
-                                                  tokenMatcher,
-                                                  tokenClassIdentityFunc,
-                                                  tokenInstanceIdentityFunc) => () => T,
-                                   maxLookahead:number):() => T {
-        let laFunc = <any>this.classLAFuncs.get(key)
-        if (laFunc === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
-            laFunc = laFuncBuilder.apply(null,
-                [occurrence, ruleGrammar, maxLookahead, this.tokenMatcher, this.tokenClassIdentityFunc, this.tokenInstanceIdentityFunc])
-            this.classLAFuncs.put(key, laFunc)
-            return laFunc
-        }
-        else {
-            return laFunc
-        }
-    }
-
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
         let errSuffix = " but found: '" + getImage(this.LA(1)) + "'"
@@ -2064,6 +2056,32 @@ export class Parser {
             errMsgTypes = `one of these possible Token sequences:\n  <${nextValidTokenSequences.join(" ,")}>`
         }
         throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.LA(1)))
+    }
+
+    private getLookaheadFuncFor<T>(key:number,
+                                   occurrence:number,
+                                   laFuncBuilder:(number,
+                                                  rule,
+                                                  k,
+                                                  tokenMatcher,
+                                                  tokenClassIdentityFunc,
+                                                  tokenInstanceIdentityFunc,
+                                                  dynamicTokensEnabled) => () => T,
+                                   maxLookahead:number):() => T {
+        let laFunc = <any>this.classLAFuncs.get(key)
+        if (laFunc === undefined) {
+            let ruleName = this.getCurrRuleFullName()
+            let ruleGrammar = this.getGAstProductions().get(ruleName)
+            laFunc = laFuncBuilder.apply(null,
+                //TODO: change
+                [occurrence, ruleGrammar, maxLookahead, this.tokenMatcher,
+                    this.tokenClassIdentityFunc, this.tokenInstanceIdentityFunc, this.dynamicTokensEnabled])
+            this.classLAFuncs.put(key, laFunc)
+            return laFunc
+        }
+        else {
+            return laFunc
+        }
     }
 
     // TODO: consider caching the error message computed information

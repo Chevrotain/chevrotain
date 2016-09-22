@@ -1,4 +1,4 @@
-import {isString, isRegExp, isFunction, assign, isUndefined} from "../utils/utils"
+import {isString, isRegExp, isFunction, assign, isUndefined, assignNoOverwrite} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
 import {Lexer, TokenConstructor} from "./lexer_public"
 import {
@@ -77,29 +77,31 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
         pattern = undefined
     }
 
-    let derivedCostructor:any = function () {
+    let derivedConstructor:any = function () {
         parentConstructor.apply(this, arguments)
     }
-
-    // static properties mixing
-    derivedCostructor = assign(derivedCostructor, parentConstructor)
 
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
     // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
     /* istanbul ignore if -> will only run in old versions of node.js */
-    if (!defineNameProp(derivedCostructor, tokenName)) {
+    if (!defineNameProp(derivedConstructor, tokenName)) {
         // hack to save the tokenName in situations where the constructor's name property cannot be reconfigured
-        derivedCostructor.tokenName = tokenName
+        derivedConstructor.tokenName = tokenName
     }
 
-    derivedCostructor.prototype = Object.create(parentConstructor.prototype)
-    derivedCostructor.prototype.constructor = derivedCostructor
+    derivedConstructor.prototype = Object.create(parentConstructor.prototype)
+    derivedConstructor.prototype.constructor = derivedConstructor
     if (!isUndefined(pattern)) {
-        derivedCostructor.PATTERN = pattern
+        derivedConstructor.PATTERN = pattern
     }
 
-    return derivedCostructor
+    augmentTokenClasses([derivedConstructor])
+
+    // static properties mixing
+    derivedConstructor = assignNoOverwrite(derivedConstructor, parentConstructor)
+
+    return derivedConstructor
 }
 
 export interface ISimpleToken {

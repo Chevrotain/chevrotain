@@ -1,10 +1,9 @@
-import {map, reduce, find, every, isEmpty, flatten, getSuperClass, forEach, has} from "../../utils/utils"
+import {map, reduce, find, every, isEmpty, flatten, forEach, has} from "../../utils/utils"
 import {gast} from "./gast_public"
 import {possiblePathsFrom} from "./interpreter"
 import {RestWalker} from "./rest"
 import {Predicate, IAnyOrAlt, TokenMatcher, TokenInstanceIdentityFunc, TokenClassIdentityFunc} from "../parser_public"
-import {isBaseTokenClass} from "../../scan/tokens"
-import {Lexer} from "../../scan/lexer_public"
+import {TokenConstructor} from "../../scan/lexer_public"
 
 export enum PROD_TYPE {
     OPTION,
@@ -21,9 +20,15 @@ export function buildLookaheadFuncForOr(occurrence:number,
                                         hasPredicates:boolean,
                                         tokenMatcher:TokenMatcher,
                                         tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                        tokenIdentityFunc:TokenInstanceIdentityFunc):(orAlts?:IAnyOrAlt<any>[]) => number {
+                                        tokenIdentityFunc:TokenInstanceIdentityFunc,
+                                        dynamicTokensEnabled:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
-    return buildAlternativesLookAheadFunc(lookAheadPaths, hasPredicates, tokenMatcher, tokenClassIdentityFunc, tokenIdentityFunc)
+    return buildAlternativesLookAheadFunc(lookAheadPaths,
+        hasPredicates,
+        tokenMatcher,
+        tokenClassIdentityFunc,
+        tokenIdentityFunc,
+        dynamicTokensEnabled)
 }
 
 /**
@@ -44,9 +49,14 @@ export function buildLookaheadFuncForOptionalProd(occurrence:number,
                                                   k:number,
                                                   tokenMatcher:TokenMatcher,
                                                   tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                                  tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                                  tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                                  dynamicTokensEnabled:boolean):() => boolean {
     let lookAheadPaths = getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k)
-    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0], tokenMatcher, tokenClassIdentityFunc, tokenInstanceIdentityFunc)
+    return buildSingleAlternativeLookaheadFunction(lookAheadPaths[0],
+        tokenMatcher,
+        tokenClassIdentityFunc,
+        tokenInstanceIdentityFunc,
+        dynamicTokensEnabled)
 }
 
 export function buildLookaheadForOption(optionOccurrence:number,
@@ -54,14 +64,16 @@ export function buildLookaheadForOption(optionOccurrence:number,
                                         k:number,
                                         tokenMatcher:TokenMatcher,
                                         tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                        tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                        tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                        dynamicTokensEnabled:boolean):() => boolean {
     return buildLookaheadFuncForOptionalProd(optionOccurrence,
         ruleGrammar,
         PROD_TYPE.OPTION,
         k,
         tokenMatcher,
         tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc)
+        tokenInstanceIdentityFunc,
+        dynamicTokensEnabled)
 }
 
 export function buildLookaheadForMany(optionOccurrence:number,
@@ -69,7 +81,8 @@ export function buildLookaheadForMany(optionOccurrence:number,
                                       k:number,
                                       tokenMatcher:TokenMatcher,
                                       tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                      tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                      tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                      dynamicTokensEnabled:boolean):() => boolean {
     return buildLookaheadFuncForOptionalProd(
         optionOccurrence,
         ruleGrammar,
@@ -77,7 +90,8 @@ export function buildLookaheadForMany(optionOccurrence:number,
         k,
         tokenMatcher,
         tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc)
+        tokenInstanceIdentityFunc,
+        dynamicTokensEnabled)
 }
 
 export function buildLookaheadForManySep(optionOccurrence:number,
@@ -85,7 +99,8 @@ export function buildLookaheadForManySep(optionOccurrence:number,
                                          k:number,
                                          tokenMatcher:TokenMatcher,
                                          tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                         tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                         tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                         dynamicTokensEnabled:boolean):() => boolean {
     return buildLookaheadFuncForOptionalProd(
         optionOccurrence,
         ruleGrammar,
@@ -93,7 +108,8 @@ export function buildLookaheadForManySep(optionOccurrence:number,
         k,
         tokenMatcher,
         tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc)
+        tokenInstanceIdentityFunc,
+        dynamicTokensEnabled)
 }
 
 export function buildLookaheadForAtLeastOne(optionOccurrence:number,
@@ -101,7 +117,8 @@ export function buildLookaheadForAtLeastOne(optionOccurrence:number,
                                             k:number,
                                             tokenMatcher:TokenMatcher,
                                             tokenIdentityFunc:TokenClassIdentityFunc,
-                                            tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                            tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                            dynamicTokensEnabled:boolean):() => boolean {
     return buildLookaheadFuncForOptionalProd(
         optionOccurrence,
         ruleGrammar,
@@ -109,7 +126,8 @@ export function buildLookaheadForAtLeastOne(optionOccurrence:number,
         k,
         tokenMatcher,
         tokenIdentityFunc,
-        tokenInstanceIdentityFunc)
+        tokenInstanceIdentityFunc,
+        dynamicTokensEnabled)
 }
 
 export function buildLookaheadForAtLeastOneSep(optionOccurrence:number,
@@ -117,7 +135,8 @@ export function buildLookaheadForAtLeastOneSep(optionOccurrence:number,
                                                k:number,
                                                tokenMatcher:TokenMatcher,
                                                tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                               tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                               tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                               dynamicTokensEnabled:boolean):() => boolean {
     return buildLookaheadFuncForOptionalProd(
         optionOccurrence,
         ruleGrammar,
@@ -125,36 +144,23 @@ export function buildLookaheadForAtLeastOneSep(optionOccurrence:number,
         k,
         tokenMatcher,
         tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc
-    )
+        tokenInstanceIdentityFunc,
+        dynamicTokensEnabled)
 }
 
-export type Alternative = Function[][]
-export type lookAheadSequence = Function[][]
+export type Alternative = TokenConstructor[][]
+export type lookAheadSequence = TokenConstructor[][]
 
 export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[],
                                                hasPredicates:boolean,
                                                tokenMatcher:TokenMatcher,
                                                tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                               tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):(orAlts?:IAnyOrAlt<any>[]) => number {
+                                               tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                               dynamicTokensEnabled:boolean):(orAlts?:IAnyOrAlt<any>[]) => number {
     let numOfAlts = alts.length
     let areAllOneTokenLookahead = every(alts, (currAlt) => {
         return every(currAlt, (currPath) => {
             return currPath.length === 1
-        })
-    })
-
-    let allTokensExtendBaseTokenClassesDirectly = every(alts, (currAlt) => {
-        return every(currAlt, (currPath) => {
-            return every(currPath, (currTokClass:any) => {
-                return isBaseTokenClass(getSuperClass(currTokClass)) &&
-                    // TODO: this is an assumption that Token inheritance is limited to only extending
-                    // "Abstract" classes and that "Abstract" classes always use "Lexer.NA" pattern
-                    // TODO: this needs to be verified at runtime in extendToken, which means ES2015 classes can no
-                    // longer be safely supported in combination with inheritance.
-                    // or maybe collect more information about the Token inheritance hierarchy at runtime?
-                    currTokClass.PATTERN !== Lexer.NA
-            })
         })
     })
 
@@ -203,8 +209,8 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[],
         }
     }
     // optimized (common) case of all the lookaheads paths requiring only
-    // a single token lookahead.
-    else if (areAllOneTokenLookahead && allTokensExtendBaseTokenClassesDirectly) {
+    // a single token lookahead. These Optimizations cannot work if dynamically defined Tokens are used.
+    else if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
 
         let singleTokenAlts = map(alts, (currAlt) => {
             return flatten(currAlt)
@@ -215,8 +221,12 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[],
                 if (!has(result, tokenClassIdentityFunc(currTokClass))) {
                     result[tokenClassIdentityFunc(currTokClass)] = idx
                 }
+                forEach(currTokClass.extendingTokenTypes, (currExtendingType) => {
+                    if (!has(result, currExtendingType)) {
+                        result[currExtendingType] = idx
+                    }
+                })
             })
-
             return result
         }, {})
 
@@ -266,40 +276,33 @@ export function buildAlternativesLookAheadFunc(alts:lookAheadSequence[],
 export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence,
                                                         tokenMatcher:TokenMatcher,
                                                         tokenClassIdentityFunc:TokenClassIdentityFunc,
-                                                        tokenInstanceIdentityFunc:TokenInstanceIdentityFunc):() => boolean {
+                                                        tokenInstanceIdentityFunc:TokenInstanceIdentityFunc,
+                                                        dynamicTokensEnabled:boolean):() => boolean {
 
     let areAllOneTokenLookahead = every(alt, (currPath) => {
         return currPath.length === 1
-    })
-
-    let allTokensExtendBaseTokenClassesDirectly = every(alt, (currPath) => {
-        return every(currPath, (currTokClass:any) => {
-            return isBaseTokenClass(getSuperClass(currTokClass)) &&
-                // TODO: this is an assumption that Token inheritance is limited to only extending
-                // "Abstract" classes and that "Abstract" classes always use "Lexer.NA" pattern
-                // TODO: this needs to be verified at runtime in extendToken, which means ES2015 classes can no
-                // longer be safely supported in combination with inheritance.
-                currTokClass.PATTERN !== Lexer.NA
-        })
     })
 
     let numOfPaths = alt.length
 
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead.
-    if (areAllOneTokenLookahead && allTokensExtendBaseTokenClassesDirectly) {
-        let singleTokensTypes = flatten(alt)
+    if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
+        let singleTokensClasses = flatten(alt)
 
-        if (singleTokensTypes.length === 1) {
-            let expectedTokenType = singleTokensTypes[0]
+        if (singleTokensClasses.length === 1 && isEmpty((<any>singleTokensClasses[0]).extendingTokenTypes)) {
+            let expectedTokenType = singleTokensClasses[0]
             let expectedTokenUniqueKey = tokenClassIdentityFunc(<any>expectedTokenType)
             return function ():boolean {
                 return tokenInstanceIdentityFunc(this.LA(1)) === expectedTokenUniqueKey
             }
         }
         else {
-            let choiceToAlt = reduce(singleTokensTypes, (result, currTokClass, idx) => {
+            let choiceToAlt = reduce(singleTokensClasses, (result, currTokClass, idx) => {
                 result[tokenClassIdentityFunc(currTokClass)] = true
+                forEach(currTokClass.extendingTokenTypes, (currExtendingType) => {
+                    result[currExtendingType] = true
+                })
                 return result
             }, {})
             return function ():boolean {
@@ -330,7 +333,6 @@ export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence,
             return false
         }
     }
-
 }
 
 class RestDefinitionFinderWalker extends RestWalker {

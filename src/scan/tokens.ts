@@ -1,5 +1,5 @@
 import {TokenConstructor} from "./lexer_public"
-import {has, forEach, isEmpty} from "../utils/utils"
+import {has, forEach, isEmpty, getSuperClass, difference, cloneArr, contains} from "../utils/utils"
 import {Token, LazyToken, IToken, SimpleLazyToken, LazyTokenCacheData, ISimpleToken, ISimpleLazyToken} from "./tokens_public"
 import {HashTable} from "../lang/lang_extensions"
 
@@ -120,24 +120,78 @@ export function tokenStructuredIdentity(token:TokenConstructor|IToken):string {
     return (<any>token).tokenType
 }
 
+export function isBaseTokenOrObject(tokClass:TokenConstructor):boolean {
+    return isBaseTokenClass(tokClass) || tokClass === Object
+}
+
 export function isBaseTokenClass(tokClass:Function):boolean {
     return tokClass === Token || tokClass === LazyToken || tokClass === SimpleLazyToken
 }
 
-let tokenShortNameIdx = 1
+export let tokenShortNameIdx = 1
 export const tokenIdxToClass = new HashTable<TokenConstructor>()
 
 export function augmentTokenClasses(tokenClasses:TokenConstructor[]):void {
+    // 1. collect the parent Token classes as well.
+    let tokenClassesAndParents = expandTokenHierarchy(tokenClasses)
+
+    // 2. add required tokenType and extendingTokenTypes properties
+    assignTokenDefaultProps(tokenClassesAndParents)
+
+    // 3. fill up the extendingTokenTypes
+    assignExtendingTokensProp(tokenClassesAndParents)
+}
+
+export function expandTokenHierarchy(tokenClasses:TokenConstructor[]):TokenConstructor[] {
+    let tokenClassesAndParents = cloneArr(tokenClasses)
+
+    forEach(tokenClasses, (currTokClass) => {
+        let currParentClass:any = getSuperClass(currTokClass)
+        while (!isBaseTokenOrObject(currParentClass)) {
+            if (!contains(tokenClassesAndParents, currParentClass)) {
+                tokenClassesAndParents.push(currParentClass)
+            }
+            currParentClass = getSuperClass(currParentClass)
+        }
+    })
+
+    return tokenClassesAndParents
+}
+
+export function assignTokenDefaultProps(tokenClasses:TokenConstructor[]):void {
     forEach(tokenClasses, (currTokClass) => {
         if (!hasShortKeyProperty(currTokClass)) {
-            tokenIdxToClass.put(tokenShortNameIdx, currTokClass)
-            currTokClass.tokenType = tokenShortNameIdx++
+            tokenIdxToClass.put(tokenShortNameIdx, currTokClass);
+            (<any>currTokClass).tokenType = tokenShortNameIdx++
+        }
+
+        if (!hasExtendingTokensTypesProperty(currTokClass)) {
+            currTokClass.extendingTokenTypes = []
         }
     })
 }
 
+export function assignExtendingTokensProp(tokenClasses:TokenConstructor[]):void {
+    forEach(tokenClasses, (currTokClass) => {
+        let currSubClassesExtendingTypes = [currTokClass.tokenType]
+        let currParentClass:any = getSuperClass(currTokClass)
+
+        while (!isBaseTokenClass(currParentClass) && currParentClass !== Object) {
+            let newExtendingTypes = difference(currSubClassesExtendingTypes, currParentClass.extendingTokenTypes)
+            currParentClass.extendingTokenTypes = currParentClass.extendingTokenTypes.concat(newExtendingTypes)
+            currSubClassesExtendingTypes.push(currParentClass.tokenType)
+            currParentClass = getSuperClass(currParentClass)
+        }
+    })
+
+}
+
 export function hasShortKeyProperty(tokClass:TokenConstructor):boolean {
     return has(tokClass, "tokenType")
+}
+
+export function hasExtendingTokensTypesProperty(tokClass:TokenConstructor):boolean {
+    return has(tokClass, "extendingTokenTypes")
 }
 
 export type LazyTokenCreator = (startOffset:number,

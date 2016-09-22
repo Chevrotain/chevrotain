@@ -3,12 +3,15 @@
  * In this example an 'array' language [1, 2, 3, 4, ...] where additional delimiters can be
  * defined by the user instead of being limited to just the 'built in' comma delimiter.
  *
- * This is made easily possible because the Lexer itself is created directly in javascript (no code generation).
+ * This is made possible because the Lexer itself is created directly in javascript (no code generation).
  * And the Token matching during parsing uses the 'instanceof' operator.
  * This the Parser need not be modified to support each new custom delimiter.
+ *
+ * Note that it is mandatory to enable the "dynamicTokensEnabled" config property for this capability to work.
+ * Otherwise certain performance optimizations may break as those assume that the Token vocabulary is static.
  */
 
-var chevrotain = require("chevrotain");
+var chevrotain = require("../../../lib/chevrotain");
 
 // ----------------- lexer -----------------
 var extendToken = chevrotain.extendToken;
@@ -42,7 +45,9 @@ function DynamicDelimiterParser(input) {
     Parser.call(this, input, allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled
             // use this flag to enable them
-            recoveryEnabled: true
+            recoveryEnabled:      true,
+            // IMPORTANT: must be enabled to support dynamically defined Tokens
+            dynamicTokensEnabled: true
         }
     );
 

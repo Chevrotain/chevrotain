@@ -36,7 +36,7 @@ function JsonParserDev(input) {
         }
     );
 
-    // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
+    // notmandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this;
 
     this.json = this.RULE("json", function() {
