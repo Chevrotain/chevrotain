@@ -2,7 +2,7 @@
 var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendLazyToken;
+var extendToken = chevrotain.extendSimpleLazyToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
