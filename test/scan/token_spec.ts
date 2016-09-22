@@ -108,4 +108,36 @@ describe("The Chevrotain Tokens namespace", () => {
         expect(tokenMatcher(BInstanceSimple, BTokSimple)).to.be.true
         expect(tokenMatcher(BInstanceSimple, ATokSimple)).to.be.false
     })
+
+    it("Will augment Token Constructors with additional metadata basic", () => {
+        let A = extendToken("A")
+        let B = extendToken("B")
+
+        expect(A.tokenType).to.be.greaterThan(0)
+        expect(B.tokenType).to.be.greaterThan(A.tokenType)
+
+        expect(A.extendingTokenTypes).to.be.an.instanceOf(Array)
+        expect(A.extendingTokenTypes).to.be.empty
+        expect(B.extendingTokenTypes).to.be.an.instanceOf(Array)
+        expect(B.extendingTokenTypes).to.be.empty
+    })
+
+    it("Will augment Token Constructors with additional metadata - inheritance", () => {
+        let A = extendToken("A")
+        let A1 = extendToken("A1", A)
+        let A2 = extendToken("A2", A1)
+
+        expect(A.tokenType).to.be.greaterThan(0)
+        expect(A1.tokenType).to.be.greaterThan(A.tokenType)
+        expect(A2.tokenType).to.be.greaterThan(A1.tokenType)
+
+        expect(A.extendingTokenTypes).to.contain(A1.tokenType)
+        expect(A.extendingTokenTypes).to.contain(A2.tokenType)
+        expect(A.extendingTokenTypes).to.have.lengthOf(2)
+
+        expect(A1.extendingTokenTypes).to.contain(A2.tokenType)
+        expect(A1.extendingTokenTypes).to.have.lengthOf(1)
+
+        expect(A2.extendingTokenTypes).to.be.empty
+    })
 })
