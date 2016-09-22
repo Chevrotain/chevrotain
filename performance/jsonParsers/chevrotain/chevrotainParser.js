@@ -1,7 +1,7 @@
 // ----------------- Lexer -----------------
 var Token = chevrotain.Token;
-// https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Lazy Tokens)
-var extendToken = chevrotain.extendLazyToken;
+// https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Simple Lazy Tokens)
+var extendToken = chevrotain.extendSimpleLazyToken;
 var ChevrotainLexer = chevrotain.Lexer;
 
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
