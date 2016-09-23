@@ -16,7 +16,7 @@ import {containsPath, getLookaheadPathsForOr, Alternative} from "./lookahead"
 
 
 export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
-    let duplicateErrors = utils.map(topLevels, validateDuplicateProductions)
+    let duplicateErrors:any = utils.map(topLevels, validateDuplicateProductions)
     let leftRecursionErrors:any = utils.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
     let emptyAltErrors = map(topLevels, validateEmptyOrAlternative)
     let ambiguousAltsErrors = map(topLevels, currTopRule =>

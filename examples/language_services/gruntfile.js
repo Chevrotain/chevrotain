@@ -53,10 +53,6 @@ module.exports = function(grunt) {
             }
         },
 
-        typings: {
-            install: {}
-        },
-
         clean: {
             all: ["bin"]
         }
@@ -66,7 +62,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('build', [
         'clean:all',
-        'typings:install',
         'tslint',
         'ts:all'
     ])

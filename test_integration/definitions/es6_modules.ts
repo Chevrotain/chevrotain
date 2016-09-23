@@ -1,5 +1,4 @@
-/// <reference path="../../lib/chevrotain.d.ts" />
-import {Parser, Lexer, gast} from "chevrotain"
+import {Parser, Lexer, gast} from "../../lib/chevrotain"
 
 /**
  * This File will be compiled using TSC to verify that the custom build chevrotain.d.ts
