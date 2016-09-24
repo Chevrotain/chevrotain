@@ -306,7 +306,7 @@
                 var currRelativeCell = table.rows[idx + 1].cells[2]
 
                 if (currSuite === fastestSuite) {
-                    currRelativeCell.innerHTML = "<b>100% <br> <small>fastest</b></small>"
+                    currRelativeCell.innerHTML = "<b>100% <br> <small>(fastest)</b></small>"
                     $(table.rows[idx + 1]).toggleClass("fastestRow")
                 } else {
                     currRelativeCell.innerHTML = '<large>' + ((currSuite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2) + "%</large>"
