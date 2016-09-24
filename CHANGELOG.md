@@ -1,3 +1,16 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+The chevrotain TypeScript definitions file is now **only** compatible with TypeScript 2.0 and later versions.
+For older versions of TypeScript use Chevrotain versions <= 0.15.0.
+
+#### Minor Changes
+
+- [Add "typings" field to package.json.](https://github.com/SAP/chevrotain/issues/251)
+
+
+
 ## 0.15.0 (9-23-2016) 
 
 #### Major Changes
