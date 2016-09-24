@@ -58,8 +58,8 @@ any code generation phase.
     * ```https://unpkg.com/chevrotain/lib/chevrotain.js```
     * ```https://unpkg.com/chevrotain/lib/chevrotain.min.js``` 
   - Explicit version number:
-    * ```https://unpkg.com/chevrotain@0.15.0/lib/chevrotain.js```
-    * ```https://unpkg.com/chevrotain@0.15.0/lib/chevrotain.min.js```
+    * ```https://unpkg.com/chevrotain@0.16.0/lib/chevrotain.js```
+    * ```https://unpkg.com/chevrotain@0.16.0/lib/chevrotain.min.js```
 
 ## Getting Started
 
@@ -80,7 +80,7 @@ any code generation phase.
 * **[Token Types Docs](docs/token_types.md)**
 
 * [HTML docs](http://sap.github.io/chevrotain/documentation)
-   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_15_0/classes/parser.html#at_least_one)
+   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_16_0/classes/parser.html#at_least_one)
    
 *  The [d.ts TypeScript definitions](https://unpkg.com/chevrotain/lib/chevrotain.d.ts)
    
