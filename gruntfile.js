@@ -238,26 +238,16 @@ module.exports = function(grunt) {
                 options: {
                     // TODO: seems like the HashTable class may need to be included in the public API
                     banner: banner + '\n' +
-                            'declare namespace chevrotain {\n' +
-                            '    class HashTable<V>{}\n    ',
+                            'export as namespace chevrotain;\n' +
+                            'declare class HashTable<V>{}\n',
 
                     process: function processDefinitions(src, filePath) {
                         var withOutImports = src.replace(/import.*;(\n|\r\n)/g, '')
                         // TODO: investigate why do Typescript definition files include private members.
                         var withoutPrivate = withOutImports.replace(/private.*;(\n|\r\n)/g, '')
 
-                        // need to remove inner declares as we are wrapping in a namespace
-                        var withoutDeclare = withoutPrivate.replace(/declare /g, '')
-                        var fixedInnerIdent = withoutDeclare.replace(/(\r\n|\n)/g, grunt.util.linefeed + fourSpaces)
-                        return fixedInnerIdent
+                        return withoutPrivate
                     },
-
-                    // this syntax allows usage of chevrotain.d.ts from either
-                    // ES6 modules / older namespaces style in typescript.
-                    footer: '\n}\n\n' +
-                            'declare module "chevrotain" {\n' +
-                            '    export = chevrotain;\n' +
-                            '}\n',
 
                     // extra spaces needed to fix indentation.
                     separator: grunt.util.linefeed + fourSpaces
