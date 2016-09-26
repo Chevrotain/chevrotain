@@ -25,9 +25,9 @@ describe("The Chevrotain Tokens namespace", () => {
 
     it("provides an offset property for backwards compatibility", () => {
         let token = new A("Hello", 5, 4, 1)
-        expect(token.offset).to.equal(5)
-        token.offset = 666
-        expect(token.offset).to.equal(666)
+        expect((<any>token).offset).to.equal(5);
+        (<any>token).offset = 666
+        expect((<any>token).offset).to.equal(666)
     })
 
     it("provides an extendToken utility - creating an instance", () => {

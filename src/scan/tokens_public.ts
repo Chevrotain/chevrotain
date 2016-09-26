@@ -1,4 +1,4 @@
-import {isString, isRegExp, isFunction, assign, isUndefined, assignNoOverwrite} from "../utils/utils"
+import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
 import {Lexer, TokenConstructor} from "./lexer_public"
 import {
@@ -47,11 +47,13 @@ export function tokenName(clazz:Function):string {
     }
 }
 
-export function extendLazyToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = LazyToken) {
+export function extendLazyToken(tokenName:string, patternOrParent:any = undefined,
+                                parentConstructor:Function = LazyToken):TokenConstructor {
     return extendToken(tokenName, patternOrParent, parentConstructor)
 }
 
-export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = undefined) {
+export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = undefined,
+                                      parentConstructor:Function = SimpleLazyToken):TokenConstructor {
     return extendToken(tokenName, patternOrParent, SimpleLazyToken)
 }
 
@@ -64,7 +66,7 @@ export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = un
  * @param {Function} parentConstructor - The Token class to be extended
  * @returns {Function} - A constructor for the new extended Token subclass
  */
-export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token) {
+export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token):TokenConstructor {
     let pattern
 
     if (isRegExp(patternOrParent) ||
