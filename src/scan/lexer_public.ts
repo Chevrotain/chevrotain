@@ -1,4 +1,4 @@
-import {Token, LazyTokenCacheData, getImage, getStartLine, getStartColumn} from "./tokens_public"
+import {Token, LazyTokenCacheData, getImage, getStartLine, getStartColumn, ISimpleTokenOrIToken} from "./tokens_public"
 import {
     validatePatterns, analyzeTokenClasses, countLineTerminators, DEFAULT_MODE, performRuntimeChecks, checkLazyMode,
     checkSimpleMode
@@ -23,7 +23,14 @@ import {
     createSimpleLazyToken, LazyTokenCreator, createLazyTokenInstance
 } from "./tokens"
 
-export type TokenConstructor = Function
+export interface TokenConstructor extends Function {
+    GROUP?:string
+    PATTERN?:RegExp
+    LABEL?:string
+    LONGER_ALT?:TokenConstructor
+
+    new(...args:any[]):ISimpleTokenOrIToken
+}
 
 export interface ILexingResult {
     tokens:Token[]
@@ -207,7 +214,7 @@ export class Lexer {
         // an error of undefined TokenClasses will be detected in "performRuntimeChecks" above.
         // this transformation is to increase robustness in the case of partially invalid lexer definition.
         forEach(actualDefinition.modes, (currModeValue, currModeName) => {
-            actualDefinition.modes[currModeName] = reject<Function>(currModeValue, (currTokClass) => isUndefined(currTokClass))
+            actualDefinition.modes[currModeName] = reject<TokenConstructor>(currModeValue, (currTokClass) => isUndefined(currTokClass))
         })
 
         let allModeNames = keys(actualDefinition.modes)

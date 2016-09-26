@@ -5,11 +5,12 @@ import {IGrammarPath, ITokenGrammarPath} from "./path_public"
 import {cloneArr, isEmpty, first as _first, forEach, drop} from "../../utils/utils"
 import {tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
+import {TokenConstructor} from "../../scan/lexer_public"
 /* tslint:enable:no-use-before-declare */
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
 
-    protected possibleTokTypes:Function[] = []
+    protected possibleTokTypes:TokenConstructor[] = []
     protected ruleStack:string[]
     protected occurrenceStack:number[]
 
@@ -20,7 +21,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
 
     constructor(protected topProd:gast.Rule, protected path:IGrammarPath) {super() }
 
-    startWalking():Function[] {
+    startWalking():TokenConstructor[] {
 
         this.found = false
 

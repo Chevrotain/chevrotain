@@ -1,8 +1,9 @@
 import {gast} from "./gast_public"
 import {isSequenceProd, isBranchingProd, isOptionalProd} from "./gast"
 import {uniq, map, flatten} from "../../utils/utils"
+import {TokenConstructor} from "../../scan/lexer_public"
 
-export function first(prod:gast.IProduction):Function[] {
+export function first(prod:gast.IProduction):TokenConstructor[] {
     if (prod instanceof gast.NonTerminal) {
         // this could in theory cause infinite loops if
         // (1) prod A refs prod B.
@@ -29,8 +30,8 @@ export function first(prod:gast.IProduction):Function[] {
     }
 }
 
-export function firstForSequence(prod:gast.AbstractProduction):Function[] {
-    let firstSet:Function[] = []
+export function firstForSequence(prod:gast.AbstractProduction):TokenConstructor[] {
+    let firstSet:TokenConstructor[] = []
     let seq = prod.definition
     let nextSubProdIdx = 0
     let hasInnerProdsRemaining = seq.length > nextSubProdIdx
@@ -49,13 +50,13 @@ export function firstForSequence(prod:gast.AbstractProduction):Function[] {
     return uniq(firstSet)
 }
 
-export function firstForBranching(prod:gast.AbstractProduction):Function[] {
+export function firstForBranching(prod:gast.AbstractProduction):TokenConstructor[] {
     let allAlternativesFirsts:Function[][] = map(prod.definition, (innerProd) => {
         return first(innerProd)
     })
-    return uniq(flatten<Function>(allAlternativesFirsts))
+    return uniq(flatten<TokenConstructor>(allAlternativesFirsts))
 }
 
-export function firstForTerminal(terminal:gast.Terminal):Function[] {
+export function firstForTerminal(terminal:gast.Terminal):TokenConstructor[] {
     return [terminal.terminalType]
 }
