@@ -121,7 +121,7 @@ export function tokenStructuredIdentity(token:TokenConstructor|IToken):string {
 }
 
 export function isBaseTokenOrObject(tokClass:TokenConstructor):boolean {
-    return isBaseTokenClass(tokClass) || tokClass === Object
+    return isBaseTokenClass(tokClass) || <any>tokClass === Object
 }
 
 export function isBaseTokenClass(tokClass:Function):boolean {

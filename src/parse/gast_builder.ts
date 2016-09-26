@@ -1,6 +1,7 @@
 import {IRange, Range} from "../text/range"
 import {gast} from "./grammar/gast_public"
 import {sortBy, forEach, every, filter, partial, uniq, isEmpty} from "../utils/utils"
+import {TokenConstructor} from "../scan/lexer_public"
 
 export enum ProdType {
     OPTION,
@@ -49,7 +50,7 @@ let orRegExGlobal = new RegExp(orRegEx.source, "g")
 let orPartRegEx = /\s*(ALT)\s*:/g
 
 export interface ITerminalNameToConstructor {
-    [fqn: string]: Function
+    [fqn: string]: TokenConstructor
 }
 
 export let terminalNameToConstructor:ITerminalNameToConstructor = {}

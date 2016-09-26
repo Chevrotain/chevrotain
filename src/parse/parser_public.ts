@@ -395,7 +395,7 @@ export class Parser {
     protected className:string
     protected RULE_STACK:string[] = []
     protected RULE_OCCURRENCE_STACK:number[] = []
-    protected tokensMap:{ [fqn:string]:Function } = undefined
+    protected tokensMap:{ [fqn:string]:TokenConstructor } = undefined
 
     private firstAfterRepMap
     private classLAFuncs
@@ -414,7 +414,7 @@ export class Parser {
      */
     private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
-    constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:Function; } | Function[],
+    constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:TokenConstructor; } | TokenConstructor[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
 
@@ -455,7 +455,7 @@ export class Parser {
         }
 
         if (isArray(tokensMapOrArr)) {
-            this.tokensMap = <any>reduce(<any>tokensMapOrArr, (acc, tokenClazz:Function) => {
+            this.tokensMap = <any>reduce(<any>tokensMapOrArr, (acc, tokenClazz:TokenConstructor) => {
                 acc[tokenName(tokenClazz)] = tokenClazz
                 return acc
             }, {})
@@ -613,7 +613,7 @@ export class Parser {
      * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
      */
-    protected CONSUME(tokClass:Function):ISimpleTokenOrIToken {
+    protected CONSUME(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.CONSUME1(tokClass)
     }
 
@@ -643,35 +643,35 @@ export class Parser {
      * @returns {Token} - The consumed token.
      */
     // TODO: what is the returned type? ISimpleTokenOrIToken or IToken? or || ?
-    protected CONSUME1(tokClass:Function):ISimpleTokenOrIToken {
+    protected CONSUME1(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 1)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME2(tokClass:Function):ISimpleTokenOrIToken {
+    protected CONSUME2(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 2)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME3(tokClass:Function):ISimpleTokenOrIToken {
+    protected CONSUME3(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 3)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME4(tokClass:Function):ISimpleTokenOrIToken {
+    protected CONSUME4(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 4)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME5(tokClass:Function):ISimpleTokenOrIToken {
+    protected CONSUME5(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 5)
     }
 
@@ -1274,7 +1274,7 @@ export class Parser {
      * @param {Function} expectedTokType - The Class of the expected Token.
      * @returns {string} - The error message saved as part of a MismatchedTokenException.
      */
-    protected getMisMatchTokenErrorMessage(expectedTokType:Function, actualToken:ISimpleTokenOrIToken):string {
+    protected getMisMatchTokenErrorMessage(expectedTokType:TokenConstructor, actualToken:ISimpleTokenOrIToken):string {
         let hasLabel = hasTokenLabel(expectedTokType)
         let expectedMsg = hasLabel ?
             `--> ${tokenLabel(expectedTokType)} <--` :
@@ -1285,7 +1285,7 @@ export class Parser {
         return msg
     }
 
-    protected getCurrentGrammarPath(tokClass:Function, tokIdxInRule:number):ITokenGrammarPath {
+    protected getCurrentGrammarPath(tokClass:TokenConstructor, tokIdxInRule:number):ITokenGrammarPath {
         let pathRuleStack:string[] = this.getHumanReadableRuleStack()
         let pathOccurrenceStack:number[] = cloneArr(this.RULE_OCCURRENCE_STACK)
         let grammarPath:any = {
@@ -1300,7 +1300,7 @@ export class Parser {
 
     // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
     // TODO: should this be more explicitly part of the public API?
-    protected getNextPossibleTokenTypes(grammarPath:ITokenGrammarPath) {
+    protected getNextPossibleTokenTypes(grammarPath:ITokenGrammarPath):TokenConstructor[] {
         let topRuleName = first(grammarPath.ruleStack)
         let gastProductions = this.getGAstProductions()
         let topProduction = gastProductions.get(topRuleName)
@@ -1320,7 +1320,7 @@ export class Parser {
      *
      * @returns {Token} - The consumed Token.
      */
-    protected consumeInternal(tokClass:Function, idx:number):ISimpleTokenOrIToken {
+    protected consumeInternal(tokClass:TokenConstructor, idx:number):ISimpleTokenOrIToken {
         // TODO: this is an hack to avoid try catch block in V8, should be removed once V8 supports try/catch optimizations.
         // as the IF/ELSE itself has some overhead.
         if (!this.recoveryEnabled) {
@@ -1517,7 +1517,7 @@ export class Parser {
     private tryInRepetitionRecovery(grammarRule:Function,
                                     grammarRuleArgs:any[],
                                     lookAheadFunc:() => boolean,
-                                    expectedTokType:Function):void {
+                                    expectedTokType:TokenConstructor):void {
         // TODO: can the resyncTokenType be cached?
         let reSyncTokType = this.findReSyncTokenType()
         this.saveLexerState()
@@ -1565,7 +1565,7 @@ export class Parser {
         this.restoreLexerState()
     }
 
-    private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:Function, nextTokIdx?:number):boolean {
+    private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:TokenConstructor, nextTokIdx?:number):boolean {
         // arguments to try and perform resync into the next iteration of the many are missing
         if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
             return false
@@ -1594,13 +1594,13 @@ export class Parser {
     }
 
     // Error Recovery functionality
-    private getFollowsForInRuleRecovery(tokClass:Function, tokIdxInRule:number):Function[] {
+    private getFollowsForInRuleRecovery(tokClass:TokenConstructor, tokIdxInRule:number):TokenConstructor[] {
         let grammarPath = this.getCurrentGrammarPath(tokClass, tokIdxInRule)
         let follows = this.getNextPossibleTokenTypes(grammarPath)
         return follows
     }
 
-    private tryInRuleRecovery(expectedTokType:TokenConstructor, follows:Function[]):ISimpleTokenOrIToken {
+    private tryInRuleRecovery(expectedTokType:TokenConstructor, follows:TokenConstructor[]):ISimpleTokenOrIToken {
         if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
             let tokToInsert = this.getTokenToInsert(expectedTokType)
             return tokToInsert
@@ -1616,12 +1616,12 @@ export class Parser {
         throw new InRuleRecoveryException("sad sad panda")
     }
 
-    private canPerformInRuleRecovery(expectedToken:Function, follows:Function[]):boolean {
+    private canPerformInRuleRecovery(expectedToken:TokenConstructor, follows:TokenConstructor[]):boolean {
         return this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
             this.canRecoverWithSingleTokenDeletion(expectedToken)
     }
 
-    private canRecoverWithSingleTokenInsertion(expectedTokType:TokenConstructor, follows:Function[]):boolean {
+    private canRecoverWithSingleTokenInsertion(expectedTokType:TokenConstructor, follows:TokenConstructor[]):boolean {
         if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
             return false
         }
@@ -1632,25 +1632,25 @@ export class Parser {
         }
 
         let mismatchedTok = this.LA(1)
-        let isMisMatchedTokInFollows = find(follows, (possibleFollowsTokType:Function) => {
+        let isMisMatchedTokInFollows = find(follows, (possibleFollowsTokType:TokenConstructor) => {
                 return this.tokenMatcher(mismatchedTok, possibleFollowsTokType)
             }) !== undefined
 
         return isMisMatchedTokInFollows
     }
 
-    private canRecoverWithSingleTokenDeletion(expectedTokType:Function):boolean {
+    private canRecoverWithSingleTokenDeletion(expectedTokType:TokenConstructor):boolean {
         let isNextTokenWhatIsExpected = this.tokenMatcher(this.LA(2), expectedTokType)
         return isNextTokenWhatIsExpected
     }
 
-    private isInCurrentRuleReSyncSet(token:Function):boolean {
+    private isInCurrentRuleReSyncSet(tokenType:TokenConstructor):boolean {
         let followKey = this.getCurrFollowKey()
         let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
-        return contains(currentRuleReSyncSet, token)
+        return contains(currentRuleReSyncSet, tokenType)
     }
 
-    private findReSyncTokenType():Function {
+    private findReSyncTokenType():TokenConstructor {
         let allPossibleReSyncTokTypes = this.flattenFollowSet()
         // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
         let nextToken = this.LA(1)
@@ -1694,14 +1694,14 @@ export class Parser {
         })
     }
 
-    private flattenFollowSet():Function[] {
+    private flattenFollowSet():TokenConstructor[] {
         let followStack = map(this.buildFullFollowKeyStack(), (currKey) => {
             return this.getFollowSetFromFollowKey(currKey)
         })
         return <any>flatten(followStack)
     }
 
-    private getFollowSetFromFollowKey(followKey:IFollowKey):Function[] {
+    private getFollowSetFromFollowKey(followKey:IFollowKey):TokenConstructor[] {
         if (followKey === EOF_FOLLOW_KEY) {
             return [EOF]
         }
@@ -1719,7 +1719,7 @@ export class Parser {
         return resyncTokens
     }
 
-    private reSyncTo(tokClass:Function):Token[] {
+    private reSyncTo(tokClass:TokenConstructor):Token[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
         while ((this.tokenMatcher(nextTok, tokClass)) === false) {

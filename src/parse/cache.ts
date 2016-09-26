@@ -7,6 +7,7 @@ import {HashTable} from "../lang/lang_extensions"
 import {gast} from "./grammar/gast_public"
 import {IFirstAfterRepetition} from "./grammar/interpreter"
 import {filter, forEach, values} from "./../utils/utils"
+import {TokenConstructor} from "../scan/lexer_public"
 
 export let CLASS_TO_DEFINITION_ERRORS = new HashTable<IParserDefinitionError[]>()
 
@@ -20,7 +21,7 @@ export function getProductionsForClass(className:string):HashTable<gast.Rule> {
 
 export let CLASS_TO_RESYNC_FOLLOW_SETS = new HashTable<HashTable<Function[]>>()
 
-export function getResyncFollowsForClass(className:string):HashTable<Function[]> {
+export function getResyncFollowsForClass(className:string):HashTable<TokenConstructor[]> {
     return getFromNestedHashTable(className, CLASS_TO_RESYNC_FOLLOW_SETS)
 }
 

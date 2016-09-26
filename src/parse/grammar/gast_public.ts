@@ -1,4 +1,5 @@
 import {forEach} from "../../utils/utils"
+import {TokenConstructor} from "../../scan/lexer_public"
 
 export namespace gast {
     export interface IProduction {
@@ -80,7 +81,7 @@ export namespace gast {
     export class Terminal implements IProductionWithOccurrence {
         public implicitOccurrenceIndex:boolean = false
 
-        constructor(public terminalType:Function, public occurrenceInParent:number = 1) {}
+        constructor(public terminalType:TokenConstructor, public occurrenceInParent:number = 1) {}
 
         accept(visitor:GAstVisitor):void {
             visitor.visit(this)
