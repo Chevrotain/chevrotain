@@ -54,7 +54,7 @@ export function extendLazyToken(tokenName:string, patternOrParent:any = undefine
 
 export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = undefined,
                                       parentConstructor:Function = SimpleLazyToken):TokenConstructor {
-    return extendToken(tokenName, patternOrParent, SimpleLazyToken)
+    return extendToken(tokenName, patternOrParent, parentConstructor)
 }
 
 /**
