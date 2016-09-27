@@ -100,7 +100,22 @@ function findColumnOfOffset(offset:number, lineToOffset:number[]):number {
 }
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
-    return tokInstance.tokenType === tokConstructor.tokenType
+    if (tokInstance.tokenType === tokConstructor.tokenType) {
+        return true
+    }
+    else if (tokConstructor.extendingTokenTypes.length > 0) {
+        let extendingTokenTypes = tokConstructor.extendingTokenTypes
+        let extendingTokenTypesLength = extendingTokenTypes.length
+        for (let i = 0; i < extendingTokenTypesLength; i++) {
+            if (extendingTokenTypes[i] === tokInstance.tokenType) {
+                return true
+            }
+        }
+        return false
+    }
+    else {
+        return false
+    }
 }
 
 export function tokenInstanceofMatcher(tokInstance, tokConstructor) {

@@ -29,6 +29,9 @@ export interface TokenConstructor extends Function {
     LABEL?:string
     LONGER_ALT?:TokenConstructor
 
+    tokenType?:number
+    extendingTokenTypes?:number[]
+
     new(...args:any[]):ISimpleTokenOrIToken
 }
 

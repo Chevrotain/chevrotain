@@ -65,10 +65,10 @@ When to use Lazy Tokens:
 
 ### The Simple Lazy Token
 The [Simple Lazy Tokens](http://sap.github.io/chevrotain/documentation/0_16_0/classes/simplelazytoken.html) are **im-mutable** plain 
-structure (**no inheritance**) based Tokens which have most of their properties computed only on demand. "Simple" Tokens are not created
+structure based Tokens which have most of their properties computed only on demand. "Simple" Tokens are not created
 using the **new** operator, instead they are plain ECMAScript objects. This approach achieves an even greater performance than Lazy 
 Tokens but at the cost of:
-* losing Token Inheritance capabilities,
+
 * Having to use utility functions to extract token properties as only the start and end offsets are directly saved on the plain token object.
   ```javascript
   var image
@@ -143,13 +143,15 @@ This switching can be useful either to investigate possible performance benefits
 or to make debugging easier by having simpler Token objects to debug (plain properties without getters, human readable instance's 
 constructor name).
 
-This however raises one concern, as the APIs of Inheritance based tokens are **different** than the Simple Token.
+This however raises one concern, as the APIs of Inheritance based tokens are **different** than the Simple Tokens.
 To get around this it is **highly recommended** to **only** use the token utility functions which extract the token properties,
 regardless of the Token type used and **never** directly access the Token properties.
 
 ```javascript
 var chevrotain = require("chevrotain")
 var getImage = chevrotain.getImage
+var getStartLine = chevrotain.getStartLine
+
 
 this.dummyRule = this.RULE("dummyRule", function() {
         var keyToken, value

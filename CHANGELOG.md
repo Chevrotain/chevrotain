@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Simple Lazy Tokens should support Token inheritance.](https://github.com/SAP/chevrotain/issues/282)
+
+
+
 ## 0.16.0 (9-24-2016)
 
 #### Breaking Changes
