@@ -19,7 +19,7 @@ import {
     uniq,
     every
 } from "../utils/utils"
-import {isLazyToken, isSimpleToken} from "./tokens"
+import {isLazyTokenType, isSimpleTokenType} from "./tokens"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -376,16 +376,16 @@ export function checkLazyMode(allTokenTypes:TokenConstructor[]):LazyCheckResult 
     let errors = []
     let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
 
-    let areAllLazy = every(allTokensTypeSet, (currTokType) => isLazyToken(currTokType))
+    let areAllLazy = every(allTokensTypeSet, (currTokType) => isLazyTokenType(currTokType))
     // TODO: why is this second check required?
-    let areAllNotLazy = every(allTokensTypeSet, (currTokType) => !isLazyToken(currTokType))
+    let areAllNotLazy = every(allTokensTypeSet, (currTokType) => !isLazyTokenType(currTokType))
 
     if (!areAllLazy && !areAllNotLazy) {
 
-        let lazyTokens = filter(allTokensTypeSet, (currTokType) => isLazyToken(currTokType))
+        let lazyTokens = filter(allTokensTypeSet, (currTokType) => isLazyTokenType(currTokType))
         let lazyTokensNames = map(lazyTokens, tokenName)
         let lazyTokensString = lazyTokensNames.join("\n\t")
-        let notLazyTokens = filter(allTokensTypeSet, (currTokType) => !isLazyToken(currTokType))
+        let notLazyTokens = filter(allTokensTypeSet, (currTokType) => !isLazyTokenType(currTokType))
         let notLazyTokensNames = map(notLazyTokens, tokenName)
         let notLazyTokensString = notLazyTokensNames.join("\n\t")
 
@@ -414,16 +414,16 @@ export function checkSimpleMode(allTokenTypes:TokenConstructor[]):SimpleCheckRes
     let errors = []
     let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
 
-    let areAllSimple = every(allTokensTypeSet, (currTokType) => isSimpleToken(currTokType))
+    let areAllSimple = every(allTokensTypeSet, (currTokType) => isSimpleTokenType(currTokType))
     // TODO: why is the second check required?
-    let areAllNotSimple = every(allTokensTypeSet, (currTokType) => !isSimpleToken(currTokType))
+    let areAllNotSimple = every(allTokensTypeSet, (currTokType) => !isSimpleTokenType(currTokType))
 
     if (!areAllSimple && !areAllNotSimple) {
 
-        let simpleTokens = filter(allTokensTypeSet, (currTokType) => isSimpleToken(currTokType))
+        let simpleTokens = filter(allTokensTypeSet, (currTokType) => isSimpleTokenType(currTokType))
         let simpleTokensNames = map(simpleTokens, tokenName)
         let simpleTokensString = simpleTokensNames.join("\n\t")
-        let notSimpleTokens = filter(allTokensTypeSet, (currTokType) => !isSimpleToken(currTokType))
+        let notSimpleTokens = filter(allTokensTypeSet, (currTokType) => !isSimpleTokenType(currTokType))
         let notSimpleTokensNames = map(notSimpleTokens, tokenName)
         let notSimpleTokensString = notSimpleTokensNames.join("\n\t")
 

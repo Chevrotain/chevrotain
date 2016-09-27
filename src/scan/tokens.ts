@@ -282,12 +282,12 @@ export function ensureLineDataProcessing(cacheData):void {
     }
 }
 
-export function isLazyToken(tokType:TokenConstructor):boolean {
+export function isLazyTokenType(tokType:TokenConstructor):boolean {
     return LazyToken.prototype.isPrototypeOf(tokType.prototype) ||
         SimpleLazyToken.prototype.isPrototypeOf(tokType.prototype)
 }
 
-export function isSimpleToken(tokType:TokenConstructor):boolean {
+export function isSimpleTokenType(tokType:TokenConstructor):boolean {
     return SimpleLazyToken.prototype.isPrototypeOf(tokType.prototype)
 }
 

@@ -24,8 +24,7 @@ import {
     some,
     NOOP,
     values,
-    every,
-    getSuperClass
+    every
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {
@@ -72,7 +71,8 @@ import {
     tokenInstanceofMatcher,
     tokenClassIdentity,
     tokenInstanceIdentity,
-    tokenStructuredMatcher
+    tokenStructuredMatcher,
+    isSimpleTokenType
 } from "../scan/tokens"
 
 export enum ParserDefinitionErrorType {
@@ -468,8 +468,8 @@ export class Parser {
         }
 
         let allTokens = values(this.tokensMap)
-        let areAllStructuredTokens = every(allTokens, (currTok) => {
-            return getSuperClass(currTok) === SimpleLazyToken
+        let areAllStructuredTokens = every(allTokens, (currTokType) => {
+            return isSimpleTokenType(currTokType)
         })
 
         if (areAllStructuredTokens) {
