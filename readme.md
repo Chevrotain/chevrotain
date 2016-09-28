@@ -63,26 +63,26 @@ any code generation phase.
 
 ## Getting Started
 
-**Online tutorial**
- * Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
- * Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
- * Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
- * Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
+## Documentation & Resources
 
-## Documentation
+* **[FAQ](docs/faq.md)**
 
+* **[Chevrotain Google Group](https://groups.google.com/forum/#!forum/chevrotain)** for questions and discussions.
+
+* **Online tutorial**
+ - Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
+ - Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
+ - Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
+ - Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
+ 
 * **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)** 
  
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
 
-* **[FAQ](docs/faq.md)**
-
 * **[Token Types Docs](docs/token_types.md)**
 
-* [HTML docs](http://sap.github.io/chevrotain/documentation)
+* **[HTML docs](http://sap.github.io/chevrotain/documentation)**
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_16_0/classes/parser.html#at_least_one)
-   
-*  The [d.ts TypeScript definitions](https://unpkg.com/chevrotain/lib/chevrotain.d.ts)
    
 ## Dependencies
 None.
