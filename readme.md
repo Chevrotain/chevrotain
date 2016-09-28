@@ -61,31 +61,28 @@ any code generation phase.
     * ```https://unpkg.com/chevrotain@0.16.0/lib/chevrotain.js```
     * ```https://unpkg.com/chevrotain@0.16.0/lib/chevrotain.min.js```
 
-## Getting Started
 
 ## Documentation & Resources
 
-* **[FAQ](docs/faq.md)**
+* **[FAQ](docs/faq.md).**
+
+* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**.
+
+* **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
+ 
+* **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
 * **[Chevrotain Google Group](https://groups.google.com/forum/#!forum/chevrotain)** for questions and discussions.
 
-* **Online tutorial**
- - Step #1 - Building a Lexer: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md).
- - Step #2 - Building a Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
- - Step #3 - Adding actions to the Parser: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
- - Step #4 - Fault tolerance and Error recovery: [online version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) / [written version](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
- 
-* **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)** 
- 
-* **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**
+* **[HTML docs](http://sap.github.io/chevrotain/documentation).**
+   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_16_0/classes/parser.html#at_least_one).
+   
+* **[Token Types Docs](docs/token_types.md)**.
 
-* **[Token Types Docs](docs/token_types.md)**
-
-* **[HTML docs](http://sap.github.io/chevrotain/documentation)**
-   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_16_0/classes/parser.html#at_least_one)
    
 ## Dependencies
 None.
+
 
 ## Compatibility
 Chevrotain should run on any modern JavaScript ES5.1 runtime. 
@@ -100,6 +97,7 @@ Chevrotain should run on any modern JavaScript ES5.1 runtime.
 Contributions are **greatly** appreciated.
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
   
+
 [benchmark]: http://sap.github.io/chevrotain/performance/
 [lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
 [lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js
