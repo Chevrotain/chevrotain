@@ -1,7 +1,9 @@
-import {forEach} from "../../utils/utils"
+import {forEach, map} from "../../utils/utils"
 import {TokenConstructor} from "../../scan/lexer_public"
+import {tokenLabel, tokenName} from "../../scan/tokens_public"
 
 export namespace gast {
+
     export interface IProduction {
         accept(visitor:GAstVisitor):void
     }
@@ -63,7 +65,7 @@ export namespace gast {
     }
 
     export class RepetitionMandatoryWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public separator:Function, public occurrenceInParent:number = 1) { super(definition) }
+        constructor(definition:IProduction[], public separator:TokenConstructor, public occurrenceInParent:number = 1) { super(definition) }
     }
 
     export class Repetition extends AbstractProduction implements IProductionWithOccurrence {
@@ -71,7 +73,7 @@ export namespace gast {
     }
 
     export class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public separator:Function, public occurrenceInParent:number = 1) { super(definition) }
+        constructor(definition:IProduction[], public separator:TokenConstructor, public occurrenceInParent:number = 1) { super(definition) }
     }
 
     export class Alternation extends AbstractProduction implements IProductionWithOccurrence {
@@ -147,4 +149,124 @@ export namespace gast {
 
         public visitRule(node:Rule):any {}
     }
+
+    export interface ISerializedGast {
+        type:"NonTerminal" |
+            "Flat" |
+            "Option" |
+            "RepetitionMandatory" |
+            "RepetitionMandatoryWithSeparator" |
+            "Repetition" |
+            "RepetitionWithSeparator" |
+            "Alternation" |
+            "Terminal" |
+            "Rule",
+
+        definition?:ISerializedGast[]
+    }
+
+    export interface ISerializedGastRule extends ISerializedGast {
+        name:string
+    }
+
+    export interface ISerializedNonTerminal extends ISerializedGast {
+        name:string
+        occurrenceInParent:number
+    }
+
+    export interface ISerializedTerminal extends ISerializedGast {
+        name:string
+        label?:string
+        pattern?:string
+        occurrenceInParent:number
+    }
+
+    export interface ISerializedTerminalWithSeparator extends ISerializedGast {
+        separator:ISerializedTerminal
+    }
+
+    export function serializeGrammar(topRules:Rule[]):ISerializedGast[] {
+        return map(topRules, serializeProduction)
+    }
+
+
+    export function serializeProduction(node:IProduction):ISerializedGast {
+
+        function convertDefinition(definition:IProduction[]):ISerializedGast[] {
+            return map(definition, serializeProduction)
+        }
+
+        if (node instanceof NonTerminal) {
+            return < ISerializedNonTerminal>{
+                type:               "NonTerminal",
+                name:               node.nonTerminalName,
+                occurrenceInParent: node.occurrenceInParent
+            }
+        }
+        else if (node instanceof Flat) {
+            return {
+                type:       "Flat",
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof Option) {
+            return {
+                type:       "Option",
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof RepetitionMandatory) {
+            return {
+                type:       "RepetitionMandatory",
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof RepetitionMandatoryWithSeparator) {
+            return < ISerializedTerminalWithSeparator>{
+                type:       "RepetitionMandatoryWithSeparator",
+                separator:  < ISerializedTerminal>serializeProduction(new Terminal(node.separator)),
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof RepetitionWithSeparator) {
+            return < ISerializedTerminalWithSeparator>{
+                type:       "RepetitionWithSeparator",
+                separator:  < ISerializedTerminal>serializeProduction(new Terminal(node.separator)),
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof Repetition) {
+            return {
+                type:       "Repetition",
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof Alternation) {
+            return {
+                type:       "Alternation",
+                definition: convertDefinition(node.definition)
+            }
+        }
+        else if (node instanceof Terminal) {
+            let serializedTerminal = < ISerializedTerminal>{
+                type:               "Terminal",
+                name:               tokenName(node.terminalType),
+                label:              tokenLabel(node.terminalType),
+                occurrenceInParent: node.occurrenceInParent
+            }
+
+            if (node.terminalType.PATTERN) {
+                serializedTerminal.pattern = node.terminalType.PATTERN.source
+            }
+
+            return serializedTerminal
+        }
+        else if (node instanceof Rule) {
+            return < ISerializedGastRule>{type: "Rule", name: node.name, definition: convertDefinition(node.definition)}
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+    }
+
 }

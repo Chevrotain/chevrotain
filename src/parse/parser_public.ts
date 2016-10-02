@@ -74,6 +74,8 @@ import {
     tokenStructuredMatcher,
     isSimpleTokenType
 } from "../scan/tokens"
+import ISerializedGast = gast.ISerializedGast
+import serializeGrammar = gast.serializeGrammar
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -532,6 +534,14 @@ export class Parser {
 
     public getGAstProductions():HashTable<gast.Rule> {
         return cache.getProductionsForClass(this.className)
+    }
+
+    // This is more than a convenience method.
+    // It is mostly used to draw the diagrams and having this method present on the parser instance
+    // can avoid certain situations in which the serialization logic would fail due to multiple versions of chevrotain
+    // bundled (due to multiple prototype chains and "instanceof" usage).
+    public getSerializedGastProductions():gast.ISerializedGast[] {
+        return serializeGrammar(cache.getProductionsForClass(this.className).values())
     }
 
     protected isBackTracking():boolean {

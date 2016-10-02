@@ -740,6 +740,37 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
                 expect(parser.errors[0].context.ruleOccurrenceStack).to.deep.equal([1])
             })
+
+            it("can serialize a Grammar's Structure", () => {
+
+                class SomeParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, [PlusTok, MinusTok, IdentTok]);
+                        (Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public rule = this.RULE("rule", () => {
+                        this.AT_LEAST_ONE_SEP(IdentTok, () => {
+                            this.SUBRULE(this.rule2)
+                        })
+                    })
+
+                    public rule2 = this.RULE("rule2", () => {
+                        this.OR([
+                            {ALT: () => { this.CONSUME1(MinusTok) }},
+                            {ALT: () => { this.CONSUME1(PlusTok) }}
+                        ])
+                    })
+                }
+
+                let parser = new SomeParser([])
+                let serializedGrammar = parser.getSerializedGastProductions()
+                // not bothering with more in-depth checks as those unit tests exist elsewhere
+                expect(serializedGrammar).to.have.lengthOf(2)
+                expect(serializedGrammar[0].type).to.equal("Rule")
+                expect(serializedGrammar[1].type).to.equal("Rule")
+            })
         })
 
         after(() => {

@@ -1,3 +1,12 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+
+- [Grammar serialization and de-serialization.](https://github.com/SAP/chevrotain/issues/139)
+- [Separate Railroad Diagram Generation into Scriptable Function.](https://github.com/SAP/chevrotain/issues/134)
+
+
+
 ## 0.16.1 (9-28-2016)
 
 #### Minor Changes
