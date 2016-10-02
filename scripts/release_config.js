@@ -11,6 +11,7 @@ var changeLogPath = path.join(__dirname, '../CHANGELOG.md')
 // docs (.md files for bumping versions)
 var docsDirPath = path.join(__dirname, '../docs')
 var docFiles = wrench.readdirSyncRecursive(docsDirPath)
+
 var docFilesPaths = _.map(docFiles, function(currDocFile) {
     return path.join(docsDirPath, currDocFile)
 })
@@ -19,6 +20,9 @@ docFilesPaths = _.filter(docFilesPaths, function(currDocEntry) {
 })
 var readmePath = path.join(__dirname, '../readme.md')
 docFilesPaths.push(readmePath)
+
+var readmeDiagramsPath = path.join(__dirname, '../diagrams/readme.md')
+docFilesPaths.push(readmeDiagramsPath)
 
 var pkgJson = jf.readFileSync(packagePath)
 var apiString = fs.readFileSync(apiPath, 'utf8').toString()
