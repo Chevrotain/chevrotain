@@ -3,7 +3,7 @@
 It is often useful to visually inspect a grammar's syntax diagrams during development
 or for documentation purposes.
 
-This folder contains a template which can be easily modified to render and display
+This folder contains two templates which can be easily modified to render and display
 A grammar as railroad syntax diagrams using the [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams)
 library by @tabatkins.
 
@@ -18,35 +18,60 @@ library by @tabatkins.
  
 
 ### Instructions:
-The template will runs as is, but it will render a sample grammar instead of your custom grammar.
+There are two templates for two separate use cases:
 
-There are **only** three steps needed to render a custom grammar:        
-- Copy **diagrams.html** (from this folder) into a source controlled folder (root of your project is recommended).
+#### Diagrams from Serialized Grammar.
+Drawing the diagrams from a **serialized** format is useful when your grammar has been implemented in node.js
+and cannot (at least not easily) be bundled for use in a browser.
 
-- Modify the references to the resources (script/stylesheet tags) in your copied **diagrams.html** so they will still be valid.
+**Instructions:**
+- Copy **[diagrams_serialized.html](https://github.com/SAP/chevrotain/blob/master/diagrams/diagrams_serialized.html)** into a source controlled folder.
+  * In the rest of this document this folder will be called **root**.
+
+- Modify the references to the resources (script/stylesheet tags) in your copied **root/diagrams_serialized.html** so they will still be valid.
  * This depends on both your project structure and on how you consume chevrotain (npm/other).
- * For example, assuming chevrotain is located in **node_modules/chevrotain**: 
-  ```<script src='src/diagrams_builder.js'></script>``` should be change to: 
-  ```<script src='node_modules/chevrotain/diagrams/src/diagrams_builder.js'></script>```
+ * For convenience **diagrams_serialized.html** contains three blocks of references for common use cases,
+   comment/uncomment the relevant block for your needs. 
+
+- Create a script to serialize your grammar. Use [sample/serialize_sample.js](https://github.com/SAP/chevrotain/blob/master/diagrams/sample/serialize_sample.js)
+  as a template. 
+  * Note that this simple serializer only exports the serialized grammar as a global variable on the window object.
+    For more complex behavior create your own serialization logic by using the available Chevrotain APIs:
+    - [serializeGrammar](http://sap.github.io/chevrotain/documentation/0_16_1/modules/gast.html#serializeGrammar) 
+    - [serializeProduction](http://sap.github.io/chevrotain/documentation/0_16_1/modules/gast.html#serializeProduction)
+
+- Modify or replace 
+  ```<script src='sample/generated_serialized_grammar.js'></script>```
+  script tag in your copied **root/diagrams_serialized.html** to load & use your serialized grammar.
+
+
+#### Diagrams from a Parser instance.
+Drawing the diagrams from a **Parser instance** is useful when your grammar has already been implemented in a browser compatible format
+(not node.js). Or if you already have a browser bundling process as part of your workflow (browserify/webpack).
+
+**Instructions:**
+- Copy **[diagrams.html](https://github.com/SAP/chevrotain/blob/master/diagrams/diagrams.html)** into a source controlled folder.
+  * In the rest of this document this folder will be called **root**.
+
+- Modify the references to the resources (script/stylesheet tags) in your copied **root/diagrams.html** so they will still be valid.
+ * This depends on both your project structure and on how you consume chevrotain (npm/other).
  * For convenience **diagrams.html** contains three blocks of references for common use cases,
-  comment/uncomment the relevant block for your needs. 
+   comment/uncomment the relevant block for your needs. 
 
-- Replace the two references to **DUMMY_SAMPLE** with script tags/logic that will load and initialize an instance of
-   the custom Parser whose grammar should be rendered.
+- Modify or replace 
+  ```<<script src='sample/dummy_sample.js'></script>``` 
+  script tag in your copied **root/diagrams.html** to load your relevant resources needed to instantiate your grammar in the browser.
    
-[Example of a modified template](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css_diagrams.html)
-* This example loads the resources from a unpkg.com.
+- Modify or replace 
+   ```javascript
+       var parserInstanceToDraw = new dummy_sample.DummySampleParser([]);
+   ``` 
+  line in your copied **root/diagrams.html** to instantiate your Parser.
+  
    
+[Example of a modified Parser Instance template](https://github.com/SAP/chevrotain/blob/master/examples/grammars/css/css_diagrams.html)
+ * This example loads the resources from a unpkg.com.
    
-#### What about grammars written with commonjs (node.js) modules.
-Because The diagrams are rendered in a browser, The grammar's implementation must be runnable in a browser.
-This means the commonjs code must be wrapped / transformed to be browser compatible.
-Some options to accomplish this:
- * [UMD](https://github.com/umdjs/umd)
- * [browserify](http://browserify.org/)
- * [webpack](https://webpack.github.io/)
- * [systemjs](https://github.com/systemjs/systemjs)
-
 
 #### What about grammars written with AMD (require.js) modules.
 All the sources used in the template are wrapped using the [UMD](https://github.com/umdjs/umd) pattern.

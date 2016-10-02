@@ -88,6 +88,8 @@ API.gast.Alternation = gast.Alternation
 API.gast.NonTerminal = gast.NonTerminal
 API.gast.Terminal = gast.Terminal
 API.gast.Rule = gast.Rule
+API.gast.serializeGrammar = gast.serializeGrammar
+API.gast.serializeProduction = gast.serializeProduction
 
 API.interperter = {}
 API.interperter.NextAfterTokenWalker = NextAfterTokenWalker
