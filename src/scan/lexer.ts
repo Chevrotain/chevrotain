@@ -1,4 +1,4 @@
-import {Token, tokenName} from "./tokens_public"
+import {Token, tokenName, ISimpleTokenOrIToken} from "./tokens_public"
 import {TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer, IMultiModeLexerDefinition} from "./lexer_public"
 import {
     reject,
@@ -17,7 +17,9 @@ import {
     first,
     forEach,
     uniq,
-    every
+    every,
+    keys,
+    isArray
 } from "../utils/utils"
 import {isLazyTokenType, isSimpleTokenType} from "./tokens"
 
@@ -441,4 +443,23 @@ export function checkSimpleMode(allTokenTypes:TokenConstructor[]):SimpleCheckRes
         isSimple: areAllSimple,
         errors:   errors
     }
+}
+
+export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken }):{ [groupName:string]:ISimpleTokenOrIToken } {
+    let clonedResult:any = {}
+    let groupKeys = keys(emptyGroups)
+
+    forEach(groupKeys, (currKey) => {
+        let currGroupValue = emptyGroups[currKey]
+
+        /* istanbul ignore else */
+        if (isArray(currGroupValue)) {
+            clonedResult[currKey] = []
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+    })
+
+    return clonedResult
 }

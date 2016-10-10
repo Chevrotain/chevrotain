@@ -1,7 +1,7 @@
 import {Token, LazyTokenCacheData, getImage, getStartLine, getStartColumn, ISimpleTokenOrIToken} from "./tokens_public"
 import {
     validatePatterns, analyzeTokenClasses, countLineTerminators, DEFAULT_MODE, performRuntimeChecks, checkLazyMode,
-    checkSimpleMode
+    checkSimpleMode, cloneEmptyGroups
 } from "./lexer"
 import {
     cloneObj,
@@ -99,7 +99,7 @@ export class Lexer {
     protected patternIdxToCanLineTerminator:{ [modeName:string]:boolean[] } = {}
     protected patternIdxToPushMode:{ [modeName:string]:string[] } = {}
     protected patternIdxToPopMode:{ [modeName:string]:boolean[] } = {}
-    protected emptyGroups:{ [groupName:string]:Token } = {}
+    protected emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken } = {}
 
 
     /**
@@ -313,7 +313,7 @@ export class Lexer {
         let errors:ILexingError[] = []
         let line = 1
         let column = 1
-        let groups:any = cloneObj(this.emptyGroups)
+        let groups:any = cloneEmptyGroups(this.emptyGroups)
 
         let currModePatterns = []
         let currModePatternsLength = 0
@@ -497,7 +497,7 @@ export class Lexer {
         let offset = 0
         let matchedTokens = []
         let errors:ILexingError[] = []
-        let groups:any = cloneObj(this.emptyGroups)
+        let groups:any = cloneEmptyGroups(this.emptyGroups)
 
         let currModePatterns = []
         let currModePatternsLength = 0
