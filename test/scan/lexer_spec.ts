@@ -632,6 +632,24 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 expect(tokenMatcher(comment, Comment)).to.be.true
             })
 
+            it("won't have leftover state when using token groups", () => {
+                let ifElseLexer = new Lexer([If, Else, Comment])
+                let input = "if//else"
+                let lexResult = ifElseLexer.tokenize(input)
+
+                expect(lexResult.groups).to.have.property("comments")
+                // tslint:disable
+                expect(lexResult.groups["comments"]).to.have.length(1)
+                // tslint:enable
+
+                // 2th time
+                lexResult = ifElseLexer.tokenize(input)
+                expect(lexResult.groups).to.have.property("comments")
+                // tslint:disable
+                expect(lexResult.groups["comments"]).to.have.length(1)
+                // tslint:enable
+            })
+
             context("lexer modes", () => {
 
                 const One = extendToken("One", /1/)
