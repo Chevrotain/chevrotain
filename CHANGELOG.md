@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.17.1 (10-12-2016)
 
 #### Bug Fixes
 - [Lexer "Groups" state persists between different inputs tokenization.](https://github.com/SAP/chevrotain/issues/287)
