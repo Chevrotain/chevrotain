@@ -1407,9 +1407,14 @@ export class Parser {
         this.inputIdx = this.savedTokenIdx
     }
 
-    protected resetLexerState() {
+    protected resetLexerState():void {
         this.inputIdx = -1
     }
+
+    protected moveLexerStateToEnd():void {
+        this.inputIdx = this.input.length - 1
+    }
+
 
     // other functionality
     private saveRecogState():IParserState {
@@ -1477,17 +1482,25 @@ export class Parser {
                 // reSync with EOF and just output some INVALID ParseTree
                 // during backtracking reSync recovery is disabled, otherwise we can't be certain the backtracking
                 // path is really the most valid one
-                let reSyncEnabled = isFirstInvokedRule || (
-                    resyncEnabled
-                    && !this.isBackTracking()
-                    // if errorRecovery is disabled, the exception will be rethrown to the top rule
-                    // (isFirstInvokedRule) and there will resync to EOF and terminate.
-                    && this.recoveryEnabled)
+                let reSyncEnabled = resyncEnabled && !this.isBackTracking() && this.recoveryEnabled
 
-                if (reSyncEnabled && exceptions.isRecognitionException(e)) {
-                    let reSyncTokType = this.findReSyncTokenType()
-                    if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
-                        e.resyncedTokens = this.reSyncTo(reSyncTokType)
+                if (exceptions.isRecognitionException(e)) {
+                    if (reSyncEnabled) {
+                        let reSyncTokType = this.findReSyncTokenType()
+                        if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
+                            e.resyncedTokens = this.reSyncTo(reSyncTokType)
+                            return recoveryValueFunc()
+                        }
+                        else {
+                            // to be handled farther up the call stack
+                            throw e
+                        }
+                    }
+                    else if (isFirstInvokedRule) {
+                        // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
+                        this.moveLexerStateToEnd()
+                        // the parser should never throw one of its own errors outside its flow.
+                        // even if error recovery is disabled
                         return recoveryValueFunc()
                     }
                     else {

@@ -570,6 +570,27 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(() => parser.someRule()).to.throw("oops")
             })
 
+            it("will rethrow none Recognizer errors during Token consumption - recovery disabled + nested rule", () => {
+                class InRuleParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS, {recoveryEnabled: true});
+                        (Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public someRule = this.RULE("someRule", () => {
+                        expect(() => this.SUBRULE(this.someNestedRule)).to.throw("MismatchedTokenException")
+                    })
+
+                    public someNestedRule = this.RULE("someNestedRule", () => {
+                        this.CONSUME1(DotTok)
+                        this.CONSUME1(IdentTok)
+                    }, {resyncEnabled: false})
+                }
+                let parser:any = new InRuleParser([createToken(IntTok, "1")])
+                parser.someRule()
+            })
+
             it("Will use Token LABELS for mismatch error messages when available", () => {
 
                 class LabelTokParser extends Parser {
