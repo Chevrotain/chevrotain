@@ -1,3 +1,14 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+- [Lexer "Groups" state persists between different inputs tokenization.](https://github.com/SAP/chevrotain/issues/287)
+
+#### Minor Changes
+
+- [Parsers without error recovery should fail faster on invalid inputs.](https://github.com/SAP/chevrotain/issues/256)
+
+
+
 ## 0.17.0 (10-3-2016)
 
 #### Major Changes
