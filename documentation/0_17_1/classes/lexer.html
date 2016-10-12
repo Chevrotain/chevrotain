@@ -1,0 +1,795 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Lexer | Chevrotain</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script src="../assets/js/modernizr.js"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.js" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">Chevrotain</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="lexer.html">Lexer</a>
+				</li>
+			</ul>
+			<h1>Class Lexer</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">Lexer</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="lexer.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#allpatterns" class="tsd-kind-icon">all<wbr>Patterns</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#defaultmode" class="tsd-kind-icon">default<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#emptygroups" class="tsd-kind-icon">empty<wbr>Groups</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#islazytokenmode" class="tsd-kind-icon">is<wbr>Lazy<wbr>Token<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#issimpletokenmode" class="tsd-kind-icon">is<wbr>Simple<wbr>Token<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#lexerdefinition" class="tsd-kind-icon">lexer<wbr>Definition</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="lexer.html#lexerdefinitionerrors" class="tsd-kind-icon">lexer<wbr>Definition<wbr>Errors</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#modes" class="tsd-kind-icon">modes</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#patternidxtocanlineterminator" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToCan<wbr>Line<wbr>Terminator</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#patternidxtoclass" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToClass</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#patternidxtogroup" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToGroup</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#patternidxtolongeraltidx" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToLonger<wbr>Alt<wbr>Idx</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#patternidxtopopmode" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToPop<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="lexer.html#patternidxtopushmode" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToPush<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="lexer.html#na" class="tsd-kind-icon">NA</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="lexer.html#tokenize" class="tsd-kind-icon">tokenize</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="lexer.html#tokenizeinternal" class="tsd-kind-icon">tokenize<wbr>Internal</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><a href="lexer.html#tokenizeinternallazy" class="tsd-kind-icon">tokenize<wbr>Internal<wbr>Lazy</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Object literals</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-object-literal tsd-parent-kind-class tsd-is-static"><a href="lexer.html#skipped" class="tsd-kind-icon">SKIPPED</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Lexer<span class="tsd-signature-symbol">(</span>lexerDefinition<span class="tsd-signature-symbol">: </span><a href="../globals.html#singlemodelexerdefinition" class="tsd-signature-type">SingleModeLexerDefinition</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/imultimodelexerdefinition.html" class="tsd-signature-type">IMultiModeLexerDefinition</a>, deferDefinitionErrorsHandling<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="lexer.html" class="tsd-signature-type">Lexer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L102">scan/lexer_public.ts:102</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>lexerDefinition: <a href="../globals.html#singlemodelexerdefinition" class="tsd-signature-type">SingleModeLexerDefinition</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/imultimodelexerdefinition.html" class="tsd-signature-type">IMultiModeLexerDefinition</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>-
+											Structure composed of constructor functions for the Tokens types this lexer will support.</p>
+											<p> In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
+											In the case of {IMultiModeLexerDefinition} the structure is an object with two properties:</p>
+											<ol>
+												<li>a &quot;modes&quot; property where each value is an array of Token.</li>
+												<li><p>a &quot;defaultMode&quot; property specifying the initial lexer mode.</p>
+													<p>constructors.</p>
+													<p>for example:
+														{
+														&quot;modes&quot; : {
+														&quot;modeX&quot; : [Token1, Token2]
+														&quot;modeY&quot; : [Token3, Token4]
+													}</p>
+													<p>&quot;defaultMode&quot; : &quot;modeY&quot;
+													}</p>
+													<p>A lexer with {MultiModesDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
+													This is useful for lexing languages where there are different lexing rules depending on context.</p>
+													<p>The current lexing mode is selected via a &quot;mode stack&quot;.
+													The last (peek) value in the stack will be the current mode of the lexer.</p>
+													<p>Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token):</p>
+													<ol>
+														<li>PUSH_MODE : push a new mode to the &quot;mode stack&quot;</li>
+														<li>POP_MODE  : pop the last mode from the &quot;mode stack&quot;</li>
+													</ol>
+													<p>Examples:
+														export class Attribute extends Token {
+														static PATTERN = ...
+														static PUSH_MODE = &quot;modeY&quot;
+													}</p>
+													<p>export class EndAttribute extends Token {
+														static PATTERN = ...
+														static POP_MODE = true
+													}</p>
+													<p>The Token constructors must be in one of these forms:</p>
+													<ol>
+														<li><p>With a PATTERN property that has a RegExp value for tokens to match:
+															example: --&gt;class Integer extends Token { static PATTERN = /[1-9]\d }&lt;--</p>
+														</li>
+														<li><p>With a PATTERN property that has the value of the var Lexer.NA defined above.
+																This is a convenience form used to avoid matching Token classes that only act as categories.
+															example: --&gt;class Keyword extends Token { static PATTERN = NA }&lt;--</p>
+														</li>
+													</ol>
+												</li>
+											</ol>
+											<p>  The following RegExp patterns are not supported:
+												a. &#39;$&#39; for match at end of input
+												b. /b global flag
+											c. /m multi-line flag</p>
+											<p>  The Lexer will identify the first pattern that matches, Therefor the order of Token Constructors may be significant.
+											For example when one pattern may match a prefix of another pattern.</p>
+											<p>  Note that there are situations in which we may wish to order the longer pattern after the shorter one.
+												For example: keywords vs Identifiers.
+											&#39;do&#39;(/do/) and &#39;donald&#39;(/w+)</p>
+											<ul>
+												<li><p>If the Identifier pattern appears before the &#39;do&#39; pattern, both &#39;do&#39; and &#39;donald&#39;
+													will be lexed as an Identifier.</p>
+												</li>
+												<li><p>If the &#39;do&#39; pattern appears before the Identifier pattern &#39;do&#39; will be lexed correctly as a keyword.
+													however &#39;donald&#39; will be lexed as TWO separate tokens: keyword &#39;do&#39; and identifier &#39;nald&#39;.</p>
+													<p>To resolve this problem, add a static property on the keyword&#39;s constructor named: LONGER_ALT
+													example:</p>
+													<p>  export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
+													export class Keyword extends Token {</p>
+													<pre><code> <span class="hljs-keyword">static</span> PATTERN = lex.NA
+ <span class="hljs-keyword">static</span> LONGER_ALT = Identifier
+</code></pre><p>  }
+														export class Do extends Keyword { static PATTERN = /do/ }
+														export class While extends Keyword { static PATTERN = /while/ }
+													export class Return extends Keyword { static PATTERN = /return/ }</p>
+													<p>The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.</p>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> deferDefinitionErrorsHandling: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="lexer.html" class="tsd-signature-type">Lexer</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="allpatterns" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> all<wbr>Patterns</h3>
+					<div class="tsd-signature tsd-kind-icon">all<wbr>Patterns<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L95">scan/lexer_public.ts:95</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">RegExp</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="defaultmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> default<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">default<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L94">scan/lexer_public.ts:94</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="emptygroups" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> empty<wbr>Groups</h3>
+					<div class="tsd-signature tsd-kind-icon">empty<wbr>Groups<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L102">scan/lexer_public.ts:102</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>groupName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><a href="../interfaces/isimpletokenoritoken.html" class="tsd-signature-type">ISimpleTokenOrIToken</a></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="islazytokenmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> is<wbr>Lazy<wbr>Token<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Lazy<wbr>Token<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L91">scan/lexer_public.ts:91</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="issimpletokenmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> is<wbr>Simple<wbr>Token<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">is<wbr>Simple<wbr>Token<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L92">scan/lexer_public.ts:92</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="lexerdefinition" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> lexer<wbr>Definition</h3>
+					<div class="tsd-signature tsd-kind-icon">lexer<wbr>Definition<span class="tsd-signature-symbol">:</span> <a href="../globals.html#singlemodelexerdefinition" class="tsd-signature-type">SingleModeLexerDefinition</a><span class="tsd-signature-symbol"> | </span><a href="../interfaces/imultimodelexerdefinition.html" class="tsd-signature-type">IMultiModeLexerDefinition</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L196">scan/lexer_public.ts:196</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>-
+							Structure composed of constructor functions for the Tokens types this lexer will support.</p>
+							<p> In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
+							In the case of {IMultiModeLexerDefinition} the structure is an object with two properties:</p>
+							<ol>
+								<li>a &quot;modes&quot; property where each value is an array of Token.</li>
+								<li><p>a &quot;defaultMode&quot; property specifying the initial lexer mode.</p>
+									<p>constructors.</p>
+									<p>for example:
+										{
+										&quot;modes&quot; : {
+										&quot;modeX&quot; : [Token1, Token2]
+										&quot;modeY&quot; : [Token3, Token4]
+									}</p>
+									<p>&quot;defaultMode&quot; : &quot;modeY&quot;
+									}</p>
+									<p>A lexer with {MultiModesDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
+									This is useful for lexing languages where there are different lexing rules depending on context.</p>
+									<p>The current lexing mode is selected via a &quot;mode stack&quot;.
+									The last (peek) value in the stack will be the current mode of the lexer.</p>
+									<p>Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token):</p>
+									<ol>
+										<li>PUSH_MODE : push a new mode to the &quot;mode stack&quot;</li>
+										<li>POP_MODE  : pop the last mode from the &quot;mode stack&quot;</li>
+									</ol>
+									<p>Examples:
+										export class Attribute extends Token {
+										static PATTERN = ...
+										static PUSH_MODE = &quot;modeY&quot;
+									}</p>
+									<p>export class EndAttribute extends Token {
+										static PATTERN = ...
+										static POP_MODE = true
+									}</p>
+									<p>The Token constructors must be in one of these forms:</p>
+									<ol>
+										<li><p>With a PATTERN property that has a RegExp value for tokens to match:
+											example: --&gt;class Integer extends Token { static PATTERN = /[1-9]\d }&lt;--</p>
+										</li>
+										<li><p>With a PATTERN property that has the value of the var Lexer.NA defined above.
+												This is a convenience form used to avoid matching Token classes that only act as categories.
+											example: --&gt;class Keyword extends Token { static PATTERN = NA }&lt;--</p>
+										</li>
+									</ol>
+								</li>
+							</ol>
+							<p>  The following RegExp patterns are not supported:
+								a. &#39;$&#39; for match at end of input
+								b. /b global flag
+							c. /m multi-line flag</p>
+							<p>  The Lexer will identify the first pattern that matches, Therefor the order of Token Constructors may be significant.
+							For example when one pattern may match a prefix of another pattern.</p>
+							<p>  Note that there are situations in which we may wish to order the longer pattern after the shorter one.
+								For example: keywords vs Identifiers.
+							&#39;do&#39;(/do/) and &#39;donald&#39;(/w+)</p>
+							<ul>
+								<li><p>If the Identifier pattern appears before the &#39;do&#39; pattern, both &#39;do&#39; and &#39;donald&#39;
+									will be lexed as an Identifier.</p>
+								</li>
+								<li><p>If the &#39;do&#39; pattern appears before the Identifier pattern &#39;do&#39; will be lexed correctly as a keyword.
+									however &#39;donald&#39; will be lexed as TWO separate tokens: keyword &#39;do&#39; and identifier &#39;nald&#39;.</p>
+									<p>To resolve this problem, add a static property on the keyword&#39;s constructor named: LONGER_ALT
+									example:</p>
+									<p>  export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
+									export class Keyword extends Token {</p>
+									<pre><code> <span class="hljs-keyword">static</span> PATTERN = lex.NA
+ <span class="hljs-keyword">static</span> LONGER_ALT = Identifier
+</code></pre><p>  }
+										export class Do extends Keyword { static PATTERN = /do/ }
+										export class While extends Keyword { static PATTERN = /while/ }
+									export class Return extends Keyword { static PATTERN = /return/ }</p>
+									<p>The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.</p>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="lexerdefinitionerrors" class="tsd-anchor"></a>
+					<h3>lexer<wbr>Definition<wbr>Errors</h3>
+					<div class="tsd-signature tsd-kind-icon">lexer<wbr>Definition<wbr>Errors<span class="tsd-signature-symbol">:</span> <a href="../interfaces/ilexerdefinitionerror.html" class="tsd-signature-type">ILexerDefinitionError</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L89">scan/lexer_public.ts:89</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="modes" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> modes</h3>
+					<div class="tsd-signature tsd-kind-icon">modes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> =&nbsp;[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L93">scan/lexer_public.ts:93</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="patternidxtocanlineterminator" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> pattern<wbr>Idx<wbr>ToCan<wbr>Line<wbr>Terminator</h3>
+					<div class="tsd-signature tsd-kind-icon">pattern<wbr>Idx<wbr>ToCan<wbr>Line<wbr>Terminator<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L99">scan/lexer_public.ts:99</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="patternidxtoclass" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> pattern<wbr>Idx<wbr>ToClass</h3>
+					<div class="tsd-signature tsd-kind-icon">pattern<wbr>Idx<wbr>ToClass<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L96">scan/lexer_public.ts:96</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="patternidxtogroup" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> pattern<wbr>Idx<wbr>ToGroup</h3>
+					<div class="tsd-signature tsd-kind-icon">pattern<wbr>Idx<wbr>ToGroup<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L97">scan/lexer_public.ts:97</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="patternidxtolongeraltidx" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> pattern<wbr>Idx<wbr>ToLonger<wbr>Alt<wbr>Idx</h3>
+					<div class="tsd-signature tsd-kind-icon">pattern<wbr>Idx<wbr>ToLonger<wbr>Alt<wbr>Idx<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L98">scan/lexer_public.ts:98</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="patternidxtopopmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> pattern<wbr>Idx<wbr>ToPop<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">pattern<wbr>Idx<wbr>ToPop<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L101">scan/lexer_public.ts:101</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="patternidxtopushmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> pattern<wbr>Idx<wbr>ToPush<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">pattern<wbr>Idx<wbr>ToPush<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L100">scan/lexer_public.ts:100</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>modeName: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
+					<a name="na" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> NA</h3>
+					<div class="tsd-signature tsd-kind-icon">NA<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">RegExp</span><span class="tsd-signature-symbol"> =&nbsp;/NOT_APPLICABLE/</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L88">scan/lexer_public.ts:88</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tokenize" class="tsd-anchor"></a>
+					<h3>tokenize</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">tokenize<span class="tsd-signature-symbol">(</span>text<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, initialMode<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/ilexingresult.html" class="tsd-signature-type">ILexingResult</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L280">scan/lexer_public.ts:280</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Will lex(Tokenize) a string.
+										Note that this can be called repeatedly on different strings as this method
+									does not modify the state of the Lexer.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>text: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The string to lex</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> initialMode: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;this.defaultMode</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/ilexingresult.html" class="tsd-signature-type">ILexingResult</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="tokenizeinternal" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> tokenize<wbr>Internal</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">tokenize<wbr>Internal<span class="tsd-signature-symbol">(</span>text<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, initialMode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/ilexingresult.html" class="tsd-signature-type">ILexingResult</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L307">scan/lexer_public.ts:307</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>text: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>initialMode: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/ilexingresult.html" class="tsd-signature-type">ILexingResult</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-private">
+					<a name="tokenizeinternallazy" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> tokenize<wbr>Internal<wbr>Lazy</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-private">
+						<li class="tsd-signature tsd-kind-icon">tokenize<wbr>Internal<wbr>Lazy<span class="tsd-signature-symbol">(</span>text<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, initialMode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, tokenCreator<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">LazyTokenCreator</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/ilexingresult.html" class="tsd-signature-type">ILexingResult</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L493">scan/lexer_public.ts:493</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>text: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>initialMode: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>tokenCreator: <span class="tsd-signature-type">LazyTokenCreator</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/ilexingresult.html" class="tsd-signature-type">ILexingResult</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Object literals</h2>
+				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-parent-kind-class tsd-is-static">
+					<a name="skipped" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> SKIPPED</h3>
+					<div class="tsd-signature tsd-kind-icon">SKIPPED<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L83">scan/lexer_public.ts:83</a></li>
+						</ul>
+					</aside>
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
+						<a name="skipped.description" class="tsd-anchor"></a>
+						<h3>description</h3>
+						<div class="tsd-signature tsd-kind-icon">description<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;This marks a skipped Token pattern, this means each token identified by it will&quot; +&quot;be consumed and then throw into oblivion, this can be used to for example: skip whitespace.&quot;</span></div>
+						<aside class="tsd-sources">
+							<ul>
+								<li>Defined in <a href="https://github.com/SAP/chevrotain/blob/88d14e9/src/scan/lexer_public.ts#L84">scan/lexer_public.ts:84</a></li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class">
+						<a href="lexer.html" class="tsd-kind-icon">Lexer</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="lexer.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#allpatterns" class="tsd-kind-icon">all<wbr>Patterns</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#defaultmode" class="tsd-kind-icon">default<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#emptygroups" class="tsd-kind-icon">empty<wbr>Groups</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#islazytokenmode" class="tsd-kind-icon">is<wbr>Lazy<wbr>Token<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#issimpletokenmode" class="tsd-kind-icon">is<wbr>Simple<wbr>Token<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#lexerdefinition" class="tsd-kind-icon">lexer<wbr>Definition</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="lexer.html#lexerdefinitionerrors" class="tsd-kind-icon">lexer<wbr>Definition<wbr>Errors</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#modes" class="tsd-kind-icon">modes</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#patternidxtocanlineterminator" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToCan<wbr>Line<wbr>Terminator</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#patternidxtoclass" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToClass</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#patternidxtogroup" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToGroup</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#patternidxtolongeraltidx" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToLonger<wbr>Alt<wbr>Idx</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#patternidxtopopmode" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToPop<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="lexer.html#patternidxtopushmode" class="tsd-kind-icon">pattern<wbr>Idx<wbr>ToPush<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
+								<a href="lexer.html#na" class="tsd-kind-icon">NA</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="lexer.html#tokenize" class="tsd-kind-icon">tokenize</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="lexer.html#tokenizeinternal" class="tsd-kind-icon">tokenize<wbr>Internal</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-private">
+								<a href="lexer.html#tokenizeinternallazy" class="tsd-kind-icon">tokenize<wbr>Internal<wbr>Lazy</a>
+							</li>
+							<li class=" tsd-kind-object-literal tsd-parent-kind-class tsd-is-static">
+								<a href="lexer.html#skipped" class="tsd-kind-icon">SKIPPED</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.io" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
