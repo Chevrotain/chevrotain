@@ -104,7 +104,7 @@ function onImplementationEditorContentChange() {
         if (parserConstructor) {
             parser = new parserConstructor()
             markParserDefinitionErrors(parser)
-            var topRules = parser.getGAstProductions().values()
+            var topRules = parser.getSerializedGastProductions()
             renderDiagramsAndAttachHighlightEvents(topRules)
             showDiagrams()
             if (!_.isEmpty(parser.definitionErrors)) {
