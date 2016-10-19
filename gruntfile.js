@@ -229,6 +229,9 @@ module.exports = function(grunt) {
                 }, {
                     from: /(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
                     to:   '/* istanbul ignore next */ $1'
+                },{
+                    from: /(\s+)(else if \(.+\s+.+\s+.+\s+(?:.+\s+)?)(\s*\/\/ IGNORE ABOVE ELSE)/g,
+                    to:   '/* istanbul ignore else */ $1$2'
                 }]
             }
         },

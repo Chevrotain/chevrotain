@@ -24,12 +24,15 @@ import {
     NextTerminalAfterManyWalker,
     NextTerminalAfterManySepWalker,
     NextTerminalAfterAtLeastOneSepWalker,
-    possiblePathsFrom
+    possiblePathsFrom,
+    nextPossibleTokensAfter
 } from "../../../src/parse/grammar/interpreter"
-import {setEquality} from "../../utils/matchers"
+import {setEquality, createRegularToken} from "../../utils/matchers"
 import {gast} from "../../../src/parse/grammar/gast_public"
-import {Token} from "../../../src/scan/tokens_public"
+import {Token, ISimpleTokenOrIToken} from "../../../src/scan/tokens_public"
 import {map} from "../../../src/utils/utils"
+import {TokenConstructor} from "../../../src/scan/lexer_public"
+import {tokenInstanceofMatcher} from "../../../src/scan/tokens"
 
 let RepetitionMandatory = gast.RepetitionMandatory
 let Terminal = gast.Terminal
@@ -465,19 +468,19 @@ describe("The NextTerminalAfterAtLeastOneSepWalker", () => {
 
 describe("The chevrotain grammar interpreter capabilities", () => {
 
-    function extraPartialPaths(newResultFormat) {
+    function extractPartialPaths(newResultFormat) {
         return map(newResultFormat, (currItem) => currItem.partialPath)
     }
 
+    class Alpha extends Token {}
+
+    class Beta extends Token {}
+
+    class Gamma extends Token {}
+
+    class Comma extends Token {}
+
     context("can calculate the next possible paths in a", () => {
-
-        class Alpha extends Token {}
-
-        class Beta extends Token {}
-
-        class Gamma extends Token {}
-
-        class Comma extends Token {}
 
         it("Sequence", () => {
             let seq = [
@@ -486,10 +489,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma]])
         })
 
         it("Optional", () => {
@@ -501,10 +504,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta], [Alpha, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta], [Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma], [Alpha, Gamma]])
         })
 
         it("Alternation", () => {
@@ -523,10 +526,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 ])
             ])]
 
-            expect(extraPartialPaths(possiblePathsFrom(alts, 1))).to.deep.equal([[Alpha], [Beta], [Beta]])
-            expect(extraPartialPaths(possiblePathsFrom(alts, 2))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(alts, 3))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(alts, 4))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(alts, 1))).to.deep.equal([[Alpha], [Beta], [Beta]])
+            expect(extractPartialPaths(possiblePathsFrom(alts, 2))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(alts, 3))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(alts, 4))).to.deep.equal([[Alpha], [Beta, Beta], [Beta, Alpha, Gamma]])
         })
 
         it("Repetition", () => {
@@ -537,10 +540,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
         })
 
         it("Mandatory Repetition", () => {
@@ -551,10 +554,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(repMand, 1))).to.deep.equal([[Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(repMand, 2))).to.deep.equal([[Alpha, Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(repMand, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(repMand, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(repMand, 1))).to.deep.equal([[Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(repMand, 2))).to.deep.equal([[Alpha, Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(repMand, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(repMand, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
         })
 
         it("Repetition with Separator", () => {
@@ -567,10 +570,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
         })
 
         it("Mandatory Repetition with Separator", () => {
@@ -583,10 +586,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 1))).to.deep.equal([[Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 2))).to.deep.equal([[Alpha, Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(repMandSep, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 1))).to.deep.equal([[Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 2))).to.deep.equal([[Alpha, Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
         })
 
         it("NonTerminal", () => {
@@ -600,10 +603,281 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(extraPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma]])
-            expect(extraPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 1))).to.deep.equal([[Alpha]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 2))).to.deep.equal([[Alpha, Beta]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 3))).to.deep.equal([[Alpha, Beta, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(seq, 4))).to.deep.equal([[Alpha, Beta, Gamma]])
+        })
+    })
+
+    context("can calculate the next possible single tokens for: ", () => {
+
+        function INPUT(tokTypes:TokenConstructor[]):ISimpleTokenOrIToken[] {
+            return map(tokTypes, (currTokType) => createRegularToken(currTokType))
+        }
+
+        function pluckTokenTypes(arr:any[]):TokenConstructor[] {
+            return map(arr, (currItem) => currItem.nextTokenType)
+        }
+
+        it("Sequence positive", () => {
+            let seq = [
+                new gast.Flat([
+                    new gast.Terminal(Alpha),
+                    new gast.Terminal(Beta),
+                    new gast.Terminal(Gamma)
+                ])
+            ]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Gamma])
+        })
+
+        it("Sequence negative", () => {
+            let seq = [
+                new gast.Flat([
+                    new gast.Terminal(Alpha),
+                    new gast.Terminal(Beta),
+                    new gast.Terminal(Gamma)
+                ])
+            ]
+
+            // negative
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("Optional positive", () => {
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.Option([
+                    new gast.Terminal(Beta)
+                ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta, Gamma])
+            // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Gamma])
+        })
+
+        it("Optional Negative", () => {
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.Option([
+                    new gast.Terminal(Beta)
+                ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Alpha]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("Alternation positive", () => {
+            let alts = [
+                new gast.Alternation([
+                    new gast.Flat([
+                        new gast.Terminal(Alpha)
+                    ]),
+                    new gast.Flat([
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Beta)
+                    ]),
+                    new gast.Flat([
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Gamma)
+                    ]),
+                    new gast.Flat([
+                        new gast.Terminal(Gamma)
+                    ])
+                ])]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha, Beta, Beta, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([Beta]), tokenInstanceofMatcher, 5)), [Beta, Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([Beta, Alpha]), tokenInstanceofMatcher, 5)), [Gamma])
+        })
+
+        it("Alternation Negative", () => {
+            let alts = [new gast.Alternation([
+                new gast.Flat([
+                    new gast.Terminal(Alpha)
+                ]),
+                new gast.Flat([
+                    new gast.Terminal(Beta),
+                    new gast.Terminal(Beta)
+                ]),
+                new gast.Flat([
+                    new gast.Terminal(Beta),
+                    new gast.Terminal(Alpha),
+                    new gast.Terminal(Gamma)
+                ])
+            ])]
+
+            expect(nextPossibleTokensAfter(alts, INPUT([Alpha]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Gamma, Alpha]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Beta, Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("Repetition - positive", () => {
+            let rep = [new gast.Repetition([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Beta]), tokenInstanceofMatcher, 5)),
+                [Alpha, Gamma])
+        })
+
+        it("Repetition - negative", () => {
+            let rep = [new gast.Repetition([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(nextPossibleTokensAfter(rep, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("Mandatory Repetition - positive", () => {
+            let repMand = [new gast.RepetitionMandatory([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Beta]), tokenInstanceofMatcher, 5)),
+                [Alpha, Gamma])
+        })
+
+        it("Mandatory Repetition - negative", () => {
+            let repMand = [new gast.RepetitionMandatory([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ]),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(nextPossibleTokensAfter(repMand, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("Repetition with Separator - positive", () => {
+            let repSep = [new gast.RepetitionWithSeparator([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ], Comma),
+                new gast.Terminal(Gamma)
+            ]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Comma, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(
+                pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma, Alpha, Beta]), tokenInstanceofMatcher, 5)),
+                [Comma, Gamma])
+        })
+
+        it("Repetition with Separator - negative", () => {
+            let repMand = [new gast.RepetitionWithSeparator([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ], Comma),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(nextPossibleTokensAfter(repMand, INPUT([Comma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("Repetition with Separator Mandatory - positive", () => {
+            let repSep = [new gast.RepetitionMandatoryWithSeparator([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ], Comma),
+                new gast.Terminal(Gamma)
+            ]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Comma, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(
+                repSep,
+                INPUT([Alpha, Beta, Comma, Alpha, Beta]),
+                tokenInstanceofMatcher, 5)), [Comma, Gamma])
+        })
+
+        it("Repetition with Separator Mandatory - negative", () => {
+            let repMand = [new gast.RepetitionMandatoryWithSeparator([
+                new gast.Terminal(Alpha),
+                new gast.Terminal(Beta)
+            ], Comma),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(nextPossibleTokensAfter(repMand, INPUT([Comma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+        })
+
+        it("NonTerminal - positive", () => {
+            let someSubRule = new gast.Rule("blah", [
+                new gast.Terminal(Beta)
+            ])
+
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.NonTerminal("blah", someSubRule),
+                new gast.Terminal(Gamma)
+            ]
+
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Gamma])
+        })
+
+        it("NonTerminal - negative", () => {
+            let someSubRule = new gast.Rule("blah", [
+                new gast.Terminal(Beta)
+            ])
+
+            let seq = [
+                new gast.Terminal(Alpha),
+                new gast.NonTerminal("blah", someSubRule),
+                new gast.Terminal(Gamma)
+            ]
+
+            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
         })
     })
 

@@ -15,6 +15,7 @@ import {
 import MismatchedTokenException = exceptions.MismatchedTokenException
 import NoViableAltException = exceptions.NoViableAltException
 import EarlyExitException = exceptions.EarlyExitException
+import {createRegularToken, createLazyToken, createSimpleToken, setEquality} from "../utils/matchers"
 
 function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
@@ -792,24 +793,51 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(serializedGrammar[0].type).to.equal("Rule")
                 expect(serializedGrammar[1].type).to.equal("Rule")
             })
+
+            it("can provide syntactic content assist suggestions", () => {
+
+                class ContentAssistParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, [PlusTok, MinusTok, IdentTok]);
+                        (Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public topRule = this.RULE("topRule", () => {
+                        this.MANY(() => {
+                            this.SUBRULE4(this.rule2)
+                        })
+                    })
+
+                    public rule2 = this.RULE("rule2", () => {
+                        this.OR([
+                            {ALT: () => { this.CONSUME1(MinusTok) }},
+                            {ALT: () => { this.CONSUME3(PlusTok) }}
+                        ])
+                    })
+                }
+
+                let parser = new ContentAssistParser([])
+                setEquality(
+                    parser.computeContentAssist("topRule", []),
+                    [{nextTokenType: MinusTok, nextTokenOccurrence: 1, ruleStack: ["topRule", "rule2"], occurrenceStack: [1, 4]},
+                        {nextTokenType: PlusTok, nextTokenOccurrence: 3, ruleStack: ["topRule", "rule2"], occurrenceStack: [1, 4]}]
+                )
+
+                setEquality(parser.computeContentAssist("topRule", [createToken(MinusTok)]),
+                    [{nextTokenType: MinusTok, nextTokenOccurrence: 1, ruleStack: ["topRule", "rule2"], occurrenceStack: [1, 4]},
+                        {nextTokenType: PlusTok, nextTokenOccurrence: 3, ruleStack: ["topRule", "rule2"], occurrenceStack: [1, 4]}]
+                )
+
+                expect(() => parser.computeContentAssist("invalid_rule_name", []))
+                    .to.throw("does not exist in this grammar")
+            })
         })
 
         after(() => {
             clearCache()
         })
     })
-}
-
-function createRegularToken(tokClass, image = "") {
-    return new tokClass(image, -1, -1, -1, -1, -1)
-}
-
-function createLazyToken(tokClass, image = "bamba") {
-    return createLazyTokenInstance(0, image.length, tokClass, {orgText: image, lineToOffset: []})
-}
-
-function createSimpleToken(tokClass, image = "bamba") {
-    return createSimpleLazyToken(0, image.length, tokClass, {orgText: image, lineToOffset: []})
 }
 
 defineRecognizerSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)

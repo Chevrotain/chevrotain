@@ -4,6 +4,7 @@ import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {tokenInstanceofMatcher, createSimpleLazyToken, createLazyTokenInstance, tokenStructuredMatcher} from "../../src/scan/tokens"
 import {clearCache} from "../../src/parse/cache_public"
+import {createRegularToken, createLazyToken, createSimpleToken} from "../utils/matchers"
 
 function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
@@ -1119,18 +1120,6 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
         })
     })
-}
-
-function createRegularToken(tokClass) {
-    return new tokClass("", -1, -1, -1, -1, -1)
-}
-
-function createLazyToken(tokClass) {
-    return createLazyTokenInstance(0, 1, tokClass, {orgText: "bamba", lineToOffset: []})
-}
-
-function createSimpleToken(tokClass) {
-    return createSimpleLazyToken(0, 1, tokClass, {orgText: "bamba", lineToOffset: []})
 }
 
 defineLookaheadSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)

@@ -149,7 +149,11 @@ export function contains<T>(arr:T[], item):boolean {
  * shallow clone
  */
 export function cloneArr<T>(arr:T[]):T[] {
-    return map(arr, (item) => item)
+    let newArr = []
+    for (let i = 0; i < arr.length; i++) {
+        newArr.push(arr[i])
+    }
+    return newArr
 }
 
 /**

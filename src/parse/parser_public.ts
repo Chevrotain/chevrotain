@@ -59,12 +59,13 @@ import {
     NextTerminalAfterAtLeastOneWalker,
     NextTerminalAfterAtLeastOneSepWalker,
     NextTerminalAfterManySepWalker,
-    NextTerminalAfterManyWalker
+    NextTerminalAfterManyWalker,
+    nextPossibleTokensAfter,
 } from "./grammar/interpreter"
 import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
-import {ITokenGrammarPath} from "./grammar/path_public"
+import {ITokenGrammarPath, ISyntacticContentAssistPath} from "./grammar/path_public"
 import {
     augmentTokenClasses,
     tokenStructuredIdentity,
@@ -542,6 +543,22 @@ export class Parser {
     // bundled (due to multiple prototype chains and "instanceof" usage).
     public getSerializedGastProductions():gast.ISerializedGast[] {
         return serializeGrammar(cache.getProductionsForClass(this.className).values())
+    }
+
+    /**
+     * @param startRuleName {string}
+     * @param precedingInput {ISimpleTokenOrIToken[]} - The token vector up to (not including) the content assist point
+     * @returns {ISyntacticContentAssistPath[]}
+     */
+    public computeContentAssist(startRuleName:string,
+                                precedingInput:ISimpleTokenOrIToken[]):ISyntacticContentAssistPath[] {
+        let startRuleGast = cache.getProductionsForClass(this.className).get(startRuleName)
+
+        if (isUndefined(startRuleGast)) {
+            throw Error(`Rule ->${startRuleName}<- does not exist in this grammar.`)
+        }
+
+        return nextPossibleTokensAfter([startRuleGast], precedingInput, this.tokenMatcher, this.maxLookahead)
     }
 
     protected isBackTracking():boolean {

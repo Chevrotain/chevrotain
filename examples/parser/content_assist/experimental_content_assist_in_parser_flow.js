@@ -1,4 +1,15 @@
 /**
+ * EXPERIMENTAL!
+ *
+ * Use "official_feature_content_assist.js" as a reference on this topic unless
+ * you cannot work around it's limitations.
+ *
+ * This example is kept as a basis for expansion in the future, but currently has limitations
+ * Paticulary around multiple Token lookahead.
+ * See Issue 290 for details: https://github.com/SAP/chevrotain/issues/290
+ *
+ *
+ *
  * An Example of using chevrotain to implement content assist (both syntatic and semantic)
  * for a mini SQL like language.
  *

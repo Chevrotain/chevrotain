@@ -106,29 +106,41 @@ JsonParserOld.prototype.constructor = JsonParserOld;
 
 // reuse the same parser instance.
 var parser = new JsonParserOld([]);
-module.exports = function (text, lexOnly) {
-    var lexResult = JsonLexer.tokenize(text);
-    if (lexResult.errors.length > 0) {
-        throw "Lexing errors encountered " + lexResult.errors[0].message
-    }
-
-    var value
-    if (!lexOnly) {
-        // setting a new input will RESET the parser instance's state.
-        parser.input = lexResult.tokens;
-
-        // any top level rule may be used as an entry point
-        value = parser.json();
-
-        if (parser.errors.length > 0) {
-            throw "parsing errors encountered " + parser.errors[0].message
-
+module.exports = {
+    parseFunc: function(text, lexOnly) {
+        var lexResult = JsonLexer.tokenize(text);
+        if (lexResult.errors.length > 0) {
+            throw "Lexing errors encountered " + lexResult.errors[0].message
         }
-    }
 
-    return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
-        parseErrors: parser.errors
-    };
-};
+        var value
+        if (!lexOnly) {
+            // setting a new input will RESET the parser instance's state.
+            parser.input = lexResult.tokens;
+
+            // any top level rule may be used as an entry point
+            value = parser.json();
+
+            if (parser.errors.length > 0) {
+                throw "parsing errors encountered " + parser.errors[0].message
+            }
+        }
+
+        return {
+            value:       value, // this is a pure grammar, the value will always be <undefined>
+            lexErrors:   lexResult.errors,
+            parseErrors: parser.errors
+        };
+    },
+
+    autoComplete: function(text) {
+        var lexResult = JsonLexer.tokenize(text);
+        if (lexResult.errors.length > 0) {
+            throw "Lexing errors encountered " + lexResult.errors[0].message
+        }
+
+        var result = parser.computeContentAssist("json", lexResult.tokens)
+
+        return result
+    }
+}

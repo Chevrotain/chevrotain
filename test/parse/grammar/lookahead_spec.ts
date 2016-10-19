@@ -30,6 +30,7 @@ import RepetitionWithSeparator = gast.RepetitionWithSeparator
 import Flat = gast.Flat
 import Alternation = gast.Alternation
 import RepetitionMandatory = gast.RepetitionMandatory
+import {createRegularToken, createLazyToken, createSimpleToken} from "../../utils/matchers"
 
 // TODO: convert this whole test to test on all types of Tokens.
 
@@ -754,19 +755,6 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
 
         })
     })
-}
-
-
-function createRegularToken(tokClass, image = "") {
-    return new tokClass(image, -1, -1, -1, -1, -1)
-}
-
-function createLazyToken(tokClass, image = "bamba") {
-    return createLazyTokenInstance(0, image.length, tokClass, {orgText: image, lineToOffset: []})
-}
-
-function createSimpleToken(tokClass, image = "bamba") {
-    return createSimpleLazyToken(0, image.length, tokClass, {orgText: image, lineToOffset: []})
 }
 
 defineLookaheadSpecs("Regular Tokens Mode",

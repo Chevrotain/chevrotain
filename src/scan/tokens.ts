@@ -118,7 +118,7 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     }
 }
 
-export function tokenInstanceofMatcher(tokInstance, tokConstructor) {
+export function tokenInstanceofMatcher(tokInstance, tokConstructor):boolean {
     return tokInstance instanceof tokConstructor
 }
 
@@ -217,7 +217,7 @@ export type LazyTokenCreator = (startOffset:number,
 export function createSimpleLazyToken(startOffset:number,
                                       endOffset:number,
                                       tokClass:TokenConstructor,
-                                      cacheData:LazyTokenCacheData):ISimpleLazyToken {
+                                      cacheData:LazyTokenCacheData):SimpleLazyToken {
     return <any>{
         startOffset: startOffset,
         endOffset:   endOffset,
@@ -229,7 +229,7 @@ export function createSimpleLazyToken(startOffset:number,
 export function createLazyTokenInstance(startOffset:number,
                                         endOffset:number,
                                         tokClass:TokenConstructor,
-                                        cacheData:LazyTokenCacheData):IToken {
+                                        cacheData:LazyTokenCacheData):LazyToken {
     return new (<any>tokClass)(startOffset, endOffset, cacheData)
 }
 
@@ -290,4 +290,3 @@ export function isLazyTokenType(tokType:TokenConstructor):boolean {
 export function isSimpleTokenType(tokType:TokenConstructor):boolean {
     return SimpleLazyToken.prototype.isPrototypeOf(tokType.prototype)
 }
-
