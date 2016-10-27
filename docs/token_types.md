@@ -6,11 +6,11 @@ See Performance [Benchmark](http://sap.github.io/chevrotain/performance/token_ty
 
  
 ### The Base Token
-The Base [Tokens](http://sap.github.io/chevrotain/documentation/0_17_1/classes/token.html)
+The Base [Tokens](http://sap.github.io/chevrotain/documentation/0_18_0/classes/token.html)
 are **mutable** Inheritance based Tokens which have all their properties **pre-computed** as standard EcmaScript properties.
 
 Base Tokens can be defined either using ES2015 inheritance or
-using the provided [extendToken](http://sap.github.io/chevrotain/documentation/0_17_1/globals.html#extendtoken) utility.
+using the provided [extendToken](http://sap.github.io/chevrotain/documentation/0_18_0/globals.html#extendtoken) utility.
  
 ```typescript
 var chevrotain = require("chevrotain")
@@ -35,12 +35,12 @@ When to use base Tokens:
 
 
 ### The Lazy Token
-The [Lazy Tokens](http://sap.github.io/chevrotain/documentation/0_17_1/classes/lazytoken.html) are **im-mutable** Inheritance based Tokens which have most of their properties computed only on demand.
+The [Lazy Tokens](http://sap.github.io/chevrotain/documentation/0_18_0/classes/lazytoken.html) are **im-mutable** Inheritance based Tokens which have most of their properties computed only on demand.
 This is accomplished by using ECMASciprt getters. This approach achieves both memory conservation and increased performance
 for most use cases. 
 
 Lazy Tokens can be defined either using ES2015 inheritance or
-using the provided [extendLazyToken](http://sap.github.io/chevrotain/documentation/0_17_1/globals.html#extendlazytoken) utility.
+using the provided [extendLazyToken](http://sap.github.io/chevrotain/documentation/0_18_0/globals.html#extendlazytoken) utility.
  
 ```typescript
 var chevrotain = require("chevrotain")
@@ -64,7 +64,7 @@ When to use Lazy Tokens:
 
 
 ### The Simple Lazy Token
-The [Simple Lazy Tokens](http://sap.github.io/chevrotain/documentation/0_17_1/classes/simplelazytoken.html) are **im-mutable** plain 
+The [Simple Lazy Tokens](http://sap.github.io/chevrotain/documentation/0_18_0/classes/simplelazytoken.html) are **im-mutable** plain 
 structure based Tokens which have most of their properties computed only on demand. "Simple" Tokens are not created
 using the **new** operator, instead they are plain ECMAScript objects. This approach achieves an even greater performance than Lazy 
 Tokens but at the cost of:
@@ -91,7 +91,7 @@ Tokens but at the cost of:
 
 
 Simple Lazy Tokens can be defined either using ES2015 inheritance or
-using the provided [extendSimpleLazyToken](http://sap.github.io/chevrotain/documentation/0_17_1/globals.html#extendsimplelazytoken) utility.
+using the provided [extendSimpleLazyToken](http://sap.github.io/chevrotain/documentation/0_18_0/globals.html#extendsimplelazytoken) utility.
  
 ```typescript
 var chevrotain = require("chevrotain")
