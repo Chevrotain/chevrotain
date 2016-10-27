@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Syntactic Content Assist Support.](https://github.com/SAP/chevrotain/issues/291)
+
+
+
 ## 0.17.1 (10-12-2016)
 
 #### Bug Fixes
