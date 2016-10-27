@@ -10,15 +10,15 @@ A few simple examples of using the Chevrotain Parser to resolve some common pars
 
 * [Multiple starting/top rules](multi_start_rules/multi_start_rules.js)
 
-* [Syntactic and Semantic content assist](content_assist/content_assist.js)
-
-* [Content Assist](content_assist/content_assist.js)
+* [Implementing content assist](content_assist/README.md)
 
 * [Dynamically defined Tokens](dynamic_tokens/dynamic_delimiters.js)
 
-* [Minifying Chevrotain Grammars](minification/)
+* [Minifying Chevrotain Grammars](minification/README.md)
 
 
-to run all the parser examples's tests:
+Some of the examples require node.js V4+ to run as ES6 syntax has been used.
+
+To run all the parser examples's tests:
 * ```npm update``` (only once)
 * ```npm test```

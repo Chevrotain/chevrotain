@@ -1,11 +1,13 @@
 /* tslint:disable:no-use-before-declare */
 import {RestWalker} from "./rest"
 import {gast} from "./gast_public"
-import {IGrammarPath, ITokenGrammarPath} from "./path_public"
-import {cloneArr, isEmpty, first as _first, forEach, drop} from "../../utils/utils"
-import {tokenName} from "../../scan/tokens_public"
+import {IGrammarPath, ITokenGrammarPath, ISyntacticContentAssistPath} from "./path_public"
+import {cloneArr, isEmpty, first as _first, forEach, drop, dropRight, last} from "../../utils/utils"
+import {tokenName, ISimpleTokenOrIToken} from "../../scan/tokens_public"
 import {first} from "./first"
 import {TokenConstructor} from "../../scan/lexer_public"
+import {TokenMatcher} from "../parser_public"
+import IProduction = gast.IProduction
 /* tslint:enable:no-use-before-declare */
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
@@ -274,4 +276,248 @@ export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number
     })
 
     return result
+}
+
+
+interface IPathToExamine {
+    idx:number
+    def:IProduction[]
+    ruleStack:string[]
+    occurrenceStack:number[]
+}
+
+export function nextPossibleTokensAfter(initialDef:IProduction[],
+                                        tokenVector:ISimpleTokenOrIToken[],
+                                        tokMatcher:TokenMatcher,
+                                        maxLookAhead:number):ISyntacticContentAssistPath[] {
+
+    const EXIT_NON_TERMINAL:any = "EXIT_NONE_TERMINAL"
+    // to avoid creating a new Array each time.
+    const EXIT_NON_TERMINAL_ARR = [EXIT_NON_TERMINAL]
+    const EXIT_ALTERNATIVE:any = "EXIT_ALTERNATIVE"
+    let foundCompletePath = false
+
+    const tokenVectorLength = tokenVector.length
+    let minimalAlternativesIndex = tokenVectorLength - maxLookAhead - 1
+
+    let result:ISyntacticContentAssistPath[] = []
+
+    let possiblePaths:IPathToExamine[] = []
+    possiblePaths.push({idx: -1, def: initialDef, ruleStack: [], occurrenceStack: []})
+
+    while (!isEmpty(possiblePaths)) {
+        let currPath = possiblePaths.pop()
+
+        // skip alternatives if no more results can be found (assuming deterministic grammar with fixed lookahead)
+        if (currPath === EXIT_ALTERNATIVE) {
+            if (foundCompletePath &&
+                last(possiblePaths).idx <= minimalAlternativesIndex) {
+                // remove irrelevant alternative
+                possiblePaths.pop()
+            }
+            continue
+        }
+
+        let currDef = currPath.def
+        let currIdx = currPath.idx
+        let currRuleStack = currPath.ruleStack
+        let currOccurrenceStack = currPath.occurrenceStack
+
+        // For Example: an empty path could exist in a valid grammar in the case of an EMPTY_ALT
+        if (isEmpty(currDef)) {
+            continue
+        }
+
+        let prod = currDef[0]
+        if (prod === EXIT_NON_TERMINAL) {
+            let nextPath = {
+                idx:             currIdx,
+                def:             drop(currDef),
+                ruleStack:       dropRight(currRuleStack),
+                occurrenceStack: dropRight(currOccurrenceStack)
+            }
+            possiblePaths.push(nextPath)
+        }
+        else if (prod instanceof gast.Terminal) {
+            if (currIdx < tokenVectorLength - 1) {
+                let nextIdx = currIdx + 1
+                let actualToken = tokenVector[nextIdx]
+                if (tokMatcher(actualToken, prod.terminalType)) {
+                    let nextPath = {
+                        idx:             nextIdx,
+                        def:             drop(currDef),
+                        ruleStack:       currRuleStack,
+                        occurrenceStack: currOccurrenceStack
+                    }
+                    possiblePaths.push(nextPath)
+                }
+                // end of the line
+            }
+            else if (currIdx === tokenVectorLength - 1) {
+                // IGNORE ABOVE ELSE
+                result.push({
+                    nextTokenType:       prod.terminalType,
+                    nextTokenOccurrence: prod.occurrenceInParent,
+                    ruleStack:           currRuleStack,
+                    occurrenceStack:     currOccurrenceStack
+                })
+                foundCompletePath = true
+            }
+            else {
+                throw Error("non exhaustive match")
+            }
+        }
+        else if (prod instanceof gast.NonTerminal) {
+            let newRuleStack = cloneArr(currRuleStack)
+            newRuleStack.push(prod.nonTerminalName)
+
+            let newOccurrenceStack = cloneArr(currOccurrenceStack)
+            newOccurrenceStack.push(prod.occurrenceInParent)
+
+            let nextPath = {
+                idx:             currIdx,
+                def:             prod.definition.concat(EXIT_NON_TERMINAL_ARR, drop(currDef)),
+                ruleStack:       newRuleStack,
+                occurrenceStack: newOccurrenceStack
+            }
+            possiblePaths.push(nextPath)
+        }
+        else if (prod instanceof gast.Option) {
+            // the order of alternatives is meaningful, FILO (Last path will be traversed first).
+            let nextPathWithout = {
+                idx:             currIdx,
+                def:             drop(currDef),
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPathWithout)
+            // required marker to avoid backtracking paths whose higher priority alternatives already matched
+            possiblePaths.push(EXIT_ALTERNATIVE)
+
+            let nextPathWith = {
+                idx:             currIdx,
+                def:             prod.definition.concat(drop(currDef)),
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPathWith)
+        }
+        else if (prod instanceof gast.RepetitionMandatory) {
+            // TODO:(THE NEW operators here take a while...) (convert once?)
+            let secondIteration = new gast.Repetition(prod.definition, prod.occurrenceInParent)
+            let nextDef = prod.definition.concat([secondIteration], drop(currDef))
+            let nextPath = {
+                idx:             currIdx,
+                def:             nextDef,
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPath)
+        }
+        else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+            // TODO:(THE NEW operators here take a while...) (convert once?)
+            let separatorGast = new gast.Terminal(prod.separator)
+            let secondIteration = new gast.Repetition([<any>separatorGast].concat(prod.definition), prod.occurrenceInParent)
+            let nextDef = prod.definition.concat([secondIteration], drop(currDef))
+            let nextPath = {
+                idx:             currIdx,
+                def:             nextDef,
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPath)
+        }
+        else if (prod instanceof gast.RepetitionWithSeparator) {
+            // the order of alternatives is meaningful, FILO (Last path will be traversed first).
+            let nextPathWithout = {
+                idx:             currIdx,
+                def:             drop(currDef),
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPathWithout)
+            // required marker to avoid backtracking paths whose higher priority alternatives already matched
+            possiblePaths.push(EXIT_ALTERNATIVE)
+
+            let separatorGast = new gast.Terminal(prod.separator)
+            let nthRepetition = new gast.Repetition([<any>separatorGast].concat(prod.definition), prod.occurrenceInParent)
+            let nextDef = prod.definition.concat([nthRepetition], drop(currDef))
+            let nextPathWith = {
+                idx:             currIdx,
+                def:             nextDef,
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPathWith)
+        }
+        else if (prod instanceof gast.Repetition) {
+            // the order of alternatives is meaningful, FILO (Last path will be traversed first).
+            let nextPathWithout = {
+                idx:             currIdx,
+                def:             drop(currDef),
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPathWithout)
+            // required marker to avoid backtracking paths whose higher priority alternatives already matched
+            possiblePaths.push(EXIT_ALTERNATIVE)
+
+            // TODO: an empty repetition will cause infinite loops here, will the parser detect this in selfAnalysis?
+            let nthRepetition = new gast.Repetition(prod.definition, prod.occurrenceInParent)
+            let nextDef = prod.definition.concat([nthRepetition], drop(currDef))
+            let nextPathWith = {
+                idx:             currIdx, def: nextDef,
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            }
+            possiblePaths.push(nextPathWith)
+        }
+        else if (prod instanceof gast.Alternation) {
+            // the order of alternatives is meaningful, FILO (Last path will be traversed first).
+            for (let i = prod.definition.length - 1; i >= 0; i--) {
+                let currAlt:any = prod.definition[i]
+                let currAltPath = {
+                    idx:             currIdx,
+                    def:             currAlt.definition.concat(drop(currDef)),
+                    ruleStack:       currRuleStack,
+                    occurrenceStack: currOccurrenceStack
+                }
+                possiblePaths.push(currAltPath)
+                possiblePaths.push(EXIT_ALTERNATIVE)
+            }
+        }
+        else if (prod instanceof gast.Flat) {
+            possiblePaths.push({
+                idx:             currIdx,
+                def:             prod.definition.concat(drop(currDef)),
+                ruleStack:       currRuleStack,
+                occurrenceStack: currOccurrenceStack
+            })
+        }
+        // last because we should only encounter at most a single one of these per invocation.
+        else if (prod instanceof gast.Rule) {
+            possiblePaths.push(expandTopLevelRule(prod, currIdx, currRuleStack, currOccurrenceStack))
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+    }
+    return result
+}
+
+
+function expandTopLevelRule(topRule:gast.Rule, currIdx:number, currRuleStack:string[], currOccurrenceStack:number[]):IPathToExamine {
+    let newRuleStack = cloneArr(currRuleStack)
+    newRuleStack.push(topRule.name)
+
+    let newCurrOccurrenceStack = cloneArr(currOccurrenceStack)
+    // top rule is always assumed to have been called with occurrence index 1
+    newCurrOccurrenceStack.push(1)
+
+    return {
+        idx:             currIdx,
+        def:             topRule.definition,
+        ruleStack:       newRuleStack,
+        occurrenceStack: newCurrOccurrenceStack
+    }
 }

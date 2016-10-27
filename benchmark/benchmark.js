@@ -1,10 +1,10 @@
 var fs = require("fs")
 var oldVersion = require("../examples/grammars/node_modules/chevrotain/lib/chevrotain").VERSION
-var oldVersionParseJson = require("./parsers/oldJsonParser")
-var devVersionParseJson = require("./parsers/devJsonParser")
+var oldVersionParseJson = require("./parsers/oldJsonParser").parseFunc
+var devVersionParseJson = require("./parsers/devJsonParser").parseFunc
 
-var devVersionParseCss = require("./parsers/cssDevParser")
-var oldVersionParseCss = require("./parsers/cssOldParser")
+var devVersionParseCss = require("./parsers/cssDevParser").parseFunc
+var oldVersionParseCss = require("./parsers/cssOldParser").parseFunc
 
 var jsonSample = require("./samples/json10k")
 var cssSample = fs.readFileSync('./samples/large_css.css', 'utf8')
