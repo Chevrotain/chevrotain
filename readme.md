@@ -15,16 +15,7 @@ any code generation phase.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
 ## Features
-  1. **Lexer Engine** based on Regular Expressions.
-    * Full Token position information.
-    * Token skipping (whitespace/comments/...).
-    * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
-    * [Multiple Lexer Modes][lexer_modes] depending on the context.
-    * [Tokens Grouping][lexer_groups].
-    * [Different Token types for balancing performance, memory usage and ease of use](docs/token_types.md).
-    * **No code generation** The Lexer does not require any code generation phase. 
-   
-  2. **Parsing DSL**.
+  1. **Parsing DSL**.
     * **LL(k)** grammars support.  
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
@@ -33,11 +24,21 @@ any code generation phase.
     * [Grammar Inheritance.][grammar_inheritance]
     * [Multiple starting rules.][starting_rules]
     * [Parametrized Rules.][parametrized_rules]
+    * [Syntactic Content Assist][content assist]
     * **No code generation**.
       * The DSL is just JavaScript, not an external language.
       * The grammar is directly debuggable as plain JavaScript source.
       * Short feedback loops.
-      * Allows great flexibility for inserting custom Parser actions
+      * Allows great flexibility for inserting custom Parser actions 
+   
+  2.  **Lexer Engine** based on Regular Expressions.
+    * Full Token position information.
+    * Token skipping (whitespace/comments/...).
+    * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
+    * [Multiple Lexer Modes][lexer_modes] depending on the context.
+    * [Tokens Grouping][lexer_groups].
+    * [Different Token types for balancing performance, memory usage and ease of use](docs/token_types.md).
+    * **No code generation** The Lexer does not require any code generation phase. 
 
   3. [**High Performance**][benchmark].
   
@@ -106,3 +107,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
 [parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
+[content assist]: https://github.com/SAP/chevrotain/blob/master/docs/syntactic_content_assist.md
