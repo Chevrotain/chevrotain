@@ -2,7 +2,7 @@
 
 See: [**Runnable example**](../examples/parser/content_assist/official_feature_content_assist.js) for quick starting.
 
-#### Detailed Docs:
+### Detailed Docs:
 Chevrotain provides Syntactic Content assist Capabilities.
 These can be accessed via the [**computeContentAssist**](http://sap.github.io/chevrotain/documentation/0_18_0/classes/parser.html#computeContentAssist) method.
 
