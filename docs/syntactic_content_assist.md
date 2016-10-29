@@ -1,8 +1,10 @@
 ## Syntactic Content Assist
 
+See: [**Runnable example**](../examples/parser/content_assist/official_feature_content_assist.js) for quick starting.
+
+#### Detailed Docs:
 Chevrotain provides Syntactic Content assist Capabilities.
 These can be accessed via the [**computeContentAssist**](http://sap.github.io/chevrotain/documentation/0_18_0/classes/parser.html#computeContentAssist) method.
-See: [runnable example](../examples/parser/content_assist/official_feature_content_assist.js) for usage details.
 
 Note that this feature **only** provides syntactic suggestions (meaning next possible token types) **not** semantic suggestions.
 It could be used as a building block in a semantic suggestions provider, but it cannot do this on "its own".
