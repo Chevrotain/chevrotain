@@ -5,7 +5,7 @@
 * [Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?](#WHY_ERROR_RECOVERY)
 * [How do I debug my parser?](#DEBUGGING)
 * [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](NUMERICAL_SUFFIXES)
-* [Why does Chevrotain now work correctly after I minified my Sources?](#MINIFIED)
+* [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
 * [How do I Maximize my parser's performance?](#PERFORMANCE)
 
 
