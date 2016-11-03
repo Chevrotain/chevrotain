@@ -2084,7 +2084,7 @@ export class Parser {
 
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
-        let errSuffix = " but found: '" + getImage(this.LA(1)) + "'"
+        let errSuffix = "\nbut found: '" + getImage(this.LA(1)) + "'"
         if (errMsgTypes === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2092,10 +2092,13 @@ export class Parser {
             let lookAheadPathsPerAlternative = getLookaheadPathsForOr(occurrence, ruleGrammar, this.maxLookahead)
             let allLookAheadPaths = reduce(lookAheadPathsPerAlternative, (result, currAltPaths) => result.concat(currAltPaths), [])
             let nextValidTokenSequences = map(allLookAheadPaths, (currPath) =>
-                `[${map(currPath, (currTokenClass) => tokenLabel(currTokenClass)).join(",")}]`)
-            errMsgTypes = `one of these possible Token sequences:\n  <${nextValidTokenSequences.join(" ,")}>`
+                `[${map(currPath, (currTokenClass) => tokenLabel(currTokenClass)).join(", ")}]`)
+            let nextValidSequenceItems = map(nextValidTokenSequences, (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`)
+            errMsgTypes = `one of these possible Token sequences:\n${nextValidSequenceItems.join("\n")}`
         }
-        throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes} ${errSuffix}`, this.LA(1)))
+
+
+        throw this.SAVE_ERROR(new exceptions.NoViableAltException(`Expecting: ${errMsgTypes}${errSuffix}`, this.LA(1)))
     }
 
     private getLookaheadFuncFor<T>(key:number,

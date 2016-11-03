@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Improve formatting of NoViableAlt exception message.](https://github.com/SAP/chevrotain/issues/297)
+
+
+
 ## 0.18.0 (10-27-2016)
 
 #### Major Changes
