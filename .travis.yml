@@ -9,17 +9,17 @@ matrix:
   include:
     - node_js: "6"
       env: GRUNT_TASK=browsers_tests
+    - node_js: "7"
+      env: GRUNT_TASK=unit_tests
     - node_js: "6"
       env: GRUNT_TASK=unit_tests COVERAGE=true DEPLOY=true
     - node_js: "4"
       env: GRUNT_TASK=unit_tests
-    - node_js: "0.12"
-      env: GRUNT_TASK=unit_tests
+    - node_js: "7"
+      env: GRUNT_TASK=node_integration_tests
     - node_js: "6"
       env: GRUNT_TASK=node_integration_tests
     - node_js: "4"
-      env: GRUNT_TASK=node_integration_tests
-    - node_js: "0.12"
       env: GRUNT_TASK=node_integration_tests
   allow_failures:
     - node_js: "6"

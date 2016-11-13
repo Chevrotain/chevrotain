@@ -1,5 +1,6 @@
 var assert = require("assert");
 var parseJson = require("./json");
+var parseJsonES6 = require("./json_es6");
 
 describe('The JSON Grammar', function() {
 
@@ -12,9 +13,6 @@ describe('The JSON Grammar', function() {
     });
 
     it('can parse a simple Json without errors - Parser implemented using ES6 syntax', function() {
-        // only load a file containing ES6 syntax when actually running the test
-        // thus if this test is ignored the other tests can still be run in old node.js versions
-        var parseJsonES6 = require("./json_es6");
         var inputText = '{ "arr": [1,null,true], "obj": {"num":666}}';
         var lexAndParseResult = parseJsonES6(inputText);
 
