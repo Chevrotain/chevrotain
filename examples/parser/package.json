@@ -14,8 +14,7 @@
     "grunt-cli": "^1.2.0",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-mocha-istanbul": "^5.0.1",
-    "mocha": "^2.2.5",
-    "semver": "^5.3.0"
+    "mocha": "^2.2.5"
   },
   "private": true
 }

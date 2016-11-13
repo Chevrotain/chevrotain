@@ -1,13 +1,8 @@
 var expect = require("chai").expect
-var semver = require("semver")
 var chevrotain = require("chevrotain")
 var NoViableAltException = chevrotain.exceptions.NoViableAltException
 
-var parseHello
-// hack to avoid requiring a file using ES6 syntax during Travis build using older version of node.js
-if (semver.gte(process.version, "4.0.0")) {
-    parseHello = require("./parametrized")
-}
+var parseHello = parseHello = require("./parametrized")
 
 var POSITIVE = "positive"
 var NEGATIVE = "negative"

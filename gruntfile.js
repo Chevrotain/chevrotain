@@ -1,5 +1,4 @@
 var _ = require('lodash')
-var semver = require("semver")
 var webpack = require("webpack")
 
 var PUBLIC_API_DTS_FILES = [
@@ -19,12 +18,7 @@ var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
 PUBLIC_API_TS_FILES.push("src/env.d.ts")
 
 var fourSpaces = "    "
-
-// Integration tests using older versions of node.js will
-// avoid running tests that require ES6 capabilities only available in node.js >= 4
-var examples_test_command = semver.gte(process.version, "4.0.0") ?
-    "mocha **/*spec.js" :
-    "mocha **/*spec.js -i -g ES6"
+var examples_test_command = "mocha **/*spec.js"
 
 var INSTALL_LINK = 'npm install && npm link chevrotain'
 var INSTALL_LINK_TEST = INSTALL_LINK + ' && ' + examples_test_command
