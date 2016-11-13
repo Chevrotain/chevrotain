@@ -1,24 +1,27 @@
 import * as utils from "../../utils/utils"
-import {forEach, reduce, map, reject} from "../../utils/utils"
+import {contains, every, flatten, forEach, groupBy, isEmpty, map, pick, reduce, reject, values} from "../../utils/utils"
 import {
+    IgnoredParserIssues,
+    IParserAmbiguousAlternativesDefinitionError,
     IParserDefinitionError,
     IParserDuplicatesDefinitionError,
-    ParserDefinitionErrorType,
     IParserEmptyAlternativeDefinitionError,
-    IParserAmbiguousAlternativesDefinitionError,
-    IgnoredParserIssues
+    ParserDefinitionErrorType
 } from "../parser_public"
 import {gast} from "./gast_public"
 import {getProductionDslName, isOptionalProd} from "./gast"
-import {tokenName, tokenLabel} from "../../scan/tokens_public"
+import {tokenLabel, tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
-import {containsPath, getLookaheadPathsForOr, Alternative} from "./lookahead"
+import {Alternative, containsPath, getLookaheadPathsForOr} from "./lookahead"
 import {VERSION} from "../../version"
-import {isEmpty} from "../../utils/utils"
-import {every} from "../../utils/utils"
+import {TokenConstructor} from "../../scan/lexer_public"
+import {NamedDSLMethodsCollectorVisitor} from "../cst/cst"
 
 
-export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
+export function validateGrammar(topLevels:gast.Rule[],
+                                maxLookahead:number,
+                                tokens:TokenConstructor[],
+                                ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
     let duplicateErrors:any = utils.map(topLevels, validateDuplicateProductions)
     let leftRecursionErrors:any = utils.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
 
@@ -33,7 +36,34 @@ export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, igno
             validateAmbiguousAlternationAlternatives(currTopRule, maxLookahead, ignoredIssues))
     }
 
-    return <any>utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors, ambiguousAltsErrors))
+    let ruleNames = map(topLevels, (currTopLevel) => currTopLevel.name)
+    let tokenNames = map(tokens, (currToken) => tokenName(currToken))
+    let termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(ruleNames, tokenNames)
+
+    let tokenNameErrors:any = utils.map(tokenNames, validateTokenName)
+    let nestedRulesNameErrors:any = validateNestedRulesNames(topLevels)
+    let nestedRulesDuplicateErrors:any = validateDuplicateNestedRules(topLevels)
+
+    return <any>utils.flatten(duplicateErrors.concat(tokenNameErrors,
+        nestedRulesNameErrors,
+        nestedRulesDuplicateErrors,
+        leftRecursionErrors,
+        emptyAltErrors,
+        ambiguousAltsErrors,
+        termsNamespaceConflictErrors))
+}
+
+function validateNestedRulesNames(topLevels:gast.Rule[]):IParserDefinitionError[] {
+    let result = []
+    forEach(topLevels, (curTopLevel) => {
+        let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
+        curTopLevel.accept(namedCollectorVisitor)
+        let nestedNamesPerRule = map(namedCollectorVisitor.result, (currItem) => currItem.name)
+        let currTopRuleName = curTopLevel.name
+        result.push(map(nestedNamesPerRule, (currNestedName) => validateNestedRuleName(currNestedName, currTopRuleName)))
+    })
+
+    return <any>flatten(result)
 }
 
 function validateDuplicateProductions(topLevelRule:gast.Rule):IParserDuplicatesDefinitionError[] {
@@ -142,18 +172,52 @@ export class OccurrenceValidationCollector extends gast.GAstVisitor {
     }
 }
 
-let ruleNamePattern = /^[a-zA-Z_]\w*$/
+export const validTermsPattern = /^[a-zA-Z_]\w*$/
+export const validNestedRuleName = new RegExp(validTermsPattern.source.replace("^", "^\\$"))
 
-export function validateRuleName(ruleName:string, className):IParserDefinitionError[] {
+export function validateRuleName(ruleName:string):IParserDefinitionError[] {
     let errors = []
     let errMsg
 
-    if (!ruleName.match(ruleNamePattern)) {
-        errMsg = `Invalid Grammar rule name: ->${ruleName}<- it must match the pattern: ->${ruleNamePattern.toString()}<-`
+    if (!ruleName.match(validTermsPattern)) {
+        errMsg = `Invalid Grammar rule name: ->${ruleName}<- it must match the pattern: ->${validTermsPattern.toString()}<-`
         errors.push({
             message:  errMsg,
             type:     ParserDefinitionErrorType.INVALID_RULE_NAME,
             ruleName: ruleName
+        })
+    }
+
+    return errors
+}
+
+export function validateNestedRuleName(nestedRuleName:string, containingRuleName:string):IParserDefinitionError[] {
+    let errors = []
+    let errMsg
+
+    if (!nestedRuleName.match(validNestedRuleName)) {
+        errMsg = `Invalid nested rule name: ->${nestedRuleName}<- inside rule: ->${containingRuleName}<-\n` +
+            `it must match the pattern: ->${validNestedRuleName.toString()}<-.\n` +
+            `Note that this means a nested rule name must start with the '$'(dollar) sign.`
+        errors.push({
+            message:  errMsg,
+            type:     ParserDefinitionErrorType.INVALID_NESTED_RULE_NAME,
+            ruleName: nestedRuleName
+        })
+    }
+
+    return errors
+}
+
+export function validateTokenName(tokenNAme:string):IParserDefinitionError[] {
+    let errors = []
+    let errMsg
+
+    if (!tokenNAme.match(validTermsPattern)) {
+        errMsg = `Invalid Grammar Token name: ->${tokenNAme}<- it must match the pattern: ->${validTermsPattern.toString()}<-`
+        errors.push({
+            message: errMsg,
+            type:    ParserDefinitionErrorType.INVALID_TOKEN_NAME
         })
     }
 
@@ -393,4 +457,56 @@ function checkAlternativesAmbiguities(alternatives:Alternative[]):IAmbiguityDesc
     }, [])
 
     return identicalAmbiguities
+}
+
+function checkTerminalAndNoneTerminalsNameSpace(ruleNames:string[], terminalNames:string[]):IParserDefinitionError[] {
+    let errors = []
+
+    forEach(ruleNames, (currRuleName) => {
+        if (contains(terminalNames, currRuleName)) {
+            let errMsg = `Namespace conflict found in grammar.\n` +
+                `The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${currRuleName}>.\n` +
+                `To resolve this make sure each Terminal and Non-Terminal names are unique\n` +
+                `This is easy to accomplish by using the convention that Terminal names start with an uppercase letter\n` +
+                `and Non-Terminal names start with a lower case letter.`
+
+            errors.push({
+                message:  errMsg,
+                type:     ParserDefinitionErrorType.CONFLICT_TOKENS_RULES_NAMESPACE,
+                ruleName: currRuleName
+            })
+        }
+    })
+
+    return errors
+}
+
+function validateDuplicateNestedRules(topLevelRules:gast.Rule[]):IParserDefinitionError[] {
+
+    let errors = []
+
+    forEach(topLevelRules, (currTopRule) => {
+        let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
+        currTopRule.accept(namedCollectorVisitor)
+        let nestedNames = map(namedCollectorVisitor.result, (currItem) => currItem.name)
+        let namesGroups = groupBy(nestedNames, (item) => item)
+
+        let duplicates:any = pick(namesGroups, (currGroup) => {
+            return currGroup.length > 1
+        })
+
+        forEach(values(duplicates), (currDuplicates:any) => {
+            let duplicateName = utils.first(currDuplicates)
+            let errMsg = `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${currTopRule.name}<-\n` +
+                `A nested name must be unique in the scope of a top level grammar rule.`
+            errors.push({
+                    message:  errMsg,
+                    type:     ParserDefinitionErrorType.DUPLICATE_NESTED_NAME,
+                    ruleName: currTopRule.name
+                }
+            )
+        })
+    })
+
+    return errors
 }

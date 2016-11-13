@@ -83,7 +83,7 @@ function JsonParserES5(input) {
             {ALT: function() { $.CONSUME(True) }},
             {ALT: function() { $.CONSUME(False) }},
             {ALT: function() { $.CONSUME(Null) }}
-        ], "a value");
+        ]);
     });
 
     // very important to call this after all the rules have been defined.

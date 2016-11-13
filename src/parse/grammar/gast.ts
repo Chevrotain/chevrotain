@@ -1,5 +1,5 @@
 import {gast} from "./gast_public"
-import {some, every, contains, map} from "../../utils/utils"
+import {contains, every, map, some} from "../../utils/utils"
 
 
 export function isSequenceProd(prod:gast.IProduction):boolean {
@@ -89,37 +89,37 @@ class GastCloneVisitor extends gast.GAstVisitor {
 
     public visitFlat(node:gast.Flat):gast.Flat {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Flat(definition)
+        return new gast.Flat(definition, node.name)
     }
 
     public visitOption(node:gast.Option):gast.Option {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Option(definition, node.occurrenceInParent)
+        return new gast.Option(definition, node.occurrenceInParent, node.name)
     }
 
     public visitRepetition(node:gast.Repetition):gast.Repetition {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Repetition(definition, node.occurrenceInParent)
+        return new gast.Repetition(definition, node.occurrenceInParent, node.name)
     }
 
     public visitRepetitionMandatory(node:gast.RepetitionMandatory):gast.RepetitionMandatory {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.RepetitionMandatory(definition, node.occurrenceInParent)
+        return new gast.RepetitionMandatory(definition, node.occurrenceInParent, node.name)
     }
 
     public visitRepetitionMandatoryWithSeparator(node:gast.RepetitionMandatoryWithSeparator):gast.RepetitionMandatoryWithSeparator {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.RepetitionMandatoryWithSeparator(definition, node.separator, node.occurrenceInParent)
+        return new gast.RepetitionMandatoryWithSeparator(definition, node.separator, node.occurrenceInParent, node.name)
     }
 
     public visitRepetitionWithSeparator(node:gast.RepetitionWithSeparator):gast.RepetitionWithSeparator {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.RepetitionWithSeparator(definition, node.separator, node.occurrenceInParent)
+        return new gast.RepetitionWithSeparator(definition, node.separator, node.occurrenceInParent, node.name)
     }
 
     public visitAlternation(node:gast.Alternation):gast.Alternation {
         let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Alternation(definition, node.occurrenceInParent)
+        return new gast.Alternation(definition, node.occurrenceInParent, node.name)
     }
 
     public visitTerminal(node:gast.Terminal):gast.Terminal {

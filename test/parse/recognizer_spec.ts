@@ -85,11 +85,12 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     }
 
                     public topRule = this.RULE("topRule", () => {
-                        this.SUBRULE(this.subRule, [5, "a"])
-                        this.SUBRULE2(this.subRule, [4, "b"])
-                        this.SUBRULE3(this.subRule, [3, "c"])
-                        this.SUBRULE4(this.subRule, [2, "d"])
-                        this.SUBRULE5(this.subRule, [1, "e"])
+                        this.SUBRULE(this.subRule, [6, "a"])
+                        this.SUBRULE1(this.subRule2, [5, "b"])
+                        this.SUBRULE2(this.subRule, [4, "c"])
+                        this.SUBRULE3(this.subRule, [3, "d"])
+                        this.SUBRULE4(this.subRule, [2, "e"])
+                        this.SUBRULE5(this.subRule, [1, "f"])
                         return {numbers: this.numbers, letters: this.letters}
                     })
 
@@ -98,13 +99,20 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                         this.numbers += numFromCaller
                         this.letters += charFromCaller
                     })
+
+                    public subRule2 = this.RULE("subRule2", (numFromCaller, charFromCaller) => {
+                        this.CONSUME(PlusTok)
+                        this.numbers += numFromCaller
+                        this.letters += charFromCaller
+                    })
                 }
 
-                let input = [createToken(PlusTok), createToken(PlusTok), createToken(PlusTok), createToken(PlusTok), createToken(PlusTok)]
+                let input = [createToken(PlusTok), createToken(PlusTok), createToken(PlusTok),
+                    createToken(PlusTok), createToken(PlusTok), createToken(PlusTok)]
                 let parser = new SubRuleArgsParser(input)
                 let result = parser.topRule()
-                expect(result.letters).to.equal("abcde")
-                expect(result.numbers).to.equal("54321")
+                expect(result.letters).to.equal("abcdef")
+                expect(result.numbers).to.equal("654321")
             })
 
             describe("supports EMPTY(...) alternative convenience function", () => {
@@ -859,6 +867,34 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(parser.errors[0].message).to.not.include("PlusTok")
             })
 
+            it("Will use Token LABELS for noViableAlt error messages when unavailable - nestedRuleNames", () => {
+
+                class LabelAltParserNested extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, [PlusTok, MinusTok], {outputCst: true});
+                        (Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public rule = this.RULE("rule", () => {
+                        this.OR({
+                            NAME: "$bamba",
+                            DEF:  [
+                                {ALT: () => {this.CONSUME1(PlusTok)}},
+                                {ALT: () => {this.CONSUME1(MinusTok)}},
+                            ]
+                        })
+                    })
+                }
+
+                let parser = new LabelAltParserNested([])
+                parser.rule()
+                expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
+                expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
+                expect(parser.errors[0].message).to.include("MinusTok")
+                expect(parser.errors[0].message).to.include("+")
+                expect(parser.errors[0].message).to.not.include("PlusTok")
+            })
 
             it("Supports custom error messages for OR", () => {
 
@@ -899,7 +935,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     public rule = this.RULE("rule", () => {
                         this.OPTION({
                             DEF: () => {
-                                this.SUBRULE2(this.rule2)
+                                this.SUBRULE1(this.rule2)
                             }
                         })
                     })
@@ -920,7 +956,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
                 expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule", "rule2", "rule3"])
-                expect(parser.errors[0].context.ruleOccurrenceStack).to.deep.equal([1, 2, 5])
+                expect(parser.errors[0].context.ruleOccurrenceStack).to.deep.equal([1, 1, 5])
             })
 
             it("Will build an error message for AT_LEAST_ONE automatically", () => {

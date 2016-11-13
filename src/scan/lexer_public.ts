@@ -43,6 +43,7 @@ export interface TokenConstructor extends Function {
     POP_MODE?:boolean
     PUSH_MODE?:string
 
+    tokenName?:string
     tokenType?:number
     extendingTokenTypes?:number[]
 
