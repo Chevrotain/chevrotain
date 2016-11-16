@@ -65,7 +65,7 @@
     "grunt-run": "^0.6.0",
     "grunt-text-replace": "^0.4.0",
     "grunt-ts": "~6.0.0-beta.3",
-    "grunt-tslint": "~3.2.1",
+    "grunt-tslint": "~3.3.0",
     "grunt-typedoc": "^0.2.4",
     "grunt-webpack": "^1.0.14",
     "istanbul": "^0.4.5",
