@@ -14,8 +14,9 @@ var PUBLIC_API_DTS_FILES = [
 var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
     return binDefFile.replace("lib/", "").replace(".d", "")
 })
+
 // so typedoc can compile "module.exports" in cache_public
-PUBLIC_API_TS_FILES.push("src/env.d.ts")
+PUBLIC_API_TS_FILES.push("./node_modules/@types/node/index.d.ts")
 
 var fourSpaces = "    "
 var examples_test_command = "mocha **/*spec.js"
