@@ -31,9 +31,10 @@ addons:
     packages:
       - g++-4.8
 before_install:
-  - travis_retry npm install -g grunt-cli
+  - npm install -g yarn
+  - npm install -g grunt-cli
 install:
-  - travis_retry npm install
+  - yarn
 before_script:
   - grunt build
 script:
