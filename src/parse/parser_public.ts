@@ -391,7 +391,7 @@ export class Parser {
     protected maxLookahead:number
     protected ignoredIssues:IgnoredParserIssues
 
-    protected _input:Token[] = []
+    protected _input:ISimpleTokenOrIToken[] = []
     protected inputIdx = -1
     protected savedTokenIdx = -1
     protected isBackTrackingStack = []
@@ -417,7 +417,7 @@ export class Parser {
      */
     private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
-    constructor(input:Token[], tokensMapOrArr:{ [fqn:string]:TokenConstructor; } | TokenConstructor[],
+    constructor(input:ISimpleTokenOrIToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor; } | TokenConstructor[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
 
@@ -506,12 +506,12 @@ export class Parser {
         this._errors = newErrors
     }
 
-    public set input(newInput:Token[]) {
+    public set input(newInput:ISimpleTokenOrIToken[]) {
         this.reset()
         this._input = newInput
     }
 
-    public get input():Token[] {
+    public get input():ISimpleTokenOrIToken[] {
         return cloneArr(this._input)
     }
 
@@ -978,7 +978,7 @@ export class Parser {
      * Convenience method equivalent to MANY_SEP1.
      * @see MANY_SEP1
      */
-    protected MANY_SEP(separator:TokenConstructor, action:GrammarAction):Token[] {
+    protected MANY_SEP(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
         return this.MANY_SEP1.call(this, separator, action)
     }
 
@@ -1006,35 +1006,35 @@ export class Parser {
      *
      * @return {Token[]} - The consumed separator Tokens.
      */
-    protected MANY_SEP1(separator:TokenConstructor, action:GrammarAction):Token[] {
+    protected MANY_SEP1(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
         return this.manySepFirstInternal(this.MANY_SEP1, 1, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP2(separator:TokenConstructor, action:GrammarAction):Token[] {
+    protected MANY_SEP2(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
         return this.manySepFirstInternal(this.MANY_SEP2, 2, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP3(separator:TokenConstructor, action:GrammarAction):Token[] {
+    protected MANY_SEP3(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
         return this.manySepFirstInternal(this.MANY_SEP3, 3, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP4(separator:TokenConstructor, action:GrammarAction):Token[] {
+    protected MANY_SEP4(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
         return this.manySepFirstInternal(this.MANY_SEP4, 4, separator, action)
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP5(separator:TokenConstructor, action:GrammarAction):Token[] {
+    protected MANY_SEP5(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
         return this.manySepFirstInternal(this.MANY_SEP5, 5, separator, action)
     }
 
@@ -1108,7 +1108,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
                                action:GrammarAction | string,
-                               errMsg?:string):Token[] {
+                               errMsg?:string):ISimpleTokenOrIToken[] {
         return this.AT_LEAST_ONE_SEP1.call(this, separator, action, errMsg)
     }
 
@@ -1126,7 +1126,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
                                 action:GrammarAction | string,
-                                errMsg?:string):Token[] {
+                                errMsg?:string):ISimpleTokenOrIToken[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 1, separator, action, errMsg)
     }
 
@@ -1135,7 +1135,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
                                 action:GrammarAction | string,
-                                errMsg?:string):Token[] {
+                                errMsg?:string):ISimpleTokenOrIToken[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 2, separator, action, errMsg)
     }
 
@@ -1144,7 +1144,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
                                 action:GrammarAction | string,
-                                errMsg?:string):Token[] {
+                                errMsg?:string):ISimpleTokenOrIToken[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 3, separator, action, errMsg)
     }
 
@@ -1153,7 +1153,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
                                 action:GrammarAction | string,
-                                errMsg?:string):Token[] {
+                                errMsg?:string):ISimpleTokenOrIToken[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 4, separator, action, errMsg)
     }
 
@@ -1162,7 +1162,7 @@ export class Parser {
      */
     protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
                                 action:GrammarAction | string,
-                                errMsg?:string):Token[] {
+                                errMsg?:string):ISimpleTokenOrIToken[] {
         return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 5, separator, action, errMsg)
     }
 
@@ -1255,7 +1255,7 @@ export class Parser {
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
-    protected getTokenToInsert(tokClass:TokenConstructor):Token {
+    protected getTokenToInsert(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         let tokToInsert
 
         if (LazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
@@ -1759,7 +1759,7 @@ export class Parser {
         return resyncTokens
     }
 
-    private reSyncTo(tokClass:TokenConstructor):Token[] {
+    private reSyncTo(tokClass:TokenConstructor):ISimpleTokenOrIToken[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
         while ((this.tokenMatcher(nextTok, tokClass)) === false) {
@@ -1868,7 +1868,7 @@ export class Parser {
                                        prodOccurrence:number,
                                        separator:TokenConstructor,
                                        action:GrammarAction | string,
-                                       userDefinedErrMsg?:string):Token[] {
+                                       userDefinedErrMsg?:string):ISimpleTokenOrIToken[] {
 
         let separatorsResult = []
         let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
@@ -1936,7 +1936,7 @@ export class Parser {
     private manySepFirstInternal(prodFunc:Function,
                                  prodOccurrence:number,
                                  separator:TokenConstructor,
-                                 action:GrammarAction):Token[] {
+                                 action:GrammarAction):ISimpleTokenOrIToken[] {
 
         let separatorsResult = []
 
