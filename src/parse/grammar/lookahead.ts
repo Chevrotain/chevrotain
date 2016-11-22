@@ -307,7 +307,7 @@ export function buildSingleAlternativeLookaheadFunction(alt:lookAheadSequence,
             }, {})
             return function ():boolean {
                 let nextToken = this.LA(1)
-                return choiceToAlt[tokenInstanceIdentityFunc(nextToken)] === true ? true : false
+                return choiceToAlt[tokenInstanceIdentityFunc(nextToken)] === true
             }
         }
     }
