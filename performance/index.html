@@ -97,6 +97,15 @@
                    href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/nearley_json_parser_tokenizer.js">hand
                     built lexer</a>
             </p></li>
+
+            <li><p>
+                <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library
+                <a rel="nofollow"\
+                  href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_grammar.js">grammar</a>
+                <a rel="nofollow"
+                  href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_parser.js">parser</a>
+            </p></li>`
+
         </ol>
         <p>The JSON Grammar was used because it is simple to implement, simple to compare and is often already
             available as a sample grammar for most Parsing Tools</p>
@@ -122,41 +131,66 @@
         <span id="wait" style="margin-left: auto;margin-right: auto;"></span>
 
         <table id="resultsTable">
+          <thead>
             <tr class="tableHeaderRow">
                 <th>Parser Library</th>
                 <th>Ops/sec</th>
                 <th>Relative Speed</th>
+                <th>Include?</th>
             </tr>
-            <tr>
+          </thead>
+
+          <tbody>
+            <tr id="rowChevrotain">
                 <td class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a></td>
-                <td></td>
-                <td></td>
+                <td id="rateChevrotain"></td>
+                <td id="speedChevrotain"></td>
+                <td><input id="includeChevrotain" type="checkbox" checked=checked/></td>
             </tr>
-            <tr>
-                <td class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
+
+            <tr id="rowParsimmon">
                 <td class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a></td>
-                <td></td>
-                <td></td>
+                <td id="rateParsimmon"></td>
+                <td id="speedParsimmon"></td>
+                <td><input id="includeParsimmon" type="checkbox" checked=checked /></td>
             </tr>
-            <tr>
+
+            <tr id="rowAntlr">
+                <td class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></td>
+                <td id="rateAntlr"></td>
+                <td id="speedAntlr"></td>
+                <td><input id="includeAntlr" type="checkbox" checked=checked /></td>
+            </tr>
+
+            <tr id="rowPeg">
+                <td class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></td>
+                <td id="ratePeg"></td>
+                <td id="speedPeg"></td>
+                <td><input id="includePeg" type="checkbox" checked=checked /></td>
+            </tr>
+
+            <tr id="rowJison">
+                <td class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></td>
+                <td id="rateJison"></td>
+                <td id="speedJison"></td>
+                <td><input id="includeJison" type="checkbox" checked=checked /></td>
+            </tr>
+
+            <tr id="rowNearley">
                 <td class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></td>
-                <td></td>
-                <td></td>
+                <td id="rateNearley"></td>
+                <td id="speedNearley"></td>
+                <td><input id="includeNearley" type="checkbox" checked=checked /></td>
             </tr>
+
+            <tr id="rowOhm">
+                <td class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></td>
+                <td id="rateOhm"></td>
+                <td id="speedOhm"></td>
+                <td><input id="includeOhm" type="checkbox" /></td>
+            </tr>
+
+          </tbody>
         </table>
         <canvas id="parsersResultChart"></canvas>
     </section>
@@ -171,25 +205,6 @@
         })(navigator.userAgent || navigator.vendor || window.opera);
         return check;
     };
-
-    if (!mobileAndTabletcheck()) {
-        var table = document.getElementById("resultsTable");
-        table.innerHTML += '<tr> \
-                    <td class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></td>\
-                    <td></td>\
-                    <td></td>\
-                    </tr>'
-
-
-        var toolsList = document.getElementById("toolsList");
-        toolsList.innerHTML += `<li><p>\
-                    <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library\
-            <a rel="nofollow"\
-            href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_grammar.js">grammar</a>\
-                    <a rel="nofollow"\
-            href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_parser.js">parser</a>\
-                    </p></li>`
-    }
 
     var orgData = {
         labels: [],
