@@ -40,6 +40,9 @@
 <script src="jsonParsers/nearley/nearley_json_parser_tokenizer.js"></script>
 <script src="jsonParsers/nearley/api.js"></script>
 
+<script src="lib/jsonify/jsonify.js"></script>
+<script src="jsonParsers/jsonify/jsonify_json_parser.js"></script>
+
 <script src="jsonParsers/browser/browser_json_parser.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
@@ -122,6 +125,11 @@
                    href="jsonParsers/browser/browser_json_parser.js">implementation</a>]
             </p></li>
 
+            <li><p>
+                <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser for comparison
+                [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
+            </p></li>
+
           </ol>
 
         </div>
@@ -172,6 +180,13 @@
                 <td id="rateChevrotain"></td>
                 <td id="speedChevrotain"></td>
                 <td><input id="includeChevrotain" type="checkbox" checked=checked/></td>
+            </tr>
+
+            <tr id="rowJsonify" class="json-only hide">
+                <td class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a></td>
+                <td id="rateJsonify"></td>
+                <td id="speedJsonify"></td>
+                <td><input id="includeJsonify" type="checkbox" /></td>
             </tr>
 
             <tr id="rowParsimmon">
@@ -316,6 +331,8 @@
         addTest(suite, 'Browser', parse_json_browser);
 
         addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer);
+
+        addTest(suite, 'Jsonify', parse_json_jsonify);
 
         addTest(suite, 'Parsimmon', parse_json_parsimmon);
 
