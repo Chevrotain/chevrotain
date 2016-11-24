@@ -345,6 +345,15 @@
         }).run({'async': true});
     }
 
+    $(document).ready(function() {
+      var loc = window.location || location
+        , query = loc.search || ''
+        , showJsons = (query.indexOf('jsons=true') > -1);
+
+      if (showJsons) $('.json-only').toggleClass('hide');
+
+    });
+
 
 </script>
 </body>
