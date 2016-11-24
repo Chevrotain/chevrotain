@@ -301,40 +301,33 @@
 
         addTest(suite, 'Ohm', parse_json_with_ohm);
 
-
         suite.on('cycle', function (event) {
+            var suite = event.target
+              , rate = suite.hz.toFixed(2)
+              , cell = document.getElementById('rate' + suite.name);
 
-            var table = document.getElementById("resultsTable");
-            data.labels.push(event.target.name);
-            data.datasets[0].data.push(event.target.hz.toFixed(2));
+            cell.innerHTML = '<large><b>' + rate + '<br>' + '</b></large>' +
+                    '<medium>&plusmn;' + suite.stats.rme.toFixed(2) + '%</medium>';
 
-            var rowName = event.target.name;
-            var rowNum = _.findIndex(table.rows, function (currRow) {
-                // the text domNode
-                return currRow.childNodes[1].innerHTML.indexOf(rowName) !== -1
-            })
-            var row = table.rows[rowNum];
-            var cell2 = row.cells[1];
-            cell2.innerHTML = '<large><b>' + event.target.hz.toFixed(2) + '<br>' + '</b></large>' +
-                    '<medium>&plusmn;' + event.target.stats.rme.toFixed(2) + '%</medium>';
+            data.labels.push(suite.name);
+            data.datasets[0].data.push(rate);
 
         }).on('complete', function (yyy) {
 
-            var table = document.getElementById("resultsTable");
+            var suites = this.filter('successful')
+              , fastestSuite = this.filter('fastest')[0];
 
-            var fastestSuite = this.filter('fastest')[0]
-            var succesfull = this.filter('successful')
+            suites.splice(suites.indexOf(fastestSuite), 1);
 
-            _.forEach(succesfull, function (currSuite, idx) {
-                var currRelativeCell = table.rows[idx + 1].cells[2]
+            var cell = document.getElementById('speed' + fastestSuite.name);
+            cell.innerHTML = "<b>100% <br> <small>(fastest)</b></small>";
+            $('#row' + fastestSuite.name).addClass("fastestRow");
 
-                if (currSuite === fastestSuite) {
-                    currRelativeCell.innerHTML = "<b>100% <br> <small>(fastest)</b></small>"
-                    $(table.rows[idx + 1]).toggleClass("fastestRow")
-                } else {
-                    currRelativeCell.innerHTML = '<large>' + ((currSuite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2) + "%</large>"
-                }
-            })
+            _.forEach(suites, function (suite) {
+              var cell = document.getElementById('speed' + suite.name)
+                , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2);
+              cell.innerHTML = '<large>' + speed + "%</large>"
+            });
 
             window.clearInterval(dots);
             document.getElementById("wait").innerHTML = "";
