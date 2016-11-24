@@ -247,6 +247,16 @@
         clearData();
     }
 
+    function addTest(suite, id, action, direct) {
+      var el = document.getElementById('include' + id);
+      if (el && el.checked) {
+        if (direct)
+          suite.add(id, action);
+        else
+          suite.add(id, function() { action(json_sample1k); });
+      }
+    }
+
     function onRunAll() {
         clearResults();
         $("#runAllButton").prop('disabled', true);
