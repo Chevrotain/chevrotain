@@ -286,31 +286,23 @@
 
         var i = 0
         var suite = new Benchmark.Suite;
-        var fullSuite = suite.add('Chevrotain', function () {
-            chevrotainParseWithChevrotainLexer(json_sample1k)
-        }).add('Jison', function () {
-            jisonJsonLexerAndParser.parse(json_sample1k)
-        }).add('ANTLR4', function () {
-            antlr4LexerAndParser(json_sample1k)
-        }).add('pegjs', function () {
-            pegjsJsonLexerAndParser.parse(json_sample1k)
-        }).add('parsimmon', function () {
-            parse_json_parsimmon(json_sample1k)
-        }).add('nearley', function () {
-            parse_json_with_nearley(json_sample1k)
-        })
+
+        addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer);
+
+        addTest(suite, 'Parsimmon', parse_json_parsimmon);
+
+        addTest(suite, 'Antlr', antlr4LexerAndParser);
+
+        addTest(suite, 'Peg', pegjsJsonLexerAndParser.parse.bind(pegjsJsonLexerAndParser));
+
+        addTest(suite, 'Jison', jisonJsonLexerAndParser.parse.bind(jisonJsonLexerAndParser));
+
+        addTest(suite, 'Nearley', parse_json_with_nearley);
+
+        addTest(suite, 'Ohm', parse_json_with_ohm);
 
 
-        // Ohm is just too slow to be benchmarked on mobile...
-        if (!mobileAndTabletcheck()) {
-            fullSuite.add('Ohm', function () {
-                parse_json_with_ohm(json_sample1k)
-            })
-
-            var table = document.getElementById("resultsTable");
-        }
-
-        fullSuite.on('cycle', function (event) {
+        suite.on('cycle', function (event) {
 
             var table = document.getElementById("resultsTable");
             data.labels.push(event.target.name);
