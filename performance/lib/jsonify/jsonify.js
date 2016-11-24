@@ -1,5 +1,7 @@
-// copied from:
-//  https://github.com/substack/jsonify/blob/master/lib/parse.js
+// copied and wrapped by a self executing function from:
+//https://github.com/substack/jsonify/blob/7064ab53e5f73fa31e2ce7aa47d210c539662f16/lib/parse.js
+// The License is Global Domain
+//https://github.com/substack/jsonify/blob/7064ab53e5f73fa31e2ce7aa47d210c539662f16/readme.markdown#license
 
 (function (exports) {
 
