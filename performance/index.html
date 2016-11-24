@@ -40,6 +40,8 @@
 <script src="jsonParsers/nearley/nearley_json_parser_tokenizer.js"></script>
 <script src="jsonParsers/nearley/api.js"></script>
 
+<script src="jsonParsers/browser/browser_json_parser.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
 
@@ -107,6 +109,23 @@
             </p></li>
 
         </ol>
+
+        <div class="json-only hide">
+
+          <p>These <em>only</em> parse JSON and are included for speed comparison.</p>
+
+          <ol>
+
+            <li><p>
+                The browser's JSON.parse() for comparison.
+                [<a rel="nofollow"
+                   href="jsonParsers/browser/browser_json_parser.js">implementation</a>]
+            </p></li>
+
+          </ol>
+
+        </div>
+
         <p>The JSON Grammar was used because it is simple to implement, simple to compare and is often already
             available as a sample grammar for most Parsing Tools</p>
 
@@ -141,6 +160,13 @@
           </thead>
 
           <tbody>
+            <tr id="rowBrowser" class="json-only hide">
+                <td class="benchName">Browser</td>
+                <td id="rateBrowser"></td>
+                <td id="speedBrowser"></td>
+                <td><input id="includeBrowser" type="checkbox" /></td>
+            </tr>
+
             <tr id="rowChevrotain">
                 <td class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a></td>
                 <td id="rateChevrotain"></td>
@@ -286,6 +312,8 @@
 
         var i = 0
         var suite = new Benchmark.Suite;
+
+        addTest(suite, 'Browser', parse_json_browser);
 
         addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer);
 
