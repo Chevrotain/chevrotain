@@ -45,6 +45,9 @@
 
 <script src="jsonParsers/browser/browser_json_parser.js"></script>
 
+<script src="https://unpkg.com/oboe@2.1.2/dist/oboe-browser.min.js"></script>
+<script src="jsonParsers/oboe/oboe_json_parser.js"></script>
+
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
 
@@ -126,6 +129,11 @@
             </p></li>
 
             <li><p>
+                <a rel="nofollow" href="https://github.com/jimhigson/oboe.js">Oboe</a> JSON Parser for comparison
+                [<a rel="nofollow" href="jsonParsers/oboe/oboe_json_parser.js">implementation</a>]
+            </p></li>
+
+            <li><p>
                 <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser for comparison
                 [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
             </p></li>
@@ -187,6 +195,13 @@
                 <td id="rateJsonify"></td>
                 <td id="speedJsonify"></td>
                 <td><input id="includeJsonify" type="checkbox" /></td>
+            </tr>
+
+            <tr id="rowOboe" class="json-only hide">
+                <td class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></td>
+                <td id="rateOboe"></td>
+                <td id="speedOboe"></td>
+                <td><input id="includeOboe" type="checkbox" /></td>
             </tr>
 
             <tr id="rowParsimmon">
@@ -333,6 +348,14 @@
         addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer);
 
         addTest(suite, 'Jsonify', parse_json_jsonify);
+
+        addTest(suite, 'Oboe', {
+          defer: true,
+          onCycle: function() { newOboe(); },
+          fn: function (deferred) {
+            parse_json_oboe(json_sample1k, deferred)
+          }
+        }, true);
 
         addTest(suite, 'Parsimmon', parse_json_parsimmon);
 
