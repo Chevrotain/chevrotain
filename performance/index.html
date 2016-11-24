@@ -278,6 +278,12 @@
         // this sets a upper bound on the benchmark runtime (at the cost of accuracy for the slower parsers)
         Benchmark.options.maxTime = 2
 
+        // Use these to force the number of runs. Useful when adding a new parser.
+        // Benchmark.options.initCount = 1
+        // Benchmark.options.minSamples = 1
+        // Benchmark.options.minTime = -1
+        // Benchmark.options.maxTime = -1
+
         var i = 0
         var suite = new Benchmark.Suite;
         var fullSuite = suite.add('Chevrotain', function () {
