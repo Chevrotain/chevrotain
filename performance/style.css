@@ -126,7 +126,7 @@ div.benchInclude {
 }
 
 .dataRow .benchRate {
-  padding-top:0;
+  padding-top:10px;
 }
 
 .benchRate, .benchSpeed, .benchInclude {
