@@ -48,7 +48,7 @@
 #resultsContainer {
   width:800px;
   margin:0;
-  margin-bottom:500px;
+  margin-bottom:700px;
 }
 
 #dataRows {
@@ -61,7 +61,7 @@
   width:100%;
 }
 
-.headerRow div, .dataRow div {
+.headerRow div, .dataRow > div {
   margin:0;
   margin-left:-2px;
   margin-right:-2px;
@@ -86,21 +86,22 @@
   padding-top:15px;
 }
 
-.headerRow .benchRate,.headerRow .benchDelta, .headerRow .benchSpeed,.headerRow .benchInclude {
+.headerRow .benchRate, .headerRow .benchSpeed,.headerRow .benchInclude {
   text-align:center;
 }
 
 .dataRow {
-  height:50px;
+  height:70px;
   background-color:white;
   position: absolute;
   top:0;
   transition: all 1s ease-in-out;
 }
 
-.dataRow div {
+.dataRow > div {
   font-size: 1.25em;
-  padding-top:10px;
+  padding-top:20px;
+  overflow: hidden;
 }
 
 .benchName, .benchRate, .benchSpeed, .benchInclude {
@@ -113,21 +114,32 @@ div.benchName {
   border-left: 1px solid black;
 }
 
-.benchRate, .benchDelta {
+.benchRate {
   width:125px;
 }
+
 .benchSpeed {
   width: 175px;
 }
 div.benchInclude {
   width: 50px;
-  border-left:1px solid black;
 }
 
-.benchRate, .benchDelta, .benchSpeed, .benchInclude {
+.dataRow .benchRate {
+  padding-top:0;
+}
+
+.benchRate, .benchSpeed, .benchInclude {
   text-align:center;
 }
 
+.benchRate .value {
+  font-weight:bold;
+}
+
+.benchRate .delta {
+  font-size: .75em;
+}
 
 /* for animating the table sort change. adapted from:
    http://blog.stevensanderson.com/2013/03/15/animating-lists-with-css-3-transitions/
