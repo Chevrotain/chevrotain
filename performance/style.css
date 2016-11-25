@@ -109,7 +109,6 @@
 
 div.benchName {
   width: 175px;
-  text-align:right;
   padding-right: 10px;
   border-left: 1px solid black;
 }
@@ -129,7 +128,7 @@ div.benchInclude {
   padding-top:10px;
 }
 
-.benchRate, .benchSpeed, .benchInclude {
+.benchRate, .benchSpeed, .benchInclude, .benchName {
   text-align:center;
 }
 
