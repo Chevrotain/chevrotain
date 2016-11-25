@@ -109,8 +109,7 @@
             </p></li>
 
             <li><p>
-                <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library (Not Included by
-                default)
+                <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library
                 <a rel="nofollow"
                    href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_grammar.js">grammar</a>
                 <a rel="nofollow"
@@ -144,7 +143,7 @@
 
             </ol>
 
-      </div>
+        </div>
 
         <p>
             The JSON Grammar was used because it is simple to implement, simple to compare and is often already <br>
@@ -170,125 +169,159 @@
         </p>
 
         <p>
-            Note that the Ohm Parser Generator is <b>not</b> included by default as it can be very slow on slower
-            machines.
+            Note that the Ohm Parser Library is <b>not</b> included by default as it can be very slow causing the <br>
+            whole benchmark to hang.
         </p>
 
-    <section style="text-align:left;">
+        <section style="text-align:left;">
 
-        <button onclick="onRunAll()" id="runAllButton">Run</button>
+            <button onclick="onRunAll()" id="runAllButton">Run</button>
 
-        <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
+            <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
 
-        <div id="resultsContainer">
+            <div id="resultsContainer">
 
-          <div class="headerRow">
+                <div class="headerRow">
 
-            <div class="benchName">Parser Library</div>
-            <div class="benchRate">Ops/sec</div>
-            <div class="benchSpeed">Relative Speed</div>
-            <div class="benchInclude">?</div>
+                    <div class="benchName">Parser Library</div>
+                    <div class="benchRate">Ops/sec</div>
+                    <div class="benchSpeed">Relative Speed</div>
+                    <div class="benchInclude">?</div>
 
-          </div>
+                </div>
 
-          <div id="dataRows">
+                <div id="dataRows">
 
-            <div class="dataRow Chevrotain">
+                    <div class="dataRow Chevrotain">
 
-              <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Parsimmon">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Antlr">
+
+                        <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Peg">
+
+                        <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Jison">
+
+                        <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Nearley">
+
+                        <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Ohm">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox"/></div>
+
+                    </div>
+
+                    <div class="dataRow Browser json-only hide">
+
+                        <div class="benchName">Browser</div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox"/></div>
+
+                    </div>
+
+                    <div class="dataRow Jsonify json-only hide">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox"/></div>
+
+                    </div>
+
+                    <div class="dataRow Oboe json-only hide">
+
+                        <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox"/></div>
+
+                    </div>
+
+                </div>
 
             </div>
 
-            <div class="dataRow Parsimmon">
+            <canvas id="parsersResultChart"></canvas>
 
-              <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-            </div>
-
-            <div class="dataRow Antlr">
-
-              <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-            </div>
-
-            <div class="dataRow Peg">
-
-              <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-            </div>
-
-            <div class="dataRow Jison">
-
-              <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-            </div>
-
-            <div class="dataRow Nearley">
-
-              <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-            </div>
-
-            <div class="dataRow Ohm">
-
-              <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox"/></div>
-
-            </div>
-
-            <div class="dataRow Browser json-only hide">
-
-              <div class="benchName">Browser</div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox"/></div>
-
-            </div>
-
-            <div class="dataRow Jsonify json-only hide">
-
-              <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox"/></div>
-
-            </div>
-
-            <div class="dataRow Oboe json-only hide">
-
-              <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
-              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
-              <div class="benchSpeed">&nbsp;</div>
-              <div class="benchInclude"><input type="checkbox"/></div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <canvas id="parsersResultChart"></canvas>
-
+        </section>
     </section>
 </div>
 <script>
@@ -309,13 +342,13 @@
 
     var data = _.cloneDeep(orgData)
 
-    var ctx = document.getElementById("parsersResultChart").getContext("2d");
+    var ctx = document.getElementById("parsersResultChart").getContext("2d")
     var myBarChart
 
     function clearData() {
-        data = _.cloneDeep(orgData);
+        data = _.cloneDeep(orgData)
         if (myBarChart) {
-            myBarChart.destroy();
+            myBarChart.destroy()
         }
     }
     function clearTable() {
@@ -327,66 +360,68 @@
     }
 
     function clearGraph() {
-        $("#parsersResultChart").css("visibility", "hidden");
+        $("#parsersResultChart").css("visibility", "hidden")
     }
 
     function clearResults() {
-        clearTable();
-        clearGraph();
-        clearData();
+        clearTable()
+        clearGraph()
+        clearData()
     }
 
     var actionCount = 0
     function addTest(suite, id, action, direct) {
-        var $el = $('.' + id + ' input');
+        var $el = $('.' + id + ' input')
         if ($el && $el.is(':checked')) {
             if (direct) {
-                suite.add(id, action);
+                suite.add(id, action)
             }
             else {
-                suite.add(id, function () { action(json_sample1k); });
+                suite.add(id, function () {
+                    action(json_sample1k)
+                })
             }
 
             // add animator aid. creates a delay while animation occurs.
             var animated = false
-                , id = 'delayor' + actionCount++
+            var id = 'delayor' + actionCount++
 
             suite.add(id, {
-                defer     : true,
-                initCount : 1,
+                defer: true,
+                initCount: 1,
                 minSamples: 1,
-                minTime   : -1,
-                maxTime   : -1,
+                minTime: -1,
+                maxTime: -1,
                 fn: function (deferred) {
-                  if (!animated) {
-                    animated = true
-                    window.sortResults()
-                    setTimeout(function () {
-                      deferred.resolve()
-                    }, 1050);
-                  }
-                  else {
-                    deferred.resolve()
-                  }
+                    if (!animated) {
+                        animated = true
+                        window.sortResults()
+                        setTimeout(function () {
+                            deferred.resolve()
+                        }, 1050)
+                    }
+                    else {
+                        deferred.resolve()
+                    }
                 }
             })
         }
     }
 
     function onRunAll() {
-        clearResults();
-        $("#runAllButton").prop('disabled', true);
+        clearResults()
+        $("#runAllButton").prop('disabled', true)
 
         //handle "Running..."
-        var valueBeforeTheDots = "Running";
-        wait.innerHTML = valueBeforeTheDots;
+        var valueBeforeTheDots = "Running"
+        wait.innerHTML = valueBeforeTheDots
         var dots = window.setInterval(function () {
-            var wait = document.getElementById("wait");
+            var wait = document.getElementById("wait")
             if (wait.innerHTML.length >= valueBeforeTheDots.length + 3)
-                wait.innerHTML = valueBeforeTheDots;
+                wait.innerHTML = valueBeforeTheDots
             else
-                wait.innerHTML += ".";
-        }, 500);
+                wait.innerHTML += "."
+        }, 500)
 
         // more minSamples (default=5) for more accurate & consistent results.
         Benchmark.options.minSamples = 30
@@ -400,123 +435,122 @@
         // Benchmark.options.minTime = -1
         // Benchmark.options.maxTime = -1
 
-        var i = 0
-        var suite = new Benchmark.Suite;
+        var suite = new Benchmark.Suite
 
-        addTest(suite, 'Browser', parse_json_browser);
+        addTest(suite, 'Browser', parse_json_browser)
 
-        addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer);
+        addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer)
 
-        addTest(suite, 'Jsonify', parse_json_jsonify);
+        addTest(suite, 'Jsonify', parse_json_jsonify)
 
         addTest(suite, 'Oboe', {
             defer: true,
             onCycle: function () {
-                newOboe();
+                newOboe()
             },
             fn: function (deferred) {
                 parse_json_oboe(json_sample1k, deferred)
             }
-        }, true);
+        }, true)
 
-        addTest(suite, 'Parsimmon', parse_json_parsimmon);
+        addTest(suite, 'Parsimmon', parse_json_parsimmon)
 
-        addTest(suite, 'Antlr', antlr4LexerAndParser);
+        addTest(suite, 'Antlr', antlr4LexerAndParser)
 
-        addTest(suite, 'Peg', pegjsJsonLexerAndParser.parse.bind(pegjsJsonLexerAndParser));
+        addTest(suite, 'Peg', pegjsJsonLexerAndParser.parse.bind(pegjsJsonLexerAndParser))
 
-        addTest(suite, 'Jison', jisonJsonLexerAndParser.parse.bind(jisonJsonLexerAndParser));
+        addTest(suite, 'Jison', jisonJsonLexerAndParser.parse.bind(jisonJsonLexerAndParser))
 
-        addTest(suite, 'Nearley', parse_json_with_nearley);
+        addTest(suite, 'Nearley', parse_json_with_nearley)
 
-        addTest(suite, 'Ohm', parse_json_with_ohm);
+        addTest(suite, 'Ohm', parse_json_with_ohm)
 
         suite.on('cycle', function (event) {
             var suite = event.target
-                , rate = suite.hz.toFixed(2)
-                , $rate = $('.' + suite.name + ' .benchRate .value')
-                , $delta = $('.' + suite.name + ' .benchRate .delta')
-                ;
+            var rate = suite.hz.toFixed(2)
+            var $rate = $('.' + suite.name + ' .benchRate .value')
+            var $delta = $('.' + suite.name + ' .benchRate .delta')
 
-            $rate.html(rate);
-            $delta.html('&plusmn;' + suite.stats.rme.toFixed(2) + '%');
 
-            data.labels.push(suite.name);
-            data.datasets[0].data.push(rate);
+            $rate.html(rate)
+            $delta.html('&plusmn;' + suite.stats.rme.toFixed(2) + '%')
 
-        }).on('complete', function (yyy) {
+            data.labels.push(suite.name)
+            data.datasets[0].data.push(rate)
+
+        }).on('complete', function () {
 
             var suites = this.filter('successful')
-                , fastestSuite = this.filter('fastest')[0];
+                    , fastestSuite = this.filter('fastest')[0]
 
-            suites.splice(suites.indexOf(fastestSuite), 1);
+            suites.splice(suites.indexOf(fastestSuite), 1)
 
-            $('.' + fastestSuite.name + ' .benchSpeed').html("100%");
-            $('.' + fastestSuite.name).addClass("fastestRow");
+            $('.' + fastestSuite.name + ' .benchSpeed').html("100%")
+            $('.' + fastestSuite.name).addClass("fastestRow")
 
             _.forEach(suites, function (suite) {
                 var $cell = $('.' + suite.name + ' .benchSpeed')
-                    , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2);
+                        , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2)
                 $cell.html(speed + '%')
-            });
+            })
 
-            window.clearInterval(dots);
+            window.clearInterval(dots)
             $('#wait').html('&nbsp;')
 
             myBarChart = new Chart(ctx, {
                 type: 'horizontalBar',
                 data: data,
                 options: {}
-            });
+            })
 
             // TODO: change to "visible" to enable the chart (but first make it more pretty...)
-            $("#parsersResultChart").css("visibility", "hidden");
+            $("#parsersResultChart").css("visibility", "hidden")
             $("#runAllButton").html("Re-run")
-            $("#runAllButton").prop('disabled', false);
-        }).run({'async': true});
+            $("#runAllButton").prop('disabled', false)
+        }).run({'async': true})
     }
 
     $(document).ready(function () {
         var loc = window.location || location
-            , query = loc.search || ''
-            , showJsons = (query.indexOf('jsons=true') > -1);
+                , query = loc.search || ''
+                , showJsons = (query.indexOf('jsons=true') > -1)
 
-        if (showJsons) $('.json-only').removeClass('hide');
+        if (showJsons) $('.json-only').removeClass('hide')
 
         // adapted from:
         //  http://blog.stevensanderson.com/2013/03/15/animating-lists-with-css-3-transitions/
 
-        var stylesToSnapshot = ["transform", "-webkit-transform"];
+        var stylesToSnapshot = ["transform", "-webkit-transform"]
 
         $.fn.snapshotStyles = function snapshotStyles() {
             if (window.getComputedStyle) {
                 $(this).each(function () {
                     for (var i = 0; i < stylesToSnapshot.length; i++)
-                        this.style[stylesToSnapshot[i]] = getComputedStyle(this)[stylesToSnapshot[i]];
-                });
+                        this.style[stylesToSnapshot[i]] = getComputedStyle(this)[stylesToSnapshot[i]]
+                })
             }
-            return this;
-        };
+            return this
+        }
 
         $.fn.releaseSnapshot = function releaseSnapshot() {
             $(this).each(function () {
-                this.offsetHeight; // Force position to be recomputed before transition starts
+                this.offsetHeight // Force position to be recomputed before transition starts
                 for (var i = 0; i < stylesToSnapshot.length; i++)
-                    this.style[stylesToSnapshot[i]] = "";
-            });
-        };
+                    this.style[stylesToSnapshot[i]] = ""
+            })
+        }
 
         window.sortResults = function sortResults() {
             var container = document.getElementById('resultsContainer')
-                , rows = container.querySelectorAll('.dataRow');
+                    , rows = container.querySelectorAll('.dataRow')
 
-            var $rows = $(rows);
-            $rows.snapshotStyles();
-            tinysort(rows, { selector:'.benchRate .value', order: 'desc' });
-            $rows.releaseSnapshot();
-        };
+            var $rows = $(rows)
+            $rows.snapshotStyles()
+            tinysort(rows, {selector: '.benchRate .value', order: 'desc'})
+            $rows.releaseSnapshot()
+        }
 
-    });
+    })
 
 </script>
 </body>
