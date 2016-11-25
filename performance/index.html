@@ -186,7 +186,6 @@
 
             <div class="benchName">Parser Library</div>
             <div class="benchRate">Ops/sec</div>
-            <div class="benchDelta">Delta</div>
             <div class="benchSpeed">Relative Speed</div>
             <div class="benchInclude">?</div>
 
@@ -197,8 +196,7 @@
             <div class="dataRow Chevrotain">
 
               <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
@@ -207,8 +205,7 @@
             <div class="dataRow Parsimmon">
 
               <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
@@ -217,8 +214,7 @@
             <div class="dataRow Antlr">
 
               <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
@@ -227,8 +223,7 @@
             <div class="dataRow Peg">
 
               <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
@@ -237,8 +232,7 @@
             <div class="dataRow Jison">
 
               <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
@@ -247,8 +241,7 @@
             <div class="dataRow Nearley">
 
               <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
@@ -257,8 +250,7 @@
             <div class="dataRow Ohm">
 
               <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox"/></div>
 
@@ -267,8 +259,7 @@
             <div class="dataRow Browser json-only hide">
 
               <div class="benchName">Browser</div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox"/></div>
 
@@ -277,8 +268,7 @@
             <div class="dataRow Jsonify json-only hide">
 
               <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox"/></div>
 
@@ -287,8 +277,7 @@
             <div class="dataRow Oboe json-only hide">
 
               <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
-              <div class="benchRate">&nbsp;</div>
-              <div class="benchDelta">&nbsp;</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
               <div class="benchSpeed">&nbsp;</div>
               <div class="benchInclude"><input type="checkbox"/></div>
 
@@ -331,8 +320,8 @@
     }
     function clearTable() {
         // when using .empty() the cells collapse... so, use non-breaking space
-        $(".dataRow .benchRate").html('&nbsp;')
-        $(".dataRow .benchDelta").html('&nbsp;')
+        $(".dataRow .benchRate .value").html('&nbsp;')
+        $(".dataRow .benchRate .delta").html('&nbsp;')
         $(".dataRow .benchSpeed").html('&nbsp;')
         $(".fastestRow").removeClass("fastestRow")
     }
@@ -347,6 +336,7 @@
         clearData();
     }
 
+    var actionCount = 0
     function addTest(suite, id, action, direct) {
         var $el = $('.' + id + ' input');
         if ($el && $el.is(':checked')) {
@@ -356,6 +346,30 @@
             else {
                 suite.add(id, function () { action(json_sample1k); });
             }
+
+            // add animator aid. creates a delay while animation occurs.
+            var animated = false
+                , id = 'delayor' + actionCount++
+
+            suite.add(id, {
+                defer     : true,
+                initCount : 1,
+                minSamples: 1,
+                minTime   : -1,
+                maxTime   : -1,
+                fn: function (deferred) {
+                  if (!animated) {
+                    animated = true
+                    window.sortResults()
+                    setTimeout(function () {
+                      deferred.resolve()
+                    }, 1050);
+                  }
+                  else {
+                    deferred.resolve()
+                  }
+                }
+            })
         }
     }
 
@@ -420,16 +434,15 @@
         suite.on('cycle', function (event) {
             var suite = event.target
                 , rate = suite.hz.toFixed(2)
-                , $rate = $('.' + suite.name + ' .benchRate')
-                , $delta = $('.' + suite.name + ' .benchDelta');
+                , $rate = $('.' + suite.name + ' .benchRate .value')
+                , $delta = $('.' + suite.name + ' .benchRate .delta')
+                ;
 
             $rate.html(rate);
-            $delta.html('&plusmn;' + suite.stats.rme.toFixed(2) + '%')
+            $delta.html('&plusmn;' + suite.stats.rme.toFixed(2) + '%');
 
             data.labels.push(suite.name);
             data.datasets[0].data.push(rate);
-
-            window.sortResults()
 
         }).on('complete', function (yyy) {
 
@@ -499,7 +512,7 @@
 
             var $rows = $(rows);
             $rows.snapshotStyles();
-            tinysort(rows, { selector:'.benchRate', order: 'desc' });
+            tinysort(rows, { selector:'.benchRate .value', order: 'desc' });
             $rows.releaseSnapshot();
         };
 
