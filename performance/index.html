@@ -410,6 +410,15 @@
 
     function onRunAll() {
         clearResults()
+
+        var enabledTestCases = $(".benchInclude :nth-child(1)").filter(":checked")
+
+        if (_.isEmpty(enabledTestCases)) {
+            // otherwise the run button will never become enabled again and
+            // the performance page will be stuck indefinitely.
+            return
+        }
+
         $("#runAllButton").prop('disabled', true)
 
         //handle "Running..."
