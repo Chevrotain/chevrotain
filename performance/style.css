@@ -2,38 +2,12 @@
     /*font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;*/
 /*}*/
 
-#resultsTable {
-    /*width: 80%;*/
-    border-collapse: collapse;
-}
-
 #parsersResultChart {
     /*width: 80%;*/
 }
 
-table, th, td {
-    border: 1px solid black;
-    text-align: center;
-    padding: 1rem;
-}
-
-tr {
-    height: 8rem;
-}
-
-.fastestRow {
+.fastestRow div {
     background-color: lightgreen;
-}
-
-.benchName {
-    font-weight: bold;
-    font-size: large;
-}
-
-.tableHeaderRow {
-    background-color: darkgreen;
-    color: white;
-    font-size: large;
 }
 
 
@@ -64,4 +38,174 @@ tr {
     width: 100px;
     height: 50px;
     margin-bottom: 15px;
+}
+
+
+/*
+ style the stuff as if they were a table.
+ allow for position relative/absolute for sorting and transforms.
+ */
+#resultsContainer {
+  width:800px;
+  margin:0;
+  margin-bottom:700px;
+}
+
+#dataRows {
+  position:relative;
+}
+
+.headerRow, .dataRow {
+  margin:0;
+  padding:0;
+  width:100%;
+}
+
+.headerRow div, .dataRow > div {
+  margin:0;
+  margin-left:-2px;
+  margin-right:-2px;
+  display: inline-block;
+  height: 100%;
+  border: 1px solid black;
+  border-left:none;
+}
+
+.dataRow div {
+  border-top:none;
+}
+
+.headerRow {
+  height:70px;
+}
+
+.headerRow div {
+  font-size: 1.5em;
+  background-color: darkgreen;
+  color: white;
+  padding-top:15px;
+}
+
+.headerRow .benchRate, .headerRow .benchSpeed,.headerRow .benchInclude {
+  text-align:center;
+}
+
+.dataRow {
+  height:70px;
+  background-color:white;
+  position: absolute;
+  top:0;
+  transition: all 1s ease-in-out;
+}
+
+.dataRow > div {
+  font-size: 1.25em;
+  padding-top:20px;
+  overflow: hidden;
+}
+
+.benchName, .benchRate, .benchSpeed, .benchInclude {
+}
+
+div.benchName {
+  width: 175px;
+  text-align:right;
+  padding-right: 10px;
+  border-left: 1px solid black;
+}
+
+.benchRate {
+  width:125px;
+}
+
+.benchSpeed {
+  width: 175px;
+}
+div.benchInclude {
+  width: 50px;
+}
+
+.dataRow .benchRate {
+  padding-top:10px;
+}
+
+.benchRate, .benchSpeed, .benchInclude {
+  text-align:center;
+}
+
+.benchRate .value {
+  font-weight:bold;
+}
+
+.benchRate .delta {
+  font-size: .75em;
+}
+
+/* for animating the table sort change. adapted from:
+   http://blog.stevensanderson.com/2013/03/15/animating-lists-with-css-3-transitions/
+   Basically, we freeze the styles, then sort the elements, then unfreeze the styles
+   and these rules then tell each element where they should be based on the order
+   they are in as elements.
+   Also, the z-index makes ones moving higher in the list show in front of the
+   others as they move up.
+*/
+
+#dataRows div.dataRow:nth-child(1)  {
+  transform: translate3d(0, 0, 0);
+  z-index: 100;
+}
+
+#dataRows div.dataRow:nth-child(2)  {
+  transform: translate3d(0, 100%, 0);
+  z-index: 99;
+}
+
+#dataRows div.dataRow:nth-child(3)  {
+  transform: translate3d(0, 200%, 0);
+  z-index: 98;
+}
+
+#dataRows div.dataRow:nth-child(4)  {
+  transform: translate3d(0, 300%, 0);
+  z-index: 97;
+}
+
+#dataRows div.dataRow:nth-child(5)  {
+  transform: translate3d(0, 400%, 0);
+  z-index: 96;
+}
+
+#dataRows div.dataRow:nth-child(6)  {
+  transform: translate3d(0, 500%, 0);
+  z-index: 95;
+}
+
+#dataRows div.dataRow:nth-child(7)  {
+  transform: translate3d(0, 600%, 0);
+  z-index: 94;
+}
+
+#dataRows div.dataRow:nth-child(8)  {
+  transform: translate3d(0, 700%, 0);
+  z-index: 93;
+}
+
+#dataRows div.dataRow:nth-child(9)  {
+  transform: translate3d(0, 800%, 0);
+  z-index: 92;
+}
+
+#dataRows div.dataRow:nth-child(10)  {
+  transform: translate3d(0, 900%, 0);
+  z-index: 91;
+}
+
+#dataRows div.dataRow:nth-child(11)  {
+  transform: translate3d(0, 1000%, 0);
+  z-index: 90;
+}
+
+#dataRows div.dataRow:nth-child(12)  {
+  transform: translate3d(0, 1100%, 0);
+  z-index: 89;
 }

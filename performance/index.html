@@ -51,6 +51,7 @@
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js"></script>
 
 <div align="center" class="card center">
     <section style="text-align:left;">
@@ -143,7 +144,7 @@
 
             </ol>
 
-        </div>
+      </div>
 
         <p>
             The JSON Grammar was used because it is simple to implement, simple to compare and is often already <br>
@@ -173,95 +174,121 @@
             machines.
         </p>
 
-    </section>
     <section style="text-align:left;">
+
         <button onclick="onRunAll()" id="runAllButton">Run</button>
-        <span id="wait" style="margin-left: auto;margin-right: auto;"></span>
 
-        <table id="resultsTable">
-            <thead>
-            <tr class="tableHeaderRow">
-                <th>Parser Library</th>
-                <th>Ops/sec</th>
-                <th>Relative Speed</th>
-                <th>Include?</th>
-            </tr>
-            </thead>
+        <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
 
-            <tbody>
-            <tr id="rowBrowser" class="json-only hide">
-                <td class="benchName">Browser</td>
-                <td id="rateBrowser"></td>
-                <td id="speedBrowser"></td>
-                <td><input id="includeBrowser" type="checkbox"/></td>
-            </tr>
+        <div id="resultsContainer">
 
-            <tr id="rowChevrotain">
-                <td class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a></td>
-                <td id="rateChevrotain"></td>
-                <td id="speedChevrotain"></td>
-                <td><input id="includeChevrotain" type="checkbox" checked=checked/></td>
-            </tr>
+          <div class="headerRow">
 
-            <tr id="rowJsonify" class="json-only hide">
-                <td class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a></td>
-                <td id="rateJsonify"></td>
-                <td id="speedJsonify"></td>
-                <td><input id="includeJsonify" type="checkbox"/></td>
-            </tr>
+            <div class="benchName">Parser Library</div>
+            <div class="benchRate">Ops/sec</div>
+            <div class="benchSpeed">Relative Speed</div>
+            <div class="benchInclude">?</div>
 
-            <tr id="rowOboe" class="json-only hide">
-                <td class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></td>
-                <td id="rateOboe"></td>
-                <td id="speedOboe"></td>
-                <td><input id="includeOboe" type="checkbox"/></td>
-            </tr>
+          </div>
 
-            <tr id="rowParsimmon">
-                <td class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a></td>
-                <td id="rateParsimmon"></td>
-                <td id="speedParsimmon"></td>
-                <td><input id="includeParsimmon" type="checkbox" checked=checked/></td>
-            </tr>
+          <div id="dataRows">
 
-            <tr id="rowAntlr">
-                <td class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></td>
-                <td id="rateAntlr"></td>
-                <td id="speedAntlr"></td>
-                <td><input id="includeAntlr" type="checkbox" checked=checked/></td>
-            </tr>
+            <div class="dataRow Chevrotain">
 
-            <tr id="rowPeg">
-                <td class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></td>
-                <td id="ratePeg"></td>
-                <td id="speedPeg"></td>
-                <td><input id="includePeg" type="checkbox" checked=checked/></td>
-            </tr>
+              <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
-            <tr id="rowJison">
-                <td class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></td>
-                <td id="rateJison"></td>
-                <td id="speedJison"></td>
-                <td><input id="includeJison" type="checkbox" checked=checked/></td>
-            </tr>
+            </div>
 
-            <tr id="rowNearley">
-                <td class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></td>
-                <td id="rateNearley"></td>
-                <td id="speedNearley"></td>
-                <td><input id="includeNearley" type="checkbox" checked=checked/></td>
-            </tr>
+            <div class="dataRow Parsimmon">
 
-            <tr id="rowOhm">
-                <td class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></td>
-                <td id="rateOhm"></td>
-                <td id="speedOhm"></td>
-                <td><input id="includeOhm" type="checkbox"/></td>
-            </tr>
+              <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
-            </tbody>
-        </table>
+            </div>
+
+            <div class="dataRow Antlr">
+
+              <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+            </div>
+
+            <div class="dataRow Peg">
+
+              <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+            </div>
+
+            <div class="dataRow Jison">
+
+              <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+            </div>
+
+            <div class="dataRow Nearley">
+
+              <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+            </div>
+
+            <div class="dataRow Ohm">
+
+              <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox"/></div>
+
+            </div>
+
+            <div class="dataRow Browser json-only hide">
+
+              <div class="benchName">Browser</div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox"/></div>
+
+            </div>
+
+            <div class="dataRow Jsonify json-only hide">
+
+              <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox"/></div>
+
+            </div>
+
+            <div class="dataRow Oboe json-only hide">
+
+              <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
+              <div class="benchRate"><div class="value">&nbsp;</div><div class="delta">&nbsp;</div></div>
+              <div class="benchSpeed">&nbsp;</div>
+              <div class="benchInclude"><input type="checkbox"/></div>
+
+            </div>
+
+          </div>
+
+        </div>
+
         <canvas id="parsersResultChart"></canvas>
+
     </section>
 </div>
 <script>
@@ -292,9 +319,11 @@
         }
     }
     function clearTable() {
-        $("td:nth-child(2)").empty()
-        $("td:nth-child(3)").empty()
-        $("tr").removeClass("fastestRow")
+        // when using .empty() the cells collapse... so, use non-breaking space
+        $(".dataRow .benchRate .value").html('&nbsp;')
+        $(".dataRow .benchRate .delta").html('&nbsp;')
+        $(".dataRow .benchSpeed").html('&nbsp;')
+        $(".fastestRow").removeClass("fastestRow")
     }
 
     function clearGraph() {
@@ -307,17 +336,40 @@
         clearData();
     }
 
+    var actionCount = 0
     function addTest(suite, id, action, direct) {
-        var el = document.getElementById('include' + id);
-        if (el && el.checked) {
+        var $el = $('.' + id + ' input');
+        if ($el && $el.is(':checked')) {
             if (direct) {
                 suite.add(id, action);
             }
             else {
-                suite.add(id, function () {
-                    action(json_sample1k);
-                });
+                suite.add(id, function () { action(json_sample1k); });
             }
+
+            // add animator aid. creates a delay while animation occurs.
+            var animated = false
+                , id = 'delayor' + actionCount++
+
+            suite.add(id, {
+                defer     : true,
+                initCount : 1,
+                minSamples: 1,
+                minTime   : -1,
+                maxTime   : -1,
+                fn: function (deferred) {
+                  if (!animated) {
+                    animated = true
+                    window.sortResults()
+                    setTimeout(function () {
+                      deferred.resolve()
+                    }, 1050);
+                  }
+                  else {
+                    deferred.resolve()
+                  }
+                }
+            })
         }
     }
 
@@ -382,10 +434,12 @@
         suite.on('cycle', function (event) {
             var suite = event.target
                 , rate = suite.hz.toFixed(2)
-                , cell = document.getElementById('rate' + suite.name);
+                , $rate = $('.' + suite.name + ' .benchRate .value')
+                , $delta = $('.' + suite.name + ' .benchRate .delta')
+                ;
 
-            cell.innerHTML = '<large><b>' + rate + '<br>' + '</b></large>' +
-                '<medium>&plusmn;' + suite.stats.rme.toFixed(2) + '%</medium>';
+            $rate.html(rate);
+            $delta.html('&plusmn;' + suite.stats.rme.toFixed(2) + '%');
 
             data.labels.push(suite.name);
             data.datasets[0].data.push(rate);
@@ -397,18 +451,17 @@
 
             suites.splice(suites.indexOf(fastestSuite), 1);
 
-            var cell = document.getElementById('speed' + fastestSuite.name);
-            cell.innerHTML = "<b>100% <br> <small>(fastest)</b></small>";
-            $('#row' + fastestSuite.name).addClass("fastestRow");
+            $('.' + fastestSuite.name + ' .benchSpeed').html("100%");
+            $('.' + fastestSuite.name).addClass("fastestRow");
 
             _.forEach(suites, function (suite) {
-                var cell = document.getElementById('speed' + suite.name)
+                var $cell = $('.' + suite.name + ' .benchSpeed')
                     , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2);
-                cell.innerHTML = '<large>' + speed + "%</large>"
+                $cell.html(speed + '%')
             });
 
             window.clearInterval(dots);
-            document.getElementById("wait").innerHTML = "";
+            $('#wait').html('&nbsp;')
 
             myBarChart = new Chart(ctx, {
                 type: 'horizontalBar',
@@ -428,10 +481,42 @@
             , query = loc.search || ''
             , showJsons = (query.indexOf('jsons=true') > -1);
 
-        if (showJsons) $('.json-only').toggleClass('hide');
+        if (showJsons) $('.json-only').removeClass('hide');
+
+        // adapted from:
+        //  http://blog.stevensanderson.com/2013/03/15/animating-lists-with-css-3-transitions/
+
+        var stylesToSnapshot = ["transform", "-webkit-transform"];
+
+        $.fn.snapshotStyles = function snapshotStyles() {
+            if (window.getComputedStyle) {
+                $(this).each(function () {
+                    for (var i = 0; i < stylesToSnapshot.length; i++)
+                        this.style[stylesToSnapshot[i]] = getComputedStyle(this)[stylesToSnapshot[i]];
+                });
+            }
+            return this;
+        };
+
+        $.fn.releaseSnapshot = function releaseSnapshot() {
+            $(this).each(function () {
+                this.offsetHeight; // Force position to be recomputed before transition starts
+                for (var i = 0; i < stylesToSnapshot.length; i++)
+                    this.style[stylesToSnapshot[i]] = "";
+            });
+        };
+
+        window.sortResults = function sortResults() {
+            var container = document.getElementById('resultsContainer')
+                , rows = container.querySelectorAll('.dataRow');
+
+            var $rows = $(rows);
+            $rows.snapshotStyles();
+            tinysort(rows, { selector:'.benchRate .value', order: 'desc' });
+            $rows.releaseSnapshot();
+        };
 
     });
-
 
 </script>
 </body>
