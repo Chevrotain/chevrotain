@@ -408,18 +408,75 @@
         }
     }
 
+    var testCases = {
+        Browser: function (suite) {
+            addTest(suite, 'Browser', parse_json_browser)
+        },
+
+        Chevrotain: function (suite) {
+            addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer)
+        },
+
+        Jsonify: function (suite) {
+            addTest(suite, 'Jsonify', parse_json_jsonify)
+        },
+
+        Oboe: function (suite) {
+            addTest(suite, 'Oboe', {
+                defer: true,
+                onCycle: function () {
+                    newOboe()
+                },
+                fn: function (deferred) {
+                    parse_json_oboe(json_sample1k, deferred)
+                }
+            }, true)
+        },
+
+        Parsimmon: function (suite) {
+            addTest(suite, 'Parsimmon', parse_json_parsimmon)
+        },
+
+        Antlr: function (suite) {
+            addTest(suite, 'Antlr', antlr4LexerAndParser)
+        },
+
+        Peg: function (suite) {
+            addTest(suite, 'Peg', pegjsJsonLexerAndParser.parse.bind(pegjsJsonLexerAndParser))
+        },
+
+        Jison: function (suite) {
+            addTest(suite, 'Jison', jisonJsonLexerAndParser.parse.bind(jisonJsonLexerAndParser))
+        },
+
+        Nearley: function (suite) {
+            addTest(suite, 'Nearley', parse_json_with_nearley)
+
+        },
+
+        Ohm: function (suite) {
+            addTest(suite, 'Ohm', parse_json_with_ohm)
+        }
+    }
+
     function onRunAll() {
         clearResults()
 
-        var enabledTestCases = $(".benchInclude :nth-child(1)").filter(":checked")
+        // These names are in the order in which they appear in the DOM
+        var enabledTestCaseNames = _.map($(".dataRow").has(":checked"), function (currDataRow) {
+            var currClassNames = $(currDataRow).attr("class").split(" ")
+            return _.first(_.difference(currClassNames, ["dataRow", "json-only", "hide"]))
+        })
 
-        if (_.isEmpty(enabledTestCases)) {
+
+        if (_.isEmpty(enabledTestCaseNames)) {
             // otherwise the run button will never become enabled again and
             // the performance page will be stuck indefinitely.
             return
         }
 
         $("#runAllButton").prop('disabled', true)
+
 
         //handle "Running..."
         var valueBeforeTheDots = "Running"
@@ -446,33 +503,12 @@
 
         var suite = new Benchmark.Suite
 
-        addTest(suite, 'Browser', parse_json_browser)
+        var enabledTestCaseDefs = _.pick(testCases, enabledTestCaseNames)
+        // adds the tests in the order they appear in the DOM table.
+        _.forEach(enabledTestCaseDefs, function (currTestCaseDefFn) {
+            currTestCaseDefFn(suite)
+        })
 
-        addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer)
-
-        addTest(suite, 'Jsonify', parse_json_jsonify)
-
-        addTest(suite, 'Oboe', {
-            defer: true,
-            onCycle: function () {
-                newOboe()
-            },
-            fn: function (deferred) {
-                parse_json_oboe(json_sample1k, deferred)
-            }
-        }, true)
-
-        addTest(suite, 'Parsimmon', parse_json_parsimmon)
-
-        addTest(suite, 'Antlr', antlr4LexerAndParser)
-
-        addTest(suite, 'Peg', pegjsJsonLexerAndParser.parse.bind(pegjsJsonLexerAndParser))
-
-        addTest(suite, 'Jison', jisonJsonLexerAndParser.parse.bind(jisonJsonLexerAndParser))
-
-        addTest(suite, 'Nearley', parse_json_with_nearley)
-
-        addTest(suite, 'Ohm', parse_json_with_ohm)
 
         suite.on('cycle', function (event) {
             var suite = event.target
