@@ -183,3 +183,14 @@ div.benchInclude {
     transform: translate3d(0, 1100%, 0);
     z-index: 89;
 }
+
+
+
+/*bootstrap customization*/
+@media (min-width: 1200px) {
+    .container{
+        width: 100%;
+    }
+}
+
+

@@ -53,277 +53,293 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js"></script>
 
-<div align="center" class="card center">
-    <section style="text-align:left;">
-        <h2>JavaScript Parsing Libraries Benchmark</h2>
-
-        <p>A JSON Parser was implemented using each of the Parsing Libraries (Generators/Combinators/DSLs).</p>
-        <ol id="toolsList">
-            <li><p><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a> Parsing DSL
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/chevrotain/chevrotainParser.js">implementation</a>
-            </p></li>
-
-            <li><p>
-                <a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a> Parser Combinator
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/parsimmon/parsimmon_json_parser.js">implementation</a>
-            </p></li>
-
-            <li><p><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a> Parser Generator
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLR.g4">grammar</a>
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLRParser.js">generated
-                    code</a>
-            </p></li>
-
-            <li><p>
-                <a rel="nofollow" href="http://pegjs.org/">PEG.js</a> Parser Generator
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/json.pegjs">grammar</a>
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/pegjs_jison_parser.js">generated
-                    code</a>
-            </p></li>
-
-            <li><p><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a> parser Generator
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/jison/jsonParserGrammar.js">grammar</a>
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/jison/jisonParser.js">generated
-                    code</a>
-            </p></li>
 
 
-            <li><p>
-                <a rel="nofollow" href="http://nearley.js.org/">Nearley</a> Parser Generator
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/json_grammar_tokenizer.ne">grammar</a>
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/pegjs_jison_parser.js">generated
-                    code</a>
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/nearley_json_parser_tokenizer.js">hand
-                    built lexer</a>
-            </p></li>
 
-            <li><p>
-                <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_grammar.js">grammar</a>
-                <a rel="nofollow"
-                   href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_parser.js">parser</a>
-            </p></li>
+<div class="container">
+    <!-- left part -->
+    <div class="row">
+        <div class="col-lg-6">
+            <h2>JavaScript Parsing Libraries Benchmark</h2>
 
-        </ol>
-
-        <div class="json-only hide">
-
-            <p>These are <em>hand-built</em> JSON parsers to compare against generic generators/libraries/DSLS</p>
-
-            <ol>
-
-                <li><p>
-                    The browser's JSON.parse() for comparison.
-                    [<a rel="nofollow"
-                        href="jsonParsers/browser/browser_json_parser.js">implementation</a>]
+            <p>A JSON Parser was implemented using each of the Parsing Libraries (Generators/Combinators/DSLs).</p>
+            <ol id="toolsList">
+                <li><p><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a> Parsing DSL
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/chevrotain/chevrotainParser.js">implementation</a>
                 </p></li>
 
                 <li><p>
-                    <a rel="nofollow" href="https://github.com/jimhigson/oboe.js">Oboe</a> JSON Parser for comparison
-                    [<a rel="nofollow" href="jsonParsers/oboe/oboe_json_parser.js">implementation</a>]
+                    <a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a> Parser Combinator
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/parsimmon/parsimmon_json_parser.js">implementation</a>
+                </p></li>
+
+                <li><p><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a> Parser Generator
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLR.g4">grammar</a>
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLRParser.js">generated
+                        code</a>
                 </p></li>
 
                 <li><p>
-                    <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser for
-                    comparison
-                    [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
+                    <a rel="nofollow" href="http://pegjs.org/">PEG.js</a> Parser Generator
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/json.pegjs">grammar</a>
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/pegjs/pegjs_jison_parser.js">generated
+                        code</a>
+                </p></li>
+
+                <li><p><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a> parser Generator
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/jison/jsonParserGrammar.js">grammar</a>
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/jison/jisonParser.js">generated
+                        code</a>
+                </p></li>
+
+
+                <li><p>
+                    <a rel="nofollow" href="http://nearley.js.org/">Nearley</a> Parser Generator
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/json_grammar_tokenizer.ne">grammar</a>
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/pegjs_jison_parser.js">generated
+                        code</a>
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/nearley/nearley_json_parser_tokenizer.js">hand
+                        built lexer</a>
+                </p></li>
+
+                <li><p>
+                    <a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a> Parser Library
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_grammar.js">grammar</a>
+                    <a rel="nofollow"
+                       href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/ohm/ohm_json_parser.js">parser</a>
                 </p></li>
 
             </ol>
 
-        </div>
+            <div class="json-only hide">
 
-        <p>
-            The JSON Grammar was used because it is simple to implement, simple to compare and is often already <br>
-            available as a sample grammar for most parsing tools.
-        </p>
+                <p>These are <em>hand-built</em> JSON parsers to compare against generic generators/libraries/DSLS</p>
 
-        <p>
-            The input <a rel="nofollow"
-                         href="https://github.com/sap/chevrotain/blob/gh-pages/performance/samples/1K_json.js">sample</a>
-            for the benchmark is a ~1,000 lines JSON file generated by <a rel="nofollow"
-                                                                          href="http://www.json-generator.com/">json-generator</a>.
-        </p>
-        <p>
-            All the parsers have no output(build no AST), they only parse the text (without errors).
-        </p>
+                <ol>
 
-        <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a> library.
-        </p>
+                    <li><p>
+                        The browser's JSON.parse() for comparison.
+                        [<a rel="nofollow"
+                            href="jsonParsers/browser/browser_json_parser.js">implementation</a>]
+                    </p></li>
 
-        <p>
-            The entire code for this benchmark can be found in this github <a rel="nofollow"
-                                                                              href="https://github.com/sap/chevrotain/tree/gh-pages/performance">repository</a>.
-        </p>
+                    <li><p>
+                        <a rel="nofollow" href="https://github.com/jimhigson/oboe.js">Oboe</a> JSON Parser for comparison
+                        [<a rel="nofollow" href="jsonParsers/oboe/oboe_json_parser.js">implementation</a>]
+                    </p></li>
 
-        <p>
-            Note that the Ohm Parser Library is <b>not</b> included by default as it can be very slow causing the <br>
-            whole benchmark to hang.
-        </p>
+                    <li><p>
+                        <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser for
+                        comparison
+                        [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
+                    </p></li>
 
-        <section style="text-align:left;">
-
-            <button onclick="onRunAll()" id="runAllButton">Run</button>
-
-            <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
-
-            <div id="resultsContainer">
-
-                <div class="headerRow">
-
-                    <div class="benchName">Parser Library</div>
-                    <div class="benchRate">Ops/sec</div>
-                    <div class="benchSpeed">Relative Speed</div>
-                    <div class="benchInclude">?</div>
-
-                </div>
-
-                <div id="dataRows">
-
-                    <div class="dataRow Chevrotain">
-
-                        <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a>
-                        </div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Parsimmon">
-
-                        <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
-                        </div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Antlr">
-
-                        <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Peg">
-
-                        <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Jison">
-
-                        <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Nearley">
-
-                        <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                    </div>
-
-                    <div class="dataRow Ohm">
-
-                        <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
-                    <div class="dataRow Browser json-only hide">
-
-                        <div class="benchName">Browser</div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
-                    <div class="dataRow Jsonify json-only hide">
-
-                        <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a>
-                        </div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
-                    <div class="dataRow Oboe json-only hide">
-
-                        <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
-                        <div class="benchRate">
-                            <div class="value">&nbsp;</div>
-                            <div class="delta">&nbsp;</div>
-                        </div>
-                        <div class="benchSpeed">&nbsp;</div>
-                        <div class="benchInclude"><input type="checkbox"/></div>
-
-                    </div>
-
-                </div>
+                </ol>
 
             </div>
 
-            <canvas id="parsersResultChart"></canvas>
+            <p>
+                The JSON Grammar was used because it is simple to implement, simple to compare and is often already <br>
+                available as a sample grammar for most parsing tools.
+            </p>
 
-        </section>
-    </section>
+            <p>
+                The input <a rel="nofollow"
+                             href="https://github.com/sap/chevrotain/blob/gh-pages/performance/samples/1K_json.js">sample</a>
+                for the benchmark is a ~1,000 lines JSON file generated by <a rel="nofollow"
+                                                                              href="http://www.json-generator.com/">json-generator</a>.
+            </p>
+            <p>
+                All the parsers have no output(build no AST), they only parse the text (without errors).
+            </p>
+
+            <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a> library.
+            </p>
+
+            <p>
+                The entire code for this benchmark can be found in this github <a rel="nofollow"
+                                                                                  href="https://github.com/sap/chevrotain/tree/gh-pages/performance">repository</a>.
+            </p>
+
+            <p>
+                Note that the Ohm Parser Library is <b>not</b> included by default as it can be very slow causing the <br>
+                whole benchmark to hang.
+            </p>
+            <button onclick="onRunAll()" id="runAllButton">Run</button>
+        </div>
+
+        <!--right part-->
+        <div class="col-lg-6">
+
+                <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
+
+                <div id="resultsContainer">
+
+                    <div class="headerRow">
+
+                        <div class="benchName">Parser Library</div>
+                        <div class="benchRate">Ops/sec</div>
+                        <div class="benchSpeed">Relative Speed</div>
+                        <div class="benchInclude">?</div>
+
+                    </div>
+
+                    <div id="dataRows">
+
+                        <div class="dataRow Chevrotain">
+
+                            <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a>
+                            </div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                        </div>
+
+                        <div class="dataRow Parsimmon">
+
+                            <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
+                            </div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                        </div>
+
+                        <div class="dataRow Antlr">
+
+                            <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                        </div>
+
+                        <div class="dataRow Peg">
+
+                            <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                        </div>
+
+                        <div class="dataRow Jison">
+
+                            <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                        </div>
+
+                        <div class="dataRow Nearley">
+
+                            <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                        </div>
+
+                        <div class="dataRow Ohm">
+
+                            <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox"/></div>
+
+                        </div>
+
+                        <div class="dataRow Browser json-only hide">
+
+                            <div class="benchName">Browser</div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox"/></div>
+
+                        </div>
+
+                        <div class="dataRow Jsonify json-only hide">
+
+                            <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a>
+                            </div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox"/></div>
+
+                        </div>
+
+                        <div class="dataRow Oboe json-only hide">
+
+                            <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
+                            <div class="benchRate">
+                                <div class="value">&nbsp;</div>
+                                <div class="delta">&nbsp;</div>
+                            </div>
+                            <div class="benchSpeed">&nbsp;</div>
+                            <div class="benchInclude"><input type="checkbox"/></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <canvas id="parsersResultChart"></canvas>
+
+        </div>
+    </div>
+
+    <hr>
+
 </div>
+
+
+
+
+
+
 <script>
 
     var orgData = {
