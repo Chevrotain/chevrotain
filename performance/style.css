@@ -20,9 +20,7 @@
  allow for position relative/absolute for sorting and transforms.
  */
 #resultsContainer {
-    width: 800px;
-    margin: 0;
-    margin-bottom: 700px;
+    text-align: center;
 }
 
 #dataRows {
