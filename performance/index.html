@@ -54,8 +54,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js"></script>
 
 
-
-
 <div class="container">
     <!-- left part -->
     <div class="row">
@@ -136,12 +134,14 @@
                     </p></li>
 
                     <li><p>
-                        <a rel="nofollow" href="https://github.com/jimhigson/oboe.js">Oboe</a> JSON Parser for comparison
+                        <a rel="nofollow" href="https://github.com/jimhigson/oboe.js">Oboe</a> JSON Parser for
+                        comparison
                         [<a rel="nofollow" href="jsonParsers/oboe/oboe_json_parser.js">implementation</a>]
                     </p></li>
 
                     <li><p>
-                        <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser for
+                        <a rel="nofollow" href="https://github.com/substack/jsonify">Substack Jsonify</a> JSON Parser
+                        for
                         comparison
                         [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
                     </p></li>
@@ -165,7 +165,8 @@
                 All the parsers have no output(build no AST), they only parse the text (without errors).
             </p>
 
-            <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a> library.
+            <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
+                library.
             </p>
 
             <p>
@@ -183,150 +184,146 @@
         <!--right part-->
         <div class="col-lg-6">
 
-                <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
+            <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
 
-                <div id="resultsContainer">
 
-                    <div class="headerRow">
+            <div class="headerRow">
 
-                        <div class="benchName">Parser Library</div>
-                        <div class="benchRate">Ops/sec</div>
-                        <div class="benchSpeed">Relative Speed</div>
-                        <div class="benchInclude">?</div>
+                <div class="benchName">Parser Library</div>
+                <div class="benchRate">Ops/sec</div>
+                <div class="benchSpeed">Relative Speed</div>
+                <div class="benchInclude">?</div>
 
+            </div>
+
+            <div id="dataRows">
+
+                <div class="dataRow Chevrotain">
+
+                    <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a>
                     </div>
-
-                    <div id="dataRows">
-
-                        <div class="dataRow Chevrotain">
-
-                            <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a>
-                            </div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                        </div>
-
-                        <div class="dataRow Parsimmon">
-
-                            <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
-                            </div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                        </div>
-
-                        <div class="dataRow Antlr">
-
-                            <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                        </div>
-
-                        <div class="dataRow Peg">
-
-                            <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                        </div>
-
-                        <div class="dataRow Jison">
-
-                            <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                        </div>
-
-                        <div class="dataRow Nearley">
-
-                            <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox" checked=checked/></div>
-
-                        </div>
-
-                        <div class="dataRow Ohm">
-
-                            <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox"/></div>
-
-                        </div>
-
-                        <div class="dataRow Browser json-only hide">
-
-                            <div class="benchName">Browser</div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox"/></div>
-
-                        </div>
-
-                        <div class="dataRow Jsonify json-only hide">
-
-                            <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a>
-                            </div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox"/></div>
-
-                        </div>
-
-                        <div class="dataRow Oboe json-only hide">
-
-                            <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
-                            <div class="benchRate">
-                                <div class="value">&nbsp;</div>
-                                <div class="delta">&nbsp;</div>
-                            </div>
-                            <div class="benchSpeed">&nbsp;</div>
-                            <div class="benchInclude"><input type="checkbox"/></div>
-
-                        </div>
-
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
                     </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox" checked=checked/></div>
 
                 </div>
 
+                <div class="dataRow Parsimmon">
 
-                <canvas id="parsersResultChart"></canvas>
+                    <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
+                    </div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                </div>
+
+                <div class="dataRow Antlr">
+
+                    <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                </div>
+
+                <div class="dataRow Peg">
+
+                    <div class="benchName"><a rel="nofollow" href="http://pegjs.org/">PEG.js</a></div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                </div>
+
+                <div class="dataRow Jison">
+
+                    <div class="benchName"><a rel="nofollow" href="http://zaach.github.io/jison/">Jison</a></div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                </div>
+
+                <div class="dataRow Nearley">
+
+                    <div class="benchName"><a rel="nofollow" href="http://nearley.js.org/">Nearley</a></div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                </div>
+
+                <div class="dataRow Ohm">
+
+                    <div class="benchName"><a rel="nofollow" href="https://github.com/cdglabs/ohm">Ohm-js</a></div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox"/></div>
+
+                </div>
+
+                <div class="dataRow Browser json-only hide">
+
+                    <div class="benchName">Browser</div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox"/></div>
+
+                </div>
+
+                <div class="dataRow Jsonify json-only hide">
+
+                    <div class="benchName"><a rel="nofollow" href="https://github.com/substack/jsonify">Jsonify</a>
+                    </div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox"/></div>
+
+                </div>
+
+                <div class="dataRow Oboe json-only hide">
+
+                    <div class="benchName"><a rel="nofollow" href="http://oboejs.com/">Oboe</a></div>
+                    <div class="benchRate">
+                        <div class="value">&nbsp;</div>
+                        <div class="delta">&nbsp;</div>
+                    </div>
+                    <div class="benchSpeed">&nbsp;</div>
+                    <div class="benchInclude"><input type="checkbox"/></div>
+
+                </div>
+
+            </div>
+
+            <canvas id="parsersResultChart"></canvas>
 
         </div>
     </div>
