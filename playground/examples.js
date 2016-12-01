@@ -64,7 +64,7 @@ function jsonExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var JsonLexer = new Lexer(jsonTokens, true);
+    var JsonLexer = new Lexer(jsonTokens);
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";
@@ -203,7 +203,7 @@ function jsonGrammarOnlyExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var JsonLexer = new Lexer(jsonTokens, true);
+    var JsonLexer = new Lexer(jsonTokens);
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";
@@ -424,7 +424,7 @@ function cssExample() {
     var Num = extendToken('Num', MAKE_PATTERN('{{num}}'));
 
 
-    var CssLexer = new Lexer(cssTokens, true);
+    var CssLexer = new Lexer(cssTokens);
 
     // ----------------- parser -----------------
     var Parser = chevrotain.Parser;
@@ -817,7 +817,7 @@ function calculatorExample() {
     var allTokens = [WhiteSpace,
         Plus, Minus, Multi, Div, LParen, RParen,
         NumberLiteral, AdditionOperator, MultiplicationOperator];
-    var CalculatorLexer = new Lexer(allTokens, true);
+    var CalculatorLexer = new Lexer(allTokens);
 
 
     // ----------------- parser -----------------
@@ -963,7 +963,7 @@ function tutorialLexerExample() {
     var allTokens = [WhiteSpace, Select, From, Where, Comma,
         Identifier, Integer, GreaterThan, LessThan];
 
-    var SelectLexer = new Lexer(allTokens, true);
+    var SelectLexer = new Lexer(allTokens);
 
     return {
         // because only a lexer is returned the output will display
@@ -1001,7 +1001,7 @@ function tutorialGrammarExample() {
     // whitespace is normally very common so it is placed first to speed up the lexer
     var allTokens = [WhiteSpace, Select, From, Where, Comma,
         Identifier, Integer, GreaterThan, LessThan];
-    var SelectLexer = new Lexer(allTokens, true);
+    var SelectLexer = new Lexer(allTokens);
 
 
     // ----------------- parser -----------------
@@ -1122,7 +1122,7 @@ function tutorialGrammarActionsExample() {
     // whitespace is normally very common so it is placed first to speed up the lexer
     var allTokens = [WhiteSpace, Select, From, Where, Comma,
         Identifier, Integer, GreaterThan, LessThan];
-    var SelectLexer = new Lexer(allTokens, true);
+    var SelectLexer = new Lexer(allTokens);
 
 
     // ----------------- parser -----------------
@@ -1264,7 +1264,7 @@ function tutorialErrorRecoveryExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var JsonLexer = new Lexer(jsonTokens, true);
+    var JsonLexer = new Lexer(jsonTokens);
 
     // ----------------- parser -----------------
     var Parser = chevrotain.Parser;

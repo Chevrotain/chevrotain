@@ -12,4 +12,24 @@ function getUrlParameter(sParam) {
             return sParameterName[1] === undefined ? true : sParameterName[1];
         }
     }
-};
+}
+
+var orgLexer = chevrotain.Lexer
+
+/**
+ * Modifies chevrotain's Lexer to by default enable the deferred error handling
+ * This should not normally be done in productive flows, but it is very important for the playground
+ * as the deferred errors are displayed in the UI...
+ */
+function wrapChevrotainLexer() {
+    chevrotain.Lexer = function (definition, deferred) {
+
+        if (_.isUndefined(deferred)) {
+            deferred = true;
+        }
+        var newLexer = new orgLexer(definition, deferred);
+        return newLexer
+    }
+
+    _.assign(chevrotain.Lexer, orgLexer)
+}
