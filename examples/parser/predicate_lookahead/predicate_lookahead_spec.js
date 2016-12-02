@@ -2,9 +2,9 @@ var parse = require("./predicate_lookahead").parse;
 var setMaxAllowed = require("./predicate_lookahead").setMaxAllowed;
 var expect = require("chai").expect;
 
-describe("The Chevrotain support for custom lookahead predicates", function () {
+describe("The Chevrotain support for custom lookahead predicates", function() {
 
-    it("can limit the available alternatives in an OR by an some external input number", function () {
+    it("can limit the available alternatives in an OR by an some external input number", function() {
         setMaxAllowed(3);
         expect(parse("1").value).to.equal(1);
         expect(parse("2").value).to.equal(2);

@@ -60,7 +60,7 @@ class JsonParserES6 extends chevrotain.Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) { 
+    constructor(input) {
         super(input, allTokens,
             // by default the error recovery / fault tolerance capabilities are disabled
             // use this flag to enable them
@@ -135,7 +135,7 @@ class JsonParserES6 extends chevrotain.Parser {
 // reuse the same parser instance.
 var parser = new JsonParserES6([]);
 
-module.exports = function (text) {
+module.exports = function(text) {
     var lexResult = JsonLexer.tokenize(text);
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens;

@@ -106,7 +106,7 @@ JsonParserES5.prototype.constructor = JsonParserES5;
 // reuse the same parser instance.
 var parser = new JsonParserES5([]);
 
-module.exports = function (text) {
+module.exports = function(text) {
     var lexResult = JsonLexer.tokenize(text);
 
     // setting a new input will RESET the parser instance's state.

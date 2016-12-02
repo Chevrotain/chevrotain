@@ -47,7 +47,7 @@ Whitespace.GROUP = Lexer.SKIPPED;
 // And each value is an array of Tokens which are valid in this Lexer mode.
 var multiModeLexerDefinition = {
 
-    modes : {
+    modes: {
         "numbers_mode": [
             One,
             Two,
@@ -74,7 +74,7 @@ var multiModeLexerDefinition = {
         ]
     },
 
-    defaultMode : "numbers_mode"
+    defaultMode: "numbers_mode"
 };
 
 // Our new lexer now support 3 different modes

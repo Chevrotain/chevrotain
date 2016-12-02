@@ -62,7 +62,7 @@ function AbstractCommandsParser(input, tokens) {
     var $ = this;
 
 
-    this.commands = $.RULE("commands", function() {
+    $.RULE("commands", function() {
         $.SUBRULE($.command);
 
         $.MANY(function() {
@@ -71,7 +71,7 @@ function AbstractCommandsParser(input, tokens) {
         })
     });
 
-    this.command = $.RULE("command", function() {
+    $.RULE("command", function() {
         // The cook and clean commands must be implemented in each sub grammar
         $.OR([
             // @formatter:off
@@ -95,7 +95,7 @@ function EnglishCommandsParser(input) {
     var $ = this;
 
     // implementing the 'cookCommand' referenced in the AbstractCommandsParser
-    this.cookCommand = $.RULE("cookCommand", function() {
+    $.RULE("cookCommand", function() {
         $.CONSUME(Cook);
         $.OPTION(function() {
             $.CONSUME(Some);
@@ -105,7 +105,7 @@ function EnglishCommandsParser(input) {
     });
 
     // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
-    this.cleanCommand = $.RULE("cleanCommand", function() {
+    $.RULE("cleanCommand", function() {
         $.CONSUME(Clean);
         $.CONSUME(The);
         $.CONSUME(Room);
@@ -127,7 +127,7 @@ function GermanCommandsParser(input) {
     var $ = this;
 
     // implementing the 'cookCommand' referenced in the AbstractCommandsParser
-    this.cookCommand = $.RULE("cookCommand", function() {
+    $.RULE("cookCommand", function() {
         $.CONSUME(Kochen);
         $.OR([
             // @formatter:off
@@ -138,7 +138,7 @@ function GermanCommandsParser(input) {
     });
 
     // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
-    this.cleanCommand = $.RULE("cleanCommand", function() {
+    $.RULE("cleanCommand", function() {
         $.CONSUME(Raum);
         $.CONSUME(Den);
         $.CONSUME2(Raum);

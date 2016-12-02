@@ -36,7 +36,7 @@ function MultiStartParser(input) {
 
     var $ = this;
 
-    this.firstRule = $.RULE("firstRule", function() {
+    $.RULE("firstRule", function() {
         $.CONSUME(Alpha);
 
         $.OPTION(function() {
@@ -44,7 +44,7 @@ function MultiStartParser(input) {
         })
     });
 
-    this.secondRule = $.RULE("secondRule", function() {
+    $.RULE("secondRule", function() {
         $.CONSUME(Bravo);
 
         $.OPTION(function() {
@@ -52,7 +52,7 @@ function MultiStartParser(input) {
         })
     });
 
-    this.thirdRule = $.RULE("thirdRule", function() {
+    $.RULE("thirdRule", function() {
         $.CONSUME(Charlie);
     });
 
