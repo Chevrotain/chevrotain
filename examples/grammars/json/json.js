@@ -38,16 +38,14 @@ function JsonParserES5(input) {
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this;
 
-    this.json = this.RULE("json", function() {
-        // @formatter:off
+    this.RULE("json", function() {
         $.OR([
-            { ALT: function () { $.SUBRULE($.object) }},
-            { ALT: function () { $.SUBRULE($.array) }}
+            {ALT: function() { $.SUBRULE($.object) }},
+            {ALT: function() { $.SUBRULE($.array) }}
         ]);
-        // @formatter:on
     });
 
-    this.object = this.RULE("object", function() {
+    this.RULE("object", function() {
         $.CONSUME(LCurly);
         $.OPTION(function() {
             $.SUBRULE($.objectItem);
@@ -59,13 +57,13 @@ function JsonParserES5(input) {
         $.CONSUME(RCurly);
     });
 
-    this.objectItem = this.RULE("objectItem", function() {
+    this.RULE("objectItem", function() {
         $.CONSUME(StringLiteral);
         $.CONSUME(Colon);
         $.SUBRULE($.value);
     });
 
-    this.array = this.RULE("array", function() {
+    this.RULE("array", function() {
         $.CONSUME(LSquare);
         $.OPTION(function() {
             $.SUBRULE($.value);
@@ -77,19 +75,17 @@ function JsonParserES5(input) {
         $.CONSUME(RSquare);
     });
 
-    // @formatter:off
-    this.value = this.RULE("value", function () {
+    this.RULE("value", function() {
         $.OR([
-            { ALT: function () { $.CONSUME(StringLiteral) }},
-            { ALT: function () { $.CONSUME(NumberLiteral) }},
-            { ALT: function () { $.SUBRULE($.object) }},
-            { ALT: function () { $.SUBRULE($.array) }},
-            { ALT: function () { $.CONSUME(True) }},
-            { ALT: function () { $.CONSUME(False) }},
-            { ALT: function () { $.CONSUME(Null) }}
+            {ALT: function() { $.CONSUME(StringLiteral) }},
+            {ALT: function() { $.CONSUME(NumberLiteral) }},
+            {ALT: function() { $.SUBRULE($.object) }},
+            {ALT: function() { $.SUBRULE($.array) }},
+            {ALT: function() { $.CONSUME(True) }},
+            {ALT: function() { $.CONSUME(False) }},
+            {ALT: function() { $.CONSUME(Null) }}
         ], "a value");
     });
-    // @formatter:on
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information

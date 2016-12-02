@@ -54,7 +54,7 @@ function DynamicDelimiterParser(input) {
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this;
 
-    this.array = this.RULE("array", function() {
+    this.RULE("array", function() {
         var result = ""
 
         $.CONSUME(LSquare); // This will match any Token Class which extends BaseLeftDelimiter
