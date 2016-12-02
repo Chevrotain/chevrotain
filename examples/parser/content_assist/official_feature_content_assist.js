@@ -41,13 +41,13 @@ class StatementsParser extends Parser {
 
         let $ = this;
 
-        this.startRule = $.RULE('startRule', () => {
+        $.RULE('startRule', () => {
             $.MANY(() => {
                 $.SUBRULE($.stmt);
             });
         });
 
-        this.stmt = $.RULE('stmt', () => {
+        $.RULE('stmt', () => {
             $.OR([
                 {ALT: () => $.SUBRULE($.functionInvocation)},
                 {ALT: () => $.SUBRULE($.functionStmt)},
@@ -55,13 +55,13 @@ class StatementsParser extends Parser {
             ]);
         });
 
-        this.functionInvocation = $.RULE('functionInvocation', () => {
+        $.RULE('functionInvocation', () => {
             $.CONSUME(Call);
             $.CONSUME(Identifier);
         });
 
         // e.g: "private static function foo"
-        this.functionStmt = $.RULE('functionStmt', () => {
+        $.RULE('functionStmt', () => {
             $.SUBRULE($.visibility);
             $.OPTION(() => {
                 $.CONSUME(Static);
@@ -71,13 +71,13 @@ class StatementsParser extends Parser {
         });
 
         // e.g "public enum MONTHS"
-        this.enumStmt = $.RULE('enumStmt', () => {
+        $.RULE('enumStmt', () => {
             $.SUBRULE($.visibility);
             $.CONSUME(Enum);
             $.CONSUME(Identifier);
         });
 
-        this.visibility = $.RULE('visibility', () => {
+        $.RULE('visibility', () => {
             $.OR([
                 {ALT: () => $.CONSUME(Private)},
                 {ALT: () => $.CONSUME(Public)},

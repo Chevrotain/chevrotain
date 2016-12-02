@@ -45,7 +45,7 @@ module.exports = function(grunt) {
                 src:     ['src/**/*.ts', 'test/**/*.ts', 'typings/**/*.d.ts'],
                 outDir:  'bin/',
                 options: {
-                    module : "commonjs",
+                    module:         "commonjs",
                     declaration:    false,
                     removeComments: false,
                     sourceMap:      true

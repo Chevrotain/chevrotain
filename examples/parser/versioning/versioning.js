@@ -36,7 +36,7 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
     var $ = this;
 
 
-    this.selectStatement = $.RULE("selectStatement", function() {
+    $.RULE("selectStatement", function() {
         $.SUBRULE($.selectClause)
         $.SUBRULE($.fromClause)
         $.OPTION(function() {
@@ -45,7 +45,7 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
     });
 
 
-    this.selectClause = $.RULE("selectClause", function() {
+    $.RULE("selectClause", function() {
         $.CONSUME(Select);
         $.AT_LEAST_ONE_SEP(Comma, function() {
             $.CONSUME(Identifier);
@@ -54,19 +54,19 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
 
 
     // fromClause in version1 allows only a single column name.
-    this.fromClause = $.RULE("fromClause", function() {
+    $.RULE("fromClause", function() {
         $.CONSUME(From);
         $.CONSUME(Identifier);
     });
 
 
-    this.whereClause = $.RULE("whereClause", function() {
+    $.RULE("whereClause", function() {
         $.CONSUME(Where)
         $.SUBRULE($.expression)
     });
 
 
-    this.expression = $.RULE("expression", function() {
+    $.RULE("expression", function() {
         $.SUBRULE($.atomicExpression);
         $.SUBRULE($.relationalOperator);
         $.SUBRULE2($.atomicExpression); // note the '2' suffix to distinguish
@@ -74,7 +74,7 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
     });
 
 
-    this.atomicExpression = $.RULE("atomicExpression", function() {
+    $.RULE("atomicExpression", function() {
         $.OR([
             // @formatter:off
             { ALT: function() {$.CONSUME(Integer)}},
@@ -84,7 +84,7 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
     });
 
 
-    this.relationalOperator = $.RULE("relationalOperator", function() {
+    $.RULE("relationalOperator", function() {
         $.OR([
             // @formatter:off
             {ALT: function() {$.CONSUME(GreaterThan)}},
@@ -164,7 +164,7 @@ module.exports = function(text, version) {
     parser.input = lexResult.tokens;
     var value = parser.selectStatement();
 
-     return {
+    return {
         value:       value, // this is a pure grammar, the value will always be <undefined>
         lexErrors:   lexResult.errors,
         parseErrors: parser.errors

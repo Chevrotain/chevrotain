@@ -51,7 +51,7 @@ function PredicateLookaheadParser(input) {
 
     var $ = this;
 
-    this.customPredicateRule = $.RULE("customPredicateRule", function() {
+    $.RULE("customPredicateRule", function() {
         // @formatter:off
         return $.OR([
             // In this example we disable some of the alternatives depending on the value of the

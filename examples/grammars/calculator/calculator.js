@@ -33,14 +33,14 @@ function Calculator(input) {
 
     var $ = this;
 
-    this.expression = $.RULE("expression", function() {
+    $.RULE("expression", function() {
         return $.SUBRULE($.additionExpression)
     });
 
     //  lowest precedence thus it is first in the rule chain
     // The precedence of binary expressions is determined by how far down the Parse Tree
     // The binary expression appears.
-    this.additionExpression = $.RULE("additionExpression", function() {
+    $.RULE("additionExpression", function() {
         var value, op, rhsVal;
 
         // parsing part
@@ -63,7 +63,7 @@ function Calculator(input) {
     });
 
 
-    this.multiplicationExpression = $.RULE("multiplicationExpression", function() {
+    $.RULE("multiplicationExpression", function() {
         var value, op, rhsVal;
 
         // parsing part
@@ -85,7 +85,7 @@ function Calculator(input) {
     });
 
 
-    this.atomicExpression = $.RULE("atomicExpression", function() {
+    $.RULE("atomicExpression", function() {
         // @formatter:off
             return $.OR([
                 // parenthesisExpression has the highest precedence and thus it appears
@@ -96,7 +96,7 @@ function Calculator(input) {
             // @formatter:on
     });
 
-    this.parenthesisExpression = $.RULE("parenthesisExpression", function() {
+    $.RULE("parenthesisExpression", function() {
         var expValue;
 
         $.CONSUME(LParen);
@@ -134,8 +134,8 @@ module.exports = function(text) {
     var value = parser.expression();
 
     return {
-        value:      value,
-        lexResult:  lexResult,
+        value:       value,
+        lexResult:   lexResult,
         parseErrors: parser.errors
     };
 };

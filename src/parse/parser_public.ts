@@ -1200,7 +1200,9 @@ export class Parser {
             }
         }
 
-        return this.defineRule(name, implementation, config)
+        let ruleImplementation = this.defineRule(name, implementation, config)
+        this[name] = ruleImplementation
+        return ruleImplementation
     }
 
     /**

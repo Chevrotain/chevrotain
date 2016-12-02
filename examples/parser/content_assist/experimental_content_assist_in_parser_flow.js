@@ -66,7 +66,7 @@ class SelectParser extends chevrotain.Parser {
         var $ = this;
 
 
-        this.selectStatement = $.RULE("selectStatement", function() {
+        $.RULE("selectStatement", function() {
             $.SUBRULE($.selectClause);
             $.SUBRULE($.fromClause);
             $.OPTION(function() {
@@ -75,7 +75,7 @@ class SelectParser extends chevrotain.Parser {
         });
 
 
-        this.selectClause = $.RULE("selectClause", function() {
+        $.RULE("selectClause", function() {
             $.CONSUME(Select);
             $.CONSUME(Identifier);
             $.MANY(function() {
@@ -85,26 +85,26 @@ class SelectParser extends chevrotain.Parser {
         });
 
 
-        this.fromClause = $.RULE("fromClause", function() {
+        $.RULE("fromClause", function() {
             $.CONSUME(From);
             $.CONSUME(Identifier);
         });
 
 
-        this.whereClause = $.RULE("whereClause", function() {
+        $.RULE("whereClause", function() {
             $.CONSUME(Where);
             $.SUBRULE($.expression);
         });
 
 
-        this.expression = $.RULE("expression", function() {
+        $.RULE("expression", function() {
             $.SUBRULE($.atomicExpression);
             $.SUBRULE($.relationalOperator);
             $.SUBRULE2($.atomicExpression);
         });
 
 
-        this.atomicExpression = $.RULE("atomicExpression", function() {
+        $.RULE("atomicExpression", function() {
             $.OR([
                 {ALT: function() { $.CONSUME(Integer)}},
                 {ALT: function() { $.CONSUME(Identifier)}}
@@ -112,7 +112,7 @@ class SelectParser extends chevrotain.Parser {
         });
 
 
-        this.relationalOperator = $.RULE("relationalOperator", function() {
+        $.RULE("relationalOperator", function() {
             $.OR([
                 {ALT: function() { $.CONSUME(GreaterThan)}},
                 {ALT: function() { $.CONSUME(LessThan)}}
