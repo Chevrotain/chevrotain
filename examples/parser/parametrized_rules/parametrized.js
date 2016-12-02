@@ -53,13 +53,13 @@ class HelloParser extends chevrotain.Parser {
 
         super(input, allTokens)
 
-        this.topRule = this.RULE("topRule", (mood) => {
+        this.RULE("topRule", (mood) => {
             // SUBRULE may be called with a array of arguments which will be passed to the sub-rule's implementation
             this.SUBRULE(this.hello, [mood])
         })
 
         // the <hello> rule's implementation is defined with a <mood> parameter
-        this.hello = this.RULE("hello", (mood) => {
+        this.RULE("hello", (mood) => {
             this.CONSUME(Hello)
 
             // The mood parameter is used to determine which path to take
@@ -71,7 +71,7 @@ class HelloParser extends chevrotain.Parser {
             this.CONSUME(World)
         })
 
-        this.negative = this.RULE("negative", () => {
+        this.RULE("negative", () => {
             this.OR([
                 {ALT: () => {this.CONSUME(Cruel)}},
                 {ALT: () => {this.CONSUME(Bad)}},
@@ -79,7 +79,7 @@ class HelloParser extends chevrotain.Parser {
             ])
         })
 
-        this.positive = this.RULE("positive", () => {
+        this.RULE("positive", () => {
             this.OR([
                 {ALT: () => {this.CONSUME(Good)}},
                 {ALT: () => {this.CONSUME(Wonderful)}},

@@ -43,7 +43,7 @@
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
         var $ = this
 
-        this.json = this.RULE("json", function() {
+        this.RULE("json", function() {
             // @formatter:off
         $.OR([
             { ALT: function () { $.SUBRULE($.object) }},
@@ -52,7 +52,7 @@
         // @formatter:on
         })
 
-        this.object = this.RULE("object", function() {
+        this.RULE("object", function() {
             $.CONSUME(LCurly)
             $.OPTION(function() {
                 $.SUBRULE($.objectItem)
@@ -64,13 +64,13 @@
             $.CONSUME(RCurly)
         })
 
-        this.objectItem = this.RULE("objectItem", function() {
+        this.RULE("objectItem", function() {
             $.CONSUME(StringLiteral)
             $.CONSUME(Colon)
             $.SUBRULE($.value)
         })
 
-        this.array = this.RULE("array", function() {
+        this.RULE("array", function() {
             $.CONSUME(LSquare)
             $.OPTION(function() {
                 $.SUBRULE($.value)
@@ -83,7 +83,7 @@
         })
 
         // @formatter:off
-    this.value = this.RULE("value", function () {
+    this.RULE("value", function () {
         $.OR([
             { ALT: function () { $.CONSUME(StringLiteral) }},
             { ALT: function () { $.CONSUME(NumberLiteral) }},
