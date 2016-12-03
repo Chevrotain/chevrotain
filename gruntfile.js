@@ -41,6 +41,9 @@ module.exports = function(grunt) {
             npm_link:                               {
                 exec: 'npm link'
             },
+            lint:                               {
+                exec: 'npm run lint'
+            },
             test_examples_lexer:                    {
                 options: {
                     cwd: process.cwd() + "/examples/lexer"
@@ -71,6 +74,7 @@ module.exports = function(grunt) {
                 },
                 exec:    INSTALL_LINK + " && npm test"
             },
+
         },
 
         karma: {
@@ -162,16 +166,6 @@ module.exports = function(grunt) {
                         functions:  100
                     }
                 }
-            }
-        },
-
-        tslint: {
-            options: {
-                configuration: grunt.file.readJSON("tslint.json")
-            },
-
-            files: {
-                src: ['src/**/*.ts', 'test/**/*.ts']
             }
         },
 
@@ -327,7 +321,7 @@ module.exports = function(grunt) {
 
     var buildTasks = [
         'clean:release',
-        'tslint',
+        'run:lint',
         'ts:release',
         'replace:coverage_ignore',
         'concat:release_definitions',
