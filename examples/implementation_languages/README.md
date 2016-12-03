@@ -1,6 +1,6 @@
 # Implementation Languages Examples
 
-Chevrotain is a **JavaScript*(ECMAScript) Parsing DSL, However that does not mean Chevrotain Parsers can only be written using
+Chevrotain is a **JavaScript**(ECMAScript) Parsing DSL, However that does not mean Chevrotain Parsers can only be written using
 pure JavaScript. It is possible to create Chevrotain Parsers using different flavors of JavaScript or even using
 compile to JS languages.
 
