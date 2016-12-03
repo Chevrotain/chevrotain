@@ -37,8 +37,8 @@ and cannot (at least not easily) be bundled for use in a browser.
   as a template. 
   * Note that this simple serializer only exports the serialized grammar as a global variable on the window object.
     For more complex behavior create your own serialization logic by using the available Chevrotain APIs:
-    - [serializeGrammar](http://sap.github.io/chevrotain/documentation/0_18_0/modules/gast.html#serializegrammar) 
-    - [serializeProduction](http://sap.github.io/chevrotain/documentation/0_18_0/modules/gast.html#serializeproduction)
+    - [serializeGrammar](http://sap.github.io/chevrotain/documentation/0_19_0/modules/gast.html#serializegrammar) 
+    - [serializeProduction](http://sap.github.io/chevrotain/documentation/0_19_0/modules/gast.html#serializeproduction)
 
 - Modify or replace 
   ```<script src='sample/generated_serialized_grammar.js'></script>```
