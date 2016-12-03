@@ -3,7 +3,7 @@
 #### Minor Changes
 
 - [Improve formatting of NoViableAlt exception message.](https://github.com/SAP/chevrotain/issues/297)
-
+- [Less verbose syntax for defining grammar rules.](https://github.com/SAP/chevrotain/issues/316)
 
 
 ## 0.18.0 (10-27-2016)
