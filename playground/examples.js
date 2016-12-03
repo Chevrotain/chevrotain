@@ -82,7 +82,7 @@ function jsonExample() {
         Parser.call(this, input, jsonTokens, {recoveryEnabled: true});
         var $ = this;
 
-        this.json = this.RULE("json", function () {
+        $.RULE("json", function () {
             // @formatter:off
             return $.OR([
                 { ALT: function () { return $.SUBRULE($.object) }},
@@ -91,7 +91,7 @@ function jsonExample() {
             // @formatter:on
         });
 
-        this.object = this.RULE("object", function () {
+        $.RULE("object", function () {
             // uncomment the debugger statement and open dev tools in chrome/firefox
             // to debug the parsing flow.
             // debugger;
@@ -107,7 +107,7 @@ function jsonExample() {
         });
 
 
-        this.objectItem = this.RULE("objectItem", function () {
+        $.RULE("objectItem", function () {
             var lit, key, value, obj = {};
 
             lit = $.CONSUME(StringLiteral)
@@ -122,7 +122,7 @@ function jsonExample() {
         });
 
 
-        this.array = this.RULE("array", function () {
+        $.RULE("array", function () {
             var arr = [];
             $.CONSUME(LSquare);
             $.MANY_SEP(Comma, function () {
@@ -135,7 +135,7 @@ function jsonExample() {
 
 
         // @formatter:off
-        this.value = this.RULE("value", function () {
+        $.RULE("value", function () {
             return $.OR([
                 { ALT: function () {
                     var stringLiteral = $.CONSUME(StringLiteral).image
@@ -221,7 +221,7 @@ function jsonGrammarOnlyExample() {
         Parser.call(this, input, jsonTokens, {recoveryEnabled: true});
         var $ = this;
 
-        this.json = this.RULE("json", function () {
+        $.RULE("json", function () {
             // @formatter:off
             $.OR([
                 { ALT: function () { $.SUBRULE($.object) }},
@@ -230,7 +230,7 @@ function jsonGrammarOnlyExample() {
             // @formatter:on
         });
 
-        this.object = this.RULE("object", function () {
+        $.RULE("object", function () {
             $.CONSUME(LCurly);
             $.MANY_SEP(Comma, function () {
                 $.SUBRULE($.objectItem);
@@ -239,14 +239,14 @@ function jsonGrammarOnlyExample() {
         });
 
 
-        this.objectItem = this.RULE("objectItem", function () {
+        $.RULE("objectItem", function () {
             $.CONSUME(StringLiteral)
             $.CONSUME(Colon);
             $.SUBRULE($.value);
         });
 
 
-        this.array = this.RULE("array", function () {
+        $.RULE("array", function () {
             $.CONSUME(LSquare);
             $.MANY_SEP(Comma, function () {
                 $.SUBRULE($.value);
@@ -256,7 +256,7 @@ function jsonGrammarOnlyExample() {
 
 
         // @formatter:off
-        this.value = this.RULE("value", function () {
+        $.RULE("value", function () {
             $.OR([
                 { ALT: function () { $.CONSUME(StringLiteral) }},
                 { ALT: function () { $.CONSUME(NumberLiteral) }},
@@ -434,7 +434,7 @@ function cssExample() {
             {recoveryEnabled: true, maxLookahead: 3});
         var $ = this;
 
-        this.stylesheet = this.RULE('stylesheet', function () {
+        $.RULE('stylesheet', function () {
 
             // [ CHARSET_SYM STRING ';' ]?
             $.OPTION(function () {
@@ -456,13 +456,13 @@ function cssExample() {
             })
         });
 
-        this.charsetHeader = this.RULE('charsetHeader', function () {
+        $.RULE('charsetHeader', function () {
             $.CONSUME(CharsetSym)
             $.CONSUME(StringLiteral)
             $.CONSUME(SemiColon)
         })
 
-        this.contents = this.RULE('contents', function () {
+        $.RULE('contents', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.SUBRULE($.ruleset)}},
@@ -474,7 +474,7 @@ function cssExample() {
         })
 
         // factor out repeating pattern for cdc/cdo
-        this.cdcCdo = this.RULE('cdcCdo', function () {
+        $.RULE('cdcCdo', function () {
             // @formatter:off
             $.MANY(function () {
                 $.OR([
@@ -487,7 +487,7 @@ function cssExample() {
 
         // IMPORT_SYM S*
         // [STRING|URI] S* media_list? ';' S*
-        this.cssImport = this.RULE('cssImport', function () {
+        $.RULE('cssImport', function () {
             $.CONSUME(ImportSym)
             // @formatter:off
             $.OR([
@@ -504,7 +504,7 @@ function cssExample() {
         });
 
         // MEDIA_SYM S* media_list '{' S* ruleset* '}' S*
-        this.media = this.RULE('media', function () {
+        $.RULE('media', function () {
             $.CONSUME(MediaSym)
             $.SUBRULE($.media_list)
             $.CONSUME(LCurly)
@@ -513,20 +513,20 @@ function cssExample() {
         });
 
         // medium [ COMMA S* medium]*
-        this.media_list = this.RULE('media_list', function () {
+        $.RULE('media_list', function () {
             $.MANY_SEP(Comma, function () {
                 $.SUBRULE($.medium)
             })
         });
 
         // IDENT S*
-        this.medium = this.RULE('medium', function () {
+        $.RULE('medium', function () {
             $.CONSUME(Ident)
         });
 
         // PAGE_SYM S* pseudo_page?
         // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-        this.page = this.RULE('page', function () {
+        $.RULE('page', function () {
             $.CONSUME(PageSym)
             $.OPTION(function () {
                 $.SUBRULE($.pseudo_page)
@@ -537,7 +537,7 @@ function cssExample() {
 
         // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
         // factored out repeating grammar pattern
-        this.declarationsGroup = this.RULE('declarationsGroup', function () {
+        $.RULE('declarationsGroup', function () {
             $.CONSUME(LCurly)
             $.OPTION(function () {
                 $.SUBRULE($.declaration)
@@ -553,13 +553,13 @@ function cssExample() {
         });
 
         // ':' IDENT S*
-        this.pseudo_page = this.RULE('pseudo_page', function () {
+        $.RULE('pseudo_page', function () {
             $.CONSUME(Colon)
             $.CONSUME(Ident)
         });
 
         // '/' S* | ',' S*
-        this.operator = this.RULE('operator', function () {
+        $.RULE('operator', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Slash)}},
@@ -569,7 +569,7 @@ function cssExample() {
         });
 
         // '+' S* | '>' S*
-        this.combinator = this.RULE('combinator', function () {
+        $.RULE('combinator', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Plus)}},
@@ -579,7 +579,7 @@ function cssExample() {
         });
 
         // '-' | '+'
-        this.unary_operator = this.RULE('unary_operator', function () {
+        $.RULE('unary_operator', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Minus)}},
@@ -589,13 +589,13 @@ function cssExample() {
         });
 
         // IDENT S*
-        this.property = this.RULE('property', function () {
+        $.RULE('property', function () {
             $.CONSUME(Ident)
         });
 
         // selector [ ',' S* selector ]*
         // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-        this.ruleset = this.RULE('ruleset', function () {
+        $.RULE('ruleset', function () {
             $.MANY_SEP(Comma, function () {
                 $.SUBRULE($.selector)
             })
@@ -604,7 +604,7 @@ function cssExample() {
         });
 
         // simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
-        this.selector = this.RULE('selector', function () {
+        $.RULE('selector', function () {
             $.SUBRULE($.simple_selector)
             $.OPTION(function () {
                 $.OPTION2(function () {
@@ -616,7 +616,7 @@ function cssExample() {
 
         // element_name [ HASH | class | attrib | pseudo ]*
         // | [ HASH | class | attrib | pseudo ]+
-        this.simple_selector = this.RULE('simple_selector', function () {
+        $.RULE('simple_selector', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() {
@@ -637,7 +637,7 @@ function cssExample() {
 
         // helper grammar rule to avoid repetition
         // [ HASH | class | attrib | pseudo ]+
-        this.simple_selector_suffix = this.RULE('simple_selector_suffix', function () {
+        $.RULE('simple_selector_suffix', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Hash) }},
@@ -649,13 +649,13 @@ function cssExample() {
         })
 
         // '.' IDENT
-        this.class = this.RULE('class', function () {
+        $.RULE('class', function () {
             $.CONSUME(Dot)
             $.CONSUME(Ident)
         });
 
         // IDENT | '*'
-        this.element_name = this.RULE('element_name', function () {
+        $.RULE('element_name', function () {
             // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Ident) }},
@@ -665,7 +665,7 @@ function cssExample() {
         });
 
         // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
-        this.attrib = this.RULE('attrib', function () {
+        $.RULE('attrib', function () {
             $.CONSUME(LSquare)
             $.CONSUME(Ident)
 
@@ -687,7 +687,7 @@ function cssExample() {
         });
 
         // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
-        this.pseudo = this.RULE('pseudo', function () {
+        $.RULE('pseudo', function () {
             $.CONSUME(Colon)
             // @formatter:off
             $.OR([
@@ -706,7 +706,7 @@ function cssExample() {
         });
 
         // property ':' S* expr prio?
-        this.declaration = this.RULE('declaration', function () {
+        $.RULE('declaration', function () {
             $.SUBRULE($.property)
             $.CONSUME(Colon)
             $.SUBRULE($.expr)
@@ -717,12 +717,12 @@ function cssExample() {
         });
 
         // IMPORTANT_SYM S*
-        this.prio = this.RULE('prio', function () {
+        $.RULE('prio', function () {
             $.CONSUME(ImportantSym)
         });
 
         // term [ operator? term ]*
-        this.expr = this.RULE('expr', function () {
+        $.RULE('expr', function () {
             $.SUBRULE($.term)
             $.MANY(function () {
                 $.OPTION(function () {
@@ -736,7 +736,7 @@ function cssExample() {
         // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* |
         // TIME S* | FREQ S* ]
         // | STRING S* | IDENT S* | URI S* | hexcolor | function
-        this.term = this.RULE('term', function () {
+        $.RULE('term', function () {
             $.OPTION(function () {
                 $.SUBRULE($.unary_operator)
             })
@@ -761,13 +761,13 @@ function cssExample() {
         });
 
         // FUNCTION S* expr ')' S*
-        this.cssFunction = this.RULE('cssFunction', function () {
+        $.RULE('cssFunction', function () {
             $.CONSUME(Func)
             $.SUBRULE($.expr)
             $.CONSUME(RParen)
         });
 
-        this.hexcolor = this.RULE('hexcolor', function () {
+        $.RULE('hexcolor', function () {
             $.CONSUME(Hash)
         });
 
@@ -1275,7 +1275,8 @@ function tutorialErrorRecoveryExample() {
         Parser.call(this, input, jsonTokens, {recoveryEnabled: isRecoveryEnabled});
         var $ = this;
 
-        this.json = this.RULE("json", function () {
+        
+        $.RULE("json", function () {
             // @formatter:off
             return $.OR([
                 { ALT: function () { return $.SUBRULE($.object) }},
@@ -1284,7 +1285,8 @@ function tutorialErrorRecoveryExample() {
             // @formatter:on
         });
 
-        this.object = this.RULE("object", function () {
+        
+        $.RULE("object", function () {
             // uncomment the debugger statement and open dev tools in chrome/firefox
             // to debug the parsing flow.
             // debugger;
@@ -1304,7 +1306,7 @@ function tutorialErrorRecoveryExample() {
             return {ALARM: "recovered objectItem"}
         }
 
-        this.objectItem = this.RULE("objectItem", function () {
+        $.RULE("objectItem", function () {
             var lit, key, value, obj = {};
 
             lit = $.CONSUME(StringLiteral)
@@ -1323,7 +1325,7 @@ function tutorialErrorRecoveryExample() {
         }, {recoveryValueFunc: invalidObjectItem});
 
 
-        this.array = this.RULE("array", function () {
+        $.RULE("array", function () {
             var arr = [];
             $.CONSUME(LSquare);
             $.MANY_SEP(Comma, function () {
@@ -1336,7 +1338,7 @@ function tutorialErrorRecoveryExample() {
 
 
         // @formatter:off
-        this.value = this.RULE("value", function () {
+        $.RULE("value", function () {
             return $.OR([
                 { ALT: function () {
                     var stringLiteral = $.CONSUME(StringLiteral).image

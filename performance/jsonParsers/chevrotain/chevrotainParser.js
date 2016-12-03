@@ -32,60 +32,60 @@ var ChevrotainParser = chevrotain.Parser;
 
 function ChevrotainJsonParser(input) {
     ChevrotainParser.call(this, input, jsonTokens);
-    var _this = this;
+    var $ = this;
 
-    this.json = this.RULE("json", function () {
-        // @formatter:off
-        _this.OR([
-            { ALT: function () { _this.SUBRULE(_this.object) }},
-            { ALT: function () { _this.SUBRULE(_this.array) }}
+    $.RULE("json", function () {
+        $.OR([
+            // @formatter:off
+            { ALT: function () { $.SUBRULE($.object) }},
+            { ALT: function () { $.SUBRULE($.array) }}
+            // @formatter:on
         ]);
-        // @formatter:on
     });
 
-    this.object = this.RULE("object", function () {
-        _this.CONSUME(LCurly);
-        _this.OPTION(function () {
-            _this.SUBRULE(_this.objectItem);
-            _this.MANY(function () {
-                _this.CONSUME(Comma);
-                _this.SUBRULE2(_this.objectItem);
+    $.RULE("object", function () {
+        $.CONSUME(LCurly);
+        $.OPTION(function () {
+            $.SUBRULE($.objectItem);
+            $.MANY(function () {
+                $.CONSUME(Comma);
+                $.SUBRULE2($.objectItem);
             });
         });
-        _this.CONSUME(RCurly);
+        $.CONSUME(RCurly);
     });
 
-    this.objectItem = this.RULE("objectItem", function () {
-        _this.CONSUME(StringLiteral);
-        _this.CONSUME(Colon);
-        _this.SUBRULE(_this.value);
+    $.RULE("objectItem", function () {
+        $.CONSUME(StringLiteral);
+        $.CONSUME(Colon);
+        $.SUBRULE($.value);
     });
 
-    this.array = this.RULE("array", function () {
-        _this.CONSUME(LSquare);
-        _this.OPTION(function () {
-            _this.SUBRULE(_this.value);
-            _this.MANY(function () {
-                _this.CONSUME(Comma);
-                _this.SUBRULE2(_this.value);
+    $.RULE("array", function () {
+        $.CONSUME(LSquare);
+        $.OPTION(function () {
+            $.SUBRULE($.value);
+            $.MANY(function () {
+                $.CONSUME(Comma);
+                $.SUBRULE2($.value);
             });
         });
-        _this.CONSUME(RSquare);
+        $.CONSUME(RSquare);
     });
 
-    // @formatter:off
-    this.value = this.RULE("value", function () {
-        _this.OR([
-            { ALT: function () { _this.CONSUME(StringLiteral) }},
-            { ALT: function () { _this.CONSUME(NumberLiteral) }},
-            { ALT: function () { _this.SUBRULE(_this.object) }},
-            { ALT: function () { _this.SUBRULE(_this.array) }},
-            { ALT: function () { _this.CONSUME(True) }},
-            { ALT: function () { _this.CONSUME(False) }},
-            { ALT: function () { _this.CONSUME(Null) }}
-        ], "a value");
+    $.RULE("value", function () {
+        $.OR([
+            // @formatter:off
+            { ALT: function () { $.CONSUME(StringLiteral) }},
+            { ALT: function () { $.CONSUME(NumberLiteral) }},
+            { ALT: function () { $.SUBRULE($.object) }},
+            { ALT: function () { $.SUBRULE($.array) }},
+            { ALT: function () { $.CONSUME(True) }},
+            { ALT: function () { $.CONSUME(False) }},
+            { ALT: function () { $.CONSUME(Null) }}
+            // @formatter:on
+        ]);
     });
-    // @formatter:on
 
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
