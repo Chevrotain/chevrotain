@@ -35,37 +35,42 @@ module.exports = function(grunt) {
         pkg: pkg,
 
         run: {
-            options:                {
+            options:                                {
                 failOnError: true
             },
-            npm_link:               {
+            npm_link:                               {
                 exec: 'npm link'
             },
-            test_examples_lexer:    {
+            test_examples_lexer:                    {
                 options: {
                     cwd: process.cwd() + "/examples/lexer"
                 },
                 exec:    INSTALL_LINK_TEST
             },
-            test_examples_grammars: {
+            test_examples_grammars:                 {
                 options: {
                     cwd: process.cwd() + "/examples/grammars"
                 },
                 exec:    INSTALL_LINK_TEST
             },
-            test_examples_parser:   {
+            test_examples_parser:                   {
                 options: {
                     cwd: process.cwd() + "/examples/parser"
                 },
                 exec:    INSTALL_LINK + ' && ' + 'grunt --gruntfile minification/gruntfile.js' + ' && ' + examples_test_command
             },
-
-            test_examples_lang_services: {
+            test_examples_lang_services:            {
                 options: {
                     cwd: process.cwd() + "/examples/language_services"
                 },
                 exec:    INSTALL_LINK + "&& grunt test"
-            }
+            },
+            test_examples_implementation_languages: {
+                options: {
+                    cwd: process.cwd() + "/examples/implementation_languages"
+                },
+                exec:    INSTALL_LINK + " && npm test"
+            },
         },
 
         karma: {
@@ -224,7 +229,7 @@ module.exports = function(grunt) {
                 }, {
                     from: /(throw\s*Error\s*\(\s*["']non exhaustive match["']\s*\))/g,
                     to:   '/* istanbul ignore next */ $1'
-                },{
+                }, {
                     from: /(\s+)(else if \(.+\s+.+\s+.+\s+(?:.+\s+)?)(\s*\/\/ IGNORE ABOVE ELSE)/g,
                     to:   '/* istanbul ignore else */ $1$2'
                 }]
@@ -357,7 +362,8 @@ module.exports = function(grunt) {
         'run:test_examples_grammars',
         'run:test_examples_parser',
         'run:test_examples_lexer',
-        'run:test_examples_lang_services'
+        'run:test_examples_lang_services',
+        'run:test_examples_implementation_languages'
     ]
 
     var browsers_tests = [
@@ -378,7 +384,7 @@ module.exports = function(grunt) {
     if (process.env.TRAVIS_BRANCH !== "master") {
         browsers_tests = function() {
             console.log("Skipping browser tests as they should only run on the 'master' branch\n" +
-            "As there seems to be issues enabling tags and result filtering with the karma-sauce-labs-launcher")
+                "As there seems to be issues enabling tags and result filtering with the karma-sauce-labs-launcher")
         }
     }
 
