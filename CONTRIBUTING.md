@@ -25,10 +25,7 @@ See some [existing examples][examples] to get started.
 
 Details:
 * An Example **must** include some tests with an **_spec.js** suffix.
-* An Example may use ES6/ES2015 syntax (classes/constructor/...) but in that case to support testing on older node.js versions:
-  - The name of the test must contain "ES6".
-  - The actual spec must still use ES5 syntax and [**conditionally**][cond_import] import(require) the implementation using ES6/ES2015 syntax. 
- 
+
 
 #### Contributing To Chevrotain's Runtime Source code.
 
@@ -38,7 +35,8 @@ Details:
 * ~100% code coverage is **required**. 
   - It is possible to disable coverage for specific code, but there must be a very good reason.
 * Try to maintain the same code style used in the rest of Chevrotain's source code.
-  - The linting can take care of most of this automatically.
+  - The linting will take care of most of this automatically.
+
 
 ## Development Environment
 
@@ -56,9 +54,7 @@ Chevrotain is written using Typescript, so compilation to javascript is needed.
 This will run the full build, including linting/packaging:
 * ```grunt build```
 
-
-Alternatively if just incremental compilation is desired, execute one of these
-scripts depending on your OS:
+Alternatively during development many times only the TypeScript compilation step is needed:
 * ```watch.bat```
 * ```watch.sh```
 

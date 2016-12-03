@@ -177,20 +177,11 @@ module.exports = function(grunt) {
 
         ts: {
             options: {
-                target:    "ES5",
-                fast:      "never",
-                sourceMap: false
-
+                fast:      "never"
             },
 
             release: {
-                src:     ["src/**/*.ts", "test/**/*.ts", "libs/**/*.ts"],
-                outDir:  'lib',
-                options: {
-                    module:         "commonjs",
-                    declaration:    true,
-                    removeComments: false
-                }
+                tsconfig : true
             },
 
             validate_definitions: {
