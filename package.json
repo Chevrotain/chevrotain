@@ -87,7 +87,7 @@
     "semver": "^5.3.0",
     "tslint": "^4.0.2",
     "typedoc": "^0.5.1",
-    "typescript": "~2.0.10",
+    "typescript": "~2.1.4",
     "webpack": "^1.13.3",
     "webpack-dev-server": "^1.16.2",
     "wrench": "^1.5.9",
