@@ -250,7 +250,13 @@ export interface IParserState {
 }
 
 export type Predicate = () => boolean
-export type GrammarAction = () => void
+export type GrammarAction<OUT> = () => OUT
+
+export type ISeparatedIterationResult<OUT> =
+    {
+        values:OUT[], // The aggregated results of the values returned by each iteration.
+        separators:ISimpleTokenOrIToken[] // the separator tokens between the iterations
+    }
 
 /**
  * Convenience used to express an empty alternative in an OR (alternation).
@@ -764,8 +770,8 @@ export class Parser {
      * Convenience method equivalent to OPTION1.
      * @see OPTION1
      */
-    protected OPTION(predicateOrAction:Predicate | GrammarAction,
-                     action?:GrammarAction):boolean {
+    protected OPTION<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                          action?:GrammarAction<OUT>):OUT {
         return this.OPTION1.call(this, predicateOrAction, action)
     }
 
@@ -788,42 +794,42 @@ export class Parser {
      *                                       or the grammar action to optionally invoke once.
      * @param {Function} [action] - The action to optionally invoke.
      *
-     * @returns {boolean} - True iff the OPTION's action has been invoked
+     * @returns {OUT}
      */
-    protected OPTION1(predicateOrAction:Predicate | GrammarAction,
-                      action?:GrammarAction):boolean {
+    protected OPTION1<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                           action?:GrammarAction<OUT>):OUT {
         return this.optionInternal(predicateOrAction, action, 1)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION2(predicateOrAction:Predicate | GrammarAction,
-                      action?:GrammarAction):boolean {
+    protected OPTION2<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                           action?:GrammarAction<OUT>):OUT {
         return this.optionInternal(predicateOrAction, action, 2)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION3(predicateOrAction:Predicate | GrammarAction,
-                      action?:GrammarAction):boolean {
+    protected OPTION3<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                           action?:GrammarAction<OUT>):OUT {
         return this.optionInternal(predicateOrAction, action, 3)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION4(predicateOrAction:Predicate | GrammarAction,
-                      action?:GrammarAction):boolean {
+    protected OPTION4<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                           action?:GrammarAction<OUT>):OUT {
         return this.optionInternal(predicateOrAction, action, 4)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION5(predicateOrAction:Predicate | GrammarAction,
-                      action?:GrammarAction):boolean {
+    protected OPTION5<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                           action?:GrammarAction<OUT>):OUT {
         return this.optionInternal(predicateOrAction, action, 5)
     }
 
@@ -909,8 +915,8 @@ export class Parser {
      * Convenience method equivalent to MANY1.
      * @see MANY1
      */
-    protected MANY(predicateOrAction:Predicate | GrammarAction,
-                   action?:GrammarAction):void {
+    protected MANY<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                        action?:GrammarAction<OUT>):OUT[] {
         return this.MANY1.call(this, predicateOrAction, action)
     }
 
@@ -936,49 +942,51 @@ export class Parser {
      * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
      *                                   or the grammar action to optionally invoke multiple times.
      * @param {Function} [action] - The action to optionally invoke multiple times.
+     *
+     * @returns {OUT[]}
      */
-    protected MANY1(predicateOrAction:Predicate | GrammarAction,
-                    action?:GrammarAction):void {
-        this.manyInternal(this.MANY1, 1, predicateOrAction, action)
+    protected MANY1<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                         action?:GrammarAction<OUT>):OUT[] {
+        return this.manyInternal(1, predicateOrAction, action, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY2(predicateOrAction:Predicate | GrammarAction,
-                    action?:GrammarAction):void {
-        this.manyInternal(this.MANY2, 2, predicateOrAction, action)
+    protected MANY2<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                         action?:GrammarAction<OUT>):OUT[] {
+        return this.manyInternal(2, predicateOrAction, action, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY3(predicateOrAction:Predicate | GrammarAction,
-                    action?:GrammarAction):void {
-        this.manyInternal(this.MANY3, 3, predicateOrAction, action)
+    protected MANY3<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                         action?:GrammarAction<OUT>):OUT[] {
+        return this.manyInternal(3, predicateOrAction, action, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY4(predicateOrAction:Predicate | GrammarAction,
-                    action?:GrammarAction):void {
-        this.manyInternal(this.MANY4, 4, predicateOrAction, action)
+    protected MANY4<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                         action?:GrammarAction<OUT>):OUT[] {
+        return this.manyInternal(4, predicateOrAction, action, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY5(predicateOrAction:Predicate | GrammarAction,
-                    action?:GrammarAction):void {
-        this.manyInternal(this.MANY5, 5, predicateOrAction, action)
+    protected MANY5<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                         action?:GrammarAction<OUT>):OUT[] {
+        return this.manyInternal(5, predicateOrAction, action, [])
     }
 
     /**
      * Convenience method equivalent to MANY_SEP1.
      * @see MANY_SEP1
      */
-    protected MANY_SEP(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
+    protected MANY_SEP<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
         return this.MANY_SEP1.call(this, separator, action)
     }
 
@@ -1004,47 +1012,47 @@ export class Parser {
      * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
      * @param {Function} [action] - The action to optionally invoke.
      *
-     * @return {Token[]} - The consumed separator Tokens.
+     * @return {ISeparatedIterationResult<OUT>}
      */
-    protected MANY_SEP1(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
-        return this.manySepFirstInternal(this.MANY_SEP1, 1, separator, action)
+    protected MANY_SEP1<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(1, separator, action, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP2(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
-        return this.manySepFirstInternal(this.MANY_SEP2, 2, separator, action)
+    protected MANY_SEP2<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(2, separator, action, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP3(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
-        return this.manySepFirstInternal(this.MANY_SEP3, 3, separator, action)
+    protected MANY_SEP3<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(3, separator, action, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP4(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
-        return this.manySepFirstInternal(this.MANY_SEP4, 4, separator, action)
+    protected MANY_SEP4<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(4, separator, action, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP5(separator:TokenConstructor, action:GrammarAction):ISimpleTokenOrIToken[] {
-        return this.manySepFirstInternal(this.MANY_SEP5, 5, separator, action)
+    protected MANY_SEP5<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(5, separator, action, {values: [], separators: []})
     }
 
     /**
      * Convenience method equivalent to AT_LEAST_ONE1.
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE(predicateOrAction:Predicate | GrammarAction,
-                           action?:GrammarAction | string,
-                           errMsg?:string):void {
+    protected AT_LEAST_ONE<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                                action?:GrammarAction<OUT> | string,
+                                errMsg?:string):void {
         return this.AT_LEAST_ONE1.call(this, predicateOrAction, action, errMsg)
     }
 
@@ -1059,56 +1067,58 @@ export class Parser {
      *                                        or the grammar action to invoke at least once.
      * @param {Function} [action] - The action to optionally invoke.
      * @param {string} [errMsg] - Short title/classification to what is being matched.
+     *
+     * @return {OUT[]}
      */
-    protected AT_LEAST_ONE1(predicateOrAction:Predicate | GrammarAction,
-                            action?:GrammarAction | string,
-                            errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE1, 1, predicateOrAction, action, errMsg)
+    protected AT_LEAST_ONE1<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                                 action?:GrammarAction<OUT> | string,
+                                 errMsg?:string):OUT[] {
+        return this.atLeastOneInternal(1, predicateOrAction, action, errMsg, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE2(predicateOrAction:Predicate | GrammarAction,
-                            action?:GrammarAction | string,
-                            errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE2, 2, predicateOrAction, action, errMsg)
+    protected AT_LEAST_ONE2<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                                 action?:GrammarAction<OUT> | string,
+                                 errMsg?:string):OUT[] {
+        return this.atLeastOneInternal(2, predicateOrAction, action, errMsg, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE3(predicateOrAction:Predicate | GrammarAction,
-                            action?:GrammarAction | string,
-                            errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE3, 3, predicateOrAction, action, errMsg)
+    protected AT_LEAST_ONE3<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                                 action?:GrammarAction<OUT> | string,
+                                 errMsg?:string):OUT[] {
+        return this.atLeastOneInternal(3, predicateOrAction, action, errMsg, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE4(predicateOrAction:Predicate | GrammarAction,
-                            action?:GrammarAction | string,
-                            errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE4, 4, predicateOrAction, action, errMsg)
+    protected AT_LEAST_ONE4<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                                 action?:GrammarAction<OUT> | string,
+                                 errMsg?:string):OUT[] {
+        return this.atLeastOneInternal(4, predicateOrAction, action, errMsg, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE5(predicateOrAction:Predicate | GrammarAction,
-                            action?:GrammarAction | string,
-                            errMsg?:string):void {
-        this.atLeastOneInternal(this.AT_LEAST_ONE5, 5, predicateOrAction, action, errMsg)
+    protected AT_LEAST_ONE5<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
+                                 action?:GrammarAction<OUT> | string,
+                                 errMsg?:string):OUT[] {
+        return this.atLeastOneInternal(5, predicateOrAction, action, errMsg, [])
     }
 
     /**
      * Convenience method equivalent to AT_LEAST_ONE_SEP1.
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE_SEP(separator:TokenConstructor,
-                               action:GrammarAction | string,
-                               errMsg?:string):ISimpleTokenOrIToken[] {
+    protected AT_LEAST_ONE_SEP<OUT>(separator:TokenConstructor,
+                                    action:GrammarAction<OUT> | string,
+                                    errMsg?:string):ISeparatedIterationResult<OUT> {
         return this.AT_LEAST_ONE_SEP1.call(this, separator, action, errMsg)
     }
 
@@ -1123,47 +1133,49 @@ export class Parser {
      * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
      * @param {Function} [action] - The action to optionally invoke.
      * @param {string} [errMsg] - Short title/classification to what is being matched.
+     *
+     * @return {ISeparatedIterationResult<OUT>}
      */
-    protected AT_LEAST_ONE_SEP1(separator:TokenConstructor,
-                                action:GrammarAction | string,
-                                errMsg?:string):ISimpleTokenOrIToken[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 1, separator, action, errMsg)
+    protected AT_LEAST_ONE_SEP1<OUT>(separator:TokenConstructor,
+                                     action:GrammarAction<OUT> | string,
+                                     errMsg?:string):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(1, separator, action, errMsg, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP2(separator:TokenConstructor,
-                                action:GrammarAction | string,
-                                errMsg?:string):ISimpleTokenOrIToken[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 2, separator, action, errMsg)
+    protected AT_LEAST_ONE_SEP2<OUT>(separator:TokenConstructor,
+                                     action:GrammarAction<OUT> | string,
+                                     errMsg?:string):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(2, separator, action, errMsg, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP3(separator:TokenConstructor,
-                                action:GrammarAction | string,
-                                errMsg?:string):ISimpleTokenOrIToken[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 3, separator, action, errMsg)
+    protected AT_LEAST_ONE_SEP3<OUT>(separator:TokenConstructor,
+                                     action:GrammarAction<OUT> | string,
+                                     errMsg?:string):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(3, separator, action, errMsg, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP4(separator:TokenConstructor,
-                                action:GrammarAction | string,
-                                errMsg?:string):ISimpleTokenOrIToken[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 4, separator, action, errMsg)
+    protected AT_LEAST_ONE_SEP4<OUT>(separator:TokenConstructor,
+                                     action:GrammarAction<OUT> | string,
+                                     errMsg?:string):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(4, separator, action, errMsg, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP5(separator:TokenConstructor,
-                                action:GrammarAction | string,
-                                errMsg?:string):ISimpleTokenOrIToken[] {
-        return this.atLeastOneSepFirstInternal(this.atLeastOneSepFirstInternal, 5, separator, action, errMsg)
+    protected AT_LEAST_ONE_SEP5<OUT>(separator:TokenConstructor,
+                                     action:GrammarAction<OUT> | string,
+                                     errMsg?:string):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(5, separator, action, errMsg, {values: [], separators: []})
     }
 
     /**
@@ -1812,27 +1824,26 @@ export class Parser {
     }
 
     // Implementation of parsing DSL
-    private optionInternal(predicateOrAction:Predicate | GrammarAction, action:GrammarAction, occurrence:number):boolean {
+    private optionInternal<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>, action:GrammarAction<OUT>, occurrence:number):OUT {
         let lookAheadFunc = this.getLookaheadFuncForOption(occurrence)
         if (action === undefined) {
             action = <any>predicateOrAction
         } // predicate present
         else if (!(predicateOrAction as Predicate).call(this)) {
-            return false
+            return undefined
         }
 
         if ((lookAheadFunc).call(this)) {
-            action.call(this)
-            return true
+            return action.call(this)
         }
-        return false
+        return undefined
     }
 
-    private atLeastOneInternal(prodFunc:Function,
-                               prodOccurrence:number,
-                               predicate:Predicate | GrammarAction,
-                               action:GrammarAction | string,
-                               userDefinedErrMsg?:string):void {
+    private atLeastOneInternal<OUT>(prodOccurrence:number,
+                                    predicate:Predicate | GrammarAction<OUT>,
+                                    action:GrammarAction<OUT> | string,
+                                    userDefinedErrMsg:string,
+                                    result:OUT[]):OUT[] {
         let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
         if (!isFunction(action)) {
             userDefinedErrMsg = <any>action
@@ -1846,11 +1857,10 @@ export class Parser {
                     orgLookAheadFunc.call(this)
             }
         }
-
         if ((<Function>lookAheadFunc).call(this)) {
-            (<any>action).call(this)
+            result.push((<any>action).call(this))
             while ((<Function>lookAheadFunc).call(this)) {
-                (<any>action).call(this)
+                result.push((<any>action).call(this))
             }
         }
         else {
@@ -1862,36 +1872,39 @@ export class Parser {
         // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-        this.attemptInRepetitionRecovery(prodFunc, [lookAheadFunc, action, userDefinedErrMsg],
+        this.attemptInRepetitionRecovery(this.atLeastOneInternal, [prodOccurrence, lookAheadFunc, action, userDefinedErrMsg, result],
             <any>lookAheadFunc, AT_LEAST_ONE_IDX, prodOccurrence, NextTerminalAfterAtLeastOneWalker)
+
+        return result
     }
 
-    private atLeastOneSepFirstInternal(prodFunc:Function,
-                                       prodOccurrence:number,
-                                       separator:TokenConstructor,
-                                       action:GrammarAction | string,
-                                       userDefinedErrMsg?:string):ISimpleTokenOrIToken[] {
+    private atLeastOneSepFirstInternal<OUT>(prodOccurrence:number,
+                                            separator:TokenConstructor,
+                                            action:GrammarAction<OUT> | string,
+                                            userDefinedErrMsg:string,
+                                            result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
 
-        let separatorsResult = []
         let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
+
+        let values = result.values
+        let separators = result.separators
 
         // 1st iteration
         if (firstIterationLookaheadFunc.call(this)) {
-            (<GrammarAction>action).call(this)
+            values.push((<GrammarAction<OUT>>action).call(this))
 
             let separatorLookAheadFunc = () => {return this.tokenMatcher(this.LA(1), separator)}
             // 2nd..nth iterations
-            while (separatorLookAheadFunc()) {
+            while (this.tokenMatcher(this.LA(1), separator)) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
-                separatorsResult.push(this.CONSUME(separator));
-                (<GrammarAction>action).call(this)
+                separators.push(this.CONSUME(separator))
+                values.push((<GrammarAction<OUT>>action).call(this))
             }
 
             // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
             this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                [prodOccurrence, separator, separatorLookAheadFunc,
-                    action, separatorsResult, NextTerminalAfterAtLeastOneSepWalker],
+                [prodOccurrence, separator, separatorLookAheadFunc, action, NextTerminalAfterAtLeastOneSepWalker, result],
                 separatorLookAheadFunc,
                 AT_LEAST_ONE_SEP_IDX,
                 prodOccurrence,
@@ -1901,13 +1914,13 @@ export class Parser {
             throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, userDefinedErrMsg)
         }
 
-        return separatorsResult
+        return result
     }
 
-    private manyInternal(prodFunc:Function,
-                         prodOccurrence:number,
-                         predicate:Predicate | GrammarAction,
-                         action?:GrammarAction):void {
+    private manyInternal<OUT>(prodOccurrence:number,
+                              predicate:Predicate | GrammarAction<OUT>,
+                              action:GrammarAction<OUT>,
+                              result:OUT[]):OUT[] {
 
         let lookaheadFunction = this.getLookaheadFuncForMany(prodOccurrence)
         if (action === undefined) {
@@ -1923,64 +1936,67 @@ export class Parser {
         }
 
         while (lookaheadFunction.call(this)) {
-            action.call(this)
+            result.push(action.call(this))
         }
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-        this.attemptInRepetitionRecovery(prodFunc,
-            [lookaheadFunction, action],
+        this.attemptInRepetitionRecovery(this.manyInternal,
+            [prodOccurrence, lookaheadFunction, action, result],
             <any>lookaheadFunction,
             MANY_IDX,
             prodOccurrence,
             NextTerminalAfterManyWalker)
+
+        return result
     }
 
-    private manySepFirstInternal(prodFunc:Function,
-                                 prodOccurrence:number,
-                                 separator:TokenConstructor,
-                                 action:GrammarAction):ISimpleTokenOrIToken[] {
-
-        let separatorsResult = []
-
+    private manySepFirstInternal<OUT>(prodOccurrence:number,
+                                      separator:TokenConstructor,
+                                      action:GrammarAction<OUT>,
+                                      result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
         let firstIterationLaFunc = this.getLookaheadFuncForManySep(prodOccurrence)
+
+        let values = result.values
+        let separators = result.separators
+
         // 1st iteration
         if (firstIterationLaFunc.call(this)) {
-            action.call(this)
+            values.push(action.call(this))
 
             let separatorLookAheadFunc = () => {return this.tokenMatcher(this.LA(1), separator)}
             // 2nd..nth iterations
-            while (separatorLookAheadFunc()) {
+            while (this.tokenMatcher(this.LA(1), separator)) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
-                separatorsResult.push(this.CONSUME(separator))
-                action.call(this)
+                separators.push(this.CONSUME(separator))
+                values.push(action.call(this))
             }
 
             // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
             this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-                [prodOccurrence, separator, separatorLookAheadFunc, action, separatorsResult, NextTerminalAfterManySepWalker],
+                [prodOccurrence, separator, separatorLookAheadFunc, action, NextTerminalAfterManySepWalker, result],
                 separatorLookAheadFunc,
                 MANY_SEP_IDX,
                 prodOccurrence,
                 NextTerminalAfterManySepWalker)
         }
 
-        return separatorsResult
+        return result
     }
 
-    private repetitionSepSecondInternal(prodOccurrence:number,
-                                        separator:TokenConstructor,
-                                        separatorLookAheadFunc:() => boolean,
-                                        action:GrammarAction,
-                                        separatorsResult:ISimpleTokenOrIToken[],
-                                        nextTerminalAfterWalker:typeof AbstractNextTerminalAfterProductionWalker):void {
+    private repetitionSepSecondInternal<OUT>(prodOccurrence:number,
+                                             separator:TokenConstructor,
+                                             separatorLookAheadFunc:() => boolean,
+                                             action:GrammarAction<OUT>,
+                                             nextTerminalAfterWalker:typeof AbstractNextTerminalAfterProductionWalker,
+                                             result:ISeparatedIterationResult<OUT>):void {
 
 
         while (separatorLookAheadFunc()) {
             // note that this CONSUME will never enter recovery because
             // the separatorLookAheadFunc checks that the separator really does exist.
-            separatorsResult.push(this.CONSUME(separator))
-            action.call(this)
+            result.separators.push(this.CONSUME(separator))
+            result.values.push(action.call(this))
         }
 
         // we can only arrive to this function after an error
@@ -1990,8 +2006,7 @@ export class Parser {
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         /* istanbul ignore else */
         this.attemptInRepetitionRecovery(this.repetitionSepSecondInternal,
-            [prodOccurrence, separator, separatorLookAheadFunc,
-                action, separatorsResult, nextTerminalAfterWalker],
+            [prodOccurrence, separator, separatorLookAheadFunc, action, nextTerminalAfterWalker, result],
             separatorLookAheadFunc,
             AT_LEAST_ONE_SEP_IDX,
             prodOccurrence,

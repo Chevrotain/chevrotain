@@ -31,10 +31,6 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
         const ALL_TOKENS = [PlusTok, MinusTok, IntTok, IdentTok, DotTok]
         augmentTokenClasses(ALL_TOKENS)
 
-        // function isQualifiedNamePart():boolean {
-        //     return this.LA(1) instanceof DotTok
-        // }
-
         describe("The Parsing DSL", () => {
 
             it("provides a production SUBRULE1-5 that invokes another rule", () => {
@@ -429,6 +425,180 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
             })
         })
 
+        describe("The Parsing DSL methods are expressions", () => {
+
+            it("OR will return the chosen alternative's grammar action's returned value", () => {
+                class OrExpressionParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS);
+                        (<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public or = this.RULE("or", () => {
+                        return this.OR<number | string>([
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(MinusTok)
+                                    return 666
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                    return "bamba"
+                                }
+                            }
+                        ])
+                    })
+                }
+
+                let parser = new OrExpressionParser([])
+
+                parser.input = [createToken(MinusTok)]
+                expect(parser.or()).to.equal(666)
+
+                parser.input = [createToken(PlusTok)]
+                expect(parser.or()).to.equal("bamba")
+            })
+
+            it("OPTION will return the grammar action value or undefined if the option was not taken", () => {
+                class OptionExpressionParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS);
+                        (<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public option = this.RULE("option", () => {
+                        return this.OPTION(() => {
+                            this.CONSUME(IdentTok)
+                            return "bamba"
+                        })
+                    })
+                }
+
+                let parser = new OptionExpressionParser([])
+
+                parser.input = [createToken(IdentTok)]
+                expect(parser.option()).to.equal("bamba")
+
+                parser.input = [createToken(IntTok)]
+                expect(parser.option()).to.be.undefined
+            })
+
+            it("MANY will return an array of grammar action values", () => {
+                let num = 0
+                class ManyExpressionParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS);
+                        (<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public many = this.RULE("many", () => {
+                        return this.MANY(() => {
+                            this.CONSUME(IntTok)
+                            return num++
+                        })
+                    })
+                }
+
+                let parser = new ManyExpressionParser([])
+
+                parser.input = [createToken(IntTok), createToken(IntTok), createToken(IntTok)]
+                expect(parser.many()).to.deep.equal([0, 1, 2])
+
+                parser.input = []
+                expect(parser.many()).to.deep.equal([])
+            })
+
+            it("AT_LEAST_ONE will return an array of grammar action values", () => {
+                class AtLeastOneExpressionParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS);
+                        (<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public atLeastOne = this.RULE("atLeastOne", () => {
+                        let num = 0
+                        return this.AT_LEAST_ONE(() => {
+                            this.CONSUME(IntTok)
+                            num = num + 3
+                            return num
+                        })
+                    })
+                }
+
+                let parser = new AtLeastOneExpressionParser([])
+
+                parser.input = [createToken(IntTok), createToken(IntTok), createToken(IntTok), createToken(IntTok)]
+                expect(parser.atLeastOne()).to.deep.equal([3, 6, 9, 12])
+
+                parser.input = [createToken(IntTok)]
+                expect(parser.atLeastOne()).to.deep.equal([3])
+            })
+
+            it("MANY_SEP will return an array of grammar action values and an array of Separators", () => {
+
+                class ManySepExpressionParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS);
+                        (<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public manySep = this.RULE("manySep", () => {
+                        let num = 0
+                        return this.MANY_SEP(PlusTok, () => {
+                            this.CONSUME(IntTok)
+                            return num++
+                        })
+                    })
+                }
+
+                let parser = new ManySepExpressionParser([])
+
+                let separator1 = createToken(PlusTok)
+                let separator2 = createToken(PlusTok)
+                parser.input = [createToken(IntTok), separator1, createToken(IntTok), separator2, createToken(IntTok)]
+                expect(parser.manySep()).to.deep.equal({values: [0, 1, 2], separators: [separator1, separator2]})
+
+                parser.input = []
+                expect(parser.manySep()).to.deep.equal({values: [], separators: []})
+            })
+
+            it("AT_LEAST_ONE_SEP will return an array of grammar action values and an array of Separators", () => {
+                class AtLeastOneSepExpressionParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, ALL_TOKENS);
+                        (<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public atLeastOneSep = this.RULE("atLeastOneSep", () => {
+                        let num = 0
+                        return this.AT_LEAST_ONE_SEP(PlusTok, () => {
+                            this.CONSUME(IntTok)
+                            num = num + 3
+                            return num
+                        })
+                    })
+                }
+
+                let parser = new AtLeastOneSepExpressionParser([])
+
+                let separator1 = createToken(PlusTok)
+                let separator2 = createToken(PlusTok)
+                parser.input = [createToken(IntTok), separator1, createToken(IntTok), separator2, createToken(IntTok)]
+                expect(parser.atLeastOneSep()).to.deep.equal({values: [3, 6, 9], separators: [separator1, separator2]})
+
+                parser.input = [createToken(IntTok)]
+                expect(parser.atLeastOneSep()).to.deep.equal({values: [3], separators: []})
+            })
+        })
+
         describe("The BaseRecognizer", () => {
 
             it("can be initialized without supplying an input vector", () => {
@@ -456,7 +626,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 // see: http://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
             })
 
-            it("invoking an OPTION will return true/false depending if it succeeded or not", () => {
+            it("invoking an OPTION will return the inner grammar action's value or undefined", () => {
 
                 class OptionsReturnValueParser extends Parser {
 
@@ -468,12 +638,14 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     public trueOptionRule = this.RULE("trueOptionRule", () => {
                         return this.OPTION(() => true, () => {
                             this.CONSUME(IntTok)
+                            return true
                         })
                     })
 
                     public falseOptionRule = this.RULE("falseOptionRule", () => {
                         return this.OPTION(() => false, () => {
                             this.CONSUME(IntTok)
+                            return false
                         })
                     })
                 }
@@ -482,7 +654,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(successfulOption).to.equal(true)
 
                 let failedOption = new OptionsReturnValueParser().falseOptionRule()
-                expect(failedOption).to.equal(false)
+                expect(failedOption).to.equal(undefined)
             })
 
             it("will return false if a RecognitionException is thrown during backtracking and rethrow any other kind of Exception", () => {

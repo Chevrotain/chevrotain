@@ -83,6 +83,10 @@ See [related documentation](../examples/parser/minification/README.md) for detai
 
 ### <a name="PERFORMANCE"></a> How do I Maximize my parser's performance?
 
+#### Major Performance Benefits
+
+These are highly recommended for each and every parser.
+
 1. **Do not create a new Parser instance for each new input**.
 
    Instead re-use a single instance and reset its state between iterations. For example:
@@ -118,8 +122,12 @@ See [related documentation](../examples/parser/minification/README.md) for detai
 2. **Choose the optimal Token Type for your use case.**
     
    See [Token Types Docs](docs/token_types.md) for more details.
-    
-3. **Avoid creating parsing rules which only parse a single Terminal.**
+
+#### Minor Performance Benefits  
+  
+These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
+   
+1. **Avoid creating parsing rules which only parse a single Terminal.**
 
    There is a certain fixed overhead for the invocation of each parsing rule.
    Normally there is no reason to pay it for a Rule which only consumes a single Terminal.
@@ -132,5 +140,47 @@ See [related documentation](../examples/parser/minification/README.md) for detai
    ``` 
    
    Instead such a rule's contents should be (manually) in-lined in its call sites.
-    
    
+2. **Avoid *_SEP DSL methods (MANY_SEP / AT_LEAST_ONE_SEP).**
+   
+   The *_SEP DSL methods also collect the separator Tokens parsed. Creating these arrays has a small overhead (several percentage).
+   Which is a complete waste in most cases where those separators tokens are not needed for any output data structure.
+   
+3. **Use the returned values of iteration DSL methods (MANY/MANY_SEP/AT_LEAST_ONE/AT_LEAST_ONE_SEP).**
+   
+   Consider the following grammar rule:
+   
+   ```javascript
+   this.RULE("array", function() {
+           let myArr = []        
+           $.CONSUME(LSquare);
+           values.push($.SUBRULE($.value));
+           $.MANY(() => {
+             $.CONSUME(Comma);
+             values.push($.SUBRULE2($.value));
+           });
+           $.CONSUME(RSquare);
+       });
+   ```
+   
+   The values of the array are manually collected inside the "myArr" array.
+   However another result array is already created by invoking the iteration DSL method "MANY"
+   This is obviously a waste of cpu cycles... 
+   
+   A slightly more efficient (but syntactically ugly) alternative would be:
+    ```javascript
+       this.RULE("array", function() {
+               let myArr = []        
+               $.CONSUME(LSquare);
+               values.push($.SUBRULE($.value));
+               
+               let iterationResult = 
+                 $.MANY(() => {
+                   $.CONSUME(Comma);
+                   return $.SUBRULE2($.value);
+                 });
+              
+                myArr = myArr.concat(iterationResult)
+               $.CONSUME(RSquare);
+           });
+     ```
