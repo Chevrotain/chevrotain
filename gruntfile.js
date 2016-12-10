@@ -41,7 +41,7 @@ module.exports = function(grunt) {
             npm_link:                               {
                 exec: 'npm link'
             },
-            lint:                               {
+            lint:                                   {
                 exec: 'npm run lint'
             },
             test_examples_lexer:                    {
@@ -171,11 +171,11 @@ module.exports = function(grunt) {
 
         ts: {
             options: {
-                fast:      "never"
+                fast: "never"
             },
 
             release: {
-                tsconfig : true
+                tsconfig: true
             },
 
             validate_definitions: {
@@ -217,6 +217,9 @@ module.exports = function(grunt) {
                 }, {
                     from: /(\s+)(else if \(.+\s+.+\s+.+\s+(?:.+\s+)?)(\s*\/\/ IGNORE ABOVE ELSE)/g,
                     to:   '/* istanbul ignore else */ $1$2'
+                }, {
+                    from: /(_super.(?:apply|call)\(this, .+\)) (\|\| this;)/g,
+                    to:   '$1 /* istanbul ignore next */ $2'
                 }]
             }
         },

@@ -47,8 +47,7 @@
     "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
     "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat",
     "unit_tests": "node_modules/.bin/_mocha ./lib/test/**/*spec.js",
-    "lint" : "tslint --project tsconfig.json"
-
+    "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {},
   "devDependencies": {
@@ -82,13 +81,13 @@
     "karma-story-reporter": "~0.3.1",
     "load-grunt-tasks": "^3.5.2",
     "lodash": "^4.17.2",
-    "mocha": "^3.1.2",
+    "mocha": "^3.2.0",
     "requirejs": "2.3.2",
     "semver": "^5.3.0",
     "tslint": "^4.0.2",
     "typedoc": "^0.5.1",
-    "typescript": "~2.0.10",
-    "webpack": "^1.13.3",
+    "typescript": "~2.1.4",
+    "webpack": "^1.14.0",
     "webpack-dev-server": "^1.16.2",
     "wrench": "^1.5.9",
     "xregexp": "^3.1.1"
