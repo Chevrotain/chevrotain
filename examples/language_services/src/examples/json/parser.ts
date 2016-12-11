@@ -43,7 +43,7 @@ export class JsonParser extends Parser {
         lCurlyTok = this.CONSUME(LCurly)
         commas = this.MANY_SEP(Comma, () => {
             objectItemPTs.push(this.SUBRULE2(this.objectItem))
-        })
+        }).separators
         rCurlyTok = this.CONSUME(RCurly)
 
         return PT(ObjectPT, CHILDREN(objectItemPTs,
@@ -68,7 +68,7 @@ export class JsonParser extends Parser {
         lSquareTok = this.CONSUME(LSquare)
         commas = this.MANY_SEP(Comma, () => {
             valuePTs.push(this.SUBRULE(this.value))
-        })
+        }).separators
         rSquareTok = this.CONSUME(RSquare)
 
         return PT(ArrayPT, CHILDREN(valuePTs,

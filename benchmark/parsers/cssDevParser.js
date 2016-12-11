@@ -230,7 +230,6 @@ function CssParser(input) {
 
     // medium [ COMMA S* medium]*
     this.media_list = this.RULE('media_list', function() {
-        $.SUBRULE($.medium)
         $.MANY_SEP(Comma, function() {
             $.SUBRULE2($.medium)
         })
@@ -313,6 +312,7 @@ function CssParser(input) {
     // selector [ ',' S* selector ]*
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
     this.ruleset = this.RULE('ruleset', function() {
+        // TODO: try without SEP?
         $.AT_LEAST_ONE_SEP(Comma, function() {
             $.SUBRULE($.selector)
         })

@@ -234,27 +234,27 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     separators = separators.concat(this.MANY_SEP1(Comma, () => {
                         this.CONSUME1(OneTok)
                         total += "1"
-                    }))
+                    }).separators)
 
                     separators = separators.concat(this.MANY_SEP2(Comma, () => {
                         this.CONSUME1(TwoTok)
                         total += "2"
-                    }))
+                    }).separators)
 
                     separators = separators.concat(this.MANY_SEP3(Comma, () => {
                         this.CONSUME1(ThreeTok)
                         total += "3"
-                    }))
+                    }).separators)
 
                     separators = separators.concat(this.MANY_SEP4(Comma, () => {
                         this.CONSUME1(FourTok)
                         total += "4"
-                    }))
+                    }).separators)
 
                     separators = separators.concat(this.MANY_SEP5(Comma, () => {
                         this.CONSUME1(FiveTok)
                         total += "5"
-                    }))
+                    }).separators)
 
                     return {total: total, separators: separators}
                 }
@@ -410,27 +410,27 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     separators = separators.concat(this.AT_LEAST_ONE_SEP1(Comma, () => {
                         this.CONSUME1(OneTok)
                         total += "1"
-                    }, "Ones"))
+                    }, "Ones").separators)
 
                     separators = separators.concat(this.AT_LEAST_ONE_SEP2(Comma, () => {
                         this.CONSUME1(TwoTok)
                         total += "2"
-                    }, "Twos"))
+                    }, "Twos").separators)
 
                     separators = separators.concat(this.AT_LEAST_ONE_SEP3(Comma, () => {
                         this.CONSUME1(ThreeTok)
                         total += "3"
-                    }, "Threes"))
+                    }, "Threes").separators)
 
                     separators = separators.concat(this.AT_LEAST_ONE_SEP4(Comma, () => {
                         this.CONSUME1(FourTok)
                         total += "4"
-                    }, "Fours"))
+                    }, "Fours").separators)
 
                     separators = separators.concat(this.AT_LEAST_ONE_SEP5(Comma, () => {
                         this.CONSUME1(FiveTok)
                         total += "5"
-                    }, "Fives"))
+                    }, "Fives").separators)
 
                     return {total: total, separators: separators}
                 }

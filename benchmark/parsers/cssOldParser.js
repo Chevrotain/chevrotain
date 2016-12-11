@@ -230,7 +230,6 @@ function CssParser(input) {
 
     // medium [ COMMA S* medium]*
     this.media_list = this.RULE('media_list', function() {
-        $.SUBRULE($.medium)
         $.MANY_SEP(Comma, function() {
             $.SUBRULE2($.medium)
         })
