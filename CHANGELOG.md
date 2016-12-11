@@ -8,6 +8,7 @@
     - The "*_SEP" methods now return an object made up of two arrays, separators and values instead of a single array of separators.
 
 
+
 ## 0.19.0 (12-3-2016)
 
 #### Minor Changes
