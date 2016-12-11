@@ -4,6 +4,7 @@
     "removeComments": false,
     "target": "ES5",
     "outDir": "lib",
+    "sourceMap": true,
     "declaration": true
   },
   "include": [
