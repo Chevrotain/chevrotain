@@ -1,9 +1,20 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [More Functional Parsing DSL API.](https://github.com/SAP/chevrotain/issues/324)
+  * This change **broke** a couple of APIS:    
+    - "OPTION" now returns the value of the inner grammar implementation or undefined otherwise instead of a boolean.
+    - The "*_SEP" methods now return an object made up of two arrays, separators and values instead of a single array of separators.
+
+
 ## 0.19.0 (12-3-2016)
 
 #### Minor Changes
 
 - [Improve formatting of NoViableAlt exception message.](https://github.com/SAP/chevrotain/issues/297)
 - [Less verbose syntax for defining grammar rules.](https://github.com/SAP/chevrotain/issues/316)
+
 
 
 ## 0.18.0 (10-27-2016)
