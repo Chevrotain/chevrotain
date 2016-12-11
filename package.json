@@ -30,7 +30,6 @@
   ],
   "files": [
     "lib/src/**/*.js",
-    "lib/src/**/*.js.map",
     "lib/chevrotain.d.ts",
     "lib/chevrotain.min.js",
     "lib/chevrotain.js",
