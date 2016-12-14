@@ -45,11 +45,11 @@ module.exports = function(config) {
             version:     'latest',
             platform:    'Windows 10'
         },
-        'SL_SAFARI9':          {
+        'SL_SAFARI10':          {
             base:        'SauceLabs',
             browserName: 'safari',
             platform:    'OS X 10.11',
-            version:     '9.0'
+            version:     '10.0'
         }
     }
 
