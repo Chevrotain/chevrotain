@@ -41,46 +41,46 @@ allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, 
 JsonLexer = new Lexer allTokens
 
 class JsonParserCoffeeScript extends Parser
-  constructor: (input) ->
+  constructor: (input = []) ->
     super input, allTokens
 
-    @RULE "json", =>
-      @.OR [
-        {ALT: => @.SUBRULE @.object}
-        {ALT: => @.SUBRULE @.array}
+    @RULE 'json', ->
+      @OR [
+        {ALT: -> @SUBRULE @object}
+        {ALT: -> @SUBRULE @array}
       ]
 
-    @RULE "object", =>
-      @.CONSUME LCurly
-      @.MANY_SEP Comma, =>
-        @.SUBRULE2 @.objectItem
-      @.CONSUME RCurly
+    @RULE 'object', ->
+      @CONSUME LCurly
+      @MANY_SEP Comma, ->
+        @SUBRULE2 @objectItem
+      @CONSUME RCurly
 
-    @RULE "objectItem", =>
-      @.CONSUME StringLiteral
-      @.CONSUME Colon
-      @.SUBRULE @.value
+    @RULE 'objectItem', ->
+      @CONSUME StringLiteral
+      @CONSUME Colon
+      @SUBRULE @value
 
-    @RULE "array", =>
-      @.CONSUME LSquare
-      @.MANY_SEP Comma, =>
-        @.SUBRULE @.value
-      @.CONSUME RSquare
+    @RULE 'array', ->
+      @CONSUME LSquare
+      @MANY_SEP Comma, ->
+        @SUBRULE @value
+      @CONSUME RSquare
 
-    @RULE "value", =>
-      @.OR [
-        {ALT: => @.CONSUME StringLiteral}
-        {ALT: => @.CONSUME NumberLiteral}
-        {ALT: => @.SUBRULE @.object}
-        {ALT: => @.SUBRULE @.array}
-        {ALT: => @.CONSUME True}
-        {ALT: => @.CONSUME False}
-        {ALT: => @.CONSUME Null}
+    @RULE 'value', ->
+      @OR [
+        {ALT: -> @CONSUME StringLiteral}
+        {ALT: -> @CONSUME NumberLiteral}
+        {ALT: -> @SUBRULE @object}
+        {ALT: -> @SUBRULE @array}
+        {ALT: -> @CONSUME True}
+        {ALT: -> @CONSUME False}
+        {ALT: -> @CONSUME Null}
       ]
 
     Parser.performSelfAnalysis(@)
 
-parser = new JsonParserCoffeeScript([])
+parser = new JsonParserCoffeeScript
 
 module.exports = (text) ->
   lexResult = JsonLexer.tokenize text
