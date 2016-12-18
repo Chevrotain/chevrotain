@@ -1,10 +1,12 @@
-import {Token, tokenName, ISimpleTokenOrIToken} from "./tokens_public"
-import {TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer, IMultiModeLexerDefinition} from "./lexer_public"
+import {Token, tokenName, ISimpleTokenOrIToken, CustomPatternMatcherFunc} from "./tokens_public"
+import {
+    TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer, IMultiModeLexerDefinition,
+    IRegExpExec
+} from "./lexer_public"
 import {
     reject,
     indexOf,
     map,
-    zipObject,
     isString,
     isUndefined,
     reduce,
@@ -19,7 +21,8 @@ import {
     uniq,
     every,
     keys,
-    isArray
+    isArray,
+    isFunction
 } from "../utils/utils"
 import {isLazyTokenType, isSimpleTokenType} from "./tokens"
 
@@ -28,7 +31,7 @@ export const DEFAULT_MODE = "defaultMode"
 export const MODES = "modes"
 
 export interface IAnalyzeResult {
-    allPatterns:RegExp[]
+    allPatterns:IRegExpExec[]
     patternIdxToClass:Function[]
     patternIdxToGroup:any[]
     patternIdxToLongerAltIdx:number[]
@@ -38,6 +41,8 @@ export interface IAnalyzeResult {
     emptyGroups:{ [groupName:string]:Token[] }
 }
 
+const CONTAINS_LINE_TERMINATOR = "containsLineTerminator"
+
 export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
 
     let onlyRelevantClasses = reject(tokenClasses, (currClass) => {
@@ -45,14 +50,26 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
     })
 
     let allTransformedPatterns = map(onlyRelevantClasses, (currClass) => {
-        return addStartOfInput(currClass[PATTERN])
+        let currPattern = currClass[PATTERN]
+
+        if (isRegExp(currPattern)) {
+            return addStartOfInput(currPattern)
+        }
+        // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
+        else if (isFunction(currPattern)) {
+            return {exec: currPattern}
+        }
+        // ICustomPattern
+        else if (has(currPattern, "exec")) {
+            return currPattern
+        }
+        else {
+            throw Error("non exhaustive match")
+        }
+
     })
 
-    let allPatternsToClass = zipObject(<any>allTransformedPatterns, onlyRelevantClasses)
-
-    let patternIdxToClass:any = map(allTransformedPatterns, (pattern) => {
-        return allPatternsToClass[pattern.toString()]
-    })
+    let patternIdxToClass = onlyRelevantClasses
 
     let patternIdxToGroup = map(onlyRelevantClasses, (clazz:any) => {
         let groupName = clazz.GROUP
@@ -84,8 +101,16 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
     let patternIdxToPopMode = map(onlyRelevantClasses, (clazz:any) => has(clazz, "POP_MODE"))
 
     let patternIdxToCanLineTerminator = map(allTransformedPatterns, (pattern:RegExp) => {
-        // TODO: unicode escapes of line terminators too?
-        return /\\n|\\r|\\s/g.test(pattern.source)
+        if (isRegExp(pattern)) {
+            // TODO: unicode escapes of line terminators too?
+            return /\\n|\\r|\\s/g.test(pattern.source)
+        }
+        else {
+            if (has(pattern, CONTAINS_LINE_TERMINATOR)) {
+                return pattern[CONTAINS_LINE_TERMINATOR]
+            }
+            return false
+        }
     })
 
     let emptyGroups = reduce(onlyRelevantClasses, (acc, clazz:any) => {
@@ -112,22 +137,30 @@ export function validatePatterns(tokenClasses:TokenConstructor[], validModesName
     let errors = []
 
     let missingResult = findMissingPatterns(tokenClasses)
-    let validTokenClasses = missingResult.valid
     errors = errors.concat(missingResult.errors)
 
-    let invalidResult = findInvalidPatterns(validTokenClasses)
-    validTokenClasses = invalidResult.valid
+    let invalidResult = findInvalidPatterns(missingResult.valid)
+    let validTokenClasses = invalidResult.valid
     errors = errors.concat(invalidResult.errors)
 
-    errors = errors.concat(findEndOfInputAnchor(validTokenClasses))
-
-    errors = errors.concat(findUnsupportedFlags(validTokenClasses))
-
-    errors = errors.concat(findDuplicatePatterns(validTokenClasses))
+    errors = errors.concat(validateRegExpPattern(validTokenClasses))
 
     errors = errors.concat(findInvalidGroupType(validTokenClasses))
 
     errors = errors.concat(findModesThatDoNotExist(validTokenClasses, validModesNames))
+
+    return errors
+}
+
+function validateRegExpPattern(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
+    let errors = []
+    let withRegExpPatterns = filter(tokenClasses, (currTokClass) => isRegExp(currTokClass[PATTERN]))
+
+    errors = errors.concat(findEndOfInputAnchor(withRegExpPatterns))
+
+    errors = errors.concat(findUnsupportedFlags(withRegExpPatterns))
+
+    errors = errors.concat(findDuplicatePatterns(withRegExpPatterns))
 
     return errors
 }
@@ -157,12 +190,13 @@ export function findMissingPatterns(tokenClasses:TokenConstructor[]):ILexerFilte
 export function findInvalidPatterns(tokenClasses:TokenConstructor[]):ILexerFilterResult {
     let tokenClassesWithInvalidPattern = filter(tokenClasses, (currClass) => {
         let pattern = currClass[PATTERN]
-        return !isRegExp(pattern)
+        return !isRegExp(pattern) && !isFunction(pattern) && !has(pattern, "exec")
     })
 
     let errors = map(tokenClassesWithInvalidPattern, (currClass) => {
         return {
-            message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp",
+            message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' can only be a RegExp, a" +
+                          " Function matching the {CustomPatternMatcherFunc} type or an Object matching the {ICustomPattern} interface.",
             type:         LexerDefinitionErrorType.INVALID_PATTERN,
             tokenClasses: [currClass]
         }
@@ -361,8 +395,6 @@ export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):
                     })
                 }
             })
-
-            // lexerDefinition.modes[currModeName] = reject<Function>(currModeValue, (currTokClass) => isUndefined(currTokClass))
         })
     }
 

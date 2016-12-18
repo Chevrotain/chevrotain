@@ -6,6 +6,7 @@ A few simple examples of using the Chevrotain Lexer to resolve some common lexin
 * [Keywords vs Identifiers](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
 * [Token Groups](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/token_groups/token_groups.js)
 * [Lexer with Multiple Modes](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js)
+* [Custom Token Patterns implementations](https://github.com/SAP/Chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js)
 
 
 to run all the lexer examples's tests:
