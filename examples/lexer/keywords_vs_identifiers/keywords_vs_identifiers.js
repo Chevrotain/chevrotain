@@ -1,18 +1,20 @@
 var chevrotain = require("chevrotain");
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 
 // using extendToken utility to create the Token constructors and hierarchy
-var Identifier = extendToken("Identifier", /[a-zA-z]\w+/);
-var Keyword = extendToken("Keyword", Lexer.NA);
-// LONGER_ALT will make the Lexer perfer a longer Identifier over a Keyword.
-Keyword.LONGER_ALT = Identifier;
+var Identifier = createToken({name: "Identifier", pattern: /[a-zA-z]\w+/});
+var Keyword = createToken({
+    name: "Keyword",
+    // LONGER_ALT will make the Lexer prefer a longer Identifier over a Keyword.
+    pattern: Lexer.NA,
+    longer_alt: Identifier
+});
 
-var While = extendToken("While", /while/, Keyword);
-var For = extendToken("For", /for/, Keyword);
-var Do = extendToken("Do", /do/, Keyword);
-var Whitespace = extendToken("Whitespace", /\s+/);
-Whitespace.GROUP = Lexer.SKIPPED;
+var While = createToken({name: "While", pattern: /while/, parent: Keyword});
+var For = createToken({name: "For", pattern: /for/, parent: Keyword});
+var Do = createToken({name: "Do", pattern: /do/, parent: Keyword});
+var Whitespace = createToken({name: "Whitespace", pattern: /\s+/, group: Lexer.SKIPPED});
 
 keywordsVsIdentifiersLexer = new Lexer(
     [

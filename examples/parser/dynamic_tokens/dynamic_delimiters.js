@@ -14,21 +14,19 @@
 var chevrotain = require("../../../lib/chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
 
-var LSquare = extendToken("LSquare", /\[/);
-var RSquare = extendToken("RSquare", /]/);
+var LSquare = createToken({name: "LSquare", pattern: /\[/});
+var RSquare = createToken({name: "RSquare", pattern: /]/});
 
 // base delimiter classes
-var BaseDelimiter = extendToken("BaseDelimiter", Lexer.NA)
-var Comma = extendToken("Comma", /,/, BaseDelimiter);
-var NumberLiteral = extendToken("NumberLiteral", /\d+/);
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
-
+var BaseDelimiter = createToken({name: "BaseDelimiter", pattern: Lexer.NA});
+var Comma = createToken({name: "Comma", pattern: /,/, parent: BaseDelimiter});
+var NumberLiteral = createToken({name: "NumberLiteral", pattern: /\d+/});
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
 
 var allTokens = [
     WhiteSpace,
@@ -93,7 +91,7 @@ module.exports = function(text, dynamicDelimiterRegExp) {
     }
 
     // dynamically create Token classes which extend the BaseXXXDelimiters
-    var dynamicDelimiter = extendToken("dynamicDelimiter", dynamicDelimiterRegExp, BaseDelimiter)
+    var dynamicDelimiter = createToken({name: "dynamicDelimiter", pattern: dynamicDelimiterRegExp, parent: BaseDelimiter})
 
     // dynamically create a Lexer which can Lex all our language including the dynamic delimiters.
     var dynamicDelimiterLexer = new Lexer(allTokens.concat([dynamicDelimiter]));

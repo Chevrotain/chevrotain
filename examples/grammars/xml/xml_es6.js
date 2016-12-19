@@ -172,7 +172,6 @@ class XmlParserES6 extends chevrotain.Parser {
             })
 
             $.MANY(() => {
-                // @formatter:off
                 $.OR([
                     {ALT: () => { $.SUBRULE($.element)}},
                     {ALT: () => { $.SUBRULE($.reference)}},
@@ -180,7 +179,6 @@ class XmlParserES6 extends chevrotain.Parser {
                     {ALT: () => { $.CONSUME(PROCESSING_INSTRUCTION)}},
                     {ALT: () => { $.CONSUME(Comment)}}
                 ]);
-                // @formatter:on
 
                 $.OPTION2(() => {
                     $.SUBRULE2($.chardata);
@@ -195,29 +193,29 @@ class XmlParserES6 extends chevrotain.Parser {
                 $.SUBRULE($.attribute);
             })
 
-            // @formatter:off
             $.OR([
-                {ALT: () => {
-                    $.CONSUME(CLOSE);
-                    $.SUBRULE($.content);
-                    $.CONSUME(SLASH_OPEN);
-                    $.CONSUME2(Name);
-                    $.CONSUME2(CLOSE);
-                }},
-                {ALT: () => {
-                    $.CONSUME(SLASH_CLOSE);
-                }}
+                {
+                    ALT: () => {
+                        $.CONSUME(CLOSE);
+                        $.SUBRULE($.content);
+                        $.CONSUME(SLASH_OPEN);
+                        $.CONSUME2(Name);
+                        $.CONSUME2(CLOSE);
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(SLASH_CLOSE);
+                    }
+                }
             ]);
-            // @formatter:on
         });
 
         $.reference = $.RULE("reference", () => {
-            // @formatter:off
             $.OR([
                 {ALT: () => { $.CONSUME(EntityRef)}},
                 {ALT: () => { $.CONSUME(CharRef)}}
             ]);
-            // @formatter:on
         });
 
         $.attribute = $.RULE("attribute", () => {
@@ -227,22 +225,18 @@ class XmlParserES6 extends chevrotain.Parser {
         });
 
         $.chardata = $.RULE("chardata", () => {
-            // @formatter:off
             $.OR([
                 {ALT: () => { $.CONSUME(TEXT)}},
                 {ALT: () => { $.CONSUME(SEA_WS)}}
             ]);
-            // @formatter:on
         });
 
         $.misc = $.RULE("misc", () => {
-            // @formatter:off
             $.OR([
                 {ALT: () => { $.CONSUME(Comment)}},
                 {ALT: () => { $.CONSUME(PROCESSING_INSTRUCTION)}},
                 {ALT: () => { $.CONSUME(SEA_WS)}}
             ]);
-            // @formatter:on
         });
 
         // very important to call this after all the rules have been defined.

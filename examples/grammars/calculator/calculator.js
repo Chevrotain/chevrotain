@@ -1,26 +1,26 @@
 var chevrotain = require("chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
-// AdditionOperator defines a Tokens hierarchy but only leafs in this hierarchy define
+// AdditionOperator defines a Tokens hierarchy but only the leafs in this hierarchy define
 // actual Tokens that can appear in the text
-var AdditionOperator = extendToken("AdditionOperator", Lexer.NA);
-var Plus = extendToken("Plus", /\+/, AdditionOperator);
-var Minus = extendToken("Minus", /-/, AdditionOperator);
+var AdditionOperator = createToken({name: "AdditionOperator", pattern: Lexer.NA});
+var Plus = createToken({name: "Plus", pattern: /\+/, parent: AdditionOperator});
+var Minus = createToken({name: "Minus", pattern: /-/, parent: AdditionOperator});
 
-var MultiplicationOperator = extendToken("MultiplicationOperator", Lexer.NA);
-var Multi = extendToken("Multi", /\*/, MultiplicationOperator);
-var Div = extendToken("Div", /\//, MultiplicationOperator);
+var MultiplicationOperator = createToken({name: "MultiplicationOperator", pattern: Lexer.NA});
+var Multi = createToken({name: "Multi", pattern: /\*/, parent: MultiplicationOperator});
+var Div = createToken({name: "Div", pattern: /\//, parent: MultiplicationOperator});
 
-var LParen = extendToken("LParen", /\(/);
-var RParen = extendToken("RParen", /\)/);
-var NumberLiteral = extendToken("NumberLiteral", /[1-9]\d*/);
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+var LParen = createToken({name: "LParen", pattern: /\(/});
+var RParen = createToken({name: "RParen", pattern: /\)/});
+var NumberLiteral = createToken({name: "NumberLiteral", pattern: /[1-9]\d*/});
+// marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
 
 var allTokens = [WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
     Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator];

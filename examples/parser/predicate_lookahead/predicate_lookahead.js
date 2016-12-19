@@ -1,15 +1,15 @@
 var chevrotain = require("chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
-var One = extendToken("One", /1/);
-var Two = extendToken("Two", /2/);
-var Three = extendToken("Three", /3/);
+var One = createToken({name: "One", pattern: /1/});
+var Two = createToken({name: "Two", pattern: /2/});
+var Three = createToken({name: "Three", pattern: /3/});
 
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
 WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
 var allTokens = [

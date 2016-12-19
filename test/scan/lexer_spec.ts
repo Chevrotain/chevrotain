@@ -292,6 +292,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                     "\telse return 2"
 
                 let lexResult = ifElseLexer.tokenize(input)
+                expect(lexResult.groups).to.be.empty
 
                 expect(getImage(lexResult.tokens[0])).to.equal("if")
                 expect(getStartOffset(lexResult.tokens[0])).to.equal(0)

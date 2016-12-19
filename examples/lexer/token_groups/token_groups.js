@@ -1,24 +1,33 @@
 var chevrotain = require("chevrotain");
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 
 // using extendToken utility to create the Token constructors and hierarchy
-var If = extendToken("if", /if/);
-var Else = extendToken("else", /else/);
-var Return = extendToken("return", /return/);
-var LParen = extendToken("LParen", /\(/);
-var RParen = extendToken("RParen", /\)/);
-var IntegerLiteral = extendToken("IntegerLiteral", /\d+/);
+var If = createToken({name: "if", pattern: /if/});
+var Else = createToken({name: "else", pattern: /else/});
+var Return = createToken({name: "return", pattern: /return/});
+var LParen = createToken({name: "LParen", pattern: /\(/});
+var RParen = createToken({name: "RParen", pattern: /\)/});
+var IntegerLiteral = createToken({name: "IntegerLiteral", pattern: /\d+/});
 
-var Whitespace = extendToken("Whitespace", /\s+/);
-Whitespace.GROUP = Lexer.SKIPPED; // the Lexer.SKIPPED group is a special group that will cause the lexer to "ignore"
-                                  // certain Tokens. these tokens are still consumed from the text, they just don't appear in the
-                                  // lexer's output. the is especially useful for ignoring whitespace and in some use cases comments too.
+var Whitespace = createToken({
+    name: "Whitespace",
+    pattern: /\s+/,
+    // the Lexer.SKIPPED group is a special group that will cause the lexer to "ignore"
+    // certain Tokens. these tokens are still consumed from the text, they just don't appear in the
+    // lexer's output. the is especially useful for ignoring whitespace and in some use cases comments too.
+    group: Lexer.SKIPPED
+});
 
-var Comment = extendToken("Comment", /\/\/.+/);
-Comment.GROUP = "singleLineComments"; // a Token's group may be a 'free' String, in that case the lexer's result will contain
-                                      // an additional array of all the tokens matched for each group under the 'group' object
-                                      // for example in this case: lexResult.groups["singleLineComments"]
+
+var Comment = createToken({
+    name: "Comment",
+    pattern: /\/\/.+/,
+    // a Token's group may be a 'free' String, in that case the lexer's result will contain
+    // an additional array of all the tokens matched for each group under the 'group' object
+    // for example in this case: lexResult.groups["singleLineComments"]
+    group: "singleLineComments"});
+
 
 TokenGroupsLexer = new Lexer(
     [
