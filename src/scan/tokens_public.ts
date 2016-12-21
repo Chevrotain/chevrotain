@@ -1,4 +1,4 @@
-import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite} from "../utils/utils"
+import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite, has} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
 import {Lexer, TokenConstructor} from "./lexer_public"
 import {
@@ -47,17 +47,83 @@ export function tokenName(clazz:Function):string {
     }
 }
 
+// TODO: uppper or lower case name? or support both???
+export interface ITokenConfig {
+    name:string
+    parent?:TokenConstructor
+    label?:string
+    pattern?:RegExp
+    group?:string|any
+    push_mode?:string
+    pop_mode?:boolean
+    longer_alt?:TokenConstructor
+}
+
+const PARENT = "parent"
+const LABEL = "label"
+const GROUP = "group"
+const PUSH_MODE = "push_mode"
+const POP_MODE = "pop_mode"
+const LONGER_ALT = "longer_alt"
+
+/**
+ *
+ * @param {ITokenConfig} config - The configuration for
+ * @returns {TokenConstructor} - A constructor for the new Token subclass
+ */
+export function createToken(config:ITokenConfig):TokenConstructor {
+
+    if (!has(config, PARENT)) {
+        config.parent = Token
+    }
+
+    return createTokenInternal(config)
+}
+
+/**
+ * Convenience method equivalent to: createToken({parent:LazyToken})
+ * @see createToken
+ */
+export function createLazyToken(config:ITokenConfig):TokenConstructor {
+    if (!has(config, PARENT)) {
+        config.parent = LazyToken
+    }
+
+    return createTokenInternal(config)
+}
+
+/**
+ * Convenience method equivalent to: createToken({parent:SimpleLazyToken})
+ * @see createToken
+ */
+export function createSimpleLazyToken(config:ITokenConfig):TokenConstructor {
+    if (!has(config, PARENT)) {
+        config.parent = SimpleLazyToken
+    }
+
+    return createTokenInternal(config)
+}
+
+/**
+ * @deprecated - - Use the new CreateSimpleLazyToken API
+ */
 export function extendLazyToken(tokenName:string, patternOrParent:any = undefined,
                                 parentConstructor:Function = LazyToken):TokenConstructor {
     return extendToken(tokenName, patternOrParent, parentConstructor)
 }
 
+/**
+ * @deprecated - Use the new CreateSimpleLazyToken API
+ */
 export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = undefined,
                                       parentConstructor:Function = SimpleLazyToken):TokenConstructor {
     return extendToken(tokenName, patternOrParent, parentConstructor)
 }
 
 /**
+ *
+ * @deprecated - Use the new CreateToken API
+ *
  * utility to help the poor souls who are still stuck writing pure javascript 5.1
  * extend and create Token subclasses in a less verbose manner
  *
@@ -78,6 +144,14 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
         parentConstructor = patternOrParent
         pattern = undefined
     }
+
+    return createTokenInternal(<any>{name: tokenName, parent: parentConstructor, pattern: pattern})
+}
+
+function createTokenInternal(config:ITokenConfig):TokenConstructor {
+    let tokenName = config.name
+    let parentConstructor = config.parent
+    let pattern = config.pattern
 
     let derivedConstructor:any = function () {
         parentConstructor.apply(this, arguments)
@@ -102,6 +176,26 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
 
     // static properties mixing
     derivedConstructor = assignNoOverwrite(derivedConstructor, parentConstructor)
+
+    if (has(config, LABEL)) {
+        derivedConstructor.LABEL = config[LABEL]
+    }
+
+    if (has(config, GROUP)) {
+        derivedConstructor.GROUP = config[GROUP]
+    }
+
+    if (has(config, POP_MODE)) {
+        derivedConstructor.POP_MODE = config[POP_MODE]
+    }
+
+    if (has(config, PUSH_MODE)) {
+        derivedConstructor.PUSH_MODE = config[PUSH_MODE]
+    }
+
+    if (has(config, LONGER_ALT)) {
+        derivedConstructor.LONGER_ALT = config[LONGER_ALT]
+    }
 
     return derivedConstructor
 }

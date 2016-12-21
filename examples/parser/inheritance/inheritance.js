@@ -12,36 +12,36 @@ var chevrotain = require("chevrotain");
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 
-var RelationWord = extendToken("RelationWord", Lexer.NA);
+var RelationWord = createToken({name: "RelationWord", pattern: Lexer.NA});
 
 // Token inheritance CONSUME(RelationWord) will work on any Token extending RelationWord
-var And = extendToken("And", /and/, RelationWord);
-var Before = extendToken("Before", /before/, RelationWord);
-var After = extendToken("After", /after/, RelationWord);
-var Und = extendToken("Und", /und/, RelationWord);
-var Vor = extendToken("Vor", /vor/, RelationWord);
-var Nach = extendToken("Nach", /nach/, RelationWord);
+var And = createToken({name: "And", pattern: /and/, parent: RelationWord});
+var Before = createToken({name: "Before", pattern: /before/, parent: RelationWord});
+var After = createToken({name: "After", pattern: /after/, parent: RelationWord});
+var Und = createToken({name: "Und", pattern: /und/, parent: RelationWord});
+var Vor = createToken({name: "Vor", pattern: /vor/, parent: RelationWord});
+var Nach = createToken({name: "Nach", pattern: /nach/, parent: RelationWord});
 
 /// English Tokens
-var Cook = extendToken("Cook", /cooking|cook/);
-var Some = extendToken("Some", /some/);
-var Sausages = extendToken("Sausages", /sausages/);
-var Clean = extendToken("Clean", /clean/);
-var The = extendToken("The", /the/);
-var Room = extendToken("Room", /room/);
+var Cook = createToken({name: "Cook", pattern: /cooking|cook/});
+var Some = createToken({name: "Some", pattern: /some/});
+var Sausages = createToken({name: "Sausages", pattern: /sausages/});
+var Clean = createToken({name: "Clean", pattern: /clean/});
+var The = createToken({name: "The", pattern: /the/});
+var Room = createToken({name: "Room", pattern: /room/});
 
 // German Tokens
-var Kochen = extendToken("Kochen", /kochen/);
-var Wurstchen = extendToken("Wurstchen", /wurstchen/);
-var Wurst = extendToken("Wurst", /wurst/);
-var Raum = extendToken("Raum", /raum/);
-var Auf = extendToken("Auf", /auf/);
-var Den = extendToken("Den", /den/);
+var Kochen = createToken({name: "Kochen", pattern: /kochen/});
+var Wurstchen = createToken({name: "Wurstchen", pattern: /wurstchen/});
+var Wurst = createToken({name: "Wurst", pattern: /wurst/});
+var Raum = createToken({name: "Raum", pattern: /raum/});
+var Auf = createToken({name: "Auf", pattern: /auf/});
+var Den = createToken({name: "Den", pattern: /den/});
 
 
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
 WhiteSpace.GROUP = Lexer.SKIPPED;
 
 var englishTokens = [WhiteSpace, RelationWord, And, Before, After, Cook,

@@ -1,5 +1,6 @@
 import {createLazyTokenInstance, createSimpleLazyToken} from "../../src/scan/tokens"
 import {LazyToken, SimpleLazyToken, ISimpleTokenOrIToken} from "../../src/scan/tokens_public"
+import {TokenConstructor} from "../../src/scan/lexer_public"
 export function setEquality(actual:any[], expected:any[]):void {
     expect(actual).to.deep.include.members(expected)
     expect(expected).to.deep.include.members(actual)

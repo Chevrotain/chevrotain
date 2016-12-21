@@ -10,16 +10,15 @@
 var chevrotain = require("chevrotain");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
-var Alpha = extendToken("Alpha", /A/);
-var Bravo = extendToken("Bravo", /B/);
-var Charlie = extendToken("Charlie", /C/);
+var Alpha = createToken({name: "Alpha", pattern: /A/});
+var Bravo = createToken({name: "Bravo", pattern: /B/});
+var Charlie = createToken({name: "Charlie", pattern: /C/});
 
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group:Lexer.SKIPPED});
 
 var allTokens = [
     WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance

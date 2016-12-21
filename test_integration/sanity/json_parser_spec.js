@@ -8,31 +8,28 @@
 }(this, function(chevrotain) {
 
     // ----------------- lexer -----------------
-    var extendToken = chevrotain.extendToken
+    var createToken = chevrotain.createToken
     var Lexer = chevrotain.Lexer
     var Parser = chevrotain.Parser
 
-    // In ES6, custom inheritance implementation (such as 'extendToken(...)') can be replaced with simple "class X extends Y"...
-    var True = extendToken("True", /true/)
-    var False = extendToken("False", /false/)
-    var Null = extendToken("Null", /null/)
-    var LCurly = extendToken("LCurly", /{/)
-    var RCurly = extendToken("RCurly", /}/)
-    var LSquare = extendToken("LSquare", /\[/)
-    var RSquare = extendToken("RSquare", /]/)
-    var Comma = extendToken("Comma", /,/)
-    var Colon = extendToken("Colon", /:/)
-    var StringLiteral = extendToken("StringLiteral", /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/)
-    var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/)
-    var WhiteSpace = extendToken("WhiteSpace", /\s+/)
-    WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+    // In ES6, custom inheritance implementation (such as 'createToken({name:...)') can be replaced with simple "class X extends Y"...
+    var True = createToken({name: "True", pattern: /true/})
+    var False = createToken({name: "False", pattern: /false/})
+    var Null = createToken({name: "Null", pattern: /null/})
+    var LCurly = createToken({name: "LCurly", pattern: /{/})
+    var RCurly = createToken({name: "RCurly", pattern: /}/})
+    var LSquare = createToken({name: "LSquare", pattern: /\[/})
+    var RSquare = createToken({name: "RSquare", pattern: /]/})
+    var Comma = createToken({name: "Comma", pattern: /,/})
+    var Colon = createToken({name: "Colon", pattern: /:/})
+    var StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/})
+    var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/})
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED})
 
     var allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
     var JsonLexer = new Lexer(allTokens)
 
-
     // ----------------- parser -----------------
-
     function JsonParser(input) {
         // invoke super constructor
         Parser.call(this, input, allTokens)
@@ -41,12 +38,10 @@
         var $ = this
 
         this.json = this.RULE("json", function() {
-            // @formatter:off
-        $.OR([
-            { ALT: function () { $.SUBRULE($.object) }},
-            { ALT: function () { $.SUBRULE($.array) }}
-        ])
-        // @formatter:on
+            $.OR([
+                {ALT: function() { $.SUBRULE($.object) }},
+                {ALT: function() { $.SUBRULE($.array) }}
+            ])
         })
 
         this.object = this.RULE("object", function() {
@@ -79,19 +74,17 @@
             $.CONSUME(RSquare)
         })
 
-        // @formatter:off
-    this.value = this.RULE("value", function () {
-        $.OR([
-            { ALT: function () { $.CONSUME(StringLiteral) }},
-            { ALT: function () { $.CONSUME(NumberLiteral) }},
-            { ALT: function () { $.SUBRULE($.object) }},
-            { ALT: function () { $.SUBRULE($.array) }},
-            { ALT: function () { $.CONSUME(True) }},
-            { ALT: function () { $.CONSUME(False) }},
-            { ALT: function () { $.CONSUME(Null) }}
-        ], "a value")
-    })
-    // @formatter:on
+        this.value = this.RULE("value", function() {
+            $.OR([
+                {ALT: function() { $.CONSUME(StringLiteral) }},
+                {ALT: function() { $.CONSUME(NumberLiteral) }},
+                {ALT: function() { $.SUBRULE($.object) }},
+                {ALT: function() { $.SUBRULE($.array) }},
+                {ALT: function() { $.CONSUME(True) }},
+                {ALT: function() { $.CONSUME(False) }},
+                {ALT: function() { $.CONSUME(Null) }}
+            ])
+        })
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information

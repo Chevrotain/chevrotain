@@ -19,7 +19,10 @@ import {
     getTokenConstructor,
     tokenMatcher,
     SimpleLazyToken,
-    LazyToken
+    LazyToken,
+    createToken,
+    createLazyToken,
+    createSimpleLazyToken
 } from "./scan/tokens_public"
 import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
@@ -54,6 +57,9 @@ API.extendSimpleLazyToken = extendSimpleLazyToken
 API.tokenName = tokenName
 API.tokenLabel = tokenLabel
 API.tokenMatcher = tokenMatcher
+API.createToken = createToken
+API.createLazyToken = createLazyToken
+API.createSimpleLazyToken = createSimpleLazyToken
 
 // Tokens getters
 API.getImage = getImage

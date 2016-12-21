@@ -90,7 +90,7 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
 
     let emptyGroups = reduce(onlyRelevantClasses, (acc, clazz:any) => {
         let groupName = clazz.GROUP
-        if (isString(groupName)) {
+        if (isString(groupName) && !(groupName === Lexer.SKIPPED)) {
             acc[groupName] = []
         }
         return acc

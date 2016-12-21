@@ -16,7 +16,7 @@ var Token = chevrotain.Token
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer
 var Parser = chevrotain.Parser
-var extendToken = chevrotain.extendToken
+var createToken = chevrotain.createToken
 
 class Hello extends Token {}
 Hello.PATTERN = /hello/
@@ -37,7 +37,8 @@ Wonderful.PATTERN = /wonderful/
 class Amazing extends Token {}
 Amazing.PATTERN = /amazing/
 
-var WhiteSpace = extendToken("WhiteSpace", /\s+/)
+class WhiteSpace extends Token {}
+WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED
 
 var allTokens = [WhiteSpace, Hello, World,

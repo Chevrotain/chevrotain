@@ -36,21 +36,20 @@ var _ = require("lodash");
 
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 
 // all keywords (from/select/where/...) extend a base Keyword class, thus
 // they will be easy to identify for the purpose of content assist.
-var Keyword = extendToken("Keyword", Lexer.NA);
-var Select = extendToken("Select", /SELECT/, Keyword);
-var From = extendToken("From", /FROM/, Keyword);
-var Where = extendToken("Where", /WHERE/, Keyword);
-var Comma = extendToken("Comma", /,/);
-var Identifier = extendToken("Identifier", /\w+/);
-var Integer = extendToken("Integer", /0|[1-9]\d+/);
-var GreaterThan = extendToken("GreaterThan", /</);
-var LessThan = extendToken("LessThan", />/);
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = Lexer.SKIPPED;
+var Keyword = createToken({name: "Keyword", pattern: Lexer.NA});
+var Select = createToken({name: "Select", pattern: /SELECT/, parent: Keyword});
+var From = createToken({name: "From", pattern: /FROM/, parent: Keyword});
+var Where = createToken({name: "Where", pattern: /WHERE/, parent: Keyword});
+var Comma = createToken({name: "Comma", pattern: /,/});
+var Identifier = createToken({name: "Identifier", pattern: /\w+/});
+var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
+var LessThan = createToken({name: "LessThan", pattern: />/});
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
 
 var allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan];
 var SelectLexer = new Lexer(allTokens);

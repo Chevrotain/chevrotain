@@ -1,46 +1,39 @@
 var chevrotain = require("chevrotain");
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 
 // numbers Tokens
-var One = extendToken("One", /1/);
-var Two = extendToken("Two", /2/);
-var Three = extendToken("Three", /3/);
+var One = createToken({name: "One", pattern: /1/});
+var Two = createToken({name: "Two", pattern: /2/});
+var Three = createToken({name: "Three", pattern: /3/});
 
 // Letter Tokens
-var Alpha = extendToken("Alpha", /A/);
-var Beta = extendToken("Beta", /B/);
-var Gamma = extendToken("Gamma", /G/);
+var Alpha = createToken({name: "Alpha", pattern: /A/});
+var Beta = createToken({name: "Beta", pattern: /B/});
+var Gamma = createToken({name: "Gamma", pattern: /G/});
 
 // signs Tokens
-var Hash = extendToken("Hash", /#/);
-var Caret = extendToken("Caret", /\^/);
-var Amp = extendToken("Amp", /&/);
+var Hash = createToken({name: "Hash", pattern: /#/});
+var Caret = createToken({name: "Caret", pattern: /\^/});
+var Amp = createToken({name: "Amp", pattern: /&/});
 
 
 // Tokens which control entering a new mode.
-var EnterNumbers = extendToken("EnterNumbers", /NUMBERS/);
-EnterNumbers.PUSH_MODE = "numbers_mode";
+var EnterNumbers = createToken({name: "EnterNumbers", pattern: /NUMBERS/, push_mode: "numbers_mode"});
 
-var EnterLetters = extendToken("EnterLetters", /LETTERS/);
-EnterLetters.PUSH_MODE = "Letter_mode";
+var EnterLetters = createToken({name: "EnterLetters", pattern: /LETTERS/, push_mode: "letter_mode"});
 
-var EnterSigns = extendToken("EnterSigns", /SIGNS/);
-EnterSigns.PUSH_MODE = "signs_mode";
-
+var EnterSigns = createToken({name: "EnterSigns", pattern: /SIGNS/, push_mode: "signs_mode"});
 
 // Tokens which control exiting modes
-var ExitNumbers = extendToken("ExitNumbers", /EXIT_NUMBERS/);
-ExitNumbers.POP_MODE = true;
+var ExitNumbers = createToken({name: "ExitNumbers", pattern: /EXIT_NUMBERS/, pop_mode: true});
 
-var ExitLetter = extendToken("ExitLetter", /EXIT_LETTERS/);
-ExitLetter.POP_MODE = true;
+var ExitLetter = createToken({name: "ExitLetter", pattern: /EXIT_LETTERS/, pop_mode: true});
 
-var ExitSigns = extendToken("ExitSigns", /EXIT_SIGNS/);
-ExitSigns.POP_MODE = true;
+var ExitSigns = createToken({name: "ExitSigns", pattern: /EXIT_SIGNS/, pop_mode: true});
 
 
-var Whitespace = extendToken("Whitespace", /(\t| )/);
+var Whitespace = createToken({name: "Whitespace", pattern: /(\t| )/});
 Whitespace.GROUP = Lexer.SKIPPED;
 
 // Each key defines a Lexer mode's name.
@@ -53,10 +46,10 @@ var multiModeLexerDefinition = {
             Two,
             Three,
             ExitNumbers, // encountering an ExitNumbers Token will cause the lexer to revert to the previous mode
-            EnterLetters, // switch to "Letter_mode" after encountering "ENTER_Letter" while in "numbers_mode"
+            EnterLetters, // switch to "letter_mode" after encountering "ENTER_Letter" while in "numbers_mode"
             Whitespace
         ],
-        "Letter_mode":  [
+        "letter_mode":  [
             Alpha,
             Beta,
             Gamma,

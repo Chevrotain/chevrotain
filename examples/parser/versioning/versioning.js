@@ -7,18 +7,17 @@ var chevrotain = require("chevrotain");
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
-var extendToken = chevrotain.extendToken;
+var createToken = chevrotain.createToken;
 
-var Select = extendToken("Select", /SELECT/i);
-var From = extendToken("From", /FROM/i);
-var Where = extendToken("Where", /WHERE/i);
-var Comma = extendToken("Comma", /,/);
-var Identifier = extendToken("Identifier", /\w+/);
-var Integer = extendToken("Integer", /0|[1-9]\d+/);
-var GreaterThan = extendToken("GreaterThan", /</);
-var LessThan = extendToken("LessThan", />/);
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = Lexer.SKIPPED;
+var Select = createToken({name: "Select", pattern: /SELECT/i});
+var From = createToken({name: "From", pattern: /FROM/i});
+var Where = createToken({name: "Where", pattern: /WHERE/i});
+var Comma = createToken({name: "Comma", pattern: /,/});
+var Identifier = createToken({name: "Identifier", pattern: /\w+/});
+var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
+var LessThan = createToken({name: "LessThan", pattern: />/});
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
 
 var allTokens = [WhiteSpace, Select, From, Where, Comma,
     Identifier, Integer, GreaterThan, LessThan];

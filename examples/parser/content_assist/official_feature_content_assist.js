@@ -14,22 +14,21 @@ const chevrotain = require('chevrotain');
 
 const Lexer = chevrotain.Lexer;
 const Parser = chevrotain.Parser;
-const extendToken = chevrotain.extendToken;
+const createToken = chevrotain.createToken;
 const EMPTY_ALT = chevrotain.EMPTY_ALT
 const getImage = chevrotain.getImage
 
-const Keyword = extendToken('Keyword', Lexer.NA);
+const Keyword = createToken({name: 'Keyword', pattern: Lexer.NA});
 
-const Private = extendToken('Private', /private/, Keyword);
-const Public = extendToken('Public', /public/, Keyword);
-const Static = extendToken('Static', /static/, Keyword);
-const Declare = extendToken('Declare', /declare/, Keyword);
-const Call = extendToken('Call', /call/, Keyword);
-const Enum = extendToken('Enum', /enum/, Keyword);
-const Function = extendToken('Function', /function/, Keyword);
-const Identifier = extendToken("Identifier", /\w+/);
-const WhiteSpace = extendToken('WhiteSpace', /\s+/);
-WhiteSpace.GROUP = Lexer.SKIPPED;
+const Private = createToken({name: 'Private', pattern: /private/, parent: Keyword});
+const Public = createToken({name: 'Public', pattern: /public/, parent: Keyword});
+const Static = createToken({name: 'Static', pattern: /static/, parent: Keyword});
+const Declare = createToken({name: 'Declare', pattern: /declare/, parent: Keyword});
+const Call = createToken({name: 'Call', pattern: /call/, parent: Keyword});
+const Enum = createToken({name: 'Enum', pattern: /enum/, parent: Keyword});
+const Function = createToken({name: 'Function', pattern: /function/, parent: Keyword});
+const Identifier = createToken({name: "Identifier", pattern: /\w+/});
+const WhiteSpace = createToken({name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED});
 
 const allTokens = [WhiteSpace, Call, Private, Public, Static, Enum, Declare, Function, Identifier];
 const StatementsLexer = new Lexer(allTokens);

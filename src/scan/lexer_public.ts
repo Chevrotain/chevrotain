@@ -28,6 +28,8 @@ export interface TokenConstructor extends Function {
     PATTERN?:RegExp
     LABEL?:string
     LONGER_ALT?:TokenConstructor
+    POP_MODE?:boolean
+    PUSH_MODE?:string
 
     tokenType?:number
     extendingTokenTypes?:number[]
@@ -80,10 +82,8 @@ export interface IMultiModeLexerDefinition {
 
 export class Lexer {
 
-    public static SKIPPED = {
-        description: "This marks a skipped Token pattern, this means each token identified by it will" +
-                     "be consumed and then throw into oblivion, this can be used to for example: skip whitespace."
-    }
+    public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
+                     "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
 
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors:ILexerDefinitionError[] = []
