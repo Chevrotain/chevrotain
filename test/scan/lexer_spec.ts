@@ -11,7 +11,8 @@ import {
     getStartColumn,
     getStartLine,
     getEndLine,
-    getEndColumn, SimpleLazyToken
+    getEndColumn,
+    SimpleLazyToken, createToken
 } from "../../src/scan/tokens_public"
 import {Lexer, LexerDefinitionErrorType, IMultiModeLexerDefinition} from "../../src/scan/lexer_public"
 import {
@@ -36,6 +37,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
         const IntegerTok = extendToken("IntegerTok", /^[1-9]\d*/)
         const IdentifierTok = extendToken("IdentifierTok", /^[A-Za-z_]\w*/)
         const BambaTok = extendToken("BambaTok", /^bamba/)
+
         BambaTok.LONGER_ALT = IdentifierTok
 
 
@@ -909,6 +911,50 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok3")
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotSimpleTok1")
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotSimpleTok2")
+                })
+
+                context("custom pattern", () => {
+
+
+                    function defineCustomPatternSpec(variant, customPattern) {
+                        it(variant, () => {
+                            let A = createToken({name: "A", pattern: /A/})
+                            let B = createToken({name: "B", pattern: customPattern})
+                            let WS = createToken({
+                                name:     "WS", pattern: {
+                                    exec:                   (text) => /^\s+/.exec(text),
+                                    containsLineTerminator: true
+                                }, group: Lexer.SKIPPED
+                            })
+
+
+                            let lexerDef:any = [WS, A, B]
+
+                            let myLexer = new Lexer(lexerDef)
+                            let lexResult = myLexer.tokenize("B A\n B ")
+                            expect(lexResult.tokens).to.have.length(3)
+                            expect(lexResult.tokens[0]).to.be.instanceOf(B)
+                            expect(lexResult.tokens[1]).to.be.instanceOf(A)
+                            expect(lexResult.tokens[2]).to.be.instanceOf(B)
+
+                            let lastToken = lexResult.tokens[2]
+                            expect(getStartLine(lastToken)).to.equal(2)
+                            expect(getEndLine(lastToken)).to.equal(2)
+                            expect(getStartColumn(lastToken)).to.equal(2)
+                            expect(getEndColumn(lastToken)).to.equal(2)
+                            expect(getStartOffset(lastToken)).to.equal(5)
+                            expect(getEndOffset(lastToken)).to.equal(5)
+                        })
+                    }
+
+                    defineCustomPatternSpec("With short function syntax", (text) => /^B/.exec(text))
+                    defineCustomPatternSpec("with explicit canContainLinerTerminator", {
+                        exec:                   (text) => /^B/.exec(text),
+                        containsLineTerminator: false
+                    })
+                    defineCustomPatternSpec("with implicit canContainLinerTerminator", {
+                        exec: (text) => /^B/.exec(text)
+                    })
                 })
             })
         })

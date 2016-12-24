@@ -138,7 +138,10 @@ export function pick(obj:Object, predicate:(item) => boolean) {
 }
 
 export function has(obj:any, prop:string):boolean {
-    return obj.hasOwnProperty(prop)
+    if (isObject(obj)) {
+        return obj.hasOwnProperty(prop)
+    }
+    return false
 }
 
 export function contains<T>(arr:T[], item):boolean {

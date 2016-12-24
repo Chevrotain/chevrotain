@@ -1,7 +1,21 @@
-import {Token, LazyTokenCacheData, getImage, getStartLine, getStartColumn, ISimpleTokenOrIToken} from "./tokens_public"
 import {
-    validatePatterns, analyzeTokenClasses, countLineTerminators, DEFAULT_MODE, performRuntimeChecks, checkLazyMode,
-    checkSimpleMode, cloneEmptyGroups
+    Token,
+    LazyTokenCacheData,
+    getImage,
+    getStartLine,
+    getStartColumn,
+    ISimpleTokenOrIToken,
+    CustomPatternMatcherFunc
+} from "./tokens_public"
+import {
+    validatePatterns,
+    analyzeTokenClasses,
+    countLineTerminators,
+    DEFAULT_MODE,
+    performRuntimeChecks,
+    checkLazyMode,
+    checkSimpleMode,
+    cloneEmptyGroups
 } from "./lexer"
 import {
     cloneObj,
@@ -19,8 +33,13 @@ import {
     mapValues
 } from "../utils/utils"
 import {
-    fillUpLineToOffset, getStartColumnFromLineToOffset, getStartLineFromLineToOffset, augmentTokenClasses,
-    createSimpleLazyToken, LazyTokenCreator, createLazyTokenInstance
+    fillUpLineToOffset,
+    getStartColumnFromLineToOffset,
+    getStartLineFromLineToOffset,
+    augmentTokenClasses,
+    createSimpleLazyToken,
+    LazyTokenCreator,
+    createLazyTokenInstance
 } from "./tokens"
 
 export interface TokenConstructor extends Function {
@@ -80,6 +99,10 @@ export interface IMultiModeLexerDefinition {
     defaultMode:string
 }
 
+export interface IRegExpExec {
+    exec:CustomPatternMatcherFunc
+}
+
 export class Lexer {
 
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
@@ -92,7 +115,7 @@ export class Lexer {
     protected isSimpleTokenMode
     protected modes:string[] = []
     protected defaultMode:string
-    protected allPatterns:{ [modeName:string]:RegExp[] } = {}
+    protected allPatterns:{ [modeName:string]:IRegExpExec[] } = {}
     protected patternIdxToClass:{ [modeName:string]:Function[] } = {}
     protected patternIdxToGroup:{ [modeName:string]:string[] } = {}
     protected patternIdxToLongerAltIdx:{ [modeName:string]:number[] } = {}
@@ -472,8 +495,8 @@ export class Lexer {
                     text = text.substr(1)
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
-                        foundResyncPoint = currModePatterns[j].test(text)
-                        if (foundResyncPoint) {
+                        foundResyncPoint = currModePatterns[j].exec(text)
+                        if (foundResyncPoint !== null) {
                             break
                         }
                     }
@@ -609,8 +632,8 @@ export class Lexer {
                     text = text.substr(1)
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
-                        foundResyncPoint = currModePatterns[j].test(text)
-                        if (foundResyncPoint) {
+                        foundResyncPoint = currModePatterns[j].exec(text)
+                        if (foundResyncPoint !== null) {
                             break
                         }
                     }

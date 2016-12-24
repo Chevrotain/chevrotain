@@ -38,6 +38,7 @@ any code generation phase.
     * [Multiple Lexer Modes][lexer_modes] depending on the context.
     * [Tokens Grouping][lexer_groups].
     * [Different Token types for balancing performance, memory usage and ease of use](docs/token_types.md).
+    * [Custom Token patterns(none RegExp) support](docs/custom_token_patterns.md)
     * **No code generation** The Lexer does not require any code generation phase. 
 
   3. [**High Performance**][benchmark].

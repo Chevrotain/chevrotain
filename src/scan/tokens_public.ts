@@ -1,6 +1,6 @@
 import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite, has} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
-import {Lexer, TokenConstructor} from "./lexer_public"
+import {Lexer, TokenConstructor, IRegExpExec} from "./lexer_public"
 import {
     isInheritanceBasedToken,
     getStartLineFromLazyToken,
@@ -15,10 +15,38 @@ import {
 } from "./tokens"
 
 /**
+ *  The type of custom pattern matcher functions.
+ *  Matches should only be done on the start of the text.
+ *  Note that this is identical to the signature of RegExp.prototype.exec
+ *
+ *  This should behave as if the regExp match is using a start of input anchor.
+ *  So: for example if a custom matcher is implemented for Tokens matching: /\w+/
+ *  The implementation of the custom matcher must implement a custom matcher for /^\w+/.
+ */
+export type CustomPatternMatcherFunc = (test:string) => RegExpExecArray
+
+/**
+ * Interface for custom user provided token pattern matchers.
+ */
+export interface ICustomPattern {
+    /**
+     * The custom pattern implementation.
+     * @see CustomPatternMatcherFunc
+     */
+    exec:CustomPatternMatcherFunc
+    /**
+     * Flag indicating if this custom pattern may contain line terminators.
+     * This is required to avoid errors in the line/column numbering.
+     * @default false - if this property was not explicitly defined.
+     */
+    containsLineTerminator?:boolean
+}
+
+/**
  *  This can be used to improve the quality/readability of error messages or syntax diagrams.
  *
  * @param {Function} clazz - A constructor for a Token subclass
- * @returns {string} - The Human readable label a Token if it exists.
+ * @returns {string} - The Human readable label for a Token if it exists.
  */
 export function tokenLabel(clazz:Function):string {
     if (hasTokenLabel(clazz)) {
@@ -47,12 +75,11 @@ export function tokenName(clazz:Function):string {
     }
 }
 
-// TODO: uppper or lower case name? or support both???
 export interface ITokenConfig {
     name:string
     parent?:TokenConstructor
     label?:string
-    pattern?:RegExp
+    pattern?:RegExp | CustomPatternMatcherFunc | ICustomPattern
     group?:string|any
     push_mode?:string
     pop_mode?:boolean
@@ -67,7 +94,6 @@ const POP_MODE = "pop_mode"
 const LONGER_ALT = "longer_alt"
 
 /**
- *
  * @param {ITokenConfig} config - The configuration for
  * @returns {TokenConstructor} - A constructor for the new Token subclass
  */
@@ -128,7 +154,7 @@ export function extendSimpleLazyToken(tokenName:string, patternOrParent:any = un
  * extend and create Token subclasses in a less verbose manner
  *
  * @param {string} tokenName - The name of the new TokenClass
- * @param {RegExp|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
+ * @param {RegExp|CustomPatternMatcherFunc|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
  * @param {Function} parentConstructor - The Token class to be extended
  * @returns {Function} - A constructor for the new extended Token subclass
  */
