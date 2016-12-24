@@ -10,7 +10,7 @@ The Base [Tokens](http://sap.github.io/chevrotain/documentation/0_20_0/classes/t
 are **mutable** Inheritance based Tokens which have all their properties **pre-computed** as standard EcmaScript properties.
 
 Base Tokens can be defined either using ES2015 inheritance or
-using the provided [extendToken](http://sap.github.io/chevrotain/documentation/0_20_0/globals.html#extendtoken) utility.
+using the provided [createToken](http://sap.github.io/chevrotain/documentation/0_20_0/globals.html#createtoken) utility.
  
 ```typescript
 var chevrotain = require("chevrotain")
@@ -19,8 +19,8 @@ class Integer extends chevrotain.Token {
     static PATTERN = /0|([1-9]\d+)/ 
 }
 
-// using the extendToken utility
-var Integer = chevrotain.extendToken("Integer", /0|([1-9]\d+)/)
+// using the createToken utility
+var Integer = chevrotain.createToken({name: "Integer", pattern: /0|([1-9]\d+)/})
 ``` 
  
 When to use base Tokens:
@@ -40,7 +40,7 @@ This is accomplished by using ECMASciprt getters. This approach achieves both me
 for most use cases. 
 
 Lazy Tokens can be defined either using ES2015 inheritance or
-using the provided [extendLazyToken](http://sap.github.io/chevrotain/documentation/0_20_0/globals.html#extendlazytoken) utility.
+using the provided [createLazyToken](http://sap.github.io/chevrotain/documentation/0_20_0/globals.html#createlazytoken) utility.
  
 ```typescript
 var chevrotain = require("chevrotain")
@@ -49,8 +49,8 @@ class Integer extends chevrotain.LazyToken {
     static PATTERN = /0|([1-9]\d+)/ 
 }
 
-// using the extendToken utility
-var Integer = chevrotain.extendLazyToken("Integer", /0|([1-9]\d+)/)
+// using the createToken utility
+var Integer = chevrotain.createLazyToken({name: "Integer", pattern: /0|([1-9]\d+)/})
 ``` 
  
 When to use Lazy Tokens:
@@ -91,7 +91,7 @@ Tokens but at the cost of:
 
 
 Simple Lazy Tokens can be defined either using ES2015 inheritance or
-using the provided [extendSimpleLazyToken](http://sap.github.io/chevrotain/documentation/0_20_0/globals.html#extendsimplelazytoken) utility.
+using the provided [createSimpleLazyToken](http://sap.github.io/chevrotain/documentation/0_20_0/globals.html#createsimplelazytoken) utility.
  
 ```typescript
 var chevrotain = require("chevrotain")
@@ -100,8 +100,8 @@ class Integer extends chevrotain.SimpleLazyToken {
     static PATTERN = /0|([1-9]\d+)/ 
 }
 
-// using the extendToken utility
-var Integer = chevrotain.extendSimpleLazyToken("Integer", /0|([1-9]\d+)/)
+// using the createToken utility
+var Integer = chevrotain.createSimpleLazyToken({name: "Integer", pattern: /0|([1-9]\d+)/})
 ``` 
  
 When to use Simple Lazy Tokens:
@@ -118,25 +118,25 @@ Chevrotain Lexers and Parsers will automatically adjust to the type of tokens us
 Therefor switching between the Token types can be easily accomplished in the dynamic world of ECMAScript:
  
 ```javascript
-    var extendToken
+    var createToken
     var tokenType = ???
-    // dynamically choose which "extendToken" to use.
+    // dynamically choose which "create" to use.
     switch (tokensType) {
         case "base" :
-            extendToken = chevrotain.extendToken
+            createToken = chevrotain.createToken
             break;
         case "kazy" :
-            extendToken = chevrotain.extendLazyToken
+            createToken = chevrotain.createLazyToken
             break;
         case "simple lazy" :
-            extendToken = chevrotain.extendSimpleLazyToken
+            createToken = chevrotain.createSimpleLazyToken
             break;
     }
 
-    var True = extendToken("True", /true/)
-    var False = extendToken("False", /false/)
-    var Null = extendToken("Null", /null/)
-    var LCurly = extendToken("LCurly", /{/)
+    var True = createToken("True", /true/)
+    var False = createToken("False", /false/)
+    var Null = createToken("Null", /null/)
+    var LCurly = createToken("LCurly", /{/)
 ``` 
 
 This switching can be useful either to investigate possible performance benefits of switching Token type,
