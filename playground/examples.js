@@ -83,12 +83,10 @@ function jsonExample() {
         var $ = this;
 
         $.RULE("json", function () {
-            // @formatter:off
             return $.OR([
                 { ALT: function () { return $.SUBRULE($.object) }},
                 { ALT: function () { return $.SUBRULE($.array) }}
             ]);
-            // @formatter:on
         });
 
         $.RULE("object", function () {
@@ -222,12 +220,10 @@ function jsonGrammarOnlyExample() {
         var $ = this;
 
         $.RULE("json", function () {
-            // @formatter:off
             $.OR([
                 { ALT: function () { $.SUBRULE($.object) }},
                 { ALT: function () { $.SUBRULE($.array) }}
             ]);
-            // @formatter:on
         });
 
         $.RULE("object", function () {
@@ -255,7 +251,6 @@ function jsonGrammarOnlyExample() {
         });
 
 
-        // @formatter:off
         $.RULE("value", function () {
             $.OR([
                 { ALT: function () { $.CONSUME(StringLiteral) }},
@@ -267,7 +262,6 @@ function jsonGrammarOnlyExample() {
                 { ALT: function () { $.CONSUME(Null); }}
             ]);
         });
-        // @formatter:on
 
         // very important to call this after all the rules have been setup.
         // otherwise the parser may not work correctly as it will lack information
@@ -463,38 +457,32 @@ function cssExample() {
         })
 
         $.RULE('contents', function () {
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.SUBRULE($.ruleset)}},
                 {ALT: function() { $.SUBRULE($.media)}},
                 {ALT: function() { $.SUBRULE($.page)}}
             ]);
-            // @formatter:on
             $.SUBRULE3($.cdcCdo)
         })
 
         // factor out repeating pattern for cdc/cdo
         $.RULE('cdcCdo', function () {
-            // @formatter:off
             $.MANY(function () {
                 $.OR([
                     {ALT: function() { $.CONSUME(Cdo)}},
                     {ALT: function() { $.CONSUME(Cdc)}}
                 ]);
             })
-            // @formatter:on
         })
 
         // IMPORT_SYM S*
         // [STRING|URI] S* media_list? ';' S*
         $.RULE('cssImport', function () {
             $.CONSUME(ImportSym)
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(StringLiteral)}},
                 {ALT: function() { $.CONSUME(Uri)}}
             ]);
-            // @formatter:on
 
             $.OPTION(function () {
                 $.SUBRULE($.media_list)
@@ -560,32 +548,26 @@ function cssExample() {
 
         // '/' S* | ',' S*
         $.RULE('operator', function () {
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Slash)}},
                 {ALT: function() { $.CONSUME(Comma)}}
             ]);
-            // @formatter:on
         });
 
         // '+' S* | '>' S*
         $.RULE('combinator', function () {
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Plus)}},
                 {ALT: function() { $.CONSUME(GreaterThan)}}
             ]);
-            // @formatter:on
         });
 
         // '-' | '+'
         $.RULE('unary_operator', function () {
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Minus)}},
                 {ALT: function() { $.CONSUME(Plus)}}
             ]);
-            // @formatter:on
         });
 
         // IDENT S*
@@ -638,14 +620,12 @@ function cssExample() {
         // helper grammar rule to avoid repetition
         // [ HASH | class | attrib | pseudo ]+
         $.RULE('simple_selector_suffix', function () {
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Hash) }},
                 {ALT: function() { $.SUBRULE($.class) }},
                 {ALT: function() { $.SUBRULE($.attrib) }},
                 {ALT: function() { $.SUBRULE($.pseudo) }}
             ]);
-            // @formatter:off
         })
 
         // '.' IDENT
@@ -656,12 +636,10 @@ function cssExample() {
 
         // IDENT | '*'
         $.RULE('element_name', function () {
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Ident) }},
                 {ALT: function() { $.CONSUME(Star) }}
             ]);
-            // @formatter:off
         });
 
         // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
@@ -670,7 +648,6 @@ function cssExample() {
             $.CONSUME(Ident)
 
             this.OPTION(function() {
-                // @formatter:off
                 $.OR([
                     {ALT: function() { $.CONSUME(Equals) }},
                     {ALT: function() { $.CONSUME(Includes) }},
@@ -681,7 +658,6 @@ function cssExample() {
                     {ALT: function() { $.CONSUME2(Ident) }},
                     {ALT: function() { $.CONSUME(StringLiteral) }}
                 ]);
-                // @formatter:off
             })
             $.CONSUME(RSquare)
         });
@@ -741,7 +717,6 @@ function cssExample() {
                 $.SUBRULE($.unary_operator)
             })
 
-            // @formatter:off
             $.OR([
                 {ALT: function() { $.CONSUME(Num) }},
                 {ALT: function() { $.CONSUME(Percentage) }},
@@ -757,7 +732,6 @@ function cssExample() {
                 {ALT: function() { $.SUBRULE($.hexcolor) }},
                 {ALT: function() { $.SUBRULE($.cssFunction) }}
             ]);
-            // @formatter:on
         });
 
         // FUNCTION S* expr ')' S*
@@ -888,14 +862,12 @@ function calculatorExample() {
 
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
-            // @formatter:off
             return $.OR([
                 // parenthesisExpression has the highest precedence and thus it
                 // appears in the "lowest" leaf in the expression ParseTree.
                 {ALT: function(){ return $.SUBRULE($.parenthesisExpression)}},
                 {ALT: function(){ return parseInt($.CONSUME(NumberLiteral).image, 10)}}
             ]);
-            // @formatter:on
         });
 
 
@@ -1060,22 +1032,18 @@ function tutorialGrammarExample() {
 
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
-            // @formatter:off
             $.OR([
                 {ALT: function(){ $.CONSUME(Integer)}},
                 {ALT: function(){ $.CONSUME(Identifier)}}
             ]);
-            // @formatter:on
         });
 
 
         this.relationalOperator = $.RULE("relationalOperator", function () {
-            // @formatter:off
             $.OR([
                 {ALT: function(){ $.CONSUME(GreaterThan)}},
                 {ALT: function(){ $.CONSUME(LessThan)}}
             ]);
-            // @formatter:on
         });
 
 
@@ -1198,22 +1166,18 @@ function tutorialGrammarActionsExample() {
 
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
-            // @formatter:off
             return $.OR([ // OR returns the value of the chosen alternative.
                 {ALT: function(){ return $.CONSUME(Integer)}},
                 {ALT: function(){ return $.CONSUME(Identifier)}}
             ]).image;
-            // @formatter:on
         });
 
 
         this.relationalOperator = $.RULE("relationalOperator", function () {
-            // @formatter:off
             return $.OR([
                 {ALT: function(){ return $.CONSUME(GreaterThan)}},
                 {ALT: function(){ return $.CONSUME(LessThan)}}
             ]).image;
-            // @formatter:on
         });
 
 
@@ -1277,12 +1241,10 @@ function tutorialErrorRecoveryExample() {
 
         
         $.RULE("json", function () {
-            // @formatter:off
             return $.OR([
                 { ALT: function () { return $.SUBRULE($.object) }},
                 { ALT: function () { return $.SUBRULE($.array) }}
             ]);
-            // @formatter:on
         });
 
         
