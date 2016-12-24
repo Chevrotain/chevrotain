@@ -117,7 +117,7 @@ let SelectLexer = new Lexer(allTokens);
 Note that:
 * The **order** of Token definitions passed to the Lexer is **important**.
   The first PATTERN to match will be chosen not the longest.
-  * See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers.js)
+  * See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
 
 * The SelectLexer is **stateless**, thus only a **single one** should be created.    
                           
@@ -130,7 +130,7 @@ let lexingResult = SelectLexer.tokenize(inputText)
 ```
 
 The Lexing Result will contain a Token Vector, the lexing errors (if any were encountered)
-and other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups.js) (if grouping was used)
+and other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)
 
 
 #### What is Next?
