@@ -41,7 +41,8 @@ function matchInteger(text) {
    }
    else {
       let matchedString = text.substring(0, i)
-      // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
+      // according to the RegExp.prototype.exec API the first item in 
+      // the returned array must be the whole matched string.
       return [matchedString]
    }
 }
