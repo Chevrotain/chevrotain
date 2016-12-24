@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [New "createToken" helper functions.](https://github.com/SAP/chevrotain/issues/329)
+- [Support for custom implementations of Token patterns.](https://github.com/SAP/chevrotain/issues/331)
+
+
+
 ## 0.20.0 (12-11-2016)
 
 #### Breaking Changes
