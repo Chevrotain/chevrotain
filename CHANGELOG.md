@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.21.0 (12-24-2016)
 
 #### Major Changes
 - [New "createToken" helper functions.](https://github.com/SAP/chevrotain/issues/329)
