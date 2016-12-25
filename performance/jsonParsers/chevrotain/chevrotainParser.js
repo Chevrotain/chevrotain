@@ -1,23 +1,30 @@
 // ----------------- Lexer -----------------
 var Token = chevrotain.Token;
 // https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Simple Lazy Tokens)
-var extendToken = chevrotain.extendSimpleLazyToken;
+var createToken = chevrotain.createSimpleLazyToken;
 var ChevrotainLexer = chevrotain.Lexer;
 
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
-var True = extendToken("True", /true/);
-var False = extendToken("False", /false/);
-var Null = extendToken("Null", /null/);
-var LCurly = extendToken("LCurly", /{/);
-var RCurly = extendToken("RCurly", /}/);
-var LSquare = extendToken("LSquare", /\[/);
-var RSquare = extendToken("RSquare", /]/);
-var Comma = extendToken("Comma", /,/);
-var Colon = extendToken("Colon", /:/);
-var StringLiteral = extendToken("StringLiteral", /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
-var NumberLiteral = extendToken("NumberLiteral", /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/);
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
-WhiteSpace.GROUP = ChevrotainLexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+var True = createToken({name: "True", pattern: /true/});
+var False = createToken({name: "False", pattern: /false/});
+var Null = createToken({name: "Null", pattern: /null/});
+var LCurly = createToken({name: "LCurly", pattern: /{/});
+var RCurly = createToken({name: "RCurly", pattern: /}/});
+var LSquare = createToken({name: "LSquare", pattern: /\[/});
+var RSquare = createToken({name: "RSquare", pattern: /]/});
+var Comma = createToken({name: "Comma", pattern: /,/});
+var Colon = createToken({name: "Colon", pattern: /:/});
+
+var stringLiteralPattern = /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+// Workaround Safari RegExp performance bugs
+// https://bugs.webkit.org/show_bug.cgi?id=152578
+// https://github.com/SAP/chevrotain/blob/master/docs/custom_token_patterns.md
+if (IsSafari()) {
+    stringLiteralPattern = matchStringLiteral
+}
+var StringLiteral = createToken({name: "StringLiteral", pattern: stringLiteralPattern});
+var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/});
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group:ChevrotainLexer.SKIPPED});
 
 
 var jsonTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
