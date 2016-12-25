@@ -13,7 +13,7 @@ As those better convey the intent. The **online** version uses ES5 syntax.
 
 ### Introduction:
 In This tutorial we will implement a Parser for a simple SQL Select statement language
-introduced in the [previous](https://github.com/SAP/chevrotain/blob/master/docs/getting_started_lexer.md) tutorial step. 
+introduced in the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md) tutorial step. 
 
 The grammar for our language:
 
@@ -42,7 +42,7 @@ relationalOperator
       
 ```
 
-A Chevrotain Parser analyses a [Token](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts#L61) vector
+A Chevrotain Parser analyses an [ISimpleTokenOrIToken](http://sap.github.io/chevrotain/documentation/0_21_0/interfaces/isimpletokenoritoken.html) vector
 that conforms to some grammar.
 The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_21_0/classes/parser.html#at_least_one),
 Which includes the following methods.
@@ -76,7 +76,7 @@ this.selectStatement =
 fairly simple...
 
 
-#### What is 'this'? where do we write the grammar rules?
+#### What is 'this' in this context? where do we write the grammar rules?
 
 Each grammar rule is a property of a class that extends chevrotain.Parser.
 
@@ -111,7 +111,7 @@ this.selectClause =
       $.CONSUME(Select);
       $.AT_LEAST_ONE_SEP(Comma, () => {
           $.CONSUME(Identifier);
-      }, "column name");
+      });
  })
  
 // atomicExpression
@@ -121,7 +121,7 @@ this.atomicExpression =
     $.OR([
          {ALT: () => { $.CONSUME(Integer)}},
          {ALT: () => { $.CONSUME(Identifier)}}
-         ]);
+    ]);
 })
  
 ```
@@ -192,7 +192,7 @@ class SelectParser extends chevrotain.Parser {
         $.CONSUME(Select)
         $.AT_LEAST_ONE_SEP(Comma, () => {
             $.CONSUME(Identifier)
-        }, "column name")
+        })
     })
      
     this.fromClause = $.RULE("fromClause", () => {
@@ -217,7 +217,7 @@ class SelectParser extends chevrotain.Parser {
         $.OR([
             {ALT: () => { $.CONSUME(Integer)}},
             {ALT: () => { $.CONSUME(Identifier)}}
-            ]);
+        ]);
     })
     
     this.relationalOperator = $.RULE("relationalOperator", () => {
@@ -248,7 +248,7 @@ let lexingResult = SelectLexer.tokenize(inputText)
 let parser = new SelectParser(lexingResult.tokens);
 parser.selectStatement()
 
-if (parser.parseErrors.length > 1) {
+if (parser.parseErrors.length > 0) {
         throw new Error("sad sad panda, Parsing errors detected")
 }
 ```
