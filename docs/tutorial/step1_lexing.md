@@ -90,7 +90,7 @@ class Integer extends Token {
 }
 
 class GreaterThan extends Token {
-  static PATTERN = /0|[1-9]\d+/  
+  static PATTERN = /</  
 }
 
 class LessThan extends Token {
