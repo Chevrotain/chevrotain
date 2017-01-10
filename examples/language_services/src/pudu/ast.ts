@@ -165,7 +165,7 @@ export function setParent(node:AstNode):void {
         return prop instanceof AstNode && !(prop instanceof Nil)
     }
 
-    let allKids = _.reduce(node, (result, prop, name:string) => {
+    let allKids = _.reduce(<any>node, (result, prop, name:string) => {
         if (isDirectChild(prop) && name !== "_parent") {
             result.push(prop)
         }
