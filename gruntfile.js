@@ -1,6 +1,7 @@
 var _ = require('lodash')
 var webpack = require("webpack")
 
+// TODO: write these files to tsdocsconfig.json
 var PUBLIC_API_DTS_FILES = [
     'lib/src/scan/tokens_public.d.ts',
     'lib/src/scan/lexer_public.d.ts',
@@ -252,14 +253,14 @@ module.exports = function(grunt) {
         typedoc: {
             build_docs: {
                 options: {
-                    mode:             'file',
-                    target:           'es5',
                     out:              'dev/docs',
                     module:           'commonjs',
                     name:             'Chevrotain',
-                    excludeExternals: ''
-                },
-                src:     PUBLIC_API_TS_FILES
+                    excludeExternals: '',
+                    includeDeclarations: true,
+                    tsconfig: "tsdocsconfig.json"
+                }
+                // src:     PUBLIC_API_TS_FILES
             }
         },
 
