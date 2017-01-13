@@ -6,6 +6,15 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: pkg,
 
+        run: {
+            options: {
+                failOnError: true
+            },
+
+            ts_compile: {
+                exec: 'tsc'
+            },
+        },
         mocha_istanbul: {
             pudu: {
                 src:     'bin/test/pudu',
@@ -63,7 +72,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build', [
         'clean:all',
         'tslint',
-        'ts:all'
+        'run:ts_compile'
     ])
 
     grunt.registerTask('test', [

@@ -39,6 +39,16 @@ module.exports = function(grunt) {
             options:                                {
                 failOnError: true
             },
+
+            ts_compile: {
+                exec: 'npm run compile'
+            },
+            ts_compile_defs: {
+                exec: 'npm run compile_definitions'
+            },
+            ts_compile_defs_namespace: {
+                exec: 'npm run compile_definitions_namespace'
+            },
             npm_link:                               {
                 exec: 'npm link'
             },
@@ -167,31 +177,6 @@ module.exports = function(grunt) {
                         functions:  100
                     }
                 }
-            }
-        },
-
-        ts: {
-            options: {
-                fast: "never"
-            },
-
-            release: {
-                tsconfig: true
-            },
-
-            validate_definitions: {
-                src:     ["test_integration/definitions/es6_modules.ts"],
-                outDir:  "dev/garbage",
-                options: {
-                    module: "commonjs"
-                }
-            },
-
-            // the created d.ts should work with both Typescript projects using ES6
-            // modules syntax or those using the old namespace syntax.
-            validate_definitions_namespace: {
-                src:    ["test_integration/definitions/namespaces.ts"],
-                outDir: "dev/garbage"
             }
         },
 
@@ -326,11 +311,11 @@ module.exports = function(grunt) {
     var buildTasks = [
         'clean:release',
         'run:lint',
-        'ts:release',
+        'run:ts_compile',
         'replace:coverage_ignore',
         'concat:release_definitions',
-        'ts:validate_definitions',
-        'ts:validate_definitions_namespace',
+        'run:ts_compile_defs',
+        'run:ts_compile_defs_namespace',
         'webpack:release',
         'webpack:specs',
         'webpack:release_uglify',

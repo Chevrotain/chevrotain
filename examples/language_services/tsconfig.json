@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+
+    "module": "commonjs",
+    "removeComments": false,
+    "target": "ES5",
+    "outDir": "bin",
+    "sourceMap": true,
+    "declaration": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

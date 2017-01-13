@@ -47,6 +47,9 @@
     "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
     "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat",
     "unit_tests": "node_modules/.bin/_mocha ./lib/test/**/*spec.js",
+    "compile" : "tsc",
+    "compile_definitions" : "tsc test_integration/definitions/es6_modules.ts --outDir dev/garbage",
+    "compile_definitions_namespace" : "tsc test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
     "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {},
@@ -65,7 +68,6 @@
     "grunt-mocha-istanbul": "^5.0.2",
     "grunt-run": "^0.6.0",
     "grunt-text-replace": "^0.4.0",
-    "grunt-ts": "~6.0.0-beta.3",
     "grunt-typedoc": "^0.2.4",
     "grunt-webpack": "^1.0.18",
     "istanbul": "^0.4.5",

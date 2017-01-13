@@ -18,7 +18,7 @@
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-mocha-istanbul": "^5.0.2",
-    "grunt-ts": "~6.0.0-beta.9",
+    "grunt-run": "^0.6.0",
     "grunt-tslint": "~4.0.0",
     "grunt-typings": "^0.1.5",
     "istanbul": "^0.4.5",
