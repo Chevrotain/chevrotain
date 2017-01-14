@@ -13,7 +13,7 @@ As those better convey the intent. The **online** version uses ES5 syntax.
 
 ### Introduction:
 In the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md) tutorial step
-we have implemented a parser for a "mini" SQL Select grammar. The problem however that our parser only
+we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
 validates the input conforms to the grammar. In most real world use cases the parser will also have to output some 
 result/data structure/value.
 
@@ -21,13 +21,15 @@ This can be accomplished using two features of the Parsing DSL:
 * [CONSUME](http://sap.github.io/chevrotain/documentation/0_21_0/classes/parser.html#consume1) will return
   The [Token](http://sap.github.io/chevrotain/documentation/0_21_0/classes/token.html) instance consumed.
 * [SUBRULE](http://sap.github.io/chevrotain/documentation/0_21_0/classes/parser.html#subrule1) will return
-  the result on invoking the rule.
+  the result on invoking the subrule.
 
 
 ### A simple contrived example:
   
 ```Typescript
-this.topRule = $.RULE("topRule", () => {
+let getImage = chevrotain.getImage
+
+$.RULE("topRule", () => {
     let result = 0
     
     $.MANY(() => {
@@ -40,15 +42,15 @@ this.topRule = $.RULE("topRule", () => {
     return result
 })
    
-this.decimalRule = $.RULE("decimalRule", () => {
+$.RULE("decimalRule", () => {
     let decToken = $.CONSUME(Decimal)
-    return parseFloat(decimalToken.image)
+    return parseFloat(getImage(decimalToken))
   
 })
 
-this.IntegerRule = $.RULE("IntegerRule", () => {
+$.RULE("IntegerRule", () => {
     let intToken = $.CONSUME(Integer)
-    return parseInt(intToken.image)
+    return parseInt(getImage(intToken))
 })
 ```
 
@@ -61,13 +63,14 @@ For this parser lets build a more complex data structure instead of simply retur
 Our selectStatement rule will now return an object with four properties:
  
 ```Typescript
-this.selectStatement = $.RULE("selectStatement", () => {
+
+$.RULE("selectStatement", () => {
     let select, from, where
     
     select = $.SUBRULE($.selectClause)
     from = $.SUBRULE($.fromClause)
     $.OPTION(() => {
-    where = $.SUBRULE($.whereClause)
+       where = $.SUBRULE($.whereClause)
     })
     
     return {
@@ -85,14 +88,16 @@ other parser rules.
 Lets look at one of those sub rules:
 
 ```Typescript
-this.selectClause = $.RULE("selectClause", () => {
+
+let getImage = chevrotain.getImage
+$.RULE("selectClause", () => {
     let columns = []
     
     $.CONSUME(Select);
     $.AT_LEAST_ONE_SEP(Comma, () => {
-    // accessing a token's string via .image property
-    columns.push($.CONSUME(Identifier).image)
-    }, "column name")
+       // accessing a token's string via getImage utility
+       columns.push(getImage($.CONSUME(Identifier))
+    })
 
     return {
         type    : "SELECT_CLAUSE", 
@@ -101,8 +106,7 @@ this.selectClause = $.RULE("selectClause", () => {
 })
 ```
 
-In the selectClause rule we access the **image** property of the Identifier token
-returned from **CONSUME**, and push each of these strings to the **columns** array. 
+In the selectClause rule we access the **image** property of the Identifier token returned from **CONSUME** using the getImage utility. and push each of these strings to the **columns** array.
 
 
 #### What is Next?
