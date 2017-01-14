@@ -16,11 +16,11 @@ In This tutorial we will implement a Lexer for a simple SQL Select statement lan
  ...
 ```
 
-A Lexer transforms a string input into a [Token](https://github.com/SAP/chevrotain/blob/master/src/scan/tokens_public.ts#L61) vector.
+A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/0_21_0/interfaces/isimpletokenoritoken.html) vector.
 Chevrotain comes with a built in Lexer engine based on Javascript Regular Expressions.
 To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
- 
+
 ```Typescript
  
 class From extends Token {
@@ -119,7 +119,7 @@ Note that:
   The first PATTERN to match will be chosen not the longest.
   * See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
 
-* The SelectLexer is **stateless**, thus only a **single one** should be created.    
+* The Chevrotain Lexer is **stateless**, thus only a **single one per language** should ever be created.
                           
 
 #### But how do we actually use this lexer?
@@ -129,8 +129,10 @@ let inputText = "SELECT column1 FROM table2"
 let lexingResult = SelectLexer.tokenize(inputText)
 ```
 
-The Lexing Result will contain a Token Vector, the lexing errors (if any were encountered)
-and other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)
+The Lexing Result will contain: 
+1. A Token Vector.
+2. the lexing errors (if any were encountered)
+3. And other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)
 
 
 #### What is Next?
