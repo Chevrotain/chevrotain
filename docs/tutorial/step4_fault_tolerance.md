@@ -98,7 +98,7 @@ value
 
 ### In Rule Repetition Re-Sync recovery:
 Repetition re-sync recovery happens when:
-* The parser is in a repetition(MANY/AT_LEAST_ONE).
+* The parser is in a repetition(MANY/AT_LEAST_ONE/MANY_SEP/AT_LEAST_ONE_SEP).
 * The parser has consumed the last iteration and is about to "exit" the repetition.
 * The next token X is invalid right after the repetition ended.
 
