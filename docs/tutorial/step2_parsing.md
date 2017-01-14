@@ -42,8 +42,7 @@ relationalOperator
       
 ```
 
-A Chevrotain Parser analyses an [ISimpleTokenOrIToken](http://sap.github.io/chevrotain/documentation/0_21_0/interfaces/isimpletokenoritoken.html) vector
-that conforms to some grammar.
+A Chevrotain Parser analyses an [Token](http://sap.github.io/chevrotain/documentation/0_21_0/interfaces/isimpletokenoritoken.html) vector that conforms to some grammar.
 The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_21_0/classes/parser.html#at_least_one),
 Which includes the following methods.
 
@@ -63,14 +62,13 @@ Which includes the following methods.
 //    : selectClause fromClause (whereClause)?;
 
 let $ = this
-this.selectStatement =
- $.RULE("selectStatement", () => {
-     $.SUBRULE($.selectClause)
-     $.SUBRULE($.fromClause)
-     $.OPTION(() => {
-         $.SUBRULE($.whereClause)        
-     })
- })
+$.RULE("selectStatement", () => {
+    $.SUBRULE($.selectClause)
+    $.SUBRULE($.fromClause)
+    $.OPTION(() => {
+        $.SUBRULE($.whereClause)        
+    })
+})
 ```
 
 fairly simple...
@@ -88,15 +86,23 @@ class SelectParser extends chevrotain.Parser {
     constructor(input:Token[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
+        
+        $.RULE("selectStatement", () => {
+           $.SUBRULE($.selectClause)
+           $.SUBRULE($.fromClause)
+           $.OPTION(() => {
+              $.SUBRULE($.whereClause)        
+           })
+        })
     }
 }
 ```
 
 Important to note that:
 * The **super** invocation has an array of the Tokens as the second parameter.
-  This is the same array we used to define the Lexer.
+  This is the same array we used to define the Lexer and it is used to define the Parser's vocabulary.
 * The static method **Parser.performSelfAnalysis** must be invoked at the end of the constructor.
-  This is where much of the 'secret sauce' happens, including finishing the grammar representation
+  This is where much of the 'secret sauce' happens, including creating the inner grammar representation
   and performing static checks on the grammar.
   
 
@@ -161,8 +167,7 @@ It is aware of:
 
 Thus the parser can dynamically create(and cache) the lookahead function to choose between the two alternatives.
 The same applies for any grammar rule where the parser has a choice, and even in some where there is no choice
-as that same in memory representation of the grammar can be used for fault tolerance as well as deciding which path
-to take.
+as that same in memory representation of the grammar can be used for error messages and fault tolerance as well as deciding which path to take.
 
 
 #### Lets finish implementing the whole SelectParser:
@@ -180,7 +185,7 @@ class SelectParser extends chevrotain.Parser {
     
     let $ = this
     
-    this.selectStatement = $.RULE("selectStatement", () => {
+    $.RULE("selectStatement", () => {
         $.SUBRULE($.selectClause)
         $.SUBRULE($.fromClause)
         $.OPTION(() => {
@@ -188,24 +193,24 @@ class SelectParser extends chevrotain.Parser {
         })
     })
      
-    this.selectClause = $.RULE("selectClause", () => {
+    $.RULE("selectClause", () => {
         $.CONSUME(Select)
         $.AT_LEAST_ONE_SEP(Comma, () => {
             $.CONSUME(Identifier)
         })
     })
      
-    this.fromClause = $.RULE("fromClause", () => {
+    $.RULE("fromClause", () => {
         $.CONSUME(From)
         $.CONSUME(Identifier)
     })
     
-    this.whereClause = $.RULE("whereClause", () => {
+    $.RULE("whereClause", () => {
         $.CONSUME(Where)
         $.SUBRULE($.expression)
     }) 
     
-    this.expression = $.RULE("expression", () => {
+    $.RULE("expression", () => {
         $.SUBRULE($.atomicExpression)
         $.SUBRULE($.relationalOperator)
         $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
@@ -213,14 +218,14 @@ class SelectParser extends chevrotain.Parser {
                       // 2 lines above.
     })
     
-    this.atomicExpression = $.RULE("atomicExpression", () => {
+    $.RULE("atomicExpression", () => {
         $.OR([
             {ALT: () => { $.CONSUME(Integer)}},
             {ALT: () => { $.CONSUME(Identifier)}}
         ]);
     })
     
-    this.relationalOperator = $.RULE("relationalOperator", () => {
+    $.RULE("relationalOperator", () => {
         return $.OR([
             {ALT: function(){ $.CONSUME(GreaterThan)}},
             {ALT: function(){ $.CONSUME(LessThan)}}
@@ -243,14 +248,22 @@ class SelectParser extends chevrotain.Parser {
 #### But how do we actually use this Parser?
 
 ```Typescript
-let inputText = "SELECT column1 FROM table2"
-let lexingResult = SelectLexer.tokenize(inputText)
-let parser = new SelectParser(lexingResult.tokens);
-parser.selectStatement()
+// ONLY ONCE
+const parser = new SelectParser(lexingResult.tokens);
 
-if (parser.parseErrors.length > 0) {
-        throw new Error("sad sad panda, Parsing errors detected")
+function parseInput(text) {
+   let lexingResult = SelectLexer.tokenize(inputText)
+   let parser = new SelectParser(lexingResult.tokens);
+   parser.selectStatement()
+
+   if (parser.parseErrors.length > 0) {
+      throw new Error("sad sad panda, Parsing errors detected")
+   }
 }
+
+let inputText = "SELECT column1 FROM table2"
+parseInput(inputText)
+
 ```
 
 * Note that any of the grammar rules can be invoked as the starting rule.
