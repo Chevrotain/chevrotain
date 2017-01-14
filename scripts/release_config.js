@@ -4,7 +4,7 @@ var path = require('path')
 var _ = require('lodash')
 var wrench = require('wrench')
 
-var apiPath = path.join(__dirname, '../src/api.ts')
+var versionPath = path.join(__dirname, '../src/version.ts')
 var packagePath = path.join(__dirname, '../package.json')
 var changeLogPath = path.join(__dirname, '../CHANGELOG.md')
 
@@ -25,7 +25,7 @@ var readmeDiagramsPath = path.join(__dirname, '../diagrams/readme.md')
 docFilesPaths.push(readmeDiagramsPath)
 
 var pkgJson = jf.readFileSync(packagePath)
-var apiString = fs.readFileSync(apiPath, 'utf8').toString()
+var apiString = fs.readFileSync(versionPath, 'utf8').toString()
 var changeLogString = fs.readFileSync(changeLogPath, 'utf8').toString()
 
 var mode = ""
@@ -41,7 +41,7 @@ else {
 }
 
 module.exports = {
-    apiPath:         apiPath,
+    versionPath:     versionPath,
     packagePath:     packagePath,
     changeLogPath:   changeLogPath,
     docFilesPaths:   docFilesPaths,

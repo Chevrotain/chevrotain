@@ -7,7 +7,7 @@ var newTagName = config.tagPrefix + config.currVersion
 var myRepo = git('')
 
 myRepo.addSync([
-    config.apiPath,
+    config.versionPath,
     config.packagePath,
     config.changeLogPath
 ].concat(config.docFilesPaths))

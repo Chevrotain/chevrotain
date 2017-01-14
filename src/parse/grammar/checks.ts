@@ -13,6 +13,7 @@ import {getProductionDslName, isOptionalProd} from "./gast"
 import {tokenName, tokenLabel} from "../../scan/tokens_public"
 import {first} from "./first"
 import {containsPath, getLookaheadPathsForOr, Alternative} from "./lookahead"
+import {VERSION} from "../../version"
 
 
 export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
@@ -329,12 +330,14 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
                 `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
 
 
+            let docs_version = VERSION.replace(/\./g, "_")
             // Should this information be on the error message or in some common errors docs?
             currMessage = currMessage + "To Resolve this, try one of of the following: \n" +
                 "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
                 "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
                 "3. This issue can be ignored (if you know what you are doing...), see" +
-                " http://sap.github.io/chevrotain/documentation/0_9_0/interfaces/iparserconfig.html for\n"
+                " http://sap.github.io/chevrotain/documentation/" + docs_version + "/interfaces/iparserconfig.html#ignoredissues for more" +
+            " details\n"
 
             return {
                 message:      currMessage,

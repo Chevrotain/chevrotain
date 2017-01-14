@@ -28,6 +28,7 @@ import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
 import {clearCache} from "./parse/cache_public"
 import {NextAfterTokenWalker} from "./parse/grammar/interpreter"
+import {VERSION} from "./version"
 
 /**
  * defines the public API of
@@ -36,7 +37,7 @@ import {NextAfterTokenWalker} from "./parse/grammar/interpreter"
 let API:any = {}
 
 // semantic version
-API.VERSION = "0.21.0"
+API.VERSION = VERSION
 
 // runtime API
 API.Parser = Parser
