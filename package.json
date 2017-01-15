@@ -72,7 +72,7 @@
     "grunt-webpack": "^1.0.18",
     "istanbul": "^0.4.5",
     "jsonfile": "^2.4.0",
-    "karma": "~1.3.0",
+    "karma": "~1.4.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "~2.0.0",
     "karma-firefox-launcher": "~1.0.0",
