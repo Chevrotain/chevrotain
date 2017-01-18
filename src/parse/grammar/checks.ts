@@ -14,14 +14,24 @@ import {tokenName, tokenLabel} from "../../scan/tokens_public"
 import {first} from "./first"
 import {containsPath, getLookaheadPathsForOr, Alternative} from "./lookahead"
 import {VERSION} from "../../version"
+import {isEmpty} from "../../utils/utils"
+import {every} from "../../utils/utils"
 
 
 export function validateGrammar(topLevels:gast.Rule[], maxLookahead:number, ignoredIssues:IgnoredParserIssues):IParserDefinitionError[] {
     let duplicateErrors:any = utils.map(topLevels, validateDuplicateProductions)
     let leftRecursionErrors:any = utils.map(topLevels, currTopRule => validateNoLeftRecursion(currTopRule, currTopRule))
-    let emptyAltErrors = map(topLevels, validateEmptyOrAlternative)
-    let ambiguousAltsErrors = map(topLevels, currTopRule =>
-        validateAmbiguousAlternationAlternatives(currTopRule, maxLookahead, ignoredIssues))
+
+    let emptyAltErrors = []
+    let ambiguousAltsErrors = []
+
+    // left recursion could cause infinite loops in the following validations.
+    // It is safest to first have the user fix the left recursion errors first and only then examine farther issues.
+    if (every(leftRecursionErrors, isEmpty)) {
+        emptyAltErrors = map(topLevels, validateEmptyOrAlternative)
+        ambiguousAltsErrors = map(topLevels, currTopRule =>
+            validateAmbiguousAlternationAlternatives(currTopRule, maxLookahead, ignoredIssues))
+    }
 
     return <any>utils.flatten(duplicateErrors.concat(leftRecursionErrors, emptyAltErrors, ambiguousAltsErrors))
 }
@@ -337,7 +347,7 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
                 "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
                 "3. This issue can be ignored (if you know what you are doing...), see" +
                 " http://sap.github.io/chevrotain/documentation/" + docs_version + "/interfaces/iparserconfig.html#ignoredissues for more" +
-            " details\n"
+                " details\n"
 
             return {
                 message:      currMessage,
