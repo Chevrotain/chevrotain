@@ -16,6 +16,8 @@ A few simple examples of using the Chevrotain Parser to resolve some common pars
 
 * [Minifying Chevrotain Grammars](minification/README.md)
 
+* [Bundling Chevrotain Grammars using Webpack 2](webpack/README.md)
+
 
 Some of the examples require node.js V4+ to run as ES6 syntax has been used.
 

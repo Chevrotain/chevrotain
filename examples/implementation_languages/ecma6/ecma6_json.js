@@ -49,8 +49,8 @@ class WhiteSpace extends Token {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
-var allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
-var JsonLexer = new Lexer(allTokens)
+const allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
+const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 // Using ES6 the parser too can be defined as a class
@@ -60,7 +60,7 @@ class JsonParserES6 extends chevrotain.Parser {
         super(input, allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
-        var $ = this
+        const $ = this
 
         $.RULE("json", () => {
             $.OR([
@@ -123,14 +123,14 @@ class JsonParserES6 extends chevrotain.Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new JsonParserES6([])
+const parser = new JsonParserES6([])
 
 module.exports = function(text) {
-    var lexResult = JsonLexer.tokenize(text)
+    const lexResult = JsonLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
-    var value = parser.json()
+    const value = parser.json()
 
     return {
         value:       value, // this is a pure grammar, the value will always be <undefined>
