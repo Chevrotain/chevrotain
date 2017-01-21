@@ -20,7 +20,7 @@ var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
 PUBLIC_API_TS_FILES.push("./node_modules/@types/node/index.d.ts")
 
 var fourSpaces = "    "
-var examples_test_command = "mocha **/*spec.js"
+var examples_test_command = "mocha '**/*spec.js'"
 
 var INSTALL_LINK = 'npm install && npm link chevrotain'
 var INSTALL_LINK_TEST = INSTALL_LINK + ' && ' + examples_test_command
