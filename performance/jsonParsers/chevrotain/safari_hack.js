@@ -1,5 +1,6 @@
 function IsSafari() {
-    var is_safari = navigator.userAgent.toLowerCase().indexOf('safari/') > -1;
+    var isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1 &&
+               navigator.userAgent && !navigator.userAgent.match('CriOS');
     return is_safari;
 }
 
