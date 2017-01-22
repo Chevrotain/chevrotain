@@ -1,7 +1,7 @@
 function IsSafari() {
     var isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1 &&
-               navigator.userAgent && !navigator.userAgent.match('CriOS');
-    return is_safari;
+               navigator.userAgent && !navigator.userAgent.match('CriOS')
+    return isSafari
 }
 
 var unicdoeRegExp = /^[0-9a-fA-F]{4}/
