@@ -20,7 +20,7 @@ var PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
 PUBLIC_API_TS_FILES.push("./node_modules/@types/node/index.d.ts")
 
 var fourSpaces = "    "
-var examples_test_command = "mocha **/*spec.js"
+var examples_test_command = "./node_modules/.bin/mocha '!(node_modules)/**/*spec.js'"
 
 var INSTALL_LINK = 'npm install && npm link chevrotain'
 var INSTALL_LINK_TEST = INSTALL_LINK + ' && ' + examples_test_command
@@ -36,17 +36,17 @@ module.exports = function(grunt) {
         pkg: pkg,
 
         run: {
-            options:                                {
+            options: {
                 failOnError: true
             },
 
-            ts_compile: {
+            ts_compile:                             {
                 exec: 'npm run compile'
             },
-            ts_compile_defs: {
+            ts_compile_defs:                        {
                 exec: 'npm run compile_definitions'
             },
-            ts_compile_defs_namespace: {
+            ts_compile_defs_namespace:              {
                 exec: 'npm run compile_definitions_namespace'
             },
             npm_link:                               {
@@ -57,31 +57,33 @@ module.exports = function(grunt) {
             },
             test_examples_lexer:                    {
                 options: {
-                    cwd: process.cwd() + "/examples/lexer"
+                    cwd: process.cwd() + "/examples/lexer/"
                 },
                 exec:    INSTALL_LINK_TEST
             },
             test_examples_grammars:                 {
                 options: {
-                    cwd: process.cwd() + "/examples/grammars"
+                    cwd: process.cwd() + "/examples/grammars/"
                 },
                 exec:    INSTALL_LINK_TEST
             },
             test_examples_parser:                   {
                 options: {
-                    cwd: process.cwd() + "/examples/parser"
+                    cwd: process.cwd() + "/examples/parser/"
                 },
-                exec:    INSTALL_LINK + ' && ' + 'grunt --gruntfile minification/gruntfile.js' + ' && ' + examples_test_command
+                exec:    INSTALL_LINK + ' && ' + 'grunt --gruntfile minification/gruntfile.js' + ' && ' + 'npm --prefix ./webpack' +
+                         ' install  ./webpack' + ' && '  + examples_test_command
+
             },
             test_examples_lang_services:            {
                 options: {
-                    cwd: process.cwd() + "/examples/language_services"
+                    cwd: process.cwd() + "/examples/language_services/"
                 },
                 exec:    INSTALL_LINK + "&& grunt test"
             },
             test_examples_implementation_languages: {
                 options: {
-                    cwd: process.cwd() + "/examples/implementation_languages"
+                    cwd: process.cwd() + "/examples/implementation_languages/"
                 },
                 exec:    INSTALL_LINK + " && npm test"
             },
@@ -238,12 +240,12 @@ module.exports = function(grunt) {
         typedoc: {
             build_docs: {
                 options: {
-                    out:              'dev/docs',
-                    module:           'commonjs',
-                    name:             'Chevrotain',
-                    excludeExternals: '',
+                    out:                 'dev/docs',
+                    module:              'commonjs',
+                    name:                'Chevrotain',
+                    excludeExternals:    '',
                     includeDeclarations: true,
-                    tsconfig: "tsdocsconfig.json"
+                    tsconfig:            "tsdocsconfig.json"
                 }
                 // src:     PUBLIC_API_TS_FILES
             }

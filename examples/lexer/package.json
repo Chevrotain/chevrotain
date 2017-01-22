@@ -2,7 +2,7 @@
   "name": "chevrotain_examples_lexer",
   "version": "0.1.0",
   "scripts": {
-    "test": "mocha **/*spec.js"
+    "test": "mocha '!(node_modules)/**/*spec.js'"
   },
   "dependencies": {
     "chevrotain": "*",
@@ -11,7 +11,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "extend": "^2.0.1",
-    "mocha": "^2.2.5"
+    "mocha": "^3.2.0"
   },
   "private": true
 }
