@@ -50,5 +50,5 @@ With a [test](./test/webpack_spec.js) running on the bundled webpack output:
 to run this example:
 
  - npm install
- - npm run webpack
+ - npm run bundle
  - npm test
