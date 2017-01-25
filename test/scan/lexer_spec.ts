@@ -676,6 +676,10 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 const SIGNS = extendToken("SIGNS", /SIGNS/)
                 SIGNS.PUSH_MODE = "signs"
 
+                const SIGNS_AND_EXIT_LETTERS = extendToken("SIGNS_AND_EXIT_LETTERS", /SIGNS_AND_EXIT_LETTERS/)
+                SIGNS_AND_EXIT_LETTERS.PUSH_MODE = "signs"
+                SIGNS_AND_EXIT_LETTERS.POP_MODE = true
+
                 const ExitNumbers = extendToken("ExitNumbers", /EXIT_NUMBERS/)
                 ExitNumbers.POP_MODE = true
 
@@ -689,11 +693,10 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 const Whitespace = extendToken("Whitespace", /(\t| )/)
                 Whitespace.GROUP = Lexer.SKIPPED
 
-
                 let modeLexerDefinition:IMultiModeLexerDefinition = {
                     modes:       {
                         "numbers": [One, Two, Three, ExitNumbers, LETTERS, Whitespace],
-                        "letters": [Alpha, Beta, Gamma, ExitLetters, SIGNS, Whitespace],
+                        "letters": [Alpha, Beta, Gamma, ExitLetters, SIGNS_AND_EXIT_LETTERS, SIGNS, Whitespace],
                         "signs":   [Hash, Caret, Amp, ExitSigns, NUMBERS, Whitespace]
                     },
                     defaultMode: "numbers"
@@ -768,6 +771,19 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                         "EXIT_NUMBERS",
                         "2"
                     ])
+                })
+
+                it("Will pop the lexer mode and push a new one if both are defined on the token", () => {
+                  let input = "LETTERS SIGNS_AND_EXIT_LETTERS &"
+                  let lexResult = ModeLexer.tokenize(input)
+                  expect(lexResult.errors).to.be.empty
+
+                  let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                  expect(images).to.deep.equal([
+                      "LETTERS",
+                      "SIGNS_AND_EXIT_LETTERS",
+                      "&"
+                  ])
                 })
 
                 it("Will detect Token definitions with push modes values that does not exist", () => {
