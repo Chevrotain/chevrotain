@@ -1,5 +1,5 @@
 // requiring the latest version of chevrotain (assuming it is indeed located there)
-var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/chevrotain");
+var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/src/api");
 
 // ----------------- lexer -----------------
 var extendToken = chevrotain.extendSimpleLazyToken;

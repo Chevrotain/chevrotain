@@ -1,5 +1,5 @@
 var XRegExp = require("xregexp");
-var chevrotain = require("../../lib/chevrotain");
+var chevrotain = require("../../lib/src/api");
 
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer;

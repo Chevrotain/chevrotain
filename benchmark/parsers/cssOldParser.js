@@ -1,5 +1,5 @@
 var XRegExp = require("xregexp");
-var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/chevrotain");
+var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/src/api");
 
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer;

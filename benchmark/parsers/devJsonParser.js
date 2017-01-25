@@ -1,5 +1,5 @@
 // requiring the development version
-var chevrotain = require("../../lib/chevrotain");
+var chevrotain = require("../../lib/src/api");
 
 // ----------------- lexer -----------------
 var extendToken = chevrotain.extendSimpleLazyToken;

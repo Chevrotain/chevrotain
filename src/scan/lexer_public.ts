@@ -106,7 +106,7 @@ export interface IRegExpExec {
 export class Lexer {
 
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
-                     "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
+        "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
 
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors:ILexerDefinitionError[] = []
@@ -465,14 +465,17 @@ export class Lexer {
 
                 // mode handling, must pop before pushing if a Token both acts as both
                 // otherwise it would be a NO-OP
-                // need to save the PUSH_MODE property as if the mode is popped
-                // patternIdxToPopMode is updated to reflect the new mode after popping the stack
-                let pushMode = patternIdxToPushMode[i]
                 if (patternIdxToPopMode[i]) {
+                    // need to save the PUSH_MODE property as if the mode is popped
+                    // patternIdxToPopMode is updated to reflect the new mode after popping the stack
+                    let pushMode = patternIdxToPushMode[i]
                     pop_mode(newToken)
+                    if (pushMode) {
+                        push_mode.call(this, pushMode)
+                    }
                 }
-                if (pushMode) {
-                    push_mode.call(this, pushMode)
+                else if (patternIdxToPushMode[i]) {
+                    push_mode.call(this, patternIdxToPushMode[i])
                 }
             }
             else { // error recovery, drop characters until we identify a valid token's start point
@@ -619,14 +622,17 @@ export class Lexer {
 
                 // mode handling, must pop before pushing if a Token both acts as both
                 // otherwise it would be a NO-OP
-                // need to save the PUSH_MODE property as if the mode is popped
-                // patternIdxToPopMode is updated to reflect the new mode after popping the stack
-                let pushMode = patternIdxToPushMode[i]
                 if (patternIdxToPopMode[i]) {
+                    // need to save the PUSH_MODE property as if the mode is popped
+                    // patternIdxToPopMode is updated to reflect the new mode after popping the stack
+                    let pushMode = patternIdxToPushMode[i]
                     pop_mode(newToken)
+                    if (pushMode) {
+                        push_mode.call(this, pushMode)
+                    }
                 }
-                if (pushMode) {
-                    push_mode.call(this, pushMode)
+                else if (patternIdxToPushMode[i]) {
+                    push_mode.call(this, patternIdxToPushMode[i])
                 }
             }
             else { // error recovery, drop characters until we identify a valid token's start point
