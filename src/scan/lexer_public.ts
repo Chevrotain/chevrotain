@@ -465,11 +465,14 @@ export class Lexer {
 
                 // mode handling, must pop before pushing if a Token both acts as both
                 // otherwise it would be a NO-OP
+                // need to save the PUSH_MODE property as if the mode is popped
+                // patternIdxToPopMode is updated to reflect the new mode after popping the stack
+                let pushMode = patternIdxToPushMode[i]
                 if (patternIdxToPopMode[i]) {
                     pop_mode(newToken)
                 }
-                if (patternIdxToPushMode[i]) {
-                    push_mode.call(this, patternIdxToPushMode[i])
+                if (pushMode) {
+                    push_mode.call(this, pushMode)
                 }
             }
             else { // error recovery, drop characters until we identify a valid token's start point
@@ -616,11 +619,14 @@ export class Lexer {
 
                 // mode handling, must pop before pushing if a Token both acts as both
                 // otherwise it would be a NO-OP
+                // need to save the PUSH_MODE property as if the mode is popped
+                // patternIdxToPopMode is updated to reflect the new mode after popping the stack
+                let pushMode = patternIdxToPushMode[i]
                 if (patternIdxToPopMode[i]) {
                     pop_mode(newToken)
                 }
-                if (patternIdxToPushMode[i]) {
-                    push_mode.call(this, patternIdxToPushMode[i])
+                if (pushMode) {
+                    push_mode.call(this, pushMode)
                 }
             }
             else { // error recovery, drop characters until we identify a valid token's start point
