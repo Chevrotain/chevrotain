@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+- [Fix issue with tokens that both pop and push a mode.](https://github.com/SAP/chevrotain/issues/351)
+- [Avoid infinite loops during validations caused by left recursion.](https://github.com/SAP/chevrotain/commit/b796ffb8a95046fa331e6f7c6c2504557b794096)
+
+
+
 ## 0.21.0 (12-24-2016)
 
 #### Major Changes
