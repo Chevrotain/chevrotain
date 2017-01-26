@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.21.1 (1-26-2017)
 
 #### Bug Fixes
 - [Fix issue with tokens that both pop and push a mode.](https://github.com/SAP/chevrotain/issues/351)

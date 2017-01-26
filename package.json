@@ -1,6 +1,6 @@
 {
   "name": "chevrotain",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "description": "Chevrotain is a high performance fault tolerant javascript parsing DSL for building recursive decent parsers",
   "keywords": [
     "parser",
@@ -47,9 +47,9 @@
     "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
     "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat",
     "unit_tests": "node_modules/.bin/_mocha ./lib/test/**/*spec.js",
-    "compile" : "tsc",
-    "compile_definitions" : "tsc test_integration/definitions/es6_modules.ts --outDir dev/garbage",
-    "compile_definitions_namespace" : "tsc test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
+    "compile": "tsc",
+    "compile_definitions": "tsc test_integration/definitions/es6_modules.ts --outDir dev/garbage",
+    "compile_definitions_namespace": "tsc test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
     "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {},
