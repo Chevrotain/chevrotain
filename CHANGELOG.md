@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.22.0 (1-27-2017)
 
 #### Minor Changes
 - [Lexer performance improvements.](https://github.com/SAP/chevrotain/issues/354)

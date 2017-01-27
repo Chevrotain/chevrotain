@@ -23,7 +23,7 @@ that any custom pattern implementations should behave as if the [start of input 
 has been used.
 
 
-The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_21_1/interfaces/icustompattern.html) interface.
+The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_22_0/interfaces/icustompattern.html) interface.
 Example:
 
 ```JavaScript
