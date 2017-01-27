@@ -6,7 +6,7 @@
     "chevrotain": "*"
   },
   "scripts": {
-    "pack_antlr4" : "browserify ./node_modules/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4"
+    "pack_antlr4": "browserify ./node_modules/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4"
   },
   "devDependencies": {
     "antlr4": "^4.6.0",
@@ -16,6 +16,7 @@
     "jison-lex": "*",
     "jsonfile": "^2.2.3",
     "lodash": "^3.10.1",
+    "nearley": "^2.7.11",
     "wrench": "^1.5.8"
   },
   "private": true
