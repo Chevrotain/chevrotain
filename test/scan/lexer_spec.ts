@@ -774,16 +774,16 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 })
 
                 it("Will pop the lexer mode and push a new one if both are defined on the token", () => {
-                  let input = "LETTERS SIGNS_AND_EXIT_LETTERS &"
-                  let lexResult = ModeLexer.tokenize(input)
-                  expect(lexResult.errors).to.be.empty
+                    let input = "LETTERS SIGNS_AND_EXIT_LETTERS &"
+                    let lexResult = ModeLexer.tokenize(input)
+                    expect(lexResult.errors).to.be.empty
 
-                  let images = map(lexResult.tokens, (currTok) => getImage(currTok))
-                  expect(images).to.deep.equal([
-                      "LETTERS",
-                      "SIGNS_AND_EXIT_LETTERS",
-                      "&"
-                  ])
+                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                    expect(images).to.deep.equal([
+                        "LETTERS",
+                        "SIGNS_AND_EXIT_LETTERS",
+                        "&"
+                    ])
                 })
 
                 it("Will detect Token definitions with push modes values that does not exist", () => {
@@ -980,3 +980,16 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
 defineLexerSpecs("Regular Tokens Mode", extendToken, tokenInstanceofMatcher)
 defineLexerSpecs("Lazy Tokens Mode", extendLazyToken, tokenInstanceofMatcher)
 defineLexerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, tokenStructuredMatcher)
+
+defineLexerSpecs("Lazy Tokens Mode (slow mode)", createSlowExtendToken(extendLazyToken), tokenInstanceofMatcher)
+defineLexerSpecs("SimpleLazy Tokens Mode (slow mode)", createSlowExtendToken(extendSimpleLazyToken), tokenStructuredMatcher)
+// ensures fastMode is not enabled by defining a LONGER_ALT
+function createSlowExtendToken(baseExtendToken) {
+    return function () {
+        let orgTokenType = baseExtendToken.apply(null, arguments)
+        if (orgTokenType.LONGER_ALT === undefined) {
+            orgTokenType.LONGER_ALT = false
+        }
+        return orgTokenType
+    }
+}
