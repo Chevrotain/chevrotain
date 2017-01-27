@@ -69,7 +69,7 @@
     "grunt-run": "^0.6.0",
     "grunt-text-replace": "^0.4.0",
     "grunt-typedoc": "^0.2.4",
-    "grunt-webpack": "^1.0.18",
+    "grunt-webpack": "^2.0.0",
     "istanbul": "^0.4.5",
     "jsonfile": "^2.4.0",
     "karma": "~1.4.0",
