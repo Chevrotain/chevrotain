@@ -1,33 +1,9 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.antlr4 = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 // This implementation of {@link TokenStream} loads tokens from a
 // {@link TokenSource} on-demand, and places the tokens in a buffer to provide
@@ -261,6 +237,7 @@ BufferedTokenStream.prototype.setTokenSource = function(tokenSource) {
 	this.index = -1;
 };
 
+
 // Given a starting index, return the index of the next token on channel.
 // Return i if tokens[i] is on channel. Return -1 if there are no tokens
 // on channel between i and EOF.
@@ -301,7 +278,7 @@ BufferedTokenStream.prototype.getHiddenTokensToRight = function(tokenIndex,
 		channel = -1;
 	}
 	this.lazyInit();
-	if (this.tokenIndex < 0 || tokenIndex >= this.tokens.length) {
+	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
 		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
 	}
 	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1,
@@ -401,34 +378,10 @@ exports.BufferedTokenStream = BufferedTokenStream;
 
 },{"./IntervalSet":6,"./Lexer":8,"./Token":14}],2:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 //
@@ -496,34 +449,10 @@ exports.CommonTokenFactory = CommonTokenFactory;
 
 },{"./Token":14}],3:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 //
@@ -625,47 +554,20 @@ CommonTokenStream.prototype.getNumberOfOnChannelTokens = function() {
 exports.CommonTokenStream = CommonTokenStream;
 },{"./BufferedTokenStream":1,"./Token":14}],4:[function(require,module,exports){
 //
-//  [The "BSD license"]
-//   Copyright (c) 2012 Terence Parr
-//   Copyright (c) 2012 Sam Harwell
-//   Copyright (c) 2014 Eric Vergnaud
-//   All rights reserved.
-// 
-//   Redistribution and use in source and binary forms, with or without
-//   modification, are permitted provided that the following conditions
-//   are met:
-// 
-//   1. Redistributions of source code must retain the above copyright
-//      notice, this list of conditions and the following disclaimer.
-//   2. Redistributions in binary form must reproduce the above copyright
-//      notice, this list of conditions and the following disclaimer in the
-//      documentation and/or other materials provided with the distribution.
-//   3. The name of the author may not be used to endorse or promote products
-//      derived from this software without specific prior written permission.
-// 
-//   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//   IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//   INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+//
 
 //
 //  This is an InputStream that is loaded from a file all at once
 //  when you construct the object.
-// 
+//
 var InputStream = require('./InputStream').InputStream;
-try {
-	var fs = require("fs");
-} catch(ex) {
-	// probably running from browser, no "Node.js/fs" makes sense 
-}
-	
+var isNodeJs = typeof window === 'undefined' && typeof importScripts === 'undefined';
+var fs = isNodeJs ? require("fs") : null;
+
 function FileStream(fileName) {
 	var data = fs.readFileSync(fileName, "utf8");
 	InputStream.call(this, data);
@@ -679,36 +581,12 @@ FileStream.prototype.constructor = FileStream;
 exports.FileStream = FileStream;
 
 },{"./InputStream":5,"fs":45}],5:[function(require,module,exports){
-// 
-//  [The "BSD license"]
-//   Copyright (c) 2012 Terence Parr
-//   Copyright (c) 2012 Sam Harwell
-//   Copyright (c) 2014 Eric Vergnaud
-//   All rights reserved.
-// 
-//   Redistribution and use in source and binary forms, with or without
-//   modification, are permitted provided that the following conditions
-//   are met:
-// 
-//   1. Redistributions of source code must retain the above copyright
-//      notice, this list of conditions and the following disclaimer.
-//   2. Redistributions in binary form must reproduce the above copyright
-//      notice, this list of conditions and the following disclaimer in the
-//      documentation and/or other materials provided with the distribution.
-//   3. The name of the author may not be used to endorse or promote products
-//      derived from this software without specific prior written permission.
-// 
-//   THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//   IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//   INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-// 
+//
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+//
 
 var Token = require('./Token').Token;
 
@@ -815,6 +693,11 @@ InputStream.prototype.toString = function() {
 exports.InputStream = InputStream;
 
 },{"./Token":14}],6:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 /*jslint smarttabs:true */
 
 var Token = require('./Token').Token;
@@ -1111,34 +994,10 @@ exports.IntervalSet = IntervalSet;
 
 },{"./Token":14}],7:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 var Set = require('./Utils').Set;
@@ -1225,7 +1084,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
     this._LOOK(s, stopState, lookContext, r, new Set(), new BitSet(), seeThruPreds, true);
     return r;
 };
-    
+
 //*
 // Compute set of tokens that can follow {@code s} in the ATN in the
 // specified {@code ctx}.
@@ -1257,7 +1116,7 @@ LL1Analyzer.prototype.LOOK = function(s, stopState, ctx) {
 // is {@code null}.
 ///
 LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calledRuleStack, seeThruPreds, addEOF) {
-    var c = new ATNConfig({state:s, alt:0}, ctx);
+    var c = new ATNConfig({state:s, alt:0, context: ctx}, null);
     if (lookBusy.contains(c)) {
         return;
     }
@@ -1335,45 +1194,20 @@ exports.LL1Analyzer = LL1Analyzer;
 
 
 },{"./IntervalSet":6,"./PredictionContext":11,"./Token":14,"./Utils":15,"./atn/ATNConfig":17,"./atn/ATNState":22,"./atn/Transition":30}],8:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  this SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  this SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 // A lexer is recognizer that draws input symbols from a character stream.
 //  lexer grammars result in a subclass of this object. A Lexer object
-//  uses simplified match() and error recovery mechanisms in the interest
-//  of speed.
-///
+//  uses simplified match() and error recovery mechanisms in the interest of speed.
 
 var Token = require('./Token').Token;
 var Recognizer = require('./Recognizer').Recognizer;
 var CommonTokenFactory = require('./CommonTokenFactory').CommonTokenFactory;
+var RecognitionException  = require('./error/Errors').RecognitionException;
 var LexerNoViableAltException = require('./error/Errors').LexerNoViableAltException;
 
 function TokenSource() {
@@ -1489,8 +1323,13 @@ Lexer.prototype.nextToken = function() {
 				try {
 					ttype = this._interp.match(this._input, this._mode);
 				} catch (e) {
-					this.notifyListeners(e); // report error
-					this.recover(e);
+				    if(e instanceof RecognitionException) {
+                        this.notifyListeners(e); // report error
+                        this.recover(e);
+                    } else {
+                        console.log(e.stack);
+                        throw e;
+                    }
 				}
 				if (this._input.LA(1) === Token.EOF) {
 					this._hitEOF = true;
@@ -1728,34 +1567,10 @@ Lexer.prototype.recover = function(re) {
 exports.Lexer = Lexer;
 
 },{"./CommonTokenFactory":2,"./Recognizer":12,"./Token":14,"./error/Errors":39}],9:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  this SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  this SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 var Token = require('./Token').Token;
 var ParseTreeListener = require('./tree/Tree').ParseTreeListener;
@@ -1763,6 +1578,8 @@ var Recognizer = require('./Recognizer').Recognizer;
 var DefaultErrorStrategy = require('./error/ErrorStrategy').DefaultErrorStrategy;
 var ATNDeserializer = require('./atn/ATNDeserializer').ATNDeserializer;
 var ATNDeserializationOptions = require('./atn/ATNDeserializationOptions').ATNDeserializationOptions;
+var TerminalNode = require('./tree/Tree').TerminalNode;
+var ErrorNode = require('./tree/Tree').ErrorNode;
 
 function TraceListener(parser) {
 	ParseTreeListener.call(this);
@@ -2052,7 +1869,7 @@ Parser.prototype.compileParseTreePattern = function(pattern, patternRuleIndex, l
 	lexer = lexer || null;
 	if (lexer === null) {
 		if (this.getTokenStream() !== null) {
-			var tokenSource = this.getTokenStream().getTokenSource();
+			var tokenSource = this.getTokenStream().tokenSource;
 			if (tokenSource instanceof Lexer) {
 				lexer = tokenSource;
 			}
@@ -2138,9 +1955,14 @@ Parser.prototype.consume = function() {
 		} else {
 			node = this._ctx.addTokenNode(o);
 		}
+        node.invokingState = this.state;
 		if (hasListener) {
 			this._parseListeners.map(function(listener) {
-				listener.visitTerminal(node);
+				if (node instanceof ErrorNode || (node.isErrorNode !== undefined && node.isErrorNode())) {
+					listener.visitErrorNode(node);
+				} else if (node instanceof TerminalNode) {
+					listener.visitTerminal(node);
+				}
 			});
 		}
 	}
@@ -2180,6 +2002,7 @@ Parser.prototype.exitRule = function() {
 };
 
 Parser.prototype.enterOuterAlt = function(localctx, altNum) {
+   	localctx.setAltNumber(altNum);
 	// if we have new localctx, make sure we replace existing ctx
 	// that is previous child of parse tree
 	if (this.buildParseTrees && this._ctx !== localctx) {
@@ -2419,34 +2242,10 @@ Parser.prototype.setTrace = function(trace) {
 
 exports.Parser = Parser;
 },{"./Lexer":8,"./Recognizer":12,"./Token":14,"./atn/ATNDeserializationOptions":19,"./atn/ATNDeserializer":20,"./error/ErrorStrategy":38,"./tree/Tree":42}],10:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 //* A rule invocation record for parsing.
 //
@@ -2509,6 +2308,17 @@ ParserRuleContext.prototype.copyFrom = function(ctx) {
     this.children = null;
     this.start = ctx.start;
     this.stop = ctx.stop;
+    // copy any error nodes to alt label node
+    if(ctx.children) {
+        this.children = [];
+        // reset parent pointer for any error nodes
+    	ctx.children.map(function(child) {
+    		if (child instanceof ErrorNodeImpl) {
+                this.children.push(child);
+                child.parentCtx = this;
+            }
+		}, this);
+	}
 };
 
 // Double dispatch methods for listeners
@@ -2635,7 +2445,7 @@ ParserRuleContext.prototype.getSourceInterval = function() {
     if( this.start === null || this.stop === null) {
         return INVALID_INTERVAL;
     } else {
-        return Interval(this.start.tokenIndex, this.stop.tokenIndex);
+        return new Interval(this.start.tokenIndex, this.stop.tokenIndex);
     }
 };
 
@@ -2653,40 +2463,17 @@ InterpreterRuleContext.prototype.constructor = InterpreterRuleContext;
 exports.ParserRuleContext = ParserRuleContext;
 },{"./IntervalSet":6,"./RuleContext":13,"./tree/Tree":42}],11:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 var RuleContext = require('./RuleContext').RuleContext;
+var Hash = require('./Utils').Hash;
 
-function PredictionContext(cachedHashString) {
-	this.cachedHashString = cachedHashString;
+function PredictionContext(cachedHashCode) {
+	this.cachedHashCode = cachedHashCode;
 }
 
 // Represents {@code $} in local context prediction, which means wildcard.
@@ -2737,17 +2524,19 @@ PredictionContext.prototype.hasEmptyPath = function() {
 	return this.getReturnState(this.length - 1) === PredictionContext.EMPTY_RETURN_STATE;
 };
 
-PredictionContext.prototype.hashString = function() {
-	return this.cachedHashString;
+PredictionContext.prototype.hashCode = function() {
+	return this.cachedHashCode;
 };
 
+
+PredictionContext.prototype.updateHashCode = function(hash) {
+    hash.update(this.cachedHashCode);
+};
+/*
 function calculateHashString(parent, returnState) {
 	return "" + parent + returnState;
 }
-
-function calculateEmptyHashString() {
-	return "";
-}
+*/
 
 // Used to cache {@link PredictionContext} objects. Its used for the shared
 // context cash associated with contexts in DFA states. This cache
@@ -2766,7 +2555,7 @@ PredictionContextCache.prototype.add = function(ctx) {
 	if (ctx === PredictionContext.EMPTY) {
 		return PredictionContext.EMPTY;
 	}
-	var existing = this.cache[ctx];
+	var existing = this.cache[ctx] || null;
 	if (existing !== null) {
 		return existing;
 	}
@@ -2785,9 +2574,13 @@ Object.defineProperty(PredictionContextCache.prototype, "length", {
 });
 
 function SingletonPredictionContext(parent, returnState) {
-	var hashString = parent !== null ? calculateHashString(parent, returnState)
-			: calculateEmptyHashString();
-	PredictionContext.call(this, hashString);
+	var hashCode = 0;
+	if(parent !== null) {
+		var hash = new Hash();
+		hash.update(parent, returnState);
+        hashCode = hash.finish();
+	}
+	PredictionContext.call(this, hashCode);
 	this.parentCtx = parent;
 	this.returnState = returnState;
 }
@@ -2823,7 +2616,7 @@ SingletonPredictionContext.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof SingletonPredictionContext)) {
 		return false;
-	} else if (this.hashString() !== other.hashString()) {
+	} else if (this.hashCode() !== other.hashCode()) {
 		return false; // can't be same if hash is different
 	} else {
 		if(this.returnState !== other.returnState)
@@ -2835,14 +2628,10 @@ SingletonPredictionContext.prototype.equals = function(other) {
 	}
 };
 
-SingletonPredictionContext.prototype.hashString = function() {
-	return this.cachedHashString;
-};
-
 SingletonPredictionContext.prototype.toString = function() {
 	var up = this.parentCtx === null ? "" : this.parentCtx.toString();
 	if (up.length === 0) {
-		if (this.returnState === this.EMPTY_RETURN_STATE) {
+		if (this.returnState === PredictionContext.EMPTY_RETURN_STATE) {
 			return "$";
 		} else {
 			return "" + this.returnState;
@@ -2887,8 +2676,10 @@ function ArrayPredictionContext(parents, returnStates) {
 	// from {@link //EMPTY} and non-empty. We merge {@link //EMPTY} by using
 	// null parent and
 	// returnState == {@link //EMPTY_RETURN_STATE}.
-	var hash = calculateHashString(parents, returnStates);
-	PredictionContext.call(this, hash);
+	var h = new Hash();
+	h.update(parents, returnStates);
+	var hashCode = h.finish();
+	PredictionContext.call(this, hashCode);
 	this.parents = parents;
 	this.returnStates = returnStates;
 	return this;
@@ -2922,7 +2713,7 @@ ArrayPredictionContext.prototype.equals = function(other) {
 		return true;
 	} else if (!(other instanceof ArrayPredictionContext)) {
 		return false;
-	} else if (this.hashString !== other.hashString()) {
+	} else if (this.hashCode() !== other.hashCode()) {
 		return false; // can't be same if hash is different
 	} else {
 		return this.returnStates === other.returnStates &&
@@ -2972,7 +2763,7 @@ function predictionContextFromRuleContext(atn, outerContext) {
 	var transition = state.transitions[0];
 	return SingletonPredictionContext.create(parent, transition.followState.stateNumber);
 }
-
+/*
 function calculateListsHashString(parents, returnStates) {
 	var s = "";
 	parents.map(function(p) {
@@ -2983,7 +2774,7 @@ function calculateListsHashString(parents, returnStates) {
 	});
 	return s;
 }
-
+*/
 function merge(a, b, rootIsWildcard, mergeCache) {
 	// share same graph if both same
 	if (a === b) {
@@ -3403,36 +3194,12 @@ exports.SingletonPredictionContext = SingletonPredictionContext;
 exports.predictionContextFromRuleContext = predictionContextFromRuleContext;
 exports.getCachedPredictionContext = getCachedPredictionContext;
 
-},{"./RuleContext":13}],12:[function(require,module,exports){
+},{"./RuleContext":13,"./Utils":15}],12:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 var Token = require('./Token').Token;
@@ -3451,7 +3218,7 @@ Recognizer.ruleIndexMapCache = {};
 
 
 Recognizer.prototype.checkVersion = function(toolVersion) {
-    var runtimeVersion = "4.5";
+    var runtimeVersion = "4.6";
     if (runtimeVersion!==toolVersion) {
         console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
     }
@@ -3484,7 +3251,7 @@ Recognizer.prototype.getTokenTypeMap = function() {
 // <p>Used for XPath and tree pattern compilation.</p>
 //
 Recognizer.prototype.getRuleIndexMap = function() {
-    var ruleNames = this.getRuleNames();
+    var ruleNames = this.ruleNames;
     if (ruleNames===null) {
         throw("The current recognizer does not provide a list of rule names.");
     }
@@ -3577,34 +3344,10 @@ Object.defineProperty(Recognizer.prototype, "state", {
 exports.Recognizer = Recognizer;
 
 },{"./Token":14,"./error/ErrorListener":37}],13:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2013 Terence Parr
-//  Copyright (c) 2013 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 //  A rule context is a record of a single rule invocation. It knows
@@ -3630,6 +3373,7 @@ exports.Recognizer = Recognizer;
 
 var RuleNode = require('./tree/Tree').RuleNode;
 var INVALID_INTERVAL = require('./tree/Tree').INVALID_INTERVAL;
+var INVALID_ALT_NUMBER = require('./atn/ATN').INVALID_ALT_NUMBER;
 
 function RuleContext(parent, invokingState) {
 	RuleNode.call(this);
@@ -3692,6 +3436,21 @@ RuleContext.prototype.getText = function() {
 	}
 };
 
+// For rule associated with this parse tree internal node, return
+// the outer alternative number used to match the input. Default
+// implementation does not compute nor store this alt num. Create
+// a subclass of ParserRuleContext with backing field and set
+// option contextSuperClass.
+// to set it.
+RuleContext.prototype.getAltNumber = function() { return INVALID_ALT_NUMBER; }
+
+// Set the outer alternative number for this context node. Default
+// implementation does nothing to avoid backing field overhead for
+// trees that don't need it.  Create
+// a subclass of ParserRuleContext with backing field and set
+// option contextSuperClass.
+RuleContext.prototype.setAltNumber = function(altNumber) { }
+
 RuleContext.prototype.getChild = function(i) {
 	return null;
 };
@@ -3743,35 +3502,11 @@ RuleContext.prototype.toString = function(ruleNames, stop) {
 };
 
 
-},{"./tree/Tree":42,"./tree/Trees":43}],14:[function(require,module,exports){
-//[The "BSD license"]
-// Copyright (c) 2012 Terence Parr
-// Copyright (c) 2012 Sam Harwell
-// Copyright (c) 2014 Eric Vergnaud
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. The name of the author may not be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-// IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-// NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+},{"./atn/ATN":16,"./tree/Tree":42,"./tree/Trees":43}],14:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 // A token has properties: text, type, line, character position in the line
@@ -3921,236 +3656,457 @@ exports.Token = Token;
 exports.CommonToken = CommonToken;
 
 },{}],15:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 function arrayToString(a) {
-	return "[" + a.join(", ") + "]";
+    return "[" + a.join(", ") + "]";
 }
 
-String.prototype.hashCode = function(s) {
-	var hash = 0;
-	if (this.length === 0) {
-		return hash;
-	}
-	for (var i = 0; i < this.length; i++) {
-		var character = this.charCodeAt(i);
-		hash = ((hash << 5) - hash) + character;
-		hash = hash & hash; // Convert to 32bit integer
-	}
-	return hash;
+String.prototype.seed = String.prototype.seed || Math.round(Math.random() * Math.pow(2, 32));
+
+String.prototype.hashCode = function () {
+    var remainder, bytes, h1, h1b, c1, c1b, c2, c2b, k1, i,
+        key = this.toString();
+
+    remainder = key.length & 3; // key.length % 4
+    bytes = key.length - remainder;
+    h1 = String.prototype.seed;
+    c1 = 0xcc9e2d51;
+    c2 = 0x1b873593;
+    i = 0;
+
+    while (i < bytes) {
+        k1 =
+            ((key.charCodeAt(i) & 0xff)) |
+            ((key.charCodeAt(++i) & 0xff) << 8) |
+            ((key.charCodeAt(++i) & 0xff) << 16) |
+            ((key.charCodeAt(++i) & 0xff) << 24);
+        ++i;
+
+        k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+        k1 = (k1 << 15) | (k1 >>> 17);
+        k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
+
+        h1 ^= k1;
+        h1 = (h1 << 13) | (h1 >>> 19);
+        h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+        h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+    }
+
+    k1 = 0;
+
+    switch (remainder) {
+        case 3:
+            k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+        case 2:
+            k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+        case 1:
+            k1 ^= (key.charCodeAt(i) & 0xff);
+
+            k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+            k1 = (k1 << 15) | (k1 >>> 17);
+            k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+            h1 ^= k1;
+    }
+
+    h1 ^= key.length;
+
+    h1 ^= h1 >>> 16;
+    h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+    h1 ^= h1 >>> 13;
+    h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+    h1 ^= h1 >>> 16;
+
+    return h1 >>> 0;
 };
 
-function standardEqualsFunction(a,b) {
-	return a.equals(b);
+function standardEqualsFunction(a, b) {
+    return a.equals(b);
 }
 
-function standardHashFunction(a) {
-	return a.hashString();
+function standardHashCodeFunction(a) {
+    return a.hashCode();
 }
 
 function Set(hashFunction, equalsFunction) {
-	this.data = {};
-	this.hashFunction = hashFunction || standardHashFunction;
-	this.equalsFunction = equalsFunction || standardEqualsFunction;
-	return this;
+    this.data = {};
+    this.hashFunction = hashFunction || standardHashCodeFunction;
+    this.equalsFunction = equalsFunction || standardEqualsFunction;
+    return this;
 }
 
 Object.defineProperty(Set.prototype, "length", {
-	get : function() {
-		return this.values().length;
-	}
+    get: function () {
+        var l = 0;
+        for (var key in this.data) {
+            if (key.indexOf("hash_") === 0) {
+                l = l + this.data[key].length;
+            }
+        }
+        return l;
+    }
 });
 
-Set.prototype.add = function(value) {
-	var hash = this.hashFunction(value);
-	var key = "hash_" + hash.hashCode();
-	if(key in this.data) {
-		var i;
-		var values = this.data[key];
-		for(i=0;i<values.length; i++) {
-			if(this.equalsFunction(value, values[i])) {
-				return values[i];
-			}
-		}
-		values.push(value);
-		return value;
-	} else {
-		this.data[key] = [ value ];
-		return value;
-	}
+Set.prototype.add = function (value) {
+    var hash = this.hashFunction(value);
+    var key = "hash_" + hash;
+    if (key in this.data) {
+        var values = this.data[key];
+        for (var i = 0; i < values.length; i++) {
+            if (this.equalsFunction(value, values[i])) {
+                return values[i];
+            }
+        }
+        values.push(value);
+        return value;
+    } else {
+        this.data[key] = [value];
+        return value;
+    }
 };
 
-Set.prototype.contains = function(value) {
-	var hash = this.hashFunction(value);
-	var key = hash.hashCode();
-	if(key in this.data) {
-		var i;
-		var values = this.data[key];
-		for(i=0;i<values.length; i++) {
-			if(this.equalsFunction(value, values[i])) {
-				return true;
-			}
-		}
-	}
-	return false;
+Set.prototype.contains = function (value) {
+    return this.get(value) != null;
 };
 
-Set.prototype.values = function() {
-	var l = [];
-	for(var key in this.data) {
-		if(key.indexOf("hash_")===0) {
-			l = l.concat(this.data[key]);
-		}
-	}
-	return l;
+Set.prototype.get = function (value) {
+    var hash = this.hashFunction(value);
+    var key = "hash_" + hash;
+    if (key in this.data) {
+        var values = this.data[key];
+        for (var i = 0; i < values.length; i++) {
+            if (this.equalsFunction(value, values[i])) {
+                return values[i];
+            }
+        }
+    }
+    return null;
 };
 
-Set.prototype.toString = function() {
-	return arrayToString(this.values());
+Set.prototype.values = function () {
+    var l = [];
+    for (var key in this.data) {
+        if (key.indexOf("hash_") === 0) {
+            l = l.concat(this.data[key]);
+        }
+    }
+    return l;
+};
+
+Set.prototype.toString = function () {
+    return arrayToString(this.values());
 };
 
 function BitSet() {
-	this.data = [];
-	return this;
+    this.data = [];
+    return this;
 }
 
-BitSet.prototype.add = function(value) {
-	this.data[value] = true;
+BitSet.prototype.add = function (value) {
+    this.data[value] = true;
 };
 
-BitSet.prototype.or = function(set) {
-	var bits = this;
-	Object.keys(set.data).map( function(alt) { bits.add(alt); });
+BitSet.prototype.or = function (set) {
+    var bits = this;
+    Object.keys(set.data).map(function (alt) {
+        bits.add(alt);
+    });
 };
 
-BitSet.prototype.remove = function(value) {
-	delete this.data[value];
+BitSet.prototype.remove = function (value) {
+    delete this.data[value];
 };
 
-BitSet.prototype.contains = function(value) {
-	return this.data[value] === true;
+BitSet.prototype.contains = function (value) {
+    return this.data[value] === true;
 };
 
-BitSet.prototype.values = function() {
-	return Object.keys(this.data);
+BitSet.prototype.values = function () {
+    return Object.keys(this.data);
 };
 
-BitSet.prototype.minValue = function() {
-	return Math.min.apply(null, this.values());
+BitSet.prototype.minValue = function () {
+    return Math.min.apply(null, this.values());
 };
 
-BitSet.prototype.hashString = function() {
-	return this.values().toString();
+BitSet.prototype.hashCode = function () {
+    var hash = new Hash();
+    hash.update(this.values());
+    return hash.finish();
 };
 
-BitSet.prototype.equals = function(other) {
-	if(!(other instanceof BitSet)) {
-		return false;
-	}
-	return this.hashString()===other.hashString();
+BitSet.prototype.equals = function (other) {
+    if (!(other instanceof BitSet)) {
+        return false;
+    }
+    return this.hashCode() === other.hashCode();
 };
 
 Object.defineProperty(BitSet.prototype, "length", {
-	get : function() {
-		return this.values().length;
-	}
+    get: function () {
+        return this.values().length;
+    }
 });
 
-BitSet.prototype.toString = function() {
-	return "{" + this.values().join(", ") + "}";
+BitSet.prototype.toString = function () {
+    return "{" + this.values().join(", ") + "}";
 };
 
-function AltDict() {
-	this.data = {};
-	return this;
+function Map(hashFunction, equalsFunction) {
+    this.data = {};
+    this.hashFunction = hashFunction || standardHashCodeFunction;
+    this.equalsFunction = equalsFunction || standardEqualsFunction;
+    return this;
 }
 
-AltDict.prototype.get = function(key) {
-	key = "k-" + key;
-	if(key in this.data){
-		return this.data[key];
-	} else {
-		return null;
-	}
+Object.defineProperty(Map.prototype, "length", {
+    get: function () {
+        var l = 0;
+        for (var hashKey in this.data) {
+            if (hashKey.indexOf("hash_") === 0) {
+                l = l + this.data[hashKey].length;
+            }
+        }
+        return l;
+    }
+});
+
+Map.prototype.put = function (key, value) {
+    var hashKey = "hash_" + this.hashFunction(key);
+    if (hashKey in this.data) {
+        var entries = this.data[hashKey];
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (this.equalsFunction(key, entry.key)) {
+                var oldValue = entry.value;
+                entry.value = value;
+                return oldValue;
+            }
+        }
+        entries.push({key:key, value:value});
+        return value;
+    } else {
+        this.data[hashKey] = [{key:key, value:value}];
+        return value;
+    }
 };
 
-AltDict.prototype.put = function(key, value) {
-	key = "k-" + key;
-	this.data[key] = value;
+Map.prototype.containsKey = function (key) {
+    var hashKey = "hash_" + this.hashFunction(key);
+    if(hashKey in this.data) {
+        var entries = this.data[hashKey];
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (this.equalsFunction(key, entry.key))
+                return true;
+        }
+    }
+    return false;
 };
 
-AltDict.prototype.values = function() {
-	var data = this.data;
-	var keys = Object.keys(this.data);
-	return keys.map(function(key) {
-		return data[key];
-	});
+Map.prototype.get = function (key) {
+    var hashKey = "hash_" + this.hashFunction(key);
+    if(hashKey in this.data) {
+        var entries = this.data[hashKey];
+        for (var i = 0; i < entries.length; i++) {
+            var entry = entries[i];
+            if (this.equalsFunction(key, entry.key))
+                return entry.value;
+        }
+    }
+    return null;
+};
+
+Map.prototype.entries = function () {
+    var l = [];
+    for (var key in this.data) {
+        if (key.indexOf("hash_") === 0) {
+            l = l.concat(this.data[key]);
+        }
+    }
+    return l;
+};
+
+
+Map.prototype.getKeys = function () {
+    return this.entries().map(function(e) {
+        return e.key;
+    });
+};
+
+
+Map.prototype.getValues = function () {
+    return this.entries().map(function(e) {
+            return e.value;
+    });
+};
+
+
+Map.prototype.toString = function () {
+    var ss = this.entries().map(function(entry) {
+        return '{' + entry.key + ':' + entry.value + '}';
+    });
+    return '[' + ss.join(", ") + ']';
+};
+
+
+function AltDict() {
+    this.data = {};
+    return this;
+}
+
+
+AltDict.prototype.get = function (key) {
+    key = "k-" + key;
+    if (key in this.data) {
+        return this.data[key];
+    } else {
+        return null;
+    }
+};
+
+AltDict.prototype.put = function (key, value) {
+    key = "k-" + key;
+    this.data[key] = value;
+};
+
+AltDict.prototype.values = function () {
+    var data = this.data;
+    var keys = Object.keys(this.data);
+    return keys.map(function (key) {
+        return data[key];
+    });
 };
 
 function DoubleDict() {
-	return this;
+    return this;
 }
 
-DoubleDict.prototype.get = function(a, b) {
-	var d = this[a] || null;
-	return d===null ? null : (d[b] || null);
+function Hash() {
+    this.count = 0;
+    this.hash = 0;
+    return this;
+}
+
+Hash.prototype.update = function () {
+    for(var i=0;i<arguments.length;i++) {
+        var value = arguments[i];
+        if (value == null)
+            continue;
+        if(Array.isArray(value))
+            this.update.apply(value);
+        else {
+            var k = 0;
+            switch (typeof(value)) {
+                case 'undefined':
+                case 'function':
+                    continue;
+                case 'number':
+                case 'boolean':
+                    k = value;
+                    break;
+                case 'string':
+                    k = value.hashCode();
+                    break;
+                default:
+                    value.updateHashCode(this);
+                    continue;
+            }
+            k = k * 0xCC9E2D51;
+            k = (k << 15) | (k >>> (32 - 15));
+            k = k * 0x1B873593;
+            this.count = this.count + 1;
+            hash = this.hash ^ k;
+            hash = (hash << 13) | (hash >>> (32 - 13));
+            hash = hash * 5 + 0xE6546B64;
+            this.hash = hash;
+        }
+    }
+}
+
+Hash.prototype.finish = function () {
+    var hash = this.hash ^ (this.count * 4);
+    hash = hash ^ (hash >>> 16);
+    hash = hash * 0x85EBCA6B;
+    hash = hash ^ (hash >>> 13);
+    hash = hash * 0xC2B2AE35;
+    hash = hash ^ (hash >>> 16);
+    return hash;
+}
+
+function hashStuff() {
+    var hash = new Hash();
+    hash.update.apply(arguments);
+    return hash.finish();
+}
+
+DoubleDict.prototype.get = function (a, b) {
+    var d = this[a] || null;
+    return d === null ? null : (d[b] || null);
 };
 
-DoubleDict.prototype.set = function(a, b, o) {
-	var d = this[a] || null;
-	if(d===null) {
-		d = {};
-		this[a] = d;
-	}
-	d[b] = o;
+DoubleDict.prototype.set = function (a, b, o) {
+    var d = this[a] || null;
+    if (d === null) {
+        d = {};
+        this[a] = d;
+    }
+    d[b] = o;
 };
 
 
 function escapeWhitespace(s, escapeSpaces) {
-	s = s.replace("\t","\\t");
-	s = s.replace("\n","\\n");
-	s = s.replace("\r","\\r");
-	if(escapeSpaces) {
-		s = s.replace(" ","\u00B7");
-	}
-	return s;
+    s = s.replace("\t", "\\t");
+    s = s.replace("\n", "\\n");
+    s = s.replace("\r", "\\r");
+    if (escapeSpaces) {
+        s = s.replace(" ", "\u00B7");
+    }
+    return s;
 }
 
+function titleCase(str) {
+    return str.replace(/\w\S*/g, function (txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1);
+    });
+};
 
+function equalArrays(a, b)
+{
+    if (!Array.isArray(a) || !Array.isArray(b))
+        return false;
+    if (a == b)
+        return true;
+    if (a.length != b.length)
+        return false;
+    for (var i = 0; i < a.length; i++) {
+        if (a[i] == b[i])
+            continue;
+        if (!a[i].equals(b[i]))
+            return false;
+    }
+    return true;
+};
+
+exports.Hash = Hash;
 exports.Set = Set;
+exports.Map = Map;
 exports.BitSet = BitSet;
 exports.AltDict = AltDict;
 exports.DoubleDict = DoubleDict;
+exports.hashStuff = hashStuff;
 exports.escapeWhitespace = escapeWhitespace;
 exports.arrayToString = arrayToString;
-
+exports.titleCase = titleCase;
+exports.equalArrays = equalArrays;
 },{}],16:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2013 Terence Parr
-//  Copyright (c) 2013 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 var LL1Analyzer = require('./../LL1Analyzer').LL1Analyzer;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
@@ -4185,7 +4141,7 @@ function ATN(grammarType , maxTokenType) {
 
     return this;
 }
-	
+
 // Compute the set of valid tokens that can occur starting in state {@code s}.
 //  If {@code ctx} is null, the set of tokens will not include what can follow
 //  the rule surrounding {@code s}. In other words, the set will be
@@ -4203,7 +4159,7 @@ ATN.prototype.nextTokensNoContext = function(s) {
         return s.nextTokenWithinRule;
     }
     s.nextTokenWithinRule = this.nextTokensInContext(s, null);
-    s.nextTokenWithinRule.readonly = true;
+    s.nextTokenWithinRule.readOnly = true;
     return s.nextTokenWithinRule;
 };
 
@@ -4291,34 +4247,10 @@ ATN.INVALID_ALT_NUMBER = 0;
 exports.ATN = ATN;
 },{"./../IntervalSet":6,"./../LL1Analyzer":7,"./../Token":14}],17:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 // A tuple: (ATN state, predicted alt, syntactic, semantic context).
@@ -4331,6 +4263,8 @@ exports.ATN = ATN;
 
 var DecisionState = require('./ATNState').DecisionState;
 var SemanticContext = require('./SemanticContext').SemanticContext;
+var Hash = require("../Utils").Hash;
+
 
 function checkParams(params, isCfg) {
 	if(params===null) {
@@ -4342,7 +4276,7 @@ function checkParams(params, isCfg) {
 	} else {
 		var props = {};
 		props.state = params.state || null;
-		props.alt = params.alt || null;
+		props.alt = (params.alt === undefined) ? null : params.alt;
 		props.context = params.context || null;
 		props.semanticContext = params.semanticContext || null;
 		if(isCfg) {
@@ -4388,10 +4322,22 @@ ATNConfig.prototype.checkContext = function(params, config) {
 	}
 };
 
+
+ATNConfig.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
+
+
+ATNConfig.prototype.updateHashCode = function(hash) {
+    hash.update(this.state.stateNumber, this.alt, this.context, this.semanticContext);
+};
+
 // An ATN configuration is equal to another if both have
 //  the same state, they predict the same alternative, and
 //  syntactic/semantic contexts are the same.
-///
+
 ATNConfig.prototype.equals = function(other) {
     if (this === other) {
         return true;
@@ -4406,15 +4352,26 @@ ATNConfig.prototype.equals = function(other) {
     }
 };
 
-ATNConfig.prototype.shortHashString = function() {
-    return "" + this.state.stateNumber + "/" + this.alt + "/" + this.semanticContext;
+
+ATNConfig.prototype.hashCodeForConfigSet = function() {
+    var hash = new Hash();
+    hash.update(this.state.stateNumber, this.alt, this.semanticContext);
+    return hash.finish();
 };
 
-ATNConfig.prototype.hashString = function() {
-    return "" + this.state.stateNumber + "/" + this.alt + "/" +
-             (this.context===null ? "" : this.context.hashString()) +
-             "/" + this.semanticContext.hashString();
+
+ATNConfig.prototype.equalsForConfigSet = function(other) {
+    if (this === other) {
+        return true;
+    } else if (! (other instanceof ATNConfig)) {
+        return false;
+    } else {
+        return this.state.stateNumber===other.state.stateNumber &&
+            this.alt===other.alt &&
+            this.semanticContext.equals(other.semanticContext);
+    }
 };
+
 
 ATNConfig.prototype.toString = function() {
     return "(" + this.state + "," + this.alt +
@@ -4430,7 +4387,7 @@ ATNConfig.prototype.toString = function() {
 
 function LexerATNConfig(params, config) {
 	ATNConfig.call(this, params, config);
-    
+
     // This is the backing field for {@link //getLexerActionExecutor}.
 	var lexerActionExecutor = params.lexerActionExecutor || null;
     this.lexerActionExecutor = lexerActionExecutor || (config!==null ? config.lexerActionExecutor : null);
@@ -4441,25 +4398,22 @@ function LexerATNConfig(params, config) {
 LexerATNConfig.prototype = Object.create(ATNConfig.prototype);
 LexerATNConfig.prototype.constructor = LexerATNConfig;
 
-LexerATNConfig.prototype.hashString = function() {
-    return "" + this.state.stateNumber + this.alt + this.context +
-            this.semanticContext + (this.passedThroughNonGreedyDecision ? 1 : 0) +
-            this.lexerActionExecutor;
+LexerATNConfig.prototype.updateHashCode = function(hash) {
+    hash.update(this.state.stateNumber, this.alt, this.context, this.semanticContext, this.passedThroughNonGreedyDecision, this.lexerActionExecutor);
 };
 
 LexerATNConfig.prototype.equals = function(other) {
-    if (this === other) {
-        return true;
-    } else if (!(other instanceof LexerATNConfig)) {
-        return false;
-    } else if (this.passedThroughNonGreedyDecision !== other.passedThroughNonGreedyDecision) {
-        return false;
-    } else if (this.lexerActionExecutor !== other.lexerActionExecutor) {
-        return false;
-    } else {
-        return ATNConfig.prototype.equals.call(this, other);
-    }
+    return this === other ||
+            (other instanceof LexerATNConfig &&
+            this.passedThroughNonGreedyDecision == other.passedThroughNonGreedyDecision &&
+            (this.lexerActionExecutor ? this.lexerActionExecutor.equals(other.lexerActionExecutor) : !other.lexerActionExecutor) &&
+            ATNConfig.prototype.equals.call(this, other));
 };
+
+LexerATNConfig.prototype.hashCodeForConfigSet = LexerATNConfig.prototype.hashCode;
+
+LexerATNConfig.prototype.equalsForConfigSet = LexerATNConfig.prototype.equals;
+
 
 LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {
     return source.passedThroughNonGreedyDecision ||
@@ -4468,36 +4422,12 @@ LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {
 
 exports.ATNConfig = ATNConfig;
 exports.LexerATNConfig = LexerATNConfig;
-},{"./ATNState":22,"./SemanticContext":29}],18:[function(require,module,exports){
+},{"../Utils":15,"./ATNState":22,"./SemanticContext":29}],18:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 //
 // Specialized {@link Set}{@code <}{@link ATNConfig}{@code >} that can track
@@ -4507,24 +4437,23 @@ exports.LexerATNConfig = LexerATNConfig;
 
 var ATN = require('./ATN').ATN;
 var Utils = require('./../Utils');
+var Hash = Utils.Hash;
 var Set = Utils.Set;
 var SemanticContext = require('./SemanticContext').SemanticContext;
 var merge = require('./../PredictionContext').merge;
 
 function hashATNConfig(c) {
-	return c.shortHashString();
+	return c.hashCodeForConfigSet();
 }
 
 function equalATNConfigs(a, b) {
 	if ( a===b ) {
 		return true;
-	}
-	if ( a===null || b===null ) {
+	} else if ( a===null || b===null ) {
 		return false;
-	}
-	return a.state.stateNumber===b.state.stateNumber &&
-		a.alt===b.alt && a.semanticContext.equals(b.semanticContext);
-}
+	} else
+       return a.equalsForConfigSet(b);
+ }
 
 
 function ATNConfigSet(fullCtx) {
@@ -4549,7 +4478,7 @@ function ATNConfigSet(fullCtx) {
 	// the sets and they must not change. This does not protect the other
 	// fields; in particular, conflictingAlts is set after
 	// we've made this readonly.
-	this.readonly = false;
+	this.readOnly = false;
 	// Track the elements as they are added to the set; supports get(i)///
 	this.configs = [];
 
@@ -4565,7 +4494,7 @@ function ATNConfigSet(fullCtx) {
 	this.hasSemanticContext = false;
 	this.dipsIntoOuterContext = false;
 
-	this.cachedHashString = "-1";
+	this.cachedHashCode = -1;
 
 	return this;
 }
@@ -4583,7 +4512,7 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	if (mergeCache === undefined) {
 		mergeCache = null;
 	}
-	if (this.readonly) {
+	if (this.readOnly) {
 		throw "This set is readonly";
 	}
 	if (config.semanticContext !== SemanticContext.NONE) {
@@ -4594,7 +4523,7 @@ ATNConfigSet.prototype.add = function(config, mergeCache) {
 	}
 	var existing = this.configLookup.add(config);
 	if (existing === config) {
-		this.cachedHashString = "-1";
+		this.cachedHashCode = -1;
 		this.configs.push(config); // track order here
 		return true;
 	}
@@ -4639,7 +4568,7 @@ Object.defineProperty(ATNConfigSet.prototype, "items", {
 });
 
 ATNConfigSet.prototype.optimizeConfigs = function(interpreter) {
-	if (this.readonly) {
+	if (this.readOnly) {
 		throw "This set is readonly";
 	}
 	if (this.configLookup.length === 0) {
@@ -4659,37 +4588,36 @@ ATNConfigSet.prototype.addAll = function(coll) {
 };
 
 ATNConfigSet.prototype.equals = function(other) {
-	if (this === other) {
-		return true;
-	} else if (!(other instanceof ATNConfigSet)) {
-		return false;
-	}
-	return this.configs !== null && this.configs.equals(other.configs) &&
-			this.fullCtx === other.fullCtx &&
-			this.uniqueAlt === other.uniqueAlt &&
-			this.conflictingAlts === other.conflictingAlts &&
-			this.hasSemanticContext === other.hasSemanticContext &&
-			this.dipsIntoOuterContext === other.dipsIntoOuterContext;
+	return this === other ||
+		(other instanceof ATNConfigSet &&
+		Utils.equalArrays(this.configs, other.configs) &&
+		this.fullCtx === other.fullCtx &&
+		this.uniqueAlt === other.uniqueAlt &&
+		this.conflictingAlts === other.conflictingAlts &&
+		this.hasSemanticContext === other.hasSemanticContext &&
+		this.dipsIntoOuterContext === other.dipsIntoOuterContext);
 };
 
-ATNConfigSet.prototype.hashString = function() {
-	if (this.readonly) {
-		if (this.cachedHashString === "-1") {
-			this.cachedHashString = this.hashConfigs();
+ATNConfigSet.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
+
+
+ATNConfigSet.prototype.updateHashCode = function(hash) {
+	if (this.readOnly) {
+		if (this.cachedHashCode === -1) {
+            var hash = new Hash();
+            hash.update(this.configs);
+			this.cachedHashCode = hash.finish();
 		}
-		return this.cachedHashString;
+        hash.update(this.cachedHashCode);
 	} else {
-		return this.hashConfigs();
+        hash.update(this.configs);
 	}
 };
 
-ATNConfigSet.prototype.hashConfigs = function() {
-	var s = "";
-	this.configs.map(function(c) {
-		s += c.toString();
-	});
-	return s;
-};
 
 Object.defineProperty(ATNConfigSet.prototype, "length", {
 	get : function() {
@@ -4716,17 +4644,17 @@ ATNConfigSet.prototype.containsFast = function(item) {
 };
 
 ATNConfigSet.prototype.clear = function() {
-	if (this.readonly) {
+	if (this.readOnly) {
 		throw "This set is readonly";
 	}
 	this.configs = [];
-	this.cachedHashString = "-1";
+	this.cachedHashCode = -1;
 	this.configLookup = new Set();
 };
 
-ATNConfigSet.prototype.setReadonly = function(readonly) {
-	this.readonly = readonly;
-	if (readonly) {
+ATNConfigSet.prototype.setReadonly = function(readOnly) {
+	this.readOnly = readOnly;
+	if (readOnly) {
 		this.configLookup = null; // can't mod, no need for lookup cache
 	}
 };
@@ -4752,34 +4680,10 @@ exports.ATNConfigSet = ATNConfigSet;
 exports.OrderedATNConfigSet = OrderedATNConfigSet;
 
 },{"./../PredictionContext":11,"./../Utils":15,"./ATN":16,"./SemanticContext":29}],19:[function(require,module,exports){
-//[The "BSD license"]
-// Copyright (c) 2013 Terence Parr
-// Copyright (c) 2013 Sam Harwell
-// Copyright (c) 2014 Eric Vergnaud
-// All rights reserved.
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//
-// 1. Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-// 2. Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-// 3. The name of the author may not be used to endorse or promote products
-//    derived from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-// OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-// IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-// INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-// NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 function ATNDeserializationOptions(copyFrom) {
 	if(copyFrom===undefined) {
@@ -4803,34 +4707,10 @@ ATNDeserializationOptions.defaultOptions.readOnly = true;
 exports.ATNDeserializationOptions = ATNDeserializationOptions;
 
 },{}],20:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2013 Terence Parr
-//  Copyright (c) 2013 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 var Token = require('./../Token').Token;
 var ATN = require('./ATN').ATN;
@@ -4896,14 +4776,14 @@ function initArray( length, value) {
 }
 
 function ATNDeserializer (options) {
-	
+
     if ( options=== undefined || options === null ) {
         options = ATNDeserializationOptions.defaultOptions;
     }
     this.deserializationOptions = options;
     this.stateFactories = null;
     this.actionFactories = null;
-    
+
     return this;
 }
 
@@ -5021,7 +4901,7 @@ ATNDeserializer.prototype.readStates = function(atn) {
         pair = endStateNumbers[j];
         pair[0].endState = atn.states[pair[1]];
     }
-    
+
     var numNonGreedyStates = this.readInt();
     for (j=0; j<numNonGreedyStates; j++) {
         stateNumber = this.readInt();
@@ -5217,7 +5097,7 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
 
     var excludeTransition = null;
     var endState = null;
-    
+
     if (atn.ruleToStartState[idx].isPrecedenceRule) {
         // wrap from the beginning of the rule to the StarLoopEntryState
         endState = null;
@@ -5235,7 +5115,7 @@ ATNDeserializer.prototype.generateRuleBypassTransition = function(atn, idx) {
     } else {
         endState = atn.ruleToStopState[idx];
     }
-    
+
     // all non-excluded transitions that currently target end state need to
 	// target blockEnd instead
     for(i=0; i<atn.states.length; i++) {
@@ -5290,7 +5170,7 @@ ATNDeserializer.prototype.stateIsEndStateFor = function(state, idx) {
 
 //
 // Analyze the {@link StarLoopEntryState} states in the specified ATN to set
-// the {@link StarLoopEntryState//precedenceRuleDecision} field to the
+// the {@link StarLoopEntryState//isPrecedenceDecision} field to the
 // correct value.
 //
 // @param atn The ATN.
@@ -5310,7 +5190,7 @@ ATNDeserializer.prototype.markPrecedenceDecisions = function(atn) {
             if (maybeLoopEndState instanceof LoopEndState) {
                 if ( maybeLoopEndState.epsilonOnlyTransitions &&
                         (maybeLoopEndState.transitions[0].target instanceof RuleStopState)) {
-                    state.precedenceRuleDecision = true;
+                    state.isPrecedenceDecision = true;
                 }
             }
         }
@@ -5395,7 +5275,7 @@ function createByteToHex() {
 }
 
 var byteToHex = createByteToHex();
-	
+
 ATNDeserializer.prototype.readUUID = function() {
 	var bb = [];
 	for(var i=7;i>=0;i--) {
@@ -5490,39 +5370,15 @@ ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
         return this.actionFactories[type](data1, data2);
     }
 };
-   
+
 
 exports.ATNDeserializer = ATNDeserializer;
 },{"./../IntervalSet":6,"./../Token":14,"./ATN":16,"./ATNDeserializationOptions":19,"./ATNState":22,"./ATNType":23,"./LexerAction":25,"./Transition":30}],21:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2013 Terence Parr
-//  Copyright (c) 2013 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 var DFAState = require('./../dfa/DFAState').DFAState;
@@ -5530,7 +5386,7 @@ var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var getCachedPredictionContext = require('./../PredictionContext').getCachedPredictionContext;
 
 function ATNSimulator(atn, sharedContextCache) {
-	
+
     // The context cache maps all PredictionContext objects that are ==
     //  to a single cached copy. This cache is shared across all contexts
     //  in all ATNConfigs in all DFA states.  We rebuild each ATNConfigSet
@@ -5572,34 +5428,10 @@ exports.ATNSimulator = ATNSimulator;
 
 },{"./../PredictionContext":11,"./../dfa/DFAState":34,"./ATNConfigSet":18}],22:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 // The following images show the relation of states and
@@ -5833,7 +5665,7 @@ function PlusLoopbackState() {
 
 PlusLoopbackState.prototype = Object.create(DecisionState.prototype);
 PlusLoopbackState.prototype.constructor = PlusLoopbackState;
-        
+
 
 // Start of {@code (A|B|...)+} loop. Technically a decision state, but
 //  we don't use for code generation; somebody might need it, so I'm defining
@@ -5876,7 +5708,7 @@ function StarLoopEntryState() {
 	this.stateType = ATNState.STAR_LOOP_ENTRY;
     this.loopBackState = null;
     // Indicates whether this state can benefit from a precedence DFA during SLL decision making.
-    this.precedenceRuleDecision = null;
+    this.isPrecedenceDecision = null;
     return this;
 }
 
@@ -5923,40 +5755,16 @@ exports.StarBlockStartState = StarBlockStartState;
 exports.BasicBlockStartState = BasicBlockStartState;
 
 },{}],23:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2013 Terence Parr
-//  Copyright (c) 2013 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 // Represents the type of recognizer an ATN applies to.
 
 function ATNType() {
-	
+
 }
 
 ATNType.LEXER = 0;
@@ -5967,34 +5775,10 @@ exports.ATNType = ATNType;
 
 },{}],24:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 // When we hit an accept state in either the DFA or the ATN, we
@@ -6113,7 +5897,7 @@ LexerATNSimulator.prototype.reset = function() {
 LexerATNSimulator.prototype.matchATN = function(input) {
 	var startState = this.atn.modeToStartState[this.mode];
 
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("matchATN mode " + this.mode + " start: " + startState);
 	}
 	var old_mode = this.mode;
@@ -6128,14 +5912,14 @@ LexerATNSimulator.prototype.matchATN = function(input) {
 
 	var predict = this.execATN(input, next);
 
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("DFA after matchATN: " + this.decisionToDFA[old_mode].toLexerString());
 	}
 	return predict;
 };
 
 LexerATNSimulator.prototype.execATN = function(input, ds0) {
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("start state closure=" + ds0.configs);
 	}
 	if (ds0.isAcceptState) {
@@ -6146,7 +5930,7 @@ LexerATNSimulator.prototype.execATN = function(input, ds0) {
 	var s = ds0; // s is current/from DFA state
 
 	while (true) { // while more work
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			console.log("execATN loop starting closure: " + s.configs);
 		}
 
@@ -6214,7 +5998,7 @@ LexerATNSimulator.prototype.getExistingTargetState = function(s, t) {
 	if(target===undefined) {
 		target = null;
 	}
-	if (this.debug && target !== null) {
+	if (LexerATNSimulator.debug && target !== null) {
 		console.log("reuse state " + s.stateNumber + " edge to " + target.stateNumber);
 	}
 	return target;
@@ -6278,7 +6062,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 		if (currentAltReachedAcceptState && cfg.passedThroughNonGreedyDecision) {
 			continue;
 		}
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			console.log("testing %s at %s\n", this.getTokenName(t), cfg
 					.toString(this.recog, true));
 		}
@@ -6305,7 +6089,7 @@ LexerATNSimulator.prototype.getReachableConfigSet = function(input, closure,
 
 LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor,
 		startIndex, index, line, charPos) {
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("ACTION %s\n", lexerActionExecutor);
 	}
 	// seek to after last char in token
@@ -6347,13 +6131,13 @@ LexerATNSimulator.prototype.computeStartState = function(input, p) {
 LexerATNSimulator.prototype.closure = function(input, config, configs,
 		currentAltReachedAcceptState, speculative, treatEofAsEpsilon) {
 	var cfg = null;
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("closure(" + config.toString(this.recog, true) + ")");
 	}
 	if (config.state instanceof RuleStopState) {
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			if (this.recog !== null) {
-				console.log("closure at %s rule stop %s\n", this.recog.getRuleNames()[config.state.ruleIndex], config);
+				console.log("closure at %s rule stop %s\n", this.recog.ruleNames[config.state.ruleIndex], config);
 			} else {
 				console.log("closure at rule stop %s\n", config);
 			}
@@ -6426,7 +6210,7 @@ LexerATNSimulator.prototype.getEpsilonTarget = function(input, config, trans,
 		// states reached by traversing predicates. Since this is when we
 		// test them, we cannot cash the DFA state target of ID.
 
-		if (this.debug) {
+		if (LexerATNSimulator.debug) {
 			console.log("EVAL rule " + trans.ruleIndex + ":" + trans.predIndex);
 		}
 		configs.hasSemanticContext = true;
@@ -6552,7 +6336,7 @@ LexerATNSimulator.prototype.addDFAEdge = function(from_, tk, to, cfgs) {
 		// Only track edges within the DFA bounds
 		return to;
 	}
-	if (this.debug) {
+	if (LexerATNSimulator.debug) {
 		console.log("EDGE " + from_ + " -> " + to + " upon " + tk);
 	}
 	if (from_.edges === null) {
@@ -6583,9 +6367,8 @@ LexerATNSimulator.prototype.addDFAState = function(configs) {
 		proposed.lexerActionExecutor = firstConfigWithRuleStopState.lexerActionExecutor;
 		proposed.prediction = this.atn.ruleToTokenType[firstConfigWithRuleStopState.state.ruleIndex];
 	}
-	var hash = proposed.hashString();
 	var dfa = this.decisionToDFA[this.mode];
-	var existing = dfa.states[hash] || null;
+	var existing = dfa.states.get(proposed);
 	if (existing!==null) {
 		return existing;
 	}
@@ -6593,7 +6376,7 @@ LexerATNSimulator.prototype.addDFAState = function(configs) {
 	newState.stateNumber = dfa.states.length;
 	configs.setReadonly(true);
 	newState.configs = configs;
-	dfa.states[hash] = newState;
+	dfa.states.add(newState);
 	return newState;
 };
 
@@ -6630,34 +6413,10 @@ exports.LexerATNSimulator = LexerATNSimulator;
 
 },{"./../Lexer":8,"./../PredictionContext":11,"./../Token":14,"./../dfa/DFAState":34,"./../error/Errors":39,"./ATN":16,"./ATNConfig":17,"./ATNConfigSet":18,"./ATNSimulator":21,"./ATNState":22,"./LexerActionExecutor":26,"./Transition":30}],25:[function(require,module,exports){
 //
- //[The "BSD license"]
- // Copyright (c) 2013 Terence Parr
- // Copyright (c) 2013 Sam Harwell
- // Copyright (c) 2014 Eric Vergnaud
- // All rights reserved.
- //
- // Redistribution and use in source and binary forms, with or without
- // modification, are permitted provided that the following conditions
- // are met:
- //
- // 1. Redistributions of source code must retain the above copyright
- //    notice, this list of conditions and the following disclaimer.
- // 2. Redistributions in binary form must reproduce the above copyright
- //    notice, this list of conditions and the following disclaimer in the
- //    documentation and/or other materials provided with the distribution.
- // 3. The name of the author may not be used to endorse or promote products
- //    derived from this software without specific prior written permission.
- //
- // THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- // IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- // OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- // IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- // INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- // NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
  //
 
 function LexerActionType() {
@@ -6678,8 +6437,14 @@ function LexerAction(action) {
     return this;
 }
 
-LexerAction.prototype.hashString = function() {
-    return "" + this.actionType;
+LexerAction.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish()
+};
+
+LexerAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType);
 };
 
 LexerAction.prototype.equals = function(other) {
@@ -6727,8 +6492,8 @@ LexerTypeAction.prototype.execute = function(lexer) {
     lexer.type = this.type;
 };
 
-LexerTypeAction.prototype.hashString = function() {
-	return "" + this.actionType + this.type;
+LexerTypeAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.type);
 };
 
 
@@ -6763,8 +6528,8 @@ LexerPushModeAction.prototype.execute = function(lexer) {
     lexer.pushMode(this.mode);
 };
 
-LexerPushModeAction.prototype.hashString = function() {
-    return "" + this.actionType + this.mode;
+LexerPushModeAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.mode);
 };
 
 LexerPushModeAction.prototype.equals = function(other) {
@@ -6846,8 +6611,8 @@ LexerModeAction.prototype.execute = function(lexer) {
     lexer.mode(this.mode);
 };
 
-LexerModeAction.prototype.hashString = function() {
-	return "" + this.actionType + this.mode;
+LexerModeAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.mode);
 };
 
 LexerModeAction.prototype.equals = function(other) {
@@ -6899,8 +6664,8 @@ LexerCustomAction.prototype.execute = function(lexer) {
     lexer.action(null, this.ruleIndex, this.actionIndex);
 };
 
-LexerCustomAction.prototype.hashString = function() {
-    return "" + this.actionType + this.ruleIndex + this.actionIndex;
+LexerCustomAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.ruleIndex, this.actionIndex);
 };
 
 LexerCustomAction.prototype.equals = function(other) {
@@ -6932,8 +6697,8 @@ LexerChannelAction.prototype.execute = function(lexer) {
     lexer._channel = this.channel;
 };
 
-LexerChannelAction.prototype.hashString = function() {
-    return "" + this.actionType + this.channel;
+LexerChannelAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.channel);
 };
 
 LexerChannelAction.prototype.equals = function(other) {
@@ -6988,8 +6753,8 @@ LexerIndexedCustomAction.prototype.execute = function(lexer) {
     this.action.execute(lexer);
 };
 
-LexerIndexedCustomAction.prototype.hashString = function() {
-    return "" + this.actionType + this.offset + this.action;
+LexerIndexedCustomAction.prototype.updateHashCode = function(hash) {
+    hash.update(this.actionType, this.offset, this.action);
 };
 
 LexerIndexedCustomAction.prototype.equals = function(other) {
@@ -7015,34 +6780,10 @@ exports.LexerPopModeAction = LexerPopModeAction;
 exports.LexerModeAction = LexerModeAction;
 },{}],26:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2013 Terence Parr
-//  Copyright (c) 2013 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 // Represents an executor for a sequence of lexer actions which traversed during
@@ -7052,13 +6793,14 @@ exports.LexerModeAction = LexerModeAction;
 // efficiently, ensuring that actions appearing only at the end of the rule do
 // not cause bloating of the {@link DFA} created for the lexer.</p>
 
+var hashStuff = require("../Utils").hashStuff;
 var LexerIndexedCustomAction = require('./LexerAction').LexerIndexedCustomAction;
 
 function LexerActionExecutor(lexerActions) {
 	this.lexerActions = lexerActions === null ? [] : lexerActions;
 	// Caches the result of {@link //hashCode} since the hash code is an element
 	// of the performance-critical {@link LexerATNConfig//hashCode} operation.
-	this.hashString = lexerActions.toString(); // "".join([str(la) for la in
+	this.cachedHashCode = hashStuff(lexerActions); // "".join([str(la) for la in
 	// lexerActions]))
 	return this;
 }
@@ -7173,53 +6915,43 @@ LexerActionExecutor.prototype.execute = function(lexer, input, startIndex) {
 	}
 };
 
-LexerActionExecutor.prototype.hashString = function() {
-	return this.hashString;
+LexerActionExecutor.prototype.hashCode = function() {
+	return this.cachedHashCode;
 };
+
+LexerActionExecutor.prototype.updateHashCode = function(hash) {
+    hash.update(this.cachedHashCode);
+};
+
 
 LexerActionExecutor.prototype.equals = function(other) {
 	if (this === other) {
 		return true;
 	} else if (!(other instanceof LexerActionExecutor)) {
 		return false;
+	} else if (this.cachedHashCode != other.cachedHashCode) {
+		return false;
+	} else if (this.lexerActions.length != other.lexerActions.length) {
+		return false;
 	} else {
-		return this.hashString === other.hashString &&
-				this.lexerActions === other.lexerActions;
+		var numActions = this.lexerActions.length
+		for (var idx = 0; idx < numActions; ++idx) {
+			if (!this.lexerActions[idx].equals(other.lexerActions[idx])) {
+				return false;
+			}
+		}
+		return true;
 	}
 };
 
 exports.LexerActionExecutor = LexerActionExecutor;
 
-},{"./LexerAction":25}],27:[function(require,module,exports){
+},{"../Utils":15,"./LexerAction":25}],27:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 //
@@ -7455,6 +7187,7 @@ var Set = Utils.Set;
 var BitSet = Utils.BitSet;
 var DoubleDict = Utils.DoubleDict;
 var ATN = require('./ATN').ATN;
+var ATNState = require('./ATNState').ATNState;
 var ATNConfig = require('./ATNConfig').ATNConfig;
 var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
 var Token = require('./../Token').Token;
@@ -7507,6 +7240,8 @@ ParserATNSimulator.prototype = Object.create(ATNSimulator.prototype);
 ParserATNSimulator.prototype.constructor = ParserATNSimulator;
 
 ParserATNSimulator.prototype.debug = false;
+ParserATNSimulator.prototype.debug_closure = false;
+ParserATNSimulator.prototype.debug_add = false;
 ParserATNSimulator.prototype.debug_list_atn_decisions = false;
 ParserATNSimulator.prototype.dfa_debug = false;
 ParserATNSimulator.prototype.retry_debug = false;
@@ -7525,7 +7260,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
     this._input = input;
     this._startIndex = input.index;
     this._outerContext = outerContext;
-    
+
     var dfa = this.decisionToDFA[decision];
     this._dfa = dfa;
     var m = input.mark();
@@ -7552,16 +7287,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
                                    " exec LA(1)==" + this.getLookaheadName(input) +
                                    ", outerContext=" + outerContext.toString(this.parser.ruleNames));
             }
-            // If this is not a precedence DFA, we check the ATN start state
-            // to determine if this ATN start state is the decision for the
-            // closure block that determines whether a precedence rule
-            // should continue or complete.
-            //
-            if (!dfa.precedenceDfa && (dfa.atnStartState instanceof StarLoopEntryState)) {
-                if (dfa.atnStartState.precedenceRuleDecision) {
-                    dfa.setPrecedenceDfa(true);
-                }
-            }
+
             var fullCtx = false;
             var s0_closure = this.computeStartState(dfa.atnStartState, RuleContext.EMPTY, fullCtx);
 
@@ -7572,6 +7298,7 @@ ParserATNSimulator.prototype.adaptivePredict = function(input, decision, outerCo
                 // appropriate start state for the precedence level rather
                 // than simply setting DFA.s0.
                 //
+                dfa.s0.configs = s0_closure; // not used for prediction but useful to know start configs anyway
                 s0_closure = this.applyPrecedenceFilter(s0_closure);
                 s0 = this.addDFAState(dfa, new DFAState(null, s0_closure));
                 dfa.setPrecedenceStartState(this.parser.getPrecedence(), s0);
@@ -7940,13 +7667,13 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
     // For full-context reach operations, separate handling is required to
     // ensure that the alternative matching the longest overall sequence is
     // chosen when multiple such configurations can match the input.
-    
+
     var skippedStopStates = null;
 
     // First figure out where we can reach on input t
     for (var i=0; i<closure.items.length;i++) {
         var c = closure.items[i];
-        if(this.debug) {
+        if(this.debug_add) {
             console.log("testing " + this.getTokenName(t) + " at " + c);
         }
         if (c.state instanceof RuleStopState) {
@@ -7955,7 +7682,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
                     skippedStopStates = [];
                 }
                 skippedStopStates.push(c);
-                if(this.debug) {
+                if(this.debug_add) {
                     console.log("added " + c + " to skippedStopStates");
                 }
             }
@@ -7967,7 +7694,7 @@ ParserATNSimulator.prototype.computeReachSet = function(closure, t, fullCtx) {
             if (target!==null) {
                 var cfg = new ATNConfig({state:target}, c);
                 intermediate.add(cfg, this.mergeCache);
-                if(this.debug) {
+                if(this.debug_add) {
                     console.log("added " + cfg + " to intermediate");
                 }
             }
@@ -8331,7 +8058,7 @@ ParserATNSimulator.prototype.getSynValidOrSemInvalidAltThatFinishedDecisionEntry
     }
     return ATN.INVALID_ALT_NUMBER;
 };
-    
+
 ParserATNSimulator.prototype.getAltThatFinishedDecisionEntryRule = function(configs) {
     var alts = [];
     for(var i=0;i<configs.items.length; i++) {
@@ -8425,9 +8152,9 @@ ParserATNSimulator.prototype.closure = function(config, configs, closureBusy, co
 
 
 ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
-    if (this.debug) {
+    if (this.debug || this.debug_closure) {
         console.log("closure(" + config.toString(this.parser,true) + ")");
-        console.log("configs(" + configs.toString() + ")");
+        // console.log("configs(" + configs.toString() + ")");
         if(config.reachesIntoOuterContext>50) {
             throw "problem";
         }
@@ -8451,10 +8178,10 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
                     }
                     continue;
                 }
-                returnState = this.atn.states[config.context.getReturnState(i)];
-                newContext = config.context.getParent(i); // "pop" return state
+                var returnState = this.atn.states[config.context.getReturnState(i)];
+                var newContext = config.context.getParent(i); // "pop" return state
                 var parms = {state:returnState, alt:config.alt, context:newContext, semanticContext:config.semanticContext};
-                c = new ATNConfig(parms, null);
+                var c = new ATNConfig(parms, null);
                 // While we have context to pop back from, we may have
                 // gotten that context AFTER having falling off a rule.
                 // Make sure we track that we are now out of context.
@@ -8476,6 +8203,7 @@ ParserATNSimulator.prototype.closureCheckingStopState = function(config, configs
     this.closure_(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon);
 };
 
+
 // Do the actual work of walking epsilon edges//
 ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, collectPredicates, fullCtx, depth, treatEofAsEpsilon) {
     var p = config.state;
@@ -8486,6 +8214,9 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
         // both epsilon transitions and non-epsilon transitions.
     }
     for(var i = 0;i<p.transitions.length; i++) {
+        if(i==0 && this.canDropLoopEntryEdgeInLeftRecursiveRule(config))
+            continue;
+
         var t = p.transitions[i];
         var continueCollecting = collectPredicates && !(t instanceof ActionTransition);
         var c = this.getEpsilonTarget(config, t, continueCollecting, depth === 0, fullCtx, treatEofAsEpsilon);
@@ -8530,6 +8261,71 @@ ParserATNSimulator.prototype.closure_ = function(config, configs, closureBusy, c
     }
 };
 
+
+ParserATNSimulator.prototype.canDropLoopEntryEdgeInLeftRecursiveRule = function(config) {
+    // return False
+    var p = config.state;
+    // First check to see if we are in StarLoopEntryState generated during
+    // left-recursion elimination. For efficiency, also check if
+    // the context has an empty stack case. If so, it would mean
+    // global FOLLOW so we can't perform optimization
+    // Are we the special loop entry/exit state? or SLL wildcard
+    if(p.stateType != ATNState.STAR_LOOP_ENTRY)
+        return false;
+    if(p.stateType != ATNState.STAR_LOOP_ENTRY || !p.isPrecedenceDecision ||
+           config.context.isEmpty() || config.context.hasEmptyPath())
+        return false;
+
+    // Require all return states to return back to the same rule that p is in.
+    var numCtxs = config.context.length;
+    for(var i=0; i<numCtxs; i++) { // for each stack context
+        var returnState = this.atn.states[config.context.getReturnState(i)];
+        if (returnState.ruleIndex != p.ruleIndex)
+            return false;
+    }
+
+    var decisionStartState = p.transitions[0].target;
+    var blockEndStateNum = decisionStartState.endState.stateNumber;
+    var blockEndState = this.atn.states[blockEndStateNum];
+
+    // Verify that the top of each stack context leads to loop entry/exit
+    // state through epsilon edges and w/o leaving rule.
+    for(var i=0; i<numCtxs; i++) { // for each stack context
+        var returnStateNumber = config.context.getReturnState(i);
+        var returnState = this.atn.states[returnStateNumber];
+        // all states must have single outgoing epsilon edge
+        if (returnState.transitions.length != 1 || !returnState.transitions[0].isEpsilon)
+            return false;
+
+        // Look for prefix op case like 'not expr', (' type ')' expr
+        var returnStateTarget = returnState.transitions[0].target;
+        if ( returnState.stateType == ATNState.BLOCK_END && returnStateTarget == p )
+            continue;
+
+        // Look for 'expr op expr' or case where expr's return state is block end
+        // of (...)* internal block; the block end points to loop back
+        // which points to p but we don't need to check that
+        if ( returnState == blockEndState )
+            continue;
+
+        // Look for ternary expr ? expr : expr. The return state points at block end,
+        // which points at loop entry state
+        if ( returnStateTarget == blockEndState )
+            continue;
+
+        // Look for complex prefix 'between expr and expr' case where 2nd expr's
+        // return state points at block end state of (...)* internal block
+        if (returnStateTarget.stateType == ATNState.BLOCK_END && returnStateTarget.transitions.length == 1
+                && returnStateTarget.transitions[0].isEpsilon && returnStateTarget.transitions[0].target == p)
+            continue;
+
+        // anything else ain't conforming
+        return false;
+    }
+    return true;
+};
+
+
 ParserATNSimulator.prototype.getRuleName = function( index) {
     if (this.parser!==null && index>=0) {
         return this.parser.ruleNames[index];
@@ -8568,7 +8364,8 @@ ParserATNSimulator.prototype.getEpsilonTarget = function(config, t, collectPredi
 
 ParserATNSimulator.prototype.actionTransition = function(config, t) {
     if (this.debug) {
-        console.log("ACTION edge " + t.ruleIndex + ":" + t.actionIndex);
+        var index = t.actionIndex==-1 ? 65535 : t.actionIndex;
+        console.log("ACTION edge " + t.ruleIndex + ":" + index);
     }
     return new ATNConfig({state:t.target}, config);
 };
@@ -8709,11 +8506,12 @@ ParserATNSimulator.prototype.getTokenName = function( t) {
         return "EOF";
     }
     if( this.parser!==null && this.parser.literalNames!==null) {
-        if (t >= this.parser.literalNames.length) {
+        if (t >= this.parser.literalNames.length && t >= this.parser.symbolicNames.length) {
             console.log("" + t + " ttype out of range: " + this.parser.literalNames);
             console.log("" + this.parser.getInputStream().getTokens());
         } else {
-            return this.parser.literalNames[t] + "<" + t + ">";
+            var name = this.parser.literalNames[t] || this.parser.symbolicNames[t];
+            return name + "<" + t + ">";
         }
     }
     return "" + t;
@@ -8800,8 +8598,9 @@ ParserATNSimulator.prototype.addDFAEdge = function(dfa, from_, t, to) {
     from_.edges[t+1] = to; // connect
 
     if (this.debug) {
-        var names = this.parser===null ? null : this.parser.literalNames;
-        console.log("DFA=\n" + dfa.toString(names));
+        var literalNames = this.parser===null ? null : this.parser.literalNames;
+        var symbolicNames = this.parser===null ? null : this.parser.symbolicNames;
+        console.log("DFA=\n" + dfa.toString(literalNames, symbolicNames));
     }
     return to;
 };
@@ -8824,17 +8623,16 @@ ParserATNSimulator.prototype.addDFAState = function(dfa, D) {
     if (D == ATNSimulator.ERROR) {
         return D;
     }
-    var hash = D.hashString();
-    var existing = dfa.states[hash] || null;
+    var existing = dfa.states.get(D);
     if(existing!==null) {
         return existing;
     }
     D.stateNumber = dfa.states.length;
-    if (! D.configs.readonly) {
+    if (! D.configs.readOnly) {
         D.configs.optimizeConfigs(this);
         D.configs.setReadonly(true);
     }
-    dfa.states[hash] = D;
+    dfa.states.add(D);
     if (this.debug) {
         console.log("adding new DFA state: " + D);
     }
@@ -8862,7 +8660,7 @@ ParserATNSimulator.prototype.reportContextSensitivity = function(dfa, prediction
         this.parser.getErrorListenerDispatch().reportContextSensitivity(this.parser, dfa, startIndex, stopIndex, prediction, configs);
     }
 };
-    
+
 // If context sensitive parsing, we know it's ambiguity not conflict//
 ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stopIndex,
                                exact, ambigAlts, configs ) {
@@ -8875,38 +8673,14 @@ ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stop
         this.parser.getErrorListenerDispatch().reportAmbiguity(this.parser, dfa, startIndex, stopIndex, exact, ambigAlts, configs);
     }
 };
-            
+
 exports.ParserATNSimulator = ParserATNSimulator;
 },{"./../IntervalSet":6,"./../ParserRuleContext":10,"./../PredictionContext":11,"./../RuleContext":13,"./../Token":14,"./../Utils":15,"./../dfa/DFAState":34,"./../error/Errors":39,"./ATN":16,"./ATNConfig":17,"./ATNConfigSet":18,"./ATNSimulator":21,"./ATNState":22,"./PredictionMode":28,"./SemanticContext":29,"./Transition":30}],28:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 //
 // This enumeration defines the prediction modes available in ANTLR 4 along with
@@ -8914,10 +8688,17 @@ exports.ParserATNSimulator = ParserATNSimulator;
 // ambiguities.
 
 var Set = require('./../Utils').Set;
+var Map = require('./../Utils').Map;
 var BitSet = require('./../Utils').BitSet;
 var AltDict = require('./../Utils').AltDict;
 var ATN = require('./ATN').ATN;
 var RuleStopState = require('./ATNState').RuleStopState;
+var ATNConfigSet = require('./ATNConfigSet').ATNConfigSet;
+var ATNConfig = require('./ATNConfig').ATNConfig;
+var SemanticContext = require('./SemanticContext').SemanticContext;
+var Hash = require("../Utils").Hash;
+var hashStuff = require('./../Utils').hashStuff;
+var equalArrays = require('./../Utils').equalArrays;
 
 function PredictionMode() {
 	return this;
@@ -9392,27 +9173,20 @@ PredictionMode.getAlts = function(altsets) {
 // map[c] U= c.{@link ATNConfig//alt alt} // map hash/equals uses s and x, not
 // alt and not pred
 // </pre>
-//
+
 PredictionMode.getConflictingAltSubsets = function(configs) {
-    var configToAlts = {};
-	for(var i=0;i<configs.items.length;i++) {
-		var c = configs.items[i];
-        var key = "key_" + c.state.stateNumber + "/" + c.context;
-        var alts = configToAlts[key] || null;
+    var configToAlts = new Map();
+    configToAlts.hashFunction = function(cfg) { hashStuff(cfg.state.stateNumber, cfg.context); };
+    configToAlts.equalsFunction = function(c1, c2) { return c1.state.stateNumber==c2.state.stateNumber && c1.context.equals(c2.context);}
+    configs.items.map(function(cfg) {
+        var alts = configToAlts.get(cfg);
         if (alts === null) {
             alts = new BitSet();
-            configToAlts[key] = alts;
+            configToAlts.put(cfg, alts);
         }
-        alts.add(c.alt);
-	}
-	var values = [];
-	for(var k in configToAlts) {
-		if(k.indexOf("key_")!==0) {
-			continue;
-		}
-		values.push(configToAlts[k]);
-	}
-    return values;
+        alts.add(cfg.alt);
+	});
+    return configToAlts.getValues();
 };
 
 //
@@ -9461,36 +9235,13 @@ PredictionMode.getSingleViableAlt = function(altsets) {
 };
 
 exports.PredictionMode = PredictionMode;
-},{"./../Utils":15,"./ATN":16,"./ATNState":22}],29:[function(require,module,exports){
+
+},{"../Utils":15,"./../Utils":15,"./ATN":16,"./ATNConfig":17,"./ATNConfigSet":18,"./ATNState":22,"./SemanticContext":29}],29:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 // A tree structure used to record the semantic context in which
@@ -9502,10 +9253,17 @@ exports.PredictionMode = PredictionMode;
 //
 
 var Set = require('./../Utils').Set;
+var Hash = require('./../Utils').Hash;
 
 function SemanticContext() {
 	return this;
 }
+
+SemanticContext.prototype.hashCode = function() {
+    var hash = new Hash();
+    this.updateHashCode(hash);
+    return hash.finish();
+};
 
 // For context independent predicates, we evaluate them without a local
 // context (i.e., null context). That way, we can evaluate them without
@@ -9599,8 +9357,8 @@ Predicate.prototype.evaluate = function(parser, outerContext) {
 	return parser.sempred(localctx, this.ruleIndex, this.predIndex);
 };
 
-Predicate.prototype.hashString = function() {
-	return "" + this.ruleIndex + "/" + this.predIndex + "/" + this.isCtxDependent;
+Predicate.prototype.updateHashCode = function(hash) {
+	hash.update(this.ruleIndex, this.predIndex, this.isCtxDependent);
 };
 
 Predicate.prototype.equals = function(other) {
@@ -9643,8 +9401,8 @@ PrecedencePredicate.prototype.compareTo = function(other) {
 	return this.precedence - other.precedence;
 };
 
-PrecedencePredicate.prototype.hashString = function() {
-	return "31";
+PrecedencePredicate.prototype.updateHashCode = function(hash) {
+    hash.update(31);
 };
 
 PrecedencePredicate.prototype.equals = function(other) {
@@ -9722,8 +9480,8 @@ AND.prototype.equals = function(other) {
 	}
 };
 
-AND.prototype.hashString = function() {
-	return "" + this.opnds + "/AND";
+AND.prototype.updateHashCode = function(hash) {
+    hash.update(this.opnds, "AND");
 };
 //
 // {@inheritDoc}
@@ -9765,7 +9523,7 @@ AND.prototype.evalPrecedence = function(parser, outerContext) {
 	}
 	var result = null;
 	operands.map(function(o) {
-		result = result === null ? o : SemanticPredicate.andContext(result, o);
+		result = result === null ? o : SemanticContext.andContext(result, o);
 	});
 	return result;
 };
@@ -9826,8 +9584,8 @@ OR.prototype.constructor = function(other) {
 	}
 };
 
-OR.prototype.hashString = function() {
-	return "" + this.opnds + "/OR"; 
+OR.prototype.updateHashCode = function(hash) {
+    hash.update(this.opnds, "OR");
 };
 
 // <p>
@@ -9872,7 +9630,7 @@ OR.prototype.evalPrecedence = function(parser, outerContext) {
 	return result;
 };
 
-AND.prototype.toString = function() {
+OR.prototype.toString = function() {
 	var s = "";
 	this.opnds.map(function(o) {
 		s += "|| " + o.toString();
@@ -9885,34 +9643,10 @@ exports.PrecedencePredicate = PrecedencePredicate;
 exports.Predicate = Predicate;
 
 },{"./../Utils":15}],30:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 //  An ATN transition between any two ATN states.  Subclasses define
@@ -10127,7 +9861,7 @@ ActionTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabS
 ActionTransition.prototype.toString = function() {
 	return "action_" + this.ruleIndex + ":" + this.actionIndex;
 };
-        
+
 
 // A transition containing a set of values.
 function SetTransition(target, set) {
@@ -10148,7 +9882,7 @@ SetTransition.prototype.constructor = SetTransition;
 SetTransition.prototype.matches = function(symbol, minVocabSymbol,  maxVocabSymbol) {
 	return this.label.contains(symbol);
 };
-        
+
 
 SetTransition.prototype.toString = function() {
 	return this.label.toString();
@@ -10212,7 +9946,7 @@ PrecedencePredicateTransition.prototype.getPredicate = function() {
 PrecedencePredicateTransition.prototype.toString = function() {
 	return this.precedence + " >= _p";
 };
-        
+
 exports.Transition = Transition;
 exports.AtomTransition = AtomTransition;
 exports.SetTransition = SetTransition;
@@ -10226,56 +9960,32 @@ exports.PredicateTransition = PredicateTransition;
 exports.PrecedencePredicateTransition = PrecedencePredicateTransition;
 exports.AbstractPredicateTransition = AbstractPredicateTransition;
 },{"./../IntervalSet":6,"./../Token":14,"./SemanticContext":29}],31:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 exports.ATN = require('./ATN').ATN;
 exports.ATNDeserializer = require('./ATNDeserializer').ATNDeserializer;
 exports.LexerATNSimulator = require('./LexerATNSimulator').LexerATNSimulator;
 exports.ParserATNSimulator = require('./ParserATNSimulator').ParserATNSimulator;
 exports.PredictionMode = require('./PredictionMode').PredictionMode;
+
 },{"./ATN":16,"./ATNDeserializer":20,"./LexerATNSimulator":24,"./ParserATNSimulator":27,"./PredictionMode":28}],32:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
+var Set = require("../Utils").Set;
 var DFAState = require('./DFAState').DFAState;
+var StarLoopEntryState = require('../atn/ATNState').StarLoopEntryState;
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
 var DFASerializer = require('./DFASerializer').DFASerializer;
 var LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
 
-function DFAStatesSet() {
-	return this;
-}
 
-Object.defineProperty(DFAStatesSet.prototype, "length", {
-	get : function() {
-		return Object.keys(this).length;
-	}
-});
 
 function DFA(atnStartState, decision) {
 	if (decision === undefined) {
@@ -10286,12 +9996,23 @@ function DFA(atnStartState, decision) {
 	this.decision = decision;
 	// A set of all DFA states. Use {@link Map} so we can get old state back
 	// ({@link Set} only allows you to see if it's there).
-	this._states = new DFAStatesSet();
+	this._states = new Set();
 	this.s0 = null;
 	// {@code true} if this DFA is for a precedence decision; otherwise,
 	// {@code false}. This is the backing field for {@link //isPrecedenceDfa},
 	// {@link //setPrecedenceDfa}.
 	this.precedenceDfa = false;
+    if (atnStartState instanceof StarLoopEntryState)
+    {
+        if (atnStartState.isPrecedenceDecision) {
+            this.precedenceDfa = true;
+            precedenceState = new DFAState(null, new ATNConfigSet());
+            precedenceState.edges = [];
+            precedenceState.isAcceptState = false;
+            precedenceState.requiresFullContext = false;
+            this.s0 = precedenceState;
+        }
+    }
 	return this;
 }
 
@@ -10359,7 +10080,7 @@ DFA.prototype.setPrecedenceDfa = function(precedenceDfa) {
 	if (this.precedenceDfa!==precedenceDfa) {
 		this._states = new DFAStatesSet();
 		if (precedenceDfa) {
-			var precedenceState = new DFAState(new ATNConfigSet());
+			var precedenceState = new DFAState(null, new ATNConfigSet());
 			precedenceState.edges = [];
 			precedenceState.isAcceptState = false;
 			precedenceState.requiresFullContext = false;
@@ -10379,12 +10100,7 @@ Object.defineProperty(DFA.prototype, "states", {
 
 // Return a list of all states in this DFA, ordered by state number.
 DFA.prototype.sortedStates = function() {
-	// states_ is a map of state/state, where key=value
-	var keys = Object.keys(this._states);
-	var list = [];
-	for(var i=0;i<keys.length;i++) {
-		list.push(this._states[keys[i]]);
-	}
+	var list = this._states.values();
 	return list.sort(function(a, b) {
 		return a.stateNumber - b.stateNumber;
 	});
@@ -10410,35 +10126,11 @@ DFA.prototype.toLexerString = function() {
 
 exports.DFA = DFA;
 
-},{"./../atn/ATNConfigSet":18,"./DFASerializer":33,"./DFAState":34}],33:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+},{"../Utils":15,"../atn/ATNState":22,"./../atn/ATNConfigSet":18,"./DFASerializer":33,"./DFAState":34}],33:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 // A DFA walker that knows how to dump them to serialized strings.#/
 
@@ -10517,37 +10209,16 @@ exports.LexerDFASerializer = LexerDFASerializer;
 
 },{}],34:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 var ATNConfigSet = require('./../atn/ATNConfigSet').ATNConfigSet;
+var Utils = require('./../Utils');
+var Hash = Utils.Hash;
+var Set = Utils.Set;
 
 // Map a predicate to a predicted alternative.///
 
@@ -10658,31 +10329,44 @@ DFAState.prototype.getAltSet = function() {
 // {@link //stateNumber} is irrelevant.</p>
 DFAState.prototype.equals = function(other) {
 	// compare set of ATN configurations in this set with other
-	if (this === other) {
-		return true;
-	} else if (!(other instanceof DFAState)) {
-		return false;
-	} else {
-		return this.configs.equals(other.configs);
-	}
+	return this === other ||
+			(other instanceof DFAState &&
+				this.configs.equals(other.configs));
 };
 
 DFAState.prototype.toString = function() {
-	return "" + this.stateNumber + ":" + this.hashString();
+	var s = "" + this.stateNumber + ":" + this.configs;
+	if(this.isAcceptState) {
+        s = s + "=>";
+        if (this.predicates !== null)
+            s = s + this.predicates;
+        else
+            s = s + this.prediction;
+    }
+	return s;
 };
 
-DFAState.prototype.hashString = function() {
-	return "" +  this.configs +
-			(this.isAcceptState ?
-					"=>" + (this.predicates !== null ?
-								this.predicates :
-								this.prediction) :
-					"");
+DFAState.prototype.hashCode = function() {
+	var hash = new Hash();
+	hash.update(this.configs);
+	if(this.isAcceptState) {
+        if (this.predicates !== null)
+            hash.update(this.predicates);
+        else
+            hash.update(this.prediction);
+    }
+    return hash.finish();
 };
 
 exports.DFAState = DFAState;
 exports.PredPrediction = PredPrediction;
-},{"./../atn/ATNConfigSet":18}],35:[function(require,module,exports){
+
+},{"./../Utils":15,"./../atn/ATNConfigSet":18}],35:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 exports.DFA = require('./DFA').DFA;
 exports.DFASerializer = require('./DFASerializer').DFASerializer;
 exports.LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
@@ -10690,34 +10374,10 @@ exports.PredPrediction = require('./DFAState').PredPrediction;
 
 },{"./DFA":32,"./DFASerializer":33,"./DFAState":34}],36:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 //
@@ -10826,34 +10486,10 @@ DiagnosticErrorListener.prototype.getConflictingAlts = function(reportedAlts, co
 exports.DiagnosticErrorListener = DiagnosticErrorListener;
 },{"./../IntervalSet":6,"./../Utils":15,"./ErrorListener":37}],37:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 // Provides an empty default implementation of {@link ANTLRErrorListener}. The
 // default implementation of each method does nothing, but can be overridden as
@@ -10939,34 +10575,10 @@ exports.ProxyErrorListener = ProxyErrorListener;
 
 },{}],38:[function(require,module,exports){
 //
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 //
 
 var Token = require('./../Token').Token;
@@ -10980,7 +10592,7 @@ var Interval = require('./../IntervalSet').Interval;
 var IntervalSet = require('./../IntervalSet').IntervalSet;
 
 function ErrorStrategy() {
-	
+
 }
 
 ErrorStrategy.prototype.reset = function(recognizer){
@@ -11209,7 +10821,8 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     case ATNState.PLUS_LOOP_BACK:
     case ATNState.STAR_LOOP_BACK:
         this.reportUnwantedToken(recognizer);
-        var expecting = recognizer.getExpectedTokens();
+        var expecting = new IntervalSet();
+        expecting.addSet(recognizer.getExpectedTokens());
         var whatFollowsLoopIterationOrRule = expecting.addSet(this.getErrorRecoverySet(recognizer));
         this.consumeUntil(recognizer, whatFollowsLoopIterationOrRule);
         break;
@@ -11705,7 +11318,7 @@ BailErrorStrategy.prototype.recover = function(recognizer, e) {
     }
     throw new ParseCancellationException(e);
 };
-    
+
 // Make sure we don't attempt to recover inline; if the parser
 // successfully recovers, it won't throw an exception.
 //
@@ -11721,34 +11334,10 @@ BailErrorStrategy.prototype.sync = function(recognizer) {
 exports.BailErrorStrategy = BailErrorStrategy;
 exports.DefaultErrorStrategy = DefaultErrorStrategy;
 },{"./../IntervalSet":6,"./../Token":14,"./../atn/ATNState":22,"./Errors":39}],39:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 
 // The root of the ANTLR exception hierarchy. In general, ANTLR tracks just
 //  3 kinds of errors: prediction errors, failed predicate errors, and
@@ -11915,6 +11504,11 @@ exports.InputMismatchException = InputMismatchException;
 exports.FailedPredicateException = FailedPredicateException;
 
 },{"./../atn/Transition":30}],40:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 exports.RecognitionException = require('./Errors').RecognitionException;
 exports.NoViableAltException = require('./Errors').NoViableAltException;
 exports.LexerNoViableAltException = require('./Errors').LexerNoViableAltException;
@@ -11923,13 +11517,18 @@ exports.FailedPredicateException = require('./Errors').FailedPredicateException;
 exports.DiagnosticErrorListener = require('./DiagnosticErrorListener').DiagnosticErrorListener;
 exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;
 exports.ErrorListener = require('./ErrorListener').ErrorListener;
+
 },{"./DiagnosticErrorListener":36,"./ErrorListener":37,"./ErrorStrategy":38,"./Errors":39}],41:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 exports.atn = require('./atn/index');
 exports.dfa = require('./dfa/index');
 exports.tree = require('./tree/index');
 exports.error = require('./error/index');
 exports.Token = require('./Token').Token;
-exports.CommonToken = require('./Token').Token;
+exports.CommonToken = require('./Token').CommonToken;
 exports.InputStream = require('./InputStream').InputStream;
 exports.FileStream = require('./FileStream').FileStream;
 exports.CommonTokenStream = require('./CommonTokenStream').CommonTokenStream;
@@ -11942,34 +11541,10 @@ exports.Interval = require('./IntervalSet').Interval;
 exports.Utils = require('./Utils');
 
 },{"./CommonTokenStream":3,"./FileStream":4,"./InputStream":5,"./IntervalSet":6,"./Lexer":8,"./Parser":9,"./ParserRuleContext":10,"./PredictionContext":11,"./Token":14,"./Utils":15,"./atn/index":31,"./dfa/index":35,"./error/index":40,"./tree/index":44}],42:[function(require,module,exports){
-// [The "BSD license"]
-//  Copyright (c) 2012 Terence Parr
-//  Copyright (c) 2012 Sam Harwell
-//  Copyright (c) 2014 Eric Vergnaud
-//  All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions
-//  are met:
-//
-//  1. Redistributions of source code must retain the above copyright
-//     notice, this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright
-//     notice, this list of conditions and the following disclaimer in the
-//     documentation and/or other materials provided with the distribution.
-//  3. The name of the author may not be used to endorse or promote products
-//     derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
 ///
 
 // The basic notion of a tree has a parent, a payload, and a list of children.
@@ -11979,6 +11554,8 @@ exports.Utils = require('./Utils');
 var Token = require('./../Token').Token;
 var Interval = require('./../IntervalSet').Interval;
 var INVALID_INTERVAL = new Interval(-1, -2);
+var Utils = require('../Utils.js');
+
 
 function Tree() {
 	return this;
@@ -12027,6 +11604,27 @@ ErrorNode.prototype.constructor = ErrorNode;
 function ParseTreeVisitor() {
 	return this;
 }
+
+ParseTreeVisitor.prototype.visit = function(ctx) {
+ 	if (Array.isArray(ctx)) {
+		return ctx.map(function(child) {
+            return ctx.accept(this);
+        }, this);
+	} else {
+		return ctx.accept(this);
+	}
+};
+
+ParseTreeVisitor.prototype.visitChildren = function(ctx) {
+  return this.visit(ctx.children);
+}
+
+ParseTreeVisitor.prototype.visitTerminal = function(node) {
+};
+
+ParseTreeVisitor.prototype.visitErrorNode = function(node) {
+};
+
 
 function ParseTreeListener() {
 	return this;
@@ -12169,35 +11767,11 @@ exports.ParseTreeListener = ParseTreeListener;
 exports.ParseTreeVisitor = ParseTreeVisitor;
 exports.ParseTreeWalker = ParseTreeWalker;
 exports.INVALID_INTERVAL = INVALID_INTERVAL;
-},{"./../IntervalSet":6,"./../Token":14}],43:[function(require,module,exports){
-/*
- * [The "BSD license"]
- *  Copyright (c) 2012 Terence Parr
- *  Copyright (c) 2012 Sam Harwell
- *  All rights reserved.
- *
- *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
- *  are met:
- *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. The name of the author may not be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- *  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- *  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- *  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- *  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- *  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+},{"../Utils.js":15,"./../IntervalSet":6,"./../Token":14}],43:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
  */
 
 var Utils = require('./../Utils');
@@ -12206,6 +11780,8 @@ var RuleNode = require('./Tree').RuleNode;
 var ErrorNode = require('./Tree').ErrorNode;
 var TerminalNode = require('./Tree').TerminalNode;
 var ParserRuleContext = require('./../ParserRuleContext').ParserRuleContext;
+var RuleContext = require('./../RuleContext').RuleContext;
+var INVALID_ALT_NUMBER = require('./../atn/ATN').INVALID_ALT_NUMBER;
 
 
 /** A set of utility routines useful for all kinds of ANTLR trees. */
@@ -12247,8 +11823,12 @@ Trees.getNodeText = function(t, ruleNames, recog) {
         ruleNames = recog.ruleNames;
     }
     if(ruleNames!==null) {
-       if (t instanceof RuleNode) {
-           return ruleNames[t.getRuleContext().ruleIndex];
+       if (t instanceof RuleContext) {
+           var altNumber = t.getAltNumber();
+           if ( altNumber!=INVALID_ALT_NUMBER ) {
+               return ruleNames[t.ruleIndex]+":"+altNumber;
+           }
+           return ruleNames[t.ruleIndex];
        } else if ( t instanceof ErrorNode) {
            return t.toString();
        } else if(t instanceof TerminalNode) {
@@ -12287,7 +11867,7 @@ Trees.getAncestors = function(t) {
     }
     return ancestors;
 };
-   
+
 Trees.findAllTokenNodes = function(t, ttype) {
     return Trees.findAllNodes(t, ttype, true);
 };
@@ -12329,14 +11909,20 @@ Trees.descendants = function(t) {
 
 
 exports.Trees = Trees;
-},{"./../ParserRuleContext":10,"./../Token":14,"./../Utils":15,"./Tree":42}],44:[function(require,module,exports){
+},{"./../ParserRuleContext":10,"./../RuleContext":13,"./../Token":14,"./../Utils":15,"./../atn/ATN":16,"./Tree":42}],44:[function(require,module,exports){
+/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
 var Tree = require('./Tree');
-exports.Trees = require('./Tree').Trees;
+exports.Trees = require('./Trees').Trees;
 exports.RuleNode = Tree.RuleNode;
 exports.ParseTreeListener = Tree.ParseTreeListener;
 exports.ParseTreeVisitor = Tree.ParseTreeVisitor;
 exports.ParseTreeWalker = Tree.ParseTreeWalker;
-},{"./Tree":42}],45:[function(require,module,exports){
+
+},{"./Tree":42,"./Trees":43}],45:[function(require,module,exports){
 
 },{}]},{},[41])(41)
 });

@@ -2,7 +2,7 @@
 var antlr4Json;
 (function (antlr4Json) {
 
-    // Generated from JSON_ANTLR.g4 by ANTLR 4.5.3
+    // Generated from JSON_ANTLR.g4 by ANTLR 4.5.6
 // jshint ignore: start
     // change to generated code: 'importing' via global ns object instead of require
     var JSON_ANTLRListener =  antlr4Json.JSON_ANTLRListener;
@@ -148,6 +148,7 @@ JSON_ANTLRParser.prototype.json = function() {
     this.enterRule(localctx, 0, JSON_ANTLRParser.RULE_json);
     try {
         this.state = 12;
+        this._errHandler.sync(this);
         switch(this._input.LA(1)) {
         case JSON_ANTLRParser.T__0:
             this.enterOuterAlt(localctx, 1);
@@ -496,6 +497,7 @@ JSON_ANTLRParser.prototype.value = function() {
     this.enterRule(localctx, 8, JSON_ANTLRParser.RULE_value);
     try {
         this.state = 55;
+        this._errHandler.sync(this);
         switch(this._input.LA(1)) {
         case JSON_ANTLRParser.STRING:
             this.enterOuterAlt(localctx, 1);

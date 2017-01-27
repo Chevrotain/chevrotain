@@ -2,7 +2,7 @@
 var antlr4Json;
 (function (antlr4Json) {
 
-    // Generated from JSON_ANTLR.g4 by ANTLR 4.5.3
+    // Generated from JSON_ANTLR.g4 by ANTLR 4.6
 // jshint ignore: start
 
 var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
@@ -117,19 +117,22 @@ JSON_ANTLRLexer.STRING = 11;
 JSON_ANTLRLexer.NUMBER = 12;
 
 
-JSON_ANTLRLexer.modeNames = [ "DEFAULT_MODE" ];
+JSON_ANTLRLexer.prototype.modeNames = [ "DEFAULT_MODE" ];
 
-JSON_ANTLRLexer.literalNames = [ null, "'{'", "','", "'}'", "':'", "'['", 
-                                 "']'", "'true'", "'false'", "'null'" ];
+JSON_ANTLRLexer.prototype.literalNames = [ null, "'{'", "','", "'}'", "':'",
+                                           "'['", "']'", "'true'", "'false'",
+                                           "'null'" ];
 
-JSON_ANTLRLexer.symbolicNames = [ null, null, null, null, null, null, null, 
-                                  null, null, null, "WS", "STRING", "NUMBER" ];
+JSON_ANTLRLexer.prototype.symbolicNames = [ null, null, null, null, null, 
+                                            null, null, null, null, null, 
+                                            "WS", "STRING", "NUMBER" ];
 
-JSON_ANTLRLexer.ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", 
-                              "T__6", "T__7", "T__8", "WS", "STRING", "ESC", 
-                              "UNICODE", "HEX", "NUMBER", "INT", "EXP" ];
+JSON_ANTLRLexer.prototype.ruleNames = [ "T__0", "T__1", "T__2", "T__3", 
+                                        "T__4", "T__5", "T__6", "T__7", 
+                                        "T__8", "WS", "STRING", "ESC", "UNICODE", 
+                                        "HEX", "NUMBER", "INT", "EXP" ];
 
-JSON_ANTLRLexer.grammarFileName = "JSON_ANTLR.g4";
+JSON_ANTLRLexer.prototype.grammarFileName = "JSON_ANTLR.g4";
 
     // change to generated code: 'exporting' via ns object
     antlr4Json.JSON_ANTLRLexer = JSON_ANTLRLexer;
