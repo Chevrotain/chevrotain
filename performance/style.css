@@ -55,7 +55,8 @@
     font-size: 1.5em;
     background-color: darkgreen;
     color: white;
-    padding-top: 15px;
+    /* This will hopefully resolve text cutoff issues on Android*/
+    line-height: 62px;
 }
 
 .headerRow .benchRate, .headerRow .benchSpeed, .headerRow .benchInclude {
