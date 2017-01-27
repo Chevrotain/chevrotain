@@ -80,7 +80,7 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
             return groupName
         }
         else if (isUndefined(groupName)) {
-            return "default"
+            return false
         }
         else {
             throw Error("non exhaustive match")
@@ -475,6 +475,13 @@ export function checkSimpleMode(allTokenTypes:TokenConstructor[]):SimpleCheckRes
         isSimple: areAllSimple,
         errors:   errors
     }
+}
+
+export function checkFastMode(allTokenTypes:TokenConstructor[]):boolean {
+    let noLongerALTs = every(allTokenTypes, (currTokType) =>  currTokType.LONGER_ALT === undefined)
+    let noModes = every(allTokenTypes, (currTokType) =>  currTokType.POP_MODE === undefined && currTokType.PUSH_MODE === undefined)
+
+    return noLongerALTs && noModes
 }
 
 export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken }):{ [groupName:string]:ISimpleTokenOrIToken } {

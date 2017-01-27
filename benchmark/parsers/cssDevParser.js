@@ -356,13 +356,13 @@ function CssParser(input) {
     // [ HASH | class | attrib | pseudo ]+
     this.simple_selector_suffix = this.RULE('simple_selector_suffix', function() {
         // @formatter:off
-            $.OR([
-                {ALT: function() { $.CONSUME(Hash) }},
-                {ALT: function() { $.SUBRULE($.class) }},
-                {ALT: function() { $.SUBRULE($.attrib) }},
-                {ALT: function() { $.SUBRULE($.pseudo) }}
-            ]);
-            // @formatter:on
+        $.OR([
+            {ALT: function() { $.CONSUME(Hash) }},
+            {ALT: function() { $.SUBRULE($.class) }},
+            {ALT: function() { $.SUBRULE($.attrib) }},
+            {ALT: function() { $.SUBRULE($.pseudo) }}
+        ]);
+        // @formatter:on
     })
 
     // '.' IDENT

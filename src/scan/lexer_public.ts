@@ -15,7 +15,8 @@ import {
     performRuntimeChecks,
     checkLazyMode,
     checkSimpleMode,
-    cloneEmptyGroups
+    cloneEmptyGroups,
+    checkFastMode
 } from "./lexer"
 import {
     cloneObj,
@@ -113,6 +114,8 @@ export class Lexer {
 
     protected isLazyTokenMode
     protected isSimpleTokenMode
+    // FastMode can be enabled when no Lexer Modes, no LONGER_ALTs have been used and we are using Lazy Tokens.
+    protected isFastMode:boolean
     protected modes:string[] = []
     protected defaultMode:string
     protected allPatterns:{ [modeName:string]:IRegExpExec[] } = {}
@@ -280,6 +283,8 @@ export class Lexer {
         this.isSimpleTokenMode = simpleCheckResult.isSimple
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(simpleCheckResult.errors)
 
+        this.isFastMode = checkFastMode(allTokensTypes)
+
         if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
                 return error.message
@@ -312,11 +317,21 @@ export class Lexer {
         }
 
         if (this.isLazyTokenMode) {
-            if (this.isSimpleTokenMode) {
-                return this.tokenizeInternalLazy(text, initialMode, createSimpleLazyToken)
+            if (this.isFastMode) {
+                if (this.isSimpleTokenMode) {
+                    return this.tokenizeInternalLazyFast(text, initialMode, createSimpleLazyToken)
+                }
+                else {
+                    return this.tokenizeInternalLazyFast(text, initialMode, createLazyTokenInstance)
+                }
             }
             else {
-                return this.tokenizeInternalLazy(text, initialMode, createLazyTokenInstance)
+                if (this.isSimpleTokenMode) {
+                    return this.tokenizeInternalLazy(text, initialMode, createSimpleLazyToken)
+                }
+                else {
+                    return this.tokenizeInternalLazy(text, initialMode, createLazyTokenInstance)
+                }
             }
 
         }
@@ -417,14 +432,14 @@ export class Lexer {
                 if (group !== undefined) {
                     tokClass = currModePatternIdxToClass[i]
                     newToken = new tokClass(matchedImage, offset, line, column)
-                    if (group === "default") {
+                    if (group === false) {
                         matchedTokens.push(newToken)
                     }
                     else {
                         groups[group].push(newToken)
                     }
                 }
-                text = text.slice(imageLength)
+                text = text.substring(imageLength)
                 offset = offset + imageLength
                 column = column + imageLength // TODO: with newlines the column may be assigned twice
 
@@ -610,14 +625,14 @@ export class Lexer {
                     tokClass = currModePatternIdxToClass[i]
                     // the end offset is non inclusive.
                     newToken = tokenCreator(offset, offset + imageLength - 1, tokClass, lazyCacheData)
-                    if (group === "default") {
+                    if (group === false) {
                         matchedTokens.push(newToken)
                     }
                     else {
                         groups[group].push(newToken)
                     }
                 }
-                text = text.slice(imageLength)
+                text = text.substring(imageLength)
                 offset = offset + imageLength
 
                 // mode handling, must pop before pushing if a Token both acts as both
@@ -669,4 +684,91 @@ export class Lexer {
 
         return {tokens: matchedTokens, groups: groups, errors: errors}
     }
+
+
+    // There is quite a bit of duplication between this and "tokenizeInternalLazy"
+    // This is intentional due to performance considerations.
+    private tokenizeInternalLazyFast(text:string, initialMode:string, tokenCreator:LazyTokenCreator):ILexingResult {
+        let match, i, j, matchedImage, imageLength, group, tokClass, newToken, errLength, droppedChar, msg, newOffset
+
+        let orgInput = text
+        let offset = 0
+        let matchedTokens = []
+        let errors:ILexingError[] = []
+        let groups:any = cloneEmptyGroups(this.emptyGroups)
+
+        let lazyCacheData:LazyTokenCacheData = {
+            orgText:      text,
+            lineToOffset: []
+        }
+
+        let currModePatterns = this.allPatterns[initialMode]
+        let currModePatternsLength = currModePatterns.length
+        let currModePatternIdxToGroup = this.patternIdxToGroup[initialMode]
+        let currModePatternIdxToClass = this.patternIdxToClass[initialMode]
+
+        while (text.length > 0) {
+            match = null
+            for (i = 0; i < currModePatternsLength; i++) {
+                match = currModePatterns[i].exec(text)
+                if (match !== null) {
+                    break
+                }
+            }
+            // successful match
+            if (match !== null) {
+                matchedImage = match[0]
+                imageLength = matchedImage.length
+                group = currModePatternIdxToGroup[i]
+                newOffset = offset + imageLength
+                if (group !== undefined) {
+                    tokClass = currModePatternIdxToClass[i]
+                    // the end offset is non inclusive.
+                    newToken = tokenCreator(offset, newOffset - 1, tokClass, lazyCacheData)
+                    if (group === false) {
+                        matchedTokens.push(newToken)
+                    }
+                    else {
+                        groups[group].push(newToken)
+                    }
+                }
+                text = text.substring(imageLength)
+                offset = newOffset
+            }
+            else {
+                // error recovery, drop characters until we identify a valid token's start point
+                let errorStartOffset = offset
+                let foundResyncPoint:any = false
+                while (!foundResyncPoint && text.length > 0) {
+                    // drop chars until we succeed in matching something
+                    droppedChar = text.charCodeAt(0)
+                    text = text.substr(1)
+                    offset++
+                    for (j = 0; j < currModePatterns.length; j++) {
+                        foundResyncPoint = currModePatterns[j].exec(text)
+                        if (foundResyncPoint !== null) {
+                            break
+                        }
+                    }
+                }
+
+                errLength = offset - errorStartOffset
+                // at this point we either re-synced or reached the end of the input text
+                msg = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
+                    ` skipped ${offset - errorStartOffset} characters.`
+
+                if (isEmpty(lazyCacheData.lineToOffset)) {
+                    fillUpLineToOffset(lazyCacheData.lineToOffset, lazyCacheData.orgText)
+                }
+
+                let errorLine = getStartLineFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
+                let errorColumn = getStartColumnFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
+
+                errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
+            }
+        }
+
+        return {tokens: matchedTokens, groups: groups, errors: errors}
+    }
+
 }
