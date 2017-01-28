@@ -33,7 +33,7 @@ This is because the grammar is written in a **different** language than the targ
 
 
 ### <a name="WHY_ERROR_RECOVERY"></a> Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?
-For building a standard compiler that should only handle completely valid inputs these capabilities are indeed irrelevant.
+When building a standard compiler that should only handle completely valid inputs these capabilities are indeed irrelevant.
 But for the use case of building Editor Tools / Language Services the parser must be able to handle partially invalid inputs as well.
 Some examples:
 * All syntax errors should be reported and not just the first one.
@@ -42,7 +42,7 @@ Some examples:
 
 
 ### <a name="DEBUGGING"></a> How do I debug my parser?
-Just add a breakpoint in your favorites IDE, and debug, same as you would for any other JavaScript code.
+Just add a breakpoint in your favorites IDE and debug, same as you would for any other JavaScript code.
 Chevrotain Grammars are **pure** javascript code. No special handling required.
 
 
