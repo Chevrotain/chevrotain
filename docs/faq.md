@@ -20,7 +20,7 @@ This is because the grammar is written in a **different** language than the targ
   
 * No need to handle grammar generation as part of the build process or commit generated files to the source code. 
   
-* No need to learn a new syntax, as Chevrotain a **Pure** JavasScript Library. instead the problem is reduced to learning a new API.
+* No need to learn a new syntax, as Chevrotain is a **Pure** JavasScript Library. instead the problem is reduced to learning a new API.
   
 * No need for a special editor to write the Grammar, just use your favorites JavaScript editor.    
 
