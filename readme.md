@@ -7,11 +7,12 @@
 
 # Chevrotain
 
-Chevrotain is a **JavaScript parsing DSL** for building [**High Performance**][benchmark] LL(k) Parsers with optional **fault-tolerant** 
-capabilities.
+Chevrotain is a [**very fast**][benchmark] and **feature rich** JavaScript LL(k) **Parsing DSL**.
+It can be used to build parsers/compilers/interperters for various use cases ranging from simple configuration files, 
+to full fledged programing languages.
 
-Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without
-any code generation phase.
+It is important to note that Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without any code generation. Chevrotain Grammars are pure JavaScript code which can be created/debugged/edited
+as any other JavaScript code without requiring any new tools or processes.
 
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
 ## Features
