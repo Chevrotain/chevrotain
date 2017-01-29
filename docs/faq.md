@@ -15,7 +15,7 @@ This is because the grammar is written in a **different** language than the targ
  
 * Debugging a generated parser means looking at **different** code than the actual grammar specifications.
   This generated code is often huge, verbose and hard to understand. On the other hand, when debugging a Parser 
-  implemented using A Parsing DSL, The **actual Grammar's code** the implementer wrote(not generated code) is debugged.
+  implemented using a Parsing DSL, The **actual Grammar's code** the implementer wrote(not generated code) is debugged.
   So debugging Chevrotain is **just like** debugging any other JavaScript code.
   
 * No need to handle grammar generation as part of the build process or commit generated files to the source code. 
