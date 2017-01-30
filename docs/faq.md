@@ -6,6 +6,7 @@
 * [How do I debug my parser?](#DEBUGGING)
 * [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](#NUMERICAL_SUFFIXES)
 * [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
+* [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
 * [How do I Maximize my parser's performance?](#PERFORMANCE)
 
 
@@ -80,6 +81,12 @@ This means that certain aggressive minification options can break Chevrotain gra
 
 See [related documentation](../examples/parser/minification/README.md) for details & workarounds.
 
+### <a name="WEBPACK"></a> Why does Chevrotain not work correctly after I webpacked my Grammar?
+Chevrotain relies on **Function.name** property and **Function.toString()**.
+This means that certain aggressive webpack 2 optimizations (tree shaking) can break Chevrotain grammars under
+certain conditions.
+
+See [related documentation](../examples/parser/webpack/README.md) for details & workarounds.
 
 ### <a name="PERFORMANCE"></a> How do I Maximize my parser's performance?
 
