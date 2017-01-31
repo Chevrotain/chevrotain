@@ -341,6 +341,24 @@
 </div>
 
 <script>
+//    var styleCss = document.styleSheets[1]
+    var styleCss = _.find(document.styleSheets, function (styleSheet) {
+        return _.endsWith(styleSheet.href, "performance/style.css");
+    })
+
+    if (styleCss === undefined) {
+        throw Error("missing style.css");
+    }
+
+    // This did not seem to work when using a JQuery child selector, no idea why...
+    if (IsSafari()) {
+        // Safari + CSS == 9th circle of hell
+        styleCss.insertRule(".dataRow > div {padding-top: 33px;}", styleCss.cssRules.length)
+    }
+    else {
+        styleCss.insertRule(".dataRow > div {padding-top: 20px;}", styleCss.cssRules.length)
+
+    }
 
     var orgData = {
         labels: [],
@@ -542,7 +560,7 @@
         }).on('complete', function () {
 
             var suites = this.filter('successful')
-                    , fastestSuite = this.filter('fastest')[0]
+                , fastestSuite = this.filter('fastest')[0]
 
             suites.splice(suites.indexOf(fastestSuite), 1)
 
@@ -551,7 +569,7 @@
 
             _.forEach(suites, function (suite) {
                 var $cell = $('.' + suite.name + ' .benchSpeed')
-                        , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2)
+                    , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2)
                 $cell.html(speed + '%')
             })
 
@@ -573,8 +591,8 @@
 
     $(document).ready(function () {
         var loc = window.location || location
-                , query = loc.search || ''
-                , showJsons = (query.indexOf('jsons=true') > -1)
+            , query = loc.search || ''
+            , showJsons = (query.indexOf('jsons=true') > -1)
 
         if (showJsons) $('.json-only').removeClass('hide')
 
@@ -603,7 +621,7 @@
 
         window.sortResults = function sortResults() {
             var container = document.getElementById('resultsContainer')
-                    , rows = container.querySelectorAll('.dataRow')
+                , rows = container.querySelectorAll('.dataRow')
 
             var $rows = $(rows)
             $rows.snapshotStyles()
