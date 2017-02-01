@@ -22,7 +22,7 @@ import {
     every,
     keys,
     isArray,
-    isFunction
+    isFunction, some
 } from "../utils/utils"
 import {isLazyTokenType, isSimpleTokenType} from "./tokens"
 
@@ -478,10 +478,17 @@ export function checkSimpleMode(allTokenTypes:TokenConstructor[]):SimpleCheckRes
 }
 
 export function checkFastMode(allTokenTypes:TokenConstructor[]):boolean {
-    let noLongerALTs = every(allTokenTypes, (currTokType) =>  currTokType.LONGER_ALT === undefined)
-    let noModes = every(allTokenTypes, (currTokType) =>  currTokType.POP_MODE === undefined && currTokType.PUSH_MODE === undefined)
+    let noLongerALTs = every(allTokenTypes, (currTokType) => currTokType.LONGER_ALT === undefined)
+    let noModes = every(allTokenTypes, (currTokType) => currTokType.POP_MODE === undefined && currTokType.PUSH_MODE === undefined)
 
     return noLongerALTs && noModes
+}
+
+export function checkHasCustomTokenPatterns(allTokenTypes:TokenConstructor[]):boolean {
+    return some(allTokenTypes, (currTokType) => {
+        let pattern = currTokType.PATTERN
+        return (!isRegExp(currTokType.PATTERN) && (isFunction(pattern) || has(pattern, "exec")))
+    })
 }
 
 export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken }):{ [groupName:string]:ISimpleTokenOrIToken } {

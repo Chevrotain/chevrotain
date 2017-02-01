@@ -1,12 +1,4 @@
-import {
-    Token,
-    LazyTokenCacheData,
-    getImage,
-    getStartLine,
-    getStartColumn,
-    ISimpleTokenOrIToken,
-    CustomPatternMatcherFunc
-} from "./tokens_public"
+import {LazyTokenCacheData, getImage, getStartLine, getStartColumn, ISimpleTokenOrIToken, CustomPatternMatcherFunc} from "./tokens_public"
 import {
     validatePatterns,
     analyzeTokenClasses,
@@ -16,7 +8,7 @@ import {
     checkLazyMode,
     checkSimpleMode,
     cloneEmptyGroups,
-    checkFastMode
+    checkFastMode, checkHasCustomTokenPatterns
 } from "./lexer"
 import {
     cloneObj,
@@ -58,8 +50,8 @@ export interface TokenConstructor extends Function {
 }
 
 export interface ILexingResult {
-    tokens:Token[]
-    groups:{ [groupName:string]:Token }
+    tokens:ISimpleTokenOrIToken[]
+    groups:{ [groupName:string]:ISimpleTokenOrIToken }
     errors:ILexingError[]
 }
 
@@ -126,6 +118,7 @@ export class Lexer {
     protected patternIdxToPushMode:{ [modeName:string]:string[] } = {}
     protected patternIdxToPopMode:{ [modeName:string]:boolean[] } = {}
     protected emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken } = {}
+    protected hasCustomTokens:boolean
 
 
     /**
@@ -284,6 +277,7 @@ export class Lexer {
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(simpleCheckResult.errors)
 
         this.isFastMode = checkFastMode(allTokensTypes)
+        this.hasCustomTokens = checkHasCustomTokenPatterns(allTokensTypes)
 
         if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
@@ -406,16 +400,25 @@ export class Lexer {
         // seem to matter performance wise.
         push_mode.call(this, initialMode)
 
+        let hasCustomTokens = this.hasCustomTokens
         while (text.length > 0) {
             match = null
             for (i = 0; i < currModePatternsLength; i++) {
-                match = currModePatterns[i].exec(text)
+                if (hasCustomTokens) {
+                    match = currModePatterns[i].exec(text, matchedTokens, groups)
+                } else {
+                    match = currModePatterns[i].exec(text)
+                }
                 if (match !== null) {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
                     longerAltIdx = currModePatternIdxToLongerAltIdx[i]
                     if (longerAltIdx) {
-                        matchAlt = currModePatterns[longerAltIdx].exec(text)
+                        if (hasCustomTokens) {
+                            matchAlt = currModePatterns[longerAltIdx].exec(text, matchedTokens, groups)
+                        } else {
+                            matchAlt = currModePatterns[longerAltIdx].exec(text)
+                        }
                         if (matchAlt && matchAlt[0].length > match[0].length) {
                             match = matchAlt
                             i = longerAltIdx
@@ -516,7 +519,11 @@ export class Lexer {
                     text = text.substr(1)
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
-                        foundResyncPoint = currModePatterns[j].exec(text)
+                        if (hasCustomTokens) {
+                            foundResyncPoint = currModePatterns[j].exec(text, matchedTokens, groups)
+                        } else {
+                            foundResyncPoint = currModePatterns[j].exec(text)
+                        }
                         if (foundResyncPoint !== null) {
                             break
                         }
@@ -598,16 +605,25 @@ export class Lexer {
         // seem to matter performance wise.
         push_mode.call(this, initialMode)
 
+        let hasCustomTokens = this.hasCustomTokens
         while (text.length > 0) {
             match = null
             for (i = 0; i < currModePatternsLength; i++) {
-                match = currModePatterns[i].exec(text)
+                if (hasCustomTokens) {
+                    match = currModePatterns[i].exec(text, matchedTokens, groups)
+                } else {
+                    match = currModePatterns[i].exec(text)
+                }
                 if (match !== null) {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
                     longerAltIdx = currModePatternIdxToLongerAltIdx[i]
                     if (longerAltIdx) {
-                        matchAlt = currModePatterns[longerAltIdx].exec(text)
+                        if (hasCustomTokens) {
+                            matchAlt = currModePatterns[longerAltIdx].exec(text, matchedTokens, groups)
+                        } else {
+                            matchAlt = currModePatterns[longerAltIdx].exec(text)
+                        }
                         if (matchAlt && matchAlt[0].length > match[0].length) {
                             match = matchAlt
                             i = longerAltIdx
@@ -659,7 +675,11 @@ export class Lexer {
                     text = text.substr(1)
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
-                        foundResyncPoint = currModePatterns[j].exec(text)
+                        if (hasCustomTokens) {
+                            foundResyncPoint = currModePatterns[j].exec(text, matchedTokens, groups)
+                        } else {
+                            foundResyncPoint = currModePatterns[j].exec(text)
+                        }
                         if (foundResyncPoint !== null) {
                             break
                         }
@@ -706,11 +726,16 @@ export class Lexer {
         let currModePatternsLength = currModePatterns.length
         let currModePatternIdxToGroup = this.patternIdxToGroup[initialMode]
         let currModePatternIdxToClass = this.patternIdxToClass[initialMode]
+        let hasCustomTokens = this.hasCustomTokens
 
         while (text.length > 0) {
             match = null
             for (i = 0; i < currModePatternsLength; i++) {
-                match = currModePatterns[i].exec(text)
+                if (hasCustomTokens) {
+                    match = currModePatterns[i].exec(text, matchedTokens, groups)
+                } else {
+                    match = currModePatterns[i].exec(text)
+                }
                 if (match !== null) {
                     break
                 }
@@ -745,7 +770,11 @@ export class Lexer {
                     text = text.substr(1)
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
-                        foundResyncPoint = currModePatterns[j].exec(text)
+                        if (hasCustomTokens) {
+                            foundResyncPoint = currModePatterns[j].exec(text, matchedTokens, groups)
+                        } else {
+                            foundResyncPoint = currModePatterns[j].exec(text)
+                        }
                         if (foundResyncPoint !== null) {
                             break
                         }

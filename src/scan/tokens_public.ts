@@ -1,6 +1,6 @@
 import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite, has} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
-import {Lexer, TokenConstructor, IRegExpExec} from "./lexer_public"
+import {Lexer, TokenConstructor} from "./lexer_public"
 import {
     isInheritanceBasedToken,
     getStartLineFromLazyToken,
@@ -17,13 +17,22 @@ import {
 /**
  *  The type of custom pattern matcher functions.
  *  Matches should only be done on the start of the text.
- *  Note that this is identical to the signature of RegExp.prototype.exec
+ *  Note that this is similar to the signature of RegExp.prototype.exec
  *
  *  This should behave as if the regExp match is using a start of input anchor.
  *  So: for example if a custom matcher is implemented for Tokens matching: /\w+/
  *  The implementation of the custom matcher must implement a custom matcher for /^\w+/.
+ *
+ *  The Optional tokens and groups arguments enable accessing information about
+ *  previously identified tokens if necessary.
+ *
+ *  This can be used for example to lex python like indentation.
+ *  see: https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js
+ *  for a fuller example
  */
-export type CustomPatternMatcherFunc = (test:string) => RegExpExecArray
+export type CustomPatternMatcherFunc = (test:string,
+                                        tokens?:ISimpleTokenOrIToken[],
+                                        groups?:{[groupName:string]:ISimpleTokenOrIToken}) => RegExpExecArray
 
 /**
  * Interface for custom user provided token pattern matchers.
