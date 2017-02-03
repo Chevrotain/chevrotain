@@ -72,7 +72,7 @@ module.exports = function(grunt) {
                     cwd: process.cwd() + "/examples/parser/"
                 },
                 exec:    INSTALL_LINK + ' && ' + 'grunt --gruntfile minification/gruntfile.js' + ' && ' + 'npm --prefix ./webpack' +
-                         ' install  ./webpack' + ' && '  + examples_test_command
+                         ' install  ./webpack' + ' && ' + examples_test_command
 
             },
             test_examples_lang_services:            {
@@ -272,7 +272,7 @@ module.exports = function(grunt) {
                 },
 
                 plugins: [
-                    new webpack.BannerPlugin(banner, {raw: true})
+                    new webpack.BannerPlugin({banner: banner, raw: true})
                 ]
             },
 
@@ -295,7 +295,7 @@ module.exports = function(grunt) {
                 },
 
                 plugins: [
-                    new webpack.BannerPlugin(banner, {raw: true}),
+                    new webpack.BannerPlugin({banner: banner, raw: true}),
                     new webpack.optimize.UglifyJsPlugin()
                 ]
             },
