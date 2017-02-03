@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Custom Token Patterns to Support Lexer Context.](https://github.com/SAP/chevrotain/issues/360)
+
+#### Documentation
+- [Example of lexing python style indentation.](https://github.com/SAP/chevrotain/issues/352)
+
+
+
 ## 0.22.0 (1-27-2017)
 
 #### Minor Changes
