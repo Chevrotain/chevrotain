@@ -92,7 +92,6 @@ function matchInteger(text, matchedTokens, groups) {
 
 A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output.
-[ILexingResult](http://sap.github.io/chevrotain/documentation/0_22_0/interfaces/ilexingresult.html).
-These arguments are current state of the lexing result so even if the lexer has performed error recovery any tokens found
+It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/0_22_0/interfaces/ilexingresult.html)).
+These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.
