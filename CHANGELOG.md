@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.23.0 (2-3-2017)
 
 #### Major Changes
 - [Custom Token Patterns to Support Lexer Context.](https://github.com/SAP/chevrotain/issues/360)
