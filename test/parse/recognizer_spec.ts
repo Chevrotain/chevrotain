@@ -1,6 +1,6 @@
 import {
     Token, EOF, extendLazyToken, extendSimpleLazyToken, extendToken, getImage, getStartOffset,
-    getEndOffset, getStartLine, getEndLine, getStartColumn, getEndColumn
+    getEndOffset, getStartLine, getEndLine, getStartColumn, getEndColumn, ISimpleTokenOrIToken
 } from "../../src/scan/tokens_public"
 import {Lexer} from "../../src/scan/lexer_public"
 import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
@@ -396,7 +396,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
                 class SingleTokenInsertRegular extends Parser {
 
-                    constructor(input:Token[] = []) {
+                    constructor(input:ISimpleTokenOrIToken[] = []) {
                         super(input, allTokens, {recoveryEnabled: true});
                         (<any>Parser).performSelfAnalysis(this)
                     }

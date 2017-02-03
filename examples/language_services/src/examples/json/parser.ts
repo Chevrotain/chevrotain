@@ -1,26 +1,18 @@
-import {
-    ParseTreeToken,
-    SYNTAX_BOX,
-    CHILDREN,
-    PT
-} from "../../pudu/parse_tree"
-import {
-    Parser,
-    Token
-} from "chevrotain"
+import {CHILDREN, ParseTreeToken, PT, SYNTAX_BOX} from "../../pudu/parse_tree"
+import {ISimpleTokenOrIToken, Parser} from "chevrotain"
 import {
     allTokens,
-    LCurly,
-    Comma,
-    RCurly,
-    StringLiteral,
     Colon,
-    LSquare,
-    RSquare,
-    NumberLiteral,
-    TrueLiteral,
+    Comma,
     FalseLiteral,
-    NullLiteral
+    LCurly,
+    LSquare,
+    NullLiteral,
+    NumberLiteral,
+    RCurly,
+    RSquare,
+    StringLiteral,
+    TrueLiteral
 } from "./lexer"
 
 export class ObjectPT extends ParseTreeToken {}
@@ -31,7 +23,7 @@ export class ValuePT extends ParseTreeToken {}
 
 export class JsonParser extends Parser {
 
-    constructor(input:Token[]) {
+    constructor(input:ISimpleTokenOrIToken[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
     }

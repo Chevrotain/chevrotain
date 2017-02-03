@@ -1,4 +1,4 @@
-import {map, keys} from "../../src/utils/utils"
+import {map, keys, isFunction, isRegExp} from "../../src/utils/utils"
 import {
     extendLazyToken,
     LazyToken,
@@ -30,7 +30,7 @@ import {setEquality} from "../utils/matchers"
 import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
 
 
-function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
+function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidationChecks = false) {
 
     context(contextName, () => {
 
@@ -74,6 +74,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
             })
         })
 
+
         const ValidNaPattern = extendToken("ValidNaPattern", Lexer.NA)
 
         const ValidNaPattern2 = extendToken("ValidNaPattern2", Lexer.NA)
@@ -102,114 +103,115 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
         const InvalidGroupNumber = extendToken("InvalidGroupNumber", /\d\d\d/)
         InvalidGroupNumber.GROUP = 666
 
-        describe("The Simple Lexer Validations", () => {
+        if (!skipValidationChecks) {
+            describe("The Simple Lexer Validations", () => {
 
-            it("won't detect valid patterns as missing", () => {
-                let result = findMissingPatterns([BambaTok, IntegerTok, IdentifierTok])
-                expect(result.errors).to.be.empty
-                expect(result.valid).to.deep.equal([BambaTok, IntegerTok, IdentifierTok])
+                it("won't detect valid patterns as missing", () => {
+                    let result = findMissingPatterns([BambaTok, IntegerTok, IdentifierTok])
+                    expect(result.errors).to.be.empty
+                    expect(result.valid).to.deep.equal([BambaTok, IntegerTok, IdentifierTok])
+                })
+
+                it("will detect missing patterns", () => {
+                    let tokenClasses = [ValidNaPattern, MissingPattern]
+                    let result = findMissingPatterns(tokenClasses)
+                    expect(result.errors.length).to.equal(1)
+                    expect(result.errors[0].tokenClasses).to.deep.equal([MissingPattern])
+                    expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.MISSING_PATTERN)
+                    expect(result.errors[0].message).to.contain("MissingPattern")
+                    expect(result.valid).to.deep.equal([ValidNaPattern])
+                })
+
+                it("won't detect valid patterns as invalid", () => {
+                    let result = findInvalidPatterns([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
+                    expect(result.errors).to.be.empty
+                    expect(result.valid).to.deep.equal([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
+                })
+
+                it("will detect invalid patterns as invalid", () => {
+                    let tokenClasses = [ValidNaPattern, InvalidPattern]
+                    let result = findInvalidPatterns(tokenClasses)
+                    expect(result.errors.length).to.equal(1)
+                    expect(result.errors[0].tokenClasses).to.deep.equal([InvalidPattern])
+                    expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_PATTERN)
+                    expect(result.errors[0].message).to.contain("InvalidPattern")
+                    expect(result.valid).to.deep.equal([ValidNaPattern])
+                })
+
+                it("won't detect valid patterns as using unsupported flags", () => {
+                    let errors = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
+                    expect(errors).to.be.empty
+                })
+
+                it("will detect patterns using unsupported multiline flag", () => {
+                    let tokenClasses = [ValidNaPattern, MultiLinePattern]
+                    let errors = findUnsupportedFlags(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([MultiLinePattern])
+                    expect(errors[0].type).to.equal(LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND)
+                    expect(errors[0].message).to.contain("MultiLinePattern")
+                })
+
+                it("will detect patterns using unsupported global flag", () => {
+                    let tokenClasses = [ValidNaPattern, GlobalPattern]
+                    let errors = findUnsupportedFlags(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([GlobalPattern])
+                    expect(errors[0].type).to.equal(LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND)
+                    expect(errors[0].message).to.contain("GlobalPattern")
+                })
+
+                it("won't detect valid patterns as duplicates", () => {
+                    let errors = findDuplicatePatterns([MultiLinePattern, IntegerValid])
+                    expect(errors).to.be.empty
+                })
+
+                it("won't detect NA patterns as duplicates", () => {
+                    let errors = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
+                    expect(errors).to.be.empty
+                })
+
+                it("will detect patterns using unsupported end of input anchor", () => {
+                    let InvalidToken = extendToken("InvalidToken", /BAMBA$/)
+                    let tokenClasses = [ValidNaPattern, InvalidToken]
+                    let errors = findEndOfInputAnchor(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([InvalidToken])
+                    expect(errors[0].type).to.equal(LexerDefinitionErrorType.EOI_ANCHOR_FOUND)
+                    expect(errors[0].message).to.contain("InvalidToken")
+                })
+
+                it("won't detect valid patterns as using unsupported end of input anchor", () => {
+                    let errors = findEndOfInputAnchor([IntegerTok, IntegerValid])
+                    expect(errors).to.be.empty
+                })
+
+                it("will detect identical patterns for different classes", () => {
+                    let tokenClasses = [DecimalInvalid, IntegerValid]
+                    let errors = findDuplicatePatterns(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([DecimalInvalid, IntegerValid])
+                    expect(errors[0].type).to.equal(LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND)
+                    expect(errors[0].message).to.contain("IntegerValid")
+                    expect(errors[0].message).to.contain("DecimalInvalid")
+                })
+
+                it("won't detect valid groups as unsupported", () => {
+                    let errors = findInvalidGroupType([IntegerTok, Skipped, Special])
+                    //noinspection BadExpressionStatementJS
+                    expect(errors).to.be.empty
+                })
+
+                it("will detect unsupported group types", () => {
+                    let tokenClasses = [InvalidGroupNumber]
+                    let errors = findInvalidGroupType(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([InvalidGroupNumber])
+                    expect(errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND)
+                    expect(errors[0].message).to.contain("InvalidGroupNumber")
+                })
             })
-
-            it("will detect missing patterns", () => {
-                let tokenClasses = [ValidNaPattern, MissingPattern]
-                let result = findMissingPatterns(tokenClasses)
-                expect(result.errors.length).to.equal(1)
-                expect(result.errors[0].tokenClasses).to.deep.equal([MissingPattern])
-                expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.MISSING_PATTERN)
-                expect(result.errors[0].message).to.contain("MissingPattern")
-                expect(result.valid).to.deep.equal([ValidNaPattern])
-            })
-
-            it("won't detect valid patterns as invalid", () => {
-                let result = findInvalidPatterns([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
-                expect(result.errors).to.be.empty
-                expect(result.valid).to.deep.equal([BambaTok, IntegerTok, IdentifierTok, ValidNaPattern])
-            })
-
-            it("will detect invalid patterns as invalid", () => {
-                let tokenClasses = [ValidNaPattern, InvalidPattern]
-                let result = findInvalidPatterns(tokenClasses)
-                expect(result.errors.length).to.equal(1)
-                expect(result.errors[0].tokenClasses).to.deep.equal([InvalidPattern])
-                expect(result.errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_PATTERN)
-                expect(result.errors[0].message).to.contain("InvalidPattern")
-                expect(result.valid).to.deep.equal([ValidNaPattern])
-            })
-
-            it("won't detect valid patterns as using unsupported flags", () => {
-                let errors = findUnsupportedFlags([BambaTok, IntegerTok, IdentifierTok, CaseInsensitivePattern])
-                expect(errors).to.be.empty
-            })
-
-            it("will detect patterns using unsupported multiline flag", () => {
-                let tokenClasses = [ValidNaPattern, MultiLinePattern]
-                let errors = findUnsupportedFlags(tokenClasses)
-                expect(errors.length).to.equal(1)
-                expect(errors[0].tokenClasses).to.deep.equal([MultiLinePattern])
-                expect(errors[0].type).to.equal(LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND)
-                expect(errors[0].message).to.contain("MultiLinePattern")
-            })
-
-            it("will detect patterns using unsupported global flag", () => {
-                let tokenClasses = [ValidNaPattern, GlobalPattern]
-                let errors = findUnsupportedFlags(tokenClasses)
-                expect(errors.length).to.equal(1)
-                expect(errors[0].tokenClasses).to.deep.equal([GlobalPattern])
-                expect(errors[0].type).to.equal(LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND)
-                expect(errors[0].message).to.contain("GlobalPattern")
-            })
-
-            it("won't detect valid patterns as duplicates", () => {
-                let errors = findDuplicatePatterns([MultiLinePattern, IntegerValid])
-                expect(errors).to.be.empty
-            })
-
-            it("won't detect NA patterns as duplicates", () => {
-                let errors = findDuplicatePatterns([ValidNaPattern, ValidNaPattern2])
-                expect(errors).to.be.empty
-            })
-
-            it("will detect patterns using unsupported end of input anchor", () => {
-                let InvalidToken = extendToken("InvalidToken", /BAMBA$/)
-                let tokenClasses = [ValidNaPattern, InvalidToken]
-                let errors = findEndOfInputAnchor(tokenClasses)
-                expect(errors.length).to.equal(1)
-                expect(errors[0].tokenClasses).to.deep.equal([InvalidToken])
-                expect(errors[0].type).to.equal(LexerDefinitionErrorType.EOI_ANCHOR_FOUND)
-                expect(errors[0].message).to.contain("InvalidToken")
-            })
-
-            it("won't detect valid patterns as using unsupported end of input anchor", () => {
-                let errors = findEndOfInputAnchor([IntegerTok, IntegerValid])
-                expect(errors).to.be.empty
-            })
-
-            it("will detect identical patterns for different classes", () => {
-                let tokenClasses = [DecimalInvalid, IntegerValid]
-                let errors = findDuplicatePatterns(tokenClasses)
-                expect(errors.length).to.equal(1)
-                expect(errors[0].tokenClasses).to.deep.equal([DecimalInvalid, IntegerValid])
-                expect(errors[0].type).to.equal(LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND)
-                expect(errors[0].message).to.contain("IntegerValid")
-                expect(errors[0].message).to.contain("DecimalInvalid")
-            })
-
-            it("won't detect valid groups as unsupported", () => {
-                let errors = findInvalidGroupType([IntegerTok, Skipped, Special])
-                //noinspection BadExpressionStatementJS
-                expect(errors).to.be.empty
-            })
-
-            it("will detect unsupported group types", () => {
-                let tokenClasses = [InvalidGroupNumber]
-                let errors = findInvalidGroupType(tokenClasses)
-                expect(errors.length).to.equal(1)
-                expect(errors[0].tokenClasses).to.deep.equal([InvalidGroupNumber])
-                expect(errors[0].type).to.equal(LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND)
-                expect(errors[0].message).to.contain("InvalidGroupNumber")
-            })
-        })
-
+        }
 
         const PatternNoStart = extendToken("PatternNoStart", /bamba/i)
 
@@ -253,27 +255,30 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 expect(/^\^/.test(transPattern.source)).to.equal(true)
             })
 
-            it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
-                let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
-                let analyzeResult = analyzeTokenClasses(tokenClasses)
-                expect(analyzeResult.allPatterns.length).to.equal(8)
-                let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
-                    return pattern.source
-                })
-                setEquality(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
-                    "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
+            if (!skipValidationChecks) {
+                it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
+                    let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
+                    let analyzeResult = analyzeTokenClasses(tokenClasses)
+                    expect(analyzeResult.allPatterns.length).to.equal(8)
+                    let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
+                        return pattern.source
+                    })
+                    setEquality(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
+                        "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
-                let patternIdxToClass = analyzeResult.patternIdxToClass
-                expect(keys(patternIdxToClass).length).to.equal(8)
-                expect(patternIdxToClass[0]).to.equal(If)
-                expect(patternIdxToClass[1]).to.equal(Else)
-                expect(patternIdxToClass[2]).to.equal(Return)
-                expect(patternIdxToClass[3]).to.equal(Integer)
-                expect(patternIdxToClass[4]).to.equal(LParen)
-                expect(patternIdxToClass[5]).to.equal(RParen)
-                expect(patternIdxToClass[6]).to.equal(Whitespace)
-                expect(patternIdxToClass[7]).to.equal(NewLine)
-            })
+                    let patternIdxToClass = analyzeResult.patternIdxToClass
+                    expect(keys(patternIdxToClass).length).to.equal(8)
+                    expect(patternIdxToClass[0]).to.equal(If)
+                    expect(patternIdxToClass[1]).to.equal(Else)
+                    expect(patternIdxToClass[2]).to.equal(Return)
+                    expect(patternIdxToClass[3]).to.equal(Integer)
+                    expect(patternIdxToClass[4]).to.equal(LParen)
+                    expect(patternIdxToClass[5]).to.equal(RParen)
+                    expect(patternIdxToClass[6]).to.equal(Whitespace)
+                    expect(patternIdxToClass[7]).to.equal(NewLine)
+                })
+
+            }
 
             it("can count the number of line terminators in a string", () => {
                 expect(countLineTerminators("bamba\r\nbisli\r")).to.equal(2)
@@ -360,22 +365,26 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 expect(tokenMatcher(lexResult.tokens[8], Integer)).to.be.true
             })
 
-            it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
-                expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/Errors detected in definition of Lexer/)
-                expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/EndOfInputAnchor/)
-            })
+            // when testing custom patterns the EOI anchor will not exist and thus no error will be thrown
+            if (!skipValidationChecks) {
+                it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/Errors detected in definition of Lexer/)
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/EndOfInputAnchor/)
+                })
 
-            it("can defer the throwing of errors during the creation of a Lexer if the Lexer's definition is invalid", () => {
-                expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/Errors detected in definition of Lexer/)
-                expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/EndOfInputAnchor/)
+                it("can defer the throwing of errors during the creation of a Lexer if the Lexer's definition is invalid", () => {
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/Errors detected in definition of Lexer/)
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/EndOfInputAnchor/)
 
-                let lexerWithErrs = new Lexer([EndOfInputAnchor, If, Else], true)
-                //noinspection BadExpressionStatementJS
-                expect(lexerWithErrs.lexerDefinitionErrors).to.not.be.empty
-                // even when the Error handling is deferred, actual usage of an invalid lexer is not permitted!
-                expect(() => lexerWithErrs.tokenize("else")).to.throw(/Unable to Tokenize because Errors detected in definition of Lexer/)
-                expect(() => lexerWithErrs.tokenize("else")).to.throw(/EndOfInputAnchor/)
-            })
+                    let lexerWithErrs = new Lexer([EndOfInputAnchor, If, Else], true)
+                    //noinspection BadExpressionStatementJS
+                    expect(lexerWithErrs.lexerDefinitionErrors).to.not.be.empty
+                    // even when the Error handling is deferred, actual usage of an invalid lexer is not permitted!
+                    expect(() => lexerWithErrs.tokenize("else"))
+                        .to.throw(/Unable to Tokenize because Errors detected in definition of Lexer/)
+                    expect(() => lexerWithErrs.tokenize("else")).to.throw(/EndOfInputAnchor/)
+                })
+            }
 
             it("can skip invalid character inputs and only report one error per sequence of characters skipped", () => {
                 let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
@@ -930,17 +939,38 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
                 })
 
                 context("custom pattern", () => {
-
-
                     function defineCustomPatternSpec(variant, customPattern) {
                         it(variant, () => {
+                            let time = 1
+
+                            function extraContextValidator(text, tokens, groups) {
+                                let result = isFunction(customPattern) ? customPattern(text) : customPattern.exec(text)
+                                if (result !== null) {
+                                    if (time === 1) {
+                                        expect(tokens).to.be.empty
+                                        time++
+                                    }
+                                    else if (time === 2) {
+                                        expect(tokens).to.have.lengthOf(2)
+                                        expect(groups.whitespace).to.have.lengthOf(2)
+                                        time++
+                                    }
+                                    else {
+                                        throw Error("Issue with Custom Token pattern context")
+                                    }
+                                }
+
+                                return result
+                            }
+
+
                             let A = createToken({name: "A", pattern: /A/})
-                            let B = createToken({name: "B", pattern: customPattern})
+                            let B = createToken({name: "B", pattern: <any>extraContextValidator})
                             let WS = createToken({
                                 name:     "WS", pattern: {
                                     exec:                   (text) => /^\s+/.exec(text),
                                     containsLineTerminator: true
-                                }, group: Lexer.SKIPPED
+                                }, group: "whitespace"
                             })
 
 
@@ -980,6 +1010,26 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher) {
 defineLexerSpecs("Regular Tokens Mode", extendToken, tokenInstanceofMatcher)
 defineLexerSpecs("Lazy Tokens Mode", extendLazyToken, tokenInstanceofMatcher)
 defineLexerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, tokenStructuredMatcher)
+
+
+function wrapWithCustom(baseExtendToken) {
+    return function () {
+        let newToken = baseExtendToken.apply(null, arguments)
+
+        let pattern = newToken.PATTERN
+        if (isRegExp(pattern) && !/\\n|\\r|\\s/g.test(pattern.source) && pattern !== Lexer.NA) {
+            newToken.PATTERN = function (text) {
+                let withStartOfInput = addStartOfInput(pattern)
+                let execResult = withStartOfInput.exec(text)
+                return execResult
+            }
+        }
+        return newToken
+    }
+}
+defineLexerSpecs("Regular Tokens Mode (custom mode)", wrapWithCustom(extendToken), tokenInstanceofMatcher, true)
+defineLexerSpecs("Lazy Tokens Mode (custom mode)", wrapWithCustom(extendLazyToken), tokenInstanceofMatcher, true)
+defineLexerSpecs("Simple Lazy Tokens Mode (custom mode)", wrapWithCustom(extendSimpleLazyToken), tokenStructuredMatcher, true)
 
 defineLexerSpecs("Lazy Tokens Mode (slow mode)", createSlowExtendToken(extendLazyToken), tokenInstanceofMatcher)
 defineLexerSpecs("SimpleLazy Tokens Mode (slow mode)", createSlowExtendToken(extendSimpleLazyToken), tokenStructuredMatcher)

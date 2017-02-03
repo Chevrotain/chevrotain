@@ -9,19 +9,22 @@ Normally a Token's pattern is defined using a JavaScript regular expression:
 let IntegerToken = createToken({name: "IntegerToken", pattern: /\d+/})
 ```
  
-However in some circumstances the capability to provide a custom pattern matching implementation may be required. 
-Perhaps a special Token which cannot be easily defined using regular expressions, or perhaps
-to enable working around performance problems in a specific RegularExpression engine, for example:
+However in some circumstances the capability to provide a custom pattern matching implementation may be required.
+There are a few use cases in which a custom pattern could be used:
 
-* [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞 
+* The token cannot be easily (or at all) defined using pure regular expressions.
+  - When context on previously lexed tokens is needed.
+    For example: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js). 
 
+* Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:
+  - [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞 
+ 
 
 ### Usage
-A custom pattern must conform to the API of the [RegExp.prototype.exec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
+A custom pattern has a similar API to the API of the [RegExp.prototype.exec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
 function. Additionally it must perform any matches from the **start** of the input. In RegExp semantics this means
 that any custom pattern implementations should behave as if the [start of input anchor](http://www.rexegg.com/regex-anchors.html#caret) 
 has been used.
-
 
 The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_22_0/interfaces/icustompattern.html) interface.
 Example:
@@ -72,6 +75,24 @@ Using an Object literal with only a single property is still a little verbose so
 let IntegerToken = createToken({name: "IntegerToken", pattern: matchInteger})
 ```
 
+### Using Previous Lexing Context
+A custom token matcher has two optional arguments which allows accessing the current result of the tokenizer.
+Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
- 
+```JavaScript
+function matchInteger(text, matchedTokens, groups) {
+   let lastMatchedToken = _.last(matchedTokens)
+   if (lastMatchedToken instanceof Identifier) {
+       return null
+   }
+       
+   // rest of the code from the example above...
+} 
+```
 
+A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js).
+
+It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output.
+[ILexingResult](http://sap.github.io/chevrotain/documentation/0_22_0/interfaces/ilexingresult.html).
+These arguments are current state of the lexing result so even if the lexer has performed error recovery any tokens found
+in those arguments are still guaranteed to be in the final result.
