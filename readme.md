@@ -76,8 +76,6 @@ as any other JavaScript code without requiring any new tools or processes.
  
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
-* **[Chevrotain Google Group](https://groups.google.com/forum/#!forum/chevrotain)** for questions and discussions.
-
 * **[HTML docs](http://sap.github.io/chevrotain/documentation).**
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_23_0/classes/parser.html#at_least_one).
    
