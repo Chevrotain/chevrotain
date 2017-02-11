@@ -46,9 +46,11 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
 
     $.RULE("selectClause", function() {
         $.CONSUME(Select);
-        $.AT_LEAST_ONE_SEP(Comma, function() {
-            $.CONSUME(Identifier);
-        }, "column name");
+        $.AT_LEAST_ONE_SEP({
+            SEP: Comma, DEF: function() {
+                $.CONSUME(Identifier);
+            }
+        });
     });
 
 
@@ -75,20 +77,16 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
 
     $.RULE("atomicExpression", function() {
         $.OR([
-            // @formatter:off
-            { ALT: function() {$.CONSUME(Integer)}},
-            { ALT: function() {$.CONSUME(Identifier)}}
-            // @formatter:on
+            {ALT: function() {$.CONSUME(Integer)}},
+            {ALT: function() {$.CONSUME(Identifier)}}
         ]);
     });
 
 
     $.RULE("relationalOperator", function() {
         $.OR([
-            // @formatter:off
             {ALT: function() {$.CONSUME(GreaterThan)}},
             {ALT: function() {$.CONSUME(LessThan)}}
-            // @formatter:on
         ]);
     });
 
@@ -119,8 +117,10 @@ function SelectParserVersion2(input) {
     // "fromClause" production in version2 is overridden to allow multiple table names.
     this.fromClause = $.OVERRIDE_RULE("fromClause", function() {
         $.CONSUME(From);
-        $.AT_LEAST_ONE_SEP(Comma, function() {
-            $.CONSUME(Identifier);
+        $.AT_LEAST_ONE_SEP({
+            SEP: Comma, DEF: function() {
+                $.CONSUME(Identifier);
+            }
         });
     });
 

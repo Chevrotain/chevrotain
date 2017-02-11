@@ -1,6 +1,17 @@
 import {
-    Token, EOF, extendLazyToken, extendSimpleLazyToken, extendToken, getImage, getStartOffset,
-    getEndOffset, getStartLine, getEndLine, getStartColumn, getEndColumn, ISimpleTokenOrIToken
+    Token,
+    EOF,
+    extendLazyToken,
+    extendSimpleLazyToken,
+    extendToken,
+    getImage,
+    getStartOffset,
+    getEndOffset,
+    getStartLine,
+    getEndLine,
+    getStartColumn,
+    getEndColumn,
+    ISimpleTokenOrIToken
 } from "../../src/scan/tokens_public"
 import {Lexer} from "../../src/scan/lexer_public"
 import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
@@ -8,14 +19,11 @@ import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
 import {clearCache} from "../../src/parse/cache_public"
-import {
-    createLazyTokenInstance, createSimpleLazyToken, tokenInstanceofMatcher, tokenStructuredMatcher,
-    augmentTokenClasses
-} from "../../src/scan/tokens"
+import {tokenInstanceofMatcher, tokenStructuredMatcher, augmentTokenClasses} from "../../src/scan/tokens"
+import {createRegularToken, createLazyToken, createSimpleToken, setEquality} from "../utils/matchers"
 import MismatchedTokenException = exceptions.MismatchedTokenException
 import NoViableAltException = exceptions.NoViableAltException
 import EarlyExitException = exceptions.EarlyExitException
-import {createRegularToken, createLazyToken, createSimpleToken, setEquality} from "../utils/matchers"
 
 function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
@@ -168,9 +176,11 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     let idents = []
 
                     idents.push(getImage(this.CONSUME1(IdentTok)))
-                    this.MANY(() => {
-                        this.CONSUME1(DotTok)
-                        idents.push(getImage(this.CONSUME2(IdentTok)))
+                    this.MANY({
+                        DEF: () => {
+                            this.CONSUME1(DotTok)
+                            idents.push(getImage(this.CONSUME2(IdentTok)))
+                        }
                     })
 
                     this.CONSUME1(EOF)
@@ -194,8 +204,10 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     idents.push(getImage(this.CONSUME1(IdentTok)))
                     this.CONSUME1(DotTok)
 
-                    this.MANY_SEP(DotTok, () => {
-                        idents.push(getImage(this.CONSUME2(IdentTok)))
+                    this.MANY_SEP({
+                        SEP: DotTok, DEF: () => {
+                            idents.push(getImage(this.CONSUME2(IdentTok)))
+                        }
                     })
 
                     this.CONSUME1(EOF)
@@ -218,8 +230,10 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 private parseQualifiedName():string[] {
                     this.idents = []
 
-                    this.MANY_SEP(DotTok, () => {
-                        this.SUBRULE(this.identifier)
+                    this.MANY_SEP({
+                        SEP: DotTok, DEF: () => {
+                            this.SUBRULE(this.identifier)
+                        }
                     })
 
                     this.CONSUME1(EOF)
@@ -250,9 +264,11 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     let idents = []
 
                     idents.push(getImage(this.CONSUME1(IdentTok)))
-                    this.AT_LEAST_ONE(() => {
-                        this.CONSUME1(DotTok)
-                        idents.push(getImage(this.CONSUME2(IdentTok)))
+                    this.AT_LEAST_ONE({
+                        DEF:        () => {
+                            this.CONSUME1(DotTok)
+                            idents.push(getImage(this.CONSUME2(IdentTok)))
+                        }, ERR_MSG: "bamba"
                     })
 
                     this.CONSUME1(EOF)
@@ -273,9 +289,11 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 private parseQualifiedName():string[] {
                     let idents = []
 
-                    this.AT_LEAST_ONE_SEP(DotTok, () => {
-                        idents.push(getImage(this.CONSUME1(IdentTok)))
-                    }, "identifiers")
+                    this.AT_LEAST_ONE_SEP({
+                        SEP: DotTok, DEF: () => {
+                            idents.push(getImage(this.CONSUME1(IdentTok)))
+                        }
+                    })
 
                     this.CONSUME1(EOF)
 
@@ -551,9 +569,11 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
                     public manySep = this.RULE("manySep", () => {
                         let num = 0
-                        return this.MANY_SEP(PlusTok, () => {
-                            this.CONSUME(IntTok)
-                            return num++
+                        return this.MANY_SEP({
+                            SEP: PlusTok, DEF: () => {
+                                this.CONSUME(IntTok)
+                                return num++
+                            }
                         })
                     })
                 }
@@ -579,10 +599,12 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
                     public atLeastOneSep = this.RULE("atLeastOneSep", () => {
                         let num = 0
-                        return this.AT_LEAST_ONE_SEP(PlusTok, () => {
-                            this.CONSUME(IntTok)
-                            num = num + 3
-                            return num
+                        return this.AT_LEAST_ONE_SEP({
+                            SEP: PlusTok, DEF: () => {
+                                this.CONSUME(IntTok)
+                                num = num + 3
+                                return num
+                            }
                         })
                     })
                 }
@@ -636,16 +658,20 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     }
 
                     public trueOptionRule = this.RULE("trueOptionRule", () => {
-                        return this.OPTION(() => true, () => {
-                            this.CONSUME(IntTok)
-                            return true
+                        return this.OPTION({
+                            GATE: () => true, DEF: () => {
+                                this.CONSUME(IntTok)
+                                return true
+                            }
                         })
                     })
 
                     public falseOptionRule = this.RULE("falseOptionRule", () => {
-                        return this.OPTION(() => false, () => {
-                            this.CONSUME(IntTok)
-                            return false
+                        return this.OPTION({
+                            GATE: () => false, DEF: () => {
+                                this.CONSUME(IntTok)
+                                return false
+                            }
                         })
                     })
                 }
@@ -834,6 +860,33 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
             })
 
 
+            it("Supports custom error messages for OR", () => {
+
+                class LabelAltParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, [PlusTok, MinusTok]);
+                        (Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public rule = this.RULE("rule", () => {
+                        this.OR({
+                            DEF:        [
+                                {ALT: () => {this.CONSUME1(PlusTok)}},
+                                {ALT: () => {this.CONSUME1(MinusTok)}},
+                            ], ERR_MSG: "bisli"
+                        })
+                    })
+                }
+
+                let parser = new LabelAltParser([])
+                parser.rule()
+                expect(parser.errors[0]).to.be.an.instanceof(NoViableAltException)
+                expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
+                expect(parser.errors[0].message).to.include("bisli")
+            })
+
+
             it("Will include the ruleStack in a recognition Exception", () => {
 
                 class NestedRulesParser extends Parser {
@@ -844,8 +897,10 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     }
 
                     public rule = this.RULE("rule", () => {
-                        this.OPTION(() => {
-                            this.SUBRULE2(this.rule2)
+                        this.OPTION({
+                            DEF: () => {
+                                this.SUBRULE2(this.rule2)
+                            }
                         })
                     })
 
@@ -901,6 +956,38 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
             })
 
+            it("supports custom error messages for AT_LEAST_ONE", () => {
+
+                class ExplicitAtLeastOneErrParser extends Parser {
+
+                    constructor(input:Token[] = []) {
+                        super(input, [PlusTok, MinusTok]);
+                        (Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public rule = this.RULE("rule", () => {
+                        this.AT_LEAST_ONE({
+                            DEF:        () => {
+                                this.SUBRULE(this.rule2)
+                            }, ERR_MSG: "bamba"
+                        })
+                    })
+
+                    public rule2 = this.RULE("rule2", () => {
+                        this.OR([
+                            {ALT: () => { this.CONSUME1(MinusTok) }},
+                            {ALT: () => { this.CONSUME1(PlusTok) }}
+                        ])
+                    })
+                }
+
+                let parser = new ExplicitAtLeastOneErrParser([createToken(IntTok, "666"), createToken(MinusTok), createToken(MinusTok)])
+                parser.rule()
+                expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
+                expect(parser.errors[0].message).to.contain("bamba")
+                expect(parser.errors[0].context.ruleStack).to.deep.equal(["rule"])
+            })
+
             it("Will build an error message for AT_LEAST_ONE_SEP automatically", () => {
 
                 class ImplicitAtLeastOneSepErrParser extends Parser {
@@ -911,8 +998,10 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     }
 
                     public rule = this.RULE("rule", () => {
-                        this.AT_LEAST_ONE_SEP(IdentTok, () => {
-                            this.SUBRULE(this.rule2)
+                        this.AT_LEAST_ONE_SEP({
+                            SEP: IdentTok, DEF: () => {
+                                this.SUBRULE(this.rule2)
+                            }
                         })
                     })
 
@@ -945,8 +1034,10 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     }
 
                     public rule = this.RULE("rule", () => {
-                        this.AT_LEAST_ONE_SEP(IdentTok, () => {
-                            this.SUBRULE(this.rule2)
+                        this.AT_LEAST_ONE_SEP({
+                            SEP: IdentTok, DEF: () => {
+                                this.SUBRULE(this.rule2)
+                            }
                         })
                     })
 

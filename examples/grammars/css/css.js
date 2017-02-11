@@ -246,8 +246,10 @@
         // medium [ COMMA S* medium]*
         this.RULE('media_list', function() {
             $.SUBRULE($.medium)
-            $.MANY_SEP(Comma, function() {
-                $.SUBRULE2($.medium)
+            $.MANY_SEP({
+                SEP: Comma, DEF: function() {
+                    $.SUBRULE2($.medium)
+                }
             })
         });
 
@@ -322,8 +324,10 @@
         // selector [ ',' S* selector ]*
         // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
         this.RULE('ruleset', function() {
-            $.MANY_SEP(Comma, function() {
-                $.SUBRULE($.selector)
+            $.MANY_SEP({
+                SEP: Comma, DEF: function() {
+                    $.SUBRULE($.selector)
+                }
             })
 
             $.SUBRULE($.declarationsGroup)

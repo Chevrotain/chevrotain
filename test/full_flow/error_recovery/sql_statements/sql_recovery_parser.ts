@@ -73,12 +73,10 @@ export class DDLExampleRecoveryParser extends Parser {
 
         this.MANY(() => {
             this.OR([
-                // @formatter:off
-                    {ALT: () => { stmts.push(this.SUBRULE(this.createStmt)) }},
-                    {ALT: () => { stmts.push(this.SUBRULE(this.insertStmt)) }},
-                    {ALT: () => { stmts.push(this.SUBRULE(this.deleteStmt)) }},
-                    // @formatter:on
-            ], "A Statement")
+                {ALT: () => { stmts.push(this.SUBRULE(this.createStmt)) }},
+                {ALT: () => { stmts.push(this.SUBRULE(this.insertStmt)) }},
+                {ALT: () => { stmts.push(this.SUBRULE(this.deleteStmt)) }},
+            ])
         })
 
         return PT(new STATEMENTS(), stmts)

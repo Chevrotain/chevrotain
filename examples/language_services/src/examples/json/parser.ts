@@ -33,9 +33,9 @@ export class JsonParser extends Parser {
         let objectItemPTs = [], commas
 
         lCurlyTok = this.CONSUME(LCurly)
-        commas = this.MANY_SEP(Comma, () => {
+        commas = this.MANY_SEP({SEP:Comma, DEF:() => {
             objectItemPTs.push(this.SUBRULE2(this.objectItem))
-        }).separators
+        }}).separators
         rCurlyTok = this.CONSUME(RCurly)
 
         return PT(ObjectPT, CHILDREN(objectItemPTs,
@@ -58,9 +58,9 @@ export class JsonParser extends Parser {
         let valuePTs = [], commas
 
         lSquareTok = this.CONSUME(LSquare)
-        commas = this.MANY_SEP(Comma, () => {
+        commas = this.MANY_SEP({SEP:Comma, DEF:() => {
             valuePTs.push(this.SUBRULE(this.value))
-        }).separators
+        }}).separators
         rSquareTok = this.CONSUME(RSquare)
 
         return PT(ArrayPT, CHILDREN(valuePTs,
@@ -76,7 +76,7 @@ export class JsonParser extends Parser {
             {ALT: () => PT(this.CONSUME(TrueLiteral))},
             {ALT: () => PT(this.CONSUME(FalseLiteral))},
             {ALT: () => PT(this.CONSUME(NullLiteral))}
-        ], "a value")
+        ])
 
         return PT(ValuePT, [valueChildPT])
     })

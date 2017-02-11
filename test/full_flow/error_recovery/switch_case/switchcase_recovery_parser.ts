@@ -95,14 +95,8 @@ export class SwitchCaseRecoveryParser extends Parser {
         this.CONSUME(LCurlyTok)
 
         this.AT_LEAST_ONE(() => {
-                assign(retObj, this.SUBRULE(this.caseStmt))
-            }
-            // DOCS: currently the following token and its index must be specified to enable error recovery
-            //       inside repetition rules (MANY/AT_LEAST_ONCE), if this information is not provided
-            //       a re-sync recovery trigger inside the rules called by the repetition may cause the whole
-            //       rule containing the repetition to fail.
-            //       ** this may be automatically inferred in a future version.
-            , "case Stmt")
+            assign(retObj, this.SUBRULE(this.caseStmt))
+        })
 
         this.CONSUME(RCurlyTok)
 

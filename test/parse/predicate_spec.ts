@@ -33,9 +33,11 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
             public optionRule = this.RULE("optionRule", () => {
                 let result = "not entered!"
-                this.OPTION(gateFunc, () => {
-                    this.CONSUME(A)
-                    result = "entered!"
+                this.OPTION({
+                    GATE: gateFunc, DEF: () => {
+                        this.CONSUME(A)
+                        result = "entered!"
+                    }
                 })
                 return result
             })
@@ -68,9 +70,11 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
             public manyRule = this.RULE("manyRule", () => {
                 let result = "not entered!"
-                this.MANY(gateFunc, () => {
-                    this.CONSUME(A)
-                    result = "entered!"
+                this.MANY({
+                    GATE: gateFunc, DEF: () => {
+                        this.CONSUME(A)
+                        result = "entered!"
+                    }
                 })
 
                 return result
@@ -104,9 +108,11 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
             public atLeastOneRule = this.RULE("atLeastOneRule", () => {
                 let result = "not entered!"
-                this.AT_LEAST_ONE(gateFunc, () => {
-                    this.CONSUME(A)
-                    result = "entered!"
+                this.AT_LEAST_ONE({
+                    GATE: gateFunc, DEF: () => {
+                        this.CONSUME(A)
+                        result = "entered!"
+                    }
                 })
 
                 return result
@@ -223,8 +229,10 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
                 public topRule = this.RULE("topRule", (param) => {
                     let result = ""
-                    this.OPTION(() => param, () => {
-                        result += this.CONSUME1(A).image
+                    this.OPTION({
+                        GATE: () => param, DEF: () => {
+                            result += this.CONSUME1(A).image
+                        }
                     })
                     result += this.CONSUME1(B).image
 
@@ -251,8 +259,10 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
                 public topRule = this.RULE("topRule", (param) => {
                     let result = ""
-                    this.MANY(() => param, () => {
-                        result += this.CONSUME1(A).image
+                    this.MANY({
+                        GATE: () => param, DEF: () => {
+                            result += this.CONSUME1(A).image
+                        }
                     })
                     result += this.CONSUME1(B).image
                     return result
@@ -293,8 +303,10 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
                     }
 
                     let result = ""
-                    this.AT_LEAST_ONE(gateFunc, () => {
-                        result += this.CONSUME1(A).image
+                    this.AT_LEAST_ONE({
+                        GATE: gateFunc, DEF: () => {
+                            result += this.CONSUME1(A).image
+                        }
                     })
                     result += this.CONSUME1(B).image
                     return result
