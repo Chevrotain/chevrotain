@@ -2,78 +2,78 @@ import * as cache from "./cache"
 import {exceptions} from "./exceptions_public"
 import {classNameFromInstance, HashTable} from "../lang/lang_extensions"
 import {resolveGrammar} from "./grammar/resolver"
-import {validateGrammar, validateRuleName, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden} from "./grammar/checks"
+import {validateGrammar, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden, validateRuleName} from "./grammar/checks"
 import {
-    isEmpty,
-    map,
-    isArray,
-    reduce,
-    isObject,
-    cloneObj,
     cloneArr,
-    first,
-    find,
+    cloneObj,
     contains,
-    flatten,
-    last,
     dropRight,
-    isFunction,
-    has,
-    isUndefined,
+    every,
+    find,
+    first,
+    flatten,
     forEach,
-    some,
+    has,
+    isArray,
+    isEmpty,
+    isFunction,
+    isObject,
+    isUndefined,
+    last,
+    map,
     NOOP,
-    values,
-    every
+    reduce,
+    some,
+    values
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
 import {
-    Token,
-    tokenName,
     EOF,
-    tokenLabel,
-    hasTokenLabel,
-    LazyToken,
-    IToken,
-    SimpleLazyToken,
     getImage,
+    getTokenConstructor,
+    hasTokenLabel,
     ISimpleTokenOrIToken,
-    getTokenConstructor
+    IToken,
+    LazyToken,
+    SimpleLazyToken,
+    Token,
+    tokenLabel,
+    tokenName
 } from "../scan/tokens_public"
 import {
-    buildLookaheadForOption,
-    buildLookaheadForMany,
-    buildLookaheadForManySep,
     buildLookaheadForAtLeastOne,
     buildLookaheadForAtLeastOneSep,
+    buildLookaheadForMany,
+    buildLookaheadForManySep,
+    buildLookaheadForOption,
     buildLookaheadFuncForOr,
-    getLookaheadPathsForOr,
     getLookaheadPathsForOptionalProd,
+    getLookaheadPathsForOr,
     PROD_TYPE
 } from "./grammar/lookahead"
 import {TokenConstructor} from "../scan/lexer_public"
 import {buildTopProduction} from "./gast_builder"
 import {
-    NextAfterTokenWalker,
     AbstractNextTerminalAfterProductionWalker,
-    NextTerminalAfterAtLeastOneWalker,
-    NextTerminalAfterAtLeastOneSepWalker,
-    NextTerminalAfterManySepWalker,
-    NextTerminalAfterManyWalker,
+    NextAfterTokenWalker,
     nextPossibleTokensAfter,
+    NextTerminalAfterAtLeastOneSepWalker,
+    NextTerminalAfterAtLeastOneWalker,
+    NextTerminalAfterManySepWalker,
+    NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
 import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
-import {ITokenGrammarPath, ISyntacticContentAssistPath} from "./grammar/path_public"
+import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
 import {
     augmentTokenClasses,
-    tokenStructuredIdentity,
-    tokenInstanceofMatcher,
+    isSimpleTokenType,
     tokenClassIdentity,
     tokenInstanceIdentity,
-    tokenStructuredMatcher,
-    isSimpleTokenType
+    tokenInstanceofMatcher,
+    tokenStructuredIdentity,
+    tokenStructuredMatcher
 } from "../scan/tokens"
 import ISerializedGast = gast.ISerializedGast
 import serializeGrammar = gast.serializeGrammar
@@ -247,6 +247,64 @@ export interface IParserState {
     errors:exceptions.IRecognitionException[]
     lexerState:any
     RULE_STACK:string[]
+}
+
+export interface DSLMethodOpts<T> {
+    /**
+     * The Grammar to process in this method.
+     */
+    DEF:GrammarAction<T>
+    /**
+     * A semantic constraint on this DSL method
+     * @see https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
+     * For farther details.
+     */
+    GATE?:Predicate
+}
+
+export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
+    /**
+     *  Short title/classification to what is being matched.
+     *  Will be used in the error message,.
+     *  If none is provided, the error message will include the names of the expected
+     *  Tokens sequences which start the method's inner grammar
+     */
+    ERR_MSG?:string
+}
+
+export interface OrMethodOpts<T> {
+    /**
+     * The set of alternatives,
+     * See detailed description in @link {Parser.OR1}
+     */
+    DEF:IAnyOrAlt<T>[]
+    /**
+     * A description for the alternatives used in error messages
+     * If none is provided, the error message will include the names of the expected
+     * Tokens sequences which may start each alternative.
+     */
+    ERR_MSG?:string
+}
+
+export interface ManySepMethodOpts<T> {
+    /**
+     * The Grammar to process in each iteration.
+     */
+    DEF:GrammarAction<T>
+    /**
+     * The separator between each iteration.
+     */
+    SEP:TokenConstructor
+}
+
+export interface AtLeastOneSepMethodOpts<T> extends ManySepMethodOpts<T> {
+    /**
+     *  Short title/classification to what is being matched.
+     *  Will be used in the error message,.
+     *  If none is provided, the error message will include the names of the expected
+     *  Tokens sequences which start the method's inner grammar
+     */
+    ERR_MSG?:string
 }
 
 export type Predicate = () => boolean
@@ -770,224 +828,234 @@ export class Parser {
      * Convenience method equivalent to OPTION1.
      * @see OPTION1
      */
-    protected OPTION<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                          action?:GrammarAction<OUT>):OUT {
-        return this.OPTION1.call(this, predicateOrAction, action)
+    protected OPTION<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT {
+        return this.OPTION1(actionORMethodDef)
     }
 
     /**
      * Parsing DSL Method that Indicates an Optional production
      * in EBNF notation: [...].
      *
-     * Note that the 'action' param is optional. so both of the following forms are valid:
+     * Note that there are two syntax forms:
+     * - Passing the grammar action directly:
+     *      this.OPTION(()=> {
+     *        this.CONSUME(Digit)}
+     *      );
      *
-     * - short: this.OPTION(()=>{ this.CONSUME(Digit});
-     * - long: this.OPTION(predicateFunc, ()=>{ this.CONSUME(Digit});
+     * - using an "options" object:
+     *      this.OPTION({
+     *        GATE:predicateFunc,
+     *        DEF: ()=>{
+     *          this.CONSUME(Digit)
+     *        }});
      *
-     * The 'predicateFunc' in the long form can be used to add constraints (none grammar related)
-     * to optionally invoking the grammar action.
+     * The optional 'GATE' property in "options" object form can be used to add constraints
+     * to invoking the grammar action.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the optional production in it's top rule.
      *
-     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
-     *                                       or the grammar action to optionally invoke once.
-     * @param {Function} [action] - The action to optionally invoke.
+     * @param  actionORMethodDef - The grammar action to optionally invoke once
+     *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
      * @returns {OUT}
      */
-    protected OPTION1<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                           action?:GrammarAction<OUT>):OUT {
-        return this.optionInternal(predicateOrAction, action, 1)
+    protected OPTION1<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT {
+        return this.optionInternal(actionORMethodDef, 1)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION2<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                           action?:GrammarAction<OUT>):OUT {
-        return this.optionInternal(predicateOrAction, action, 2)
+    protected OPTION2<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT {
+        return this.optionInternal(actionORMethodDef, 2)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION3<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                           action?:GrammarAction<OUT>):OUT {
-        return this.optionInternal(predicateOrAction, action, 3)
+    protected OPTION3<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT {
+        return this.optionInternal(actionORMethodDef, 3)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION4<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                           action?:GrammarAction<OUT>):OUT {
-        return this.optionInternal(predicateOrAction, action, 4)
+    protected OPTION4<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT {
+        return this.optionInternal(actionORMethodDef, 4)
     }
 
     /**
      * @see OPTION1
      */
-    protected OPTION5<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                           action?:GrammarAction<OUT>):OUT {
-        return this.optionInternal(predicateOrAction, action, 5)
+    protected OPTION5<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT {
+        return this.optionInternal(actionORMethodDef, 5)
     }
 
     /**
      * Convenience method equivalent to OR1.
      * @see OR1
      */
-    protected OR<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
-        return this.OR1(alts, errMsgTypes)
+    protected OR<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>):T {
+        return this.OR1(altsOrOpts)
     }
 
     /**
      * Parsing DSL method that indicates a choice between a set of alternatives must be made.
      * This is equivalent to EBNF alternation (A | B | C | D ...)
      *
-     * There are two forms:
+     * There are a couple of syntax forms for the inner alternatives array.
      *
-     * - short: this.OR([
+     * Passing alternatives array directly:
+     *        this.OR([
      *           {ALT:()=>{this.CONSUME(One)}},
      *           {ALT:()=>{this.CONSUME(Two)}},
-     *           {ALT:()=>{this.CONSUME(Three)}},
-     *        ], "a number")
+     *           {ALT:()=>{this.CONSUME(Three)}}
+     *        ])
      *
-     * - long: this.OR([
+     * Passing alternative array directly with predicates (GATE).
+     *        this.OR([
      *           {GATE: predicateFunc1, ALT:()=>{this.CONSUME(One)}},
      *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Two)}},
-     *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Three)}},
-     *        ], "a number")
+     *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Three)}}
+     *        ])
      *
-     * They can also be mixed:
-     * mixed: this.OR([
+     * These syntax forms can also be mixed:
+     *        this.OR([
      *           {GATE: predicateFunc1, ALT:()=>{this.CONSUME(One)}},
      *           {ALT:()=>{this.CONSUME(Two)}},
      *           {ALT:()=>{this.CONSUME(Three)}}
-     *        ], "a number")
+     *        ])
      *
-     * The 'predicateFuncX' in the long form can be used to add constraints (none grammar related) to choosing the alternative.
+     * Additionally an "options" object may be used:
+     * this.OR({
+     *          DEF:[
+     *            {ALT:()=>{this.CONSUME(One)}},
+     *            {ALT:()=>{this.CONSUME(Two)}},
+     *            {ALT:()=>{this.CONSUME(Three)}}
+     *          ],
+     *          // OPTIONAL property
+     *          ERR_MSG: "A Number"
+     *        })
+     *
+     * The 'predicateFuncX' in the long form can be used to add constraints to choosing the alternative.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the alternation production in it's top rule.
      *
-     * @param {{ALT:Function}[] | {GATE:Function, ALT:Function}[]} alts - An array of alternatives.
-     *
-     * @param {string} [errMsgTypes] - A description for the alternatives used in error messages
-     *                                 If none is provided, the error message will include the names of the expected
-     *                                 Tokens sequences which may start each alternative.
+     * @param altsOrOpts - A set of alternatives or an "OPTIONS" object describing the alternatives and optional properties.
      *
      * @returns {*} - The result of invoking the chosen alternative.
      */
-    protected OR1<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
-        return this.orInternal(alts, errMsgTypes, 1)
+    protected OR1<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>):T {
+        return this.orInternal(altsOrOpts, 1)
     }
 
     /**
      * @see OR1
      */
-    protected OR2<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
-        return this.orInternal(alts, errMsgTypes, 2)
+    protected OR2<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>):T {
+        return this.orInternal(altsOrOpts, 2)
     }
 
     /**
      * @see OR1
      */
-    protected OR3<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
-        return this.orInternal(alts, errMsgTypes, 3)
+    protected OR3<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>):T {
+        return this.orInternal(altsOrOpts, 3)
     }
 
     /**
      * @see OR1
      */
-    protected OR4<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
-        return this.orInternal(alts, errMsgTypes, 4)
+    protected OR4<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>):T {
+        return this.orInternal(altsOrOpts, 4)
     }
 
     /**
      * @see OR1
      */
-    protected OR5<T>(alts:IAnyOrAlt<T>[], errMsgTypes?:string):T {
-        return this.orInternal(alts, errMsgTypes, 5)
+    protected OR5<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>):T {
+        return this.orInternal(altsOrOpts, 5)
     }
 
     /**
      * Convenience method equivalent to MANY1.
      * @see MANY1
      */
-    protected MANY<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                        action?:GrammarAction<OUT>):OUT[] {
-        return this.MANY1.call(this, predicateOrAction, action)
+    protected MANY<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT[] {
+        return this.MANY1(actionORMethodDef)
     }
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
      * This is equivalent to EBNF repetition {...}.
      *
-     * Note that the 'action' param is optional. so both of the following forms are valid:
+     * Note that there are two syntax forms:
+     * - Passing the grammar action directly:
+     *        this.MANY(()=>{
+     *                        this.CONSUME(Comma)
+     *                        this.CONSUME(Digit)
+     *                      })
      *
-     * short: this.MANY(()=>{
-     *                       this.CONSUME(Comma};
-     *                       this.CONSUME(Digit});
+     * - using an "options" object:
+     *        this.MANY({
+     *                   GATE: predicateFunc,
+     *                   DEF: () => {
+     *                          this.CONSUME(Comma)
+     *                          this.CONSUME(Digit)
+     *                        }
+     *                 });
      *
-     * long: this.MANY(predicateFunc, () => {
-     *                       this.CONSUME(Comma};
-     *                       this.CONSUME(Digit});
-     *
-     * The 'predicateFunc' in the long form can be used to add constraints (none grammar related) taking another iteration.
+     * The optional 'GATE' property in "options" object form can be used to add constraints
+     * to invoking the grammar action.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * @param {Function} predicateOrAction - The predicate / gate function that implements the constraint on the grammar
-     *                                   or the grammar action to optionally invoke multiple times.
-     * @param {Function} [action] - The action to optionally invoke multiple times.
+     * @param {Function} actionORMethodDef - The grammar action to optionally invoke multiple times
+     *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
      * @returns {OUT[]}
      */
-    protected MANY1<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                         action?:GrammarAction<OUT>):OUT[] {
-        return this.manyInternal(1, predicateOrAction, action, [])
+    protected MANY1<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT[] {
+        return this.manyInternal(1, actionORMethodDef, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY2<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                         action?:GrammarAction<OUT>):OUT[] {
-        return this.manyInternal(2, predicateOrAction, action, [])
+    protected MANY2<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT[] {
+        return this.manyInternal(2, actionORMethodDef, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY3<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                         action?:GrammarAction<OUT>):OUT[] {
-        return this.manyInternal(3, predicateOrAction, action, [])
+    protected MANY3<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT[] {
+        return this.manyInternal(3, actionORMethodDef, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY4<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                         action?:GrammarAction<OUT>):OUT[] {
-        return this.manyInternal(4, predicateOrAction, action, [])
+    protected MANY4<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT[] {
+        return this.manyInternal(4, actionORMethodDef, [])
     }
 
     /**
      * @see MANY1
      */
-    protected MANY5<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                         action?:GrammarAction<OUT>):OUT[] {
-        return this.manyInternal(5, predicateOrAction, action, [])
+    protected MANY5<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>):OUT[] {
+        return this.manyInternal(5, actionORMethodDef, [])
     }
 
     /**
      * Convenience method equivalent to MANY_SEP1.
      * @see MANY_SEP1
      */
-    protected MANY_SEP<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
-        return this.MANY_SEP1.call(this, separator, action)
+    protected MANY_SEP<OUT>(options:ManySepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.MANY_SEP1(options)
     }
 
     /**
@@ -996,186 +1064,166 @@ export class Parser {
      *
      * Example:
      *
-     * this.MANY_SEP(Comma, () => {
-     *                     this.CONSUME(Number};
-     *                     ...
-     *                   );
+     * this.MANY_SEP({
+     *                  SEP:Comma,
+     *                  DEF: () => {
+     *                         this.CONSUME(Number};
+     *                         ...
+     *                       );
+     *              })
+     *
+     * Note that because this DSL method always requires more than one argument the options object is always required
+     * and it is not possible to use a shorter form like in the MANY DSL method.
      *
      * Note that for the purposes of deciding on whether or not another iteration exists
      * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
-     * so "crazy" to require multiple tokens to identify an item separator please use the basic DSL methods
+     * so "crazy" to require multiple tokens to identify an item separator please use the more basic DSL methods
      * to implement it.
      *
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
-     * @param {Function} [action] - The action to optionally invoke.
+     * Note that due to current limitations in the implementation the "SEP" property must appear BEFORE the "DEF" property.
+     *
+     * @param options - An object defining the grammar of each iteration and the separator between iterations
      *
      * @return {ISeparatedIterationResult<OUT>}
      */
-    protected MANY_SEP1<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(1, separator, action, {values: [], separators: []})
+    protected MANY_SEP1<OUT>(options:ManySepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(1, options, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP2<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(2, separator, action, {values: [], separators: []})
+    protected MANY_SEP2<OUT>(options:ManySepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(2, options, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP3<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(3, separator, action, {values: [], separators: []})
+    protected MANY_SEP3<OUT>(options:ManySepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(3, options, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP4<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(4, separator, action, {values: [], separators: []})
+    protected MANY_SEP4<OUT>(options:ManySepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(4, options, {values: [], separators: []})
     }
 
     /**
      * @see MANY_SEP1
      */
-    protected MANY_SEP5<OUT>(separator:TokenConstructor, action:GrammarAction<OUT>):ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(5, separator, action, {values: [], separators: []})
+    protected MANY_SEP5<OUT>(options:ManySepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(5, options, {values: [], separators: []})
     }
 
     /**
      * Convenience method equivalent to AT_LEAST_ONE1.
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                                action?:GrammarAction<OUT> | string,
-                                errMsg?:string):void {
-        return this.AT_LEAST_ONE1.call(this, predicateOrAction, action, errMsg)
+    protected AT_LEAST_ONE<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>):OUT[] {
+        return this.AT_LEAST_ONE1(actionORMethodDef)
     }
 
     /**
      * Convenience method, same as MANY but the repetition is of one or more.
      * failing to match at least one repetition will result in a parsing error and
-     * cause the parser to attempt error recovery.
+     * cause a parsing error.
      *
      * @see MANY1
      *
-     * @param {Function} predicateOrAction  - The predicate / gate function that implements the constraint on the grammar
-     *                                        or the grammar action to invoke at least once.
-     * @param {Function} [action] - The action to optionally invoke.
-     * @param {string} [errMsg] - Short title/classification to what is being matched.
+     * @param actionORMethodDef  - The grammar action to optionally invoke multiple times
+     *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
      * @return {OUT[]}
      */
-    protected AT_LEAST_ONE1<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                                 action?:GrammarAction<OUT> | string,
-                                 errMsg?:string):OUT[] {
-        return this.atLeastOneInternal(1, predicateOrAction, action, errMsg, [])
+    protected AT_LEAST_ONE1<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>):OUT[] {
+        return this.atLeastOneInternal(1, actionORMethodDef, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE2<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                                 action?:GrammarAction<OUT> | string,
-                                 errMsg?:string):OUT[] {
-        return this.atLeastOneInternal(2, predicateOrAction, action, errMsg, [])
+    protected AT_LEAST_ONE2<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>):OUT[] {
+        return this.atLeastOneInternal(2, actionORMethodDef, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE3<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                                 action?:GrammarAction<OUT> | string,
-                                 errMsg?:string):OUT[] {
-        return this.atLeastOneInternal(3, predicateOrAction, action, errMsg, [])
+    protected AT_LEAST_ONE3<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>):OUT[] {
+        return this.atLeastOneInternal(3, actionORMethodDef, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE4<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                                 action?:GrammarAction<OUT> | string,
-                                 errMsg?:string):OUT[] {
-        return this.atLeastOneInternal(4, predicateOrAction, action, errMsg, [])
+    protected AT_LEAST_ONE4<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>):OUT[] {
+        return this.atLeastOneInternal(4, actionORMethodDef, [])
     }
 
     /**
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE5<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>,
-                                 action?:GrammarAction<OUT> | string,
-                                 errMsg?:string):OUT[] {
-        return this.atLeastOneInternal(5, predicateOrAction, action, errMsg, [])
+    protected AT_LEAST_ONE5<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>):OUT[] {
+        return this.atLeastOneInternal(5, actionORMethodDef, [])
     }
 
     /**
      * Convenience method equivalent to AT_LEAST_ONE_SEP1.
      * @see AT_LEAST_ONE1
      */
-    protected AT_LEAST_ONE_SEP<OUT>(separator:TokenConstructor,
-                                    action:GrammarAction<OUT> | string,
-                                    errMsg?:string):ISeparatedIterationResult<OUT> {
-        return this.AT_LEAST_ONE_SEP1.call(this, separator, action, errMsg)
+    protected AT_LEAST_ONE_SEP<OUT>(options:AtLeastOneSepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.AT_LEAST_ONE_SEP1(options)
     }
 
     /**
-     *
      * Convenience method, same as MANY_SEP but the repetition is of one or more.
      * failing to match at least one repetition will result in a parsing error and
      * cause the parser to attempt error recovery.
      *
+     * Note that an additional optional property ERR_MSG can be used to provide custom error messages.
+     *
      * @see MANY_SEP1
      *
-     * @param {TokenConstructor} separator - The Token class which will be used as a separator between repetitions.
-     * @param {Function} [action] - The action to optionally invoke.
-     * @param {string} [errMsg] - Short title/classification to what is being matched.
+     * @param options - An object defining the grammar of each iteration and the separator between iterations
      *
      * @return {ISeparatedIterationResult<OUT>}
      */
-    protected AT_LEAST_ONE_SEP1<OUT>(separator:TokenConstructor,
-                                     action:GrammarAction<OUT> | string,
-                                     errMsg?:string):ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(1, separator, action, errMsg, {values: [], separators: []})
+    protected AT_LEAST_ONE_SEP1<OUT>(options:AtLeastOneSepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(1, options, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP2<OUT>(separator:TokenConstructor,
-                                     action:GrammarAction<OUT> | string,
-                                     errMsg?:string):ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(2, separator, action, errMsg, {values: [], separators: []})
+    protected AT_LEAST_ONE_SEP2<OUT>(options:AtLeastOneSepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(2, options, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP3<OUT>(separator:TokenConstructor,
-                                     action:GrammarAction<OUT> | string,
-                                     errMsg?:string):ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(3, separator, action, errMsg, {values: [], separators: []})
+    protected AT_LEAST_ONE_SEP3<OUT>(options:AtLeastOneSepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(3, options, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP4<OUT>(separator:TokenConstructor,
-                                     action:GrammarAction<OUT> | string,
-                                     errMsg?:string):ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(4, separator, action, errMsg, {values: [], separators: []})
+    protected AT_LEAST_ONE_SEP4<OUT>(options:AtLeastOneSepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(4, options, {values: [], separators: []})
     }
 
     /**
      * @see AT_LEAST_ONE_SEP1
      */
-    protected AT_LEAST_ONE_SEP5<OUT>(separator:TokenConstructor,
-                                     action:GrammarAction<OUT> | string,
-                                     errMsg?:string):ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(5, separator, action, errMsg, {values: [], separators: []})
+    protected AT_LEAST_ONE_SEP5<OUT>(options:AtLeastOneSepMethodOpts<OUT>):ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(5, options, {values: [], separators: []})
     }
 
     /**
@@ -1824,13 +1872,25 @@ export class Parser {
     }
 
     // Implementation of parsing DSL
-    private optionInternal<OUT>(predicateOrAction:Predicate | GrammarAction<OUT>, action:GrammarAction<OUT>, occurrence:number):OUT {
+    private optionInternal<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>, occurrence:number):OUT {
         let lookAheadFunc = this.getLookaheadFuncForOption(occurrence)
-        if (action === undefined) {
-            action = <any>predicateOrAction
-        } // predicate present
-        else if (!(predicateOrAction as Predicate).call(this)) {
-            return undefined
+
+        let action
+        let predicate
+        if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
+            action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
+            predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
+            // predicate present
+            if (predicate !== undefined) {
+                let orgLookaheadFunction = lookAheadFunc
+                lookAheadFunc = () => {
+                    return predicate.call(this) &&
+                        orgLookaheadFunction.call(this)
+                }
+            }
+        }
+        else {
+            action = actionORMethodDef
         }
 
         if ((lookAheadFunc).call(this)) {
@@ -1840,23 +1900,28 @@ export class Parser {
     }
 
     private atLeastOneInternal<OUT>(prodOccurrence:number,
-                                    predicate:Predicate | GrammarAction<OUT>,
-                                    action:GrammarAction<OUT> | string,
-                                    userDefinedErrMsg:string,
+                                    actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
                                     result:OUT[]):OUT[] {
         let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
-        if (!isFunction(action)) {
-            userDefinedErrMsg = <any>action
-            action = <any>predicate
-        }
-        // predicate present
-        else {
-            let orgLookAheadFunc = lookAheadFunc
-            lookAheadFunc = () => {
-                return (predicate as Predicate).call(this) &&
-                    orgLookAheadFunc.call(this)
+
+        let action
+        let predicate
+        if ((<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF !== undefined) {
+            action = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).DEF
+            predicate = (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).GATE
+            // predicate present
+            if (predicate !== undefined) {
+                let orgLookaheadFunction = lookAheadFunc
+                lookAheadFunc = () => {
+                    return predicate.call(this) &&
+                        orgLookaheadFunction.call(this)
+                }
             }
         }
+        else {
+            action = actionORMethodDef
+        }
+
         if ((<Function>lookAheadFunc).call(this)) {
             result.push((<any>action).call(this))
             while ((<Function>lookAheadFunc).call(this)) {
@@ -1864,7 +1929,8 @@ export class Parser {
             }
         }
         else {
-            throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY, userDefinedErrMsg)
+            throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY,
+                (<DSLMethodOptsWithErr<OUT>>actionORMethodDef).ERR_MSG)
         }
 
         // note that while it may seem that this can cause an error because by using a recursive call to
@@ -1872,17 +1938,18 @@ export class Parser {
         // from the tryInRepetitionRecovery(...) will only happen IFF there really are TWO/THREE/.... items.
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
-        this.attemptInRepetitionRecovery(this.atLeastOneInternal, [prodOccurrence, lookAheadFunc, action, userDefinedErrMsg, result],
+        this.attemptInRepetitionRecovery(this.atLeastOneInternal, [prodOccurrence, actionORMethodDef, result],
             <any>lookAheadFunc, AT_LEAST_ONE_IDX, prodOccurrence, NextTerminalAfterAtLeastOneWalker)
 
         return result
     }
 
     private atLeastOneSepFirstInternal<OUT>(prodOccurrence:number,
-                                            separator:TokenConstructor,
-                                            action:GrammarAction<OUT> | string,
-                                            userDefinedErrMsg:string,
+                                            options:AtLeastOneSepMethodOpts<OUT>,
                                             result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
+        let action = options.DEF
+        let separator = options.SEP
+
 
         let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
 
@@ -1911,28 +1978,34 @@ export class Parser {
                 NextTerminalAfterAtLeastOneSepWalker)
         }
         else {
-            throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, userDefinedErrMsg)
+            throw this.raiseEarlyExitException(prodOccurrence, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR, options.ERR_MSG)
         }
 
         return result
     }
 
     private manyInternal<OUT>(prodOccurrence:number,
-                              predicate:Predicate | GrammarAction<OUT>,
-                              action:GrammarAction<OUT>,
+                              actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>,
                               result:OUT[]):OUT[] {
 
         let lookaheadFunction = this.getLookaheadFuncForMany(prodOccurrence)
-        if (action === undefined) {
-            action = <any>predicate
-        }
-        // predicate present
-        else {
-            let orgLookaheadFunction = lookaheadFunction
-            lookaheadFunction = () => {
-                return (predicate as Predicate).call(this) &&
-                    orgLookaheadFunction.call(this)
+
+        let action
+        let predicate
+        if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
+            action = (<DSLMethodOpts<OUT>>actionORMethodDef).DEF
+            predicate = (<DSLMethodOpts<OUT>>actionORMethodDef).GATE
+            // predicate present
+            if (predicate !== undefined) {
+                let orgLookaheadFunction = lookaheadFunction
+                lookaheadFunction = () => {
+                    return predicate.call(this) &&
+                        orgLookaheadFunction.call(this)
+                }
             }
+        }
+        else {
+            action = actionORMethodDef
         }
 
         while (lookaheadFunction.call(this)) {
@@ -1941,7 +2014,7 @@ export class Parser {
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         this.attemptInRepetitionRecovery(this.manyInternal,
-            [prodOccurrence, lookaheadFunction, action, result],
+            [prodOccurrence, actionORMethodDef, result],
             <any>lookaheadFunction,
             MANY_IDX,
             prodOccurrence,
@@ -1951,9 +2024,11 @@ export class Parser {
     }
 
     private manySepFirstInternal<OUT>(prodOccurrence:number,
-                                      separator:TokenConstructor,
-                                      action:GrammarAction<OUT>,
+                                      options:ManySepMethodOpts<OUT>,
                                       result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
+        let action = options.DEF
+        let separator = options.SEP
+
         let firstIterationLaFunc = this.getLookaheadFuncForManySep(prodOccurrence)
 
         let values = result.values
@@ -2013,9 +2088,11 @@ export class Parser {
             nextTerminalAfterWalker)
     }
 
-    private orInternal<T>(alts:IAnyOrAlt<T>[],
-                          errMsgTypes:string,
+    private orInternal<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>,
                           occurrence:number):T {
+
+        let alts = isArray(altsOrOpts) ? altsOrOpts as IAnyOrAlt<T>[] : (altsOrOpts as OrMethodOpts<T>).DEF
+
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
         let altToTake = laFunc.call(this, alts)
         if (altToTake !== undefined) {
@@ -2023,7 +2100,7 @@ export class Parser {
             return chosenAlternative.ALT.call(this)
         }
 
-        this.raiseNoAltException(occurrence, errMsgTypes)
+        this.raiseNoAltException(occurrence, (altsOrOpts as OrMethodOpts<T>).ERR_MSG)
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch

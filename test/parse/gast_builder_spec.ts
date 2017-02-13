@@ -176,8 +176,8 @@ describe("The GAst Builder namespace", () => {
         let ter = ".CONSUME3(one1"
         let option = ".OPTION(2)"
         let many = ".MANY(3)"
-        let many_sep = ".MANY_SEP(Comma,)"
-        let at_least_one_sep = ".AT_LEAST_ONE_SEP(Comma,)"
+        let many_sep = ".MANY_SEP({SEP:Comma,)"
+        let at_least_one_sep = ".AT_LEAST_ONE_SEP({SEP:Comma,)"
         let ref = ".SUBRULE5(this.other"
         let atLeastOne = ".AT_LEAST_ONE(6)"
         let or = ".OR(7)"
@@ -309,7 +309,7 @@ describe("The GAst Builder namespace", () => {
         // hack, using "toString" because it exists on plain js object as the "separator".
         let actual = buildProdGast({
             range: new Range(1, 2),
-            text:  "this.MANY_SEP(toString...)",
+            text:  "this.MANY_SEP({SEP:toString...)",
             type:  ProdType.MANY_SEP
         }, [])
         expect(actual).to.be.an.instanceof(RepetitionWithSeparator)
@@ -319,7 +319,7 @@ describe("The GAst Builder namespace", () => {
     it("will fail when building a MANY_SEP Production from a RangeProd in the seperator is not known", () => {
         expect(() => buildProdGast({
             range: new Range(1, 2),
-            text:  "this.MANY_SEP(MISSING...)",
+            text:  "this.MANY_SEP({SEP: MISSING...)",
             type:  ProdType.MANY_SEP
         }, [])).to.throw("Separator Terminal Token name: MISSING not found")
     })

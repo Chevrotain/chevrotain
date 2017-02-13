@@ -46,8 +46,10 @@ class JsonParserTypeScript extends Parser {
     // example for private access control
     private object = this.RULE("object", () => {
         this.CONSUME(LCurly)
-        this.MANY_SEP(Comma, () => {
-            this.SUBRULE2(this.objectItem)
+        this.MANY_SEP({
+            SEP: Comma, DEF: () => {
+                this.SUBRULE2(this.objectItem)
+            }
         })
         this.CONSUME(RCurly)
     })
@@ -60,8 +62,10 @@ class JsonParserTypeScript extends Parser {
 
     private array = this.RULE("array", () => {
         this.CONSUME(LSquare)
-        this.MANY_SEP(Comma, () => {
-            this.SUBRULE(this.value)
+        this.MANY_SEP({
+            SEP: Comma, DEF: () => {
+                this.SUBRULE(this.value)
+            }
         })
         this.CONSUME(RSquare)
     })

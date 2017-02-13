@@ -532,20 +532,13 @@ describe("The empty alternative detection full flow", () => {
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
-                // @formatter:off
-                    this.OR1([
-                        {ALT: () => {
-                            this.CONSUME1(PlusTok)
-                        }},
-                        {ALT: EMPTY_ALT()},  // empty alternative #2 which is not the last one!
-                        {ALT: () => {
-                            // empty alternative #3 which is not the last one!
-                        }},
-                        {ALT: () => {
-                            this.CONSUME2(StarTok)
-                        }}
-                    ], "digits")
-                    // @formatter:on
+                this.OR1([
+                    {ALT: () => { this.CONSUME1(PlusTok)}},
+                    {ALT: EMPTY_ALT()},  // empty alternative #2 which is not the last one!
+                    // empty alternative #3 which is not the last one!
+                    {ALT: () => {}},
+                    {ALT: () => { this.CONSUME2(StarTok)}}
+                ])
             })
 
         }
@@ -563,17 +556,11 @@ describe("The empty alternative detection full flow", () => {
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
-                // @formatter:off
-                    this.OR([ // using OR without occurrence suffix, test to check for fix for https://github.com/SAP/chevrotain/issues/101
-                         {ALT: EMPTY_ALT()},  // empty alternative #1 which is not the last one!
-                        {ALT: () => {
-                            this.CONSUME1(PlusTok)
-                        }},
-                        {ALT: () => {
-                            this.CONSUME2(StarTok)
-                        }}
-                    ], "digits")
-                    // @formatter:on
+                this.OR([ // using OR without occurrence suffix, test to check for fix for https://github.com/SAP/chevrotain/issues/101
+                    {ALT: EMPTY_ALT()},  // empty alternative #1 which is not the last one!
+                    {ALT: () => {this.CONSUME1(PlusTok)}},
+                    {ALT: () => {this.CONSUME2(StarTok)}}
+                ])
             })
 
         }
@@ -593,7 +580,7 @@ describe("The anonymous Parser constructor detection full flow", () => {
         // var foo = function(){}
         // foo.name --> foo (was "" in ES5)
         function generateAnonymousConstructor() {
-            return function(input) {
+            return function (input) {
                 Parser.call(this, input, []);
                 (<any>Parser).performSelfAnalysis(this)
             }

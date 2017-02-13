@@ -2,7 +2,7 @@ import {Token, extendToken, extendLazyToken, extendSimpleLazyToken} from "../../
 import {Parser} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
-import {tokenInstanceofMatcher, createSimpleLazyToken, createLazyTokenInstance, tokenStructuredMatcher} from "../../src/scan/tokens"
+import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
 import {clearCache} from "../../src/parse/cache_public"
 import {createRegularToken, createLazyToken, createSimpleToken} from "../utils/matchers"
 
@@ -231,29 +231,39 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     let total = ""
                     let separators = []
 
-                    separators = separators.concat(this.MANY_SEP1(Comma, () => {
-                        this.CONSUME1(OneTok)
-                        total += "1"
+                    separators = separators.concat(this.MANY_SEP1({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(OneTok)
+                            total += "1"
+                        }
                     }).separators)
 
-                    separators = separators.concat(this.MANY_SEP2(Comma, () => {
-                        this.CONSUME1(TwoTok)
-                        total += "2"
+                    separators = separators.concat(this.MANY_SEP2({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(TwoTok)
+                            total += "2"
+                        }
                     }).separators)
 
-                    separators = separators.concat(this.MANY_SEP3(Comma, () => {
-                        this.CONSUME1(ThreeTok)
-                        total += "3"
+                    separators = separators.concat(this.MANY_SEP3({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(ThreeTok)
+                            total += "3"
+                        }
                     }).separators)
 
-                    separators = separators.concat(this.MANY_SEP4(Comma, () => {
-                        this.CONSUME1(FourTok)
-                        total += "4"
+                    separators = separators.concat(this.MANY_SEP4({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(FourTok)
+                            total += "4"
+                        }
                     }).separators)
 
-                    separators = separators.concat(this.MANY_SEP5(Comma, () => {
-                        this.CONSUME1(FiveTok)
-                        total += "5"
+                    separators = separators.concat(this.MANY_SEP5({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(FiveTok)
+                            total += "5"
+                        }
                     }).separators)
 
                     return {total: total, separators: separators}
@@ -334,27 +344,27 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     this.AT_LEAST_ONE1(() => {
                         this.CONSUME1(OneTok)
                         total += "1"
-                    }, "Ones")
+                    })
 
                     this.AT_LEAST_ONE2(() => {
                         this.CONSUME1(TwoTok)
                         total += "2"
-                    }, "Twos")
+                    })
 
                     this.AT_LEAST_ONE3(() => {
                         this.CONSUME1(ThreeTok)
                         total += "3"
-                    }, "Threes")
+                    })
 
                     this.AT_LEAST_ONE4(() => {
                         this.CONSUME1(FourTok)
                         total += "4"
-                    }, "Fours")
+                    })
 
                     this.AT_LEAST_ONE5(() => {
                         this.CONSUME1(FiveTok)
                         total += "5"
-                    }, "Fives")
+                    })
 
                     return total
                 }
@@ -407,30 +417,40 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     let total = ""
                     let separators = []
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP1(Comma, () => {
-                        this.CONSUME1(OneTok)
-                        total += "1"
-                    }, "Ones").separators)
+                    separators = separators.concat(this.AT_LEAST_ONE_SEP1({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(OneTok)
+                            total += "1"
+                        }
+                    }).separators)
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP2(Comma, () => {
-                        this.CONSUME1(TwoTok)
-                        total += "2"
-                    }, "Twos").separators)
+                    separators = separators.concat(this.AT_LEAST_ONE_SEP2({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(TwoTok)
+                            total += "2"
+                        }
+                    }).separators)
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP3(Comma, () => {
-                        this.CONSUME1(ThreeTok)
-                        total += "3"
-                    }, "Threes").separators)
+                    separators = separators.concat(this.AT_LEAST_ONE_SEP3({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(ThreeTok)
+                            total += "3"
+                        }
+                    }).separators)
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP4(Comma, () => {
-                        this.CONSUME1(FourTok)
-                        total += "4"
-                    }, "Fours").separators)
+                    separators = separators.concat(this.AT_LEAST_ONE_SEP4({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(FourTok)
+                            total += "4"
+                        }
+                    }).separators)
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP5(Comma, () => {
-                        this.CONSUME1(FiveTok)
-                        total += "5"
-                    }, "Fives").separators)
+                    separators = separators.concat(this.AT_LEAST_ONE_SEP5({
+                        SEP: Comma, DEF: () => {
+                            this.CONSUME1(FiveTok)
+                            total += "5"
+                        }
+                    }).separators)
 
                     return {total: total, separators: separators}
                 }
@@ -528,7 +548,7 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     this.CONSUME2(FiveTok)
                     total += "B5"
                 }},
-            ], "digits")
+            ])
 
             this.OR3([
                 {ALT: () => {
@@ -551,7 +571,7 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     this.CONSUME3(OneTok)
                     total += "C1"
                 }}
-            ], "digits")
+            ])
 
             this.OR4([
                 {ALT: () => {
@@ -574,7 +594,7 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     this.CONSUME4(FiveTok)
                     total += "D5"
                 }}
-            ], "digits")
+            ])
 
             this.OR5([
                 {ALT: () => {
@@ -597,7 +617,7 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     this.CONSUME5(FiveTok)
                     total += "E5"
                 }},
-            ], "digits")
+            ])
 
             // @formatter:on
                     return total
@@ -643,23 +663,13 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
 
                     private parseAmbiguityRule():void {
-
-                        // @formatter:off
-            this.OR1([
-                {ALT: () => {
-                    this.CONSUME1(OneTok)
-                }},
-                {ALT: () => { // <-- this alternative starts with the same token as the previous one, ambiguity!
-                    this.CONSUME2(OneTok)
-                }},
-                {ALT: () => {
-                    this.CONSUME2(TwoTok)
-                }},
-                {ALT: () => {
-                    this.CONSUME2(ThreeTok)
-                }}
-            ], "digits")
-            // @formatter:on
+                        this.OR1([
+                            {ALT: () => {this.CONSUME1(OneTok)}},
+                            // <-- this alternative starts with the same token as the previous one, ambiguity!
+                            {ALT: () => { this.CONSUME2(OneTok)}},
+                            {ALT: () => { this.CONSUME2(TwoTok)}},
+                            {ALT: () => {this.CONSUME2(ThreeTok)}}
+                        ])
                     }
                 }
 
@@ -681,22 +691,22 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     private parseAmbiguityRule():void {
 
                         // @formatter:off
-            this.OR1([
-                {ALT: () => {
-                    this.CONSUME1(OneTok)
-                }},
-                {ALT: () => {
-                    this.CONSUME1(TwoTok)
-                    this.CONSUME1(ThreeTok)
-                    this.CONSUME1(FourTok)
-                }},
-                {ALT: () => {
-                    this.CONSUME2(TwoTok)
-                    this.CONSUME2(ThreeTok)
-                    this.CONSUME2(FourTok)
-                }}
-            ], "digits")
-            // @formatter:on
+                        this.OR1([
+                            {ALT: () => {
+                                this.CONSUME1(OneTok)
+                            }},
+                            {ALT: () => {
+                                this.CONSUME1(TwoTok)
+                                this.CONSUME1(ThreeTok)
+                                this.CONSUME1(FourTok)
+                            }},
+                            {ALT: () => {
+                                this.CONSUME2(TwoTok)
+                                this.CONSUME2(ThreeTok)
+                                this.CONSUME2(FourTok)
+                            }}
+                            // @formatter:on
+                        ])
                     }
                 }
                 expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw("Ambiguous alternatives")
@@ -734,118 +744,118 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     let total = ""
 
                     // @formatter:off
-            this.OR([
-                {ALT: () => {
-                    this.CONSUME1(OneTok)
-                    total += "A1"
-                }},
-                {ALT: () => {
-                    this.CONSUME2(OneTok)
-                    total += "OOPS!"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(ThreeTok)
-                    total += "A3"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(FourTok)
-                    total += "A4"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(FiveTok)
-                    total += "A5"
-                }},
-            ], "digits")
+                    this.OR([
+                        {ALT: () => {
+                            this.CONSUME1(OneTok)
+                            total += "A1"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME2(OneTok)
+                            total += "OOPS!"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME1(ThreeTok)
+                            total += "A3"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME1(FourTok)
+                            total += "A4"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME1(FiveTok)
+                            total += "A5"
+                        }},
+                    ])
 
-            this.OR2([
-                {ALT: () => {
-                    this.CONSUME2(FourTok)
-                    total += "B4"
-                }},
-                {ALT: () => {
-                    this.CONSUME2(ThreeTok)
-                    total += "B3"
-                }},
-                 {ALT: () => {
-                    this.CONSUME2(TwoTok)
-                    total += "B2"
-                }},
-                {ALT: () => {
-                    this.CONSUME3(TwoTok)
-                    total += "OOPS!"
-                }},
-                {ALT: () => {
-                    this.CONSUME2(FiveTok)
-                    total += "B5"
-                }},
-            ], "digits")
+                    this.OR2([
+                        {ALT: () => {
+                            this.CONSUME2(FourTok)
+                            total += "B4"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME2(ThreeTok)
+                            total += "B3"
+                        }},
+                         {ALT: () => {
+                            this.CONSUME2(TwoTok)
+                            total += "B2"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME3(TwoTok)
+                            total += "OOPS!"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME2(FiveTok)
+                            total += "B5"
+                        }},
+                    ])
 
-            this.OR3([
-                {ALT: () => {
-                    this.CONSUME3(FourTok)
-                    total += "C4"
-                }},
-                {ALT: () => {
-                    this.CONSUME3(ThreeTok)
-                    total += "C3"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(ThreeTok)
-                    total += "OOPS!"
-                }},
-                {ALT: () => {
-                    this.CONSUME3(FiveTok)
-                    total += "C5"
-                }},
-                 {ALT: () => {
-                    this.CONSUME3(OneTok)
-                    total += "C1"
-                }}
-            ], "digits")
+                    this.OR3([
+                        {ALT: () => {
+                            this.CONSUME3(FourTok)
+                            total += "C4"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME3(ThreeTok)
+                            total += "C3"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME4(ThreeTok)
+                            total += "OOPS!"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME3(FiveTok)
+                            total += "C5"
+                        }},
+                         {ALT: () => {
+                            this.CONSUME3(OneTok)
+                            total += "C1"
+                        }}
+                    ])
 
-            this.OR4([
-                {ALT: () => {
-                    this.CONSUME4(OneTok)
-                    total += "D1"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(FourTok)
-                    total += "D4"
-                }},
-                {ALT: () => {
-                    this.CONSUME5(FourTok)
-                    total += "OOPS!"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(TwoTok)
-                    total += "D2"
-                }},
-            ], "digits")
+                    this.OR4([
+                        {ALT: () => {
+                            this.CONSUME4(OneTok)
+                            total += "D1"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME4(FourTok)
+                            total += "D4"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME5(FourTok)
+                            total += "OOPS!"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME4(TwoTok)
+                            total += "D2"
+                        }},
+                    ])
 
-            this.OR5([
-                {ALT: () => {
-                    this.CONSUME5(TwoTok)
-                    total += "E2"
-                }},
-                 {ALT: () => {
-                    this.CONSUME5(OneTok)
-                    total += "E1"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(FiveTok)
-                    total += "E5"
-                }},
-                 {ALT: () => {
-                    this.CONSUME5(ThreeTok)
-                    total += "E3"
-                }},
-                {ALT: () => {
-                    this.CONSUME5(FiveTok)
-                    total += "OOPS!"
-                }},
-            ], "digits")
+                    this.OR5([
+                        {ALT: () => {
+                            this.CONSUME5(TwoTok)
+                            total += "E2"
+                        }},
+                         {ALT: () => {
+                            this.CONSUME5(OneTok)
+                            total += "E1"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME4(FiveTok)
+                            total += "E5"
+                        }},
+                         {ALT: () => {
+                            this.CONSUME5(ThreeTok)
+                            total += "E3"
+                        }},
+                        {ALT: () => {
+                            this.CONSUME5(FiveTok)
+                            total += "OOPS!"
+                        }},
+                    ])
 
-            // @formatter:on
+                 // @formatter:on
                     return total
                 }
             }
@@ -958,11 +968,13 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
 
                     public rule = this.RULE("orRule", () => {
                         let numOfIterations = 0
-                        this.MANY_SEP(Comma, () => {
-                            this.CONSUME1(OneTok)
-                            this.CONSUME1(TwoTok)
-                            this.CONSUME1(ThreeTok)
-                            numOfIterations++
+                        this.MANY_SEP({
+                            SEP: Comma, DEF: () => {
+                                this.CONSUME1(OneTok)
+                                this.CONSUME1(TwoTok)
+                                this.CONSUME1(ThreeTok)
+                                numOfIterations++
+                            }
                         })
                         this.CONSUME2(OneTok)
                         this.CONSUME2(TwoTok)
@@ -1088,11 +1100,13 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
 
                     public rule = this.RULE("orRule", () => {
                         let numOfIterations = 0
-                        this.AT_LEAST_ONE_SEP(Comma, () => {
-                            this.CONSUME1(OneTok)
-                            this.CONSUME1(TwoTok)
-                            this.CONSUME1(ThreeTok)
-                            numOfIterations++
+                        this.AT_LEAST_ONE_SEP({
+                            SEP: Comma, DEF: () => {
+                                this.CONSUME1(OneTok)
+                                this.CONSUME1(TwoTok)
+                                this.CONSUME1(ThreeTok)
+                                numOfIterations++
+                            }
                         })
                         this.CONSUME2(OneTok)
                         this.CONSUME2(TwoTok)

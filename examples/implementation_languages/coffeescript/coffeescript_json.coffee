@@ -52,8 +52,10 @@ class JsonParserCoffeeScript extends Parser
 
     @RULE 'object', ->
       @CONSUME LCurly
-      @MANY_SEP Comma, ->
-        @SUBRULE2 @objectItem
+      @MANY_SEP {
+        SEP: Comma, DEF: ->
+          @SUBRULE2 @objectItem
+      }
       @CONSUME RCurly
 
     @RULE 'objectItem', ->
@@ -63,8 +65,10 @@ class JsonParserCoffeeScript extends Parser
 
     @RULE 'array', ->
       @CONSUME LSquare
-      @MANY_SEP Comma, ->
-        @SUBRULE @value
+      @MANY_SEP {
+        SEP: Comma, DEF: ->
+          @SUBRULE2 @value
+      }
       @CONSUME RSquare
 
     @RULE 'value', ->

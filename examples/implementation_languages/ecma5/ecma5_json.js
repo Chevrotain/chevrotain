@@ -39,12 +39,10 @@ function JsonParserES5(input) {
 
     this.RULE("object", function() {
         $.CONSUME(LCurly)
-        $.OPTION(function() {
-            $.SUBRULE($.objectItem)
-            $.MANY(function() {
-                $.CONSUME(Comma)
+        $.MANY_SEP({
+            SEP: Comma, DEF: () => {
                 $.SUBRULE2($.objectItem)
-            })
+            }
         })
         $.CONSUME(RCurly)
     })
@@ -57,12 +55,10 @@ function JsonParserES5(input) {
 
     this.RULE("array", function() {
         $.CONSUME(LSquare)
-        $.OPTION(function() {
-            $.SUBRULE($.value)
-            $.MANY(function() {
-                $.CONSUME(Comma)
+        $.MANY_SEP({
+            SEP: Comma, DEF: () => {
                 $.SUBRULE2($.value)
-            })
+            }
         })
         $.CONSUME(RSquare)
     })

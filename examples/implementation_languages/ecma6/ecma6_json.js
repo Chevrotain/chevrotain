@@ -72,12 +72,10 @@ class JsonParserES6 extends chevrotain.Parser {
         // the parsing methods
         $.RULE("object", () => {
             $.CONSUME(LCurly)
-            $.OPTION(() => {
-                $.SUBRULE($.objectItem)
-                $.MANY(() => {
-                    $.CONSUME(Comma)
+            $.MANY_SEP({
+                SEP: Comma, DEF: () => {
                     $.SUBRULE2($.objectItem)
-                })
+                }
             })
             $.CONSUME(RCurly)
         })
@@ -90,12 +88,10 @@ class JsonParserES6 extends chevrotain.Parser {
 
         $.RULE("array", () => {
             $.CONSUME(LSquare)
-            $.OPTION(() => {
-                $.SUBRULE($.value)
-                $.MANY(() => {
-                    $.CONSUME(Comma)
+            $.MANY_SEP({
+                SEP: Comma, DEF: () => {
                     $.SUBRULE2($.value)
-                })
+                }
             })
             $.CONSUME(RSquare)
         })

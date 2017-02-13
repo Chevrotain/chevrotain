@@ -35,10 +35,11 @@ let optionRegExGlobal = new RegExp(optionRegEx.source, "g")
 let manyRegEx = /\.\s*MANY(\d)?\s*\(/
 let manyRegExGlobal = new RegExp(manyRegEx.source, "g")
 
-let manyWithSeparatorRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+
+let manyWithSeparatorRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*\{\s*SEP\s*:\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
 let manyWithSeparatorRegExGlobal = new RegExp(manyWithSeparatorRegEx.source, "g")
 
-let atLeastOneWithSeparatorRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+let atLeastOneWithSeparatorRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*\{\s*SEP\s*:\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
 let atLeastOneWithSeparatorRegExGlobal = new RegExp(atLeastOneWithSeparatorRegEx.source, "g")
 
 let atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
