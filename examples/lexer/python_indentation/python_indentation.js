@@ -23,7 +23,7 @@ const _ = require("lodash")
 const whiteSpaceRegExp = /^ +/
 
 // State required for matching the indentations
-let identStack = [0]
+let indentStack = [0]
 let lastTextMatched
 
 /**
@@ -36,7 +36,7 @@ let lastTextMatched
  * @param {string} type - determines if this function matches Indent or Outdent tokens.
  * @returns {*}
  */
-function matchIndenBase(text, matchedTokens, groups, type) {
+function matchIndentBase(text, matchedTokens, groups, type) {
     const noTokensMatchedYet = _.isEmpty(matchedTokens)
     const newLines = groups.nl
     const noNewLinesMatchedYet = _.isEmpty(newLines)
@@ -70,13 +70,26 @@ function matchIndenBase(text, matchedTokens, groups, type) {
         }
 
         if (currIndentLevel !== undefined) {
-            let lastIndentLEvel = _.last(identStack)
-            if (currIndentLevel > lastIndentLEvel && type === "indent") {
-                identStack.push(currIndentLevel)
+            let lastIndentLevel = _.last(indentStack)
+            if (currIndentLevel > lastIndentLevel && type === "indent") {
+                indentStack.push(currIndentLevel)
                 return match
             }
-            else if (currIndentLevel < lastIndentLEvel && type === "outdent") {
-                identStack.pop()
+            else if (currIndentLevel < lastIndentLevel && type === "outdent") {
+                //if we need more than one outdent token, add all but the last one
+                if(indentStack.length > 2){
+                  const image = "";
+                  const offset = chevrotain.getEndOffset(_.last(matchedTokens)) + 1
+                  const line = chevrotain.getEndLine(_.last(matchedTokens))
+                  const column = chevrotain.getEndColumn(_.last(matchedTokens)) + 1
+                  while(indentStack.length > 2 &&
+                    //stop before the last Outdent
+                    indentStack[indentStack.length - 2] > currIndentLevel){
+                    indentStack.pop()
+                    matchedTokens.push(new Outdent(image, offset, line, column))
+                  }
+                }
+                indentStack.pop()
                 return match
             }
             else {
@@ -95,9 +108,9 @@ function matchIndenBase(text, matchedTokens, groups, type) {
     }
 }
 
-// customize matchIndenBase to create separate functions of Indent and Outdent.
-let matchIndent = _.partialRight(matchIndenBase, "indent")
-let matchOutdent = _.partialRight(matchIndenBase, "outdent")
+// customize matchIndentBase to create separate functions of Indent and Outdent.
+let matchIndent = _.partialRight(matchIndentBase, "indent")
+let matchOutdent = _.partialRight(matchIndentBase, "outdent")
 
 let If = createToken({name: "If", pattern: /if/})
 let Else = createToken({name: "Else", pattern: /else/})
@@ -152,10 +165,21 @@ module.exports = {
     tokenize: function(text) {
 
         // have to reset the indent stack between processing of different text inputs
-        identStack = [0]
+        indentStack = [0]
         lastTextMatched = undefined
 
         let lexResult = customPatternLexer.tokenize(text)
+
+        const lastToken = _.last(lexResult.tokens);
+        const lastOffset = chevrotain.getEndOffset(lastToken);
+        const lastLine = chevrotain.getEndLine(lastToken);
+        const lastColumn = chevrotain.getEndColumn(lastToken);
+
+        //add remaining Outdents
+        while (indentStack.length > 1) {
+            lexResult.tokens.push(new Outdent("", lastOffset, lastLine, lastColumn))
+            indentStack.pop();
+        }
 
         if (lexResult.errors.length > 0) {
             throw new Error("sad sad panda lexing errors detected")
