@@ -470,7 +470,9 @@ export class Parser {
     private definedRulesNames:string[] = []
 
     private shortRuleNameToFull = new HashTable<string>()
-    private ruleShortNameIdx = 1
+
+    // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
+    private ruleShortNameIdx = 256
     private tokenMatcher:TokenMatcher
     private tokenClassIdentityFunc:TokenClassIdentityFunc
     private tokenInstanceIdentityFunc:TokenInstanceIdentityFunc
