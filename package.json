@@ -44,8 +44,8 @@
     "url": "git://github.com/SAP/chevrotain.git"
   },
   "scripts": {
-    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && upload_docs.bat",
-    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && upload_docs.bat",
+    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && node ../chevrotain_docs/scripts/upload_docs.js",
+    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && node ../chevrotain_docs/scripts/upload_docs.js",
     "unit_tests": "node_modules/.bin/_mocha ./lib/test/**/*spec.js",
     "compile": "tsc",
     "compile_definitions": "tsc test_integration/definitions/es6_modules.ts --outDir dev/garbage",
