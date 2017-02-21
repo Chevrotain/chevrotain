@@ -5,7 +5,7 @@ var fs = require('fs')
 var wrench = require('wrench')
 var path = require('path')
 
-var myRepo = git('')
+var myRepo = git(path.join(__dirname, '../'))
 var status = myRepo.statusSync()
 if (!_.isEmpty(status.staged) || !_.isEmpty(status.unstaged) || !_.isEmpty(status.untracked)) {
     console.error('Error: git working directory must be clean in order to perform a release')
