@@ -36,7 +36,7 @@ as any other JavaScript code without requiring any new tools or processes.
   2.  **Lexer Engine** based on Regular Expressions.
     * Full Token position information.
     * Token skipping (whitespace/comments/...).
-    * Prioritise shorter matches ([Keywords vs Identifiers][keywords_vs_idents]).
+    * Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
     * [Multiple Lexer Modes][lexer_modes] depending on the context.
     * [Tokens Grouping][lexer_groups].
     * [Different Token types for balancing performance, memory usage and ease of use](docs/token_types.md).
