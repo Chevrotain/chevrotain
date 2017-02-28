@@ -169,7 +169,9 @@
                                                                               href="http://www.json-generator.com/">json-generator</a>.
             </p>
             <p>
-                All the parsers have no output(build no AST), they only parse the text (without errors).
+                None of the parsers have explicit output actions(build no user defined AST), they only parse the text (without errors),
+                However some of the parsing libraries may always build some default output structure even if no actions have been explicitly
+                defined.
             </p>
 
             <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
