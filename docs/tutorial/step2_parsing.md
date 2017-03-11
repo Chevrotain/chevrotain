@@ -85,16 +85,17 @@ class SelectParser extends chevrotain.Parser {
 
     constructor(input:Token[]) {
         super(input, allTokens)
-        Parser.performSelfAnalysis(this)
-        
-        $.RULE("selectStatement", () => {
-           $.SUBRULE($.selectClause)
-           $.SUBRULE($.fromClause)
-           $.OPTION(() => {
-              $.SUBRULE($.whereClause)        
-           })
-        })
     }
+       
+    let $ = this;
+        
+    $.RULE("selectStatement", () => {
+         $.SUBRULE($.selectClause)
+         $.SUBRULE($.fromClause)
+         $.OPTION(() => {
+            $.SUBRULE($.whereClause)        
+           })
+     })
 }
 ```
 
@@ -179,59 +180,59 @@ let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, Gr
 class SelectParser extends chevrotain.Parser {
 
     constructor(input:Token[]) {
-        super(input, allTokens)
-        Parser.performSelfAnalysis(this)
-    }
-    
-    let $ = this
-    
-    $.RULE("selectStatement", () => {
-        $.SUBRULE($.selectClause)
-        $.SUBRULE($.fromClause)
-        $.OPTION(() => {
-            $.SUBRULE($.whereClause)        
-        })
-    })
+     super(input, allTokens)
      
-    $.RULE("selectClause", () => {
-        $.CONSUME(Select)
-        $.AT_LEAST_ONE_SEP(Comma, () => {
-            $.CONSUME(Identifier)
-        })
-    })
+     let $ = this
      
-    $.RULE("fromClause", () => {
-        $.CONSUME(From)
-        $.CONSUME(Identifier)
-    })
+     $.RULE("selectStatement", () => {
+         $.SUBRULE($.selectClause)
+         $.SUBRULE($.fromClause)
+         $.OPTION(() => {
+             $.SUBRULE($.whereClause)        
+         })
+     })
+
+     $.RULE("selectClause", () => {
+         $.CONSUME(Select)
+         $.AT_LEAST_ONE_SEP(Comma, () => {
+             $.CONSUME(Identifier)
+         })
+     })
+
+     $.RULE("fromClause", () => {
+         $.CONSUME(From)
+         $.CONSUME(Identifier)
+     })
+
+     $.RULE("whereClause", () => {
+         $.CONSUME(Where)
+         $.SUBRULE($.expression)
+     }) 
+
+     $.RULE("expression", () => {
+         $.SUBRULE($.atomicExpression)
+         $.SUBRULE($.relationalOperator)
+         $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
+                       // from the 'SUBRULE(atomicExpression)'
+                       // 2 lines above.
+     })
+
+     $.RULE("atomicExpression", () => {
+         $.OR([
+             {ALT: () => { $.CONSUME(Integer)}},
+             {ALT: () => { $.CONSUME(Identifier)}}
+         ]);
+     })
+
+     $.RULE("relationalOperator", () => {
+         return $.OR([
+             {ALT: function(){ $.CONSUME(GreaterThan)}},
+             {ALT: function(){ $.CONSUME(LessThan)}}
+         ]);
+     });
     
-    $.RULE("whereClause", () => {
-        $.CONSUME(Where)
-        $.SUBRULE($.expression)
-    }) 
-    
-    $.RULE("expression", () => {
-        $.SUBRULE($.atomicExpression)
-        $.SUBRULE($.relationalOperator)
-        $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
-                      // from the 'SUBRULE(atomicExpression)'
-                      // 2 lines above.
-    })
-    
-    $.RULE("atomicExpression", () => {
-        $.OR([
-            {ALT: () => { $.CONSUME(Integer)}},
-            {ALT: () => { $.CONSUME(Identifier)}}
-        ]);
-    })
-    
-    $.RULE("relationalOperator", () => {
-        return $.OR([
-            {ALT: function(){ $.CONSUME(GreaterThan)}},
-            {ALT: function(){ $.CONSUME(LessThan)}}
-        ]);
-    });
-        
+     Parser.performSelfAnalysis(this)
+    }    
 }
 
 ```
