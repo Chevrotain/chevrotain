@@ -252,7 +252,7 @@ class SelectParser extends chevrotain.Parser {
 const parser = new SelectParser(lexingResult.tokens);
 
 function parseInput(text) {
-   let lexingResult = SelectLexer.tokenize(inputText)
+   let lexingResult = SelectLexer.tokenize(text)
    let parser = new SelectParser(lexingResult.tokens);
    parser.selectStatement()
 
