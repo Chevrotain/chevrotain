@@ -85,17 +85,19 @@ class SelectParser extends chevrotain.Parser {
 
     constructor(input:Token[]) {
         super(input, allTokens)
-    }
-       
-    let $ = this;
         
-    $.RULE("selectStatement", () => {
-         $.SUBRULE($.selectClause)
-         $.SUBRULE($.fromClause)
-         $.OPTION(() => {
-            $.SUBRULE($.whereClause)        
-           })
-     })
+        let $ = this;
+        
+        $.RULE("selectStatement", () => {
+          $.SUBRULE($.selectClause)
+          $.SUBRULE($.fromClause)
+          $.OPTION(() => {
+             $.SUBRULE($.whereClause)        
+         })
+         
+         Parser.performSelfAnalysis(this)
+       })
+    }   
 }
 ```
 
