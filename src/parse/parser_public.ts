@@ -382,6 +382,7 @@ export class Parser {
         let definitionErrors = []
         let defErrorsMsgs
 
+        parserInstance.selfAnalysisDone = true
         let className = classNameFromInstance(parserInstance)
 
         if (className === "") {
@@ -476,6 +477,7 @@ export class Parser {
     private tokenMatcher:TokenMatcher
     private tokenClassIdentityFunc:TokenClassIdentityFunc
     private tokenInstanceIdentityFunc:TokenInstanceIdentityFunc
+    private selfAnalysisDone = false
 
     /**
      * Only used internally for storing productions as they are built for the first time.
@@ -1519,6 +1521,10 @@ export class Parser {
                           impl:(...implArgs:any[]) => T,
                           config:IRuleConfig<T>):(idxInCallingRule?:number, ...args:any[]) => T {
 
+        if (this.selfAnalysisDone) {
+            throw Error(`Grammar rule <${ruleName}> may not be defined after the 'performSelfAnalysis' method has been called'\n` +
+                `Make sure that all grammar rule definitions are done before 'performSelfAnalysis' is called.`)
+        }
         let resyncEnabled = has(config, "resyncEnabled") ?
             config.resyncEnabled :
             DEFAULT_RULE_CONFIG.resyncEnabled
