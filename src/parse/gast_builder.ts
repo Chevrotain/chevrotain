@@ -1,7 +1,12 @@
 import {IRange, Range} from "../text/range"
 import {gast} from "./grammar/gast_public"
-import {sortBy, forEach, every, filter, partial, uniq, isEmpty} from "../utils/utils"
+import {every, filter, forEach, isEmpty, isUndefined, partial, sortBy, uniq} from "../utils/utils"
 import {TokenConstructor} from "../scan/lexer_public"
+import IProduction = gast.IProduction
+import Terminal = gast.Terminal
+import NonTerminal = gast.NonTerminal
+import AbstractProduction = gast.AbstractProduction
+import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
 
 export enum ProdType {
     OPTION,
@@ -21,37 +26,52 @@ export interface IProdRange {
     type:ProdType
 }
 
-// TODO: this regexp creates a constraint on names of Terminals (Tokens).
-// TODO: document and consider reducing the constraint by expanding the regexp
-let terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-let terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
+const namePropRegExp = /(?:\s*{\s*NAME\s*:\s*["'`]([\w$]*)["'`])?/
+const namePropRegExpNoCurlyFirstOfTwo = new RegExp(namePropRegExp.source
+// remove opening curly brackets
+    .replace("{", "")
+    // add the comma between the NAME prop and the following prop
+    .replace(")?", "\\s*,)?"))
 
-let refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-let refRegExGlobal = new RegExp(refRegEx.source, "g")
+const terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+const terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
-let optionRegEx = /\.\s*OPTION(\d)?\s*\(/
-let optionRegExGlobal = new RegExp(optionRegEx.source, "g")
+const refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+const refRegExGlobal = new RegExp(refRegEx.source, "g")
 
-let manyRegEx = /\.\s*MANY(\d)?\s*\(/
-let manyRegExGlobal = new RegExp(manyRegEx.source, "g")
+const optionPrefixRegEx = /\.\s*OPTION(\d)?\s*\(/
+const optionRegEx = new RegExp(optionPrefixRegEx.source + namePropRegExp.source)
+const optionRegExGlobal = new RegExp(optionPrefixRegEx.source, "g")
 
+const manyPrefixRegEx = /\.\s*MANY(\d)?\s*\(/
+const manyRegEx = new RegExp(manyPrefixRegEx.source + namePropRegExp.source)
+const manyRegExGlobal = new RegExp(manyPrefixRegEx.source, "g")
 
-let manyWithSeparatorRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*\{\s*SEP\s*:\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-let manyWithSeparatorRegExGlobal = new RegExp(manyWithSeparatorRegEx.source, "g")
+const sepPropRegEx = /\s*SEP\s*:\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+const manySepPrefixRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*{/
+const manyWithSeparatorRegEx = new RegExp(manySepPrefixRegEx.source + namePropRegExpNoCurlyFirstOfTwo.source + sepPropRegEx.source)
+const manyWithSeparatorRegExGlobal = new RegExp(manyWithSeparatorRegEx.source, "g")
 
-let atLeastOneWithSeparatorRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*\{\s*SEP\s*:\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-let atLeastOneWithSeparatorRegExGlobal = new RegExp(atLeastOneWithSeparatorRegEx.source, "g")
+const atLeastOneSepPrefixRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*{/
+const atLeastOneWithSeparatorRegEx = new RegExp(atLeastOneSepPrefixRegEx.source +
+    namePropRegExpNoCurlyFirstOfTwo.source +
+    sepPropRegEx.source)
+const atLeastOneWithSeparatorRegExGlobal = new RegExp(atLeastOneWithSeparatorRegEx.source, "g")
 
-let atLeastOneRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
-let atLeastOneRegExGlobal = new RegExp(atLeastOneRegEx.source, "g")
+const atLeastOnePrefixRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
+const atLeastOneRegEx = new RegExp(atLeastOnePrefixRegEx.source + namePropRegExp.source)
+const atLeastOneRegExGlobal = new RegExp(atLeastOnePrefixRegEx.source, "g")
 
-let orRegEx = /\.\s*OR(\d)?\s*\(/
-let orRegExGlobal = new RegExp(orRegEx.source, "g")
+const orPrefixRegEx = /\.\s*OR(\d)?\s*\(/
+const orRegEx = new RegExp(orPrefixRegEx.source + namePropRegExp.source)
+const orRegExGlobal = new RegExp(orPrefixRegEx.source, "g")
 
-let orPartRegEx = /\s*(ALT)\s*:/g
+const orPartSuffixRegEx = /\s*(ALT)\s*:/
+const orPartRegEx = new RegExp(namePropRegExpNoCurlyFirstOfTwo.source + orPartSuffixRegEx.source)
+const orPartRegExGlobal = new RegExp(orPartRegEx.source, "g")
 
 export interface ITerminalNameToConstructor {
-    [fqn: string]: TokenConstructor
+    [fqn:string]:TokenConstructor
 }
 
 export let terminalNameToConstructor:ITerminalNameToConstructor = {}
@@ -68,7 +88,8 @@ export function buildTopProduction(impelText:string, name:string, terminals:ITer
     let textWithoutCommentsAndStrings = removeStringLiterals(txtWithoutComments)
     let prodRanges = createRanges(textWithoutCommentsAndStrings)
     let topRange = new Range(0, impelText.length + 2)
-    return buildTopLevel(name, topRange, prodRanges, impelText)
+    let topRule = buildTopLevel(name, topRange, prodRanges, impelText)
+    return topRule
 }
 
 function buildTopLevel(name:string, topRange:IRange, allRanges:IProdRange[], orgText:string):gast.Rule {
@@ -92,7 +113,7 @@ export function buildProdGast(prodRange:IProdRange, allRanges:IProdRange[]):gast
         case ProdType.OR:
             return buildOrProd(prodRange, allRanges)
         case ProdType.FLAT:
-            return buildAbstractProd(new gast.Flat([]), prodRange.range, allRanges)
+            return buildFlatProd(prodRange, allRanges)
         case ProdType.REF:
             return buildRefProd(prodRange)
         case ProdType.TERMINAL:
@@ -139,8 +160,12 @@ function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(regEx:RegExp,
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     prodInstance.occurrenceInParent = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
     prodInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
-    // <any> due to intellij bugs
-    return <any>buildAbstractProd(prodInstance, prodRange.range, allRanges)
+
+    let nestedName = reResult[2]
+    if (!isUndefined(nestedName)) {
+        (prodInstance as IOptionallyNamedProduction).name = nestedName
+    }
+    return buildAbstractProd(prodInstance, prodRange.range, allRanges)
 }
 
 function buildAtLeastOneProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.RepetitionMandatory {
@@ -164,7 +189,8 @@ function buildRepetitionWithSep(prodRange:IProdRange, allRanges:IProdRange[],
     let reResult = regExp.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let occurrenceIdx = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
-    let sepName = reResult[2]
+
+    let sepName = reResult[3]
     let separatorType = terminalNameToConstructor[sepName]
     if (!separatorType) {
         throw Error("Separator Terminal Token name: " + sepName + " not found")
@@ -172,6 +198,10 @@ function buildRepetitionWithSep(prodRange:IProdRange, allRanges:IProdRange[],
 
     let repetitionInstance:any = new (<any>repConstructor)([], separatorType, occurrenceIdx)
     repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
+    let nestedName = reResult[2]
+    if (!isUndefined(nestedName)) {
+        (repetitionInstance as IOptionallyNamedProduction).name = nestedName
+    }
     return <any>buildAbstractProd(repetitionInstance, prodRange.range, allRanges)
 }
 
@@ -183,9 +213,20 @@ function buildOrProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Alternat
     return buildProdWithOccurrence(orRegEx, new gast.Alternation([]), prodRange, allRanges)
 }
 
-function buildAbstractProd<T extends gast.AbstractProduction >(prod:T,
-                                                                                  topLevelRange:IRange,
-                                                                                  allRanges:IProdRange[]):T {
+function buildFlatProd(prodRange:IProdRange, allRanges:IProdRange[]):gast.Flat {
+    let prodInstance = new gast.Flat([])
+    let reResult = orPartRegEx.exec(prodRange.text)
+
+    let nestedName = reResult[1]
+    if (!isUndefined(nestedName)) {
+        (prodInstance as IOptionallyNamedProduction).name = nestedName
+    }
+    return buildAbstractProd(prodInstance, prodRange.range, allRanges)
+}
+
+function buildAbstractProd<T extends gast.AbstractProduction>(prod:T,
+                                                              topLevelRange:IRange,
+                                                              allRanges:IProdRange[]):T {
     let secondLevelProds = getDirectlyContainedRanges(topLevelRange, allRanges)
     let secondLevelInOrder = sortBy(secondLevelProds, (prodRng) => { return prodRng.range.start })
 
@@ -212,8 +253,8 @@ export function getDirectlyContainedRanges(y:IRange, prodRanges:IProdRange[]):IP
 
 let singleLineCommentRegEx = /\/\/.*/g
 let multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g
-let doubleQuoteStringLiteralRegEx = /"([^\\"]+|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g
-let singleQuoteStringLiteralRegEx = /'([^\\']+|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g
+let doubleQuoteStringLiteralRegEx = /(NAME\s*:\s*)?"([^\\"]+|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g
+let singleQuoteStringLiteralRegEx = /(NAME\s*:\s*)?'([^\\']+|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g
 
 export function removeComments(text:string):string {
     let noSingleLine = text.replace(singleLineCommentRegEx, "")
@@ -221,9 +262,16 @@ export function removeComments(text:string):string {
     return noComments
 }
 
+function replaceWithEmptyStringExceptNestedRules(match, nestedRuleGroup):string {
+    // do not replace with empty string if a nest rule (NAME:"bamba") was detected
+    if (nestedRuleGroup !== undefined) {
+        return match
+    }
+    return ""
+}
 export function removeStringLiterals(text:string):string {
-    let noDoubleQuotes = text.replace(doubleQuoteStringLiteralRegEx, "")
-    let noSingleQuotes = noDoubleQuotes.replace(singleQuoteStringLiteralRegEx, "")
+    let noDoubleQuotes = text.replace(doubleQuoteStringLiteralRegEx, replaceWithEmptyStringExceptNestedRules)
+    let noSingleQuotes = noDoubleQuotes.replace(singleQuoteStringLiteralRegEx, replaceWithEmptyStringExceptNestedRules)
     return noSingleQuotes
 }
 
@@ -284,7 +332,7 @@ let findClosingParen:(start:number, text:string) => number = <any>partial(findCl
 export function createOrPartRanges(orRanges:IProdRange[]):IProdRange[] {
     let orPartRanges:IProdRange[] = []
     forEach(orRanges, (orRange) => {
-        let currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegEx, findClosingCurly)
+        let currOrParts = createOperatorProdRangeInternal(orRange.text, ProdType.FLAT, orPartRegExGlobal, findClosingCurly)
         let currOrRangeStart = orRange.range.start
         // fix offsets as we are working on a subset of the text
         forEach(currOrParts, (orPart) => {

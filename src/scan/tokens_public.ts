@@ -107,7 +107,6 @@ const LONGER_ALT = "longer_alt"
  * @returns {TokenConstructor} - A constructor for the new Token subclass
  */
 export function createToken(config:ITokenConfig):TokenConstructor {
-
     if (!has(config, PARENT)) {
         config.parent = Token
     }

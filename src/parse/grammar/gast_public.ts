@@ -4,6 +4,18 @@ import {tokenLabel, tokenName} from "../../scan/tokens_public"
 
 export namespace gast {
 
+    export interface INamedProductionConstructor extends Function {
+        new(definition:IProduction[], occurrenceInParent:number, name?:string):AbstractProduction
+    }
+
+    export interface INamedSepProductionConstructor extends Function {
+        new(definition:IProduction[], separator:TokenConstructor, occurrenceInParent:number, name?:string):AbstractProduction
+    }
+
+    export interface IOptionallyNamedProduction {
+        name?:string
+    }
+
     export interface IProduction {
         accept(visitor:GAstVisitor):void
     }
@@ -52,32 +64,40 @@ export namespace gast {
         constructor(public name:string, definition:IProduction[], public orgText:string = "") { super(definition) }
     }
 
-    export class Flat extends AbstractProduction {
-        constructor(definition:IProduction[]) { super(definition) }
+    export class Flat extends AbstractProduction implements IOptionallyNamedProduction {
+        // A named Flat production is used to indicate a Nested Rule in an alternation
+        constructor(definition:IProduction[], public name?:string) { super(definition) }
     }
 
-    export class Option extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
+    export class Option extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
+        constructor(definition:IProduction[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
     }
 
-    export class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
+    export class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
+        constructor(definition:IProduction[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
     }
 
-    export class RepetitionMandatoryWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public separator:TokenConstructor, public occurrenceInParent:number = 1) { super(definition) }
+    export class RepetitionMandatoryWithSeparator extends AbstractProduction
+        implements IProductionWithOccurrence, IOptionallyNamedProduction {
+        constructor(definition:IProduction[],
+                    public separator:TokenConstructor,
+                    public occurrenceInParent:number = 1,
+                    public name?:string) { super(definition) }
     }
 
-    export class Repetition extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1) { super(definition) }
+    export class Repetition extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
+        constructor(definition:IProduction[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
     }
 
-    export class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:IProduction[], public separator:TokenConstructor, public occurrenceInParent:number = 1) { super(definition) }
+    export class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
+        constructor(definition:IProduction[],
+                    public separator:TokenConstructor,
+                    public occurrenceInParent:number = 1,
+                    public name?:string) { super(definition) }
     }
 
-    export class Alternation extends AbstractProduction implements IProductionWithOccurrence {
-        constructor(definition:Flat[], public occurrenceInParent:number = 1) { super(definition) }
+    export class Alternation extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
+        constructor(definition:Flat[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
     }
 
     export class Terminal implements IProductionWithOccurrence {

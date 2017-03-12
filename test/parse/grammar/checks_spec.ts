@@ -71,7 +71,7 @@ describe("the grammar validations", () => {
                 new Terminal(IdentTok, 2)
             ])
         ])
-        let actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2], 5, {})
+        let actualErrors = validateGrammar([qualifiedNameErr1, qualifiedNameErr2], 5, [], {})
         expect(actualErrors.length).to.equal(4)
 
         forEach(actualErrors, err => delete err.message)
@@ -93,19 +93,19 @@ describe("the grammar validations", () => {
     })
 
     it("only allows a subset of ECMAScript identifiers as rule names", () => {
-        let res1 = validateRuleName("1baa", "className")
+        let res1 = validateRuleName("1baa")
         expect(res1).to.have.lengthOf(1)
         expect(res1[0]).to.have.property("message")
         expect(res1[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
         expect(res1[0]).to.have.property("ruleName", "1baa")
 
-        let res2 = validateRuleName("שלום", "className")
+        let res2 = validateRuleName("שלום")
         expect(res2).to.have.lengthOf(1)
         expect(res2[0]).to.have.property("message")
         expect(res2[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
         expect(res2[0]).to.have.property("ruleName", "שלום")
 
-        let res3 = validateRuleName("$bamba", "className")
+        let res3 = validateRuleName("$bamba")
         expect(res3).to.have.lengthOf(1)
         expect(res3[0]).to.have.property("message")
         expect(res3[0]).to.have.property("type", ParserDefinitionErrorType.INVALID_RULE_NAME)
@@ -590,6 +590,109 @@ describe("The anonymous Parser constructor detection full flow", () => {
         AnonymousParser.prototype = Object.create(Parser.prototype)
         AnonymousParser.prototype.constructor = AnonymousParser
         expect(() => new AnonymousParser([])).to.throw("constructor may not be an anonymous Function")
+    })
+})
+
+describe("The namespace conflict detection full flow", () => {
+
+    it("will throw an error when a Terminal and a NoneTerminal have the same name", () => {
+
+        class Bamba extends Token {}
+        class A extends Token {}
+
+        class NameSpaceConflict extends Parser {
+            constructor(input:Token[] = []) {
+                super(input, [Bamba, A])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public Bamba = this.RULE("Bamba", () => {
+                this.CONSUME(A)
+            })
+        }
+
+        expect(() => new NameSpaceConflict([])).to.throw("The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <Bamba>")
+    })
+})
+
+describe("The nested rule name validation full flow", () => {
+
+    it("will throw an error when a nested name does not start with $(dollar)", () => {
+
+        class A extends Token {}
+
+        class NestedNamedInvalid extends Parser {
+            constructor(input:Token[] = []) {
+                super(input, [A])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => {
+                this.OPTION({
+                    NAME: "blah",
+                    DEF:  () => {
+                        this.CONSUME(A)
+                    }
+                })
+            })
+        }
+
+        expect(() => new NestedNamedInvalid([])).to.throw("Invalid nested rule name: ->blah<- inside rule: ->someRule<-")
+    })
+})
+
+describe("The duplicated nested name validation full flow", () => {
+
+    it("will throw an error when two nested rules share the same name", () => {
+
+        class A extends Token {}
+        class B extends Token {}
+
+        class NestedNamedDuplicate extends Parser {
+            constructor(input:Token[] = []) {
+                super(input, [A, B])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => {
+                this.OPTION({
+                    NAME: "$blah",
+                    DEF:  () => {
+                        this.CONSUME(A)
+                    }
+                })
+
+                this.OPTION2({
+                    NAME: "$blah",
+                    DEF:  () => {
+                        this.CONSUME(B)
+                    }
+                })
+            })
+        }
+        expect(() => new NestedNamedDuplicate([])).to.throw("Duplicate nested rule name: ->$blah<- inside rule: ->someRule<-")
+    })
+})
+
+describe("The invalid token name validation", () => {
+
+    it("will throw an error when a Token is using an invalid name", () => {
+
+        class במבה extends Token {}
+        class A extends Token {}
+
+        class InvalidTokenName extends Parser {
+            constructor(input:Token[] = []) {
+                super(input, [במבה, A])
+                Parser.performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => {
+                this.CONSUME(A)
+            })
+        }
+        expect(() => new InvalidTokenName([]))
+            .to.throw("Invalid Grammar Token name: ->במבה<- it must match the pattern: ->/^[a-zA-Z_]\\w*$/<-")
     })
 })
 

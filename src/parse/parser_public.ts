@@ -19,7 +19,6 @@ import {
     isFunction,
     isObject,
     isUndefined,
-    last,
     map,
     NOOP,
     reduce,
@@ -75,6 +74,28 @@ import {
     tokenStructuredIdentity,
     tokenStructuredMatcher
 } from "../scan/tokens"
+import {CstNode} from "./cst/cst_public"
+import {
+    addNoneTerminalToCst,
+    AddRecoveryInfoToCstNode,
+    addTerminalToCst,
+    buildChildrenDictionaryDefTopRules,
+    buildInitCstDef,
+    CST_SUBTYPE,
+    initChildrenDictionary
+} from "./cst/cst"
+import {
+    AT_LEAST_ONE_IDX,
+    AT_LEAST_ONE_SEP_IDX,
+    BITS_FOR_METHOD_IDX,
+    BITS_FOR_OCCURRENCE_IDX,
+    getKeyForAltIndex,
+    getKeyForAutomaticLookahead,
+    MANY_IDX,
+    MANY_SEP_IDX,
+    OPTION_IDX,
+    OR_IDX
+} from "./grammar/keys"
 import ISerializedGast = gast.ISerializedGast
 import serializeGrammar = gast.serializeGrammar
 
@@ -86,7 +107,11 @@ export enum ParserDefinitionErrorType {
     UNRESOLVED_SUBRULE_REF,
     LEFT_RECURSION,
     NONE_LAST_EMPTY_ALT,
-    AMBIGUOUS_ALTS
+    AMBIGUOUS_ALTS,
+    CONFLICT_TOKENS_RULES_NAMESPACE,
+    INVALID_TOKEN_NAME,
+    INVALID_NESTED_RULE_NAME,
+    DUPLICATE_NESTED_NAME
 }
 
 export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
@@ -97,25 +122,6 @@ const END_OF_FILE = new EOF();
 (<any>END_OF_FILE).tokenType = (<any>EOF).tokenType
 Object.freeze(END_OF_FILE)
 
-// Lookahead keys are 32Bit integers in the form
-// ZZZZZZZZZZZZZZZZZZZZZZZZ-YYYY-XXXX
-// XXXX -> Occurrence Index bitmap.
-// YYYY -> DSL Method Name bitmap.
-// ZZZZZZZZZZZZZZZZZZZZZZZZ -> Rule short Index bitmap.
-const BITS_FOR_METHOD_IDX = 4
-const BITS_FOR_OCCURRENCE_IDX = 4
-
-// short string used as part of mapping keys.
-// being short improves the performance when composing KEYS for maps out of these
-// The 4 - 7 bits (16 possible values, are reserved for the DSL method indices)
-/* tslint:disable */
-const OR_IDX = 1 << BITS_FOR_METHOD_IDX
-const OPTION_IDX = 2 << BITS_FOR_METHOD_IDX
-const MANY_IDX = 3 << BITS_FOR_METHOD_IDX
-const AT_LEAST_ONE_IDX = 4 << BITS_FOR_METHOD_IDX
-const MANY_SEP_IDX = 5 << BITS_FOR_METHOD_IDX
-const AT_LEAST_ONE_SEP_IDX = 6 << BITS_FOR_METHOD_IDX
-/* tslint:enable */
 
 export type TokenMatcher = (token:ISimpleTokenOrIToken, tokClass:TokenConstructor) => boolean
 export type TokenInstanceIdentityFunc = (tok:IToken) => string
@@ -157,13 +163,21 @@ export interface IParserConfig {
      * During Parser initialization.
      */
     dynamicTokensEnabled?:boolean
+
+    /**
+     * TODO: docs
+     */
+    outputCst?:boolean
 }
 
 const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
     recoveryEnabled:      false,
     maxLookahead:         5,
     ignoredIssues:        <any>{},
-    dynamicTokensEnabled: false
+    dynamicTokensEnabled: false,
+    // TODO: Document this breaking change, can it be mitigated?
+    // TODO: change to true
+    outputCst:            false
 })
 
 export interface IRuleConfig<T> {
@@ -187,7 +201,7 @@ const DEFAULT_RULE_CONFIG:IRuleConfig<any> = Object.freeze({
 export interface IParserDefinitionError {
     message:string
     type:ParserDefinitionErrorType
-    ruleName:string
+    ruleName?:string
 }
 
 export interface IParserDuplicatesDefinitionError extends IParserDefinitionError {
@@ -217,7 +231,6 @@ export interface IFollowKey {
     inRule:string
 }
 
-
 /**
  * OR([
  *  {ALT:XXX },
@@ -237,6 +250,7 @@ export interface IOrAlt<T> {
  * ])
  */
 export interface IOrAltWithGate<T> extends IOrAlt<T> {
+    NAME?:string
     GATE:() => boolean
     ALT:() => T
 }
@@ -247,9 +261,13 @@ export interface IParserState {
     errors:exceptions.IRecognitionException[]
     lexerState:any
     RULE_STACK:string[]
+    CST_STACK:CstNode[]
+    LAST_EXPLICIT_RULE_STACK:number[]
 }
 
 export interface DSLMethodOpts<T> {
+    NAME?:string
+
     /**
      * The Grammar to process in this method.
      */
@@ -273,6 +291,8 @@ export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
 }
 
 export interface OrMethodOpts<T> {
+
+    NAME?:string
     /**
      * The set of alternatives,
      * See detailed description in @link {Parser.OR1}
@@ -287,6 +307,8 @@ export interface OrMethodOpts<T> {
 }
 
 export interface ManySepMethodOpts<T> {
+
+    NAME?:string
     /**
      * The Grammar to process in each iteration.
      */
@@ -423,6 +445,7 @@ export class Parser {
                 let validationErrors = validateGrammar(
                     clonedProductions.values(),
                     parserInstance.maxLookahead,
+                    values(parserInstance.tokensMap),
                     parserInstance.ignoredIssues)
 
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
@@ -435,6 +458,15 @@ export class Parser {
             if (isEmpty(definitionErrors)) { // this analysis may fail if the grammar is not perfectly valid
                 let allFollows = computeAllProdsFollows(clonedProductions.values())
                 cache.setResyncFollowsForClass(className, allFollows)
+            }
+
+            if (parserInstance.outputCst) {
+                let dictDefForRules = buildChildrenDictionaryDefTopRules(clonedProductions.values(),
+                    parserInstance.fullRuleNameToShort)
+                cache.getCstDictDefPerRuleForClass(className).putAll(dictDefForRules)
+
+                let dictInitDefForRules = buildInitCstDef(dictDefForRules)
+                cache.getCstInitDefPerRuleForClass(className).putAll(dictInitDefForRules)
             }
         }
 
@@ -455,6 +487,7 @@ export class Parser {
     protected dynamicTokensEnabled:boolean
     protected maxLookahead:number
     protected ignoredIssues:IgnoredParserIssues
+    protected outputCst:boolean
 
     protected _input:ISimpleTokenOrIToken[] = []
     protected inputIdx = -1
@@ -463,20 +496,26 @@ export class Parser {
     protected className:string
     protected RULE_STACK:string[] = []
     protected RULE_OCCURRENCE_STACK:number[] = []
+    protected CST_STACK:CstNode[] = []
     protected tokensMap:{ [fqn:string]:TokenConstructor } = undefined
 
     private firstAfterRepMap
     private classLAFuncs
+    private cstDictDefForRule
+    private cstInitDefForRule
     private definitionErrors:IParserDefinitionError[]
     private definedRulesNames:string[] = []
 
     private shortRuleNameToFull = new HashTable<string>()
+    private fullRuleNameToShort = new HashTable<number>()
 
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
     private ruleShortNameIdx = 256
     private tokenMatcher:TokenMatcher
     private tokenClassIdentityFunc:TokenClassIdentityFunc
     private tokenInstanceIdentityFunc:TokenInstanceIdentityFunc
+    private CST_DICT_DEF_STACK:HashTable<CST_SUBTYPE>[] = []
+    private LAST_EXPLICIT_RULE_STACK:number[] = []
     private selfAnalysisDone = false
 
     /**
@@ -485,7 +524,7 @@ export class Parser {
      */
     private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
-    constructor(input:ISimpleTokenOrIToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor; } | TokenConstructor[],
+    constructor(input:ISimpleTokenOrIToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor } | TokenConstructor[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
 
@@ -513,9 +552,32 @@ export class Parser {
             config.ignoredIssues :
             DEFAULT_PARSER_CONFIG.ignoredIssues
 
+        this.outputCst = has(config, "outputCst") ?
+            config.outputCst :
+            DEFAULT_PARSER_CONFIG.outputCst
+
+        if (!this.outputCst) {
+            this.cstInvocationStateUpdate = NOOP
+            this.cstFinallyStateUpdate = NOOP
+            this.cstPostTerminal = NOOP
+            this.cstPostNonTerminal = NOOP
+            this.getLastExplicitRuleShortName = this.getLastExplicitRuleShortNameNoCst
+            this.getPreviousExplicitRuleShortName = this.getPreviousExplicitRuleShortNameNoCst
+            this.getPreviousExplicitRuleOccurenceIndex = this.getPreviousExplicitRuleOccurenceIndexNoCst
+            this.manyInternal = this.manyInternalNoCst
+            this.orInternal = this.orInternalNoCst
+            this.optionInternal = this.optionInternalNoCst
+            this.atLeastOneInternal = this.atLeastOneInternalNoCst
+            this.manySepFirstInternal = this.manySepFirstInternalNoCst
+            this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
+            this.invokeRuleNoTry = <any>this.invokeRuleNoTryNoCst
+        }
+
         this.className = classNameFromInstance(this)
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
+        this.cstDictDefForRule = cache.getCstDictDefPerRuleForClass(this.className)
+        this.cstInitDefForRule = cache.getCstInitDefPerRuleForClass(this.className)
 
         if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
             this.definitionErrors = []
@@ -594,6 +656,8 @@ export class Parser {
         this.errors = []
         this._input = []
         this.RULE_STACK = []
+        this.LAST_EXPLICIT_RULE_STACK = []
+        this.CST_STACK = []
         this.RULE_OCCURRENCE_STACK = []
     }
 
@@ -633,8 +697,8 @@ export class Parser {
         return !(isEmpty(this.isBackTrackingStack))
     }
 
-    protected getCurrRuleFullName() {
-        let shortName = last(this.RULE_STACK)
+    protected getCurrRuleFullName():string {
+        let shortName = this.getLastExplicitRuleShortName()
         return this.shortRuleNameToFull.get(shortName)
     }
 
@@ -642,8 +706,13 @@ export class Parser {
         return this.shortRuleNameToFull.get(shortName)
     }
 
-    protected getHumanReadableRuleStack() {
-        return map(this.RULE_STACK, (currShortName) => this.shortRuleNameToFullName(currShortName))
+    protected getHumanReadableRuleStack():string[] {
+        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
+            return map(this.LAST_EXPLICIT_RULE_STACK, (currIdx) => this.shortRuleNameToFullName(this.RULE_STACK[currIdx]))
+        }
+        else {
+            return map(this.RULE_STACK, (currShortName) => this.shortRuleNameToFullName(currShortName))
+        }
     }
 
     protected SAVE_ERROR(error:exceptions.IRecognitionException):exceptions.IRecognitionException {
@@ -775,7 +844,7 @@ export class Parser {
      * @see SUBRULE1
      */
     protected SUBRULE<T>(ruleToCall:(number) => T, args:any[] = []):T {
-        return this.SUBRULE1(ruleToCall, args)
+        return this.subruleInternal(ruleToCall, 1, args)
     }
 
     /**
@@ -797,35 +866,35 @@ export class Parser {
      * @returns {*} - The result of invoking ruleToCall.
      */
     protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = []):T {
-        return ruleToCall.call(this, 1, args)
+        return this.subruleInternal(ruleToCall, 1, args)
     }
 
     /**
      * @see SUBRULE1
      */
     protected SUBRULE2<T>(ruleToCall:(number) => T, args:any[] = []):T {
-        return ruleToCall.call(this, 2, args)
+        return this.subruleInternal(ruleToCall, 2, args)
     }
 
     /**
      * @see SUBRULE1
      */
     protected SUBRULE3<T>(ruleToCall:(number) => T, args:any[] = []):T {
-        return ruleToCall.call(this, 3, args)
+        return this.subruleInternal(ruleToCall, 3, args)
     }
 
     /**
      * @see SUBRULE1
      */
     protected SUBRULE4<T>(ruleToCall:(number) => T, args:any[] = []):T {
-        return ruleToCall.call(this, 4, args)
+        return this.subruleInternal(ruleToCall, 4, args)
     }
 
     /**
      * @see SUBRULE1
      */
     protected SUBRULE5<T>(ruleToCall:(number) => T, args:any[] = []):T {
-        return ruleToCall.call(this, 5, args)
+        return this.subruleInternal(ruleToCall, 5, args)
     }
 
     /**
@@ -1241,9 +1310,11 @@ export class Parser {
      */
     protected RULE<T>(name:string,
                       implementation:(...implArgs:any[]) => T,
-                      config:IRuleConfig<T> = DEFAULT_RULE_CONFIG):(idxInCallingRule?:number, ...args:any[]) => T {
+                      // TODO: how to describe the optional return type of CSTNode? T|CstNode is not good because it is not backward
+                      // compatible, T|any is very general...
+                      config:IRuleConfig<T> = DEFAULT_RULE_CONFIG):(idxInCallingRule?:number, ...args:any[]) => T | any {
 
-        let ruleErrors = validateRuleName(name, this.className)
+        let ruleErrors = validateRuleName(name)
         ruleErrors = ruleErrors.concat(validateRuleDoesNotAlreadyExist(name, this.definedRulesNames, this.className))
         this.definedRulesNames.push(name)
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
@@ -1278,7 +1349,7 @@ export class Parser {
                                impl:(...implArgs:any[]) => T,
                                config:IRuleConfig<T> = DEFAULT_RULE_CONFIG):(idxInCallingRule?:number, ...args:any[]) => T {
 
-        let ruleErrors = validateRuleName(name, this.className)
+        let ruleErrors = validateRuleName(name)
         ruleErrors = ruleErrors.concat(validateRuleIsOverridden(name, this.definedRulesNames, this.className))
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
@@ -1300,20 +1371,39 @@ export class Parser {
         return this.defineRule(name, impl, config)
     }
 
-    protected ruleInvocationStateUpdate(shortName:string, idxInCallingRule:number):void {
+    protected ruleInvocationStateUpdate(shortName:string, fullName:string, idxInCallingRule:number):void {
         this.RULE_OCCURRENCE_STACK.push(idxInCallingRule)
         this.RULE_STACK.push(shortName)
+        // NOOP when cst is disabled
+        this.cstInvocationStateUpdate(fullName, shortName)
     }
 
     protected ruleFinallyStateUpdate():void {
         this.RULE_STACK.pop()
         this.RULE_OCCURRENCE_STACK.pop()
 
+        // NOOP when cst is disabled
+        this.cstFinallyStateUpdate()
+
         if ((this.RULE_STACK.length === 0) && !this.isAtEndOfInput()) {
             let firstRedundantTok = this.LA(1)
             this.SAVE_ERROR(new exceptions.NotAllInputParsedException(
                 "Redundant input, expecting EOF but found: " + getImage(firstRedundantTok), firstRedundantTok))
         }
+    }
+
+    protected nestedRuleInvocationStateUpdate(nestedRuleName:string, shortNameKey:number):void {
+        this.RULE_OCCURRENCE_STACK.push(1)
+        this.RULE_STACK.push(<any>shortNameKey)
+        this.cstNestedInvocationStateUpdate(nestedRuleName, shortNameKey)
+    }
+
+    protected nestedRuleFinallyStateUpdate():void {
+        this.RULE_STACK.pop()
+        this.RULE_OCCURRENCE_STACK.pop()
+
+        // NOOP when cst is disabled
+        this.cstNestedFinallyStateUpdate()
     }
 
     /**
@@ -1337,7 +1427,8 @@ export class Parser {
                 cacheData:   {
                     orgText:      "",
                     lineToOffset: []
-                }
+                },
+                tokenType:   tokClass.tokenType
             }
         }
         else if (Token.prototype.isPrototypeOf(tokClass.prototype)) {
@@ -1401,6 +1492,13 @@ export class Parser {
         return nextPossibleTokenTypes
     }
 
+    protected subruleInternal<T>(ruleToCall:(number) => T, idx, args:any[]) {
+        let ruleResult = ruleToCall.call(this, idx, args)
+        this.cstPostNonTerminal(ruleResult, (<any>ruleToCall).ruleName)
+
+        return ruleResult
+    }
+
     /**
      * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function).
      * @param idx - Occurrence index of consumed token in the invoking parser rule text
@@ -1416,12 +1514,16 @@ export class Parser {
     protected consumeInternal(tokClass:TokenConstructor, idx:number):ISimpleTokenOrIToken {
         // TODO: this is an hack to avoid try catch block in V8, should be removed once V8 supports try/catch optimizations.
         // as the IF/ELSE itself has some overhead.
+        let consumedToken
         if (!this.recoveryEnabled) {
-            return this.consumeInternalOptimized(tokClass)
+            consumedToken = this.consumeInternalOptimized(tokClass)
         }
         else {
-            return this.consumeInternalWithTryCatch(tokClass, idx)
+            consumedToken = this.consumeInternalWithTryCatch(tokClass, idx)
         }
+
+        this.cstPostTerminal(tokClass, consumedToken)
+        return consumedToken
     }
 
     protected consumeInternalWithTryCatch(tokClass:TokenConstructor, idx:number):ISimpleTokenOrIToken {
@@ -1498,16 +1600,17 @@ export class Parser {
         this.inputIdx = this.input.length - 1
     }
 
-
     // other functionality
     private saveRecogState():IParserState {
         // errors is a getter which will clone the errors array
         let savedErrors = this.errors
         let savedRuleStack = cloneArr(this.RULE_STACK)
         return {
-            errors:     savedErrors,
-            lexerState: this.inputIdx,
-            RULE_STACK: savedRuleStack
+            errors:                   savedErrors,
+            lexerState:               this.inputIdx,
+            RULE_STACK:               savedRuleStack,
+            CST_STACK:                this.CST_STACK,
+            LAST_EXPLICIT_RULE_STACK: this.LAST_EXPLICIT_RULE_STACK
         }
     }
 
@@ -1515,6 +1618,20 @@ export class Parser {
         this.errors = newState.errors
         this.inputIdx = newState.lexerState
         this.RULE_STACK = newState.RULE_STACK
+    }
+
+    private invokeRuleNoTryNoCst(args:any[], impl:Function) {
+        let result = impl.apply(this, args)
+        this.ruleFinallyStateUpdate()
+        return result
+    }
+
+    private invokeRuleNoTry(args:any[], impl:Function) {
+        impl.apply(this, args)
+        let result = this.CST_STACK[this.CST_STACK.length - 1]
+        this.ruleFinallyStateUpdate()
+
+        return result
     }
 
     private defineRule<T>(ruleName:string,
@@ -1540,19 +1657,19 @@ export class Parser {
 
         this.ruleShortNameIdx++
         this.shortRuleNameToFull.put(shortName, ruleName)
-
-        function invokeRuleNoTry(args:any[]) {
-            let result = impl.apply(this, args)
-            this.ruleFinallyStateUpdate()
-            return result
-        }
+        this.fullRuleNameToShort.put(ruleName, shortName)
 
         function invokeRuleWithTry(args:any[], isFirstRule:boolean) {
             try {
-                // actual parsing happens here
-                return impl.apply(this, args)
+                // TODO: dynamically get rid of this?
+                if (this.outputCst) {
+                    impl.apply(this, args)
+                    return this.CST_STACK[this.CST_STACK.length - 1]
+                }
+                else {
+                    return impl.apply(this, args)
+                }
             } catch (e) {
-
                 // TODO: this is part of a Performance hack for V8 due to lack of support
                 // of try/catch optimizations. Should be removed once V8 supports that.
                 // This is needed because in case of an error during a nested subRule
@@ -1576,9 +1693,26 @@ export class Parser {
                         let reSyncTokType = this.findReSyncTokenType()
                         if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
                             e.resyncedTokens = this.reSyncTo(reSyncTokType)
-                            return recoveryValueFunc()
+                            if (this.outputCst) {
+                                let partialCstResult = this.CST_STACK[this.CST_STACK.length - 1]
+                                let cstDictDef = this.CST_DICT_DEF_STACK[this.CST_DICT_DEF_STACK.length - 1]
+                                AddRecoveryInfoToCstNode(partialCstResult, cstDictDef)
+                                return partialCstResult
+                            }
+                            else {
+                                return recoveryValueFunc()
+                            }
                         }
                         else {
+                            if (this.outputCst) {
+                                // recovery is only for "real" non nested rules.git
+                                let prevRuleShortName = this.getLastExplicitRuleShortNameNoCst()
+                                let preRuleFullName = this.shortRuleNameToFull.get(prevRuleShortName)
+                                let partialCstResult = this.CST_STACK[this.CST_STACK.length - 1]
+                                let cstDictDef = this.CST_DICT_DEF_STACK[this.CST_DICT_DEF_STACK.length - 1]
+                                AddRecoveryInfoToCstNode(partialCstResult, cstDictDef)
+                                this.cstPostNonTerminalRecovery(partialCstResult, preRuleFullName)
+                            }
                             // to be handled farther up the call stack
                             throw e
                         }
@@ -1605,20 +1739,31 @@ export class Parser {
             }
         }
 
-        let wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[]) {
-            this.ruleInvocationStateUpdate(shortName, idxInCallingRule)
+        let wrappedGrammarRule
 
-            // TODO: performance hack due to V8 lack of try/catch optimizations.
-            // should be removed once V8 support those.
-            let isFirstRule = this.RULE_STACK.length === 1
-            if (!this.recoveryEnabled && !isFirstRule) {
-                return invokeRuleNoTry.call(this, args)
-            }
-            else {
+        if (this.recoveryEnabled) {
+            wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[]) {
+                this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
+                // TODO: performance hack due to V8 lack of try/catch optimizations.
+                // should be removed once V8 support those.
+                let isFirstRule = this.RULE_STACK.length === 1
                 return invokeRuleWithTry.call(this, args, isFirstRule)
             }
-
+        } else {
+            wrappedGrammarRule = function (idxInCallingRule:number = 1, args:any[]) {
+                this.ruleInvocationStateUpdate(shortName, ruleName, idxInCallingRule)
+                // TODO: performance hack due to V8 lack of try/catch optimizations.
+                // should be removed once V8 support those.
+                let isFirstRule = this.RULE_STACK.length === 1
+                if (!isFirstRule) {
+                    return this.invokeRuleNoTry(args, impl)
+                }
+                else {
+                    return invokeRuleWithTry.call(this, args, isFirstRule)
+                }
+            }
         }
+
         let ruleNamePropName = "ruleName"
         wrappedGrammarRule[ruleNamePropName] = ruleName
         return wrappedGrammarRule
@@ -1780,26 +1925,36 @@ export class Parser {
         if (this.RULE_STACK.length === 1) {
             return EOF_FOLLOW_KEY
         }
-        let currRuleIdx = this.RULE_STACK.length - 1
-        let currRuleOccIdx = currRuleIdx
-        let prevRuleIdx = currRuleIdx - 1
+
+        let currRuleShortName = this.getLastExplicitRuleShortName()
+        let prevRuleShortName = this.getPreviousExplicitRuleShortName()
+        let prevRuleIdx = this.getPreviousExplicitRuleOccurenceIndex()
 
         return {
-            ruleName:         this.shortRuleNameToFullName(this.RULE_STACK[currRuleIdx]),
-            idxInCallingRule: this.RULE_OCCURRENCE_STACK[currRuleOccIdx],
-            inRule:           this.shortRuleNameToFullName(this.RULE_STACK[prevRuleIdx])
+            ruleName:         this.shortRuleNameToFullName(currRuleShortName),
+            idxInCallingRule: prevRuleIdx,
+            inRule:           this.shortRuleNameToFullName(prevRuleShortName)
         }
     }
 
     private buildFullFollowKeyStack():IFollowKey[] {
-        return map(this.RULE_STACK, (ruleName, idx) => {
+        let explicitRuleStack = this.RULE_STACK
+        let explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
+
+        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
+            explicitRuleStack = map(this.LAST_EXPLICIT_RULE_STACK, (idx) => this.RULE_STACK[idx])
+            explicitOccurrenceStack = map(this.LAST_EXPLICIT_RULE_STACK, (idx) => this.RULE_OCCURRENCE_STACK[idx])
+        }
+
+        // TODO: only iterate over explicit rules here
+        return map(explicitRuleStack, (ruleName, idx) => {
             if (idx === 0) {
                 return EOF_FOLLOW_KEY
             }
             return {
                 ruleName:         this.shortRuleNameToFullName(ruleName),
-                idxInCallingRule: this.RULE_OCCURRENCE_STACK[idx],
-                inRule:           this.shortRuleNameToFullName(this.RULE_STACK[idx - 1])
+                idxInCallingRule: explicitOccurrenceStack[idx],
+                inRule:           this.shortRuleNameToFullName(explicitRuleStack[idx - 1])
             }
         })
     }
@@ -1879,10 +2034,57 @@ export class Parser {
         }
     }
 
+    private cstNestedInvocationStateUpdate(fullRuleName:string, shortName:string | number):void {
+        this.CST_DICT_DEF_STACK.push(this.cstDictDefForRule.get(shortName))
+        let initDef = this.cstInitDefForRule.get(shortName)
+        this.CST_STACK.push({
+            name:     fullRuleName,
+            children: initChildrenDictionary(initDef.collections, initDef.optionals),
+        })
+    }
+
+    private cstInvocationStateUpdate(fullRuleName:string, shortName:string | number):void {
+        this.CST_DICT_DEF_STACK.push(this.cstDictDefForRule.get(shortName))
+        this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
+        let initDef = this.cstInitDefForRule.get(shortName)
+        this.CST_STACK.push({
+            name:     fullRuleName,
+            children: initChildrenDictionary(initDef.collections, initDef.optionals),
+        })
+    }
+
+    private cstFinallyStateUpdate():void {
+        this.LAST_EXPLICIT_RULE_STACK.pop()
+        this.CST_STACK.pop()
+        this.CST_DICT_DEF_STACK.pop()
+    }
+
+    private cstNestedFinallyStateUpdate():void {
+        this.CST_DICT_DEF_STACK.pop()
+        this.CST_STACK.pop()
+    }
+
     // Implementation of parsing DSL
     private optionInternal<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>, occurrence:number):OUT {
-        let lookAheadFunc = this.getLookaheadFuncForOption(occurrence)
+        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
+        let nestedName = this.nestedRuleBeforeClause(actionORMethodDef, key)
+        try {
+            return this.optionInternalLogic(actionORMethodDef, occurrence, key)
+        }
+        finally {
+            if (nestedName !== undefined) {
+                this.nestedRuleFinallyClause(key, nestedName)
+            }
+        }
+    }
 
+    private optionInternalNoCst<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>, occurrence:number):OUT {
+        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
+        return this.optionInternalLogic(actionORMethodDef, occurrence, key)
+    }
+
+    private optionInternalLogic<OUT>(actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>, occurrence:number, key:number):OUT {
+        let lookAheadFunc = this.getLookaheadFuncForOption(key, occurrence)
         let action
         let predicate
         if ((<DSLMethodOpts<OUT>>actionORMethodDef).DEF !== undefined) {
@@ -1910,7 +2112,30 @@ export class Parser {
     private atLeastOneInternal<OUT>(prodOccurrence:number,
                                     actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
                                     result:OUT[]):OUT[] {
-        let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(prodOccurrence)
+        let laKey = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, prodOccurrence)
+        let nestedName = this.nestedRuleBeforeClause(actionORMethodDef, laKey)
+        try {
+            return this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, result, laKey)
+        }
+        finally {
+            if (nestedName !== undefined) {
+                this.nestedRuleFinallyClause(laKey, nestedName)
+            }
+        }
+    }
+
+    private atLeastOneInternalNoCst<OUT>(prodOccurrence:number,
+                                         actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
+                                         result:OUT[]):OUT[] {
+        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, prodOccurrence)
+        return this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, result, key)
+    }
+
+    private atLeastOneInternalLogic<OUT>(prodOccurrence:number,
+                                         actionORMethodDef:GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
+                                         result:OUT[],
+                                         key:number):OUT[] {
+        let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(key, prodOccurrence)
 
         let action
         let predicate
@@ -1955,11 +2180,35 @@ export class Parser {
     private atLeastOneSepFirstInternal<OUT>(prodOccurrence:number,
                                             options:AtLeastOneSepMethodOpts<OUT>,
                                             result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
+
+        let laKey = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, prodOccurrence)
+        let nestedName = this.nestedRuleBeforeClause(options, laKey)
+        try {
+            return this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, result, laKey)
+        }
+        finally {
+            if (nestedName !== undefined) {
+                this.nestedRuleFinallyClause(laKey, nestedName)
+            }
+        }
+    }
+
+    private atLeastOneSepFirstInternalNoCst<OUT>(prodOccurrence:number,
+                                                 options:AtLeastOneSepMethodOpts<OUT>,
+                                                 result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
+        let laKey = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, prodOccurrence)
+        return this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, result, laKey)
+
+    }
+
+    private atLeastOneSepFirstInternalLogic<OUT>(prodOccurrence:number,
+                                                 options:AtLeastOneSepMethodOpts<OUT>,
+                                                 result:ISeparatedIterationResult<OUT>,
+                                                 key:number):ISeparatedIterationResult<OUT> {
         let action = options.DEF
         let separator = options.SEP
 
-
-        let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(prodOccurrence)
+        let firstIterationLookaheadFunc = this.getLookaheadFuncForAtLeastOneSep(key, prodOccurrence)
 
         let values = result.values
         let separators = result.separators
@@ -1996,7 +2245,30 @@ export class Parser {
                               actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>,
                               result:OUT[]):OUT[] {
 
-        let lookaheadFunction = this.getLookaheadFuncForMany(prodOccurrence)
+        let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
+        let nestedName = this.nestedRuleBeforeClause(actionORMethodDef, laKey)
+        try {
+            return this.manyInternalLogic(prodOccurrence, actionORMethodDef, result, laKey)
+        }
+        finally {
+            if (nestedName !== undefined) {
+                this.nestedRuleFinallyClause(laKey, nestedName)
+            }
+        }
+    }
+
+    private manyInternalNoCst<OUT>(prodOccurrence:number,
+                                   actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>,
+                                   result:OUT[]):OUT[] {
+        let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
+        return this.manyInternalLogic(prodOccurrence, actionORMethodDef, result, laKey)
+    }
+
+    private manyInternalLogic<OUT>(prodOccurrence:number,
+                                   actionORMethodDef:GrammarAction<OUT> | DSLMethodOpts<OUT>,
+                                   result:OUT[], key:number):OUT[] {
+
+        let lookaheadFunction = this.getLookaheadFuncForMany(key, prodOccurrence)
 
         let action
         let predicate
@@ -2034,10 +2306,33 @@ export class Parser {
     private manySepFirstInternal<OUT>(prodOccurrence:number,
                                       options:ManySepMethodOpts<OUT>,
                                       result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
+        let laKey = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, prodOccurrence)
+        let nestedName = this.nestedRuleBeforeClause(options, laKey)
+        try {
+            return this.manySepFirstInternalLogic(prodOccurrence, options, result, laKey)
+        }
+        finally {
+            if (nestedName !== undefined) {
+                this.nestedRuleFinallyClause(laKey, nestedName)
+            }
+        }
+    }
+
+    private manySepFirstInternalNoCst<OUT>(prodOccurrence:number,
+                                           options:ManySepMethodOpts<OUT>,
+                                           result:ISeparatedIterationResult<OUT>):ISeparatedIterationResult<OUT> {
+        let laKey = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, prodOccurrence)
+        return this.manySepFirstInternalLogic(prodOccurrence, options, result, laKey)
+    }
+
+    private manySepFirstInternalLogic<OUT>(prodOccurrence:number,
+                                           options:ManySepMethodOpts<OUT>,
+                                           result:ISeparatedIterationResult<OUT>,
+                                           key:number):ISeparatedIterationResult<OUT> {
         let action = options.DEF
         let separator = options.SEP
 
-        let firstIterationLaFunc = this.getLookaheadFuncForManySep(prodOccurrence)
+        let firstIterationLaFunc = this.getLookaheadFuncForManySep(key, prodOccurrence)
 
         let values = result.values
         let separators = result.separators
@@ -2063,7 +2358,6 @@ export class Parser {
                 prodOccurrence,
                 NextTerminalAfterManySepWalker)
         }
-
         return result
     }
 
@@ -2096,19 +2390,47 @@ export class Parser {
             nextTerminalAfterWalker)
     }
 
-    private orInternal<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>,
-                          occurrence:number):T {
-
+    private orInternalNoCst<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>,
+                               occurrence:number):T {
         let alts = isArray(altsOrOpts) ? altsOrOpts as IAnyOrAlt<T>[] : (altsOrOpts as OrMethodOpts<T>).DEF
-
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
-        let altToTake = laFunc.call(this, alts)
-        if (altToTake !== undefined) {
-            let chosenAlternative:any = alts[altToTake]
+        let altIdxToTake = laFunc.call(this, alts)
+        if (altIdxToTake !== undefined) {
+            let chosenAlternative:any = alts[altIdxToTake]
             return chosenAlternative.ALT.call(this)
         }
-
         this.raiseNoAltException(occurrence, (altsOrOpts as OrMethodOpts<T>).ERR_MSG)
+    }
+
+    private orInternal<T>(altsOrOpts:IAnyOrAlt<T>[] | OrMethodOpts<T>,
+                          occurrence:number):T {
+        let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
+        let nestedName = this.nestedRuleBeforeClause(altsOrOpts, laKey)
+
+        try {
+            let alts = isArray(altsOrOpts) ? altsOrOpts as IAnyOrAlt<T>[] : (altsOrOpts as OrMethodOpts<T>).DEF
+
+            let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
+            let altIdxToTake = laFunc.call(this, alts)
+            if (altIdxToTake !== undefined) {
+                let chosenAlternative:any = alts[altIdxToTake]
+                let nestedAltBeforeClauseResult = this.nestedAltBeforeClause(chosenAlternative, occurrence, OR_IDX, altIdxToTake)
+                try {
+                    return chosenAlternative.ALT.call(this)
+                }
+                finally {
+                    if (nestedAltBeforeClauseResult !== undefined) {
+                        this.nestedRuleFinallyClause(nestedAltBeforeClauseResult.shortName, nestedAltBeforeClauseResult.nestedName)
+                    }
+                }
+            }
+            this.raiseNoAltException(occurrence, (altsOrOpts as OrMethodOpts<T>).ERR_MSG)
+        }
+        finally {
+            if (nestedName !== undefined) {
+                this.nestedRuleFinallyClause(laKey, nestedName)
+            }
+        }
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
@@ -2126,10 +2448,9 @@ export class Parser {
 
     // this actually returns a number, but it is always used as a string (object prop key)
     private getKeyForAutomaticLookahead(dslMethodIdx:number, occurrence:number):number {
-        let ruleStack = this.RULE_STACK
-        let currRuleShortName:any = ruleStack[ruleStack.length - 1]
+        let currRuleShortName:any = this.getLastExplicitRuleShortName()
         /* tslint:disable */
-        return occurrence | dslMethodIdx | currRuleShortName
+        return getKeyForAutomaticLookahead(currRuleShortName, dslMethodIdx, occurrence)
         /* tslint:enable */
     }
 
@@ -2159,28 +2480,23 @@ export class Parser {
     }
 
     // Automatic lookahead calculation
-    private getLookaheadFuncForOption(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
+    private getLookaheadFuncForOption(key:number, occurrence:number):() => boolean {
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForOption, this.maxLookahead)
     }
 
-    private getLookaheadFuncForMany(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(MANY_IDX, occurrence)
+    private getLookaheadFuncForMany(key:number, occurrence:number):() => boolean {
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForMany, this.maxLookahead)
     }
 
-    private getLookaheadFuncForManySep(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(MANY_SEP_IDX, occurrence)
+    private getLookaheadFuncForManySep(key:number, occurrence:number):() => boolean {
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForManySep, this.maxLookahead)
     }
 
-    private getLookaheadFuncForAtLeastOne(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_IDX, occurrence)
+    private getLookaheadFuncForAtLeastOne(key:number, occurrence:number):() => boolean {
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOne, this.maxLookahead)
     }
 
-    private getLookaheadFuncForAtLeastOneSep(occurrence:number):() => boolean {
-        let key = this.getKeyForAutomaticLookahead(AT_LEAST_ONE_SEP_IDX, occurrence)
+    private getLookaheadFuncForAtLeastOneSep(key:number, occurrence:number):() => boolean {
         return this.getLookaheadFuncFor(key, occurrence, buildLookaheadForAtLeastOneSep, this.maxLookahead)
     }
 
@@ -2218,7 +2534,6 @@ export class Parser {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
             laFunc = laFuncBuilder.apply(null,
-                //TODO: change
                 [occurrence, ruleGrammar, maxLookahead, this.tokenMatcher,
                     this.tokenClassIdentityFunc, this.tokenInstanceIdentityFunc, this.dynamicTokensEnabled])
             this.classLAFuncs.put(key, laFunc)
@@ -2249,6 +2564,101 @@ export class Parser {
         }
         throw this.SAVE_ERROR(new exceptions.EarlyExitException(userDefinedErrMsg + errSuffix, this.LA(1)))
     }
+
+    private getLastExplicitRuleShortName():string {
+        let lastExplictIndex = this.LAST_EXPLICIT_RULE_STACK[this.LAST_EXPLICIT_RULE_STACK.length - 1]
+        return this.RULE_STACK[lastExplictIndex]
+    }
+
+    private getLastExplicitRuleShortNameNoCst():string {
+        let ruleStack = this.RULE_STACK
+        return ruleStack[ruleStack.length - 1]
+    }
+
+    private getPreviousExplicitRuleShortName():string {
+        let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[this.LAST_EXPLICIT_RULE_STACK.length - 2]
+        return this.RULE_STACK[lastExplicitIndex]
+    }
+
+    private getPreviousExplicitRuleShortNameNoCst():string {
+        let ruleStack = this.RULE_STACK
+        return ruleStack[ruleStack.length - 2]
+    }
+
+    private getPreviousExplicitRuleOccurenceIndex():number {
+        let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[this.LAST_EXPLICIT_RULE_STACK.length - 2]
+        return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
+    }
+
+    private getPreviousExplicitRuleOccurenceIndexNoCst():number {
+        let occurrenceStack = this.RULE_OCCURRENCE_STACK
+        return occurrenceStack[occurrenceStack.length - 2]
+    }
+
+    private nestedRuleBeforeClause(methodOpts:{ NAME?:string },
+                                   laKey:number):string {
+        let nestedName
+        if (methodOpts.NAME !== undefined) {
+            nestedName = methodOpts.NAME
+            this.nestedRuleInvocationStateUpdate(nestedName, laKey)
+            return nestedName
+        }
+        else {
+            return undefined
+        }
+    }
+
+    private nestedAltBeforeClause(methodOpts:{ NAME?:string },
+                                  occurrence:number,
+                                  methodKeyIdx:number,
+                                  altIdx:number):{ shortName?:number, nestedName?:string } {
+        let ruleIdx = this.getLastExplicitRuleShortName()
+        let shortName = getKeyForAltIndex(<any>ruleIdx, methodKeyIdx, occurrence, altIdx)
+        let nestedName
+        if (methodOpts.NAME !== undefined) {
+            nestedName = methodOpts.NAME
+            this.nestedRuleInvocationStateUpdate(nestedName, shortName)
+            return {
+                shortName,
+                nestedName
+            }
+        }
+        else {
+            return undefined
+        }
+    }
+
+    private nestedRuleFinallyClause(laKey:number, nestedName:string):void {
+        let cstStack = this.CST_STACK
+        let nestedRuleCst = cstStack[cstStack.length - 1]
+        this.nestedRuleFinallyStateUpdate()
+        // TODO: should not this disappear?
+        let cstDictType = this.cstDictDefForRule.get(laKey)
+        // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
+        let parentCstNode = cstStack[cstStack.length - 1]
+        addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst, cstDictType.get(nestedName))
+    }
+
+    private cstPostTerminal(tokClass:TokenConstructor, consumedToken:ISimpleTokenOrIToken):void {
+        let cstDictStack = this.CST_DICT_DEF_STACK
+        let cstDictDef = cstDictStack[cstDictStack.length - 1]
+        let currTokTypeName = tokClass.tokenName
+        let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
+        addTerminalToCst(rootCst, consumedToken, cstDictDef.get(currTokTypeName), currTokTypeName)
+    }
+
+    private cstPostNonTerminal(ruleCstResult:CstNode, ruleName:string):void {
+        let cstDictStack = this.CST_DICT_DEF_STACK
+        let cstDictDef = cstDictStack[cstDictStack.length - 1]
+        addNoneTerminalToCst(this.CST_STACK[this.CST_STACK.length - 1], ruleName, ruleCstResult, cstDictDef.get(ruleName))
+    }
+
+    private cstPostNonTerminalRecovery(ruleCstResult:CstNode, ruleName:string):void {
+        // TODO: assumes not first rule, is this assumption always correct?
+        let cstDictStack = this.CST_DICT_DEF_STACK
+        let cstDictDef = cstDictStack[cstDictStack.length - 2]
+        addNoneTerminalToCst(this.CST_STACK[this.CST_STACK.length - 2], ruleName, ruleCstResult, cstDictDef.get(ruleName))
+    }
 }
 
 function InRuleRecoveryException(message:string) {
@@ -2257,4 +2667,3 @@ function InRuleRecoveryException(message:string) {
 }
 
 InRuleRecoveryException.prototype = Error.prototype
-

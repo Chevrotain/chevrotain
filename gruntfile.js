@@ -6,6 +6,7 @@ var PUBLIC_API_DTS_FILES = [
     'lib/src/scan/tokens_public.d.ts',
     'lib/src/scan/lexer_public.d.ts',
     'lib/src/parse/parser_public.d.ts',
+    'lib/src/parse/cst/cst_public.d.ts',
     'lib/src/parse/exceptions_public.d.ts',
     'lib/src/parse/grammar/path_public.d.ts',
     'lib/src/parse/grammar/gast_public.d.ts',
@@ -324,6 +325,12 @@ module.exports = function(grunt) {
         'typedoc:build_docs'
     ]
 
+    var quickBuildTasks = [
+        'clean:release',
+        'run:ts_compile',
+        'webpack:release'
+    ]
+
     var unitTestsTasks = [
         'mocha_istanbul'
     ]
@@ -367,6 +374,7 @@ module.exports = function(grunt) {
     var buildTestTasks = buildTasks.concat(unitTestsTasks)
 
     grunt.registerTask('build', buildTasks)
+    grunt.registerTask('quick_build', quickBuildTasks)
     grunt.registerTask('build_test', buildTestTasks)
     grunt.registerTask('unit_tests', unitTestsTasks)
     grunt.registerTask('node_integration_tests', integrationTestsNodeTasks)
