@@ -705,6 +705,29 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
         describe("The BaseRecognizer", () => {
 
+            it("Will throw an error is performSelfAnalysis is called before all the rules have been defined", () => {
+                    class WrongOrderOfSelfAnalysisParser extends Parser {
+
+                        constructor(input:Token[] = []) {
+                            super(input, ALL_TOKENS)
+
+                            this.RULE("goodRule", () => {
+                                this.CONSUME(IntTok)
+                            });
+
+                            (Parser as any).performSelfAnalysis(this)
+
+                            this.RULE("badRule", () => {
+                                this.CONSUME(IntTok)
+                            })
+                        }
+                    }
+
+                    expect(() => new WrongOrderOfSelfAnalysisParser())
+                        .to.throw("Grammar rule <badRule> may not be defined after the 'performSelfAnalysis' method has been called")
+                }
+            )
+
             it("can be initialized with a vector of Tokens", () => {
                 let parser:any = new Parser([], [PlusTok, MinusTok, IntTok])
                 let tokensMap = (<any>parser).tokensMap
