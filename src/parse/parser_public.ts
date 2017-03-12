@@ -843,7 +843,7 @@ export class Parser {
      * Convenience method equivalent to SUBRULE1
      * @see SUBRULE1
      */
-    protected SUBRULE<T>(ruleToCall:(number) => T, args:any[] = []):T {
+    protected SUBRULE<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 1, args)
     }
 
@@ -865,35 +865,35 @@ export class Parser {
      * @param {*[]} args - The arguments to pass to the invoked subrule.
      * @returns {*} - The result of invoking ruleToCall.
      */
-    protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = []):T {
+    protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 1, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE2<T>(ruleToCall:(number) => T, args:any[] = []):T {
+    protected SUBRULE2<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 2, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE3<T>(ruleToCall:(number) => T, args:any[] = []):T {
+    protected SUBRULE3<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 3, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE4<T>(ruleToCall:(number) => T, args:any[] = []):T {
+    protected SUBRULE4<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 4, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE5<T>(ruleToCall:(number) => T, args:any[] = []):T {
+    protected SUBRULE5<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 5, args)
     }
 
