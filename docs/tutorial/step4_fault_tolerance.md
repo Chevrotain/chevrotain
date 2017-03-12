@@ -225,7 +225,7 @@ additional definitions (what should be returned value of a re-synced rule?).
    
 ### Disabling All Recovery mechanisms
 By default fault tolerance and error recovery heuristics are enabled.
-They can be disabled by passing a optional **isErrorRecoveryEnabled** parameter (default true)
+They can be disabled by passing a optional **recoveryEnabled** parameter (default true)
 To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_23_0/classes/parser.html#constructor).
    
    
