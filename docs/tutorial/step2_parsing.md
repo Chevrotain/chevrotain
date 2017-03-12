@@ -259,7 +259,7 @@ function parseInput(text) {
    let parser = new SelectParser(lexingResult.tokens);
    parser.selectStatement()
 
-   if (parser.parseErrors.length > 0) {
+   if (parser.errors.length > 0) {
       throw new Error("sad sad panda, Parsing errors detected")
    }
 }
