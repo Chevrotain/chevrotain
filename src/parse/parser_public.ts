@@ -121,6 +121,53 @@ export type TokenMatcher = (token:ISimpleTokenOrIToken, tokClass:TokenConstructo
 export type TokenInstanceIdentityFunc = (tok:IToken) => string
 export type TokenClassIdentityFunc = (tok:TokenConstructor) => string
 
+export interface ILexerAdapter {
+
+    lookahead(howMuch:number):ISimpleTokenOrIToken
+    consume():void
+    isAtEOI(howFarAhead:number):boolean
+    reset():void
+    saveState():void
+    restoreState():void
+}
+
+class TokenVectorLexerAdapter implements ILexerAdapter {
+
+    protected currIdx = -1
+    protected stateStack = []
+
+    constructor(public tokVector:ISimpleTokenOrIToken[]) {}
+
+    lookahead(howMuch:number):ISimpleTokenOrIToken {
+        return this.tokVector[this.currIdx + howMuch]
+    }
+
+    isAtEOI(howFarAhead:number):boolean {
+        return this.currIdx >= this.tokVector.length - howFarAhead
+    }
+
+    reset():void {
+        this.currIdx = -1
+        this.stateStack = []
+    }
+
+    saveState():void {
+        this.stateStack.push(this.currIdx)
+    }
+
+    restoreState():void {
+        this.currIdx = this.stateStack.pop()
+    }
+
+    moveToTerminatedState():void {
+        this.currIdx = this.tokVector.length - 1
+    }
+
+    consume():void {
+        this.currIdx++
+    }
+}
+
 export interface IParserConfig {
     /**
      * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
@@ -245,7 +292,6 @@ export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithGate<T>
 
 export interface IParserState {
     errors:exceptions.IRecognitionException[]
-    lexerState:any
     RULE_STACK:string[]
 }
 
@@ -456,6 +502,8 @@ export class Parser {
     protected maxLookahead:number
     protected ignoredIssues:IgnoredParserIssues
 
+    protected lexerAdapter:ILexerAdapter
+
     protected _input:ISimpleTokenOrIToken[] = []
     protected inputIdx = -1
     protected savedTokenIdx = -1
@@ -485,9 +533,10 @@ export class Parser {
      */
     private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
-    constructor(input:ISimpleTokenOrIToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor; } | TokenConstructor[],
+    constructor(inputOrAdapter:ISimpleTokenOrIToken[] | ILexerAdapter,
+                tokensTypesMapOrArr:{ [fqn:string]:TokenConstructor; } | TokenConstructor[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
-        this._input = input
+        this.input = inputOrAdapter
 
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled") ?
@@ -525,14 +574,14 @@ export class Parser {
             this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className)
         }
 
-        if (isArray(tokensMapOrArr)) {
-            this.tokensMap = <any>reduce(<any>tokensMapOrArr, (acc, tokenClazz:TokenConstructor) => {
+        if (isArray(tokensTypesMapOrArr)) {
+            this.tokensMap = <any>reduce(<any>tokensTypesMapOrArr, (acc, tokenClazz:TokenConstructor) => {
                 acc[tokenName(tokenClazz)] = tokenClazz
                 return acc
             }, {})
         }
-        else if (isObject(tokensMapOrArr)) {
-            this.tokensMap = cloneObj(tokensMapOrArr)
+        else if (isObject(tokensTypesMapOrArr)) {
+            this.tokensMap = cloneObj(tokensTypesMapOrArr)
         }
         else {
             throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.")
@@ -574,13 +623,15 @@ export class Parser {
         this._errors = newErrors
     }
 
-    public set input(newInput:ISimpleTokenOrIToken[]) {
+    public set input(newInput:ISimpleTokenOrIToken[] | ILexerAdapter) {
         this.reset()
-        this._input = newInput
-    }
+        if (isArray(newInput)) {
+            this.lexerAdapter = new TokenVectorLexerAdapter(<ISimpleTokenOrIToken[]>newInput)
+        }
+        else {
+            this.lexerAdapter = <ILexerAdapter>newInput
+        }
 
-    public get input():ISimpleTokenOrIToken[] {
-        return cloneArr(this._input)
     }
 
     /**
@@ -588,11 +639,14 @@ export class Parser {
      * When overriding, remember to also invoke the super implementation!
      */
     public reset():void {
-        this.resetLexerState()
+        // on the first initialization the lexerAdapter may not yet "be ready"
+        if (!isUndefined(this.lexerAdapter)) {
+            this.lexerAdapter.reset()
+        }
 
         this.isBackTrackingStack = []
         this.errors = []
-        this._input = []
+
         this.RULE_STACK = []
         this.RULE_OCCURRENCE_STACK = []
     }
@@ -694,12 +748,12 @@ export class Parser {
         // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
         // input[45] which is the 46th item and no longer exists,
         // so in this case the largest valid input index is 43 (input.length - 2 )
-        if (this.inputIdx <= this._input.length - 2) {
-            this.consumeToken()
-            return this.LA(1)
+        if (this.lexerAdapter.isAtEOI(1)) {
+            return END_OF_FILE
         }
         else {
-            return END_OF_FILE
+            this.lexerAdapter.consume()
+            return this.LA(1)
         }
     }
 
@@ -1470,50 +1524,29 @@ export class Parser {
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
     protected LA(howMuch:number):ISimpleTokenOrIToken {
-        if (this._input.length <= this.inputIdx + howMuch) {
+        if (this.lexerAdapter.isAtEOI(howMuch)) {
             return END_OF_FILE
         }
         else {
-            return this._input[this.inputIdx + howMuch]
+            return this.lexerAdapter.lookahead(howMuch)
         }
     }
 
-    protected consumeToken() {
-        this.inputIdx++
-    }
-
-    protected saveLexerState() {
-        this.savedTokenIdx = this.inputIdx
-    }
-
-    protected restoreLexerState() {
-        this.inputIdx = this.savedTokenIdx
-    }
-
-    protected resetLexerState():void {
-        this.inputIdx = -1
-    }
-
-    protected moveLexerStateToEnd():void {
-        this.inputIdx = this.input.length - 1
-    }
-
-
     // other functionality
     private saveRecogState():IParserState {
+        this.lexerAdapter.saveState()
         // errors is a getter which will clone the errors array
         let savedErrors = this.errors
         let savedRuleStack = cloneArr(this.RULE_STACK)
         return {
             errors:     savedErrors,
-            lexerState: this.inputIdx,
             RULE_STACK: savedRuleStack
         }
     }
 
     private reloadRecogState(newState:IParserState) {
+        this.lexerAdapter.restoreState()
         this.errors = newState.errors
-        this.inputIdx = newState.lexerState
         this.RULE_STACK = newState.RULE_STACK
     }
 
@@ -1585,7 +1618,7 @@ export class Parser {
                     }
                     else if (isFirstInvokedRule) {
                         // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
-                        this.moveLexerStateToEnd()
+                        this.lexerAdapter.moveToTerminatedState()
                         // the parser should never throw one of its own errors outside its flow.
                         // even if error recovery is disabled
                         return recoveryValueFunc()
@@ -1630,7 +1663,7 @@ export class Parser {
                                     expectedTokType:TokenConstructor):void {
         // TODO: can the resyncTokenType be cached?
         let reSyncTokType = this.findReSyncTokenType()
-        this.saveLexerState()
+        this.lexerAdapter.saveState()
         let resyncedTokens = []
         let passedResyncPoint = false
 
@@ -1672,7 +1705,7 @@ export class Parser {
         // we were unable to find a CLOSER point to resync inside the Repetition, reset the state.
         // The parsing exception we were trying to prevent will happen in the NEXT parsing step. it may be handled by
         // "between rules" resync recovery later in the flow.
-        this.restoreLexerState()
+        this.lexerAdapter.restoreState()
     }
 
     private shouldInRepetitionRecoveryBeTried(expectTokAfterLastMatch?:TokenConstructor, nextTokIdx?:number):boolean {
@@ -1719,7 +1752,7 @@ export class Parser {
 
         if (this.canRecoverWithSingleTokenDeletion(expectedTokType)) {
             let nextTok = this.SKIP_TOKEN()
-            this.consumeToken()
+            this.lexerAdapter.consume()
             return nextTok
         }
 
@@ -2115,7 +2148,7 @@ export class Parser {
     private consumeInternalOptimized(expectedTokClass:TokenConstructor):ISimpleTokenOrIToken {
         let nextToken = this.LA(1)
         if (this.tokenMatcher(nextToken, expectedTokClass)) {
-            this.consumeToken()
+            this.lexerAdapter.consume()
             return nextToken
         }
         else {

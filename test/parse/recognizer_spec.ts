@@ -625,15 +625,13 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
             it("can be initialized without supplying an input vector", () => {
                 let parser = new Parser([], [])
-                expect(parser.input).to.deep.equal([])
-                expect(parser.input).to.be.an.instanceof(Array)
+                expect((<any>parser).LA(1)).to.be.an.instanceOf(EOF)
             })
 
             it("can only SAVE_ERROR for recognition exceptions", () => {
                 let parser:any = new Parser([], [])
                 expect(() => parser.SAVE_ERROR(new Error("I am some random Error")))
                     .to.throw("Trying to save an Error which is not a RecognitionException")
-                expect(parser.input).to.be.an.instanceof(Array)
             })
 
             it("when it runs out of input EOF will be returned", () => {
