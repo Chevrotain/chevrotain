@@ -1,13 +1,13 @@
 /**
- * This example demonstrate implementing a lexer for a language using python like indentation.
+ * This example demonstrate implementing a lexer for a language using python style indentation.
  * This is achieved by using custom Token patterns which allow running user defined logic
  * to match tokens.
  *
  * The logic is simple:
- * - Indentation tokens (Indent, outdent) can only be created for whitespace on the beginning of a line.
+ * - Indentation tokens (Indent, Outdent) can only be created for whitespace on the beginning of a line.
  * - Change in the "level" of the indentation will create either Indent(increase) or Outdent(decrease).
  * - Same indentation level will be parsed as "regular" whitespace and be ignored.
- * - The previous Ident levels will be saved in a stack.
+ * - To implement this the previous Ident levels will be saved in a stack.
  *
  * For additional details on custom token patterns, see the docs:
  * https://github.com/SAP/chevrotain/blob/master/docs/custom_token_patterns.md
@@ -20,11 +20,36 @@ const Lexer = chevrotain.Lexer
 const getStartOffset = chevrotain.getStartOffset
 const _ = require("lodash")
 
-const whiteSpaceRegExp = /^ +/
+/**
+ *
+ * Works like a / +/y regExp.
+ *  - Note the usage of the 'y' (sticky) flag.
+ *    This can be used to match from a specific offset in the text
+ *    in our case from startOffset.
+ *
+ * The reason this has been implemented "manually" is because the sticky flag is not supported
+ * on all modern node.js versions (4.0 specifically).
+ */
+function matchWhiteSpace(text, startOffset) {
+    let result = ""
+    let offset = startOffset
+    // ignoring tabs in this example
+    while (text[offset] === " ") {
+        offset++
+        result += " "
+    }
+
+    if (result === "") {
+        return null
+    }
+
+    return [result]
+}
+
 
 // State required for matching the indentations
 let indentStack = [0]
-let lastTextMatched
+let lastOffsetChecked
 
 /**
  * This custom Token matcher uses Lexer context ("matchedTokens" and "groups" arguments)
@@ -36,7 +61,7 @@ let lastTextMatched
  * @param {string} type - determines if this function matches Indent or Outdent tokens.
  * @returns {*}
  */
-function matchIndentBase(text, matchedTokens, groups, type) {
+function matchIndentBase(text, offset, matchedTokens, groups, type) {
     const noTokensMatchedYet = _.isEmpty(matchedTokens)
     const newLines = groups.nl
     const noNewLinesMatchedYet = _.isEmpty(newLines)
@@ -51,19 +76,19 @@ function matchIndentBase(text, matchedTokens, groups, type) {
     if (isFirstLine || isStartOfLine) {
         let match
         let currIndentLevel = undefined
-        let isZeroIndent = text.length > 0 && text[0] !== " "
+        let isZeroIndent = text.length < offset && text[offset] !== " "
         if (isZeroIndent) {
             // Matching zero spaces Outdent would not consume any chars, thus it would cause an infinite loop.
             // This check prevents matching a sequence of zero spaces outdents.
-            if (lastTextMatched !== text) {
+            if (lastOffsetChecked !== offset) {
                 currIndentLevel = 0
                 match = [""]
-                lastTextMatched = text
+                lastOffsetChecked = offset
             }
         }
         // possible non-empty indentation
         else {
-            match = whiteSpaceRegExp.exec(text)
+            match = matchWhiteSpace(text, offset)
             if (match !== null) {
                 currIndentLevel = match[0].length
             }
@@ -77,17 +102,17 @@ function matchIndentBase(text, matchedTokens, groups, type) {
             }
             else if (currIndentLevel < lastIndentLevel && type === "outdent") {
                 //if we need more than one outdent token, add all but the last one
-                if(indentStack.length > 2){
-                  const image = "";
-                  const offset = chevrotain.getEndOffset(_.last(matchedTokens)) + 1
-                  const line = chevrotain.getEndLine(_.last(matchedTokens))
-                  const column = chevrotain.getEndColumn(_.last(matchedTokens)) + 1
-                  while(indentStack.length > 2 &&
+                if (indentStack.length > 2) {
+                    const image = "";
+                    const offset = chevrotain.getEndOffset(_.last(matchedTokens)) + 1
+                    const line = chevrotain.getEndLine(_.last(matchedTokens))
+                    const column = chevrotain.getEndColumn(_.last(matchedTokens)) + 1
+                    while (indentStack.length > 2 &&
                     //stop before the last Outdent
-                    indentStack[indentStack.length - 2] > currIndentLevel){
-                    indentStack.pop()
-                    matchedTokens.push(new Outdent(image, offset, line, column))
-                  }
+                    indentStack[indentStack.length - 2] > currIndentLevel) {
+                        indentStack.pop()
+                        matchedTokens.push(new Outdent(image, offset, line, column))
+                    }
                 }
                 indentStack.pop()
                 return match
@@ -166,7 +191,7 @@ module.exports = {
 
         // have to reset the indent stack between processing of different text inputs
         indentStack = [0]
-        lastTextMatched = undefined
+        lastOffsetChecked = undefined
 
         let lexResult = customPatternLexer.tokenize(text)
 

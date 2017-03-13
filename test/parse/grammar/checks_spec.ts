@@ -695,5 +695,3 @@ describe("The invalid token name validation", () => {
             .to.throw("Invalid Grammar Token name: ->במבה<- it must match the pattern: ->/^[a-zA-Z_]\\w*$/<-")
     })
 })
-
-

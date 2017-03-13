@@ -1,45 +1,48 @@
-import {map, keys, isFunction, isRegExp} from "../../src/utils/utils"
+import {forEach, isFunction, isRegExp, keys, map} from "../../src/utils/utils"
 import {
+    createToken,
     extendLazyToken,
-    LazyToken,
-    Token,
-    extendToken,
     extendSimpleLazyToken,
-    getImage,
-    getStartOffset,
+    extendToken,
+    getEndColumn,
+    getEndLine,
     getEndOffset,
+    getImage,
     getStartColumn,
     getStartLine,
-    getEndLine,
-    getEndColumn,
-    SimpleLazyToken, createToken
+    getStartOffset,
+    LazyToken,
+    SimpleLazyToken,
+    Token
 } from "../../src/scan/tokens_public"
-import {Lexer, LexerDefinitionErrorType, IMultiModeLexerDefinition} from "../../src/scan/lexer_public"
+import {IMultiModeLexerDefinition, Lexer, LexerDefinitionErrorType} from "../../src/scan/lexer_public"
 import {
-    findMissingPatterns,
-    findInvalidPatterns,
-    findUnsupportedFlags,
+    addStartOfInput,
+    analyzeTokenClasses,
+    countLineTerminators,
+    disableSticky,
+    enableSticky,
     findDuplicatePatterns,
     findEndOfInputAnchor,
     findInvalidGroupType,
-    addStartOfInput,
-    analyzeTokenClasses,
-    countLineTerminators
+    findInvalidPatterns,
+    findMissingPatterns, findStartOfInputAnchor,
+    findUnsupportedFlags,
+    SUPPORT_STICKY
 } from "../../src/scan/lexer"
 import {setEquality} from "../utils/matchers"
 import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
 
-
+const ORG_SUPPORT_STICKY = SUPPORT_STICKY
 function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidationChecks = false) {
 
-    context(contextName, () => {
+    function lexerSpecs() {
 
-        const IntegerTok = extendToken("IntegerTok", /^[1-9]\d*/)
-        const IdentifierTok = extendToken("IdentifierTok", /^[A-Za-z_]\w*/)
-        const BambaTok = extendToken("BambaTok", /^bamba/)
+        const IntegerTok = extendToken("IntegerTok", /[1-9]\d*/)
+        const IdentifierTok = extendToken("IdentifierTok", /[A-Za-z_]\w*/)
+        const BambaTok = extendToken("BambaTok", /bamba/)
 
         BambaTok.LONGER_ALT = IdentifierTok
-
 
         let testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok])
 
@@ -186,6 +189,27 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     expect(errors).to.be.empty
                 })
 
+                it("will detect patterns using unsupported start of input anchor", () => {
+                    let InvalidToken = extendToken("InvalidToken", /^BAMBA/)
+                    let tokenClasses = [ValidNaPattern, InvalidToken]
+                    let errors = findStartOfInputAnchor(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([InvalidToken])
+                    expect(errors[0].type).to.equal(LexerDefinitionErrorType.SOI_ANCHOR_FOUND)
+                    expect(errors[0].message).to.contain("InvalidToken")
+                })
+
+                it("won't detect negation as using unsupported start of input anchor", () => {
+                    let negationPattern = extendToken("negationPattern", /[^\\]/)
+                    let errors = findStartOfInputAnchor([negationPattern])
+                    expect(errors).to.be.empty
+                })
+
+                it("won't detect valid patterns as using unsupported start of input anchor", () => {
+                    let errors = findStartOfInputAnchor([IntegerTok, IntegerValid])
+                    expect(errors).to.be.empty
+                })
+
                 it("will detect identical patterns for different classes", () => {
                     let tokenClasses = [DecimalInvalid, IntegerValid]
                     let errors = findDuplicatePatterns(tokenClasses)
@@ -218,7 +242,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
         const Keyword = extendToken("Keyword", Lexer.NA)
         const If = extendToken("If", /if/, Keyword)
         const Else = extendToken("Else", /else/, Keyword)
-        const Return = extendToken("Return", /return/, Keyword)
+        const Return = extendToken("Return", /return/i, Keyword)
         const Integer = extendToken("Integer", /[1-9]\d*/)
 
         const Punctuation = extendToken("Punctuation", Lexer.NA)
@@ -258,7 +282,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
             if (!skipValidationChecks) {
                 it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
                     let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
-                    let analyzeResult = analyzeTokenClasses(tokenClasses)
+                    let analyzeResult = analyzeTokenClasses(tokenClasses, false)
                     expect(analyzeResult.allPatterns.length).to.equal(8)
                     let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
                         return pattern.source
@@ -277,7 +301,34 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     expect(patternIdxToClass[6]).to.equal(Whitespace)
                     expect(patternIdxToClass[7]).to.equal(NewLine)
                 })
+            }
 
+            if (!skipValidationChecks && ORG_SUPPORT_STICKY) {
+                it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass - sticky", () => {
+                    let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
+                    // on newer node.js this will run with the 2nd argument as true.
+                    let analyzeResult = analyzeTokenClasses(tokenClasses, true)
+                    expect(analyzeResult.allPatterns.length).to.equal(8)
+                    let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
+                        return pattern.source
+                    })
+                    setEquality(allPatternsString, ["(\\t| )", "(\\n|\\r|\\r\\n)",
+                        "\\(", "\\)", "[1-9]\\d*", "if", "else", "return"])
+
+                    forEach(analyzeResult.allPatterns, (currPattern) => {
+                        expect(currPattern.sticky).to.be.true
+                    })
+                    let patternIdxToClass = analyzeResult.patternIdxToClass
+                    expect(keys(patternIdxToClass).length).to.equal(8)
+                    expect(patternIdxToClass[0]).to.equal(If)
+                    expect(patternIdxToClass[1]).to.equal(Else)
+                    expect(patternIdxToClass[2]).to.equal(Return)
+                    expect(patternIdxToClass[3]).to.equal(Integer)
+                    expect(patternIdxToClass[4]).to.equal(LParen)
+                    expect(patternIdxToClass[5]).to.equal(RParen)
+                    expect(patternIdxToClass[6]).to.equal(Whitespace)
+                    expect(patternIdxToClass[7]).to.equal(NewLine)
+                })
             }
 
             it("can count the number of line terminators in a string", () => {
@@ -295,7 +346,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 //noinspection BadExpressionStatementJS
                 expect(ifElseLexer.lexerDefinitionErrors).to.be.empty
 
-                let input = "if (666) return 1\n" +
+                let input = "if (666) reTurn 1\n" +
                     "\telse return 2"
 
                 let lexResult = ifElseLexer.tokenize(input)
@@ -329,7 +380,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 expect(getStartColumn(lexResult.tokens[3])).to.equal(8)
                 expect(tokenMatcher(lexResult.tokens[3], RParen)).to.be.true
 
-                expect(getImage(lexResult.tokens[4])).to.equal("return")
+                expect(getImage(lexResult.tokens[4])).to.equal("reTurn")
                 expect(getStartOffset(lexResult.tokens[4])).to.equal(9)
                 expect(getEndOffset(lexResult.tokens[4])).to.equal(14)
                 expect(getStartLine(lexResult.tokens[4])).to.equal(1)
@@ -943,8 +994,8 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                         it(variant, () => {
                             let time = 1
 
-                            function extraContextValidator(text, tokens, groups) {
-                                let result = isFunction(customPattern) ? customPattern(text) : customPattern.exec(text)
+                            function extraContextValidator(text, offset, tokens, groups) {
+                                let result = isFunction(customPattern) ? customPattern(text, offset) : customPattern.exec(text, offset)
                                 if (result !== null) {
                                     if (time === 1) {
                                         expect(tokens).to.be.empty
@@ -968,7 +1019,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                             let B = createToken({name: "B", pattern: <any>extraContextValidator})
                             let WS = createToken({
                                 name:     "WS", pattern: {
-                                    exec:                   (text) => /^\s+/.exec(text),
+                                    exec:                   (text, offset) => /^\s+/.exec(text.substring(offset)),
                                     containsLineTerminator: true
                                 }, group: "whitespace"
                             })
@@ -993,24 +1044,32 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                         })
                     }
 
-                    defineCustomPatternSpec("With short function syntax", (text) => /^B/.exec(text))
+                    defineCustomPatternSpec("With short function syntax", (text, offset) => /^B/.exec(text.substring(offset)))
                     defineCustomPatternSpec("with explicit canContainLinerTerminator", {
-                        exec:                   (text) => /^B/.exec(text),
+                        exec:                   (text, offset) => /^B/.exec(text.substring(offset)),
                         containsLineTerminator: false
                     })
                     defineCustomPatternSpec("with implicit canContainLinerTerminator", {
-                        exec: (text) => /^B/.exec(text)
+                        exec: (text, offset) => /^B/.exec(text.substring(offset))
                     })
                 })
             })
         })
-    })
+    }
+
+    context(contextName, lexerSpecs)
+
+    if (SUPPORT_STICKY === true) {
+        context(contextName + " NO STICKY", () => {
+
+            before(disableSticky)
+
+            lexerSpecs()
+
+            after(enableSticky)
+        })
+    }
 }
-
-defineLexerSpecs("Regular Tokens Mode", extendToken, tokenInstanceofMatcher)
-defineLexerSpecs("Lazy Tokens Mode", extendLazyToken, tokenInstanceofMatcher)
-defineLexerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, tokenStructuredMatcher)
-
 
 function wrapWithCustom(baseExtendToken) {
     return function () {
@@ -1018,21 +1077,17 @@ function wrapWithCustom(baseExtendToken) {
 
         let pattern = newToken.PATTERN
         if (isRegExp(pattern) && !/\\n|\\r|\\s/g.test(pattern.source) && pattern !== Lexer.NA) {
-            newToken.PATTERN = function (text) {
-                let withStartOfInput = addStartOfInput(pattern)
-                let execResult = withStartOfInput.exec(text)
+            newToken.PATTERN = function (text, offset) {
+                // can't use sticky here because tests on node.js version 4 won't pass.
+                let withStart = addStartOfInput(pattern)
+                let execResult = withStart.exec(text.substring(offset))
                 return execResult
             }
         }
         return newToken
     }
 }
-defineLexerSpecs("Regular Tokens Mode (custom mode)", wrapWithCustom(extendToken), tokenInstanceofMatcher, true)
-defineLexerSpecs("Lazy Tokens Mode (custom mode)", wrapWithCustom(extendLazyToken), tokenInstanceofMatcher, true)
-defineLexerSpecs("Simple Lazy Tokens Mode (custom mode)", wrapWithCustom(extendSimpleLazyToken), tokenStructuredMatcher, true)
 
-defineLexerSpecs("Lazy Tokens Mode (slow mode)", createSlowExtendToken(extendLazyToken), tokenInstanceofMatcher)
-defineLexerSpecs("SimpleLazy Tokens Mode (slow mode)", createSlowExtendToken(extendSimpleLazyToken), tokenStructuredMatcher)
 // ensures fastMode is not enabled by defining a LONGER_ALT
 function createSlowExtendToken(baseExtendToken) {
     return function () {
@@ -1043,3 +1098,15 @@ function createSlowExtendToken(baseExtendToken) {
         return orgTokenType
     }
 }
+
+defineLexerSpecs("Regular Tokens Mode", extendToken, tokenInstanceofMatcher)
+defineLexerSpecs("Lazy Tokens Mode", extendLazyToken, tokenInstanceofMatcher)
+defineLexerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, tokenStructuredMatcher)
+
+defineLexerSpecs("Regular Tokens Mode (custom mode)", wrapWithCustom(extendToken), tokenInstanceofMatcher, true)
+defineLexerSpecs("Lazy Tokens Mode (custom mode)", wrapWithCustom(extendLazyToken), tokenInstanceofMatcher, true)
+defineLexerSpecs("Simple Lazy Tokens Mode (custom mode)", wrapWithCustom(extendSimpleLazyToken), tokenStructuredMatcher, true)
+
+defineLexerSpecs("Regular Tokens Mode (slow mode)", createSlowExtendToken(extendToken), tokenInstanceofMatcher)
+defineLexerSpecs("Lazy Tokens Mode (slow mode)", createSlowExtendToken(extendLazyToken), tokenInstanceofMatcher)
+defineLexerSpecs("SimpleLazy Tokens Mode (slow mode)", createSlowExtendToken(extendSimpleLazyToken), tokenStructuredMatcher)

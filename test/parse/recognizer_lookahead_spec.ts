@@ -1139,4 +1139,3 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
 defineLookaheadSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)
 defineLookaheadSpecs("Lazy Tokens Mode", extendLazyToken, createLazyToken, tokenInstanceofMatcher)
 defineLookaheadSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, createSimpleToken, tokenStructuredMatcher)
-

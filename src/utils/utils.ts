@@ -346,6 +346,10 @@ export function merge(obj1:Object, obj2:Object):any {
 
 export function NOOP() {}
 
+export function IDENTITY(item) {
+    return item
+}
+
 export function getSuperClass(clazz:Function):Function {
     return Object.getPrototypeOf(clazz.prototype).constructor
 }
