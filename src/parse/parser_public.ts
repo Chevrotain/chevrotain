@@ -258,6 +258,9 @@ export interface IParserState {
 }
 
 export interface DSLMethodOpts<T> {
+    /**
+     * in-lined method name
+     */
     NAME?:string
 
     /**

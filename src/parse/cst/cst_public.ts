@@ -1,7 +1,7 @@
 import {ISimpleTokenOrIToken} from "../../scan/tokens_public"
 
 export type CstElement = ISimpleTokenOrIToken | CstNode
-export type CstChildrenDictionary = { [identifier:string]:CstElement | CstElement[] }
+export type CstChildrenDictionary = { [identifier:string]:CstElement[] }
 
 /**
  * A Concrete Syntax Tree Node.
