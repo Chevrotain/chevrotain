@@ -14,7 +14,7 @@ class LSquare extends Token { static PATTERN = /\[/}
 class RSquare extends Token { static PATTERN = /]/}
 class Comma extends Token { static PATTERN = /,/}
 class Colon extends Token { static PATTERN = /:/}
-class StringLiteral extends Token { static PATTERN = /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/}
+class StringLiteral extends Token { static PATTERN = /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/}
 class NumberLiteral extends Token { static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/}
 class WhiteSpace extends Token {
     static PATTERN = /\s+/

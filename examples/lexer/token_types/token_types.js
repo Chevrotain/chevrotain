@@ -38,7 +38,7 @@ function createLexer(tokensType) {
     var RSquare = createToken({name: "RSquare", pattern: /]/});
     var Comma = createToken({name: "Comma", pattern: /,/});
     var Colon = createToken({name: "Colon", pattern: /:/});
-    var StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
+    var StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
     var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/});
     var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
 

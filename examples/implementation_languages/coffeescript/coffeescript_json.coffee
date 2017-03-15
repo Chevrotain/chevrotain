@@ -28,7 +28,7 @@ class Colon extends Token
   @PATTERN: /:/
 
 class StringLiteral extends Token
-  @PATTERN: /"(:?[^\\"]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+  @PATTERN: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 
 class NumberLiteral extends Token
   @PATTERN: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
