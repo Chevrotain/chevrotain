@@ -52,10 +52,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
             expect(cst.children).to.have.keys("A", "B", "bamba")
-            expect(tokenMatcher(cst.children.A, A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
-            expect(cst.children.bamba.name).to.equal("bamba")
-            expect(tokenMatcher(cst.children.bamba.children.C, C)).to.be.true
+            expect(tokenMatcher(cst.children.A[0], A)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
+            expect(cst.children.bamba[0].name).to.equal("bamba")
+            expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be.true
         })
 
         it("Can output a CST for a Terminal - alternations", () => {
@@ -92,8 +92,8 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
             expect(cst.children).to.have.keys("A", "B", "bamba")
-            expect(tokenMatcher(cst.children.A, A)).to.be.true
-            expect(cst.children.bamba).to.be.undefined
+            expect(tokenMatcher(cst.children.A[0], A)).to.be.true
+            expect(cst.children.bamba[0]).to.be.undefined
         })
 
         it("Can output a CST for a Terminal - alternations - single", () => {
@@ -121,8 +121,8 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
             expect(cst.children).to.have.keys("A", "B")
-            expect(tokenMatcher(cst.children.A, A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
+            expect(tokenMatcher(cst.children.A[0], A)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
         })
 
         it("Can output a CST for a Terminal with multiple occurrences", () => {
@@ -148,7 +148,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(cst.children.A).to.have.length(2)
             expect(tokenMatcher(cst.children.A[0], A)).to.be.true
             expect(tokenMatcher(cst.children.A[1], A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
         })
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration", () => {
@@ -181,11 +181,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(tokenMatcher(cst.children.A[0], A)).to.be.true
             expect(tokenMatcher(cst.children.A[1], A)).to.be.true
             expect(tokenMatcher(cst.children.A[2], A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
             expect(cst.children.bamba).to.have.length(3)
-            expect(tokenMatcher(cst.children.bamba[0].children.C, C)).to.be.true
-            expect(tokenMatcher(cst.children.bamba[1].children.C, C)).to.be.true
-            expect(tokenMatcher(cst.children.bamba[2].children.C, C)).to.be.true
+            expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be.true
+            expect(tokenMatcher(cst.children.bamba[1].children.C[0], C)).to.be.true
+            expect(tokenMatcher(cst.children.bamba[2].children.C[0], C)).to.be.true
         })
 
         context("Can output a CST for an optional terminal", () => {
@@ -215,10 +215,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.ruleWithOptional()
                 expect(cst.name).to.equal("ruleWithOptional")
                 expect(cst.children).to.have.keys("A", "B", "bamba")
-                expect(tokenMatcher(cst.children.A, A)).to.be.true
-                expect(cst.children.bamba.name).to.equal("bamba")
-                expect(tokenMatcher(cst.children.bamba.children.C, C)).to.be.true
-                expect(tokenMatcher(cst.children.B, B)).to.be.true
+                expect(tokenMatcher(cst.children.A[0], A)).to.be.true
+                expect(cst.children.bamba[0].name).to.equal("bamba")
+                expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be.true
+                expect(tokenMatcher(cst.children.B[0], B)).to.be.true
             })
 
             it("path NOT taken", () => {
@@ -227,9 +227,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.ruleWithOptional()
                 expect(cst.name).to.equal("ruleWithOptional")
                 expect(cst.children).to.have.keys("A", "B", "bamba")
-                expect(cst.children.A).to.be.undefined
-                expect(cst.children.bamba).to.be.undefined
-                expect(tokenMatcher(cst.children.B, B)).to.be.true
+                expect(cst.children.A[0]).to.be.undefined
+                expect(cst.children.bamba[0]).to.be.undefined
+                expect(tokenMatcher(cst.children.B[0], B)).to.be.true
             })
         })
 
@@ -258,7 +258,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(tokenMatcher(cst.children.A[0], A)).to.be.true
             expect(tokenMatcher(cst.children.A[1], A)).to.be.true
             expect(tokenMatcher(cst.children.A[2], A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
         })
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP", () => {
@@ -287,7 +287,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(cst.children.A).to.have.length(2)
             expect(tokenMatcher(cst.children.A[0], A)).to.be.true
             expect(tokenMatcher(cst.children.A[1], A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
 
             expect(cst.children.C).to.have.length(1)
             expect(tokenMatcher(cst.children.C[0], C)).to.be.true
@@ -319,7 +319,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(cst.children.A).to.have.length(2)
             expect(tokenMatcher(cst.children.A[0], A)).to.be.true
             expect(tokenMatcher(cst.children.A[1], A)).to.be.true
-            expect(tokenMatcher(cst.children.B, B)).to.be.true
+            expect(tokenMatcher(cst.children.B[0], B)).to.be.true
 
             expect(cst.children.C).to.have.length(1)
             expect(tokenMatcher(cst.children.C[0], C)).to.be.true
@@ -356,11 +356,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     let cst = parser.ruleWithOptional()
                     expect(cst.name).to.equal("ruleWithOptional")
                     expect(cst.children).to.have.keys("$nestedOption", "B")
-                    let $nestedOptionCst = cst.children.$nestedOption
-                    expect(tokenMatcher($nestedOptionCst.children.A, A)).to.be.true
-                    expect($nestedOptionCst.children.bamba.name).to.equal("bamba")
-                    expect(tokenMatcher($nestedOptionCst.children.bamba.children.C, C)).to.be.true
-                    expect(tokenMatcher(cst.children.B, B)).to.be.true
+                    let $nestedOptionCst = cst.children.$nestedOption[0]
+                    expect(tokenMatcher($nestedOptionCst.children.A[0], A)).to.be.true
+                    expect($nestedOptionCst.children.bamba[0].name).to.equal("bamba")
+                    expect(tokenMatcher($nestedOptionCst.children.bamba[0].children.C[0], C)).to.be.true
+                    expect(tokenMatcher(cst.children.B[0], B)).to.be.true
                 })
 
                 it("path NOT taken", () => {
@@ -369,10 +369,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     let cst = parser.ruleWithOptional()
                     expect(cst.name).to.equal("ruleWithOptional")
                     expect(cst.children).to.have.keys("$nestedOption", "B")
-                    let $nestedOptionCst = cst.children.$nestedOption
-                    expect($nestedOptionCst.children.A).to.be.undefined
-                    expect($nestedOptionCst.children.bamba).to.be.undefined
-                    expect(tokenMatcher(cst.children.B, B)).to.be.true
+                    let $nestedOptionCst = cst.children.$nestedOption[0]
+                    expect($nestedOptionCst.children.A[0]).to.be.undefined
+                    expect($nestedOptionCst.children.bamba[0]).to.be.undefined
+                    expect(tokenMatcher(cst.children.B[0], B)).to.be.true
                 })
             })
 
@@ -411,10 +411,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$first_alternative", "B", "bamba")
-                let firstAltCst = cst.children.$first_alternative
-                expect(tokenMatcher(firstAltCst.children.A, A)).to.be.true
-                expect(cst.children.bamba).to.be.undefined
-                expect(cst.children.B).to.be.undefined
+                let firstAltCst = cst.children.$first_alternative[0]
+                expect(tokenMatcher(firstAltCst.children.A[0], A)).to.be.true
+                expect(cst.children.bamba[0]).to.be.undefined
+                expect(cst.children.B[0]).to.be.undefined
             })
 
             it("Can output a CST when using OR", () => {
@@ -454,11 +454,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$nestedOr")
-                let orCst = cst.children.$nestedOr
+                let orCst = cst.children.$nestedOr[0]
                 expect(orCst.children).to.have.keys("A", "B", "bamba")
-                expect(tokenMatcher(orCst.children.A, A)).to.be.true
-                expect(orCst.children.bamba).to.be.undefined
-                expect(orCst.children.B).to.be.undefined
+                expect(tokenMatcher(orCst.children.A[0], A)).to.be.true
+                expect(orCst.children.bamba[0]).to.be.undefined
+                expect(orCst.children.B[0]).to.be.undefined
             })
 
             it("Can output a CST when using OR - single Alt", () => {
@@ -493,10 +493,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$nestedAlt")
-                let altCst = cst.children.$nestedAlt
+                let altCst = cst.children.$nestedAlt[0]
                 expect(altCst.children).to.have.keys("B", "bamba")
-                expect(tokenMatcher(altCst.children.B, B)).to.be.true
-                expect(altCst.children.bamba.children).to.have.keys("C")
+                expect(tokenMatcher(altCst.children.B[0], B)).to.be.true
+                expect(altCst.children.bamba[0].children).to.have.keys("C")
             })
 
             it("Can output a CST using Repetitions", () => {
@@ -528,8 +528,8 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("B", "$nestedMany")
-                expect(tokenMatcher(cst.children.B, B)).to.be.true
-                let nestedManyCst = cst.children.$nestedMany
+                expect(tokenMatcher(cst.children.B[0], B)).to.be.true
+                let nestedManyCst = cst.children.$nestedMany[0]
                 expect(nestedManyCst.children).to.have.keys("A", "bamba")
 
                 expect(nestedManyCst.children.A).to.have.length(3)
@@ -538,9 +538,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 expect(tokenMatcher(nestedManyCst.children.A[2], A)).to.be.true
 
                 expect(nestedManyCst.children.bamba).to.have.length(3)
-                expect(tokenMatcher(nestedManyCst.children.bamba[0].children.C, C)).to.be.true
-                expect(tokenMatcher(nestedManyCst.children.bamba[1].children.C, C)).to.be.true
-                expect(tokenMatcher(nestedManyCst.children.bamba[2].children.C, C)).to.be.true
+                expect(tokenMatcher(nestedManyCst.children.bamba[0].children.C[0], C)).to.be.true
+                expect(tokenMatcher(nestedManyCst.children.bamba[1].children.C[0], C)).to.be.true
+                expect(tokenMatcher(nestedManyCst.children.bamba[2].children.C[0], C)).to.be.true
             })
 
             it("Can output a CST using mandatory Repetitions", () => {
@@ -567,8 +567,8 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$oops", "B")
-                expect(tokenMatcher(cst.children.B, B)).to.be.true
-                let oopsCst = cst.children.$oops
+                expect(tokenMatcher(cst.children.B[0], B)).to.be.true
+                let oopsCst = cst.children.$oops[0]
                 expect(oopsCst.children).to.have.keys("A")
                 expect(oopsCst.children.A).to.have.length(3)
                 expect(tokenMatcher(oopsCst.children.A[0], A)).to.be.true
@@ -600,8 +600,8 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$pizza", "B")
-                expect(tokenMatcher(cst.children.B, B)).to.be.true
-                let pizzaCst = cst.children.$pizza
+                expect(tokenMatcher(cst.children.B[0], B)).to.be.true
+                let pizzaCst = cst.children.$pizza[0]
                 expect(pizzaCst.children.A).to.have.length(2)
                 expect(tokenMatcher(pizzaCst.children.A[0], A)).to.be.true
                 expect(tokenMatcher(pizzaCst.children.A[1], A)).to.be.true
@@ -633,9 +633,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
                 expect(cst.children).to.have.keys("$nestedName", "B")
-                expect(tokenMatcher(cst.children.B, B)).to.be.true
+                expect(tokenMatcher(cst.children.B[0], B)).to.be.true
 
-                let nestedCst = cst.children.$nestedName
+                let nestedCst = cst.children.$nestedName[0]
                 expect(nestedCst.children.A).to.have.length(2)
                 expect(tokenMatcher(nestedCst.children.A[0], A)).to.be.true
                 expect(tokenMatcher(nestedCst.children.A[1], A)).to.be.true
@@ -696,16 +696,16 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let first = firstCollection[0]
                 expect(first.recoveredNode).to.be.true
                 expect(first.children).to.have.keys("A", "B")
-                expect(tokenMatcher(first.children.A, A)).to.be.true
-                expect(first.children.B).to.be.undefined
+                expect(tokenMatcher(first.children.A[0], A)).to.be.true
+                expect(first.children.B[0]).to.be.undefined
 
                 let secondCollection = cst.children.second
                 expect(secondCollection).to.have.lengthOf(1)
                 let second = secondCollection[0]
                 expect(second.recoveredNode).to.be.undefined
                 expect(second.children).to.have.keys("C", "D")
-                expect(tokenMatcher(second.children.C, C)).to.be.true
-                expect(tokenMatcher(second.children.D, D)).to.be.true
+                expect(tokenMatcher(second.children.C[0], C)).to.be.true
+                expect(tokenMatcher(second.children.D[0], D)).to.be.true
             })
 
             it("re-sync recovery nested", () => {
@@ -762,19 +762,19 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let firstRoot = firstRootCollection[0]
                 expect(firstRoot.children).to.have.keys("first")
 
-                let first = firstRoot.children.first
+                let first = firstRoot.children.first[0]
                 expect(first.recoveredNode).to.be.true
                 expect(first.children).to.have.keys("A", "B")
-                expect(tokenMatcher(first.children.A, A)).to.be.true
-                expect(first.children.B).to.be.undefined
+                expect(tokenMatcher(first.children.A[0], A)).to.be.true
+                expect(first.children.B[0]).to.be.undefined
 
                 let secondCollection = cst.children.second
                 expect(secondCollection).to.have.lengthOf(1)
                 let second = secondCollection[0]
                 expect(second.recoveredNode).to.be.undefined
                 expect(second.children).to.have.keys("C", "D")
-                expect(tokenMatcher(second.children.C, C)).to.be.true
-                expect(tokenMatcher(second.children.D, D)).to.be.true
+                expect(tokenMatcher(second.children.C[0], C)).to.be.true
+                expect(tokenMatcher(second.children.D[0], D)).to.be.true
             })
 
 
@@ -787,5 +787,5 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 }
 
 defineCstSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)
-// defineCstSpecs("Lazy Tokens Mode", extendLazyToken, createLazyToken, tokenInstanceofMatcher)
-// defineCstSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, createSimpleToken, tokenStructuredMatcher)
+defineCstSpecs("Lazy Tokens Mode", extendLazyToken, createLazyToken, tokenInstanceofMatcher)
+defineCstSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, createSimpleToken, tokenStructuredMatcher)

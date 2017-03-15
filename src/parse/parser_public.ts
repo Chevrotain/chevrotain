@@ -75,15 +75,7 @@ import {
     tokenStructuredMatcher
 } from "../scan/tokens"
 import {CstNode} from "./cst/cst_public"
-import {
-    addNoneTerminalToCst,
-    AddRecoveryInfoToCstNode,
-    addTerminalToCst,
-    buildChildrenDictionaryDefTopRules,
-    buildInitCstDef,
-    CST_SUBTYPE,
-    initChildrenDictionary
-} from "./cst/cst"
+import {addNoneTerminalToCst, addTerminalToCst, buildChildrenDictionaryDefTopRules, initChildrenDictionary} from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -464,9 +456,6 @@ export class Parser {
                 let dictDefForRules = buildChildrenDictionaryDefTopRules(clonedProductions.values(),
                     parserInstance.fullRuleNameToShort)
                 cache.getCstDictDefPerRuleForClass(className).putAll(dictDefForRules)
-
-                let dictInitDefForRules = buildInitCstDef(dictDefForRules)
-                cache.getCstInitDefPerRuleForClass(className).putAll(dictInitDefForRules)
             }
         }
 
@@ -502,7 +491,6 @@ export class Parser {
     private firstAfterRepMap
     private classLAFuncs
     private cstDictDefForRule
-    private cstInitDefForRule
     private definitionErrors:IParserDefinitionError[]
     private definedRulesNames:string[] = []
 
@@ -514,7 +502,6 @@ export class Parser {
     private tokenMatcher:TokenMatcher
     private tokenClassIdentityFunc:TokenClassIdentityFunc
     private tokenInstanceIdentityFunc:TokenInstanceIdentityFunc
-    private CST_DICT_DEF_STACK:HashTable<CST_SUBTYPE>[] = []
     private LAST_EXPLICIT_RULE_STACK:number[] = []
     private selfAnalysisDone = false
 
@@ -577,7 +564,6 @@ export class Parser {
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
         this.cstDictDefForRule = cache.getCstDictDefPerRuleForClass(this.className)
-        this.cstInitDefForRule = cache.getCstInitDefPerRuleForClass(this.className)
 
         if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
             this.definitionErrors = []
@@ -806,7 +792,6 @@ export class Parser {
      *
      * @returns {Token} - The consumed token.
      */
-    // TODO: what is the returned type? ISimpleTokenOrIToken or IToken? or || ?
     protected CONSUME1(tokClass:TokenConstructor):ISimpleTokenOrIToken {
         return this.consumeInternal(tokClass, 1)
     }
@@ -1695,8 +1680,7 @@ export class Parser {
                             e.resyncedTokens = this.reSyncTo(reSyncTokType)
                             if (this.outputCst) {
                                 let partialCstResult = this.CST_STACK[this.CST_STACK.length - 1]
-                                let cstDictDef = this.CST_DICT_DEF_STACK[this.CST_DICT_DEF_STACK.length - 1]
-                                AddRecoveryInfoToCstNode(partialCstResult, cstDictDef)
+                                partialCstResult.recoveredNode = true
                                 return partialCstResult
                             }
                             else {
@@ -1705,12 +1689,11 @@ export class Parser {
                         }
                         else {
                             if (this.outputCst) {
-                                // recovery is only for "real" non nested rules.git
+                                // recovery is only for "real" non nested rules
                                 let prevRuleShortName = this.getLastExplicitRuleShortNameNoCst()
                                 let preRuleFullName = this.shortRuleNameToFull.get(prevRuleShortName)
                                 let partialCstResult = this.CST_STACK[this.CST_STACK.length - 1]
-                                let cstDictDef = this.CST_DICT_DEF_STACK[this.CST_DICT_DEF_STACK.length - 1]
-                                AddRecoveryInfoToCstNode(partialCstResult, cstDictDef)
+                                partialCstResult.recoveredNode = true
                                 this.cstPostNonTerminalRecovery(partialCstResult, preRuleFullName)
                             }
                             // to be handled farther up the call stack
@@ -2035,32 +2018,29 @@ export class Parser {
     }
 
     private cstNestedInvocationStateUpdate(fullRuleName:string, shortName:string | number):void {
-        this.CST_DICT_DEF_STACK.push(this.cstDictDefForRule.get(shortName))
-        let initDef = this.cstInitDefForRule.get(shortName)
+        let initDef = this.cstDictDefForRule.get(shortName)
+        // TODO: investigate performance impact of adding accessor methods
         this.CST_STACK.push({
             name:     fullRuleName,
-            children: initChildrenDictionary(initDef.collections, initDef.optionals),
+            children: initChildrenDictionary(initDef)
         })
     }
 
     private cstInvocationStateUpdate(fullRuleName:string, shortName:string | number):void {
-        this.CST_DICT_DEF_STACK.push(this.cstDictDefForRule.get(shortName))
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        let initDef = this.cstInitDefForRule.get(shortName)
+        let initDef = this.cstDictDefForRule.get(shortName)
         this.CST_STACK.push({
             name:     fullRuleName,
-            children: initChildrenDictionary(initDef.collections, initDef.optionals),
+            children: initChildrenDictionary(initDef)
         })
     }
 
     private cstFinallyStateUpdate():void {
         this.LAST_EXPLICIT_RULE_STACK.pop()
         this.CST_STACK.pop()
-        this.CST_DICT_DEF_STACK.pop()
     }
 
     private cstNestedFinallyStateUpdate():void {
-        this.CST_DICT_DEF_STACK.pop()
         this.CST_STACK.pop()
     }
 
@@ -2632,32 +2612,24 @@ export class Parser {
         let cstStack = this.CST_STACK
         let nestedRuleCst = cstStack[cstStack.length - 1]
         this.nestedRuleFinallyStateUpdate()
-        // TODO: should not this disappear?
-        let cstDictType = this.cstDictDefForRule.get(laKey)
         // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
         let parentCstNode = cstStack[cstStack.length - 1]
-        addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst, cstDictType.get(nestedName))
+        addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
     private cstPostTerminal(tokClass:TokenConstructor, consumedToken:ISimpleTokenOrIToken):void {
-        let cstDictStack = this.CST_DICT_DEF_STACK
-        let cstDictDef = cstDictStack[cstDictStack.length - 1]
         let currTokTypeName = tokClass.tokenName
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
-        addTerminalToCst(rootCst, consumedToken, cstDictDef.get(currTokTypeName), currTokTypeName)
+        addTerminalToCst(rootCst, consumedToken, currTokTypeName)
     }
 
     private cstPostNonTerminal(ruleCstResult:CstNode, ruleName:string):void {
-        let cstDictStack = this.CST_DICT_DEF_STACK
-        let cstDictDef = cstDictStack[cstDictStack.length - 1]
-        addNoneTerminalToCst(this.CST_STACK[this.CST_STACK.length - 1], ruleName, ruleCstResult, cstDictDef.get(ruleName))
+        addNoneTerminalToCst(this.CST_STACK[this.CST_STACK.length - 1], ruleName, ruleCstResult)
     }
 
     private cstPostNonTerminalRecovery(ruleCstResult:CstNode, ruleName:string):void {
         // TODO: assumes not first rule, is this assumption always correct?
-        let cstDictStack = this.CST_DICT_DEF_STACK
-        let cstDictDef = cstDictStack[cstDictStack.length - 2]
-        addNoneTerminalToCst(this.CST_STACK[this.CST_STACK.length - 2], ruleName, ruleCstResult, cstDictDef.get(ruleName))
+        addNoneTerminalToCst(this.CST_STACK[this.CST_STACK.length - 2], ruleName, ruleCstResult)
     }
 }
 

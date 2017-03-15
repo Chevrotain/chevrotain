@@ -75,5 +75,4 @@ var multiModeLexerDefinition = {
 // using the PUSH_MODE and POP_MODE static properties defined on the Token classes
 var MultiModeLexer = new Lexer(multiModeLexerDefinition);
 
-
 module.exports = MultiModeLexer;
