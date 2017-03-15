@@ -55,5 +55,5 @@ function performBenchmark(name, input, devParse, oldParse) {
     }
 }
 
-performBenchmark("CSS", cssSample, devVersionParseCss, oldVersionParseCss)
+// performBenchmark("CSS", cssSample, devVersionParseCss, oldVersionParseCss)
 performBenchmark("JSON", jsonSample, devVersionParseJson, oldVersionParseJson)

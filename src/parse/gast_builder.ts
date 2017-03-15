@@ -253,8 +253,8 @@ export function getDirectlyContainedRanges(y:IRange, prodRanges:IProdRange[]):IP
 
 let singleLineCommentRegEx = /\/\/.*/g
 let multiLineCommentRegEx = /\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\//g
-let doubleQuoteStringLiteralRegEx = /(NAME\s*:\s*)?"([^\\"]+|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g
-let singleQuoteStringLiteralRegEx = /(NAME\s*:\s*)?'([^\\']+|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g
+let doubleQuoteStringLiteralRegEx = /(NAME\s*:\s*)?"([^\\"]|\\([bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/g
+let singleQuoteStringLiteralRegEx = /(NAME\s*:\s*)?'([^\\']|\\([bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/g
 
 export function removeComments(text:string):string {
     let noSingleLine = text.replace(singleLineCommentRegEx, "")

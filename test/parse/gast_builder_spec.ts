@@ -213,17 +213,28 @@ describe("The GAst Builder namespace", () => {
         expect(actual).to.equal("\nhello world")
     })
 
-    it("has a utility function that can remove string literals from texts", () => {
-        let input = "'single quotes string'" +
-            "\nhello" +
-            "\"\"" +
-            "\"double quotes string\"" +
-            " world" +
-            "'bam\\'ba\"\"'"
+    context("has a utility function that can remove string literals from texts", () => {
+        it("simple flow", () => {
+            let input = "'single quotes string'" +
+                "\nhello" +
+                "\"\"" +
+                "\"double quotes string\"" +
+                " world" +
+                "'bam\\'ba\"\"'"
 
-        let actual = removeStringLiterals(input)
-        expect(actual).to.equal("\nhello world")
+            let actual = removeStringLiterals(input)
+            expect(actual).to.equal("\nhello world")
+        })
+
+        it("won't get suck in infinite loop", () => {
+            let input =
+                "   throw new TypeError(`Type hint \"${typeHintName}\" dosen\'t match real type`);aaaaaa\n" +
+                "return aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+            let actual = removeStringLiterals(input)
+        })
     })
+
 
     it("can detect missing closing parenthesis in a string", () => {
         let input = " ((()))" // the input is assumed to start right after an opening parenthesis
@@ -434,7 +445,6 @@ describe("The GAst Builder namespace", () => {
         expect((<gast.Terminal>def[5]).terminalType).to.equal(SemicolonTok)
     })
 
-
     it("can build nested OR grammar successfully", () => {
 
         let input = " let max = this.OR([\n\
@@ -462,4 +472,6 @@ describe("The GAst Builder namespace", () => {
         })
         expect(allOrRanges.length).to.equal(2)
     })
+
+
 })

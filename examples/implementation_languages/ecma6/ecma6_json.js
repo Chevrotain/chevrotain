@@ -39,7 +39,7 @@ class Colon extends Token {}
 Colon.PATTERN = /:/
 
 class StringLiteral extends Token {}
-StringLiteral.PATTERN = /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+StringLiteral.PATTERN = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 
 class NumberLiteral extends Token {}
 NumberLiteral.PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
