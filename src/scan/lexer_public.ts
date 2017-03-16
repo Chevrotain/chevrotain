@@ -52,7 +52,7 @@ export interface TokenConstructor extends Function {
 
 export interface ILexingResult {
     tokens:ISimpleTokenOrIToken[]
-    groups:{ [groupName:string]:ISimpleTokenOrIToken }
+    groups:{ [groupName:string]:ISimpleTokenOrIToken[] }
     errors:ILexingError[]
 }
 
