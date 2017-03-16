@@ -7,18 +7,16 @@ The main advantage of using the automatic CST creation is that it enables writin
 This means that the semantic actions are **not** embedded into the grammar implementation but are instead
 completely separated from it.
 
-This separation of concerns makes the grammar easier to maintain
-and makes it easier to implement different capabilities on the grammar,
-for example, separate logic for compilation and for IDE support.
+This separation of concerns makes the grammar easier to maintain and makes it easier to implement different capabilities on the grammar, for example: separate logic for compilation and for IDE support.
 
 
 ### Differences between an AST and a CST.
 There are two major differences.
 1. An Abstract Syntax Tree would not normally contain all the syntactic information.
-   This mean the **original** text could not be re-constructed from the AST.
+   This mean the **exact original** text could not be re-constructed from the AST.
    
 2. An Abstract Syntax Tree would not represent the whole syntactic parse tree.
-   It would normally only contain nodes related to certain parse tree nodes, but not all of those (mostly leaf nodes).
+   It would normally only contain nodes related to specific parse tree nodes, but not all of those (mostly leaf nodes).
    
 
 ### How to enable CST output?
@@ -39,10 +37,13 @@ class MyParser extends chevrotain.Parser {
 ### The structure of the CST
 
 The structure of the CST is very simple.
+
+* Note that the following examples are not runnable or contain the full information.
+These are just snippets to explain the core concepts.
  
 ```TypeScript
 export type CstElement = ISimpleTokenOrIToken | CstNode
-export type CstChildrenDictionary = { [identifier:string]:CstElement[] }
+export type CstChildrenDictionary = { [elementName:string]:CstElement[] }
 
 export interface CstNode {
     readonly name:string
@@ -53,7 +54,7 @@ export interface CstNode {
 }
 ``` 
 
-A Single CstNode corresponds to a single Grammar rule's invocation result.
+A single CstNode corresponds to a single rammar rule's invocation result.
 
 ```JavaScript
 $.RULE("qualifiedName", () => {
@@ -80,19 +81,19 @@ $.RULE("qualifiedName", () => {
     $.CONSUME2(Identifier)
 })
 
-input = "foo"
+input = "foo.bar"
 
 output = {
   name: "qualifiedName",  
   children: {
-      Dot : [dotToken1],
-      Identifier : [identToken1, identToken2]
+      Dot : ["."],
+      Identifier : ["foo", "bar"]
   }
 }
 ```
 
 Non-Terminals are handled similarly to Terminals except each item in the value's array
-Is the CstNode of the corresponding Non-Terminal.
+Is the CstNode of the corresponding Grammar Rule (Non-Terminal).
 
 ```JavaScript
 $.RULE("qualifiedName", () => {
@@ -112,7 +113,7 @@ output = {
           {
             name: "singleIdent",  
             children: {
-            Identifier : [identToken1]
+               Identifier : ["foo"]
             }
         }
       ]
@@ -147,7 +148,7 @@ $.RULE("statements", () => {
 ````
 
 Some of the Terminals and Non-Terminals are used in **both** alternatives.
-It is possible to check for the existence of distinguishing terminals such as the Let and Select
+It is possible to check for the existence of distinguishing terminals such as the "Let" and "Select".
 But this is not a robust approach.
 
 ```javaScript
@@ -176,7 +177,7 @@ $.RULE("statements", () => {
 })
 ```
 
-This is the recommended approach in this case as otherwise as more alternations would be added the grammar rule
+This is the recommended approach in this case as more and more alternations are added the grammar rule
 will become too difficult to understand and maintain due to verbosity.   
 
 However sometimes refactoring out rules is too much, this is where **in-lined** rules arrive to the rescue.
@@ -253,7 +254,8 @@ Syntax Limitation:
 
 CST output is also supported in combination with automatic error recovery.
 This combination is actually stronger than regular error recovery because
-even partially formed CstNodes will be present on the CST output.
+even partially formed CstNodes will be present on the CST output and be marked 
+using the **recoveredNode"** boolean property.
 
 For example given this grammar and assuming the parser re-synced after a token mismatch at
 the "Where" token:
@@ -269,7 +271,7 @@ $.RULE("statements", () => {
 })
 
 // mismatch token due to typo at "wherrrre", parsing halts and re-syncs to upper rule so 
-// "wherrrre age > 25" is not parsed.
+// the suffix "wherrrre age > 25" is not parsed.
 input = "select age from persons wherrrre age > 25"
 
 output = {
@@ -280,11 +282,13 @@ output = {
       From: ["from"],
       Where: [/*nothing here, due to parse error*/],
       expression: [/*nothing here, due to parse error*/],
-  }
+  },
+  // This marks a recovered node.
+  recoveredNode: true
 }
 ```
 
-This accessibility of **partial parsing results** means some post parsing logic
+This accessibility of **partial parsing results** means some post-parsing logic
 may be able to perform farther analysis for example: offer auto-fix suggestions or provide better error messages.
  
 
@@ -303,5 +307,5 @@ building is 55-65% of simply parsing without any output structure.
   
 * Note that even when building a CST the performance on most recent versions of Chrome (59) was faster
   Than any other tested parsing library (Antlr4/PegJS/Jison).
-  - Again we are unfortunately comparing apples to oranges as most parsing libraries in that benchmark
+  - Again we are unfortunately comparing apples to oranges as most parsing libraries in that JSON benchmark
     do not output any data structure.
