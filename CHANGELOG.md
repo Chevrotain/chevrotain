@@ -1,3 +1,22 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [DSL Methods Improved optional arguments syntax.](https://github.com/SAP/chevrotain/issues/367)
+
+#### Major Changes
+- [Automatic creation of a Concrete Syntax Tree.](https://github.com/SAP/chevrotain/issues/215)
+  * See [Relevant Docs]( https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md).
+
+#### Minor Changes
+- [Clear error message if rules have been defined after performSelfAnalysis has been called.](https://github.com/SAP/chevrotain/issues/385)
+- [Micro performance boost on subrule array init.](https://github.com/SAP/chevrotain/issues/378)
+
+#### Bug Fixes
+- [Avoid Possible internal unique key conflicts.](https://github.com/SAP/chevrotain/commit/393f2a97cd109c239ced67931586afe5034df713)
+- [Infinite loop during GAST builder.](https://github.com/SAP/chevrotain/issues/392)
+
+
+
 ## 0.23.0 (2-3-2017)
 
 #### Major Changes
