@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.24.0 (3-17-2017)
 
 #### Breaking Changes
 - [DSL Methods Improved optional arguments syntax.](https://github.com/SAP/chevrotain/issues/367)

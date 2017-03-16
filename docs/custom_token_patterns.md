@@ -26,7 +26,7 @@ function. Additionally it must perform any matches from the **start** of the inp
 that any custom pattern implementations should behave as if the [start of input anchor](http://www.rexegg.com/regex-anchors.html#caret) 
 has been used.
 
-The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_23_0/interfaces/icustompattern.html) interface.
+The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_24_0/interfaces/icustompattern.html) interface.
 Example:
 
 ```JavaScript
@@ -92,6 +92,6 @@ function matchInteger(text, matchedTokens, groups) {
 
 A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/0_23_0/interfaces/ilexingresult.html)).
+It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/0_24_0/interfaces/ilexingresult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.
