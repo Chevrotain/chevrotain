@@ -1,7 +1,7 @@
 import {ISimpleTokenOrIToken, tokenName} from "../../scan/tokens_public"
 import {CstChildrenDictionary, CstNode} from "./cst_public"
 import {gast} from "../grammar/gast_public"
-import {cloneArr, cloneObj, drop, dropRight, forEach, has, isEmpty, isUndefined, last} from "../../utils/utils"
+import {cloneObj, drop, forEach, has, isEmpty, isUndefined} from "../../utils/utils"
 import {HashTable} from "../../lang/lang_extensions"
 import {
     AT_LEAST_ONE_IDX,
@@ -21,22 +21,12 @@ import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
 import IProductionWithOccurrence = gast.IProductionWithOccurrence
 import AbstractProduction = gast.AbstractProduction
 
-export function addTerminalToCst(node:CstNode, token:ISimpleTokenOrIToken, cstType:CST_SUBTYPE, tokenTypeName:string):void {
-    if (cstType === CST_SUBTYPE.COLLECTION) {
-        (node.children[tokenTypeName] as Array<ISimpleTokenOrIToken>).push(token)
-    }
-    else {
-        node.children[tokenTypeName] = token
-    }
+export function addTerminalToCst(node:CstNode, token:ISimpleTokenOrIToken, tokenTypeName:string):void {
+    (node.children[tokenTypeName] as Array<ISimpleTokenOrIToken>).push(token)
 }
 
-export function addNoneTerminalToCst(node:CstNode, ruleName:string, ruleResult:any, cstType:CST_SUBTYPE):void {
-    if (cstType === CST_SUBTYPE.COLLECTION) {
-        (node.children[ruleName] as Array<CstNode>).push(ruleResult)
-    }
-    else {
-        node.children[ruleName] = ruleResult
-    }
+export function addNoneTerminalToCst(node:CstNode, ruleName:string, ruleResult:any):void {
+    (node.children[ruleName] as Array<CstNode>).push(ruleResult)
 }
 
 export interface DefAndKeyAndName {
@@ -114,82 +104,32 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
     }
 }
 
+// TODO: maybe just need a list of names if we use pure arrays?
 export function buildChildrenDictionaryDefTopRules(topRules:gast.Rule[],
-                                                   fullToShortName:HashTable<number>):HashTable<HashTable<CST_SUBTYPE>> {
-    let result = new HashTable<HashTable<CST_SUBTYPE>>()
+                                                   fullToShortName:HashTable<number>):HashTable<string[]> {
+    let result = new HashTable<string[]>()
 
     forEach(topRules, (currTopRule) => {
-        let currRuleDictionaryDef = buildChildDictionaryDef(currTopRule.definition)
+        let currChildrenNames = buildChildDictionaryDef(currTopRule.definition)
         let currTopRuleShortName = fullToShortName.get(currTopRule.name)
-        result.put(currTopRuleShortName, currRuleDictionaryDef)
+        result.put(currTopRuleShortName, currChildrenNames)
 
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor(currTopRuleShortName)
         currTopRule.accept(namedCollectorVisitor)
         forEach(namedCollectorVisitor.result, ({def, key}) => {
-            let currNamedMethodDictionaryDef = buildChildDictionaryDef(def)
-            result.put(key, currNamedMethodDictionaryDef)
+            let currNestedChildrenNames = buildChildDictionaryDef(def)
+            result.put(key, currNestedChildrenNames)
         })
     })
 
     return result
 }
 
-export type InitCstDef = HashTable<{ collections:string[], optionals:string[] }>
-export function buildInitCstDef(childrenDictionaryDef:HashTable<HashTable<CST_SUBTYPE>>):InitCstDef {
-    let result = new HashTable<{ collections:string[], optionals:string[] }>()
-
-    forEach(childrenDictionaryDef.keys(), (currKey) => {
-        let currRuleDictDef = childrenDictionaryDef.get(currKey)
-        let collections:string[] = []
-        let optionals:string[] = []
-
-        forEach(currRuleDictDef.keys(), (currDefKey) => {
-            let dictValue = currRuleDictDef.get(currDefKey)
-            if (dictValue === CST_SUBTYPE.COLLECTION) {
-                collections.push(currDefKey)
-            }
-            else if (dictValue === CST_SUBTYPE.OPTIONAL) {
-                optionals.push(currDefKey)
-            }
-        })
-
-        result.put(currKey, {collections, optionals})
-    })
-
-    return result
-}
-
-export enum CST_SUBTYPE {NONE, COLLECTION, OPTIONAL}
-
-export class ChildDictionaryDefInitVisitor extends GAstVisitor {
-
-    public result:HashTable<CST_SUBTYPE>
-
-    constructor() {
-        super()
-        this.result = new HashTable<CST_SUBTYPE>()
-    }
-
-    public visitNonTerminal(node:NonTerminal):any {
-        let id = node.nonTerminalName
-        this.result.put(id, CST_SUBTYPE.NONE)
-    }
-
-    public visitTerminal(node:Terminal):any {
-        let id = tokenName(node.terminalType)
-        this.result.put(id, CST_SUBTYPE.NONE)
-    }
-}
-
-export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_SUBTYPE> {
-    let initVisitor = new ChildDictionaryDefInitVisitor()
-    let wrapperRule = new gast.Rule("wrapper", initialDef)
-    wrapperRule.accept(initVisitor)
-
-    let result = initVisitor.result
+export function buildChildDictionaryDef(initialDef:IProduction[]):string[] {
+    let result = []
 
     let possiblePaths = []
-    possiblePaths.push({def: initialDef, inIteration: [], inOption: [], currResult: {}})
+    possiblePaths.push({def: initialDef})
 
     let currDef:IProduction[]
     let currInIteration
@@ -197,18 +137,7 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
     let currResult
 
     function addSingleItemToResult(itemName) {
-        if (!has(currResult, itemName)) {
-            currResult[itemName] = 0
-        }
-        currResult[itemName] += 1
-
-        let occurrencesFound = currResult[itemName]
-        if (occurrencesFound > 1 || last(currInIteration)) {
-            result.put(itemName, CST_SUBTYPE.COLLECTION)
-        }
-        else if (last(currInOption)) {
-            result.put(itemName, CST_SUBTYPE.OPTIONAL)
-        }
+        result.push(itemName)
 
         let nextPath = {
             def:         drop(currDef),
@@ -232,29 +161,8 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
             continue
         }
 
-        const EXIT_ITERATION:any = "EXIT_ITERATION"
-        const EXIT_OPTION:any = "EXIT_OPTION"
-
         let prod = currDef[0]
-        if (prod === EXIT_ITERATION) {
-            let nextPath = {
-                def:         drop(currDef),
-                inIteration: dropRight(currInIteration),
-                inOption:    currInOption,
-                currResult:  cloneObj(currResult)
-            }
-            possiblePaths.push(nextPath)
-        }
-        else if (prod === EXIT_OPTION) {
-            let nextPath = {
-                def:         drop(currDef),
-                inIteration: currInIteration,
-                inOption:    dropRight(currInOption),
-                currResult:  cloneObj(currResult)
-            }
-            possiblePaths.push(nextPath)
-        }
-        else if (prod instanceof gast.Terminal) {
+        if (prod instanceof gast.Terminal) {
             let terminalName = tokenName(prod.terminalType)
             addSingleItemToResult(terminalName)
         }
@@ -267,14 +175,8 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
                 addSingleItemToResult(prod.name)
             }
             else {
-                let newInOption = cloneArr(currInIteration)
-                newInOption.push(true)
-
                 let nextPathWith = {
-                    def:         prod.definition.concat([EXIT_OPTION], drop(currDef)),
-                    inIteration: currInIteration,
-                    inOption:    newInOption,
-                    currResult:  cloneObj(currResult)
+                    def: prod.definition.concat(drop(currDef)),
                 }
                 possiblePaths.push(nextPathWith)
             }
@@ -285,14 +187,9 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
                 addSingleItemToResult(prod.name)
             }
             else {
-                let nextDef = prod.definition.concat([EXIT_ITERATION], drop(currDef))
-                let newInIteration = cloneArr(currInIteration)
-                newInIteration.push(true)
+                let nextDef = prod.definition.concat(drop(currDef))
                 let nextPath = {
-                    def:         nextDef,
-                    inIteration: newInIteration,
-                    inOption:    currInOption,
-                    currResult:  cloneObj(currResult)
+                    def: nextDef
                 }
                 possiblePaths.push(nextPath)
             }
@@ -305,14 +202,9 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
                 let separatorGast = new gast.Terminal(prod.separator)
                 let secondIteration:any = new gast.Repetition([<any>separatorGast].concat(prod.definition), prod.occurrenceInParent)
                 // Hack: X (, X)* --> (, X) because it is identical in terms of identifying "isCollection?"
-                let nextDef = [secondIteration].concat([EXIT_ITERATION], drop(currDef))
-                let newInIteration = cloneArr(currInIteration)
-                newInIteration.push(true)
+                let nextDef = [secondIteration].concat(drop(currDef))
                 let nextPath = {
-                    def:         nextDef,
-                    inIteration: newInIteration,
-                    inOption:    currInOption,
-                    currResult:  cloneObj(currResult)
+                    def: nextDef
                 }
                 possiblePaths.push(nextPath)
             }
@@ -323,31 +215,17 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
                 addSingleItemToResult(prod.name)
             }
             else {
-                let hasMoreThanOneAlt = prod.definition.length > 1
                 // the order of alternatives is meaningful, FILO (Last path will be traversed first).
                 for (let i = prod.definition.length - 1; i >= 0; i--) {
                     let currAlt:any = prod.definition[i]
                     // named alternatives
                     if (!isUndefined(currAlt.name)) {
-                        addSingleItemToResult(prod.name)
+                        addSingleItemToResult(currAlt.name)
                     }
                     else {
-                        let newInOption
-                        let newDef
-                        if (hasMoreThanOneAlt) {
-                            newInOption = cloneArr(currInIteration)
-                            newInOption.push(true)
-                            newDef = currAlt.definition.concat([EXIT_OPTION], drop(currDef))
-                        }
-                        else {
-                            newInOption = cloneArr(currInIteration)
-                            newDef = currAlt.definition.concat(drop(currDef))
-                        }
+                        let newDef = currAlt.definition.concat(drop(currDef))
                         let currAltPath = {
-                            def:         newDef,
-                            inIteration: currInIteration,
-                            inOption:    newInOption,
-                            currResult:  cloneObj(currResult)
+                            def: newDef
                         }
                         possiblePaths.push(currAltPath)
                     }
@@ -361,7 +239,7 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):HashTable<CST_
     return result
 }
 
-export function initChildrenDictionary(collections:string[], optionals:string[]):CstChildrenDictionary {
+export function initChildrenDictionary(collections:string[]):CstChildrenDictionary {
     let childrenDictionary = {}
 
     let collectionsLength = collections.length
@@ -370,29 +248,5 @@ export function initChildrenDictionary(collections:string[], optionals:string[])
         childrenDictionary[key] = []
     }
 
-    let optionalLength = optionals.length
-    for (let i = 0; i < optionalLength; i++) {
-        let key = optionals[i]
-        childrenDictionary[key] = undefined
-    }
-
     return childrenDictionary
-}
-
-/**
- * Side Effect, Modifies the input cstNode
- */
-export function AddRecoveryInfoToCstNode(cstNode:CstNode, childrenDictionaryDef:HashTable<CST_SUBTYPE>):void {
-    (<any>cstNode).recoveredNode = true
-
-    forEach(childrenDictionaryDef.keys(), (currKey) => {
-        let dictValue = childrenDictionaryDef.get(currKey)
-
-        if (dictValue === CST_SUBTYPE.NONE && !has(cstNode.children, currKey)) {
-            // during parsing of valid input this key would not have had to be defined
-            // as it is a mandatory (non-optional) Cst child. However when dealing with partial parsing results
-            // during error recovery, the parser may not have encountered all the "mandatory" cst children.
-            cstNode.children[currKey] = undefined
-        }
-    })
 }
