@@ -36,7 +36,7 @@ When to use base Tokens:
 
 ### The Lazy Token
 The [Lazy Tokens](http://sap.github.io/chevrotain/documentation/0_23_0/classes/lazytoken.html) are **im-mutable** Inheritance based Tokens which have most of their properties computed only on demand.
-This is accomplished by using ECMASciprt getters. This approach achieves both memory conservation and increased performance
+This is accomplished by using ECMAScript getters. This approach achieves both memory conservation and increased performance
 for most use cases. 
 
 Lazy Tokens can be defined either using ES2015 inheritance or
@@ -87,7 +87,7 @@ Tokens but at the cost of:
   var startLine = chevrotain.getStartLine(startLine)
   var endColumn = chevrotain.getEndColumn(myTokenInstance)
   ```
-* being harder to debug as there is less information for the .  
+* being harder to debug as there is less information on the token object itself.  
 
 
 Simple Lazy Tokens can be defined either using ES2015 inheritance or
