@@ -44,20 +44,22 @@ function jsonExample() {
     // In ES6, custom inheritance implementation
     // (such as the one above) can be replaced
     // with a more simple: "class X extends Y"...
-    var True = createToken({name:"True", pattern: /true/});
-    var False = createToken({name:"False", pattern: /false/});
-    var Null = createToken({name:"Null", pattern: /null/});
-    var LCurly = createToken({name:"LCurly", pattern: /{/});
-    var RCurly = createToken({name:"RCurly", pattern: /}/});
-    var LSquare = createToken({name:"LSquare", pattern: /\[/});
-    var RSquare = createToken({name:"RSquare", pattern: /]/});
-    var Comma = createToken({name:"Comma", pattern:/,/});
-    var Colon = createToken({name:"Colon", pattern: /:/});
-    var StringLiteral = createToken({name:"StringLiteral", pattern:
-        /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
-    var NumberLiteral = createToken({name:"NumberLiteral", pattern:
-        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var True = createToken({name: "True", pattern: /true/});
+    var False = createToken({name: "False", pattern: /false/});
+    var Null = createToken({name: "Null", pattern: /null/});
+    var LCurly = createToken({name: "LCurly", pattern: /{/});
+    var RCurly = createToken({name: "RCurly", pattern: /}/});
+    var LSquare = createToken({name: "LSquare", pattern: /\[/});
+    var RSquare = createToken({name: "RSquare", pattern: /]/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+    var Colon = createToken({name: "Colon", pattern: /:/});
+    var StringLiteral = createToken({
+        name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+    });
+    var NumberLiteral = createToken({
+        name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+    });
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
 
@@ -84,8 +86,8 @@ function jsonExample() {
 
         $.RULE("json", function () {
             return $.OR([
-                { ALT: function () { return $.SUBRULE($.object) }},
-                { ALT: function () { return $.SUBRULE($.array) }}
+                {ALT: function () { return $.SUBRULE($.object) }},
+                {ALT: function () { return $.SUBRULE($.array) }}
             ]);
         });
 
@@ -96,8 +98,10 @@ function jsonExample() {
             var obj = {}
 
             $.CONSUME(LCurly);
-            $.MANY_SEP(Comma, function () {
-                _.assign(obj, $.SUBRULE($.objectItem));
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    _.assign(obj, $.SUBRULE($.objectItem));
+                }
             });
             $.CONSUME(RCurly);
 
@@ -123,8 +127,10 @@ function jsonExample() {
         $.RULE("array", function () {
             var arr = [];
             $.CONSUME(LSquare);
-            $.MANY_SEP(Comma, function () {
-                arr.push($.SUBRULE($.value));
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    arr.push($.SUBRULE($.value));
+                }
             });
             $.CONSUME(RSquare);
 
@@ -181,20 +187,22 @@ function jsonGrammarOnlyExample() {
     var createToken = chevrotain.createToken;
     var Lexer = chevrotain.Lexer;
 
-    var True = createToken({name:"True", pattern: /true/});
-    var False = createToken({name:"False", pattern: /false/});
-    var Null = createToken({name:"Null", pattern: /null/});
-    var LCurly = createToken({name:"LCurly", pattern: /{/});
-    var RCurly = createToken({name:"RCurly", pattern: /}/});
-    var LSquare = createToken({name:"LSquare", pattern: /\[/});
-    var RSquare = createToken({name:"RSquare", pattern: /]/});
-    var Comma = createToken({name:"Comma", pattern:/,/});
-    var Colon = createToken({name:"Colon", pattern: /:/});
-    var StringLiteral = createToken({name:"StringLiteral", pattern:
-        /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
-    var NumberLiteral = createToken({name:"NumberLiteral", pattern:
-        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var True = createToken({name: "True", pattern: /true/});
+    var False = createToken({name: "False", pattern: /false/});
+    var Null = createToken({name: "Null", pattern: /null/});
+    var LCurly = createToken({name: "LCurly", pattern: /{/});
+    var RCurly = createToken({name: "RCurly", pattern: /}/});
+    var LSquare = createToken({name: "LSquare", pattern: /\[/});
+    var RSquare = createToken({name: "RSquare", pattern: /]/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+    var Colon = createToken({name: "Colon", pattern: /:/});
+    var StringLiteral = createToken({
+        name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+    });
+    var NumberLiteral = createToken({
+        name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+    });
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
 
@@ -216,20 +224,27 @@ function jsonGrammarOnlyExample() {
     var Parser = chevrotain.Parser;
 
     function JsonParser(input) {
-        Parser.call(this, input, jsonTokens, {recoveryEnabled: true});
+        Parser.call(this, input, jsonTokens, {
+            recoveryEnabled: true,
+            // This will automatically create a Concrete Syntax Tree
+            // You can inspect this structure in the output window.
+            outputCst: true
+        });
         var $ = this;
 
         $.RULE("json", function () {
             $.OR([
-                { ALT: function () { $.SUBRULE($.object) }},
-                { ALT: function () { $.SUBRULE($.array) }}
+                {ALT: function () { $.SUBRULE($.object) }},
+                {ALT: function () { $.SUBRULE($.array) }}
             ]);
         });
 
         $.RULE("object", function () {
             $.CONSUME(LCurly);
-            $.MANY_SEP(Comma, function () {
-                $.SUBRULE($.objectItem);
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    $.SUBRULE($.objectItem);
+                }
             });
             $.CONSUME(RCurly);
         });
@@ -244,8 +259,10 @@ function jsonGrammarOnlyExample() {
 
         $.RULE("array", function () {
             $.CONSUME(LSquare);
-            $.MANY_SEP(Comma, function () {
-                $.SUBRULE($.value);
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    $.SUBRULE($.value);
+                }
             });
             $.CONSUME(RSquare);
         });
@@ -253,13 +270,13 @@ function jsonGrammarOnlyExample() {
 
         $.RULE("value", function () {
             $.OR([
-                { ALT: function () { $.CONSUME(StringLiteral) }},
-                { ALT: function () { $.CONSUME(NumberLiteral) }},
-                { ALT: function () { $.SUBRULE($.object) }},
-                { ALT: function () { $.SUBRULE($.array) }},
-                { ALT: function () { $.CONSUME(True) }},
-                { ALT: function () { $.CONSUME(False) }},
-                { ALT: function () { $.CONSUME(Null); }}
+                {ALT: function () { $.CONSUME(StringLiteral) }},
+                {ALT: function () { $.CONSUME(NumberLiteral) }},
+                {ALT: function () { $.SUBRULE($.object) }},
+                {ALT: function () { $.SUBRULE($.array) }},
+                {ALT: function () { $.CONSUME(True) }},
+                {ALT: function () { $.CONSUME(False) }},
+                {ALT: function () { $.CONSUME(Null); }}
             ]);
         });
 
@@ -324,8 +341,8 @@ function cssExample() {
     FRAGMENT("ident", "-?{{nmstart}}{{nmchar}}*");
     FRAGMENT("num", "[0-9]+|[0-9]*\\.[0-9]+");
 
-    var Whitespace = createToken({name:'Whitespace', pattern: MAKE_PATTERN('{{spaces}}')});
-    var Comment = createToken({name:'Comment', pattern: /\/\*[^*]*\*+([^/*][^*]*\*+)*\//});
+    var Whitespace = createToken({name: 'Whitespace', pattern: MAKE_PATTERN('{{spaces}}')});
+    var Comment = createToken({name: 'Comment', pattern: /\/\*[^*]*\*+([^/*][^*]*\*+)*\//});
     // the W3C specs are are defined in a whitespace sensitive manner.
     // This implementation ignores that crazy mess, This means that this grammar may be a superset of the css 2.1 grammar.
     // Checking for whitespace related errors can be done in a separate process AFTER parsing.
@@ -333,38 +350,41 @@ function cssExample() {
     Comment.GROUP = Lexer.SKIPPED;
 
     // This group has to be defined BEFORE Ident as their prefix is a valid Ident
-    var Uri = createToken({name:'Uri', pattern: Lexer.NA});
-    var UriString = createToken({name:'UriString', pattern: MAKE_PATTERN('url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)')});
-    var UriUrl = createToken({name:'UriUrl', pattern: MAKE_PATTERN('url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)')});
-    var Func = createToken({name:'Func', pattern: MAKE_PATTERN('{{ident}}\\(')});
+    var Uri = createToken({name: 'Uri', pattern: Lexer.NA});
+    var UriString = createToken({
+        name: 'UriString',
+        pattern: MAKE_PATTERN('url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)')
+    });
+    var UriUrl = createToken({name: 'UriUrl', pattern: MAKE_PATTERN('url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)')});
+    var Func = createToken({name: 'Func', pattern: MAKE_PATTERN('{{ident}}\\(')});
     // Ident must be before Minus
-    var Ident = createToken({name:'Ident', pattern: MAKE_PATTERN('{{ident}}')});
+    var Ident = createToken({name: 'Ident', pattern: MAKE_PATTERN('{{ident}}')});
 
-    var Cdo = createToken({name:'Cdo', pattern: /<!--/});
+    var Cdo = createToken({name: 'Cdo', pattern: /<!--/});
     // Cdc must be before Minus
-    var Cdc = createToken({name:'Cdc', pattern: /-->/});
-    var Includes = createToken({name:'Includes', pattern: /~=/});
-    var Dasmatch = createToken({name:'Dasmatch', pattern: /\|=/});
-    var Exclamation = createToken({name:'Exclamation', pattern: /!/});
-    var Dot = createToken({name:'Dot', pattern: /\./});
-    var LCurly = createToken({name:'LCurly', pattern: /{/});
-    var RCurly = createToken({name:'RCurly', pattern: /}/});
-    var LSquare = createToken({name:'LSquare', pattern: /\[/});
-    var RSquare = createToken({name:'RSquare', pattern: /]/});
-    var LParen = createToken({name:'LParen', pattern: /\(/});
-    var RParen = createToken({name:'RParen', pattern: /\)/});
-    var Comma = createToken({name:'Comma', pattern: /,/});
-    var Colon = createToken({name:'Colon', pattern: /:/});
-    var SemiColon = createToken({name:'SemiColon', pattern:/;/});
-    var Equals = createToken({name:'Equals', pattern: /=/});
-    var Star = createToken({name:'Star', pattern: /\*/});
-    var Plus = createToken({name:'Plus', pattern: /\+/});
-    var Minus = createToken({name:'Minus', pattern: /-/});
-    var GreaterThan = createToken({name:'GreaterThan', pattern: />/});
-    var Slash = createToken({name:'Slash', pattern: /\//});
+    var Cdc = createToken({name: 'Cdc', pattern: /-->/});
+    var Includes = createToken({name: 'Includes', pattern: /~=/});
+    var Dasmatch = createToken({name: 'Dasmatch', pattern: /\|=/});
+    var Exclamation = createToken({name: 'Exclamation', pattern: /!/});
+    var Dot = createToken({name: 'Dot', pattern: /\./});
+    var LCurly = createToken({name: 'LCurly', pattern: /{/});
+    var RCurly = createToken({name: 'RCurly', pattern: /}/});
+    var LSquare = createToken({name: 'LSquare', pattern: /\[/});
+    var RSquare = createToken({name: 'RSquare', pattern: /]/});
+    var LParen = createToken({name: 'LParen', pattern: /\(/});
+    var RParen = createToken({name: 'RParen', pattern: /\)/});
+    var Comma = createToken({name: 'Comma', pattern: /,/});
+    var Colon = createToken({name: 'Colon', pattern: /:/});
+    var SemiColon = createToken({name: 'SemiColon', pattern: /;/});
+    var Equals = createToken({name: 'Equals', pattern: /=/});
+    var Star = createToken({name: 'Star', pattern: /\*/});
+    var Plus = createToken({name: 'Plus', pattern: /\+/});
+    var Minus = createToken({name: 'Minus', pattern: /-/});
+    var GreaterThan = createToken({name: 'GreaterThan', pattern: />/});
+    var Slash = createToken({name: 'Slash', pattern: /\//});
 
-    var StringLiteral = createToken({name:'StringLiteral', pattern: MAKE_PATTERN('{{string1}}|{{string2}}')});
-    var Hash = createToken({name:'Hash', pattern: MAKE_PATTERN('#{{name}}')});
+    var StringLiteral = createToken({name: 'StringLiteral', pattern: MAKE_PATTERN('{{string1}}|{{string2}}')});
+    var Hash = createToken({name: 'Hash', pattern: MAKE_PATTERN('#{{name}}')});
 
     // note that the spec defines import as : @{I}{M}{P}{O}{R}{T}
     // Where every letter is defined in this pattern:
@@ -381,41 +401,41 @@ function cssExample() {
     // This gives us 73^6 options to write the word "import" which is a number with 12 digits...
     // This implementation does not bother with this crap :) and instead settles for
     // "just" 64 option to write "impPorT" (case due to case insensitivity)
-    var ImportSym = createToken({name:'ImportSym', pattern: /@import/i});
-    var PageSym = createToken({name:'PageSym', pattern: /@page/i});
-    var MediaSym = createToken({name:'MediaSym', pattern: /@media/i});
-    var CharsetSym = createToken({name:'CharsetSym', pattern: /@charset/i});
-    var ImportantSym = createToken({name:'ImportantSym', pattern: /important/i});
+    var ImportSym = createToken({name: 'ImportSym', pattern: /@import/i});
+    var PageSym = createToken({name: 'PageSym', pattern: /@page/i});
+    var MediaSym = createToken({name: 'MediaSym', pattern: /@media/i});
+    var CharsetSym = createToken({name: 'CharsetSym', pattern: /@charset/i});
+    var ImportantSym = createToken({name: 'ImportantSym', pattern: /important/i});
 
 
-    var Ems = createToken({name:'Ems', pattern: MAKE_PATTERN('{{num}}em', 'i')});
-    var Exs = createToken({name:'Exs', pattern: MAKE_PATTERN('{{num}}ex', 'i')});
+    var Ems = createToken({name: 'Ems', pattern: MAKE_PATTERN('{{num}}em', 'i')});
+    var Exs = createToken({name: 'Exs', pattern: MAKE_PATTERN('{{num}}ex', 'i')});
 
-    var Length = createToken({name:'Length', pattern: Lexer.NA});
-    var Px = createToken({name:'Px', pattern: MAKE_PATTERN('{{num}}px', 'i'), parent: Length});
-    var Cm = createToken({name:'Cm', pattern: MAKE_PATTERN('{{num}}cm', 'i'), parent: Length});
-    var Mm = createToken({name:'Mm', pattern: MAKE_PATTERN('{{num}}mm', 'i'), parent: Length});
-    var In = createToken({name:'In', pattern: MAKE_PATTERN('{{num}}in', 'i'), parent: Length});
-    var Pt = createToken({name:'Pt', pattern: MAKE_PATTERN('{{num}}pt', 'i'), parent: Length});
-    var Pc = createToken({name:'Pc', pattern: MAKE_PATTERN('{{num}}pc', 'i'), parent: Length});
+    var Length = createToken({name: 'Length', pattern: Lexer.NA});
+    var Px = createToken({name: 'Px', pattern: MAKE_PATTERN('{{num}}px', 'i'), parent: Length});
+    var Cm = createToken({name: 'Cm', pattern: MAKE_PATTERN('{{num}}cm', 'i'), parent: Length});
+    var Mm = createToken({name: 'Mm', pattern: MAKE_PATTERN('{{num}}mm', 'i'), parent: Length});
+    var In = createToken({name: 'In', pattern: MAKE_PATTERN('{{num}}in', 'i'), parent: Length});
+    var Pt = createToken({name: 'Pt', pattern: MAKE_PATTERN('{{num}}pt', 'i'), parent: Length});
+    var Pc = createToken({name: 'Pc', pattern: MAKE_PATTERN('{{num}}pc', 'i'), parent: Length});
 
-    var Angle = createToken({name:'Angle', pattern: Lexer.NA});
-    var Deg = createToken({name:'Deg', pattern: MAKE_PATTERN('{{num}}deg', 'i'), parent: Angle});
-    var Rad = createToken({name:'Rad', pattern: MAKE_PATTERN('{{num}}rad', 'i'), parent: Angle});
-    var Grad = createToken({name:'Grad', pattern: MAKE_PATTERN('{{num}}grad', 'i'), parent: Angle});
+    var Angle = createToken({name: 'Angle', pattern: Lexer.NA});
+    var Deg = createToken({name: 'Deg', pattern: MAKE_PATTERN('{{num}}deg', 'i'), parent: Angle});
+    var Rad = createToken({name: 'Rad', pattern: MAKE_PATTERN('{{num}}rad', 'i'), parent: Angle});
+    var Grad = createToken({name: 'Grad', pattern: MAKE_PATTERN('{{num}}grad', 'i'), parent: Angle});
 
-    var Time = createToken({name:'Time', pattern: Lexer.NA});
-    var Ms = createToken({name:'Ms', pattern: MAKE_PATTERN('{{num}}ms', 'i'), parent: Time});
-    var Sec = createToken({name:'Sec', pattern: MAKE_PATTERN('{{num}}sec', 'i'), parent: Time});
+    var Time = createToken({name: 'Time', pattern: Lexer.NA});
+    var Ms = createToken({name: 'Ms', pattern: MAKE_PATTERN('{{num}}ms', 'i'), parent: Time});
+    var Sec = createToken({name: 'Sec', pattern: MAKE_PATTERN('{{num}}sec', 'i'), parent: Time});
 
-    var Freq = createToken({name:'Freq', pattern: Lexer.NA});
-    var Hz = createToken({name:'Hz', pattern: MAKE_PATTERN('{{num}}hz', 'i'), parent: Freq});
-    var Khz = createToken({name:'Khz', pattern: MAKE_PATTERN('{{num}}khz', 'i'), parent: Freq});
+    var Freq = createToken({name: 'Freq', pattern: Lexer.NA});
+    var Hz = createToken({name: 'Hz', pattern: MAKE_PATTERN('{{num}}hz', 'i'), parent: Freq});
+    var Khz = createToken({name: 'Khz', pattern: MAKE_PATTERN('{{num}}khz', 'i'), parent: Freq});
 
-    var Percentage = createToken({name:'Percentage', pattern: MAKE_PATTERN('{{num}}%', 'i')});
+    var Percentage = createToken({name: 'Percentage', pattern: MAKE_PATTERN('{{num}}%', 'i')});
 
     // Num must appear after all the num forms with a suffix
-    var Num = createToken({name:'Num', pattern: MAKE_PATTERN('{{num}}')});
+    var Num = createToken({name: 'Num', pattern: MAKE_PATTERN('{{num}}')});
 
 
     var CssLexer = new Lexer(cssTokens);
@@ -458,9 +478,9 @@ function cssExample() {
 
         $.RULE('contents', function () {
             $.OR([
-                {ALT: function() { $.SUBRULE($.ruleset)}},
-                {ALT: function() { $.SUBRULE($.media)}},
-                {ALT: function() { $.SUBRULE($.page)}}
+                {ALT: function () { $.SUBRULE($.ruleset)}},
+                {ALT: function () { $.SUBRULE($.media)}},
+                {ALT: function () { $.SUBRULE($.page)}}
             ]);
             $.SUBRULE3($.cdcCdo)
         })
@@ -469,8 +489,8 @@ function cssExample() {
         $.RULE('cdcCdo', function () {
             $.MANY(function () {
                 $.OR([
-                    {ALT: function() { $.CONSUME(Cdo)}},
-                    {ALT: function() { $.CONSUME(Cdc)}}
+                    {ALT: function () { $.CONSUME(Cdo)}},
+                    {ALT: function () { $.CONSUME(Cdc)}}
                 ]);
             })
         })
@@ -480,8 +500,8 @@ function cssExample() {
         $.RULE('cssImport', function () {
             $.CONSUME(ImportSym)
             $.OR([
-                {ALT: function() { $.CONSUME(StringLiteral)}},
-                {ALT: function() { $.CONSUME(Uri)}}
+                {ALT: function () { $.CONSUME(StringLiteral)}},
+                {ALT: function () { $.CONSUME(Uri)}}
             ]);
 
             $.OPTION(function () {
@@ -502,8 +522,10 @@ function cssExample() {
 
         // medium [ COMMA S* medium]*
         $.RULE('media_list', function () {
-            $.MANY_SEP(Comma, function () {
-                $.SUBRULE($.medium)
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    $.SUBRULE($.medium)
+                }
             })
         });
 
@@ -549,24 +571,24 @@ function cssExample() {
         // '/' S* | ',' S*
         $.RULE('operator', function () {
             $.OR([
-                {ALT: function() { $.CONSUME(Slash)}},
-                {ALT: function() { $.CONSUME(Comma)}}
+                {ALT: function () { $.CONSUME(Slash)}},
+                {ALT: function () { $.CONSUME(Comma)}}
             ]);
         });
 
         // '+' S* | '>' S*
         $.RULE('combinator', function () {
             $.OR([
-                {ALT: function() { $.CONSUME(Plus)}},
-                {ALT: function() { $.CONSUME(GreaterThan)}}
+                {ALT: function () { $.CONSUME(Plus)}},
+                {ALT: function () { $.CONSUME(GreaterThan)}}
             ]);
         });
 
         // '-' | '+'
         $.RULE('unary_operator', function () {
             $.OR([
-                {ALT: function() { $.CONSUME(Minus)}},
-                {ALT: function() { $.CONSUME(Plus)}}
+                {ALT: function () { $.CONSUME(Minus)}},
+                {ALT: function () { $.CONSUME(Plus)}}
             ]);
         });
 
@@ -578,8 +600,10 @@ function cssExample() {
         // selector [ ',' S* selector ]*
         // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
         $.RULE('ruleset', function () {
-            $.MANY_SEP(Comma, function () {
-                $.SUBRULE($.selector)
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    $.SUBRULE($.selector)
+                }
             })
 
             $.SUBRULE($.declarationsGroup)
@@ -621,10 +645,10 @@ function cssExample() {
         // [ HASH | class | attrib | pseudo ]+
         $.RULE('simple_selector_suffix', function () {
             $.OR([
-                {ALT: function() { $.CONSUME(Hash) }},
-                {ALT: function() { $.SUBRULE($.class) }},
-                {ALT: function() { $.SUBRULE($.attrib) }},
-                {ALT: function() { $.SUBRULE($.pseudo) }}
+                {ALT: function () { $.CONSUME(Hash) }},
+                {ALT: function () { $.SUBRULE($.class) }},
+                {ALT: function () { $.SUBRULE($.attrib) }},
+                {ALT: function () { $.SUBRULE($.pseudo) }}
             ]);
         })
 
@@ -637,8 +661,8 @@ function cssExample() {
         // IDENT | '*'
         $.RULE('element_name', function () {
             $.OR([
-                {ALT: function() { $.CONSUME(Ident) }},
-                {ALT: function() { $.CONSUME(Star) }}
+                {ALT: function () { $.CONSUME(Ident) }},
+                {ALT: function () { $.CONSUME(Star) }}
             ]);
         });
 
@@ -647,16 +671,16 @@ function cssExample() {
             $.CONSUME(LSquare)
             $.CONSUME(Ident)
 
-            this.OPTION(function() {
+            this.OPTION(function () {
                 $.OR([
-                    {ALT: function() { $.CONSUME(Equals) }},
-                    {ALT: function() { $.CONSUME(Includes) }},
-                    {ALT: function() { $.CONSUME(Dasmatch) }}
+                    {ALT: function () { $.CONSUME(Equals) }},
+                    {ALT: function () { $.CONSUME(Includes) }},
+                    {ALT: function () { $.CONSUME(Dasmatch) }}
                 ]);
 
                 $.OR2([
-                    {ALT: function() { $.CONSUME2(Ident) }},
-                    {ALT: function() { $.CONSUME(StringLiteral) }}
+                    {ALT: function () { $.CONSUME2(Ident) }},
+                    {ALT: function () { $.CONSUME(StringLiteral) }}
                 ]);
             })
             $.CONSUME(RSquare)
@@ -718,19 +742,19 @@ function cssExample() {
             })
 
             $.OR([
-                {ALT: function() { $.CONSUME(Num) }},
-                {ALT: function() { $.CONSUME(Percentage) }},
-                {ALT: function() { $.CONSUME(Length) }},
-                {ALT: function() { $.CONSUME(Ems) }},
-                {ALT: function() { $.CONSUME(Exs) }},
-                {ALT: function() { $.CONSUME(Angle) }},
-                {ALT: function() { $.CONSUME(Time) }},
-                {ALT: function() { $.CONSUME(Freq) }},
-                {ALT: function() { $.CONSUME(StringLiteral) }},
-                {ALT: function() { $.CONSUME(Ident) }},
-                {ALT: function() { $.CONSUME(Uri) }},
-                {ALT: function() { $.SUBRULE($.hexcolor) }},
-                {ALT: function() { $.SUBRULE($.cssFunction) }}
+                {ALT: function () { $.CONSUME(Num) }},
+                {ALT: function () { $.CONSUME(Percentage) }},
+                {ALT: function () { $.CONSUME(Length) }},
+                {ALT: function () { $.CONSUME(Ems) }},
+                {ALT: function () { $.CONSUME(Exs) }},
+                {ALT: function () { $.CONSUME(Angle) }},
+                {ALT: function () { $.CONSUME(Time) }},
+                {ALT: function () { $.CONSUME(Freq) }},
+                {ALT: function () { $.CONSUME(StringLiteral) }},
+                {ALT: function () { $.CONSUME(Ident) }},
+                {ALT: function () { $.CONSUME(Uri) }},
+                {ALT: function () { $.SUBRULE($.hexcolor) }},
+                {ALT: function () { $.SUBRULE($.cssFunction) }}
             ]);
         });
 
@@ -773,18 +797,18 @@ function calculatorExample() {
     // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
     // AdditionOperator defines a Tokens hierarchy but only leafs in this hierarchy
     // define actual Tokens that can appear in the text
-    var AdditionOperator = createToken({name:"AdditionOperator", pattern: Lexer.NA});
-    var Plus = createToken({name:"Plus", pattern: /\+/, parent:  AdditionOperator});
-    var Minus = createToken({name:"Minus", pattern: /-/, parent:  AdditionOperator});
+    var AdditionOperator = createToken({name: "AdditionOperator", pattern: Lexer.NA});
+    var Plus = createToken({name: "Plus", pattern: /\+/, parent: AdditionOperator});
+    var Minus = createToken({name: "Minus", pattern: /-/, parent: AdditionOperator});
 
-    var MultiplicationOperator = createToken({name:"MultiplicationOperator", pattern: Lexer.NA});
-    var Multi = createToken({name:"Multi", pattern: /\*/, parent:  MultiplicationOperator});
-    var Div = createToken({name:"Div", pattern: /\//, parent:  MultiplicationOperator});
+    var MultiplicationOperator = createToken({name: "MultiplicationOperator", pattern: Lexer.NA});
+    var Multi = createToken({name: "Multi", pattern: /\*/, parent: MultiplicationOperator});
+    var Div = createToken({name: "Div", pattern: /\//, parent: MultiplicationOperator});
 
-    var LParen = createToken({name:"LParen", pattern: /\(/});
-    var RParen = createToken({name:"RParen", pattern: /\)/});
-    var NumberLiteral = createToken({name:"NumberLiteral", pattern: /[1-9]\d*/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var LParen = createToken({name: "LParen", pattern: /\(/});
+    var RParen = createToken({name: "RParen", pattern: /\)/});
+    var NumberLiteral = createToken({name: "NumberLiteral", pattern: /[1-9]\d*/});
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
@@ -865,8 +889,8 @@ function calculatorExample() {
             return $.OR([
                 // parenthesisExpression has the highest precedence and thus it
                 // appears in the "lowest" leaf in the expression ParseTree.
-                {ALT: function(){ return $.SUBRULE($.parenthesisExpression)}},
-                {ALT: function(){ return parseInt($.CONSUME(NumberLiteral).image, 10)}}
+                {ALT: function () { return $.SUBRULE($.parenthesisExpression)}},
+                {ALT: function () { return parseInt($.CONSUME(NumberLiteral).image, 10)}}
             ]);
         });
 
@@ -920,15 +944,15 @@ function tutorialLexerExample() {
     // createToken is used to create a constructor for a Token class
     // The Lexer's output will contain an array of
     // instances created by these constructors
-    var Select = createToken({name:"Select", pattern: /SELECT/});
-    var From = createToken({name:"From", pattern: /FROM/});
-    var Where = createToken({name:"Where", pattern: /WHERE/});
-    var Comma = createToken({name:"Comma", pattern:/,/});
-    var Identifier = createToken({name:"identifier", pattern: /\w+/});
-    var Integer = createToken({name:"Integer", pattern: /0|[1-9]\d+/});
-    var GreaterThan = createToken({name:"GreaterThan", pattern: /</});
-    var LessThan = createToken({name:"LessThan", pattern: />/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var Select = createToken({name: "Select", pattern: /SELECT/});
+    var From = createToken({name: "From", pattern: /FROM/});
+    var Where = createToken({name: "Where", pattern: /WHERE/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+    var Identifier = createToken({name: "identifier", pattern: /\w+/});
+    var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+    var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
+    var LessThan = createToken({name: "LessThan", pattern: />/});
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
@@ -959,15 +983,15 @@ function tutorialGrammarExample() {
     var Lexer = chevrotain.Lexer;
     var Parser = chevrotain.Parser;
 
-    var Select = createToken({name:"Select", pattern: /SELECT/});
-    var From = createToken({name:"From", pattern: /FROM/});
-    var Where = createToken({name:"Where", pattern: /WHERE/});
-    var Comma = createToken({name:"Comma", pattern:/,/});
-    var Identifier = createToken({name:"Identifier", pattern: /\w+/});
-    var Integer = createToken({name:"Integer", pattern: /0|[1-9]\d+/});
-    var GreaterThan = createToken({name:"GreaterThan", pattern: /</});
-    var LessThan = createToken({name:"LessThan", pattern: />/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var Select = createToken({name: "Select", pattern: /SELECT/});
+    var From = createToken({name: "From", pattern: /FROM/});
+    var Where = createToken({name: "Where", pattern: /WHERE/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+    var Identifier = createToken({name: "Identifier", pattern: /\w+/});
+    var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+    var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
+    var LessThan = createToken({name: "LessThan", pattern: />/});
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
@@ -995,8 +1019,10 @@ function tutorialGrammarExample() {
 
         this.selectClause = $.RULE("selectClause", function () {
             $.CONSUME(Select);
-            $.AT_LEAST_ONE_SEP(Comma, function () {
-                $.CONSUME(Identifier);
+            $.AT_LEAST_ONE_SEP({
+                SEP: Comma, DEF: function () {
+                    $.CONSUME(Identifier);
+                }
             });
         });
 
@@ -1009,10 +1035,12 @@ function tutorialGrammarExample() {
             // replace the contents of this rule with the commented out lines
             // below to implement multiple tables to select from (implicit join).
 
-            //$.CONSUME(From);
-            //$.AT_LEAST_ONE_SEP(Comma, function () {
-            //    $.CONSUME(Identifier);
-            //});
+            // $.CONSUME(From);
+            // $.AT_LEAST_ONE_SEP({
+            //     SEP: Comma, DEF: function () {
+            //         $.CONSUME(Identifier);
+            //     }
+            // });
         });
 
 
@@ -1033,16 +1061,16 @@ function tutorialGrammarExample() {
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
             $.OR([
-                {ALT: function(){ $.CONSUME(Integer)}},
-                {ALT: function(){ $.CONSUME(Identifier)}}
+                {ALT: function () { $.CONSUME(Integer)}},
+                {ALT: function () { $.CONSUME(Identifier)}}
             ]);
         });
 
 
         this.relationalOperator = $.RULE("relationalOperator", function () {
             $.OR([
-                {ALT: function(){ $.CONSUME(GreaterThan)}},
-                {ALT: function(){ $.CONSUME(LessThan)}}
+                {ALT: function () { $.CONSUME(GreaterThan)}},
+                {ALT: function () { $.CONSUME(LessThan)}}
             ]);
         });
 
@@ -1076,15 +1104,15 @@ function tutorialGrammarActionsExample() {
     var Lexer = chevrotain.Lexer;
     var Parser = chevrotain.Parser;
 
-    var Select = createToken({name:"Select", pattern: /SELECT/});
-    var From = createToken({name:"From", pattern: /FROM/});
-    var Where = createToken({name:"Where", pattern: /WHERE/});
-    var Comma = createToken({name:"Comma", pattern:/,/});
-    var Identifier = createToken({name:"Identifier", pattern: /\w+/});
-    var Integer = createToken({name:"Integer", pattern: /0|[1-9]\d+/});
-    var GreaterThan = createToken({name:"GreaterThan", pattern: /</});
-    var LessThan = createToken({name:"LessThan", pattern: />/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var Select = createToken({name: "Select", pattern: /SELECT/});
+    var From = createToken({name: "From", pattern: /FROM/});
+    var Where = createToken({name: "Where", pattern: /WHERE/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+    var Identifier = createToken({name: "Identifier", pattern: /\w+/});
+    var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+    var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
+    var LessThan = createToken({name: "LessThan", pattern: />/});
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
@@ -1121,9 +1149,11 @@ function tutorialGrammarActionsExample() {
             var columns = []
 
             $.CONSUME(Select);
-            $.AT_LEAST_ONE_SEP(Comma, function () {
-                // accessing a token's string via .image property
-                columns.push($.CONSUME(Identifier).image);
+            $.AT_LEAST_ONE_SEP({
+                SEP: Comma, DEF: function () {
+                    // accessing a token's string via .image property
+                    columns.push($.CONSUME(Identifier).image);
+                }
             });
 
             return {type: "SELECT_CLAUSE", columns: columns}
@@ -1167,16 +1197,16 @@ function tutorialGrammarActionsExample() {
 
         this.atomicExpression = $.RULE("atomicExpression", function () {
             return $.OR([ // OR returns the value of the chosen alternative.
-                {ALT: function(){ return $.CONSUME(Integer)}},
-                {ALT: function(){ return $.CONSUME(Identifier)}}
+                {ALT: function () { return $.CONSUME(Integer)}},
+                {ALT: function () { return $.CONSUME(Identifier)}}
             ]).image;
         });
 
 
         this.relationalOperator = $.RULE("relationalOperator", function () {
             return $.OR([
-                {ALT: function(){ return $.CONSUME(GreaterThan)}},
-                {ALT: function(){ return $.CONSUME(LessThan)}}
+                {ALT: function () { return $.CONSUME(GreaterThan)}},
+                {ALT: function () { return $.CONSUME(LessThan)}}
             ]).image;
         });
 
@@ -1208,20 +1238,22 @@ function tutorialErrorRecoveryExample() {
     // In ES6, custom inheritance implementation
     // (such as the one above) can be replaced
     // with a more simple: "class X extends Y"...
-    var True = createToken({name:"True", pattern: /true/});
-    var False = createToken({name:"False", pattern: /false/});
-    var Null = createToken({name:"Null", pattern: /null/});
-    var LCurly = createToken({name:"LCurly", pattern: /{/});
-    var RCurly = createToken({name:"RCurly", pattern: /}/});
-    var LSquare = createToken({name:"LSquare", pattern: /\[/});
-    var RSquare = createToken({name:"RSquare", pattern: /]/});
-    var Comma = createToken({name:"Comma", pattern:/,/});
-    var Colon = createToken({name:"Colon", pattern: /:/});
-    var StringLiteral = createToken({name:"StringLiteral", pattern:
-        /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
-    var NumberLiteral = createToken({name:"NumberLiteral", pattern:
-        /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/});
-    var WhiteSpace = createToken({name:"WhiteSpace", pattern: /\s+/});
+    var True = createToken({name: "True", pattern: /true/});
+    var False = createToken({name: "False", pattern: /false/});
+    var Null = createToken({name: "Null", pattern: /null/});
+    var LCurly = createToken({name: "LCurly", pattern: /{/});
+    var RCurly = createToken({name: "RCurly", pattern: /}/});
+    var LSquare = createToken({name: "LSquare", pattern: /\[/});
+    var RSquare = createToken({name: "RSquare", pattern: /]/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+    var Colon = createToken({name: "Colon", pattern: /:/});
+    var StringLiteral = createToken({
+        name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+    });
+    var NumberLiteral = createToken({
+        name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+    });
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
 
@@ -1242,8 +1274,8 @@ function tutorialErrorRecoveryExample() {
 
         $.RULE("json", function () {
             return $.OR([
-                { ALT: function () { return $.SUBRULE($.object) }},
-                { ALT: function () { return $.SUBRULE($.array) }}
+                {ALT: function () { return $.SUBRULE($.object) }},
+                {ALT: function () { return $.SUBRULE($.array) }}
             ]);
         });
 
@@ -1255,8 +1287,10 @@ function tutorialErrorRecoveryExample() {
             var obj = {}
 
             $.CONSUME(LCurly);
-            $.MANY_SEP(Comma, function () {
-                _.assign(obj, $.SUBRULE($.objectItem));
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    _.assign(obj, $.SUBRULE($.objectItem));
+                }
             });
             $.CONSUME(RCurly);
 
@@ -1290,8 +1324,10 @@ function tutorialErrorRecoveryExample() {
         $.RULE("array", function () {
             var arr = [];
             $.CONSUME(LSquare);
-            $.MANY_SEP(Comma, function () {
-                arr.push($.SUBRULE($.value));
+            $.MANY_SEP({
+                SEP: Comma, DEF: function () {
+                    arr.push($.SUBRULE($.value));
+                }
             });
             $.CONSUME(RSquare);
 
@@ -1355,7 +1391,7 @@ function tutorialErrorRecoveryExample() {
 
 var samples = {
 
-    "JSON grammar only": {
+    "JSON grammar and automatic CST output": {
         implementation: jsonGrammarOnlyExample,
         sampleInputs: {
             'valid': '{' +
@@ -1399,7 +1435,7 @@ var samples = {
         }
     },
 
-    "JSON grammar and actions": {
+    "JSON grammar and embedded actions": {
         implementation: jsonExample,
         sampleInputs: {
             'valid': '{' +
