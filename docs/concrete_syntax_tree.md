@@ -37,6 +37,7 @@ class MyParser extends chevrotain.Parser {
 ### The structure of the CST
 
 The structure of the CST is very simple.
+Try CST creation in the [online playground](http://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
 
 * Note that the following examples are not runnable or contain the full information.
 These are just snippets to explain the core concepts.
