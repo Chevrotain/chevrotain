@@ -19,6 +19,7 @@ as any other JavaScript code without requiring any new tools or processes.
 ## Features
   1. **Parsing DSL**.
     * **LL(k)** grammars support.  
+    * [Automatic Concrete Syntax Tree Creation.][cst]
     * **Error Reporting** with full location information. 
     * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     * Supports [gates/predicates][gates].
@@ -109,3 +110,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
 [parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
 [content assist]: https://github.com/SAP/chevrotain/blob/master/docs/syntactic_content_assist.md
+[cst]: https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md
