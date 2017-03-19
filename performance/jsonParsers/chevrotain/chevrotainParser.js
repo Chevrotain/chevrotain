@@ -16,16 +16,9 @@ var Comma = createToken({name: "Comma", pattern: /,/});
 var Colon = createToken({name: "Colon", pattern: /:/});
 
 var stringLiteralPattern = /"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-// Workaround Safari RegExp performance bugs
-// https://bugs.webkit.org/show_bug.cgi?id=152578
-// https://github.com/SAP/chevrotain/blob/master/docs/custom_token_patterns.md
-if (IsSafari()) {
-    stringLiteralPattern = matchStringLiteral
-}
 var StringLiteral = createToken({name: "StringLiteral", pattern: stringLiteralPattern});
 var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/});
-var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group:ChevrotainLexer.SKIPPED});
-
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: ChevrotainLexer.SKIPPED});
 
 var jsonTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
 var ChevJsonLexer = new ChevrotainLexer(jsonTokens);

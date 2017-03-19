@@ -13,7 +13,6 @@
 <script src="https://unpkg.com/chart.js@2.4.0/dist/Chart.min.js"></script>
 <script src="samples/1K_json.js"></script>
 
-<script src="jsonParsers/chevrotain/safari_hack.js"></script>
 <script src="jsonParsers/chevrotain/chevrotainParser.js"></script>
 <script src="jsonParsers/chevrotain/api.js"></script>
 
@@ -169,8 +168,10 @@
                                                                               href="http://www.json-generator.com/">json-generator</a>.
             </p>
             <p>
-                None of the parsers have explicit output actions(build no user defined AST), they only parse the text (without errors),
-                However some of the parsing libraries may always build some default output structure even if no actions have been explicitly
+                None of the parsers have explicit output actions(build no user defined AST), they only parse the text
+                (without errors),
+                However some of the parsing libraries may always build some default output structure even if no actions
+                have been explicitly
                 defined.
             </p>
 
@@ -192,7 +193,6 @@
 
         <!--right part-->
         <div class="col-lg-6">
-
 
 
             <div id="resultsContainer">
@@ -343,13 +343,19 @@
 </div>
 
 <script>
-//    var styleCss = document.styleSheets[1]
+    //    var styleCss = document.styleSheets[1]
     var styleCss = _.find(document.styleSheets, function (styleSheet) {
         return _.endsWith(styleSheet.href, "performance/style.css");
     })
 
     if (styleCss === undefined) {
         throw Error("missing style.css");
+    }
+
+    function IsSafari() {
+        var isSafari = navigator.vendor && navigator.vendor.indexOf('Apple') > -1 &&
+            navigator.userAgent && !navigator.userAgent.match('CriOS')
+        return isSafari
     }
 
     // This did not seem to work when using a JQuery child selector, no idea why...
