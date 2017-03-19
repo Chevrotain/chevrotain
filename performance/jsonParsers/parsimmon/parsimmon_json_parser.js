@@ -37,7 +37,7 @@ var x
 
     // Regexp based parsers should generally be named for better error reporting.
     var stringLiteral =
-        token(P.regexp(/"(?:[^\\"]+|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/))
+        token(P.regexp(/"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/))
             .desc('string');
 
     var numberLiteral =
