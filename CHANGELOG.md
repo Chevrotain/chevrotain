@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.25.0 (3-19-2017)
 
 #### Breaking Changes
 - [Custom Token Patterns API change](https://github.com/SAP/chevrotain/issues/380#issuecomment-287629918)
