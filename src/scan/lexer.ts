@@ -1,28 +1,33 @@
-import {Token, tokenName, ISimpleTokenOrIToken, CustomPatternMatcherFunc} from "./tokens_public"
+import {ISimpleTokenOrIToken, Token, tokenName} from "./tokens_public"
 import {
-    TokenConstructor, ILexerDefinitionError, LexerDefinitionErrorType, Lexer, IMultiModeLexerDefinition,
-    IRegExpExec
+    ILexerDefinitionError,
+    IMultiModeLexerDefinition,
+    IRegExpExec,
+    Lexer,
+    LexerDefinitionErrorType,
+    TokenConstructor
 } from "./lexer_public"
 import {
-    reject,
-    indexOf,
-    map,
-    isString,
-    isUndefined,
-    reduce,
-    has,
-    filter,
-    difference,
-    isRegExp,
     compact,
     contains,
+    difference,
+    every,
+    filter,
     first,
     forEach,
-    uniq,
-    every,
-    keys,
+    has,
+    indexOf,
     isArray,
-    isFunction, some
+    isFunction,
+    isRegExp,
+    isString,
+    isUndefined,
+    keys,
+    map,
+    reduce,
+    reject,
+    some,
+    uniq
 } from "../utils/utils"
 import {isLazyTokenType, isSimpleTokenType} from "./tokens"
 
@@ -36,6 +41,7 @@ export interface IAnalyzeResult {
     patternIdxToGroup:any[]
     patternIdxToLongerAltIdx:number[]
     patternIdxToCanLineTerminator:boolean[]
+    patternIdxToIsCustom:boolean[]
     patternIdxToPushMode:string[]
     patternIdxToPopMode:boolean[]
     emptyGroups:{ [groupName:string]:Token[] }
@@ -43,7 +49,17 @@ export interface IAnalyzeResult {
 
 const CONTAINS_LINE_TERMINATOR = "containsLineTerminator"
 
-export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeResult {
+export let SUPPORT_STICKY = typeof (<any>new RegExp("(?:)")).sticky === "boolean"
+
+export function disableSticky() {
+    SUPPORT_STICKY = false
+}
+
+export function enableSticky() {
+    SUPPORT_STICKY = true
+}
+
+export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:boolean = SUPPORT_STICKY):IAnalyzeResult {
 
     let onlyRelevantClasses = reject(tokenClasses, (currClass) => {
         return currClass[PATTERN] === Lexer.NA
@@ -53,7 +69,9 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
         let currPattern = currClass[PATTERN]
 
         if (isRegExp(currPattern)) {
-            return addStartOfInput(currPattern)
+            return useSticky ?
+                addStickyFlag(currPattern) :
+                addStartOfInput(currPattern)
         }
         // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
         else if (isFunction(currPattern)) {
@@ -113,6 +131,8 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
         }
     })
 
+    let patternIdxToIsCustom = map(onlyRelevantClasses, isCustomPattern)
+
     let emptyGroups = reduce(onlyRelevantClasses, (acc, clazz:any) => {
         let groupName = clazz.GROUP
         if (isString(groupName) && !(groupName === Lexer.SKIPPED)) {
@@ -127,6 +147,7 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[]):IAnalyzeRes
         patternIdxToGroup:             patternIdxToGroup,
         patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
         patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
+        patternIdxToIsCustom:          patternIdxToIsCustom,
         patternIdxToPushMode:          patternIdxToPushMode,
         patternIdxToPopMode:           patternIdxToPopMode,
         emptyGroups:                   emptyGroups
@@ -157,6 +178,8 @@ function validateRegExpPattern(tokenClasses:TokenConstructor[]):ILexerDefinition
     let withRegExpPatterns = filter(tokenClasses, (currTokClass) => isRegExp(currTokClass[PATTERN]))
 
     errors = errors.concat(findEndOfInputAnchor(withRegExpPatterns))
+
+    errors = errors.concat(findStartOfInputAnchor(withRegExpPatterns))
 
     errors = errors.concat(findUnsupportedFlags(withRegExpPatterns))
 
@@ -206,7 +229,7 @@ export function findInvalidPatterns(tokenClasses:TokenConstructor[]):ILexerFilte
     return {errors, valid}
 }
 
-let end_of_input = /[^\\][\$]/
+const end_of_input = /[^\\][\$]/
 
 export function findEndOfInputAnchor(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
     let invalidRegex = filter(tokenClasses, (currClass) => {
@@ -218,6 +241,25 @@ export function findEndOfInputAnchor(tokenClasses:TokenConstructor[]):ILexerDefi
         return {
             message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' cannot contain end of input anchor '$'",
             type:         LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
+            tokenClasses: [currClass]
+        }
+    })
+
+    return errors
+}
+
+const start_of_input = /[^\\[][\^]|^\^/
+
+export function findStartOfInputAnchor(tokenClasses:TokenConstructor[]):ILexerDefinitionError[] {
+    let invalidRegex = filter(tokenClasses, (currClass) => {
+        let pattern = currClass[PATTERN]
+        return start_of_input.test(pattern.source)
+    })
+
+    let errors = map(invalidRegex, (currClass) => {
+        return {
+            message:      "Token class: ->" + tokenName(currClass) + "<- static 'PATTERN' cannot contain start of input anchor '^'",
+            type:         LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
             tokenClasses: [currClass]
         }
     })
@@ -331,6 +373,15 @@ export function addStartOfInput(pattern:RegExp):RegExp {
     // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
     // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
     return new RegExp(`^(?:${pattern.source})`, flags)
+}
+
+export function addStickyFlag(pattern:RegExp):RegExp {
+    let flags = pattern.ignoreCase ?
+        "iy" :
+        "y"
+    // always wrapping in a none capturing group preceded by '^' to make sure matching can only work on start of input.
+    // duplicate/redundant start of input markers have no meaning (/^^^^A/ === /^A/)
+    return new RegExp(`${pattern.source}`, flags)
 }
 
 export function countLineTerminators(text:string):number {
@@ -508,4 +559,23 @@ export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:ISimpleTokenOr
     })
 
     return clonedResult
+}
+
+// TODO: refactor to avoid duplication
+export function isCustomPattern(tokenType:any):boolean {
+    let pattern = tokenType.PATTERN
+    if (isRegExp(pattern)) {
+        return false
+    }
+    // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
+    else if (isFunction(pattern)) {
+        return true
+    }
+    // ICustomPattern
+    else if (has(pattern, "exec")) {
+        return true
+    }
+    else {
+        throw Error("non exhaustive match")
+    }
 }

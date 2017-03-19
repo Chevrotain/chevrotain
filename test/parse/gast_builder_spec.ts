@@ -472,6 +472,4 @@ describe("The GAst Builder namespace", () => {
         })
         expect(allOrRanges.length).to.equal(2)
     })
-
-
 })

@@ -31,6 +31,7 @@ import {
  *  for a fuller example
  */
 export type CustomPatternMatcherFunc = (test:string,
+                                        offset?:number,
                                         tokens?:ISimpleTokenOrIToken[],
                                         groups?:{[groupName:string]:ISimpleTokenOrIToken}) => RegExpExecArray
 

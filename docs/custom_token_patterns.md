@@ -22,16 +22,17 @@ There are a few use cases in which a custom pattern could be used:
 
 ### Usage
 A custom pattern has a similar API to the API of the [RegExp.prototype.exec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
-function. Additionally it must perform any matches from the **start** of the input. In RegExp semantics this means
-that any custom pattern implementations should behave as if the [start of input anchor](http://www.rexegg.com/regex-anchors.html#caret) 
-has been used.
+function. But with a small constraint.
+
+* A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
+  This means that attempted matches must begin at the offset argument, **not** at the start of the input.    
 
 The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_24_0/interfaces/icustompattern.html) interface.
 Example:
 
 ```JavaScript
-function matchInteger(text) {
-   let i = 0
+function matchInteger(text, offset) {
+   let i = offset
    let charCode = text.charCodeAt(i)
    while (charCode >= 48 && charCode <= 57) {
      i++
@@ -80,7 +81,7 @@ A custom token matcher has two optional arguments which allows accessing the cur
 Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
 ```JavaScript
-function matchInteger(text, matchedTokens, groups) {
+function matchInteger(text, offset, matchedTokens, groups) {
    let lastMatchedToken = _.last(matchedTokens)
    if (lastMatchedToken instanceof Identifier) {
        return null
