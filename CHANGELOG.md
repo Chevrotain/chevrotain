@@ -1,3 +1,17 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [Custom Token Patterns API change](https://github.com/SAP/chevrotain/issues/380#issuecomment-287629918)
+
+#### Major Changes
+- [Use RegExp sticky flag for lexer performance boost.](https://github.com/SAP/chevrotain/issues/380)
+  * Up to **30%** Lexer performance boost measured.
+
+#### Bug Fixes
+- [0.24.0: Regression: Terminal token name: {name} not found.](https://github.com/SAP/chevrotain/issues/406)
+
+
+
 ## 0.24.0 (3-17-2017)
 
 #### Breaking Changes
