@@ -1,4 +1,4 @@
-import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite, has} from "../utils/utils"
+import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite, has, isObject} from "../utils/utils"
 import {functionName, defineNameProp} from "../lang/lang_extensions"
 import {Lexer, TokenConstructor} from "./lexer_public"
 import {
@@ -33,7 +33,7 @@ import {
 export type CustomPatternMatcherFunc = (test:string,
                                         offset?:number,
                                         tokens?:ISimpleTokenOrIToken[],
-                                        groups?:{[groupName:string]:ISimpleTokenOrIToken}) => RegExpExecArray
+                                        groups?:{ [groupName:string]:ISimpleTokenOrIToken }) => RegExpExecArray
 
 /**
  * Interface for custom user provided token pattern matchers.
@@ -77,7 +77,7 @@ export function tokenName(clazz:Function):string {
     // where the Function.prototype.name property is not defined as a 'configurable' property
     // enable producing readable error messages.
     /* istanbul ignore if -> will only run in old versions of node.js */
-    if (isString((<any>clazz).tokenName)) {
+    if (isObject(clazz) && clazz.hasOwnProperty("tokenName") && isString((<any>clazz).tokenName)) {
         return (<any>clazz).tokenName
     }
     else {
@@ -90,7 +90,7 @@ export interface ITokenConfig {
     parent?:TokenConstructor
     label?:string
     pattern?:RegExp | CustomPatternMatcherFunc | ICustomPattern
-    group?:string|any
+    group?:string | any
     push_mode?:string
     pop_mode?:boolean
     longer_alt?:TokenConstructor
