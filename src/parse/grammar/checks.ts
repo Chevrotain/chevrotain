@@ -475,7 +475,9 @@ export function validateNoEmptyLookaheads(topLevelRules:gast.Rule[], maxLookahea
             forEach(paths, (path) => {
                 forEach(path, (p) => {
                     if (isEmpty(p)) {
-                        let errMsg = `Empty lookahead paths found in grammar.\n`
+                        let dslName = getProductionDslName(currProd)
+                        let errMsg = `Empty lookahead paths found in <${dslName}${currOccurrence}> within Rule <${currTopRule.name}>.\n` +
+                            `This means that no Tokens are consumed. To fix this, change the rule to consume Tokens.`
                         errors.push({
                             message:  errMsg,
                             type:     ParserDefinitionErrorType.EMTPY_LOOKAHEAD,
