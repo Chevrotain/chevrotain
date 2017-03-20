@@ -695,3 +695,25 @@ describe("The invalid token name validation", () => {
             .to.throw("Invalid Grammar Token name: ->במבה<- it must match the pattern: ->/^[a-zA-Z_]\\w*$/<-")
     })
 })
+
+describe("The empty lookahead validation", () => {
+
+        it("will throw an error when an empty lookahead is provided", () => {
+            class EmptyLookaheadParser extends Parser {
+
+                constructor(input:Token[] = []) {
+                    super(input, [PlusTok, StarTok]);
+                    (<any>Parser).performSelfAnalysis(this)
+                }
+
+                public start = this.RULE("sourceElements", () => this.AT_LEAST_ONE(this.block)) // missing SUBRULE
+                public block = this.RULE("block", () => {
+                    this.CONSUME(PlusTok)
+                    this.OPTION(() => this.AT_LEAST_ONE(this.SUBRULE(this.block)))
+                    this.CONSUME(StarTok)
+                })
+
+            }
+            expect(() => new EmptyLookaheadParser()).to.throw("Empty lookahead")
+        })
+})

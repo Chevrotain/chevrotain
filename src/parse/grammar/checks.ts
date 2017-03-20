@@ -12,7 +12,7 @@ import {gast} from "./gast_public"
 import {getProductionDslName, isOptionalProd} from "./gast"
 import {tokenLabel, tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
-import {Alternative, containsPath, getLookaheadPathsForOr} from "./lookahead"
+import {Alternative, containsPath, getLookaheadPathsForOr, getLookaheadPathsForOptionalProd, PROD_TYPE} from "./lookahead"
 import {VERSION} from "../../version"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {NamedDSLMethodsCollectorVisitor} from "../cst/cst"
@@ -44,9 +44,12 @@ export function validateGrammar(topLevels:gast.Rule[],
     let nestedRulesNameErrors:any = validateNestedRulesNames(topLevels)
     let nestedRulesDuplicateErrors:any = validateDuplicateNestedRules(topLevels)
 
+    let emptyRepititionErrors = validateNoEmptyLookaheads(topLevels, maxLookahead)
+    
     return <any>utils.flatten(duplicateErrors.concat(tokenNameErrors,
         nestedRulesNameErrors,
         nestedRulesDuplicateErrors,
+        emptyRepititionErrors,
         leftRecursionErrors,
         emptyAltErrors,
         ambiguousAltsErrors,
@@ -423,6 +426,66 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
         })
         return result.concat(currErrors)
     }, [])
+
+    return errors
+}
+
+export class RepitionCollector extends gast.GAstVisitor {
+    public allProductions:gast.IProduction[] = []
+
+    public visitRepetitionWithSeparator(manySep:gast.RepetitionWithSeparator):void {
+        this.allProductions.push(manySep)
+    }
+
+    public visitRepetitionMandatory(atLeastOne:gast.RepetitionMandatory):void {
+        this.allProductions.push(atLeastOne)
+    }
+
+    public visitRepetitionMandatoryWithSeparator(atLeastOneSep:gast.RepetitionMandatoryWithSeparator):void {
+        this.allProductions.push(atLeastOneSep)
+    }
+
+    public visitRepetition(many:gast.Repetition):void {
+        this.allProductions.push(many)
+    }
+}
+
+export function validateNoEmptyLookaheads(topLevelRules:gast.Rule[], maxLookahead:number):IParserDefinitionError[] {
+    let errors = []
+    forEach(topLevelRules, (currTopRule) => {
+        let collectorVisitor = new RepitionCollector()
+        currTopRule.accept(collectorVisitor)
+        let allRuleProductions = collectorVisitor.allProductions
+        forEach(allRuleProductions, (currProd) => {
+            let prodType
+            let currOccurrence = currProd.occurrenceInParent
+            if (currProd instanceof gast.Repetition) {
+                prodType = PROD_TYPE.REPETITION
+            }
+            else if (currProd instanceof gast.RepetitionMandatory) {
+                prodType = PROD_TYPE.REPETITION_MANDATORY
+            }
+            else if (currProd instanceof gast.RepetitionWithSeparator) {
+                prodType = PROD_TYPE.REPETITION_WITH_SEPARATOR
+            }
+            else if (currProd instanceof gast.RepetitionMandatoryWithSeparator) {
+                prodType = PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
+            }
+            let paths = getLookaheadPathsForOptionalProd(currOccurrence, currTopRule, prodType, maxLookahead)
+            forEach(paths, (path) => {
+                forEach(path, (p) => {
+                    if (isEmpty(p)) {
+                        let errMsg = `Empty lookahead paths found in grammar.\n`
+                        errors.push({
+                            message:  errMsg,
+                            type:     ParserDefinitionErrorType.EMTPY_LOOKAHEAD,
+                            ruleName: currTopRule.name
+                        })
+                    }
+                })
+            })
+        })
+    })
 
     return errors
 }
