@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.25.1 (3-21-2017)
 
 #### Bug Fixes
 - [Fix Performance regression in Regular Tokens 0.25.0.](https://github.com/SAP/chevrotain/commit/52f3f1a4a7214b2b75c2ca95b58a1ec28ccbcfbd)

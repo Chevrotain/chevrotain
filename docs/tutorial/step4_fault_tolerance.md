@@ -47,9 +47,9 @@ Therefore the missing colon will be automatically "inserted".
 
 This heuristic's behavior can be customized by the following methods:
 
-* [canTokenTypeBeInsertedInRecovery](http://sap.github.io/chevrotain/documentation/0_25_0/classes/parser.html#cantokentypebeinsertedinrecovery)
+* [canTokenTypeBeInsertedInRecovery](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#cantokentypebeinsertedinrecovery)
   
-* [getTokenToInsert](http://sap.github.io/chevrotain/documentation/0_25_0/classes/parser.html#gettokentoinsert)
+* [getTokenToInsert](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#gettokentoinsert)
         
             
 ### In Rule Single Token deletion:
@@ -204,7 +204,7 @@ from the sub-rule we have recovered from.
 By default **undefined** will be returned from a recovered rule, however this should most likely be customize
 in any but the most simple cases.
 
-Customization is done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_25_0/classes/parser.html#rule).
+Customization is done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#rule).
 The third parameter(**config**) may contain a **recoveryValueFunc** property which is a function that will be invoked to produce the returned value in 
 case of re-sync recovery. 
 
@@ -212,7 +212,7 @@ case of re-sync recovery.
 ####Disabling Re-Sync Recovery:
 Re-Sync recovery is enabled by default for all rules.
 In some cases it may be appropriate to disable re-sync recovery for a specific rule.
-This is (once again) done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_25_0/classes/parser.html#rule).
+This is (once again) done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#rule).
 The third parameter(**config**) may contain a *resyncEnabled** property that controls whether or not re-sync is enabled for the 
 rule.
  
@@ -226,7 +226,7 @@ additional definitions (what should be returned value of a re-synced rule?).
 ### Disabling All Recovery mechanisms
 By default fault tolerance and error recovery heuristics are enabled.
 They can be disabled by passing a optional **recoveryEnabled** parameter (default true)
-To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_25_0/classes/parser.html#constructor).
+To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#constructor).
    
    
 #### What is Next?
