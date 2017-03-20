@@ -12,7 +12,7 @@ import {gast} from "./gast_public"
 import {getProductionDslName, isOptionalProd} from "./gast"
 import {tokenLabel, tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
-import {Alternative, containsPath, getLookaheadPathsForOr, getLookaheadPathsForOptionalProd, PROD_TYPE} from "./lookahead"
+import {Alternative, containsPath, getLookaheadPathsForOr, getLookaheadPathsForOptionalProd, getProdType} from "./lookahead"
 import {VERSION} from "../../version"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {NamedDSLMethodsCollectorVisitor} from "../cst/cst"
@@ -45,7 +45,7 @@ export function validateGrammar(topLevels:gast.Rule[],
     let nestedRulesDuplicateErrors:any = validateDuplicateNestedRules(topLevels)
 
     let emptyRepititionErrors = validateSomeNonEmptyLookaheadPath(topLevels, maxLookahead)
-    
+
     return <any>utils.flatten(duplicateErrors.concat(tokenNameErrors,
         nestedRulesNameErrors,
         nestedRulesDuplicateErrors,
@@ -457,22 +457,11 @@ export function validateSomeNonEmptyLookaheadPath(topLevelRules:gast.Rule[], max
         currTopRule.accept(collectorVisitor)
         let allRuleProductions = collectorVisitor.allProductions
         forEach(allRuleProductions, (currProd) => {
-            let prodType
+            let prodType = getProdType(currProd)
             let currOccurrence = currProd.occurrenceInParent
-            if (currProd instanceof gast.Repetition) {
-                prodType = PROD_TYPE.REPETITION
-            }
-            else if (currProd instanceof gast.RepetitionMandatory) {
-                prodType = PROD_TYPE.REPETITION_MANDATORY
-            }
-            else if (currProd instanceof gast.RepetitionWithSeparator) {
-                prodType = PROD_TYPE.REPETITION_WITH_SEPARATOR
-            }
-            else if (currProd instanceof gast.RepetitionMandatoryWithSeparator) {
-                prodType = PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
-            }
             let paths = getLookaheadPathsForOptionalProd(currOccurrence, currTopRule, prodType, maxLookahead)
-            if (isEmpty(flatten(paths))) {
+            let pathsInsideProduction = paths[0]
+            if (isEmpty(flatten(pathsInsideProduction))) {
                 let dslName = getProductionDslName(currProd)
                 let errMsg = `Empty lookahead paths found in <${dslName}${currOccurrence}> within Rule <${currTopRule.name}>.\n` +
                     `This means that no Tokens are consumed. To fix this, change the rule to consume Tokens.`
