@@ -44,7 +44,7 @@ export function validateGrammar(topLevels:gast.Rule[],
     let nestedRulesNameErrors:any = validateNestedRulesNames(topLevels)
     let nestedRulesDuplicateErrors:any = validateDuplicateNestedRules(topLevels)
 
-    let emptyRepititionErrors = validateNoEmptyLookaheads(topLevels, maxLookahead)
+    let emptyRepititionErrors = validateSomeNonEmptyLookaheadPath(topLevels, maxLookahead)
     
     return <any>utils.flatten(duplicateErrors.concat(tokenNameErrors,
         nestedRulesNameErrors,
@@ -450,7 +450,7 @@ export class RepitionCollector extends gast.GAstVisitor {
     }
 }
 
-export function validateNoEmptyLookaheads(topLevelRules:gast.Rule[], maxLookahead:number):IParserDefinitionError[] {
+export function validateSomeNonEmptyLookaheadPath(topLevelRules:gast.Rule[], maxLookahead:number):IParserDefinitionError[] {
     let errors = []
     forEach(topLevelRules, (currTopRule) => {
         let collectorVisitor = new RepitionCollector()
@@ -472,20 +472,16 @@ export function validateNoEmptyLookaheads(topLevelRules:gast.Rule[], maxLookahea
                 prodType = PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
             }
             let paths = getLookaheadPathsForOptionalProd(currOccurrence, currTopRule, prodType, maxLookahead)
-            forEach(paths, (path) => {
-                forEach(path, (p) => {
-                    if (isEmpty(p)) {
-                        let dslName = getProductionDslName(currProd)
-                        let errMsg = `Empty lookahead paths found in <${dslName}${currOccurrence}> within Rule <${currTopRule.name}>.\n` +
-                            `This means that no Tokens are consumed. To fix this, change the rule to consume Tokens.`
-                        errors.push({
-                            message:  errMsg,
-                            type:     ParserDefinitionErrorType.EMTPY_LOOKAHEAD,
-                            ruleName: currTopRule.name
-                        })
-                    }
+            if (isEmpty(flatten(paths))) {
+                let dslName = getProductionDslName(currProd)
+                let errMsg = `Empty lookahead paths found in <${dslName}${currOccurrence}> within Rule <${currTopRule.name}>.\n` +
+                    `This means that no Tokens are consumed. To fix this, change the rule to consume Tokens.`
+                errors.push({
+                    message:  errMsg,
+                    type:     ParserDefinitionErrorType.NO_NON_EMPTY_LOOKAHEAD,
+                    ruleName: currTopRule.name
                 })
-            })
+            }
         })
     })
 

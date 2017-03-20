@@ -104,7 +104,7 @@ export enum ParserDefinitionErrorType {
     INVALID_TOKEN_NAME,
     INVALID_NESTED_RULE_NAME,
     DUPLICATE_NESTED_NAME,
-    EMTPY_LOOKAHEAD
+    NO_NON_EMPTY_LOOKAHEAD
 }
 
 export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
