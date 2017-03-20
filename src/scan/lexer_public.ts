@@ -435,8 +435,8 @@ export class Lexer {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
                     longerAltIdx = currModePatternIdxToLongerAltIdx[i]
-                    let longerAltPattern = currModePatterns[longerAltIdx]
-                    if (longerAltIdx) {
+                    if (longerAltIdx !== undefined) {
+                        let longerAltPattern = currModePatterns[longerAltIdx]
                         if (hasCustomTokens) {
                             matchAlt = longerAltPattern.exec(text, matchedTokens, groups)
                         } else {
@@ -658,7 +658,7 @@ export class Lexer {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
                     longerAltIdx = currModePatternIdxToLongerAltIdx[i]
-                    if (longerAltIdx) {
+                    if (longerAltIdx !== undefined) {
                         let longerPattern = currModePatterns[longerAltIdx]
                         if (hasCustomTokens &&
                             // slower check to optimize the less common case of custom patterns
