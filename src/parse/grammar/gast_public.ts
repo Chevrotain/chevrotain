@@ -26,8 +26,6 @@ export namespace gast {
     }
 
     export abstract class AbstractProduction implements IProduction {
-        public implicitOccurrenceIndex = false
-
         constructor(public definition:IProduction[]) {}
 
         accept(visitor:GAstVisitor):void {
@@ -41,7 +39,8 @@ export namespace gast {
     export class NonTerminal extends AbstractProduction implements IProductionWithOccurrence {
         constructor(public nonTerminalName:string,
                     public referencedRule:Rule = undefined,
-                    public occurrenceInParent:number = 1) { super([]) }
+                    public occurrenceInParent:number = 1,
+                    public implicitOccurrenceIndex:boolean = false) { super([]) }
 
         set definition(definition:IProduction[]) {
             // immutable
@@ -70,11 +69,17 @@ export namespace gast {
     }
 
     export class Option extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
+        constructor(definition:IProduction[],
+                    public occurrenceInParent:number = 1,
+                    public name?:string,
+                    public implicitOccurrenceIndex:boolean = false) { super(definition) }
     }
 
     export class RepetitionMandatory extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
+        constructor(definition:IProduction[],
+                    public occurrenceInParent:number = 1,
+                    public name?:string,
+                    public implicitOccurrenceIndex:boolean = false) { super(definition) }
     }
 
     export class RepetitionMandatoryWithSeparator extends AbstractProduction
@@ -82,28 +87,36 @@ export namespace gast {
         constructor(definition:IProduction[],
                     public separator:TokenConstructor,
                     public occurrenceInParent:number = 1,
-                    public name?:string) { super(definition) }
+                    public name?:string,
+                    public implicitOccurrenceIndex:boolean = false) { super(definition) }
     }
 
     export class Repetition extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(definition:IProduction[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
+        constructor(definition:IProduction[],
+                    public occurrenceInParent:number = 1,
+                    public name?:string,
+                    public implicitOccurrenceIndex:boolean = false) { super(definition) }
     }
 
     export class RepetitionWithSeparator extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
         constructor(definition:IProduction[],
                     public separator:TokenConstructor,
                     public occurrenceInParent:number = 1,
-                    public name?:string) { super(definition) }
+                    public name?:string,
+                    public implicitOccurrenceIndex:boolean = false) { super(definition) }
     }
 
     export class Alternation extends AbstractProduction implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(definition:Flat[], public occurrenceInParent:number = 1, public name?:string) { super(definition) }
+        constructor(definition:Flat[],
+                    public occurrenceInParent:number = 1,
+                    public name?:string,
+                    public implicitOccurrenceIndex:boolean = false) { super(definition) }
     }
 
     export class Terminal implements IProductionWithOccurrence {
-        public implicitOccurrenceIndex:boolean = false
-
-        constructor(public terminalType:TokenConstructor, public occurrenceInParent:number = 1) {}
+        constructor(public terminalType:TokenConstructor,
+                    public occurrenceInParent:number = 1,
+                    public implicitOccurrenceIndex:boolean = false) {}
 
         accept(visitor:GAstVisitor):void {
             visitor.visit(this)
