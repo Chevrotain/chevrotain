@@ -696,24 +696,71 @@ describe("The invalid token name validation", () => {
     })
 })
 
-describe("The empty lookahead validation", () => {
+describe("The no non-empty lookahead validation", () => {
 
-        it("will throw an error when an empty lookahead is provided", () => {
-            class EmptyLookaheadParser extends Parser {
+    class EmptyLookaheadParser extends Parser {
+        constructor(input:Token[] = []) {
+            super(input, [PlusTok]);
+        }
 
-                constructor(input:Token[] = []) {
-                    super(input, [PlusTok, StarTok]);
-                    (<any>Parser).performSelfAnalysis(this)
-                }
-
-                public start = this.RULE("sourceElements", () => this.AT_LEAST_ONE(this.block)) // missing SUBRULE
-                public block = this.RULE("block", () => {
-                    this.CONSUME(PlusTok)
-                    this.OPTION(() => this.AT_LEAST_ONE(this.SUBRULE(this.block)))
-                    this.CONSUME(StarTok)
-                })
-
+        public block = this.RULE("block", () => this.CONSUME(PlusTok))
+    }
+    it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE", () => {
+        class EmptyLookaheadParserAtLeastOne extends EmptyLookaheadParser {
+            constructor(input:Token[] = []) {
+                super(input);
+                (<any>Parser).performSelfAnalysis(this)
             }
-            expect(() => new EmptyLookaheadParser()).to.throw("Empty lookahead")
-        })
+
+            public someRule = this.RULE("someRule", () => this.AT_LEAST_ONE(this.block))
+        }
+        expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw("The repetition <AT_LEAST_ONE>")
+        expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw("<someRule> can never consume any tokens")
+    })
+
+    it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE_SEP", () => {
+        class EmptyLookaheadParserAtLeastOneSep extends EmptyLookaheadParser {
+            constructor(input:Token[] = []) {
+                super(input);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => this.AT_LEAST_ONE_SEP5({
+                SEP: PlusTok,
+                DEF: this.block
+            }))
+        }
+        expect(() => new EmptyLookaheadParserAtLeastOneSep()).to.throw("The repetition <AT_LEAST_ONE_SEP5>")
+        expect(() => new EmptyLookaheadParserAtLeastOneSep()).to.throw("within Rule <someRule>")
+    })
+
+    it("will throw an error when there are no non-empty lookaheads for MANY", () => {
+        class EmptyLookaheadParserMany extends EmptyLookaheadParser {
+            constructor(input:Token[] = []) {
+                super(input);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => this.MANY2(this.block))
+        }
+        expect(() => new EmptyLookaheadParserMany()).to.throw("The repetition <MANY2>")
+        expect(() => new EmptyLookaheadParserMany()).to.throw("<someRule> can never consume any tokens")
+    })
+
+
+    it("will throw an error when there are no non-empty lookaheads for MANY_SEP", () => {
+        class EmptyLookaheadParserManySep extends EmptyLookaheadParser {
+            constructor(input:Token[] = []) {
+                super(input);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public someRule = this.RULE("someRule", () => this.MANY_SEP3({
+                SEP: PlusTok,
+                DEF: this.block
+            }))
+        }
+        expect(() => new EmptyLookaheadParserManySep()).to.throw("The repetition <MANY_SEP3>")
+        expect(() => new EmptyLookaheadParserManySep()).to.throw("within Rule <someRule>")
+    })
 })
