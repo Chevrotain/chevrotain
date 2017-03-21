@@ -700,7 +700,7 @@ describe("The no non-empty lookahead validation", () => {
 
     class EmptyLookaheadParser extends Parser {
         constructor(input:Token[] = []) {
-            super(input, [PlusTok]);
+            super(input, [PlusTok])
         }
 
         public block = this.RULE("block", () => this.CONSUME(PlusTok))
