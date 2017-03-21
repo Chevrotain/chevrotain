@@ -44,12 +44,12 @@ export function validateGrammar(topLevels:gast.Rule[],
     let nestedRulesNameErrors:any = validateNestedRulesNames(topLevels)
     let nestedRulesDuplicateErrors:any = validateDuplicateNestedRules(topLevels)
 
-    let emptyRepititionErrors = validateSomeNonEmptyLookaheadPath(topLevels, maxLookahead)
+    let emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(topLevels, maxLookahead)
 
     return <any>utils.flatten(duplicateErrors.concat(tokenNameErrors,
         nestedRulesNameErrors,
         nestedRulesDuplicateErrors,
-        emptyRepititionErrors,
+        emptyRepetitionErrors,
         leftRecursionErrors,
         emptyAltErrors,
         ambiguousAltsErrors,
@@ -430,7 +430,7 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
     return errors
 }
 
-export class RepitionCollector extends gast.GAstVisitor {
+export class RepetionCollector extends gast.GAstVisitor {
     public allProductions:gast.IProduction[] = []
 
     public visitRepetitionWithSeparator(manySep:gast.RepetitionWithSeparator):void {
@@ -453,7 +453,7 @@ export class RepitionCollector extends gast.GAstVisitor {
 export function validateSomeNonEmptyLookaheadPath(topLevelRules:gast.Rule[], maxLookahead:number):IParserDefinitionError[] {
     let errors = []
     forEach(topLevelRules, (currTopRule) => {
-        let collectorVisitor = new RepitionCollector()
+        let collectorVisitor = new RepetionCollector()
         currTopRule.accept(collectorVisitor)
         let allRuleProductions = collectorVisitor.allProductions
         forEach(allRuleProductions, (currProd) => {
@@ -462,9 +462,10 @@ export function validateSomeNonEmptyLookaheadPath(topLevelRules:gast.Rule[], max
             let paths = getLookaheadPathsForOptionalProd(currOccurrence, currTopRule, prodType, maxLookahead)
             let pathsInsideProduction = paths[0]
             if (isEmpty(flatten(pathsInsideProduction))) {
-                let dslName = getProductionDslName(currProd)
-                let errMsg = `Empty lookahead paths found in <${dslName}${currOccurrence}> within Rule <${currTopRule.name}>.\n` +
-                    `This means that no Tokens are consumed. To fix this, change the rule to consume Tokens.`
+                let implicitOccurrence = currProd.implicitOccurrenceIndex
+                let dslName = `${getProductionDslName(currProd)}${implicitOccurrence ? "" : currOccurrence}`
+                let errMsg = `The repetition <${dslName}> within Rule <${currTopRule.name}> can never consume any tokens.\n` +
+                    `This could lead to an infinite loop.`
                 errors.push({
                     message:  errMsg,
                     type:     ParserDefinitionErrorType.NO_NON_EMPTY_LOOKAHEAD,
