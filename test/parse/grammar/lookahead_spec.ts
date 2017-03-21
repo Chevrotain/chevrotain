@@ -7,7 +7,9 @@ import {
     buildLookaheadForMany,
     lookAheadSequenceFromAlternatives,
     buildAlternativesLookAheadFunc,
-    buildSingleAlternativeLookaheadFunction
+    buildSingleAlternativeLookaheadFunction,
+    getProdType,
+    PROD_TYPE
 } from "../../../src/parse/grammar/lookahead"
 import {map} from "../../../src/utils/utils"
 import {
@@ -218,6 +220,31 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         ], CommaTok, 2)
 
     ])
+
+    describe("getProdType", () => {
+        it("handles `Option`", () => {
+            expect(getProdType(new Option([]))).to.equal(PROD_TYPE.OPTION)
+        })
+        it("handles `Repetition`", () => {
+            expect(getProdType(new Repetition([]))).to.equal(PROD_TYPE.REPETITION)
+        })
+        it("handles `RepetitionMandatory`", () => {
+            expect(getProdType(new RepetitionMandatory([]))).to.equal(PROD_TYPE.REPETITION_MANDATORY)
+        })
+        it("handles `RepetitionWithSeparator`", () => {
+            expect(getProdType(new RepetitionWithSeparator([], null))).to.equal(PROD_TYPE.REPETITION_WITH_SEPARATOR)
+        })
+        it("handles `RepetitionMandatoryWithSeparator`", () => {
+            expect(getProdType(new RepetitionMandatoryWithSeparator([], null))).to.equal(PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR)
+        })
+        it("handles `Alternation`", () => {
+            expect(getProdType(new Alternation([]))).to.equal(PROD_TYPE.ALTERNATION)
+        })
+        it("handles other productions", () => {
+            expect(() => getProdType(new NonTerminal("whatever", null))).to.throw("non exhaustive match")
+            expect(() => getProdType(new Terminal(IdentTok))).to.throw("non exhaustive match")
+        })
+    })
 
     context("lookahead " + contextName, () => {
 
