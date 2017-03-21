@@ -712,9 +712,9 @@ describe("The no non-empty lookahead validation", () => {
                 (<any>Parser).performSelfAnalysis(this)
             }
 
-            public someRule = this.RULE("someRule", () => this.AT_LEAST_ONE1(this.block))
+            public someRule = this.RULE("someRule", () => this.AT_LEAST_ONE(this.block))
         }
-        expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw("The repetition <AT_LEAST_ONE1>")
+        expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw("The repetition <AT_LEAST_ONE>")
         expect(() => new EmptyLookaheadParserAtLeastOne()).to.throw("<someRule> can never consume any tokens")
     })
 
