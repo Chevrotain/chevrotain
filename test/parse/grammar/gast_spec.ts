@@ -1,6 +1,6 @@
 import {gast} from "../../../src/parse/grammar/gast_public"
 import {getProductionDslName} from "../../../src/parse/grammar/gast"
-import {Token, extendSimpleLazyToken, extendLazyToken, extendToken} from "../../../src/scan/tokens_public"
+import {extendToken, Token} from "../../../src/scan/tokens_public"
 import Terminal = gast.Terminal
 import NonTerminal = gast.NonTerminal
 import Flat = gast.Flat
@@ -64,9 +64,9 @@ describe("GAst namespace", () => {
 
     describe("the GAst serialization capabilities", () => {
 
-        let A = extendSimpleLazyToken("A")
+        let A = extendToken("A")
         A.LABEL = "bamba"
-        let B = extendLazyToken("B", /[a-zA-Z]\w*/)
+        let B = extendToken("B", /[a-zA-Z]\w*/)
         let C = extendToken("C")
         let D = extendToken("D")
         let Comma = extendToken("Comma")
@@ -110,14 +110,14 @@ describe("GAst namespace", () => {
                 type:       "Option",
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     },
                 ]
@@ -131,14 +131,14 @@ describe("GAst namespace", () => {
                 type:       "RepetitionMandatory",
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     },
                 ]
@@ -151,21 +151,21 @@ describe("GAst namespace", () => {
             expect(actual).to.deep.equal({
                 type:       "RepetitionMandatoryWithSeparator",
                 separator:  {
-                    type:  "Terminal",
-                    name:  "Comma",
-                    label: "Comma",
+                    type:               "Terminal",
+                    name:               "Comma",
+                    label:              "Comma",
                     occurrenceInParent: 1
                 },
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     }
                 ]
@@ -179,14 +179,14 @@ describe("GAst namespace", () => {
                 type:       "Repetition",
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     },
                 ]
@@ -199,21 +199,21 @@ describe("GAst namespace", () => {
             expect(actual).to.deep.equal({
                 type:       "RepetitionWithSeparator",
                 separator:  {
-                    type:  "Terminal",
-                    name:  "Comma",
-                    label: "Comma",
+                    type:               "Terminal",
+                    name:               "Comma",
+                    label:              "Comma",
                     occurrenceInParent: 1
                 },
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     },
                 ]
@@ -235,9 +235,9 @@ describe("GAst namespace", () => {
                         type:       "Flat",
                         definition: [
                             {
-                                type:  "Terminal",
-                                name:  "A",
-                                label: "bamba",
+                                type:               "Terminal",
+                                name:               "A",
+                                label:              "bamba",
                                 occurrenceInParent: 1
                             }
                         ]
@@ -246,10 +246,10 @@ describe("GAst namespace", () => {
                         type:       "Flat",
                         definition: [
                             {
-                                type:    "Terminal",
-                                name:    "B",
-                                label:   "B",
-                                pattern: "[a-zA-Z]\\w*",
+                                type:               "Terminal",
+                                name:               "B",
+                                label:              "B",
+                                pattern:            "[a-zA-Z]\\w*",
                                 occurrenceInParent: 1
                             }
                         ]
@@ -258,9 +258,9 @@ describe("GAst namespace", () => {
                         type:       "Flat",
                         definition: [
                             {
-                                type:  "Terminal",
-                                name:  "C",
-                                label: "C",
+                                type:               "Terminal",
+                                name:               "C",
+                                label:              "C",
                                 occurrenceInParent: 1
                             }
                         ]
@@ -273,9 +273,9 @@ describe("GAst namespace", () => {
             let input = new gast.Terminal(A)
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
-                type:  "Terminal",
-                name:  "A",
-                label: "bamba",
+                type:               "Terminal",
+                name:               "A",
+                label:              "bamba",
                 occurrenceInParent: 1
             })
         })
@@ -284,10 +284,10 @@ describe("GAst namespace", () => {
             let input = new gast.Terminal(B)
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
-                type:    "Terminal",
-                name:    "B",
-                label:   "B",
-                pattern: "[a-zA-Z]\\w*",
+                type:               "Terminal",
+                name:               "B",
+                label:              "B",
+                pattern:            "[a-zA-Z]\\w*",
                 occurrenceInParent: 1
             })
         })
@@ -300,14 +300,14 @@ describe("GAst namespace", () => {
                 name:       "myRule",
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     },
                 ]
@@ -324,14 +324,14 @@ describe("GAst namespace", () => {
                 name:       "myRule",
                 definition: [
                     {
-                        type:  "Terminal",
-                        name:  "C",
-                        label: "C",
+                        type:               "Terminal",
+                        name:               "C",
+                        label:              "C",
                         occurrenceInParent: 1
                     },
                     {
-                        type: "NonTerminal",
-                        name: "bamba",
+                        type:               "NonTerminal",
+                        name:               "bamba",
                         occurrenceInParent: 1
                     },
                 ]
@@ -341,14 +341,14 @@ describe("GAst namespace", () => {
                     name:       "myRule2",
                     definition: [
                         {
-                            type:  "Terminal",
-                            name:  "D",
-                            label: "D",
+                            type:               "Terminal",
+                            name:               "D",
+                            label:              "D",
                             occurrenceInParent: 1
                         },
                         {
-                            type: "NonTerminal",
-                            name: "bisli",
+                            type:               "NonTerminal",
+                            name:               "bisli",
                             occurrenceInParent: 1
                         },
                     ]

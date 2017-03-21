@@ -1,9 +1,9 @@
-import {extendLazyToken, extendSimpleLazyToken, extendToken, Token} from "../../src/scan/tokens_public"
+import {extendToken, Token} from "../../src/scan/tokens_public"
 import {Parser} from "../../src/parse/parser_public"
 import {exceptions} from "../../src/parse/exceptions_public"
 import {clearCache} from "../../src/parse/cache_public"
-import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
-import {createLazyToken, createRegularToken, createSimpleToken} from "../utils/matchers"
+import {tokenStructuredMatcher} from "../../src/scan/tokens"
+import {createRegularToken} from "../utils/matchers"
 import {TokenConstructor} from "../../src/scan/lexer_public"
 import {map} from "../../src/utils/utils"
 import MismatchedTokenException = exceptions.MismatchedTokenException
@@ -786,6 +786,4 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
     })
 }
 
-defineCstSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)
-defineCstSpecs("Lazy Tokens Mode", extendLazyToken, createLazyToken, tokenInstanceofMatcher)
-defineCstSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, createSimpleToken, tokenStructuredMatcher)
+defineCstSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenStructuredMatcher)

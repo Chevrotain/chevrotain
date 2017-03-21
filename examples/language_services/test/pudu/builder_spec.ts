@@ -1,13 +1,13 @@
-import {VirtualToken} from "chevrotain"
-import {AstNode, NIL, setParent} from "../../src/pudu/ast"
+import {AstNode, setParent} from "../../src/pudu/ast"
 import {ParseTree} from "../../src/pudu/parse_tree"
 import {MATCH_CHILDREN} from "../../src/pudu/builder"
 import {expect} from "chai"
+import {createTokenInstance, Token} from "chevrotain"
 
-class Root extends VirtualToken {}
-class A extends VirtualToken {}
-class B extends VirtualToken {}
-class C extends VirtualToken {}
+class Root extends Token {}
+class A extends Token {}
+class B extends Token {}
+class C extends Token {}
 
 class C2 extends C {}
 class C3 extends C {}
@@ -35,9 +35,9 @@ describe("The Core AstBuilder", () => {
     it("Implements a pattern patcher by ParseTree payload class type - simple", () => {
         let input = new ParseTree(new Root(),
             [
-                new ParseTree(new A()),
-                new ParseTree(new B()),
-                new ParseTree(new C())
+                new ParseTree(createTokenInstance(A, "", NaN, NaN, NaN, NaN, NaN, NaN)),
+                new ParseTree(createTokenInstance(B, "", NaN, NaN, NaN, NaN, NaN, NaN)),
+                new ParseTree(createTokenInstance(C, "", NaN, NaN, NaN, NaN, NaN, NaN))
             ])
 
         let actual = ""
@@ -54,10 +54,10 @@ describe("The Core AstBuilder", () => {
     it("Implements a pattern patcher by ParseTree payload class type - hierarchy", () => {
         let input = new ParseTree(new Root(),
             [
-                new ParseTree(new A()),
-                new ParseTree(new C2()),
-                new ParseTree(new C3()),
-                new ParseTree(new C())
+                new ParseTree(createTokenInstance(A, "", NaN, NaN, NaN, NaN, NaN, NaN)),
+                new ParseTree(createTokenInstance(C2, "", NaN, NaN, NaN, NaN, NaN, NaN)),
+                new ParseTree(createTokenInstance(C3, "", NaN, NaN, NaN, NaN, NaN, NaN)),
+                new ParseTree(createTokenInstance(C, "", NaN, NaN, NaN, NaN, NaN, NaN))
             ])
 
         let actual = ""
@@ -77,8 +77,9 @@ describe("The Core AstBuilder", () => {
     it("Implements a pattern patcher by ParseTree payload class type - non exhaustive match", () => {
         let input = new ParseTree(new Root(),
             [
-                new ParseTree(new A()),
-                new ParseTree(new C()) // no matching CASE for C in the pattern matcher below
+                new ParseTree(createTokenInstance(A, "", NaN, NaN, NaN, NaN, NaN, NaN)),
+                new ParseTree(createTokenInstance(C, "", NaN, NaN, NaN, NaN, NaN, NaN)), // no matching CASE for C in the pattern
+                // matcher below
             ])
 
         let actual = ""

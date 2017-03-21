@@ -36,6 +36,7 @@ var _ = require("lodash");
 
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
+var tokenMatcher = chevrotain.tokenMatcher;
 var createToken = chevrotain.createToken;
 
 // all keywords (from/select/where/...) extend a base Keyword class, thus
@@ -160,7 +161,7 @@ class SelectContentAssistParser extends SelectParser {
             if (consumedToken !== undefined &&
                 // we have reached the end of the input without encountering the contentAssist offset
                 // this means the content assist offset is AFTER the input
-                (this.NEXT_TOKEN() instanceof chevrotain.EOF ||
+                (tokenMatcher(this.NEXT_TOKEN(), chevrotain.EOF) ||
                     // we consumed the last token BEFORE the content assist of offset
                     this.NEXT_TOKEN().startOffset > this.assistOffset
                 )) {
@@ -172,7 +173,7 @@ class SelectContentAssistParser extends SelectParser {
             else if (nextTokenEndOffset >= this.assistOffset && // going to reach or pass the assist offset.
                 nextToken.startOffset < this.assistOffset &&
                 // only provide suggestions if it was requested after some word like(Ident/Keyword) prefix.
-                (nextToken instanceof Identifier || nextToken instanceof Keyword)) {
+                (tokenMatcher(nextToken, Identifier) || tokenMatcher(nextToken, Keyword))) {
                 contentAssistPointReached = true;
                 prefix = nextToken.image.substring(0, this.assistOffset - nextToken.startOffset);
                 // we need the last grammar path and not the current one as we need to find out what TokenTypes the prefix
@@ -227,7 +228,7 @@ module.exports = {
 
                 // handling keyword suggestions
                 var nextPossibleKeywordsTypes = _.filter(nextPossibleTokTypes, function(currPossibleTokType) {
-                    return new currPossibleTokType("dummy") instanceof Keyword;
+                    return Keyword.prototype.isPrototypeOf(currPossibleTokType.prototype);
                 })
                 var possibleKeywordSuggestions = _.map(nextPossibleKeywordsTypes, function(currKeywordType) {
                     // relying on the fact that the keyword patterns(regexps) are identical to the strings they match. (very simple regexps)
@@ -251,6 +252,8 @@ module.exports = {
                 var allPossibleSuggestions = possibleKeywordSuggestions.concat(possibleIdentifierSuggestions);
                 return filterByPrefix(allPossibleSuggestions, prefix);
             }
+
+            throw e
         }
         return [];
     }

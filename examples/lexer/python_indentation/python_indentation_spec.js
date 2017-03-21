@@ -2,45 +2,46 @@
 
 let expect = require("chai").expect
 let indentationExample = require("./python_indentation")
+let tokenMatcher = require("chevrotain").tokenMatcher
 let tokenize = indentationExample.tokenize
 
 describe('The Chevrotain Lexer ability to lex python like indentation.', () => {
 
     it('Can Lex a simple python style if-else ', () => {
         let input =
-        "if (1)\n" +
-        "  if (2)\n" +
-        "    if(3)\n" +
-        "      print 666\n" +
-        "  else\n" +
-        "    print 999\n"
+            "if (1)\n" +
+            "  if (2)\n" +
+            "    if(3)\n" +
+            "      print 666\n" +
+            "  else\n" +
+            "    print 999\n"
 
         let lexResult = tokenize(input)
         let actualTokens = lexResult.tokens
-        expect(actualTokens[0]).to.be.an.instanceOf(indentationExample.If)
-        expect(actualTokens[1]).to.be.an.instanceOf(indentationExample.LParen)
-        expect(actualTokens[2]).to.be.an.instanceOf(indentationExample.IntegerLiteral)
-        expect(actualTokens[3]).to.be.an.instanceOf(indentationExample.RParen)
-        expect(actualTokens[4]).to.be.an.instanceOf(indentationExample.Indent)
-        expect(actualTokens[5]).to.be.an.instanceOf(indentationExample.If)
-        expect(actualTokens[6]).to.be.an.instanceOf(indentationExample.LParen)
-        expect(actualTokens[7]).to.be.an.instanceOf(indentationExample.IntegerLiteral)
-        expect(actualTokens[8]).to.be.an.instanceOf(indentationExample.RParen)
-        expect(actualTokens[9]).to.be.an.instanceOf(indentationExample.Indent)
-        expect(actualTokens[10]).to.be.an.instanceOf(indentationExample.If)
-        expect(actualTokens[11]).to.be.an.instanceOf(indentationExample.LParen)
-        expect(actualTokens[12]).to.be.an.instanceOf(indentationExample.IntegerLiteral)
-        expect(actualTokens[13]).to.be.an.instanceOf(indentationExample.RParen)
-        expect(actualTokens[14]).to.be.an.instanceOf(indentationExample.Indent)
-        expect(actualTokens[15]).to.be.an.instanceOf(indentationExample.Print)
-        expect(actualTokens[16]).to.be.an.instanceOf(indentationExample.IntegerLiteral)
-        expect(actualTokens[17]).to.be.an.instanceOf(indentationExample.Outdent)
-        expect(actualTokens[18]).to.be.an.instanceOf(indentationExample.Outdent)
-        expect(actualTokens[19]).to.be.an.instanceOf(indentationExample.Else)
-        expect(actualTokens[20]).to.be.an.instanceOf(indentationExample.Indent)
-        expect(actualTokens[21]).to.be.an.instanceOf(indentationExample.Print)
-        expect(actualTokens[22]).to.be.an.instanceOf(indentationExample.IntegerLiteral)
-        expect(actualTokens[23]).to.be.an.instanceOf(indentationExample.Outdent)
-        expect(actualTokens[24]).to.be.an.instanceOf(indentationExample.Outdent)
+        expect(tokenMatcher(actualTokens[0], indentationExample.If)).to.be.true
+        expect(tokenMatcher(actualTokens[1], indentationExample.LParen)).to.be.true
+        expect(tokenMatcher(actualTokens[2], indentationExample.IntegerLiteral)).to.be.true
+        expect(tokenMatcher(actualTokens[3], indentationExample.RParen)).to.be.true
+        expect(tokenMatcher(actualTokens[4], indentationExample.Indent)).to.be.true
+        expect(tokenMatcher(actualTokens[5], indentationExample.If)).to.be.true
+        expect(tokenMatcher(actualTokens[6], indentationExample.LParen)).to.be.true
+        expect(tokenMatcher(actualTokens[7], indentationExample.IntegerLiteral)).to.be.true
+        expect(tokenMatcher(actualTokens[8], indentationExample.RParen)).to.be.true
+        expect(tokenMatcher(actualTokens[9], indentationExample.Indent)).to.be.true
+        expect(tokenMatcher(actualTokens[10], indentationExample.If)).to.be.true
+        expect(tokenMatcher(actualTokens[11], indentationExample.LParen)).to.be.true
+        expect(tokenMatcher(actualTokens[12], indentationExample.IntegerLiteral)).to.be.true
+        expect(tokenMatcher(actualTokens[13], indentationExample.RParen)).to.be.true
+        expect(tokenMatcher(actualTokens[14], indentationExample.Indent)).to.be.true
+        expect(tokenMatcher(actualTokens[15], indentationExample.Print)).to.be.true
+        expect(tokenMatcher(actualTokens[16], indentationExample.IntegerLiteral)).to.be.true
+        expect(tokenMatcher(actualTokens[17], indentationExample.Outdent)).to.be.true
+        expect(tokenMatcher(actualTokens[18], indentationExample.Outdent)).to.be.true
+        expect(tokenMatcher(actualTokens[19], indentationExample.Else)).to.be.true
+        expect(tokenMatcher(actualTokens[20], indentationExample.Indent)).to.be.true
+        expect(tokenMatcher(actualTokens[21], indentationExample.Print)).to.be.true
+        expect(tokenMatcher(actualTokens[22], indentationExample.IntegerLiteral)).to.be.true
+        expect(tokenMatcher(actualTokens[23], indentationExample.Outdent)).to.be.true
+        expect(tokenMatcher(actualTokens[24], indentationExample.Outdent)).to.be.true
     })
 })

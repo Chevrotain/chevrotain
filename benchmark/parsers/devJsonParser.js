@@ -2,27 +2,27 @@
 var chevrotain = require("../../lib/src/api");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendSimpleLazyToken;
+var createToken = chevrotain.createToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
-// In ES6, custom inheritance implementation (such as 'extendToken(...)') can be replaced with simple "class X extends Y"...
-var True = extendToken("True", /true/);
-var False = extendToken("False", /false/);
-var Null = extendToken("Null", /null/);
-var LCurly = extendToken("LCurly", /{/);
-var RCurly = extendToken("RCurly", /}/);
-var LSquare = extendToken("LSquare", /\[/);
-var RSquare = extendToken("RSquare", /]/);
-var Comma = extendToken("Comma", /,/);
-var Colon = extendToken("Colon", /:/);
-var StringLiteral = extendToken("StringLiteral", /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/);
-var NumberLiteral = extendToken("NumberLiteral", /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/);
-var WhiteSpace = extendToken("WhiteSpace", /\s+/);
+// In ES6, custom inheritance implementation (such as 'extendToken({...)') can be replaced with simple "class X extends Y"...
+var True = createToken({name: "True", pattern: /true/});
+var False = createToken({name: "False", pattern: /false/});
+var Null = createToken({name: "Null", pattern: /null/});
+var LCurly = createToken({name: "LCurly", pattern: /{/});
+var RCurly = createToken({name: "RCurly", pattern: /}/});
+var LSquare = createToken({name: "LSquare", pattern: /\[/});
+var RSquare = createToken({name: "RSquare", pattern: /]/});
+var Comma = createToken({name: "Comma", pattern: /,/});
+var Colon = createToken({name: "Colon", pattern: /:/});
+var StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
+var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/});
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
 WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
 var allTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
-var JsonLexer = new Lexer(allTokens);
+var JsonLexer = new Lexer(allTokens, {positionTracking:"onlyOffset"});
 
 
 // ----------------- parser -----------------

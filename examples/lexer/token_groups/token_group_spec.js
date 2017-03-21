@@ -1,5 +1,6 @@
 var assert = require("assert");
 var groupsLexer = require("./token_groups");
+var tokenMatcher = require("chevrotain").tokenMatcher
 
 describe('The Chevrotain Lexer ability to group the Tokens.', function() {
 
@@ -23,9 +24,9 @@ describe('The Chevrotain Lexer ability to group the Tokens.', function() {
 
         var commentsGroup = lexResult.groups.singleLineComments;
         assert.equal(commentsGroup.length, 2);
-        assert.equal(commentsGroup[0] instanceof groupsLexer.Comment, true);
+        assert.equal(tokenMatcher(commentsGroup[0], groupsLexer.Comment), true);
         assert.equal(commentsGroup[0].image, '// some comment!');
-        assert.equal(commentsGroup[1] instanceof groupsLexer.Comment, true);
+        assert.equal(tokenMatcher(commentsGroup[1], groupsLexer.Comment), true);
         assert.equal(commentsGroup[1].image, '// some other comment!');
     });
 

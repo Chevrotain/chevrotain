@@ -1,5 +1,5 @@
 import {AstNode, NIL, NO_POSITION, setParent} from "../../src/pudu/ast"
-import {Token} from "chevrotain"
+import {Token, createTokenInstance} from "chevrotain"
 import {expect} from "chai"
 
 class A extends AstNode {
@@ -16,7 +16,12 @@ class B extends AstNode {}
 describe("The AstNode's textual position capabilities", () => {
 
     it("can extract textual position information from an AstNode", () => {
-        let b = new B(NIL, [new Token("bamba", 2, 3, 4, 5, 6), new Token("bisli", 100, 50, 51, 52, 53)])
+
+        let b = new B(NIL,
+            [
+                createTokenInstance(Token, "bamba", 2, 3, 4, 5, 6, 7),
+                createTokenInstance(Token, "bisli", 100, 50, 51, 52, 53, 105)
+            ])
         let actual = b.position()
         expect(actual).to.deep.equal({
             startOffset: 2,
@@ -29,8 +34,12 @@ describe("The AstNode's textual position capabilities", () => {
     })
 
     it("can extract textual position information from a complex AstNode", () => {
-        let b = new B(NIL, [new Token("bamba", 1, 3, 4, 5, 6), new Token("pizza", 5, 4, 5, 6, 6)])
-        let a = new A(b, NIL, [new Token("bisli", 100, 50, 51, 52, 53)])
+        let b = new B(NIL, [
+            createTokenInstance(Token, "bamba", 1, 3, 4, 5, 6, 6),
+            createTokenInstance(Token, "pizza", 5, 4, 5, 6, 6, 10)
+        ])
+
+        let a = new A(b, NIL, [createTokenInstance(Token, "bisli", 100, 50, 51, 52, 53, 105)])
 
         let actual = a.position()
         expect(actual).to.deep.equal({
@@ -52,12 +61,13 @@ describe("The AstNode's textual position capabilities", () => {
 
     it("will ignore Tokens inserted during recovery when computing the textual position", () => {
 
-        let recoveredToken = new Token("pizza", 1111, 1, 234234, 52, 99)
+
+        let recoveredToken = createTokenInstance(Token, "pizza", 1111, 1, 234234, 52, 99, 1116)
         recoveredToken.isInsertedInRecovery = true
 
         let b = new B(NIL, [
-            new Token("bamba", 2, 3, 4, 5, 6),
-            new Token("bisli", 100, 50, 51, 52, 53),
+            createTokenInstance(Token, "bamba", 2, 3, 4, 5, 6, 7),
+            createTokenInstance(Token, "bisli", 100, 50, 51, 52, 53, 105),
             recoveredToken
         ])
 

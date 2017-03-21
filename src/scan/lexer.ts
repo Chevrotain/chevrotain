@@ -1,4 +1,4 @@
-import {ISimpleTokenOrIToken, Token, tokenName} from "./tokens_public"
+import {IToken, Token, tokenName} from "./tokens_public"
 import {
     ILexerDefinitionError,
     IMultiModeLexerDefinition,
@@ -11,7 +11,6 @@ import {
     compact,
     contains,
     difference,
-    every,
     filter,
     first,
     forEach,
@@ -26,10 +25,8 @@ import {
     map,
     reduce,
     reject,
-    some,
-    uniq
+    some
 } from "../utils/utils"
-import {isLazyTokenType, isSimpleTokenType} from "./tokens"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -37,7 +34,7 @@ export const MODES = "modes"
 
 export interface IAnalyzeResult {
     allPatterns:IRegExpExec[]
-    patternIdxToClass:Function[]
+    patternIdxToType:number[]
     patternIdxToGroup:any[]
     patternIdxToLongerAltIdx:number[]
     patternIdxToCanLineTerminator:boolean[]
@@ -87,7 +84,7 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
 
     })
 
-    let patternIdxToClass = onlyRelevantClasses
+    let patternIdxToType = map(onlyRelevantClasses, (currClass) => currClass.tokenType)
 
     let patternIdxToGroup = map(onlyRelevantClasses, (clazz:any) => {
         let groupName = clazz.GROUP
@@ -143,13 +140,13 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
 
     return {
         allPatterns:                   allTransformedPatterns,
-        patternIdxToClass:             patternIdxToClass,
         patternIdxToGroup:             patternIdxToGroup,
         patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
         patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
         patternIdxToIsCustom:          patternIdxToIsCustom,
         patternIdxToPushMode:          patternIdxToPushMode,
         patternIdxToPopMode:           patternIdxToPopMode,
+        patternIdxToType:              patternIdxToType,
         emptyGroups:                   emptyGroups
     }
 }
@@ -384,30 +381,6 @@ export function addStickyFlag(pattern:RegExp):RegExp {
     return new RegExp(`${pattern.source}`, flags)
 }
 
-export function countLineTerminators(text:string):number {
-    let lineTerminators = 0
-    let currOffset = 0
-
-    while (currOffset < text.length) {
-        let c = text.charCodeAt(currOffset)
-        if (c === 10) { // "\n"
-            lineTerminators++
-        }
-        else if (c === 13) { // \r
-            if (currOffset !== text.length - 1 &&
-                text.charCodeAt(currOffset + 1) === 10) { // "\n"
-            }
-            else {
-                lineTerminators++
-            }
-        }
-
-        currOffset++
-    }
-
-    return lineTerminators
-}
-
 export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):ILexerDefinitionError[] {
 
     let errors = []
@@ -452,89 +425,6 @@ export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):
     return errors
 }
 
-export interface LazyCheckResult {
-    isLazy:boolean
-    errors:ILexerDefinitionError[]
-}
-
-export function checkLazyMode(allTokenTypes:TokenConstructor[]):LazyCheckResult {
-    let errors = []
-    let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
-
-    let areAllLazy = every(allTokensTypeSet, (currTokType) => isLazyTokenType(currTokType))
-    // TODO: why is this second check required?
-    let areAllNotLazy = every(allTokensTypeSet, (currTokType) => !isLazyTokenType(currTokType))
-
-    if (!areAllLazy && !areAllNotLazy) {
-
-        let lazyTokens = filter(allTokensTypeSet, (currTokType) => isLazyTokenType(currTokType))
-        let lazyTokensNames = map(lazyTokens, tokenName)
-        let lazyTokensString = lazyTokensNames.join("\n\t")
-        let notLazyTokens = filter(allTokensTypeSet, (currTokType) => !isLazyTokenType(currTokType))
-        let notLazyTokensNames = map(notLazyTokens, tokenName)
-        let notLazyTokensString = notLazyTokensNames.join("\n\t")
-
-        errors.push({
-            message: `A Lexer cannot be defined using a mix of both Lazy and Non-Lazy Tokens:\n` +
-                     `Lazy Tokens:\n\t` +
-                     lazyTokensString +
-                     `\nNon-Lazy Tokens:\n\t` +
-                     notLazyTokensString,
-            type:    LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY
-        })
-    }
-
-    return {
-        isLazy: areAllLazy,
-        errors: errors
-    }
-}
-
-export interface SimpleCheckResult {
-    isSimple:boolean
-    errors:ILexerDefinitionError[]
-}
-
-export function checkSimpleMode(allTokenTypes:TokenConstructor[]):SimpleCheckResult {
-    let errors = []
-    let allTokensTypeSet = uniq(allTokenTypes, (currTokType) => tokenName(currTokType))
-
-    let areAllSimple = every(allTokensTypeSet, (currTokType) => isSimpleTokenType(currTokType))
-    // TODO: why is the second check required?
-    let areAllNotSimple = every(allTokensTypeSet, (currTokType) => !isSimpleTokenType(currTokType))
-
-    if (!areAllSimple && !areAllNotSimple) {
-
-        let simpleTokens = filter(allTokensTypeSet, (currTokType) => isSimpleTokenType(currTokType))
-        let simpleTokensNames = map(simpleTokens, tokenName)
-        let simpleTokensString = simpleTokensNames.join("\n\t")
-        let notSimpleTokens = filter(allTokensTypeSet, (currTokType) => !isSimpleTokenType(currTokType))
-        let notSimpleTokensNames = map(notSimpleTokens, tokenName)
-        let notSimpleTokensString = notSimpleTokensNames.join("\n\t")
-
-        errors.push({
-            message: `A Lexer cannot be defined using a mix of both Simple and Non-Simple Tokens:\n` +
-                     `Simple Tokens:\n\t` +
-                     simpleTokensString +
-                     `\nNon-Simple Tokens:\n\t` +
-                     notSimpleTokensString,
-            type:    LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_SIMPLE_AND_NOT_SIMPLE
-        })
-    }
-
-    return {
-        isSimple: areAllSimple,
-        errors:   errors
-    }
-}
-
-export function checkFastMode(allTokenTypes:TokenConstructor[]):boolean {
-    let noLongerALTs = every(allTokenTypes, (currTokType) => currTokType.LONGER_ALT === undefined)
-    let noModes = every(allTokenTypes, (currTokType) => currTokType.POP_MODE === undefined && currTokType.PUSH_MODE === undefined)
-
-    return noLongerALTs && noModes
-}
-
 export function checkHasCustomTokenPatterns(allTokenTypes:TokenConstructor[]):boolean {
     return some(allTokenTypes, (currTokType) => {
         let pattern = currTokType.PATTERN
@@ -542,7 +432,7 @@ export function checkHasCustomTokenPatterns(allTokenTypes:TokenConstructor[]):bo
     })
 }
 
-export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken }):{ [groupName:string]:ISimpleTokenOrIToken } {
+export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:IToken }):{ [groupName:string]:IToken } {
     let clonedResult:any = {}
     let groupKeys = keys(emptyGroups)
 

@@ -16,8 +16,8 @@
 "use strict"
 const chevrotain = require("chevrotain")
 const createToken = chevrotain.createToken
+const createTokenInstance = chevrotain.createTokenInstance
 const Lexer = chevrotain.Lexer
-const getStartOffset = chevrotain.getStartOffset
 const _ = require("lodash")
 
 /**
@@ -70,7 +70,9 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
         // only newlines matched so far
         (noTokensMatchedYet && !noNewLinesMatchedYet) ||
         // Both newlines and other Tokens have been matched AND the last matched Token is a newline
-        (!noTokensMatchedYet && !noNewLinesMatchedYet && getStartOffset(_.last(newLines)) > getStartOffset(_.last(matchedTokens)))
+        (!noTokensMatchedYet &&
+        !noNewLinesMatchedYet &&
+        (!_.isEmpty(newLines) && !_.isEmpty(matchedTokens) && _.last(newLines).startOffset) > _.last(matchedTokens).startOffset)
 
     // indentation can only be matched at the start of a line.
     if (isFirstLine || isStartOfLine) {
@@ -104,14 +106,14 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
                 //if we need more than one outdent token, add all but the last one
                 if (indentStack.length > 2) {
                     const image = "";
-                    const offset = chevrotain.getEndOffset(_.last(matchedTokens)) + 1
-                    const line = chevrotain.getEndLine(_.last(matchedTokens))
-                    const column = chevrotain.getEndColumn(_.last(matchedTokens)) + 1
+                    const offset = _.last(matchedTokens).endOffset + 1
+                    const line = _.last(matchedTokens).endLine
+                    const column = _.last(matchedTokens).endColumn + 1
                     while (indentStack.length > 2 &&
                     //stop before the last Outdent
                     indentStack[indentStack.length - 2] > currIndentLevel) {
                         indentStack.pop()
-                        matchedTokens.push(new Outdent(image, offset, line, column))
+                        matchedTokens.push(createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN))
                     }
                 }
                 indentStack.pop()
@@ -195,14 +197,9 @@ module.exports = {
 
         let lexResult = customPatternLexer.tokenize(text)
 
-        const lastToken = _.last(lexResult.tokens);
-        const lastOffset = chevrotain.getEndOffset(lastToken);
-        const lastLine = chevrotain.getEndLine(lastToken);
-        const lastColumn = chevrotain.getEndColumn(lastToken);
-
         //add remaining Outdents
         while (indentStack.length > 1) {
-            lexResult.tokens.push(new Outdent("", lastOffset, lastLine, lastColumn))
+            lexResult.tokens.push(createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN))
             indentStack.pop();
         }
 

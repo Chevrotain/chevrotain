@@ -29,10 +29,10 @@ import {
 } from "../../../src/parse/grammar/interpreter"
 import {setEquality, createRegularToken} from "../../utils/matchers"
 import {gast} from "../../../src/parse/grammar/gast_public"
-import {Token, ISimpleTokenOrIToken} from "../../../src/scan/tokens_public"
+import {Token, IToken} from "../../../src/scan/tokens_public"
 import {map} from "../../../src/utils/utils"
 import {TokenConstructor} from "../../../src/scan/lexer_public"
-import {tokenInstanceofMatcher} from "../../../src/scan/tokens"
+import {augmentTokenClasses, tokenStructuredMatcher} from "../../../src/scan/tokens"
 
 let RepetitionMandatory = gast.RepetitionMandatory
 let Terminal = gast.Terminal
@@ -480,6 +480,8 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
     class Comma extends Token {}
 
+    augmentTokenClasses([Alpha, Beta, Gamma, Comma])
+
     context("can calculate the next possible paths in a", () => {
 
         it("Sequence", () => {
@@ -612,7 +614,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
     context("can calculate the next possible single tokens for: ", () => {
 
-        function INPUT(tokTypes:TokenConstructor[]):ISimpleTokenOrIToken[] {
+        function INPUT(tokTypes:TokenConstructor[]):IToken[] {
             return map(tokTypes, (currTokType) => createRegularToken(currTokType))
         }
 
@@ -629,9 +631,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 ])
             ]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Gamma])
         })
 
         it("Sequence negative", () => {
@@ -644,9 +646,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             ]
 
             // negative
-            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("Optional positive", () => {
@@ -658,9 +660,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta, Gamma])
-            // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Gamma])
+            // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta, Gamma])
+            // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Gamma])
         })
 
         it("Optional Negative", () => {
@@ -672,9 +674,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Alpha]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Alpha]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("Alternation positive", () => {
@@ -697,9 +699,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                     ])
                 ])]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha, Beta, Beta, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([Beta]), tokenInstanceofMatcher, 5)), [Beta, Alpha])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([Beta, Alpha]), tokenInstanceofMatcher, 5)), [Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([]), tokenStructuredMatcher, 5)), [Alpha, Beta, Beta, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([Beta]), tokenStructuredMatcher, 5)), [Beta, Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(alts, INPUT([Beta, Alpha]), tokenStructuredMatcher, 5)), [Gamma])
         })
 
         it("Alternation Negative", () => {
@@ -718,10 +720,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 ])
             ])]
 
-            expect(nextPossibleTokensAfter(alts, INPUT([Alpha]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(alts, INPUT([Gamma, Alpha]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(alts, INPUT([Beta, Beta]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(alts, INPUT([Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Alpha]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Gamma, Alpha]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Beta, Beta]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(alts, INPUT([Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("Repetition - positive", () => {
@@ -732,11 +734,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Beta]), tokenInstanceofMatcher, 5)),
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([]), tokenStructuredMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Beta]), tokenStructuredMatcher, 5)),
                 [Alpha, Gamma])
         })
 
@@ -748,10 +750,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(nextPossibleTokensAfter(rep, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Beta]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(rep, INPUT([Alpha, Beta, Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("Mandatory Repetition - positive", () => {
@@ -762,11 +764,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Beta]), tokenInstanceofMatcher, 5)),
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([]), tokenStructuredMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Beta]), tokenStructuredMatcher, 5)),
                 [Alpha, Gamma])
         })
 
@@ -778,10 +780,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(nextPossibleTokensAfter(repMand, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Beta]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("Repetition with Separator - positive", () => {
@@ -792,12 +794,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Comma, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([]), tokenStructuredMatcher, 5)), [Alpha, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Comma, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma]), tokenStructuredMatcher, 5)), [Alpha])
             setEquality(
-                pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma, Alpha, Beta]), tokenInstanceofMatcher, 5)),
+                pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma, Alpha, Beta]), tokenStructuredMatcher, 5)),
                 [Comma, Gamma])
         })
 
@@ -809,10 +811,10 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(nextPossibleTokensAfter(repMand, INPUT([Comma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Comma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("Repetition with Separator Mandatory - positive", () => {
@@ -823,14 +825,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Comma, Gamma])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma]), tokenInstanceofMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([]), tokenStructuredMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Comma, Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(repSep, INPUT([Alpha, Beta, Comma]), tokenStructuredMatcher, 5)), [Alpha])
             setEquality(pluckTokenTypes(nextPossibleTokensAfter(
                 repSep,
                 INPUT([Alpha, Beta, Comma, Alpha, Beta]),
-                tokenInstanceofMatcher, 5)), [Comma, Gamma])
+                tokenStructuredMatcher, 5)), [Comma, Gamma])
         })
 
         it("Repetition with Separator Mandatory - negative", () => {
@@ -841,11 +843,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(nextPossibleTokensAfter(repMand, INPUT([Comma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Comma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(repMand, INPUT([Alpha, Beta, Comma, Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
 
         it("NonTerminal - positive", () => {
@@ -859,9 +861,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenInstanceofMatcher, 5)), [Alpha])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenInstanceofMatcher, 5)), [Beta])
-            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenInstanceofMatcher, 5)), [Gamma])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5)), [Alpha])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha]), tokenStructuredMatcher, 5)), [Beta])
+            setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta]), tokenStructuredMatcher, 5)), [Gamma])
         })
 
         it("NonTerminal - negative", () => {
@@ -875,9 +877,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
                 new gast.Terminal(Gamma)
             ]
 
-            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
-            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenInstanceofMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Beta]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
+            expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
     })
 

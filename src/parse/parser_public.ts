@@ -8,7 +8,6 @@ import {
     cloneObj,
     contains,
     dropRight,
-    every,
     find,
     first,
     flatten,
@@ -26,19 +25,7 @@ import {
     values
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
-import {
-    EOF,
-    getImage,
-    getTokenConstructor,
-    hasTokenLabel,
-    ISimpleTokenOrIToken,
-    IToken,
-    LazyToken,
-    SimpleLazyToken,
-    Token,
-    tokenLabel,
-    tokenName
-} from "../scan/tokens_public"
+import {createTokenInstance, EOF, getTokenConstructor, hasTokenLabel, IToken, Token, tokenLabel, tokenName} from "../scan/tokens_public"
 import {
     buildLookaheadForAtLeastOne,
     buildLookaheadForAtLeastOneSep,
@@ -65,15 +52,7 @@ import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
 import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
-import {
-    augmentTokenClasses,
-    isSimpleTokenType,
-    tokenClassIdentity,
-    tokenInstanceIdentity,
-    tokenInstanceofMatcher,
-    tokenStructuredIdentity,
-    tokenStructuredMatcher
-} from "../scan/tokens"
+import {augmentTokenClasses, tokenStructuredIdentity, tokenStructuredMatcher} from "../scan/tokens"
 import {CstNode} from "./cst/cst_public"
 import {addNoneTerminalToCst, addTerminalToCst, buildChildrenDictionaryDefTopRules, initChildrenDictionary} from "./cst/cst"
 import {
@@ -111,12 +90,10 @@ export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
 export type IgnoredParserIssues = { [ruleName:string]:IgnoredRuleIssues }
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
-const END_OF_FILE = new EOF();
-(<any>END_OF_FILE).tokenType = (<any>EOF).tokenType
+const END_OF_FILE = createTokenInstance(EOF, "", NaN, NaN, NaN, NaN, NaN, NaN)
 Object.freeze(END_OF_FILE)
 
-
-export type TokenMatcher = (token:ISimpleTokenOrIToken, tokClass:TokenConstructor) => boolean
+export type TokenMatcher = (token:IToken, tokClass:TokenConstructor) => boolean
 export type TokenInstanceIdentityFunc = (tok:IToken) => string
 export type TokenClassIdentityFunc = (tok:TokenConstructor) => string
 
@@ -331,7 +308,7 @@ export type GrammarAction<OUT> = () => OUT
 export type ISeparatedIterationResult<OUT> =
     {
         values:OUT[], // The aggregated results of the values returned by each iteration.
-        separators:ISimpleTokenOrIToken[] // the separator tokens between the iterations
+        separators:IToken[] // the separator tokens between the iterations
     }
 
 /**
@@ -482,7 +459,7 @@ export class Parser {
     protected ignoredIssues:IgnoredParserIssues
     protected outputCst:boolean
 
-    protected _input:ISimpleTokenOrIToken[] = []
+    protected _input:IToken[] = []
     protected inputIdx = -1
     protected savedTokenIdx = -1
     protected isBackTrackingStack = []
@@ -515,7 +492,7 @@ export class Parser {
      */
     private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
-    constructor(input:ISimpleTokenOrIToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor } | TokenConstructor[],
+    constructor(input:IToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor } | TokenConstructor[],
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
 
@@ -590,21 +567,10 @@ export class Parser {
             throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.")
         }
 
-        let allTokens = values(this.tokensMap)
-        let areAllStructuredTokens = every(allTokens, (currTokType) => {
-            return isSimpleTokenType(currTokType)
-        })
-
-        if (areAllStructuredTokens) {
-            this.tokenMatcher = tokenStructuredMatcher
-            this.tokenClassIdentityFunc = tokenStructuredIdentity
-            // same IdentityFunc used in structured Mode
-            this.tokenInstanceIdentityFunc = tokenStructuredIdentity
-        } else {
-            this.tokenMatcher = tokenInstanceofMatcher
-            this.tokenClassIdentityFunc = tokenClassIdentity
-            this.tokenInstanceIdentityFunc = tokenInstanceIdentity
-        }
+        this.tokenMatcher = tokenStructuredMatcher
+        this.tokenClassIdentityFunc = tokenStructuredIdentity
+        // same IdentityFunc used in structured Mode
+        this.tokenInstanceIdentityFunc = tokenStructuredIdentity
 
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
         // parsed with a clear error message ("expecting EOF but found ...")
@@ -626,12 +592,12 @@ export class Parser {
         this._errors = newErrors
     }
 
-    public set input(newInput:ISimpleTokenOrIToken[]) {
+    public set input(newInput:IToken[]) {
         this.reset()
         this._input = newInput
     }
 
-    public get input():ISimpleTokenOrIToken[] {
+    public get input():IToken[] {
         return cloneArr(this._input)
     }
 
@@ -669,11 +635,11 @@ export class Parser {
 
     /**
      * @param startRuleName {string}
-     * @param precedingInput {ISimpleTokenOrIToken[]} - The token vector up to (not including) the content assist point
+     * @param precedingInput {IToken[]} - The token vector up to (not including) the content assist point
      * @returns {ISyntacticContentAssistPath[]}
      */
     public computeContentAssist(startRuleName:string,
-                                precedingInput:ISimpleTokenOrIToken[]):ISyntacticContentAssistPath[] {
+                                precedingInput:IToken[]):ISyntacticContentAssistPath[] {
         let startRuleGast = cache.getProductionsForClass(this.className).get(startRuleName)
 
         if (isUndefined(startRuleGast)) {
@@ -749,7 +715,7 @@ export class Parser {
     }
 
     // skips a token and returns the next token
-    protected SKIP_TOKEN():ISimpleTokenOrIToken {
+    protected SKIP_TOKEN():IToken {
         // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
         // input[45] which is the 46th item and no longer exists,
         // so in this case the largest valid input index is 43 (input.length - 2 )
@@ -767,7 +733,7 @@ export class Parser {
      * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
      */
-    protected CONSUME(tokClass:TokenConstructor):ISimpleTokenOrIToken {
+    protected CONSUME(tokClass:TokenConstructor):IToken {
         return this.CONSUME1(tokClass)
     }
 
@@ -796,35 +762,35 @@ export class Parser {
      *
      * @returns {Token} - The consumed token.
      */
-    protected CONSUME1(tokClass:TokenConstructor):ISimpleTokenOrIToken {
+    protected CONSUME1(tokClass:TokenConstructor):IToken {
         return this.consumeInternal(tokClass, 1)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME2(tokClass:TokenConstructor):ISimpleTokenOrIToken {
+    protected CONSUME2(tokClass:TokenConstructor):IToken {
         return this.consumeInternal(tokClass, 2)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME3(tokClass:TokenConstructor):ISimpleTokenOrIToken {
+    protected CONSUME3(tokClass:TokenConstructor):IToken {
         return this.consumeInternal(tokClass, 3)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME4(tokClass:TokenConstructor):ISimpleTokenOrIToken {
+    protected CONSUME4(tokClass:TokenConstructor):IToken {
         return this.consumeInternal(tokClass, 4)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME5(tokClass:TokenConstructor):ISimpleTokenOrIToken {
+    protected CONSUME5(tokClass:TokenConstructor):IToken {
         return this.consumeInternal(tokClass, 5)
     }
 
@@ -1377,7 +1343,7 @@ export class Parser {
         if ((this.RULE_STACK.length === 0) && !this.isAtEndOfInput()) {
             let firstRedundantTok = this.LA(1)
             this.SAVE_ERROR(new exceptions.NotAllInputParsedException(
-                "Redundant input, expecting EOF but found: " + getImage(firstRedundantTok), firstRedundantTok))
+                "Redundant input, expecting EOF but found: " + firstRedundantTok.image, firstRedundantTok))
         }
     }
 
@@ -1400,33 +1366,8 @@ export class Parser {
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
-    protected getTokenToInsert(tokClass:TokenConstructor):ISimpleTokenOrIToken {
-        let tokToInsert
-
-        if (LazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
-            tokToInsert = new (<any>tokClass)(NaN, NaN, {
-                orgText:      "",
-                lineToOffset: []
-            })
-        }
-        else if (SimpleLazyToken.prototype.isPrototypeOf(tokClass.prototype)) {
-            tokToInsert = {
-                startOffset: NaN,
-                endOffset:   NaN,
-                cacheData:   {
-                    orgText:      "",
-                    lineToOffset: []
-                },
-                tokenType:   tokClass.tokenType
-            }
-        }
-        else if (Token.prototype.isPrototypeOf(tokClass.prototype)) {
-            tokToInsert = new (<any>tokClass)("", NaN, NaN, NaN, NaN, NaN)
-        }
-        else {
-            throw Error("non exhaustive match")
-        }
-
+    protected getTokenToInsert(tokClass:TokenConstructor):IToken {
+        let tokToInsert = createTokenInstance(tokClass, "", NaN, NaN, NaN, NaN, NaN, NaN)
         tokToInsert.isInsertedInRecovery = true
         return tokToInsert
     }
@@ -1447,13 +1388,13 @@ export class Parser {
      * @param {Function} expectedTokType - The Class of the expected Token.
      * @returns {string} - The error message saved as part of a MismatchedTokenException.
      */
-    protected getMisMatchTokenErrorMessage(expectedTokType:TokenConstructor, actualToken:ISimpleTokenOrIToken):string {
+    protected getMisMatchTokenErrorMessage(expectedTokType:TokenConstructor, actualToken:IToken):string {
         let hasLabel = hasTokenLabel(expectedTokType)
         let expectedMsg = hasLabel ?
             `--> ${tokenLabel(expectedTokType)} <--` :
             `token of type --> ${tokenName(expectedTokType)} <--`
 
-        let msg = `Expecting ${expectedMsg} but found --> '${getImage(actualToken)}' <--`
+        let msg = `Expecting ${expectedMsg} but found --> '${actualToken.image}' <--`
 
         return msg
     }
@@ -1500,7 +1441,7 @@ export class Parser {
      *
      * @returns {Token} - The consumed Token.
      */
-    protected consumeInternal(tokClass:TokenConstructor, idx:number):ISimpleTokenOrIToken {
+    protected consumeInternal(tokClass:TokenConstructor, idx:number):IToken {
         // TODO: this is an hack to avoid try catch block in V8, should be removed once V8 supports try/catch optimizations.
         // as the IF/ELSE itself has some overhead.
         let consumedToken
@@ -1515,7 +1456,7 @@ export class Parser {
         return consumedToken
     }
 
-    protected consumeInternalWithTryCatch(tokClass:TokenConstructor, idx:number):ISimpleTokenOrIToken {
+    protected consumeInternalWithTryCatch(tokClass:TokenConstructor, idx:number):IToken {
         try {
             return this.consumeInternalOptimized(tokClass)
         } catch (eFromConsumption) {
@@ -1554,13 +1495,13 @@ export class Parser {
      *
      * @deprecated
      */
-    protected NEXT_TOKEN():ISimpleTokenOrIToken {
+    protected NEXT_TOKEN():IToken {
         return this.LA(1)
     }
 
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
-    protected LA(howMuch:number):ISimpleTokenOrIToken {
+    protected LA(howMuch:number):IToken {
         if (this._input.length <= this.inputIdx + howMuch) {
             return END_OF_FILE
         }
@@ -1842,7 +1783,7 @@ export class Parser {
         return follows
     }
 
-    private tryInRuleRecovery(expectedTokType:TokenConstructor, follows:TokenConstructor[]):ISimpleTokenOrIToken {
+    private tryInRuleRecovery(expectedTokType:TokenConstructor, follows:TokenConstructor[]):IToken {
         if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
             let tokToInsert = this.getTokenToInsert(expectedTokType)
             return tokToInsert
@@ -1964,14 +1905,14 @@ export class Parser {
 
     // It does not make any sense to include a virtual EOF token in the list of resynced tokens
     // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
-    private addToResyncTokens(token:ISimpleTokenOrIToken, resyncTokens:ISimpleTokenOrIToken[]):ISimpleTokenOrIToken[] {
+    private addToResyncTokens(token:IToken, resyncTokens:IToken[]):IToken[] {
         if (!this.tokenMatcher(token, EOF)) {
             resyncTokens.push(token)
         }
         return resyncTokens
     }
 
-    private reSyncTo(tokClass:TokenConstructor):ISimpleTokenOrIToken[] {
+    private reSyncTo(tokClass:TokenConstructor):IToken[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
         while ((this.tokenMatcher(nextTok, tokClass)) === false) {
@@ -2418,7 +2359,7 @@ export class Parser {
     }
 
     // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
-    private consumeInternalOptimized(expectedTokClass:TokenConstructor):ISimpleTokenOrIToken {
+    private consumeInternalOptimized(expectedTokClass:TokenConstructor):IToken {
         let nextToken = this.LA(1)
         if (this.tokenMatcher(nextToken, expectedTokClass)) {
             this.consumeToken()
@@ -2486,7 +2427,7 @@ export class Parser {
 
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence:number, errMsgTypes:string):void {
-        let errSuffix = "\nbut found: '" + getImage(this.LA(1)) + "'"
+        let errSuffix = "\nbut found: '" + this.LA(1).image + "'"
         if (errMsgTypes === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2532,7 +2473,7 @@ export class Parser {
     private raiseEarlyExitException(occurrence:number,
                                     prodType:PROD_TYPE,
                                     userDefinedErrMsg:string):void {
-        let errSuffix = " but found: '" + getImage(this.LA(1)) + "'"
+        let errSuffix = " but found: '" + this.LA(1).image + "'"
         if (userDefinedErrMsg === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2621,7 +2562,7 @@ export class Parser {
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
-    private cstPostTerminal(tokClass:TokenConstructor, consumedToken:ISimpleTokenOrIToken):void {
+    private cstPostTerminal(tokClass:TokenConstructor, consumedToken:IToken):void {
         let currTokTypeName = tokClass.tokenName
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, currTokTypeName)

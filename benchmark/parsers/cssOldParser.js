@@ -230,8 +230,10 @@ function CssParser(input) {
 
     // medium [ COMMA S* medium]*
     this.media_list = this.RULE('media_list', function() {
-        $.MANY_SEP(Comma, function() {
-            $.SUBRULE2($.medium)
+        $.MANY_SEP({
+            SEP: Comma, DEF: function() {
+                $.SUBRULE2($.medium)
+            }
         })
     });
 
@@ -312,8 +314,10 @@ function CssParser(input) {
     // selector [ ',' S* selector ]*
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
     this.ruleset = this.RULE('ruleset', function() {
-        $.AT_LEAST_ONE_SEP(Comma, function() {
-            $.SUBRULE($.selector)
+        $.AT_LEAST_ONE_SEP({
+            SEP: Comma, DEF: function() {
+                $.SUBRULE($.selector)
+            }
         })
 
         $.SUBRULE($.declarationsGroup)
@@ -503,7 +507,7 @@ CssParser.prototype.constructor = CssParser;
 var parser = new CssParser([]);
 
 module.exports = {
-    parseFunc:function (text, lexOnly) {
+    parseFunc: function(text, lexOnly) {
         var lexResult = CssLexer.tokenize(text);
         if (lexResult.errors.length > 0) {
             throw "Lexing errors encountered " + lexResult.errors[0].message

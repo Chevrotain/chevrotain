@@ -1,62 +1,66 @@
-import {Token, VirtualToken} from "../../../../src/scan/tokens_public"
+import {Token} from "../../../../src/scan/tokens_public"
+
+export class VirtualToken extends Token {
+    constructor() {super() }
+}
 
 export class IdentTok extends Token {
-    constructor(startLine:number, startColumn:number, image:string) { super(image, -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 // DOCS: once again an example of Token types hierarchies
 export class LiteralTok extends Token {}
 export class StringTok extends LiteralTok {
-    constructor(startLine:number, startColumn:number, image:string) { super(image, -1, startLine, startColumn) }
+    constructor() {super()}
 }
 export class IntTok extends LiteralTok {
-    constructor(startLine:number, startColumn:number, image:string) { super(image, -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class Keyword extends Token {}
 
 export class CreateTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("CREATE", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class TableTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("TABLE", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class InsertTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("INSERT", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class IntoTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("INTO", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class DeleteTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("DELETE", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class FromTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("FROM", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class LParenTok extends Token {
-    constructor(startLine:number, startColumn:number) { super("(", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class RParenTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(")", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class CommaTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(",", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class SemiColonTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(";", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class DotTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(".", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 /* tslint:disable:class-name */

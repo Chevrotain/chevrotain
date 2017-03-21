@@ -14,6 +14,7 @@ const chevrotain = require('chevrotain');
 
 const Lexer = chevrotain.Lexer;
 const Parser = chevrotain.Parser;
+const tokenMatcher = chevrotain.tokenMatcher;
 const createToken = chevrotain.createToken;
 const EMPTY_ALT = chevrotain.EMPTY_ALT
 const getImage = chevrotain.getImage
@@ -107,7 +108,7 @@ function getContentAssistSuggestions(text, symbolTable) {
     let assistanceTokenVector = lexResult.tokens
 
     // we have requested assistance while inside a Keyword or Identifier
-    if ((lastInputToken instanceof Identifier || lastInputToken instanceof Keyword) &&
+    if (lastInputToken !== undefined && (tokenMatcher(lastInputToken, Identifier) || tokenMatcher(lastInputToken, Keyword)) &&
         /\w/.test(text[text.length - 1])) {
         assistanceTokenVector = _.dropRight(assistanceTokenVector)
         partialSuggestionMode = true
@@ -152,7 +153,7 @@ function getContentAssistSuggestions(text, symbolTable) {
     // throw away any suggestion that is not a suffix of the last partialToken.
     if (partialSuggestionMode) {
         finalSuggestions = _.filter(finalSuggestions, (currSuggestion) => {
-            return _.startsWith(currSuggestion, getImage(lastInputToken))
+            return _.startsWith(currSuggestion, lastInputToken.image)
         })
     }
 

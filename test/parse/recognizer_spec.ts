@@ -1,17 +1,7 @@
 import {
     Token,
     EOF,
-    extendLazyToken,
-    extendSimpleLazyToken,
-    extendToken,
-    getImage,
-    getStartOffset,
-    getEndOffset,
-    getStartLine,
-    getEndLine,
-    getStartColumn,
-    getEndColumn,
-    ISimpleTokenOrIToken
+    extendToken, IToken
 } from "../../src/scan/tokens_public"
 import {Lexer} from "../../src/scan/lexer_public"
 import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
@@ -19,8 +9,8 @@ import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
 import {exceptions} from "../../src/parse/exceptions_public"
 import {clearCache} from "../../src/parse/cache_public"
-import {tokenInstanceofMatcher, tokenStructuredMatcher, augmentTokenClasses} from "../../src/scan/tokens"
-import {createRegularToken, createLazyToken, createSimpleToken, setEquality} from "../utils/matchers"
+import {tokenStructuredMatcher, augmentTokenClasses} from "../../src/scan/tokens"
+import {createRegularToken, setEquality} from "../utils/matchers"
 import MismatchedTokenException = exceptions.MismatchedTokenException
 import NoViableAltException = exceptions.NoViableAltException
 import EarlyExitException = exceptions.EarlyExitException
@@ -183,11 +173,11 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 private parseQualifiedName():string[] {
                     let idents = []
 
-                    idents.push(getImage(this.CONSUME1(IdentTok)))
+                    idents.push(this.CONSUME1(IdentTok).image)
                     this.MANY({
                         DEF: () => {
                             this.CONSUME1(DotTok)
-                            idents.push(getImage(this.CONSUME2(IdentTok)))
+                            idents.push(this.CONSUME2(IdentTok).image)
                         }
                     })
 
@@ -209,12 +199,12 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 private parseQualifiedName():string[] {
                     let idents = []
 
-                    idents.push(getImage(this.CONSUME1(IdentTok)))
+                    idents.push(this.CONSUME1(IdentTok).image)
                     this.CONSUME1(DotTok)
 
                     this.MANY_SEP({
                         SEP: DotTok, DEF: () => {
-                            idents.push(getImage(this.CONSUME2(IdentTok)))
+                            idents.push(this.CONSUME2(IdentTok).image)
                         }
                     })
 
@@ -250,7 +240,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 }
 
                 private parseIdentifier():void {
-                    this.idents.push(getImage(this.CONSUME1(IdentTok)))
+                    this.idents.push(this.CONSUME1(IdentTok).image)
                 }
 
                 protected canTokenTypeBeInsertedInRecovery(tokClass:Function) {
@@ -271,11 +261,11 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 private parseQualifiedName():string[] {
                     let idents = []
 
-                    idents.push(getImage(this.CONSUME1(IdentTok)))
+                    idents.push(this.CONSUME1(IdentTok).image)
                     this.AT_LEAST_ONE({
                         DEF:        () => {
                             this.CONSUME1(DotTok)
-                            idents.push(getImage(this.CONSUME2(IdentTok)))
+                            idents.push(this.CONSUME2(IdentTok).image)
                         }, ERR_MSG: "bamba"
                     })
 
@@ -299,7 +289,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
                     this.AT_LEAST_ONE_SEP({
                         SEP: DotTok, DEF: () => {
-                            idents.push(getImage(this.CONSUME1(IdentTok)))
+                            idents.push(this.CONSUME1(IdentTok).image)
                         }
                     })
 
@@ -322,7 +312,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(parser.CONSUME1(IntTok)).to.equal(testInput[2])
                 expect(parser.CONSUME3(PlusTok)).to.equal(testInput[3])
                 expect(parser.CONSUME1(IntTok)).to.equal(testInput[4])
-                expect(parser.NEXT_TOKEN()).to.be.an.instanceof(EOF)
+                expect(tokenMatcher(parser.NEXT_TOKEN(), EOF))
             })
 
             it("will not perform inRepetition recovery while in backtracking mode", () => {
@@ -422,7 +412,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
 
                 class SingleTokenInsertRegular extends Parser {
 
-                    constructor(input:ISimpleTokenOrIToken[] = []) {
+                    constructor(input:IToken[] = []) {
                         super(input, allTokens, {recoveryEnabled: true});
                         (<any>Parser).performSelfAnalysis(this)
                     }
@@ -441,13 +431,13 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 let insertedToken = parser.topRule()
 
                 expect(insertedToken.isInsertedInRecovery).to.be.true
-                expect(getImage(insertedToken)).to.equal("")
-                expect(getStartOffset(insertedToken)).to.be.NaN
-                expect(getEndOffset(insertedToken)).to.be.NaN
-                expect(getStartLine(insertedToken)).to.be.NaN
-                expect(getEndLine(insertedToken)).to.be.NaN
-                expect(getStartColumn(insertedToken)).to.be.NaN
-                expect(getEndColumn(insertedToken)).to.be.NaN
+                expect(insertedToken.image).to.equal("")
+                expect(insertedToken.startOffset).to.be.NaN
+                expect(insertedToken.endOffset).to.be.NaN
+                expect(insertedToken.startLine).to.be.NaN
+                expect(insertedToken.endLine).to.be.NaN
+                expect(insertedToken.startColumn).to.be.NaN
+                expect(insertedToken.endColumn).to.be.NaN
             })
         })
 
@@ -648,10 +638,10 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 let parser:any = new Parser([createToken(IntTok, "1"), createToken(PlusTok)], [IntTok, PlusTok])
                 parser.CONSUME(IntTok)
                 parser.CONSUME(PlusTok)
-                expect(parser.LA(1)).to.be.an.instanceof(EOF)
-                expect(parser.LA(1)).to.be.an.instanceof(EOF)
-                expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
-                expect(parser.SKIP_TOKEN()).to.be.an.instanceof(EOF)
+                expect(tokenMatcher(parser.LA(1), EOF))
+                expect(tokenMatcher(parser.LA(1), EOF))
+                expect(tokenMatcher(parser.SKIP_TOKEN(), EOF))
+                expect(tokenMatcher(parser.SKIP_TOKEN(), EOF))
                 // and we can go on and on and on... this avoid returning null/undefined
                 // see: http://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
             })
@@ -1162,6 +1152,4 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
     })
 }
 
-defineRecognizerSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)
-defineRecognizerSpecs("Lazy Tokens Mode", extendLazyToken, createLazyToken, tokenInstanceofMatcher)
-defineRecognizerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, createSimpleToken, tokenStructuredMatcher)
+defineRecognizerSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenStructuredMatcher)

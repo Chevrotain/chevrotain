@@ -1,9 +1,9 @@
 /* tslint:disable:no-use-before-declare */
 import {RestWalker} from "./rest"
 import {gast} from "./gast_public"
-import {IGrammarPath, ITokenGrammarPath, ISyntacticContentAssistPath} from "./path_public"
-import {cloneArr, isEmpty, first as _first, forEach, drop, dropRight, last} from "../../utils/utils"
-import {tokenName, ISimpleTokenOrIToken} from "../../scan/tokens_public"
+import {IGrammarPath, ISyntacticContentAssistPath, ITokenGrammarPath} from "./path_public"
+import {cloneArr, drop, dropRight, first as _first, forEach, isEmpty, last} from "../../utils/utils"
+import {IToken, tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {TokenMatcher} from "../parser_public"
@@ -287,7 +287,7 @@ interface IPathToExamine {
 }
 
 export function nextPossibleTokensAfter(initialDef:IProduction[],
-                                        tokenVector:ISimpleTokenOrIToken[],
+                                        tokenVector:IToken[],
                                         tokMatcher:TokenMatcher,
                                         maxLookAhead:number):ISyntacticContentAssistPath[] {
 

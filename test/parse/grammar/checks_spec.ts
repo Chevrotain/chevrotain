@@ -259,16 +259,13 @@ describe("the getFirstNoneTerminal function", () => {
 })
 
 export class PlusTok extends Token {
-    constructor() { super("+", 0, 1, 1) }
-}
+    constructor() {super()}}
 
 export class MinusTok extends Token {
-    constructor() { super("+", 0, 1, 1) }
-}
+    constructor() {super()}}
 
 export class StarTok extends Token {
-    constructor() { super("*", 0, 1, 1) }
-}
+    constructor() {super()}}
 
 class ErroneousOccurrenceNumUsageParser1 extends Parser {
 
