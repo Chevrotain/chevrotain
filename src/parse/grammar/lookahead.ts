@@ -33,6 +33,9 @@ export function getProdType(prod:gast.IProduction):PROD_TYPE {
     if (prod instanceof gast.Alternation) {
         return PROD_TYPE.ALTERNATION
     }
+    else {
+        throw Error("non exhaustive match")
+    }
 }
 
 export function buildLookaheadFuncForOr(occurrence:number,
