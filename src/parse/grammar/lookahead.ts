@@ -18,19 +18,19 @@ export function getProdType(prod:gast.IProduction):PROD_TYPE {
     if (prod instanceof gast.Option) {
         return PROD_TYPE.OPTION
     }
-    if (prod instanceof gast.Repetition) {
+    else if (prod instanceof gast.Repetition) {
         return PROD_TYPE.REPETITION
     }
-    if (prod instanceof gast.RepetitionMandatory) {
+    else if (prod instanceof gast.RepetitionMandatory) {
         return PROD_TYPE.REPETITION_MANDATORY
     }
-    if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+    else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
         return PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
     }
-    if (prod instanceof gast.RepetitionWithSeparator) {
+    else if (prod instanceof gast.RepetitionWithSeparator) {
         return PROD_TYPE.REPETITION_WITH_SEPARATOR
     }
-    if (prod instanceof gast.Alternation) {
+    else if (prod instanceof gast.Alternation) {
         return PROD_TYPE.ALTERNATION
     }
     else {
