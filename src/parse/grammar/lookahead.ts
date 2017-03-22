@@ -14,6 +14,30 @@ export enum PROD_TYPE {
     ALTERNATION
 }
 
+export function getProdType(prod:gast.IProduction):PROD_TYPE {
+    if (prod instanceof gast.Option) {
+        return PROD_TYPE.OPTION
+    }
+    else if (prod instanceof gast.Repetition) {
+        return PROD_TYPE.REPETITION
+    }
+    else if (prod instanceof gast.RepetitionMandatory) {
+        return PROD_TYPE.REPETITION_MANDATORY
+    }
+    else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+        return PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
+    }
+    else if (prod instanceof gast.RepetitionWithSeparator) {
+        return PROD_TYPE.REPETITION_WITH_SEPARATOR
+    }
+    else if (prod instanceof gast.Alternation) {
+        return PROD_TYPE.ALTERNATION
+    }
+    else {
+        throw Error("non exhaustive match")
+    }
+}
+
 export function buildLookaheadFuncForOr(occurrence:number,
                                         ruleGrammar:gast.Rule,
                                         k:number,

@@ -12,7 +12,7 @@ import {gast} from "./gast_public"
 import {getProductionDslName, isOptionalProd} from "./gast"
 import {tokenLabel, tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
-import {Alternative, containsPath, getLookaheadPathsForOr} from "./lookahead"
+import {Alternative, containsPath, getLookaheadPathsForOr, getLookaheadPathsForOptionalProd, getProdType} from "./lookahead"
 import {VERSION} from "../../version"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {NamedDSLMethodsCollectorVisitor} from "../cst/cst"
@@ -44,9 +44,12 @@ export function validateGrammar(topLevels:gast.Rule[],
     let nestedRulesNameErrors:any = validateNestedRulesNames(topLevels)
     let nestedRulesDuplicateErrors:any = validateDuplicateNestedRules(topLevels)
 
+    let emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(topLevels, maxLookahead)
+
     return <any>utils.flatten(duplicateErrors.concat(tokenNameErrors,
         nestedRulesNameErrors,
         nestedRulesDuplicateErrors,
+        emptyRepetitionErrors,
         leftRecursionErrors,
         emptyAltErrors,
         ambiguousAltsErrors,
@@ -423,6 +426,57 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
         })
         return result.concat(currErrors)
     }, [])
+
+    return errors
+}
+
+export class RepetionCollector extends gast.GAstVisitor {
+    public allProductions:gast.IProduction[] = []
+
+    public visitRepetitionWithSeparator(manySep:gast.RepetitionWithSeparator):void {
+        this.allProductions.push(manySep)
+    }
+
+    public visitRepetitionMandatory(atLeastOne:gast.RepetitionMandatory):void {
+        this.allProductions.push(atLeastOne)
+    }
+
+    public visitRepetitionMandatoryWithSeparator(atLeastOneSep:gast.RepetitionMandatoryWithSeparator):void {
+        this.allProductions.push(atLeastOneSep)
+    }
+
+    public visitRepetition(many:gast.Repetition):void {
+        this.allProductions.push(many)
+    }
+}
+
+export function validateSomeNonEmptyLookaheadPath(topLevelRules:gast.Rule[], maxLookahead:number):IParserDefinitionError[] {
+    let errors = []
+    forEach(topLevelRules, (currTopRule) => {
+        let collectorVisitor = new RepetionCollector()
+        currTopRule.accept(collectorVisitor)
+        let allRuleProductions = collectorVisitor.allProductions
+        forEach(allRuleProductions, (currProd) => {
+            let prodType = getProdType(currProd)
+            let currOccurrence = currProd.occurrenceInParent
+            let paths = getLookaheadPathsForOptionalProd(currOccurrence, currTopRule, prodType, maxLookahead)
+            let pathsInsideProduction = paths[0]
+            if (isEmpty(flatten(pathsInsideProduction))) {
+                let implicitOccurrence = currProd.implicitOccurrenceIndex
+                let dslName = getProductionDslName(currProd)
+                if (!implicitOccurrence) {
+                    dslName += currOccurrence
+                }
+                let errMsg = `The repetition <${dslName}> within Rule <${currTopRule.name}> can never consume any tokens.\n` +
+                    `This could lead to an infinite loop.`
+                errors.push({
+                    message:  errMsg,
+                    type:     ParserDefinitionErrorType.NO_NON_EMPTY_LOOKAHEAD,
+                    ruleName: currTopRule.name
+                })
+            }
+        })
+    })
 
     return errors
 }

@@ -103,7 +103,8 @@ export enum ParserDefinitionErrorType {
     CONFLICT_TOKENS_RULES_NAMESPACE,
     INVALID_TOKEN_NAME,
     INVALID_NESTED_RULE_NAME,
-    DUPLICATE_NESTED_NAME
+    DUPLICATE_NESTED_NAME,
+    NO_NON_EMPTY_LOOKAHEAD
 }
 
 export type IgnoredRuleIssues = { [dslNameAndOccurrence:string]:boolean }
