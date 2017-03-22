@@ -463,7 +463,10 @@ export function validateSomeNonEmptyLookaheadPath(topLevelRules:gast.Rule[], max
             let pathsInsideProduction = paths[0]
             if (isEmpty(flatten(pathsInsideProduction))) {
                 let implicitOccurrence = currProd.implicitOccurrenceIndex
-                let dslName = `${getProductionDslName(currProd)}${implicitOccurrence ? "" : currOccurrence}`
+                let dslName = getProductionDslName(currProd)
+                if (!implicitOccurrence) {
+                    dslName += currOccurrence
+                }
                 let errMsg = `The repetition <${dslName}> within Rule <${currTopRule.name}> can never consume any tokens.\n` +
                     `This could lead to an infinite loop.`
                 errors.push({

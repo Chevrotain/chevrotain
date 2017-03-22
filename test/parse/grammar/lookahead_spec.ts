@@ -240,10 +240,6 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         it("handles `Alternation`", () => {
             expect(getProdType(new Alternation([]))).to.equal(PROD_TYPE.ALTERNATION)
         })
-        it("handles other productions", () => {
-            expect(() => getProdType(new NonTerminal("whatever", null))).to.throw("non exhaustive match")
-            expect(() => getProdType(new Terminal(IdentTok))).to.throw("non exhaustive match")
-        })
     })
 
     context("lookahead " + contextName, () => {
