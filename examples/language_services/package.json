@@ -8,10 +8,10 @@
     "xregexp": "^3.1.1"
   },
   "devDependencies": {
-    "@types/chai": "^3.4.34",
-    "@types/lodash": "^4.14.48",
-    "@types/mocha": "^2.2.37",
-    "@types/node": "^6.0.59",
+    "@types/chai": "^3.4.35",
+    "@types/lodash": "^4.14.57",
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.9",
     "chai": "^3.5.0",
     "grunt": "^1.0.1",
     "grunt-cli": "~1.2.0",
@@ -19,13 +19,13 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-mocha-istanbul": "^5.0.2",
     "grunt-run": "^0.6.0",
-    "grunt-tslint": "~4.0.0",
+    "grunt-tslint": "~4.0.1",
     "grunt-typings": "^0.1.5",
     "istanbul": "^0.4.5",
     "load-grunt-tasks": "^3.5.2",
     "mocha": "^3.2.0",
-    "tslint": "^4.3.1",
-    "typescript": "~2.1.4"
+    "tslint": "^4.5.1",
+    "typescript": "~2.2.1"
   },
   "scripts": {
     "test": "grunt test"
