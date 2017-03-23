@@ -1,5 +1,6 @@
 var _ = require('lodash')
 var webpack = require("webpack")
+var path = require('path')
 
 // TODO: write these files to tsdocsconfig.json
 var PUBLIC_API_DTS_FILES = [
@@ -189,14 +190,18 @@ module.exports = function(grunt) {
 
         replace: {
             coverage_ignore: {
+                // d.prototype = b === null ? Object.create(b) :
                 src:          ['lib/src/**/*.js'],
                 overwrite:    true,
                 replacements: [{
                     from: 'if (b.hasOwnProperty(p)) d[p] = b[p];',
                     to:   '/* istanbul ignore next */ ' + ' if (b.hasOwnProperty(p)) d[p] = b[p];'
                 }, {
-                    from: 'd.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());',
-                    to:   '/* istanbul ignore next */ ' + ' d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());'
+                    from: 'var extendStatics = Object.setPrototypeOf ||',
+                    to:   '/* istanbul ignore next */ \n' + 'var extendStatics = Object.setPrototypeOf ||'
+                }, {
+                    from: 'd.prototype = b === null ? Object.create(b) :',
+                    to:   '/* istanbul ignore next */ \n' + 'd.prototype = b === null ? Object.create(b) :'
                 }, {
                     from: /(\s+)(else if \(.+\s+.+\s+.+\s+(?:.+\s+)?else \{\s+throw Error\("non exhaustive match"\))/g,
                     to:   '/* istanbul ignore else */ $1$2'
@@ -265,7 +270,7 @@ module.exports = function(grunt) {
             release: {
                 entry:  "./lib/src/api.js",
                 output: {
-                    path:           "lib/",
+                    path:           path.resolve(__dirname, "./lib/"),
                     filename:       "chevrotain.js",
                     library:        "chevrotain",
                     libraryTarget:  "umd",
@@ -280,7 +285,7 @@ module.exports = function(grunt) {
             specs: {
                 entry:  "./lib/test/all.js",
                 output: {
-                    path:     "lib/",
+                    path:     path.resolve(__dirname, "./lib/"),
                     filename: "chevrotainSpecs.js"
                 }
             },
@@ -288,7 +293,7 @@ module.exports = function(grunt) {
             release_uglify: {
                 entry:  "./lib/src/api.js",
                 output: {
-                    path:           "lib/",
+                    path:           path.resolve(__dirname, "./lib/"),
                     filename:       "chevrotain.min.js",
                     library:        "chevrotain",
                     libraryTarget:  "umd",
