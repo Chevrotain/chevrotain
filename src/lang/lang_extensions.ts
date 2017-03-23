@@ -23,16 +23,13 @@ export function functionName(func:Function):string {
     }
 
     // hack for IE and engines that do not support Object.defineProperty on function.name (Node.js 0.10 && 0.12)
-    let existingSpecialCacheNameProp = func[SPECIAL_NAME_CACHE_KEY]
-    if (existingSpecialCacheNameProp) {
-        return existingSpecialCacheNameProp
+    if (func.hasOwnProperty(SPECIAL_NAME_CACHE_KEY)) {
+        return func[SPECIAL_NAME_CACHE_KEY]
     }
 
     let computedName = func.toString().match(FUNC_NAME_REGEXP)[1]
 
-    if (!defineNameProp(func, computedName)) {
-        func[SPECIAL_NAME_CACHE_KEY] = computedName
-    }
+    func[SPECIAL_NAME_CACHE_KEY] = computedName
     return computedName
 }
 
@@ -73,7 +70,7 @@ export class HashTable<V> {
         return <any>utils.values(this._state)
     }
 
-    put(key:string|number, value:V):void {
+    put(key:string | number, value:V):void {
         this._state[key] = value
     }
 

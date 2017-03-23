@@ -1,5 +1,5 @@
 import {isString, isRegExp, isFunction, isUndefined, assignNoOverwrite, has, isObject} from "../utils/utils"
-import {functionName, defineNameProp} from "../lang/lang_extensions"
+import {defineNameProp, functionName} from "../lang/lang_extensions"
 import {Lexer, TokenConstructor} from "./lexer_public"
 import {
     isInheritanceBasedToken,

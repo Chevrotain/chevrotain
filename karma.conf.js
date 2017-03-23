@@ -14,7 +14,7 @@ module.exports = function(config) {
 
         files: [
             'test/test.config.js',
-            'dev/chevrotainSpecs.js'
+            'lib/chevrotainSpecs.js'
         ],
 
         // test results reporter to use
