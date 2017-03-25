@@ -7,12 +7,6 @@
     "sourceMap": true
   },
   "files": [
-    "lib/src/scan/tokens_public.d.ts",
-    "lib/src/scan/lexer_public.d.ts",
-    "lib/src/parse/parser_public.d.ts",
-    "lib/src/parse/exceptions_public.d.ts",
-    "lib/src/parse/grammar/path_public.d.ts",
-    "lib/src/parse/grammar/gast_public.d.ts",
-    "lib/src/parse/cache_public.d.ts"
+    "lib/chevrotain.d.ts"
   ]
 }
