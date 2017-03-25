@@ -1,3 +1,17 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [Major Refactoring to Lexer & Token APIs](https://github.com/SAP/chevrotain/issues/423#issuecomment-289225219)
+
+#### Major Changes
+- [Simplify Lexer & Tokens APIs.](https://github.com/SAP/chevrotain/issues/423)
+
+#### Minor Changes
+- [Detection of infinite loops caused by grammars with "empty" repetitions.](https://github.com/SAP/chevrotain/pull/410)
+  * Thanks @kdex!
+  
+  
+
 ## 0.25.1 (3-21-2017)
 
 #### Bug Fixes
