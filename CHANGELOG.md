@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.26.0 (3-26-2017)
 
 #### Breaking Changes
 - [Major Refactoring to Lexer & Token APIs](https://github.com/SAP/chevrotain/issues/423#issuecomment-289225219)

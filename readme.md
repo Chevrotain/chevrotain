@@ -62,8 +62,8 @@ as any other JavaScript code without requiring any new tools or processes.
     * ```https://unpkg.com/chevrotain/lib/chevrotain.js```
     * ```https://unpkg.com/chevrotain/lib/chevrotain.min.js``` 
   - Explicit version number:
-    * ```https://unpkg.com/chevrotain@0.25.1/lib/chevrotain.js```
-    * ```https://unpkg.com/chevrotain@0.25.1/lib/chevrotain.min.js```
+    * ```https://unpkg.com/chevrotain@0.26.0/lib/chevrotain.js```
+    * ```https://unpkg.com/chevrotain@0.26.0/lib/chevrotain.min.js```
 
 
 ## Documentation & Resources
@@ -77,7 +77,7 @@ as any other JavaScript code without requiring any new tools or processes.
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
 * **[HTML docs](http://sap.github.io/chevrotain/documentation).**
-   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#at_least_one).
+   * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_26_0/classes/parser.html#at_least_one).
    
 * **[Token Types Docs](docs/token_types.md)**.
 
