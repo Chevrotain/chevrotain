@@ -2,7 +2,7 @@
 var chevrotain = require("../../examples/grammars/node_modules/chevrotain/lib/src/api");
 
 // ----------------- lexer -----------------
-var extendToken = chevrotain.extendSimpleLazyToken;
+var extendToken = chevrotain.extendToken;
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
@@ -22,7 +22,7 @@ var WhiteSpace = extendToken("WhiteSpace", /\s+/);
 WhiteSpace.GROUP = Lexer.SKIPPED; // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
 var allTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
-var JsonLexer = new Lexer(allTokens);
+var JsonLexer = new Lexer(allTokens, {positionTracking:"onlyOffset"});
 
 
 // ----------------- parser -----------------

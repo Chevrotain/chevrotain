@@ -1,30 +1,6 @@
 import {CustomPatternMatcherFunc, getTokenConstructor, IToken, tokenName} from "./tokens_public"
-import {
-    analyzeTokenClasses,
-    checkHasCustomTokenPatterns,
-    cloneEmptyGroups,
-    DEFAULT_MODE,
-    performRuntimeChecks,
-    SUPPORT_STICKY,
-    validatePatterns
-} from "./lexer"
-import {
-    cloneArr,
-    cloneObj,
-    flatten,
-    forEach,
-    IDENTITY,
-    isArray,
-    isEmpty,
-    isUndefined,
-    keys,
-    last,
-    map,
-    mapValues,
-    merge,
-    NOOP,
-    reject
-} from "../utils/utils"
+import {analyzeTokenClasses, cloneEmptyGroups, DEFAULT_MODE, performRuntimeChecks, SUPPORT_STICKY, validatePatterns} from "./lexer"
+import {cloneArr, cloneObj, forEach, IDENTITY, isArray, isEmpty, isUndefined, keys, last, map, merge, NOOP, reject} from "../utils/utils"
 import {augmentTokenClasses} from "./tokens"
 
 export interface TokenConstructor extends Function {
@@ -145,10 +121,10 @@ export class Lexer {
     protected patternIdxToLongerAltIdx:{ [modeName:string]:number[] } = {}
     protected patternIdxToCanLineTerminator:{ [modeName:string]:boolean[] } = {}
     protected patternIdxToIsCustom:{ [modeName:string]:boolean[] } = {}
+    protected patternIdxToShort:{ [modeName:string]:(number | boolean)[] } = {}
     protected patternIdxToPushMode:{ [modeName:string]:string[] } = {}
     protected patternIdxToPopMode:{ [modeName:string]:boolean[] } = {}
     protected emptyGroups:{ [groupName:string]:IToken } = {}
-    protected hasCustomTokens:boolean
 
     private config:ILexerConfig = undefined
     private trackStartLines:boolean = true
@@ -303,6 +279,7 @@ export class Lexer {
                 this.patternIdxToLongerAltIdx[currModName] = currAnalyzeResult.patternIdxToLongerAltIdx
                 this.patternIdxToCanLineTerminator[currModName] = currAnalyzeResult.patternIdxToCanLineTerminator
                 this.patternIdxToIsCustom[currModName] = currAnalyzeResult.patternIdxToIsCustom
+                this.patternIdxToShort[currModName] = currAnalyzeResult.patternIdxToShort
                 this.patternIdxToPushMode[currModName] = currAnalyzeResult.patternIdxToPushMode
                 this.patternIdxToPopMode[currModName] = currAnalyzeResult.patternIdxToPopMode
                 this.emptyGroups = merge(this.emptyGroups, currAnalyzeResult.emptyGroups)
@@ -310,9 +287,6 @@ export class Lexer {
         })
 
         this.defaultMode = actualDefinition.defaultMode
-        let allTokensTypes:any = flatten(mapValues(actualDefinition.modes, (currModDef) => currModDef))
-
-        this.hasCustomTokens = checkHasCustomTokenPatterns(allTokensTypes)
 
         if (!isEmpty(this.lexerDefinitionErrors) && !this.config.deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
@@ -331,10 +305,6 @@ export class Lexer {
 
         if (hasOnlySingleMode) {
             this.handleModes = NOOP
-        }
-
-        if (!this.hasCustomTokens) {
-            this.matchToPattern = this.matchPatternNoCustom
         }
 
         if (this.trackStartLines === false) {
@@ -393,8 +363,8 @@ export class Lexer {
     // There is quite a bit of duplication between this and "tokenizeInternalLazy"
     // This is intentional due to performance considerations.
     private tokenizeInternal(text:string, initialMode:string):ILexingResult {
-        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokType, newToken, errLength,
-            droppedChar, lastLTIdx, msg
+        let i, j, matchAltImage, longerAltIdx, matchedImage, imageLength, group, tokType, newToken, errLength,
+            droppedChar, lastLTIdx, msg, match
         let orgText = text
         let orgLength = orgText.length
         let offset = 0
@@ -408,6 +378,7 @@ export class Lexer {
         let currModePatterns = []
         let currModePatternsLength = 0
         let currModePatternIdxToLongerAltIdx = []
+        let currModePatternIdxToShort = []
         let currModePatternIdxToIsCustom = []
         let currModePatternIdxToGroup = []
         let currModePatternIdxToType = []
@@ -437,6 +408,7 @@ export class Lexer {
                 currModePatternsLength = currModePatterns.length
                 currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
                 currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
+                currModePatternIdxToShort = this.patternIdxToShort[newMode]
                 currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
                 currModePatternIdxToType = this.patternIdxToType[newMode]
                 currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
@@ -451,6 +423,7 @@ export class Lexer {
             currModePatternsLength = currModePatterns.length
             currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
             currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
+            currModePatternIdxToShort = this.patternIdxToShort[newMode]
             currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
             currModePatternIdxToType = this.patternIdxToType[newMode]
             currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
@@ -463,27 +436,47 @@ export class Lexer {
         push_mode.call(this, initialMode)
 
         while (offset < orgLength) {
-            match = null
+            matchedImage = null
             for (i = 0; i < currModePatternsLength; i++) {
                 let currPattern = currModePatterns[i]
-                match = this.matchToPattern(currPattern, offset, text, currModePatternIdxToIsCustom, i, orgText, matchedTokens, groups)
-                if (match !== null) {
+
+                // manually in-lined because > 600 chars won't be in-lined in V8
+                let singleCharCode = currModePatternIdxToShort[i]
+                if (singleCharCode !== false) {
+                    if (orgText.charCodeAt(offset) === singleCharCode) {
+                        // single character string
+                        matchedImage = currPattern
+                    }
+                }
+                else if (currModePatternIdxToIsCustom[i] === true) {
+                    match = currPattern.exec(orgText, offset, matchedTokens, groups)
+                    matchedImage = match !== null ? match[0] : match
+                } else {
+                    this.updateLastIndex(currPattern, offset)
+                    match = currPattern.exec(text)
+                    matchedImage = match !== null ? match[0] : match
+                }
+
+                if (matchedImage !== null) {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
                     longerAltIdx = currModePatternIdxToLongerAltIdx[i]
                     if (longerAltIdx !== undefined) {
                         let longerAltPattern = currModePatterns[longerAltIdx]
-                        matchAlt = this.matchToPattern(longerAltPattern,
-                            offset,
-                            text,
-                            currModePatternIdxToIsCustom,
-                            i,
-                            orgText,
-                            matchedTokens,
-                            groups)
 
-                        if (matchAlt && matchAlt[0].length > match[0].length) {
-                            match = matchAlt
+                        // single Char can never be a longer alt so no need to test it.
+                        // manually in-lined because > 600 chars won't be in-lined in V8
+                        if (currModePatternIdxToIsCustom[longerAltIdx] === true) {
+                            match = longerAltPattern.exec(orgText, offset, matchedTokens, groups)
+                            matchAltImage = match !== null ? match[0] : match
+                        } else {
+                            this.updateLastIndex(longerAltPattern, offset)
+                            match = longerAltPattern.exec(text)
+                            matchAltImage = match !== null ? match[0] : match
+                        }
+
+                        if (matchAltImage && matchAltImage.length > matchedImage.length) {
+                            matchedImage = matchAltImage
                             i = longerAltIdx
                         }
                     }
@@ -491,8 +484,8 @@ export class Lexer {
                 }
             }
             // successful match
-            if (match !== null) {
-                matchedImage = match[0]
+            if (matchedImage !== null) {
+                // matchedImage = match[0]
                 imageLength = matchedImage.length
                 group = currModePatternIdxToGroup[i]
                 if (group !== undefined) {
@@ -573,15 +566,23 @@ export class Lexer {
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
                         let currPattern = currModePatterns[j]
-                        foundResyncPoint = this.matchToPattern(currPattern,
-                            offset,
-                            text,
-                            currModePatternIdxToIsCustom,
-                            j,
-                            orgText,
-                            matchedTokens,
-                            groups)
-                        if (foundResyncPoint !== null) {
+
+                        // manually in-lined because > 600 chars won't be in-lined in V8
+                        let singleCharCode = currModePatternIdxToShort[j]
+                        if (singleCharCode !== false) {
+                            if (orgText.charCodeAt(offset) === singleCharCode) {
+                                // single character string
+                                foundResyncPoint = true
+                            }
+                        }
+                        else if (currModePatternIdxToIsCustom[j] === true) {
+                            foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups) !== null
+                        } else {
+                            this.updateLastIndex(currPattern, offset)
+                            foundResyncPoint = currPattern.exec(text) !== null
+                        }
+
+                        if (foundResyncPoint === true) {
                             break
                         }
                     }
@@ -611,20 +612,6 @@ export class Lexer {
         else if (patternIdxToPushMode[i] !== undefined) {
             push_mode.call(this, patternIdxToPushMode[i])
         }
-    }
-
-    private matchToPattern(currPattern, offset, text, currModePatternIdxToIsCustom, i, orgText, matchedTokens, groups) {
-        if (currModePatternIdxToIsCustom[i] === true) {
-            return currPattern.exec(orgText, offset, matchedTokens, groups)
-        } else {
-            this.updateLastIndex(currPattern, offset)
-            return currPattern.exec(text)
-        }
-    }
-
-    private matchPatternNoCustom(currPattern, offset, text) {
-        this.updateLastIndex(currPattern, offset)
-        return currPattern.exec(text)
     }
 
     private chopInput(text, length):string {
