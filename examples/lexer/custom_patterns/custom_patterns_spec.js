@@ -4,6 +4,7 @@ let expect = require("chai").expect
 let customPatternExample = require("./custom_patterns")
 
 let tokenize = customPatternExample.tokenize
+let tokenMatcher = require("chevrotain").tokenMatcher
 let Comma = customPatternExample.Comma
 let IntegerLiteral = customPatternExample.IntegerLiteral
 
@@ -15,10 +16,10 @@ describe('The Chevrotain Lexer ability to use custom pattern implementations.', 
 
         expect(lexResult.errors).to.be.empty
         expect(lexResult.tokens).to.have.lengthOf(5)
-        expect(lexResult.tokens[0]).to.be.an.instanceof(IntegerLiteral)
-        expect(lexResult.tokens[1]).to.be.an.instanceof(Comma)
-        expect(lexResult.tokens[2]).to.be.an.instanceof(IntegerLiteral)
-        expect(lexResult.tokens[3]).to.be.an.instanceof(Comma)
-        expect(lexResult.tokens[4]).to.be.an.instanceof(IntegerLiteral)
+        expect(tokenMatcher(lexResult.tokens[0], IntegerLiteral))
+        expect(tokenMatcher(lexResult.tokens[1], Comma))
+        expect(tokenMatcher(lexResult.tokens[2], IntegerLiteral))
+        expect(tokenMatcher(lexResult.tokens[3], Comma))
+        expect(tokenMatcher(lexResult.tokens[4], IntegerLiteral))
     })
 })

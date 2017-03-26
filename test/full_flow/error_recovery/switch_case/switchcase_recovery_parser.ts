@@ -31,21 +31,21 @@
 import {Parser} from "../../../../src/parse/parser_public"
 import * as allTokens from "./Switchcase_recovery_tokens"
 import {
-    IdentTok,
-    StringTok,
-    IntTok,
-    SwitchTok,
-    LParenTok,
-    RParenTok,
-    LCurlyTok,
-    RCurlyTok,
     CaseTok,
     ColonTok,
+    IdentTok,
+    IntTok,
+    LCurlyTok,
+    LParenTok,
+    RCurlyTok,
     ReturnTok,
-    SemiColonTok
+    RParenTok,
+    SemiColonTok,
+    StringTok,
+    SwitchTok
 } from "./Switchcase_recovery_tokens"
-import {Token} from "../../../../src/scan/tokens_public"
-import {contains, assign} from "../../../../src/utils/utils"
+import {IToken} from "../../../../src/scan/tokens_public"
+import {assign, contains} from "../../../../src/utils/utils"
 
 
 export interface RetType { [caseValue:string]:number }
@@ -53,7 +53,7 @@ export interface RetType { [caseValue:string]:number }
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class SwitchCaseRecoveryParser extends Parser {
 
-    constructor(input:Token[] = []) {
+    constructor(input:IToken[] = []) {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.

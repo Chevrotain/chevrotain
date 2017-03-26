@@ -1,5 +1,5 @@
 import {CHILDREN, ParseTreeToken, PT, SYNTAX_BOX} from "../../pudu/parse_tree"
-import {ISimpleTokenOrIToken, Parser} from "chevrotain"
+import {IToken, Parser} from "chevrotain"
 import {
     allTokens,
     Colon,
@@ -23,7 +23,7 @@ export class ValuePT extends ParseTreeToken {}
 
 export class JsonParser extends Parser {
 
-    constructor(input:ISimpleTokenOrIToken[]) {
+    constructor(input:IToken[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
     }

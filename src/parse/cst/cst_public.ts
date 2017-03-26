@@ -1,6 +1,6 @@
-import {ISimpleTokenOrIToken} from "../../scan/tokens_public"
+import {IToken} from "../../scan/tokens_public"
 
-export type CstElement = ISimpleTokenOrIToken | CstNode
+export type CstElement = IToken | CstNode
 export type CstChildrenDictionary = { [identifier:string]:CstElement[] }
 
 /**

@@ -27,29 +27,38 @@ import {
     IntTok
 } from "./sql_recovery_tokens"
 import {DDLExampleRecoveryParser} from "./sql_recovery_parser"
-import {Token} from "../../../../src/scan/tokens_public"
+import {Token, tokenMatcher} from "../../../../src/scan/tokens_public"
 import {exceptions} from "../../../../src/parse/exceptions_public"
 import {ParseTree} from "../../parse_tree"
 import {flatten} from "../../../../src/utils/utils"
+import {createRegularToken} from "../../../utils/matchers"
 
+// for side effect if augmenting the Token classes.
+new DDLExampleRecoveryParser([])
 describe("Error Recovery SQL DDL Example", () => {
     "use strict"
 
-    let schemaFQN = [new IdentTok(1, 1, "schema2"), new DotTok(1, 1), new IdentTok(1, 1, "Persons")]
+    let schemaFQN = [createRegularToken(IdentTok, "schema2"), createRegularToken(DotTok), createRegularToken(IdentTok, "Persons")]
     /* tslint:disable:quotemark  */
     let shahar32Record = [
-        new LParenTok(1, 1), new IntTok(1, 9, "32"), new CommaTok(1, 1), new StringTok(1, 1, '"SHAHAR"'), new RParenTok(1, 1)]
-    let shahar31Record = [new LParenTok(1, 1), new IntTok(1, 9, "31"), new CommaTok(1, 1), new StringTok(1, 1, '"SHAHAR"'), new RParenTok(1, 1)]
+        createRegularToken(LParenTok),
+        createRegularToken(IntTok, "32"),
+        createRegularToken(CommaTok),
+        createRegularToken(StringTok, "SHAHAR"),
+        createRegularToken(RParenTok)]
+
+    let shahar31Record = [createRegularToken(LParenTok), createRegularToken(IntTok, "31"), createRegularToken(CommaTok),
+        createRegularToken(StringTok, '"SHAHAR"'), createRegularToken(RParenTok)]
     /* tslint:enable:quotemark  */
 
     it("can parse a series of three statements successfully", () => {
         let input:any = flatten([
             // CREATE TABLE schema2.Persons
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok),
             // INSERT (32, "SHAHAR") INTO schema2.Persons
-            new InsertTok(1, 1), shahar32Record, new IntoTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(InsertTok), shahar32Record, createRegularToken(IntoTok), schemaFQN, createRegularToken(SemiColonTok),
             // DELETE (31, "SHAHAR") FROM schema2.Persons
-            new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)
         ])
 
         let parser = new DDLExampleRecoveryParser(input)
@@ -62,11 +71,11 @@ describe("Error Recovery SQL DDL Example", () => {
     describe("Single Token insertion recovery mechanism", () => {
         let input:any = flatten([
             // CREATE TABLE schema2.Persons
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok),
             // INSERT (32, "SHAHAR") INTO schema2.Persons
-            new InsertTok(1, 1), shahar32Record, new IntoTok(1, 1), schemaFQN, /*new SemiColonTok(1, 1), <-- missing semicolon!*/
+            createRegularToken(InsertTok), shahar32Record, createRegularToken(IntoTok), schemaFQN, /*createRegularToken(SemiColonTok), <-- missing semicolon!*/
             // DELETE (31, "SHAHAR") FROM schema2.Persons
-            new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)
         ])
 
         it("can perform single token insertion for a missing semicolon", () => {
@@ -80,7 +89,7 @@ describe("Error Recovery SQL DDL Example", () => {
             assertAllThreeStatementsPresentAndValid(ptResult)
             let insertedSemiColon:Token = ptResult.children[1].children[4].payload
             // the semicolon is present even though it did not exist in the input, magic!
-            expect(insertedSemiColon).to.be.an.instanceof(SemiColonTok)
+            expect(tokenMatcher(insertedSemiColon, SemiColonTok)).to.be.true
             expect(insertedSemiColon.isInsertedInRecovery).to.equal(true)
         })
 
@@ -98,11 +107,12 @@ describe("Error Recovery SQL DDL Example", () => {
 
         let input:any = flatten([
             // CREATE TABLE schema2.Persons
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok),
             // INSERT (32, "SHAHAR") INTO INTO schema2.Persons
-            new InsertTok(1, 1), shahar32Record, new IntoTok(1, 1), new IntoTok(1, 1), /* <-- "INTO INTO" oops */ schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(InsertTok), shahar32Record, createRegularToken(IntoTok), createRegularToken(IntoTok), /* <-- "INTO INTO" oops */ schemaFQN, createRegularToken(
+                SemiColonTok),
             // DELETE (31, "SHAHAR") FROM schema2.Persons
-            new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)
         ])
 
         it("can perform single token deletion for a redundant keyword", () => {
@@ -132,11 +142,12 @@ describe("Error Recovery SQL DDL Example", () => {
         it("can perform re-sync recovery and only 'lose' part of the input", () => {
             let input:any = flatten([
                 // CREATE TABLE schema2.Persons
-                new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+                createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok),
                 // INSERT (32, "SHAHAR") FROM (( schema2.Persons <-- this can't be recovered with a single token insertion of deletion, must do re-sync
-                new InsertTok(1, 1), shahar32Record, new FromTok(1, 1), new LParenTok(1, 1), new LParenTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+                createRegularToken(InsertTok), shahar32Record, createRegularToken(FromTok), createRegularToken(LParenTok), createRegularToken(
+                    LParenTok), schemaFQN, createRegularToken(SemiColonTok),
                 // DELETE (31, "SHAHAR") FROM schema2.Persons
-                new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+                createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)
             ])
 
             let parser = new DDLExampleRecoveryParser(input)
@@ -158,17 +169,18 @@ describe("Error Recovery SQL DDL Example", () => {
         })
         // (32, "SHAHAR" ( <-- wrong parenthesis
         let badShahar32Record = [
-            new LParenTok(1, 1), new IntTok(1, 9, "32"), new CommaTok(1, 1), new StringTok(1, 1, "\"SHAHAR\""), new LParenTok(1, 1)]
+            createRegularToken(LParenTok), createRegularToken(IntTok, "32"), createRegularToken(CommaTok),
+            createRegularToken(StringTok, "\"SHAHAR\""), createRegularToken(LParenTok)]
 
         let input:any = flatten([
             // CREATE TABLE schema2.Persons
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok),
             // issues:
             // 1. FromTok instead of IntoTok so this rule also includes a bug
             // 2. using the bad/invalid record Token.
-            new InsertTok(1, 1), badShahar32Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(InsertTok), badShahar32Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok),
             // DELETE (31, "SHAHAR") FROM schema2.Persons
-            new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)
         ])
 
         it("can perform re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
@@ -219,7 +231,8 @@ describe("Error Recovery SQL DDL Example", () => {
     it("will encounter an NotAllInputParsedException when some of the input vector has not been parsed", () => {
         let input:any = flatten([
             // CREATE TABLE schema2.Persons; TABLE <-- redundant "TABLE" token
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1)])
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok), createRegularToken(
+                TableTok)])
         let parser = new DDLExampleRecoveryParser(input)
 
         parser.ddl()
@@ -230,7 +243,7 @@ describe("Error Recovery SQL DDL Example", () => {
     it("can use the same parser instance to parse multiple inputs", () => {
         let input1:any = flatten([
             // CREATE TABLE schema2.Persons;
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok)])
         let parser = new DDLExampleRecoveryParser(input1)
         parser.ddl()
         expect(parser.errors.length).to.equal(0)
@@ -239,7 +252,7 @@ describe("Error Recovery SQL DDL Example", () => {
 
         let input2:any = flatten([
             // DELETE (31, "SHAHAR") FROM schema2.Persons
-            new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)])
+            createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)])
         // the parser is being reset instead of creating a new instance for each new input
         parser.reset()
         parser.input = input2
@@ -256,12 +269,13 @@ describe("Error Recovery SQL DDL Example", () => {
     it("can re-sync to the next iteration in a MANY rule", () => {
         let input:any = flatten([
             // CREATE TABLE schema2.Persons
-            new CreateTok(1, 1), new TableTok(1, 1), schemaFQN, new SemiColonTok(1, 1),
+            createRegularToken(CreateTok), createRegularToken(TableTok), schemaFQN, createRegularToken(SemiColonTok),
             // INSERT (32, "SHAHAR") INTO schema2.Persons TABLE <-- the redundant 'TABLE' should trigger in repetition recovery
-            new InsertTok(1, 1), shahar32Record, new IntoTok(1, 1), schemaFQN, new SemiColonTok(1, 1), new TableTok(1, 1),
+            createRegularToken(InsertTok), shahar32Record, createRegularToken(IntoTok), schemaFQN, createRegularToken(SemiColonTok), createRegularToken(
+                TableTok),
 
             // DELETE (31, "SHAHAR") FROM schema2.Persons
-            new DeleteTok(1, 1), shahar31Record, new FromTok(1, 1), schemaFQN, new SemiColonTok(1, 1)
+            createRegularToken(DeleteTok), shahar31Record, createRegularToken(FromTok), schemaFQN, createRegularToken(SemiColonTok)
         ])
 
         let parser = new DDLExampleRecoveryParser(input)

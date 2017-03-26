@@ -2,27 +2,12 @@ import {Parser, EMPTY_ALT, ParserDefinitionErrorType} from "./parse/parser_publi
 import {Lexer, LexerDefinitionErrorType} from "./scan/lexer_public"
 import {
     Token,
-    extendToken,
     tokenName,
     tokenLabel,
-    extendLazyToken,
-    extendSimpleLazyToken,
-    getStartOffset,
-    getImage,
-    getStartLine,
-    getStartColumn,
-    getEndOffset,
-    getEndLine,
-    getEndColumn,
-    VirtualToken,
     EOF,
     getTokenConstructor,
     tokenMatcher,
-    SimpleLazyToken,
-    LazyToken,
-    createToken,
-    createLazyToken,
-    createSimpleLazyToken
+    createToken, createTokenInstance, extendToken
 } from "./scan/tokens_public"
 import {exceptions} from "./parse/exceptions_public"
 import {gast} from "./parse/grammar/gast_public"
@@ -45,31 +30,15 @@ API.ParserDefinitionErrorType = ParserDefinitionErrorType
 API.Lexer = Lexer
 API.LexerDefinitionErrorType = LexerDefinitionErrorType
 API.Token = Token
-API.LazyToken = LazyToken
-API.SimpleLazyToken = SimpleLazyToken
-// TODO: remove this, does not belong on the API.
-API.VirtualToken = VirtualToken
 API.EOF = EOF
 
 // Tokens utilities
-API.extendToken = extendToken
-API.extendLazyToken = extendLazyToken
-API.extendSimpleLazyToken = extendSimpleLazyToken
 API.tokenName = tokenName
 API.tokenLabel = tokenLabel
 API.tokenMatcher = tokenMatcher
 API.createToken = createToken
-API.createLazyToken = createLazyToken
-API.createSimpleLazyToken = createSimpleLazyToken
-
-// Tokens getters
-API.getImage = getImage
-API.getStartOffset = getStartOffset
-API.getStartLine = getStartLine
-API.getStartColumn = getStartColumn
-API.getEndOffset = getEndOffset
-API.getEndLine = getEndLine
-API.getEndColumn = getEndColumn
+API.extendToken = extendToken
+API.createTokenInstance = createTokenInstance
 API.getTokenConstructor = getTokenConstructor
 
 // Other Utilities

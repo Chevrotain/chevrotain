@@ -23,12 +23,13 @@ This is because the grammar is written in a **different** language than the targ
   
 * No need to learn a new syntax, as Chevrotain is a **Pure** JavasScript Library. instead the problem is reduced to learning a new API.
   
-* No need for a special editor to write the Grammar, just use your favorites JavaScript editor.    
+* No need for a special editor to write the Grammar, just use your favorite JavaScript editor.    
 
 
 ### <a name="VS_OTHERS"></a> What Differentiates Chevrotain from other JavaScript Parsing Solutions?
 * **Performance**: Chevrotain is generally faster (often much more so) than other existing JavaScript Parsing Solutions.
-  See an [Online Benchmark](http://sap.github.io/chevrotain/performance/) that compares the performance of JSON Parsers implemented using multipile JavaScript Parsing solutions.
+  See an [Online Benchmark](http://sap.github.io/chevrotain/performance/) that compares the performance of JSON Parsers implemented using 
+  multiple JavaScript Parsing solutions.
 
 * **Error Recovery/ Fault Tolerance**: With the exception of Antlr4, other JavaScript Parsing Solutions usually do not have Error Recovery capabilities.
 
@@ -126,15 +127,15 @@ These are highly recommended for each and every parser.
    Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_25_1/classes/parser.html#reset) method
    to accomplish that.
     
-2. **Choose the optimal Token Type for your use case.**
-    
-   See [Token Types Docs](docs/token_types.md) for more details.
 
 #### Minor Performance Benefits  
   
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
    
-1. **Avoid creating parsing rules which only parse a single Terminal.**
+1. Reduce the amount of Token position tracking the lexer performs.
+   See The [ILexerConfig.positionTracking](http://sap.github.io/chevrotain/documentation/0_25_1/interfaces/ilexerconfig.html) property.
+   
+2. **Avoid creating parsing rules which only parse a single Terminal.**
 
    There is a certain fixed overhead for the invocation of each parsing rule.
    Normally there is no reason to pay it for a Rule which only consumes a single Terminal.
@@ -148,12 +149,12 @@ These are only required if you are trying to squeeze every tiny bit of performan
    
    Instead such a rule's contents should be (manually) in-lined in its call sites.
    
-2. **Avoid *_SEP DSL methods (MANY_SEP / AT_LEAST_ONE_SEP).**
+3. **Avoid *_SEP DSL methods (MANY_SEP / AT_LEAST_ONE_SEP).**
    
    The *_SEP DSL methods also collect the separator Tokens parsed. Creating these arrays has a small overhead (several percentage).
    Which is a complete waste in most cases where those separators tokens are not needed for any output data structure.
    
-3. **Use the returned values of iteration DSL methods (MANY/MANY_SEP/AT_LEAST_ONE/AT_LEAST_ONE_SEP).**
+4. **Use the returned values of iteration DSL methods (MANY/MANY_SEP/AT_LEAST_ONE/AT_LEAST_ONE_SEP).**
    
    Consider the following grammar rule:
    

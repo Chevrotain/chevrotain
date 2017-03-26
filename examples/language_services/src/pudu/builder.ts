@@ -1,10 +1,11 @@
 import {ParseTree} from "./parse_tree"
 import * as utils from "./utils"
-import {Token} from "chevrotain"
+import {Token, tokenMatcher, TokenConstructor} from "chevrotain"
 import * as _ from "lodash"
+import {} from "../../../../src/scan/lexer_public"
 
 export interface IMatchCase {
-    CASE:Function, // a Token Constructor
+    CASE:any, // a Token Constructor
     THEN:Function  // The Action to perform
 }
 
@@ -12,7 +13,10 @@ export function MATCH_CHILDREN(root:ParseTree, ...cases:IMatchCase[]):void {
 
     _.forEach(root.children, (currChild) => {
         let matchingCase = _.find(cases,
-            (currCase) => currChild.payload instanceof currCase.CASE)
+            (currCase) => {
+                return currChild.payload instanceof currCase.CASE ||
+                    tokenMatcher(currChild.payload, currCase.CASE)
+            })
 
         if (_.isUndefined(matchingCase)) {
             let childClassName = utils.getClassNameFromInstance(currChild)

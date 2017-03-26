@@ -17,22 +17,32 @@ import {
 } from "./Switchcase_recovery_tokens"
 import {SwitchCaseRecoveryParser} from "./switchcase_recovery_parser"
 import {exceptions} from "../../../../src/parse/exceptions_public"
+import {createRegularToken} from "../../../utils/matchers"
 
 
 describe("Error Recovery switch-case Example", () => {
     "use strict"
 
+    // called for side effect of augmenting
+    new SwitchCaseRecoveryParser([])
+
     it("can parse a valid text successfully", () => {
         let input = [
             // switch (name) {
-            new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
+            createRegularToken(SwitchTok), createRegularToken(LParenTok), createRegularToken(IdentTok,
+                "name"), createRegularToken(RParenTok), createRegularToken(LCurlyTok),
             // case "Terry" : return 2;
-            new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Terry"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "2"), createRegularToken(
+                SemiColonTok),
             // case "Robert" : return 4;
-            new CaseTok(1, 1), new StringTok("Robert", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("4", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Robert"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "4"), createRegularToken(
+                SemiColonTok),
             // case "Brandon" : return 6;
-            new CaseTok(1, 1), new StringTok("Brandon", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("6", 0, 1, 1), new SemiColonTok(1, 1),
-            new RCurlyTok(1, 1)
+            createRegularToken(CaseTok), createRegularToken(StringTok, "Brandon"), createRegularToken(ColonTok), createRegularToken(
+                ReturnTok), createRegularToken(IntTok, "6"), createRegularToken(SemiColonTok),
+            createRegularToken(RCurlyTok)
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -50,14 +60,20 @@ describe("Error Recovery switch-case Example", () => {
     it("can perform re-sync recovery to the next case stmt", () => {
         let input = [
             // switch (name) {
-            new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
+            createRegularToken(SwitchTok), createRegularToken(LParenTok), createRegularToken(IdentTok,
+                "name"), createRegularToken(RParenTok), createRegularToken(LCurlyTok),
             // case "Terry" : return 2;
-            new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Terry"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "2"), createRegularToken(
+                SemiColonTok),
             // case "Robert" ::: return 4; <-- using 3 colons to trigger re-sync recovery
-            new CaseTok(1, 1), new StringTok("Robert", 0, 1, 1), new ColonTok(1, 1), new ColonTok(1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("4", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Robert"), createRegularToken(ColonTok, ":"), createRegularToken(ColonTok, ":"), createRegularToken(ColonTok, ":"),
+            createRegularToken(ReturnTok, "return"), createRegularToken(IntTok, "4"), createRegularToken(SemiColonTok, ";"),
             // case "Brandon" : return 6;
-            new CaseTok(1, 1), new StringTok("Brandon", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("6", 0, 1, 1), new SemiColonTok(1, 1),
-            new RCurlyTok(1, 1)
+            createRegularToken(CaseTok), createRegularToken(StringTok, "Brandon"), createRegularToken(ColonTok), createRegularToken(
+                ReturnTok), createRegularToken(IntTok, "6"), createRegularToken(SemiColonTok),
+            createRegularToken(RCurlyTok)
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -81,7 +97,8 @@ describe("Error Recovery switch-case Example", () => {
     it("will detect an error if missing AT_LEAST_ONCE occurrence", () => {
         let input = [
             // switch (name) { }
-            new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1), new RCurlyTok(1, 1)
+            createRegularToken(SwitchTok), createRegularToken(LParenTok), createRegularToken(IdentTok,
+                "name"), createRegularToken(RParenTok), createRegularToken(LCurlyTok), createRegularToken(RCurlyTok)
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -97,18 +114,24 @@ describe("Error Recovery switch-case Example", () => {
     it("can perform re-sync recovery to the next case stmt even if the unexpected tokens are between valid case stmts", () => {
         let input = [
             // switch (name) {
-            new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
+            createRegularToken(SwitchTok), createRegularToken(LParenTok), createRegularToken(IdentTok,
+                "name"), createRegularToken(RParenTok), createRegularToken(LCurlyTok),
             // case "Terry" : return 2;
-            new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Terry"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "2"), createRegularToken(
+                SemiColonTok),
             // case "Robert" : return 4;
-            new CaseTok(1, 1), new StringTok("Robert", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("4", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Robert"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "4"), createRegularToken(
+                SemiColonTok),
             // "ima" "aba" "bamba" <-- these three strings do not belong here, but instead of failing everything
             // we should still get a valid output as these tokens will be ignored and the parser will re-sync to the next case stmt
-            new StringTok("ima", 0, 1, 1), new StringTok("aba", 0, 1, 1), new StringTok("bamba", 0, 1, 1),
+            createRegularToken(StringTok, "ima"), createRegularToken(StringTok, "aba"), createRegularToken(StringTok, "bamba"),
             // case "Brandon" : return 6;
-            new CaseTok(1, 1), new StringTok("Brandon", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("6", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok, "Brandon"), createRegularToken(ColonTok), createRegularToken(
+                ReturnTok), createRegularToken(IntTok, "6"), createRegularToken(SemiColonTok),
 
-            new RCurlyTok(1, 1)
+            createRegularToken(RCurlyTok)
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -126,15 +149,21 @@ describe("Error Recovery switch-case Example", () => {
     it("can perform re-sync recovery to the right curly after the case statements repetition", () => {
         let input = [
             // switch (name) {
-            new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
+            createRegularToken(SwitchTok), createRegularToken(LParenTok), createRegularToken(IdentTok,
+                "name"), createRegularToken(RParenTok), createRegularToken(LCurlyTok),
             // case "Terry" : return 2;
-            new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Terry"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "2"), createRegularToken(
+                SemiColonTok),
             // case "Robert" : return 4;
-            new CaseTok(1, 1), new StringTok("Robert", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("4", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Robert"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "4"), createRegularToken(
+                SemiColonTok),
             // case "Brandon" : return 6;
-            new CaseTok(1, 1), new StringTok("Brandon", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("6", 0, 1, 1), new SemiColonTok(1, 1),
-            new StringTok("ima", 0, 1, 1), new StringTok("aba", 0, 1, 1), new StringTok("bamba", 0, 1, 1),
-            new RCurlyTok(1, 1)
+            createRegularToken(CaseTok), createRegularToken(StringTok, "Brandon"), createRegularToken(ColonTok), createRegularToken(
+                ReturnTok), createRegularToken(IntTok, "6"), createRegularToken(SemiColonTok),
+            createRegularToken(StringTok, "ima"), createRegularToken(StringTok, "aba"), createRegularToken(StringTok, "bamba"),
+            createRegularToken(RCurlyTok)
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -157,15 +186,21 @@ describe("Error Recovery switch-case Example", () => {
     it("can perform single token deletion recovery", () => {
         let input = [
             // switch (name) {
-            new SwitchTok(1, 1), new LParenTok(1, 1), new IdentTok("name", 0, 1, 1), new RParenTok(1, 1), new LCurlyTok(1, 1),
+            createRegularToken(SwitchTok), createRegularToken(LParenTok), createRegularToken(IdentTok,
+                "name"), createRegularToken(RParenTok), createRegularToken(LCurlyTok),
             // case "Terry" : return 2;
-            new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Terry"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "2"), createRegularToken(
+                SemiColonTok),
             // case "Robert" : return 4;
-            new CaseTok(1, 1), new StringTok("Robert", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("4", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok,
+                "Robert"), createRegularToken(ColonTok), createRegularToken(ReturnTok), createRegularToken(IntTok, "4"), createRegularToken(
+                SemiColonTok),
             // case "Brandon" : return 6;
-            new CaseTok(1, 1), new StringTok("Brandon", 0, 1, 1), new ColonTok(1, 1), new ReturnTok(1, 1), new IntTok("6", 0, 1, 1), new SemiColonTok(1, 1),
-            new SemiColonTok(1, 1), // <-- the redundant token to be deleted
-            new RCurlyTok(1, 1)
+            createRegularToken(CaseTok), createRegularToken(StringTok, "Brandon"), createRegularToken(ColonTok), createRegularToken(
+                ReturnTok), createRegularToken(IntTok, "6"), createRegularToken(SemiColonTok),
+            createRegularToken(SemiColonTok), // <-- the redundant token to be deleted
+            createRegularToken(RCurlyTok)
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -182,7 +217,8 @@ describe("Error Recovery switch-case Example", () => {
     it("will perform single token insertion for a missing colon", () => {
         let input = [
             // case "Terry" return 2 <-- missing the colon between "Terry" and return
-            new CaseTok(1, 1), new StringTok("Terry", 0, 1, 1), /* new ColonTok(1, 1) ,*/ new ReturnTok(1, 1), new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), createRegularToken(StringTok, "Terry"), /* createRegularToken(ColonTok) ,*/ createRegularToken(
+                ReturnTok), createRegularToken(IntTok, "2"), createRegularToken(SemiColonTok),
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)
@@ -196,8 +232,8 @@ describe("Error Recovery switch-case Example", () => {
     it("will NOT perform single token insertion for a missing string", () => {
         let input = [
             // case  : return 2 <-- missing the string for the case's value
-            new CaseTok(1, 1), /* new StringTok("Terry" , 0, 1, 1),*/  new ColonTok(1, 1), new ReturnTok(1, 1),
-            new IntTok("2", 0, 1, 1), new SemiColonTok(1, 1),
+            createRegularToken(CaseTok), /* new StringTok("Terry" , 0, 1, 1),*/  createRegularToken(ColonTok), createRegularToken(ReturnTok),
+            createRegularToken(IntTok, "2"), createRegularToken(SemiColonTok),
         ]
 
         let parser = new SwitchCaseRecoveryParser(input)

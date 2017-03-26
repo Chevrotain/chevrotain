@@ -2,6 +2,7 @@ var chevrotain = require("chevrotain");
 
 // ----------------- lexer -----------------
 var createToken = chevrotain.createToken;
+var tokenMatcher = chevrotain.tokenMatcher
 var Lexer = chevrotain.Lexer;
 var Parser = chevrotain.Parser;
 
@@ -52,7 +53,7 @@ function Calculator(input) {
             rhsVal = $.SUBRULE2($.multiplicationExpression);
 
             // interpreter part
-            if (op instanceof Plus) {
+            if (tokenMatcher(op, Plus)) {
                 value += rhsVal
             } else { // op instanceof Minus
                 value -= rhsVal
@@ -74,7 +75,7 @@ function Calculator(input) {
             rhsVal = $.SUBRULE2($.atomicExpression);
 
             // interpreter part
-            if (op instanceof Multi) {
+            if (tokenMatcher(op, Multi)) {
                 value *= rhsVal
             } else { // op instanceof Div
                 value /= rhsVal
@@ -86,14 +87,12 @@ function Calculator(input) {
 
 
     $.RULE("atomicExpression", function() {
-        // @formatter:off
-            return $.OR([
-                // parenthesisExpression has the highest precedence and thus it appears
-                // in the "lowest" leaf in the expression ParseTree.
-                {ALT: function(){ return $.SUBRULE($.parenthesisExpression)}},
-                {ALT: function(){ return parseInt($.CONSUME(NumberLiteral).image, 10)}}
-            ], "a number or parenthesis expression");
-            // @formatter:on
+        return $.OR([
+            // parenthesisExpression has the highest precedence and thus it appears
+            // in the "lowest" leaf in the expression ParseTree.
+            {ALT: function() { return $.SUBRULE($.parenthesisExpression)}},
+            {ALT: function() { return parseInt($.CONSUME(NumberLiteral).image, 10)}}
+        ], "a number or parenthesis expression");
     });
 
     $.RULE("parenthesisExpression", function() {

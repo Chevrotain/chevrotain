@@ -1,40 +1,28 @@
-import {forEach, isFunction, isRegExp, keys, map} from "../../src/utils/utils"
-import {
-    createToken,
-    extendLazyToken,
-    extendSimpleLazyToken,
-    extendToken,
-    getEndColumn,
-    getEndLine,
-    getEndOffset,
-    getImage,
-    getStartColumn,
-    getStartLine,
-    getStartOffset,
-    LazyToken,
-    SimpleLazyToken,
-    Token
-} from "../../src/scan/tokens_public"
+import {forEach, isFunction, isRegExp, keys, last, map} from "../../src/utils/utils"
+import {createToken, extendToken} from "../../src/scan/tokens_public"
 import {IMultiModeLexerDefinition, Lexer, LexerDefinitionErrorType} from "../../src/scan/lexer_public"
 import {
     addStartOfInput,
     analyzeTokenClasses,
-    countLineTerminators,
     disableSticky,
     enableSticky,
     findDuplicatePatterns,
     findEndOfInputAnchor,
     findInvalidGroupType,
     findInvalidPatterns,
-    findMissingPatterns, findStartOfInputAnchor,
+    findMissingPatterns,
+    findStartOfInputAnchor,
     findUnsupportedFlags,
     SUPPORT_STICKY
 } from "../../src/scan/lexer"
 import {setEquality} from "../utils/matchers"
-import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
+import {tokenStructuredMatcher} from "../../src/scan/tokens"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
-function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidationChecks = false) {
+function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidationChecks = false, lexerConfig) {
+
+    const testFull = lexerConfig.positionTracking === "full"
+    const testStart = lexerConfig.positionTracking === "onlyStart" || testFull
 
     function lexerSpecs() {
 
@@ -53,27 +41,27 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 let input = "bamba"
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], BambaTok)).to.be.true
-                expect(getImage(result.tokens[0])).to.equal("bamba")
-                expect(getStartLine(result.tokens[0])).to.equal(1)
-                expect(getStartColumn(result.tokens[0])).to.equal(1)
+                expect(result.tokens[0].image).to.equal("bamba")
+                expect(result.tokens[0].startLine).to.equal(1)
+                expect(result.tokens[0].startColumn).to.equal(1)
             })
 
             it("can create a token from a string with priority to the First Token class with the longest match #2", () => {
                 let input = "bambaMIA"
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], IdentifierTok)).to.be.true
-                expect(getImage(result.tokens[0])).to.equal("bambaMIA")
-                expect(getStartLine(result.tokens[0])).to.equal(1)
-                expect(getStartColumn(result.tokens[0])).to.equal(1)
+                expect(result.tokens[0].image).to.equal("bambaMIA")
+                expect(result.tokens[0].startLine).to.equal(1)
+                expect(result.tokens[0].startColumn).to.equal(1)
             })
 
             it("can create a token from a string", () => {
                 let input = "6666543221231"
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], IntegerTok)).to.be.true
-                expect(getImage(result.tokens[0])).to.equal("6666543221231")
-                expect(getStartLine(result.tokens[0])).to.equal(1)
-                expect(getStartColumn(result.tokens[0])).to.equal(1)
+                expect(result.tokens[0].image).to.equal("6666543221231")
+                expect(result.tokens[0].startLine).to.equal(1)
+                expect(result.tokens[0].startColumn).to.equal(1)
             })
         })
 
@@ -290,16 +278,16 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     setEquality(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
                         "^(?:\\()", "^(?:\\))", "^(?:[1-9]\\d*)", "^(?:if)", "^(?:else)", "^(?:return)"])
 
-                    let patternIdxToClass = analyzeResult.patternIdxToClass
+                    let patternIdxToClass = analyzeResult.patternIdxToType
                     expect(keys(patternIdxToClass).length).to.equal(8)
-                    expect(patternIdxToClass[0]).to.equal(If)
-                    expect(patternIdxToClass[1]).to.equal(Else)
-                    expect(patternIdxToClass[2]).to.equal(Return)
-                    expect(patternIdxToClass[3]).to.equal(Integer)
-                    expect(patternIdxToClass[4]).to.equal(LParen)
-                    expect(patternIdxToClass[5]).to.equal(RParen)
-                    expect(patternIdxToClass[6]).to.equal(Whitespace)
-                    expect(patternIdxToClass[7]).to.equal(NewLine)
+                    expect(patternIdxToClass[0]).to.equal(If.tokenType)
+                    expect(patternIdxToClass[1]).to.equal(Else.tokenType)
+                    expect(patternIdxToClass[2]).to.equal(Return.tokenType)
+                    expect(patternIdxToClass[3]).to.equal(Integer.tokenType)
+                    expect(patternIdxToClass[4]).to.equal(LParen.tokenType)
+                    expect(patternIdxToClass[5]).to.equal(RParen.tokenType)
+                    expect(patternIdxToClass[6]).to.equal(Whitespace.tokenType)
+                    expect(patternIdxToClass[7]).to.equal(NewLine.tokenType)
                 })
             }
 
@@ -318,31 +306,53 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     forEach(analyzeResult.allPatterns, (currPattern) => {
                         expect(currPattern.sticky).to.be.true
                     })
-                    let patternIdxToClass = analyzeResult.patternIdxToClass
+                    let patternIdxToClass = analyzeResult.patternIdxToType
                     expect(keys(patternIdxToClass).length).to.equal(8)
-                    expect(patternIdxToClass[0]).to.equal(If)
-                    expect(patternIdxToClass[1]).to.equal(Else)
-                    expect(patternIdxToClass[2]).to.equal(Return)
-                    expect(patternIdxToClass[3]).to.equal(Integer)
-                    expect(patternIdxToClass[4]).to.equal(LParen)
-                    expect(patternIdxToClass[5]).to.equal(RParen)
-                    expect(patternIdxToClass[6]).to.equal(Whitespace)
-                    expect(patternIdxToClass[7]).to.equal(NewLine)
+                    expect(patternIdxToClass[0]).to.equal(If.tokenType)
+                    expect(patternIdxToClass[1]).to.equal(Else.tokenType)
+                    expect(patternIdxToClass[2]).to.equal(Return.tokenType)
+                    expect(patternIdxToClass[3]).to.equal(Integer.tokenType)
+                    expect(patternIdxToClass[4]).to.equal(LParen.tokenType)
+                    expect(patternIdxToClass[5]).to.equal(RParen.tokenType)
+                    expect(patternIdxToClass[6]).to.equal(Whitespace.tokenType)
+                    expect(patternIdxToClass[7]).to.equal(NewLine.tokenType)
                 })
             }
 
             it("can count the number of line terminators in a string", () => {
-                expect(countLineTerminators("bamba\r\nbisli\r")).to.equal(2)
-                expect(countLineTerminators("\r\r\r1234\r\n")).to.equal(4)
-                expect(countLineTerminators("aaaa\raaa\n\r1234\n")).to.equal(4)
+                let ltCounter = new Lexer([createToken({name: "lt", pattern: /\s+/}), createToken({name: "num", pattern: /\d+/})])
+                let lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)
+                expect(lastToken.startLine).to.equal(3)
+
+                let lastToken2 = last(ltCounter.tokenize("\r\r\r1234\r\n1").tokens)
+                expect(lastToken2.startLine).to.equal(5)
+
+                let lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)
+                expect(lastToken3.startLine).to.equal(5)
             })
         })
 
         describe("The Simple Lexer Full flow", () => {
 
+            it("can run a simpleLexer in debug mode", () => {
+                let WS = createToken({name: "WS", pattern: /(\t| )/, group: "spaces"})
+                let ifElseLexer = new Lexer([WS, If, Else], {debug: true})
+
+                let input = "if else"
+
+                let lexResult = ifElseLexer.tokenize(input)
+                let tokens:any = lexResult.tokens
+                expect(tokens[0].tokenClassName).to.equal("If")
+                expect(tokens[1].tokenClassName).to.equal("Else")
+
+                let spacesGroups:any = lexResult.groups.spaces
+                expect(spacesGroups[0].tokenClassName).to.equal("WS")
+            })
+
             const EndOfInputAnchor = extendToken("EndOfInputAnchor", /BAMBA$/)
             it("can create a simple Lexer from a List of Token Classes", () => {
-                let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+                let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine],
+                    lexerConfig)
                 //noinspection BadExpressionStatementJS
                 expect(ifElseLexer.lexerDefinitionErrors).to.be.empty
 
@@ -352,82 +362,133 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 let lexResult = ifElseLexer.tokenize(input)
                 expect(lexResult.groups).to.be.empty
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getEndOffset(lexResult.tokens[0])).to.equal(1)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[0].endOffset).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(getImage(lexResult.tokens[1])).to.equal("(")
-                expect(getStartOffset(lexResult.tokens[1])).to.equal(3)
-                expect(getEndOffset(lexResult.tokens[1])).to.equal(3)
-                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[1])).to.equal(4)
+                expect(lexResult.tokens[1].image).to.equal("(")
+                expect(lexResult.tokens[1].startOffset).to.equal(3)
+                if (testStart) {
+                    expect(lexResult.tokens[1].startLine).to.equal(1)
+                    expect(lexResult.tokens[1].startColumn).to.equal(4)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[1].endOffset).to.equal(3)
+                }
                 expect(tokenMatcher(lexResult.tokens[1], LParen)).to.be.true
 
-                expect(getImage(lexResult.tokens[2])).to.equal("666")
-                expect(getStartOffset(lexResult.tokens[2])).to.equal(4)
-                expect(getEndOffset(lexResult.tokens[2])).to.equal(6)
-                expect(getStartLine(lexResult.tokens[2])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[2])).to.equal(5)
+                expect(lexResult.tokens[2].image).to.equal("666")
+                expect(lexResult.tokens[2].startOffset).to.equal(4)
+                if (testStart) {
+                    expect(lexResult.tokens[2].startLine).to.equal(1)
+                    expect(lexResult.tokens[2].startColumn).to.equal(5)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[2].endOffset).to.equal(6)
+                }
                 expect(tokenMatcher(lexResult.tokens[2], Integer)).to.be.true
 
-                expect(getImage(lexResult.tokens[3])).to.equal(")")
-                expect(getStartOffset(lexResult.tokens[3])).to.equal(7)
-                expect(getEndOffset(lexResult.tokens[3])).to.equal(7)
-                expect(getStartLine(lexResult.tokens[3])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[3])).to.equal(8)
+                expect(lexResult.tokens[3].image).to.equal(")")
+                expect(lexResult.tokens[3].startOffset).to.equal(7)
+                if (testStart) {
+                    if (testStart) {
+                        expect(lexResult.tokens[3].startLine).to.equal(1)
+                        expect(lexResult.tokens[3].startColumn).to.equal(8)
+                    }
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[3].endOffset).to.equal(7)
+                }
                 expect(tokenMatcher(lexResult.tokens[3], RParen)).to.be.true
 
-                expect(getImage(lexResult.tokens[4])).to.equal("reTurn")
-                expect(getStartOffset(lexResult.tokens[4])).to.equal(9)
-                expect(getEndOffset(lexResult.tokens[4])).to.equal(14)
-                expect(getStartLine(lexResult.tokens[4])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[4])).to.equal(10)
+                expect(lexResult.tokens[4].image).to.equal("reTurn")
+                expect(lexResult.tokens[4].startOffset).to.equal(9)
+                if (testStart) {
+                    expect(lexResult.tokens[4].startLine).to.equal(1)
+                    expect(lexResult.tokens[4].startColumn).to.equal(10)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[4].endOffset).to.equal(14)
+                }
                 expect(tokenMatcher(lexResult.tokens[4], Return)).to.be.true
 
-                expect(getImage(lexResult.tokens[5])).to.equal("1")
-                expect(getStartOffset(lexResult.tokens[5])).to.equal(16)
-                expect(getEndOffset(lexResult.tokens[5])).to.equal(16)
-                expect(getStartLine(lexResult.tokens[5])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[5])).to.equal(17)
+                expect(lexResult.tokens[5].image).to.equal("1")
+                expect(lexResult.tokens[5].startOffset).to.equal(16)
+                if (testStart) {
+                    expect(lexResult.tokens[5].startLine).to.equal(1)
+                    expect(lexResult.tokens[5].startColumn).to.equal(17)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[5].endOffset).to.equal(16)
+                }
                 expect(tokenMatcher(lexResult.tokens[5], Integer)).to.be.true
 
-                expect(getImage(lexResult.tokens[6])).to.equal("else")
-                expect(getStartOffset(lexResult.tokens[6])).to.equal(19)
-                expect(getEndOffset(lexResult.tokens[6])).to.equal(22)
-                expect(getStartLine(lexResult.tokens[6])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[6])).to.equal(2)
+                expect(lexResult.tokens[6].image).to.equal("else")
+                expect(lexResult.tokens[6].startOffset).to.equal(19)
+                if (testStart) {
+                    expect(lexResult.tokens[6].startLine).to.equal(2)
+                    expect(lexResult.tokens[6].startColumn).to.equal(2)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[6].endOffset).to.equal(22)
+                }
                 expect(tokenMatcher(lexResult.tokens[6], Else)).to.be.true
 
-                expect(getImage(lexResult.tokens[7])).to.equal("return")
-                expect(getStartOffset(lexResult.tokens[7])).to.equal(24)
-                expect(getEndOffset(lexResult.tokens[7])).to.equal(29)
-                expect(getStartLine(lexResult.tokens[7])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[7])).to.equal(7)
+                expect(lexResult.tokens[7].image).to.equal("return")
+                expect(lexResult.tokens[7].startOffset).to.equal(24)
+                if (testStart) {
+                    expect(lexResult.tokens[7].startLine).to.equal(2)
+                    expect(lexResult.tokens[7].startColumn).to.equal(7)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[7].endOffset).to.equal(29)
+                }
                 expect(tokenMatcher(lexResult.tokens[7], Return)).to.be.true
 
-                expect(getImage(lexResult.tokens[8])).to.equal("2")
-                expect(getStartOffset(lexResult.tokens[8])).to.equal(31)
-                expect(getEndOffset(lexResult.tokens[8])).to.equal(31)
-                expect(getStartLine(lexResult.tokens[8])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[8])).to.equal(14)
+                expect(lexResult.tokens[8].image).to.equal("2")
+                expect(lexResult.tokens[8].startOffset).to.equal(31)
+                if (testStart) {
+                    expect(lexResult.tokens[8].startLine).to.equal(2)
+                    expect(lexResult.tokens[8].startColumn).to.equal(14)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[8].endOffset).to.equal(31)
+                }
                 expect(tokenMatcher(lexResult.tokens[8], Integer)).to.be.true
             })
 
             // when testing custom patterns the EOI anchor will not exist and thus no error will be thrown
             if (!skipValidationChecks) {
+
+                it("Will throw an error during the creation of a Lexer if the lexer config argument is a boolean", () => {
+                    expect(() => new Lexer([], {positionTracking: <any>"oops"})).to.throw("Invalid <positionTracking> config option:" +
+                        " \"oops\"")
+                })
+
+                it("Will throw an error during the creation of a Lexer if the lexer config argument is a boolean", () => {
+                    expect(() => new Lexer([], false)).to.throw("The second argument to the Lexer constructor is now an ILexerConfig")
+                })
+
                 it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
-                    expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/Errors detected in definition of Lexer/)
-                    expect(() => new Lexer([EndOfInputAnchor, If, Else])).to.throw(/EndOfInputAnchor/)
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else]), lexerConfig).to.throw(/Errors detected in definition of Lexer/)
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else]), lexerConfig).to.throw(/EndOfInputAnchor/)
                 })
 
                 it("can defer the throwing of errors during the creation of a Lexer if the Lexer's definition is invalid", () => {
-                    expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/Errors detected in definition of Lexer/)
-                    expect(() => new Lexer([EndOfInputAnchor, If, Else], true)).to.not.throw(/EndOfInputAnchor/)
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else], {deferDefinitionErrorsHandling: true}))
+                        .to.not.throw(/Errors detected in definition of Lexer/)
+                    expect(() => new Lexer([EndOfInputAnchor, If, Else], {deferDefinitionErrorsHandling: true}))
+                        .to.not.throw(/EndOfInputAnchor/)
 
-                    let lexerWithErrs = new Lexer([EndOfInputAnchor, If, Else], true)
+                    let lexerWithErrs = new Lexer([EndOfInputAnchor, If, Else], {deferDefinitionErrorsHandling: true})
                     //noinspection BadExpressionStatementJS
                     expect(lexerWithErrs.lexerDefinitionErrors).to.not.be.empty
                     // even when the Error handling is deferred, actual usage of an invalid lexer is not permitted!
@@ -438,7 +499,8 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
             }
 
             it("can skip invalid character inputs and only report one error per sequence of characters skipped", () => {
-                let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+                let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine],
+                    lexerConfig)
 
                 let input = "if (666) return 1@#$@#$\n" +
                     "\telse return 2"
@@ -446,239 +508,331 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 let lexResult = ifElseLexer.tokenize(input)
                 expect(lexResult.errors.length).to.equal(1)
                 expect(lexResult.errors[0].message).to.contain("@")
-                expect(lexResult.errors[0].line).to.equal(1)
-                expect(lexResult.errors[0].column).to.equal(18)
                 expect(lexResult.errors[0].length).to.equal(6)
+                if (testStart) {
+                    expect(lexResult.errors[0].line).to.equal(1)
+                    expect(lexResult.errors[0].column).to.equal(18)
+                }
+                else {
+                    expect(lexResult.errors[0].line).to.be.undefined
+                    expect(lexResult.errors[0].column).to.be.undefined
+                }
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(getImage(lexResult.tokens[1])).to.equal("(")
-                expect(getStartOffset(lexResult.tokens[1])).to.equal(3)
-                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[1])).to.equal(4)
+                expect(lexResult.tokens[1].image).to.equal("(")
+                expect(lexResult.tokens[1].startOffset).to.equal(3)
+                if (testStart) {
+                    expect(lexResult.tokens[1].startLine).to.equal(1)
+                    expect(lexResult.tokens[1].startColumn).to.equal(4)
+                }
                 expect(tokenMatcher(lexResult.tokens[1], LParen)).to.be.true
 
-                expect(getImage(lexResult.tokens[2])).to.equal("666")
-                expect(getStartOffset(lexResult.tokens[2])).to.equal(4)
-                expect(getStartLine(lexResult.tokens[2])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[2])).to.equal(5)
+                expect(lexResult.tokens[2].image).to.equal("666")
+                expect(lexResult.tokens[2].startOffset).to.equal(4)
+                if (testStart) {
+                    expect(lexResult.tokens[2].startLine).to.equal(1)
+                    expect(lexResult.tokens[2].startColumn).to.equal(5)
+                }
                 expect(tokenMatcher(lexResult.tokens[2], Integer)).to.be.true
 
-                expect(getImage(lexResult.tokens[3])).to.equal(")")
-                expect(getStartOffset(lexResult.tokens[3])).to.equal(7)
-                expect(getStartLine(lexResult.tokens[3])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[3])).to.equal(8)
+                expect(lexResult.tokens[3].image).to.equal(")")
+                expect(lexResult.tokens[3].startOffset).to.equal(7)
+                if (testStart) {
+                    expect(lexResult.tokens[3].startLine).to.equal(1)
+                    expect(lexResult.tokens[3].startColumn).to.equal(8)
+                }
                 expect(tokenMatcher(lexResult.tokens[3], RParen)).to.be.true
 
-                expect(getImage(lexResult.tokens[4])).to.equal("return")
-                expect(getStartOffset(lexResult.tokens[4])).to.equal(9)
-                expect(getStartLine(lexResult.tokens[4])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[4])).to.equal(10)
+                expect(lexResult.tokens[4].image).to.equal("return")
+                expect(lexResult.tokens[4].startOffset).to.equal(9)
+                if (testStart) {
+                    expect(lexResult.tokens[4].startLine).to.equal(1)
+                    expect(lexResult.tokens[4].startColumn).to.equal(10)
+                }
                 expect(tokenMatcher(lexResult.tokens[4], Return)).to.be.true
 
-                expect(getImage(lexResult.tokens[5])).to.equal("1")
-                expect(getStartOffset(lexResult.tokens[5])).to.equal(16)
-                expect(getStartLine(lexResult.tokens[5])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[5])).to.equal(17)
+                expect(lexResult.tokens[5].image).to.equal("1")
+                expect(lexResult.tokens[5].startOffset).to.equal(16)
+                if (testStart) {
+                    expect(lexResult.tokens[5].startLine).to.equal(1)
+                    expect(lexResult.tokens[5].startColumn).to.equal(17)
+                }
                 expect(tokenMatcher(lexResult.tokens[5], Integer)).to.be.true
 
-                expect(getImage(lexResult.tokens[6])).to.equal("else")
-                expect(getStartOffset(lexResult.tokens[6])).to.equal(25)
-                expect(getStartLine(lexResult.tokens[6])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[6])).to.equal(2)
+                expect(lexResult.tokens[6].image).to.equal("else")
+                expect(lexResult.tokens[6].startOffset).to.equal(25)
+                if (testStart) {
+                    expect(lexResult.tokens[6].startLine).to.equal(2)
+                    expect(lexResult.tokens[6].startColumn).to.equal(2)
+                }
                 expect(tokenMatcher(lexResult.tokens[6], Else)).to.be.true
 
-                expect(getImage(lexResult.tokens[7])).to.equal("return")
-                expect(getStartOffset(lexResult.tokens[7])).to.equal(30)
-                expect(getStartLine(lexResult.tokens[7])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[7])).to.equal(7)
+                expect(lexResult.tokens[7].image).to.equal("return")
+                expect(lexResult.tokens[7].startOffset).to.equal(30)
+                if (testStart) {
+                    expect(lexResult.tokens[7].startLine).to.equal(2)
+                    expect(lexResult.tokens[7].startColumn).to.equal(7)
+                }
                 expect(tokenMatcher(lexResult.tokens[7], Return)).to.be.true
 
-                expect(getImage(lexResult.tokens[8])).to.equal("2")
-                expect(getStartOffset(lexResult.tokens[8])).to.equal(37)
-                expect(getStartLine(lexResult.tokens[8])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[8])).to.equal(14)
+                expect(lexResult.tokens[8].image).to.equal("2")
+                expect(lexResult.tokens[8].startOffset).to.equal(37)
+                if (testStart) {
+                    expect(lexResult.tokens[8].startLine).to.equal(2)
+                    expect(lexResult.tokens[8].startColumn).to.equal(14)
+                }
                 expect(tokenMatcher(lexResult.tokens[8], Integer)).to.be.true
             })
 
             it("won't go into infinite loops when skipping at end of input", () => {
-                let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine])
+                let ifElseLexer = new Lexer([Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine],
+                    lexerConfig)
 
                 let input = "if&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
                 let lexResult = ifElseLexer.tokenize(input)
                 expect(lexResult.errors.length).to.equal(1)
                 expect(lexResult.errors[0].message).to.contain("&")
-                expect(lexResult.errors[0].line).to.equal(1)
-                expect(lexResult.errors[0].column).to.equal(3)
-                expect(lexResult.errors[0].length).to.equal(28)
+                if (testStart) {
+                    expect(lexResult.errors[0].line).to.equal(1)
+                    expect(lexResult.errors[0].column).to.equal(3)
+                }
+                else {
+                    expect(lexResult.errors[0].line).to.be.undefined
+                    expect(lexResult.errors[0].column).to.be.undefined
+                }
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(lexResult.errors[0].length).to.equal(28)
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
             })
 
             it("can deal with line terminators during resync", () => {
-                let ifElseLexer = new Lexer([If, Else]) // no newLine tokens those will be resynced
+                let ifElseLexer = new Lexer([If, Else], lexerConfig) // no newLine tokens those will be resynced
 
                 let input = "if\r\nelse\rif\r"
                 let lexResult = ifElseLexer.tokenize(input)
                 expect(lexResult.errors.length).to.equal(3)
                 expect(lexResult.errors[0].message).to.contain("\r")
-                expect(lexResult.errors[0].line).to.equal(1)
-                expect(lexResult.errors[0].column).to.equal(3)
+                if (testStart) {
+                    expect(lexResult.errors[0].line).to.equal(1)
+                    expect(lexResult.errors[0].column).to.equal(3)
+                }
                 expect(lexResult.errors[0].length).to.equal(2)
 
                 expect(lexResult.errors[1].message).to.contain("\r")
-                expect(lexResult.errors[1].line).to.equal(2)
-                expect(lexResult.errors[1].column).to.equal(5)
+                if (testStart) {
+                    expect(lexResult.errors[1].line).to.equal(2)
+                    expect(lexResult.errors[1].column).to.equal(5)
+                }
                 expect(lexResult.errors[1].length).to.equal(1)
 
                 expect(lexResult.errors[2].message).to.contain("\r")
-                expect(lexResult.errors[2].line).to.equal(3)
-                expect(lexResult.errors[2].column).to.equal(3)
+                if (testStart) {
+                    expect(lexResult.errors[2].line).to.equal(3)
+                    expect(lexResult.errors[2].column).to.equal(3)
+                }
                 expect(lexResult.errors[2].length).to.equal(1)
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(getImage(lexResult.tokens[1])).to.equal("else")
-                expect(getStartOffset(lexResult.tokens[1])).to.equal(4)
-                expect(getStartLine(lexResult.tokens[1])).to.equal(2)
-                expect(getStartColumn(lexResult.tokens[1])).to.equal(1)
+                expect(lexResult.tokens[1].image).to.equal("else")
+                expect(lexResult.tokens[1].startOffset).to.equal(4)
+                if (testStart) {
+                    expect(lexResult.tokens[1].startLine).to.equal(2)
+                    expect(lexResult.tokens[1].startColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[1], Else)).to.be.true
 
-                expect(getImage(lexResult.tokens[2])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[2])).to.equal(9)
-                expect(getStartLine(lexResult.tokens[2])).to.equal(3)
-                expect(getStartColumn(lexResult.tokens[2])).to.equal(1)
+                expect(lexResult.tokens[2].image).to.equal("if")
+                expect(lexResult.tokens[2].startOffset).to.equal(9)
+                if (testStart) {
+                    expect(lexResult.tokens[2].startLine).to.equal(3)
+                    expect(lexResult.tokens[2].startColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[2], If)).to.be.true
             })
 
-
             it("can deal with line terminators inside multi-line Tokens", () => {
-                let ifElseLexer = new Lexer([If, Else, WhitespaceNotSkipped])
+                let ifElseLexer = new Lexer([If, Else, WhitespaceNotSkipped], lexerConfig)
 
                 let input = "if\r\r\telse\rif\n"
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
-                expect(getEndLine(lexResult.tokens[0])).to.equal(1)
-                expect(getEndColumn(lexResult.tokens[0])).to.equal(2)
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[0].endLine).to.equal(1)
+                    expect(lexResult.tokens[0].endColumn).to.equal(2)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(getImage(lexResult.tokens[1])).to.equal("\r\r\t")
-                expect(getStartOffset(lexResult.tokens[1])).to.equal(2)
-                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[1])).to.equal(3)
-                expect(getEndLine(lexResult.tokens[1])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[1])).to.equal(1)
+                expect(lexResult.tokens[1].image).to.equal("\r\r\t")
+                expect(lexResult.tokens[1].startOffset).to.equal(2)
+                if (testStart) {
+                    expect(lexResult.tokens[1].startLine).to.equal(1)
+                    expect(lexResult.tokens[1].startColumn).to.equal(3)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[1].endLine).to.equal(3)
+                    expect(lexResult.tokens[1].endColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[1], WhitespaceNotSkipped)).to.be.true
 
-                expect(getImage(lexResult.tokens[2])).to.equal("else")
-                expect(getStartOffset(lexResult.tokens[2])).to.equal(5)
-                expect(getStartLine(lexResult.tokens[2])).to.equal(3)
-                expect(getStartColumn(lexResult.tokens[2])).to.equal(2)
-                expect(getEndLine(lexResult.tokens[2])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[2])).to.equal(5)
+                expect(lexResult.tokens[2].image).to.equal("else")
+                expect(lexResult.tokens[2].startOffset).to.equal(5)
+                if (testStart) {
+                    expect(lexResult.tokens[2].startLine).to.equal(3)
+                    expect(lexResult.tokens[2].startColumn).to.equal(2)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[2].endLine).to.equal(3)
+                    expect(lexResult.tokens[2].endColumn).to.equal(5)
+                }
                 expect(tokenMatcher(lexResult.tokens[2], Else)).to.be.true
 
-                expect(getImage(lexResult.tokens[3])).to.equal("\r")
-                expect(getStartOffset(lexResult.tokens[3])).to.equal(9)
-                expect(getStartLine(lexResult.tokens[3])).to.equal(3)
-                expect(getStartColumn(lexResult.tokens[3])).to.equal(6)
-                expect(getEndLine(lexResult.tokens[3])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[3])).to.equal(6)
+                expect(lexResult.tokens[3].image).to.equal("\r")
+                expect(lexResult.tokens[3].startOffset).to.equal(9)
+                if (testStart) {
+                    expect(lexResult.tokens[3].startLine).to.equal(3)
+                    expect(lexResult.tokens[3].startColumn).to.equal(6)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[3].endLine).to.equal(3)
+                    expect(lexResult.tokens[3].endColumn).to.equal(6)
+                }
                 expect(tokenMatcher(lexResult.tokens[3], WhitespaceNotSkipped)).to.be.true
 
-                expect(getImage(lexResult.tokens[4])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[4])).to.equal(10)
-                expect(getStartLine(lexResult.tokens[4])).to.equal(4)
-                expect(getStartColumn(lexResult.tokens[4])).to.equal(1)
-                expect(getEndLine(lexResult.tokens[4])).to.equal(4)
-                expect(getEndColumn(lexResult.tokens[4])).to.equal(2)
+                expect(lexResult.tokens[4].image).to.equal("if")
+                expect(lexResult.tokens[4].startOffset).to.equal(10)
+                if (testStart) {
+                    expect(lexResult.tokens[4].startLine).to.equal(4)
+                    expect(lexResult.tokens[4].startColumn).to.equal(1)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[4].endLine).to.equal(4)
+                    expect(lexResult.tokens[4].endColumn).to.equal(2)
+                }
                 expect(tokenMatcher(lexResult.tokens[4], If)).to.be.true
 
-                expect(getImage(lexResult.tokens[5])).to.equal("\n")
-                expect(getStartOffset(lexResult.tokens[5])).to.equal(12)
-                expect(getStartLine(lexResult.tokens[5])).to.equal(4)
-                expect(getStartColumn(lexResult.tokens[5])).to.equal(3)
-                expect(getEndLine(lexResult.tokens[5])).to.equal(4)
-                expect(getEndColumn(lexResult.tokens[5])).to.equal(3)
+                expect(lexResult.tokens[5].image).to.equal("\n")
+                expect(lexResult.tokens[5].startOffset).to.equal(12)
+                if (testStart) {
+                    expect(lexResult.tokens[5].startLine).to.equal(4)
+                    expect(lexResult.tokens[5].startColumn).to.equal(3)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[5].endLine).to.equal(4)
+                    expect(lexResult.tokens[5].endColumn).to.equal(3)
+                }
                 expect(tokenMatcher(lexResult.tokens[5], WhitespaceNotSkipped)).to.be.true
 
             })
 
             it("can deal with Tokens which may or may not be a lineTerminator", () => {
-                let ifElseLexer = new Lexer([If, Else, WhitespaceOrAmp])
+                let ifElseLexer = new Lexer([If, Else, WhitespaceOrAmp], lexerConfig)
 
                 let input = "if\r\r\telse&if"
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
-                expect(getEndLine(lexResult.tokens[0])).to.equal(1)
-                expect(getEndColumn(lexResult.tokens[0])).to.equal(2)
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[0].endLine).to.equal(1)
+                    expect(lexResult.tokens[0].endColumn).to.equal(2)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
-                expect(getImage(lexResult.tokens[1])).to.equal("\r\r\t")
-                expect(getStartOffset(lexResult.tokens[1])).to.equal(2)
-                expect(getStartLine(lexResult.tokens[1])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[1])).to.equal(3)
-                expect(getEndLine(lexResult.tokens[1])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[1])).to.equal(1)
+                expect(lexResult.tokens[1].image).to.equal("\r\r\t")
+                expect(lexResult.tokens[1].startOffset).to.equal(2)
+                if (testStart) {
+                    expect(lexResult.tokens[1].startLine).to.equal(1)
+                    expect(lexResult.tokens[1].startColumn).to.equal(3)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[1].endLine).to.equal(3)
+                    expect(lexResult.tokens[1].endColumn).to.equal(1)
+                }
                 expect(tokenMatcher(lexResult.tokens[1], WhitespaceOrAmp)).to.be.true
 
-                expect(getImage(lexResult.tokens[2])).to.equal("else")
-                expect(getStartOffset(lexResult.tokens[2])).to.equal(5)
-                expect(getStartLine(lexResult.tokens[2])).to.equal(3)
-                expect(getStartColumn(lexResult.tokens[2])).to.equal(2)
-                expect(getEndLine(lexResult.tokens[2])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[2])).to.equal(5)
+                expect(lexResult.tokens[2].image).to.equal("else")
+                expect(lexResult.tokens[2].startOffset).to.equal(5)
+                if (testStart) {
+                    expect(lexResult.tokens[2].startLine).to.equal(3)
+                    expect(lexResult.tokens[2].startColumn).to.equal(2)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[2].endLine).to.equal(3)
+                    expect(lexResult.tokens[2].endColumn).to.equal(5)
+                }
                 expect(tokenMatcher(lexResult.tokens[2], Else)).to.be.true
 
-                expect(getImage(lexResult.tokens[3])).to.equal("&")
-                expect(getStartOffset(lexResult.tokens[3])).to.equal(9)
-                expect(getStartLine(lexResult.tokens[3])).to.equal(3)
-                expect(getStartColumn(lexResult.tokens[3])).to.equal(6)
-                expect(getEndLine(lexResult.tokens[3])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[3])).to.equal(6)
+                expect(lexResult.tokens[3].image).to.equal("&")
+                expect(lexResult.tokens[3].startOffset).to.equal(9)
+                if (testStart) {
+                    expect(lexResult.tokens[3].startLine).to.equal(3)
+                    expect(lexResult.tokens[3].startColumn).to.equal(6)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[3].endLine).to.equal(3)
+                    expect(lexResult.tokens[3].endColumn).to.equal(6)
+                }
                 expect(tokenMatcher(lexResult.tokens[3], WhitespaceOrAmp)).to.be.true
 
-                expect(getImage(lexResult.tokens[4])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[4])).to.equal(10)
-                expect(getStartLine(lexResult.tokens[4])).to.equal(3)
-                expect(getStartColumn(lexResult.tokens[4])).to.equal(7)
-                expect(getEndLine(lexResult.tokens[4])).to.equal(3)
-                expect(getEndColumn(lexResult.tokens[4])).to.equal(8)
+                expect(lexResult.tokens[4].image).to.equal("if")
+                expect(lexResult.tokens[4].startOffset).to.equal(10)
+                if (testStart) {
+                    expect(lexResult.tokens[4].startLine).to.equal(3)
+                    expect(lexResult.tokens[4].startColumn).to.equal(7)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[4].endLine).to.equal(3)
+                    expect(lexResult.tokens[4].endColumn).to.equal(8)
+                }
                 expect(tokenMatcher(lexResult.tokens[4], If)).to.be.true
 
             })
 
             it("supports Token groups", () => {
-                let ifElseLexer = new Lexer([If, Else, Comment])
+                let ifElseLexer = new Lexer([If, Else, Comment], lexerConfig)
                 let input = "if//else"
                 let lexResult = ifElseLexer.tokenize(input)
 
-                expect(getImage(lexResult.tokens[0])).to.equal("if")
-                expect(getStartOffset(lexResult.tokens[0])).to.equal(0)
-                expect(getStartLine(lexResult.tokens[0])).to.equal(1)
-                expect(getStartColumn(lexResult.tokens[0])).to.equal(1)
-                expect(getEndLine(lexResult.tokens[0])).to.equal(1)
-                expect(getEndColumn(lexResult.tokens[0])).to.equal(2)
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].startOffset).to.equal(0)
+                if (testStart) {
+                    expect(lexResult.tokens[0].startLine).to.equal(1)
+                    expect(lexResult.tokens[0].startColumn).to.equal(1)
+                }
+                if (testFull) {
+                    expect(lexResult.tokens[0].endLine).to.equal(1)
+                    expect(lexResult.tokens[0].endColumn).to.equal(2)
+                }
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
 
                 expect(lexResult.groups).to.have.property("comments")
@@ -686,17 +840,21 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 expect(lexResult.groups["comments"]).to.have.length(1)
                 let comment = lexResult.groups["comments"][0]
                 // tslint:enable
-                expect(getImage(comment)).to.equal("//else")
-                expect(getStartOffset(comment)).to.equal(2)
-                expect(getStartLine(comment)).to.equal(1)
-                expect(getStartColumn(comment)).to.equal(3)
-                expect(getEndLine(comment)).to.equal(1)
-                expect(getEndColumn(comment)).to.equal(8)
+                expect(comment.image).to.equal("//else")
+                expect(comment.startOffset).to.equal(2)
+                if (testStart) {
+                    expect(comment.startLine).to.equal(1)
+                    expect(comment.startColumn).to.equal(3)
+                }
+                if (testFull) {
+                    expect(comment.endLine).to.equal(1)
+                    expect(comment.endColumn).to.equal(8)
+                }
                 expect(tokenMatcher(comment, Comment)).to.be.true
             })
 
             it("won't have leftover state when using token groups", () => {
-                let ifElseLexer = new Lexer([If, Else, Comment])
+                let ifElseLexer = new Lexer([If, Else, Comment], lexerConfig)
                 let input = "if//else"
                 let lexResult = ifElseLexer.tokenize(input)
 
@@ -762,14 +920,14 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     defaultMode: "numbers"
                 }
 
-                let ModeLexer = new Lexer(modeLexerDefinition)
+                let ModeLexer = new Lexer(modeLexerDefinition, lexerConfig)
 
                 it("supports 'context' lexer modes full flow", () => {
                     let input = "1 LETTERS G A G SIGNS & EXIT_SIGNS B EXIT_LETTERS 3"
                     let lexResult = ModeLexer.tokenize(input)
                     expect(lexResult.errors).to.be.empty
 
-                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                    let images = map(lexResult.tokens, (currTok) => currTok.image)
                     expect(images).to.deep.equal([
                         "1",
                         "LETTERS",
@@ -790,7 +948,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     let lexResult = ModeLexer.tokenize(input, "letters")
                     expect(lexResult.errors).to.be.empty
 
-                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                    let images = map(lexResult.tokens, (currTok) => currTok.image)
                     expect(images).to.deep.equal([
                         "A",
                         "G",
@@ -806,7 +964,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     expect(lexResult.errors[0].message).to.include("skipped 1")
                     expect(lexResult.errors[0].message).to.include(">1<")
 
-                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                    let images = map(lexResult.tokens, (currTok) => currTok.image)
 
                     expect(images).to.deep.equal([
                         "1",
@@ -821,11 +979,17 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     expect(lexResult.errors).to.have.lengthOf(1)
                     expect(lexResult.errors[0].message).to.include(">EXIT_NUMBERS<")
                     expect(lexResult.errors[0].message).to.include("Unable to pop")
-                    expect(lexResult.errors[0].line).to.equal(1)
-                    expect(lexResult.errors[0].column).to.equal(3)
+                    if (testStart) {
+                        expect(lexResult.errors[0].line).to.equal(1)
+                        expect(lexResult.errors[0].column).to.equal(3)
+                    } else {
+                        expect(lexResult.errors[0].line).to.equal(undefined)
+                        expect(lexResult.errors[0].column).to.equal(undefined)
+                    }
+
                     expect(lexResult.errors[0].length).to.equal(12)
 
-                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                    let images = map(lexResult.tokens, (currTok) => currTok.image)
                     expect(images).to.deep.equal([
                         "1",
                         "EXIT_NUMBERS",
@@ -838,7 +1002,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     let lexResult = ModeLexer.tokenize(input)
                     expect(lexResult.errors).to.be.empty
 
-                    let images = map(lexResult.tokens, (currTok) => getImage(currTok))
+                    let images = map(lexResult.tokens, (currTok) => currTok.image)
                     expect(images).to.deep.equal([
                         "LETTERS",
                         "SIGNS_AND_EXIT_LETTERS",
@@ -867,7 +1031,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                         defaultMode: "letters"
                     }
 
-                    let badLexer = new Lexer(lexerDef, true)
+                    let badLexer = new Lexer(lexerDef, {deferDefinitionErrorsHandling: true})
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].tokenClasses).to.deep.equal([EnterNumbers])
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST)
@@ -885,7 +1049,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                         defaultMode: ""
                     }
 
-                    let badLexer = new Lexer(lexerDef, true)
+                    let badLexer = new Lexer(lexerDef, {deferDefinitionErrorsHandling: true})
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
                         LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY)
@@ -901,7 +1065,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                         defaultMode___: "" //  typo in 'defaultMode' property name
                     }
 
-                    let badLexer = new Lexer(lexerDef, true)
+                    let badLexer = new Lexer(lexerDef, {deferDefinitionErrorsHandling: true})
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE)
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("MultiMode Lexer cannot be initialized")
@@ -918,7 +1082,7 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
 
                         defaultMode: "bisli"
                     }
-                    let badLexer = new Lexer(lexerDef, true)
+                    let badLexer = new Lexer(lexerDef, {deferDefinitionErrorsHandling: true})
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
                         LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST)
@@ -932,61 +1096,13 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     let lexerDef:any = [
                         Alpha, Beta, /* this is undefined */, Gamma
                     ]
-                    let badLexer = new Lexer(lexerDef, true)
+                    let badLexer = new Lexer(lexerDef, {deferDefinitionErrorsHandling: true})
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
                         LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED)
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include(
                         "A Lexer cannot be initialized using an undefined Token Class")
                     expect(badLexer.lexerDefinitionErrors[0].message).to.include("2")
-                })
-
-                it("Will detect a Lexer definition which has mixed Lazy and None Lazy Tokens", () => {
-                    class LazyTok1 extends LazyToken {static PATTERN = /A/}
-                    class LazyTok2 extends LazyToken {static PATTERN = /B/}
-                    class LazyTok3 extends LazyToken {static PATTERN = /C/}
-                    class NotLazyTok1 extends Token {static PATTERN = /D/}
-                    class NotLazyTok2 extends Token {static PATTERN = /E/}
-
-                    let lexerDef:any = [
-                        LazyTok1, LazyTok2, LazyTok3, NotLazyTok1, NotLazyTok2
-                    ]
-
-                    let badLexer = new Lexer(lexerDef, true)
-                    expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
-                    expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-                        LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY)
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-                        "A Lexer cannot be defined using a mix of both Lazy and Non-Lazy Tokens:")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok1")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok2")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok3")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotLazyTok1")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotLazyTok2")
-                })
-
-                it("Will detect a Lexer definition which has mixed Simple and None Simple Tokens", () => {
-                    class LazyTok1 extends LazyToken {static PATTERN = /A/}
-                    class LazyTok2 extends LazyToken {static PATTERN = /B/}
-                    class LazyTok3 extends LazyToken {static PATTERN = /C/}
-                    class NotSimpleTok1 extends SimpleLazyToken {static PATTERN = /D/}
-                    class NotSimpleTok2 extends SimpleLazyToken {static PATTERN = /E/}
-
-                    let lexerDef:any = [
-                        LazyTok1, LazyTok2, LazyTok3, NotSimpleTok1, NotSimpleTok2
-                    ]
-
-                    let badLexer = new Lexer(lexerDef, true)
-                    expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
-                    expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
-                        LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_MIX_SIMPLE_AND_NOT_SIMPLE)
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include(
-                        "A Lexer cannot be defined using a mix of both Simple and Non-Simple Tokens:")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok1")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok2")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("LazyTok3")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotSimpleTok1")
-                    expect(badLexer.lexerDefinitionErrors[0].message).to.include("NotSimpleTok2")
                 })
 
                 context("custom pattern", () => {
@@ -1014,7 +1130,6 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                                 return result
                             }
 
-
                             let A = createToken({name: "A", pattern: /A/})
                             let B = createToken({name: "B", pattern: <any>extraContextValidator})
                             let WS = createToken({
@@ -1024,23 +1139,27 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                                 }, group: "whitespace"
                             })
 
-
                             let lexerDef:any = [WS, A, B]
-
-                            let myLexer = new Lexer(lexerDef)
+                            let myLexer = new Lexer(lexerDef, lexerConfig)
                             let lexResult = myLexer.tokenize("B A\n B ")
                             expect(lexResult.tokens).to.have.length(3)
-                            expect(lexResult.tokens[0]).to.be.instanceOf(B)
-                            expect(lexResult.tokens[1]).to.be.instanceOf(A)
-                            expect(lexResult.tokens[2]).to.be.instanceOf(B)
+                            expect(tokenMatcher(lexResult.tokens[0], B)).to.be.true
+                            expect(tokenMatcher(lexResult.tokens[1], A)).to.be.true
+                            expect(tokenMatcher(lexResult.tokens[2], B)).to.be.true
 
                             let lastToken = lexResult.tokens[2]
-                            expect(getStartLine(lastToken)).to.equal(2)
-                            expect(getEndLine(lastToken)).to.equal(2)
-                            expect(getStartColumn(lastToken)).to.equal(2)
-                            expect(getEndColumn(lastToken)).to.equal(2)
-                            expect(getStartOffset(lastToken)).to.equal(5)
-                            expect(getEndOffset(lastToken)).to.equal(5)
+                            expect(lastToken.startOffset).to.equal(5)
+
+                            if (testStart) {
+                                expect(lastToken.startLine).to.equal(2)
+                                expect(lastToken.startColumn).to.equal(2)
+                            }
+
+                            if (testFull) {
+                                expect(lastToken.endLine).to.equal(2)
+                                expect(lastToken.endColumn).to.equal(2)
+                                expect(lastToken.endOffset).to.equal(5)
+                            }
                         })
                     }
 
@@ -1088,25 +1207,19 @@ function wrapWithCustom(baseExtendToken) {
     }
 }
 
-// ensures fastMode is not enabled by defining a LONGER_ALT
-function createSlowExtendToken(baseExtendToken) {
-    return function () {
-        let orgTokenType = baseExtendToken.apply(null, arguments)
-        if (orgTokenType.LONGER_ALT === undefined) {
-            orgTokenType.LONGER_ALT = false
-        }
-        return orgTokenType
-    }
-}
+defineLexerSpecs("Regular Tokens Mode", extendToken, tokenStructuredMatcher, false, {positionTracking: "full"})
+defineLexerSpecs("Regular Tokens Mode (custom mode)", wrapWithCustom(extendToken), tokenStructuredMatcher, true, {positionTracking: "full"})
 
-defineLexerSpecs("Regular Tokens Mode", extendToken, tokenInstanceofMatcher)
-defineLexerSpecs("Lazy Tokens Mode", extendLazyToken, tokenInstanceofMatcher)
-defineLexerSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, tokenStructuredMatcher)
+defineLexerSpecs("Regular Tokens Mode - only start", extendToken, tokenStructuredMatcher, false, {positionTracking: "onlyStart"})
+defineLexerSpecs("Regular Tokens Mode (custom mode) - only start",
+    wrapWithCustom(extendToken),
+    tokenStructuredMatcher,
+    true,
+    {positionTracking: "onlyStart"})
 
-defineLexerSpecs("Regular Tokens Mode (custom mode)", wrapWithCustom(extendToken), tokenInstanceofMatcher, true)
-defineLexerSpecs("Lazy Tokens Mode (custom mode)", wrapWithCustom(extendLazyToken), tokenInstanceofMatcher, true)
-defineLexerSpecs("Simple Lazy Tokens Mode (custom mode)", wrapWithCustom(extendSimpleLazyToken), tokenStructuredMatcher, true)
-
-defineLexerSpecs("Regular Tokens Mode (slow mode)", createSlowExtendToken(extendToken), tokenInstanceofMatcher)
-defineLexerSpecs("Lazy Tokens Mode (slow mode)", createSlowExtendToken(extendLazyToken), tokenInstanceofMatcher)
-defineLexerSpecs("SimpleLazy Tokens Mode (slow mode)", createSlowExtendToken(extendSimpleLazyToken), tokenStructuredMatcher)
+defineLexerSpecs("Regular Tokens Mode - onlyOffset", extendToken, tokenStructuredMatcher, false, {positionTracking: "onlyOffset"})
+defineLexerSpecs("Regular Tokens Mode (custom mode)",
+    wrapWithCustom(extendToken),
+    tokenStructuredMatcher,
+    true,
+    {positionTracking: "onlyOffset"})

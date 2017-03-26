@@ -35,37 +35,38 @@ import {
 } from "../../../src/examples/json/parser"
 
 import {expect} from "chai"
+import {createTokenInstance} from "chevrotain"
 
 describe("The jes ast builder", () => {
 
     it("can build a StringNode Ast", () => {
-        let ptInput = PT(new StringLiteral("\"bamba\"", 1, 1, 1, 1, 1))
+        let ptInput = PT(createTokenInstance(StringLiteral, "\"bamba\"", 1, 1, 1, 1, 1, 1))
         let astOutput = buildStringNode(ptInput)
         expect(astOutput).to.be.instanceOf(StringNode)
         expect(astOutput.value).to.equal("bamba")
     })
 
     it("can build a NumberNode Ast", () => {
-        let ptInput = PT(new NumberLiteral("666", 1, 1, 1, 1, 1))
+        let ptInput = PT(createTokenInstance(NumberLiteral, "666", 1, 1, 1, 1, 1, 1))
         let astOutput = buildNumberNode(ptInput)
         expect(astOutput).to.be.instanceOf(NumberNode)
         expect(astOutput.value).to.equal("666")
     })
 
     it("can build a TrueNode Ast", () => {
-        let ptInput = PT(new TrueLiteral("true", 1, 1, 1, 1, 1))
+        let ptInput = PT(createTokenInstance(TrueLiteral, "true", 1, 1, 1, 1, 1, 1))
         let astOutput = buildTrueNode(ptInput)
         expect(astOutput).to.be.instanceOf(TrueNode)
     })
 
     it("can build a FalseNode Ast", () => {
-        let ptInput = PT(new FalseLiteral("false", 1, 1, 1, 1, 1))
+        let ptInput = PT(createTokenInstance(FalseLiteral, "false", 1, 1, 1, 1, 1, 1))
         let astOutput = buildFalseNode(ptInput)
         expect(astOutput).to.be.instanceOf(FalseNode)
     })
 
     it("can build a NullNode Ast", () => {
-        let ptInput = PT(new NullLiteral("null", 1, 1, 1, 1, 1))
+        let ptInput = PT(createTokenInstance(NullLiteral, "null", 1, 1, 1, 1, 1, 1))
         let astOutput = buildNullNode(ptInput)
         expect(astOutput).to.be.instanceOf(NullNode)
     })
@@ -73,9 +74,9 @@ describe("The jes ast builder", () => {
     it("can build an arrayNode Ast", () => {
         let ptInput = PT(ArrayPT,
             [
-                PT(ValuePT, [PT(new NumberLiteral("123", 1, 1, 1, 1, 1))]),
-                PT(ValuePT, [PT(new StringLiteral("\"bisli\"", 1, 1, 1, 1, 1))]),
-                PT(ValuePT, [PT(new NullLiteral("null", 1, 1, 1, 1, 1))]),
+                PT(ValuePT, [PT(createTokenInstance(NumberLiteral, "123", 1, 1, 1, 1, 1, 1))]),
+                PT(ValuePT, [PT(createTokenInstance(StringLiteral, "\"bisli\"", 1, 1, 1, 1, 1, 1))]),
+                PT(ValuePT, [PT(createTokenInstance(NullLiteral, "null", 1, 1, 1, 1, 1, 1))]),
             ]
         )
 
@@ -90,8 +91,8 @@ describe("The jes ast builder", () => {
     it("can build an ObjecItemNode Ast", () => {
         let ptInput = PT(ObjectItemPT,
             [
-                PT(new StringLiteral("\"key\"", 1, 1, 1, 1, 1)),
-                PT(ValuePT, [PT(new NumberLiteral("\"value\"", 1, 1, 1, 1, 1))])
+                PT(createTokenInstance(StringLiteral, "\"key\"", 1, 1, 1, 1, 1, 1)),
+                PT(ValuePT, [PT(createTokenInstance(NumberLiteral, "\"value\"", 1, 1, 1, 1, 1, 1))])
             ]
         )
 
@@ -105,16 +106,16 @@ describe("The jes ast builder", () => {
         let ptInput = PT(ObjectPT,
             [
                 PT(ObjectItemPT, [
-                    PT(new StringLiteral("\"key1\"", 1, 1, 1, 1, 1)),
-                    PT(ValuePT, [PT(new NumberLiteral("\"value\"", 1, 1, 1, 1, 1))])
+                    PT(createTokenInstance(StringLiteral, "\"key1\"", 1, 1, 1, 1, 1, 1)),
+                    PT(ValuePT, [PT(createTokenInstance(NumberLiteral, "\"value\"", 1, 1, 1, 1, 1, 1))])
                 ]),
                 PT(ObjectItemPT, [
-                    PT(new StringLiteral("\"key2\"", 1, 1, 1, 1, 1)),
-                    PT(ValuePT, [PT(new NumberLiteral("\"value\"", 1, 1, 1, 1, 1))])
+                    PT(createTokenInstance(StringLiteral, "\"key2\"", 1, 1, 1, 1, 1, 1)),
+                    PT(ValuePT, [PT(createTokenInstance(NumberLiteral, "\"value\"", 1, 1, 1, 1, 1, 1))])
                 ]),
                 PT(ObjectItemPT, [
-                    PT(new StringLiteral("\"key3\"", 1, 1, 1, 1, 1)),
-                    PT(ValuePT, [PT(new NumberLiteral("\"value\"", 1, 1, 1, 1, 1))])
+                    PT(createTokenInstance(StringLiteral, "\"key3\"", 1, 1, 1, 1, 1, 1)),
+                    PT(ValuePT, [PT(createTokenInstance(NumberLiteral, "\"value\"", 1, 1, 1, 1, 1, 1))])
                 ])
             ]
         )

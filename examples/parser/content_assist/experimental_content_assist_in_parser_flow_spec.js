@@ -2,7 +2,7 @@ var expect = require("chai").expect;
 
 describe('The Content Assist Parser Example using ES6 syntax', function() {
 
-    var getContentAssist
+    var getContentAssist = require('./experimental_content_assist_in_parser_flow').getContentAssist;
 
     var symbolTable = {
         tableNames:  ['employees', 'managers', 'aliens', 'allies'],
@@ -11,9 +11,6 @@ describe('The Content Assist Parser Example using ES6 syntax', function() {
 
     context('works even on invalid inputs!', function() {
         it('missing <FROM> keyword', function() {
-            // hack to avoid loading a module with ES6 syntax on node.js 0.12 (during integration builds)
-            getContentAssist = require('./experimental_content_assist_in_parser_flow').getContentAssist;
-
             // content assist point:                                   ^
             var inputText = 'SELECT name, age, salary managers WHERE ag > 67'; // MISSING the <FROM> between salary and managers
             var suggestions = getContentAssist(inputText, 42, symbolTable);

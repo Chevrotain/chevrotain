@@ -1,14 +1,11 @@
-import {CustomPatternMatcherFunc, getImage, getStartColumn, getStartLine, ISimpleTokenOrIToken, LazyTokenCacheData} from "./tokens_public"
+import {CustomPatternMatcherFunc, getTokenConstructor, IToken, tokenName} from "./tokens_public"
 import {
     analyzeTokenClasses,
-    checkFastMode,
     checkHasCustomTokenPatterns,
-    checkLazyMode,
-    checkSimpleMode,
     cloneEmptyGroups,
-    countLineTerminators,
     DEFAULT_MODE,
-    performRuntimeChecks, SUPPORT_STICKY,
+    performRuntimeChecks,
+    SUPPORT_STICKY,
     validatePatterns
 } from "./lexer"
 import {
@@ -24,18 +21,11 @@ import {
     last,
     map,
     mapValues,
-    merge, NOOP,
+    merge,
+    NOOP,
     reject
 } from "../utils/utils"
-import {
-    augmentTokenClasses,
-    createLazyTokenInstance,
-    createSimpleLazyToken,
-    fillUpLineToOffset,
-    getStartColumnFromLineToOffset,
-    getStartLineFromLineToOffset,
-    LazyTokenCreator
-} from "./tokens"
+import {augmentTokenClasses} from "./tokens"
 
 export interface TokenConstructor extends Function {
     GROUP?:string
@@ -49,12 +39,12 @@ export interface TokenConstructor extends Function {
     tokenType?:number
     extendingTokenTypes?:number[]
 
-    new(...args:any[]):ISimpleTokenOrIToken
+    new(...args:any[]):IToken
 }
 
 export interface ILexingResult {
-    tokens:ISimpleTokenOrIToken[]
-    groups:{ [groupName:string]:ISimpleTokenOrIToken[] }
+    tokens:IToken[]
+    groups:{ [groupName:string]:IToken[] }
     errors:ILexingError[]
 }
 
@@ -70,8 +60,6 @@ export enum LexerDefinitionErrorType {
     MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY,
     MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
     LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
-    LEXER_DEFINITION_CANNOT_MIX_LAZY_AND_NOT_LAZY,
-    LEXER_DEFINITION_CANNOT_MIX_SIMPLE_AND_NOT_SIMPLE,
     SOI_ANCHOR_FOUND
 }
 
@@ -82,6 +70,7 @@ export interface ILexerDefinitionError {
 }
 
 export interface ILexingError {
+    offset:number
     line:number
     column:number
     length:number
@@ -100,6 +89,46 @@ export interface IRegExpExec {
     exec:CustomPatternMatcherFunc
 }
 
+export interface ILexerConfig {
+    /**
+     * An optional flag indicating that lexer definition errors
+     * should not automatically cause an error to be raised.
+     * This can be useful when wishing to indicate lexer errors in another manner
+     * than simply throwing an error (for example in an online playground).
+     */
+    deferDefinitionErrorsHandling?:boolean
+
+    /**
+     * "full" location information means all six combinations of /(end|start)(Line|Column|Offset)/ properties.
+     * "onlyStart" means that only startLine, startColumn and startOffset will be tracked
+     * "onlyOffset" means that only the startOffset will be tracked.
+     *
+     * The less position tracking the faster the Lexer will be and the less memory used.
+     * However the difference is not large (~10% On V8), thus reduced location tracking options should only be used
+     * in edge cases where every last ounce of performance is needed.
+     */
+    positionTracking?:"full" | "onlyStart" | "onlyOffset"
+
+    /**
+     * Run the Lexer in debug mode.
+     * Features:
+     * - The output tokens will contain their tokenConstructor name in a human readable manner.
+     *   This information is always available by using the <getTokenConstructor> function on the official API.
+     *   However, this is less convenient then a direct property when inspecting values in a debugger.
+     *
+     * DO NOT ENABLE THIS IN PRODUCTION has a large performance penalty.
+     */
+    debug?:boolean
+}
+
+const DEFAULT_LEXER_CONFIG:ILexerConfig = {
+    deferDefinitionErrorsHandling: false,
+    positionTracking:              "full",
+    debug:                         false
+}
+
+Object.freeze(DEFAULT_LEXER_CONFIG)
+
 export class Lexer {
 
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
@@ -108,23 +137,22 @@ export class Lexer {
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors:ILexerDefinitionError[] = []
 
-    protected isLazyTokenMode
-    protected isSimpleTokenMode
-    // FastMode can be enabled when no Lexer Modes, no LONGER_ALTs have been used and we are using Lazy Tokens.
-    protected isFastMode:boolean
     protected modes:string[] = []
     protected defaultMode:string
     protected allPatterns:{ [modeName:string]:IRegExpExec[] } = {}
-    protected patternIdxToClass:{ [modeName:string]:Function[] } = {}
+    protected patternIdxToType:{ [modeName:string]:number[] } = {}
     protected patternIdxToGroup:{ [modeName:string]:string[] } = {}
     protected patternIdxToLongerAltIdx:{ [modeName:string]:number[] } = {}
     protected patternIdxToCanLineTerminator:{ [modeName:string]:boolean[] } = {}
     protected patternIdxToIsCustom:{ [modeName:string]:boolean[] } = {}
     protected patternIdxToPushMode:{ [modeName:string]:string[] } = {}
     protected patternIdxToPopMode:{ [modeName:string]:boolean[] } = {}
-    protected emptyGroups:{ [groupName:string]:ISimpleTokenOrIToken } = {}
+    protected emptyGroups:{ [groupName:string]:IToken } = {}
     protected hasCustomTokens:boolean
 
+    private config:ILexerConfig = undefined
+    private trackStartLines:boolean = true
+    private trackEndLines:boolean = true
 
     /**
      * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
@@ -211,15 +239,26 @@ export class Lexer {
      *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.
      *
      *
-     * @param {boolean} [deferDefinitionErrorsHandling=false] -
-     *                  An optional flag indicating that lexer definition errors
-     *                  should not automatically cause an error to be raised.
-     *                  This can be useful when wishing to indicate lexer errors in another manner
-     *                  than simply throwing an error (for example in an online playground).
+     * @param {ILexerConfig} [config=DEFAULT_LEXER_CONFIG] -
+     *                  The Lexer's configuration @see {ILexerConfig} for details.
      */
     constructor(protected lexerDefinition:SingleModeLexerDefinition | IMultiModeLexerDefinition,
-                deferDefinitionErrorsHandling:boolean = false) {
+                config:ILexerConfig = DEFAULT_LEXER_CONFIG) {
 
+        if (typeof config === "boolean") {
+            throw Error("The second argument to the Lexer constructor is now an ILexerConfig Object.\n" +
+                "a boolean 2nd argument is no longer supported")
+        }
+        this.config = merge(DEFAULT_LEXER_CONFIG, config)
+
+        if (this.config.debug === true) {
+            console.log("Running the Lexer in Debug Mode, DO NOT ENABLE THIS IN PRODUCTIVE ENV!")
+        }
+
+        this.trackStartLines = /full|onlyStart/i.test(this.config.positionTracking)
+        this.trackEndLines = /full/i.test(this.config.positionTracking)
+
+        let hasOnlySingleMode = true
         let actualDefinition:IMultiModeLexerDefinition
 
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
@@ -230,6 +269,7 @@ export class Lexer {
         }
         // no conversion needed, input should already be a IMultiModeLexerDefinition
         else {
+            hasOnlySingleMode = false
             actualDefinition = cloneObj(<IMultiModeLexerDefinition>lexerDefinition)
         }
 
@@ -258,7 +298,7 @@ export class Lexer {
                 augmentTokenClasses(currModDef)
                 let currAnalyzeResult = analyzeTokenClasses(currModDef)
                 this.allPatterns[currModName] = currAnalyzeResult.allPatterns
-                this.patternIdxToClass[currModName] = currAnalyzeResult.patternIdxToClass
+                this.patternIdxToType[currModName] = currAnalyzeResult.patternIdxToType
                 this.patternIdxToGroup[currModName] = currAnalyzeResult.patternIdxToGroup
                 this.patternIdxToLongerAltIdx[currModName] = currAnalyzeResult.patternIdxToLongerAltIdx
                 this.patternIdxToCanLineTerminator[currModName] = currAnalyzeResult.patternIdxToCanLineTerminator
@@ -272,20 +312,9 @@ export class Lexer {
         this.defaultMode = actualDefinition.defaultMode
         let allTokensTypes:any = flatten(mapValues(actualDefinition.modes, (currModDef) => currModDef))
 
-        // Lazy Mode handling
-        let lazyCheckResult = checkLazyMode(allTokensTypes)
-        this.isLazyTokenMode = lazyCheckResult.isLazy
-        this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(lazyCheckResult.errors)
-
-        // Simple Mode handling
-        let simpleCheckResult = checkSimpleMode(allTokensTypes)
-        this.isSimpleTokenMode = simpleCheckResult.isSimple
-        this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(simpleCheckResult.errors)
-
-        this.isFastMode = checkFastMode(allTokensTypes)
         this.hasCustomTokens = checkHasCustomTokenPatterns(allTokensTypes)
 
-        if (!isEmpty(this.lexerDefinitionErrors) && !deferDefinitionErrorsHandling) {
+        if (!isEmpty(this.lexerDefinitionErrors) && !this.config.deferDefinitionErrorsHandling) {
             let allErrMessages = map(this.lexerDefinitionErrors, (error) => {
                 return error.message
             })
@@ -298,6 +327,35 @@ export class Lexer {
         }
         else {
             this.updateLastIndex = NOOP
+        }
+
+        if (hasOnlySingleMode) {
+            this.handleModes = NOOP
+        }
+
+        if (!this.hasCustomTokens) {
+            this.matchToPattern = this.matchPatternNoCustom
+        }
+
+        if (this.trackStartLines === false) {
+            this.computeNewColumn = IDENTITY
+        }
+
+        if (this.trackEndLines === false) {
+            this.updateTokenEndLineColumnLocation = NOOP
+        }
+
+        if (/full/i.test(this.config.positionTracking)) {
+            this.createTokenInstance = this.createFullToken
+        }
+        else if (/onlyStart/i.test(this.config.positionTracking)) {
+            this.createTokenInstance = this.createStartOnlyToken
+        }
+        else if (/onlyOffset/i.test(this.config.positionTracking)) {
+            this.createTokenInstance = this.createOffsetOnlyToken
+        }
+        else {
+            throw Error(`Invalid <positionTracking> config option: "${this.config.positionTracking}"`)
         }
     }
 
@@ -323,50 +381,36 @@ export class Lexer {
             throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString)
         }
 
-        if (this.isLazyTokenMode) {
-            if (this.isFastMode) {
-                if (this.isSimpleTokenMode) {
-                    return this.tokenizeInternalLazyFast(text, initialMode, createSimpleLazyToken)
-                }
-                else {
-                    return this.tokenizeInternalLazyFast(text, initialMode, createLazyTokenInstance)
-                }
-            }
-            else {
-                if (this.isSimpleTokenMode) {
-                    return this.tokenizeInternalLazy(text, initialMode, createSimpleLazyToken)
-                }
-                else {
-                    return this.tokenizeInternalLazy(text, initialMode, createLazyTokenInstance)
-                }
-            }
+        let lexResult = this.tokenizeInternal(text, initialMode)
 
+        if (this.config.debug === true) {
+            this.addTokenTypeNamesToResult(lexResult)
         }
-        else {
-            return this.tokenizeInternal(text, initialMode)
-        }
+
+        return lexResult
     }
 
     // There is quite a bit of duplication between this and "tokenizeInternalLazy"
     // This is intentional due to performance considerations.
     private tokenizeInternal(text:string, initialMode:string):ILexingResult {
-        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength,
-            fixForEndingInLT, c, droppedChar, lastLTIdx, msg, lastCharIsLT
+        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokType, newToken, errLength,
+            droppedChar, lastLTIdx, msg
         let orgText = text
         let orgLength = orgText.length
         let offset = 0
         let matchedTokens = []
         let errors:ILexingError[] = []
-        let line = 1
-        let column = 1
+        let line = this.trackStartLines ? 1 : undefined
+        let column = this.trackStartLines ? 1 : undefined
         let groups:any = cloneEmptyGroups(this.emptyGroups)
+        let trackLines = this.trackStartLines
 
         let currModePatterns = []
         let currModePatternsLength = 0
         let currModePatternIdxToLongerAltIdx = []
         let currModePatternIdxToIsCustom = []
         let currModePatternIdxToGroup = []
-        let currModePatternIdxToClass = []
+        let currModePatternIdxToType = []
         let currModePatternIdxToCanLineTerminator = []
         let patternIdxToPushMode = []
         let patternIdxToPopMode = []
@@ -377,11 +421,12 @@ export class Lexer {
             if (modeStack.length === 1) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-                let msg = `Unable to pop Lexer Mode after encountering Token ->${getImage(popToken)}<- The Mode Stack is empty`
+                let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
                 errors.push({
-                    line:    getStartLine(popToken),
-                    column:  getStartColumn(popToken),
-                    length:  getImage(popToken).length,
+                    offset:  popToken.startOffset,
+                    line:    popToken.startLine !== undefined ? popToken.startLine : undefined,
+                    column:  popToken.startColumn !== undefined ? popToken.startColumn : undefined,
+                    length:  popToken.image.length,
                     message: msg
                 })
             }
@@ -393,7 +438,7 @@ export class Lexer {
                 currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
                 currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
                 currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
-                currModePatternIdxToClass = this.patternIdxToClass[newMode]
+                currModePatternIdxToType = this.patternIdxToType[newMode]
                 currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
                 patternIdxToPushMode = this.patternIdxToPushMode[newMode]
                 patternIdxToPopMode = this.patternIdxToPopMode[newMode]
@@ -407,7 +452,7 @@ export class Lexer {
             currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
             currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
             currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
-            currModePatternIdxToClass = this.patternIdxToClass[newMode]
+            currModePatternIdxToType = this.patternIdxToType[newMode]
             currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
             patternIdxToPushMode = this.patternIdxToPushMode[newMode]
             patternIdxToPopMode = this.patternIdxToPopMode[newMode]
@@ -417,32 +462,26 @@ export class Lexer {
         // seem to matter performance wise.
         push_mode.call(this, initialMode)
 
-        let hasCustomTokens = this.hasCustomTokens
         while (offset < orgLength) {
             match = null
             for (i = 0; i < currModePatternsLength; i++) {
                 let currPattern = currModePatterns[i]
-                // quick check to avoid performance hit in the common case of no custom patterns
-                if (hasCustomTokens &&
-                    // slower check to optimize the less common case of custom patterns
-                    currModePatternIdxToIsCustom[i] === true) {
-                    match = currPattern.exec(orgText, offset, matchedTokens, groups)
-                } else {
-                    this.updateLastIndex(currPattern, offset)
-                    match = currPattern.exec(text)
-                }
+                match = this.matchToPattern(currPattern, offset, text, currModePatternIdxToIsCustom, i, orgText, matchedTokens, groups)
                 if (match !== null) {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
                     longerAltIdx = currModePatternIdxToLongerAltIdx[i]
                     if (longerAltIdx !== undefined) {
                         let longerAltPattern = currModePatterns[longerAltIdx]
-                        if (hasCustomTokens) {
-                            matchAlt = longerAltPattern.exec(text, matchedTokens, groups)
-                        } else {
-                            this.updateLastIndex(longerAltPattern, offset)
-                            matchAlt = longerAltPattern.exec(text)
-                        }
+                        matchAlt = this.matchToPattern(longerAltPattern,
+                            offset,
+                            text,
+                            currModePatternIdxToIsCustom,
+                            i,
+                            orgText,
+                            matchedTokens,
+                            groups)
+
                         if (matchAlt && matchAlt[0].length > match[0].length) {
                             match = matchAlt
                             i = longerAltIdx
@@ -457,8 +496,11 @@ export class Lexer {
                 imageLength = matchedImage.length
                 group = currModePatternIdxToGroup[i]
                 if (group !== undefined) {
-                    tokClass = currModePatternIdxToClass[i]
-                    newToken = new tokClass(matchedImage, offset, line, column)
+                    tokType = currModePatternIdxToType[i]
+                    // TODO: "offset + imageLength" and the new column may be computed twice in case of "full" location information inside
+                    // createFullToken method
+                    newToken = this.createTokenInstance(matchedImage, offset, tokType, line, column, imageLength)
+
                     if (group === false) {
                         matchedTokens.push(newToken)
                     }
@@ -468,57 +510,41 @@ export class Lexer {
                 }
                 text = this.chopInput(text, imageLength)
                 offset = offset + imageLength
-                column = column + imageLength // TODO: with newlines the column may be assigned twice
 
-                if (currModePatternIdxToCanLineTerminator[i]) {
-                    let lineTerminatorsInMatch = countLineTerminators(matchedImage)
-                    // TODO: identify edge case of one token ending in '\r' and another one starting with '\n'
-                    if (lineTerminatorsInMatch !== 0) {
-                        line = line + lineTerminatorsInMatch
+                // TODO: with newlines the column may be assigned twice
+                column = this.computeNewColumn(column, imageLength)
 
-                        lastLTIdx = imageLength - 1
-                        while (lastLTIdx >= 0) {
-                            c = matchedImage.charCodeAt(lastLTIdx)
-                            // scan in reverse to find last lineTerminator in image
-                            if (c === 13 || c === 10) { // '\r' or '\n'
-                                break
-                            }
-                            lastLTIdx--
+                if (trackLines === true && currModePatternIdxToCanLineTerminator[i] === true) {
+                    let numOfLTsInMatch = 0
+                    let imageOffset = 0
+                    let imageLengthMinusOne = imageLength - 1
+
+                    while (imageOffset < matchedImage.length) {
+                        let c = matchedImage.charCodeAt(imageOffset)
+                        if (c === 10) { // "\n"
+                            numOfLTsInMatch++
+                            lastLTIdx = imageOffset
                         }
+                        else if (c === 13) { // \r
+                            if (imageOffset !== imageLengthMinusOne &&
+                                matchedImage.charCodeAt(imageOffset + 1) === 10) { // "\n"
+                            }
+                            else {
+                                numOfLTsInMatch++
+                                lastLTIdx = imageOffset
+                            }
+                        }
+                        imageOffset++
+                    }
+
+                    if (numOfLTsInMatch !== 0) {
+                        line = line + numOfLTsInMatch
                         column = imageLength - lastLTIdx
-
-                        if (group !== undefined) { // a none skipped multi line Token, need to update endLine/endColumn
-                            lastCharIsLT = lastLTIdx === imageLength - 1
-                            fixForEndingInLT = lastCharIsLT ?
-                                -1 :
-                                0
-
-                            if (!(lineTerminatorsInMatch === 1 && lastCharIsLT)) {
-                                // if a token ends in a LT that last LT only affects the line numbering of following Tokens
-                                newToken.endLine = line + fixForEndingInLT
-                                // the last LT in a token does not affect the endColumn either as the [columnStart ... columnEnd)
-                                // inclusive to exclusive range.
-                                newToken.endColumn = column - 1 + -fixForEndingInLT
-                            }
-                            // else single LT in the last character of a token, no need to modify the endLine/EndColumn
-                        }
+                        this.updateTokenEndLineColumnLocation(newToken, group, lastLTIdx, numOfLTsInMatch, line, column, imageLength)
                     }
                 }
-
-                // mode handling, must pop before pushing if a Token both acts as both
-                // otherwise it would be a NO-OP
-                if (patternIdxToPopMode[i]) {
-                    // need to save the PUSH_MODE property as if the mode is popped
-                    // patternIdxToPopMode is updated to reflect the new mode after popping the stack
-                    let pushMode = patternIdxToPushMode[i]
-                    pop_mode(newToken)
-                    if (pushMode) {
-                        push_mode.call(this, pushMode)
-                    }
-                }
-                else if (patternIdxToPushMode[i]) {
-                    push_mode.call(this, patternIdxToPushMode[i])
-                }
+                // will be NOOP if no modes present
+                this.handleModes(i, patternIdxToPopMode, patternIdxToPushMode, pop_mode, push_mode, newToken)
             }
             else { // error recovery, drop characters until we identify a valid token's start point
                 let errorStartOffset = offset
@@ -547,14 +573,14 @@ export class Lexer {
                     offset++
                     for (j = 0; j < currModePatterns.length; j++) {
                         let currPattern = currModePatterns[j]
-                        if (hasCustomTokens &&
-                            // slower check to optimize the less common case of custom patterns
-                            currModePatternIdxToIsCustom[j] === true) {
-                            foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups)
-                        } else {
-                            this.updateLastIndex(currPattern, offset)
-                            foundResyncPoint = currPattern.exec(text)
-                        }
+                        foundResyncPoint = this.matchToPattern(currPattern,
+                            offset,
+                            text,
+                            currModePatternIdxToIsCustom,
+                            j,
+                            orgText,
+                            matchedTokens,
+                            groups)
                         if (foundResyncPoint !== null) {
                             break
                         }
@@ -565,301 +591,41 @@ export class Lexer {
                 // at this point we either re-synced or reached the end of the input text
                 msg = `unexpected character: ->${orgText.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
                     ` skipped ${offset - errorStartOffset} characters.`
-                errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
+                errors.push({offset: errorStartOffset, line: errorLine, column: errorColumn, length: errLength, message: msg})
             }
         }
 
         return {tokens: matchedTokens, groups: groups, errors: errors}
     }
 
-    private tokenizeInternalLazy(text:string, initialMode:string, tokenCreator:LazyTokenCreator):ILexingResult {
-        let match, i, j, matchAlt, longerAltIdx, matchedImage, imageLength, group, tokClass, newToken, errLength, droppedChar, msg
-
-        let orgText = text
-        let orgLength = text.length
-        let offset = 0
-        let matchedTokens = []
-        let errors:ILexingError[] = []
-        let groups:any = cloneEmptyGroups(this.emptyGroups)
-
-        let currModePatterns = []
-        let currModePatternsLength = 0
-        let currModePatternIdxToLongerAltIdx = []
-        let currModePatternIdxToIsCustom = []
-        let currModePatternIdxToGroup = []
-        let currModePatternIdxToClass = []
-        let patternIdxToPushMode = []
-        let patternIdxToPopMode = []
-
-        let lazyCacheData:LazyTokenCacheData = {
-            orgText:      text,
-            lineToOffset: []
-        }
-
-        let modeStack = []
-        let pop_mode = (popToken) => {
-            // TODO: perhaps avoid this error in the edge case there is no more input?
-            if (modeStack.length === 1) {
-                // if we try to pop the last mode there lexer will no longer have ANY mode.
-                // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-                let msg = `Unable to pop Lexer Mode after encountering Token ->${getImage(popToken)}<- The Mode Stack is empty`
-                errors.push({
-                    line:    getStartLine(popToken),
-                    column:  getStartColumn(popToken),
-                    length:  getImage(popToken).length,
-                    message: msg
-                })
-            }
-            else {
-                modeStack.pop()
-                let newMode = last(modeStack)
-                currModePatterns = this.allPatterns[newMode]
-                currModePatternsLength = currModePatterns.length
-                currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
-                currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
-                currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
-                currModePatternIdxToClass = this.patternIdxToClass[newMode]
-                patternIdxToPushMode = this.patternIdxToPushMode[newMode]
-                patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+    private handleModes(i, patternIdxToPopMode, patternIdxToPushMode, pop_mode, push_mode, newToken) {
+        if (patternIdxToPopMode[i] === true) {
+            // need to save the PUSH_MODE property as if the mode is popped
+            // patternIdxToPopMode is updated to reflect the new mode after popping the stack
+            let pushMode = patternIdxToPushMode[i]
+            pop_mode(newToken)
+            if (pushMode !== undefined) {
+                push_mode.call(this, pushMode)
             }
         }
-
-        function push_mode(newMode) {
-            modeStack.push(newMode)
-            currModePatterns = this.allPatterns[newMode]
-            currModePatternsLength = currModePatterns.length
-            currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
-            currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
-            currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
-            currModePatternIdxToClass = this.patternIdxToClass[newMode]
-            patternIdxToPushMode = this.patternIdxToPushMode[newMode]
-            patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+        else if (patternIdxToPushMode[i] !== undefined) {
+            push_mode.call(this, patternIdxToPushMode[i])
         }
-
-        // this pattern seems to avoid a V8 de-optimization, although that de-optimization does not
-        // seem to matter performance wise.
-        push_mode.call(this, initialMode)
-
-        let hasCustomTokens = this.hasCustomTokens
-        while (offset < orgLength) {
-            match = null
-            for (i = 0; i < currModePatternsLength; i++) {
-                let currPattern = currModePatterns[i]
-                // quick check to avoid performance hit in the common case of no custom patterns
-                if (hasCustomTokens &&
-                    // slower check to optimize the less common case of custom patterns
-                    currModePatternIdxToIsCustom[i] === true) {
-                    match = currPattern.exec(orgText, offset, matchedTokens, groups)
-                } else {
-                    this.updateLastIndex(currPattern, offset)
-                    match = currPattern.exec(text)
-                }
-                if (match !== null) {
-                    // even though this pattern matched we must try a another longer alternative.
-                    // this can be used to prioritize keywords over identifiers
-                    longerAltIdx = currModePatternIdxToLongerAltIdx[i]
-                    if (longerAltIdx !== undefined) {
-                        let longerPattern = currModePatterns[longerAltIdx]
-                        if (hasCustomTokens &&
-                            // slower check to optimize the less common case of custom patterns
-                            currModePatternIdxToIsCustom[longerAltIdx] === true) {
-                            matchAlt = longerPattern.exec(orgText, offset, matchedTokens, groups)
-                        } else {
-                            this.updateLastIndex(longerPattern, offset)
-                            matchAlt = longerPattern.exec(text)
-                        }
-                        if (matchAlt && matchAlt[0].length > match[0].length) {
-                            match = matchAlt
-                            i = longerAltIdx
-                        }
-                    }
-                    break
-                }
-            }
-            // successful match
-            if (match !== null) {
-                matchedImage = match[0]
-                imageLength = matchedImage.length
-                group = currModePatternIdxToGroup[i]
-                if (group !== undefined) {
-                    tokClass = currModePatternIdxToClass[i]
-                    // the end offset is non inclusive.
-                    newToken = tokenCreator(offset, offset + imageLength - 1, tokClass, lazyCacheData)
-                    if (group === false) {
-                        matchedTokens.push(newToken)
-                    }
-                    else {
-                        groups[group].push(newToken)
-                    }
-                }
-                text = this.chopInput(text, imageLength)
-                offset = offset + imageLength
-
-                // mode handling, must pop before pushing if a Token both acts as both
-                // otherwise it would be a NO-OP
-                if (patternIdxToPopMode[i]) {
-                    // need to save the PUSH_MODE property as if the mode is popped
-                    // patternIdxToPopMode is updated to reflect the new mode after popping the stack
-                    let pushMode = patternIdxToPushMode[i]
-                    pop_mode(newToken)
-                    if (pushMode) {
-                        push_mode.call(this, pushMode)
-                    }
-                }
-                else if (patternIdxToPushMode[i]) {
-                    push_mode.call(this, patternIdxToPushMode[i])
-                }
-            }
-            else { // error recovery, drop characters until we identify a valid token's start point
-                let errorStartOffset = offset
-                let foundResyncPoint = false
-                while (!foundResyncPoint && offset < orgLength) {
-                    // drop chars until we succeed in matching something
-                    droppedChar = orgText.charCodeAt(offset)
-                    text = this.chopInput(text, 1)
-                    offset++
-                    for (j = 0; j < currModePatterns.length; j++) {
-                        let currPattern = currModePatterns[j]
-                        if (hasCustomTokens &&
-                            // slower check to optimize the less common case of custom patterns
-                            currModePatternIdxToIsCustom[j] === true) {
-                            foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups)
-                        } else {
-                            this.updateLastIndex(currPattern, offset)
-                            foundResyncPoint = currPattern.exec(text)
-                        }
-                        if (foundResyncPoint !== null) {
-                            break
-                        }
-                    }
-                }
-
-                errLength = offset - errorStartOffset
-                // at this point we either re-synced or reached the end of the input text
-                msg = `unexpected character: ->${orgText.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
-                    ` skipped ${offset - errorStartOffset} characters.`
-
-                if (isEmpty(lazyCacheData.lineToOffset)) {
-                    fillUpLineToOffset(lazyCacheData.lineToOffset, lazyCacheData.orgText)
-                }
-
-                let errorLine = getStartLineFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
-                let errorColumn = getStartColumnFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
-
-                errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
-            }
-        }
-
-        return {tokens: matchedTokens, groups: groups, errors: errors}
     }
 
-
-    // There is quite a bit of duplication between this and "tokenizeInternalLazy"
-    // This is intentional due to performance considerations.
-    private tokenizeInternalLazyFast(text:string, initialMode:string, tokenCreator:LazyTokenCreator):ILexingResult {
-        let match, i, j, matchedImage, imageLength, group, tokClass, newToken, errLength, droppedChar, msg, newOffset
-
-        let orgText = text
-        let orgLength = orgText.length
-        let orgInput = text
-        let offset = 0
-        let matchedTokens = []
-        let errors:ILexingError[] = []
-        let groups:any = cloneEmptyGroups(this.emptyGroups)
-
-        let lazyCacheData:LazyTokenCacheData = {
-            orgText:      text,
-            lineToOffset: []
+    private matchToPattern(currPattern, offset, text, currModePatternIdxToIsCustom, i, orgText, matchedTokens, groups) {
+        if (currModePatternIdxToIsCustom[i] === true) {
+            return currPattern.exec(orgText, offset, matchedTokens, groups)
+        } else {
+            this.updateLastIndex(currPattern, offset)
+            return currPattern.exec(text)
         }
-
-        let currModePatterns = this.allPatterns[initialMode]
-        let currModePatternsLength = currModePatterns.length
-        let currModePatternIdxToGroup = this.patternIdxToGroup[initialMode]
-        let currModePatternIdxToClass = this.patternIdxToClass[initialMode]
-        let currModePatternIdxToIsCustom = this.patternIdxToIsCustom[initialMode]
-        let hasCustomTokens = this.hasCustomTokens
-
-        while (offset < orgLength) {
-            match = null
-            for (i = 0; i < currModePatternsLength; i++) {
-                let currPattern = currModePatterns[i]
-                // quick check to avoid performance hit in the common case of no custom patterns
-                if (hasCustomTokens &&
-                    // slower check to optimize the less common case of custom patterns
-                    currModePatternIdxToIsCustom[i] === true) {
-                    match = currModePatterns[i].exec(orgText, offset, matchedTokens, groups)
-                } else {
-                    this.updateLastIndex(currPattern, offset)
-                    match = currPattern.exec(text)
-                }
-                if (match !== null) {
-                    break
-                }
-            }
-            // successful match
-            if (match !== null) {
-                matchedImage = match[0]
-                imageLength = matchedImage.length
-                group = currModePatternIdxToGroup[i]
-                newOffset = offset + imageLength
-                if (group !== undefined) {
-                    tokClass = currModePatternIdxToClass[i]
-                    // the end offset is non inclusive.
-                    newToken = tokenCreator(offset, newOffset - 1, tokClass, lazyCacheData)
-                    if (group === false) {
-                        matchedTokens.push(newToken)
-                    }
-                    else {
-                        groups[group].push(newToken)
-                    }
-                }
-                text = this.chopInput(text, imageLength)
-                offset = newOffset
-            }
-            else {
-                // error recovery, drop characters until we identify a valid token's start point
-                let errorStartOffset = offset
-                let foundResyncPoint:any = false
-                while (!foundResyncPoint && offset < orgLength) {
-                    // drop chars until we succeed in matching something
-                    droppedChar = orgText.charCodeAt(offset)
-                    text = this.chopInput(text, 1)
-                    offset++
-                    for (j = 0; j < currModePatterns.length; j++) {
-                        let currPattern = currModePatterns[j]
-                        if (hasCustomTokens &&
-                            // slower check to optimize the less common case of custom patterns
-                            currModePatternIdxToIsCustom[j] === true) {
-                            foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups)
-                        } else {
-                            this.updateLastIndex(currPattern, offset)
-                            foundResyncPoint = currPattern.exec(text)
-                        }
-                        if (foundResyncPoint !== null) {
-                            break
-                        }
-                    }
-                }
-
-                errLength = offset - errorStartOffset
-                // at this point we either re-synced or reached the end of the input text
-                msg = `unexpected character: ->${orgInput.charAt(errorStartOffset)}<- at offset: ${errorStartOffset},` +
-                    ` skipped ${offset - errorStartOffset} characters.`
-
-                if (isEmpty(lazyCacheData.lineToOffset)) {
-                    fillUpLineToOffset(lazyCacheData.lineToOffset, lazyCacheData.orgText)
-                }
-
-                let errorLine = getStartLineFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
-                let errorColumn = getStartColumnFromLineToOffset(errorStartOffset, lazyCacheData.lineToOffset)
-
-                errors.push({line: errorLine, column: errorColumn, length: errLength, message: msg})
-            }
-        }
-
-        return {tokens: matchedTokens, groups: groups, errors: errors}
     }
 
+    private matchPatternNoCustom(currPattern, offset, text) {
+        this.updateLastIndex(currPattern, offset)
+        return currPattern.exec(text)
+    }
 
     private chopInput(text, length):string {
         return text.substring(length)
@@ -869,4 +635,75 @@ export class Lexer {
         regExp.lastIndex = newLastIndex
     }
 
+    // TODO: decrease this under 600 characters? inspect stripping comments option in TSC compiler
+    private updateTokenEndLineColumnLocation(newToken, group, lastLTIdx, numOfLTsInMatch, line, column, imageLength):void {
+        let lastCharIsLT, fixForEndingInLT
+        if (group !== undefined) { // a none skipped multi line Token, need to update endLine/endColumn
+            lastCharIsLT = lastLTIdx === imageLength - 1
+            fixForEndingInLT = lastCharIsLT ?
+                -1 :
+                0
+            if (!(numOfLTsInMatch === 1 && lastCharIsLT === true)) {
+                // if a token ends in a LT that last LT only affects the line numbering of following Tokens
+                newToken.endLine = line + fixForEndingInLT
+                // the last LT in a token does not affect the endColumn either as the [columnStart ... columnEnd)
+                // inclusive to exclusive range.
+                newToken.endColumn = column - 1 + -fixForEndingInLT
+            }
+            // else single LT in the last character of a token, no need to modify the endLine/EndColumn
+        }
+    }
+
+    private computeNewColumn(oldColumn, imageLength) {
+        return oldColumn + imageLength
+    }
+
+    // Place holder, will be replaced by the correct variant according to the locationTracking option at runtime.
+    /* istanbul ignore next - place holder */
+    private createTokenInstance(...args:any[]):IToken {
+        return null
+    }
+
+    private createOffsetOnlyToken(image, startOffset, tokenType) {
+        return {
+            image,
+            startOffset,
+            tokenType
+        }
+    }
+
+    private createStartOnlyToken(image, startOffset, tokenType, startLine, startColumn) {
+        return {
+            image,
+            startOffset,
+            startLine,
+            startColumn,
+            tokenType
+        }
+    }
+
+    private createFullToken(image, startOffset, tokenType, startLine, startColumn, imageLength) {
+        return {
+            image,
+            startOffset,
+            endOffset: startOffset + imageLength - 1,
+            startLine,
+            endLine:   startLine,
+            startColumn,
+            endColumn: startColumn + imageLength - 1,
+            tokenType
+        }
+    }
+
+    private addTokenTypeNamesToResult(lexResult:ILexingResult):void {
+        forEach(lexResult.tokens, (currToken) => {
+            currToken.tokenClassName = tokenName(getTokenConstructor(currToken))
+        })
+
+        forEach(lexResult.groups, (currGroup) => {
+            forEach(currGroup, (currToken) => {
+                currToken.tokenClassName = tokenName(getTokenConstructor(currToken))
+            })
+        })
+    }
 }

@@ -26,7 +26,7 @@ function MAKE_PATTERN(def, flags) {
 // array of cssTokens
 var cssTokens = [];
 var extendToken = function() {
-    var newToken = chevrotain.extendSimpleLazyToken.apply(null, arguments);
+    var newToken = chevrotain.extendToken.apply(null, arguments);
     cssTokens.push(newToken);
     return newToken;
 }
@@ -142,7 +142,7 @@ var Percentage = extendToken('Percentage', MAKE_PATTERN('{{num}}%', 'i'))
 var Num = extendToken('Num', MAKE_PATTERN('{{num}}'));
 
 
-var CssLexer = new Lexer(cssTokens);
+var CssLexer = new Lexer(cssTokens, {positionTracking:"onlyOffset"});
 
 // ----------------- parser -----------------
 

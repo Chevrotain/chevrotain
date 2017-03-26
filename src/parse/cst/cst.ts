@@ -1,4 +1,4 @@
-import {ISimpleTokenOrIToken, tokenName} from "../../scan/tokens_public"
+import {IToken, tokenName} from "../../scan/tokens_public"
 import {CstChildrenDictionary, CstNode} from "./cst_public"
 import {gast} from "../grammar/gast_public"
 import {cloneObj, drop, forEach, has, isEmpty, isUndefined} from "../../utils/utils"
@@ -21,8 +21,8 @@ import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
 import IProductionWithOccurrence = gast.IProductionWithOccurrence
 import AbstractProduction = gast.AbstractProduction
 
-export function addTerminalToCst(node:CstNode, token:ISimpleTokenOrIToken, tokenTypeName:string):void {
-    (node.children[tokenTypeName] as Array<ISimpleTokenOrIToken>).push(token)
+export function addTerminalToCst(node:CstNode, token:IToken, tokenTypeName:string):void {
+    (node.children[tokenTypeName] as Array<IToken>).push(token)
 }
 
 export function addNoneTerminalToCst(node:CstNode, ruleName:string, ruleResult:any):void {

@@ -6,7 +6,7 @@
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
 import {Parser} from "../../../../src/parse/parser_public"
-import {Token, VirtualToken, IToken} from "../../../../src/scan/tokens_public"
+import {Token} from "../../../../src/scan/tokens_public"
 import * as allTokens from "./sql_recovery_tokens"
 import {
     INVALID_DDL,
@@ -34,9 +34,12 @@ import {
     RParenTok,
     COMMAS,
     StringTok,
-    IntTok
+    IntTok, VirtualToken
 } from "./sql_recovery_tokens"
 import {ParseTree} from "../../parse_tree"
+import {augmentTokenClasses} from "../../../../src/scan/tokens"
+
+augmentTokenClasses(<any>allTokens)
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends Parser {

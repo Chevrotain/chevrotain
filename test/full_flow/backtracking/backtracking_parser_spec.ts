@@ -1,37 +1,48 @@
 import {
-    IdentTok,
+    BackTrackingParser,
+    ColonTok,
+    DefaultTok,
     DotTok,
     ElementTok,
     EqualsTok,
+    IdentTok,
     NumberTok,
-    ColonTok,
-    SemiColonTok,
-    BackTrackingParser,
-    DefaultTok,
-    RET_TYPE
+    RET_TYPE,
+    SemiColonTok
 } from "./backtracking_parser"
 import {flatten} from "../../../src/utils/utils"
+import {createRegularToken} from "../../utils/matchers"
 
 describe("Simple backtracking example", () => {
 
+    // for side effect of augmenting the tokens metadata
+    new BackTrackingParser([])
+
     // TODO: modify example to use the Chevrotain Lexer to increase readability
     let largeFqnTokenVector = [
-        new IdentTok("ns1", 0, 1, 1), new DotTok(".", 0, 1, 1), new IdentTok("ns2", 0, 1, 1), new DotTok(".", 0, 1, 1),
-        new IdentTok("ns3", 0, 1, 1), new DotTok(".", 0, 1, 1), new IdentTok("ns4", 0, 1, 1), new DotTok(".", 0, 1, 1),
-        new IdentTok("ns5", 0, 1, 1), new DotTok(".", 0, 1, 1), new IdentTok("ns6", 0, 1, 1), new DotTok(".", 0, 1, 1),
-        new IdentTok("ns7", 0, 1, 1), new DotTok(".", 0, 1, 1), new IdentTok("ns8", 0, 1, 1), new DotTok(".", 0, 1, 1),
-        new IdentTok("ns9", 0, 1, 1), new DotTok(".", 0, 1, 1), new IdentTok("ns10", 0, 1, 1), new DotTok(".", 0, 1, 1),
-        new IdentTok("ns11", 0, 1, 1), new DotTok(".", 0, 1, 1), new IdentTok("ns12", 0, 1, 1)
+        createRegularToken(IdentTok, "ns1"), createRegularToken(DotTok, "."), createRegularToken(IdentTok,
+            "ns2"), createRegularToken(DotTok, "."),
+        createRegularToken(IdentTok, "ns3"), createRegularToken(DotTok, "."), createRegularToken(IdentTok,
+            "ns4"), createRegularToken(DotTok, "."),
+        createRegularToken(IdentTok, "ns5"), createRegularToken(DotTok, "."), createRegularToken(IdentTok,
+            "ns6"), createRegularToken(DotTok, "."),
+        createRegularToken(IdentTok, "ns7"), createRegularToken(DotTok, "."), createRegularToken(IdentTok,
+            "ns8"), createRegularToken(DotTok, "."),
+        createRegularToken(IdentTok, "ns9"), createRegularToken(DotTok, "."), createRegularToken(IdentTok, "ns10"), createRegularToken(
+            DotTok,
+            "."),
+        createRegularToken(IdentTok, "ns11"), createRegularToken(DotTok, "."), createRegularToken(IdentTok, "ns12")
     ]
     // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 default 666;
     // new ElementTok(1, 1), new IdentTok("A" , 0, 1, 1), new ColonTok(1,1),
-    // largeFqnTokenVector,new DefaultTok(1,1), new NumberTok(1,1,"666"), new SemiColonTok(";", 0, 1, 1)
+    // largeFqnTokenVector,new DefaultTok(1,1), new NumberTok(1,1,"666"), createRegularToken(SemiColonTok, ";")
 
     it("can parse an element with Equals and a very long qualified name", () => {
         let input:any = flatten([
             // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 = 666;
-            new ElementTok("element", 0, 1, 1), new IdentTok("A", 0, 1, 1), new ColonTok(":", 0, 1, 1),
-            largeFqnTokenVector, new EqualsTok("=", 0, 1, 1), new NumberTok("666", 0, 1, 1), new SemiColonTok(";", 0, 1, 1),
+            createRegularToken(ElementTok, "element"), createRegularToken(IdentTok, "A"), createRegularToken(ColonTok, ":"),
+            largeFqnTokenVector, createRegularToken(EqualsTok, "="), createRegularToken(NumberTok, "666"), createRegularToken(SemiColonTok,
+                ";"),
         ])
 
         let parser = new BackTrackingParser(input)
@@ -45,8 +56,9 @@ describe("Simple backtracking example", () => {
     it("can parse an element with Default and a very long qualified name", () => {
         let input:any = flatten([
             // element A:ns1.ns2.ns3.ns4.ns5.ns6.ns7.ns8.ns9.ns10.ns11.ns12 default 666;
-            new ElementTok("element", 0, 1, 1), new IdentTok("A", 0, 1, 1), new ColonTok(":", 0, 1, 1), largeFqnTokenVector,
-            new DefaultTok("deafult", 0, 1, 1), new NumberTok("666", 0, 1, 1), new SemiColonTok(";", 0, 1, 1),
+            createRegularToken(ElementTok, "element"), createRegularToken(IdentTok, "A"), createRegularToken(ColonTok,
+                ":"), largeFqnTokenVector,
+            createRegularToken(DefaultTok, "deafult"), createRegularToken(NumberTok, "666"), createRegularToken(SemiColonTok, ";"),
         ])
 
         let parser = new BackTrackingParser(input)

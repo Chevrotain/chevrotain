@@ -1,5 +1,5 @@
 import {Parser} from "../../../src/parse/parser_public"
-import {Token, EOF, extendToken, extendLazyToken, extendSimpleLazyToken} from "../../../src/scan/tokens_public"
+import {Token, EOF, extendToken} from "../../../src/scan/tokens_public"
 import {gast} from "../../../src/parse/grammar/gast_public"
 import {
     buildLookaheadFuncForOr,
@@ -14,11 +14,7 @@ import {
 import {map} from "../../../src/utils/utils"
 import {
     augmentTokenClasses,
-    tokenInstanceofMatcher,
     tokenClassIdentity,
-    tokenInstanceIdentity,
-    createLazyTokenInstance,
-    createSimpleLazyToken,
     tokenStructuredMatcher,
     tokenStructuredIdentity
 } from "../../../src/scan/tokens"
@@ -32,7 +28,7 @@ import RepetitionWithSeparator = gast.RepetitionWithSeparator
 import Flat = gast.Flat
 import Alternation = gast.Alternation
 import RepetitionMandatory = gast.RepetitionMandatory
-import {createRegularToken, createLazyToken, createSimpleToken} from "../../utils/matchers"
+import {createRegularToken} from "../../utils/matchers"
 
 // TODO: convert this whole test to test on all types of Tokens.
 
@@ -783,20 +779,6 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
 defineLookaheadSpecs("Regular Tokens Mode",
     extendToken,
     createRegularToken,
-    tokenInstanceofMatcher,
-    tokenClassIdentity,
-    tokenInstanceIdentity)
-
-defineLookaheadSpecs("Lazy Tokens Mode",
-    extendLazyToken,
-    createLazyToken,
-    tokenInstanceofMatcher,
-    tokenClassIdentity,
-    tokenInstanceIdentity)
-
-defineLookaheadSpecs("Simple Lazy Tokens Mode",
-    extendSimpleLazyToken,
-    createSimpleToken,
     tokenStructuredMatcher,
-    tokenStructuredIdentity,
+    tokenClassIdentity,
     tokenStructuredIdentity)

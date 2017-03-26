@@ -1,20 +1,24 @@
-import {Token} from "../../../src/scan/tokens_public"
+import {IToken, Token} from "../../../src/scan/tokens_public"
 import {Parser} from "../../../src/parse/parser_public"
+import {createRegularToken} from "../../utils/matchers"
+import {augmentTokenClasses} from "../../../src/scan/tokens"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
 
     class PlusTok extends Token {
-        constructor() { super("+", 0, 1, 1) }
+        constructor() {super()}
     }
 
     class MinusTok extends Token {
-        constructor() { super("-", 0, 1, 1) }
+        constructor() {super()}
     }
+
+    augmentTokenClasses([PlusTok, MinusTok])
 
     it("Can override an existing rule", () => {
         class SuperOverrideParser extends Parser {
 
-            constructor(input:Token[] = [], isInvokedByChildConstructor = false) {
+            constructor(input:IToken[] = [], isInvokedByChildConstructor = false) {
                 super(input, [PlusTok, MinusTok])
 
                 // performSelfAnalysis should only be invoked once.
@@ -39,7 +43,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
 
         class ChildOverrideParser extends SuperOverrideParser {
 
-            constructor(input:Token[] = []) {
+            constructor(input:IToken[] = []) {
                 super(input, true)
                 Parser.performSelfAnalysis(this)
             }
@@ -53,12 +57,13 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
             })
         }
 
-        let superParser = new SuperOverrideParser([new PlusTok()])
+        let superParser = new SuperOverrideParser([createRegularToken(PlusTok)])
         let superResult = superParser.topRule()
         expect(superResult).to.equal("yey")
         expect(superParser.errors).to.be.empty
 
-        let childParser = new ChildOverrideParser([new MinusTok(), new MinusTok(), new MinusTok()])
+        let childParser = new ChildOverrideParser(
+            [createRegularToken(MinusTok), createRegularToken(MinusTok), createRegularToken(MinusTok)])
         let childResult = childParser.topRule()
         expect(childResult).to.equal("ney")
         expect(superParser.errors).to.be.empty

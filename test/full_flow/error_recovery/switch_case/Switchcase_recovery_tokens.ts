@@ -7,38 +7,37 @@ export class StringTok extends LiteralTok {}
 export class Keyword extends Token {}
 
 export class SwitchTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("switch", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class CaseTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("case", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class ReturnTok extends Keyword {
-    constructor(startLine:number, startColumn:number) { super("return", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class LParenTok extends Token {
-    constructor(startLine:number, startColumn:number) { super("(", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class RParenTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(")", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class LCurlyTok extends Token {
-    constructor(startLine:number, startColumn:number) { super("{", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class RCurlyTok extends Token {
-    constructor(startLine:number, startColumn:number) { super("}", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class ColonTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(":", -1, startLine, startColumn) }
+    constructor() {super()}
 }
 
 export class SemiColonTok extends Token {
-    constructor(startLine:number, startColumn:number) { super(";", -1, startLine, startColumn) }
+    constructor() {super()}
 }
-

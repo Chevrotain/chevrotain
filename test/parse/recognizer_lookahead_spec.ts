@@ -1,10 +1,10 @@
-import {Token, extendToken, extendLazyToken, extendSimpleLazyToken} from "../../src/scan/tokens_public"
+import {Token, extendToken} from "../../src/scan/tokens_public"
 import {Parser} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
-import {tokenInstanceofMatcher, tokenStructuredMatcher} from "../../src/scan/tokens"
+import {tokenStructuredMatcher} from "../../src/scan/tokens"
 import {clearCache} from "../../src/parse/cache_public"
-import {createRegularToken, createLazyToken, createSimpleToken} from "../utils/matchers"
+import {createRegularToken} from "../utils/matchers"
 
 function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
@@ -1136,6 +1136,5 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
     })
 }
 
-defineLookaheadSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenInstanceofMatcher)
-defineLookaheadSpecs("Lazy Tokens Mode", extendLazyToken, createLazyToken, tokenInstanceofMatcher)
-defineLookaheadSpecs("Simple Lazy Tokens Mode", extendSimpleLazyToken, createSimpleToken, tokenStructuredMatcher)
+defineLookaheadSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenStructuredMatcher)
+// TODO: variant probably not needed
