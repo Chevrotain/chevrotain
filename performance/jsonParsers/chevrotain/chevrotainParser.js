@@ -1,7 +1,7 @@
 // ----------------- Lexer -----------------
 var Token = chevrotain.Token;
 // https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Simple Lazy Tokens)
-var createToken = chevrotain.createSimpleLazyToken;
+var createToken = chevrotain.createToken;
 var ChevrotainLexer = chevrotain.Lexer;
 
 // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
@@ -21,7 +21,8 @@ var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(?:0|[1-9]\d
 var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: ChevrotainLexer.SKIPPED});
 
 var jsonTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
-var ChevJsonLexer = new ChevrotainLexer(jsonTokens);
+// Tracking only the offset provides a small speed boost.
+var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {positionTracking: "onlyOffset"});
 
 
 // ----------------- parser -----------------
