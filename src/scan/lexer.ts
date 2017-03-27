@@ -24,8 +24,7 @@ import {
     keys,
     map,
     reduce,
-    reject,
-    some
+    reject
 } from "../utils/utils"
 
 const PATTERN = "PATTERN"
@@ -39,6 +38,7 @@ export interface IAnalyzeResult {
     patternIdxToLongerAltIdx:number[]
     patternIdxToCanLineTerminator:boolean[]
     patternIdxToIsCustom:boolean[]
+    patternIdxToShort:(number | boolean)[]
     patternIdxToPushMode:string[]
     patternIdxToPopMode:boolean[]
     emptyGroups:{ [groupName:string]:Token[] }
@@ -66,9 +66,23 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
         let currPattern = currClass[PATTERN]
 
         if (isRegExp(currPattern)) {
-            return useSticky ?
-                addStickyFlag(currPattern) :
-                addStartOfInput(currPattern)
+            let regExpSource = currPattern.source
+            if (regExpSource.length === 1 &&
+                // only these regExp meta characters which can appear in a length one regExp
+                regExpSource !== "^" && regExpSource !== "$" && regExpSource !== ".") {
+                return regExpSource
+            }
+            // escaped meta Characters: /\+/ /\[/
+            // or redundant escaping: /\a/
+            else if (regExpSource.length === 2 && regExpSource[0] === "\\") {
+                // without escaping "\"
+                return regExpSource[1]
+            }
+            else {
+                return useSticky ?
+                    addStickyFlag(currPattern) :
+                    addStartOfInput(currPattern)
+            }
         }
         // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
         else if (isFunction(currPattern)) {
@@ -77,6 +91,20 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
         // ICustomPattern
         else if (has(currPattern, "exec")) {
             return currPattern
+        }
+        else if (typeof currPattern === "string") {
+            // IGNORE ABOVE ELSE
+            if (currPattern.length === 1) {
+                return currPattern
+            }
+            else {
+                let escapedRegExpString = currPattern.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&")
+                let wrappedRegExp = new RegExp(escapedRegExpString)
+                // TODO: extract the "?" expression, it is duplicated
+                return useSticky ?
+                    addStickyFlag(wrappedRegExp) :
+                    addStartOfInput(wrappedRegExp)
+            }
         }
         else {
             throw Error("non exhaustive match")
@@ -115,10 +143,15 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
 
     let patternIdxToPopMode = map(onlyRelevantClasses, (clazz:any) => has(clazz, "POP_MODE"))
 
-    let patternIdxToCanLineTerminator = map(allTransformedPatterns, (pattern:RegExp) => {
+    let patternIdxToCanLineTerminator = map(allTransformedPatterns, (pattern:any) => {
         if (isRegExp(pattern)) {
             // TODO: unicode escapes of line terminators too?
             return /\\n|\\r|\\s/g.test(pattern.source)
+        }
+        // single Char String
+        else if (isString(pattern)) {
+            // only need to handle single character newline (not /r/n)
+            return pattern === "\n" || pattern === "\r"
         }
         else {
             if (has(pattern, CONTAINS_LINE_TERMINATOR)) {
@@ -129,6 +162,7 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
     })
 
     let patternIdxToIsCustom = map(onlyRelevantClasses, isCustomPattern)
+    let patternIdxToShort = map(allTransformedPatterns, isShortPattern)
 
     let emptyGroups = reduce(onlyRelevantClasses, (acc, clazz:any) => {
         let groupName = clazz.GROUP
@@ -144,6 +178,7 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
         patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
         patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
         patternIdxToIsCustom:          patternIdxToIsCustom,
+        patternIdxToShort:             patternIdxToShort,
         patternIdxToPushMode:          patternIdxToPushMode,
         patternIdxToPopMode:           patternIdxToPopMode,
         patternIdxToType:              patternIdxToType,
@@ -210,7 +245,7 @@ export function findMissingPatterns(tokenClasses:TokenConstructor[]):ILexerFilte
 export function findInvalidPatterns(tokenClasses:TokenConstructor[]):ILexerFilterResult {
     let tokenClassesWithInvalidPattern = filter(tokenClasses, (currClass) => {
         let pattern = currClass[PATTERN]
-        return !isRegExp(pattern) && !isFunction(pattern) && !has(pattern, "exec")
+        return !isRegExp(pattern) && !isFunction(pattern) && !has(pattern, "exec") && !isString(pattern)
     })
 
     let errors = map(tokenClassesWithInvalidPattern, (currClass) => {
@@ -425,13 +460,6 @@ export function performRuntimeChecks(lexerDefinition:IMultiModeLexerDefinition):
     return errors
 }
 
-export function checkHasCustomTokenPatterns(allTokenTypes:TokenConstructor[]):boolean {
-    return some(allTokenTypes, (currTokType) => {
-        let pattern = currTokType.PATTERN
-        return (!isRegExp(currTokType.PATTERN) && (isFunction(pattern) || has(pattern, "exec")))
-    })
-}
-
 export function cloneEmptyGroups(emptyGroups:{ [groupName:string]:IToken }):{ [groupName:string]:IToken } {
     let clonedResult:any = {}
     let groupKeys = keys(emptyGroups)
@@ -465,7 +493,19 @@ export function isCustomPattern(tokenType:any):boolean {
     else if (has(pattern, "exec")) {
         return true
     }
+    else if (isString(pattern)) {
+        return false
+    }
     else {
         throw Error("non exhaustive match")
+    }
+}
+
+export function isShortPattern(pattern:any):number | boolean {
+    if (isString(pattern) && pattern.length === 1) {
+        return pattern.charCodeAt(0)
+    }
+    else {
+        return false
     }
 }

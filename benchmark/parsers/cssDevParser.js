@@ -25,8 +25,13 @@ function MAKE_PATTERN(def, flags) {
 // A Little wrapper to save us the trouble of manually building the
 // array of cssTokens
 var cssTokens = [];
-var extendToken = function() {
-    var newToken = chevrotain.extendToken.apply(null, arguments);
+var extendToken = function(name, pattern, parent) {
+
+    var options = {name:name, pattern:pattern}
+    if (parent) {
+        options.parent = parent
+    }
+    var newToken = chevrotain.createToken(options)
     cssTokens.push(newToken);
     return newToken;
 }
@@ -69,23 +74,23 @@ var Cdo = extendToken('Cdo', /<!--/);
 var Cdc = extendToken('Cdc', /-->/);
 var Includes = extendToken('Includes', /~=/);
 var Dasmatch = extendToken('Dasmatch', /\|=/);
-var Exclamation = extendToken('Exclamation', /!/);
-var Dot = extendToken('Dot', /\./);
-var LCurly = extendToken('LCurly', /{/);
-var RCurly = extendToken('RCurly', /}/);
-var LSquare = extendToken('LSquare', /\[/);
-var RSquare = extendToken('RSquare', /]/);
-var LParen = extendToken('LParen', /\(/);
-var RParen = extendToken('RParen', /\)/);
-var Comma = extendToken('Comma', /,/);
-var Colon = extendToken('Colon', /:/);
-var SemiColon = extendToken('SemiColon', /;/);
-var Equals = extendToken('Equals', /=/);
-var Star = extendToken('Star', /\*/);
-var Plus = extendToken('Plus', /\+/);
-var Minus = extendToken('Minus', /-/);
-var GreaterThan = extendToken('GreaterThan', />/);
-var Slash = extendToken('Slash', /\//);
+var Exclamation = extendToken('Exclamation', "!");
+var Dot = extendToken('Dot', ".");
+var LCurly = extendToken('LCurly', "{");
+var RCurly = extendToken('RCurly', "}");
+var LSquare = extendToken('LSquare', "[");
+var RSquare = extendToken('RSquare', "]");
+var LParen = extendToken('LParen', "(");
+var RParen = extendToken('RParen', ")");
+var Comma = extendToken('Comma', ",");
+var Colon = extendToken('Colon', ":");
+var SemiColon = extendToken('SemiColon', ";");
+var Equals = extendToken('Equals', "=");
+var Star = extendToken('Star', "*");
+var Plus = extendToken('Plus', "+");
+var Minus = extendToken('Minus', "-");
+var GreaterThan = extendToken('GreaterThan', ">");
+var Slash = extendToken('Slash', "/");
 
 var StringLiteral = extendToken('StringLiteral', MAKE_PATTERN('{{string1}}|{{string2}}'));
 var Hash = extendToken('Hash', MAKE_PATTERN('#{{name}}'));

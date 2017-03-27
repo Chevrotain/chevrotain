@@ -23,7 +23,7 @@ import {
     sortBy,
     zipObject,
     assign,
-    groupBy
+    groupBy, mapValues
 } from "../../src/utils/utils"
 
 describe("The Utils functions namespace", () => {
@@ -208,5 +208,14 @@ describe("The Utils functions namespace", () => {
     it("exports a groupBy utility", () => {
         expect(groupBy([1, 2, 3, 4], (num) => "" + num % 2)).to.deep.equal({0: [2, 4], 1: [1, 3]})
         expect(groupBy([1, 2, 3, 4], (num) => "" + num)).to.deep.equal({1: [1], 2: [2], 3: [3], 4: [4]})
+    })
+
+    it("exports a groupBy utility", () => {
+        expect(groupBy([1, 2, 3, 4], (num) => "" + num % 2)).to.deep.equal({0: [2, 4], 1: [1, 3]})
+        expect(groupBy([1, 2, 3, 4], (num) => "" + num)).to.deep.equal({1: [1], 2: [2], 3: [3], 4: [4]})
+    })
+
+    it("exports a mapValues utility", () => {
+        expect(mapValues({key1: 1, key2: 2}, (val:number) => val * 2)).to.deep.equal([2, 4])
     })
 })

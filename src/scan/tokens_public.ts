@@ -78,7 +78,7 @@ export interface ITokenConfig {
     name:string
     parent?:TokenConstructor
     label?:string
-    pattern?:RegExp | CustomPatternMatcherFunc | ICustomPattern
+    pattern?:RegExp | CustomPatternMatcherFunc | ICustomPattern | string
     group?:string | any
     push_mode?:string
     pop_mode?:boolean
@@ -122,7 +122,8 @@ export function extendToken(tokenName:string, patternOrParent:any = undefined, p
 
     if (isRegExp(patternOrParent) ||
         patternOrParent === Lexer.SKIPPED ||
-        patternOrParent === Lexer.NA) {
+        patternOrParent === Lexer.NA ||
+        isString(patternOrParent)) {
         pattern = patternOrParent
     }
     else if (isFunction(patternOrParent)) {
