@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.27.0 (3-27-2017)
 
 #### Major Changes
 - [Support string Literals as Token patterns.](https://github.com/SAP/chevrotain/issues/431)
