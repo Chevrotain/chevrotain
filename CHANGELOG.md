@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Support string Literals as Token patterns.](https://github.com/SAP/chevrotain/issues/431)
+- [Lexer Performance optimizations 0.27.0](https://github.com/SAP/chevrotain/issues/432)
+
+
+
 ## 0.26.0 (3-26-2017)
 
 #### Breaking Changes
