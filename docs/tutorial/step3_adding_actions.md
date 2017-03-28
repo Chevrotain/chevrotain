@@ -18,9 +18,9 @@ validates the input conforms to the grammar. In most real world use cases the pa
 result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
-* [CONSUME](http://sap.github.io/chevrotain/documentation/0_27_0/classes/_chevrotain_d_.parser.html#consume1) will return
-  The [Token](http://sap.github.io/chevrotain/documentation/0_27_0/classes/_chevrotain_d_.token.html) instance consumed.
-* [SUBRULE](http://sap.github.io/chevrotain/documentation/0_27_0/classes/_chevrotain_d_.parser.html#subrule1) will return
+* [CONSUME](http://sap.github.io/chevrotain/documentation/0_27_1/classes/_chevrotain_d_.parser.html#consume1) will return
+  The [Token](http://sap.github.io/chevrotain/documentation/0_27_1/classes/_chevrotain_d_.token.html) instance consumed.
+* [SUBRULE](http://sap.github.io/chevrotain/documentation/0_27_1/classes/_chevrotain_d_.parser.html#subrule1) will return
   the result on invoking the subrule.
 
 

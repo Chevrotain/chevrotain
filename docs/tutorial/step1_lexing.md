@@ -16,7 +16,7 @@ In This tutorial we will implement a Lexer for a simple SQL Select statement lan
  ...
 ```
 
-A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/0_27_0/interfaces/_chevrotain_d_.isimpletokenoritoken.html) vector.
+A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/0_27_1/interfaces/_chevrotain_d_.isimpletokenoritoken.html) vector.
 Chevrotain comes with a built in Lexer engine based on Javascript Regular Expressions.
 To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
