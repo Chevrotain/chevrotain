@@ -78,8 +78,10 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
             }
             // escaped meta Characters: /\+/ /\[/
             // or redundant escaping: /\a/
-            else if (regExpSource.length === 2 && regExpSource[0] === "\\") {
-                // without escaping "\"
+            else if (regExpSource.length === 2 && regExpSource[0] === "\\" &&
+                // not a meta character
+                !contains(["d", "D", "s", "S", "t", "r", "n", "t", "0", "c", "b", "B", "f", "v", "w", "W"], regExpSource[1])) {
+                // without the escaping "\"
                 return regExpSource[1]
             }
             else {

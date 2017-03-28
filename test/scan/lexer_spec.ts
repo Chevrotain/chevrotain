@@ -364,6 +364,21 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
 
         describe("The Simple Lexer Full flow", () => {
 
+            it("can run a simpleLexer without optimizing meta chars", () => {
+                let Tab = createToken({name: "Tab", pattern: /\t/, group: "spaces"})
+                let ifElseLexer = new Lexer([Tab, If, Else])
+
+                let input = "if\telse"
+
+                let lexResult = ifElseLexer.tokenize(input)
+                let tokens:any = lexResult.tokens
+                expect(tokens[0].image).to.equal("if")
+                expect(tokens[1].image).to.equal("else")
+
+                let spacesGroups:any = lexResult.groups.spaces
+                expect(spacesGroups[0].image).to.equal("\t")
+            })
+
             it("can run a simpleLexer in debug mode", () => {
                 let WS = createToken({name: "WS", pattern: /(\t| )/, group: "spaces"})
                 let ifElseLexer = new Lexer([WS, If, Else], {debug: true})
