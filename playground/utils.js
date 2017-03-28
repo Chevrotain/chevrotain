@@ -22,12 +22,13 @@ var orgLexer = chevrotain.Lexer
  * as the deferred errors are displayed in the UI...
  */
 function wrapChevrotainLexer() {
-    chevrotain.Lexer = function (definition, deferred) {
+    chevrotain.Lexer = function (definition, config) {
 
-        if (_.isUndefined(deferred)) {
-            deferred = true;
+        if (config) {
+            // always override this in playground context
+            config.deferDefinitionErrorsHandling = true;
         }
-        var newLexer = new orgLexer(definition, deferred);
+        var newLexer = new orgLexer(definition, config);
         return newLexer
     }
 

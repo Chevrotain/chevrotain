@@ -791,6 +791,7 @@ function cssExample() {
 function calculatorExample() {
     // ----------------- lexer -----------------
     var createToken = chevrotain.createToken;
+    var tokenMatcher = chevrotain.tokenMatcher;
     var Lexer = chevrotain.Lexer;
     var Parser = chevrotain.Parser;
 
@@ -851,9 +852,10 @@ function calculatorExample() {
                 rhsVal = $.SUBRULE2($.multiplicationExpression);
 
                 // interpreter part
-                if (op instanceof Plus) {
+                // tokenMatcher acts as ECMAScript instanceof operator
+                if (tokenMatcher(op, Plus)) {
                     value += rhsVal
-                } else { // op instanceof Minus
+                } else { // op "instanceof" Minus
                     value -= rhsVal
                 }
             });
@@ -874,7 +876,8 @@ function calculatorExample() {
                 rhsVal = $.SUBRULE2($.atomicExpression);
 
                 // interpreter part
-                if (op instanceof Multi) {
+                // tokenMatcher acts as ECMAScript instanceof operator
+                if (tokenMatcher(op,Multi)) {
                     value *= rhsVal
                 } else { // op instanceof Div
                     value /= rhsVal
@@ -941,9 +944,10 @@ function tutorialLexerExample() {
     var createToken = chevrotain.createToken;
     var Lexer = chevrotain.Lexer;
 
-    // createToken is used to create a constructor for a Token class
-    // The Lexer's output will contain an array of
-    // instances created by these constructors
+    // createToken is used to create a "constructor" for a Token class
+    // The Lexer's output will contain an array token Objects created by metadata
+    // on these "constructors". Note that the Token "instances" are not proper class instances
+    // So use chevrotain.tokenMatcher instead of "instanceof" when matching
     var Select = createToken({name: "Select", pattern: /SELECT/});
     var From = createToken({name: "From", pattern: /FROM/});
     var Where = createToken({name: "Where", pattern: /WHERE/});
