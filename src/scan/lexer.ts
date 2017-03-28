@@ -31,16 +31,20 @@ const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
 export const MODES = "modes"
 
+export interface IPatternConfig {
+    pattern:IRegExpExec,
+    longerAlt:number,
+    canLineTerminator:boolean,
+    isCustom:boolean,
+    short:number | boolean,
+    group:any,
+    push:string,
+    pop:boolean,
+    tokenType:number
+}
+
 export interface IAnalyzeResult {
-    allPatterns:IRegExpExec[]
-    patternIdxToType:number[]
-    patternIdxToGroup:any[]
-    patternIdxToLongerAltIdx:number[]
-    patternIdxToCanLineTerminator:boolean[]
-    patternIdxToIsCustom:boolean[]
-    patternIdxToShort:(number | boolean)[]
-    patternIdxToPushMode:string[]
-    patternIdxToPopMode:boolean[]
+    patternIdxToConfig:IPatternConfig[]
     emptyGroups:{ [groupName:string]:Token[] }
 }
 
@@ -172,17 +176,23 @@ export function analyzeTokenClasses(tokenClasses:TokenConstructor[], useSticky:b
         return acc
     }, {})
 
+    let patternIdxToConfig = map(allTransformedPatterns, (x, idx) => {
+        return {
+            pattern:           allTransformedPatterns[idx],
+            longerAlt:         patternIdxToLongerAltIdx[idx],
+            canLineTerminator: patternIdxToCanLineTerminator[idx],
+            isCustom:          patternIdxToIsCustom[idx],
+            short:             patternIdxToShort[idx],
+            group:             patternIdxToGroup[idx],
+            push:              patternIdxToPushMode[idx],
+            pop:               patternIdxToPopMode[idx],
+            tokenType:         patternIdxToType[idx]
+        }
+    })
+
     return {
-        allPatterns:                   allTransformedPatterns,
-        patternIdxToGroup:             patternIdxToGroup,
-        patternIdxToLongerAltIdx:      patternIdxToLongerAltIdx,
-        patternIdxToCanLineTerminator: patternIdxToCanLineTerminator,
-        patternIdxToIsCustom:          patternIdxToIsCustom,
-        patternIdxToShort:             patternIdxToShort,
-        patternIdxToPushMode:          patternIdxToPushMode,
-        patternIdxToPopMode:           patternIdxToPopMode,
-        patternIdxToType:              patternIdxToType,
-        emptyGroups:                   emptyGroups
+        emptyGroups:        emptyGroups,
+        patternIdxToConfig: patternIdxToConfig
     }
 }
 

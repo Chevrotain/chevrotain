@@ -289,14 +289,17 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                 it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
                     let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
                     let analyzeResult = analyzeTokenClasses(tokenClasses, false)
-                    expect(analyzeResult.allPatterns.length).to.equal(8)
-                    let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
+
+                    let allPatterns = map(analyzeResult.patternIdxToConfig, (currConfig) => currConfig.pattern)
+
+                    expect(allPatterns.length).to.equal(8)
+                    let allPatternsString = map(allPatterns, (pattern) => {
                         return isString(pattern) ? pattern : pattern.source
                     })
                     setEquality(allPatternsString, ["^(?:(\\t| ))", "^(?:(\\n|\\r|\\r\\n))",
                         "^(?:[1-9]\\d*)", "(", ")", "^(?:if)", "^(?:else)", "^(?:return)"])
 
-                    let patternIdxToClass = analyzeResult.patternIdxToType
+                    let patternIdxToClass = map(analyzeResult.patternIdxToConfig, (currConfig) => currConfig.tokenType)
                     expect(keys(patternIdxToClass).length).to.equal(8)
                     expect(patternIdxToClass[0]).to.equal(If.tokenType)
                     expect(patternIdxToClass[1]).to.equal(Else.tokenType)
@@ -314,19 +317,20 @@ function defineLexerSpecs(contextName, extendToken, tokenMatcher, skipValidation
                     let tokenClasses = [Keyword, If, Else, Return, Integer, Punctuation, LParen, RParen, Whitespace, NewLine]
                     // on newer node.js this will run with the 2nd argument as true.
                     let analyzeResult = analyzeTokenClasses(tokenClasses, true)
-                    expect(analyzeResult.allPatterns.length).to.equal(8)
-                    let allPatternsString = map(analyzeResult.allPatterns, (pattern) => {
+                    let allPatterns = map(analyzeResult.patternIdxToConfig, (currConfig) => currConfig.pattern)
+                    expect(allPatterns.length).to.equal(8)
+                    let allPatternsString = map(allPatterns, (pattern) => {
                         return isString(pattern) ? pattern : pattern.source
                     })
                     setEquality(allPatternsString, ["(\\t| )", "(\\n|\\r|\\r\\n)",
                         "(", ")", "[1-9]\\d*", "if", "else", "return"])
 
-                    forEach(analyzeResult.allPatterns, (currPattern) => {
+                    forEach(allPatterns, (currPattern) => {
                         if (isRegExp(currPattern)) {
                             expect(currPattern.sticky).to.be.true
                         }
                     })
-                    let patternIdxToClass = analyzeResult.patternIdxToType
+                    let patternIdxToClass = map(analyzeResult.patternIdxToConfig, (currConfig) => currConfig.tokenType)
                     expect(keys(patternIdxToClass).length).to.equal(8)
                     expect(patternIdxToClass[0]).to.equal(If.tokenType)
                     expect(patternIdxToClass[1]).to.equal(Else.tokenType)

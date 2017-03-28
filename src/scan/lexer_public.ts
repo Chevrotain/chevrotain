@@ -113,17 +113,10 @@ export class Lexer {
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors:ILexerDefinitionError[] = []
 
+    protected patternIdxToConfig:any = {}
+
     protected modes:string[] = []
     protected defaultMode:string
-    protected allPatterns:{ [modeName:string]:IRegExpExec[] } = {}
-    protected patternIdxToType:{ [modeName:string]:number[] } = {}
-    protected patternIdxToGroup:{ [modeName:string]:string[] } = {}
-    protected patternIdxToLongerAltIdx:{ [modeName:string]:number[] } = {}
-    protected patternIdxToCanLineTerminator:{ [modeName:string]:boolean[] } = {}
-    protected patternIdxToIsCustom:{ [modeName:string]:boolean[] } = {}
-    protected patternIdxToShort:{ [modeName:string]:(number | boolean)[] } = {}
-    protected patternIdxToPushMode:{ [modeName:string]:string[] } = {}
-    protected patternIdxToPopMode:{ [modeName:string]:boolean[] } = {}
     protected emptyGroups:{ [groupName:string]:IToken } = {}
 
     private config:ILexerConfig = undefined
@@ -273,15 +266,8 @@ export class Lexer {
             if (isEmpty(this.lexerDefinitionErrors)) {
                 augmentTokenClasses(currModDef)
                 let currAnalyzeResult = analyzeTokenClasses(currModDef)
-                this.allPatterns[currModName] = currAnalyzeResult.allPatterns
-                this.patternIdxToType[currModName] = currAnalyzeResult.patternIdxToType
-                this.patternIdxToGroup[currModName] = currAnalyzeResult.patternIdxToGroup
-                this.patternIdxToLongerAltIdx[currModName] = currAnalyzeResult.patternIdxToLongerAltIdx
-                this.patternIdxToCanLineTerminator[currModName] = currAnalyzeResult.patternIdxToCanLineTerminator
-                this.patternIdxToIsCustom[currModName] = currAnalyzeResult.patternIdxToIsCustom
-                this.patternIdxToShort[currModName] = currAnalyzeResult.patternIdxToShort
-                this.patternIdxToPushMode[currModName] = currAnalyzeResult.patternIdxToPushMode
-                this.patternIdxToPopMode[currModName] = currAnalyzeResult.patternIdxToPopMode
+
+                this.patternIdxToConfig[currModName] = currAnalyzeResult.patternIdxToConfig
                 this.emptyGroups = merge(this.emptyGroups, currAnalyzeResult.emptyGroups)
             }
         })
@@ -375,16 +361,8 @@ export class Lexer {
         let groups:any = cloneEmptyGroups(this.emptyGroups)
         let trackLines = this.trackStartLines
 
-        let currModePatterns = []
         let currModePatternsLength = 0
-        let currModePatternIdxToLongerAltIdx = []
-        let currModePatternIdxToShort = []
-        let currModePatternIdxToIsCustom = []
-        let currModePatternIdxToGroup = []
-        let currModePatternIdxToType = []
-        let currModePatternIdxToCanLineTerminator = []
-        let patternIdxToPushMode = []
-        let patternIdxToPopMode = []
+        let patternIdxToConfig = []
 
         let modeStack = []
         let pop_mode = (popToken) => {
@@ -404,51 +382,38 @@ export class Lexer {
             else {
                 modeStack.pop()
                 let newMode = last(modeStack)
-                currModePatterns = this.allPatterns[newMode]
-                currModePatternsLength = currModePatterns.length
-                currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
-                currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
-                currModePatternIdxToShort = this.patternIdxToShort[newMode]
-                currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
-                currModePatternIdxToType = this.patternIdxToType[newMode]
-                currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
-                patternIdxToPushMode = this.patternIdxToPushMode[newMode]
-                patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+                patternIdxToConfig = this.patternIdxToConfig[newMode]
+                currModePatternsLength = patternIdxToConfig.length
             }
         }
 
         function push_mode(newMode) {
             modeStack.push(newMode)
-            currModePatterns = this.allPatterns[newMode]
-            currModePatternsLength = currModePatterns.length
-            currModePatternIdxToLongerAltIdx = this.patternIdxToLongerAltIdx[newMode]
-            currModePatternIdxToIsCustom = this.patternIdxToIsCustom[newMode]
-            currModePatternIdxToShort = this.patternIdxToShort[newMode]
-            currModePatternIdxToGroup = this.patternIdxToGroup[newMode]
-            currModePatternIdxToType = this.patternIdxToType[newMode]
-            currModePatternIdxToCanLineTerminator = this.patternIdxToCanLineTerminator[newMode]
-            patternIdxToPushMode = this.patternIdxToPushMode[newMode]
-            patternIdxToPopMode = this.patternIdxToPopMode[newMode]
+            patternIdxToConfig = this.patternIdxToConfig[newMode]
+            currModePatternsLength = patternIdxToConfig.length
         }
 
         // this pattern seems to avoid a V8 de-optimization, although that de-optimization does not
         // seem to matter performance wise.
         push_mode.call(this, initialMode)
 
+        let currConfig
+
         while (offset < orgLength) {
             matchedImage = null
             for (i = 0; i < currModePatternsLength; i++) {
-                let currPattern = currModePatterns[i]
+                currConfig = patternIdxToConfig[i]
+                let currPattern = currConfig.pattern
 
                 // manually in-lined because > 600 chars won't be in-lined in V8
-                let singleCharCode = currModePatternIdxToShort[i]
+                let singleCharCode = currConfig.short
                 if (singleCharCode !== false) {
                     if (orgText.charCodeAt(offset) === singleCharCode) {
                         // single character string
                         matchedImage = currPattern
                     }
                 }
-                else if (currModePatternIdxToIsCustom[i] === true) {
+                else if (currConfig.isCustom === true) {
                     match = currPattern.exec(orgText, offset, matchedTokens, groups)
                     matchedImage = match !== null ? match[0] : match
                 } else {
@@ -460,13 +425,16 @@ export class Lexer {
                 if (matchedImage !== null) {
                     // even though this pattern matched we must try a another longer alternative.
                     // this can be used to prioritize keywords over identifiers
-                    longerAltIdx = currModePatternIdxToLongerAltIdx[i]
+                    longerAltIdx = currConfig.longerAlt
                     if (longerAltIdx !== undefined) {
-                        let longerAltPattern = currModePatterns[longerAltIdx]
+                        // TODO: micro optimize, avoid extra prop access
+                        // by saving/linking longerAlt on the original config?
+                        let longerAltConfig = patternIdxToConfig[longerAltIdx]
+                        let longerAltPattern = longerAltConfig.pattern
 
                         // single Char can never be a longer alt so no need to test it.
                         // manually in-lined because > 600 chars won't be in-lined in V8
-                        if (currModePatternIdxToIsCustom[longerAltIdx] === true) {
+                        if (longerAltConfig.isCustom === true) {
                             match = longerAltPattern.exec(orgText, offset, matchedTokens, groups)
                             matchAltImage = match !== null ? match[0] : match
                         } else {
@@ -477,7 +445,7 @@ export class Lexer {
 
                         if (matchAltImage && matchAltImage.length > matchedImage.length) {
                             matchedImage = matchAltImage
-                            i = longerAltIdx
+                            currConfig = longerAltConfig
                         }
                     }
                     break
@@ -487,9 +455,9 @@ export class Lexer {
             if (matchedImage !== null) {
                 // matchedImage = match[0]
                 imageLength = matchedImage.length
-                group = currModePatternIdxToGroup[i]
+                group = currConfig.group
                 if (group !== undefined) {
-                    tokType = currModePatternIdxToType[i]
+                    tokType = currConfig.tokenType
                     // TODO: "offset + imageLength" and the new column may be computed twice in case of "full" location information inside
                     // createFullToken method
                     newToken = this.createTokenInstance(matchedImage, offset, tokType, line, column, imageLength)
@@ -507,7 +475,7 @@ export class Lexer {
                 // TODO: with newlines the column may be assigned twice
                 column = this.computeNewColumn(column, imageLength)
 
-                if (trackLines === true && currModePatternIdxToCanLineTerminator[i] === true) {
+                if (trackLines === true && currConfig.canLineTerminator === true) {
                     let numOfLTsInMatch = 0
                     let imageOffset = 0
                     let imageLengthMinusOne = imageLength - 1
@@ -537,7 +505,7 @@ export class Lexer {
                     }
                 }
                 // will be NOOP if no modes present
-                this.handleModes(i, patternIdxToPopMode, patternIdxToPushMode, pop_mode, push_mode, newToken)
+                this.handleModes(i, currConfig, pop_mode, push_mode, newToken)
             }
             else { // error recovery, drop characters until we identify a valid token's start point
                 let errorStartOffset = offset
@@ -564,18 +532,19 @@ export class Lexer {
                     // Identity Func (when sticky flag is enabled)
                     text = this.chopInput(text, 1)
                     offset++
-                    for (j = 0; j < currModePatterns.length; j++) {
-                        let currPattern = currModePatterns[j]
+                    for (j = 0; j < currModePatternsLength; j++) {
+                        let currConfig = patternIdxToConfig[j]
+                        let currPattern = currConfig.pattern
 
                         // manually in-lined because > 600 chars won't be in-lined in V8
-                        let singleCharCode = currModePatternIdxToShort[j]
+                        let singleCharCode = currConfig.short
                         if (singleCharCode !== false) {
                             if (orgText.charCodeAt(offset) === singleCharCode) {
                                 // single character string
                                 foundResyncPoint = true
                             }
                         }
-                        else if (currModePatternIdxToIsCustom[j] === true) {
+                        else if (currConfig.isCustom === true) {
                             foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups) !== null
                         } else {
                             this.updateLastIndex(currPattern, offset)
@@ -599,18 +568,18 @@ export class Lexer {
         return {tokens: matchedTokens, groups: groups, errors: errors}
     }
 
-    private handleModes(i, patternIdxToPopMode, patternIdxToPushMode, pop_mode, push_mode, newToken) {
-        if (patternIdxToPopMode[i] === true) {
+    private handleModes(i, config, pop_mode, push_mode, newToken) {
+        if (config.pop === true) {
             // need to save the PUSH_MODE property as if the mode is popped
             // patternIdxToPopMode is updated to reflect the new mode after popping the stack
-            let pushMode = patternIdxToPushMode[i]
+            let pushMode = config.push
             pop_mode(newToken)
             if (pushMode !== undefined) {
                 push_mode.call(this, pushMode)
             }
         }
-        else if (patternIdxToPushMode[i] !== undefined) {
-            push_mode.call(this, patternIdxToPushMode[i])
+        else if (config.push !== undefined) {
+            push_mode.call(this, config.push)
         }
     }
 
