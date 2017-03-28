@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+- [Refactor Lexer for minor performance boost.](https://github.com/SAP/chevrotain/commit/e91fc7e7b4f3a000ed9e3fa359b8fe6c3a6fd873)
+
+#### Bug Fixes
+- [Certain RegExp meta characters won't be handled correctly in small RegExps.](https://github.com/SAP/chevrotain/issues/433)
+
+
+
 ## 0.27.0 (3-27-2017)
 
 #### Major Changes
