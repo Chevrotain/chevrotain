@@ -1,18 +1,22 @@
 var mooLexer = Moo.compile({
     WS: {match: /\s+/, lineBreaks: true},
-    NumberLiteral: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/,
     StringLiteral: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/,
+    NumberLiteral: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/,
+    Comma: ',',
+    Colon: ':',
     LCurly: '{',
     RCurly: '}',
     LSquare: '[',
     RSquare: ']',
-    Comma: ',',
-    Colon: ':',
     True: /true/,
     False: /false/,
     Null: /null/,
 })
 
+// remove default post processors for fairer benchmark
+nearley_parser.ParserRules.forEach(function (currRule) {
+    currRule.postprocess = undefined
+})
 
 function parse_json_with_nearley(input) {
     // No known API to reset the parser state, may not be possible to avoid parser reinitialization.
