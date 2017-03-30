@@ -18,30 +18,30 @@ as any other JavaScript code without requiring any new tools or processes.
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
 ## Features
   1. **Parsing DSL**.
-    * **LL(k)** grammars support.  
-    * [Automatic Concrete Syntax Tree Creation.][cst]
-    * **Error Reporting** with full location information. 
-    * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
-    * Supports [gates/predicates][gates].
-    * Backtracking support.
-    * [Grammar Inheritance.][grammar_inheritance]
-    * [Multiple starting rules.][starting_rules]
-    * [Parametrized Rules.][parametrized_rules]
-    * [Syntactic Content Assist][content assist]
-    * **No code generation**.
-      * The DSL is just JavaScript, not an external language.
-      * The grammar is directly debuggable as plain JavaScript source.
-      * Short feedback loops.
-      * Allows great flexibility for inserting custom Parser actions 
+      * **LL(k)** grammars support.  
+      * [Automatic Concrete Syntax Tree Creation.][cst]
+      * **Error Reporting** with full location information. 
+      * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
+      * Supports [gates/predicates][gates].
+      * Backtracking support.
+      * [Grammar Inheritance.][grammar_inheritance]
+      * [Multiple starting rules.][starting_rules]
+      * [Parametrized Rules.][parametrized_rules]
+      * [Syntactic Content Assist][content assist]
+      * **No code generation**.
+        * The DSL is just JavaScript, not an external language.
+        * The grammar is directly debuggable as plain JavaScript source.
+        * Short feedback loops.
+        * Allows great flexibility for inserting custom Parser actions 
    
   2.  **Lexer Engine** based on Regular Expressions.
-    * Full Token position information.
-    * Token skipping (whitespace/comments/...).
-    * Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
-    * [Multiple Lexer Modes][lexer_modes] depending on the context.
-    * [Tokens Grouping][lexer_groups].
-    * [Custom Token patterns(none RegExp) support](docs/custom_token_patterns.md)
-    * **No code generation** The Lexer does not require any code generation phase. 
+      * Full Token position information.
+      * Token skipping (whitespace/comments/...).
+      * Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
+      * [Multiple Lexer Modes][lexer_modes] depending on the context.
+      * [Tokens Grouping][lexer_groups].
+      * [Custom Token patterns(none RegExp) support](docs/custom_token_patterns.md)
+      * **No code generation** The Lexer does not require any code generation phase. 
 
   3. [**High Performance**][benchmark].
   
