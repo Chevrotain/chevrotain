@@ -34,8 +34,9 @@ as any other JavaScript code without requiring any new tools or processes.
         * Short feedback loops.
         * Allows great flexibility for inserting custom Parser actions 
    
-  2.  **Lexer Engine** based on Regular Expressions.
-      * Full Token position information.
+  2.  **Lexer Engine** 
+      * Based on Regular Expressions.
+      * Full position information tracking (lines/columns/offsets).
       * Token skipping (whitespace/comments/...).
       * Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
       * [Multiple Lexer Modes][lexer_modes] depending on the context.
