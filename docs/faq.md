@@ -124,7 +124,7 @@ These are highly recommended for each and every parser.
    Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.
    
    Note that this means that if your parser "carries" additional state, that state should also be reset.
-   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_27_2/classes/_chevrotain_d_.parser.html#reset) method
+   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#reset) method
    to accomplish that.
     
 
@@ -133,7 +133,7 @@ These are highly recommended for each and every parser.
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
    
 1. Reduce the amount of Token position tracking the lexer performs.
-   See The [ILexerConfig.positionTracking](http://sap.github.io/chevrotain/documentation/0_27_2/interfaces/_chevrotain_d_.ilexerconfig.html) property.
+   See The [ILexerConfig.positionTracking](http://sap.github.io/chevrotain/documentation/0_27_3/interfaces/_chevrotain_d_.ilexerconfig.html) property.
    
 2. **Avoid creating parsing rules which only parse a single Terminal.**
 

@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.27.3 (3-31-2017)
 
 #### Minor Changes
 - [Support MultiMode Lexer definitions in Parser Constructor.](https://github.com/SAP/chevrotain/issues/395)
