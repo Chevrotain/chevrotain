@@ -809,13 +809,18 @@ function calculatorExample() {
     var LParen = createToken({name: "LParen", pattern: /\(/});
     var RParen = createToken({name: "RParen", pattern: /\)/});
     var NumberLiteral = createToken({name: "NumberLiteral", pattern: /[1-9]\d*/});
+
+    var PowerFunc = createToken({name: "PowerFunc", pattern: /power/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+
     var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
     WhiteSpace.GROUP = Lexer.SKIPPED;
 
     // whitespace is normally very common so it is placed first to speed up the lexer
     var allTokens = [WhiteSpace,
         Plus, Minus, Multi, Div, LParen, RParen,
-        NumberLiteral, AdditionOperator, MultiplicationOperator];
+        NumberLiteral, AdditionOperator, MultiplicationOperator,
+        PowerFunc, Comma];
     var CalculatorLexer = new Lexer(allTokens);
 
 
@@ -893,7 +898,8 @@ function calculatorExample() {
                 // parenthesisExpression has the highest precedence and thus it
                 // appears in the "lowest" leaf in the expression ParseTree.
                 {ALT: function () { return $.SUBRULE($.parenthesisExpression)}},
-                {ALT: function () { return parseInt($.CONSUME(NumberLiteral).image, 10)}}
+                {ALT: function () { return parseInt($.CONSUME(NumberLiteral).image, 10)}},
+                {ALT: function() { return $.SUBRULE($.powerFunction)}}
             ]);
         });
 
@@ -906,6 +912,19 @@ function calculatorExample() {
             $.CONSUME(RParen);
 
             return expValue
+        });
+
+        $.RULE("powerFunction", function() {
+            var base, exponent;
+
+            $.CONSUME(PowerFunc);
+            $.CONSUME(LParen);
+            base = $.SUBRULE($.expression);
+            $.CONSUME(Comma);
+            exponent = $.SUBRULE2($.expression);
+            $.CONSUME(RParen);
+
+            return Math.pow(base, exponent)
         });
 
         // very important to call this after all the rules have been defined.
@@ -1488,6 +1507,7 @@ var samples = {
         sampleInputs: {
             "parenthesis precedence": "2 * ( 3 + 7)",
             "operator precedence": "2 + 4 * 5 / 10",
+            "power function": "1 + power(3, 2)",
             "unidentified Token - success": "1 + @@1 + 1"
         }
     },
