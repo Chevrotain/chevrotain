@@ -114,3 +114,6 @@ export function hasTokenNameProperty(tokClass:TokenConstructor):boolean {
     return has(tokClass, "tokenName")
 }
 
+export function isExtendingTokenType(tokType:TokenConstructor):boolean {
+    return Token.prototype.isPrototypeOf(tokType.prototype)
+}

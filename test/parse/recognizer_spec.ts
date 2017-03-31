@@ -3,7 +3,7 @@ import {
     EOF,
     extendToken, IToken
 } from "../../src/scan/tokens_public"
-import {Lexer} from "../../src/scan/lexer_public"
+import {IMultiModeLexerDefinition, Lexer} from "../../src/scan/lexer_public"
 import {Parser, EMPTY_ALT} from "../../src/parse/parser_public"
 import {HashTable} from "../../src/lang/lang_extensions"
 import {getLookaheadFuncsForClass} from "../../src/parse/cache"
@@ -739,6 +739,23 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                 expect(tokensMap.PlusTok).to.equal(PlusTok)
                 expect(tokensMap.MinusTok).to.equal(MinusTok)
                 expect(tokensMap.IntToken).to.equal(IntTok)
+            })
+
+            it("can be initialized with a IMultiModeLexerDefinition of Tokens", () => {
+                let multiModeLexerDef:IMultiModeLexerDefinition = {
+                    modes:       {
+                        bamba: [PlusTok],
+                        bisli: [MinusTok, IntTok]
+                    },
+                    defaultMode: "bisli"
+                }
+                let parser:any = new Parser([], multiModeLexerDef)
+                let tokensMap = (<any>parser).tokensMap
+                // the implementation should clone the dictionary to avoid bugs caused by mutability
+                expect(tokensMap).not.to.equal(multiModeLexerDef)
+                expect(tokensMap.PlusTok).to.equal(PlusTok)
+                expect(tokensMap.MinusTok).to.equal(MinusTok)
+                expect(tokensMap.IntTok).to.equal(IntTok)
             })
 
             it("cannot be initialized with other parameters", () => {

@@ -7,7 +7,7 @@ import {
     cloneArr,
     cloneObj,
     contains,
-    dropRight,
+    dropRight, every,
     find,
     first,
     flatten,
@@ -21,7 +21,7 @@ import {
     map,
     NOOP,
     reduce,
-    some,
+    some, uniq,
     values
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
@@ -37,7 +37,7 @@ import {
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "./grammar/lookahead"
-import {TokenConstructor} from "../scan/lexer_public"
+import {IMultiModeLexerDefinition, TokenConstructor} from "../scan/lexer_public"
 import {buildTopProduction} from "./gast_builder"
 import {
     AbstractNextTerminalAfterProductionWalker,
@@ -52,7 +52,7 @@ import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
 import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
-import {augmentTokenClasses, tokenStructuredIdentity, tokenStructuredMatcher} from "../scan/tokens"
+import {augmentTokenClasses, isBaseTokenClass, isExtendingTokenType, tokenStructuredIdentity, tokenStructuredMatcher} from "../scan/tokens"
 import {CstNode} from "./cst/cst_public"
 import {addNoneTerminalToCst, addTerminalToCst, buildChildrenDictionaryDefTopRules, initChildrenDictionary} from "./cst/cst"
 import {
@@ -493,7 +493,7 @@ export class Parser {
      */
     private _productions:HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
-    constructor(input:IToken[], tokensMapOrArr:{ [fqn:string]:TokenConstructor } | TokenConstructor[],
+    constructor(input:IToken[], tokensDictionary:{ [fqn:string]:TokenConstructor } | TokenConstructor[] | IMultiModeLexerDefinition,
                 config:IParserConfig = DEFAULT_PARSER_CONFIG) {
         this._input = input
 
@@ -555,17 +555,26 @@ export class Parser {
             this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(this.className)
         }
 
-        if (isArray(tokensMapOrArr)) {
-            this.tokensMap = <any>reduce(<any>tokensMapOrArr, (acc, tokenClazz:TokenConstructor) => {
+        if (isArray(tokensDictionary)) {
+            this.tokensMap = <any>reduce(<any>tokensDictionary, (acc, tokenClazz:TokenConstructor) => {
                 acc[tokenName(tokenClazz)] = tokenClazz
                 return acc
             }, {})
         }
-        else if (isObject(tokensMapOrArr)) {
-            this.tokensMap = cloneObj(tokensMapOrArr)
+        else if (has(tokensDictionary, "modes") && every(flatten(values((<any>tokensDictionary).modes)), isExtendingTokenType)) {
+            let allTokenTypes = flatten(values((<any>tokensDictionary).modes))
+            let uniqueTokens = uniq(allTokenTypes)
+            this.tokensMap = <any>reduce(uniqueTokens, (acc, tokenClazz:TokenConstructor) => {
+                acc[tokenName(tokenClazz)] = tokenClazz
+                return acc
+            }, {})
+        }
+        else if (isObject(tokensDictionary)) {
+            this.tokensMap = cloneObj(tokensDictionary)
         }
         else {
-            throw new Error("'tokensMapOrArr' argument must be An Array of Token constructors or a Dictionary of Tokens.")
+            throw new Error("<tokensDictionary> argument must be An Array of Token constructors" +
+                " A dictionary of Token constructors or an IMultiModeLexerDefinition")
         }
 
         this.tokenMatcher = tokenStructuredMatcher
