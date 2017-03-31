@@ -24,7 +24,7 @@ There are two major differences.
 In the future this capability will be enabled by default.
 Currently this feature must be explicitly enabled by setting the **outputCst** flag.
 
-In the parser [configuration object](http://sap.github.io/chevrotain/documentation/0_27_1/interfaces/_chevrotain_d_.iparserconfig.html).
+In the parser [configuration object](http://sap.github.io/chevrotain/documentation/0_27_2/interfaces/_chevrotain_d_.iparserconfig.html).
 
 ```JavaScript
 class MyParser extends chevrotain.Parser {
