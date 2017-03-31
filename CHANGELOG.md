@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+- [Detect alternation prefix ambiguities.](https://github.com/SAP/chevrotain/issues/186)
+
+
+
 ## 0.27.1 (3-29-2017)
 
 #### Minor Changes
