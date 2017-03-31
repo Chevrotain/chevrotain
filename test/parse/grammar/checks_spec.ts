@@ -259,13 +259,16 @@ describe("the getFirstNoneTerminal function", () => {
 })
 
 export class PlusTok extends Token {
-    constructor() {super()}}
+    constructor() {super()}
+}
 
 export class MinusTok extends Token {
-    constructor() {super()}}
+    constructor() {super()}
+}
 
 export class StarTok extends Token {
-    constructor() {super()}}
+    constructor() {super()}
+}
 
 class ErroneousOccurrenceNumUsageParser1 extends Parser {
 
@@ -544,6 +547,37 @@ describe("The empty alternative detection full flow", () => {
         expect(() => new EmptyAltAmbiguityParser()).to.throw("2")
     })
 
+    it("will detect alternative ambiguity with identical lookaheads", () => {
+        class AltAmbiguityParserImplicitOccurence extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, StarTok]);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                this.OR([
+                    {
+                        ALT: () => {
+                            this.CONSUME1(PlusTok)
+                            this.CONSUME1(StarTok)
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.CONSUME2(PlusTok)
+                            this.CONSUME2(StarTok)
+                        }
+                    }
+                ])
+            })
+        }
+        expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("Ambiguous alternative")
+        expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("1")
+        expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("2")
+        expect(() => new AltAmbiguityParserImplicitOccurence()).to.throw("<PlusTok, StarTok> may appears as a prefix path")
+    })
+
     it("will throw an error when an empty alternative is not the last alternative #2", () => {
         class EmptyAltAmbiguityParser extends Parser {
 
@@ -565,6 +599,79 @@ describe("The empty alternative detection full flow", () => {
         expect(() => new EmptyAltAmbiguityParser()).to.throw("1")
         expect(() => new EmptyAltAmbiguityParser()).to.throw("Only the last alternative may be an empty alternative.")
         expect(() => new EmptyAltAmbiguityParser()).to.not.throw("undefined")
+    })
+})
+
+describe("The prefix ambiguity detection full flow", () => {
+
+    it("will throw an error when an a common prefix ambiguity is detected", () => {
+        class PrefixAltAmbiguity extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok, StarTok]);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public prefixAltAmbiguity = this.RULE("prefixAltAmbiguity", () => {
+                this.OR3([
+                    {
+                        ALT: () => {
+                            this.CONSUME1(PlusTok)
+                            this.CONSUME1(MinusTok)
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.CONSUME2(PlusTok)
+                            this.CONSUME2(MinusTok)
+                            this.CONSUME1(StarTok)
+                        }
+                    }
+                ])
+            })
+
+        }
+        expect(() => new PrefixAltAmbiguity()).to.throw("OR3")
+        expect(() => new PrefixAltAmbiguity()).to.throw("Ambiguous alternatives")
+        expect(() => new PrefixAltAmbiguity()).to.throw("due to common lookahead prefix")
+        expect(() => new PrefixAltAmbiguity()).to.throw("<PlusTok, MinusTok>")
+        expect(() => new PrefixAltAmbiguity()).to.throw(
+            "See https://github.com/SAP/chevrotain/blob/master/docs/resolving_grammar_errors.md#COMMON_PREFIX")
+    })
+
+    it("will throw an error when an a common prefix ambiguity is detected - implicit occurrence idx", () => {
+        class PrefixAltAmbiguity2 extends Parser {
+
+            constructor(input:Token[] = []) {
+                super(input, [PlusTok, MinusTok, StarTok]);
+                (<any>Parser).performSelfAnalysis(this)
+            }
+
+            public prefixAltAmbiguity = this.RULE("prefixAltAmbiguity", () => {
+                this.OR([
+                    {
+                        ALT: () => {
+                            this.CONSUME1(PlusTok)
+                            this.CONSUME1(MinusTok)
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.CONSUME2(PlusTok)
+                            this.CONSUME2(MinusTok)
+                            this.CONSUME1(StarTok)
+                        }
+                    }
+                ])
+            })
+
+        }
+        expect(() => new PrefixAltAmbiguity2()).to.throw("OR")
+        expect(() => new PrefixAltAmbiguity2()).to.throw("Ambiguous alternatives")
+        expect(() => new PrefixAltAmbiguity2()).to.throw("due to common lookahead prefix")
+        expect(() => new PrefixAltAmbiguity2()).to.throw("<PlusTok, MinusTok>")
+        expect(() => new PrefixAltAmbiguity2()).to.throw(
+            "See https://github.com/SAP/chevrotain/blob/master/docs/resolving_grammar_errors.md#COMMON_PREFIX")
     })
 })
 

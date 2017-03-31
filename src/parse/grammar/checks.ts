@@ -1,5 +1,5 @@
 import * as utils from "../../utils/utils"
-import {contains, every, flatten, forEach, groupBy, isEmpty, map, pick, reduce, reject, values} from "../../utils/utils"
+import {contains, every, findAll, flatten, forEach, groupBy, isEmpty, map, pick, reduce, reject, values} from "../../utils/utils"
 import {
     IgnoredParserIssues,
     IParserAmbiguousAlternativesDefinitionError,
@@ -12,7 +12,14 @@ import {gast} from "./gast_public"
 import {getProductionDslName, isOptionalProd} from "./gast"
 import {tokenLabel, tokenName} from "../../scan/tokens_public"
 import {first} from "./first"
-import {Alternative, containsPath, getLookaheadPathsForOr, getLookaheadPathsForOptionalProd, getProdType} from "./lookahead"
+import {
+    Alternative,
+    containsPath,
+    getLookaheadPathsForOptionalProd,
+    getLookaheadPathsForOr,
+    getProdType,
+    isStrictPrefixOfPath
+} from "./lookahead"
 import {VERSION} from "../../version"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {NamedDSLMethodsCollectorVisitor} from "../cst/cst"
@@ -394,38 +401,14 @@ export function validateAmbiguousAlternationAlternatives(topLevelRule:gast.Rule,
     }
 
     let errors = utils.reduce(ors, (result, currOr:gast.Alternation) => {
-
         let currOccurrence = currOr.occurrenceInParent
         let alternatives = getLookaheadPathsForOr(currOccurrence, topLevelRule, maxLookahead)
-        let altsAmbiguityErrors = checkAlternativesAmbiguities(alternatives)
+        let altsAmbiguityErrors = checkAlternativesAmbiguities(alternatives, currOr, topLevelRule.name)
+        let altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(alternatives, currOr, topLevelRule.name)
 
-        let currErrors = utils.map(altsAmbiguityErrors, (currAmbDescriptor) => {
-            let ambgIndices = map(currAmbDescriptor.alts, (currAltIdx) => currAltIdx + 1)
-            let pathMsg = map(currAmbDescriptor.path, (currtok) => tokenLabel(currtok)).join(", ")
-            let currMessage = `Ambiguous alternatives: <${ambgIndices.join(" ,")}> in <OR${currOccurrence}>` +
-                ` inside <${topLevelRule.name}> Rule,\n` +
-                `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
-
-
-            let docs_version = VERSION.replace(/\./g, "_")
-            // Should this information be on the error message or in some common errors docs?
-            currMessage = currMessage + "To Resolve this, try one of of the following: \n" +
-                "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
-                "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
-                "3. This issue can be ignored (if you know what you are doing...), see" +
-                " http://sap.github.io/chevrotain/documentation/" + docs_version + "/interfaces/iparserconfig.html#ignoredissues for more" +
-                " details\n"
-
-            return {
-                message:      currMessage,
-                type:         ParserDefinitionErrorType.AMBIGUOUS_ALTS,
-                ruleName:     topLevelRule.name,
-                occurrence:   currOr.occurrenceInParent,
-                alternatives: [currAmbDescriptor.alts]
-            }
-        })
-        return result.concat(currErrors)
+        return result.concat(altsAmbiguityErrors, altsPrefixAmbiguityErrors)
     }, [])
+
 
     return errors
 }
@@ -486,7 +469,9 @@ export interface IAmbiguityDescriptor {
     path:Function[]
 }
 
-function checkAlternativesAmbiguities(alternatives:Alternative[]):IAmbiguityDescriptor[] {
+function checkAlternativesAmbiguities(alternatives:Alternative[],
+                                      alternation:gast.Alternation,
+                                      topRuleName:string):IParserAmbiguousAlternativesDefinitionError[] {
 
     let foundAmbiguousPaths = []
     let identicalAmbiguities = reduce(alternatives, (result, currAlt, currAltIdx) => {
@@ -510,7 +495,81 @@ function checkAlternativesAmbiguities(alternatives:Alternative[]):IAmbiguityDesc
         return result
     }, [])
 
-    return identicalAmbiguities
+    let currErrors = utils.map(identicalAmbiguities, (currAmbDescriptor) => {
+        let ambgIndices = map(currAmbDescriptor.alts, (currAltIdx) => currAltIdx + 1)
+        let pathMsg = map(currAmbDescriptor.path, (currtok) => tokenLabel(currtok)).join(", ")
+        let occurrence = alternation.implicitOccurrenceIndex ? "" : alternation.occurrenceInParent
+        let currMessage = `Ambiguous alternatives: <${ambgIndices.join(" ,")}> in <OR${occurrence}>` +
+            ` inside <${topRuleName}> Rule,\n` +
+            `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
+
+
+        let docs_version = VERSION.replace(/\./g, "_")
+        // Should this information be on the error message or in some common errors docs?
+        currMessage = currMessage + "To Resolve this, try one of of the following: \n" +
+            "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
+            "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
+            "3. This issue can be ignored (if you know what you are doing...), see" +
+            " http://sap.github.io/chevrotain/documentation/" + docs_version + "/interfaces/iparserconfig.html#ignoredissues for more" +
+            " details\n"
+
+        return {
+            message:      currMessage,
+            type:         ParserDefinitionErrorType.AMBIGUOUS_ALTS,
+            ruleName:     topRuleName,
+            occurrence:   alternation.occurrenceInParent,
+            alternatives: [currAmbDescriptor.alts]
+        }
+    })
+
+    return currErrors
+}
+
+function checkPrefixAlternativesAmbiguities(alternatives:Alternative[], alternation:gast.Alternation, ruleName):IAmbiguityDescriptor[] {
+    let errors = []
+
+    // flatten
+    let pathsAndIndices = reduce(alternatives, (result, currAlt, idx) => {
+        let currPathsAndIdx = map(currAlt, (currPath) => {
+            return {idx: idx, path: currPath}
+        })
+        return result.concat(currPathsAndIdx)
+    }, [])
+
+    forEach(pathsAndIndices, (currPathAndIdx) => {
+        let targetIdx = currPathAndIdx.idx
+        let targetPath = currPathAndIdx.path
+
+        let prefixAmbiguitiesPathsAndIndices = findAll(pathsAndIndices, (searchPathAndIdx) => {
+            // prefix ambiguity can only be created from lower idx (higher priority) path
+            return searchPathAndIdx.idx < targetIdx &&
+                // checking for strict prefix because identical lookaheads
+                // will be be detected using a different validation.
+                isStrictPrefixOfPath(searchPathAndIdx.path, targetPath)
+        })
+
+        let currPathPrefixErrors = map(prefixAmbiguitiesPathsAndIndices, (currAmbPathAndIdx) => {
+            let ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
+            let pathMsg = map(currAmbPathAndIdx.path, (currTok) => tokenLabel(currTok)).join(", ")
+            let occurrence = alternation.implicitOccurrenceIndex ? "" : alternation.occurrenceInParent
+            let currMessage = `Ambiguous alternatives: <${ambgIndices.join(" ,")}> due to common lookahead prefix\n` +
+                `in <OR${occurrence}> inside <${ruleName}> Rule,\n` +
+                `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
+                `See https://github.com/SAP/chevrotain/blob/master/docs/resolving_grammar_errors.md#COMMON_PREFIX\n` +
+                `For farther details.`
+
+            return {
+                message:      currMessage,
+                type:         ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
+                ruleName:     ruleName,
+                occurrence:   occurrence,
+                alternatives: ambgIndices
+            }
+        })
+        errors = errors.concat(currPathPrefixErrors)
+    })
+
+    return errors
 }
 
 function checkTerminalAndNoneTerminalsNameSpace(ruleNames:string[], terminalNames:string[]):IParserDefinitionError[] {
