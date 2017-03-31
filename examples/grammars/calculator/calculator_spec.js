@@ -20,4 +20,8 @@ describe("The Calculator Grammar", function() {
         assert.equal(calc("((((666))))").value, 666);
     })
 
+    it("can calculate an expression with power function", function() {
+        assert.equal(calc("1 + power(2,2)").value, 5);
+    });
+
 });

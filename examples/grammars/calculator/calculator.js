@@ -20,11 +20,15 @@ var Div = createToken({name: "Div", pattern: /\//, parent: MultiplicationOperato
 var LParen = createToken({name: "LParen", pattern: /\(/});
 var RParen = createToken({name: "RParen", pattern: /\)/});
 var NumberLiteral = createToken({name: "NumberLiteral", pattern: /[1-9]\d*/});
+
+var PowerFunc = createToken({name: "PowerFunc", pattern: /power/});
+var Comma = createToken({name: "Comma", pattern: /,/});
+
 // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
 
 var allTokens = [WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
-    Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator];
+    Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator, PowerFunc, Comma];
 var CalculatorLexer = new Lexer(allTokens);
 
 
@@ -91,8 +95,9 @@ function Calculator(input) {
             // parenthesisExpression has the highest precedence and thus it appears
             // in the "lowest" leaf in the expression ParseTree.
             {ALT: function() { return $.SUBRULE($.parenthesisExpression)}},
-            {ALT: function() { return parseInt($.CONSUME(NumberLiteral).image, 10)}}
-        ], "a number or parenthesis expression");
+            {ALT: function() { return parseInt($.CONSUME(NumberLiteral).image, 10)}},
+            {ALT: function() { return $.SUBRULE($.powerFunction)}}
+        ]);
     });
 
     $.RULE("parenthesisExpression", function() {
@@ -103,6 +108,19 @@ function Calculator(input) {
         $.CONSUME(RParen);
 
         return expValue
+    });
+
+    $.RULE("powerFunction", function() {
+        var base, exponent;
+
+        $.CONSUME(PowerFunc);
+        $.CONSUME(LParen);
+        base = $.SUBRULE($.expression);
+        $.CONSUME(Comma);
+        exponent = $.SUBRULE2($.expression);
+        $.CONSUME(RParen);
+
+        return Math.pow(base, exponent)
     });
 
     // very important to call this after all the rules have been defined.
