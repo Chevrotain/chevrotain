@@ -563,4 +563,10 @@ export function containsPath(alternative:Alternative, path:Function[]):boolean {
     return found !== undefined
 }
 
+export function isStrictPrefixOfPath(prefix:Function[], other:Function[]):boolean {
+    return prefix.length < other.length &&
+        every(prefix, (tokType, idx) => {
+            return tokType === other[idx]
+        })
+}
 

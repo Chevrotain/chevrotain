@@ -183,7 +183,18 @@ export function find<T>(arr:T[], predicate:(item:T) => boolean):T {
     return undefined
 }
 
-export function reduce<T, A>(arrOrObj:Array<T>|Object, iterator:(result:A, item, idx?) => A, initial:A):A {
+export function findAll<T>(arr:T[], predicate:(item:T) => boolean):T[] {
+    let found = []
+    for (let i = 0; i < arr.length; i++) {
+        let item = arr[i]
+        if (predicate.call(null, item)) {
+            found.push(item)
+        }
+    }
+    return found
+}
+
+export function reduce<T, A>(arrOrObj:Array<T> | Object, iterator:(result:A, item, idx?) => A, initial:A):A {
     let vals:T[] = Array.isArray(arrOrObj) ? <Array<T>>arrOrObj : values(arrOrObj)
 
     let accumulator = initial
@@ -310,8 +321,8 @@ export function assignNoOverwrite(target:Object, ...sources:Object[]):Object {
     return target
 }
 
-export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey:string]:T[]} {
-    let result:{ [groupKey:string]:T[]} = {}
+export function groupBy<T>(arr:T[], groupKeyFunc:(item:T) => string):{ [groupKey:string]:T[] } {
+    let result:{ [groupKey:string]:T[] } = {}
 
     forEach(arr, (item) => {
         let currGroupKey = groupKeyFunc(item)
