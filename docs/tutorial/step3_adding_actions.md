@@ -94,10 +94,10 @@ $.RULE("selectClause", () => {
     let columns = []
     
     $.CONSUME(Select);
-    $.AT_LEAST_ONE_SEP(Comma, () => {
+    $.AT_LEAST_ONE_SEP({SEP:Comma, DEF:() => {
        // accessing a token's string via getImage utility
        columns.push(getImage($.CONSUME(Identifier))
-    })
+    }})
 
     return {
         type    : "SELECT_CLAUSE", 
