@@ -53,6 +53,10 @@ export function getCstDictDefPerRuleForClass(className:string):HashTable<string[
     return getFromNestedHashTable(className, CLASS_TO_CST_DICT_DEF_PER_RULE)
 }
 
+export let CLASS_TO_BASE_CST_VISITOR = new HashTable<Function>()
+export let CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS = new HashTable<Function>()
+export let CLASS_TO_ALL_RULE_NAMES = new HashTable<string[]>()
+
 // TODO reflective test to verify this has not changed, for example (OPTION6 added)
 export const MAX_OCCURRENCE_INDEX = 5
 

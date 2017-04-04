@@ -104,21 +104,26 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
     }
 }
 
-// TODO: maybe just need a list of names if we use pure arrays?
-export function buildChildrenDictionaryDefTopRules(topRules:gast.Rule[],
-                                                   fullToShortName:HashTable<number>):HashTable<string[]> {
-    let result = new HashTable<string[]>()
+export function analyzeCst(topRules:gast.Rule[],
+                           fullToShortName:HashTable<number>):{
+    dictDef:HashTable<string[]>,
+    allRuleNames:string[]
+} {
+    let result = {dictDef: new HashTable<string[]>(), allRuleNames: []}
 
     forEach(topRules, (currTopRule) => {
         let currChildrenNames = buildChildDictionaryDef(currTopRule.definition)
         let currTopRuleShortName = fullToShortName.get(currTopRule.name)
-        result.put(currTopRuleShortName, currChildrenNames)
+        result.dictDef.put(currTopRuleShortName, currChildrenNames)
+        result.allRuleNames.push(currTopRule.name)
 
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor(currTopRuleShortName)
         currTopRule.accept(namedCollectorVisitor)
-        forEach(namedCollectorVisitor.result, ({def, key}) => {
+        forEach(namedCollectorVisitor.result, ({def, key, name}) => {
             let currNestedChildrenNames = buildChildDictionaryDef(def)
-            result.put(key, currNestedChildrenNames)
+            result.dictDef.put(key, currNestedChildrenNames)
+            // TODO: use something other than "$"?
+            result.allRuleNames.push(currTopRule.name + name)
         })
     })
 

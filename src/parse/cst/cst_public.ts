@@ -18,4 +18,20 @@ export interface CstNode {
     readonly children:CstChildrenDictionary
 
     readonly recoveredNode?:boolean
+
+    /**
+     * Only for "in-lined" rules, the name of the top level rule containing this nested rule
+     */
+    readonly fullName?:string
+}
+
+// TODO: use default generics arguments in typescript 2.3
+export interface ICstVisitor<IN, OUT> {
+    // If an array is passed as the first argument it is equivalent to passing the first item of the array.
+    visit(cstNode:CstNode | CstNode[], param?:IN):OUT
+    validateVisitor():void
+}
+
+export interface CstVisitorConstructor extends Function {
+    new<IN, OUT>(...args:any[]):ICstVisitor<IN, OUT>
 }

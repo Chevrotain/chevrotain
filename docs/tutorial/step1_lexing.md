@@ -1,10 +1,11 @@
 # Tutorial Step 1 - Building a Lexer.
 
-### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
+### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015/2016 syntax (classes/let/static class props) as those better convey the intent. The **online** version uses ES5 syntax.
+The code samples in the **written** tutorial use ES2015+ for clarity. 
+The **online demo** version uses ES5 syntax.
 
 
 ### Introduction:
@@ -15,8 +16,8 @@ In This tutorial we will implement a Lexer for a simple SQL Select statement lan
  ...
 ```
 
-A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/0_27_3/interfaces/_chevrotain_d_.isimpletokenoritoken.html) vector.
-Chevrotain comes with a built in Lexer engine based on Javascript Regular Expressions.
+A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/0_27_3/interfaces/_chevrotain_d_.itoken.html) vector.
+Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
 To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
 

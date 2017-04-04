@@ -1,3 +1,14 @@
+"use strict";
+/**
+ * An Example of implementing a Calculator with embedded actions (semantics).
+ *
+ * Embedded actions mean that the semantics of the grammar (in our case the calculation of the numerical result)
+ * are written as part of (inside) the grammar rules.
+ *
+ * This can be useful for simple use cases and it is also very fast.
+ * However for complex use cases see the same grammar with separated semantics:
+ * https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
+ */
 var chevrotain = require("chevrotain");
 
 // ----------------- lexer -----------------
@@ -139,7 +150,7 @@ Calculator.prototype = Object.create(Parser.prototype);
 Calculator.prototype.constructor = Calculator;
 
 
-// wrapping it all togater
+// wrapping it all together
 // reuse the same parser instance.
 var parser = new Calculator([]);
 

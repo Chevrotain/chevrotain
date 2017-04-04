@@ -1,4 +1,5 @@
 import * as cache from "./cache"
+import {CLASS_TO_ALL_RULE_NAMES, CLASS_TO_BASE_CST_VISITOR, CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS} from "./cache"
 import {exceptions} from "./exceptions_public"
 import {classNameFromInstance, HashTable} from "../lang/lang_extensions"
 import {resolveGrammar} from "./grammar/resolver"
@@ -7,7 +8,8 @@ import {
     cloneArr,
     cloneObj,
     contains,
-    dropRight, every,
+    dropRight,
+    every,
     find,
     first,
     flatten,
@@ -21,7 +23,8 @@ import {
     map,
     NOOP,
     reduce,
-    some, uniq,
+    some,
+    uniq,
     values
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
@@ -52,9 +55,9 @@ import {IN} from "./constants"
 import {gast} from "./grammar/gast_public"
 import {cloneProduction} from "./grammar/gast"
 import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
-import {augmentTokenClasses, isBaseTokenClass, isExtendingTokenType, tokenStructuredIdentity, tokenStructuredMatcher} from "../scan/tokens"
-import {CstNode} from "./cst/cst_public"
-import {addNoneTerminalToCst, addTerminalToCst, buildChildrenDictionaryDefTopRules, initChildrenDictionary} from "./cst/cst"
+import {augmentTokenClasses, isExtendingTokenType, tokenStructuredIdentity, tokenStructuredMatcher} from "../scan/tokens"
+import {CstNode, ICstVisitor} from "./cst/cst_public"
+import {addNoneTerminalToCst, addTerminalToCst, analyzeCst, initChildrenDictionary} from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -67,6 +70,7 @@ import {
     OPTION_IDX,
     OR_IDX
 } from "./grammar/keys"
+import {createBaseSemanticVisitorConstructor, createBaseVisitorConstructorWithDefaults} from "./cst/cst_visitor"
 import ISerializedGast = gast.ISerializedGast
 import serializeGrammar = gast.serializeGrammar
 
@@ -136,7 +140,9 @@ export interface IParserConfig {
     dynamicTokensEnabled?:boolean
 
     /**
-     * TODO: docs
+     * Enable automatic Concrete Syntax Tree creation
+     * For in-depth docs:
+     * {@link https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md}
      */
     outputCst?:boolean
 }
@@ -434,11 +440,10 @@ export class Parser {
                 cache.setResyncFollowsForClass(className, allFollows)
             }
 
-            if (parserInstance.outputCst) {
-                let dictDefForRules = buildChildrenDictionaryDefTopRules(clonedProductions.values(),
-                    parserInstance.fullRuleNameToShort)
-                cache.getCstDictDefPerRuleForClass(className).putAll(dictDefForRules)
-            }
+            let cstAnalysisResult = analyzeCst(clonedProductions.values(),
+                parserInstance.fullRuleNameToShort)
+            cache.getCstDictDefPerRuleForClass(className).putAll(cstAnalysisResult.dictDef)
+            cache.CLASS_TO_ALL_RULE_NAMES.put(className, cstAnalysisResult.allRuleNames)
         }
 
         // reThrow the validation errors each time an erroneous parser is instantiated
@@ -629,6 +634,31 @@ export class Parser {
 
     public isAtEndOfInput():boolean {
         return this.tokenMatcher(this.LA(1), EOF)
+    }
+
+    public getBaseCstVisitorConstructor():{ new(...args:any[]):ICstVisitor<any, any> } {
+        let cachedConstructor = CLASS_TO_BASE_CST_VISITOR.get(this.className)
+
+        if (isUndefined(cachedConstructor)) {
+            let allRuleNames = CLASS_TO_ALL_RULE_NAMES.get(this.className)
+            cachedConstructor = createBaseSemanticVisitorConstructor(this.className, allRuleNames)
+            CLASS_TO_BASE_CST_VISITOR.put(this.className, cachedConstructor)
+        }
+
+        return <any>cachedConstructor
+    }
+
+    public getBaseCstVisitorConstructorWithDefaults():{ new(...args:any[]):ICstVisitor<any, any> } {
+        let cachedConstructor = CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS.get(this.className)
+
+        if (isUndefined(cachedConstructor)) {
+            let allRuleNames = CLASS_TO_ALL_RULE_NAMES.get(this.className)
+            let baseConstructor = this.getBaseCstVisitorConstructor()
+            cachedConstructor = createBaseVisitorConstructorWithDefaults(this.className, allRuleNames, baseConstructor)
+            CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS.put(this.className, cachedConstructor)
+        }
+
+        return <any>cachedConstructor
     }
 
     public getGAstProductions():HashTable<gast.Rule> {
@@ -1972,12 +2002,13 @@ export class Parser {
         }
     }
 
-    private cstNestedInvocationStateUpdate(fullRuleName:string, shortName:string | number):void {
+    private cstNestedInvocationStateUpdate(nestedName:string, shortName:string | number):void {
         let initDef = this.cstDictDefForRule.get(shortName)
         // TODO: investigate performance impact of adding accessor methods
         this.CST_STACK.push({
-            name:     fullRuleName,
-            children: initChildrenDictionary(initDef)
+            name:       nestedName,
+            fullName: this.shortRuleNameToFull.get(this.getLastExplicitRuleShortName()) + nestedName,
+            children:   initChildrenDictionary(initDef)
         })
     }
 
