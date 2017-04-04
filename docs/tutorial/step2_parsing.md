@@ -118,9 +118,9 @@ Important to note that:
 this.selectClause =
  $.RULE("selectClause", () => {
       $.CONSUME(Select);
-      $.AT_LEAST_ONE_SEP(Comma, () => {
+      $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
           $.CONSUME(Identifier);
-      });
+      }});
  })
  
 // atomicExpression
