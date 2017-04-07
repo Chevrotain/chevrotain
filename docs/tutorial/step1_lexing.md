@@ -4,8 +4,7 @@
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015/2016 syntax (classes/let/static class props)
-As those better convey the intent. The **online** version uses ES5 syntax.
+The code samples in the **written** tutorial use ES2015/2016 syntax (classes/let/static class props) as those better convey the intent. The **online** version uses ES5 syntax.
 
 
 ### Introduction:
@@ -136,5 +135,5 @@ The Lexing Result will contain:
 
 
 #### What is Next?
-* Try out the [**onine** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of this tutorial
+* Try out the [**online** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of this tutorial
 * Move to the next step: [Step 2 -  Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
