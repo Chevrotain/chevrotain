@@ -7,12 +7,11 @@
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015/2016/Typescript syntax (classes/let/static class props)
-As those better convey the intent. The **online** version uses ES5 syntax.
+The code samples in the **written** tutorial use ES2015/2016/Typescript syntax (classes/let/static class props) as those better convey the intent. The **online** version uses ES5 syntax.
 
 
 ### Introduction:
-In This tutorial we will implement a Parser for a simple SQL Select statement language
+In this tutorial we will implement a Parser for a simple SQL Select statement language
 introduced in the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md) tutorial step. 
 
 The grammar for our language:
@@ -43,8 +42,7 @@ relationalOperator
 ```
 
 A Chevrotain Parser analyses an [IToken](http://sap.github.io/chevrotain/documentation/0_27_3/interfaces/_chevrotain_d_.itoken.html) vector that conforms to some grammar.
-The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#at_least_one),
-Which includes the following methods.
+The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#at_least_one), which includes the following methods.
 
 *   [CONSUME](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#consume1) - 'eat' a Token.
 *   [SUBRULE](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#subrule1) - reference to another rule.
@@ -55,7 +53,7 @@ Which includes the following methods.
 *   [AT_LEAST_ONE_SEP](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
 
 
-#### Lets implement our first grammar rule. 
+#### Let's implement our first grammar rule. 
 
 ```Typescript
 // selectStatement
@@ -109,7 +107,7 @@ Important to note that:
   and performing static checks on the grammar.
   
 
-#### Lets look at two more grammar rule, this time with repetition and alternation.
+#### Let's look at two more grammar rule, this time with repetition and alternation.
 
 ```Typescript
 // selectClause
@@ -138,10 +136,13 @@ this.atomicExpression =
 
 #### How can the Parser be debugged? 
 The grammar rules above do not only define the grammar, they are also the code that will be run
-during parsing. This means that debugging the parser **simply means adding a break
-point in the grammar**. There **do not** exist two different representations for for the grammar
-and the runnable implementation (for example grammar file vs generated code in the case of parser generators).
+during parsing. This means that you can debug the parser **simply by adding a break
+point in the grammar**.
 
+There **do not** exist two different representations for the grammar
+and the runnable implementation (for example, grammar file vs generated code in the case of parser generators). Again, please note that Chevrotain is **NOT** a parser generator.
+
+The reasoning behind this decision is [explained here[(https://www.bountysource.com/issues/38668050-chevrotain-as-the-generated-code-from-peg).
 
 #### But how does it work? (skip if you don't care :) )
 The code above will be executed as is. Yet we have not implemented a lookahead function to
@@ -150,30 +151,30 @@ nor have we implemented logic to identify the next iteration for ```("," IDENTIF
 So how does it work?
 
 The answer is the 'secret sauce' of Chevrotain:
- * ```$.RULE``` will both:
-  * Analyse (using Function.toString) the implementation passed to it.
-    and construct a representation of the grammar in memory.
-  * Wrap the implementation passed to it in logic for running the Parser (fault tolerance/rule stacks/...)  
- * ```Parser.performSelfAnalysis(this)``` will finish 'compiling' the grammar representation (name resolution/static analysis) 
+
+* `$.RULE` will both:
+  - Analyse (using Function.toString) the implementation passed to it and construct a representation of the grammar in memory.
+  - Wrap the implementation passed to it in logic for running the Parser (fault tolerance/rule stacks/...)  
+* `Parser.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis) 
 
 So when the parser needs to choose between the two alternatives:
 ```Typescript
 $.OR([
      {ALT: () => { $.CONSUME(Integer)}},
      {ALT: () => { $.CONSUME(Identifier)}}
-     ]);
+]);
 ```
 
 It is aware of:
-* Where it is (OR [1] INSIDE_RULE [A] INSIDE_RULE [B] ...)
+* Where it is (`OR [1] INSIDE_RULE [A] INSIDE_RULE [B] ...`)
 * What Tokens can come next for each alternative, as it "is aware" of the whole grammar representation.
 
-Thus the parser can dynamically create(and cache) the lookahead function to choose between the two alternatives.
-The same applies for any grammar rule where the parser has a choice, and even in some where there is no choice
-as that same in memory representation of the grammar can be used for error messages and fault tolerance as well as deciding which path to take.
+Thus the parser can dynamically create (and cache) the lookahead function to choose between the two alternatives.
+
+The same applies for any grammar rule where the parser has a choice, and even in some where there is no choice as that same in memory representation of the grammar can be used for error messages and fault tolerance as well as deciding which path to take.
 
 
-#### Lets finish implementing the whole SelectParser:
+#### Let's finish implementing the whole SelectParser:
 
 ```Typescript
 
@@ -239,13 +240,9 @@ class SelectParser extends chevrotain.Parser {
 
 ```
 
-* Note that as a consequence of the parser having to 'know' its position
-  in the grammar during runtime, the Parsing DSL methods need to be distinguishable
-  when appearing in the same rule. Thus in the **expression** rule above
-  the second appearance of SUBRULE with atomicExpression parameter.
-  has a '2' suffix: $.SUBRULE**2**($.atomicExpression)
- * Such errors will be detected during self analysis, and will prevent
-   the creation of parser instances with a descriptive error message (fail fast...).
+* Note that as a consequence of the parser having to 'know' its position in the grammar during runtime, the Parsing DSL methods need to be distinguishable when appearing in the same rule. 
+  Thus in the `"expression"` rule above, the second appearance of `SUBRULE` with `atomicExpression` parameter has a '2' suffix: `$.SUBRULE2($.atomicExpression)`
+* Such errors will be detected during self analysis, and will prevent the creation of parser instances with a descriptive error message (fail fast...).
 
 
 #### But how do we actually use this Parser?
