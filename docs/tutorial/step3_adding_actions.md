@@ -14,8 +14,7 @@ As those better convey the intent. The **online** version uses ES5 syntax.
 ### Introduction:
 In the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
-validates the input conforms to the grammar. In most real world use cases the parser will also have to output some 
-result/data structure/value.
+validates the input conforms to the grammar, in other words it is just a recognizer. But in most real world use cases the parser will **also** have to output some result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 * [CONSUME](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#consume1) will return
@@ -27,8 +26,6 @@ This can be accomplished using two features of the Parsing DSL:
 ### A simple contrived example:
   
 ```Typescript
-let getImage = chevrotain.getImage
-
 $.RULE("topRule", () => {
     let result = 0
     
@@ -44,13 +41,13 @@ $.RULE("topRule", () => {
    
 $.RULE("decimalRule", () => {
     let decToken = $.CONSUME(Decimal)
-    return parseFloat(getImage(decimalToken))
+    return parseFloat(decimalToken.image)
   
 })
 
 $.RULE("IntegerRule", () => {
     let intToken = $.CONSUME(Integer)
-    return parseInt(getImage(intToken))
+    return parseInt(intToken.image)
 })
 ```
 
@@ -89,14 +86,12 @@ Lets look at one of those sub rules:
 
 ```Typescript
 
-let getImage = chevrotain.getImage
 $.RULE("selectClause", () => {
     let columns = []
     
     $.CONSUME(Select);
     $.AT_LEAST_ONE_SEP({SEP:Comma, DEF:() => {
-       // accessing a token's string via getImage utility
-       columns.push(getImage($.CONSUME(Identifier))
+       columns.push($.CONSUME(Identifier).image)
     }})
 
     return {
@@ -106,7 +101,7 @@ $.RULE("selectClause", () => {
 })
 ```
 
-In the selectClause rule we access the **image** property of the Identifier token returned from **CONSUME** using the getImage utility. and push each of these strings to the **columns** array.
+In the selectClause rule we access the **image** property of the Identifier **Token** returned from **CONSUME** utility. and push each of these strings to the **columns** array. We then return an AST node which includes the columns array and a **type** property.
 
 
 #### What is Next?
