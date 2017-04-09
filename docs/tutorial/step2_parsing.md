@@ -142,7 +142,7 @@ point in the grammar**.
 There **do not** exist two different representations for the grammar
 and the runnable implementation (for example, grammar file vs generated code in the case of parser generators). Again, please note that Chevrotain is **NOT** a parser generator.
 
-The reasoning behind this decision is [explained here[(https://www.bountysource.com/issues/38668050-chevrotain-as-the-generated-code-from-peg).
+The reasoning behind this decision is [explained in FAQ](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#-why-should-i-use-a-parsing-dsl-instead-of-a-parser-generator).
 
 #### But how does it work? (skip if you don't care :) )
 The code above will be executed as is. Yet we have not implemented a lookahead function to
