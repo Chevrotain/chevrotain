@@ -21,7 +21,7 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
  * See in depth documentation of Chevrotain's [CST capabilities](https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md)
 
 
-### Enable CST output for the parser.
+### Enabling CST output in our parser.
 
 First we need to enable CST (Concrete Syntax Tree) creation by our parser.
 This is easily done by passing the ["outputCst"](http://sap.github.io/chevrotain/documentation/0_27_3/interfaces/_chevrotain_d_.iparserconfig.html#outputcst) parser options object in
@@ -50,7 +50,7 @@ function parseInput(text) {
    let parser = new SelectParser(lexingResult.tokens)
    
    // CST automatically created. 
-   let ctxOutput = parser.selectStatement()
+   let cstOutput = parser.selectStatement()
 }
 ``` 
 
@@ -77,7 +77,7 @@ class myCustomVisitor extends BaseSQLVisitor {
         this.validateVisitor()
     }
     
-    /* Visit methods go here*/
+    /* Visit methods go here */
 }
 
 class myCustomVisitorWithDefaults extends BaseSQLVisitorWithDefaults {
@@ -86,7 +86,7 @@ class myCustomVisitorWithDefaults extends BaseSQLVisitorWithDefaults {
         this.validateVisitor()
     }
     
-    /* Visit methods go here*/
+    /* Visit methods go here */
 }
 
 const myVisitorInstance = new myCustomVisitor()
@@ -120,8 +120,8 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     
     // The Ctx argument is the current CSTNode's children.
     selectClause(ctx) {
-        // Each Terminal or Non-Terminal in a rule are collected into
-        // an array with the same name in the ctx object.
+        // Each Terminal or Non-Terminal in a grammar rule are collected into
+        // an array with the same name(key) in the ctx object.
         let columns = ctx.Identifier.map((identToken) => identToken.image)
         
         return {
@@ -156,12 +156,14 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
     
     selectStatement(ctx) {
-        // "this.visit" can be used to visit none-terminals
+        // "this.visit" can be used to visit none-terminals and will invoke the correct visit method for the CstNode passed.
         let select = this.visit(ctx.selectClause)
+        
         //  "this.visit" can work on either a CstNode or an Array of CstNodes.
         //  If an array is passed (ctx.fromClause is an array) it is equivalent
         //  to passing the first element of that array
         let from = this.visit(ctx.fromClause)
+        
         // "whereClause" is optional, "this.visit" will ignore empty arrays (optional)   
         let where = this.visit(ctx.whereClause)
         
