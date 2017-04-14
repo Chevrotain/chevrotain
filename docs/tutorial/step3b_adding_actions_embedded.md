@@ -21,7 +21,7 @@ This can be accomplished using two features of the Parsing DSL:
 * [CONSUME](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#consume1) will return
   The [Token](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.token.html) instance consumed.
 * [SUBRULE](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#subrule1) will return
-  the result on invoking the subrule.
+  the result of the grammar rule invoked.
 
 
 ### A simple contrived example:
@@ -57,7 +57,7 @@ and the **topRule** adds it to the final result.
 
 
 #### Back To the mini SQL Select grammar:
-For this parser lets build a more complex data structure instead of simply returning a number.
+For this grammar lets build a more complex data structure (an AST) instead of simply returning a number.
 Our selectStatement rule will now return an object with four properties:
  
 ```javascript
@@ -74,6 +74,7 @@ $.RULE("selectStatement", () => {
         type         : "SELECT_STMT", 
         selectClause : select,
         fromClause   : from, 
+        // may be undefined if the OPTION was not entered.
         whereClause  : where
     }
 })
@@ -82,10 +83,9 @@ $.RULE("selectStatement", () => {
 Three of those properties (selectClause / fromClause / whereClause) are the results of invoking
 other parser rules.
 
-Lets look at one of those sub rules:
+Lets look at the "selectClause" rule implemntaiton:
 
 ```javascript
-
 $.RULE("selectClause", () => {
     let columns = []
     
