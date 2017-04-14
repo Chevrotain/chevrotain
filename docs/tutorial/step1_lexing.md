@@ -21,30 +21,33 @@ Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
 To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
 
-```Typescript
- 
-class From extends Token {
-  static PATTERN = /FROM/  
-}
+```javascript
+const createToken = chevrotain.createToken
+// using createToken API
+const From = createToken({name: "From", pattern: /FROM/});
+
+// Using Class syntax 
+class From extends Token {}
+// manually creating static fields as those are not yet supported in ES2015
+From.PATTERN = /FROM/
 ```
  
-There is nothing much to it. The static **PATTERN** property is a RegExp which will be used when splitting up the input string
+There is nothing much to it. The pattern/PATTERN property is a RegExp which will be used when splitting up the input string
 into separate Tokens.
+
+We will use the [**createToken** API](http://sap.github.io/chevrotain/documentation/0_27_3/modules/_chevrotain_d_.html#createtoken) 
+in the rest of tutorial because ES2015 has no support for static fields.
  
  
+
 #### What about a slightly more complex Tokens? 
 
 How can we define Tokens for Identifiers or Integers?
  
-```Typescript
+```javascript
+const Identifier = createToken({name: "Identifier", pattern: /\w+/});
 
-class Identifier extends Token {
-  static PATTERN = /\w+/  
-}
- 
-class Integer extends Token {
-  static PATTERN = /0|[1-9]\d+/  
-}
+const Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
 ```
 
 
@@ -52,62 +55,46 @@ class Integer extends Token {
 The obvious use case in this language (and many others) is **whitespace**. skipping certain Tokens is easily
 accomplished by marking them with the SKIP group.
 
-```Typescript
-
-class WhiteSpace extends Token {
-  static PATTERN = /\s+/
-  static GROUP = chevrotain.lexer.SKIPPED
-}
+```javascript
+const WhiteSpace = createToken({
+     name: "WhiteSpace", 
+     pattern: /\s+/,
+     group: chevrotain.lexer.SKIPPED  
+     });
 ```
 
 
 #### Let us define all our nine Tokens:
 
-```Typescript
- 
-class Select extends Token {
-  static PATTERN = /SELECT/  
-}
-      
-class From extends Token {
-  static PATTERN = /FROM/  
-}
+```javascript
 
-class Where extends Token {
-  static PATTERN = /WHERE/  
-}
+const Select = createToken({name: "Select", pattern: /SELECT/});
 
-class Comma extends Token {
-  static PATTERN = /,/  
-}
-  
-class Identifier extends Token {
-  static PATTERN = /\w+/  
-}
+const From = createToken({name: "From", pattern: /FROM/});
 
-class Integer extends Token {
-  static PATTERN = /0|[1-9]\d+/  
-}
+const Where = createToken({name: "Where", pattern: /WHERE/});
 
-class GreaterThan extends Token {
-  static PATTERN = /</  
-}
+const Comma = createToken({name: "Comma", pattern: /,/});
 
-class LessThan extends Token {
-  static PATTERN = />/  
-}
+const Identifier = createToken({name: "Identifier", pattern: /\w+/});
 
-class WhiteSpace extends Token {
-  static PATTERN = /\s+/
-  static GROUP = chevrotain.lexer.SKIPPED
-}
- 
+const Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+
+const GreaterThan = createToken({name: "GreaterThan", pattern: /</});
+
+const LessThan = createToken({name: "LessThan", pattern: />/});
+
+const WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: chevrotain.lexer.SKIPPED
+    }); 
 ```
 
 
 #### All right, we have Token definitions, how do we use them to create a Lexer?
 
-```Typescript
+```javascript
 
 let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 let SelectLexer = new Lexer(allTokens);
@@ -119,12 +106,12 @@ Note that:
   The first PATTERN to match will be chosen not the longest.
   * See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
 
-* The Chevrotain Lexer is **stateless**, thus only a **single one per language** should ever be created.
+* The Chevrotain Lexer is **stateless**, thus only a **single one per grammar** should ever be created.
                           
 
 #### But how do we actually use this lexer?
 
-```Typescript
+```javascript
 let inputText = "SELECT column1 FROM table2"
 let lexingResult = SelectLexer.tokenize(inputText)
 ```
@@ -136,5 +123,5 @@ The Lexing Result will contain:
 
 
 #### What is Next?
-* Try out the [**online** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of this tutorial
+* Try out the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of this tutorial
 * Move to the next step: [Step 2 -  Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
