@@ -12,20 +12,20 @@ result/data structure/value.
 
 Chevrotain supports two **very different** solutions to this problem:
 
- * Separation of grammar and user actions (Semantics) using **CST Visitor**.
+ * Separation of grammar and user actions (Semantics) using a **CST Visitor**.
    - [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
- * **Embedding** user actions (Semantics) inside the grammar rules
+   
+ * **Embedding** user actions (Semantics) inside the grammar rules.
    - [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js)
    
-
 Before we continue one of the two approaches must be chosen.
 
 The main different between the two approaches is in regards to the question:
 **Where are the user actions (a.k.a semantics) written?**
 
-When using a **CST Visitor** the semantics are completely separated from the grammar
+When using a CST Visitor the semantics are **completely separated** from the grammar
 They could actually be implemented in a **different** file. This has great benefits
-for the ease of **maintenance** of the grammar and its **re-usability**.
+for the parser's ease of **maintenance** and its **re-usability**.
 Thus using a CST Visitor is the **recommended approach**.
   
 That is not to say there are no use cases in which **embedded actions** are better.
@@ -48,8 +48,3 @@ but that is not the case:
 #### What is Next?
 * Next step in the tutorial: [Step 3a - Separated Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_separated.md).
 * Next step in the tutorial: [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
-
-
-
-
-
