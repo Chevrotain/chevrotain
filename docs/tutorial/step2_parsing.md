@@ -3,11 +3,12 @@
 # Tutorial Step 2 - Building a Parser.
 
 
-### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) <---
+### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) <---
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015/2016/Typescript syntax (classes/let/static class props) as those better convey the intent. The **online** version uses ES5 syntax.
+The code samples in the **written** tutorial use ES2015+ for clarity. 
+The **online demo** version uses ES5 syntax.
 
 
 ### Introduction:
@@ -22,19 +23,19 @@ selectStatement
    : selectClause fromClause (whereClause)?
    
 selectClause
-   : "SELECT" IDENTIFIER ("," IDENTIFIER)*
+   : "SELECT" Identifier ("," Identifier)*
    
 fromClause
-   : "FROM" IDENTIFIER
+   : "FROM" Identifier
      
-fromClause
+whereClause
    : "WHERE" expression
    
 expression
    : atomicExpression relationalOperator atomicExpression
       
 atomicExpression
-   : INTEGER | IDENTIFIER
+   : Integer | Identifier
          
 relationalOperator
    : ">" | "<"
@@ -81,7 +82,7 @@ let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, Gr
 
 class SelectParser extends chevrotain.Parser {
 
-    constructor(input:Token[]) {
+    constructor(input:IToken[]) {
         super(input, allTokens)
         
         let $ = this;
@@ -109,7 +110,7 @@ Important to note that:
 
 #### Let's look at two more grammar rule, this time with repetition and alternation.
 
-```Typescript
+```javascript
 // selectClause
 //   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
 
@@ -176,13 +177,13 @@ The same applies for any grammar rule where the parser has a choice, and even in
 
 #### Let's finish implementing the whole SelectParser:
 
-```Typescript
+```javascript
 
 let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 
 class SelectParser extends chevrotain.Parser {
 
-    constructor(input:Token[]) {
+    constructor(input) {
      super(input, allTokens)
      
      let $ = this
@@ -237,7 +238,6 @@ class SelectParser extends chevrotain.Parser {
      Parser.performSelfAnalysis(this)
     }    
 }
-
 ```
 
 * Note that as a consequence of the parser having to 'know' its position in the grammar during runtime, the Parsing DSL methods need to be distinguishable when appearing in the same rule. 
@@ -247,9 +247,9 @@ class SelectParser extends chevrotain.Parser {
 
 #### But how do we actually use this Parser?
 
-```Typescript
+```Javascript
 // ONLY ONCE
-const parser = new SelectParser(lexingResult.tokens);
+const parser = new SelectParser([]);
 
 function parseInput(text) {
    let lexingResult = SelectLexer.tokenize(text)
@@ -271,5 +271,5 @@ parseInput(inputText)
 
 
 #### What is Next?
-* Play around in the [**online** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of this tutorial.
+* Play around in the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of this tutorial.
 * Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).

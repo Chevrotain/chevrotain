@@ -1,13 +1,14 @@
+// TODO: add two previous steps
 * Previous tutorial step - [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md)
 
 # Tutorial Step 4 - Fault tolerance and Error recovery.
 
 
-### ---> [Try This Tutorial Online](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) <---
+### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) <---
 
 
 ### Introduction:
-In the previous tutorial steps we leared how to build a parser for a simple grammar.
+In the previous tutorial steps we have learned how to build a parser for a simple grammar.
 Our parser can handle valid inputs just fine, but what happens if the input is not perfectly valid?
 For example when building an editor for a programing language, the input is often not completely valid,
 yet the editor is still expected to provide functionality (outline/auto-complete/navigation/error locations...)
@@ -230,4 +231,4 @@ To the parser's constructor [constructor](http://sap.github.io/chevrotain/docume
    
    
 #### What is Next?
-* Play around in the [**online** version](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) of this tutorial.
+* Play around in the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) of this tutorial.
