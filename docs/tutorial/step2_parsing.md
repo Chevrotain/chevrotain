@@ -56,11 +56,11 @@ The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/d
 
 #### Let's implement our first grammar rule. 
 
-```Typescript
+```javascript
 // selectStatement
 //    : selectClause fromClause (whereClause)?;
 
-let $ = this
+const $ = this
 $.RULE("selectStatement", () => {
     $.SUBRULE($.selectClause)
     $.SUBRULE($.fromClause)
@@ -70,32 +70,36 @@ $.RULE("selectStatement", () => {
 })
 ```
 
-fairly simple...
+Fairly straight forward translation:
+ * Non-Terminals --> SUBRULE
+ * "?" --> OPTION
 
 
 #### What is 'this' in this context? where do we write the grammar rules?
 
 Each grammar rule is a property of a class that extends chevrotain.Parser.
 
-```Typescript
+```javascript
 let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 
 class SelectParser extends chevrotain.Parser {
-
-    constructor(input:IToken[]) {
+    /**
+    * @param {IToken[]} input 
+    */
+    constructor(input) {
         super(input, allTokens)
         
-        let $ = this;
+        const $ = this;
         
         $.RULE("selectStatement", () => {
-          $.SUBRULE($.selectClause)
-          $.SUBRULE($.fromClause)
-          $.OPTION(() => {
-             $.SUBRULE($.whereClause)        
-         })
+            $.SUBRULE($.selectClause)
+            $.SUBRULE($.fromClause)
+            $.OPTION(() => {
+               $.SUBRULE($.whereClause)        
+            })
          
-         Parser.performSelfAnalysis(this)
-       })
+            Parser.performSelfAnalysis(this)
+        })
     }   
 }
 ```
@@ -113,25 +117,23 @@ Important to note that:
 ```javascript
 // selectClause
 //   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
-
 this.selectClause =
- $.RULE("selectClause", () => {
-      $.CONSUME(Select);
-      $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
-          $.CONSUME(Identifier);
-      }});
- })
+   $.RULE("selectClause", () => {
+       $.CONSUME(Select);
+       $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
+           $.CONSUME(Identifier);
+       }});
+   })
  
 // atomicExpression
 //    : INTEGER | IDENTIFIER
 this.atomicExpression =
- $.RULE("atomicExpression", () => {
-    $.OR([
-         {ALT: () => { $.CONSUME(Integer)}},
-         {ALT: () => { $.CONSUME(Identifier)}}
-    ]);
+   $.RULE("atomicExpression", () => {
+       $.OR([
+           {ALT: () => { $.CONSUME(Integer)}},
+           {ALT: () => { $.CONSUME(Identifier)}}
+       ]);
 })
- 
 ```
 
 
@@ -141,9 +143,10 @@ during parsing. This means that you can debug the parser **simply by adding a br
 point in the grammar**.
 
 There **do not** exist two different representations for the grammar
-and the runnable implementation (for example, grammar file vs generated code in the case of parser generators). Again, please note that Chevrotain is **NOT** a parser generator.
+and the runnable implementation (for example, grammar file vs generated code in the case of parser generators).
+Again, please note that Chevrotain is **NOT** a parser generator.
+Extra details cna be found [in the FAQ](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#-why-should-i-use-a-parsing-dsl-instead-of-a-parser-generator).
 
-The reasoning behind this decision is [explained in FAQ](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#-why-should-i-use-a-parsing-dsl-instead-of-a-parser-generator).
 
 #### But how does it work? (skip if you don't care :) )
 The code above will be executed as is. Yet we have not implemented a lookahead function to
@@ -159,7 +162,7 @@ The answer is the 'secret sauce' of Chevrotain:
 * `Parser.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis) 
 
 So when the parser needs to choose between the two alternatives:
-```Typescript
+```javascript
 $.OR([
      {ALT: () => { $.CONSUME(Integer)}},
      {ALT: () => { $.CONSUME(Identifier)}}
@@ -172,7 +175,9 @@ It is aware of:
 
 Thus the parser can dynamically create (and cache) the lookahead function to choose between the two alternatives.
 
-The same applies for any grammar rule where the parser has a choice, and even in some where there is no choice as that same in memory representation of the grammar can be used for error messages and fault tolerance as well as deciding which path to take.
+The same applies for any grammar rule where the parser has a choice, 
+and even in some where there is no choice as that same in memory representation of the grammar 
+can be used for error messages and fault tolerance as well as deciding which path to take.
 
 
 #### Let's finish implementing the whole SelectParser:
@@ -186,7 +191,7 @@ class SelectParser extends chevrotain.Parser {
     constructor(input) {
      super(input, allTokens)
      
-     let $ = this
+     const $ = this
      
      $.RULE("selectStatement", () => {
          $.SUBRULE($.selectClause)
@@ -253,7 +258,8 @@ const parser = new SelectParser([]);
 
 function parseInput(text) {
    let lexingResult = SelectLexer.tokenize(text)
-   let parser = new SelectParser(lexingResult.tokens);
+   // "input" is a setter which will reset the parser's state.
+   parser.input = lexingResult.tokens
    parser.selectStatement()
 
    if (parser.errors.length > 0) {
@@ -263,7 +269,6 @@ function parseInput(text) {
 
 let inputText = "SELECT column1 FROM table2"
 parseInput(inputText)
-
 ```
 
 * Note that any of the grammar rules can be invoked as the starting rule.
