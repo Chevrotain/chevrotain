@@ -1,5 +1,6 @@
-// TODO: add two previous steps
-* Previous tutorial step - [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md)
+* Previous tutorial steps
+  * [Step 3a - Separated Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_separated.md).
+  * [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
 
 # Tutorial Step 4 - Fault tolerance and Error recovery.
 
@@ -198,7 +199,23 @@ For the following invalid json input:
 * Thus the next two items will appear be parsed successfully even though they were preceded by a syntax error! 
 
 
-####Regarding return values of re-synced rules:
+#### Enabling All Recovery mechanisms
+By default fault tolerance and error recovery heuristics are disabled.
+They can be enabled by passing a optional **recoveryEnabled** parameter (default true)
+To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#constructor).
+
+
+#### CST output for re-synced rules:
+When using [Concrete Syntax Tree]((https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md)) output
+A re-synced will return a CSTNode with the boolean ["recoveredNode"](http://sap.github.io/chevrotain/documentation/0_27_3/interfaces/_chevrotain_d_.cstnode.html#recoverednode) flag marked as true.
+Additionally a recovered node **may not** have all its contents (children dictionary) filled
+as only the Terminals and None-Terminals encountered **before** the error which triggered the re-sync
+will be present. This means that code that handles the CST (CST Walker or Visitor) **must not** 
+assume certain content is always present on a CstNode. Instead it must be very defensive to avoid runtime
+errors.
+   
+
+#### Embedded Actions (semantics) and the return values of re-synced rules:
 Just being able to continue parsing is not enough, as "someone" probably expects a returned value
 from the sub-rule we have recovered from.
 
@@ -210,7 +227,7 @@ The third parameter(**config**) may contain a **recoveryValueFunc** property whi
 case of re-sync recovery. 
 
 
-####Disabling Re-Sync Recovery:
+#### Disabling Re-Sync Recovery per rule.:
 Re-Sync recovery is enabled by default for all rules.
 In some cases it may be appropriate to disable re-sync recovery for a specific rule.
 This is (once again) done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#rule).
@@ -223,12 +240,6 @@ The main difference is that "In-Rule" recovery fixes the problem in the scope of
 least one parsing rule (and perhaps many more). Thus the latter tends to "lose" more of the original input and requires 
 additional definitions (what should be returned value of a re-synced rule?).
  
-   
-### Disabling All Recovery mechanisms
-By default fault tolerance and error recovery heuristics are enabled.
-They can be disabled by passing a optional **recoveryEnabled** parameter (default true)
-To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_27_3/classes/_chevrotain_d_.parser.html#constructor).
-   
    
 #### What is Next?
 * Play around in the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) of this tutorial.
