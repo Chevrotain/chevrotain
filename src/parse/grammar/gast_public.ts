@@ -1,4 +1,4 @@
-import {forEach, map} from "../../utils/utils"
+import {forEach, isRegExp, map} from "../../utils/utils"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {tokenLabel, tokenName} from "../../scan/tokens_public"
 
@@ -288,8 +288,9 @@ export namespace gast {
                 occurrenceInParent: node.occurrenceInParent
             }
 
+            let pattern = node.terminalType
             if (node.terminalType.PATTERN) {
-                serializedTerminal.pattern = node.terminalType.PATTERN.source
+                serializedTerminal.pattern = isRegExp(pattern) ? (<any>pattern).source : pattern
             }
 
             return serializedTerminal

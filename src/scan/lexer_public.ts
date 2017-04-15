@@ -5,7 +5,7 @@ import {augmentTokenClasses} from "./tokens"
 
 export interface TokenConstructor extends Function {
     GROUP?:string
-    PATTERN?:RegExp
+    PATTERN?:RegExp | string
     LABEL?:string
     LONGER_ALT?:TokenConstructor
     POP_MODE?:boolean
