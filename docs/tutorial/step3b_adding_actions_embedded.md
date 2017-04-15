@@ -4,6 +4,7 @@
 
 
 ### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) <---
+### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3b_actions_embedded.js) <---
 
 
 ### On code samples:
@@ -107,5 +108,7 @@ and push each of these strings to the **columns** array.
 
 
 #### What is Next?
-* Play around in the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) of This tutorial.
+#### What is Next?
+* Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) of This
+  or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js)  of this tutorial step.
 * Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).

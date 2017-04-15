@@ -1,6 +1,7 @@
 # Tutorial Step 1 - Building a Lexer.
 
-### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
+### ---> [**Online** demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
+### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) <---
 
 
 ### On code samples:
@@ -96,6 +97,7 @@ const WhiteSpace = createToken({
 
 ```javascript
 
+// note we are placing WhiteSpace first as it is very common thus it will speed up the lexer.
 let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 let SelectLexer = new Lexer(allTokens);
 
@@ -123,5 +125,6 @@ The Lexing Result will contain:
 
 
 #### What is Next?
-* Try out the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of this tutorial
-* Move to the next step: [Step 2 -  Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
+* Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of This
+ or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step1_lexing.js)  of this tutorial step.
+* Move to the next step: [Step 2 - Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).

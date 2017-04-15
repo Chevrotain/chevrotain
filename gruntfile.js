@@ -89,7 +89,12 @@ module.exports = function(grunt) {
                 },
                 exec:    INSTALL_LINK + " && npm test"
             },
-
+            test_tutorial:                          {
+                options: {
+                    cwd: process.cwd() + "/tutorial/src/"
+                },
+                exec:    INSTALL_LINK + " && npm test"
+            }
         },
 
         karma: {
