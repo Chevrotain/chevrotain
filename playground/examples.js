@@ -971,7 +971,7 @@ function tutorialLexerExample() {
     var From = createToken({name: "From", pattern: /FROM/});
     var Where = createToken({name: "Where", pattern: /WHERE/});
     var Comma = createToken({name: "Comma", pattern: /,/});
-    var Identifier = createToken({name: "identifier", pattern: /\w+/});
+    var Identifier = createToken({name: "Identifier", pattern: /\w+/});
     var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
     var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
     var LessThan = createToken({name: "LessThan", pattern: />/});
