@@ -1,7 +1,7 @@
 # Tutorial Step 1 - Building a Lexer.
 
-### ---> [**Online** demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
-### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) <---
+### ---> [Online demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
+### ---> [Offline demo](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) <---
 
 
 ### On code samples:
