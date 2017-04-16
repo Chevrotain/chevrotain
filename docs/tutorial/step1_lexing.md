@@ -58,9 +58,9 @@ accomplished by marking them with the SKIP group.
 
 ```javascript
 const WhiteSpace = createToken({
-     name: "WhiteSpace", 
-     pattern: /\s+/,
-     group: chevrotain.lexer.SKIPPED  
+         name: "WhiteSpace", 
+         pattern: /\s+/,
+         group: chevrotain.lexer.SKIPPED  
      });
 ```
 
@@ -86,9 +86,9 @@ const GreaterThan = createToken({name: "GreaterThan", pattern: /</});
 const LessThan = createToken({name: "LessThan", pattern: />/});
 
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: chevrotain.lexer.SKIPPED
+        name: "WhiteSpace",
+        pattern: /\s+/,
+        group: chevrotain.lexer.SKIPPED
     }); 
 ```
 
