@@ -48,6 +48,7 @@ The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/d
 
 *   [CONSUME](http://sap.github.io/chevrotain/documentation/0_28_0/classes/_chevrotain_d_.parser.html#consume1) - 'eat' a Token.
 *   [SUBRULE](http://sap.github.io/chevrotain/documentation/0_28_0/classes/_chevrotain_d_.parser.html#subrule1) - reference to another rule.
+*   [OR](http://sap.github.io/chevrotain/documentation/0_28_0/classes/_chevrotain_d_.parser.html#or1) - Alternation
 *   [OPTION](http://sap.github.io/chevrotain/documentation/0_28_0/classes/_chevrotain_d_.parser.html#option1) - optional production. 
 *   [MANY](http://sap.github.io/chevrotain/documentation/0_28_0/classes/_chevrotain_d_.parser.html#many1) - repetition zero or more.
 *   [AT_LEAST_ONE](http://sap.github.io/chevrotain/documentation/0_28_0/classes/_chevrotain_d_.parser.html#at_least_one1) - repetition one or more.
