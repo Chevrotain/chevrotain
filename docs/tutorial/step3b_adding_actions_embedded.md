@@ -3,8 +3,8 @@
 # Tutorial Step 3 - Adding Embedded Actions to the Parser.
 
 
-### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) <---
-### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3b_actions_embedded.js) <---
+### ---> [Online demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions) <---
+### ---> [Offline demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3b_actions_embedded.js) <---
 
 
 ### On code samples:
