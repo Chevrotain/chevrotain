@@ -5,7 +5,7 @@
 # Tutorial Step 4 - Fault tolerance and Error recovery.
 
 
-### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) <---
+### ---> [Online demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20fault%20tolerance) <---
 
 
 ### Introduction:
