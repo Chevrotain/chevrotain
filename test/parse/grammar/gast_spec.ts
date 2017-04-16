@@ -1,6 +1,6 @@
 import {gast} from "../../../src/parse/grammar/gast_public"
 import {getProductionDslName} from "../../../src/parse/grammar/gast"
-import {extendToken, Token} from "../../../src/scan/tokens_public"
+import {createToken, extendToken, Token} from "../../../src/scan/tokens_public"
 import Terminal = gast.Terminal
 import NonTerminal = gast.NonTerminal
 import Flat = gast.Flat
@@ -70,6 +70,7 @@ describe("GAst namespace", () => {
         let C = extendToken("C")
         let D = extendToken("D")
         let Comma = extendToken("Comma")
+        let WithLiteral = createToken({name: "WithLiteral", pattern: "bamba"})
 
 
         it("can serialize a NonTerminal", () => {
@@ -83,15 +84,16 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Flat", () => {
-            let input = new gast.Flat([new Terminal(C), new NonTerminal("bamba")])
+            let input = new gast.Flat([new Terminal(WithLiteral), new NonTerminal("bamba")])
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
                 type:       "Flat",
                 definition: [
                     {
                         type:               "Terminal",
-                        name:               "C",
-                        label:              "C",
+                        name:               "WithLiteral",
+                        pattern:            "bamba",
+                        label:              "WithLiteral",
                         occurrenceInParent: 1
                     },
                     {

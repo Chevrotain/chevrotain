@@ -288,7 +288,7 @@ export namespace gast {
                 occurrenceInParent: node.occurrenceInParent
             }
 
-            let pattern = node.terminalType
+            let pattern = node.terminalType.PATTERN
             if (node.terminalType.PATTERN) {
                 serializedTerminal.pattern = isRegExp(pattern) ? (<any>pattern).source : pattern
             }
