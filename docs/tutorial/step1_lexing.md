@@ -1,12 +1,11 @@
 # Tutorial Step 1 - Building a Lexer.
 
-### ---> [Online demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) <---
-### ---> [Offline demo](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) for this step<---
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015+ for clarity. 
-The **online demo** version uses ES5 syntax.
+The tutorial uses ES2015+ syntax.
+See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
 
 
 ### Introduction:
@@ -125,6 +124,6 @@ The Lexing Result will contain:
 
 
 #### What is Next?
-* Play around in the [**Online** demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of This
- or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step1_lexing.js)  of this tutorial step.
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step1_lexing.js) of 
+  this tutorial step.
 * Move to the next step: [Step 2 - Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).

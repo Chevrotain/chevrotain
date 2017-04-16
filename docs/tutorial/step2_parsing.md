@@ -3,13 +3,12 @@
 # Tutorial Step 2 - Building a Parser.
 
 
-### ---> [**Online** demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) <---
-### ---> [**Offline** demo](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step2_parsing.js) <---
+### ---> [Source Code](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) for this step<---
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015+ for clarity. 
-The **online demo** version uses ES5 syntax.
+The tutorial uses ES2015+ syntax.
+See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
 
 
 ### Introduction:
@@ -293,6 +292,6 @@ parseInput(inputText)
 
 
 #### What is Next?
-* Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of This
- or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing.js) of this tutorial step.
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing.js) of 
+  this tutorial step.
 * Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions_root.md).

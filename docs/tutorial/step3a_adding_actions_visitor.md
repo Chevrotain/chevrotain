@@ -3,13 +3,12 @@
 # Tutorial Step 3 - Adding Actions using a CST Visitor.
 
 
-### ---> [**Online** demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) <---
-### ---> [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) for this step<---
 
 
 ### On code samples:
-The code samples in the **written** and **offline** version use ES2015+ for clarity. 
-The **online demo** version uses ES5 syntax for browser compatibility.
+The tutorial uses ES2015+ syntax.
+See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
 
 
 ### Introduction:
@@ -300,7 +299,6 @@ function toAst(inputText) {
 ``` 
 
 #### What is Next?
-* Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) of This
- or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js)  of this tutorial step. 
- 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) of 
+  this tutorial step.
 * Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
