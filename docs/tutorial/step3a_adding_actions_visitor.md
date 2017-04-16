@@ -3,8 +3,8 @@
 # Tutorial Step 3 - Adding Actions using a CST Visitor.
 
 
-### ---> [**Online** demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) <---
-### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) <---
+### ---> [**Online** demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) <---
+### ---> [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) <---
 
 
 ### On code samples:
