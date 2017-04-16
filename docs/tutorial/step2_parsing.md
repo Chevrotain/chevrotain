@@ -98,9 +98,9 @@ class SelectParser extends chevrotain.Parser {
             $.OPTION(() => {
                $.SUBRULE($.whereClause)        
             })
-         
-            Parser.performSelfAnalysis(this)
         })
+        
+        Parser.performSelfAnalysis(this)
     }   
 }
 ```
