@@ -125,6 +125,6 @@ The Lexing Result will contain:
 
 
 #### What is Next?
-* Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of This
+* Play around in the [**Online** demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20lexer) of This
  or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step1_lexing.js)  of this tutorial step.
 * Move to the next step: [Step 2 - Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md).
