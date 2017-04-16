@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.28.0 (4-16-2017)
 
 #### Major Changes
 - [Concrete Syntax Tree / Semantic Actions Visitor.](https://github.com/SAP/chevrotain/issues/381)
