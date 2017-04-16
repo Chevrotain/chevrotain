@@ -3,8 +3,8 @@
 # Tutorial Step 2 - Building a Parser.
 
 
-### ---> [**Online** demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) <---
-### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step2_parsing.js) <---
+### ---> [**Online** demo](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) <---
+### ---> [**Offline** demo](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step2_parsing.js) <---
 
 
 ### On code samples:
@@ -278,5 +278,5 @@ parseInput(inputText)
 
 #### What is Next?
 * Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) of This
- or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing.js)  of this tutorial step.
+ or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing.js) of this tutorial step.
 * Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md).
