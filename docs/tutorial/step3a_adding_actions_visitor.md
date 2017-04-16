@@ -3,12 +3,13 @@
 # Tutorial Step 3 - Adding Actions to the Parser.
 
 
-### ---> [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) <---
+### ---> [**Online** demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) <---
+### ---> [**Offline** demo of this tutorial step](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) <---
 
 
 ### On code samples:
-The code samples in the **written** tutorial use ES2015+ for clarity. 
-The **online demo** version uses ES5 syntax.
+The code samples in the **written** and **offline** version use ES2015+ for clarity. 
+The **online demo** version uses ES5 syntax for browser compatibility.
 
 
 ### Introduction:
@@ -270,8 +271,36 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 }
 ``` 
 
+#### Gluing it all together 
+
+So we know how to create a CST Visitor, but how do we actually use it?
+
+```javascript
+
+// A new parser instance with CST output enabled.
+const parserInstance = new SelectParser([], {outputCst: true})
+// Our visitor has no state, so a single instance is sufficient.
+const toAstVisitorInstance = new SQLToAstVisitor()
+
+function toAst(inputText) {
+    // Lex
+    let lexResult = selectLexer.lex(inputText)
+    parserInstance.input = lexResult.tokens
+    
+    // Automatic CST created when parsing
+    let cst = parserInstance.selectStatement()
+    if (parserInstance.errors.length > 0) {
+        throw Error("Sad sad panda, parsing errors detected!\n" + parserInstance.errors[0].message)
+    }
+    
+    // Visit
+    let ast = toAstVisitorInstance.visit(cst)
+    return ast
+}
+``` 
 
 #### What is Next?
-* Play around in the [Online demo of this tutorial step](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) of This
- tutorial.
+* Play around in the [**Online demo**](http://sap.github.io/chevrotain/playground/?example=tutorial%20actions%20cst) of This
+ or [**Offline** demo](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js)  of this tutorial step. 
+ 
 * Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
