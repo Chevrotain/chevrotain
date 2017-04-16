@@ -144,6 +144,21 @@ The grammar rules above do not only define the grammar, they are also the code t
 during parsing. This means that you can debug the parser **simply by adding a break
 point in the grammar**.
 
+```javascript
+// selectClause
+//   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
+this.selectClause =
+   $.RULE("selectClause", () => {
+       $.CONSUME(Select);
+       // Can be debugged directly! no code generation.
+       debugger;
+       $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
+           $.CONSUME(Identifier);
+       }});
+   })
+})
+```
+
 There **do not** exist two different representations for the grammar
 and the runnable implementation (for example, grammar file vs generated code in the case of parser generators).
 Again, please note that Chevrotain is **NOT** a parser generator.
