@@ -1,3 +1,16 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Concrete Syntax Tree / Semantic Actions Visitor.](https://github.com/SAP/chevrotain/issues/381)
+
+#### Documentation
+- [Runnable offline tutorial source code.](https://github.com/SAP/chevrotain/pull/410)
+
+#### Bug Fixes
+- [Definitions: Chevrotain don't support literal string as Token PATTERN in TypeScript.](https://github.com/SAP/chevrotain/pull/448)
+
+
+
 ## 0.27.3 (3-31-2017)
 
 #### Minor Changes
