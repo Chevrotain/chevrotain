@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+- [Major performance boost for CST Creation.](https://github.com/SAP/chevrotain/issues/446)
+  * **50%** speed boost measured on V8 when CST output is enabled. 
+
+
+
 ## 0.28.0 (4-16-2017)
 
 #### Major Changes
