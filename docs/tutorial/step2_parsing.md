@@ -3,7 +3,7 @@
 # Tutorial Step 2 - Building a Parser.
 
 
-### ---> [Source Code](http://sap.github.io/chevrotain/playground/?example=tutorial%20grammar) for this step<---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing.js) for this step <---
 
 
 ### On code samples:
