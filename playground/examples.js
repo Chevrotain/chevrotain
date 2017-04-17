@@ -209,10 +209,7 @@ function jsonGrammarOnlyExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var JsonLexer = new Lexer(jsonTokens, {
-        // reduce verbosity of output pane by tracking less position info.
-        positionTracking: "onlyOffset"
-    });
+    var JsonLexer = new Lexer(jsonTokens);
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";

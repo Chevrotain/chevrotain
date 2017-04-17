@@ -27,7 +27,7 @@ function markInputErrors(lexErrors, parseErrors) {
         var lastToken = currParserError.token
         if (!_.isEmpty(currParserError.resyncedTokens)) {
             lastToken = _.max(currParserError.resyncedTokens, function(tok) {
-                return tok.offset
+                return tok.startOffset
             })
         }
 
