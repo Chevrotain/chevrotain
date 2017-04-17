@@ -19,7 +19,12 @@ function onInputEditorContentChange() {
     if (parser) {
         parseResult = parse(lexResult, defaultRuleName)
         markInputErrors(lexResult.errors, parseResult.parseErrors)
-        printResult = parseResult.value
+        if (visitor) {
+            printResult = visitor.visit(parseResult.value)
+        }
+        else {
+            printResult = parseResult.value
+        }
     }
     else {
         markInputErrors(lexResult.errors, [])
@@ -96,6 +101,7 @@ function onImplementationEditorContentChange() {
         }
 
         var parserConstructor = editorFuncVal.parser
+        var visitorConstructor = editorFuncVal.visitor
         lexer = editorFuncVal.lexer
         markLexerDefinitionErrors(lexer)
         defaultRuleName = editorFuncVal.defaultRule
@@ -113,6 +119,9 @@ function onImplementationEditorContentChange() {
                 })
                 //noinspection ExceptionCaughtLocallyJS
                 throw Error(defErrorMessages.join("\n"))
+            }
+            if (visitorConstructor) {
+                visitor = new visitorConstructor()
             }
         } else { // lexer Only Example
             parser = undefined

@@ -112,6 +112,7 @@
     // global state
     var lexer = null
     var parser = null
+    var visitor = null
     var defaultRuleName = null
     var javaScriptEditor = null
     var inputEditor = null
@@ -183,7 +184,7 @@
             loadExample(urlParamExample, true)
         }
         else {
-            loadExample("JSON grammar and automatic CST output", true)
+            loadExample("JSON grammar and CST output", true)
         }
         updateSamplesDropDown()
 

@@ -209,7 +209,10 @@ function jsonGrammarOnlyExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var JsonLexer = new Lexer(jsonTokens);
+    var JsonLexer = new Lexer(jsonTokens, {
+        // reduce verbosity of output pane by tracking less position info.
+        positionTracking: "onlyOffset"
+    });
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";
@@ -882,7 +885,7 @@ function calculatorExample() {
 
                 // interpreter part
                 // tokenMatcher acts as ECMAScript instanceof operator
-                if (tokenMatcher(op,Multi)) {
+                if (tokenMatcher(op, Multi)) {
                     value *= rhsVal
                 } else { // op instanceof Div
                     value /= rhsVal
@@ -899,7 +902,7 @@ function calculatorExample() {
                 // appears in the "lowest" leaf in the expression ParseTree.
                 {ALT: function () { return $.SUBRULE($.parenthesisExpression)}},
                 {ALT: function () { return parseInt($.CONSUME(NumberLiteral).image, 10)}},
-                {ALT: function() { return $.SUBRULE($.powerFunction)}}
+                {ALT: function () { return $.SUBRULE($.powerFunction)}}
             ]);
         });
 
@@ -914,7 +917,7 @@ function calculatorExample() {
             return expValue
         });
 
-        $.RULE("powerFunction", function() {
+        $.RULE("powerFunction", function () {
             var base, exponent;
 
             $.CONSUME(PowerFunc);
@@ -953,150 +956,108 @@ function calculatorExample() {
     };
 }
 
-
-function tutorialLexerExample() {
-    // Written Docs for this tutorial step can be found here:
-    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md
-
-    // Tutorial Step 1:
-    // Implementation of A lexer for a simple SELECT statement grammar
+function calculatorExampleCst() {
+    "use strict";
+    /**
+     * An Example of implementing a Calculator with separated grammar and semantics (actions).
+     * This separation makes it easier to maintain the grammar and reuse it in different use cases.
+     *
+     * This is accomplished by using the automatic CST (Concrete Syntax Tree) output capabilities
+     * of chevrotain.
+     *
+     * See farther details here:
+     * https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md
+     */
+        // ----------------- lexer -----------------
     var createToken = chevrotain.createToken;
-    var Lexer = chevrotain.Lexer;
-
-    // createToken is used to create a "constructor" for a Token class
-    // The Lexer's output will contain an array token Objects created by metadata
-    // on these "constructors". Note that the Token "instances" are not proper class instances
-    // So use chevrotain.tokenMatcher instead of "instanceof" when matching
-    var Select = createToken({name: "Select", pattern: /SELECT/});
-    var From = createToken({name: "From", pattern: /FROM/});
-    var Where = createToken({name: "Where", pattern: /WHERE/});
-    var Comma = createToken({name: "Comma", pattern: /,/});
-    var Identifier = createToken({name: "Identifier", pattern: /\w+/});
-    var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
-    var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
-    var LessThan = createToken({name: "LessThan", pattern: />/});
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
-
-    // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma,
-        Identifier, Integer, GreaterThan, LessThan];
-
-    var SelectLexer = new Lexer(allTokens);
-
-    return {
-        // because only a lexer is returned the output will display
-        // the Lexed token array.
-        lexer: SelectLexer
-    };
-}
-
-// TODO: avoid duplication of code from step 1
-function tutorialGrammarExample() {
-    // Written Docs for this tutorial step can be found here:
-    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md
-
-    // Tutorial Step 2:
-
-    // Adding a Parser (grammar only, only reads the input
-    // without any actions) using the Tokens defined in the previous step.
-    // modification to the grammar will be displayed in the syntax diagrams panel.
-
-    var createToken = chevrotain.createToken;
+    var tokenMatcher = chevrotain.tokenMatcher
     var Lexer = chevrotain.Lexer;
     var Parser = chevrotain.Parser;
 
-    var Select = createToken({name: "Select", pattern: /SELECT/});
-    var From = createToken({name: "From", pattern: /FROM/});
-    var Where = createToken({name: "Where", pattern: /WHERE/});
-    var Comma = createToken({name: "Comma", pattern: /,/});
-    var Identifier = createToken({name: "Identifier", pattern: /\w+/});
-    var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
-    var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
-    var LessThan = createToken({name: "LessThan", pattern: />/});
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
+    // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
+    // AdditionOperator defines a Tokens hierarchy but only the leafs in this hierarchy define
+    // actual Tokens that can appear in the text
+    var AdditionOperator = createToken({name: "AdditionOperator", pattern: Lexer.NA});
+    var Plus = createToken({name: "Plus", pattern: /\+/, parent: AdditionOperator});
+    var Minus = createToken({name: "Minus", pattern: /-/, parent: AdditionOperator});
 
-    // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma,
-        Identifier, Integer, GreaterThan, LessThan];
-    var SelectLexer = new Lexer(allTokens);
+    var MultiplicationOperator = createToken({name: "MultiplicationOperator", pattern: Lexer.NA});
+    var Multi = createToken({name: "Multi", pattern: /\*/, parent: MultiplicationOperator});
+    var Div = createToken({name: "Div", pattern: /\//, parent: MultiplicationOperator});
+
+    var LParen = createToken({name: "LParen", pattern: /\(/});
+    var RParen = createToken({name: "RParen", pattern: /\)/});
+    var NumberLiteral = createToken({name: "NumberLiteral", pattern: /[1-9]\d*/});
+
+    var PowerFunc = createToken({name: "PowerFunc", pattern: /power/});
+    var Comma = createToken({name: "Comma", pattern: /,/});
+
+    // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
+
+    var allTokens = [WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+        Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator, PowerFunc, Comma];
+    var CalculatorLexer = new Lexer(allTokens);
 
 
     // ----------------- parser -----------------
-    function SelectParser(input) {
-        // By default if {recoveryEnabled: true} is not passed in the config object
-        // error recovery / fault tolerance capabilities will be disabled
-        Parser.call(this, input, allTokens);
+    // Note that this is a Pure grammar, it only describes the grammar
+    // Not any actions (semantics) to perform during parsing.
+    function CalculatorPure(input) {
+        Parser.call(this, input, allTokens, {outputCst: true});
+
         var $ = this;
 
-
-        this.selectStatement = $.RULE("selectStatement", function () {
-            $.SUBRULE($.selectClause)
-            $.SUBRULE($.fromClause)
-            $.OPTION(function () {
-                $.SUBRULE($.whereClause)
-            })
+        $.RULE("expression", function () {
+            $.SUBRULE($.additionExpression)
         });
 
-
-        this.selectClause = $.RULE("selectClause", function () {
-            $.CONSUME(Select);
-            $.AT_LEAST_ONE_SEP({
-                SEP: Comma, DEF: function () {
-                    $.CONSUME(Identifier);
-                }
+        //  lowest precedence thus it is first in the rule chain
+        // The precedence of binary expressions is determined by how far down the Parse Tree
+        // The binary expression appears.
+        $.RULE("additionExpression", function () {
+            $.SUBRULE($.multiplicationExpression);
+            $.MANY(function () {
+                // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
+                $.CONSUME(AdditionOperator);
+                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                $.SUBRULE2($.multiplicationExpression);
             });
         });
 
-
-        this.fromClause = $.RULE("fromClause", function () {
-            $.CONSUME(From);
-            $.CONSUME(Identifier);
-
-            // example:
-            // replace the contents of this rule with the commented out lines
-            // below to implement multiple tables to select from (implicit join).
-
-            // $.CONSUME(From);
-            // $.AT_LEAST_ONE_SEP({
-            //     SEP: Comma, DEF: function () {
-            //         $.CONSUME(Identifier);
-            //     }
-            // });
-        });
-
-
-        this.whereClause = $.RULE("whereClause", function () {
-            $.CONSUME(Where)
-            $.SUBRULE($.expression)
-        });
-
-
-        this.expression = $.RULE("expression", function () {
+        $.RULE("multiplicationExpression", function () {
             $.SUBRULE($.atomicExpression);
-            $.SUBRULE($.relationalOperator);
-            $.SUBRULE2($.atomicExpression); // note the '2' suffix to distinguish
-                                            // from the 'SUBRULE(atomicExpression)'
-                                            // 2 lines above.
+            $.MANY(function () {
+                $.CONSUME(MultiplicationOperator);
+                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                $.SUBRULE2($.atomicExpression);
+            });
         });
 
-
-        this.atomicExpression = $.RULE("atomicExpression", function () {
-            $.OR([
-                {ALT: function () { $.CONSUME(Integer)}},
-                {ALT: function () { $.CONSUME(Identifier)}}
+        $.RULE("atomicExpression", function () {
+            return $.OR([
+                // parenthesisExpression has the highest precedence and thus it appears
+                // in the "lowest" leaf in the expression ParseTree.
+                {ALT: function () { return $.SUBRULE($.parenthesisExpression)}},
+                {ALT: function () { return $.CONSUME(NumberLiteral)}},
+                {ALT: function () { return $.SUBRULE($.powerFunction)}}
             ]);
         });
 
-
-        this.relationalOperator = $.RULE("relationalOperator", function () {
-            $.OR([
-                {ALT: function () { $.CONSUME(GreaterThan)}},
-                {ALT: function () { $.CONSUME(LessThan)}}
-            ]);
+        $.RULE("parenthesisExpression", function () {
+            $.CONSUME(LParen);
+            $.SUBRULE($.expression);
+            $.CONSUME(RParen);
         });
 
+        $.RULE("powerFunction", function () {
+            $.CONSUME(PowerFunc);
+            $.CONSUME(LParen);
+            $.SUBRULE($.expression);
+            $.CONSUME(Comma);
+            $.SUBRULE2($.expression);
+            $.CONSUME(RParen);
+        });
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
@@ -1104,317 +1065,104 @@ function tutorialGrammarExample() {
         Parser.performSelfAnalysis(this);
     }
 
-    SelectParser.prototype = Object.create(Parser.prototype);
-    SelectParser.prototype.constructor = SelectParser;
-
-    return {
-        lexer: SelectLexer,
-        parser: SelectParser,
-        defaultRule: "selectStatement"
-    };
-}
-
-function tutorialGrammarActionsExample() {
-    // Written Docs for this tutorial step can be found here:
-    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions.md
-
-    // Tutorial Step 3:
-
-    // Adding grammar action to build an AST instead of just reading the input.
-    // The output AST can be observed in the output panel.
-
-    var createToken = chevrotain.createToken;
-    var Lexer = chevrotain.Lexer;
-    var Parser = chevrotain.Parser;
-
-    var Select = createToken({name: "Select", pattern: /SELECT/});
-    var From = createToken({name: "From", pattern: /FROM/});
-    var Where = createToken({name: "Where", pattern: /WHERE/});
-    var Comma = createToken({name: "Comma", pattern: /,/});
-    var Identifier = createToken({name: "Identifier", pattern: /\w+/});
-    var Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
-    var GreaterThan = createToken({name: "GreaterThan", pattern: /</});
-    var LessThan = createToken({name: "LessThan", pattern: />/});
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
-
-    // whitespace is normally very common so it is placed first to speed up the lexer
-    var allTokens = [WhiteSpace, Select, From, Where, Comma,
-        Identifier, Integer, GreaterThan, LessThan];
-    var SelectLexer = new Lexer(allTokens);
+    CalculatorPure.prototype = Object.create(Parser.prototype);
+    CalculatorPure.prototype.constructor = CalculatorPure;
 
 
-    // ----------------- parser -----------------
-    function SelectParser(input) {
-        Parser.call(this, input, allTokens);
-        var $ = this;
+    // wrapping it all together
+    // reuse the same parser instance.
+    var parser = new CalculatorPure([]);
 
 
-        this.selectStatement = $.RULE("selectStatement", function () {
-            var select, from, where
-            select = $.SUBRULE($.selectClause)
-            from = $.SUBRULE($.fromClause)
-            $.OPTION(function () {
-                where = $.SUBRULE($.whereClause)
-            })
+    // ----------------- Interpreter -----------------
+    const BaseCstVisitor = parser.getBaseCstVisitorConstructor()
 
-            // a parsing rule may return a value.
-            // In this case our AST is is a simple javascript object.
-            // Generally the returned value may be any javascript value.
-            return {
-                type: "SELECT_STMT", selectClause: select,
-                fromClause: from, whereClause: where
-            }
-        });
+    class CalculatorInterpreter extends BaseCstVisitor {
 
-
-        this.selectClause = $.RULE("selectClause", function () {
-            var columns = []
-
-            $.CONSUME(Select);
-            $.AT_LEAST_ONE_SEP({
-                SEP: Comma, DEF: function () {
-                    // accessing a token's string via .image property
-                    columns.push($.CONSUME(Identifier).image);
-                }
-            });
-
-            return {type: "SELECT_CLAUSE", columns: columns}
-        });
-
-
-        this.fromClause = $.RULE("fromClause", function () {
-            var table
-
-            $.CONSUME(From);
-            table = $.CONSUME(Identifier).image;
-
-            return {type: "FROM_CLAUSE", table: table}
-        });
-
-
-        this.whereClause = $.RULE("whereClause", function () {
-            var condition
-            // uncomment the debugger statement and open dev tools in chrome/firefox
-            // to debug the parsing flow.
-            // debugger;
-
-            $.CONSUME(Where)
-            // a SUBRULE call will return the value the called rule returns.
-            condition = $.SUBRULE($.expression)
-
-            return {type: "WHERE_CLAUSE", condition: condition}
-        });
-
-
-        this.expression = $.RULE("expression", function () {
-            var lhs, operator, rhs
-
-            lhs = $.SUBRULE($.atomicExpression);
-            operator = $.SUBRULE($.relationalOperator);
-            rhs = $.SUBRULE2($.atomicExpression);
-
-            return {type: "EXPRESSION", lhs: lhs, operator: operator, rhs: rhs}
-        });
-
-
-        this.atomicExpression = $.RULE("atomicExpression", function () {
-            return $.OR([ // OR returns the value of the chosen alternative.
-                {ALT: function () { return $.CONSUME(Integer)}},
-                {ALT: function () { return $.CONSUME(Identifier)}}
-            ]).image;
-        });
-
-
-        this.relationalOperator = $.RULE("relationalOperator", function () {
-            return $.OR([
-                {ALT: function () { return $.CONSUME(GreaterThan)}},
-                {ALT: function () { return $.CONSUME(LessThan)}}
-            ]).image;
-        });
-
-
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this);
-    }
-
-    SelectParser.prototype = Object.create(Parser.prototype);
-    SelectParser.prototype.constructor = SelectParser;
-
-    return {
-        lexer: SelectLexer,
-        parser: SelectParser,
-        defaultRule: "selectStatement"
-    };
-}
-
-function tutorialErrorRecoveryExample() {
-    // Written Docs for this tutorial step can be found here:
-    // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md
-
-    // ----------------- Lexer -----------------
-    var createToken = chevrotain.createToken;
-    var Lexer = chevrotain.Lexer;
-
-    // In ES6, custom inheritance implementation
-    // (such as the one above) can be replaced
-    // with a more simple: "class X extends Y"...
-    var True = createToken({name: "True", pattern: /true/});
-    var False = createToken({name: "False", pattern: /false/});
-    var Null = createToken({name: "Null", pattern: /null/});
-    var LCurly = createToken({name: "LCurly", pattern: /{/});
-    var RCurly = createToken({name: "RCurly", pattern: /}/});
-    var LSquare = createToken({name: "LSquare", pattern: /\[/});
-    var RSquare = createToken({name: "RSquare", pattern: /]/});
-    var Comma = createToken({name: "Comma", pattern: /,/});
-    var Colon = createToken({name: "Colon", pattern: /:/});
-    var StringLiteral = createToken({
-        name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-    });
-    var NumberLiteral = createToken({
-        name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
-    });
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
-
-
-    var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
-        LSquare, RSquare, Comma, Colon, True, False, Null];
-
-    var JsonLexer = new Lexer(jsonTokens);
-
-    // ----------------- parser -----------------
-    var Parser = chevrotain.Parser;
-
-    function JsonParser(input) {
-        // change to false to completely disable error recovery.
-        var isRecoveryEnabled = true
-        Parser.call(this, input, jsonTokens, {recoveryEnabled: isRecoveryEnabled});
-        var $ = this;
-
-
-        $.RULE("json", function () {
-            return $.OR([
-                {ALT: function () { return $.SUBRULE($.object) }},
-                {ALT: function () { return $.SUBRULE($.array) }}
-            ]);
-        });
-
-
-        $.RULE("object", function () {
-            // uncomment the debugger statement and open dev tools in chrome/firefox
-            // to debug the parsing flow.
-            // debugger;
-            var obj = {}
-
-            $.CONSUME(LCurly);
-            $.MANY_SEP({
-                SEP: Comma, DEF: function () {
-                    _.assign(obj, $.SUBRULE($.objectItem));
-                }
-            });
-            $.CONSUME(RCurly);
-
-            return obj;
-        });
-
-
-        function invalidObjectItem() {
-            return {ALARM: "recovered objectItem"}
+        constructor() {
+            super()
+            // This helper will detect any missing or redundant methods on this visitor
+            this.validateVisitor()
         }
 
-        $.RULE("objectItem", function () {
-            var lit, key, value, obj = {};
+        expression(ctx) {
+            return this.visit(ctx.additionExpression[0])
+        }
 
-            lit = $.CONSUME(StringLiteral)
-            $.CONSUME(Colon);
-            value = $.SUBRULE($.value);
+        additionExpression(ctx) {
+            var lhs = this.visit(ctx.multiplicationExpression[0])
+            var result = lhs
+            for (var i = 1; i < ctx.multiplicationExpression.length; i++) {
+                // There is one less operator than operands
+                var operator = ctx.AdditionOperator[i - 1]
+                var rhs = this.visit(ctx.multiplicationExpression[i])
 
-            // an empty json key is not valid, use "BAD_KEY" instead
-            key = lit.isInsertedInRecovery ?
-                "BAD_KEY" : lit.image.substr(1, lit.image.length - 2);
-            obj[key] = value;
-            return obj;
-
-            // CUSTOM returned value from recovered production:
-            // <InvalidObjectItem> will be invoked to replace the returned value of objectItem in case of
-            // between rules re-sync recovery.
-        }, {recoveryValueFunc: invalidObjectItem});
-
-
-        $.RULE("array", function () {
-            var arr = [];
-            $.CONSUME(LSquare);
-            $.MANY_SEP({
-                SEP: Comma, DEF: function () {
-                    arr.push($.SUBRULE($.value));
+                if (tokenMatcher(operator, Plus)) {
+                    result += rhs
                 }
-            });
-            $.CONSUME(RSquare);
+                else { // Minus
+                    result -= rhs
+                }
+            }
+            return result
+        }
 
-            return arr;
-        });
+        multiplicationExpression(ctx) {
+            var lhs = this.visit(ctx.atomicExpression[0])
+            var result = lhs
+            for (var i = 1; i < ctx.atomicExpression.length; i++) {
+                // There is one less operator than operands
+                var operator = ctx.MultiplicationOperator[i - 1]
+                var rhs = this.visit(ctx.atomicExpression[i])
 
+                if (tokenMatcher(operator, Multi)) {
+                    result *= rhs
+                }
+                else { // Division
+                    result /= rhs
+                }
+            }
+            return result
+        }
 
-        // @formatter:off
-        $.RULE("value", function () {
-            return $.OR([
-                { ALT: function () {
-                    var stringLiteral = $.CONSUME(StringLiteral).image
-                    // chop of the quotation marks
-                    return stringLiteral.substr(1, stringLiteral.length  - 2);
-                }},
-                { ALT: function () { return Number($.CONSUME(NumberLiteral).image) }},
-                { ALT: function () { return $.SUBRULE($.object) }},
-                { ALT: function () { return $.SUBRULE($.array) }},
-                { ALT: function () {
-                    $.CONSUME(True);
-                    return true;
-                }},
-                { ALT: function () {
-                    $.CONSUME(False);
-                    return false;
-                }},
-                { ALT: function () {
-                    $.CONSUME(Null);
-                    return null;
-                }}
-            ]);
-        });
-        // @formatter:on
+        atomicExpression(ctx) {
+            if (ctx.parenthesisExpression.length > 0) {
+                // TODO: allow accepting array for less verbose syntax
+                return this.visit(ctx.parenthesisExpression[0])
+            }
+            else if (ctx.NumberLiteral.length > 0) {
+                return parseInt(ctx.NumberLiteral[0].image, 10)
+            }
+            else if (ctx.powerFunction.length > 0) {
+                return this.visit(ctx.powerFunction[0])
+            }
+        }
 
-        // very important to call this after all the rules have been setup.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived from the self analysis.
-        Parser.performSelfAnalysis(this);
-    }
+        parenthesisExpression(ctx) {
+            // The ctx will also contain the parenthesis tokens, but we don't care about those
+            // in the context of calculating the result.
+            return this.visit(ctx.expression[0])
+        }
 
-    JsonParser.prototype = Object.create(Parser.prototype);
-    JsonParser.prototype.constructor = JsonParser;
-
-    // customize the allowed types of tokens which are allowed to be inserted in single token insertion
-    JsonParser.prototype.canTokenTypeBeInsertedInRecovery = function (tokClass) {
-        // comment in to disable insertion for colons
-        // if (tokClass === Colon) {
-        //     return false;
-        // }
-
-        return true;
+        powerFunction(ctx) {
+            var base = this.visit(ctx.expression[0])
+            var exponent = this.visit(ctx.expression[1])
+            return Math.pow(base, exponent)
+        }
     }
 
     // for the playground to work the returned object must contain these fields
     return {
-        lexer: JsonLexer,
-        parser: JsonParser,
-        defaultRule: "json"
+        lexer: CalculatorLexer,
+        parser: CalculatorPure,
+        visitor: CalculatorInterpreter,
+        defaultRule: "expression"
     };
 }
 
 var samples = {
 
-    "JSON grammar and automatic CST output": {
+    "JSON grammar and CST output": {
         implementation: jsonGrammarOnlyExample,
         sampleInputs: {
             'valid': '{' +
@@ -1458,7 +1206,7 @@ var samples = {
         }
     },
 
-    "JSON grammar and embedded actions": {
+    "JSON grammar and embedded semantics": {
         implementation: jsonExample,
         sampleInputs: {
             'valid': '{' +
@@ -1502,7 +1250,17 @@ var samples = {
         }
     },
 
-    calculator: {
+    "Calculator separated semantics": {
+        implementation: calculatorExampleCst,
+        sampleInputs: {
+            "parenthesis precedence": "2 * ( 3 + 7)",
+            "operator precedence": "2 + 4 * 5 / 10",
+            "power function": "1 + power(3, 2)",
+            "unidentified Token - success": "1 + @@1 + 1"
+        }
+    },
+
+    "Calculator embedded semantics": {
         implementation: calculatorExample,
         sampleInputs: {
             "parenthesis precedence": "2 * ( 3 + 7)",
@@ -1512,7 +1270,7 @@ var samples = {
         }
     },
 
-    CSS: {
+    "CSS Grammar": {
         implementation: cssExample,
         sampleInputs: {
             simpleCss: "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
@@ -1523,40 +1281,6 @@ var samples = {
             "won't stop on first error": "@charset \"UTF-8\";\r\n\/* CSS Document *\/\r\n\r\n\/** Structure *\/\r\nbody" +
             " {\r\n  font-family Arial, sans-serif;\r\n  margin: 0;\r\n  font-size: 14px;\r\n}\r\n\r\n#system-error" +
             " {\r\n  font-size 1.5em;\r\n  text-align: center;\r\n}"
-        }
-    },
-
-    "tutorial lexer": {
-        implementation: tutorialLexerExample,
-        sampleInputs: {
-            "valid": "SELECT name, age FROM students WHERE age > 22",
-            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
-        }
-    },
-
-    "tutorial grammar": {
-        implementation: tutorialGrammarExample,
-        sampleInputs: {
-            "valid": "SELECT name, age FROM students WHERE age > 22",
-            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
-        }
-    },
-
-    "tutorial actions": {
-        implementation: tutorialGrammarActionsExample,
-        sampleInputs: {
-            "valid": "SELECT name, age FROM students WHERE age > 22",
-            "invalid tokens": "SELECT lastName, wage #$@#$ FROM employees ? WHERE wage > 666"
-        }
-    },
-
-    "tutorial fault tolerance": {
-        implementation: tutorialErrorRecoveryExample,
-        sampleInputs: {
-            "single token insertion": '{ "key"   666}',
-            "single token deletion": '{ "key" }: 666}',
-            "in rule repetition re-sync recovery:": '{\n"key1" : 1, \n"key2" : 2 666 \n"key3"  : 3, \n"key4"  : 4 }',
-            "between rules re-sync recovery": '{ \n"firstName": "John",\n "someData": { "bad" :: "part" }, \n "isAlive": true, \n"age": 25 }'
         }
     }
 }
