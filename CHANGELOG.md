@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.28.1 (4-18-2017)
 
 #### Minor Changes
 - [Major performance boost for CST Creation.](https://github.com/SAP/chevrotain/issues/446)
