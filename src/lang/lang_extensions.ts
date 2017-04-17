@@ -7,11 +7,7 @@ export function classNameFromInstance(instance:any):string {
 
 const FUNC_NAME_REGEXP = /^\s*function\s*(\S*)\s*\(/
 const NAME = "name"
-export const SPECIAL_NAME_CACHE_KEY = "CHEV_FUNC_NAME_CACHE666"
 
-/**
- * Will Modify the func argument and define a 'name' property if none exists.
- */
 /* istanbul ignore next too many hacks for IE/old versions of node.js here*/
 export function functionName(func:Function):string {
 
@@ -23,13 +19,8 @@ export function functionName(func:Function):string {
     }
 
     // hack for IE and engines that do not support Object.defineProperty on function.name (Node.js 0.10 && 0.12)
-    if (func.hasOwnProperty(SPECIAL_NAME_CACHE_KEY)) {
-        return func[SPECIAL_NAME_CACHE_KEY]
-    }
-
     let computedName = func.toString().match(FUNC_NAME_REGEXP)[1]
 
-    func[SPECIAL_NAME_CACHE_KEY] = computedName
     return computedName
 }
 
