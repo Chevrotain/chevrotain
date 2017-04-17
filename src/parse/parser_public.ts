@@ -57,7 +57,7 @@ import {cloneProduction} from "./grammar/gast"
 import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
 import {augmentTokenClasses, isExtendingTokenType, tokenStructuredIdentity, tokenStructuredMatcher} from "../scan/tokens"
 import {CstNode, ICstVisitor} from "./cst/cst_public"
-import {addNoneTerminalToCst, addTerminalToCst, analyzeCst, initChildrenDictionary} from "./cst/cst"
+import {addNoneTerminalToCst, addTerminalToCst, analyzeCst} from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -2004,11 +2004,10 @@ export class Parser {
 
     private cstNestedInvocationStateUpdate(nestedName:string, shortName:string | number):void {
         let initDef = this.cstDictDefForRule.get(shortName)
-        // TODO: investigate performance impact of adding accessor methods
         this.CST_STACK.push({
-            name:       nestedName,
+            name:     nestedName,
             fullName: this.shortRuleNameToFull.get(this.getLastExplicitRuleShortName()) + nestedName,
-            children:   initChildrenDictionary(initDef)
+            children: initDef()
         })
     }
 
@@ -2017,7 +2016,7 @@ export class Parser {
         let initDef = this.cstDictDefForRule.get(shortName)
         this.CST_STACK.push({
             name:     fullRuleName,
-            children: initChildrenDictionary(initDef)
+            children: initDef()
         })
     }
 

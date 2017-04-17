@@ -1,7 +1,7 @@
 import {IToken, tokenName} from "../../scan/tokens_public"
-import {CstChildrenDictionary, CstNode} from "./cst_public"
+import {CstNode} from "./cst_public"
 import {gast} from "../grammar/gast_public"
-import {cloneObj, drop, forEach, has, isEmpty, isUndefined} from "../../utils/utils"
+import {cloneObj, drop, forEach, has, isEmpty, isUndefined, map} from "../../utils/utils"
 import {HashTable} from "../../lang/lang_extensions"
 import {
     AT_LEAST_ONE_IDX,
@@ -106,28 +106,37 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
 
 export function analyzeCst(topRules:gast.Rule[],
                            fullToShortName:HashTable<number>):{
-    dictDef:HashTable<string[]>,
+    dictDef:HashTable<Function>,
     allRuleNames:string[]
 } {
-    let result = {dictDef: new HashTable<string[]>(), allRuleNames: []}
+    let result = {dictDef: new HashTable<Function>(), allRuleNames: []}
 
     forEach(topRules, (currTopRule) => {
         let currChildrenNames = buildChildDictionaryDef(currTopRule.definition)
         let currTopRuleShortName = fullToShortName.get(currTopRule.name)
-        result.dictDef.put(currTopRuleShortName, currChildrenNames)
+        result.dictDef.put(currTopRuleShortName, buildInitDefFunc(currChildrenNames))
         result.allRuleNames.push(currTopRule.name)
 
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor(currTopRuleShortName)
         currTopRule.accept(namedCollectorVisitor)
         forEach(namedCollectorVisitor.result, ({def, key, name}) => {
             let currNestedChildrenNames = buildChildDictionaryDef(def)
-            result.dictDef.put(key, currNestedChildrenNames)
-            // TODO: use something other than "$"?
+            result.dictDef.put(key, buildInitDefFunc(currNestedChildrenNames))
             result.allRuleNames.push(currTopRule.name + name)
         })
     })
 
     return result
+}
+function buildInitDefFunc(childrenNames:string[]):Function {
+    let funcString = `return {\n`
+
+    funcString += map(childrenNames, (currName) => `"${currName}" : []`).join(",\n")
+    funcString += `}`
+
+    // major performance optimization, faster to create the children dictionary this way
+    // versus iterating over the childrenNames each time.
+    return Function(funcString)
 }
 
 export function buildChildDictionaryDef(initialDef:IProduction[]):string[] {
@@ -242,16 +251,4 @@ export function buildChildDictionaryDef(initialDef:IProduction[]):string[] {
         }
     }
     return result
-}
-
-export function initChildrenDictionary(collections:string[]):CstChildrenDictionary {
-    let childrenDictionary = {}
-
-    let collectionsLength = collections.length
-    for (let i = 0; i < collectionsLength; i++) {
-        let key = collections[i]
-        childrenDictionary[key] = []
-    }
-
-    return childrenDictionary
 }

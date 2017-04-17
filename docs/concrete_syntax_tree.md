@@ -448,18 +448,8 @@ thus the chain of returned values will be broken.
 
 ### Performance of CST building.
 
-Building the CST is a fairly intensive operation.
-Using a JSON Grammar benchmarking has shown the performance of CST
-building is 55-65% of simply parsing without any output structure.  
-
-* This is a bad benchmark as it compares apples to oranges because one scenario creates an output structure and
-  the other does not.
-  - A more representative benchmark will be provided in the future.  
-  
-* Upcoming versions of Chrome (59) with the new V8 JS compilation pipeline enabled were faster (65%)
-  Than current versions of chrome (56).
-  
-* Note that even when building a CST the performance on most recent versions of Chrome (59) was faster
-  Than any other tested parsing library (Antlr4/PegJS/Jison).
-  - Again we are unfortunately comparing apples to oranges as most parsing libraries in that JSON benchmark
-    do not output any data structure.
+On V8 (Chrome/Node) building the CST was measured at about **65%** of the performance
+versus a pure grammar's runtime. This is substantial but considering Chevrotain is already [very fast](http://sap.github.io/chevrotain/performance/)
+and that parsing is usually just one part of a larger flow, than unless there a special edge case which requires
+maximum performance than the benefits of using the CST (modularity / ease of maintenance) by far outweigh the costs (reduced performance).
+ 

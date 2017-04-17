@@ -49,7 +49,7 @@ export function getProductionOverriddenForClass(className:string):HashTable<bool
 
 export const CLASS_TO_CST_DICT_DEF_PER_RULE = new HashTable<HashTable<string[]>>()
 
-export function getCstDictDefPerRuleForClass(className:string):HashTable<string[]> {
+export function getCstDictDefPerRuleForClass(className:string):HashTable<Function> {
     return getFromNestedHashTable(className, CLASS_TO_CST_DICT_DEF_PER_RULE)
 }
 
