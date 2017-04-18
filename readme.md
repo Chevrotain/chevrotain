@@ -69,11 +69,11 @@ as any other JavaScript code without requiring any new tools or processes.
 
 ## Documentation & Resources
 
-* **[FAQ](docs/faq.md).**
-
 * **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**.
 
 * **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
+
+* **[FAQ](docs/faq.md).**
  
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
