@@ -5,9 +5,8 @@
 <script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
 <script>
     // ----------------- Lexer -----------------
-    var extendToken = chevrotain.extendLazyToken;
+    var extendToken = chevrotain.extendToken;
 
-    // https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Lazy Tokens)
     var ChevrotainLexer = chevrotain.Lexer;
 
     // In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
@@ -27,7 +26,7 @@
 
 
     var jsonTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
-    var jsonLexer = new ChevrotainLexer(jsonTokens);
+    var jsonLexer = new ChevrotainLexer(jsonTokens, {positionTracking: "onlyOffset"});
 
     // ----------------- parser -----------------
 
@@ -35,17 +34,15 @@
     // (Do not create a new Parser instance for each new input.)
     var ChevrotainParser = chevrotain.Parser;
 
-    function JsonLazyParser(input) {
-        ChevrotainParser.call(this, input, jsonTokens);
+    function JsonParser(input) {
+        ChevrotainParser.call(this, input, jsonTokens, {outputCst: false});
         var _this = this;
 
         this.json = this.RULE("json", function () {
-            // @formatter:off
-        _this.OR([
-            { ALT: function () { _this.SUBRULE(_this.object) }},
-            { ALT: function () { _this.SUBRULE(_this.array) }}
-        ]);
-        // @formatter:on
+            _this.OR([
+                {ALT: function () { _this.SUBRULE(_this.object) }},
+                {ALT: function () { _this.SUBRULE(_this.array) }}
+            ]);
         });
 
         this.object = this.RULE("object", function () {
@@ -78,19 +75,17 @@
             _this.CONSUME(RSquare);
         });
 
-        // @formatter:off
-    this.value = this.RULE("value", function () {
-        _this.OR([
-            { ALT: function () { _this.CONSUME(StringLiteral) }},
-            { ALT: function () { _this.CONSUME(NumberLiteral) }},
-            { ALT: function () { _this.SUBRULE(_this.object) }},
-            { ALT: function () { _this.SUBRULE(_this.array) }},
-            { ALT: function () { _this.CONSUME(True) }},
-            { ALT: function () { _this.CONSUME(False) }},
-            { ALT: function () { _this.CONSUME(Null) }}
-        ], "a value");
-    });
-    // @formatter:on
+        this.value = this.RULE("value", function () {
+            _this.OR([
+                {ALT: function () { _this.CONSUME(StringLiteral) }},
+                {ALT: function () { _this.CONSUME(NumberLiteral) }},
+                {ALT: function () { _this.SUBRULE(_this.object) }},
+                {ALT: function () { _this.SUBRULE(_this.array) }},
+                {ALT: function () { _this.CONSUME(True) }},
+                {ALT: function () { _this.CONSUME(False) }},
+                {ALT: function () { _this.CONSUME(Null) }}
+            ]);
+        });
 
         // very important to call this after all the rules have been setup.
         // otherwise the parser may not work correctly as it will lack information
@@ -98,13 +93,11 @@
         ChevrotainParser.performSelfAnalysis(this);
     }
 
-    JsonLazyParser.prototype = Object.create(ChevrotainParser.prototype);
-    JsonLazyParser.prototype.constructor = JsonLazyParser;
-
+    JsonParser.prototype = Object.create(ChevrotainParser.prototype);
+    JsonParser.prototype.constructor = JsonParser;
 
     lexer = jsonLexer;
-    parser = new JsonLazyParser([]);
-
+    parser = new JsonParser([]);
 
 </script>
 </body>

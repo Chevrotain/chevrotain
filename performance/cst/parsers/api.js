@@ -13,7 +13,7 @@ function performSingleLexAndParserBase(text, lexerAndParser) {
     }
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
+        value:       value,
         lexErrors:   lexResult.errors,
         parseErrors: lexerAndParser.parser.errors
     };
