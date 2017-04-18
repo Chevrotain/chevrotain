@@ -181,7 +181,7 @@ describe("The CSTVisitor", () => {
         }
 
         expect(() => new CstVisitorValidator()).to.throw("Missing visitor method: <bamba>")
-        expect(() => new CstVisitorValidator()).to.throw("Errors Detected in CST Visitor <CstVisitorValidator>")
+        expect(() => new CstVisitorValidator()).to.throw("Errors Detected in CST Visitor")
     })
 
     it("can detect redundant visitor methods", () => {
@@ -206,6 +206,6 @@ describe("The CSTVisitor", () => {
         }
 
         expect(() => new CstVisitorValidatorRedundant()).to.throw("Redundant visitor method: <oops>")
-        expect(() => new CstVisitorValidatorRedundant()).to.throw("Errors Detected in CST Visitor <CstVisitorValidatorRedundant>")
+        expect(() => new CstVisitorValidatorRedundant()).to.throw("Errors Detected in CST Visitor")
     })
 })
