@@ -452,4 +452,6 @@ On V8 (Chrome/Node) building the CST was measured at about **65%** of the perfor
 versus a pure grammar's runtime. This is substantial but considering Chevrotain is already [very fast](http://sap.github.io/chevrotain/performance/)
 and that parsing is usually just one part of a larger flow, than unless there a special edge case which requires
 maximum performance than the benefits of using the CST (modularity / ease of maintenance) by far outweigh the costs (reduced performance).
+
+* Online [CST Benchmark](http://sap.github.io/chevrotain/performance/cst/)
  
