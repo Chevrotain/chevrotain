@@ -22,8 +22,17 @@
     <section style="text-align:left;">
         <h1>Performance comparison of CST Output vs No output.</h1>
 
+        <p>This benchmark also includes an example of manually building the CST using embedded actions.<br>
+           This demonstrates the overhead of Automatic CST building done by Chevrotain v</p>
+
         <p>This benchmark uses a JSON grammar and measures the performance cost
            of enabling CST Output</p>
+
+        <p>
+            Source Code for this benchmark can be found <a rel="nofollow"
+                         href="https://github.com/sap/chevrotain/blob/gh-pages/performance/cst/">here</a>
+        </p>
+
         <p>
             The input <a rel="nofollow"
                          href="https://github.com/sap/chevrotain/blob/gh-pages/performance/samples/1K_json.js">sample</a>
@@ -46,6 +55,10 @@
             </tr>
             <tr>
                 <td>CST Disabled</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>CST Manual</td>
                 <td></td>
             </tr>
         </table>
@@ -115,6 +128,8 @@
             performSingleLexAndParserBase(json_sample1k, cstOn)
         }).add('CST Disabled', function () {
             performSingleLexAndParserBase(json_sample1k, cstOff)
+        }).add('CST Manual', function () {
+            performSingleLexAndParserBase(json_sample1k, cstManual)
         }).on('cycle', function (event) {
 
             var table = document.getElementById("resultsTable");

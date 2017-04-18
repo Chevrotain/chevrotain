@@ -22,4 +22,16 @@ lazyIframe.addEventListener("load", function () {
     cstOff.lexer = lazyIframe.contentWindow.lexer
 })
 
+var cstManual = {};
+var manualIframe = document.createElement("iframe");
+manualIframe.setAttribute("src", "parsers/cst_manual.html");
+manualIframe.style.visibility = "hidden"
+manualIframe.style.height = 0
+manualIframe.style.width = 0
+document.body.appendChild(manualIframe);
+manualIframe.addEventListener("load", function () {
+    cstManual.parser = manualIframe.contentWindow.parser
+    cstManual.lexer = manualIframe.contentWindow.lexer
+})
+
 
