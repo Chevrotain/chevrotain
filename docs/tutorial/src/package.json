@@ -2,7 +2,7 @@
   "name": "chevrotain_examples_tutorial",
   "version": "0.1.0",
   "scripts": {
-    "test": "mocha '*spec.js'"
+    "test": "mocha \"step*/*spec.js\""
   },
   "dependencies": {
     "chevrotain": "*"

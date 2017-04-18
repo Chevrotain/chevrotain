@@ -9,7 +9,7 @@
 // Therefore using the CST Visitor is the recommended approach:
 // https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js
 
-const selectLexer = require("./step1_lexing")
+const selectLexer = require("../step1_lexing/step1_lexing")
 const Parser = require("chevrotain").Parser
 const tokenVocabulary = selectLexer.tokenVocabulary
 

@@ -107,6 +107,6 @@ and push each of these strings to the **columns** array.
 
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor.js) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor) of 
   this tutorial step.
 * Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).

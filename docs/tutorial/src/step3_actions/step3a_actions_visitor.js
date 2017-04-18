@@ -6,8 +6,8 @@
 
 // Adding Actions(semantics) to our grammar using a CST Visitor.
 
-const selectLexer = require("./step1_lexing")
-const parser = require("./step2_parsing")
+const selectLexer = require("../step1_lexing/step1_lexing")
+const parser = require("../step2_parsing/step2_parsing")
 const SelectParser = parser.SelectParser
 
 // A new parser instance with CST output enabled.

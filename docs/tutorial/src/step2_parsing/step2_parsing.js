@@ -7,7 +7,7 @@
 // Adding a Parser (grammar only, only reads the input without any actions).
 // Using the Token Vocabulary defined in the previous step.
 
-const selectLexer = require("./step1_lexing")
+const selectLexer = require("../step1_lexing/step1_lexing")
 const Parser = require("chevrotain").Parser
 const tokenVocabulary = selectLexer.tokenVocabulary
 
