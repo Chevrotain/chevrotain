@@ -20,7 +20,7 @@ library by @tabatkins.
 ### Instructions:
 There are two templates for two separate use cases:
 
-#### Diagrams from Serialized Grammar.
+#### Template1: Diagrams from Serialized Grammar.
 Drawing the diagrams from a **serialized** format is useful when your grammar has been implemented in node.js
 and cannot (at least not easily) be bundled for use in a browser.
 
@@ -45,7 +45,7 @@ and cannot (at least not easily) be bundled for use in a browser.
   script tag in your copied **root/diagrams_serialized.html** to load & use your serialized grammar.
 
 
-#### Diagrams from a Parser instance.
+#### Template2: Diagrams from a Parser instance.
 Drawing the diagrams from a **Parser instance** is useful when your grammar has already been implemented in a browser compatible format
 (not node.js). Or if you already have a browser bundling process as part of your workflow (browserify/webpack).
 
