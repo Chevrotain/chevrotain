@@ -3,7 +3,7 @@
 # Tutorial Step 3 - Adding Embedded Actions to the Parser.
 
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3b_actions_embedded.js) for this step<---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3b_actions_embedded.js) for this step <---
 
 
 ### On code samples:
