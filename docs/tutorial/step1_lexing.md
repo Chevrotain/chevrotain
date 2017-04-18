@@ -1,6 +1,6 @@
 # Tutorial Step 1 - Building a Lexer.
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) for this step<---
+### ---> [Source Code](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step1_lexing.js) for this step <---
 
 
 ### On code samples:
