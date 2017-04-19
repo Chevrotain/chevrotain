@@ -46,5 +46,5 @@ but that is not the case:
 * Prefer embedding the semantics (actions) in the grammar only in use cases where performance is of utmost concern.
 
 #### What is Next?
-* Next step in the tutorial: [Step 3a - Separated Actions with a Visitor](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_visitor.md).
+* Next step in the tutorial: [Step 3a - Separated Actions with a Visitor](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3a_adding_actions_visitor.md).
 * Next step in the tutorial: [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
