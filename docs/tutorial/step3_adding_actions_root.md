@@ -12,7 +12,7 @@ result/data structure/value.
 
 Chevrotain supports two **very different** solutions to this problem:
 
- * Separation of grammar and user actions (Semantics) using a **CST Visitor**.
+ * **Separation** of grammar and user actions (Semantics) using a **CST Visitor**.
    - [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
    
  * **Embedding** user actions (Semantics) inside the grammar rules.
@@ -46,5 +46,5 @@ but that is not the case:
 * Prefer embedding the semantics (actions) in the grammar only in use cases where performance is of utmost concern.
 
 #### What is Next?
-* Next step in the tutorial: [Step 3a - Separated Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_separated.md).
+* Next step in the tutorial: [Step 3a - Separated Actions with a Visitor](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_visitor.md).
 * Next step in the tutorial: [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
