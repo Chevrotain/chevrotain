@@ -123,6 +123,9 @@ function onImplementationEditorContentChange() {
             if (visitorConstructor) {
                 visitor = new visitorConstructor()
             }
+            else {
+                visitor = null
+            }
         } else { // lexer Only Example
             parser = undefined
             renderDiagramsAndAttachHighlightEvents([])
