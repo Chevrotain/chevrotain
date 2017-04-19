@@ -61,7 +61,7 @@
         <div class="col-lg-6">
             <h2>JavaScript Parsing Libraries Benchmark</h2>
 
-            <p>A JSON Parser was implemented using each of the Parsing Libraries (Generators/Combinators/DSLs).</p>
+            <p>A JSON Parser was implemented using each of these Parsing Libraries (Generators/Combinators/DSLs):</p>
             <ol id="toolsList">
                 <li><p><a rel="nofollow" href="https://github.com/SAP/chevrotain">Chevrotain</a> Parsing DSL
                     <a rel="nofollow"
@@ -169,11 +169,8 @@
                                                                               href="http://www.json-generator.com/">json-generator</a>.
             </p>
             <p>
-                None of the parsers have explicit output actions(build no user defined AST), they only parse the text
-                (without errors),
-                However some of the parsing libraries may always build some default output structure even if no actions
-                have been explicitly
-                defined.
+                None of the parsers have any user defined output actions. they only parse the text
+                without errors.
             </p>
 
             <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
@@ -181,13 +178,13 @@
             </p>
 
             <p>
-                The entire code for this benchmark can be found in this github <a rel="nofollow"
+                The entire source code for this benchmark can be found in this github <a rel="nofollow"
                                                                                   href="https://github.com/sap/chevrotain/tree/gh-pages/performance">repository</a>.
             </p>
 
             <p>
                 Note that the Ohm Parser Library is <b>not</b> included by default as it can be very slow causing the
-                whole benchmark to hang.
+                whole benchmark to hang. Click the checkbox to add it.
             </p>
             <button onclick="onRunAll()" id="runAllButton">Run</button>
         </div>
