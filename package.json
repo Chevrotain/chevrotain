@@ -48,8 +48,8 @@
     "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && node ../chevrotain_docs/scripts/upload_docs.js",
     "unit_tests": "node_modules/.bin/_mocha ./lib/test/**/*spec.js",
     "compile": "tsc",
-    "compile_definitions": "tsc test_integration/definitions/es6_modules.ts --outDir dev/garbage",
-    "compile_definitions_namespace": "tsc test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
+    "compile_definitions": "tsc --noImplicitAny test_integration/definitions/es6_modules.ts --outDir dev/garbage",
+    "compile_definitions_namespace": "tsc --noImplicitAny test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
     "lint": "tslint --project tsconfig.json"
   },
   "dependencies": {},
