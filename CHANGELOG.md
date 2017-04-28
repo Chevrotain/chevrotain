@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+- [Upgrade to TypeScript 2.3.1](https://github.com/SAP/chevrotain/pull/458)
+
+#### Documentation
+- [Ensure chevrotain.d.ts is compatiable with noImplicitAny.](https://github.com/SAP/chevrotain/issues/459)
+
+
+
 ## 0.28.1 (4-18-2017)
 
 #### Minor Changes

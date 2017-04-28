@@ -731,7 +731,7 @@ export class Parser {
      *
      * @return {Function():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
      */
-    protected BACKTRACK<T>(grammarRule:(...args) => T, isValid:(T) => boolean):() => boolean {
+    protected BACKTRACK<T>(grammarRule:(...args:any[]) => T, isValid:(T:any) => boolean):() => boolean {
         return function () {
             // save org state
             this.isBackTrackingStack.push(1)
@@ -838,7 +838,7 @@ export class Parser {
      * Convenience method equivalent to SUBRULE1
      * @see SUBRULE1
      */
-    protected SUBRULE<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
+    protected SUBRULE<T>(ruleToCall:(idx:number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 1, args)
     }
 
@@ -860,35 +860,35 @@ export class Parser {
      * @param {*[]} args - The arguments to pass to the invoked subrule.
      * @returns {*} - The result of invoking ruleToCall.
      */
-    protected SUBRULE1<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
+    protected SUBRULE1<T>(ruleToCall:(idx:number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 1, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE2<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
+    protected SUBRULE2<T>(ruleToCall:(idx:number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 2, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE3<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
+    protected SUBRULE3<T>(ruleToCall:(idx:number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 3, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE4<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
+    protected SUBRULE4<T>(ruleToCall:(idx:number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 4, args)
     }
 
     /**
      * @see SUBRULE1
      */
-    protected SUBRULE5<T>(ruleToCall:(number) => T, args:any[] = undefined):T {
+    protected SUBRULE5<T>(ruleToCall:(idx:number) => T, args:any[] = undefined):T {
         return this.subruleInternal(ruleToCall, 5, args)
     }
 
@@ -1462,7 +1462,7 @@ export class Parser {
         return nextPossibleTokenTypes
     }
 
-    protected subruleInternal<T>(ruleToCall:(number) => T, idx, args:any[]) {
+    protected subruleInternal<T>(ruleToCall:(idx:number) => T, idx:number, args:any[]) {
         let ruleResult = ruleToCall.call(this, idx, args)
         this.cstPostNonTerminal(ruleResult, (<any>ruleToCall).ruleName)
 
