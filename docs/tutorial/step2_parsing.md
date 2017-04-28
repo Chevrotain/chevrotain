@@ -42,17 +42,17 @@ relationalOperator
       
 ```
 
-A Chevrotain Parser analyses an [IToken](http://sap.github.io/chevrotain/documentation/0_28_1/interfaces/_chevrotain_d_.itoken.html) vector that conforms to some grammar.
-The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#at_least_one), which includes the following methods.
+A Chevrotain Parser analyses an [IToken](http://sap.github.io/chevrotain/documentation/0_28_2/interfaces/_chevrotain_d_.itoken.html) vector that conforms to some grammar.
+The grammar is defined using the [parsing DSL](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#at_least_one), which includes the following methods.
 
-*   [CONSUME](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#consume1) - 'eat' a Token.
-*   [SUBRULE](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#subrule1) - reference to another rule.
-*   [OR](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#or1) - Alternation
-*   [OPTION](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#option1) - optional production. 
-*   [MANY](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#many1) - repetition zero or more.
-*   [AT_LEAST_ONE](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#at_least_one1) - repetition one or more.
-*   [MANY_SEP](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#many_sep1) - repetition (zero or more) with a separator between any two items 
-*   [AT_LEAST_ONE_SEP](http://sap.github.io/chevrotain/documentation/0_28_1/classes/_chevrotain_d_.parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
+*   [CONSUME](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#consume1) - 'eat' a Token.
+*   [SUBRULE](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#subrule1) - reference to another rule.
+*   [OR](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#or1) - Alternation
+*   [OPTION](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#option1) - optional production. 
+*   [MANY](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#many1) - repetition zero or more.
+*   [AT_LEAST_ONE](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#at_least_one1) - repetition one or more.
+*   [MANY_SEP](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#many_sep1) - repetition (zero or more) with a separator between any two items 
+*   [AT_LEAST_ONE_SEP](http://sap.github.io/chevrotain/documentation/0_28_2/classes/_chevrotain_d_.parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
 
 
 #### Let's implement our first grammar rule. 

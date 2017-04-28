@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.28.2 (4-28-2017)
 
 #### Minor Changes
 - [Upgrade to TypeScript 2.3.1](https://github.com/SAP/chevrotain/pull/458)
