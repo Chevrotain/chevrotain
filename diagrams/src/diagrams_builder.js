@@ -56,7 +56,13 @@
      */
     function createTerminalFromSerializedGast(prod, topRuleName, dslRuleName) {
         // PATTERN static property will not exist when using custom lexers (hand built or other lexer generators)
-        var toolTipTitle = prod.pattern
+        var toolTipTitle = undefined
+        // avoid trying to use a custom token pattern as the title.
+        if (typeof prod.pattern === "string" ||
+            Object.prototype.toString.call(prod.pattern) === "[object RegExp]") {
+            toolTipTitle = prod.pattern
+        }
+
         return railroad.Terminal(prod.label,
             undefined,
             toolTipTitle,
