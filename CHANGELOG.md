@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+- [Diagrams drawing bug when using custom Token patterns.](https://github.com/SAP/chevrotain/issues/462)
+
+
+
 ## 0.28.2 (4-28-2017)
 
 #### Minor Changes
