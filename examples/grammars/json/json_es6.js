@@ -61,25 +61,20 @@ class JsonParserES6 extends chevrotain.Parser {
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor(input) {
-        super(input, allTokens,
-            // by default the error recovery / fault tolerance capabilities are disabled
-            // use this flag to enable them
-            {recoveryEnabled: true});
+        super(input, allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
-        var $ = this;
+        const $ = this;
 
-        $.json = $.RULE("json", () => {
-            // @formatter:off
+        $.RULE("json", () => {
             $.OR([
-                { ALT: () => { $.SUBRULE($.object) }},
-                { ALT: () => { $.SUBRULE($.array) }}
+                {ALT: () => { $.SUBRULE($.object) }},
+                {ALT: () => { $.SUBRULE($.array) }}
             ]);
-            // @formatter:on
         });
 
         // the parsing methods
-        $.object = $.RULE("object", () => { // using ES2015 Arrow functions to reduce verbosity.
+        $.RULE("object", () => { // using ES2015 Arrow functions to reduce verbosity.
             $.CONSUME(LCurly);
             $.OPTION(() => {
                 $.SUBRULE($.objectItem);
@@ -91,13 +86,13 @@ class JsonParserES6 extends chevrotain.Parser {
             $.CONSUME(RCurly);
         });
 
-        $.objectItem = $.RULE("objectItem", () => {
+        $.RULE("objectItem", () => {
             $.CONSUME(StringLiteral);
             $.CONSUME(Colon);
             $.SUBRULE($.value);
         });
 
-        $.array = $.RULE("array", () => {
+        $.RULE("array", () => {
             $.CONSUME(LSquare);
             $.OPTION(() => {
                 $.SUBRULE($.value);
@@ -109,19 +104,17 @@ class JsonParserES6 extends chevrotain.Parser {
             $.CONSUME(RSquare);
         });
 
-        // @formatter:off
-        $.value = $.RULE("value", () => {
+        $.RULE("value", () => {
             $.OR([
-                { ALT: () => { $.CONSUME(StringLiteral) }},
-                { ALT: () => { $.CONSUME(NumberLiteral) }},
-                { ALT: () => { $.SUBRULE($.object) }},
-                { ALT: () => { $.SUBRULE($.array) }},
-                { ALT: () => { $.CONSUME(True) }},
-                { ALT: () => { $.CONSUME(False) }},
-                { ALT: () => { $.CONSUME(Null) }}
-            ], "a value");
+                {ALT: () => { $.CONSUME(StringLiteral) }},
+                {ALT: () => { $.CONSUME(NumberLiteral) }},
+                {ALT: () => { $.SUBRULE($.object) }},
+                {ALT: () => { $.SUBRULE($.array) }},
+                {ALT: () => { $.CONSUME(True) }},
+                {ALT: () => { $.CONSUME(False) }},
+                {ALT: () => { $.CONSUME(Null) }}
+            ]);
         });
-        // @formatter:on
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
@@ -133,14 +126,14 @@ class JsonParserES6 extends chevrotain.Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new JsonParserES6([]);
+const parser = new JsonParserES6([]);
 
 module.exports = function(text) {
-    var lexResult = JsonLexer.tokenize(text);
+    const lexResult = JsonLexer.tokenize(text);
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens;
     // any top level rule may be used as an entry point
-    var value = parser.json();
+    const value = parser.json();
 
     return {
         value:       value, // this is a pure grammar, the value will always be <undefined>
