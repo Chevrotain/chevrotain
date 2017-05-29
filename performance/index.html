@@ -21,6 +21,7 @@
 <script src="jsonParsers/pegjs/pegjs_jison_parser.js"></script>
 
 <script src='lib/lib/require.js'></script>
+
 <script src="../bower_components/antlr4/antlr4.js"></script>
 <script src="jsonParsers/antlr/JSON_ANTLRLexer.js"></script>
 <script src="jsonParsers/antlr/JSON_ANTLRListener.js"></script>
@@ -48,6 +49,10 @@
 
 <script src="https://unpkg.com/oboe@2.1.2/dist/oboe-browser.min.js"></script>
 <script src="jsonParsers/oboe/oboe_json_parser.js"></script>
+
+<script src="https://unpkg.com/myna-parser"></script>
+<script src="https://unpkg.com/myna-parser/grammars/grammar_json"></script>
+<script src="jsonParsers/myna/myna_json_parser.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
@@ -81,6 +86,12 @@
                     <a rel="nofollow"
                        href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/antlr/JSON_ANTLRParser.js">generated
                         code</a>
+                </p></li>
+
+                <li><p>
+                    <a rel="nofollow" href="https://cdiggins.github.io/myna-parser/">Myna</a> Parsing Library
+                    <a rel="nofollow"
+                       href="https://github.com/cdiggins/myna-parser/tree/master/grammars">implementation</a>
                 </p></li>
 
                 <li><p>
@@ -235,6 +246,19 @@
                     <div class="dataRow Antlr">
 
                         <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Myna">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/myna">Myna</a>
+                        </div>
                         <div class="benchRate">
                             <div class="value">&nbsp;</div>
                             <div class="delta">&nbsp;</div>
@@ -449,6 +473,10 @@
     }
 
     var testCases = {
+        Myna: function (suite) {
+            addTest(suite, 'Myna', parseJsonMyna)
+        },
+
         Browser: function (suite) {
             addTest(suite, 'Browser', parse_json_browser)
         },
