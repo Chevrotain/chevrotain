@@ -32,15 +32,16 @@ var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {positionTracking: "onlyOffs
 var ChevrotainParser = chevrotain.Parser;
 
 function ChevrotainJsonParser(input) {
-    ChevrotainParser.call(this, input, jsonTokens);
-    var $ = this;
+    ChevrotainParser.call(this, input, jsonTokens, {ignoredIssues:
+        {value: {
+            OR: true
+        }}});
+    const $ = this;
 
     $.RULE("json", function () {
         $.OR([
-            // @formatter:off
-            { ALT: function () { $.SUBRULE($.object) }},
-            { ALT: function () { $.SUBRULE($.array) }}
-            // @formatter:on
+            {ALT: function () { $.SUBRULE($.object) }},
+            {ALT: function () { $.SUBRULE($.array) }}
         ]);
     });
 
@@ -76,7 +77,6 @@ function ChevrotainJsonParser(input) {
 
     $.RULE("value", function () {
         $.OR([
-            // @formatter:off
             { ALT: function () { $.CONSUME(StringLiteral) }},
             { ALT: function () { $.CONSUME(NumberLiteral) }},
             { ALT: function () { $.SUBRULE($.object) }},
@@ -84,7 +84,6 @@ function ChevrotainJsonParser(input) {
             { ALT: function () { $.CONSUME(True) }},
             { ALT: function () { $.CONSUME(False) }},
             { ALT: function () { $.CONSUME(Null) }}
-            // @formatter:on
         ]);
     });
 
