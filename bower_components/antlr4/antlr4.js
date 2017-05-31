@@ -1,6 +1,6 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.antlr4 = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -235,6 +235,7 @@ BufferedTokenStream.prototype.setTokenSource = function(tokenSource) {
 	this.tokenSource = tokenSource;
 	this.tokens = [];
 	this.index = -1;
+	this.fetchedEOF = false;
 };
 
 
@@ -281,8 +282,7 @@ BufferedTokenStream.prototype.getHiddenTokensToRight = function(tokenIndex,
 	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
 		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
 	}
-	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL);
+	var nextOnChannel = this.nextTokenOnChannel(tokenIndex + 1, Lexer.DEFAULT_TOKEN_CHANNEL);
 	var from_ = tokenIndex + 1;
 	// if none onchannel to right, nextOnChannel=-1 so set to = last token
 	var to = nextOnChannel === -1 ? this.tokens.length - 1 : nextOnChannel;
@@ -301,8 +301,7 @@ BufferedTokenStream.prototype.getHiddenTokensToLeft = function(tokenIndex,
 	if (tokenIndex < 0 || tokenIndex >= this.tokens.length) {
 		throw "" + tokenIndex + " not in 0.." + this.tokens.length - 1;
 	}
-	var prevOnChannel = this.previousTokenOnChannel(tokenIndex - 1,
-			Lexer.DEFAULT_TOKEN_CHANNEL);
+	var prevOnChannel = this.previousTokenOnChannel(tokenIndex - 1, Lexer.DEFAULT_TOKEN_CHANNEL);
 	if (prevOnChannel === tokenIndex - 1) {
 		return null;
 	}
@@ -376,9 +375,82 @@ BufferedTokenStream.prototype.fill = function() {
 
 exports.BufferedTokenStream = BufferedTokenStream;
 
-},{"./IntervalSet":6,"./Lexer":8,"./Token":14}],2:[function(require,module,exports){
+},{"./IntervalSet":7,"./Lexer":9,"./Token":15}],2:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+//
+
+var InputStream = require('./InputStream').InputStream;
+
+var isNodeJs = typeof window === 'undefined' && typeof importScripts === 'undefined';
+var fs = isNodeJs ? require("fs") : null;
+
+// Utility functions to create InputStreams from various sources.
+//
+// All returned InputStreams support the full range of Unicode
+// up to U+10FFFF (the default behavior of InputStream only supports
+// code points up to U+FFFF).
+var CharStreams = {
+  // Creates an InputStream from a string.
+  fromString: function(str) {
+    return InputStream(str, true);
+  },
+
+  // Asynchronously creates an InputStream from a blob given the
+  // encoding of the bytes in that blob (defaults to 'utf8' if
+  // encoding is null).
+  //
+  // Invokes onLoad(result) on success, onError(error) on
+  // failure.
+  fromBlob: function(blob, encoding, onLoad, onError) {
+    var reader = FileReader();
+    reader.onload = function(e) {
+      var is = InputStream(e.target.result, true);
+      onLoad(is);
+    };
+    reader.onerror = onError;
+    reader.readAsText(blob, encoding);
+  },
+
+  // Creates an InputStream from a Buffer given the
+  // encoding of the bytes in that buffer (defaults to 'utf8' if
+  // encoding is null).
+  fromBuffer: function(buffer, encoding) {
+    return InputStream(buffer.toString(encoding), true);
+  },
+
+  // Asynchronously creates an InputStream from a file on disk given
+  // the encoding of the bytes in that file (defaults to 'utf8' if
+  // encoding is null).
+  //
+  // Invokes callback(error, result) on completion.
+  fromPath: function(path, encoding, callback) {
+    fs.readFile(path, encoding, function(err, data) {
+      var is = null;
+      if (data !== null) {
+        is = InputStream(data, true);
+      }
+      callback(err, is);
+    });
+  },
+
+  // Synchronously creates an InputStream given a path to a file
+  // on disk and the encoding of the bytes in that file (defaults to
+  // 'utf8' if encoding is null).
+  fromPathSync: function(path, encoding) {
+    var data = fs.readFileSync(path, encoding);
+    return InputStream(data, true);
+  }
+};
+
+exports.CharStreams = CharStreams;
+
+},{"./InputStream":6,"fs":48}],3:[function(require,module,exports){
+//
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -447,9 +519,9 @@ CommonTokenFactory.prototype.createThin = function(type, text) {
 
 exports.CommonTokenFactory = CommonTokenFactory;
 
-},{"./Token":14}],3:[function(require,module,exports){
+},{"./Token":15}],4:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -552,9 +624,9 @@ CommonTokenStream.prototype.getNumberOfOnChannelTokens = function() {
 };
 
 exports.CommonTokenStream = CommonTokenStream;
-},{"./BufferedTokenStream":1,"./Token":14}],4:[function(require,module,exports){
+},{"./BufferedTokenStream":1,"./Token":15}],5:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -568,9 +640,9 @@ var InputStream = require('./InputStream').InputStream;
 var isNodeJs = typeof window === 'undefined' && typeof importScripts === 'undefined';
 var fs = isNodeJs ? require("fs") : null;
 
-function FileStream(fileName) {
+function FileStream(fileName, decodeToUnicodeCodePoints) {
 	var data = fs.readFileSync(fileName, "utf8");
-	InputStream.call(this, data);
+	InputStream.call(this, data, decodeToUnicodeCodePoints);
 	this.fileName = fileName;
 	return this;
 }
@@ -580,30 +652,47 @@ FileStream.prototype.constructor = FileStream;
 
 exports.FileStream = FileStream;
 
-},{"./InputStream":5,"fs":45}],5:[function(require,module,exports){
+},{"./InputStream":6,"fs":48}],6:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 //
 
 var Token = require('./Token').Token;
+require('./polyfills/codepointat');
+require('./polyfills/fromcodepoint');
 
 // Vacuum all input from a string and then treat it like a buffer.
 
-function _loadString(stream) {
+function _loadString(stream, decodeToUnicodeCodePoints) {
 	stream._index = 0;
 	stream.data = [];
-	for (var i = 0; i < stream.strdata.length; i++) {
-		stream.data.push(stream.strdata.charCodeAt(i));
+	if (stream.decodeToUnicodeCodePoints) {
+		for (var i = 0; i < stream.strdata.length; ) {
+			var codePoint = stream.strdata.codePointAt(i);
+			stream.data.push(codePoint);
+			i += codePoint <= 0xFFFF ? 1 : 2;
+		}
+	} else {
+		for (var i = 0; i < stream.strdata.length; i++) {
+			var codeUnit = stream.strdata.charCodeAt(i);
+			stream.data.push(codeUnit);
+		}
 	}
 	stream._size = stream.data.length;
 }
 
-function InputStream(data) {
+// If decodeToUnicodeCodePoints is true, the input is treated
+// as a series of Unicode code points.
+//
+// Otherwise, the input is treated as a series of 16-bit UTF-16 code
+// units.
+function InputStream(data, decodeToUnicodeCodePoints) {
 	this.name = "<empty>";
 	this.strdata = data;
+	this.decodeToUnicodeCodePoints = decodeToUnicodeCodePoints || false;
 	_loadString(this);
 	return this;
 }
@@ -682,7 +771,15 @@ InputStream.prototype.getText = function(start, stop) {
 	if (start >= this._size) {
 		return "";
 	} else {
-		return this.strdata.slice(start, stop + 1);
+		if (this.decodeToUnicodeCodePoints) {
+			var result = "";
+			for (var i = start; i <= stop; i++) {
+				result += String.fromCodePoint(this.data[i]);
+			}
+			return result;
+		} else {
+			return this.strdata.slice(start, stop + 1);
+		}
 	}
 };
 
@@ -692,8 +789,8 @@ InputStream.prototype.toString = function() {
 
 exports.InputStream = InputStream;
 
-},{"./Token":14}],6:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./Token":15,"./polyfills/codepointat":43,"./polyfills/fromcodepoint":44}],7:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -992,9 +1089,9 @@ IntervalSet.prototype.elementName = function(literalNames, symbolicNames, a) {
 exports.Interval = Interval;
 exports.IntervalSet = IntervalSet;
 
-},{"./Token":14}],7:[function(require,module,exports){
+},{"./Token":15}],8:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -1193,8 +1290,8 @@ LL1Analyzer.prototype._LOOK = function(s, stopState , ctx, look, lookBusy, calle
 exports.LL1Analyzer = LL1Analyzer;
 
 
-},{"./IntervalSet":6,"./PredictionContext":11,"./Token":14,"./Utils":15,"./atn/ATNConfig":17,"./atn/ATNState":22,"./atn/Transition":30}],8:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./IntervalSet":7,"./PredictionContext":12,"./Token":15,"./Utils":16,"./atn/ATNConfig":18,"./atn/ATNState":23,"./atn/Transition":31}],9:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -1272,8 +1369,8 @@ Lexer.SKIP = -3;
 
 Lexer.DEFAULT_TOKEN_CHANNEL = Token.DEFAULT_CHANNEL;
 Lexer.HIDDEN = Token.HIDDEN_CHANNEL;
-Lexer.MIN_CHAR_VALUE = '\u0000';
-Lexer.MAX_CHAR_VALUE = '\uFFFE';
+Lexer.MIN_CHAR_VALUE = 0x0000;
+Lexer.MAX_CHAR_VALUE = 0x10FFFF;
 
 Lexer.prototype.reset = function() {
 	// wack Lexer state variables
@@ -1566,8 +1663,8 @@ Lexer.prototype.recover = function(re) {
 
 exports.Lexer = Lexer;
 
-},{"./CommonTokenFactory":2,"./Recognizer":12,"./Token":14,"./error/Errors":39}],9:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./CommonTokenFactory":3,"./Recognizer":13,"./Token":15,"./error/Errors":40}],10:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -1587,7 +1684,7 @@ function TraceListener(parser) {
 	return this;
 }
 
-TraceListener.prototype = Object.create(ParseTreeListener);
+TraceListener.prototype = Object.create(ParseTreeListener.prototype);
 TraceListener.prototype.constructor = TraceListener;
 
 TraceListener.prototype.enterEveryRule = function(ctx) {
@@ -2241,8 +2338,8 @@ Parser.prototype.setTrace = function(trace) {
 };
 
 exports.Parser = Parser;
-},{"./Lexer":8,"./Recognizer":12,"./Token":14,"./atn/ATNDeserializationOptions":19,"./atn/ATNDeserializer":20,"./error/ErrorStrategy":38,"./tree/Tree":42}],10:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./Lexer":9,"./Recognizer":13,"./Token":15,"./atn/ATNDeserializationOptions":20,"./atn/ATNDeserializer":21,"./error/ErrorStrategy":39,"./tree/Tree":45}],11:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -2363,8 +2460,11 @@ ParserRuleContext.prototype.addErrorNode = function(badToken) {
 
 ParserRuleContext.prototype.getChild = function(i, type) {
 	type = type || null;
+	if (this.children === null || i < 0 || i >= this.children.length) {
+		return null;
+	}
 	if (type === null) {
-		return this.children.length>=i ? this.children[i] : null;
+		return this.children[i];
 	} else {
 		for(var j=0; j<this.children.length; j++) {
 			var child = this.children[j];
@@ -2382,6 +2482,9 @@ ParserRuleContext.prototype.getChild = function(i, type) {
 
 
 ParserRuleContext.prototype.getToken = function(ttype, i) {
+	if (this.children === null || i < 0 || i >= this.children.length) {
+		return null;
+	}
 	for(var j=0; j<this.children.length; j++) {
 		var child = this.children[j];
 		if (child instanceof TerminalNode) {
@@ -2461,9 +2564,9 @@ InterpreterRuleContext.prototype = Object.create(ParserRuleContext.prototype);
 InterpreterRuleContext.prototype.constructor = InterpreterRuleContext;
 
 exports.ParserRuleContext = ParserRuleContext;
-},{"./IntervalSet":6,"./RuleContext":13,"./tree/Tree":42}],11:[function(require,module,exports){
+},{"./IntervalSet":7,"./RuleContext":14,"./tree/Tree":45}],12:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -3194,9 +3297,9 @@ exports.SingletonPredictionContext = SingletonPredictionContext;
 exports.predictionContextFromRuleContext = predictionContextFromRuleContext;
 exports.getCachedPredictionContext = getCachedPredictionContext;
 
-},{"./RuleContext":13,"./Utils":15}],12:[function(require,module,exports){
+},{"./RuleContext":14,"./Utils":16}],13:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -3218,7 +3321,7 @@ Recognizer.ruleIndexMapCache = {};
 
 
 Recognizer.prototype.checkVersion = function(toolVersion) {
-    var runtimeVersion = "4.6";
+    var runtimeVersion = "4.7";
     if (runtimeVersion!==toolVersion) {
         console.log("ANTLR runtime and generated code versions disagree: "+runtimeVersion+"!="+toolVersion);
     }
@@ -3343,8 +3446,8 @@ Object.defineProperty(Recognizer.prototype, "state", {
 
 exports.Recognizer = Recognizer;
 
-},{"./Token":14,"./error/ErrorListener":37}],13:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./Token":15,"./error/ErrorListener":38}],14:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -3502,8 +3605,8 @@ RuleContext.prototype.toString = function(ruleNames, stop) {
 };
 
 
-},{"./atn/ATN":16,"./tree/Tree":42,"./tree/Trees":43}],14:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./atn/ATN":17,"./tree/Tree":45,"./tree/Trees":46}],15:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -3655,8 +3758,8 @@ CommonToken.prototype.toString = function() {
 exports.Token = Token;
 exports.CommonToken = CommonToken;
 
-},{}],15:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{}],16:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -4019,7 +4122,7 @@ Hash.prototype.update = function () {
             k = (k << 15) | (k >>> (32 - 15));
             k = k * 0x1B873593;
             this.count = this.count + 1;
-            hash = this.hash ^ k;
+            var hash = this.hash ^ k;
             hash = (hash << 13) | (hash >>> (32 - 13));
             hash = hash * 5 + 0xE6546B64;
             this.hash = hash;
@@ -4102,8 +4205,8 @@ exports.escapeWhitespace = escapeWhitespace;
 exports.arrayToString = arrayToString;
 exports.titleCase = titleCase;
 exports.equalArrays = equalArrays;
-},{}],16:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{}],17:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -4245,9 +4348,9 @@ ATN.prototype.getExpectedTokens = function( stateNumber, ctx ) {
 ATN.INVALID_ALT_NUMBER = 0;
 
 exports.ATN = ATN;
-},{"./../IntervalSet":6,"./../LL1Analyzer":7,"./../Token":14}],17:[function(require,module,exports){
+},{"./../IntervalSet":7,"./../LL1Analyzer":8,"./../Token":15}],18:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -4422,9 +4525,9 @@ LexerATNConfig.prototype.checkNonGreedyDecision = function(source, target) {
 
 exports.ATNConfig = ATNConfig;
 exports.LexerATNConfig = LexerATNConfig;
-},{"../Utils":15,"./ATNState":22,"./SemanticContext":29}],18:[function(require,module,exports){
+},{"../Utils":16,"./ATNState":23,"./SemanticContext":30}],19:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -4679,8 +4782,8 @@ OrderedATNConfigSet.prototype.constructor = OrderedATNConfigSet;
 exports.ATNConfigSet = ATNConfigSet;
 exports.OrderedATNConfigSet = OrderedATNConfigSet;
 
-},{"./../PredictionContext":11,"./../Utils":15,"./ATN":16,"./SemanticContext":29}],19:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../PredictionContext":12,"./../Utils":16,"./ATN":17,"./SemanticContext":30}],20:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -4706,8 +4809,8 @@ ATNDeserializationOptions.defaultOptions.readOnly = true;
 
 exports.ATNDeserializationOptions = ATNDeserializationOptions;
 
-},{}],20:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{}],21:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -4760,14 +4863,21 @@ var LexerModeAction = LexerActions.LexerModeAction;
 // stick to serialized version for now, we don't need a UUID instance
 var BASE_SERIALIZED_UUID = "AADB8D7E-AEEF-4415-AD2B-8204D6CF042E";
 
+//
+// This UUID indicates the serialized ATN contains two sets of
+// IntervalSets, where the second set's values are encoded as
+// 32-bit integers to support the full Unicode SMP range up to U+10FFFF.
+//
+var ADDED_UNICODE_SMP = "59627784-3BE5-417A-B9EB-8131A7286089";
+
 // This list contains all of the currently supported UUIDs, ordered by when
 // the feature first appeared in this branch.
-var SUPPORTED_UUIDS = [ BASE_SERIALIZED_UUID ];
+var SUPPORTED_UUIDS = [ BASE_SERIALIZED_UUID, ADDED_UNICODE_SMP ];
 
 var SERIALIZED_VERSION = 3;
 
 // This is the current serialized UUID.
-var SERIALIZED_UUID = BASE_SERIALIZED_UUID;
+var SERIALIZED_UUID = ADDED_UNICODE_SMP;
 
 function initArray( length, value) {
 	var tmp = [];
@@ -4800,11 +4910,11 @@ function ATNDeserializer (options) {
 // introduced; otherwise, {@code false}.
 
 ATNDeserializer.prototype.isFeatureSupported = function(feature, actualUuid) {
-    var idx1 = SUPPORTED_UUIDS.index(feature);
+    var idx1 = SUPPORTED_UUIDS.indexOf(feature);
     if (idx1<0) {
         return false;
     }
-    var idx2 = SUPPORTED_UUIDS.index(actualUuid);
+    var idx2 = SUPPORTED_UUIDS.indexOf(actualUuid);
     return idx2 >= idx1;
 };
 
@@ -4816,7 +4926,14 @@ ATNDeserializer.prototype.deserialize = function(data) {
     this.readStates(atn);
     this.readRules(atn);
     this.readModes(atn);
-    var sets = this.readSets(atn);
+    var sets = [];
+    // First, deserialize sets with 16-bit arguments <= U+FFFF.
+    this.readSets(atn, sets, this.readInt.bind(this));
+    // Next, if the ATN was serialized with the Unicode SMP feature,
+    // deserialize sets with 32-bit arguments <= U+10FFFF.
+    if (this.isFeatureSupported(ADDED_UNICODE_SMP, this.uuid)) {
+        this.readSets(atn, sets, this.readInt32.bind(this));
+    }
     this.readEdges(atn, sets);
     this.readDecisions(atn);
     this.readLexerActions(atn);
@@ -4953,8 +5070,7 @@ ATNDeserializer.prototype.readModes = function(atn) {
     }
 };
 
-ATNDeserializer.prototype.readSets = function(atn) {
-    var sets = [];
+ATNDeserializer.prototype.readSets = function(atn, sets, readUnicode) {
     var m = this.readInt();
     for (var i=0; i<m; i++) {
         var iset = new IntervalSet();
@@ -4965,12 +5081,11 @@ ATNDeserializer.prototype.readSets = function(atn) {
             iset.addOne(-1);
         }
         for (var j=0; j<n; j++) {
-            var i1 = this.readInt();
-            var i2 = this.readInt();
+            var i1 = readUnicode();
+            var i2 = readUnicode();
             iset.addRange(i1, i2);
         }
     }
-    return sets;
 };
 
 ATNDeserializer.prototype.readEdges = function(atn, sets) {
@@ -5373,9 +5488,9 @@ ATNDeserializer.prototype.lexerActionFactory = function(type, data1, data2) {
 
 
 exports.ATNDeserializer = ATNDeserializer;
-},{"./../IntervalSet":6,"./../Token":14,"./ATN":16,"./ATNDeserializationOptions":19,"./ATNState":22,"./ATNType":23,"./LexerAction":25,"./Transition":30}],21:[function(require,module,exports){
+},{"./../IntervalSet":7,"./../Token":15,"./ATN":17,"./ATNDeserializationOptions":20,"./ATNState":23,"./ATNType":24,"./LexerAction":26,"./Transition":31}],22:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -5426,9 +5541,9 @@ ATNSimulator.prototype.getCachedContext = function(context) {
 
 exports.ATNSimulator = ATNSimulator;
 
-},{"./../PredictionContext":11,"./../dfa/DFAState":34,"./ATNConfigSet":18}],22:[function(require,module,exports){
+},{"./../PredictionContext":12,"./../dfa/DFAState":35,"./ATNConfigSet":19}],23:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -5754,8 +5869,8 @@ exports.PlusBlockStartState = PlusBlockStartState;
 exports.StarBlockStartState = StarBlockStartState;
 exports.BasicBlockStartState = BasicBlockStartState;
 
-},{}],23:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{}],24:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -5773,9 +5888,9 @@ ATNType.PARSER = 1;
 exports.ATNType = ATNType;
 
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -6102,7 +6217,7 @@ LexerATNSimulator.prototype.accept = function(input, lexerActionExecutor,
 };
 
 LexerATNSimulator.prototype.getReachableTarget = function(trans, t) {
-	if (trans.matches(t, 0, 0xFFFE)) {
+	if (trans.matches(t, 0, Lexer.MAX_CHAR_VALUE)) {
 		return trans.target;
 	} else {
 		return null;
@@ -6244,7 +6359,7 @@ LexerATNSimulator.prototype.getEpsilonTarget = function(input, config, trans,
 				trans.serializationType === Transition.RANGE ||
 				trans.serializationType === Transition.SET) {
 		if (treatEofAsEpsilon) {
-			if (trans.matches(Token.EOF, 0, 0xFFFF)) {
+			if (trans.matches(Token.EOF, 0, Lexer.MAX_CHAR_VALUE)) {
 				cfg = new LexerATNConfig( { state:trans.target }, config);
 			}
 		}
@@ -6411,9 +6526,9 @@ LexerATNSimulator.prototype.getTokenName = function(tt) {
 
 exports.LexerATNSimulator = LexerATNSimulator;
 
-},{"./../Lexer":8,"./../PredictionContext":11,"./../Token":14,"./../dfa/DFAState":34,"./../error/Errors":39,"./ATN":16,"./ATNConfig":17,"./ATNConfigSet":18,"./ATNSimulator":21,"./ATNState":22,"./LexerActionExecutor":26,"./Transition":30}],25:[function(require,module,exports){
+},{"./../Lexer":9,"./../PredictionContext":12,"./../Token":15,"./../dfa/DFAState":35,"./../error/Errors":40,"./ATN":17,"./ATNConfig":18,"./ATNConfigSet":19,"./ATNSimulator":22,"./ATNState":23,"./LexerActionExecutor":27,"./Transition":31}],26:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -6778,9 +6893,9 @@ exports.LexerTypeAction = LexerTypeAction;
 exports.LexerPushModeAction = LexerPushModeAction;
 exports.LexerPopModeAction = LexerPopModeAction;
 exports.LexerModeAction = LexerModeAction;
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -6946,9 +7061,9 @@ LexerActionExecutor.prototype.equals = function(other) {
 
 exports.LexerActionExecutor = LexerActionExecutor;
 
-},{"../Utils":15,"./LexerAction":25}],27:[function(require,module,exports){
+},{"../Utils":16,"./LexerAction":26}],28:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -8393,7 +8508,7 @@ ParserATNSimulator.prototype.precedenceTransition = function(config, pt,  collec
                 c = new ATNConfig({state:pt.target}, config); // no pred context
             }
         } else {
-            newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
+            var newSemCtx = SemanticContext.andContext(config.semanticContext, pt.getPredicate());
             c = new ATNConfig({state:pt.target, semanticContext:newSemCtx}, config);
         }
     } else {
@@ -8675,9 +8790,9 @@ ParserATNSimulator.prototype.reportAmbiguity = function(dfa, D, startIndex, stop
 };
 
 exports.ParserATNSimulator = ParserATNSimulator;
-},{"./../IntervalSet":6,"./../ParserRuleContext":10,"./../PredictionContext":11,"./../RuleContext":13,"./../Token":14,"./../Utils":15,"./../dfa/DFAState":34,"./../error/Errors":39,"./ATN":16,"./ATNConfig":17,"./ATNConfigSet":18,"./ATNSimulator":21,"./ATNState":22,"./PredictionMode":28,"./SemanticContext":29,"./Transition":30}],28:[function(require,module,exports){
+},{"./../IntervalSet":7,"./../ParserRuleContext":11,"./../PredictionContext":12,"./../RuleContext":14,"./../Token":15,"./../Utils":16,"./../dfa/DFAState":35,"./../error/Errors":40,"./ATN":17,"./ATNConfig":18,"./ATNConfigSet":19,"./ATNSimulator":22,"./ATNState":23,"./PredictionMode":29,"./SemanticContext":30,"./Transition":31}],29:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -9236,9 +9351,9 @@ PredictionMode.getSingleViableAlt = function(altsets) {
 
 exports.PredictionMode = PredictionMode;
 
-},{"../Utils":15,"./../Utils":15,"./ATN":16,"./ATNConfig":17,"./ATNConfigSet":18,"./ATNState":22,"./SemanticContext":29}],29:[function(require,module,exports){
+},{"../Utils":16,"./../Utils":16,"./ATN":17,"./ATNConfig":18,"./ATNConfigSet":19,"./ATNState":23,"./SemanticContext":30}],30:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -9642,8 +9757,8 @@ exports.SemanticContext = SemanticContext;
 exports.PrecedencePredicate = PrecedencePredicate;
 exports.Predicate = Predicate;
 
-},{"./../Utils":15}],30:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../Utils":16}],31:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -9959,8 +10074,8 @@ exports.WildcardTransition = WildcardTransition;
 exports.PredicateTransition = PredicateTransition;
 exports.PrecedencePredicateTransition = PrecedencePredicateTransition;
 exports.AbstractPredicateTransition = AbstractPredicateTransition;
-},{"./../IntervalSet":6,"./../Token":14,"./SemanticContext":29}],31:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../IntervalSet":7,"./../Token":15,"./SemanticContext":30}],32:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -9971,9 +10086,9 @@ exports.LexerATNSimulator = require('./LexerATNSimulator').LexerATNSimulator;
 exports.ParserATNSimulator = require('./ParserATNSimulator').ParserATNSimulator;
 exports.PredictionMode = require('./PredictionMode').PredictionMode;
 
-},{"./ATN":16,"./ATNDeserializer":20,"./LexerATNSimulator":24,"./ParserATNSimulator":27,"./PredictionMode":28}],32:[function(require,module,exports){
+},{"./ATN":17,"./ATNDeserializer":21,"./LexerATNSimulator":25,"./ParserATNSimulator":28,"./PredictionMode":29}],33:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10006,7 +10121,7 @@ function DFA(atnStartState, decision) {
     {
         if (atnStartState.isPrecedenceDecision) {
             this.precedenceDfa = true;
-            precedenceState = new DFAState(null, new ATNConfigSet());
+            var precedenceState = new DFAState(null, new ATNConfigSet());
             precedenceState.edges = [];
             precedenceState.isAcceptState = false;
             precedenceState.requiresFullContext = false;
@@ -10126,8 +10241,8 @@ DFA.prototype.toLexerString = function() {
 
 exports.DFA = DFA;
 
-},{"../Utils":15,"../atn/ATNState":22,"./../atn/ATNConfigSet":18,"./DFASerializer":33,"./DFAState":34}],33:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"../Utils":16,"../atn/ATNState":23,"./../atn/ATNConfigSet":19,"./DFASerializer":34,"./DFAState":35}],34:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10207,9 +10322,9 @@ exports.DFASerializer = DFASerializer;
 exports.LexerDFASerializer = LexerDFASerializer;
 
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10361,8 +10476,8 @@ DFAState.prototype.hashCode = function() {
 exports.DFAState = DFAState;
 exports.PredPrediction = PredPrediction;
 
-},{"./../Utils":15,"./../atn/ATNConfigSet":18}],35:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../Utils":16,"./../atn/ATNConfigSet":19}],36:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10372,9 +10487,9 @@ exports.DFASerializer = require('./DFASerializer').DFASerializer;
 exports.LexerDFASerializer = require('./DFASerializer').LexerDFASerializer;
 exports.PredPrediction = require('./DFAState').PredPrediction;
 
-},{"./DFA":32,"./DFASerializer":33,"./DFAState":34}],36:[function(require,module,exports){
+},{"./DFA":33,"./DFASerializer":34,"./DFAState":35}],37:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10484,9 +10599,9 @@ DiagnosticErrorListener.prototype.getConflictingAlts = function(reportedAlts, co
 };
 
 exports.DiagnosticErrorListener = DiagnosticErrorListener;
-},{"./../IntervalSet":6,"./../Utils":15,"./ErrorListener":37}],37:[function(require,module,exports){
+},{"./../IntervalSet":7,"./../Utils":16,"./ErrorListener":38}],38:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10573,9 +10688,9 @@ exports.ConsoleErrorListener = ConsoleErrorListener;
 exports.ProxyErrorListener = ProxyErrorListener;
 
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 //
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -10799,11 +10914,8 @@ DefaultErrorStrategy.prototype.sync = function(recognizer) {
     var s = recognizer._interp.atn.states[recognizer.state];
     var la = recognizer.getTokenStream().LA(1);
     // try cheaper subset first; might get lucky. seems to shave a wee bit off
-    if (la===Token.EOF || recognizer.atn.nextTokens(s).contains(la)) {
-        return;
-    }
-    // Return but don't end recovery. only do that upon valid token match
-    if(recognizer.isExpectedToken(la)) {
+    var nextTokens = recognizer.atn.nextTokens(s);
+    if (nextTokens.contains(Token.EPSILON) || nextTokens.contains(la)) {
         return;
     }
     switch (s.stateType) {
@@ -11333,8 +11445,8 @@ BailErrorStrategy.prototype.sync = function(recognizer) {
 
 exports.BailErrorStrategy = BailErrorStrategy;
 exports.DefaultErrorStrategy = DefaultErrorStrategy;
-},{"./../IntervalSet":6,"./../Token":14,"./../atn/ATNState":22,"./Errors":39}],39:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../IntervalSet":7,"./../Token":15,"./../atn/ATNState":23,"./Errors":40}],40:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -11502,9 +11614,10 @@ exports.NoViableAltException = NoViableAltException;
 exports.LexerNoViableAltException = LexerNoViableAltException;
 exports.InputMismatchException = InputMismatchException;
 exports.FailedPredicateException = FailedPredicateException;
+exports.ParseCancellationException = ParseCancellationException;
 
-},{"./../atn/Transition":30}],40:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../atn/Transition":31}],41:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -11518,16 +11631,19 @@ exports.DiagnosticErrorListener = require('./DiagnosticErrorListener').Diagnosti
 exports.BailErrorStrategy = require('./ErrorStrategy').BailErrorStrategy;
 exports.ErrorListener = require('./ErrorListener').ErrorListener;
 
-},{"./DiagnosticErrorListener":36,"./ErrorListener":37,"./ErrorStrategy":38,"./Errors":39}],41:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./DiagnosticErrorListener":37,"./ErrorListener":38,"./ErrorStrategy":39,"./Errors":40}],42:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
 exports.atn = require('./atn/index');
+exports.codepointat = require('./polyfills/codepointat');
 exports.dfa = require('./dfa/index');
+exports.fromcodepoint = require('./polyfills/fromcodepoint');
 exports.tree = require('./tree/index');
 exports.error = require('./error/index');
 exports.Token = require('./Token').Token;
+exports.CharStreams = require('./CharStreams').CharStreams;
 exports.CommonToken = require('./Token').CommonToken;
 exports.InputStream = require('./InputStream').InputStream;
 exports.FileStream = require('./FileStream').FileStream;
@@ -11540,8 +11656,128 @@ exports.ParserRuleContext = require('./ParserRuleContext').ParserRuleContext;
 exports.Interval = require('./IntervalSet').Interval;
 exports.Utils = require('./Utils');
 
-},{"./CommonTokenStream":3,"./FileStream":4,"./InputStream":5,"./IntervalSet":6,"./Lexer":8,"./Parser":9,"./ParserRuleContext":10,"./PredictionContext":11,"./Token":14,"./Utils":15,"./atn/index":31,"./dfa/index":35,"./error/index":40,"./tree/index":44}],42:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./CharStreams":2,"./CommonTokenStream":4,"./FileStream":5,"./InputStream":6,"./IntervalSet":7,"./Lexer":9,"./Parser":10,"./ParserRuleContext":11,"./PredictionContext":12,"./Token":15,"./Utils":16,"./atn/index":32,"./dfa/index":36,"./error/index":41,"./polyfills/codepointat":43,"./polyfills/fromcodepoint":44,"./tree/index":47}],43:[function(require,module,exports){
+/*! https://mths.be/codepointat v0.2.0 by @mathias */
+if (!String.prototype.codePointAt) {
+	(function() {
+		'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
+		var defineProperty = (function() {
+			// IE 8 only supports `Object.defineProperty` on DOM elements
+			try {
+				var object = {};
+				var $defineProperty = Object.defineProperty;
+				var result = $defineProperty(object, object, object) && $defineProperty;
+			} catch(error) {}
+			return result;
+		}());
+		var codePointAt = function(position) {
+			if (this == null) {
+				throw TypeError();
+			}
+			var string = String(this);
+			var size = string.length;
+			// `ToInteger`
+			var index = position ? Number(position) : 0;
+			if (index != index) { // better `isNaN`
+				index = 0;
+			}
+			// Account for out-of-bounds indices:
+			if (index < 0 || index >= size) {
+				return undefined;
+			}
+			// Get the first code unit
+			var first = string.charCodeAt(index);
+			var second;
+			if ( // check if it’s the start of a surrogate pair
+				first >= 0xD800 && first <= 0xDBFF && // high surrogate
+				size > index + 1 // there is a next code unit
+			) {
+				second = string.charCodeAt(index + 1);
+				if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+					// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+					return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+				}
+			}
+			return first;
+		};
+		if (defineProperty) {
+			defineProperty(String.prototype, 'codePointAt', {
+				'value': codePointAt,
+				'configurable': true,
+				'writable': true
+			});
+		} else {
+			String.prototype.codePointAt = codePointAt;
+		}
+	}());
+}
+
+},{}],44:[function(require,module,exports){
+/*! https://mths.be/fromcodepoint v0.2.1 by @mathias */
+if (!String.fromCodePoint) {
+	(function() {
+		var defineProperty = (function() {
+			// IE 8 only supports `Object.defineProperty` on DOM elements
+			try {
+				var object = {};
+				var $defineProperty = Object.defineProperty;
+				var result = $defineProperty(object, object, object) && $defineProperty;
+			} catch(error) {}
+			return result;
+		}());
+		var stringFromCharCode = String.fromCharCode;
+		var floor = Math.floor;
+		var fromCodePoint = function(_) {
+			var MAX_SIZE = 0x4000;
+			var codeUnits = [];
+			var highSurrogate;
+			var lowSurrogate;
+			var index = -1;
+			var length = arguments.length;
+			if (!length) {
+				return '';
+			}
+			var result = '';
+			while (++index < length) {
+				var codePoint = Number(arguments[index]);
+				if (
+					!isFinite(codePoint) || // `NaN`, `+Infinity`, or `-Infinity`
+					codePoint < 0 || // not a valid Unicode code point
+					codePoint > 0x10FFFF || // not a valid Unicode code point
+					floor(codePoint) != codePoint // not an integer
+				) {
+					throw RangeError('Invalid code point: ' + codePoint);
+				}
+				if (codePoint <= 0xFFFF) { // BMP code point
+					codeUnits.push(codePoint);
+				} else { // Astral code point; split in surrogate halves
+					// https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+					codePoint -= 0x10000;
+					highSurrogate = (codePoint >> 10) + 0xD800;
+					lowSurrogate = (codePoint % 0x400) + 0xDC00;
+					codeUnits.push(highSurrogate, lowSurrogate);
+				}
+				if (index + 1 == length || codeUnits.length > MAX_SIZE) {
+					result += stringFromCharCode.apply(null, codeUnits);
+					codeUnits.length = 0;
+				}
+			}
+			return result;
+		};
+		if (defineProperty) {
+			defineProperty(String, 'fromCodePoint', {
+				'value': fromCodePoint,
+				'configurable': true,
+				'writable': true
+			});
+		} else {
+			String.fromCodePoint = fromCodePoint;
+		}
+	}());
+}
+
+},{}],45:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -11608,7 +11844,7 @@ function ParseTreeVisitor() {
 ParseTreeVisitor.prototype.visit = function(ctx) {
  	if (Array.isArray(ctx)) {
 		return ctx.map(function(child) {
-            return ctx.accept(this);
+            return child.accept(this);
         }, this);
 	} else {
 		return ctx.accept(this);
@@ -11768,8 +12004,8 @@ exports.ParseTreeVisitor = ParseTreeVisitor;
 exports.ParseTreeWalker = ParseTreeWalker;
 exports.INVALID_INTERVAL = INVALID_INTERVAL;
 
-},{"../Utils.js":15,"./../IntervalSet":6,"./../Token":14}],43:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"../Utils.js":16,"./../IntervalSet":7,"./../Token":15}],46:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -11909,8 +12145,8 @@ Trees.descendants = function(t) {
 
 
 exports.Trees = Trees;
-},{"./../ParserRuleContext":10,"./../RuleContext":13,"./../Token":14,"./../Utils":15,"./../atn/ATN":16,"./Tree":42}],44:[function(require,module,exports){
-/* Copyright (c) 2012-2016 The ANTLR Project. All rights reserved.
+},{"./../ParserRuleContext":11,"./../RuleContext":14,"./../Token":15,"./../Utils":16,"./../atn/ATN":17,"./Tree":45}],47:[function(require,module,exports){
+/* Copyright (c) 2012-2017 The ANTLR Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.txt file in the project root.
  */
@@ -11922,7 +12158,7 @@ exports.ParseTreeListener = Tree.ParseTreeListener;
 exports.ParseTreeVisitor = Tree.ParseTreeVisitor;
 exports.ParseTreeWalker = Tree.ParseTreeWalker;
 
-},{"./Tree":42,"./Trees":43}],45:[function(require,module,exports){
+},{"./Tree":45,"./Trees":46}],48:[function(require,module,exports){
 
-},{}]},{},[41])(41)
+},{}]},{},[42])(42)
 });

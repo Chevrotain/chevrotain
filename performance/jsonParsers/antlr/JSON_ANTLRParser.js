@@ -2,13 +2,11 @@
 var antlr4Json;
 (function (antlr4Json) {
 
-    // Generated from JSON_ANTLR.g4 by ANTLR 4.5.6
+    // Generated from JSON_ANTLR.g4 by ANTLR 4.7
 // jshint ignore: start
-    // change to generated code: 'importing' via global ns object instead of require
-    var JSON_ANTLRListener =  antlr4Json.JSON_ANTLRListener;
 var grammarFileName = "JSON_ANTLR.g4";
 
-var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
+var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0003\u000e<\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004\t",
     "\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0003\u0002\u0003\u0002",
     "\u0005\u0002\u000f\n\u0002\u0003\u0003\u0003\u0003\u0003\u0003\u0003",
@@ -19,34 +17,34 @@ var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "+\u000b\u0005\u0003\u0005\u0003\u0005\u0003\u0005\u0003\u0005\u0005",
     "\u00051\n\u0005\u0003\u0006\u0003\u0006\u0003\u0006\u0003\u0006\u0003",
     "\u0006\u0003\u0006\u0003\u0006\u0005\u0006:\n\u0006\u0003\u0006\u0002",
-    "\u0002\u0007\u0002\u0004\u0006\b\n\u0002\u0002A\u0002\u000e\u0003\u0002",
-    "\u0002\u0002\u0004\u001d\u0003\u0002\u0002\u0002\u0006\u001f\u0003\u0002",
-    "\u0002\u0002\b0\u0003\u0002\u0002\u0002\n9\u0003\u0002\u0002\u0002\f",
-    "\u000f\u0005\u0004\u0003\u0002\r\u000f\u0005\b\u0005\u0002\u000e\f\u0003",
-    "\u0002\u0002\u0002\u000e\r\u0003\u0002\u0002\u0002\u000f\u0003\u0003",
-    "\u0002\u0002\u0002\u0010\u0011\u0007\u0003\u0002\u0002\u0011\u0016\u0005",
-    "\u0006\u0004\u0002\u0012\u0013\u0007\u0004\u0002\u0002\u0013\u0015\u0005",
-    "\u0006\u0004\u0002\u0014\u0012\u0003\u0002\u0002\u0002\u0015\u0018\u0003",
-    "\u0002\u0002\u0002\u0016\u0014\u0003\u0002\u0002\u0002\u0016\u0017\u0003",
-    "\u0002\u0002\u0002\u0017\u0019\u0003\u0002\u0002\u0002\u0018\u0016\u0003",
-    "\u0002\u0002\u0002\u0019\u001a\u0007\u0005\u0002\u0002\u001a\u001e\u0003",
-    "\u0002\u0002\u0002\u001b\u001c\u0007\u0003\u0002\u0002\u001c\u001e\u0007",
-    "\u0005\u0002\u0002\u001d\u0010\u0003\u0002\u0002\u0002\u001d\u001b\u0003",
-    "\u0002\u0002\u0002\u001e\u0005\u0003\u0002\u0002\u0002\u001f \u0007",
-    "\r\u0002\u0002 !\u0007\u0006\u0002\u0002!\"\u0005\n\u0006\u0002\"\u0007",
-    "\u0003\u0002\u0002\u0002#$\u0007\u0007\u0002\u0002$)\u0005\n\u0006\u0002",
-    "%&\u0007\u0004\u0002\u0002&(\u0005\n\u0006\u0002\'%\u0003\u0002\u0002",
-    "\u0002(+\u0003\u0002\u0002\u0002)\'\u0003\u0002\u0002\u0002)*\u0003",
-    "\u0002\u0002\u0002*,\u0003\u0002\u0002\u0002+)\u0003\u0002\u0002\u0002",
-    ",-\u0007\b\u0002\u0002-1\u0003\u0002\u0002\u0002./\u0007\u0007\u0002",
-    "\u0002/1\u0007\b\u0002\u00020#\u0003\u0002\u0002\u00020.\u0003\u0002",
-    "\u0002\u00021\t\u0003\u0002\u0002\u00022:\u0007\r\u0002\u00023:\u0007",
-    "\u000e\u0002\u00024:\u0005\u0004\u0003\u00025:\u0005\b\u0005\u00026",
-    ":\u0007\t\u0002\u00027:\u0007\n\u0002\u00028:\u0007\u000b\u0002\u0002",
-    "92\u0003\u0002\u0002\u000293\u0003\u0002\u0002\u000294\u0003\u0002\u0002",
-    "\u000295\u0003\u0002\u0002\u000296\u0003\u0002\u0002\u000297\u0003\u0002",
-    "\u0002\u000298\u0003\u0002\u0002\u0002:\u000b\u0003\u0002\u0002\u0002",
-    "\b\u000e\u0016\u001d)09"].join("");
+    "\u0002\u0007\u0002\u0004\u0006\b\n\u0002\u0002\u0002A\u0002\u000e\u0003",
+    "\u0002\u0002\u0002\u0004\u001d\u0003\u0002\u0002\u0002\u0006\u001f\u0003",
+    "\u0002\u0002\u0002\b0\u0003\u0002\u0002\u0002\n9\u0003\u0002\u0002\u0002",
+    "\f\u000f\u0005\u0004\u0003\u0002\r\u000f\u0005\b\u0005\u0002\u000e\f",
+    "\u0003\u0002\u0002\u0002\u000e\r\u0003\u0002\u0002\u0002\u000f\u0003",
+    "\u0003\u0002\u0002\u0002\u0010\u0011\u0007\u0003\u0002\u0002\u0011\u0016",
+    "\u0005\u0006\u0004\u0002\u0012\u0013\u0007\u0004\u0002\u0002\u0013\u0015",
+    "\u0005\u0006\u0004\u0002\u0014\u0012\u0003\u0002\u0002\u0002\u0015\u0018",
+    "\u0003\u0002\u0002\u0002\u0016\u0014\u0003\u0002\u0002\u0002\u0016\u0017",
+    "\u0003\u0002\u0002\u0002\u0017\u0019\u0003\u0002\u0002\u0002\u0018\u0016",
+    "\u0003\u0002\u0002\u0002\u0019\u001a\u0007\u0005\u0002\u0002\u001a\u001e",
+    "\u0003\u0002\u0002\u0002\u001b\u001c\u0007\u0003\u0002\u0002\u001c\u001e",
+    "\u0007\u0005\u0002\u0002\u001d\u0010\u0003\u0002\u0002\u0002\u001d\u001b",
+    "\u0003\u0002\u0002\u0002\u001e\u0005\u0003\u0002\u0002\u0002\u001f ",
+    "\u0007\r\u0002\u0002 !\u0007\u0006\u0002\u0002!\"\u0005\n\u0006\u0002",
+    "\"\u0007\u0003\u0002\u0002\u0002#$\u0007\u0007\u0002\u0002$)\u0005\n",
+    "\u0006\u0002%&\u0007\u0004\u0002\u0002&(\u0005\n\u0006\u0002\'%\u0003",
+    "\u0002\u0002\u0002(+\u0003\u0002\u0002\u0002)\'\u0003\u0002\u0002\u0002",
+    ")*\u0003\u0002\u0002\u0002*,\u0003\u0002\u0002\u0002+)\u0003\u0002\u0002",
+    "\u0002,-\u0007\b\u0002\u0002-1\u0003\u0002\u0002\u0002./\u0007\u0007",
+    "\u0002\u0002/1\u0007\b\u0002\u00020#\u0003\u0002\u0002\u00020.\u0003",
+    "\u0002\u0002\u00021\t\u0003\u0002\u0002\u00022:\u0007\r\u0002\u0002",
+    "3:\u0007\u000e\u0002\u00024:\u0005\u0004\u0003\u00025:\u0005\b\u0005",
+    "\u00026:\u0007\t\u0002\u00027:\u0007\n\u0002\u00028:\u0007\u000b\u0002",
+    "\u000292\u0003\u0002\u0002\u000293\u0003\u0002\u0002\u000294\u0003\u0002",
+    "\u0002\u000295\u0003\u0002\u0002\u000296\u0003\u0002\u0002\u000297\u0003",
+    "\u0002\u0002\u000298\u0003\u0002\u0002\u0002:\u000b\u0003\u0002\u0002",
+    "\u0002\b\u000e\u0016\u001d)09"].join("");
 
 
 var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
@@ -125,18 +123,6 @@ JsonContext.prototype.array = function() {
     return this.getTypedRuleContext(ArrayContext,0);
 };
 
-JsonContext.prototype.enterRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.enterJson(this);
-	}
-};
-
-JsonContext.prototype.exitRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.exitJson(this);
-	}
-};
-
 
 
 
@@ -202,18 +188,6 @@ ObjectContext.prototype.pair = function(i) {
     } else {
         return this.getTypedRuleContext(PairContext,i);
     }
-};
-
-ObjectContext.prototype.enterRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.enterObject(this);
-	}
-};
-
-ObjectContext.prototype.exitRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.exitObject(this);
-	}
 };
 
 
@@ -300,18 +274,6 @@ PairContext.prototype.value = function() {
     return this.getTypedRuleContext(ValueContext,0);
 };
 
-PairContext.prototype.enterRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.enterPair(this);
-	}
-};
-
-PairContext.prototype.exitRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.exitPair(this);
-	}
-};
-
 
 
 
@@ -368,18 +330,6 @@ ArrayContext.prototype.value = function(i) {
     } else {
         return this.getTypedRuleContext(ValueContext,i);
     }
-};
-
-ArrayContext.prototype.enterRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.enterArray(this);
-	}
-};
-
-ArrayContext.prototype.exitRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.exitArray(this);
-	}
 };
 
 
@@ -474,18 +424,6 @@ ValueContext.prototype.array = function() {
     return this.getTypedRuleContext(ArrayContext,0);
 };
 
-ValueContext.prototype.enterRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.enterValue(this);
-	}
-};
-
-ValueContext.prototype.exitRule = function(listener) {
-    if(listener instanceof JSON_ANTLRListener ) {
-        listener.exitValue(this);
-	}
-};
-
 
 
 
@@ -554,4 +492,3 @@ JSON_ANTLRParser.prototype.value = function() {
     // change to generated code: 'exporting' via ns object
     antlr4Json.JSON_ANTLRParser = JSON_ANTLRParser;
 })(antlr4Json || (antlr4Json = {}));
-
