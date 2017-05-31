@@ -21,10 +21,10 @@
             this.comma = m.char(",").ws;
 
             // The following rules create nodes in the abstract syntax tree
-            this.string = m.doubleQuoted(this.quoteChar.zeroOrMore).ast;
-            this.null = m.keyword("null").ast;
-            this.bool = m.keywords("true", "false").ast;
-            this.number = m.seq(this.plusOrMinus.opt, m.integer, this.fraction.opt, this.exponent.opt).ast;
+            this.string = m.doubleQuoted(this.quoteChar.zeroOrMore);
+            this.null = m.keyword("null");
+            this.bool = m.keywords("true", "false");
+            this.number = m.seq(this.plusOrMinus.opt, m.integer, this.fraction.opt, this.exponent.opt);
 
             let _this = this;
             this.value = m.choice(
@@ -38,9 +38,9 @@
                 this.null
             );
 
-            this.array = m.bracketed(m.delimited(this.value.ws, this.comma)).ast;
-            this.pair = m.seq(this.string, m.ws, ":", m.ws, this.value.ws).ast;
-            this.object = m.braced(m.delimited(this.pair.ws, this.comma)).ast;
+            this.array = m.bracketed(m.delimited(this.value.ws, this.comma));
+            this.pair = m.seq(this.string, m.ws, ":", m.ws, this.value.ws);
+            this.object = m.braced(m.delimited(this.pair.ws, this.comma));
             this.json = m.choice(this.object, this.array)
         };
 
@@ -51,8 +51,6 @@
     var grammar = CreateJsonGrammar(Myna);
     var rule = grammar.array;
     exports.parseJsonMyna = function (input) {
-        var ast = Myna.parse(rule, input);
-        // Uncomment this line to see the generated AST
-        //console.log(ast.allText);
+        Myna.parse(rule, input);
     }
 })(this);
