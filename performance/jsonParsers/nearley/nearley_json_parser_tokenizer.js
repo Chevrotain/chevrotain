@@ -19,6 +19,7 @@ var Null = {test: function(x) {return x.type === "Null"; }}
 var StringLiteral = {test: function(x) {return x.type === "StringLiteral"; }}
 var NumberLiteral = {test: function(x) {return x.type === "NumberLiteral"; }}
 var grammar = {
+    Lexer: undefined,
     ParserRules: [
     {"name": "json$subexpression$1", "symbols": ["object"]},
     {"name": "json$subexpression$1", "symbols": ["array"]},
