@@ -9,36 +9,11 @@
 <body>
 <script src="https://unpkg.com/lodash@4.17.2/lodash.min.js"></script>
 <script src="https://unpkg.com/benchmark@2.1.2"></script>
-<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
 <script src="https://unpkg.com/chart.js@2.4.0/dist/Chart.min.js"></script>
 <script src="samples/1K_json.js"></script>
 
-<script src="jsonParsers/chevrotain/chevrotainParser.js"></script>
-<script src="jsonParsers/chevrotain/api.js"></script>
-
 <script src="jsonParsers/jison/jisonParser.js"></script>
 
-<script src="jsonParsers/pegjs/pegjs_jison_parser.js"></script>
-
-<script src="../bower_components/antlr4/antlr4.js"></script>
-<script src="jsonParsers/antlr/JSON_ANTLRLexer.js"></script>
-<script src="jsonParsers/antlr/JSON_ANTLRListener.js"></script>
-<script src="jsonParsers/antlr/JSON_ANTLRParser.js"></script>
-<script src="jsonParsers/antlr/api.js"></script>
-
-<script src="https://unpkg.com/ohm-js@0.13.1/dist/ohm.min.js"></script>
-<script src="jsonParsers/ohm/ohm_json_grammar.js"></script>
-<script src="jsonParsers/ohm/ohm_json_parser.js"></script>
-
-
-<script src="https://unpkg.com/parsimmon@1.3.0/build/parsimmon.browser.js"></script>
-<script src="jsonParsers/parsimmon/parsimmon_json_parser.js"></script>
-
-<script src="https://unpkg.com/nearley@2.9.2/lib/nearley.js"></script>
-<script src="https://unpkg.com/moo@0.2.0"></script>
-
-<script src="jsonParsers/nearley/nearley_json_parser_tokenizer.js"></script>
-<script src="jsonParsers/nearley/api.js"></script>
 
 <script src="lib/jsonify/jsonify.js"></script>
 <script src="jsonParsers/jsonify/jsonify_json_parser.js"></script>
@@ -48,8 +23,6 @@
 <script src="https://unpkg.com/oboe@2.1.2/dist/oboe-browser.min.js"></script>
 <script src="jsonParsers/oboe/oboe_json_parser.js"></script>
 
-<script src="https://unpkg.com/myna-parser@2.0.0"></script>
-<script src="jsonParsers/myna/myna_json_parser.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
@@ -160,7 +133,6 @@
                         comparison
                         [<a rel="nofollow" href="jsonParsers/jsonify/jsonify_json_parser.js">implementation</a>]
                     </p></li>
-
                 </ol>
 
             </div>
@@ -177,8 +149,15 @@
                                                                               href="http://www.json-generator.com/">json-generator</a>.
             </p>
             <p>
-                None of the parsers have any user defined output actions. they only parse the text
-                without errors.
+                The intent of the benchmark is to measure the maximum parsing speed.
+                <br>which means the entire syntactic analysis flow excluding the execution of user actions/semantics.
+                <br>See the <a rel="nofollow"
+                       href=" https://github.com/SAP/chevrotain/tree/gh-pages/performance/README.md">benchmark methodology</a> for details.
+            </p>
+
+            <p>
+                The Chevrotain and Antlr Libraries can either produce a Parse Tree or use embedded actions
+                in the grammar. Thus they are benchmarked in both scenarios ("-PT" means Parse Tree variant).
             </p>
 
             <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
@@ -187,13 +166,9 @@
 
             <p>
                 The entire source code for this benchmark can be found in this github <a rel="nofollow"
-                                                                                  href="https://github.com/sap/chevrotain/tree/gh-pages/performance">repository</a>.
+                                                                                         href="https://github.com/sap/chevrotain/tree/gh-pages/performance">repository</a>.
             </p>
 
-            <p>
-                Note that the Ohm Parser Library is <b>not</b> included by default as it can be very slow causing the
-                whole benchmark to hang. Click the checkbox to add it.
-            </p>
             <button onclick="onRunAll()" id="runAllButton">Run</button>
         </div>
 
@@ -227,6 +202,20 @@
 
                     </div>
 
+                    <div class="dataRow Chevrotain-PT">
+
+                        <div class="benchName"><a rel="nofollow"
+                                                  href="https://github.com/SAP/chevrotain">Chevrotain-PT</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
                     <div class="dataRow Parsimmon">
 
                         <div class="benchName"><a rel="nofollow" href="https://github.com/jneen/parsimmon">Parsimmon</a>
@@ -243,6 +232,18 @@
                     <div class="dataRow Antlr">
 
                         <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4</a></div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow Antlr-PT">
+
+                        <div class="benchName"><a rel="nofollow" href="http://www.antlr.org/">ANTLR4-PT</a></div>
                         <div class="benchRate">
                             <div class="value">&nbsp;</div>
                             <div class="delta">&nbsp;</div>
@@ -362,7 +363,28 @@
 </div>
 
 <script>
-    //    var styleCss = document.styleSheets[1]
+
+    function includeTestIFrame(id, url) {
+        var iframe = document.createElement("iframe")
+        iframe.src = url
+        iframe.id = id
+        iframe.style = "visibility: hidden;";
+        document.body.appendChild(iframe)
+        return iframe.contentWindow
+    }
+
+    var chevrotainFrame = includeTestIFrame("chevrotain", "./jsonParsers/chevrotain/chevrotain.html")
+    var chevrotainFrame_cst = includeTestIFrame("chevrotain_cst", "./jsonParsers/chevrotain/chevrotain_cst.html")
+    var antlrFrame = includeTestIFrame("antlr", "./jsonParsers/antlr/antlr.html")
+    var antlrPtFrame = includeTestIFrame("antlr-PT", "./jsonParsers/antlr/antlr_pt.html")
+    var jisonFrame = includeTestIFrame("jison", "./jsonParsers/jison/jison.html")
+    var mynaFrame = includeTestIFrame("myna", "./jsonParsers/myna/myna.html")
+    var nearleyFrame = includeTestIFrame("nearley", "./jsonParsers/nearley/nearley.html")
+    var ohmFrame = includeTestIFrame("ohm", "./jsonParsers/ohm/ohm.html")
+    var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
+    var pegjsFrame = includeTestIFrame("pegjs", "./jsonParsers/pegjs/pegjs.html")
+
+
     var styleCss = _.find(document.styleSheets, function (styleSheet) {
         return _.endsWith(styleSheet.href, "performance/style.css");
     })
@@ -412,6 +434,7 @@
             myBarChart.destroy()
         }
     }
+
     function clearTable() {
         // when using .empty() the cells collapse... so, use non-breaking space
         $(".dataRow .benchRate .value").html('&nbsp;')
@@ -431,6 +454,7 @@
     }
 
     var actionCount = 0
+
     function addTest(suite, id, action, direct) {
         var $el = $('.' + id + ' input')
         if ($el && $el.is(':checked')) {
@@ -471,7 +495,7 @@
 
     var testCases = {
         Myna: function (suite) {
-            addTest(suite, 'Myna', parseJsonMyna)
+            addTest(suite, 'Myna', mynaFrame.parse)
         },
 
         Browser: function (suite) {
@@ -479,7 +503,11 @@
         },
 
         Chevrotain: function (suite) {
-            addTest(suite, 'Chevrotain', chevrotainParseWithChevrotainLexer)
+            addTest(suite, 'Chevrotain', chevrotainFrame.parse)
+        },
+
+        "Chevrotain-PT": function (suite) {
+            addTest(suite, 'Chevrotain-PT', chevrotainFrame_cst.parse)
         },
 
         Jsonify: function (suite) {
@@ -499,28 +527,32 @@
         },
 
         Parsimmon: function (suite) {
-            addTest(suite, 'Parsimmon', parse_json_parsimmon)
+            addTest(suite, 'Parsimmon', parsimmonFrame.parse)
         },
 
         Antlr: function (suite) {
-            addTest(suite, 'Antlr', antlr4LexerAndParser)
+            addTest(suite, 'Antlr', antlrFrame.parse)
+        },
+
+        "Antlr-PT": function (suite) {
+            addTest(suite, 'Antlr-PT', antlrPtFrame.parse)
         },
 
         Peg: function (suite) {
-            addTest(suite, 'Peg', pegjsJsonLexerAndParser.parse.bind(pegjsJsonLexerAndParser))
+            addTest(suite, 'Peg', pegjsFrame.parse)
         },
 
         Jison: function (suite) {
-            addTest(suite, 'Jison', jisonJsonLexerAndParser.parse.bind(jisonJsonLexerAndParser))
+            addTest(suite, 'Jison', jisonFrame.parse)
         },
 
         Nearley: function (suite) {
-            addTest(suite, 'Nearley', parse_json_with_nearley)
+            addTest(suite, 'Nearley', nearleyFrame.parse)
 
         },
 
         Ohm: function (suite) {
-            addTest(suite, 'Ohm', parse_json_with_ohm)
+            addTest(suite, 'Ohm', ohmFrame.parse)
         }
     }
 

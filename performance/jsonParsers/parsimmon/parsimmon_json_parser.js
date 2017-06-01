@@ -1,6 +1,5 @@
 // based on: https://github.com/jneen/parsimmon/blob/master/examples/json.js
 
-var x
 (function (exports) {
 
     var P = Parsimmon;
@@ -71,7 +70,7 @@ var x
         lbrace.then(commaSep(pair)).skip(rbrace)
 
     ///////////////////////////////////////////////////////////////////////
-    exports.parse_json_parsimmon = function parse_json_parsimmon(input) {
+    exports.parse = function parse_json_parsimmon(input) {
         x = json.parse(input, 'utf-8');
     }
 })(this);
