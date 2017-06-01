@@ -5,12 +5,14 @@ function parse(text) {
     var lexer = new antlr4Json.JSON_ANTLRLexer(chars);
     var tokens = new antlr4.CommonTokenStream(lexer);
     var parser = new antlr4Json.JSON_ANTLRParser(tokens);
-    parser.buildParseTrees = false;
+    parser.buildParseTrees = true;
 
     parser._interp.predictionMode = antlr4.atn.PredictionMode.SLL;
 
-    parser.json();
+    var parseTree = parser.json();
     if (parser._errHandler.lastErrorIndex !== -1) {
         throw Error("errors found while parsing with Antlr4");
     }
+
+    return parseTree
 }

@@ -50,8 +50,9 @@
 
     var grammar = CreateJsonGrammar(Myna);
     var rule = grammar.array;
-    exports.parseJsonMyna = function (input) {
+    exports.parse = function (input) {
         var ast = Myna.parse(rule, input);
+        return ast;
         // Uncomment this line to see the generated AST
         //console.log(ast.allText);
     }

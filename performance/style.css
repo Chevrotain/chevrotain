@@ -64,7 +64,7 @@
 }
 
 .dataRow {
-    height: 70px;
+    height: 60px;
     background-color: white;
     position: absolute;
     top: 0;
@@ -98,7 +98,7 @@ div.benchInclude {
 }
 
 .dataRow .benchRate {
-    padding-top: 10px;
+    padding-top: 5px;
 }
 
 .benchRate, .benchSpeed, .benchInclude, .benchName {
