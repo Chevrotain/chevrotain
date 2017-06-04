@@ -816,7 +816,7 @@ function defineRecognizerSpecs(contextName, extendToken, createToken, tokenMatch
                     }
 
                     public someRule = this.RULE("someRule", () => {
-                        expect(() => this.SUBRULE(this.someNestedRule)).to.throw("MismatchedTokenException")
+                        expect(() => this.SUBRULE(this.someNestedRule)).to.throw("Expecting token of type --> DotTok <--")
                     })
 
                     public someNestedRule = this.RULE("someNestedRule", () => {

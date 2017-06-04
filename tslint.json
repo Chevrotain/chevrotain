@@ -32,7 +32,7 @@
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": true,
     "no-unused-expression": false,
-    "no-use-before-declare": true,
+    "no-use-before-declare": false,
     "one-line": [
       true,
       "check-open-brace",

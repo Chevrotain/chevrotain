@@ -193,6 +193,7 @@ module.exports = function(grunt) {
             release: ['lib/**/*', 'dev/**/*']
         },
 
+        // TODO: this is quite slow, need to examine if it is still needed...
         replace: {
             coverage_ignore: {
                 // d.prototype = b === null ? Object.create(b) :
