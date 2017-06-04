@@ -64,7 +64,7 @@
 }
 
 .dataRow {
-    height: 60px;
+    height: 50px;
     background-color: white;
     position: absolute;
     top: 0;
@@ -72,7 +72,7 @@
 }
 
 .dataRow > div {
-    font-size: 1.25em;
+    font-size: 1em;
     overflow: hidden;
 }
 

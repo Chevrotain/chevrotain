@@ -5,7 +5,7 @@
 The intent of the benchmark is to measure the maximum parsing speed.
 With Parsing is defined as: 
 
-**The entire parsing flow excluding the execution of user actions/semantics.**
+**The entire syntactic analysis flow excluding the execution of user actions/semantics.**
 
 It is important to note that all the steps needed to for the users to run their actions/semantics
 must be measured. This means that the grammar or implementation must **still be productive**.
@@ -15,7 +15,7 @@ for "pure" parsing, because they will be needed for the user to add their semant
  
 The "maximum" part means that if a parsing library has options/flags to speed up the performance
 those will be enabled if relevant.
-Examples of such flags:
+Examples of such options/flags:
  * Chevrotain: Reducing amount location tracking information.
  * Antlr: Using SLL [prediction mode](http://www.antlr.org/api/Java/org/antlr/v4/runtime/atn/PredictionMode.html)
  * Antlr: disabling visitor pre/post hooks creation (--no-visitor CLI argument)
@@ -32,12 +32,23 @@ This means:
  * ... 
 
 
+### Isolation
+
+* Each implementation will be invoked in its own separate iframe to ensure maximum isolation.
+
+
+### Hand Built Parser
+An Hand Built Parser is included for comparison purposes.
+It is based on Douglas Crockford's [Jsonify](https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js)
+recursive decent parser with the semantic actions (re-assembly of the json object) removed.
+
+
 ### Apples and Oranges
 The benchmark **cannot** be perfectly fair:
 
 * Some parsing libraries may always create some output structure (Parse Trees/Asts/Csts),
   other may not support any automatic data structure creation and 
-  yet others may even provide capabilities to control which rule creates a Parse Tree.
+  yet others may even provide capabilities to control the created Parse Tree.
   
 * Some parsing libraries will not track any position information, other will track offsets only and others yet
   will track start/end lines/columns in addition to offsets.
@@ -45,10 +56,6 @@ The benchmark **cannot** be perfectly fair:
 This is the reasoning for the definition of the "parsing" as everything **excluding** the user defined actions.
 It is very difficult if not impossible to create a completely fair benchmark, so we will have to settle
 for trying to measure the maximum performance of the parsing engine.
-
-### Isolation
-
-* Each implementation will be invoked in its own separate iframe to ensure maximum isolation.
 
 
 ### End to End benchmark

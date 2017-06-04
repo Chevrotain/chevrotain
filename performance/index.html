@@ -12,8 +12,6 @@
 <script src="https://unpkg.com/chart.js@2.4.0/dist/Chart.min.js"></script>
 <script src="samples/1K_json.js"></script>
 
-<script src="jsonParsers/jison/jisonParser.js"></script>
-
 
 <script src="lib/jsonify/jsonify.js"></script>
 <script src="jsonParsers/jsonify/jsonify_json_parser.js"></script>
@@ -149,15 +147,14 @@
                                                                               href="http://www.json-generator.com/">json-generator</a>.
             </p>
             <p>
-                The intent of the benchmark is to measure the maximum parsing speed.
-                <br>which means the entire syntactic analysis flow excluding the execution of user actions/semantics.
-                <br>See the <a rel="nofollow"
-                       href=" https://github.com/SAP/chevrotain/tree/gh-pages/performance/README.md">benchmark methodology</a> for details.
+                See the <a rel="nofollow"
+                       href=" https://github.com/SAP/chevrotain/tree/gh-pages/performance/README.md">benchmark methodology</a> for details
+                    on what is being tested and how.
             </p>
 
             <p>
-                The Chevrotain and Antlr Libraries can either produce a Parse Tree or use embedded actions
-                in the grammar. Thus they are benchmarked in both scenarios ("-PT" means Parse Tree variant).
+                The Chevrotain and Antlr Libraries can either produce a Parse Tree (with Visitor / listener) or use embedded actions
+                in the grammar. Thus they are measured in both scenarios ("-PT" means Parse Tree variant).
             </p>
 
             <p>Benchmarking is done using the <a rel="nofollow" href="https://benchmarkjs.com/">benchmark.js</a>
@@ -188,6 +185,19 @@
                 </div>
 
                 <div id="dataRows">
+
+                    <div class="dataRow HandBuilt">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/sap/chevrotain/blob/gh-pages/performance/jsonParsers/handbuilt/handbuilt.js">HandBuilt</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
 
                     <div class="dataRow Chevrotain">
 
@@ -373,6 +383,7 @@
         return iframe.contentWindow
     }
 
+    var handBuiltFrame = includeTestIFrame("handbuilt", "./jsonParsers/handbuilt/handbuilt.html")
     var chevrotainFrame = includeTestIFrame("chevrotain", "./jsonParsers/chevrotain/chevrotain.html")
     var chevrotainFrame_cst = includeTestIFrame("chevrotain_cst", "./jsonParsers/chevrotain/chevrotain_cst.html")
     var antlrFrame = includeTestIFrame("antlr", "./jsonParsers/antlr/antlr.html")
@@ -500,6 +511,10 @@
 
         Browser: function (suite) {
             addTest(suite, 'Browser', parse_json_browser)
+        },
+
+        HandBuilt: function (suite) {
+            addTest(suite, 'HandBuilt', handBuiltFrame.parse)
         },
 
         Chevrotain: function (suite) {
