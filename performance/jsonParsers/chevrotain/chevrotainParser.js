@@ -73,7 +73,9 @@ function ChevrotainJsonParser(input, options) {
     });
 
     $.RULE("value", function () {
-        $.OR([
+        // Perf boost: https://github.com/SAP/chevrotain/blob/master/docs/faq.md#PERFORMANCE
+        // See "Avoid reinitializing large arrays of alternatives." section
+        $.OR($.c1 || ($.c1  = [
             { ALT: function () { $.CONSUME(StringLiteral) }},
             { ALT: function () { $.CONSUME(NumberLiteral) }},
             { ALT: function () { $.SUBRULE($.object) }},
@@ -81,7 +83,7 @@ function ChevrotainJsonParser(input, options) {
             { ALT: function () { $.CONSUME(True) }},
             { ALT: function () { $.CONSUME(False) }},
             { ALT: function () { $.CONSUME(Null) }}
-        ]);
+        ]));
     });
 
     // very important to call this after all the rules have been setup.
