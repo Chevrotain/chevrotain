@@ -126,7 +126,88 @@ These are highly recommended for each and every parser.
    Note that this means that if your parser "carries" additional state, that state should also be reset.
    Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/0_28_3/classes/_chevrotain_d_.parser.html#reset) method
    to accomplish that.
-    
+
+2. **Avoid reinitializing large arrays of alternatives**.
+
+   The syntax for alternatives (OR) requires creating an array on every **single** invocation.
+   For large enough arrays and in rules which are called often this can cause quite a large performance penalty.
+
+   ```javascript
+   $.RULE("value", () => {
+        $.OR(
+          [ // an array with seven alternatives
+            { ALT: () => { $.CONSUME(StringLiteral) }},
+            { ALT: () => { $.CONSUME(NumberLiteral) }},
+            { ALT: () => { $.SUBRULE($.object) }},
+            { ALT: () => { $.SUBRULE($.array) }},
+            { ALT: () => { $.CONSUME(True) }},
+            { ALT: () => { $.CONSUME(False) }},
+            { ALT: () => { $.CONSUME(Null) }}
+          ]);
+    });
+   ```
+   
+   A simple JavaScript pattern can avoid this costly re-initilization:
+   
+   ```javascript
+       $.RULE("value", function () {
+        // c1 is used as a cache, the short circute "||" will ensure only a single initilization
+        $.OR($.c1 || ($.c1  = [
+            { ALT: () => { $.CONSUME(StringLiteral) }},
+            { ALT: () => { $.CONSUME(NumberLiteral) }},
+            { ALT: () => { $.SUBRULE($.object) }},
+            { ALT: () => { $.SUBRULE($.array) }},
+            { ALT: () => { $.CONSUME(True) }},
+            { ALT: () => { $.CONSUME(False) }},
+            { ALT: () => { $.CONSUME(Null) }}
+        ]));
+    });
+   ```
+   
+   Applying this pattern (in just a single location) on a JSON grammar provided 25-30% performance boost
+   (Node.js 8), For a CSS grammar (2 locations) this resulted in about 20% speed boost.
+   
+   
+   It is important to note that:
+   
+   - This pattern should only be applied on largish number of alternatives, testing on node.js 8.0 showed
+     it was only useful when there are at least four alternatives. in cases with fewer alternatives this pattern
+     would actually be slower!.
+     
+   - This pattern can only be applied if there are no vars which can change accessed via closures.
+     Example:
+     ```javascript
+      // BAD
+      $.RULE("value", function () {
+        let result
+        // We reference the "result" variable via a closure.
+        // So a new function is needed each time this grammar rule is invoked.
+        $.OR($.c1 || ($.c1  = [
+            { ALT: () => { result = $.CONSUME(StringLiteral) }},
+      ]));
+      
+      // GOOD
+      $.RULE("value", function () {
+        let result
+        // no closure for the result variable, we use the returned value of the OR instead.
+        result = $.OR($.c1 || ($.c1  = [
+            { ALT: () => { return $.CONSUME(StringLiteral) }},
+      ]));    
+     ```
+     * Note that gates / predicaetes often use vars from closures.
+     
+   - Due to the way Chevrotain is built, the text of the alternatives cannot be completly extracted from the grammar rule
+     ```javascript
+     let myAlts = [
+            { ALT: () => { return $.CONSUME(StringLiteral) }},
+     ]
+     // Won't work
+      $.RULE("value", function () {
+        // Chevrotain won't be able to analyze this grammar rule as it relies on Function.prototype.toString
+        result = $.OR(myAlts);    
+     ```
+   
+      
 
 #### Minor Performance Benefits  
   
