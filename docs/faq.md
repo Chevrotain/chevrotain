@@ -171,8 +171,8 @@ These are highly recommended for each and every parser.
    It is important to note that:
    
    - This pattern should only be applied on largish number of alternatives, testing on node.js 8.0 showed
-     it was only useful when there are at least four alternatives. in cases with fewer alternatives this pattern
-     would actually be slower!.
+     it was only useful when there are at least four alternatives. In cases with fewer alternatives this pattern
+     would actually be **slower**!
      
    - This pattern can only be applied if there are no vars which can change accessed via closures.
      Example:
