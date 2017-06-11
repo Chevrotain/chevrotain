@@ -1,3 +1,14 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [Default maxLookahead changed to 3](https://github.com/SAP/chevrotain/issues/472)
+  * Originally the default maxLookahead was 5, This could cause very slow parser initialization
+    under certain edge case during ambiguity detection, however the vast majority of grammars do not
+    require five tokens of lookahead. A smaller default avoids these potential slow downs while still allows
+    override in unique cases which require a large lookahead.
+    
+    
+
 ## 0.28.3 (5-1-2017)
 
 #### Bug Fixes
