@@ -7,6 +7,7 @@
 * [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](#NUMERICAL_SUFFIXES)
 * [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
 * [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
+* [Why does my parser appear to be stuck during it's initialization?](#STUCK_AMBIGUITY)
 * [How do I Maximize my parser's performance?](#PERFORMANCE)
 
 
@@ -76,11 +77,13 @@ used for many things such as:
 * Computing an appropriate error message which includes the list of next valid possible tokens.
 * Performing automatic Error Recovery by figuring out "re-sync" tokens. 
 
+
 ### <a name="MINIFIED"></a> Why does Chevrotain not work correctly after I minified my Grammar?
 Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive minification options can break Chevrotain grammars.
 
 See [related documentation](../examples/parser/minification/README.md) for details & workarounds.
+
 
 ### <a name="WEBPACK"></a> Why does Chevrotain not work correctly after I webpacked my Grammar?
 Chevrotain relies on **Function.name** property and **Function.toString()**.
@@ -88,6 +91,17 @@ This means that certain aggressive webpack 2 optimizations (tree shaking) can br
 certain conditions.
 
 See [related documentation](../examples/parser/webpack/README.md) for details & workarounds.
+
+
+### <a name="STUCK_AMBIGUITY"></a> Why does my parser appear to be stuck during it's initialization?
+The first time a Chevrotain parser is initialized additional validations and computations are performed.
+Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
+when the parser uses a larger than the default [maxLookahead](http://sap.github.io/chevrotain/documentation/0_28_3/interfaces/_chevrotain_d_.iparserconfig.html#maxlookahead)
+and there are many (thousands) of ambiguous paths.
+
+To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
+the grammar ambiguity which is the root cause of the problem. 
+
 
 ### <a name="PERFORMANCE"></a> How do I Maximize my parser's performance?
 
@@ -184,7 +198,7 @@ These are highly recommended for each and every parser.
         // So a new function is needed each time this grammar rule is invoked.
         $.OR($.c1 || ($.c1  = [
             { ALT: () => { result = $.CONSUME(StringLiteral) }},
-      ]));
+      ]))})
       
       // GOOD
       $.RULE("value", function () {
@@ -192,7 +206,7 @@ These are highly recommended for each and every parser.
         // no closure for the result variable, we use the returned value of the OR instead.
         result = $.OR($.c1 || ($.c1  = [
             { ALT: () => { return $.CONSUME(StringLiteral) }},
-      ]));    
+      ]))})
      ```
      * Note that gates / predicaetes often use vars from closures.
      
@@ -204,7 +218,8 @@ These are highly recommended for each and every parser.
      // Won't work
       $.RULE("value", function () {
         // Chevrotain won't be able to analyze this grammar rule as it relies on Function.prototype.toString
-        result = $.OR(myAlts);    
+        result = $.OR(myAlts);
+     })
      ```
    
       

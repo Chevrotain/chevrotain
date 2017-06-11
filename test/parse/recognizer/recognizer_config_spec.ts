@@ -12,7 +12,7 @@ describe("The Recognizer's Configuration", () => {
 
         let parser = new EmptyConfigParser()
         expect((<any>parser).recoveryEnabled).to.be.false
-        expect((<any>parser).maxLookahead).to.equal(5)
+        expect((<any>parser).maxLookahead).to.equal(3)
 
     })
 
@@ -26,7 +26,7 @@ describe("The Recognizer's Configuration", () => {
 
         let parser = new NoConfigParser()
         expect((<any>parser).recoveryEnabled).to.be.false
-        expect((<any>parser).maxLookahead).to.equal(5)
+        expect((<any>parser).maxLookahead).to.equal(3)
     })
 
 })
