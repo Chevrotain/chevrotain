@@ -1,38 +1,39 @@
 import {ITokenGrammarPath} from "../../../src/parse/grammar/path_public"
 import {
-    ActionTok,
     actionDec,
+    actionDecSep,
+    ActionTok,
+    atLeastOneRule,
+    atLeastOneSepRule,
+    callArguments,
+    ColonTok,
+    CommaTok,
+    DotTok,
     IdentTok,
     LParenTok,
-    RParenTok,
-    ColonTok,
-    SemicolonTok,
     LSquareTok,
-    RSquareTok,
-    DotTok,
-    CommaTok,
     paramSpec,
-    callArguments,
-    actionDecSep,
-    atLeastOneRule,
     qualifiedNameSep,
-    atLeastOneSepRule
+    RParenTok,
+    RSquareTok,
+    SemicolonTok
 } from "./samples"
 import {
     NextAfterTokenWalker,
-    NextTerminalAfterAtLeastOneWalker,
-    NextTerminalAfterManyWalker,
-    NextTerminalAfterManySepWalker,
+    nextPossibleTokensAfter,
     NextTerminalAfterAtLeastOneSepWalker,
-    possiblePathsFrom,
-    nextPossibleTokensAfter
+    NextTerminalAfterAtLeastOneWalker,
+    NextTerminalAfterManySepWalker,
+    NextTerminalAfterManyWalker,
+    possiblePathsFrom
 } from "../../../src/parse/grammar/interpreter"
-import {setEquality, createRegularToken} from "../../utils/matchers"
+import {createRegularToken, setEquality} from "../../utils/matchers"
 import {gast} from "../../../src/parse/grammar/gast_public"
-import {Token, IToken} from "../../../src/scan/tokens_public"
+import {createToken, IToken, Token} from "../../../src/scan/tokens_public"
 import {map} from "../../../src/utils/utils"
-import {TokenConstructor} from "../../../src/scan/lexer_public"
+import {Lexer, TokenConstructor} from "../../../src/scan/lexer_public"
 import {augmentTokenClasses, tokenStructuredMatcher} from "../../../src/scan/tokens"
+import {Parser} from "../../../src/parse/parser_public"
 
 let RepetitionMandatory = gast.RepetitionMandatory
 let Terminal = gast.Terminal
@@ -571,11 +572,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             ], Comma),
                 new gast.Terminal(Gamma)
             ]
-
             expect(extractPartialPaths(possiblePathsFrom(rep, 1))).to.deep.equal([[Alpha], [Gamma]])
             expect(extractPartialPaths(possiblePathsFrom(rep, 2))).to.deep.equal([[Alpha, Alpha], [Gamma]])
-            expect(extractPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
-            expect(extractPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal([[Alpha, Alpha, Gamma], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 3))).to.deep.equal([[Alpha, Alpha, Comma], [Alpha, Alpha, Gamma], [Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(rep, 4))).to.deep.equal(
+                [[Alpha, Alpha, Comma, Alpha], [Alpha, Alpha, Gamma], [Gamma]])
         })
 
         it("Mandatory Repetition with Separator", () => {
@@ -590,8 +591,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
             expect(extractPartialPaths(possiblePathsFrom(repMandSep, 1))).to.deep.equal([[Alpha]])
             expect(extractPartialPaths(possiblePathsFrom(repMandSep, 2))).to.deep.equal([[Alpha, Alpha]])
-            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 3))).to.deep.equal([[Alpha, Alpha, Gamma]])
-            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 4))).to.deep.equal([[Alpha, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 3))).to.deep.equal([[Alpha, Alpha, Comma], [Alpha, Alpha, Gamma]])
+            expect(extractPartialPaths(possiblePathsFrom(repMandSep, 4))).to.deep.equal(
+                [[Alpha, Alpha, Comma, Alpha], [Alpha, Alpha, Gamma]])
         })
 
         it("NonTerminal", () => {
@@ -882,5 +884,68 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             expect(nextPossibleTokensAfter(seq, INPUT([Alpha, Beta, Gamma]), tokenStructuredMatcher, 5)).to.be.empty
         })
     })
+})
 
+describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahead", () => {
+    it("Reproduce issue", () => {
+
+        const LParen = createToken({name: "LParen", pattern: /\(/})
+        const RParen = createToken({name: "RParen", pattern: /\)/})
+        const Comma = createToken({name: "Comma", pattern: /,/})
+        const FatArrow = createToken({name: "FatArrow", pattern: /=>/})
+        const Identifier = createToken({name: "Identifier", pattern: /[a-zA-Z]+/})
+        const WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED})
+
+        const allTokens = [WhiteSpace, LParen, RParen, Comma, FatArrow, Identifier]
+        const issue391Lexer = new Lexer(allTokens)
+
+        class Issue391Parser extends Parser {
+            constructor(input:Token[] = []) {
+                super(input, allTokens, {maxLookahead: 4});
+                (Parser as any).performSelfAnalysis(this)
+            }
+
+            topRule = this.RULE("topRule", () => {
+                return this.OR1([
+                    {
+                        // Lambda Function
+                        ALT: () => {
+                            this.CONSUME1(LParen)
+                            this.MANY_SEP({
+                                SEP: Comma,
+                                DEF: () => {
+                                    this.CONSUME1(Identifier)
+                                }
+                            })
+                            this.CONSUME1(RParen)
+                            this.CONSUME1(FatArrow)
+                        }
+                    },
+                    {
+                        // Parenthesis Expression
+                        ALT: () => {
+                            this.CONSUME2(LParen)
+                            this.CONSUME2(Identifier)
+                            this.CONSUME2(RParen)
+                        }
+                    },
+                ])
+            })
+        }
+
+        expect(() => new Issue391Parser([])).to.not.throw("Ambiguous alternatives: <1 ,2>")
+        const myParser = new Issue391Parser([])
+
+        function testInput(input) {
+            const tokens = issue391Lexer.tokenize(input).tokens
+            myParser.input = tokens
+            myParser.topRule()
+            expect(myParser.errors).to.be.empty
+        }
+
+        testInput("(x, y) => ")
+        testInput("() =>")
+        testInput("(x) =>")
+        testInput("(x)")
+    })
 })
