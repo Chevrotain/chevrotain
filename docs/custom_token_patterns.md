@@ -27,7 +27,7 @@ function. But with a small constraint.
 * A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
   This means that attempted matches must begin at the offset argument, **not** at the start of the input.    
 
-The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_28_3/interfaces/_chevrotain_d_.icustompattern.html) interface.
+The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](http://sap.github.io/chevrotain/documentation/0_29_0/interfaces/_chevrotain_d_.icustompattern.html) interface.
 Example:
 
 ```JavaScript
@@ -93,6 +93,6 @@ function matchInteger(text, offset, matchedTokens, groups) {
 
 A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/0_28_3/interfaces/_chevrotain_d_.ilexingresult.html)).
+It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/0_29_0/interfaces/_chevrotain_d_.ilexingresult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.

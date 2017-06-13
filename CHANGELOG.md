@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 0.29.0 (6-13-2017)
 
 #### Breaking Changes
 - [Default maxLookahead changed to 4](https://github.com/SAP/chevrotain/issues/472)
