@@ -149,7 +149,7 @@ export interface IParserConfig {
 
 const DEFAULT_PARSER_CONFIG:IParserConfig = Object.freeze({
     recoveryEnabled:      false,
-    maxLookahead:         3,
+    maxLookahead:         4,
     ignoredIssues:        <any>{},
     dynamicTokensEnabled: false,
     // TODO: Document this breaking change, can it be mitigated?
