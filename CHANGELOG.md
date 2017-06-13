@@ -7,6 +7,8 @@
     require five tokens of lookahead. A smaller default avoids these potential slow downs while still allows
     override in unique cases which require a large lookahead.
     
+#### Bug Fixes
+- [Separator DSL methods lookahead issue.](https://github.com/SAP/chevrotain/issues/391)
     
 
 ## 0.28.3 (5-1-2017)

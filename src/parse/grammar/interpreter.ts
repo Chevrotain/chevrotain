@@ -8,6 +8,7 @@ import {first} from "./first"
 import {TokenConstructor} from "../../scan/lexer_public"
 import {TokenMatcher} from "../parser_public"
 import IProduction = gast.IProduction
+
 /* tslint:enable:no-use-before-declare */
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
@@ -219,8 +220,8 @@ export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number
         return nextDef.concat(drop(targetDef, i + 1))
     }
 
-    function getAlternativesForProd(prod:gast.AbstractProduction) {
-        let alternatives = possiblePathsFrom(remainingPathWith(prod.definition), maxLength, currPath)
+    function getAlternativesForProd(definition:gast.IProduction[]) {
+        let alternatives = possiblePathsFrom(remainingPathWith(definition), maxLength, currPath)
         return result.concat(alternatives)
     }
 
@@ -235,29 +236,33 @@ export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number
         let prod = targetDef[i]
 
         if (prod instanceof gast.Flat) {
-            return getAlternativesForProd(prod)
+            return getAlternativesForProd(prod.definition)
         }
         else if (prod instanceof gast.NonTerminal) {
-            return getAlternativesForProd(prod)
+            return getAlternativesForProd(prod.definition)
         }
         else if (prod instanceof gast.Option) {
-            result = getAlternativesForProd(prod)
+            result = getAlternativesForProd(prod.definition)
         }
         else if (prod instanceof gast.RepetitionMandatory) {
-            return getAlternativesForProd(prod)
+            return getAlternativesForProd(prod.definition)
         }
         else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
-            return getAlternativesForProd(prod)
+            const newDef =
+                [new gast.Flat(prod.definition), new gast.Repetition([new gast.Terminal(prod.separator)].concat(<any>prod.definition))]
+            return getAlternativesForProd(newDef)
         }
         else if (prod instanceof gast.RepetitionWithSeparator) {
-            result = getAlternativesForProd(prod)
+            const newDef =
+                prod.definition.concat([new gast.Repetition([new gast.Terminal(prod.separator)].concat(<any>prod.definition))])
+            result = getAlternativesForProd(newDef)
         }
         else if (prod instanceof gast.Repetition) {
-            result = getAlternativesForProd(prod)
+            result = getAlternativesForProd(prod.definition)
         }
         else if (prod instanceof gast.Alternation) {
             forEach(prod.definition, (currAlt) => {
-                result = getAlternativesForProd(currAlt)
+                result = getAlternativesForProd(currAlt.definition)
             })
             return result
         }
@@ -272,7 +277,7 @@ export function possiblePathsFrom(targetDef:gast.IProduction[], maxLength:number
     }
     result.push({
         partialPath: currPath,
-        suffixDef:   drop(targetDef, 1)
+        suffixDef:   drop(targetDef, i)
     })
 
     return result
