@@ -30,14 +30,15 @@ Thus using a CST Visitor is the **recommended approach**.
   
 That is not to say there are no use cases in which **embedded actions** are better.
 The main advantage of embedded actions is their **performance**. Embedded actions are
-about twice as fast as using a CST Visitor. This may sound like an unbeatable advantage
+about 50% faster than using a CST Visitor. This may sound like an unbeatable advantage
 but that is not the case:
 
-* Chevrotain is [so fast](http://sap.github.io/chevrotain/performance/) that even with a 1/2 performance 
-  penalty it would beat most other parsing solutions.
+* Chevrotain is [so fast](http://sap.github.io/chevrotain/performance/) that even with that performance penalty.
+  penalty it would beat most other parsing solutions and still be close to the performance of an hand built parser.
+  - Tested on Modern V8
 
-* The Parsing step is normally just one step of a larger flow, a 1/2 performance penalty in one step
-  does not equate to a 1/2 performance penalty in the whole flow...
+* The Parsing step is normally just one step of a larger flow, a large performance penalty in one step
+  does not equate to a large performance penalty in the whole flow...
  
  
 ### Summary
