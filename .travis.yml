@@ -2,6 +2,10 @@ language: node_js
 env:
   global:
    - CXX=g++-4.8
+cache:
+  yarn: true
+  directories:
+    - node_modules
 matrix:
   include:
     - node_js: "6"
@@ -28,8 +32,7 @@ addons:
     packages:
       - g++-4.8
 before_install:
-  - npm install -g yarn
-  - npm install -g grunt-cli
+  - yarn global add grunt-cli
 install:
   - yarn
 before_script:
