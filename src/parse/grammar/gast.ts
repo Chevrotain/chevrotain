@@ -1,9 +1,9 @@
-import {gast} from "./gast_public"
-import {contains, every, map, some} from "../../utils/utils"
+import { gast } from "./gast_public"
+import { contains, every, map, some } from "../../utils/utils"
 
-
-export function isSequenceProd(prod:gast.IProduction):boolean {
-    return prod instanceof gast.Flat ||
+export function isSequenceProd(prod: gast.IProduction): boolean {
+    return (
+        prod instanceof gast.Flat ||
         prod instanceof gast.Option ||
         prod instanceof gast.Repetition ||
         prod instanceof gast.RepetitionMandatory ||
@@ -11,10 +11,15 @@ export function isSequenceProd(prod:gast.IProduction):boolean {
         prod instanceof gast.RepetitionWithSeparator ||
         prod instanceof gast.Terminal ||
         prod instanceof gast.Rule
+    )
 }
 
-export function isOptionalProd(prod:gast.IProduction, alreadyVisited:gast.NonTerminal[] = []):boolean {
-    let isDirectlyOptional = prod instanceof gast.Option ||
+export function isOptionalProd(
+    prod: gast.IProduction,
+    alreadyVisited: gast.NonTerminal[] = []
+): boolean {
+    let isDirectlyOptional =
+        prod instanceof gast.Option ||
         prod instanceof gast.Repetition ||
         prod instanceof gast.RepetitionWithSeparator
     if (isDirectlyOptional) {
@@ -26,121 +31,175 @@ export function isOptionalProd(prod:gast.IProduction, alreadyVisited:gast.NonTer
     // may be indirectly optional ((A?B?C?) | (D?E?F?))
     if (prod instanceof gast.Alternation) {
         // for OR its enough for just one of the alternatives to be optional
-        return some((<gast.Alternation>prod).definition, (subProd:gast.IProduction) => {
-            return isOptionalProd(subProd, alreadyVisited)
-        })
-    }
-    else if (prod instanceof gast.NonTerminal && contains(alreadyVisited, prod)) {
+        return some(
+            (<gast.Alternation>prod).definition,
+            (subProd: gast.IProduction) => {
+                return isOptionalProd(subProd, alreadyVisited)
+            }
+        )
+    } else if (
+        prod instanceof gast.NonTerminal &&
+        contains(alreadyVisited, prod)
+    ) {
         // avoiding stack overflow due to infinite recursion
         return false
-    }
-    else if (prod instanceof gast.AbstractProduction) {
+    } else if (prod instanceof gast.AbstractProduction) {
         if (prod instanceof gast.NonTerminal) {
             alreadyVisited.push(prod)
         }
-        return every((<gast.AbstractProduction>prod).definition, (subProd:gast.IProduction) => {
-            return isOptionalProd(subProd, alreadyVisited)
-        })
-    }
-    else {
+        return every(
+            (<gast.AbstractProduction>prod).definition,
+            (subProd: gast.IProduction) => {
+                return isOptionalProd(subProd, alreadyVisited)
+            }
+        )
+    } else {
         return false
     }
 }
 
-export function isBranchingProd(prod:gast.IProduction):boolean {
+export function isBranchingProd(prod: gast.IProduction): boolean {
     return prod instanceof gast.Alternation
 }
 
-export function getProductionDslName(prod:gast.IProductionWithOccurrence):string {
+export function getProductionDslName(
+    prod: gast.IProductionWithOccurrence
+): string {
     if (prod instanceof gast.NonTerminal) {
         return "SUBRULE"
-    }
-    else if (prod instanceof gast.Option) {
+    } else if (prod instanceof gast.Option) {
         return "OPTION"
-    }
-    else if (prod instanceof gast.Alternation) {
+    } else if (prod instanceof gast.Alternation) {
         return "OR"
-    }
-    else if (prod instanceof gast.RepetitionMandatory) {
+    } else if (prod instanceof gast.RepetitionMandatory) {
         return "AT_LEAST_ONE"
-    }
-    else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+    } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
         return "AT_LEAST_ONE_SEP"
-    }
-    else if (prod instanceof gast.RepetitionWithSeparator) {
+    } else if (prod instanceof gast.RepetitionWithSeparator) {
         return "MANY_SEP"
-    }
-    else if (prod instanceof gast.Repetition) {
+    } else if (prod instanceof gast.Repetition) {
         return "MANY"
-    }
-    else if (prod instanceof gast.Terminal) {
+    } else if (prod instanceof gast.Terminal) {
         return "CONSUME"
-    }
-    else {
+    } else {
         throw Error("non exhaustive match")
     }
 }
 
 class GastCloneVisitor extends gast.GAstVisitor {
-
-    public visitNonTerminal(node:gast.NonTerminal):gast.NonTerminal {
-        return new gast.NonTerminal(node.nonTerminalName, undefined, node.occurrenceInParent, node.implicitOccurrenceIndex)
+    public visitNonTerminal(node: gast.NonTerminal): gast.NonTerminal {
+        return new gast.NonTerminal(
+            node.nonTerminalName,
+            undefined,
+            node.occurrenceInParent,
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitFlat(node:gast.Flat):gast.Flat {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
+    public visitFlat(node: gast.Flat): gast.Flat {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
         return new gast.Flat(definition, node.name)
     }
 
-    public visitOption(node:gast.Option):gast.Option {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Option(definition, node.occurrenceInParent, node.name, node.implicitOccurrenceIndex)
+    public visitOption(node: gast.Option): gast.Option {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
+        return new gast.Option(
+            definition,
+            node.occurrenceInParent,
+            node.name,
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitRepetition(node:gast.Repetition):gast.Repetition {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Repetition(definition, node.occurrenceInParent, node.name, node.implicitOccurrenceIndex)
+    public visitRepetition(node: gast.Repetition): gast.Repetition {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
+        return new gast.Repetition(
+            definition,
+            node.occurrenceInParent,
+            node.name,
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitRepetitionMandatory(node:gast.RepetitionMandatory):gast.RepetitionMandatory {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.RepetitionMandatory(definition, node.occurrenceInParent, node.name, node.implicitOccurrenceIndex)
+    public visitRepetitionMandatory(
+        node: gast.RepetitionMandatory
+    ): gast.RepetitionMandatory {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
+        return new gast.RepetitionMandatory(
+            definition,
+            node.occurrenceInParent,
+            node.name,
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitRepetitionMandatoryWithSeparator(node:gast.RepetitionMandatoryWithSeparator):gast.RepetitionMandatoryWithSeparator {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.RepetitionMandatoryWithSeparator(definition,
+    public visitRepetitionMandatoryWithSeparator(
+        node: gast.RepetitionMandatoryWithSeparator
+    ): gast.RepetitionMandatoryWithSeparator {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
+        return new gast.RepetitionMandatoryWithSeparator(
+            definition,
             node.separator,
             node.occurrenceInParent,
             node.name,
-            node.implicitOccurrenceIndex)
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitRepetitionWithSeparator(node:gast.RepetitionWithSeparator):gast.RepetitionWithSeparator {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.RepetitionWithSeparator(definition,
+    public visitRepetitionWithSeparator(
+        node: gast.RepetitionWithSeparator
+    ): gast.RepetitionWithSeparator {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
+        return new gast.RepetitionWithSeparator(
+            definition,
             node.separator,
             node.occurrenceInParent,
             node.name,
-            node.implicitOccurrenceIndex)
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitAlternation(node:gast.Alternation):gast.Alternation {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
-        return new gast.Alternation(definition, node.occurrenceInParent, node.name, node.implicitOccurrenceIndex)
+    public visitAlternation(node: gast.Alternation): gast.Alternation {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
+        return new gast.Alternation(
+            definition,
+            node.occurrenceInParent,
+            node.name,
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitTerminal(node:gast.Terminal):gast.Terminal {
-        return new gast.Terminal(node.terminalType, node.occurrenceInParent, node.implicitOccurrenceIndex)
+    public visitTerminal(node: gast.Terminal): gast.Terminal {
+        return new gast.Terminal(
+            node.terminalType,
+            node.occurrenceInParent,
+            node.implicitOccurrenceIndex
+        )
     }
 
-    public visitRule(node:gast.Rule):gast.Rule {
-        let definition = map(node.definition, (currSubDef) => this.visit(currSubDef))
+    public visitRule(node: gast.Rule): gast.Rule {
+        let definition = map(node.definition, currSubDef =>
+            this.visit(currSubDef)
+        )
         return new gast.Rule(node.name, definition, node.orgText)
     }
 }
 
-export function cloneProduction<T extends gast.IProduction>(prod:T):T {
+export function cloneProduction<T extends gast.IProduction>(prod: T): T {
     let cloningVisitor = new GastCloneVisitor()
     return cloningVisitor.visit(prod)
 }

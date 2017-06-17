@@ -3,7 +3,7 @@ var jsonParser = require("./parsers/devJsonParser")
 var cssParser = require("./parsers/cssDevParser")
 
 var jsonSample = require("./samples/json10k")
-var cssSample = fs.readFileSync('./samples/large_css.css', 'utf8')
+var cssSample = fs.readFileSync("./samples/large_css.css", "utf8")
 
 var _ = require("lodash")
 
@@ -11,9 +11,10 @@ var times = 100
 var warmupTimes = 10
 
 function performBenchmark(name, input, regularParse, autoCompleteParse) {
-
     console.log("----------------------------------------------")
-    console.log(name + ": Testing Regular Parsing Speed vs AutoComplete Parsing Speed")
+    console.log(
+        name + ": Testing Regular Parsing Speed vs AutoComplete Parsing Speed"
+    )
 
     // warmup
     for (var z = 0; z < warmupTimes; z++) {
@@ -44,14 +45,22 @@ function performBenchmark(name, input, regularParse, autoCompleteParse) {
 
     // reporting
     if (averageDev < averageOld) {
-        console.log("Regular is faster by: " + (averageOld / averageDev).toFixed(3))
-    }
-    else {
-        console.log("AutoComplete is faster by: " + ((averageDev / averageOld)).toFixed(3))
+        console.log(
+            "Regular is faster by: " + (averageOld / averageDev).toFixed(3)
+        )
+    } else {
+        console.log(
+            "AutoComplete is faster by: " + (averageDev / averageOld).toFixed(3)
+        )
     }
 
     console.log("----------------------------------------------\n")
 }
 
-performBenchmark("JSON", jsonSample, jsonParser.parseFunc, jsonParser.autoComplete)
+performBenchmark(
+    "JSON",
+    jsonSample,
+    jsonParser.parseFunc,
+    jsonParser.autoComplete
+)
 performBenchmark("CSS", cssSample, cssParser.parseFunc, cssParser.autoComplete)

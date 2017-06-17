@@ -11,12 +11,11 @@ const parser = require("../step2_parsing/step2_parsing")
 const SelectParser = parser.SelectParser
 
 // A new parser instance with CST output enabled.
-const parserInstance = new SelectParser([], {outputCst: true})
+const parserInstance = new SelectParser([], { outputCst: true })
 // The base visitor class can be accessed via the a parser instance.
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()
 
 class SQLToAstVisitor extends BaseSQLVisitor {
-
     constructor() {
         super()
         this.validateVisitor()
@@ -35,20 +34,20 @@ class SQLToAstVisitor extends BaseSQLVisitor {
         let where = this.visit(ctx.whereClause)
 
         return {
-            type:         "SELECT_STMT",
+            type: "SELECT_STMT",
             selectClause: select,
-            fromClause:   from,
-            whereClause:  where
+            fromClause: from,
+            whereClause: where
         }
     }
 
     selectClause(ctx) {
         // Each Terminal or Non-Terminal in a grammar rule are collected into
         // an array with the same name(key) in the ctx object.
-        let columns = ctx.Identifier.map((identToken) => identToken.image)
+        let columns = ctx.Identifier.map(identToken => identToken.image)
 
         return {
-            type:    "SELECT_CLAUSE",
+            type: "SELECT_CLAUSE",
             columns: columns
         }
     }
@@ -57,7 +56,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
         let tableName = ctx.Identifier[0].image
 
         return {
-            type:  "FROM_CLAUSE",
+            type: "FROM_CLAUSE",
             table: tableName
         }
     }
@@ -66,10 +65,9 @@ class SQLToAstVisitor extends BaseSQLVisitor {
         let condition = this.visit(ctx.expression)
 
         return {
-            type:      "WHERE_CLAUSE",
+            type: "WHERE_CLAUSE",
             condition: condition
         }
-
     }
 
     expression(ctx) {
@@ -79,10 +77,10 @@ class SQLToAstVisitor extends BaseSQLVisitor {
         let operator = this.visit(ctx.relationalOperator)
 
         return {
-            type:     "EXPRESSION",
-            lhs:      lhs,
+            type: "EXPRESSION",
+            lhs: lhs,
             operator: operator,
-            rhs:      rhs
+            rhs: rhs
         }
     }
 
@@ -90,8 +88,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     atomicExpression(ctx) {
         if (ctx.Integer[0]) {
             return ctx.Integer[0].image
-        }
-        else {
+        } else {
             return ctx.Identifier[0].image
         }
     }
@@ -99,8 +96,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     relationalOperator(ctx) {
         if (ctx.GreaterThan[0]) {
             return ctx.GreaterThan[0].image
-        }
-        else {
+        } else {
             return ctx.LessThan[0].image
         }
     }
@@ -120,7 +116,10 @@ module.exports = {
         let cst = parserInstance.selectStatement()
 
         if (parserInstance.errors.length > 0) {
-            throw Error("Sad sad panda, parsing errors detected!\n" + parserInstance.errors[0].message)
+            throw Error(
+                "Sad sad panda, parsing errors detected!\n" +
+                    parserInstance.errors[0].message
+            )
         }
 
         let ast = toAstVisitorInstance.visit(cst)

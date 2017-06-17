@@ -1,25 +1,23 @@
-import {extendToken, Token} from "../../src/scan/tokens_public"
-import {Parser} from "../../src/parse/parser_public"
-import {exceptions} from "../../src/parse/exceptions_public"
-import {clearCache} from "../../src/parse/cache_public"
-import {tokenStructuredMatcher} from "../../src/scan/tokens"
-import {createRegularToken} from "../utils/matchers"
-import {TokenConstructor} from "../../src/scan/lexer_public"
-import {map} from "../../src/utils/utils"
+import { extendToken, Token } from "../../src/scan/tokens_public"
+import { Parser } from "../../src/parse/parser_public"
+import { exceptions } from "../../src/parse/exceptions_public"
+import { clearCache } from "../../src/parse/cache_public"
+import { tokenStructuredMatcher } from "../../src/scan/tokens"
+import { createRegularToken } from "../utils/matchers"
+import { TokenConstructor } from "../../src/scan/lexer_public"
+import { map } from "../../src/utils/utils"
 import MismatchedTokenException = exceptions.MismatchedTokenException
 import NoViableAltException = exceptions.NoViableAltException
 import EarlyExitException = exceptions.EarlyExitException
 
 function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
-
-    function createTokenVector(tokTypes:TokenConstructor[]):any[] {
-        return map(tokTypes, (curTokType) => {
+    function createTokenVector(tokTypes: TokenConstructor[]): any[] {
+        return map(tokTypes, curTokType => {
             return createToken(curTokType)
         })
     }
 
     context("CST " + contextName, () => {
-
         let A = extendToken("A")
         let B = extendToken("B")
         let C = extendToken("C")
@@ -30,10 +28,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a flat structure", () => {
             class CstTerminalParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -55,15 +52,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(tokenMatcher(cst.children.A[0], A)).to.be.true
             expect(tokenMatcher(cst.children.B[0], B)).to.be.true
             expect(cst.children.bamba[0].name).to.equal("bamba")
-            expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be.true
+            expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be
+                .true
         })
 
         it("Can output a CST for a Terminal - alternations", () => {
             class CstTerminalAlternationParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -98,10 +95,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a Terminal - alternations - single", () => {
             class CstTerminalAlternationSingleAltParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -127,10 +123,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a Terminal with multiple occurrences", () => {
             class CstMultiTerminalParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -153,10 +148,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration", () => {
             class CstMultiTerminalWithManyParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -172,7 +166,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(C), createToken(A), createToken(C), createToken(A), createToken(C), createToken(B)]
+            let input = [
+                createToken(A),
+                createToken(C),
+                createToken(A),
+                createToken(C),
+                createToken(A),
+                createToken(C),
+                createToken(B)
+            ]
             let parser = new CstMultiTerminalWithManyParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -183,17 +185,19 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             expect(tokenMatcher(cst.children.A[2], A)).to.be.true
             expect(tokenMatcher(cst.children.B[0], B)).to.be.true
             expect(cst.children.bamba).to.have.length(3)
-            expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be.true
-            expect(tokenMatcher(cst.children.bamba[1].children.C[0], C)).to.be.true
-            expect(tokenMatcher(cst.children.bamba[2].children.C[0], C)).to.be.true
+            expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be
+                .true
+            expect(tokenMatcher(cst.children.bamba[1].children.C[0], C)).to.be
+                .true
+            expect(tokenMatcher(cst.children.bamba[2].children.C[0], C)).to.be
+                .true
         })
 
         context("Can output a CST for an optional terminal", () => {
             class CstOptionalTerminalParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public ruleWithOptional = this.RULE("ruleWithOptional", () => {
@@ -217,7 +221,8 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 expect(cst.children).to.have.keys("A", "B", "bamba")
                 expect(tokenMatcher(cst.children.A[0], A)).to.be.true
                 expect(cst.children.bamba[0].name).to.equal("bamba")
-                expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to.be.true
+                expect(tokenMatcher(cst.children.bamba[0].children.C[0], C)).to
+                    .be.true
                 expect(tokenMatcher(cst.children.B[0], B)).to.be.true
             })
 
@@ -235,10 +240,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration mandatory", () => {
             class CstMultiTerminalWithAtLeastOneParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -249,7 +253,12 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(A), createToken(A), createToken(B)]
+            let input = [
+                createToken(A),
+                createToken(A),
+                createToken(A),
+                createToken(B)
+            ]
             let parser = new CstMultiTerminalWithAtLeastOneParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -263,15 +272,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP", () => {
             class CstMultiTerminalWithManySepParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
                     this.MANY_SEP({
-                        SEP: C, DEF: () => {
+                        SEP: C,
+                        DEF: () => {
                             this.CONSUME(A)
                         }
                     })
@@ -279,7 +288,12 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(C), createToken(A), createToken(B)]
+            let input = [
+                createToken(A),
+                createToken(C),
+                createToken(A),
+                createToken(B)
+            ]
             let parser = new CstMultiTerminalWithManySepParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -295,15 +309,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP mandatory", () => {
             class CstMultiTerminalWithAtLeastOneSepParser extends Parser {
-
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS, {outputCst: true});
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS, { outputCst: true })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
                 public testRule = this.RULE("testRule", () => {
                     this.AT_LEAST_ONE_SEP({
-                        SEP: C, DEF: () => {
+                        SEP: C,
+                        DEF: () => {
                             this.CONSUME(A)
                         }
                     })
@@ -311,7 +325,12 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(C), createToken(A), createToken(B)]
+            let input = [
+                createToken(A),
+                createToken(C),
+                createToken(A),
+                createToken(B)
+            ]
             let parser = new CstMultiTerminalWithAtLeastOneSepParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -328,22 +347,24 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
         context("nested rules", () => {
             context("Can output cst when using OPTION", () => {
                 class CstOptionalNestedTerminalParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
-                    public ruleWithOptional = this.RULE("ruleWithOptional", () => {
-                        this.OPTION({
-                            NAME: "$nestedOption",
-                            DEF:  () => {
-                                this.CONSUME(A)
-                                this.SUBRULE(this.bamba)
-                            }
-                        })
-                        this.CONSUME(B)
-                    })
+                    public ruleWithOptional = this.RULE(
+                        "ruleWithOptional",
+                        () => {
+                            this.OPTION({
+                                NAME: "$nestedOption",
+                                DEF: () => {
+                                    this.CONSUME(A)
+                                    this.SUBRULE(this.bamba)
+                                }
+                            })
+                            this.CONSUME(B)
+                        }
+                    )
 
                     public bamba = this.RULE("bamba", () => {
                         this.CONSUME(C)
@@ -357,9 +378,17 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     expect(cst.name).to.equal("ruleWithOptional")
                     expect(cst.children).to.have.keys("$nestedOption", "B")
                     let $nestedOptionCst = cst.children.$nestedOption[0]
-                    expect(tokenMatcher($nestedOptionCst.children.A[0], A)).to.be.true
-                    expect($nestedOptionCst.children.bamba[0].name).to.equal("bamba")
-                    expect(tokenMatcher($nestedOptionCst.children.bamba[0].children.C[0], C)).to.be.true
+                    expect(tokenMatcher($nestedOptionCst.children.A[0], A)).to
+                        .be.true
+                    expect($nestedOptionCst.children.bamba[0].name).to.equal(
+                        "bamba"
+                    )
+                    expect(
+                        tokenMatcher(
+                            $nestedOptionCst.children.bamba[0].children.C[0],
+                            C
+                        )
+                    ).to.be.true
                     expect(tokenMatcher(cst.children.B[0], B)).to.be.true
                 })
 
@@ -378,17 +407,16 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("Can output a CST when using OR with nested named Alternatives", () => {
                 class CstAlternationNestedAltParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
                         this.OR([
                             {
                                 NAME: "$first_alternative",
-                                ALT:  () => {
+                                ALT: () => {
                                     this.CONSUME(A)
                                 }
                             },
@@ -410,7 +438,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 let parser = new CstAlternationNestedAltParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
-                expect(cst.children).to.have.keys("$first_alternative", "B", "bamba")
+                expect(cst.children).to.have.keys(
+                    "$first_alternative",
+                    "B",
+                    "bamba"
+                )
                 let firstAltCst = cst.children.$first_alternative[0]
                 expect(tokenMatcher(firstAltCst.children.A[0], A)).to.be.true
                 expect(cst.children.bamba[0]).to.be.undefined
@@ -419,16 +451,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("Can output a CST when using OR", () => {
                 class CstAlternationNestedParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
                         this.OR({
                             NAME: "$nestedOr",
-                            DEF:  [
+                            DEF: [
                                 {
                                     ALT: () => {
                                         this.CONSUME(A)
@@ -463,24 +494,21 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("Can output a CST when using OR - single Alt", () => {
                 class CstAlternationNestedAltSingleParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
-                        this.OR(
-                            [
-                                {
-                                    NAME: "$nestedAlt",
-                                    ALT:  () => {
-                                        this.CONSUME(B)
-                                        this.SUBRULE(this.bamba)
-                                    }
+                        this.OR([
+                            {
+                                NAME: "$nestedAlt",
+                                ALT: () => {
+                                    this.CONSUME(B)
+                                    this.SUBRULE(this.bamba)
                                 }
-                            ]
-                        )
+                            }
+                        ])
                     })
 
                     public bamba = this.RULE("bamba", () => {
@@ -501,16 +529,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("Can output a CST using Repetitions", () => {
                 class CstMultiTerminalWithManyNestedParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
                         this.MANY({
                             NAME: "$nestedMany",
-                            DEF:  () => {
+                            DEF: () => {
                                 this.CONSUME(A)
                                 this.SUBRULE(this.bamba)
                             }
@@ -523,7 +550,15 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(A), createToken(C), createToken(A), createToken(C), createToken(A), createToken(C), createToken(B)]
+                let input = [
+                    createToken(A),
+                    createToken(C),
+                    createToken(A),
+                    createToken(C),
+                    createToken(A),
+                    createToken(C),
+                    createToken(B)
+                ]
                 let parser = new CstMultiTerminalWithManyNestedParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -538,23 +573,37 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 expect(tokenMatcher(nestedManyCst.children.A[2], A)).to.be.true
 
                 expect(nestedManyCst.children.bamba).to.have.length(3)
-                expect(tokenMatcher(nestedManyCst.children.bamba[0].children.C[0], C)).to.be.true
-                expect(tokenMatcher(nestedManyCst.children.bamba[1].children.C[0], C)).to.be.true
-                expect(tokenMatcher(nestedManyCst.children.bamba[2].children.C[0], C)).to.be.true
+                expect(
+                    tokenMatcher(
+                        nestedManyCst.children.bamba[0].children.C[0],
+                        C
+                    )
+                ).to.be.true
+                expect(
+                    tokenMatcher(
+                        nestedManyCst.children.bamba[1].children.C[0],
+                        C
+                    )
+                ).to.be.true
+                expect(
+                    tokenMatcher(
+                        nestedManyCst.children.bamba[2].children.C[0],
+                        C
+                    )
+                ).to.be.true
             })
 
             it("Can output a CST using mandatory Repetitions", () => {
                 class CstAtLeastOneNestedParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
                         this.AT_LEAST_ONE({
                             NAME: "$oops",
-                            DEF:  () => {
+                            DEF: () => {
                                 this.CONSUME(A)
                             }
                         })
@@ -562,7 +611,12 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(A), createToken(A), createToken(A), createToken(B)]
+                let input = [
+                    createToken(A),
+                    createToken(A),
+                    createToken(A),
+                    createToken(B)
+                ]
                 let parser = new CstAtLeastOneNestedParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -578,16 +632,16 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("Can output a CST using Repetitions with separator", () => {
                 class CstNestedRuleWithManySepParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
                         this.MANY_SEP({
                             NAME: "$pizza",
-                            SEP:  C, DEF: () => {
+                            SEP: C,
+                            DEF: () => {
                                 this.CONSUME(A)
                             }
                         })
@@ -595,7 +649,12 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(A), createToken(C), createToken(A), createToken(B)]
+                let input = [
+                    createToken(A),
+                    createToken(C),
+                    createToken(A),
+                    createToken(B)
+                ]
                 let parser = new CstNestedRuleWithManySepParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -611,16 +670,16 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("Can output a CST using Repetitions with separator - mandatory", () => {
                 class CstAtLeastOneSepNestedParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, { outputCst: true })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public testRule = this.RULE("testRule", () => {
                         this.AT_LEAST_ONE_SEP({
                             NAME: "$nestedName",
-                            SEP:  C, DEF: () => {
+                            SEP: C,
+                            DEF: () => {
                                 this.CONSUME(A)
                             }
                         })
@@ -628,7 +687,12 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(A), createToken(C), createToken(A), createToken(B)]
+                let input = [
+                    createToken(A),
+                    createToken(C),
+                    createToken(A),
+                    createToken(B)
+                ]
                 let parser = new CstAtLeastOneSepNestedParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -647,17 +711,27 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
         context("Error Recovery", () => {
             it("re-sync recovery", () => {
                 class CstRecoveryParserReSync extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true, recoveryEnabled: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, {
+                            outputCst: true,
+                            recoveryEnabled: true
+                        })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public root = this.RULE("root", () => {
                         this.MANY(() => {
                             this.OR([
-                                {ALT: () => { this.SUBRULE(this.first) }},
-                                {ALT: () => { this.SUBRULE(this.second) }}
+                                {
+                                    ALT: () => {
+                                        this.SUBRULE(this.first)
+                                    }
+                                },
+                                {
+                                    ALT: () => {
+                                        this.SUBRULE(this.second)
+                                    }
+                                }
                             ])
                         })
                     })
@@ -672,20 +746,24 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                         this.CONSUME(D)
                     })
 
-                    protected canTokenTypeBeInsertedInRecovery(tokClass:Function):boolean {
+                    protected canTokenTypeBeInsertedInRecovery(
+                        tokClass: Function
+                    ): boolean {
                         // we want to force re-sync recovery
                         return false
                     }
                 }
 
-
                 let input = createTokenVector([A, E, E, C, D])
                 let parser = new CstRecoveryParserReSync(input)
                 let cst = parser.root()
                 expect(parser.errors).to.have.lengthOf(1)
-                expect(parser.errors[0].message).to.include("Expecting token of type --> B <--")
+                expect(parser.errors[0].message).to.include(
+                    "Expecting token of type --> B <--"
+                )
                 expect(parser.errors[0].resyncedTokens).to.have.lengthOf(1)
-                expect(tokenMatcher(parser.errors[0].resyncedTokens[0], E)).to.be.true
+                expect(tokenMatcher(parser.errors[0].resyncedTokens[0], E)).to
+                    .be.true
 
                 // expect(parser.errors[0]).
                 expect(cst.name).to.equal("root")
@@ -710,17 +788,27 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
             it("re-sync recovery nested", () => {
                 class CstRecoveryParserReSyncNested extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS, {outputCst: true, recoveryEnabled: true});
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS, {
+                            outputCst: true,
+                            recoveryEnabled: true
+                        })
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public root = this.RULE("root", () => {
                         this.MANY(() => {
                             this.OR([
-                                {ALT: () => { this.SUBRULE(this.first_root) }},
-                                {ALT: () => { this.SUBRULE(this.second) }}
+                                {
+                                    ALT: () => {
+                                        this.SUBRULE(this.first_root)
+                                    }
+                                },
+                                {
+                                    ALT: () => {
+                                        this.SUBRULE(this.second)
+                                    }
+                                }
                             ])
                         })
                     })
@@ -739,20 +827,24 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                         this.CONSUME(D)
                     })
 
-                    protected canTokenTypeBeInsertedInRecovery(tokClass:Function):boolean {
+                    protected canTokenTypeBeInsertedInRecovery(
+                        tokClass: Function
+                    ): boolean {
                         // we want to force re-sync recovery
                         return false
                     }
                 }
 
-
                 let input = createTokenVector([A, E, E, C, D])
                 let parser = new CstRecoveryParserReSyncNested(input)
                 let cst = parser.root()
                 expect(parser.errors).to.have.lengthOf(1)
-                expect(parser.errors[0].message).to.include("Expecting token of type --> B <--")
+                expect(parser.errors[0].message).to.include(
+                    "Expecting token of type --> B <--"
+                )
                 expect(parser.errors[0].resyncedTokens).to.have.lengthOf(1)
-                expect(tokenMatcher(parser.errors[0].resyncedTokens[0], E)).to.be.true
+                expect(tokenMatcher(parser.errors[0].resyncedTokens[0], E)).to
+                    .be.true
 
                 expect(cst.name).to.equal("root")
                 expect(cst.children).to.have.keys("first_root", "second")
@@ -776,8 +868,6 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 expect(tokenMatcher(second.children.C[0], C)).to.be.true
                 expect(tokenMatcher(second.children.D[0], D)).to.be.true
             })
-
-
         })
 
         after(() => {
@@ -786,4 +876,9 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
     })
 }
 
-defineCstSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenStructuredMatcher)
+defineCstSpecs(
+    "Regular Tokens Mode",
+    extendToken,
+    createRegularToken,
+    tokenStructuredMatcher
+)

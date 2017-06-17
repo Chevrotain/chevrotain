@@ -1,18 +1,24 @@
-import {gast} from "../../../src/parse/grammar/gast_public"
-import {IdentTok, EntityTok, actionDec, CommaTok, RParenTok, SemicolonTok} from "./samples"
+import { gast } from "../../../src/parse/grammar/gast_public"
+import {
+    IdentTok,
+    EntityTok,
+    actionDec,
+    CommaTok,
+    RParenTok,
+    SemicolonTok
+} from "./samples"
 import {
     buildInProdFollowPrefix,
     buildBetweenProdsFollowPrefix,
     ResyncFollowsWalker,
     computeAllProdsFollows
 } from "../../../src/parse/grammar/follow"
-import {setEquality} from "../../utils/matchers"
+import { setEquality } from "../../utils/matchers"
 
 let Rule = gast.Rule
 let Terminal = gast.Terminal
 
 describe("The Grammar Ast Follows model", () => {
-
     it("can build a followNamePrefix from a Terminal", () => {
         let terminal = new Terminal(IdentTok)
         let actual = buildInProdFollowPrefix(terminal)
@@ -33,13 +39,19 @@ describe("The Grammar Ast Follows model", () => {
     })
 
     it("can compute the follows for Top level production ref in ActionDec", () => {
-        let actual:any = new ResyncFollowsWalker(actionDec).startWalking()
+        let actual: any = new ResyncFollowsWalker(actionDec).startWalking()
         let actualFollowNames = actual.keys()
         expect(actualFollowNames.length).to.equal(3)
         expect(actual.get("paramSpec1_~IN~_actionDec").length).to.equal(2)
-        setEquality(actual.get("paramSpec1_~IN~_actionDec"), [CommaTok, RParenTok])
+        setEquality(actual.get("paramSpec1_~IN~_actionDec"), [
+            CommaTok,
+            RParenTok
+        ])
         expect(actual.get("paramSpec2_~IN~_actionDec").length).to.equal(2)
-        setEquality(actual.get("paramSpec1_~IN~_actionDec"), [CommaTok, RParenTok])
+        setEquality(actual.get("paramSpec1_~IN~_actionDec"), [
+            CommaTok,
+            RParenTok
+        ])
         expect(actual.get("qualifiedName1_~IN~_actionDec").length).to.equal(1)
         setEquality(actual.get("qualifiedName1_~IN~_actionDec"), [SemicolonTok])
     })
@@ -48,5 +60,4 @@ describe("The Grammar Ast Follows model", () => {
         let actual = computeAllProdsFollows([actionDec])
         expect(actual.keys().length).to.equal(3)
     })
-
 })

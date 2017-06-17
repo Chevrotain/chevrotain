@@ -15,23 +15,25 @@ var Lexer = chevrotain.Lexer
 var Parser = chevrotain.Parser
 
 // Lexer
-const Text = createToken({name: "Text", pattern: /[^,\n\r"]+/})
-const Comma = createToken({name: "Comma", pattern: /,/})
-const NewLine = createToken({name: "NewLine", pattern: /\r?\n/})
-const String = createToken({name: "String", pattern: /"(?:""|[^"])*"/})
+const Text = createToken({ name: "Text", pattern: /[^,\n\r"]+/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const NewLine = createToken({ name: "NewLine", pattern: /\r?\n/ })
+const String = createToken({ name: "String", pattern: /"(?:""|[^"])*"/ })
 
 const allTokens = [Text, String, Comma, NewLine]
 const CsvLexer = new Lexer(allTokens)
 
-
 // Parser
 class CsvParser extends Parser {
-
     constructor(input) {
-        super(input, allTokens, {
-            // uncomment this to enable automatic CstOutput.
-            // outputCst: true
-        })
+        super(
+            input,
+            allTokens,
+            {
+                // uncomment this to enable automatic CstOutput.
+                // outputCst: true
+            }
+        )
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -48,7 +50,8 @@ class CsvParser extends Parser {
         })
 
         // the parsing methods
-        $.RULE("row", () => { // using ES2015 Arrow functions to reduce verbosity.
+        $.RULE("row", () => {
+            // using ES2015 Arrow functions to reduce verbosity.
             $.SUBRULE($.field)
             $.MANY(() => {
                 $.CONSUME(Comma)
@@ -59,9 +62,21 @@ class CsvParser extends Parser {
 
         $.RULE("field", () => {
             $.OR([
-                {ALT: () => { $.CONSUME(Text) }},
-                {ALT: () => { $.CONSUME(String) }},
-                {ALT: () => { /* empty alt */}}
+                {
+                    ALT: () => {
+                        $.CONSUME(Text)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(String)
+                    }
+                },
+                {
+                    ALT: () => {
+                        /* empty alt */
+                    }
+                }
             ])
         })
 
@@ -77,7 +92,6 @@ class CsvParser extends Parser {
 const parser = new CsvParser([])
 
 module.exports = function(text) {
-
     // 1. Tokenize the input.
     const lexResult = CsvLexer.tokenize(text)
 
@@ -89,8 +103,8 @@ module.exports = function(text) {
     return {
         // Unless we enable CstOutput the value will be undefined
         // as our csvFile parser rule does not return anything.
-        value:       value,
-        lexResult:   lexResult,
+        value: value,
+        lexResult: lexResult,
         parseErrors: parser.errors
     }
 }

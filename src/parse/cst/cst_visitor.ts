@@ -1,10 +1,18 @@
-import {CstVisitorConstructor} from "./cst_public"
-import {compact, contains, forEach, isArray, isEmpty, isFunction, keys, map} from "../../utils/utils"
-import {defineNameProp, functionName} from "../../lang/lang_extensions"
-import {validTermsPattern} from "../grammar/checks"
+import { CstVisitorConstructor } from "./cst_public"
+import {
+    compact,
+    contains,
+    forEach,
+    isArray,
+    isEmpty,
+    isFunction,
+    keys,
+    map
+} from "../../utils/utils"
+import { defineNameProp, functionName } from "../../lang/lang_extensions"
+import { validTermsPattern } from "../grammar/checks"
 
-
-export function defaultVisit<IN, OUT>(ctx:any, param:IN):OUT {
+export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
     let childrenNames = keys(ctx)
     let childrenNamesLength = childrenNames.length
     for (let i = 0; i < childrenNamesLength; i++) {
@@ -12,13 +20,12 @@ export function defaultVisit<IN, OUT>(ctx:any, param:IN):OUT {
         let currChildArray = ctx[currChildName]
         let currChildArrayLength = currChildArray.length
         for (let j = 0; j < currChildArrayLength; j++) {
-            let currChild:any = currChildArray[j]
+            let currChild: any = currChildArray[j]
             // distinction between Tokens Children and CstNode children
             if (currChild.tokenType === undefined) {
                 if (currChild.fullName !== undefined) {
                     this[currChild.fullName](currChild.children, param)
-                }
-                else {
+                } else {
                     this[currChild.name](currChild.children, param)
                 }
             }
@@ -28,8 +35,11 @@ export function defaultVisit<IN, OUT>(ctx:any, param:IN):OUT {
     return undefined
 }
 
-export function createBaseSemanticVisitorConstructor(grammarName:string, ruleNames:string[]):CstVisitorConstructor {
-    let derivedConstructor:any = function () {}
+export function createBaseSemanticVisitorConstructor(
+    grammarName: string,
+    ruleNames: string[]
+): CstVisitorConstructor {
+    let derivedConstructor: any = function() {}
 
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
@@ -37,33 +47,37 @@ export function createBaseSemanticVisitorConstructor(grammarName:string, ruleNam
     defineNameProp(derivedConstructor, grammarName + "BaseSemantics")
 
     let semanticProto = {
-        visit: function (cstNode, param) {
-
+        visit: function(cstNode, param) {
             // enables writing more concise visitor methods when CstNode has only a single child
             if (isArray(cstNode)) {
                 if (cstNode.length > 0) {
                     cstNode = cstNode[0]
-                }
-                // enables passing optional CstNodes concisely.
-                else {
+                } else {
+                    // enables passing optional CstNodes concisely.
                     return undefined
                 }
             }
 
             if (cstNode.fullName !== undefined) {
                 return this[cstNode.fullName](cstNode.children, param)
-            }
-            else {
+            } else {
                 return this[cstNode.name](cstNode.children, param)
             }
         },
 
-        validateVisitor: function () {
+        validateVisitor: function() {
             let semanticDefinitionErrors = validateVisitor(this, ruleNames)
             if (!isEmpty(semanticDefinitionErrors)) {
-                let errorMessages = map(semanticDefinitionErrors, (currDefError) => currDefError.msg)
-                throw Error(`Errors Detected in CST Visitor <${functionName(this.constructor)}>:\n\t` +
-                    `${errorMessages.join("\n\n").replace(/\n/g, "\n\t")}`)
+                let errorMessages = map(
+                    semanticDefinitionErrors,
+                    currDefError => currDefError.msg
+                )
+                throw Error(
+                    `Errors Detected in CST Visitor <${functionName(
+                        this.constructor
+                    )}>:\n\t` +
+                        `${errorMessages.join("\n\n").replace(/\n/g, "\n\t")}`
+                )
             }
         }
     }
@@ -76,18 +90,23 @@ export function createBaseSemanticVisitorConstructor(grammarName:string, ruleNam
     return derivedConstructor
 }
 
-export function createBaseVisitorConstructorWithDefaults(grammarName:string,
-                                                         ruleNames:string[],
-                                                         baseConstructor:Function):CstVisitorConstructor {
-    let derivedConstructor:any = function () {}
+export function createBaseVisitorConstructorWithDefaults(
+    grammarName: string,
+    ruleNames: string[],
+    baseConstructor: Function
+): CstVisitorConstructor {
+    let derivedConstructor: any = function() {}
 
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
     // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
-    defineNameProp(derivedConstructor, grammarName + "BaseSemanticsWithDefaults")
+    defineNameProp(
+        derivedConstructor,
+        grammarName + "BaseSemanticsWithDefaults"
+    )
 
     let withDefaultsProto = Object.create(baseConstructor.prototype)
-    forEach(ruleNames, (ruleName) => {
+    forEach(ruleNames, ruleName => {
         withDefaultsProto[ruleName] = defaultVisit
     })
 
@@ -103,24 +122,32 @@ export enum CstVisitorDefinitionError {
 }
 
 export interface IVisitorDefinitionError {
-    msg:string,
-    type:CstVisitorDefinitionError
-    methodName:string
+    msg: string
+    type: CstVisitorDefinitionError
+    methodName: string
 }
 
-export function validateVisitor(visitorInstance:Function, ruleNames:string[]):IVisitorDefinitionError[] {
+export function validateVisitor(
+    visitorInstance: Function,
+    ruleNames: string[]
+): IVisitorDefinitionError[] {
     let missingErrors = validateMissingCstMethods(visitorInstance, ruleNames)
     let redundantErrors = validateRedundantMethods(visitorInstance, ruleNames)
 
     return missingErrors.concat(redundantErrors)
 }
 
-export function validateMissingCstMethods(visitorInstance:Function, ruleNames:string[]):IVisitorDefinitionError[] {
-    let errors:IVisitorDefinitionError[] = map(ruleNames, (currRuleName) => {
+export function validateMissingCstMethods(
+    visitorInstance: Function,
+    ruleNames: string[]
+): IVisitorDefinitionError[] {
+    let errors: IVisitorDefinitionError[] = map(ruleNames, currRuleName => {
         if (!isFunction(visitorInstance[currRuleName])) {
             return {
-                msg:        `Missing visitor method: <${currRuleName}> on ${functionName(<any>visitorInstance.constructor)} CST Visitor.`,
-                type:       CstVisitorDefinitionError.MISSING_METHOD,
+                msg: `Missing visitor method: <${currRuleName}> on ${functionName(
+                    <any>visitorInstance.constructor
+                )} CST Visitor.`,
+                type: CstVisitorDefinitionError.MISSING_METHOD,
                 methodName: currRuleName
             }
         }
@@ -130,19 +157,27 @@ export function validateMissingCstMethods(visitorInstance:Function, ruleNames:st
 }
 
 const VALID_PROP_NAMES = ["constructor", "visit", "validateVisitor"]
-export function validateRedundantMethods(visitorInstance:Function, ruleNames:string[]):IVisitorDefinitionError[] {
+export function validateRedundantMethods(
+    visitorInstance: Function,
+    ruleNames: string[]
+): IVisitorDefinitionError[] {
     let errors = []
 
     for (let prop in visitorInstance) {
-        if (validTermsPattern.test(prop) &&
+        if (
+            validTermsPattern.test(prop) &&
             isFunction(visitorInstance[prop]) &&
             !contains(VALID_PROP_NAMES, prop) &&
-            !contains(ruleNames, prop)) {
+            !contains(ruleNames, prop)
+        ) {
             errors.push({
-                msg:        `Redundant visitor method: <${prop}> on ${functionName(<any>visitorInstance.constructor)} CST Visitor\n` +
-                            `There is no Grammar Rule corresponding to this method's name.\n` +
-                            `For utility methods on visitor classes use methods names that do not match /${validTermsPattern.source}/.`,
-                type:       CstVisitorDefinitionError.REDUNDANT_METHOD,
+                msg:
+                    `Redundant visitor method: <${prop}> on ${functionName(
+                        <any>visitorInstance.constructor
+                    )} CST Visitor\n` +
+                        `There is no Grammar Rule corresponding to this method's name.\n` +
+                        `For utility methods on visitor classes use methods names that do not match /${validTermsPattern.source}/.`,
+                type: CstVisitorDefinitionError.REDUNDANT_METHOD,
                 methodName: prop
             })
         }

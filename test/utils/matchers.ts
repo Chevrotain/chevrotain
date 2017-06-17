@@ -1,16 +1,15 @@
-import {IToken} from "../../src/scan/tokens_public"
+import { IToken } from "../../src/scan/tokens_public"
 
-export function setEquality(actual:any[], expected:any[]):void {
+export function setEquality(actual: any[], expected: any[]): void {
     expect(actual).to.deep.include.members(expected)
     expect(expected).to.deep.include.members(actual)
     expect(expected).to.have.lengthOf(actual.length)
 }
 
-export function createRegularToken(tokClass, image = ""):IToken {
+export function createRegularToken(tokClass, image = ""): IToken {
     return {
-        image:       image,
+        image: image,
         startOffset: 1,
-        tokenType:   tokClass.tokenType
+        tokenType: tokClass.tokenType
     }
 }
-

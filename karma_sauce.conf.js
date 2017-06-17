@@ -1,106 +1,109 @@
-var os = require('os');
-var ifaces = os.networkInterfaces();
+var os = require("os")
+var ifaces = os.networkInterfaces()
 
 var ipAddresses = []
 // based on http://stackoverflow.com/a/8440736
 Object.keys(ifaces).forEach(function(ifname) {
-    var alias = 0;
+    var alias = 0
 
     ifaces[ifname].forEach(function(iface) {
-        if ('IPv4' !== iface.family || iface.internal !== false) {
+        if ("IPv4" !== iface.family || iface.internal !== false) {
             // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-            return;
+            return
         }
-        ipAddresses.push(iface.address);
-    });
-});
+        ipAddresses.push(iface.address)
+    })
+})
 
 module.exports = function(config) {
-    "use strict";
-
+    "use strict"
     var fs = require("fs")
 
     var customLaunchers = {
-        'SL_Chrome':           {
-            base:        'SauceLabs',
-            browserName: 'chrome',
-            platform:    'Windows 10',
-            version:     'latest'
+        SL_Chrome: {
+            base: "SauceLabs",
+            browserName: "chrome",
+            platform: "Windows 10",
+            version: "latest"
         },
-        'SL_InternetExplorer': {
-            base:        'SauceLabs',
-            browserName: 'internet explorer',
-            version:     'latest',
-            platform:    'Windows 10'
+        SL_InternetExplorer: {
+            base: "SauceLabs",
+            browserName: "internet explorer",
+            version: "latest",
+            platform: "Windows 10"
         },
-        'SL_EDGE':             {
-            base:        'SauceLabs',
-            browserName: 'MicrosoftEdge',
-            platform:    'Windows 10',
-            version:     'latest'
+        SL_EDGE: {
+            base: "SauceLabs",
+            browserName: "MicrosoftEdge",
+            platform: "Windows 10",
+            version: "latest"
         },
-        'SL_FireFox':          {
-            base:        'SauceLabs',
-            browserName: 'firefox',
-            version:     'latest',
-            platform:    'Windows 10'
+        SL_FireFox: {
+            base: "SauceLabs",
+            browserName: "firefox",
+            version: "latest",
+            platform: "Windows 10"
         },
-        'SL_SAFARI10':          {
-            base:        'SauceLabs',
-            browserName: 'safari',
-            platform:    'OS X 10.11',
-            version:     '10.0'
+        SL_SAFARI10: {
+            base: "SauceLabs",
+            browserName: "safari",
+            platform: "OS X 10.11",
+            version: "10.0"
         }
     }
 
     // Use ENV vars on Travis and sauce.json locally to get credentials
     if (!process.env.SAUCE_USERNAME) {
-        if (!fs.existsSync('sauce.json')) {
-            console.log('Create a sauce.json with your credentials based on the sauce-sample.json file.');
-            process.exit(1);
+        if (!fs.existsSync("sauce.json")) {
+            console.log(
+                "Create a sauce.json with your credentials based on the sauce-sample.json file."
+            )
+            process.exit(1)
         } else {
-            process.env.SAUCE_USERNAME = require('./sauce').username;
-            process.env.SAUCE_ACCESS_KEY = require('./sauce').accessKey;
+            process.env.SAUCE_USERNAME = require("./sauce").username
+            process.env.SAUCE_ACCESS_KEY = require("./sauce").accessKey
         }
     }
 
     var sauceConfig = {
-        testName:          'Chevrotain-CI',
-        retryLimit:        3,
-        recordVideo:       false,
+        testName: "Chevrotain-CI",
+        retryLimit: 3,
+        recordVideo: false,
         recordScreenshots: false
     }
 
     if (process.env.TRAVIS) {
-        sauceConfig.build = 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
-
+        sauceConfig.build =
+            "TRAVIS #" +
+            process.env.TRAVIS_BUILD_NUMBER +
+            " (" +
+            process.env.TRAVIS_BUILD_ID +
+            ")"
     }
 
     // TODO: this does not actually seem to work... if it would work we can use filtering by tag name in the badge.
-    if (process.env.TRAVIS_BRANCH === "master" &&
-        process.env.TRAVIS_PULL_REQUEST !== "false") {
+    if (
+        process.env.TRAVIS_BRANCH === "master" &&
+        process.env.TRAVIS_PULL_REQUEST !== "false"
+    ) {
         console.log("Sauce Labs results will be reported in the badge")
         sauceConfig.tags = ["master"]
     }
 
     config.set({
-
         sauceLabs: sauceConfig,
 
         // base path, that will be used to resolve files and exclude
-        basePath: '',
+        basePath: "",
 
         // frameworks to use
-        frameworks: ['mocha', 'chai'],
+        frameworks: ["mocha", "chai"],
 
-        files: [
-            'test/test.config.js',
-            'dev/chevrotainSpecs.js'
-        ],
+        files: ["test/test.config.js", "dev/chevrotainSpecs.js"],
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-        reporters: ['progress', 'saucelabs'],
+        reporters: ["progress", "saucelabs"],
 
         // Hack for SauceLabs seems that Safari and IE-Edge refuse to connect to localhost with SauceLabs connect.
         // but will work if given the actual local network IP...
@@ -132,11 +135,11 @@ module.exports = function(config) {
         customLaunchers: customLaunchers,
 
         // If browser does not capture in given timeout [ms], kill it
-        captureTimeout:           10000000,
+        captureTimeout: 10000000,
         browserNoActivityTimeout: 60000,
 
         // Continuous Integration mode
         // if true, it capture browsers, run tests and exit
         singleRun: false
-    });
-};
+    })
+}

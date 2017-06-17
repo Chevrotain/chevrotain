@@ -4,25 +4,22 @@
  * "breaking" chevrotain grammars during minification.
  */
 
-
 var chevrotain = require("chevrotain")
 
 // DOCS: extracting to Token names to perform "gentle" minification with reserved function names.
-var jsonTokens = require('./unminified.js').jsonTokens
+var jsonTokens = require("./unminified.js").jsonTokens
 var jsonTokenNames = jsonTokens.map(function(currTok) {
     return chevrotain.tokenName(currTok)
 })
 
 module.exports = function(grunt) {
-
     grunt.initConfig({
-
         mocha_istanbul: {
             coverage: {
-                src:     './',
+                src: "./",
                 options: {
-                    mask:           '**/*spec.js',
-                    coverageFolder: 'coverage'
+                    mask: "**/*spec.js",
+                    coverageFolder: "coverage"
                 }
             }
         },
@@ -35,8 +32,8 @@ module.exports = function(grunt) {
                     // this will increase the size of the minified sources.
                     mangle: false
                 },
-                files:   {
-                    'gen/disable_mangling.min.js': ['unminified.js']
+                files: {
+                    "gen/disable_mangling.min.js": ["unminified.js"]
                 }
             },
 
@@ -52,8 +49,8 @@ module.exports = function(grunt) {
                         except: jsonTokenNames
                     }
                 },
-                files:   {
-                    'gen/selective.min.js': ['unminified.js']
+                files: {
+                    "gen/selective.min.js": ["unminified.js"]
                 }
             },
 
@@ -66,16 +63,16 @@ module.exports = function(grunt) {
                     // using default compression options.
                     // this will fail at runtime.
                 },
-                files:   {
-                    'gen/no_compression.min.js': ['unminified.js']
+                files: {
+                    "gen/no_compression.min.js": ["unminified.js"]
                 }
             }
         }
     })
 
     // https://github.com/gruntjs/grunt/issues/696#issuecomment-63192649
-    grunt.file.expand('../node_modules/grunt-*/tasks').forEach(grunt.loadTasks)
+    grunt.file.expand("../node_modules/grunt-*/tasks").forEach(grunt.loadTasks)
 
-    grunt.registerTask('default', ['uglify'])
-    grunt.registerTask('build', ['uglify', 'mocha_istanbul:coverage'])
+    grunt.registerTask("default", ["uglify"])
+    grunt.registerTask("build", ["uglify", "mocha_istanbul:coverage"])
 }

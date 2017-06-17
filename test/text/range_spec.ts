@@ -1,10 +1,13 @@
-import {Range} from "../../src/text/range"
+import { Range } from "../../src/text/range"
 
 describe("The Chevrotain Range namespace", () => {
-
     it("an invalid range can not be created", () => {
-        expect(() => { return new Range(5, 1)}).to.throw("INVALID RANGE")
-        expect(() => { return new Range(-1, 2)}).to.throw("INVALID RANGE")
+        expect(() => {
+            return new Range(5, 1)
+        }).to.throw("INVALID RANGE")
+        expect(() => {
+            return new Range(-1, 2)
+        }).to.throw("INVALID RANGE")
     })
 
     it("can check if a number is contained in a give range", () => {
@@ -56,5 +59,4 @@ describe("The Chevrotain Range namespace", () => {
         expect(_49_50.isStrictlyContainedInRange(_10_50)).to.equal(false)
         expect(_51_100.isStrictlyContainedInRange(_10_50)).to.equal(false)
     })
-
 })

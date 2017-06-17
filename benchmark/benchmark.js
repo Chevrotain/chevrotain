@@ -1,13 +1,14 @@
 var fs = require("fs")
-var oldVersion = require("../examples/grammars/node_modules/chevrotain/lib/chevrotain").VERSION
+var oldVersion = require("../examples/grammars/node_modules/chevrotain/lib/chevrotain")
+    .VERSION
 var oldVersionParseJson = require("./parsers/oldJsonParser").parseFunc
 var devVersionParseJson = require("./parsers/devJsonParser").parseFunc
 
 var devVersionParseCss = require("./parsers/cssDevParser").parseFunc
 var oldVersionParseCss = require("./parsers/cssOldParser").parseFunc
 
-var jsonSample = require("./samples/json10k")
-var cssSample = fs.readFileSync('./samples/large_css.css', 'utf8')
+var jsonSample = fs.readFileSync("./samples/json10k", "utf8")
+var cssSample = fs.readFileSync("./samples/large_css.css", "utf8")
 var isBenchmarkOnlyLexer = false
 
 var _ = require("lodash")
@@ -16,7 +17,6 @@ var times = 400
 var warmupTimes = 50
 
 function performBenchmark(name, input, devParse, oldParse) {
-
     console.log("----------------------------------------------")
     console.log("Benchmarking: " + name + " Dev Vs Old: (" + oldVersion + ")")
     // warmup
@@ -49,9 +49,8 @@ function performBenchmark(name, input, devParse, oldParse) {
     // reporting
     if (averageDev < averageOld) {
         console.log("Dev is faster by: " + (averageOld / averageDev).toFixed(3))
-    }
-    else {
-        console.log("Old is faster by: " + ((averageDev / averageOld)).toFixed(3))
+    } else {
+        console.log("Old is faster by: " + (averageDev / averageOld).toFixed(3))
     }
 }
 

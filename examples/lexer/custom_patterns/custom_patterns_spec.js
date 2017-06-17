@@ -8,9 +8,8 @@ let tokenMatcher = require("chevrotain").tokenMatcher
 let Comma = customPatternExample.Comma
 let IntegerLiteral = customPatternExample.IntegerLiteral
 
-describe('The Chevrotain Lexer ability to use custom pattern implementations.', () => {
-
-    it('Can Lex a simple input using a Custom Integer Literal RegExp', () => {
+describe("The Chevrotain Lexer ability to use custom pattern implementations.", () => {
+    it("Can Lex a simple input using a Custom Integer Literal RegExp", () => {
         let text = `1 , 2 , 3`
         let lexResult = tokenize(text)
 

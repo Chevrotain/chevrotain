@@ -1,14 +1,20 @@
-import {Token} from "../../src/scan/tokens_public"
-import {compact, isFunction, isUndefined} from "../../src/utils/utils"
+import { Token } from "../../src/scan/tokens_public"
+import { compact, isFunction, isUndefined } from "../../src/utils/utils"
 
 export class ParseTree {
-    getImage():string { return this.payload.image }
+    getImage(): string {
+        return this.payload.image
+    }
 
-    getLine():number { return this.payload.startLine }
+    getLine(): number {
+        return this.payload.startLine
+    }
 
-    getColumn():number { return this.payload.startColumn }
+    getColumn(): number {
+        return this.payload.startColumn
+    }
 
-    constructor(public payload:Token, public children:ParseTree[] = []) {}
+    constructor(public payload: Token, public children: ParseTree[] = []) {}
 }
 
 /**
@@ -19,19 +25,19 @@ export class ParseTree {
  * @param {ParseTree[]} children The sub nodes of the ParseTree to the built
  * @returns {ParseTree}
  */
-export function PT(tokenOrTokenClass:Function|Token, children:ParseTree[] = []):ParseTree {
+export function PT(
+    tokenOrTokenClass: Function | Token,
+    children: ParseTree[] = []
+): ParseTree {
     let childrenCompact = compact(children)
 
     if (tokenOrTokenClass instanceof Token) {
         return new ParseTree(tokenOrTokenClass, childrenCompact)
-    }
-    else if (isFunction(tokenOrTokenClass)) {
+    } else if (isFunction(tokenOrTokenClass)) {
         return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
-    }
-    else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
+    } else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
         return null
-    }
-    else {
+    } else {
         throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`
     }
 }

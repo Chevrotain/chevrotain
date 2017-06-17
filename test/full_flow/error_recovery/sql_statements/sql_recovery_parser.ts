@@ -5,8 +5,8 @@
  * INSERT (32, "SHAHAR") INTO schema2.Persons
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
-import {Parser} from "../../../../src/parse/parser_public"
-import {Token} from "../../../../src/scan/tokens_public"
+import { Parser } from "../../../../src/parse/parser_public"
+import { Token } from "../../../../src/scan/tokens_public"
 import * as allTokens from "./sql_recovery_tokens"
 import {
     INVALID_DDL,
@@ -34,21 +34,21 @@ import {
     RParenTok,
     COMMAS,
     StringTok,
-    IntTok, VirtualToken
+    IntTok,
+    VirtualToken
 } from "./sql_recovery_tokens"
-import {ParseTree} from "../../parse_tree"
-import {augmentTokenClasses} from "../../../../src/scan/tokens"
+import { ParseTree } from "../../parse_tree"
+import { augmentTokenClasses } from "../../../../src/scan/tokens"
 
 augmentTokenClasses(<any>allTokens)
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends Parser {
-
-    constructor(input:Token[] = [], isRecoveryEnabled = true) {
+    constructor(input: Token[] = [], isRecoveryEnabled = true) {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
-        super(input, <any>allTokens, {recoveryEnabled: isRecoveryEnabled})
+        super(input, <any>allTokens, { recoveryEnabled: isRecoveryEnabled })
         // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
         //       The typescript compiler places the constructor body last after initializations in the class's body
         //       which is why place the call here meets the criteria.
@@ -59,33 +59,59 @@ export class DDLExampleRecoveryParser extends Parser {
     // with the error recovery re-sync behavior.
     // note that when one parsing rule calls another (via SUBRULE) the invoked rule is the one defined here,
     // without the "parse" prefix.
-    public ddl = this.RULE("ddl", this.parseDdl, {recoveryValueFunc: INVALID(INVALID_DDL)})
+    public ddl = this.RULE("ddl", this.parseDdl, {
+        recoveryValueFunc: INVALID(INVALID_DDL)
+    })
     // DOCS: a specific return type has been provided in case of re-sync recovery.
-    public createStmt = this.RULE("createStmt", this.parseCreateStmt, {recoveryValueFunc: INVALID(INVALID_CREATE_STMT)})
-    public insertStmt = this.RULE("insertStmt", this.parseInsertStmt, {recoveryValueFunc: INVALID(INVALID_INSERT_STMT)})
-    public deleteStmt = this.RULE("deleteStmt", this.parseDeleteStmt, {recoveryValueFunc: INVALID(INVALID_DELETE_STMT)})
-    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {recoveryValueFunc: INVALID(INVALID_QUALIFIED_NAME)})
-    public recordValue = this.RULE("recordValue", this.parseRecordValue, {recoveryValueFunc: INVALID()})
+    public createStmt = this.RULE("createStmt", this.parseCreateStmt, {
+        recoveryValueFunc: INVALID(INVALID_CREATE_STMT)
+    })
+    public insertStmt = this.RULE("insertStmt", this.parseInsertStmt, {
+        recoveryValueFunc: INVALID(INVALID_INSERT_STMT)
+    })
+    public deleteStmt = this.RULE("deleteStmt", this.parseDeleteStmt, {
+        recoveryValueFunc: INVALID(INVALID_DELETE_STMT)
+    })
+    public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {
+        recoveryValueFunc: INVALID(INVALID_QUALIFIED_NAME)
+    })
+    public recordValue = this.RULE("recordValue", this.parseRecordValue, {
+        recoveryValueFunc: INVALID()
+    })
     // DOCS: A Parsing rule may also be private and not part of the public API
-    private value = this.RULE("value", this.parseValue, {recoveryValueFunc: INVALID()})
+    private value = this.RULE("value", this.parseValue, {
+        recoveryValueFunc: INVALID()
+    })
 
     // DOCS: note how all the parsing rules in this example return a ParseTree, we require some output from the parser
     // to demonstrate the error recovery mechanisms. otherwise it is harder to prove we have indeed recovered.
-    private parseDdl():ParseTree {
+    private parseDdl(): ParseTree {
         let stmts = []
 
         this.MANY(() => {
             this.OR([
-                {ALT: () => { stmts.push(this.SUBRULE(this.createStmt)) }},
-                {ALT: () => { stmts.push(this.SUBRULE(this.insertStmt)) }},
-                {ALT: () => { stmts.push(this.SUBRULE(this.deleteStmt)) }},
+                {
+                    ALT: () => {
+                        stmts.push(this.SUBRULE(this.createStmt))
+                    }
+                },
+                {
+                    ALT: () => {
+                        stmts.push(this.SUBRULE(this.insertStmt))
+                    }
+                },
+                {
+                    ALT: () => {
+                        stmts.push(this.SUBRULE(this.deleteStmt))
+                    }
+                }
             ])
         })
 
         return PT(new STATEMENTS(), stmts)
     }
 
-    private parseCreateStmt():ParseTree {
+    private parseCreateStmt(): ParseTree {
         let createKW, tableKW, qn, semiColon
 
         createKW = this.CONSUME1(CreateTok)
@@ -93,11 +119,15 @@ export class DDLExampleRecoveryParser extends Parser {
         qn = this.SUBRULE(this.qualifiedName)
         semiColon = this.CONSUME1(SemiColonTok)
 
-        return PT(new CREATE_STMT(),
-            [PT(createKW), PT(tableKW), qn, PT(semiColon)])
+        return PT(new CREATE_STMT(), [
+            PT(createKW),
+            PT(tableKW),
+            qn,
+            PT(semiColon)
+        ])
     }
 
-    private parseInsertStmt():ParseTree {
+    private parseInsertStmt(): ParseTree {
         let insertKW, recordValue, intoKW, qn, semiColon
 
         // parse
@@ -108,11 +138,16 @@ export class DDLExampleRecoveryParser extends Parser {
         semiColon = this.CONSUME1(SemiColonTok)
 
         // tree rewrite
-        return PT(new INSERT_STMT(),
-            [PT(insertKW), recordValue, PT(intoKW), qn, PT(semiColon)])
+        return PT(new INSERT_STMT(), [
+            PT(insertKW),
+            recordValue,
+            PT(intoKW),
+            qn,
+            PT(semiColon)
+        ])
     }
 
-    private parseDeleteStmt():ParseTree {
+    private parseDeleteStmt(): ParseTree {
         let deleteKW, recordValue, fromKW, qn, semiColon
 
         // parse
@@ -123,11 +158,16 @@ export class DDLExampleRecoveryParser extends Parser {
         semiColon = this.CONSUME1(SemiColonTok)
 
         // tree rewrite
-        return PT(new DELETE_STMT(),
-            [PT(deleteKW), recordValue, PT(fromKW), qn, PT(semiColon)])
+        return PT(new DELETE_STMT(), [
+            PT(deleteKW),
+            recordValue,
+            PT(fromKW),
+            qn,
+            PT(semiColon)
+        ])
     }
 
-    private parseQualifiedName():ParseTree {
+    private parseQualifiedName(): ParseTree {
         let dots = []
         let idents = []
 
@@ -149,7 +189,7 @@ export class DDLExampleRecoveryParser extends Parser {
         return PT(new QUALIFIED_NAME(), <any>allPtChildren)
     }
 
-    private parseRecordValue():ParseTree {
+    private parseRecordValue(): ParseTree {
         let values = []
         let commas = []
 
@@ -167,27 +207,35 @@ export class DDLExampleRecoveryParser extends Parser {
         return PT(new QUALIFIED_NAME(), allPtChildren)
     }
 
-    private parseValue():ParseTree {
+    private parseValue(): ParseTree {
         let value = null
-        this.OR(
-            [   // @formatter:off
-                    {ALT: () => {value = this.CONSUME1(StringTok)}},
-                    {ALT: () => {value = this.CONSUME1(IntTok)}}
-                ])
-                    // @formatter:on
+        this.OR([
+            // @formatter:off
+            {
+                ALT: () => {
+                    value = this.CONSUME1(StringTok)
+                }
+            },
+            {
+                ALT: () => {
+                    value = this.CONSUME1(IntTok)
+                }
+            }
+        ])
+        // @formatter:on
         return PT(value)
     }
 }
 
 // HELPER FUNCTIONS
-function PT(token:Token, children:ParseTree[] = []):ParseTree {
+function PT(token: Token, children: ParseTree[] = []): ParseTree {
     return new ParseTree(token, children)
 }
 
-export function WRAP_IN_PT(toks:Token[]):ParseTree[] {
+export function WRAP_IN_PT(toks: Token[]): ParseTree[] {
     let parseTrees = new Array(toks.length)
     for (let i = 0; i < toks.length; i++) {
-        parseTrees[i] = (PT(toks[i]))
+        parseTrees[i] = PT(toks[i])
     }
     return parseTrees
 }
@@ -195,7 +243,9 @@ export function WRAP_IN_PT(toks:Token[]):ParseTree[] {
 /* tslint:disable:class-name */
 export class INVALID_INPUT extends VirtualToken {}
 /* tslint:enable:class-name */
-export function INVALID(tokType:Function = INVALID_INPUT):() => ParseTree {
+export function INVALID(tokType: Function = INVALID_INPUT): () => ParseTree {
     // virtual invalid tokens should have no parameters...
-    return () => {return PT(new (<any>tokType)()) }
+    return () => {
+        return PT(new (<any>tokType)())
+    }
 }

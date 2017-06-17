@@ -6,7 +6,6 @@ const lex = require("./step1_lexing").lex
 const tokenVocabulary = require("./step1_lexing").tokenVocabulary
 
 describe("Chevrotain Tutorial", () => {
-
     context("Step 1 - Lexing", () => {
         it("Can Lex a simple input", () => {
             let inputText = "SELECT column1 FROM table2"
@@ -23,9 +22,11 @@ describe("Chevrotain Tutorial", () => {
 
             // tokenMatcher acts as an "instanceof" check for Tokens
             expect(tokenMatcher(tokens[0], tokenVocabulary.Select)).to.be.true
-            expect(tokenMatcher(tokens[1], tokenVocabulary.Identifier)).to.be.true
+            expect(tokenMatcher(tokens[1], tokenVocabulary.Identifier)).to.be
+                .true
             expect(tokenMatcher(tokens[2], tokenVocabulary.From)).to.be.true
-            expect(tokenMatcher(tokens[3], tokenVocabulary.Identifier)).to.be.true
+            expect(tokenMatcher(tokens[3], tokenVocabulary.Identifier)).to.be
+                .true
         })
     })
 })

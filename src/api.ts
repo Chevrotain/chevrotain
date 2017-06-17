@@ -1,5 +1,9 @@
-import {Parser, EMPTY_ALT, ParserDefinitionErrorType} from "./parse/parser_public"
-import {Lexer, LexerDefinitionErrorType} from "./scan/lexer_public"
+import {
+    Parser,
+    EMPTY_ALT,
+    ParserDefinitionErrorType
+} from "./parse/parser_public"
+import { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
 import {
     Token,
     tokenName,
@@ -7,19 +11,21 @@ import {
     EOF,
     getTokenConstructor,
     tokenMatcher,
-    createToken, createTokenInstance, extendToken
+    createToken,
+    createTokenInstance,
+    extendToken
 } from "./scan/tokens_public"
-import {exceptions} from "./parse/exceptions_public"
-import {gast} from "./parse/grammar/gast_public"
-import {clearCache} from "./parse/cache_public"
-import {NextAfterTokenWalker} from "./parse/grammar/interpreter"
-import {VERSION} from "./version"
+import { exceptions } from "./parse/exceptions_public"
+import { gast } from "./parse/grammar/gast_public"
+import { clearCache } from "./parse/cache_public"
+import { NextAfterTokenWalker } from "./parse/grammar/interpreter"
+import { VERSION } from "./version"
 
 /**
  * defines the public API of
  * changes here may require major version change. (semVer)
  */
-let API:any = {}
+let API: any = {}
 
 // semantic version
 API.VERSION = VERSION
@@ -48,7 +54,8 @@ API.exceptions = {}
 API.exceptions.isRecognitionException = exceptions.isRecognitionException
 API.exceptions.EarlyExitException = exceptions.EarlyExitException
 API.exceptions.MismatchedTokenException = exceptions.MismatchedTokenException
-API.exceptions.NotAllInputParsedException = exceptions.NotAllInputParsedException
+API.exceptions.NotAllInputParsedException =
+    exceptions.NotAllInputParsedException
 API.exceptions.NoViableAltException = exceptions.NoViableAltException
 
 // grammar reflection API
@@ -58,7 +65,8 @@ API.gast.Flat = gast.Flat
 API.gast.Repetition = gast.Repetition
 API.gast.RepetitionWithSeparator = gast.RepetitionWithSeparator
 API.gast.RepetitionMandatory = gast.RepetitionMandatory
-API.gast.RepetitionMandatoryWithSeparator = gast.RepetitionMandatoryWithSeparator
+API.gast.RepetitionMandatoryWithSeparator =
+    gast.RepetitionMandatoryWithSeparator
 API.gast.Option = gast.Option
 API.gast.Alternation = gast.Alternation
 API.gast.NonTerminal = gast.NonTerminal

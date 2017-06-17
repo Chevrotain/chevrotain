@@ -1,28 +1,27 @@
-import {createToken, Token} from "../../src/scan/tokens_public"
-import {Parser} from "../../src/parse/parser_public"
-import {createRegularToken} from "../utils/matchers"
-import {keys} from "../../src/utils/utils"
+import { createToken, Token } from "../../src/scan/tokens_public"
+import { Parser } from "../../src/parse/parser_public"
+import { createRegularToken } from "../utils/matchers"
+import { keys } from "../../src/utils/utils"
 
 describe("The CSTVisitor", () => {
-
-    let A = createToken({name: "A"})
-    let B = createToken({name: "B"})
-    let C = createToken({name: "C"})
+    let A = createToken({ name: "A" })
+    let B = createToken({ name: "B" })
+    let C = createToken({ name: "C" })
 
     const ALL_TOKENS = [A, B, C]
 
     class CstTerminalParserReturnVisitor extends Parser {
-
-        constructor(input:Token[] = []) {
-            super(input, ALL_TOKENS, {outputCst: true});
-            (<any>Parser).performSelfAnalysis(this)
+        constructor(input: Token[] = []) {
+            super(input, ALL_TOKENS, { outputCst: true })
+            ;(<any>Parser).performSelfAnalysis(this)
         }
 
         public testRule = this.RULE("testRule", () => {
             this.CONSUME(A)
             this.CONSUME(B)
             this.OPTION({
-                NAME: "$bisli", DEF: () => {
+                NAME: "$bisli",
+                DEF: () => {
                     this.SUBRULE(this.bamba)
                 }
             })
@@ -69,7 +68,11 @@ describe("The CSTVisitor", () => {
             }
         }
 
-        let input = [createRegularToken(A), createRegularToken(B), createRegularToken(C)]
+        let input = [
+            createRegularToken(A),
+            createRegularToken(B),
+            createRegularToken(C)
+        ]
         parserInstance.input = input
         let cst = parserInstance.testRule()
 
@@ -100,7 +103,11 @@ describe("The CSTVisitor", () => {
             }
         }
 
-        let input = [createRegularToken(A), createRegularToken(B), createRegularToken(C)]
+        let input = [
+            createRegularToken(A),
+            createRegularToken(B),
+            createRegularToken(C)
+        ]
         parserInstance.input = input
         let cst = parserInstance.testRule()
 
@@ -123,7 +130,11 @@ describe("The CSTVisitor", () => {
             }
         }
 
-        let input = [createRegularToken(A), createRegularToken(B), createRegularToken(C)]
+        let input = [
+            createRegularToken(A),
+            createRegularToken(B),
+            createRegularToken(C)
+        ]
         parserInstance.input = input
         let cst = parserInstance.testRule()
 
@@ -155,7 +166,11 @@ describe("The CSTVisitor", () => {
             }
         }
 
-        let input = [createRegularToken(A), createRegularToken(B), createRegularToken(C)]
+        let input = [
+            createRegularToken(A),
+            createRegularToken(B),
+            createRegularToken(C)
+        ]
         parserInstance.input = input
         let cst = parserInstance.testRule()
 
@@ -171,17 +186,19 @@ describe("The CSTVisitor", () => {
                 this.validateVisitor()
             }
 
-            testRule(ctx, param) {
-            }
+            testRule(ctx, param) {}
 
-            testRule$bisli(ctx, param) {
-            }
+            testRule$bisli(ctx, param) {}
 
             // missing "bamba" method
         }
 
-        expect(() => new CstVisitorValidator()).to.throw("Missing visitor method: <bamba>")
-        expect(() => new CstVisitorValidator()).to.throw("Errors Detected in CST Visitor")
+        expect(() => new CstVisitorValidator()).to.throw(
+            "Missing visitor method: <bamba>"
+        )
+        expect(() => new CstVisitorValidator()).to.throw(
+            "Errors Detected in CST Visitor"
+        )
     })
 
     it("can detect redundant visitor methods", () => {
@@ -191,21 +208,20 @@ describe("The CSTVisitor", () => {
                 this.validateVisitor()
             }
 
-            testRule(ctx, param) {
-            }
+            testRule(ctx, param) {}
 
-            testRule$bisli(ctx, param) {
-            }
+            testRule$bisli(ctx, param) {}
 
-            bamba(ctx, param) {
-            }
+            bamba(ctx, param) {}
 
-            oops(ctx, param) {
-
-            }
+            oops(ctx, param) {}
         }
 
-        expect(() => new CstVisitorValidatorRedundant()).to.throw("Redundant visitor method: <oops>")
-        expect(() => new CstVisitorValidatorRedundant()).to.throw("Errors Detected in CST Visitor")
+        expect(() => new CstVisitorValidatorRedundant()).to.throw(
+            "Redundant visitor method: <oops>"
+        )
+        expect(() => new CstVisitorValidatorRedundant()).to.throw(
+            "Errors Detected in CST Visitor"
+        )
     })
 })
