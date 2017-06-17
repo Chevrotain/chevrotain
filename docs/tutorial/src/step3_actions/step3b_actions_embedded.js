@@ -25,7 +25,6 @@ const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
 class SelectParserEmbedded extends Parser {
-
     constructor(input) {
         super(input, tokenVocabulary)
         const $ = this
@@ -42,11 +41,11 @@ class SelectParserEmbedded extends Parser {
             // Each Grammar rule can return a value, these values can be combined to create a new data structure
             // in our case an AST.
             return {
-                type:         "SELECT_STMT",
+                type: "SELECT_STMT",
                 selectClause: select,
-                fromClause:   from,
+                fromClause: from,
                 // may be undefined if the OPTION was not entered.
-                whereClause:  where
+                whereClause: where
             }
         })
 
@@ -55,13 +54,14 @@ class SelectParserEmbedded extends Parser {
 
             $.CONSUME(Select)
             $.AT_LEAST_ONE_SEP({
-                SEP: Comma, DEF: () => {
+                SEP: Comma,
+                DEF: () => {
                     columns.push($.CONSUME(Identifier).image)
                 }
             })
 
             return {
-                type:    "SELECT_CLAUSE",
+                type: "SELECT_CLAUSE",
                 columns: columns
             }
         })
@@ -73,7 +73,7 @@ class SelectParserEmbedded extends Parser {
             table = $.CONSUME(Identifier).image
 
             return {
-                type:  "FROM_CLAUSE",
+                type: "FROM_CLAUSE",
                 table: table
             }
         })
@@ -85,7 +85,7 @@ class SelectParserEmbedded extends Parser {
             condition = $.SUBRULE($.expression)
 
             return {
-                type:      "WHERE_CLAUSE",
+                type: "WHERE_CLAUSE",
                 condition: condition
             }
         })
@@ -100,24 +100,24 @@ class SelectParserEmbedded extends Parser {
             // 2 lines above.
 
             return {
-                type:     "EXPRESSION",
-                lhs:      lhs,
+                type: "EXPRESSION",
+                lhs: lhs,
                 operator: operator,
-                rhs:      rhs
+                rhs: rhs
             }
         })
 
         this.atomicExpression = $.RULE("atomicExpression", () => {
             return $.OR([
-                {ALT: () => $.CONSUME(Integer)},
-                {ALT: () => $.CONSUME(Identifier)}
+                { ALT: () => $.CONSUME(Integer) },
+                { ALT: () => $.CONSUME(Identifier) }
             ]).image
         })
 
         this.relationalOperator = $.RULE("relationalOperator", () => {
             return $.OR([
-                {ALT: () => $.CONSUME(GreaterThan)},
-                {ALT: () => $.CONSUME(LessThan)}
+                { ALT: () => $.CONSUME(GreaterThan) },
+                { ALT: () => $.CONSUME(LessThan) }
             ]).image
         })
 
@@ -142,7 +142,10 @@ module.exports = {
         let ast = parserInstance.selectStatement()
 
         if (parserInstance.errors.length > 0) {
-            throw Error("Sad sad panda, parsing errors detected!\n" + parserInstance.errors[0].message)
+            throw Error(
+                "Sad sad panda, parsing errors detected!\n" +
+                    parserInstance.errors[0].message
+            )
         }
 
         return ast

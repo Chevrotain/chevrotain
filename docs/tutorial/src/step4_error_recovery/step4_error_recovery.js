@@ -5,36 +5,57 @@ let createToken = chevrotain.createToken
 let Lexer = chevrotain.Lexer
 let Parser = chevrotain.Parser
 
-let True = createToken({name: "True", pattern: /true/})
-let False = createToken({name: "False", pattern: /false/})
-let Null = createToken({name: "Null", pattern: /null/})
-let LCurly = createToken({name: "LCurly", pattern: /{/})
-let RCurly = createToken({name: "RCurly", pattern: /}/})
-let LSquare = createToken({name: "LSquare", pattern: /\[/})
-let RSquare = createToken({name: "RSquare", pattern: /]/})
-let Comma = createToken({name: "Comma", pattern: /,/})
-let Colon = createToken({name: "Colon", pattern: /:/})
-let StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/})
-let NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/})
-let WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED})
+let True = createToken({ name: "True", pattern: /true/ })
+let False = createToken({ name: "False", pattern: /false/ })
+let Null = createToken({ name: "Null", pattern: /null/ })
+let LCurly = createToken({ name: "LCurly", pattern: /{/ })
+let RCurly = createToken({ name: "RCurly", pattern: /}/ })
+let LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+let RSquare = createToken({ name: "RSquare", pattern: /]/ })
+let Comma = createToken({ name: "Comma", pattern: /,/ })
+let Colon = createToken({ name: "Colon", pattern: /:/ })
+let StringLiteral = createToken({
+    name: "StringLiteral",
+    pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+})
+let NumberLiteral = createToken({
+    name: "NumberLiteral",
+    pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+})
+let WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED
+})
 
-let allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
+let allTokens = [
+    WhiteSpace,
+    NumberLiteral,
+    StringLiteral,
+    LCurly,
+    RCurly,
+    LSquare,
+    RSquare,
+    Comma,
+    Colon,
+    True,
+    False,
+    Null
+]
 let JsonLexer = new Lexer(allTokens, {
     // Less verbose tokens will make the test's assertions easier to understand
     positionTracking: "onlyOffset"
 })
 
-
 // ----------------- parser -----------------
 
 class JsonParser extends Parser {
-
     constructor(input) {
         super(input, allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled
             recoveryEnabled: true,
             // enable CST Output so we can test the recovery capabilities
-            outputCst:       true
+            outputCst: true
         })
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
@@ -42,8 +63,16 @@ class JsonParser extends Parser {
 
         this.RULE("json", () => {
             $.OR([
-                {ALT: () => { $.SUBRULE($.object) }},
-                {ALT: () => { $.SUBRULE($.array) }}
+                {
+                    ALT: () => {
+                        $.SUBRULE($.object)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.array)
+                    }
+                }
             ])
         })
 
@@ -79,13 +108,41 @@ class JsonParser extends Parser {
 
         this.RULE("value", () => {
             $.OR([
-                {ALT: () => { $.CONSUME(StringLiteral) }},
-                {ALT: () => { $.CONSUME(NumberLiteral) }},
-                {ALT: () => { $.SUBRULE($.object) }},
-                {ALT: () => { $.SUBRULE($.array) }},
-                {ALT: () => { $.CONSUME(True) }},
-                {ALT: () => { $.CONSUME(False) }},
-                {ALT: () => { $.CONSUME(Null) }}
+                {
+                    ALT: () => {
+                        $.CONSUME(StringLiteral)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(NumberLiteral)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.object)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.array)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(True)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(False)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(Null)
+                    }
+                }
             ])
         })
 
@@ -95,7 +152,6 @@ class JsonParser extends Parser {
         Parser.performSelfAnalysis(this)
     }
 }
-
 
 // reuse the same parser instance.
 const parser = new JsonParser([])
@@ -112,10 +168,9 @@ module.exports = {
         let cst = parser.json()
 
         return {
-            cst:         cst,
-            lexErrors:   lexResult.errors,
+            cst: cst,
+            lexErrors: lexResult.errors,
             parseErrors: parser.errors
         }
     }
 }
-

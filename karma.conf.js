@@ -1,26 +1,20 @@
 // Karma.conf for local testing on chrome.
 module.exports = function(config) {
-    "use strict";
-
+    "use strict"
     var fs = require("fs")
 
     config.set({
-
         // base path, that will be used to resolve files and exclude
-        basePath: '',
+        basePath: "",
 
         // frameworks to use
-        frameworks: ['mocha', 'chai'],
+        frameworks: ["mocha", "chai"],
 
-        files: [
-            'test/test.config.js',
-            'lib/chevrotainSpecs.js'
-        ],
+        files: ["test/test.config.js", "lib/chevrotainSpecs.js"],
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-        reporters: ['progress'],
-
+        reporters: ["progress"],
 
         // web server port
         port: 9979,
@@ -46,11 +40,11 @@ module.exports = function(config) {
         browsers: ["Chrome"],
 
         // If browser does not capture in given timeout [ms], kill it
-        captureTimeout:           10000000,
+        captureTimeout: 10000000,
         browserNoActivityTimeout: 60000,
 
         // Continuous Integration mode
         // if true, it capture browsers, run tests and exit
         singleRun: false
-    });
-};
+    })
+}

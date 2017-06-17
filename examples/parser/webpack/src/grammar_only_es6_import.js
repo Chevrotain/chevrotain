@@ -1,9 +1,15 @@
 // Using ES6 style imports, this means Webpack 2 can perform tree shaking
-import {Parser} from "chevrotain"
-import {ArrayLexer, allTokens, Integer, Comma, LSquare, RSquare}  from "./tokens_only"
+import { Parser } from "chevrotain"
+import {
+    ArrayLexer,
+    allTokens,
+    Integer,
+    Comma,
+    LSquare,
+    RSquare
+} from "./tokens_only"
 
 class ArrayParserES6 extends Parser {
-
     constructor(input) {
         super(input, allTokens)
 
@@ -38,8 +44,8 @@ export function parse(text) {
     const value = parser.json()
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
 }

@@ -1,9 +1,9 @@
-import {gast} from "./gast_public"
-import {isSequenceProd, isBranchingProd, isOptionalProd} from "./gast"
-import {uniq, map, flatten} from "../../utils/utils"
-import {TokenConstructor} from "../../scan/lexer_public"
+import { gast } from "./gast_public"
+import { isSequenceProd, isBranchingProd, isOptionalProd } from "./gast"
+import { uniq, map, flatten } from "../../utils/utils"
+import { TokenConstructor } from "../../scan/lexer_public"
 
-export function first(prod:gast.IProduction):TokenConstructor[] {
+export function first(prod: gast.IProduction): TokenConstructor[] {
     if (prod instanceof gast.NonTerminal) {
         // this could in theory cause infinite loops if
         // (1) prod A refs prod B.
@@ -14,24 +14,21 @@ export function first(prod:gast.IProduction):TokenConstructor[] {
         // currently there is no safeguard for this unique edge case because
         // (1) not sure a grammar in which this can happen is useful for anything (productive)
         return first((<gast.NonTerminal>prod).referencedRule)
-
-    }
-    else if (prod instanceof gast.Terminal) {
+    } else if (prod instanceof gast.Terminal) {
         return firstForTerminal(<gast.Terminal>prod)
-    }
-    else if (isSequenceProd(prod)) {
+    } else if (isSequenceProd(prod)) {
         return firstForSequence(<gast.AbstractProduction>prod)
-    }
-    else if (isBranchingProd(prod)) {
+    } else if (isBranchingProd(prod)) {
         return firstForBranching(<gast.AbstractProduction>prod)
-    }
-    else {
+    } else {
         throw Error("non exhaustive match")
     }
 }
 
-export function firstForSequence(prod:gast.AbstractProduction):TokenConstructor[] {
-    let firstSet:TokenConstructor[] = []
+export function firstForSequence(
+    prod: gast.AbstractProduction
+): TokenConstructor[] {
+    let firstSet: TokenConstructor[] = []
     let seq = prod.definition
     let nextSubProdIdx = 0
     let hasInnerProdsRemaining = seq.length > nextSubProdIdx
@@ -50,13 +47,18 @@ export function firstForSequence(prod:gast.AbstractProduction):TokenConstructor[
     return uniq(firstSet)
 }
 
-export function firstForBranching(prod:gast.AbstractProduction):TokenConstructor[] {
-    let allAlternativesFirsts:Function[][] = map(prod.definition, (innerProd) => {
-        return first(innerProd)
-    })
+export function firstForBranching(
+    prod: gast.AbstractProduction
+): TokenConstructor[] {
+    let allAlternativesFirsts: Function[][] = map(
+        prod.definition,
+        innerProd => {
+            return first(innerProd)
+        }
+    )
     return uniq(flatten<TokenConstructor>(allAlternativesFirsts))
 }
 
-export function firstForTerminal(terminal:gast.Terminal):TokenConstructor[] {
+export function firstForTerminal(terminal: gast.Terminal): TokenConstructor[] {
     return [terminal.terminalType]
 }

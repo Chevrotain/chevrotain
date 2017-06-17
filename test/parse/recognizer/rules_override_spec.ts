@@ -1,24 +1,29 @@
-import {IToken, Token} from "../../../src/scan/tokens_public"
-import {Parser} from "../../../src/parse/parser_public"
-import {createRegularToken} from "../../utils/matchers"
-import {augmentTokenClasses} from "../../../src/scan/tokens"
+import { IToken, Token } from "../../../src/scan/tokens_public"
+import { Parser } from "../../../src/parse/parser_public"
+import { createRegularToken } from "../../utils/matchers"
+import { augmentTokenClasses } from "../../../src/scan/tokens"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
-
     class PlusTok extends Token {
-        constructor() {super()}
+        constructor() {
+            super()
+        }
     }
 
     class MinusTok extends Token {
-        constructor() {super()}
+        constructor() {
+            super()
+        }
     }
 
     augmentTokenClasses([PlusTok, MinusTok])
 
     it("Can override an existing rule", () => {
         class SuperOverrideParser extends Parser {
-
-            constructor(input:IToken[] = [], isInvokedByChildConstructor = false) {
+            constructor(
+                input: IToken[] = [],
+                isInvokedByChildConstructor = false
+            ) {
                 super(input, [PlusTok, MinusTok])
 
                 // performSelfAnalysis should only be invoked once.
@@ -42,8 +47,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
         }
 
         class ChildOverrideParser extends SuperOverrideParser {
-
-            constructor(input:IToken[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, true)
                 Parser.performSelfAnalysis(this)
             }
@@ -62,31 +66,40 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
         expect(superResult).to.equal("yey")
         expect(superParser.errors).to.be.empty
 
-        let childParser = new ChildOverrideParser(
-            [createRegularToken(MinusTok), createRegularToken(MinusTok), createRegularToken(MinusTok)])
+        let childParser = new ChildOverrideParser([
+            createRegularToken(MinusTok),
+            createRegularToken(MinusTok),
+            createRegularToken(MinusTok)
+        ])
         let childResult = childParser.topRule()
         expect(childResult).to.equal("ney")
         expect(superParser.errors).to.be.empty
     })
 
     it("Can not override a rule which does not exist", () => {
-
         class InvalidOverrideParser extends Parser {
-
-            constructor(input:Token[] = []) {
+            constructor(input: Token[] = []) {
                 super(input, [PlusTok, MinusTok])
                 Parser.performSelfAnalysis(this)
             }
 
             // nothing to override, oops does not exist in any of the super grammars
-            public oops = this.OVERRIDE_RULE("oops", () => {
-                this.CONSUME(PlusTok)
-                return "poof"
-            }, {recoveryValueFunc: () => "boom"})
+            public oops = this.OVERRIDE_RULE(
+                "oops",
+                () => {
+                    this.CONSUME(PlusTok)
+                    return "poof"
+                },
+                { recoveryValueFunc: () => "boom" }
+            )
         }
 
-        expect(() => new InvalidOverrideParser([])).to.throw("Parser Definition Errors detected")
-        expect(() => new InvalidOverrideParser([])).to.throw("Invalid rule override")
+        expect(() => new InvalidOverrideParser([])).to.throw(
+            "Parser Definition Errors detected"
+        )
+        expect(() => new InvalidOverrideParser([])).to.throw(
+            "Invalid rule override"
+        )
         expect(() => new InvalidOverrideParser([])).to.throw("->oops<-")
     })
 })

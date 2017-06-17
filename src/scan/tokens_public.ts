@@ -1,7 +1,19 @@
-import {assignNoOverwrite, has, isFunction, isObject, isRegExp, isString, isUndefined} from "../utils/utils"
-import {defineNameProp, functionName} from "../lang/lang_extensions"
-import {Lexer, TokenConstructor} from "./lexer_public"
-import {augmentTokenClasses, tokenIdxToClass, tokenStructuredMatcher} from "./tokens"
+import {
+    assignNoOverwrite,
+    has,
+    isFunction,
+    isObject,
+    isRegExp,
+    isString,
+    isUndefined
+} from "../utils/utils"
+import { defineNameProp, functionName } from "../lang/lang_extensions"
+import { Lexer, TokenConstructor } from "./lexer_public"
+import {
+    augmentTokenClasses,
+    tokenIdxToClass,
+    tokenStructuredMatcher
+} from "./tokens"
 
 /**
  *  The type of custom pattern matcher functions.
@@ -19,10 +31,12 @@ import {augmentTokenClasses, tokenIdxToClass, tokenStructuredMatcher} from "./to
  *  see: https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js
  *  for a fuller example
  */
-export type CustomPatternMatcherFunc = (test:string,
-                                        offset?:number,
-                                        tokens?:IToken[],
-                                        groups?:{ [groupName:string]:IToken }) => RegExpExecArray
+export type CustomPatternMatcherFunc = (
+    test: string,
+    offset?: number,
+    tokens?: IToken[],
+    groups?: { [groupName: string]: IToken }
+) => RegExpExecArray
 
 /**
  * Interface for custom user provided token pattern matchers.
@@ -32,13 +46,13 @@ export interface ICustomPattern {
      * The custom pattern implementation.
      * @see CustomPatternMatcherFunc
      */
-    exec:CustomPatternMatcherFunc
+    exec: CustomPatternMatcherFunc
     /**
      * Flag indicating if this custom pattern may contain line terminators.
      * This is required to avoid errors in the line/column numbering.
      * @default false - if this property was not explicitly defined.
      */
-    containsLineTerminator?:boolean
+    containsLineTerminator?: boolean
 }
 
 /**
@@ -47,42 +61,43 @@ export interface ICustomPattern {
  * @param {Function} clazz - A constructor for a Token subclass
  * @returns {string} - The Human readable label for a Token if it exists.
  */
-export function tokenLabel(clazz:Function):string {
+export function tokenLabel(clazz: Function): string {
     if (hasTokenLabel(clazz)) {
         return (<any>clazz).LABEL
-    }
-    else {
-
+    } else {
         return tokenName(clazz)
     }
 }
 
-export function hasTokenLabel(clazz:Function):boolean {
+export function hasTokenLabel(clazz: Function): boolean {
     return isString((<any>clazz).LABEL) && (<any>clazz).LABEL !== ""
 }
 
-export function tokenName(clazz:Function):string {
+export function tokenName(clazz: Function): string {
     // The tokenName property is needed under some old versions of node.js (0.10/0.12)
     // where the Function.prototype.name property is not defined as a 'configurable' property
     // enable producing readable error messages.
     /* istanbul ignore if -> will only run in old versions of node.js */
-    if (isObject(clazz) && clazz.hasOwnProperty("tokenName") && isString((<any>clazz).tokenName)) {
+    if (
+        isObject(clazz) &&
+        clazz.hasOwnProperty("tokenName") &&
+        isString((<any>clazz).tokenName)
+    ) {
         return (<any>clazz).tokenName
-    }
-    else {
+    } else {
         return functionName(clazz)
     }
 }
 
 export interface ITokenConfig {
-    name:string
-    parent?:TokenConstructor
-    label?:string
-    pattern?:RegExp | CustomPatternMatcherFunc | ICustomPattern | string
-    group?:string | any
-    push_mode?:string
-    pop_mode?:boolean
-    longer_alt?:TokenConstructor
+    name: string
+    parent?: TokenConstructor
+    label?: string
+    pattern?: RegExp | CustomPatternMatcherFunc | ICustomPattern | string
+    group?: string | any
+    push_mode?: string
+    pop_mode?: boolean
+    longer_alt?: TokenConstructor
 }
 
 const PARENT = "parent"
@@ -96,14 +111,13 @@ const LONGER_ALT = "longer_alt"
  * @param {ITokenConfig} config - The configuration for
  * @returns {TokenConstructor} - A constructor for the new Token subclass
  */
-export function createToken(config:ITokenConfig):TokenConstructor {
+export function createToken(config: ITokenConfig): TokenConstructor {
     if (!has(config, PARENT)) {
         config.parent = Token
     }
 
     return createTokenInternal(config)
 }
-
 
 /**
  *
@@ -117,29 +131,36 @@ export function createToken(config:ITokenConfig):TokenConstructor {
  * @param {Function} parentConstructor - The Token class to be extended
  * @returns {Function} - A constructor for the new extended Token subclass
  */
-export function extendToken(tokenName:string, patternOrParent:any = undefined, parentConstructor:Function = Token):TokenConstructor {
+export function extendToken(
+    tokenName: string,
+    patternOrParent: any = undefined,
+    parentConstructor: Function = Token
+): TokenConstructor {
     let pattern
 
-    if (isRegExp(patternOrParent) ||
+    if (
+        isRegExp(patternOrParent) ||
         patternOrParent === Lexer.SKIPPED ||
         patternOrParent === Lexer.NA ||
-        isString(patternOrParent)) {
+        isString(patternOrParent)
+    ) {
         pattern = patternOrParent
-    }
-    else if (isFunction(patternOrParent)) {
+    } else if (isFunction(patternOrParent)) {
         parentConstructor = patternOrParent
         pattern = undefined
     }
 
-    return createTokenInternal(<any>{name: tokenName, parent: parentConstructor, pattern: pattern})
+    return createTokenInternal(
+        <any>{ name: tokenName, parent: parentConstructor, pattern: pattern }
+    )
 }
 
-function createTokenInternal(config:ITokenConfig):TokenConstructor {
+function createTokenInternal(config: ITokenConfig): TokenConstructor {
     let tokenName = config.name
     let parentConstructor = config.parent
     let pattern = config.pattern
 
-    let derivedConstructor:any = function () {
+    let derivedConstructor: any = function() {
         parentConstructor.apply(this, arguments)
     }
 
@@ -161,7 +182,10 @@ function createTokenInternal(config:ITokenConfig):TokenConstructor {
     augmentTokenClasses([derivedConstructor])
 
     // static properties mixing
-    derivedConstructor = assignNoOverwrite(derivedConstructor, parentConstructor)
+    derivedConstructor = assignNoOverwrite(
+        derivedConstructor,
+        parentConstructor
+    )
 
     if (has(config, LABEL)) {
         derivedConstructor.LABEL = config[LABEL]
@@ -200,42 +224,41 @@ function createTokenInternal(config:ITokenConfig):TokenConstructor {
  */
 export interface IToken {
     /** The textual representation of the Token as it appeared in the text. */
-    image:string
+    image: string
 
     /** Offset of the first character of the Token. */
-    startOffset:number
+    startOffset: number
 
     /** Line of the first character of the Token. */
-    startLine?:number
+    startLine?: number
 
     /** Column of the first character of the Token. */
-    startColumn?:number
+    startColumn?: number
 
     /** Offset of the last character of the Token. */
-    endOffset?:number
+    endOffset?: number
 
     /** Line of the last character of the Token. */
-    endLine?:number
+    endLine?: number
 
     /** Column of the last character of the Token. */
-    endColumn?:number
+    endColumn?: number
 
     /** this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery. */
-    isInsertedInRecovery?:boolean
+    isInsertedInRecovery?: boolean
 
     /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
-    tokenType?:number
+    tokenType?: number
 
     /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
      *  @see {ILexerConfig} debug flag.
      *
      *  This property should not be used in productive flows as it will not always exist!
      * */
-    tokenClassName?:number
+    tokenClassName?: number
 }
 
 export class Token implements IToken {
-
     /**
      * A "human readable" Label for a Token.
      * Subclasses of Token may define their own static LABEL property.
@@ -249,18 +272,18 @@ export class Token implements IToken {
      * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
      * "expecting '{' but found ')'"
      */
-    static LABEL:string = undefined
+    static LABEL: string = undefined
 
     // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
-    public isInsertedInRecovery?:boolean = false
+    public isInsertedInRecovery?: boolean = false
 
-    public image:string
-    public startOffset:number
-    public startLine?:number
-    public startColumn?:number
-    public endLine?:number
-    public endColumn?:number
-    public endOffset?:number
+    public image: string
+    public startOffset: number
+    public startLine?: number
+    public startColumn?: number
+    public endLine?: number
+    public endColumn?: number
+    public endOffset?: number
 
     /**
      * This class is never meant to be initialized.
@@ -295,15 +318,16 @@ augmentTokenClasses([EOF])
  *            endColumn: number,
  *            tokenType}}
  */
-export function createTokenInstance(tokClass:TokenConstructor,
-                                    image:string,
-                                    startOffset:number,
-                                    endOffset:number,
-                                    startLine:number,
-                                    endLine:number,
-                                    startColumn:number,
-                                    endColumn:number):IToken {
-
+export function createTokenInstance(
+    tokClass: TokenConstructor,
+    image: string,
+    startOffset: number,
+    endOffset: number,
+    startLine: number,
+    endLine: number,
+    startColumn: number,
+    endColumn: number
+): IToken {
     return {
         image,
         startOffset,
@@ -312,7 +336,7 @@ export function createTokenInstance(tokClass:TokenConstructor,
         endLine,
         startColumn,
         endColumn,
-        tokenType: (<any>tokClass).tokenType,
+        tokenType: (<any>tokClass).tokenType
     }
 }
 
@@ -325,7 +349,7 @@ export function createTokenInstance(tokClass:TokenConstructor,
  * @param tokenInstance {IToken}
  * @returns {TokenConstructor}
  */
-export function getTokenConstructor(tokenInstance:IToken):TokenConstructor {
+export function getTokenConstructor(tokenInstance: IToken): TokenConstructor {
     let tokenIdx
     tokenIdx = tokenInstance.tokenType
     return tokenIdxToClass.get(tokenIdx)
@@ -343,6 +367,9 @@ export function getTokenConstructor(tokenInstance:IToken):TokenConstructor {
  * @param tokClass {TokenConstructor}
  * @returns {boolean}
  */
-export function tokenMatcher(tokInstance:IToken, tokClass:TokenConstructor):boolean {
+export function tokenMatcher(
+    tokInstance: IToken,
+    tokClass: TokenConstructor
+): boolean {
     return tokenStructuredMatcher(tokInstance, tokClass)
 }

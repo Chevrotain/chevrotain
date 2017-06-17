@@ -46,7 +46,6 @@ function matchWhiteSpace(text, startOffset) {
     return [result]
 }
 
-
 // State required for matching the indentations
 let indentStack = [0]
 let lastOffsetChecked
@@ -71,8 +70,11 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
         (noTokensMatchedYet && !noNewLinesMatchedYet) ||
         // Both newlines and other Tokens have been matched AND the last matched Token is a newline
         (!noTokensMatchedYet &&
-        !noNewLinesMatchedYet &&
-        (!_.isEmpty(newLines) && !_.isEmpty(matchedTokens) && _.last(newLines).startOffset) > _.last(matchedTokens).startOffset)
+            !noNewLinesMatchedYet &&
+            (!_.isEmpty(newLines) &&
+                !_.isEmpty(matchedTokens) &&
+                _.last(newLines).startOffset) >
+                _.last(matchedTokens).startOffset)
 
     // indentation can only be matched at the start of a line.
     if (isFirstLine || isStartOfLine) {
@@ -87,9 +89,8 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
                 match = [""]
                 lastOffsetChecked = offset
             }
-        }
-        // possible non-empty indentation
-        else {
+        } else {
+            // possible non-empty indentation
             match = matchWhiteSpace(text, offset)
             if (match !== null) {
                 currIndentLevel = match[0].length
@@ -101,35 +102,47 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
             if (currIndentLevel > lastIndentLevel && type === "indent") {
                 indentStack.push(currIndentLevel)
                 return match
-            }
-            else if (currIndentLevel < lastIndentLevel && type === "outdent") {
+            } else if (
+                currIndentLevel < lastIndentLevel &&
+                type === "outdent"
+            ) {
                 //if we need more than one outdent token, add all but the last one
                 if (indentStack.length > 2) {
-                    const image = "";
+                    const image = ""
                     const offset = _.last(matchedTokens).endOffset + 1
                     const line = _.last(matchedTokens).endLine
                     const column = _.last(matchedTokens).endColumn + 1
-                    while (indentStack.length > 2 &&
-                    //stop before the last Outdent
-                    indentStack[indentStack.length - 2] > currIndentLevel) {
+                    while (
+                        indentStack.length > 2 &&
+                        //stop before the last Outdent
+                        indentStack[indentStack.length - 2] > currIndentLevel
+                    ) {
                         indentStack.pop()
-                        matchedTokens.push(createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN))
+                        matchedTokens.push(
+                            createTokenInstance(
+                                Outdent,
+                                "",
+                                NaN,
+                                NaN,
+                                NaN,
+                                NaN,
+                                NaN,
+                                NaN
+                            )
+                        )
                     }
                 }
                 indentStack.pop()
                 return match
-            }
-            else {
+            } else {
                 // same indent, this should be lexed as simple whitespace and ignored
                 return null
             }
-        }
-        else {
+        } else {
             // indentation cannot be matched without at least one space character.
             return null
         }
-    }
-    else {
+    } else {
         // indentation cannot be matched under other circumstances
         return null
     }
@@ -139,58 +152,63 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
 let matchIndent = _.partialRight(matchIndentBase, "indent")
 let matchOutdent = _.partialRight(matchIndentBase, "outdent")
 
-let If = createToken({name: "If", pattern: /if/})
-let Else = createToken({name: "Else", pattern: /else/})
-let Print = createToken({name: "Print", pattern: /print/})
-let IntegerLiteral = createToken({name: "IntegerLiteral", pattern: /\d+/})
-let Colon = createToken({name: "Colon", pattern: /:/})
-let LParen = createToken({name: "LParen", pattern: /\(/})
-let RParen = createToken({name: "RParen", pattern: /\)/})
-let Spaces = createToken({name: "Spaces", pattern: / +/, group: Lexer.SKIPPED})
+let If = createToken({ name: "If", pattern: /if/ })
+let Else = createToken({ name: "Else", pattern: /else/ })
+let Print = createToken({ name: "Print", pattern: /print/ })
+let IntegerLiteral = createToken({ name: "IntegerLiteral", pattern: /\d+/ })
+let Colon = createToken({ name: "Colon", pattern: /:/ })
+let LParen = createToken({ name: "LParen", pattern: /\(/ })
+let RParen = createToken({ name: "RParen", pattern: /\)/ })
+let Spaces = createToken({
+    name: "Spaces",
+    pattern: / +/,
+    group: Lexer.SKIPPED
+})
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
-let Newline = createToken({name: "Newline", pattern: /\n\r|\n|\r/, group: "nl"})
+let Newline = createToken({
+    name: "Newline",
+    pattern: /\n\r|\n|\r/,
+    group: "nl"
+})
 
 // define the indentation tokens using custom token patterns
-let Indent = createToken({name: "Indent", pattern: matchIndent})
-let Outdent = createToken({name: "Outdent", pattern: matchOutdent})
+let Indent = createToken({ name: "Indent", pattern: matchIndent })
+let Outdent = createToken({ name: "Outdent", pattern: matchOutdent })
 
-let customPatternLexer = new Lexer(
-    [
-        Newline,
-        // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
-        // Outdent must appear before Indent for handling zero spaces outdents.
-        Outdent,
-        Indent,
+let customPatternLexer = new Lexer([
+    Newline,
+    // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
+    // Outdent must appear before Indent for handling zero spaces outdents.
+    Outdent,
+    Indent,
 
-        Spaces,
-        If,
-        Else,
-        Print,
-        IntegerLiteral,
-        Colon,
-        LParen,
-        RParen
-    ])
+    Spaces,
+    If,
+    Else,
+    Print,
+    IntegerLiteral,
+    Colon,
+    LParen,
+    RParen
+])
 
 module.exports = {
-
     // for testing purposes
-    Newline:        IntegerLiteral,
-    Indent:         Indent,
-    Outdent:        Outdent,
-    Spaces:         Spaces,
-    If:             If,
-    Else:           Else,
-    Print:          Print,
+    Newline: IntegerLiteral,
+    Indent: Indent,
+    Outdent: Outdent,
+    Spaces: Spaces,
+    If: If,
+    Else: Else,
+    Print: Print,
     IntegerLiteral: IntegerLiteral,
-    Colon:          Colon,
-    LParen:         LParen,
-    RParen:         RParen,
+    Colon: Colon,
+    LParen: LParen,
+    RParen: RParen,
 
     tokenize: function(text) {
-
         // have to reset the indent stack between processing of different text inputs
         indentStack = [0]
         lastOffsetChecked = undefined
@@ -199,8 +217,10 @@ module.exports = {
 
         //add remaining Outdents
         while (indentStack.length > 1) {
-            lexResult.tokens.push(createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN))
-            indentStack.pop();
+            lexResult.tokens.push(
+                createTokenInstance(Outdent, "", NaN, NaN, NaN, NaN, NaN, NaN)
+            )
+            indentStack.pop()
         }
 
         if (lexResult.errors.length > 0) {

@@ -1,66 +1,96 @@
-import {Token} from "../../../../src/scan/tokens_public"
+import { Token } from "../../../../src/scan/tokens_public"
 
 export class VirtualToken extends Token {
-    constructor() {super() }
+    constructor() {
+        super()
+    }
 }
 
 export class IdentTok extends Token {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 // DOCS: once again an example of Token types hierarchies
 export class LiteralTok extends Token {}
 export class StringTok extends LiteralTok {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 export class IntTok extends LiteralTok {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class Keyword extends Token {}
 
 export class CreateTok extends Keyword {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class TableTok extends Keyword {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class InsertTok extends Keyword {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class IntoTok extends Keyword {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class DeleteTok extends Keyword {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class FromTok extends Keyword {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class LParenTok extends Token {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class RParenTok extends Token {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class CommaTok extends Token {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class SemiColonTok extends Token {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 export class DotTok extends Token {
-    constructor() {super()}
+    constructor() {
+        super()
+    }
 }
 
 /* tslint:disable:class-name */

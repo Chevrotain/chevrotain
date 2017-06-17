@@ -1,7 +1,7 @@
 import * as utils from "../utils/utils"
-import {isUndefined} from "../utils/utils"
+import { isUndefined } from "../utils/utils"
 
-export function classNameFromInstance(instance:any):string {
+export function classNameFromInstance(instance: any): string {
     return functionName(instance.constructor)
 }
 
@@ -9,8 +9,7 @@ const FUNC_NAME_REGEXP = /^\s*function\s*(\S*)\s*\(/
 const NAME = "name"
 
 /* istanbul ignore next too many hacks for IE/old versions of node.js here*/
-export function functionName(func:Function):string {
-
+export function functionName(func: Function): string {
     // Engines that support Function.prototype.name OR the nth (n>1) time after
     // the name has been computed in the following else block.
     let existingNameProp = (<any>func).name
@@ -27,16 +26,15 @@ export function functionName(func:Function):string {
 /**
  * @returns {boolean} - has the property been successfully defined
  */
-export function defineNameProp(obj, nameValue):boolean {
+export function defineNameProp(obj, nameValue): boolean {
     let namePropDescriptor = Object.getOwnPropertyDescriptor(obj, NAME)
     /* istanbul ignore else -> will only run in old versions of node.js */
-    if (isUndefined(namePropDescriptor) ||
-        namePropDescriptor.configurable) {
+    if (isUndefined(namePropDescriptor) || namePropDescriptor.configurable) {
         Object.defineProperty(obj, NAME, {
-            enumerable:   false,
+            enumerable: false,
             configurable: true,
-            writable:     false,
-            value:        nameValue
+            writable: false,
+            value: nameValue
         })
 
         return true
@@ -50,26 +48,25 @@ export function defineNameProp(obj, nameValue):boolean {
  * this should be removed once typescript supports ES6 style Hashtable
  */
 export class HashTable<V> {
-
     private _state = {}
 
-    keys():string[] {
+    keys(): string[] {
         return utils.keys(this._state)
     }
 
-    values():V[] {
+    values(): V[] {
         return <any>utils.values(this._state)
     }
 
-    put(key:string | number, value:V):void {
+    put(key: string | number, value: V): void {
         this._state[key] = value
     }
 
-    putAll(other:HashTable<V>):void {
+    putAll(other: HashTable<V>): void {
         this._state = utils.assign(this._state, other._state)
     }
 
-    get(key:string):V {
+    get(key: string): V {
         // To avoid edge case with a key called "hasOwnProperty" we need to perform the commented out check below
         // -> if (Object.prototype.hasOwnProperty.call(this._state, key)) { ... } <-
         // however this costs nearly 25% of the parser's runtime.
@@ -77,12 +74,11 @@ export class HashTable<V> {
         return this._state[key]
     }
 
-    containsKey(key:string):boolean {
+    containsKey(key: string): boolean {
         return utils.has(this._state, key)
     }
 
-    clear():void {
+    clear(): void {
         this._state = {}
     }
 }
-

@@ -6,14 +6,15 @@
 function serializeGrammarToFile(targetFilePath, varName, parserInstance) {
     var fs = require("fs")
     var serializedGrammar = parserInstance.getSerializedGastProductions()
-    var serializedGrammarText = JSON.stringify(serializedGrammar, null, "\t");
+    var serializedGrammarText = JSON.stringify(serializedGrammar, null, "\t")
 
     // generated a JavaScript file which exports the serialized grammar on the global scope (Window)
-    fs.writeFileSync(targetFilePath, 'var ' + varName + ' = ' + serializedGrammarText)
+    fs.writeFileSync(
+        targetFilePath,
+        "var " + varName + " = " + serializedGrammarText
+    )
 }
 
 module.exports = {
-
     serializeGrammarToFile: serializeGrammarToFile
-
 }

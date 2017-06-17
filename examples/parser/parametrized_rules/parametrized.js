@@ -41,32 +41,44 @@ class WhiteSpace extends Token {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED
 
-var allTokens = [WhiteSpace, Hello, World,
-    Cruel, Bad, Evil, Good, Wonderful, Amazing]
+var allTokens = [
+    WhiteSpace,
+    Hello,
+    World,
+    Cruel,
+    Bad,
+    Evil,
+    Good,
+    Wonderful,
+    Amazing
+]
 
 var HelloLexer = new Lexer(allTokens)
 
-
 // ----------------- parser -----------------
 class HelloParser extends chevrotain.Parser {
-
     constructor(input) {
-
         super(input, allTokens)
 
-        this.RULE("topRule", (mood) => {
+        this.RULE("topRule", mood => {
             // SUBRULE may be called with a array of arguments which will be passed to the sub-rule's implementation
             this.SUBRULE(this.hello, [mood])
         })
 
         // the <hello> rule's implementation is defined with a <mood> parameter
-        this.RULE("hello", (mood) => {
+        this.RULE("hello", mood => {
             this.CONSUME(Hello)
 
             // The mood parameter is used to determine which path to take
             this.OR([
-                {GATE: () => mood === "positive", ALT: () => this.SUBRULE(this.positive)},
-                {GATE: () => mood === "negative", ALT: () => this.SUBRULE(this.negative)}
+                {
+                    GATE: () => mood === "positive",
+                    ALT: () => this.SUBRULE(this.positive)
+                },
+                {
+                    GATE: () => mood === "negative",
+                    ALT: () => this.SUBRULE(this.negative)
+                }
             ])
 
             this.CONSUME(World)
@@ -74,17 +86,41 @@ class HelloParser extends chevrotain.Parser {
 
         this.RULE("negative", () => {
             this.OR([
-                {ALT: () => {this.CONSUME(Cruel)}},
-                {ALT: () => {this.CONSUME(Bad)}},
-                {ALT: () => {this.CONSUME(Evil)}}
+                {
+                    ALT: () => {
+                        this.CONSUME(Cruel)
+                    }
+                },
+                {
+                    ALT: () => {
+                        this.CONSUME(Bad)
+                    }
+                },
+                {
+                    ALT: () => {
+                        this.CONSUME(Evil)
+                    }
+                }
             ])
         })
 
         this.RULE("positive", () => {
             this.OR([
-                {ALT: () => {this.CONSUME(Good)}},
-                {ALT: () => {this.CONSUME(Wonderful)}},
-                {ALT: () => {this.CONSUME(Amazing)}}
+                {
+                    ALT: () => {
+                        this.CONSUME(Good)
+                    }
+                },
+                {
+                    ALT: () => {
+                        this.CONSUME(Wonderful)
+                    }
+                },
+                {
+                    ALT: () => {
+                        this.CONSUME(Amazing)
+                    }
+                }
             ])
         })
 
@@ -95,17 +131,16 @@ class HelloParser extends chevrotain.Parser {
     }
 }
 
-
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new HelloParser([]);
+var parser = new HelloParser([])
 
 module.exports = function(text, mood) {
     var lexResult = HelloLexer.tokenize(text)
 
     // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens;
+    parser.input = lexResult.tokens
 
     // Passing the argument to the top rule.
     // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
@@ -114,8 +149,8 @@ module.exports = function(text, mood) {
     var value = parser.topRule(1, [mood])
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
-    };
+    }
 }

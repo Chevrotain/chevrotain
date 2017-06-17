@@ -1,7 +1,6 @@
-import {HashTable} from "../../src/lang/lang_extensions"
+import { HashTable } from "../../src/lang/lang_extensions"
 
 describe("The HashTable implementation", () => {
-
     it("will return undefined for a key that does not exist, and the value for a key that does exist", () => {
         let hashTable = new HashTable<number>()
         hashTable.put("one", 1)

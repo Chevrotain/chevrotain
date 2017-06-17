@@ -1,15 +1,20 @@
-import {TokenConstructor} from "./lexer_public"
-import {cloneArr, contains, difference, forEach, getSuperClass, has} from "../utils/utils"
-import {IToken, Token, tokenName} from "./tokens_public"
-import {HashTable} from "../lang/lang_extensions"
-
+import { TokenConstructor } from "./lexer_public"
+import {
+    cloneArr,
+    contains,
+    difference,
+    forEach,
+    getSuperClass,
+    has
+} from "../utils/utils"
+import { IToken, Token, tokenName } from "./tokens_public"
+import { HashTable } from "../lang/lang_extensions"
 
 // TODO: rename "tokenInstanceOf" ?
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     if (tokInstance.tokenType === tokConstructor.tokenType) {
         return true
-    }
-    else if (tokConstructor.extendingTokenTypes.length > 0) {
+    } else if (tokConstructor.extendingTokenTypes.length > 0) {
         let extendingTokenTypes = tokConstructor.extendingTokenTypes
         let extendingTokenTypesLength = extendingTokenTypes.length
         for (let i = 0; i < extendingTokenTypesLength; i++) {
@@ -18,32 +23,33 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
             }
         }
         return false
-    }
-    else {
+    } else {
         return false
     }
 }
 
-export function tokenClassIdentity(tokenConstructor:TokenConstructor):string {
+export function tokenClassIdentity(tokenConstructor: TokenConstructor): string {
     return (<any>tokenConstructor).tokenType
 }
 
-export function tokenStructuredIdentity(token:TokenConstructor | IToken):string {
+export function tokenStructuredIdentity(
+    token: TokenConstructor | IToken
+): string {
     return (<any>token).tokenType
 }
 
-export function isBaseTokenOrObject(tokClass:TokenConstructor):boolean {
-    return isBaseTokenClass(tokClass) || <any>tokClass === Object
+export function isBaseTokenOrObject(tokClass: TokenConstructor): boolean {
+    return isBaseTokenClass(tokClass) || (<any>tokClass) === Object
 }
 
-export function isBaseTokenClass(tokClass:Function):boolean {
+export function isBaseTokenClass(tokClass: Function): boolean {
     return tokClass === Token
 }
 
 export let tokenShortNameIdx = 1
 export const tokenIdxToClass = new HashTable<TokenConstructor>()
 
-export function augmentTokenClasses(tokenClasses:TokenConstructor[]):void {
+export function augmentTokenClasses(tokenClasses: TokenConstructor[]): void {
     // 1. collect the parent Token classes as well.
     let tokenClassesAndParents = expandTokenHierarchy(tokenClasses)
 
@@ -54,11 +60,13 @@ export function augmentTokenClasses(tokenClasses:TokenConstructor[]):void {
     assignExtendingTokensProp(tokenClassesAndParents)
 }
 
-export function expandTokenHierarchy(tokenClasses:TokenConstructor[]):TokenConstructor[] {
+export function expandTokenHierarchy(
+    tokenClasses: TokenConstructor[]
+): TokenConstructor[] {
     let tokenClassesAndParents = cloneArr(tokenClasses)
 
-    forEach(tokenClasses, (currTokClass) => {
-        let currParentClass:any = getSuperClass(currTokClass)
+    forEach(tokenClasses, currTokClass => {
+        let currParentClass: any = getSuperClass(currTokClass)
         while (!isBaseTokenOrObject(currParentClass)) {
             if (!contains(tokenClassesAndParents, currParentClass)) {
                 tokenClassesAndParents.push(currParentClass)
@@ -70,11 +78,13 @@ export function expandTokenHierarchy(tokenClasses:TokenConstructor[]):TokenConst
     return tokenClassesAndParents
 }
 
-export function assignTokenDefaultProps(tokenClasses:TokenConstructor[]):void {
-    forEach(tokenClasses, (currTokClass) => {
+export function assignTokenDefaultProps(
+    tokenClasses: TokenConstructor[]
+): void {
+    forEach(tokenClasses, currTokClass => {
         if (!hasShortKeyProperty(currTokClass)) {
-            tokenIdxToClass.put(tokenShortNameIdx, currTokClass);
-            (<any>currTokClass).tokenType = tokenShortNameIdx++
+            tokenIdxToClass.put(tokenShortNameIdx, currTokClass)
+            ;(<any>currTokClass).tokenType = tokenShortNameIdx++
         }
 
         if (!hasExtendingTokensTypesProperty(currTokClass)) {
@@ -88,32 +98,44 @@ export function assignTokenDefaultProps(tokenClasses:TokenConstructor[]):void {
     })
 }
 
-export function assignExtendingTokensProp(tokenClasses:TokenConstructor[]):void {
-    forEach(tokenClasses, (currTokClass) => {
+export function assignExtendingTokensProp(
+    tokenClasses: TokenConstructor[]
+): void {
+    forEach(tokenClasses, currTokClass => {
         let currSubClassesExtendingTypes = [currTokClass.tokenType]
-        let currParentClass:any = getSuperClass(currTokClass)
+        let currParentClass: any = getSuperClass(currTokClass)
 
-        while (!isBaseTokenClass(currParentClass) && currParentClass !== Object) {
-            let newExtendingTypes = difference(currSubClassesExtendingTypes, currParentClass.extendingTokenTypes)
-            currParentClass.extendingTokenTypes = currParentClass.extendingTokenTypes.concat(newExtendingTypes)
+        while (
+            !isBaseTokenClass(currParentClass) &&
+            currParentClass !== Object
+        ) {
+            let newExtendingTypes = difference(
+                currSubClassesExtendingTypes,
+                currParentClass.extendingTokenTypes
+            )
+            currParentClass.extendingTokenTypes = currParentClass.extendingTokenTypes.concat(
+                newExtendingTypes
+            )
             currSubClassesExtendingTypes.push(currParentClass.tokenType)
             currParentClass = getSuperClass(currParentClass)
         }
     })
 }
 
-export function hasShortKeyProperty(tokClass:TokenConstructor):boolean {
+export function hasShortKeyProperty(tokClass: TokenConstructor): boolean {
     return has(tokClass, "tokenType")
 }
 
-export function hasExtendingTokensTypesProperty(tokClass:TokenConstructor):boolean {
+export function hasExtendingTokensTypesProperty(
+    tokClass: TokenConstructor
+): boolean {
     return has(tokClass, "extendingTokenTypes")
 }
 
-export function hasTokenNameProperty(tokClass:TokenConstructor):boolean {
+export function hasTokenNameProperty(tokClass: TokenConstructor): boolean {
     return has(tokClass, "tokenName")
 }
 
-export function isExtendingTokenType(tokType:TokenConstructor):boolean {
+export function isExtendingTokenType(tokType: TokenConstructor): boolean {
     return Token.prototype.isPrototypeOf(tokType.prototype)
 }

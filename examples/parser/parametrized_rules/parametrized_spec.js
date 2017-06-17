@@ -2,13 +2,12 @@ var expect = require("chai").expect
 var chevrotain = require("chevrotain")
 var NoViableAltException = chevrotain.exceptions.NoViableAltException
 
-var parseHello = parseHello = require("./parametrized")
+var parseHello = (parseHello = require("./parametrized"))
 
 var POSITIVE = "positive"
 var NEGATIVE = "negative"
 
 describe("The Grammar Parametrized Rules example - using ES6 syntax", function() {
-
     it("can parse a cheerful hello sentence in <positive> mode", function() {
         var inputText = "hello wonderful world"
         var result = parseHello(inputText, POSITIVE)

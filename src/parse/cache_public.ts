@@ -1,4 +1,4 @@
-import {clearCache as internalClearCache} from "./cache"
+import { clearCache as internalClearCache } from "./cache"
 
 /**
  * Clears the chevrotain internal cache.
@@ -6,6 +6,6 @@ import {clearCache as internalClearCache} from "./cache"
  * unique use cases for example: online playground where the a parser with the same name is initialized with
  * different implementations multiple times.
  */
-export function clearCache():void {
+export function clearCache(): void {
     internalClearCache()
 }

@@ -6,20 +6,43 @@ var Lexer = chevrotain.Lexer
 var Parser = chevrotain.Parser
 
 // In ES5 there are no classes, therefore utility methods must be used to create Token "classes".
-var True = createToken({name: "True", pattern: /true/})
-var False = createToken({name: "False", pattern: /false/})
-var Null = createToken({name: "Null", pattern: /null/})
-var LCurly = createToken({name: "LCurly", pattern: /{/})
-var RCurly = createToken({name: "RCurly", pattern: /}/})
-var LSquare = createToken({name: "LSquare", pattern: /\[/})
-var RSquare = createToken({name: "RSquare", pattern: /]/})
-var Comma = createToken({name: "Comma", pattern: /,/})
-var Colon = createToken({name: "Colon", pattern: /:/})
-var StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/});
-var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/});
-var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED})
+var True = createToken({ name: "True", pattern: /true/ })
+var False = createToken({ name: "False", pattern: /false/ })
+var Null = createToken({ name: "Null", pattern: /null/ })
+var LCurly = createToken({ name: "LCurly", pattern: /{/ })
+var RCurly = createToken({ name: "RCurly", pattern: /}/ })
+var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+var RSquare = createToken({ name: "RSquare", pattern: /]/ })
+var Comma = createToken({ name: "Comma", pattern: /,/ })
+var Colon = createToken({ name: "Colon", pattern: /:/ })
+var StringLiteral = createToken({
+    name: "StringLiteral",
+    pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+})
+var NumberLiteral = createToken({
+    name: "NumberLiteral",
+    pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+})
+var WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED
+})
 
-var allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
+var allTokens = [
+    WhiteSpace,
+    NumberLiteral,
+    StringLiteral,
+    LCurly,
+    RCurly,
+    LSquare,
+    RSquare,
+    Comma,
+    Colon,
+    True,
+    False,
+    Null
+]
 var JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
@@ -32,15 +55,24 @@ function JsonParserES5(input) {
 
     this.RULE("json", function() {
         $.OR([
-            {ALT: function() { $.SUBRULE($.object) }},
-            {ALT: function() { $.SUBRULE($.array) }}
+            {
+                ALT: function() {
+                    $.SUBRULE($.object)
+                }
+            },
+            {
+                ALT: function() {
+                    $.SUBRULE($.array)
+                }
+            }
         ])
     })
 
     this.RULE("object", function() {
         $.CONSUME(LCurly)
         $.MANY_SEP({
-            SEP: Comma, DEF: () => {
+            SEP: Comma,
+            DEF: () => {
                 $.SUBRULE2($.objectItem)
             }
         })
@@ -56,7 +88,8 @@ function JsonParserES5(input) {
     this.RULE("array", function() {
         $.CONSUME(LSquare)
         $.MANY_SEP({
-            SEP: Comma, DEF: () => {
+            SEP: Comma,
+            DEF: () => {
                 $.SUBRULE2($.value)
             }
         })
@@ -65,13 +98,41 @@ function JsonParserES5(input) {
 
     this.RULE("value", function() {
         $.OR([
-            {ALT: function() { $.CONSUME(StringLiteral) }},
-            {ALT: function() { $.CONSUME(NumberLiteral) }},
-            {ALT: function() { $.SUBRULE($.object) }},
-            {ALT: function() { $.SUBRULE($.array) }},
-            {ALT: function() { $.CONSUME(True) }},
-            {ALT: function() { $.CONSUME(False) }},
-            {ALT: function() { $.CONSUME(Null) }}
+            {
+                ALT: function() {
+                    $.CONSUME(StringLiteral)
+                }
+            },
+            {
+                ALT: function() {
+                    $.CONSUME(NumberLiteral)
+                }
+            },
+            {
+                ALT: function() {
+                    $.SUBRULE($.object)
+                }
+            },
+            {
+                ALT: function() {
+                    $.SUBRULE($.array)
+                }
+            },
+            {
+                ALT: function() {
+                    $.CONSUME(True)
+                }
+            },
+            {
+                ALT: function() {
+                    $.CONSUME(False)
+                }
+            },
+            {
+                ALT: function() {
+                    $.CONSUME(Null)
+                }
+            }
         ])
     })
 
@@ -100,8 +161,8 @@ module.exports = function(text) {
     var value = parser.json()
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
 }

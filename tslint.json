@@ -39,30 +39,11 @@
       "check-catch",
       "check-whitespace"
     ],
-    "quotemark": [
-      true,
-      "double"
-    ],
     "radix": true,
-    "semicolon": [
-      true,
-      "never"
-    ],
-    "trailing-comma": [
-      true,
-      "never"
-    ],
     "triple-equals": [
       true,
       "allow-null-check"
     ],
-    "variable-name": false,
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-separator"
-    ]
+    "variable-name": false
   }
 }

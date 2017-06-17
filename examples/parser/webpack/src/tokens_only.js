@@ -1,4 +1,4 @@
-import {Token, Lexer} from "chevrotain"
+import { Token, Lexer } from "chevrotain"
 // TODO: does babel support static properties?
 // Unfortunately no support for static class properties in ES2015, only in ES2016...
 // so the PATTERN/GROUP static props are defined outside the class declarations.

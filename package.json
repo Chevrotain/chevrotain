@@ -50,9 +50,10 @@
     "compile": "tsc",
     "compile_definitions": "tsc --noImplicitAny test_integration/definitions/es6_modules.ts --outDir dev/garbage",
     "compile_definitions_namespace": "tsc --noImplicitAny test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
-    "lint": "tslint --project tsconfig.json"
+    "lint": "tslint --project tsconfig.json",
+    "format": "prettier --no-semi --tab-width 4 --write \"(src|test)**/*.ts\" \"(src|test)**/*.js\"",
+    "verify_format" :"prettier --no-semi --tab-width 4 --list-different \"(src|test)**/*.ts\" \"(src|test)**/*.js\""
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.0.0",
     "@types/mocha": "^2.2.41",
@@ -84,6 +85,7 @@
     "load-grunt-tasks": "^3.5.2",
     "lodash": "^4.17.4",
     "mocha": "^3.4.2",
+    "prettier": "^1.4.4",
     "requirejs": "2.3.3",
     "semver": "^5.3.0",
     "tslint": "^5.4.2",

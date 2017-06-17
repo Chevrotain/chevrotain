@@ -1,5 +1,4 @@
-
-import {Token, Lexer, Parser} from "chevrotain"
+import { Token, Lexer, Parser } from "chevrotain"
 
 // ----------------- lexer -----------------
 // TODO: does babel support static properties?
@@ -27,7 +26,6 @@ const ArrayLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class ArrayParserCombined extends Parser {
-
     constructor(input) {
         super(input, allTokens)
         const $ = this
@@ -64,8 +62,8 @@ export function parse(text) {
     const value = parser.array()
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
 }

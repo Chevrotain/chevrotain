@@ -1,32 +1,62 @@
-import {
-    Lexer,
-    Parser,
-    Token
-} from "chevrotain"
+import { Lexer, Parser, Token } from "chevrotain"
 
 // Using TypeScript we have both classes and static properties to define Tokens
-class True extends Token { static PATTERN = /true/}
-class False extends Token { static PATTERN = /false/}
-class Null extends Token { static PATTERN = /null/}
-class LCurly extends Token { static PATTERN = /{/}
-class RCurly extends Token { static PATTERN = /}/}
-class LSquare extends Token { static PATTERN = /\[/}
-class RSquare extends Token { static PATTERN = /]/}
-class Comma extends Token { static PATTERN = /,/}
-class Colon extends Token { static PATTERN = /:/}
-class StringLiteral extends Token { static PATTERN = /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/}
-class NumberLiteral extends Token { static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/}
+class True extends Token {
+    static PATTERN = /true/
+}
+class False extends Token {
+    static PATTERN = /false/
+}
+class Null extends Token {
+    static PATTERN = /null/
+}
+class LCurly extends Token {
+    static PATTERN = /{/
+}
+class RCurly extends Token {
+    static PATTERN = /}/
+}
+class LSquare extends Token {
+    static PATTERN = /\[/
+}
+class RSquare extends Token {
+    static PATTERN = /]/
+}
+class Comma extends Token {
+    static PATTERN = /,/
+}
+class Colon extends Token {
+    static PATTERN = /:/
+}
+class StringLiteral extends Token {
+    static PATTERN = /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+}
+class NumberLiteral extends Token {
+    static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+}
 class WhiteSpace extends Token {
     static PATTERN = /\s+/
     static GROUP = Lexer.SKIPPED
 }
 
-const allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
+const allTokens = [
+    WhiteSpace,
+    NumberLiteral,
+    StringLiteral,
+    LCurly,
+    RCurly,
+    LSquare,
+    RSquare,
+    Comma,
+    Colon,
+    True,
+    False,
+    Null
+]
 const JsonLexer = new Lexer(allTokens)
 
 class JsonParserTypeScript extends Parser {
-
-    constructor(input:Token[]) {
+    constructor(input: Token[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
     }
@@ -38,8 +68,16 @@ class JsonParserTypeScript extends Parser {
     public json = this.RULE("json", () => {
         this.OR([
             // using ES6 Arrow functions to reduce verbosity.
-            {ALT: () => { this.SUBRULE(this.object) }},
-            {ALT: () => { this.SUBRULE(this.array) }}
+            {
+                ALT: () => {
+                    this.SUBRULE(this.object)
+                }
+            },
+            {
+                ALT: () => {
+                    this.SUBRULE(this.array)
+                }
+            }
         ])
     })
 
@@ -47,7 +85,8 @@ class JsonParserTypeScript extends Parser {
     private object = this.RULE("object", () => {
         this.CONSUME(LCurly)
         this.MANY_SEP({
-            SEP: Comma, DEF: () => {
+            SEP: Comma,
+            DEF: () => {
                 this.SUBRULE2(this.objectItem)
             }
         })
@@ -63,7 +102,8 @@ class JsonParserTypeScript extends Parser {
     private array = this.RULE("array", () => {
         this.CONSUME(LSquare)
         this.MANY_SEP({
-            SEP: Comma, DEF: () => {
+            SEP: Comma,
+            DEF: () => {
                 this.SUBRULE(this.value)
             }
         })
@@ -72,13 +112,13 @@ class JsonParserTypeScript extends Parser {
 
     private value = this.RULE("value", () => {
         this.OR([
-            {ALT: () => this.CONSUME(StringLiteral)},
-            {ALT: () => this.CONSUME(NumberLiteral)},
-            {ALT: () => this.SUBRULE(this.object)},
-            {ALT: () => this.SUBRULE(this.array)},
-            {ALT: () => this.CONSUME(True)},
-            {ALT: () => this.CONSUME(False)},
-            {ALT: () => this.CONSUME(Null)}
+            { ALT: () => this.CONSUME(StringLiteral) },
+            { ALT: () => this.CONSUME(NumberLiteral) },
+            { ALT: () => this.SUBRULE(this.object) },
+            { ALT: () => this.SUBRULE(this.array) },
+            { ALT: () => this.CONSUME(True) },
+            { ALT: () => this.CONSUME(False) },
+            { ALT: () => this.CONSUME(Null) }
         ])
     })
 }
@@ -97,8 +137,8 @@ export function parseJson(text) {
     // let value = parser.json_OopsTypo()
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
 }

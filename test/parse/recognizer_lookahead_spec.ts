@@ -1,15 +1,18 @@
-import {Token, extendToken} from "../../src/scan/tokens_public"
-import {Parser} from "../../src/parse/parser_public"
-import {HashTable} from "../../src/lang/lang_extensions"
-import {getLookaheadFuncsForClass} from "../../src/parse/cache"
-import {tokenStructuredMatcher} from "../../src/scan/tokens"
-import {clearCache} from "../../src/parse/cache_public"
-import {createRegularToken} from "../utils/matchers"
+import { Token, extendToken } from "../../src/scan/tokens_public"
+import { Parser } from "../../src/parse/parser_public"
+import { HashTable } from "../../src/lang/lang_extensions"
+import { getLookaheadFuncsForClass } from "../../src/parse/cache"
+import { tokenStructuredMatcher } from "../../src/scan/tokens"
+import { clearCache } from "../../src/parse/cache_public"
+import { createRegularToken } from "../utils/matchers"
 
-function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatcher) {
-
+function defineLookaheadSpecs(
+    contextName,
+    extendToken,
+    createToken,
+    tokenMatcher
+) {
     context("lookahead " + contextName, () => {
-
         after(() => {
             clearCache()
         })
@@ -22,24 +25,36 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         let SixTok = extendToken("SixTok")
         let Comma = extendToken("Comma")
 
-        const ALL_TOKENS = [OneTok, TwoTok, ThreeTok, FourTok, FiveTok, SixTok, Comma]
+        const ALL_TOKENS = [
+            OneTok,
+            TwoTok,
+            ThreeTok,
+            FourTok,
+            FiveTok,
+            SixTok,
+            Comma
+        ]
 
         describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", () => {
-
             class OptionsImplicitLookAheadParser extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS);
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS)
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public manyOptionsRule = this.RULE("manyOptionsRule", this.parseManyOptionsRule, () => { return "-666" })
+                public manyOptionsRule = this.RULE(
+                    "manyOptionsRule",
+                    this.parseManyOptionsRule,
+                    () => {
+                        return "-666"
+                    }
+                )
 
-                private parseManyOptionsRule():string {
+                private parseManyOptionsRule(): string {
                     let total = ""
 
                     this.OPTION1(() => {
@@ -115,21 +130,25 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("The implicit lookahead calculation functionality of the Recognizer For MANY", () => {
-
             class ManyImplicitLookAheadParser extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS);
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS)
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public manyRule = this.RULE("manyRule", this.parseManyRule, () => { return "-666" })
+                public manyRule = this.RULE(
+                    "manyRule",
+                    this.parseManyRule,
+                    () => {
+                        return "-666"
+                    }
+                )
 
-                private parseManyRule():string {
+                private parseManyRule(): string {
                     let total = ""
 
                     this.MANY1(() => {
@@ -198,8 +217,14 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
 
             it("can accept lookahead function param for flow mixing several MANYs", () => {
-                let input = [createToken(OneTok), createToken(OneTok), createToken(ThreeTok),
-                    createToken(ThreeTok), createToken(ThreeTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(OneTok),
+                    createToken(ThreeTok),
+                    createToken(ThreeTok),
+                    createToken(ThreeTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("113335")
             })
@@ -212,61 +237,79 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("The implicit lookahead calculation functionality of the Recognizer For MANY_SEP", () => {
-
             class ManySepImplicitLookAheadParser extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS);
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS)
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public manySepRule = this.RULE("manySepRule", this.parseManyRule, () => { return {total: 666, separators: []} })
+                public manySepRule = this.RULE(
+                    "manySepRule",
+                    this.parseManyRule,
+                    () => {
+                        return { total: 666, separators: [] }
+                    }
+                )
 
-                private parseManyRule():any {
-
+                private parseManyRule(): any {
                     let total = ""
                     let separators = []
 
-                    separators = separators.concat(this.MANY_SEP1({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(OneTok)
-                            total += "1"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.MANY_SEP1({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(OneTok)
+                                total += "1"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.MANY_SEP2({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(TwoTok)
-                            total += "2"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.MANY_SEP2({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(TwoTok)
+                                total += "2"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.MANY_SEP3({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(ThreeTok)
-                            total += "3"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.MANY_SEP3({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(ThreeTok)
+                                total += "3"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.MANY_SEP4({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(FourTok)
-                            total += "4"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.MANY_SEP4({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(FourTok)
+                                total += "4"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.MANY_SEP5({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(FiveTok)
-                            total += "5"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.MANY_SEP5({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(FiveTok)
+                                total += "5"
+                            }
+                        }).separators
+                    )
 
-                    return {total: total, separators: separators}
+                    return { total: total, separators: separators }
                 }
             }
 
@@ -307,13 +350,26 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
 
             it("can accept lookahead function param for flow mixing several MANY_SEPs", () => {
-                let input = [createToken(OneTok), createToken(Comma), createToken(OneTok), createToken(ThreeTok), createToken(Comma),
-                    createToken(ThreeTok), createToken(Comma), createToken(ThreeTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(Comma),
+                    createToken(OneTok),
+                    createToken(ThreeTok),
+                    createToken(Comma),
+                    createToken(ThreeTok),
+                    createToken(Comma),
+                    createToken(ThreeTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 let result = parser.manySepRule()
                 expect(result.total).to.equal("113335")
                 expect(result.separators).to.have.length(3)
-                expect(result.separators).to.deep.equal([createToken(Comma), createToken(Comma), createToken(Comma)])
+                expect(result.separators).to.deep.equal([
+                    createToken(Comma),
+                    createToken(Comma),
+                    createToken(Comma)
+                ])
             })
 
             it("will cache the generatedLookAhead functions AFTER (check cache is filled)", () => {
@@ -324,21 +380,27 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE", () => {
-
             class AtLeastOneImplicitLookAheadParser extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS);
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS)
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public atLeastOneRule = this.RULE("atLeastOneRule", this.parseAtLeastOneRule, {recoveryValueFunc: () => { return "-666" }})
+                public atLeastOneRule = this.RULE(
+                    "atLeastOneRule",
+                    this.parseAtLeastOneRule,
+                    {
+                        recoveryValueFunc: () => {
+                            return "-666"
+                        }
+                    }
+                )
 
-                private parseAtLeastOneRule():string {
+                private parseAtLeastOneRule(): string {
                     let total = ""
 
                     this.AT_LEAST_ONE1(() => {
@@ -377,15 +439,26 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
 
             it("can accept lookahead function param for AT_LEAST_ONE1-5", () => {
-                let input = [createToken(OneTok), createToken(TwoTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(FourTok), createToken(FourTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(FourTok),
+                    createToken(FourTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new AtLeastOneImplicitLookAheadParser(input)
                 expect(parser.atLeastOneRule()).to.equal("1223445")
             })
 
             it("will fail when zero occurrences of AT_LEAST_ONE in input", () => {
-                let input = [createToken(OneTok), createToken(TwoTok), /*createToken(ThreeTok),*/
-                    createToken(FourTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(TwoTok) /*createToken(ThreeTok),*/,
+                    createToken(FourTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new AtLeastOneImplicitLookAheadParser(input)
                 expect(parser.atLeastOneRule()).to.equal("-666")
             })
@@ -398,61 +471,81 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE_SEP", () => {
-
             class AtLeastOneSepImplicitLookAheadParser extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS);
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS)
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public atLeastOneSepRule = this.RULE("atLeastOneSepRule", this.parseAtLeastOneRule,
-                    {recoveryValueFunc: () => { return {total: "-666", separators: []}}})
+                public atLeastOneSepRule = this.RULE(
+                    "atLeastOneSepRule",
+                    this.parseAtLeastOneRule,
+                    {
+                        recoveryValueFunc: () => {
+                            return { total: "-666", separators: [] }
+                        }
+                    }
+                )
 
-                private parseAtLeastOneRule():any {
+                private parseAtLeastOneRule(): any {
                     let total = ""
                     let separators = []
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP1({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(OneTok)
-                            total += "1"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP1({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(OneTok)
+                                total += "1"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP2({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(TwoTok)
-                            total += "2"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP2({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(TwoTok)
+                                total += "2"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP3({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(ThreeTok)
-                            total += "3"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP3({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(ThreeTok)
+                                total += "3"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP4({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(FourTok)
-                            total += "4"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP4({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(FourTok)
+                                total += "4"
+                            }
+                        }).separators
+                    )
 
-                    separators = separators.concat(this.AT_LEAST_ONE_SEP5({
-                        SEP: Comma, DEF: () => {
-                            this.CONSUME1(FiveTok)
-                            total += "5"
-                        }
-                    }).separators)
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP5({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(FiveTok)
+                                total += "5"
+                            }
+                        }).separators
+                    )
 
-                    return {total: total, separators: separators}
+                    return { total: total, separators: separators }
                 }
             }
 
@@ -463,17 +556,33 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
 
             it("can accept lookahead function param for AT_LEAST_ONE_SEP1-5", () => {
-                let input = [createToken(OneTok), createToken(TwoTok), createToken(Comma), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(FourTok), createToken(Comma), createToken(FourTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(Comma),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(FourTok),
+                    createToken(Comma),
+                    createToken(FourTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new AtLeastOneSepImplicitLookAheadParser(input)
                 let parseResult = parser.atLeastOneSepRule()
                 expect(parseResult.total).to.equal("1223445")
-                expect(parseResult.separators).to.deep.equal([createToken(Comma), createToken(Comma)])
+                expect(parseResult.separators).to.deep.equal([
+                    createToken(Comma),
+                    createToken(Comma)
+                ])
             })
 
             it("will fail when zero occurrences of AT_LEAST_ONE_SEP in input", () => {
-                let input = [createToken(OneTok), createToken(TwoTok),
-                    /*createToken(ThreeTok),*/ createToken(FourTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    /*createToken(ThreeTok),*/ createToken(FourTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new AtLeastOneSepImplicitLookAheadParser(input)
                 expect(parser.atLeastOneSepRule().total).to.equal("-666")
             })
@@ -486,140 +595,190 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("The implicit lookahead calculation functionality of the Recognizer For OR", () => {
-
             class OrImplicitLookAheadParser extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
-                    super(input, ALL_TOKENS);
-                    (<any>Parser).performSelfAnalysis(this)
+                constructor(input: Token[] = []) {
+                    super(input, ALL_TOKENS)
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public orRule = this.RULE("orRule", this.parseOrRule, {recoveryValueFunc: () => "-666"})
+                public orRule = this.RULE("orRule", this.parseOrRule, {
+                    recoveryValueFunc: () => "-666"
+                })
 
-                private parseOrRule():string {
+                private parseOrRule(): string {
                     let total = ""
 
                     // @formatter:off
-            this.OR1([
-                {ALT: () => {
-                    this.CONSUME1(OneTok)
-                    total += "A1"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(TwoTok)
-                    total += "A2"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(ThreeTok)
-                    total += "A3"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(FourTok)
-                    total += "A4"
-                }},
-                {ALT: () => {
-                    this.CONSUME1(FiveTok)
-                    total += "A5"
-                }},
-            ])
+                    this.OR1([
+                        {
+                            ALT: () => {
+                                this.CONSUME1(OneTok)
+                                total += "A1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(TwoTok)
+                                total += "A2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(ThreeTok)
+                                total += "A3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(FourTok)
+                                total += "A4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(FiveTok)
+                                total += "A5"
+                            }
+                        }
+                    ])
 
-            this.OR2([
-                {ALT: () => {
-                    this.CONSUME2(OneTok)
-                    total += "B1"
-                }},
-                {ALT: () => {
-                    this.CONSUME2(FourTok)
-                    total += "B4"
-                }},
-                {ALT: () => {
-                    this.CONSUME2(ThreeTok)
-                    total += "B3"
-                }},
-                 {ALT: () => {
-                    this.CONSUME2(TwoTok)
-                    total += "B2"
-                }},
-                {ALT: () => {
-                    this.CONSUME2(FiveTok)
-                    total += "B5"
-                }},
-            ])
+                    this.OR2([
+                        {
+                            ALT: () => {
+                                this.CONSUME2(OneTok)
+                                total += "B1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(FourTok)
+                                total += "B4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(ThreeTok)
+                                total += "B3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(TwoTok)
+                                total += "B2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(FiveTok)
+                                total += "B5"
+                            }
+                        }
+                    ])
 
-            this.OR3([
-                {ALT: () => {
-                    this.CONSUME3(TwoTok)
-                    total += "C2"
-                }},
-                {ALT: () => {
-                    this.CONSUME3(FourTok)
-                    total += "C4"
-                }},
-                {ALT: () => {
-                    this.CONSUME3(ThreeTok)
-                    total += "C3"
-                }},
-                {ALT: () => {
-                    this.CONSUME3(FiveTok)
-                    total += "C5"
-                }},
-                 {ALT: () => {
-                    this.CONSUME3(OneTok)
-                    total += "C1"
-                }}
-            ])
+                    this.OR3([
+                        {
+                            ALT: () => {
+                                this.CONSUME3(TwoTok)
+                                total += "C2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(FourTok)
+                                total += "C4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(ThreeTok)
+                                total += "C3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(FiveTok)
+                                total += "C5"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(OneTok)
+                                total += "C1"
+                            }
+                        }
+                    ])
 
-            this.OR4([
-                {ALT: () => {
-                    this.CONSUME4(OneTok)
-                    total += "D1"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(ThreeTok)
-                    total += "D3"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(FourTok)
-                    total += "D4"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(TwoTok)
-                    total += "D2"
-                }},
-                {ALT: () => {
-                    this.CONSUME4(FiveTok)
-                    total += "D5"
-                }}
-            ])
+                    this.OR4([
+                        {
+                            ALT: () => {
+                                this.CONSUME4(OneTok)
+                                total += "D1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(ThreeTok)
+                                total += "D3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(FourTok)
+                                total += "D4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(TwoTok)
+                                total += "D2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(FiveTok)
+                                total += "D5"
+                            }
+                        }
+                    ])
 
-            this.OR5([
-                {ALT: () => {
-                    this.CONSUME5(TwoTok)
-                    total += "E2"
-                }},
-                 {ALT: () => {
-                    this.CONSUME5(OneTok)
-                    total += "E1"
-                }},
-                {ALT: () => {
-                    this.CONSUME5(FourTok)
-                    total += "E4"
-                }},
-                 {ALT: () => {
-                    this.CONSUME5(ThreeTok)
-                    total += "E3"
-                }},
-                {ALT: () => {
-                    this.CONSUME5(FiveTok)
-                    total += "E5"
-                }},
-            ])
+                    this.OR5([
+                        {
+                            ALT: () => {
+                                this.CONSUME5(TwoTok)
+                                total += "E2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(OneTok)
+                                total += "E1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(FourTok)
+                                total += "E4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(ThreeTok)
+                                total += "E3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(FiveTok)
+                                total += "E5"
+                            }
+                        }
+                    ])
 
-            // @formatter:on
+                    // @formatter:on
                     return total
                 }
             }
@@ -631,7 +790,13 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
 
             it("can compute the lookahead automatically for OR1-5", () => {
-                let input = [createToken(OneTok), createToken(TwoTok), createToken(ThreeTok), createToken(FourTok), createToken(FiveTok)]
+                let input = [
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(FourTok),
+                    createToken(FiveTok)
+                ]
                 let parser = new OrImplicitLookAheadParser(input)
                 expect(parser.orRule()).to.equal("A1B2C3D4E5")
             })
@@ -650,79 +815,107 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("OR production ambiguity detection when using implicit lookahead calculation", () => {
-
             it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", () => {
-
                 class OrAmbiguityLookAheadParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
-                    public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
+                    public ambiguityRule = this.RULE(
+                        "ambiguityRule",
+                        this.parseAmbiguityRule
+                    )
 
-                    private parseAmbiguityRule():void {
+                    private parseAmbiguityRule(): void {
                         this.OR1([
-                            {ALT: () => {this.CONSUME1(OneTok)}},
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(OneTok)
+                                }
+                            },
                             // <-- this alternative starts with the same token as the previous one, ambiguity!
-                            {ALT: () => { this.CONSUME2(OneTok)}},
-                            {ALT: () => { this.CONSUME2(TwoTok)}},
-                            {ALT: () => {this.CONSUME2(ThreeTok)}}
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(OneTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(TwoTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(ThreeTok)
+                                }
+                            }
                         ])
                     }
                 }
 
-                expect(() => new OrAmbiguityLookAheadParser()).to.throw("Ambiguous alternatives")
-                expect(() => new OrAmbiguityLookAheadParser()).to.throw("OneTok")
+                expect(() => new OrAmbiguityLookAheadParser()).to.throw(
+                    "Ambiguous alternatives"
+                )
+                expect(() => new OrAmbiguityLookAheadParser()).to.throw(
+                    "OneTok"
+                )
             })
 
             it("will throw an error when two alternatives have the same multi token (lookahead > 1) prefix", () => {
-
                 class OrAmbiguityMultiTokenLookAheadParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
-                    public ambiguityRule = this.RULE("ambiguityRule", this.parseAmbiguityRule)
+                    public ambiguityRule = this.RULE(
+                        "ambiguityRule",
+                        this.parseAmbiguityRule
+                    )
 
-                    private parseAmbiguityRule():void {
-
+                    private parseAmbiguityRule(): void {
                         // @formatter:off
                         this.OR1([
-                            {ALT: () => {
-                                this.CONSUME1(OneTok)
-                            }},
-                            {ALT: () => {
-                                this.CONSUME1(TwoTok)
-                                this.CONSUME1(ThreeTok)
-                                this.CONSUME1(FourTok)
-                            }},
-                            {ALT: () => {
-                                this.CONSUME2(TwoTok)
-                                this.CONSUME2(ThreeTok)
-                                this.CONSUME2(FourTok)
-                            }}
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(OneTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(TwoTok)
+                                    this.CONSUME1(ThreeTok)
+                                    this.CONSUME1(FourTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME2(TwoTok)
+                                    this.CONSUME2(ThreeTok)
+                                    this.CONSUME2(FourTok)
+                                }
+                            }
                             // @formatter:on
                         ])
                     }
                 }
-                expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw("Ambiguous alternatives")
-                expect(() => new OrAmbiguityMultiTokenLookAheadParser()).to.throw("TwoTok, ThreeTok, FourTok")
+                expect(
+                    () => new OrAmbiguityMultiTokenLookAheadParser()
+                ).to.throw("Ambiguous alternatives")
+                expect(
+                    () => new OrAmbiguityMultiTokenLookAheadParser()
+                ).to.throw("TwoTok, ThreeTok, FourTok")
             })
         })
 
         describe("The implicit lookahead calculation functionality of the Recognizer For OR (with IGNORE_AMBIGUITIES)", () => {
-
             class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
-
-                public getLookAheadCache():HashTable<Function> {
+                public getLookAheadCache(): HashTable<Function> {
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input:Token[] = []) {
+                constructor(input: Token[] = []) {
                     super(input, ALL_TOKENS, {
                         ignoredIssues: {
                             orRule: {
@@ -733,133 +926,181 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                                 OR5: true
                             }
                         }
-                    });
-
-                    (<any>Parser).performSelfAnalysis(this)
+                    })
+                    ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public orRule = this.RULE("orRule", this.parseOrRule, {recoveryValueFunc: () => "-666"})
+                public orRule = this.RULE("orRule", this.parseOrRule, {
+                    recoveryValueFunc: () => "-666"
+                })
 
-                private parseOrRule():string {
+                private parseOrRule(): string {
                     let total = ""
 
                     // @formatter:off
                     this.OR([
-                        {ALT: () => {
-                            this.CONSUME1(OneTok)
-                            total += "A1"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME2(OneTok)
-                            total += "OOPS!"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME1(ThreeTok)
-                            total += "A3"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME1(FourTok)
-                            total += "A4"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME1(FiveTok)
-                            total += "A5"
-                        }},
+                        {
+                            ALT: () => {
+                                this.CONSUME1(OneTok)
+                                total += "A1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(OneTok)
+                                total += "OOPS!"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(ThreeTok)
+                                total += "A3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(FourTok)
+                                total += "A4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME1(FiveTok)
+                                total += "A5"
+                            }
+                        }
                     ])
 
                     this.OR2([
-                        {ALT: () => {
-                            this.CONSUME2(FourTok)
-                            total += "B4"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME2(ThreeTok)
-                            total += "B3"
-                        }},
-                         {ALT: () => {
-                            this.CONSUME2(TwoTok)
-                            total += "B2"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME3(TwoTok)
-                            total += "OOPS!"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME2(FiveTok)
-                            total += "B5"
-                        }},
+                        {
+                            ALT: () => {
+                                this.CONSUME2(FourTok)
+                                total += "B4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(ThreeTok)
+                                total += "B3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(TwoTok)
+                                total += "B2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(TwoTok)
+                                total += "OOPS!"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME2(FiveTok)
+                                total += "B5"
+                            }
+                        }
                     ])
 
                     this.OR3([
-                        {ALT: () => {
-                            this.CONSUME3(FourTok)
-                            total += "C4"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME3(ThreeTok)
-                            total += "C3"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME4(ThreeTok)
-                            total += "OOPS!"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME3(FiveTok)
-                            total += "C5"
-                        }},
-                         {ALT: () => {
-                            this.CONSUME3(OneTok)
-                            total += "C1"
-                        }}
+                        {
+                            ALT: () => {
+                                this.CONSUME3(FourTok)
+                                total += "C4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(ThreeTok)
+                                total += "C3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(ThreeTok)
+                                total += "OOPS!"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(FiveTok)
+                                total += "C5"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME3(OneTok)
+                                total += "C1"
+                            }
+                        }
                     ])
 
                     this.OR4([
-                        {ALT: () => {
-                            this.CONSUME4(OneTok)
-                            total += "D1"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME4(FourTok)
-                            total += "D4"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME5(FourTok)
-                            total += "OOPS!"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME4(TwoTok)
-                            total += "D2"
-                        }},
+                        {
+                            ALT: () => {
+                                this.CONSUME4(OneTok)
+                                total += "D1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(FourTok)
+                                total += "D4"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(FourTok)
+                                total += "OOPS!"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(TwoTok)
+                                total += "D2"
+                            }
+                        }
                     ])
 
                     this.OR5([
-                        {ALT: () => {
-                            this.CONSUME5(TwoTok)
-                            total += "E2"
-                        }},
-                         {ALT: () => {
-                            this.CONSUME5(OneTok)
-                            total += "E1"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME4(FiveTok)
-                            total += "E5"
-                        }},
-                         {ALT: () => {
-                            this.CONSUME5(ThreeTok)
-                            total += "E3"
-                        }},
-                        {ALT: () => {
-                            this.CONSUME5(FiveTok)
-                            total += "OOPS!"
-                        }},
+                        {
+                            ALT: () => {
+                                this.CONSUME5(TwoTok)
+                                total += "E2"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(OneTok)
+                                total += "E1"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME4(FiveTok)
+                                total += "E5"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(ThreeTok)
+                                total += "E3"
+                            }
+                        },
+                        {
+                            ALT: () => {
+                                this.CONSUME5(FiveTok)
+                                total += "OOPS!"
+                            }
+                        }
                     ])
 
-                 // @formatter:on
+                    // @formatter:on
                     return total
                 }
             }
-
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
@@ -868,14 +1109,24 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
             })
 
             it("can compute the lookahead automatically for OR1-5", () => {
-                let input = [createToken(OneTok), createToken(TwoTok), createToken(ThreeTok), createToken(FourTok), createToken(FiveTok)]
-                let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
+                let input = [
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(FourTok),
+                    createToken(FiveTok)
+                ]
+                let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(
+                    input
+                )
                 expect(parser.orRule()).to.equal("A1B2C3D4E5")
             })
 
             it("will fail when none of the alternatives match", () => {
                 let input = [createToken(SixTok)]
-                let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(input)
+                let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(
+                    input
+                )
                 expect(parser.orRule()).to.equal("-666")
             })
 
@@ -887,13 +1138,11 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
         })
 
         describe("The support for MultiToken (K>1) implicit lookahead capabilities in DSL Production:", () => {
-
             it("OPTION", () => {
                 class MultiTokenLookAheadForOptionParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -910,21 +1159,27 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     })
                 }
 
-                let parser = new MultiTokenLookAheadForOptionParser([createToken(OneTok), createToken(TwoTok)])
+                let parser = new MultiTokenLookAheadForOptionParser([
+                    createToken(OneTok),
+                    createToken(TwoTok)
+                ])
                 expect(parser.rule()).to.equal("OPTION Not Taken")
 
-                let parser2 = new MultiTokenLookAheadForOptionParser([createToken(OneTok),
-                    createToken(TwoTok), createToken(ThreeTok), createToken(
-                        OneTok), createToken(TwoTok)])
+                let parser2 = new MultiTokenLookAheadForOptionParser([
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(OneTok),
+                    createToken(TwoTok)
+                ])
                 expect(parser2.rule()).to.equal("OPTION Taken")
             })
 
             it("MANY", () => {
                 class MultiTokenLookAheadForManyParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public rule = this.RULE("orRule", () => {
@@ -941,35 +1196,47 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     })
                 }
 
-                let parser = new MultiTokenLookAheadForManyParser([createToken(OneTok), createToken(TwoTok)])
+                let parser = new MultiTokenLookAheadForManyParser([
+                    createToken(OneTok),
+                    createToken(TwoTok)
+                ])
                 expect(parser.rule()).to.equal(0)
 
                 let oneIterationParser = new MultiTokenLookAheadForManyParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(OneTok),
+                    createToken(TwoTok)
                 ])
                 expect(oneIterationParser.rule()).to.equal(1)
 
                 let twoIterationsParser = new MultiTokenLookAheadForManyParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok),
+                    createToken(OneTok),
+                    createToken(TwoTok)
+                ])
 
                 expect(twoIterationsParser.rule()).to.equal(2)
             })
 
             it("MANY_SEP", () => {
                 class MultiTokenLookAheadForManySepParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public rule = this.RULE("orRule", () => {
                         let numOfIterations = 0
                         this.MANY_SEP({
-                            SEP: Comma, DEF: () => {
+                            SEP: Comma,
+                            DEF: () => {
                                 this.CONSUME1(OneTok)
                                 this.CONSUME1(TwoTok)
                                 this.CONSUME1(ThreeTok)
@@ -982,76 +1249,112 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     })
                 }
 
-                let parser = new MultiTokenLookAheadForManySepParser([createToken(OneTok), createToken(TwoTok)])
+                let parser = new MultiTokenLookAheadForManySepParser([
+                    createToken(OneTok),
+                    createToken(TwoTok)
+                ])
                 expect(parser.rule()).to.equal(0)
 
-                let oneIterationParser = new MultiTokenLookAheadForManySepParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let oneIterationParser = new MultiTokenLookAheadForManySepParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
                 expect(oneIterationParser.rule()).to.equal(1)
 
-                let twoIterationsParser = new MultiTokenLookAheadForManySepParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok), createToken(Comma),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let twoIterationsParser = new MultiTokenLookAheadForManySepParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(Comma),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
                 expect(twoIterationsParser.rule()).to.equal(2)
             })
 
             it("OR", () => {
                 class MultiTokenLookAheadForOrParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public orRule = this.RULE("orRule", () => {
                         return this.OR([
                             // @formatter:off
-                    {ALT: () => {
-                        this.CONSUME1(OneTok)
-                        this.CONSUME2(OneTok)
-                        return "alt1 Taken"
-                    }},
-                    {ALT: () => {
-                        this.CONSUME3(OneTok)
-                        this.CONSUME1(TwoTok)
-                        this.CONSUME1(ThreeTok)
-                        return "alt2 Taken"
-                    }},
-                    {ALT: () => {
-                        this.CONSUME4(OneTok)
-                        this.CONSUME2(TwoTok)
-                        return "alt3 Taken"
-                    }},
-                    {ALT: () => {
-                        this.CONSUME1(FourTok)
-                        return "alt4 Taken"
-                    }}
-                    // @formatter:on
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(OneTok)
+                                    this.CONSUME2(OneTok)
+                                    return "alt1 Taken"
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME3(OneTok)
+                                    this.CONSUME1(TwoTok)
+                                    this.CONSUME1(ThreeTok)
+                                    return "alt2 Taken"
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME4(OneTok)
+                                    this.CONSUME2(TwoTok)
+                                    return "alt3 Taken"
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(FourTok)
+                                    return "alt4 Taken"
+                                }
+                            }
+                            // @formatter:on
                         ])
                     })
                 }
 
-                let alt1Parser = new MultiTokenLookAheadForOrParser([createToken(OneTok), createToken(OneTok)])
+                let alt1Parser = new MultiTokenLookAheadForOrParser([
+                    createToken(OneTok),
+                    createToken(OneTok)
+                ])
                 expect(alt1Parser.orRule()).to.equal("alt1 Taken")
 
-                let alt2Parser = new MultiTokenLookAheadForOrParser([createToken(OneTok), createToken(TwoTok), createToken(ThreeTok)])
+                let alt2Parser = new MultiTokenLookAheadForOrParser([
+                    createToken(OneTok),
+                    createToken(TwoTok),
+                    createToken(ThreeTok)
+                ])
                 expect(alt2Parser.orRule()).to.equal("alt2 Taken")
 
-                let alt3Parser = new MultiTokenLookAheadForOrParser([createToken(OneTok), createToken(TwoTok)])
+                let alt3Parser = new MultiTokenLookAheadForOrParser([
+                    createToken(OneTok),
+                    createToken(TwoTok)
+                ])
                 expect(alt3Parser.orRule()).to.equal("alt3 Taken")
 
-                let alt4Parser = new MultiTokenLookAheadForOrParser([createToken(FourTok)])
+                let alt4Parser = new MultiTokenLookAheadForOrParser([
+                    createToken(FourTok)
+                ])
                 expect(alt4Parser.orRule()).to.equal("alt4 Taken")
             })
 
             it("AT_LEAST_ONE", () => {
                 class MultiTokenLookAheadForAtLeastOneParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public rule = this.RULE("orRule", () => {
@@ -1068,40 +1371,63 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     })
                 }
 
-                let oneIterationParser = new MultiTokenLookAheadForAtLeastOneParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)
-                ])
+                let oneIterationParser = new MultiTokenLookAheadForAtLeastOneParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
                 expect(oneIterationParser.rule()).to.equal(1)
 
-                let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
 
                 expect(twoIterationsParser.rule()).to.equal(2)
 
-                let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
 
                 expect(threeIterationsParser.rule()).to.equal(3)
             })
 
             it("AT_LEAST_ONE_SEP", () => {
                 class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
-
-                    constructor(input:Token[] = []) {
-                        super(input, ALL_TOKENS);
-                        (<any>Parser).performSelfAnalysis(this)
+                    constructor(input: Token[] = []) {
+                        super(input, ALL_TOKENS)
+                        ;(<any>Parser).performSelfAnalysis(this)
                     }
 
                     public rule = this.RULE("orRule", () => {
                         let numOfIterations = 0
                         this.AT_LEAST_ONE_SEP({
-                            SEP: Comma, DEF: () => {
+                            SEP: Comma,
+                            DEF: () => {
                                 this.CONSUME1(OneTok)
                                 this.CONSUME1(TwoTok)
                                 this.CONSUME1(ThreeTok)
@@ -1114,27 +1440,59 @@ function defineLookaheadSpecs(contextName, extendToken, createToken, tokenMatche
                     })
                 }
 
-                let oneIterationParser = new MultiTokenLookAheadForAtLeastOneSepParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let oneIterationParser = new MultiTokenLookAheadForAtLeastOneSepParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
                 expect(oneIterationParser.rule()).to.equal(1)
 
-                let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok), createToken(Comma),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(Comma),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
                 expect(twoIterationsParser.rule()).to.equal(2)
 
-                let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser([
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok), createToken(Comma),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok), createToken(Comma),
-                    createToken(OneTok), createToken(TwoTok), createToken(ThreeTok),
-                    createToken(OneTok), createToken(TwoTok)])
+                let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
+                    [
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(Comma),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(Comma),
+                        createToken(OneTok),
+                        createToken(TwoTok),
+                        createToken(ThreeTok),
+                        createToken(OneTok),
+                        createToken(TwoTok)
+                    ]
+                )
                 expect(threeIterationsParser.rule()).to.equal(3)
             })
         })
     })
 }
 
-defineLookaheadSpecs("Regular Tokens Mode", extendToken, createRegularToken, tokenStructuredMatcher)
+defineLookaheadSpecs(
+    "Regular Tokens Mode",
+    extendToken,
+    createRegularToken,
+    tokenStructuredMatcher
+)
 // TODO: variant probably not needed

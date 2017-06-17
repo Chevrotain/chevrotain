@@ -23,7 +23,6 @@ const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
 class SelectParser extends Parser {
-
     constructor(input, config) {
         super(input, tokenVocabulary, config)
         const $ = this
@@ -39,7 +38,8 @@ class SelectParser extends Parser {
         this.selectClause = $.RULE("selectClause", () => {
             $.CONSUME(Select)
             $.AT_LEAST_ONE_SEP({
-                SEP: Comma, DEF: () => {
+                SEP: Comma,
+                DEF: () => {
                     $.CONSUME(Identifier)
                 }
             })
@@ -65,15 +65,31 @@ class SelectParser extends Parser {
 
         this.atomicExpression = $.RULE("atomicExpression", () => {
             $.OR([
-                {ALT: () => { $.CONSUME(Integer)}},
-                {ALT: () => { $.CONSUME(Identifier)}}
+                {
+                    ALT: () => {
+                        $.CONSUME(Integer)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(Identifier)
+                    }
+                }
             ])
         })
 
         this.relationalOperator = $.RULE("relationalOperator", () => {
             $.OR([
-                {ALT: () => { $.CONSUME(GreaterThan)}},
-                {ALT: () => { $.CONSUME(LessThan)}}
+                {
+                    ALT: () => {
+                        $.CONSUME(GreaterThan)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(LessThan)
+                    }
+                }
             ])
         })
 
@@ -102,7 +118,10 @@ module.exports = {
         parserInstance.selectStatement()
 
         if (parserInstance.errors.length > 0) {
-            throw Error("Sad sad panda, parsing errors detected!\n" + parserInstance.errors[0].message)
+            throw Error(
+                "Sad sad panda, parsing errors detected!\n" +
+                    parserInstance.errors[0].message
+            )
         }
     }
 }

@@ -1,10 +1,9 @@
 // Using ES6 style imports for Chevrotain, this means Webpack 2 can perform tree shaking
-import {Parser} from "chevrotain"
+import { Parser } from "chevrotain"
 // Using commonjs require to import the tokens instead of ES6 imports to avoid Webpack tree shaking.
 const tokens = require("./tokens_only")
 
 class ArrayParserCommonJS extends Parser {
-
     constructor(input) {
         super(input, tokens.allTokens)
         const $ = this
@@ -38,8 +37,8 @@ export function parse(text) {
     const value = parser.array()
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
 }

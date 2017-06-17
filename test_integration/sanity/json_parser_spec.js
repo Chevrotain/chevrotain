@@ -1,32 +1,54 @@
-(function(root, factory) {
-    if (typeof define === 'function' && define.amd) {
+;(function(root, factory) {
+    if (typeof define === "function" && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['chevrotain'], factory)
+        define(["chevrotain"], factory)
     } else {
         factory(root.chevrotain)
     }
-}(this, function(chevrotain) {
-
+})(this, function(chevrotain) {
     // ----------------- lexer -----------------
     var createToken = chevrotain.createToken
     var Lexer = chevrotain.Lexer
     var Parser = chevrotain.Parser
 
     // In ES6, custom inheritance implementation (such as 'createToken({name:...)') can be replaced with simple "class X extends Y"...
-    var True = createToken({name: "True", pattern: /true/})
-    var False = createToken({name: "False", pattern: /false/})
-    var Null = createToken({name: "Null", pattern: /null/})
-    var LCurly = createToken({name: "LCurly", pattern: /{/})
-    var RCurly = createToken({name: "RCurly", pattern: /}/})
-    var LSquare = createToken({name: "LSquare", pattern: /\[/})
-    var RSquare = createToken({name: "RSquare", pattern: /]/})
-    var Comma = createToken({name: "Comma", pattern: /,/})
-    var Colon = createToken({name: "Colon", pattern: /:/})
-    var StringLiteral = createToken({name: "StringLiteral", pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/})
-    var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/})
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED})
+    var True = createToken({ name: "True", pattern: /true/ })
+    var False = createToken({ name: "False", pattern: /false/ })
+    var Null = createToken({ name: "Null", pattern: /null/ })
+    var LCurly = createToken({ name: "LCurly", pattern: /{/ })
+    var RCurly = createToken({ name: "RCurly", pattern: /}/ })
+    var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+    var RSquare = createToken({ name: "RSquare", pattern: /]/ })
+    var Comma = createToken({ name: "Comma", pattern: /,/ })
+    var Colon = createToken({ name: "Colon", pattern: /:/ })
+    var StringLiteral = createToken({
+        name: "StringLiteral",
+        pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+    })
+    var NumberLiteral = createToken({
+        name: "NumberLiteral",
+        pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+    })
+    var WhiteSpace = createToken({
+        name: "WhiteSpace",
+        pattern: /\s+/,
+        group: Lexer.SKIPPED
+    })
 
-    var allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
+    var allTokens = [
+        WhiteSpace,
+        NumberLiteral,
+        StringLiteral,
+        LCurly,
+        RCurly,
+        LSquare,
+        RSquare,
+        Comma,
+        Colon,
+        True,
+        False,
+        Null
+    ]
     var JsonLexer = new Lexer(allTokens)
 
     // ----------------- parser -----------------
@@ -39,8 +61,16 @@
 
         this.json = this.RULE("json", function() {
             $.OR([
-                {ALT: function() { $.SUBRULE($.object) }},
-                {ALT: function() { $.SUBRULE($.array) }}
+                {
+                    ALT: function() {
+                        $.SUBRULE($.object)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.SUBRULE($.array)
+                    }
+                }
             ])
         })
 
@@ -76,13 +106,41 @@
 
         this.value = this.RULE("value", function() {
             $.OR([
-                {ALT: function() { $.CONSUME(StringLiteral) }},
-                {ALT: function() { $.CONSUME(NumberLiteral) }},
-                {ALT: function() { $.SUBRULE($.object) }},
-                {ALT: function() { $.SUBRULE($.array) }},
-                {ALT: function() { $.CONSUME(True) }},
-                {ALT: function() { $.CONSUME(False) }},
-                {ALT: function() { $.CONSUME(Null) }}
+                {
+                    ALT: function() {
+                        $.CONSUME(StringLiteral)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.CONSUME(NumberLiteral)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.SUBRULE($.object)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.SUBRULE($.array)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.CONSUME(True)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.CONSUME(False)
+                    }
+                },
+                {
+                    ALT: function() {
+                        $.CONSUME(Null)
+                    }
+                }
             ])
         })
 
@@ -99,27 +157,26 @@
     // ----------------- wrapping it all together -----------------
 
     // reuse the same parser instance.
-    var parser = new JsonParser([]);
+    var parser = new JsonParser([])
 
     function parseJson(text) {
-        var lexResult = JsonLexer.tokenize(text);
+        var lexResult = JsonLexer.tokenize(text)
 
         // setting a new input will RESET the parser instance's state.
-        parser.input = lexResult.tokens;
+        parser.input = lexResult.tokens
 
         // any top level rule may be used as an entry point
-        var value = parser.json();
+        var value = parser.json()
 
         return {
-            value:       value, // this is a pure grammar, the value will always be <undefined>
-            lexErrors:   lexResult.errors,
+            value: value, // this is a pure grammar, the value will always be <undefined>
+            lexErrors: lexResult.errors,
             parseErrors: parser.errors
-        };
+        }
     }
 
-    describe('The Json Parser', function() {
-
-        it('can parse a simple Json without errors', function() {
+    describe("The Json Parser", function() {
+        it("can parse a simple Json without errors", function() {
             var inputText = '{ "arr": [1,2,3], "obj": {"num":666}}'
             var lexAndParseResult = parseJson(inputText)
 
@@ -133,4 +190,4 @@
             setTimeout(done, 1000)
         })
     })
-}))
+})

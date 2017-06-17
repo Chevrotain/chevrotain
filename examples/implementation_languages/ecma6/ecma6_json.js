@@ -48,13 +48,25 @@ class WhiteSpace extends Token {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
-const allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
+const allTokens = [
+    WhiteSpace,
+    NumberLiteral,
+    StringLiteral,
+    LCurly,
+    RCurly,
+    LSquare,
+    RSquare,
+    Comma,
+    Colon,
+    True,
+    False,
+    Null
+]
 const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 // Using ES6 the parser too can be defined as a class
 class JsonParserES6 extends chevrotain.Parser {
-
     constructor(input) {
         super(input, allTokens)
 
@@ -64,8 +76,16 @@ class JsonParserES6 extends chevrotain.Parser {
         $.RULE("json", () => {
             $.OR([
                 // using ES6 Arrow functions to reduce verbosity.
-                {ALT: () => { $.SUBRULE($.object) }},
-                {ALT: () => { $.SUBRULE($.array) }}
+                {
+                    ALT: () => {
+                        $.SUBRULE($.object)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.array)
+                    }
+                }
             ])
         })
 
@@ -73,7 +93,8 @@ class JsonParserES6 extends chevrotain.Parser {
         $.RULE("object", () => {
             $.CONSUME(LCurly)
             $.MANY_SEP({
-                SEP: Comma, DEF: () => {
+                SEP: Comma,
+                DEF: () => {
                     $.SUBRULE2($.objectItem)
                 }
             })
@@ -89,7 +110,8 @@ class JsonParserES6 extends chevrotain.Parser {
         $.RULE("array", () => {
             $.CONSUME(LSquare)
             $.MANY_SEP({
-                SEP: Comma, DEF: () => {
+                SEP: Comma,
+                DEF: () => {
                     $.SUBRULE2($.value)
                 }
             })
@@ -98,13 +120,41 @@ class JsonParserES6 extends chevrotain.Parser {
 
         $.RULE("value", () => {
             $.OR([
-                {ALT: () => { $.CONSUME(StringLiteral) }},
-                {ALT: () => { $.CONSUME(NumberLiteral) }},
-                {ALT: () => { $.SUBRULE($.object) }},
-                {ALT: () => { $.SUBRULE($.array) }},
-                {ALT: () => { $.CONSUME(True) }},
-                {ALT: () => { $.CONSUME(False) }},
-                {ALT: () => { $.CONSUME(Null) }}
+                {
+                    ALT: () => {
+                        $.CONSUME(StringLiteral)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(NumberLiteral)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.object)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.array)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(True)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(False)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(Null)
+                    }
+                }
             ])
         })
 
@@ -128,8 +178,8 @@ module.exports = function(text) {
     const value = parser.json()
 
     return {
-        value:       value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors:   lexResult.errors,
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
 }
