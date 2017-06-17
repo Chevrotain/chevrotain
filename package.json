@@ -51,8 +51,8 @@
     "compile_definitions": "tsc --noImplicitAny test_integration/definitions/es6_modules.ts --outDir dev/garbage",
     "compile_definitions_namespace": "tsc --noImplicitAny test_integration/definitions/namespaces.ts --module none --outDir dev/garbage",
     "lint": "tslint --project tsconfig.json",
-    "format": "prettier --no-semi --tab-width 4 --write \"(src|test)**/*.ts\" \"(src|test)**/*.js\"",
-    "verify_format" :"prettier --no-semi --tab-width 4 --list-different \"(src|test)**/*.ts\" \"(src|test)**/*.js\""
+    "format": "prettier --no-semi --tab-width 4 --write \"!(lib|dev)/**/*.@(ts|js)\"",
+    "verify_format" :"prettier --no-semi --tab-width 4 --list-different  \"!(lib|dev)/**/*.@(ts|js)\""
   },
   "devDependencies": {
     "@types/chai": "^4.0.0",

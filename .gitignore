@@ -12,3 +12,7 @@
 /sauce.json
 
 /npm-debug.log
+
+# prettier watcher task is not portable (linux/mac/windows) because a different executable ([.cmd])
+# is needed on windows, so not possible to share it on SCM.
+/.idea/watcherTasks.xml
