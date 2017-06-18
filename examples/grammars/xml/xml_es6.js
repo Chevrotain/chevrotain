@@ -180,32 +180,13 @@ class XmlParserES6 extends chevrotain.Parser {
             })
 
             $.MANY(() => {
+                // prettier-ignore
                 $.OR([
-                    {
-                        ALT: () => {
-                            $.SUBRULE($.element)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.SUBRULE($.reference)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(CData)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(PROCESSING_INSTRUCTION)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(Comment)
-                        }
-                    }
+                    {ALT: () => {$.SUBRULE($.element)}},
+                    {ALT: () => {$.SUBRULE($.reference)}},
+                    {ALT: () => {$.CONSUME(CData)}},
+                    {ALT: () => {$.CONSUME(PROCESSING_INSTRUCTION)}},
+                    {ALT: () => {$.CONSUME(Comment)}}
                 ])
 
                 $.OPTION2(() => {
@@ -240,17 +221,10 @@ class XmlParserES6 extends chevrotain.Parser {
         })
 
         $.reference = $.RULE("reference", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(EntityRef)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(CharRef)
-                    }
-                }
+                {ALT: () => {$.CONSUME(EntityRef)}},
+                {ALT: () => {$.CONSUME(CharRef)}}
             ])
         })
 
@@ -261,37 +235,19 @@ class XmlParserES6 extends chevrotain.Parser {
         })
 
         $.chardata = $.RULE("chardata", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(TEXT)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(SEA_WS)
-                    }
-                }
+                {ALT: () => {$.CONSUME(TEXT)}},
+                {ALT: () => {$.CONSUME(SEA_WS)}}
             ])
         })
 
         $.misc = $.RULE("misc", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(Comment)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(PROCESSING_INSTRUCTION)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(SEA_WS)
-                    }
-                }
+                {ALT: () => {$.CONSUME(Comment)}},
+                {ALT: () => {$.CONSUME(PROCESSING_INSTRUCTION)}},
+                {ALT: () => {$.CONSUME(SEA_WS)}}
             ])
         })
 

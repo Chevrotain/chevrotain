@@ -52,7 +52,6 @@ function PredicateLookaheadParser(input) {
     var $ = this
 
     $.RULE("customPredicateRule", function() {
-        // @formatter:off
         return $.OR([
             // In this example we disable some of the alternatives depending on the value of the
             // "maxNumberAllowed" flag. For each alternative a custom Predicate / Gate function is provided
@@ -80,7 +79,6 @@ function PredicateLookaheadParser(input) {
                 }
             }
         ])
-        // @formatter:on
     })
 
     // very important to call this after all the rules have been defined.

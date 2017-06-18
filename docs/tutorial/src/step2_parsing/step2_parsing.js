@@ -64,32 +64,18 @@ class SelectParser extends Parser {
         })
 
         this.atomicExpression = $.RULE("atomicExpression", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(Integer)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(Identifier)
-                    }
-                }
+                {ALT: () => {$.CONSUME(Integer)}},
+                {ALT: () => {$.CONSUME(Identifier)}}
             ])
         })
 
         this.relationalOperator = $.RULE("relationalOperator", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(GreaterThan)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(LessThan)
-                    }
-                }
+                {ALT: () => {$.CONSUME(GreaterThan)}},
+                {ALT: () => {$.CONSUME(LessThan)}}
             ])
         })
 

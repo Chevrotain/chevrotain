@@ -61,22 +61,11 @@ class CsvParser extends Parser {
         })
 
         $.RULE("field", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(Text)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(String)
-                    }
-                },
-                {
-                    ALT: () => {
-                        /* empty alt */
-                    }
-                }
+                {ALT: () => {$.CONSUME(Text)}},
+                {ALT: () => {$.CONSUME(String)}},
+                {ALT: () => {/* empty alt */}}
             ])
         })
 

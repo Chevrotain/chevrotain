@@ -199,7 +199,6 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             }
 
             public orRule = this.RULE("orRule", () => {
-                // @formatter:off
                 return this.OR1([
                     // no predicate
                     {
@@ -223,7 +222,6 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
                         }
                     }
                 ])
-                // @formatter:on
             })
         }
 

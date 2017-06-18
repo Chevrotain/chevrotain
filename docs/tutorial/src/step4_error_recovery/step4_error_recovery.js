@@ -62,17 +62,10 @@ class JsonParser extends Parser {
         let $ = this
 
         this.RULE("json", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.array)
-                    }
-                }
+                {ALT: () => {$.SUBRULE($.object)}},
+                {ALT: () => {$.SUBRULE($.array)}}
             ])
         })
 
@@ -107,42 +100,15 @@ class JsonParser extends Parser {
         })
 
         this.RULE("value", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(StringLiteral)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(NumberLiteral)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.array)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(True)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(False)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(Null)
-                    }
-                }
+                {ALT: () => {$.CONSUME(StringLiteral)}},
+                {ALT: () => {$.CONSUME(NumberLiteral)}},
+                {ALT: () => {$.SUBRULE($.object)}},
+                {ALT: () => {$.SUBRULE($.array)}},
+                {ALT: () => {$.CONSUME(True)}},
+                {ALT: () => {$.CONSUME(False)}},
+                {ALT: () => {$.CONSUME(Null)}}
             ])
         })
 

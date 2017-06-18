@@ -210,7 +210,6 @@ export class DDLExampleRecoveryParser extends Parser {
     private parseValue(): ParseTree {
         let value = null
         this.OR([
-            // @formatter:off
             {
                 ALT: () => {
                     value = this.CONSUME1(StringTok)
@@ -222,7 +221,7 @@ export class DDLExampleRecoveryParser extends Parser {
                 }
             }
         ])
-        // @formatter:on
+
         return PT(value)
     }
 }

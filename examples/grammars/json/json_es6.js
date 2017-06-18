@@ -77,17 +77,10 @@ class JsonParserES6 extends chevrotain.Parser {
         const $ = this
 
         $.RULE("json", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.array)
-                    }
-                }
+                {ALT: () => {$.SUBRULE($.object)}},
+                {ALT: () => {$.SUBRULE($.array)}}
             ])
         })
 
@@ -124,42 +117,15 @@ class JsonParserES6 extends chevrotain.Parser {
         })
 
         $.RULE("value", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(StringLiteral)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(NumberLiteral)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.array)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(True)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(False)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(Null)
-                    }
-                }
+                {ALT: () => {$.CONSUME(StringLiteral)}},
+                {ALT: () => {$.CONSUME(NumberLiteral)}},
+                {ALT: () => {$.SUBRULE($.object)}},
+                {ALT: () => {$.SUBRULE($.array)}},
+                {ALT: () => {$.CONSUME(True)}},
+                {ALT: () => {$.CONSUME(False)}},
+                {ALT: () => {$.CONSUME(Null)}}
             ])
         })
 

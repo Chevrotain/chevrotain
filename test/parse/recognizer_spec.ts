@@ -142,7 +142,6 @@ function defineRecognizerSpecs(
                     )
 
                     private parseOrRule(): string {
-                        // @formatter:off
                         return this.OR1([
                             {
                                 ALT: () => {
@@ -158,7 +157,6 @@ function defineRecognizerSpecs(
                             },
                             { ALT: EMPTY_ALT("EMPTY_ALT") }
                         ])
-                        // @formatter:on
                     }
                 }
 

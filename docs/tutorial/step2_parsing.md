@@ -130,6 +130,7 @@ this.selectClause =
 //    : INTEGER | IDENTIFIER
 this.atomicExpression =
    $.RULE("atomicExpression", () => {
+// prettier-ignore
        $.OR([
            {ALT: () => { $.CONSUME(Integer)}},
            {ALT: () => { $.CONSUME(Identifier)}}
@@ -243,6 +244,7 @@ class SelectParser extends chevrotain.Parser {
      })
 
      $.RULE("atomicExpression", () => {
+// prettier-ignore
          $.OR([
              {ALT: () => { $.CONSUME(Integer)}},
              {ALT: () => { $.CONSUME(Identifier)}}
@@ -250,7 +252,8 @@ class SelectParser extends chevrotain.Parser {
      })
 
      $.RULE("relationalOperator", () => {
-         return $.OR([
+         return// prettier-ignore
+ $.OR([
              {ALT: function(){ $.CONSUME(GreaterThan)}},
              {ALT: function(){ $.CONSUME(LessThan)}}
          ]);

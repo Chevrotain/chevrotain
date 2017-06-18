@@ -100,7 +100,6 @@ function AbstractCommandsParser(input, tokens) {
     $.RULE("command", function() {
         // The cook and clean commands must be implemented in each sub grammar
         $.OR([
-            // @formatter:off
             {
                 ALT: function() {
                     $.SUBRULE($.cookCommand)
@@ -111,7 +110,6 @@ function AbstractCommandsParser(input, tokens) {
                     $.SUBRULE($.cleanCommand)
                 }
             }
-            // @formatter:on
         ])
     })
 
@@ -163,7 +161,6 @@ function GermanCommandsParser(input) {
     $.RULE("cookCommand", function() {
         $.CONSUME(Kochen)
         $.OR([
-            // @formatter:off
             {
                 ALT: function() {
                     $.CONSUME(Wurstchen)
@@ -174,7 +171,6 @@ function GermanCommandsParser(input) {
                     $.CONSUME(Wurst)
                 }
             }
-            // @formatter:on
         ])
     })
 

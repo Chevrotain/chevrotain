@@ -110,32 +110,18 @@ class SelectParser extends chevrotain.Parser {
         })
 
         $.RULE("atomicExpression", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Integer)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Identifier)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Integer)}},
+                {ALT: function() {$.CONSUME(Identifier)}}
             ])
         })
 
         $.RULE("relationalOperator", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(GreaterThan)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(LessThan)
-                    }
-                }
+                {ALT: function() {$.CONSUME(GreaterThan)}},
+                {ALT: function() {$.CONSUME(LessThan)}}
             ])
         })
 

@@ -277,22 +277,11 @@
         })
 
         this.RULE("contents", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.SUBRULE($.ruleset)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.media)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.page)
-                    }
-                }
+                {ALT: function() {$.SUBRULE($.ruleset)}},
+                {ALT: function() {$.SUBRULE($.media)}},
+                {ALT: function() {$.SUBRULE($.page)}}
             ])
             $.SUBRULE3($.cdcCdo)
         })
@@ -300,17 +289,10 @@
         // factor out repeating pattern for cdc/cdo
         this.RULE("cdcCdo", function() {
             $.MANY(function() {
+                // prettier-ignore
                 $.OR([
-                    {
-                        ALT: function() {
-                            $.CONSUME(Cdo)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(Cdc)
-                        }
-                    }
+                    {ALT: function() {$.CONSUME(Cdo)}},
+                    {ALT: function() {$.CONSUME(Cdc)}}
                 ])
             })
         })
@@ -319,17 +301,10 @@
         // [STRING|URI] S* media_list? ';' S*
         this.RULE("cssImport", function() {
             $.CONSUME(ImportSym)
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(StringLiteral)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Uri)
-                    }
-                }
+                {ALT: function() {$.CONSUME(StringLiteral)}},
+                {ALT: function() {$.CONSUME(Uri)}}
             ])
 
             $.OPTION(function() {
@@ -400,49 +375,28 @@
 
         // '/' S* | ',' S*
         this.RULE("operator", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Slash)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Comma)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Slash)}},
+                {ALT: function() {$.CONSUME(Comma)}}
             ])
         })
 
         // '+' S* | '>' S*
         this.RULE("combinator", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Plus)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(GreaterThan)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Plus)}},
+                {ALT: function() {$.CONSUME(GreaterThan)}}
             ])
         })
 
         // '-' | '+'
         this.RULE("unary_operator", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Minus)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Plus)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Minus)}},
+                {ALT: function() {$.CONSUME(Plus)}}
             ])
         })
 
@@ -478,7 +432,6 @@
         // element_name [ HASH | class | attrib | pseudo ]*
         // | [ HASH | class | attrib | pseudo ]+
         this.RULE("simple_selector", function() {
-            // @formatter:off
             $.OR([
                 {
                     ALT: function() {
@@ -496,33 +449,17 @@
                     }
                 }
             ])
-            // @formatter:on
         })
 
         // helper grammar rule to avoid repetition
         // [ HASH | class | attrib | pseudo ]+
         this.RULE("simple_selector_suffix", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Hash)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.class)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.attrib)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.pseudo)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Hash)}},
+                {ALT: function() {$.SUBRULE($.class)}},
+                {ALT: function() {$.SUBRULE($.attrib)}},
+                {ALT: function() {$.SUBRULE($.pseudo)}}
             ])
         })
 
@@ -534,17 +471,10 @@
 
         // IDENT | '*'
         this.RULE("element_name", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Ident)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Star)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Ident)}},
+                {ALT: function() {$.CONSUME(Star)}}
             ])
         })
 
@@ -554,35 +484,17 @@
             $.CONSUME(Ident)
 
             this.OPTION(function() {
+                // prettier-ignore
                 $.OR([
-                    {
-                        ALT: function() {
-                            $.CONSUME(Equals)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(Includes)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(Dasmatch)
-                        }
-                    }
+                    {ALT: function() {$.CONSUME(Equals)}},
+                    {ALT: function() {$.CONSUME(Includes)}},
+                    {ALT: function() {$.CONSUME(Dasmatch)}}
                 ])
 
+                // prettier-ignore
                 $.OR2([
-                    {
-                        ALT: function() {
-                            $.CONSUME2(Ident)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(StringLiteral)
-                        }
-                    }
+                    {ALT: function() {$.CONSUME2(Ident)}},
+                    {ALT: function() {$.CONSUME(StringLiteral)}}
                 ])
             })
             $.CONSUME(RSquare)
@@ -591,13 +503,10 @@
         // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
         this.RULE("pseudo", function() {
             $.CONSUME(Colon)
-            // @formatter:off
+
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Ident)
-                    }
-                },
+                {ALT: function() {$.CONSUME(Ident)}},
                 {
                     ALT: function() {
                         $.CONSUME(Func)
@@ -608,7 +517,6 @@
                     }
                 }
             ])
-            // @formatter:on
         })
 
         // property ':' S* expr prio?
@@ -647,72 +555,21 @@
                 $.SUBRULE($.unary_operator)
             })
 
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Num)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Percentage)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Length)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Ems)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Exs)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Angle)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Time)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Freq)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(StringLiteral)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Ident)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Uri)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.hexcolor)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.cssFunction)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Num)}},
+                {ALT: function() {$.CONSUME(Percentage)}},
+                {ALT: function() {$.CONSUME(Length)}},
+                {ALT: function() {$.CONSUME(Ems)}},
+                {ALT: function() {$.CONSUME(Exs)}},
+                {ALT: function() {$.CONSUME(Angle)}},
+                {ALT: function() {$.CONSUME(Time)}},
+                {ALT: function() {$.CONSUME(Freq)}},
+                {ALT: function() {$.CONSUME(StringLiteral)}},
+                {ALT: function() {$.CONSUME(Ident)}},
+                {ALT: function() {$.CONSUME(Uri)}},
+                {ALT: function() {$.SUBRULE($.hexcolor)}},
+                {ALT: function() {$.SUBRULE($.cssFunction)}}
             ])
         })
 

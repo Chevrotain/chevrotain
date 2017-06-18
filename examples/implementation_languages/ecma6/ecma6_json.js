@@ -119,42 +119,15 @@ class JsonParserES6 extends chevrotain.Parser {
         })
 
         $.RULE("value", () => {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(StringLiteral)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(NumberLiteral)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.array)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(True)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(False)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(Null)
-                    }
-                }
+                {ALT: () => {$.CONSUME(StringLiteral)}},
+                {ALT: () => {$.CONSUME(NumberLiteral)}},
+                {ALT: () => {$.SUBRULE($.object)}},
+                {ALT: () => {$.SUBRULE($.array)}},
+                {ALT: () => {$.CONSUME(True)}},
+                {ALT: () => {$.CONSUME(False)}},
+                {ALT: () => {$.CONSUME(Null)}}
             ])
         })
 

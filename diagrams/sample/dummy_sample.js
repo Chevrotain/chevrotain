@@ -73,20 +73,11 @@
         var $ = this
 
         this.json = this.RULE("json", function() {
-            // @formatter:off
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.array)
-                    }
-                }
+                {ALT: function() { $.SUBRULE($.object)}},
+                {ALT: function() {$.SUBRULE($.array)}}
             ])
-            // @formatter:on
         })
 
         this.object = this.RULE("object", function() {
@@ -115,50 +106,19 @@
             $.CONSUME(RSquare)
         })
 
-        // @formatter:off
         this.value = this.RULE("value", function() {
+            // prettier-ignore
             $.OR(
                 [
-                    {
-                        ALT: function() {
-                            $.CONSUME(StringLiteral)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(NumberLiteral)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.SUBRULE($.object)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.SUBRULE($.array)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(True)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(False)
-                        }
-                    },
-                    {
-                        ALT: function() {
-                            $.CONSUME(Null)
-                        }
-                    }
-                ],
-                "a value"
-            )
+                    {ALT: function() {$.CONSUME(StringLiteral)}},
+                    {ALT: function() {$.CONSUME(NumberLiteral)}},
+                    {ALT: function() {$.SUBRULE($.object)}},
+                    {ALT: function() {$.SUBRULE($.array)}},
+                    {ALT: function() {$.CONSUME(True)}},
+                    {ALT: function() {$.CONSUME(False)}},
+                    {ALT: function() {$.CONSUME(Null)}}
+                ])
         })
-        // @formatter:on
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information

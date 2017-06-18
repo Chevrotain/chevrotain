@@ -192,66 +192,36 @@ function CssParser(input) {
     })
 
     this.contents = this.RULE("contents", function() {
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.SUBRULE($.ruleset)
-                }
-            },
-            {
-                ALT: function() {
-                    $.SUBRULE($.media)
-                }
-            },
-            {
-                ALT: function() {
-                    $.SUBRULE($.page)
-                }
-            }
+            {ALT: function() {$.SUBRULE($.ruleset)}},
+            {ALT: function() {$.SUBRULE($.media)}},
+            {ALT: function() {$.SUBRULE($.page)}}
         ])
-        // @formatter:on
         $.SUBRULE3($.cdcCdo)
     })
 
     // factor out repeating pattern for cdc/cdo
     this.cdcCdo = this.RULE("cdcCdo", function() {
-        // @formatter:off
         $.MANY(function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Cdo)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Cdc)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Cdo)}},
+                {ALT: function() {$.CONSUME(Cdc)}}
             ])
         })
-        // @formatter:on
     })
 
     // IMPORT_SYM S*
     // [STRING|URI] S* media_list? ';' S*
     this.cssImport = this.RULE("cssImport", function() {
         $.CONSUME(ImportSym)
-        // @formatter:off
+
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(StringLiteral)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Uri)
-                }
-            }
+            {ALT: function() {$.CONSUME(StringLiteral)}},
+            {ALT: function() {$.CONSUME(Uri)}}
         ])
-        // @formatter:on
 
         $.OPTION(function() {
             $.SUBRULE($.media_list)
@@ -320,56 +290,29 @@ function CssParser(input) {
 
     // '/' S* | ',' S*
     this.operator = this.RULE("operator", function() {
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Slash)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Comma)
-                }
-            }
+            {ALT: function() {$.CONSUME(Slash)}},
+            {ALT: function() {$.CONSUME(Comma)}}
         ])
-        // @formatter:on
     })
 
     // '+' S* | '>' S*
     this.combinator = this.RULE("combinator", function() {
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Plus)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(GreaterThan)
-                }
-            }
+            {ALT: function() {$.CONSUME(Plus)}},
+            {ALT: function() {$.CONSUME(GreaterThan)}}
         ])
-        // @formatter:on
     })
 
     // '-' | '+'
     this.unary_operator = this.RULE("unary_operator", function() {
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Minus)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Plus)
-                }
-            }
+            {ALT: function() {$.CONSUME(Minus)}},
+            {ALT: function() {$.CONSUME(Plus)}}
         ])
-        // @formatter:on
     })
 
     // IDENT S*
@@ -405,7 +348,6 @@ function CssParser(input) {
     // element_name [ HASH | class | attrib | pseudo ]*
     // | [ HASH | class | attrib | pseudo ]+
     this.simple_selector = this.RULE("simple_selector", function() {
-        // @formatter:off
         $.OR([
             {
                 ALT: function() {
@@ -423,7 +365,6 @@ function CssParser(input) {
                 }
             }
         ])
-        // @formatter:on
     })
 
     // helper grammar rule to avoid repetition
@@ -431,30 +372,13 @@ function CssParser(input) {
     this.simple_selector_suffix = this.RULE(
         "simple_selector_suffix",
         function() {
-            // @formatter:off
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Hash)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.class)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.attrib)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.pseudo)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Hash)}},
+                {ALT: function() {$.SUBRULE($.class)}},
+                {ALT: function() {$.SUBRULE($.attrib)}},
+                {ALT: function() {$.SUBRULE($.pseudo)}}
             ])
-            // @formatter:on
         }
     )
 
@@ -466,20 +390,11 @@ function CssParser(input) {
 
     // IDENT | '*'
     this.element_name = this.RULE("element_name", function() {
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Ident)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Star)
-                }
-            }
+            {ALT: function() {$.CONSUME(Ident)}},
+            {ALT: function() {$.CONSUME(Star)}}
         ])
-        // @formatter:on
     })
 
     // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
@@ -488,38 +403,18 @@ function CssParser(input) {
         $.CONSUME(Ident)
 
         this.OPTION(function() {
-            // @formatter:off
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(Equals)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Includes)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Dasmatch)
-                    }
-                }
+                {ALT: function() {$.CONSUME(Equals)}},
+                {ALT: function() {$.CONSUME(Includes)}},
+                {ALT: function() {$.CONSUME(Dasmatch)}}
             ])
 
+            // prettier-ignore
             $.OR2([
-                {
-                    ALT: function() {
-                        $.CONSUME2(Ident)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(StringLiteral)
-                    }
-                }
+                {ALT: function() {$.CONSUME2(Ident)}},
+                {ALT: function() {$.CONSUME(StringLiteral)}}
             ])
-            // @formatter:on
         })
         $.CONSUME(RSquare)
     })
@@ -527,13 +422,10 @@ function CssParser(input) {
     // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
     this.pseudo = this.RULE("pseudo", function() {
         $.CONSUME(Colon)
-        // @formatter:off
+
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Ident)
-                }
-            },
+            {ALT: function() {$.CONSUME(Ident)}},
             {
                 ALT: function() {
                     $.CONSUME(Func)
@@ -544,7 +436,6 @@ function CssParser(input) {
                 }
             }
         ])
-        // @formatter:on
     })
 
     // property ':' S* expr prio?
@@ -583,75 +474,22 @@ function CssParser(input) {
             $.SUBRULE($.unary_operator)
         })
 
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Num)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Percentage)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Length)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Ems)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Exs)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Angle)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Time)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Freq)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(StringLiteral)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Ident)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Uri)
-                }
-            },
-            {
-                ALT: function() {
-                    $.SUBRULE($.hexcolor)
-                }
-            },
-            {
-                ALT: function() {
-                    $.SUBRULE($.cssFunction)
-                }
-            }
+            {ALT: function() {$.CONSUME(Num)}},
+            {ALT: function() {$.CONSUME(Percentage)}},
+            {ALT: function() {$.CONSUME(Length)}},
+            {ALT: function() {$.CONSUME(Ems)}},
+            {ALT: function() {$.CONSUME(Exs)}},
+            {ALT: function() {$.CONSUME(Angle)}},
+            {ALT: function() {$.CONSUME(Time)}},
+            {ALT: function() {$.CONSUME(Freq)}},
+            {ALT: function() {$.CONSUME(StringLiteral)}},
+            {ALT: function() {$.CONSUME(Ident)}},
+            {ALT: function() {$.CONSUME(Uri)}},
+            {ALT: function() {$.SUBRULE($.hexcolor)}},
+            {ALT: function() {$.SUBRULE($.cssFunction)}}
         ])
-        // @formatter:on
     })
 
     // FUNCTION S* expr ')' S*

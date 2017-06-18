@@ -57,20 +57,11 @@ function JsonParserDev(input) {
     var $ = this
 
     this.json = this.RULE("json", function() {
-        // @formatter:off
+        // prettier-ignore
         $.OR([
-            {
-                ALT: function() {
-                    $.SUBRULE($.object)
-                }
-            },
-            {
-                ALT: function() {
-                    $.SUBRULE($.array)
-                }
-            }
+            {ALT: function() {$.SUBRULE($.object)}},
+            {ALT: function() {$.SUBRULE($.array)}}
         ])
-        // @formatter:on
     })
 
     this.object = this.RULE("object", function() {
@@ -103,7 +94,6 @@ function JsonParserDev(input) {
         $.CONSUME(RSquare)
     })
 
-    // @formatter:off
     this.value = this.RULE("value", function() {
         $.OR(
             [
@@ -146,7 +136,6 @@ function JsonParserDev(input) {
             "a value"
         )
     })
-    // @formatter:on
 
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information

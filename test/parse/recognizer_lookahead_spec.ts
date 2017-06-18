@@ -612,7 +612,6 @@ function defineLookaheadSpecs(
                 private parseOrRule(): string {
                     let total = ""
 
-                    // @formatter:off
                     this.OR1([
                         {
                             ALT: () => {
@@ -778,7 +777,6 @@ function defineLookaheadSpecs(
                         }
                     ])
 
-                    // @formatter:on
                     return total
                 }
             }
@@ -875,7 +873,6 @@ function defineLookaheadSpecs(
                     )
 
                     private parseAmbiguityRule(): void {
-                        // @formatter:off
                         this.OR1([
                             {
                                 ALT: () => {
@@ -896,7 +893,6 @@ function defineLookaheadSpecs(
                                     this.CONSUME2(FourTok)
                                 }
                             }
-                            // @formatter:on
                         ])
                     }
                 }
@@ -937,7 +933,6 @@ function defineLookaheadSpecs(
                 private parseOrRule(): string {
                     let total = ""
 
-                    // @formatter:off
                     this.OR([
                         {
                             ALT: () => {
@@ -1097,7 +1092,6 @@ function defineLookaheadSpecs(
                         }
                     ])
 
-                    // @formatter:on
                     return total
                 }
             }
@@ -1291,7 +1285,6 @@ function defineLookaheadSpecs(
 
                     public orRule = this.RULE("orRule", () => {
                         return this.OR([
-                            // @formatter:off
                             {
                                 ALT: () => {
                                     this.CONSUME1(OneTok)
@@ -1320,7 +1313,6 @@ function defineLookaheadSpecs(
                                     return "alt4 Taken"
                                 }
                             }
-                            // @formatter:on
                         ])
                     })
                 }

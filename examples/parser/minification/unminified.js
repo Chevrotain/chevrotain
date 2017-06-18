@@ -64,17 +64,10 @@
         var $ = this
 
         this.RULE("json", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.array)
-                    }
-                }
+                {ALT: function() {$.SUBRULE($.object)}},
+                {ALT: function() {$.SUBRULE($.array)}}
             ])
         })
 
@@ -109,42 +102,15 @@
         })
 
         this.RULE("value", function() {
+            // prettier-ignore
             $.OR([
-                {
-                    ALT: function() {
-                        $.CONSUME(StringLiteral)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(NumberLiteral)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.SUBRULE($.array)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(True)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(False)
-                    }
-                },
-                {
-                    ALT: function() {
-                        $.CONSUME(Null)
-                    }
-                }
+                {ALT: function() {$.CONSUME(StringLiteral)}},
+                {ALT: function() {$.CONSUME(NumberLiteral)}},
+                {ALT: function() {$.SUBRULE($.object)}},
+                {ALT: function() {$.SUBRULE($.array)}},
+                {ALT: function() {$.CONSUME(True)}},
+                {ALT: function() {$.CONSUME(False)}},
+                {ALT: function() {$.CONSUME(Null)}}
             ])
         })
 
