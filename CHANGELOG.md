@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+- [Customizable error messages.](https://github.com/SAP/chevrotain/issues/500)
+
+
+
 ## 0.29.0 (6-13-2017)
 
 #### Breaking Changes

@@ -21,7 +21,7 @@ as any other JavaScript code without requiring any new tools or processes.
   1. **Parsing DSL**.
       * **LL(k)** grammars support.  
       * [**Separation** of grammar and semantics.][separation]
-      * **Error Reporting** with full location information. 
+      * [Customizable][custom_errors] **Error Reporting** with full location information. 
       * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
       * Supports [gates/predicates][gates].
       * Backtracking support.
@@ -110,3 +110,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
 [parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
 [content assist]: https://github.com/SAP/chevrotain/blob/master/docs/syntactic_content_assist.md
 [separation]: https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
+[custom_errors]: https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js
