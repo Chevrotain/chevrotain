@@ -276,6 +276,8 @@ function validateRegExpPattern(
 
     errors = errors.concat(findDuplicatePatterns(withRegExpPatterns))
 
+    errors = errors.concat(findEmptyMatchRegExps(withRegExpPatterns))
+
     return errors
 }
 
@@ -352,6 +354,28 @@ export function findEndOfInputAnchor(
                     tokenName(currClass) +
                     "<- static 'PATTERN' cannot contain end of input anchor '$'",
             type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
+            tokenClasses: [currClass]
+        }
+    })
+
+    return errors
+}
+
+export function findEmptyMatchRegExps(
+    tokenClasses: TokenConstructor[]
+): ILexerDefinitionError[] {
+    let matchesEmptyString = filter(tokenClasses, currClass => {
+        let pattern = currClass[PATTERN]
+        return pattern.test("")
+    })
+
+    let errors = map(matchesEmptyString, currClass => {
+        return {
+            message:
+                "Token class: ->" +
+                    tokenName(currClass) +
+                    "<- static 'PATTERN' must not match an empty string",
+            type: LexerDefinitionErrorType.EMPTY_MATCH_PATTERN,
             tokenClasses: [currClass]
         }
     })
