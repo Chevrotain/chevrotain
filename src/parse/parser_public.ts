@@ -17,6 +17,7 @@ import {
     cloneArr,
     cloneObj,
     contains,
+    defaults,
     dropRight,
     every,
     find,
@@ -41,10 +42,8 @@ import {
     createTokenInstance,
     EOF,
     getTokenConstructor,
-    hasTokenLabel,
     IToken,
     Token,
-    tokenLabel,
     tokenName
 } from "../scan/tokens_public"
 import {
@@ -103,7 +102,7 @@ import {
     createBaseSemanticVisitorConstructor,
     createBaseVisitorConstructorWithDefaults
 } from "./cst/cst_visitor"
-import ISerializedGast = gast.ISerializedGast
+import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
 import serializeGrammar = gast.serializeGrammar
 
 export enum ParserDefinitionErrorType {
@@ -180,6 +179,16 @@ export interface IParserConfig {
      * {@link https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md}
      */
     outputCst?: boolean
+
+    /**
+     * A custom error message provider.
+     * Can be used to override the default error messages.
+     * For example:
+     *   - Translating the error messages to a different languages.
+     *   - Changing the formatting
+     *   - Providing special error messages under certain conditions - missing semicolons
+     */
+    errorMessageProvider?: IErrorMessageProvider
 }
 
 const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
@@ -189,7 +198,8 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     dynamicTokensEnabled: false,
     // TODO: Document this breaking change, can it be mitigated?
     // TODO: change to true
-    outputCst: false
+    outputCst: false,
+    errorMessageProvider: defaultErrorProvider
 })
 
 export interface IRuleConfig<T> {
@@ -528,6 +538,7 @@ export class Parser {
     protected maxLookahead: number
     protected ignoredIssues: IgnoredParserIssues
     protected outputCst: boolean
+    protected errorMessageProvider: IErrorMessageProvider
 
     protected _input: IToken[] = []
     protected inputIdx = -1
@@ -599,6 +610,11 @@ export class Parser {
         this.outputCst = has(config, "outputCst")
             ? config.outputCst
             : DEFAULT_PARSER_CONFIG.outputCst
+
+        this.errorMessageProvider = defaults(
+            config.errorMessageProvider,
+            DEFAULT_PARSER_CONFIG.errorMessageProvider
+        )
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -1644,10 +1660,15 @@ export class Parser {
 
         if (this.RULE_STACK.length === 0 && !this.isAtEndOfInput()) {
             let firstRedundantTok = this.LA(1)
+            let errMsg = this.errorMessageProvider.buildNotAllInputParsedMessage(
+                {
+                    firstRedundant: firstRedundantTok,
+                    ruleName: this.getCurrRuleFullName()
+                }
+            )
             this.SAVE_ERROR(
                 new exceptions.NotAllInputParsedException(
-                    "Redundant input, expecting EOF but found: " +
-                        firstRedundantTok.image,
+                    errMsg,
                     firstRedundantTok
                 )
             )
@@ -1700,25 +1721,6 @@ export class Parser {
      */
     protected canTokenTypeBeInsertedInRecovery(tokClass: TokenConstructor) {
         return true
-    }
-
-    /**
-     * @param {Token} actualToken - The actual unexpected (mismatched) Token instance encountered.
-     * @param {Function} expectedTokType - The Class of the expected Token.
-     * @returns {string} - The error message saved as part of a MismatchedTokenException.
-     */
-    protected getMisMatchTokenErrorMessage(
-        expectedTokType: TokenConstructor,
-        actualToken: IToken
-    ): string {
-        let hasLabel = hasTokenLabel(expectedTokType)
-        let expectedMsg = hasLabel
-            ? `--> ${tokenLabel(expectedTokType)} <--`
-            : `token of type --> ${tokenName(expectedTokType)} <--`
-
-        let msg = `Expecting ${expectedMsg} but found --> '${actualToken.image}' <--`
-
-        return msg
     }
 
     protected getCurrentGrammarPath(
@@ -2075,10 +2077,11 @@ export class Parser {
         let generateErrorMessage = () => {
             // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
             // the error that would have been thrown
-            let msg = this.getMisMatchTokenErrorMessage(
-                expectedTokType,
-                nextTokenWithoutResync
-            )
+            let msg = this.errorMessageProvider.buildMismatchTokenMessage({
+                expected: expectedTokType,
+                actual: nextTokenWithoutResync,
+                ruleName: this.getCurrRuleFullName()
+            })
             let error = new exceptions.MismatchedTokenException(
                 msg,
                 nextTokenWithoutResync
@@ -2957,10 +2960,11 @@ export class Parser {
             this.consumeToken()
             return nextToken
         } else {
-            let msg = this.getMisMatchTokenErrorMessage(
-                expectedTokClass,
-                nextToken
-            )
+            let msg = this.errorMessageProvider.buildMismatchTokenMessage({
+                expected: expectedTokClass,
+                actual: nextToken,
+                ruleName: this.getCurrRuleFullName()
+            })
             throw this.SAVE_ERROR(
                 new exceptions.MismatchedTokenException(msg, nextToken)
             )
@@ -3075,42 +3079,29 @@ export class Parser {
 
     // TODO: consider caching the error message computed information
     private raiseNoAltException(occurrence: number, errMsgTypes: string): void {
-        let errSuffix = "\nbut found: '" + this.LA(1).image + "'"
-        if (errMsgTypes === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
-            // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
-            let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
-                occurrence,
-                ruleGrammar,
-                this.maxLookahead
-            )
-            let allLookAheadPaths = reduce(
-                lookAheadPathsPerAlternative,
-                (result, currAltPaths) => result.concat(currAltPaths),
-                []
-            )
-            let nextValidTokenSequences = map(
-                allLookAheadPaths,
-                currPath =>
-                    `[${map(currPath, currTokenClass =>
-                        tokenLabel(currTokenClass)
-                    ).join(", ")}]`
-            )
-            let nextValidSequenceItems = map(
-                nextValidTokenSequences,
-                (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`
-            )
-            errMsgTypes = `one of these possible Token sequences:\n${nextValidSequenceItems.join(
-                "\n"
-            )}`
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOr(
+            occurrence,
+            ruleGrammar,
+            this.maxLookahead
+        )
+
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
         }
 
+        let errMsg = this.errorMessageProvider.buildNoViableAltMessage({
+            expectedPathsPerAlt: lookAheadPathsPerAlternative,
+            actual: actualTokens,
+            customUserDescription: errMsgTypes,
+            ruleName: this.getCurrRuleFullName()
+        })
+
         throw this.SAVE_ERROR(
-            new exceptions.NoViableAltException(
-                `Expecting: ${errMsgTypes}${errSuffix}`,
-                this.LA(1)
-            )
+            new exceptions.NoViableAltException(errMsg, this.LA(1))
         )
     }
 
@@ -3154,35 +3145,28 @@ export class Parser {
         prodType: PROD_TYPE,
         userDefinedErrMsg: string
     ): void {
-        let errSuffix = " but found: '" + this.LA(1).image + "'"
-        if (userDefinedErrMsg === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
-            let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
-                occurrence,
-                ruleGrammar,
-                prodType,
-                this.maxLookahead
-            )
-            let insideProdPaths = lookAheadPathsPerAlternative[0]
-            let nextValidTokenSequences = map(
-                insideProdPaths,
-                currPath =>
-                    `[${map(currPath, currTokenClass =>
-                        tokenLabel(currTokenClass)
-                    ).join(",")}]`
-            )
-            userDefinedErrMsg =
-                `expecting at least one iteration which starts with one of these possible Token sequences::\n  ` +
-                `<${nextValidTokenSequences.join(" ,")}>`
-        } else {
-            userDefinedErrMsg = `Expecting at least one ${userDefinedErrMsg}`
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+            occurrence,
+            ruleGrammar,
+            prodType,
+            this.maxLookahead
+        )
+        let insideProdPaths = lookAheadPathsPerAlternative[0]
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
         }
+        let msg = this.errorMessageProvider.buildEarlyExitMessage({
+            expectedIterationPaths: insideProdPaths,
+            actual: actualTokens,
+            customUserDescription: userDefinedErrMsg,
+            ruleName: ruleName
+        })
+
         throw this.SAVE_ERROR(
-            new exceptions.EarlyExitException(
-                userDefinedErrMsg + errSuffix,
-                this.LA(1)
-            )
+            new exceptions.EarlyExitException(msg, this.LA(1))
         )
     }
 

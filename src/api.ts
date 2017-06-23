@@ -20,6 +20,7 @@ import { gast } from "./parse/grammar/gast_public"
 import { clearCache } from "./parse/cache_public"
 import { NextAfterTokenWalker } from "./parse/grammar/interpreter"
 import { VERSION } from "./version"
+import { defaultErrorProvider } from "./parse/errors_public"
 
 /**
  * defines the public API of
@@ -49,6 +50,7 @@ API.getTokenConstructor = getTokenConstructor
 
 // Other Utilities
 API.EMPTY_ALT = EMPTY_ALT
+API.defaultErrorProvider = defaultErrorProvider
 
 API.exceptions = {}
 API.exceptions.isRecognitionException = exceptions.isRecognitionException
