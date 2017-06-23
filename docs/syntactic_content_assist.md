@@ -4,7 +4,7 @@ See: [**Runnable example**](../examples/parser/content_assist/official_feature_c
 
 ### Detailed Docs:
 Chevrotain provides Syntactic Content assist Capabilities.
-These can be accessed via the [**computeContentAssist**](http://sap.github.io/chevrotain/documentation/0_29_0/classes/_chevrotain_d_.parser.html#computecontentassist) method.
+These can be accessed via the [**computeContentAssist**](http://sap.github.io/chevrotain/documentation/0_30_0/classes/_chevrotain_d_.parser.html#computecontentassist) method.
 
 Note that this feature **only** provides syntactic suggestions (meaning next possible token types) **not** semantic suggestions.
 It could be used as a building block in a semantic suggestions provider, but it cannot do this on "its own".
