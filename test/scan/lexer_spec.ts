@@ -19,6 +19,7 @@ import {
     disableSticky,
     enableSticky,
     findDuplicatePatterns,
+    findEmptyMatchRegExps,
     findEndOfInputAnchor,
     findInvalidGroupType,
     findInvalidPatterns,
@@ -306,6 +307,23 @@ function defineLexerSpecs(
                     )
                     expect(errors[0].message).to.contain("IntegerValid")
                     expect(errors[0].message).to.contain("DecimalInvalid")
+                })
+
+                it("will detect patterns that can match an empty string", () => {
+                    // should use \d+ as * allows zero repetitions
+                    const emptyMatch = extendToken("emptyMatch", /\d*/)
+
+                    let tokenClasses = [emptyMatch]
+                    let errors = findEmptyMatchRegExps(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([emptyMatch])
+                    expect(errors[0].type).to.equal(
+                        LexerDefinitionErrorType.EMPTY_MATCH_PATTERN
+                    )
+                    expect(errors[0].message).to.contain("emptyMatch")
+                    expect(errors[0].message).to.contain(
+                        "must not match an empty string"
+                    )
                 })
 
                 it("won't detect valid groups as unsupported", () => {

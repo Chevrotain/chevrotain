@@ -3,6 +3,9 @@
 #### Major Changes
 - [Customizable error messages.](https://github.com/SAP/chevrotain/issues/500)
 
+#### Minor Changes
+- [Validate that user Token Patterns cannot match an empty string.](https://github.com/SAP/chevrotain/issues/379)
+
 
 
 ## 0.29.0 (6-13-2017)
