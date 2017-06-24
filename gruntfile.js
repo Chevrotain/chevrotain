@@ -98,6 +98,15 @@ module.exports = function(grunt) {
                     cwd: process.cwd() + "/tutorial/src/"
                 },
                 exec: INSTALL_LINK + " && npm test"
+            },
+            bundle: {
+                exec: "npm run bundle"
+            },
+            bundle_min: {
+                exec: "npm run bundle_min"
+            },
+            bundle_spec: {
+                exec: "npm run bundle_spec"
             }
         },
 
@@ -286,56 +295,6 @@ module.exports = function(grunt) {
             }
         },
 
-        webpack: {
-            options: {
-                stats: {
-                    colors: true,
-                    modules: true,
-                    reasons: true
-                },
-                failOnError: true
-            },
-
-            release: {
-                entry: "./lib/src/api.js",
-                output: {
-                    path: path.resolve(__dirname, "./lib/"),
-                    filename: "chevrotain.js",
-                    library: "chevrotain",
-                    libraryTarget: "umd",
-                    umdNamedDefine: true
-                },
-
-                plugins: [
-                    new webpack.BannerPlugin({ banner: banner, raw: true })
-                ]
-            },
-
-            specs: {
-                entry: "./lib/test/all.js",
-                output: {
-                    path: path.resolve(__dirname, "./lib/"),
-                    filename: "chevrotainSpecs.js"
-                }
-            },
-
-            release_uglify: {
-                entry: "./lib/src/api.js",
-                output: {
-                    path: path.resolve(__dirname, "./lib/"),
-                    filename: "chevrotain.min.js",
-                    library: "chevrotain",
-                    libraryTarget: "umd",
-                    umdNamedDefine: true
-                },
-
-                plugins: [
-                    new webpack.BannerPlugin({ banner: banner, raw: true }),
-                    new webpack.optimize.UglifyJsPlugin()
-                ]
-            }
-        },
-
         coveralls: {
             publish: {
                 src: "dev/coverage/lcov.info"
@@ -354,9 +313,9 @@ module.exports = function(grunt) {
         "concat:release_definitions",
         "run:ts_compile_defs",
         "run:ts_compile_defs_namespace",
-        "webpack:release",
-        "webpack:specs",
-        "webpack:release_uglify",
+        "run:bundle",
+        "run:bundle_min",
+        "run:bundle_spec",
         "typedoc:build_docs"
     ]
 
