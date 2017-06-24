@@ -136,6 +136,11 @@ export type TokenMatcher = (
 export type TokenInstanceIdentityFunc = (tok: IToken) => string
 export type TokenClassIdentityFunc = (tok: TokenConstructor) => string
 
+export type TokenVocabulary =
+    | { [tokenName: string]: TokenConstructor }
+    | TokenConstructor[]
+    | IMultiModeLexerDefinition
+
 export interface IParserConfig {
     /**
      * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
@@ -575,10 +580,7 @@ export class Parser {
 
     constructor(
         input: IToken[],
-        tokensDictionary:
-            | { [fqn: string]: TokenConstructor }
-            | TokenConstructor[]
-            | IMultiModeLexerDefinition,
+        tokensDictionary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
         this._input = input
