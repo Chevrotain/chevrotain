@@ -2,7 +2,7 @@ var fs = require("fs")
 var jsonParser = require("./parsers/devJsonParser")
 var cssParser = require("./parsers/cssDevParser")
 
-var jsonSample = require("./samples/json10k")
+var jsonSample = fs.readFileSync("./samples/json10k.json", "utf8")
 var cssSample = fs.readFileSync("./samples/large_css.css", "utf8")
 
 var _ = require("lodash")
