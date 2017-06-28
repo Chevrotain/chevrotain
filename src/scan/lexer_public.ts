@@ -132,6 +132,8 @@ const DEFAULT_LEXER_CONFIG: ILexerConfig = {
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
 
+let nlRegExp = /\n|\r\n?/g
+
 export class Lexer {
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
         "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
@@ -581,29 +583,16 @@ export class Lexer {
                     currConfig.canLineTerminator === true
                 ) {
                     let numOfLTsInMatch = 0
-                    let imageOffset = 0
-                    let imageLengthMinusOne = imageLength - 1
-
-                    while (imageOffset < matchedImage.length) {
-                        let c = matchedImage.charCodeAt(imageOffset)
-                        if (c === 10) {
-                            // "\n"
+                    let nl
+                    let lastLTIdx
+                    nlRegExp.lastIndex = 0
+                    do {
+                        nl = nlRegExp.exec(matchedImage)
+                        if (nl !== null) {
+                            lastLTIdx = nl.index
                             numOfLTsInMatch++
-                            lastLTIdx = imageOffset
-                        } else if (c === 13) {
-                            // \r
-                            if (
-                                imageOffset !== imageLengthMinusOne &&
-                                matchedImage.charCodeAt(imageOffset + 1) === 10
-                            ) {
-                                // "\n"
-                            } else {
-                                numOfLTsInMatch++
-                                lastLTIdx = imageOffset
-                            }
                         }
-                        imageOffset++
-                    }
+                    } while (nl)
 
                     if (numOfLTsInMatch !== 0) {
                         line = line + numOfLTsInMatch
