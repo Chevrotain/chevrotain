@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<script src="https://unpkg.com/lodash@4.17.2/lodash.min.js"></script>
+<script src="https://unpkg.com/benchmark@2.1.2"></script>
+<script src="samples/1K_json.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
+        integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinysort/2.3.6/tinysort.min.js"></script>
+
+
+<div class="container">
+    <!-- left part -->
+    <div class="row">
+        <!--right part-->
+        <div class="col-lg-6">
+            <div id="resultsContainer">
+                <button onclick="onRunAll()" id="runAllButton">Run Lex And Parse</button>
+                <button onclick="onRunAll({lexerOnly:true})" id="runAllButton_lexer">Run Lexer Only</button>
+                <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
+                <div class="headerRow">
+
+                    <div class="benchName">Library</div>
+                    <div class="benchRate">Ops/sec</div>
+                    <div class="benchSpeed">Relative Speed</div>
+                    <div class="benchInclude">?</div>
+
+                </div>
+
+                <div id="dataRows">
+
+                    <div class="dataRow JSON_Dev">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">JSON_Dev</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow JSON_Latest">
+
+                        <div class="benchName"><a rel="nofollow" href="https://github.com/SAP/chevrotain">JSON_Latest</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <hr>
+
+</div>
+
+<script>
+
+    var lexerOnly = false;
+
+    function includeTestIFrame(id, url) {
+        var iframe = document.createElement("iframe")
+        iframe.src = url
+        iframe.id = id
+        iframe.style = "visibility: hidden;";
+        document.body.appendChild(iframe)
+        return iframe.contentWindow
+    }
+
+    var jsonLatestFrame = includeTestIFrame("JSON_Latest", "./parsers/json_latest.html")
+    var jsonDevFrame = includeTestIFrame("JSON_Dev", "./parsers/json_dev.html")
+
+    var orgData = {
+        labels:   [],
+        datasets: [
+            {
+                label:           "",
+                fillColor:       "rgba(220,220,220,0.5)",
+                strokeColor:     "rgba(220,220,220,0.8)",
+                highlightFill:   "rgba(220,220,220,0.75)",
+                highlightStroke: "rgba(220,220,220,1)",
+                data:            []
+            }
+        ]
+    };
+
+    var data = _.cloneDeep(orgData)
+
+
+    function clearData() {
+        data = _.cloneDeep(orgData)
+    }
+
+    function clearTable() {
+        // when using .empty() the cells collapse... so, use non-breaking space
+        $(".dataRow .benchRate .value").html('&nbsp;')
+        $(".dataRow .benchRate .delta").html('&nbsp;')
+        $(".dataRow .benchSpeed").html('&nbsp;')
+        $(".fastestRow").removeClass("fastestRow")
+    }
+
+    function clearResults() {
+        clearTable()
+        clearData()
+    }
+
+    function addTest(suite, id, action) {
+        var $el = $('.' + id + ' input')
+        if ($el && $el.is(':checked')) {
+            suite.add(id, function() {
+                action(json_sample1k, lexerOnly)
+            })
+        }
+    }
+
+    var testCases = {
+        JSON_Dev: function(suite) {
+            addTest(suite, 'JSON_Dev', jsonDevFrame.parse)
+        },
+
+        JSON_Latest: function(suite) {
+            addTest(suite, 'JSON_Latest', jsonLatestFrame.parse)
+        }
+    }
+
+    function onRunAll(options) {
+        lexerOnly = options && options.lexerOnly === true
+        clearResults()
+
+        // These names are in the order in which they appear in the DOM
+        var enabledTestCaseNames = _.map($(".dataRow").has(":checked"), function(currDataRow) {
+            var currClassNames = $(currDataRow).attr("class").split(" ")
+            return _.first(_.difference(currClassNames, ["dataRow", "json-only", "hide"]))
+        })
+
+
+        if (_.isEmpty(enabledTestCaseNames)) {
+            // otherwise the run button will never become enabled again and
+            // the performance page will be stuck indefinitely.
+            return
+        }
+
+        $("#runAllButton").prop('disabled', true)
+        $("#runAllButton_lexer").prop('disabled', true)
+
+
+        //handle "Running..."
+        var valueBeforeTheDots = "Running"
+        wait.innerHTML = valueBeforeTheDots
+        var dots = window.setInterval(function() {
+            var wait = document.getElementById("wait")
+            if (wait.innerHTML.length >= valueBeforeTheDots.length + 3)
+                wait.innerHTML = valueBeforeTheDots
+            else
+                wait.innerHTML += "."
+        }, 500)
+
+        // more minSamples (default=5) for more accurate & consistent results.
+        Benchmark.options.minSamples = 100
+
+        var suite = new Benchmark.Suite
+
+        var enabledTestCaseDefs = _.pick(testCases, enabledTestCaseNames)
+        // adds the tests in the order they appear in the DOM table.
+        _.forEach(enabledTestCaseDefs, function(currTestCaseDefFn) {
+            currTestCaseDefFn(suite)
+        })
+
+
+        suite.on('cycle', function(event) {
+            var suite = event.target
+            var rate = suite.hz.toFixed(2)
+            var $rate = $('.' + suite.name + ' .benchRate .value')
+            var $delta = $('.' + suite.name + ' .benchRate .delta')
+
+
+            $rate.html(rate)
+            $delta.html('&plusmn;' + suite.stats.rme.toFixed(2) + '%')
+
+            data.labels.push(suite.name)
+            data.datasets[0].data.push(rate)
+
+        }).on('complete', function() {
+
+            var suites = this.filter('successful')
+                , fastestSuite = this.filter('fastest')[0]
+
+            suites.splice(suites.indexOf(fastestSuite), 1)
+
+            $('.' + fastestSuite.name + ' .benchSpeed').html("100%")
+            $('.' + fastestSuite.name).addClass("fastestRow")
+
+            _.forEach(suites, function(suite) {
+                var $cell = $('.' + suite.name + ' .benchSpeed')
+                    , speed = ((suite.hz / fastestSuite.hz).toFixed(4) * 100).toFixed(2)
+                $cell.html(speed + '%')
+            })
+
+            window.clearInterval(dots)
+            $('#wait').html('&nbsp;')
+
+            // TODO: investigate hack around strange race condition
+            setTimeout(function() {
+                $("#runAllButton").prop('disabled', false)
+                $("#runAllButton_lexer").prop('disabled', false)
+            }, 1000)
+
+        }).run({'async': true})
+    }
+
+</script>
+</body>
+</html>
