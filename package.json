@@ -55,7 +55,8 @@
     "verify_format": "prettier --no-semi --tab-width 4 --list-different  \"!(lib|dev)/**/*.@(ts|js)\"",
     "bundle": "webpack --config webpack_release.config.js",
     "bundle_min": "webpack --config webpack_release_min.config.js",
-    "bundle_spec": "webpack --config webpack_specs.config.js"
+    "bundle_spec": "webpack --config webpack_specs.config.js",
+    "quick_build" : "tsc && npm run bundle"
   },
   "devDependencies": {
     "@types/chai": "^4.0.0",
