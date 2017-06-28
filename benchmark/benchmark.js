@@ -7,7 +7,7 @@ var devVersionParseJson = require("./parsers/devJsonParser").parseFunc
 var devVersionParseCss = require("./parsers/cssDevParser").parseFunc
 var oldVersionParseCss = require("./parsers/cssOldParser").parseFunc
 
-var jsonSample = fs.readFileSync("./samples/json10k", "utf8")
+var jsonSample = fs.readFileSync("./samples/json10k.json", "utf8")
 var cssSample = fs.readFileSync("./samples/large_css.css", "utf8")
 var isBenchmarkOnlyLexer = false
 
