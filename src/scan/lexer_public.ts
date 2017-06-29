@@ -134,6 +134,36 @@ Object.freeze(DEFAULT_LEXER_CONFIG)
 
 let nlRegExp = /\n|\r\n?/g
 
+// optimized subset of regExp API
+var nlRegExpLike = {
+    exec: function(text) {
+        let r = this.result
+        let len = text.length
+        for (let i = this.lastIndex; i < len; i++) {
+            let c = text.charCodeAt(i)
+            if (c === 10) {
+                r.index = i
+                this.lastIndex = i + 1
+                return r
+            } else if (c === 13) {
+                if (text.charCodeAt(i + 1) === 10) {
+                    this.lastIndex = i + 2
+                } else {
+                    this.lastIndex = i + 1
+                }
+                r.index = i
+                return r
+            }
+        }
+        return null
+    },
+
+    lastIndex: 0,
+
+    // reuse the same plain object to avoid wasting cpu cycles on creation of plain objects and garbage collecting them.
+    result: { index: 0 }
+}
+
 export class Lexer {
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
         "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
@@ -585,9 +615,11 @@ export class Lexer {
                     let numOfLTsInMatch = 0
                     let nl
                     let lastLTIdx
-                    nlRegExp.lastIndex = 0
+                    // nlRegExp.lastIndex = 0
+                    nlRegExpLike.lastIndex = 0
                     do {
-                        nl = nlRegExp.exec(matchedImage)
+                        // nl = nlRegExp.exec(matchedImage)
+                        nl = nlRegExpLike.exec(matchedImage)
                         if (nl !== null) {
                             lastLTIdx = nl.index
                             numOfLTsInMatch++
