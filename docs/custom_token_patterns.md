@@ -31,24 +31,22 @@ The basic syntax for supplying a custom pattern is defined by the [ICustomPatter
 Example:
 
 ```JavaScript
-function matchInteger(text, offset) {
-   let i = offset
-   let charCode = text.charCodeAt(i)
-   while (charCode >= 48 && charCode <= 57) {
-     i++
-     charCode = text.charCodeAt(i)
-   }
-   
-   // No match, must return null to conform with the RegExp.prototype.exec signature
-   if (i === 0) {
-      return null
-   }
-   else {
-      let matchedString = text.substring(0, i)
-      // according to the RegExp.prototype.exec API the first item in 
-      // the returned array must be the whole matched string.
-      return [matchedString]
-   }
+function matchInteger(text, startOffset) {
+    let endOffset = startOffset
+    let charCode = text.charCodeAt(endOffset)
+    while (charCode >= 48 && charCode <= 57) {
+        endOffset++
+        charCode = text.charCodeAt(endOffset)
+    }
+
+    // No match, must return null to conform with the RegExp.prototype.exec signature
+    if (endOffset === startOffset) {
+        return null
+    } else {
+        let matchedString = text.substring(startOffset, endOffset)
+        // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
+        return [matchedString]
+    }
 }
 
 let IntegerToken = createToken({

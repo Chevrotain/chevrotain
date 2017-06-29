@@ -15,19 +15,19 @@ let Lexer = chevrotain.Lexer
 // First lets define our custom pattern for matching an Integer Literal.
 // This function's signature matches the RegExp.prototype.exec function.
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
-function matchInteger(text) {
-    let i = 0
-    let charCode = text.charCodeAt(i)
+function matchInteger(text, startOffset) {
+    let endOffset = startOffset
+    let charCode = text.charCodeAt(endOffset)
     while (charCode >= 48 && charCode <= 57) {
-        i++
-        charCode = text.charCodeAt(i)
+        endOffset++
+        charCode = text.charCodeAt(endOffset)
     }
 
     // No match, must return null to conform with the RegExp.prototype.exec signature
-    if (i === 0) {
+    if (endOffset === startOffset) {
         return null
     } else {
-        let matchedString = text.substring(0, i)
+        let matchedString = text.substring(startOffset, endOffset)
         // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
         return [matchedString]
     }
