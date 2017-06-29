@@ -52,14 +52,9 @@ function matchInteger(text, startOffset) {
 let IntegerToken = createToken({
                                  name: "IntegerToken",
                                  pattern: {
-                                   exec:  matchInteger,
-                                   containsLineTerminator: false
+                                   exec:  matchInteger
                               }})
 ```
-
-The **containsLineTerminator** property is used by the lexer to properly compute the line/column numbers.
-If the custom matched pattern could possibly include a line terminator then this property must be defined as "true".
-Most Tokens can never contain a line terminator so the property is optional (false by default) which enables a shorter syntax:
 
 ```JavaScript
 let IntegerToken = createToken({

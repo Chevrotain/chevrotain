@@ -8,6 +8,7 @@ import {
     analyzeTokenClasses,
     cloneEmptyGroups,
     DEFAULT_MODE,
+    nlRegExpLike,
     performRuntimeChecks,
     SUPPORT_STICKY,
     validatePatterns
@@ -36,6 +37,7 @@ export interface TokenConstructor extends Function {
     LONGER_ALT?: TokenConstructor
     POP_MODE?: boolean
     PUSH_MODE?: string
+    LINE_BREAKS?: boolean
 
     tokenName?: string
     tokenType?: number
@@ -92,6 +94,24 @@ export interface IRegExpExec {
     exec: CustomPatternMatcherFunc
 }
 
+/**
+ * A subset of the regExp interface.
+ * This is all that is needed to define
+ */
+export interface ILineTerminatorsRegExp {
+    /**
+     * Just like regExp.exec but returned value should be a boolean 'true'
+     * if the match succeeded and null otherwise.
+     */
+    exec: (text: string) => true | null
+    /**
+     * Just like the regExp lastIndex with the global flag enabled
+     * It should be updated after every match to point to the offset where the next
+     * march attempt starts.
+     */
+    lastIndex: number
+}
+
 export interface ILexerConfig {
     /**
      * An optional flag indicating that lexer definition errors
@@ -119,50 +139,36 @@ export interface ILexerConfig {
      *   This information is always available by using the <getTokenConstructor> function on the official API.
      *   However, this is less convenient then a direct property when inspecting values in a debugger.
      *
-     * DO NOT ENABLE THIS IN PRODUCTION has a large performance penalty.
+     * DO NOT ENABLE THIS IN PRODUCTION, has a large performance penalty.
      */
     debug?: boolean
+
+    /**
+     * A global regExp defining custom line terminators.
+     * This will be used to calculate the line and column information.
+     *
+     * By default this is /\n|\r\n?/g
+     * But some grammars have a different definition, for example in ECMAScript:
+     * http://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
+     * U+2028 and U+2029 are also treated as line terminators.
+     *
+     * In that case we would use
+     * {
+     *    lineTerminators: /\n|\r|\u2028|\u2029/g
+     * }
+     *
+     */
+    lineTerminators?: RegExp | ILineTerminatorsRegExp
 }
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
     positionTracking: "full",
-    debug: false
+    debug: false,
+    lineTerminators: /\n|\r\n?/g
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
-
-let nlRegExp = /\n|\r\n?/g
-
-// optimized subset of regExp API
-var nlRegExpLike = {
-    exec: function(text) {
-        let r = this.result
-        let len = text.length
-        for (let i = this.lastIndex; i < len; i++) {
-            let c = text.charCodeAt(i)
-            if (c === 10) {
-                r.index = i
-                this.lastIndex = i + 1
-                return r
-            } else if (c === 13) {
-                if (text.charCodeAt(i + 1) === 10) {
-                    this.lastIndex = i + 2
-                } else {
-                    this.lastIndex = i + 1
-                }
-                r.index = i
-                return r
-            }
-        }
-        return null
-    },
-
-    lastIndex: 0,
-
-    // reuse the same plain object to avoid wasting cpu cycles on creation of plain objects and garbage collecting them.
-    result: { index: 0 }
-}
 
 export class Lexer {
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
@@ -460,7 +466,6 @@ export class Lexer {
             newToken,
             errLength,
             droppedChar,
-            lastLTIdx,
             msg,
             match
         let orgText = text
@@ -614,25 +619,25 @@ export class Lexer {
                 ) {
                     let numOfLTsInMatch = 0
                     let nl
-                    let lastLTIdx
+                    let lastLTEndOffset
                     // nlRegExp.lastIndex = 0
                     nlRegExpLike.lastIndex = 0
                     do {
                         // nl = nlRegExp.exec(matchedImage)
                         nl = nlRegExpLike.exec(matchedImage)
                         if (nl !== null) {
-                            lastLTIdx = nl.index
+                            lastLTEndOffset = nlRegExpLike.lastIndex - 1
                             numOfLTsInMatch++
                         }
                     } while (nl)
 
                     if (numOfLTsInMatch !== 0) {
                         line = line + numOfLTsInMatch
-                        column = imageLength - lastLTIdx
+                        column = imageLength - lastLTEndOffset
                         this.updateTokenEndLineColumnLocation(
                             newToken,
                             group,
-                            lastLTIdx,
+                            lastLTEndOffset,
                             numOfLTsInMatch,
                             line,
                             column,
@@ -651,24 +656,6 @@ export class Lexer {
                 while (!foundResyncPoint && offset < orgLength) {
                     // drop chars until we succeed in matching something
                     droppedChar = orgText.charCodeAt(offset)
-                    if (
-                        droppedChar === 10 || // '\n'
-                        (droppedChar === 13 &&
-                            (offset === orgLength - 1 ||
-                                (offset < orgLength - 1 &&
-                                    orgText.charCodeAt(offset + 1) !== 10)))
-                    ) {
-                        //'\r' not
-                        // followed by
-                        // '\n'
-                        line++
-                        column = 1
-                    } else {
-                        // this else also matches '\r\n' which is fine, the '\n' will be counted
-                        // either when skipping the next char, or when consuming the following pattern
-                        // (which will have to start in a '\n' if we manage to consume it)
-                        column++
-                    }
                     // Identity Func (when sticky flag is enabled)
                     text = this.chopInput(text, 1)
                     offset++
@@ -697,6 +684,31 @@ export class Lexer {
                         }
 
                         if (foundResyncPoint === true) {
+                            if (trackLines) {
+                                let resyncedChunk = orgText.substring(
+                                    errorStartOffset,
+                                    offset
+                                )
+
+                                let numOfLTsInMatch = 0
+                                let nl
+                                let lastLTOffset
+                                nlRegExpLike.lastIndex = 0
+                                do {
+                                    nl = nlRegExpLike.exec(resyncedChunk)
+                                    if (nl !== null) {
+                                        lastLTOffset =
+                                            // TODO: do we need the index property?
+                                            nlRegExpLike.lastIndex - 1
+                                        numOfLTsInMatch++
+                                    }
+                                } while (nl)
+
+                                if (numOfLTsInMatch !== 0) {
+                                    line = line + numOfLTsInMatch
+                                    column = resyncedChunk.length - lastLTOffset
+                                }
+                            }
                             break
                         }
                     }

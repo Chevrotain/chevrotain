@@ -48,8 +48,6 @@ export interface IAnalyzeResult {
     emptyGroups: { [groupName: string]: Token[] }
 }
 
-const CONTAINS_LINE_TERMINATOR = "containsLineTerminator"
-
 export let SUPPORT_STICKY =
     typeof (<any>new RegExp("(?:)")).sticky === "boolean"
 
@@ -183,22 +181,8 @@ export function analyzeTokenClasses(
     )
 
     let patternIdxToCanLineTerminator = map(
-        allTransformedPatterns,
-        (pattern: any) => {
-            if (isRegExp(pattern)) {
-                // TODO: unicode escapes of line terminators too?
-                return /\\n|\\r|\\s/g.test(pattern.source)
-            } else if (isString(pattern)) {
-                // single Char String
-                // only need to handle single character newline (not /r/n)
-                return pattern === "\n" || pattern === "\r"
-            } else {
-                if (has(pattern, CONTAINS_LINE_TERMINATOR)) {
-                    return pattern[CONTAINS_LINE_TERMINATOR]
-                }
-                return false
-            }
-        }
+        onlyRelevantClasses,
+        clazz => clazz.LINE_BREAKS === true
     )
 
     let patternIdxToIsCustom = map(onlyRelevantClasses, isCustomPattern)
@@ -653,4 +637,28 @@ export function isShortPattern(pattern: any): number | boolean {
     } else {
         return false
     }
+}
+
+// optimized subset of regExp API
+export const nlRegExpLike = {
+    exec: function(text) {
+        let len = text.length
+        for (let i = this.lastIndex; i < len; i++) {
+            let c = text.charCodeAt(i)
+            if (c === 10) {
+                this.lastIndex = i + 1
+                return true
+            } else if (c === 13) {
+                if (text.charCodeAt(i + 1) === 10) {
+                    this.lastIndex = i + 2
+                } else {
+                    this.lastIndex = i + 1
+                }
+                return true
+            }
+        }
+        return null
+    },
+
+    lastIndex: 0
 }

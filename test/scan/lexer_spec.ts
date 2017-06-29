@@ -368,13 +368,16 @@ function defineLexerSpecs(
 
         const NewLine = extendToken("NewLine", /(\n|\r|\r\n)/)
         NewLine.GROUP = Lexer.SKIPPED
+        NewLine.LINE_BREAKS = true
 
         const WhitespaceNotSkipped = extendToken("WhitespaceNotSkipped", /\s+/)
+        WhitespaceNotSkipped.LINE_BREAKS = true
 
         const Comment = extendToken("Comment", /\/\/.+/)
         Comment.GROUP = "comments"
 
         const WhitespaceOrAmp = extendToken("WhitespaceOrAmp", /\s+|&/)
+        WhitespaceOrAmp.LINE_BREAKS = true
 
         describe("The Simple Lexer transformations", () => {
             it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", () => {
@@ -501,7 +504,11 @@ function defineLexerSpecs(
 
             it("can count the number of line terminators in a string", () => {
                 let ltCounter = new Lexer([
-                    createToken({ name: "lt", pattern: /\s+/ }),
+                    createToken({
+                        name: "lt",
+                        pattern: /\s+/,
+                        line_breaks: true
+                    }),
                     createToken({ name: "num", pattern: /\d+/ })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)
@@ -511,6 +518,7 @@ function defineLexerSpecs(
                     ltCounter.tokenize("\r\r\r1234\r\n1").tokens
                 )
                 expect(lastToken2.startLine).to.equal(5)
+                expect(lastToken2.startColumn).to.equal(1)
 
                 let lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)
                 expect(lastToken3.startLine).to.equal(5)
@@ -518,7 +526,11 @@ function defineLexerSpecs(
 
             it("can count the number of line terminators in a string - string literal patterns", () => {
                 let ltCounter = new Lexer([
-                    createToken({ name: "lt", pattern: "\n" }),
+                    createToken({
+                        name: "lt",
+                        pattern: "\n",
+                        line_breaks: true
+                    }),
                     createToken({ name: "num", pattern: /\d+/ })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
@@ -1505,10 +1517,10 @@ function defineLexerSpecs(
                                 name: "WS",
                                 pattern: {
                                     exec: (text, offset) =>
-                                        /^\s+/.exec(text.substring(offset)),
-                                    containsLineTerminator: true
+                                        /^\s+/.exec(text.substring(offset))
                                 },
-                                group: "whitespace"
+                                group: "whitespace",
+                                line_breaks: true
                             })
 
                             let lexerDef: any = [WS, A, B]

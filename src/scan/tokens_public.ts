@@ -47,12 +47,6 @@ export interface ICustomPattern {
      * @see CustomPatternMatcherFunc
      */
     exec: CustomPatternMatcherFunc
-    /**
-     * Flag indicating if this custom pattern may contain line terminators.
-     * This is required to avoid errors in the line/column numbering.
-     * @default false - if this property was not explicitly defined.
-     */
-    containsLineTerminator?: boolean
 }
 
 /**
@@ -98,6 +92,11 @@ export interface ITokenConfig {
     push_mode?: string
     pop_mode?: boolean
     longer_alt?: TokenConstructor
+    /**
+     * Can a String matching this token's pattern possibly contain a line terminator?
+     * If true and the line_breaks property is not also true this will cause inaccuracies in the Lexer's line / column tracking.
+     */
+    line_breaks?: boolean
 }
 
 const PARENT = "parent"
@@ -106,6 +105,7 @@ const GROUP = "group"
 const PUSH_MODE = "push_mode"
 const POP_MODE = "pop_mode"
 const LONGER_ALT = "longer_alt"
+const LINE_BREAKS = "line_breaks"
 
 /**
  * @param {ITokenConfig} config - The configuration for
@@ -205,6 +205,10 @@ function createTokenInternal(config: ITokenConfig): TokenConstructor {
 
     if (has(config, LONGER_ALT)) {
         derivedConstructor.LONGER_ALT = config[LONGER_ALT]
+    }
+
+    if (has(config, LINE_BREAKS)) {
+        derivedConstructor.LINE_BREAKS = config[LINE_BREAKS]
     }
 
     return derivedConstructor
