@@ -12,6 +12,9 @@ export function isEmpty(arr: any[]): boolean {
 }
 
 export function keys(obj: any): string[] {
+    if (obj === undefined || obj === null) {
+        return []
+    }
     return Object.keys(obj)
 }
 

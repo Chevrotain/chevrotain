@@ -49,7 +49,9 @@ function defineLexerSpecs(
 
         BambaTok.LONGER_ALT = IdentifierTok
 
-        let testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok])
+        let testLexer = new Lexer([BambaTok, IntegerTok, IdentifierTok], {
+            positionTracking: "onlyOffset"
+        })
 
         describe("The Chevrotain Lexers", () => {
             it("can create a token from a string with priority to the First Token class with the longest match #1", () => {
@@ -58,8 +60,7 @@ function defineLexerSpecs(
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], BambaTok)).to.be.true
                 expect(result.tokens[0].image).to.equal("bamba")
-                expect(result.tokens[0].startLine).to.equal(1)
-                expect(result.tokens[0].startColumn).to.equal(1)
+                expect(result.tokens[0].startOffset).to.equal(0)
             })
 
             it("can create a token from a string with priority to the First Token class with the longest match #2", () => {
@@ -67,8 +68,7 @@ function defineLexerSpecs(
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], IdentifierTok)).to.be.true
                 expect(result.tokens[0].image).to.equal("bambaMIA")
-                expect(result.tokens[0].startLine).to.equal(1)
-                expect(result.tokens[0].startColumn).to.equal(1)
+                expect(result.tokens[0].startOffset).to.equal(0)
             })
 
             it("can create a token from a string with priority to the First Token class with the longest match - negative", () => {
@@ -78,7 +78,9 @@ function defineLexerSpecs(
                 const BambaTok = extendToken("BambaTok", /_bamba/)
                 BambaTok.LONGER_ALT = IdentTok
 
-                const myLexer = new Lexer([BambaTok, IntegerTok, IdentTok])
+                const myLexer = new Lexer([BambaTok, IntegerTok, IdentTok], {
+                    positionTracking: "onlyOffset"
+                })
                 let input = "_bamba123"
                 let result = myLexer.tokenize(input)
 
@@ -93,8 +95,7 @@ function defineLexerSpecs(
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], IntegerTok)).to.be.true
                 expect(result.tokens[0].image).to.equal("6666543221231")
-                expect(result.tokens[0].startLine).to.equal(1)
-                expect(result.tokens[0].startColumn).to.equal(1)
+                expect(result.tokens[0].startOffset).to.equal(0)
             })
         })
 
@@ -536,6 +537,32 @@ function defineLexerSpecs(
                 let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
                 expect(lastToken.startLine).to.equal(3)
             })
+
+            it("Supports custom Line Terminators", () => {
+                let WS = createToken({
+                    name: "WS",
+                    pattern: /\u2028/,
+                    line_breaks: true,
+                    group: Lexer.SKIPPED
+                })
+                let ifElseLexer = new Lexer([WS, If, Else], {
+                    lineTerminatorsPattern: /\u2028/g
+                })
+
+                let input = "if\u2028elseif"
+
+                let lexResult = ifElseLexer.tokenize(input)
+                let tokens: any = lexResult.tokens
+                expect(tokens[0].image).to.equal("if")
+                expect(tokens[0].startLine).to.equal(1)
+                expect(tokens[0].startColumn).to.equal(1)
+                expect(tokens[1].image).to.equal("else")
+                expect(tokens[1].startLine).to.equal(2)
+                expect(tokens[1].startColumn).to.equal(1)
+                expect(tokens[2].image).to.equal("if")
+                expect(tokens[2].startLine).to.equal(2)
+                expect(tokens[2].startColumn).to.equal(5)
+            })
         })
 
         describe("The Simple Lexer Full flow", () => {
@@ -545,7 +572,9 @@ function defineLexerSpecs(
                     pattern: /\t/,
                     group: "spaces"
                 })
-                let ifElseLexer = new Lexer([Tab, If, Else])
+                let ifElseLexer = new Lexer([Tab, If, Else], {
+                    positionTracking: "onlyOffset"
+                })
 
                 let input = "if\telse"
 
@@ -564,7 +593,10 @@ function defineLexerSpecs(
                     pattern: /(\t| )/,
                     group: "spaces"
                 })
-                let ifElseLexer = new Lexer([WS, If, Else], { debug: true })
+                let ifElseLexer = new Lexer([WS, If, Else], {
+                    debug: true,
+                    positionTracking: "onlyOffset"
+                })
 
                 let input = "if else"
 
@@ -904,58 +936,6 @@ function defineLexerSpecs(
                 expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
             })
 
-            it("can deal with line terminators during resync", () => {
-                let ifElseLexer = new Lexer([If, Else], lexerConfig) // no newLine tokens those will be resynced
-
-                let input = "if\r\nelse\rif\r"
-                let lexResult = ifElseLexer.tokenize(input)
-                expect(lexResult.errors.length).to.equal(3)
-                expect(lexResult.errors[0].message).to.contain("\r")
-                if (testStart) {
-                    expect(lexResult.errors[0].line).to.equal(1)
-                    expect(lexResult.errors[0].column).to.equal(3)
-                }
-                expect(lexResult.errors[0].length).to.equal(2)
-
-                expect(lexResult.errors[1].message).to.contain("\r")
-                if (testStart) {
-                    expect(lexResult.errors[1].line).to.equal(2)
-                    expect(lexResult.errors[1].column).to.equal(5)
-                }
-                expect(lexResult.errors[1].length).to.equal(1)
-
-                expect(lexResult.errors[2].message).to.contain("\r")
-                if (testStart) {
-                    expect(lexResult.errors[2].line).to.equal(3)
-                    expect(lexResult.errors[2].column).to.equal(3)
-                }
-                expect(lexResult.errors[2].length).to.equal(1)
-
-                expect(lexResult.tokens[0].image).to.equal("if")
-                expect(lexResult.tokens[0].startOffset).to.equal(0)
-                if (testStart) {
-                    expect(lexResult.tokens[0].startLine).to.equal(1)
-                    expect(lexResult.tokens[0].startColumn).to.equal(1)
-                }
-                expect(tokenMatcher(lexResult.tokens[0], If)).to.be.true
-
-                expect(lexResult.tokens[1].image).to.equal("else")
-                expect(lexResult.tokens[1].startOffset).to.equal(4)
-                if (testStart) {
-                    expect(lexResult.tokens[1].startLine).to.equal(2)
-                    expect(lexResult.tokens[1].startColumn).to.equal(1)
-                }
-                expect(tokenMatcher(lexResult.tokens[1], Else)).to.be.true
-
-                expect(lexResult.tokens[2].image).to.equal("if")
-                expect(lexResult.tokens[2].startOffset).to.equal(9)
-                if (testStart) {
-                    expect(lexResult.tokens[2].startLine).to.equal(3)
-                    expect(lexResult.tokens[2].startColumn).to.equal(1)
-                }
-                expect(tokenMatcher(lexResult.tokens[2], If)).to.be.true
-            })
-
             it("can deal with line terminators inside multi-line Tokens", () => {
                 let ifElseLexer = new Lexer(
                     [If, Else, WhitespaceNotSkipped],
@@ -1114,7 +1094,10 @@ function defineLexerSpecs(
             })
 
             it("supports Token groups", () => {
-                let ifElseLexer = new Lexer([If, Else, Comment], lexerConfig)
+                let ifElseLexer = new Lexer(
+                    [If, Else, Comment, NewLine],
+                    lexerConfig
+                )
                 let input = "if//else"
                 let lexResult = ifElseLexer.tokenize(input)
 
@@ -1149,7 +1132,10 @@ function defineLexerSpecs(
             })
 
             it("won't have leftover state when using token groups", () => {
-                let ifElseLexer = new Lexer([If, Else, Comment], lexerConfig)
+                let ifElseLexer = new Lexer(
+                    [If, Else, Comment, NewLine],
+                    lexerConfig
+                )
                 let input = "if//else"
                 let lexResult = ifElseLexer.tokenize(input)
 
@@ -1232,7 +1218,8 @@ function defineLexerSpecs(
                             Amp,
                             ExitSigns,
                             NUMBERS,
-                            Whitespace
+                            Whitespace,
+                            NewLine
                         ]
                     },
                     defaultMode: "numbers"
@@ -1345,7 +1332,7 @@ function defineLexerSpecs(
                                 EnterNumbers
                             ],
                             // the numbers mode has a typo! so the PUSH_MODE in the 'EnterNumbers' is invalid
-                            nuMbers_TYPO: [One, Two, Whitespace]
+                            nuMbers_TYPO: [One, Two, Whitespace, NewLine]
                         },
 
                         defaultMode: "letters"
@@ -1382,7 +1369,8 @@ function defineLexerSpecs(
                     }
 
                     let badLexer = new Lexer(lexerDef, {
-                        deferDefinitionErrorsHandling: true
+                        deferDefinitionErrorsHandling: true,
+                        positionTracking: "onlyOffset"
                     })
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
@@ -1404,7 +1392,8 @@ function defineLexerSpecs(
                     }
 
                     let badLexer = new Lexer(lexerDef, {
-                        deferDefinitionErrorsHandling: true
+                        deferDefinitionErrorsHandling: true,
+                        positionTracking: "onlyOffset"
                     })
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
@@ -1430,7 +1419,8 @@ function defineLexerSpecs(
                             defaultMode: "bisli"
                         }
                         let badLexer = new Lexer(lexerDef, {
-                            deferDefinitionErrorsHandling: true
+                            deferDefinitionErrorsHandling: true,
+                            positionTracking: "onlyOffset"
                         })
                         expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(
                             1
@@ -1458,7 +1448,8 @@ function defineLexerSpecs(
                         Gamma
                     ]
                     let badLexer = new Lexer(lexerDef, {
-                        deferDefinitionErrorsHandling: true
+                        deferDefinitionErrorsHandling: true,
+                        positionTracking: "onlyOffset"
                     })
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
@@ -1554,21 +1545,10 @@ function defineLexerSpecs(
                         "With short function syntax",
                         (text, offset) => /^B/.exec(text.substring(offset))
                     )
-                    defineCustomPatternSpec(
-                        "with explicit canContainLinerTerminator",
-                        {
-                            exec: (text, offset) =>
-                                /^B/.exec(text.substring(offset)),
-                            containsLineTerminator: false
-                        }
-                    )
-                    defineCustomPatternSpec(
-                        "with implicit canContainLinerTerminator",
-                        {
-                            exec: (text, offset) =>
-                                /^B/.exec(text.substring(offset))
-                        }
-                    )
+                    defineCustomPatternSpec("verbose syntax", {
+                        exec: (text, offset) =>
+                            /^B/.exec(text.substring(offset))
+                    })
                 })
             })
         })

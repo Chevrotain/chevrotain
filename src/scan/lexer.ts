@@ -1,6 +1,7 @@
 import { IToken, Token, tokenName } from "./tokens_public"
 import {
     ILexerDefinitionError,
+    ILineTerminatorsTester,
     IMultiModeLexerDefinition,
     IRegExpExec,
     Lexer,
@@ -12,6 +13,7 @@ import {
     contains,
     difference,
     filter,
+    find,
     first,
     forEach,
     has,
@@ -24,8 +26,10 @@ import {
     keys,
     map,
     reduce,
-    reject
+    reject,
+    mapValues
 } from "../utils/utils"
+import { flatten } from "../utils/utils"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -535,7 +539,8 @@ export function addStickyFlag(pattern: RegExp): RegExp {
 }
 
 export function performRuntimeChecks(
-    lexerDefinition: IMultiModeLexerDefinition
+    lexerDefinition: IMultiModeLexerDefinition,
+    trackLines: boolean
 ): ILexerDefinitionError[] {
     let errors = []
 
@@ -590,6 +595,27 @@ export function performRuntimeChecks(
         })
     }
 
+    let allTokenTypes = flatten(
+        mapValues(lexerDefinition.modes, tokTypes => tokTypes)
+    )
+    if (
+        trackLines &&
+        find(
+            allTokenTypes,
+            (currTokType: TokenConstructor) => currTokType.LINE_BREAKS
+        ) === undefined
+    ) {
+        errors.push({
+            message:
+                "No LINE_BREAKS Error:\n" +
+                    "This Lexer has been defined to track line and column information,\n" +
+                    "yet none of the Token definitions contain a LINE_BREAK flag.\n" +
+                    "See https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS \n" +
+                    "for details.",
+            type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
+        })
+    }
+
     return errors
 }
 
@@ -637,4 +663,28 @@ export function isShortPattern(pattern: any): number | boolean {
     } else {
         return false
     }
+}
+
+// optimized subset of regExp API
+export const LineTerminatorOptimizedTester: ILineTerminatorsTester = {
+    test: function(text) {
+        let len = text.length
+        for (let i = this.lastIndex; i < len; i++) {
+            let c = text.charCodeAt(i)
+            if (c === 10) {
+                this.lastIndex = i + 1
+                return true
+            } else if (c === 13) {
+                if (text.charCodeAt(i + 1) === 10) {
+                    this.lastIndex = i + 2
+                } else {
+                    this.lastIndex = i + 1
+                }
+                return true
+            }
+        }
+        return false
+    },
+
+    lastIndex: 0
 }

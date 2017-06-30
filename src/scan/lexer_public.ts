@@ -8,6 +8,7 @@ import {
     analyzeTokenClasses,
     cloneEmptyGroups,
     DEFAULT_MODE,
+    LineTerminatorOptimizedTester,
     performRuntimeChecks,
     SUPPORT_STICKY,
     validatePatterns
@@ -64,7 +65,8 @@ export enum LexerDefinitionErrorType {
     MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
     LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
     SOI_ANCHOR_FOUND,
-    EMPTY_MATCH_PATTERN
+    EMPTY_MATCH_PATTERN,
+    NO_LINE_BREAKS_FLAGS
 }
 
 export interface ILexerDefinitionError {
@@ -91,6 +93,23 @@ export interface IMultiModeLexerDefinition {
 
 export interface IRegExpExec {
     exec: CustomPatternMatcherFunc
+}
+
+/**
+ * A subset of the regExp interface.
+ * Needed to compute line/column info by a chevrotain lexer.
+ */
+export interface ILineTerminatorsTester {
+    /**
+     * Just like regExp.test
+     */
+    test: (text: string) => boolean
+    /**
+     * Just like the regExp lastIndex with the global flag enabled
+     * It should be updated after every match to point to the offset where the next
+     * match attempt starts.
+     */
+    lastIndex: number
 }
 
 export interface ILexerConfig {
@@ -137,8 +156,15 @@ export interface ILexerConfig {
      * U+2028 and U+2029 are also treated as line terminators.
      *
      * In that case we would use /\n|\r|\u2028|\u2029/g
+     *
+     * Note that it is also possible to supply an optimized RegExp like implementation
+     * as only a subset of the RegExp is needed, @see {ILineTerminatorsRegExp}
+     * for details.
+     *
+     * keep in mind that for the default pattern: /\n|\r\n?/g an optimized implementation is already built-in.
+     * This means the optimization is only relevant for lexers overriding the default pattern.
      */
-    lineTerminatorsPattern?: RegExp
+    lineTerminatorsPattern?: RegExp | ILineTerminatorsTester
 }
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
@@ -272,6 +298,14 @@ export class Lexer {
         // todo: defaults func?
         this.config = merge(DEFAULT_LEXER_CONFIG, config)
 
+        if (
+            this.config.lineTerminatorsPattern ===
+            DEFAULT_LEXER_CONFIG.lineTerminatorsPattern
+        ) {
+            // optimized built-in implementation for the defaults definition of lineTerminators
+            this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
+        }
+
         if (this.config.debug === true) {
             console.log(
                 "Running the Lexer in Debug Mode, DO NOT ENABLE THIS IN PRODUCTIVE ENV!"
@@ -302,7 +336,7 @@ export class Lexer {
         }
 
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-            performRuntimeChecks(actualDefinition)
+            performRuntimeChecks(actualDefinition, this.trackStartLines)
         )
 
         // for extra robustness to avoid throwing an none informative error message
@@ -669,32 +703,6 @@ export class Lexer {
                         }
 
                         if (foundResyncPoint === true) {
-                            if (trackLines) {
-                                let resyncedChunk = orgText.substring(
-                                    errorStartOffset,
-                                    offset
-                                )
-
-                                let numOfLTsInMatch = 0
-                                let foundLineTerminator
-                                let lastLTOffset
-                                lineTerminatorPattern.lastIndex = 0
-                                do {
-                                    foundLineTerminator = lineTerminatorPattern.test(
-                                        resyncedChunk
-                                    )
-                                    if (foundLineTerminator === true) {
-                                        lastLTOffset =
-                                            lineTerminatorPattern.lastIndex - 1
-                                        numOfLTsInMatch++
-                                    }
-                                } while (foundLineTerminator)
-
-                                if (numOfLTsInMatch !== 0) {
-                                    line = line + numOfLTsInMatch
-                                    column = resyncedChunk.length - lastLTOffset
-                                }
-                            }
                             break
                         }
                     }

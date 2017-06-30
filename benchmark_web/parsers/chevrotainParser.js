@@ -26,7 +26,8 @@ var NumberLiteral = createToken({
 var WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
-    group: ChevrotainLexer.SKIPPED
+    group: ChevrotainLexer.SKIPPED,
+    line_breaks: true
 })
 
 var jsonTokens = [
