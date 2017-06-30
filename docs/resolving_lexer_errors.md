@@ -1,20 +1,20 @@
 ## Resolving Lexer Errors
 
-* [No LINE_BREAKS Error..](#LINE_BREAKS)
+* [No LINE_BREAKS Error.](#LINE_BREAKS)
 
 
 ### <a name="LINE_BREAKS"></a> No LINE_BREAKS Error. 
 
-A Chevrotain Lexer tracking full position information for each token by default.
+A Chevrotain Lexer will by default track the full position information for each token.
 This includes line and column information.
 
 In order to support this the Lexer must be aware of which Tokens may include line terminators.
 This information must be provided by the lexer's author.
 
 This error means that the Lexer has been defined to track line and column information (perhaps by default).
-Yet not a single one of the Token definitions passed to it contains the LINE_BREAKS flag.
+Yet not a single one of the Token definitions passed to it was defined as possibly containing line terminators.
 
-To fix this:
+To resolve this choose one of the following:
 
 1. Disable the line and column position tracking using the [positionTracking][position_tracking] configuration option.
    ```javascript

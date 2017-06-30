@@ -17,7 +17,11 @@ var Parser = chevrotain.Parser
 // Lexer
 const Text = createToken({ name: "Text", pattern: /[^,\n\r"]+/ })
 const Comma = createToken({ name: "Comma", pattern: /,/ })
-const NewLine = createToken({ name: "NewLine", pattern: /\r?\n/ })
+const NewLine = createToken({
+    name: "NewLine",
+    pattern: /\r?\n/,
+    line_breaks: true
+})
 const String = createToken({ name: "String", pattern: /"(?:""|[^"])*"/ })
 
 const allTokens = [Text, String, Comma, NewLine]

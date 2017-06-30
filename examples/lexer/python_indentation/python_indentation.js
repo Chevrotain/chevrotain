@@ -169,8 +169,9 @@ let Spaces = createToken({
 // and thus we can check before creating an indentation token that the last token matched was a newline.
 let Newline = createToken({
     name: "Newline",
-    pattern: /\n\r|\n|\r/,
-    group: "nl"
+    pattern: /\n|\r\n?/,
+    group: "nl",
+    line_breaks: true
 })
 
 // define the indentation tokens using custom token patterns

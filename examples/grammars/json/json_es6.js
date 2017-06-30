@@ -46,6 +46,7 @@ NumberLiteral.PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 class WhiteSpace extends Token {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+WhiteSpace.LINE_BREAKS = true
 
 var allTokens = [
     WhiteSpace,

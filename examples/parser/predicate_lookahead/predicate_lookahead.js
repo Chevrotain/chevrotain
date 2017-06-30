@@ -11,6 +11,7 @@ var Three = createToken({ name: "Three", pattern: /3/ })
 
 var WhiteSpace = createToken({ name: "WhiteSpace", pattern: /\s+/ })
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+WhiteSpace.LINE_BREAKS = true
 
 var allTokens = [
     WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance

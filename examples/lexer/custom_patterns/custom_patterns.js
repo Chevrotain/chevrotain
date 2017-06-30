@@ -43,7 +43,8 @@ let Comma = createToken({ name: "Comma", pattern: /,/ })
 let Whitespace = createToken({
     name: "Whitespace",
     pattern: /\s+/,
-    group: Lexer.SKIPPED
+    group: Lexer.SKIPPED,
+    line_breaks: true
 })
 
 let customPatternLexer = new Lexer([Whitespace, Comma, IntegerLiteral])

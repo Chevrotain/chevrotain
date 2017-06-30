@@ -149,7 +149,7 @@ export interface ILexerConfig {
      *
      * Note that the regExp should use the global flag, for example: /\n/g
      *
-     * The default /\n|\r\n?/g
+     * The default is: /\n|\r\n?/g
      *
      * But some grammars have a different definition, for example in ECMAScript:
      * http://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
@@ -169,7 +169,6 @@ export interface ILexerConfig {
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
-    // TODO: change to onlyOffset by default
     positionTracking: "full",
     debug: false,
     lineTerminatorsPattern: /\n|\r\n?/g

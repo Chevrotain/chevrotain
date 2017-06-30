@@ -37,6 +37,7 @@ class NumberLiteral extends Token {
 class WhiteSpace extends Token {
     static PATTERN = /\s+/
     static GROUP = Lexer.SKIPPED
+    static LINE_BREAKS = true
 }
 
 const allTokens = [

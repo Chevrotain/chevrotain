@@ -17,7 +17,8 @@ var Do = createToken({ name: "Do", pattern: /do/, parent: Keyword })
 var Whitespace = createToken({
     name: "Whitespace",
     pattern: /\s+/,
-    group: Lexer.SKIPPED
+    group: Lexer.SKIPPED,
+    line_breaks: true
 })
 
 keywordsVsIdentifiersLexer = new Lexer([

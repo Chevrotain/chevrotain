@@ -18,6 +18,7 @@ Integer.PATTERN = /\d+/
 export class WhiteSpace extends Token {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
+WhiteSpace.LINE_BREAKS = true
 
 export const allTokens = [WhiteSpace, LSquare, RSquare, Comma, Integer]
 export const ArrayLexer = new Lexer(allTokens)

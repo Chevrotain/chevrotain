@@ -665,8 +665,11 @@ export function isShortPattern(pattern: any): number | boolean {
     }
 }
 
-// optimized subset of regExp API
+/**
+ * Faster than using a RegExp for default newline detection during lexing.
+ */
 export const LineTerminatorOptimizedTester: ILineTerminatorsTester = {
+    // implements /\n|\r\n?/g.test
     test: function(text) {
         let len = text.length
         for (let i = this.lastIndex; i < len; i++) {

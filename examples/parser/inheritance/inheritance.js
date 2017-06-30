@@ -50,6 +50,7 @@ var Den = createToken({ name: "Den", pattern: /den/ })
 
 var WhiteSpace = createToken({ name: "WhiteSpace", pattern: /\s+/ })
 WhiteSpace.GROUP = Lexer.SKIPPED
+WhiteSpace.LINE_BREAKS = true
 
 var englishTokens = [
     WhiteSpace,
