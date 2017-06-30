@@ -638,27 +638,3 @@ export function isShortPattern(pattern: any): number | boolean {
         return false
     }
 }
-
-// optimized subset of regExp API
-export const nlRegExpLike = {
-    exec: function(text) {
-        let len = text.length
-        for (let i = this.lastIndex; i < len; i++) {
-            let c = text.charCodeAt(i)
-            if (c === 10) {
-                this.lastIndex = i + 1
-                return true
-            } else if (c === 13) {
-                if (text.charCodeAt(i + 1) === 10) {
-                    this.lastIndex = i + 2
-                } else {
-                    this.lastIndex = i + 1
-                }
-                return true
-            }
-        }
-        return null
-    },
-
-    lastIndex: 0
-}

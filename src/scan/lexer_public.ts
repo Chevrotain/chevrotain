@@ -8,7 +8,6 @@ import {
     analyzeTokenClasses,
     cloneEmptyGroups,
     DEFAULT_MODE,
-    nlRegExpLike,
     performRuntimeChecks,
     SUPPORT_STICKY,
     validatePatterns
@@ -94,24 +93,6 @@ export interface IRegExpExec {
     exec: CustomPatternMatcherFunc
 }
 
-/**
- * A subset of the regExp interface.
- * This is all that is needed to define
- */
-export interface ILineTerminatorsRegExp {
-    /**
-     * Just like regExp.exec but returned value should be a boolean 'true'
-     * if the match succeeded and null otherwise.
-     */
-    exec: (text: string) => true | null
-    /**
-     * Just like the regExp lastIndex with the global flag enabled
-     * It should be updated after every match to point to the offset where the next
-     * march attempt starts.
-     */
-    lastIndex: number
-}
-
 export interface ILexerConfig {
     /**
      * An optional flag indicating that lexer definition errors
@@ -144,28 +125,28 @@ export interface ILexerConfig {
     debug?: boolean
 
     /**
-     * A global regExp defining custom line terminators.
+     * A regExp defining custom line terminators.
      * This will be used to calculate the line and column information.
      *
-     * By default this is /\n|\r\n?/g
+     * Note that the regExp should use the global flag, for example: /\n/g
+     *
+     * The default /\n|\r\n?/g
+     *
      * But some grammars have a different definition, for example in ECMAScript:
      * http://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
      * U+2028 and U+2029 are also treated as line terminators.
      *
-     * In that case we would use
-     * {
-     *    lineTerminators: /\n|\r|\u2028|\u2029/g
-     * }
-     *
+     * In that case we would use /\n|\r|\u2028|\u2029/g
      */
-    lineTerminators?: RegExp | ILineTerminatorsRegExp
+    lineTerminatorsPattern?: RegExp
 }
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
+    // TODO: change to onlyOffset by default
     positionTracking: "full",
     debug: false,
-    lineTerminators: /\n|\r\n?/g
+    lineTerminatorsPattern: /\n|\r\n?/g
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -287,6 +268,8 @@ export class Lexer {
                     "a boolean 2nd argument is no longer supported"
             )
         }
+
+        // todo: defaults func?
         this.config = merge(DEFAULT_LEXER_CONFIG, config)
 
         if (this.config.debug === true) {
@@ -477,6 +460,7 @@ export class Lexer {
         let column = this.trackStartLines ? 1 : undefined
         let groups: any = cloneEmptyGroups(this.emptyGroups)
         let trackLines = this.trackStartLines
+        const lineTerminatorPattern = this.config.lineTerminatorsPattern
 
         let currModePatternsLength = 0
         let patternIdxToConfig = []
@@ -618,18 +602,19 @@ export class Lexer {
                     currConfig.canLineTerminator === true
                 ) {
                     let numOfLTsInMatch = 0
-                    let nl
+                    let foundTerminator
                     let lastLTEndOffset
-                    // nlRegExp.lastIndex = 0
-                    nlRegExpLike.lastIndex = 0
+                    lineTerminatorPattern.lastIndex = 0
                     do {
-                        // nl = nlRegExp.exec(matchedImage)
-                        nl = nlRegExpLike.exec(matchedImage)
-                        if (nl !== null) {
-                            lastLTEndOffset = nlRegExpLike.lastIndex - 1
+                        foundTerminator = lineTerminatorPattern.test(
+                            matchedImage
+                        )
+                        if (foundTerminator === true) {
+                            lastLTEndOffset =
+                                lineTerminatorPattern.lastIndex - 1
                             numOfLTsInMatch++
                         }
-                    } while (nl)
+                    } while (foundTerminator)
 
                     if (numOfLTsInMatch !== 0) {
                         line = line + numOfLTsInMatch
@@ -691,18 +676,19 @@ export class Lexer {
                                 )
 
                                 let numOfLTsInMatch = 0
-                                let nl
+                                let foundLineTerminator
                                 let lastLTOffset
-                                nlRegExpLike.lastIndex = 0
+                                lineTerminatorPattern.lastIndex = 0
                                 do {
-                                    nl = nlRegExpLike.exec(resyncedChunk)
-                                    if (nl !== null) {
+                                    foundLineTerminator = lineTerminatorPattern.test(
+                                        resyncedChunk
+                                    )
+                                    if (foundLineTerminator === true) {
                                         lastLTOffset =
-                                            // TODO: do we need the index property?
-                                            nlRegExpLike.lastIndex - 1
+                                            lineTerminatorPattern.lastIndex - 1
                                         numOfLTsInMatch++
                                     }
-                                } while (nl)
+                                } while (foundLineTerminator)
 
                                 if (numOfLTsInMatch !== 0) {
                                     line = line + numOfLTsInMatch
