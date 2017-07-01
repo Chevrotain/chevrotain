@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+- [Token patterns which may include line terminators must be explicitly flagged with the "line_breaks" property.](https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS)
+
+#### Major Changes
+- [Support for user defined line terminators.](https://github.com/SAP/chevrotain/issues/523)
+
+
+
 ## 0.30.0 (6-23-2017)
 
 #### Major Changes
