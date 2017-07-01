@@ -107,6 +107,10 @@ module.exports = function(grunt) {
             },
             bundle_spec: {
                 exec: "npm run bundle_spec"
+            },
+
+            docs: {
+                exec: "npm run docs"
             }
         },
 
@@ -281,20 +285,6 @@ module.exports = function(grunt) {
             }
         },
 
-        typedoc: {
-            build_docs: {
-                options: {
-                    out: "dev/docs",
-                    module: "commonjs",
-                    name: "Chevrotain",
-                    excludeExternals: "",
-                    includeDeclarations: true,
-                    tsconfig: "tsdocsconfig.json"
-                }
-                // src:     PUBLIC_API_TS_FILES
-            }
-        },
-
         coveralls: {
             publish: {
                 src: "dev/coverage/lcov.info"
@@ -316,7 +306,7 @@ module.exports = function(grunt) {
         "run:bundle",
         "run:bundle_min",
         "run:bundle_spec",
-        "typedoc:build_docs"
+        "run:docs"
     ]
 
     var quickBuildTasks = ["clean:release", "run:ts_compile", "webpack:release"]
