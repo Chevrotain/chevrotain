@@ -88,7 +88,7 @@ const semVer = createToken({
 new chevrotain.Lexer([semVer])
 ``` 
 
-It is possible to workaround this problem by simply **escaping** the the offending carat of dollar sign.
+It is possible to workaround this problem by simply **escaping** the the offending carat or dollar sign.
 
 ```javascript
 const semVer = createToken({
