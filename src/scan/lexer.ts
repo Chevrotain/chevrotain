@@ -338,9 +338,12 @@ export function findEndOfInputAnchor(
     let errors = map(invalidRegex, currClass => {
         return {
             message:
-                "Token class: ->" +
+                "Unexpected RegExp Anchor Error:\n" +
+                    "\tToken class: ->" +
                     tokenName(currClass) +
-                    "<- static 'PATTERN' cannot contain end of input anchor '$'",
+                    "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
+                    "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS \n" +
+                    "\tfor details.",
             type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
             tokenClasses: [currClass]
         }
@@ -384,9 +387,12 @@ export function findStartOfInputAnchor(
     let errors = map(invalidRegex, currClass => {
         return {
             message:
-                "Token class: ->" +
+                "Unexpected RegExp Anchor Error:\n" +
+                    "\tToken class: ->" +
                     tokenName(currClass) +
-                    "<- static 'PATTERN' cannot contain start of input anchor '^'",
+                    "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
+                    "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS\n" +
+                    "\tfor details.",
             type: LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
             tokenClasses: [currClass]
         }
@@ -608,10 +614,10 @@ export function performRuntimeChecks(
         errors.push({
             message:
                 "No LINE_BREAKS Error:\n" +
-                    "This Lexer has been defined to track line and column information,\n" +
-                    "yet none of the Token definitions contain a LINE_BREAK flag.\n" +
-                    "See https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS \n" +
-                    "for details.",
+                    "\tThis Lexer has been defined to track line and column information,\n" +
+                    "\tyet none of the Token definitions contain a LINE_BREAK flag.\n" +
+                    "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS \n" +
+                    "\tfor details.",
             type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
         })
     }

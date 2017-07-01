@@ -1,6 +1,7 @@
 ## Resolving Lexer Errors
 
 * [No LINE_BREAKS Error.](#LINE_BREAKS)
+* [Unexpected RegExp Anchor Error.](#ANCHORS)
 
 
 ### <a name="LINE_BREAKS"></a> No LINE_BREAKS Error. 
@@ -52,5 +53,49 @@ To resolve this choose one of the following:
      line terminators, if your language includes such tokens they must also be marked with the line_breaks flag.
    
    
+   
+### <a name="ANCHORS"></a> Unexpected RegExp Anchor Error.
+
+A Token RegExp pattern used in a chevrotain lexer may not use the start/end of input anchors ('$' and '^').
+
+```javascript
+const createToken = chevrotain.createToken
+    
+// Using createToken API
+const Whitespace = createToken({
+    name: "Integer",
+    // invalid pattern using both anchors
+    pattern: /^\d+$/
+})
+``` 
+
+This will be checked for during the initialization of the lexer.
+Unfortunately, this validation can detect false positives when the anchor characters
+are used in certain regExp contexts, for example:
+
+```javascript
+const createToken = chevrotain.createToken
+    
+const semVer = createToken({
+    name: "semVer",
+    // will match semantic versions such as: "1.0.2", "^0.3.9"
+    // inside a character set ([...]) the carat ('^') character does not act as an anchor.
+    // yet it would still cause the validation to fail.
+    pattern: /[~^]?\d+\.\d+\.\d+/
+})
+
+// will throw an error
+new chevrotain.Lexer([semVer])
+``` 
+
+It is possible to workaround this problem by simply **escaping** the the offending carat of dollar sign.
+
+```javascript
+const semVer = createToken({
+    name: "semVer",
+    pattern: /[~\^]?\d+\.\d+\.\d+/
+})
+``` 
+
 [position_tracking]: http://sap.github.io/chevrotain/documentation/0_30_0/interfaces/_chevrotain_d_.ilexerconfig.html#positiontracking
 [line_terminator_docs]: http://sap.github.io/chevrotain/documentation/0_30_0/interfaces/_chevrotain_d_.ilexerconfig.html#lineTerminatorsPattern   
