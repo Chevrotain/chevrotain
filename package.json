@@ -56,7 +56,8 @@
     "bundle": "webpack --config webpack_release.config.js",
     "bundle_min": "webpack --config webpack_release_min.config.js",
     "bundle_spec": "webpack --config webpack_specs.config.js",
-    "quick_build" : "tsc && npm run bundle"
+    "quick_build": "tsc && npm run bundle",
+    "docs": "typedoc --tsconfig tsdocsconfig.json --out dev/docs --module commonjs --name Chevrotain --excludeExternals  --includeDeclarations"
   },
   "devDependencies": {
     "@types/chai": "^4.0.0",
@@ -73,7 +74,6 @@
     "grunt-mocha-istanbul": "^5.0.2",
     "grunt-run": "^0.7.0",
     "grunt-text-replace": "^0.4.0",
-    "grunt-typedoc": "^0.2.4",
     "istanbul": "^0.4.5",
     "jsonfile": "^3.0.0",
     "karma": "~1.7.0",
