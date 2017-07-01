@@ -33,6 +33,8 @@ FRAGMENT("Name", "{{NameStartChar}}({{NameChar}})*")
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
 class Comment extends Token {}
 Comment.PATTERN = /<!--.*?-->/
+// A Comment may span multiple lines.
+Comment.LINE_BREAKS = true
 
 class CData extends Token {}
 CData.PATTERN = /<!\[CDATA\[.*?]]>/
@@ -49,10 +51,12 @@ CharRef.PATTERN = /&#\d+;|&#x[a-fA-F0-9]/
 
 class SEA_WS extends Token {}
 SEA_WS.PATTERN = /( |\t|\n|\r\n)+/
+SEA_WS.LINE_BREAKS = true
 
 class XMLDeclOpen extends Token {}
 XMLDeclOpen.PATTERN = /<\?xml[ \t\r\n]/
 XMLDeclOpen.PUSH_MODE = "INSIDE"
+XMLDeclOpen.LINE_BREAKS = true
 
 class SLASH_OPEN extends Token {}
 SLASH_OPEN.PATTERN = /<\//
@@ -67,6 +71,7 @@ PROCESSING_INSTRUCTION.PATTERN = MAKE_PATTERN("<\\?{{Name}}.*\\?>")
 
 class TEXT extends Token {}
 TEXT.PATTERN = /[^<&]+/
+TEXT.LINE_BREAKS = true
 
 class CLOSE extends Token {}
 CLOSE.PATTERN = />/
@@ -85,6 +90,7 @@ SLASH.PATTERN = /\//
 
 class STRING extends Token {}
 STRING.PATTERN = /"[^<"]*"|'[^<']*'/
+STRING.LINE_BREAKS = true
 
 class EQUALS extends Token {}
 EQUALS.PATTERN = /=/
@@ -95,6 +101,7 @@ Name.PATTERN = MAKE_PATTERN("{{Name}}")
 class S extends Token {}
 S.PATTERN = /[ \t\r\n]/
 S.GROUP = Lexer.SKIPPED
+S.LINE_BREAKS = true
 
 var XmlLexerDefinition = {
     defaultMode: "OUTSIDE",

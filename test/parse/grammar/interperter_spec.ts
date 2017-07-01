@@ -1555,7 +1555,8 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
         const WhiteSpace = createToken({
             name: "WhiteSpace",
             pattern: /\s+/,
-            group: Lexer.SKIPPED
+            group: Lexer.SKIPPED,
+            line_breaks: true
         })
 
         const allTokens = [

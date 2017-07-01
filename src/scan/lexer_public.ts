@@ -8,6 +8,7 @@ import {
     analyzeTokenClasses,
     cloneEmptyGroups,
     DEFAULT_MODE,
+    LineTerminatorOptimizedTester,
     performRuntimeChecks,
     SUPPORT_STICKY,
     validatePatterns
@@ -36,6 +37,7 @@ export interface TokenConstructor extends Function {
     LONGER_ALT?: TokenConstructor
     POP_MODE?: boolean
     PUSH_MODE?: string
+    LINE_BREAKS?: boolean
 
     tokenName?: string
     tokenType?: number
@@ -63,7 +65,8 @@ export enum LexerDefinitionErrorType {
     MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST,
     LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
     SOI_ANCHOR_FOUND,
-    EMPTY_MATCH_PATTERN
+    EMPTY_MATCH_PATTERN,
+    NO_LINE_BREAKS_FLAGS
 }
 
 export interface ILexerDefinitionError {
@@ -90,6 +93,23 @@ export interface IMultiModeLexerDefinition {
 
 export interface IRegExpExec {
     exec: CustomPatternMatcherFunc
+}
+
+/**
+ * A subset of the regExp interface.
+ * Needed to compute line/column info by a chevrotain lexer.
+ */
+export interface ILineTerminatorsTester {
+    /**
+     * Just like regExp.test
+     */
+    test: (text: string) => boolean
+    /**
+     * Just like the regExp lastIndex with the global flag enabled
+     * It should be updated after every match to point to the offset where the next
+     * match attempt starts.
+     */
+    lastIndex: number
 }
 
 export interface ILexerConfig {
@@ -119,15 +139,39 @@ export interface ILexerConfig {
      *   This information is always available by using the <getTokenConstructor> function on the official API.
      *   However, this is less convenient then a direct property when inspecting values in a debugger.
      *
-     * DO NOT ENABLE THIS IN PRODUCTION has a large performance penalty.
+     * DO NOT ENABLE THIS IN PRODUCTION, has a large performance penalty.
      */
     debug?: boolean
+
+    /**
+     * A regExp defining custom line terminators.
+     * This will be used to calculate the line and column information.
+     *
+     * Note that the regExp should use the global flag, for example: /\n/g
+     *
+     * The default is: /\n|\r\n?/g
+     *
+     * But some grammars have a different definition, for example in ECMAScript:
+     * http://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
+     * U+2028 and U+2029 are also treated as line terminators.
+     *
+     * In that case we would use /\n|\r|\u2028|\u2029/g
+     *
+     * Note that it is also possible to supply an optimized RegExp like implementation
+     * as only a subset of the RegExp is needed, @see {ILineTerminatorsRegExp}
+     * for details.
+     *
+     * keep in mind that for the default pattern: /\n|\r\n?/g an optimized implementation is already built-in.
+     * This means the optimization is only relevant for lexers overriding the default pattern.
+     */
+    lineTerminatorsPattern?: RegExp | ILineTerminatorsTester
 }
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
     positionTracking: "full",
-    debug: false
+    debug: false,
+    lineTerminatorsPattern: /\n|\r\n?/g
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -249,7 +293,17 @@ export class Lexer {
                     "a boolean 2nd argument is no longer supported"
             )
         }
+
+        // todo: defaults func?
         this.config = merge(DEFAULT_LEXER_CONFIG, config)
+
+        if (
+            this.config.lineTerminatorsPattern ===
+            DEFAULT_LEXER_CONFIG.lineTerminatorsPattern
+        ) {
+            // optimized built-in implementation for the defaults definition of lineTerminators
+            this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
+        }
 
         if (this.config.debug === true) {
             console.log(
@@ -281,7 +335,7 @@ export class Lexer {
         }
 
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-            performRuntimeChecks(actualDefinition)
+            performRuntimeChecks(actualDefinition, this.trackStartLines)
         )
 
         // for extra robustness to avoid throwing an none informative error message
@@ -428,7 +482,6 @@ export class Lexer {
             newToken,
             errLength,
             droppedChar,
-            lastLTIdx,
             msg,
             match
         let orgText = text
@@ -440,6 +493,7 @@ export class Lexer {
         let column = this.trackStartLines ? 1 : undefined
         let groups: any = cloneEmptyGroups(this.emptyGroups)
         let trackLines = this.trackStartLines
+        const lineTerminatorPattern = this.config.lineTerminatorsPattern
 
         let currModePatternsLength = 0
         let patternIdxToConfig = []
@@ -581,37 +635,27 @@ export class Lexer {
                     currConfig.canLineTerminator === true
                 ) {
                     let numOfLTsInMatch = 0
-                    let imageOffset = 0
-                    let imageLengthMinusOne = imageLength - 1
-
-                    while (imageOffset < matchedImage.length) {
-                        let c = matchedImage.charCodeAt(imageOffset)
-                        if (c === 10) {
-                            // "\n"
+                    let foundTerminator
+                    let lastLTEndOffset
+                    lineTerminatorPattern.lastIndex = 0
+                    do {
+                        foundTerminator = lineTerminatorPattern.test(
+                            matchedImage
+                        )
+                        if (foundTerminator === true) {
+                            lastLTEndOffset =
+                                lineTerminatorPattern.lastIndex - 1
                             numOfLTsInMatch++
-                            lastLTIdx = imageOffset
-                        } else if (c === 13) {
-                            // \r
-                            if (
-                                imageOffset !== imageLengthMinusOne &&
-                                matchedImage.charCodeAt(imageOffset + 1) === 10
-                            ) {
-                                // "\n"
-                            } else {
-                                numOfLTsInMatch++
-                                lastLTIdx = imageOffset
-                            }
                         }
-                        imageOffset++
-                    }
+                    } while (foundTerminator)
 
                     if (numOfLTsInMatch !== 0) {
                         line = line + numOfLTsInMatch
-                        column = imageLength - lastLTIdx
+                        column = imageLength - lastLTEndOffset
                         this.updateTokenEndLineColumnLocation(
                             newToken,
                             group,
-                            lastLTIdx,
+                            lastLTEndOffset,
                             numOfLTsInMatch,
                             line,
                             column,
@@ -630,24 +674,6 @@ export class Lexer {
                 while (!foundResyncPoint && offset < orgLength) {
                     // drop chars until we succeed in matching something
                     droppedChar = orgText.charCodeAt(offset)
-                    if (
-                        droppedChar === 10 || // '\n'
-                        (droppedChar === 13 &&
-                            (offset === orgLength - 1 ||
-                                (offset < orgLength - 1 &&
-                                    orgText.charCodeAt(offset + 1) !== 10)))
-                    ) {
-                        //'\r' not
-                        // followed by
-                        // '\n'
-                        line++
-                        column = 1
-                    } else {
-                        // this else also matches '\r\n' which is fine, the '\n' will be counted
-                        // either when skipping the next char, or when consuming the following pattern
-                        // (which will have to start in a '\n' if we manage to consume it)
-                        column++
-                    }
                     // Identity Func (when sticky flag is enabled)
                     text = this.chopInput(text, 1)
                     offset++

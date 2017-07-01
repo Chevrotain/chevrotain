@@ -57,6 +57,7 @@ var ExitSigns = createToken({
 
 var Whitespace = createToken({ name: "Whitespace", pattern: /(\t| )/ })
 Whitespace.GROUP = Lexer.SKIPPED
+Whitespace.LINE_BREAKS = true
 
 // Each key defines a Lexer mode's name.
 // And each value is an array of Tokens which are valid in this Lexer mode.

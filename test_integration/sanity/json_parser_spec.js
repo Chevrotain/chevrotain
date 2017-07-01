@@ -32,7 +32,8 @@
     var WhiteSpace = createToken({
         name: "WhiteSpace",
         pattern: /\s+/,
-        group: Lexer.SKIPPED
+        group: Lexer.SKIPPED,
+        line_breaks: true
     })
 
     var allTokens = [

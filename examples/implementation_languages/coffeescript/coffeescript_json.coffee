@@ -36,6 +36,7 @@ class NumberLiteral extends Token
 class WhiteSpace extends Token
   @PATTERN = /\s+/
   @GROUP = Lexer.SKIPPED
+  @LINE_BREAKS = true
 
 allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
 JsonLexer = new Lexer allTokens

@@ -538,7 +538,9 @@ function defineRecognizerSpecs(
                 let C = extendToken("C", /C/)
                 let allTokens = [A, B, C]
 
-                let lexer = new Lexer(allTokens)
+                let lexer = new Lexer(allTokens, {
+                    positionTracking: "onlyOffset"
+                })
 
                 class SingleTokenInsertRegular extends Parser {
                     constructor(input: IToken[] = []) {

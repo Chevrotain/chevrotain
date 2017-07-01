@@ -40,6 +40,7 @@ Amazing.PATTERN = /amazing/
 class WhiteSpace extends Token {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED
+WhiteSpace.LINE_BREAKS = true
 
 var allTokens = [
     WhiteSpace,
