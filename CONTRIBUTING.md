@@ -55,8 +55,7 @@ This will run the full build, including linting/packaging:
 * ```grunt build```
 
 Alternatively during development many times only the TypeScript compilation step is needed:
-* ```watch.bat```
-* ```watch.sh```
+* ```npm run watch```
 
 #### Testing
 
