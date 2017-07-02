@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": " Apache-2.0",
   "dependencies": {
-    "chevrotain": "*"
+    "chevrotain": "^0.31.0"
   },
   "scripts": {
     "pack_antlr4": "browserify ./node_modules/antlr4/index.js -o ./bower_components/antlr4/antlr4.js -s antlr4"
@@ -16,7 +16,7 @@
     "jison-lex": "*",
     "jsonfile": "^2.2.3",
     "lodash": "^3.10.1",
-    "nearley": "^2.9.2",
+    "nearley": "^2.10.1",
     "wrench": "^1.5.8"
   },
   "private": true
