@@ -1,23 +1,23 @@
 import { Parser } from "../../../src/parse/parser_public"
-import { Token, EOF, extendToken } from "../../../src/scan/tokens_public"
+import { EOF, extendToken, Token } from "../../../src/scan/tokens_public"
 import { gast } from "../../../src/parse/grammar/gast_public"
 import {
-    buildLookaheadFuncForOr,
-    buildLookaheadForOption,
-    buildLookaheadForMany,
-    lookAheadSequenceFromAlternatives,
     buildAlternativesLookAheadFunc,
+    buildLookaheadFuncForOptionalProd,
+    buildLookaheadFuncForOr,
     buildSingleAlternativeLookaheadFunction,
     getProdType,
+    lookAheadSequenceFromAlternatives,
     PROD_TYPE
 } from "../../../src/parse/grammar/lookahead"
 import { map } from "../../../src/utils/utils"
 import {
     augmentTokenClasses,
     tokenClassIdentity,
-    tokenStructuredMatcher,
-    tokenStructuredIdentity
+    tokenStructuredIdentity,
+    tokenStructuredMatcher
 } from "../../../src/scan/tokens"
+import { createRegularToken } from "../../utils/matchers"
 import Terminal = gast.Terminal
 import RepetitionMandatoryWithSeparator = gast.RepetitionMandatoryWithSeparator
 import Repetition = gast.Repetition
@@ -28,7 +28,6 @@ import RepetitionWithSeparator = gast.RepetitionWithSeparator
 import Flat = gast.Flat
 import Alternation = gast.Alternation
 import RepetitionMandatory = gast.RepetitionMandatory
-import { createRegularToken } from "../../utils/matchers"
 
 // TODO: convert this whole test to test on all types of Tokens.
 
@@ -295,14 +294,16 @@ function defineLookaheadSpecs(
                 let colonMock = new ColonParserMock()
                 let indentMock = new IdentParserMock()
 
-                let laFunc = buildLookaheadForOption(
+                let laFunc = buildLookaheadFuncForOptionalProd(
                     1,
                     actionDec,
                     1,
                     tokenMatcher,
                     tokenTypeIdentity,
                     tokenIdentity,
-                    false
+                    false,
+                    PROD_TYPE.OPTION,
+                    buildSingleAlternativeLookaheadFunction
                 )
 
                 expect(laFunc.call(colonMock)).to.equal(false)
@@ -313,14 +314,16 @@ function defineLookaheadSpecs(
                 let colonParserMock = new ColonParserMock()
                 let identParserMock = new IdentParserMock()
 
-                let laFunc = buildLookaheadForOption(
+                let laFunc = buildLookaheadFuncForOptionalProd(
                     2,
                     actionDec,
                     1,
                     tokenMatcher,
                     tokenTypeIdentity,
                     tokenIdentity,
-                    false
+                    false,
+                    PROD_TYPE.OPTION,
+                    buildSingleAlternativeLookaheadFunction
                 )
 
                 expect(laFunc.call(colonParserMock)).to.equal(true)
@@ -331,14 +334,16 @@ function defineLookaheadSpecs(
                 let identParserMock = new IdentParserMock()
                 let commaParserMock = new CommaParserMock()
 
-                let laFunc = buildLookaheadForMany(
+                let laFunc = buildLookaheadFuncForOptionalProd(
                     1,
                     actionDec,
                     1,
                     tokenMatcher,
                     tokenTypeIdentity,
                     tokenIdentity,
-                    false
+                    false,
+                    PROD_TYPE.REPETITION,
+                    buildSingleAlternativeLookaheadFunction
                 )
 
                 expect(laFunc.call(commaParserMock)).to.equal(true)
@@ -359,7 +364,8 @@ function defineLookaheadSpecs(
                     tokenMatcher,
                     tokenTypeIdentity,
                     tokenIdentity,
-                    false
+                    false,
+                    buildAlternativesLookAheadFunc
                 )
 
                 expect(laFunc.call(commaParserMock)).to.equal(0)
@@ -381,7 +387,8 @@ function defineLookaheadSpecs(
                     tokenMatcher,
                     tokenTypeIdentity,
                     tokenIdentity,
-                    false
+                    false,
+                    buildAlternativesLookAheadFunc
                 )
 
                 expect(laFunc.call(keyParserMock)).to.equal(0)
