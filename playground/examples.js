@@ -59,8 +59,11 @@ function jsonExample() {
     var NumberLiteral = createToken({
         name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
     });
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
+    var WhiteSpace = createToken({
+        name: "WhiteSpace", pattern: /\s+/,
+        group: Lexer.SKIPPED,
+        line_breaks: true
+    });
 
 
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
@@ -202,9 +205,12 @@ function jsonGrammarOnlyExample() {
     var NumberLiteral = createToken({
         name: "NumberLiteral", pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
     });
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
-
+    var WhiteSpace = createToken({
+        name: "WhiteSpace",
+        pattern: /\s+/,
+        group: Lexer.SKIPPED,
+        line_breaks: true
+    });
 
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
@@ -341,13 +347,21 @@ function cssExample() {
     FRAGMENT("ident", "-?{{nmstart}}{{nmchar}}*");
     FRAGMENT("num", "[0-9]+|[0-9]*\\.[0-9]+");
 
-    var Whitespace = createToken({name: 'Whitespace', pattern: MAKE_PATTERN('{{spaces}}')});
-    var Comment = createToken({name: 'Comment', pattern: /\/\*[^*]*\*+([^/*][^*]*\*+)*\//});
-    // the W3C specs are are defined in a whitespace sensitive manner.
-    // This implementation ignores that crazy mess, This means that this grammar may be a superset of the css 2.1 grammar.
-    // Checking for whitespace related errors can be done in a separate process AFTER parsing.
-    Whitespace.GROUP = Lexer.SKIPPED;
-    Comment.GROUP = Lexer.SKIPPED;
+    var Whitespace = createToken({
+        name: 'Whitespace',
+        pattern: MAKE_PATTERN('{{spaces}}'),
+        group: Lexer.SKIPPED,
+        line_breaks: true
+    });
+    var Comment = createToken({
+        name: 'Comment',
+        pattern: /\/\*[^*]*\*+([^/*][^*]*\*+)*\//,
+        // the W3C specs are are defined in a whitespace sensitive manner.
+        // but this grammar is not
+        // TODO: there is actually one place in the CSS grammar where whitespace is meaningful.
+        group: Lexer.SKIPPED,
+        line_breaks: true
+    });
 
     // This group has to be defined BEFORE Ident as their prefix is a valid Ident
     var Uri = createToken({name: 'Uri', pattern: Lexer.NA});
@@ -813,8 +827,12 @@ function calculatorExample() {
     var PowerFunc = createToken({name: "PowerFunc", pattern: /power/});
     var Comma = createToken({name: "Comma", pattern: /,/});
 
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/});
-    WhiteSpace.GROUP = Lexer.SKIPPED;
+    var WhiteSpace = createToken({
+        name: "WhiteSpace",
+        pattern: /\s+/,
+        group: Lexer.SKIPPED,
+        line_breaks: true
+    });
 
     // whitespace is normally very common so it is placed first to speed up the lexer
     var allTokens = [WhiteSpace,
@@ -990,7 +1008,12 @@ function calculatorExampleCst() {
     var Comma = createToken({name: "Comma", pattern: /,/});
 
     // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
-    var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED});
+    var WhiteSpace = createToken({
+        name: "WhiteSpace",
+        pattern: /\s+/,
+        group: Lexer.SKIPPED,
+        line_breaks: true
+    });
 
     var allTokens = [WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
         Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator, PowerFunc, Comma];
