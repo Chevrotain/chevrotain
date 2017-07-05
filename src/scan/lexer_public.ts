@@ -192,6 +192,7 @@ export class Lexer {
     private config: ILexerConfig = undefined
     private trackStartLines: boolean = true
     private trackEndLines: boolean = true
+    private hasCustom: boolean = false
 
     /**
      * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
@@ -377,6 +378,9 @@ export class Lexer {
                         this.emptyGroups,
                         currAnalyzeResult.emptyGroups
                     )
+
+                    this.hasCustom =
+                        currAnalyzeResult.hasCustom || this.hasCustom
                 }
             }
         )
@@ -492,7 +496,9 @@ export class Lexer {
         // guessing too little will still reduce the number of array re-sizes on pushes.
         // guessing too large (Tested by guessing x4 too large) may cost a bit more of memory
         // but would still have a faster runtime by avoiding (All but one) array resizing.
-        let guessedNumberOfTokens = Math.floor(text.length / 10)
+        let guessedNumberOfTokens = this.hasCustom
+            ? 0 // will break custom token pattern APIs the matchedTokens array will contain undefined elements.
+            : Math.floor(text.length / 10)
         let matchedTokens = new Array(guessedNumberOfTokens)
         let errors: ILexingError[] = []
         let line = this.trackStartLines ? 1 : undefined

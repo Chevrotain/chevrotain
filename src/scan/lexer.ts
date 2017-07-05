@@ -50,6 +50,7 @@ export interface IPatternConfig {
 export interface IAnalyzeResult {
     patternIdxToConfig: IPatternConfig[]
     emptyGroups: { [groupName: string]: Token[] }
+    hasCustom: boolean
 }
 
 export let SUPPORT_STICKY =
@@ -71,6 +72,7 @@ export function analyzeTokenClasses(
         return currClass[PATTERN] === Lexer.NA
     })
 
+    let hasCustom = false
     let allTransformedPatterns = map(onlyRelevantClasses, currClass => {
         let currPattern = currClass[PATTERN]
 
@@ -120,9 +122,11 @@ export function analyzeTokenClasses(
                     : addStartOfInput(currPattern)
             }
         } else if (isFunction(currPattern)) {
+            hasCustom = true
             // CustomPatternMatcherFunc - custom patterns do not require any transformations, only wrapping in a RegExp Like object
             return { exec: currPattern }
         } else if (has(currPattern, "exec")) {
+            hasCustom = true
             // ICustomPattern
             return currPattern
         } else if (typeof currPattern === "string") {
@@ -220,7 +224,8 @@ export function analyzeTokenClasses(
 
     return {
         emptyGroups: emptyGroups,
-        patternIdxToConfig: patternIdxToConfig
+        patternIdxToConfig: patternIdxToConfig,
+        hasCustom: hasCustom
     }
 }
 
