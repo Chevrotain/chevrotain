@@ -433,6 +433,12 @@ export class Lexer {
                     .positionTracking}"`
             )
         }
+
+        if (this.hasCustom) {
+            this.addToken = this.addTokenUsingPush
+        } else {
+            this.addToken = this.addTokenUsingMemberAccess
+        }
     }
 
     /**
@@ -631,8 +637,11 @@ export class Lexer {
                     )
 
                     if (group === false) {
-                        matchedTokens[matchedTokensIndex] = newToken
-                        matchedTokensIndex++
+                        matchedTokensIndex = this.addToken(
+                            matchedTokens,
+                            matchedTokensIndex,
+                            newToken
+                        )
                     } else {
                         groups[group].push(newToken)
                     }
@@ -737,8 +746,12 @@ export class Lexer {
             }
         }
 
-        // if we guessed a too large size for the tokens array this will shrink it to the right size.
-        matchedTokens.length = matchedTokensIndex
+        // if we do have custom patterns which push directly into the
+        if (!this.hasCustom) {
+            // if we guessed a too large size for the tokens array this will shrink it to the right size.
+            matchedTokens.length = matchedTokensIndex
+        }
+
         return { tokens: matchedTokens, groups: groups, errors: errors }
     }
 
@@ -856,5 +869,22 @@ export class Lexer {
                 )
             })
         })
+    }
+
+    // Place holder, will be replaced by the correct variant according to the locationTracking option at runtime.
+    /* istanbul ignore next - place holder */
+    private addToken(tokenVector, index, tokenToAdd): number {
+        return 666
+    }
+
+    private addTokenUsingPush(tokenVector, index, tokenToAdd): number {
+        tokenVector.push(tokenToAdd)
+        return index
+    }
+
+    private addTokenUsingMemberAccess(tokenVector, index, tokenToAdd): number {
+        tokenVector[index] = tokenToAdd
+        index++
+        return index
     }
 }
