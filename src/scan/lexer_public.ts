@@ -487,7 +487,13 @@ export class Lexer {
         let orgText = text
         let orgLength = orgText.length
         let offset = 0
-        let matchedTokens = []
+        let matchedTokensIndex = 0
+        // initializing the tokensArray to the "guessed" size.
+        // guessing too little will still reduce the number of array re-sizes on pushes.
+        // guessing too large (Tested by guessing x4 too large) may cost a bit more of memory
+        // but would still have a faster runtime by avoiding (All but one) array resizing.
+        let guessedNumberOfTokens = Math.floor(text.length / 10)
+        let matchedTokens = new Array(guessedNumberOfTokens)
         let errors: ILexingError[] = []
         let line = this.trackStartLines ? 1 : undefined
         let column = this.trackStartLines ? 1 : undefined
@@ -619,7 +625,8 @@ export class Lexer {
                     )
 
                     if (group === false) {
-                        matchedTokens.push(newToken)
+                        matchedTokens[matchedTokensIndex] = newToken
+                        matchedTokensIndex++
                     } else {
                         groups[group].push(newToken)
                     }
@@ -724,6 +731,8 @@ export class Lexer {
             }
         }
 
+        // if we guessed a too large size for the tokens array this will shrink it to the right size.
+        matchedTokens.length = matchedTokensIndex
         return { tokens: matchedTokens, groups: groups, errors: errors }
     }
 
