@@ -97,5 +97,5 @@ const semVer = createToken({
 })
 ``` 
 
-[position_tracking]: http://sap.github.io/chevrotain/documentation/0_31_0/interfaces/_chevrotain_d_.ilexerconfig.html#positiontracking
-[line_terminator_docs]: http://sap.github.io/chevrotain/documentation/0_31_0/interfaces/_chevrotain_d_.ilexerconfig.html#lineTerminatorsPattern   
+[position_tracking]: http://sap.github.io/chevrotain/documentation/0_32_0/interfaces/_chevrotain_d_.ilexerconfig.html#positiontracking
+[line_terminator_docs]: http://sap.github.io/chevrotain/documentation/0_32_0/interfaces/_chevrotain_d_.ilexerconfig.html#lineTerminatorsPattern   
