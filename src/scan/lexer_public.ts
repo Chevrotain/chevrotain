@@ -403,10 +403,15 @@ export class Lexer {
             )
         }
 
+        // Choose the relevant internal implementations for this specific parser.
+        // These implementations should be in-lined by the JavaScript engine
+        // to provide optimal performance in each scenario.
         if (SUPPORT_STICKY) {
             this.chopInput = <any>IDENTITY
+            this.match = this.matchWithTest
         } else {
             this.updateLastIndex = NOOP
+            this.match = this.matchWithExec
         }
 
         if (hasOnlySingleMode) {
@@ -577,8 +582,7 @@ export class Lexer {
                     matchedImage = match !== null ? match[0] : match
                 } else {
                     this.updateLastIndex(currPattern, offset)
-                    match = currPattern.exec(text)
-                    matchedImage = match !== null ? match[0] : match
+                    matchedImage = this.match(currPattern, text, offset)
                 }
 
                 if (matchedImage !== null) {
@@ -603,8 +607,11 @@ export class Lexer {
                             matchAltImage = match !== null ? match[0] : match
                         } else {
                             this.updateLastIndex(longerAltPattern, offset)
-                            match = longerAltPattern.exec(text)
-                            matchAltImage = match !== null ? match[0] : match
+                            matchAltImage = this.match(
+                                longerAltPattern,
+                                text,
+                                offset
+                            )
                         }
 
                         if (
@@ -886,5 +893,27 @@ export class Lexer {
         tokenVector[index] = tokenToAdd
         index++
         return index
+    }
+
+    /* istanbul ignore next - place holder to be replaced with chosen alternative at runtime */
+    private match(pattern: RegExp, text: string, offset?: number): string {
+        return null
+    }
+
+    private matchWithTest(
+        pattern: RegExp,
+        text: string,
+        offset: number
+    ): string {
+        let found = pattern.test(text)
+        if (found === true) {
+            return text.substring(offset, pattern.lastIndex)
+        }
+        return null
+    }
+
+    private matchWithExec(pattern, text): string {
+        let regExpArray = pattern.exec(text)
+        return regExpArray !== null ? regExpArray[0] : regExpArray
     }
 }
