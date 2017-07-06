@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/lodash@4.17.2/lodash.min.js"></script>
 <script src="https://unpkg.com/benchmark@2.1.2"></script>
 <script src="samples/1K_json.js"></script>
+<script src="samples/1K_css.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
@@ -62,6 +63,32 @@
 
                     </div>
 
+                    <div class="dataRow CSS_Dev">
+
+                        <div class="benchName"><a rel="nofollow" href="../lib/chevrotain.js">CSS_Dev</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow CSS_Latest">
+
+                        <div class="benchName"><a rel="nofollow" href="https://unpkg.com/chevrotain/lib/chevrotain.js">CSS_Latest</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -85,8 +112,11 @@
         return iframe.contentWindow
     }
 
-    var jsonLatestFrame = includeTestIFrame("JSON_Latest", "./parsers/json_latest.html")
-    var jsonDevFrame = includeTestIFrame("JSON_Dev", "./parsers/json_dev.html")
+    var jsonLatestFrame = includeTestIFrame("JSON_Latest", "./parsers/json/json_latest.html")
+    var jsonDevFrame = includeTestIFrame("JSON_Dev", "./parsers/json/json_dev.html")
+
+    var cssLatestFrame = includeTestIFrame("CSS_Latest", "./parsers/css/css_latest.html")
+    var cssDevFrame = includeTestIFrame("CSS_Dev", "./parsers/css/css_dev.html")
 
     var orgData = {
         labels:   [],
@@ -122,22 +152,30 @@
         clearData()
     }
 
-    function addTest(suite, id, action) {
+    function addTest(suite, id, action, input) {
         var $el = $('.' + id + ' input')
         if ($el && $el.is(':checked')) {
             suite.add(id, function() {
-                action(json_sample1k, lexerOnly)
+                action(input, lexerOnly)
             })
         }
     }
 
     var testCases = {
         JSON_Dev: function(suite) {
-            addTest(suite, 'JSON_Dev', jsonDevFrame.parse)
+            addTest(suite, 'JSON_Dev', jsonDevFrame.parse, json_sample1k)
         },
 
         JSON_Latest: function(suite) {
-            addTest(suite, 'JSON_Latest', jsonLatestFrame.parse)
+            addTest(suite, 'JSON_Latest', jsonLatestFrame.parse, json_sample1k)
+        },
+
+        CSS_Dev: function(suite) {
+            addTest(suite, 'CSS_Dev', cssDevFrame.parse, css_sample1k)
+        },
+
+        CSS_Latest: function(suite) {
+            addTest(suite, 'CSS_Latest', cssLatestFrame.parse, css_sample1k)
         }
     }
 

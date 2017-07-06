@@ -45,7 +45,7 @@ var jsonTokens = [
     Null
 ]
 // Tracking only the offset provides a small speed boost.
-var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {
+var JsonLexer = new ChevrotainLexer(jsonTokens, {
     positionTracking: "onlyOffset"
 })
 
@@ -55,7 +55,7 @@ var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {
 // (Do not create a new Parser instance for each new input.)
 var ChevrotainParser = chevrotain.Parser
 
-function ChevrotainJsonParser(input, options) {
+function JsonParser(input, options) {
     ChevrotainParser.call(this, input, jsonTokens, options)
     const $ = this
 
@@ -120,5 +120,5 @@ function ChevrotainJsonParser(input, options) {
     ChevrotainParser.performSelfAnalysis(this)
 }
 
-ChevrotainJsonParser.prototype = Object.create(ChevrotainParser.prototype)
-ChevrotainJsonParser.prototype.constructor = ChevrotainJsonParser
+JsonParser.prototype = Object.create(ChevrotainParser.prototype)
+JsonParser.prototype.constructor = JsonParser
