@@ -1,3 +1,15 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+
+Lexer Performance oriented release. 
+10%+ performance boost measured under V8.
+
+- [Lexer Perf boost - .test + lastIndex vs .exec.](https://github.com/SAP/chevrotain/issues/522)
+- [Reduce token vector resizing using a simple heuristic](https://github.com/SAP/chevrotain/commit/530a1fe5fe0bb24233d1ff9759bae073e07365fe)
+
+
+
 ## 0.31.0 (2017-7-1)
 
 #### Breaking Changes
