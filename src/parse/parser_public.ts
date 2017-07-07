@@ -261,6 +261,7 @@ export interface IFollowKey {
  * ])
  */
 export interface IOrAlt<T> {
+    NAME?: string
     ALT: () => T
 }
 
@@ -2912,7 +2913,10 @@ export class Parser {
         occurrence: number
     ): T {
         let laKey = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let nestedName = this.nestedRuleBeforeClause(altsOrOpts, laKey)
+        let nestedName = this.nestedRuleBeforeClause(
+            <OrMethodOpts<T>>altsOrOpts,
+            laKey
+        )
 
         try {
             let alts = isArray(altsOrOpts)

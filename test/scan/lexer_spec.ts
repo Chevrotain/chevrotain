@@ -747,7 +747,7 @@ function defineLexerSpecs(
                 })
 
                 it("Will throw an error during the creation of a Lexer if the lexer config argument is a boolean", () => {
-                    expect(() => new Lexer([], false)).to.throw(
+                    expect(() => new Lexer([], <any>false)).to.throw(
                         "The second argument to the Lexer constructor is now an ILexerConfig"
                     )
                 })
