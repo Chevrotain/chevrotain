@@ -1,1 +1,0 @@
-node --trace-hydrogen --trace-phase=Z --trace-deopt --code-comments --hydrogen-track-positions --redirect-code-traces --print-opt-code --redirect-code-traces-to=code.asm benchmark.js
