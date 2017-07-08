@@ -17,8 +17,7 @@
     var Lexer = chevrotain.Lexer
     var Parser = chevrotain.Parser
 
-    // In ES6, custom inheritance implementation (such as 'extendToken(...)') can be replaced with simple "class X extends Y"...
-    var True = createToken({ name: "True", pattern: () => true })
+    var True = createToken({ name: "True", pattern: "true" })
     var False = createToken({ name: "False", pattern: "false" })
     var Null = createToken({ name: "Null", pattern: "null" })
     var LCurly = createToken({ name: "LCurly", pattern: "{" })
@@ -36,7 +35,11 @@
         name: "NumberLiteral",
         pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
     })
-    var WhiteSpace = createToken({ name: "WhiteSpace", pattern: /\s+/ })
+    var WhiteSpace = createToken({
+        name: "WhiteSpace",
+        pattern: /\s+/,
+        line_breaks: true
+    })
     WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 
     var allTokens = [
