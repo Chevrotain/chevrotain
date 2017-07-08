@@ -13,8 +13,8 @@
 <script src="../api.js"> </script>
 
 <script>
-    function parse(text, lexOnly) {
-        return parseBench(text, lexOnly, CssLexer, CssParser, "stylesheet")
+    function parse(text, options) {
+        return parseBench(text, CssLexer, CssParser, "stylesheet", options)
     }
 </script>
 

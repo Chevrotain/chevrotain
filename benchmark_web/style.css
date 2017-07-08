@@ -21,6 +21,12 @@
     margin-bottom: 15px;
 }
 
+#runAllButton_parser {
+    width: 100px;
+    height: 50px;
+    margin-bottom: 15px;
+}
+
 /*
  style the stuff as if they were a table.
  allow for position relative/absolute for sorting and transforms.

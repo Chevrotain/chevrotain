@@ -24,7 +24,8 @@
         <div class="col-lg-6">
             <div id="resultsContainer">
                 <button onclick="onRunAll()" id="runAllButton">Run Lex And Parse</button>
-                <button onclick="onRunAll({lexerOnly:true})" id="runAllButton_lexer">Run Lexer Only</button>
+                <button onclick="onRunAll({lexerOnly:true, parserOnly:false})" id="runAllButton_lexer">Run Lexer Only</button>
+                <button onclick="onRunAll({lexerOnly:false, parserOnly:true})" id="runAllButton_parser">Run Parser Only</button>
                 <div id="wait" style="margin-left: auto;margin-right: auto;">&nbsp;</div>
                 <div class="headerRow">
 
@@ -102,6 +103,7 @@
 <script>
 
     var lexerOnly = false;
+    var parserOnly = false;
 
     function includeTestIFrame(id, url) {
         var iframe = document.createElement("iframe")
@@ -156,7 +158,7 @@
         var $el = $('.' + id + ' input')
         if ($el && $el.is(':checked')) {
             suite.add(id, function() {
-                action(input, lexerOnly)
+                action(input, {lexerOnly:lexerOnly, parserOnly:parserOnly})
             })
         }
     }
@@ -181,6 +183,7 @@
 
     function onRunAll(options) {
         lexerOnly = options && options.lexerOnly === true
+        parserOnly = options && options.parserOnly === true
         clearResults()
 
         // These names are in the order in which they appear in the DOM
@@ -198,7 +201,7 @@
 
         $("#runAllButton").prop('disabled', true)
         $("#runAllButton_lexer").prop('disabled', true)
-
+        $("#runAllButton_parser").prop('disabled', true)
 
         //handle "Running..."
         var valueBeforeTheDots = "Running"
@@ -259,6 +262,7 @@
             setTimeout(function() {
                 $("#runAllButton").prop('disabled', false)
                 $("#runAllButton_lexer").prop('disabled', false)
+                $("#runAllButton_parser").prop('disabled', false)
             }, 1000)
 
         }).run({'async': true})

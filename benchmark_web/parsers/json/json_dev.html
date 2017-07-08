@@ -12,8 +12,8 @@
 <script src="../api.js"></script>
 
 <script>
-    function parse(text, lexOnly) {
-        return parseBench(text, lexOnly, JsonLexer, JsonParser, "json")
+    function parse(text, options) {
+        return parseBench(text, JsonLexer, JsonParser, "json", options)
     }
 </script>
 </body>
