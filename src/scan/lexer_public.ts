@@ -530,12 +530,14 @@ export class Lexer {
                 let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
                 errors.push({
                     offset: popToken.startOffset,
-                    line: popToken.startLine !== undefined
-                        ? popToken.startLine
-                        : undefined,
-                    column: popToken.startColumn !== undefined
-                        ? popToken.startColumn
-                        : undefined,
+                    line:
+                        popToken.startLine !== undefined
+                            ? popToken.startLine
+                            : undefined,
+                    column:
+                        popToken.startColumn !== undefined
+                            ? popToken.startColumn
+                            : undefined,
                     length: popToken.image.length,
                     message: msg
                 })

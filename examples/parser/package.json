@@ -1,21 +1,21 @@
 {
-  "name": "chevrotain_examples_parser",
-  "version": "0.1.0",
-  "scripts": {
-    "test": "grunt --gruntfile minification/gruntfile.js && npm --prefix ./webpack install ./webpack && mocha '!(node_modules)/**/*spec.js'"
-  },
-  "dependencies": {
-    "chevrotain": "*",
-    "lodash": "~3.10.1"
-  },
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-uglify": "^2.0.0",
-    "grunt-mocha-istanbul": "^5.0.1",
-    "mocha": "^3.2.0",
-    "webpack": "^1.14.0"
-  },
-  "private": true
+    "name": "chevrotain_examples_parser",
+    "version": "0.1.0",
+    "scripts": {
+        "test": "grunt --gruntfile minification/gruntfile.js && npm --prefix ./webpack install ./webpack && mocha '!(node_modules)/**/*spec.js'"
+    },
+    "dependencies": {
+        "chevrotain": "*",
+        "lodash": "~3.10.1"
+    },
+    "devDependencies": {
+        "chai": "^3.5.0",
+        "grunt": "^1.0.1",
+        "grunt-cli": "^1.2.0",
+        "grunt-contrib-uglify": "^2.0.0",
+        "grunt-mocha-istanbul": "^5.0.1",
+        "mocha": "^3.2.0",
+        "webpack": "^1.14.0"
+    },
+    "private": true
 }

@@ -4,11 +4,20 @@ import { tokenLabel, tokenName } from "../../scan/tokens_public"
 
 export namespace gast {
     export interface INamedProductionConstructor extends Function {
-        new (definition: IProduction[], occurrenceInParent: number, name?: string): AbstractProduction
+        new (
+            definition: IProduction[],
+            occurrenceInParent: number,
+            name?: string
+        ): AbstractProduction
     }
 
     export interface INamedSepProductionConstructor extends Function {
-        new (definition: IProduction[], separator: TokenConstructor, occurrenceInParent: number, name?: string): AbstractProduction
+        new (
+            definition: IProduction[],
+            separator: TokenConstructor,
+            occurrenceInParent: number,
+            name?: string
+        ): AbstractProduction
     }
 
     export interface IOptionallyNamedProduction {

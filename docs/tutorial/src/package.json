@@ -1,16 +1,16 @@
 {
-  "name": "chevrotain_examples_tutorial",
-  "version": "0.1.0",
-  "scripts": {
-    "test": "mocha \"step*/*spec.js\""
-  },
-  "dependencies": {
-    "chevrotain": "*"
-  },
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0",
-    "lodash": "^4.17.4"
-  },
-  "private": true
+    "name": "chevrotain_examples_tutorial",
+    "version": "0.1.0",
+    "scripts": {
+        "test": "mocha \"step*/*spec.js\""
+    },
+    "dependencies": {
+        "chevrotain": "*"
+    },
+    "devDependencies": {
+        "chai": "^3.5.0",
+        "mocha": "^3.2.0",
+        "lodash": "^4.17.4"
+    },
+    "private": true
 }

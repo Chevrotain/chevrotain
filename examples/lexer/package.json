@@ -1,17 +1,17 @@
 {
-  "name": "chevrotain_examples_lexer",
-  "version": "0.1.0",
-  "scripts": {
-    "test": "mocha '!(node_modules)/**/*spec.js'"
-  },
-  "dependencies": {
-    "chevrotain": "*",
-    "lodash": "~3.10.1"
-  },
-  "devDependencies": {
-    "chai": "^3.5.0",
-    "extend": "^2.0.1",
-    "mocha": "^3.2.0"
-  },
-  "private": true
+    "name": "chevrotain_examples_lexer",
+    "version": "0.1.0",
+    "scripts": {
+        "test": "mocha '!(node_modules)/**/*spec.js'"
+    },
+    "dependencies": {
+        "chevrotain": "*",
+        "lodash": "~3.10.1"
+    },
+    "devDependencies": {
+        "chai": "^3.5.0",
+        "extend": "^2.0.1",
+        "mocha": "^3.2.0"
+    },
+    "private": true
 }

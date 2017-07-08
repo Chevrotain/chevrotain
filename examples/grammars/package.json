@@ -1,16 +1,16 @@
 {
-  "name": "chevrotain_examples_grammars",
-  "version": "0.1.0",
-  "scripts": {
-    "test": "mocha '!(node_modules)/**/*spec.js'"
-  },
-  "dependencies": {
-    "chevrotain": "*",
-    "lodash": "~3.10.1"
-  },
-  "devDependencies": {
-    "mocha": "^3.2.0",
-    "xregexp": "^3.1.1"
-  },
-  "private": true
+    "name": "chevrotain_examples_grammars",
+    "version": "0.1.0",
+    "scripts": {
+        "test": "mocha '!(node_modules)/**/*spec.js'"
+    },
+    "dependencies": {
+        "chevrotain": "*",
+        "lodash": "~3.10.1"
+    },
+    "devDependencies": {
+        "mocha": "^3.2.0",
+        "xregexp": "^3.1.1"
+    },
+    "private": true
 }

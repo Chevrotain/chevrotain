@@ -191,7 +191,9 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
 }
 
 // http://stackoverflow.com/questions/17125764/can-you-specify-multiple-type-constraints-for-typescript-generics
-interface AbsProdWithOccurrence extends gast.IProductionWithOccurrence, gast.AbstractProduction {}
+interface AbsProdWithOccurrence
+    extends gast.IProductionWithOccurrence,
+        gast.AbstractProduction {}
 
 function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
     regEx: RegExp,

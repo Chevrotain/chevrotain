@@ -388,7 +388,7 @@ export function buildSingleAlternativeLookaheadFunction(
             return function(): boolean {
                 let nextToken = this.LA(1)
                 return choiceToAlt[tokenInstanceIdentityFunc(nextToken)] ===
-                    true
+                true
                     ? true
                     : false
             }

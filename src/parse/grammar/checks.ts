@@ -471,8 +471,8 @@ export function validateEmptyOrAlternative(
                             message:
                                 `Ambiguous empty alternative: <${currAltIdx +
                                     1}>` +
-                                    ` in <OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n` +
-                                    `Only the last alternative may be an empty alternative.`,
+                                ` in <OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n` +
+                                `Only the last alternative may be an empty alternative.`,
                             type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
                             ruleName: topLevelRule.name,
                             occurrence: currOr.occurrenceInParent,

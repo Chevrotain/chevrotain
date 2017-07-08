@@ -290,8 +290,8 @@ export function findMissingPatterns(
         return {
             message:
                 "Token class: ->" +
-                    tokenName(currClass) +
-                    "<- missing static 'PATTERN' property",
+                tokenName(currClass) +
+                "<- missing static 'PATTERN' property",
             type: LexerDefinitionErrorType.MISSING_PATTERN,
             tokenClasses: [currClass]
         }
@@ -318,9 +318,9 @@ export function findInvalidPatterns(
         return {
             message:
                 "Token class: ->" +
-                    tokenName(currClass) +
-                    "<- static 'PATTERN' can only be a RegExp, a" +
-                    " Function matching the {CustomPatternMatcherFunc} type or an Object matching the {ICustomPattern} interface.",
+                tokenName(currClass) +
+                "<- static 'PATTERN' can only be a RegExp, a" +
+                " Function matching the {CustomPatternMatcherFunc} type or an Object matching the {ICustomPattern} interface.",
             type: LexerDefinitionErrorType.INVALID_PATTERN,
             tokenClasses: [currClass]
         }
@@ -344,11 +344,11 @@ export function findEndOfInputAnchor(
         return {
             message:
                 "Unexpected RegExp Anchor Error:\n" +
-                    "\tToken class: ->" +
-                    tokenName(currClass) +
-                    "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
-                    "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS \n" +
-                    "\tfor details.",
+                "\tToken class: ->" +
+                tokenName(currClass) +
+                "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
+                "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS \n" +
+                "\tfor details.",
             type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
             tokenClasses: [currClass]
         }
@@ -369,8 +369,8 @@ export function findEmptyMatchRegExps(
         return {
             message:
                 "Token class: ->" +
-                    tokenName(currClass) +
-                    "<- static 'PATTERN' must not match an empty string",
+                tokenName(currClass) +
+                "<- static 'PATTERN' must not match an empty string",
             type: LexerDefinitionErrorType.EMPTY_MATCH_PATTERN,
             tokenClasses: [currClass]
         }
@@ -393,11 +393,11 @@ export function findStartOfInputAnchor(
         return {
             message:
                 "Unexpected RegExp Anchor Error:\n" +
-                    "\tToken class: ->" +
-                    tokenName(currClass) +
-                    "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
-                    "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS\n" +
-                    "\tfor details.",
+                "\tToken class: ->" +
+                tokenName(currClass) +
+                "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
+                "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS\n" +
+                "\tfor details.",
             type: LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
             tokenClasses: [currClass]
         }
@@ -420,8 +420,8 @@ export function findUnsupportedFlags(
         return {
             message:
                 "Token class: ->" +
-                    tokenName(currClass) +
-                    "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
+                tokenName(currClass) +
+                "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
             type: LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
             tokenClasses: [currClass]
         }
@@ -471,9 +471,9 @@ export function findDuplicatePatterns(
         return {
             message:
                 `The same RegExp pattern ->${dupPatternSrc}<-` +
-                    `has been used in all the following classes: ${classNames.join(
-                        ", "
-                    )} <-`,
+                `has been used in all the following classes: ${classNames.join(
+                    ", "
+                )} <-`,
             type: LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
             tokenClasses: setOfIdentical
         }
@@ -498,8 +498,8 @@ export function findInvalidGroupType(
         return {
             message:
                 "Token class: ->" +
-                    tokenName(currClass) +
-                    "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
+                tokenName(currClass) +
+                "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
             type: LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
             tokenClasses: [currClass]
         }
@@ -560,8 +560,8 @@ export function performRuntimeChecks(
         errors.push({
             message:
                 "A MultiMode Lexer cannot be initialized without a <" +
-                    DEFAULT_MODE +
-                    "> property in its definition\n",
+                DEFAULT_MODE +
+                "> property in its definition\n",
             type: LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_DEFAULT_MODE
         })
     }
@@ -569,8 +569,8 @@ export function performRuntimeChecks(
         errors.push({
             message:
                 "A MultiMode Lexer cannot be initialized without a <" +
-                    MODES +
-                    "> property in its definition\n",
+                MODES +
+                "> property in its definition\n",
             type:
                 LexerDefinitionErrorType.MULTI_MODE_LEXER_WITHOUT_MODES_PROPERTY
         })
@@ -584,7 +584,7 @@ export function performRuntimeChecks(
         errors.push({
             message:
                 `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${lexerDefinition.defaultMode}>` +
-                    `which does not exist\n`,
+                `which does not exist\n`,
             type:
                 LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
         })
@@ -597,7 +597,7 @@ export function performRuntimeChecks(
                     errors.push({
                         message:
                             `A Lexer cannot be initialized using an undefined Token Class. Mode:` +
-                                `<${currModeName}> at index: <${currIdx}>\n`,
+                            `<${currModeName}> at index: <${currIdx}>\n`,
                         type:
                             LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED
                     })
@@ -619,10 +619,10 @@ export function performRuntimeChecks(
         errors.push({
             message:
                 "No LINE_BREAKS Error:\n" +
-                    "\tThis Lexer has been defined to track line and column information,\n" +
-                    "\tyet none of the Token definitions contain a LINE_BREAK flag.\n" +
-                    "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS \n" +
-                    "\tfor details.",
+                "\tThis Lexer has been defined to track line and column information,\n" +
+                "\tyet none of the Token definitions contain a LINE_BREAK flag.\n" +
+                "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS \n" +
+                "\tfor details.",
             type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
         })
     }

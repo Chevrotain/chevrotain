@@ -1,18 +1,18 @@
 {
-  "name": "chevrotain_examples_implementation_languages",
-  "version": "0.1.0",
-  "scripts": {
-    "build_ts": "tsc ./typescript/typescript_json.ts",
-    "build_coffee": "coffee -c ./coffeescript/coffeescript_json.coffee",
-    "test": "npm run build_ts && npm run build_coffee && mocha '*spec.js'"
-  },
-  "dependencies": {
-    "chevrotain": "*"
-  },
-  "devDependencies": {
-    "coffee-script": "^1.11.1",
-    "mocha": "^3.2.0",
-    "typescript": "^2.0.10"
-  },
-  "private": true
+    "name": "chevrotain_examples_implementation_languages",
+    "version": "0.1.0",
+    "scripts": {
+        "build_ts": "tsc ./typescript/typescript_json.ts",
+        "build_coffee": "coffee -c ./coffeescript/coffeescript_json.coffee",
+        "test": "npm run build_ts && npm run build_coffee && mocha '*spec.js'"
+    },
+    "dependencies": {
+        "chevrotain": "*"
+    },
+    "devDependencies": {
+        "coffee-script": "^1.11.1",
+        "mocha": "^3.2.0",
+        "typescript": "^2.0.10"
+    },
+    "private": true
 }

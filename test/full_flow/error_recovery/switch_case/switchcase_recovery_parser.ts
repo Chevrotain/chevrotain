@@ -47,7 +47,9 @@ import {
 import { IToken } from "../../../../src/scan/tokens_public"
 import { assign, contains } from "../../../../src/utils/utils"
 
-export interface RetType { [caseValue: string]: number }
+export interface RetType {
+    [caseValue: string]: number
+}
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class SwitchCaseRecoveryParser extends Parser {

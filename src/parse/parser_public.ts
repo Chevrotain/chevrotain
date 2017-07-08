@@ -226,23 +226,27 @@ export interface IParserDefinitionError {
     ruleName?: string
 }
 
-export interface IParserDuplicatesDefinitionError extends IParserDefinitionError {
+export interface IParserDuplicatesDefinitionError
+    extends IParserDefinitionError {
     dslName: string
     occurrence: number
     parameter?: string
 }
 
-export interface IParserEmptyAlternativeDefinitionError extends IParserDefinitionError {
+export interface IParserEmptyAlternativeDefinitionError
+    extends IParserDefinitionError {
     occurrence: number
     alternative: number
 }
 
-export interface IParserAmbiguousAlternativesDefinitionError extends IParserDefinitionError {
+export interface IParserAmbiguousAlternativesDefinitionError
+    extends IParserDefinitionError {
     occurrence: number
     alternatives: number[]
 }
 
-export interface IParserUnresolvedRefDefinitionError extends IParserDefinitionError {
+export interface IParserUnresolvedRefDefinitionError
+    extends IParserDefinitionError {
     unresolvedRefName: string
 }
 
