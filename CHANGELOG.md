@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [Fixed diagrams sample.](https://github.com/SAP/chevrotain/commit/d28eb378d5704e82e189f05ff3333cf29601b27c)
+
+
+
 ## 0.32.0 (2017-7-6)
 
 #### Major Changes
