@@ -104,6 +104,10 @@ import {
 } from "./cst/cst_visitor"
 import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
 import serializeGrammar = gast.serializeGrammar
+import {
+    ILexerAdapter,
+    TokenVectorLexerAdapter
+} from "./adapters/lexer_adapter"
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -126,7 +130,16 @@ export type IgnoredRuleIssues = { [dslNameAndOccurrence: string]: boolean }
 export type IgnoredParserIssues = { [ruleName: string]: IgnoredRuleIssues }
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
-const END_OF_FILE = createTokenInstance(EOF, "", NaN, NaN, NaN, NaN, NaN, NaN)
+export const END_OF_FILE = createTokenInstance(
+    EOF,
+    "",
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN
+)
 Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (
@@ -416,7 +429,7 @@ let EOF_FOLLOW_KEY: any = {}
  * This is used for more advanced features requiring such information.
  * For example: Error Recovery, Automatic lookahead calculation.
  */
-export class Parser {
+export class Parser<INPUT_TYPE = IToken[]> {
     static NO_RESYNC: boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
     // (normally during the parser's constructor).
@@ -426,7 +439,7 @@ export class Parser {
     // needing to display the parser definition errors in some GUI(online playground).
     static DEFER_DEFINITION_ERRORS_HANDLING: boolean = false
 
-    protected static performSelfAnalysis(parserInstance: Parser): void {
+    protected static performSelfAnalysis(parserInstance: Parser<any>): void {
         let definitionErrors = []
         let defErrorsMsgs
 
@@ -543,11 +556,12 @@ export class Parser {
     protected maxLookahead: number
     protected ignoredIssues: IgnoredParserIssues
     protected outputCst: boolean
-    protected errorMessageProvider: IErrorMessageProvider
 
-    protected _input: IToken[] = []
-    protected inputIdx = -1
-    protected savedTokenIdx = -1
+    // adapters
+    protected errorMessageProvider: IErrorMessageProvider
+    protected lexerAdapter: ILexerAdapter<any, any>
+    protected savedLexerState: any
+
     protected isBackTrackingStack = []
     protected className: string
     protected RULE_STACK: string[] = []
@@ -579,14 +593,15 @@ export class Parser {
     private _productions: HashTable<gast.Rule> = new HashTable<gast.Rule>()
 
     constructor(
-        input: IToken[],
+        input: INPUT_TYPE,
         tokensDictionary:
             | { [fqn: string]: TokenConstructor }
             | TokenConstructor[]
             | IMultiModeLexerDefinition,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
-        this._input = input
+        this.lexerAdapter = new TokenVectorLexerAdapter()
+        this.lexerAdapter.setInput(input)
 
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled")
@@ -717,13 +732,13 @@ export class Parser {
         this._errors = newErrors
     }
 
-    public set input(newInput: IToken[]) {
+    public set input(newInput: INPUT_TYPE) {
         this.reset()
-        this._input = newInput
+        this.lexerAdapter.setInput(newInput)
     }
 
-    public get input(): IToken[] {
-        return cloneArr(this._input)
+    public get input(): INPUT_TYPE {
+        return this.lexerAdapter.getInput()
     }
 
     /**
@@ -735,7 +750,9 @@ export class Parser {
 
         this.isBackTrackingStack = []
         this.errors = []
-        this._input = []
+
+        this.lexerAdapter.reset()
+
         this.RULE_STACK = []
         this.LAST_EXPLICIT_RULE_STACK = []
         this.CST_STACK = []
@@ -902,15 +919,7 @@ export class Parser {
 
     // skips a token and returns the next token
     protected SKIP_TOKEN(): IToken {
-        // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
-        // input[45] which is the 46th item and no longer exists,
-        // so in this case the largest valid input index is 43 (input.length - 2 )
-        if (this.inputIdx <= this._input.length - 2) {
-            this.consumeToken()
-            return this.LA(1)
-        } else {
-            return END_OF_FILE
-        }
+        return this.lexerAdapter.skip()
     }
 
     // Parsing DSL
@@ -1847,31 +1856,23 @@ export class Parser {
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
     protected LA(howMuch: number): IToken {
-        if (this._input.length <= this.inputIdx + howMuch) {
-            return END_OF_FILE
-        } else {
-            return this._input[this.inputIdx + howMuch]
-        }
+        return this.lexerAdapter.lookahead(howMuch)
     }
 
     protected consumeToken() {
-        this.inputIdx++
+        this.lexerAdapter.consume()
     }
 
     protected saveLexerState() {
-        this.savedTokenIdx = this.inputIdx
+        this.savedLexerState = this.lexerAdapter.exportState()
     }
 
     protected restoreLexerState() {
-        this.inputIdx = this.savedTokenIdx
+        this.lexerAdapter.importState(this.savedLexerState)
     }
 
     protected resetLexerState(): void {
-        this.inputIdx = -1
-    }
-
-    protected moveLexerStateToEnd(): void {
-        this.inputIdx = this.input.length - 1
+        this.lexerAdapter.reset()
     }
 
     // other functionality
@@ -1881,7 +1882,7 @@ export class Parser {
         let savedRuleStack = cloneArr(this.RULE_STACK)
         return {
             errors: savedErrors,
-            lexerState: this.inputIdx,
+            lexerState: this.lexerAdapter.exportState(),
             RULE_STACK: savedRuleStack,
             CST_STACK: this.CST_STACK,
             LAST_EXPLICIT_RULE_STACK: this.LAST_EXPLICIT_RULE_STACK
@@ -1890,7 +1891,7 @@ export class Parser {
 
     private reloadRecogState(newState: IParserState) {
         this.errors = newState.errors
-        this.inputIdx = newState.lexerState
+        this.lexerAdapter.importState(newState.lexerState)
         this.RULE_STACK = newState.RULE_STACK
     }
 
@@ -2004,7 +2005,7 @@ export class Parser {
                         }
                     } else if (isFirstInvokedRule) {
                         // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
-                        this.moveLexerStateToEnd()
+                        this.lexerAdapter.moveToTerminatedState()
                         // the parser should never throw one of its own errors outside its flow.
                         // even if error recovery is disabled
                         return recoveryValueFunc()
