@@ -8,7 +8,7 @@
         module.exports = factory(require("chevrotain"), require("xregexp"))
     } else {
         // Browser globals (root is window)\
-        root["CssParser"] = factory(root.chevrotain, root.XRegExp).CssParser
+        root["parser"] = factory(root.chevrotain, root.XRegExp).CssParser
     }
 })(this, function(chevrotain, XRegExp) {
     // ----------------- lexer -----------------

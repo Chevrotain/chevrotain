@@ -153,11 +153,11 @@ var Percentage = extendToken("Percentage", MAKE_PATTERN("{{num}}%", "i"))
 // Num must appear after all the num forms with a suffix
 var Num = extendToken("Num", MAKE_PATTERN("{{num}}"))
 
-var CssLexer = new Lexer(cssTokens, { positionTracking: "onlyOffset" })
+var lexer = new Lexer(cssTokens, { positionTracking: "onlyOffset" })
 
 // ----------------- parser -----------------
 
-function CssParser(input) {
+function parser(input) {
     Parser.call(this, input, cssTokens)
     var $ = this
 
@@ -506,5 +506,5 @@ function CssParser(input) {
     Parser.performSelfAnalysis(this)
 }
 
-CssParser.prototype = Object.create(Parser.prototype)
-CssParser.prototype.constructor = CssParser
+parser.prototype = Object.create(Parser.prototype)
+parser.prototype.constructor = parser

@@ -79,13 +79,13 @@ module.exports = function(grunt) {
                 },
                 exec:
                     INSTALL_LINK +
-                        " && " +
-                        "grunt --gruntfile minification/gruntfile.js" +
-                        " && " +
-                        "npm --prefix ./webpack" +
-                        " install  ./webpack" +
-                        " && " +
-                        examples_test_command
+                    " && " +
+                    "grunt --gruntfile minification/gruntfile.js" +
+                    " && " +
+                    "npm --prefix ./webpack" +
+                    " install  ./webpack" +
+                    " && " +
+                    examples_test_command
             },
             test_examples_implementation_languages: {
                 options: {
@@ -218,19 +218,19 @@ module.exports = function(grunt) {
                         from: "if (b.hasOwnProperty(p)) d[p] = b[p];",
                         to:
                             "/* istanbul ignore next */ " +
-                                " if (b.hasOwnProperty(p)) d[p] = b[p];"
+                            " if (b.hasOwnProperty(p)) d[p] = b[p];"
                     },
                     {
                         from: "var extendStatics = Object.setPrototypeOf ||",
                         to:
                             "/* istanbul ignore next */ \n" +
-                                "var extendStatics = Object.setPrototypeOf ||"
+                            "var extendStatics = Object.setPrototypeOf ||"
                     },
                     {
                         from: "d.prototype = b === null ? Object.create(b) :",
                         to:
                             "/* istanbul ignore next */ \n" +
-                                "d.prototype = b === null ? Object.create(b) :"
+                            "d.prototype = b === null ? Object.create(b) :"
                     },
                     {
                         from: /(\s+)(else if \(.+\s+.+\s+.+\s+(?:.+\s+)?else \{\s+throw Error\("non exhaustive match"\))/g,
@@ -258,9 +258,9 @@ module.exports = function(grunt) {
                     // TODO: seems like the HashTable class may need to be included in the public API
                     banner:
                         banner +
-                            "\n" +
-                            "export as namespace chevrotain;\n" +
-                            "declare class HashTable<V>{}\n",
+                        "\n" +
+                        "export as namespace chevrotain;\n" +
+                        "declare class HashTable<V>{}\n",
 
                     process: function processDefinitions(src, filePath) {
                         var withOutImports = src.replace(

@@ -6,17 +6,22 @@
 </head>
 <body>
 
-<!-- unpkg without explicit version number means the latest-->
-<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
-<script src="https://unpkg.com/xregexp@3.2.0/xregexp-all.js"></script>
-<script src="css_parser.js"></script>
-<script src="../api.js"> </script>
+<script src="../worker_api.js"></script>
 
 <script>
-    function parse(text, options) {
-        return parseBench(text, CssLexer, CssParser, "stylesheet", options)
-    }
+    // relative ti thr worker impel file
+    initWorker({
+        startRule:     "stylesheet",
+        importScripts: [
+            "https://unpkg.com/chevrotain/lib/chevrotain.js",
+            "https://unpkg.com/xregexp@3.2.0/xregexp-all.js",
+            "./css/css_parser.js",
+            "./css/1K_css.js",
+            "./api.js"]
+    })
 </script>
+
 
 </body>
 </html>
+
