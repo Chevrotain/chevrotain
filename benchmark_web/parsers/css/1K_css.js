@@ -1,4 +1,4 @@
-var css_sample1k = `
+var sample = `
 
 @charset "UTF-8";
 

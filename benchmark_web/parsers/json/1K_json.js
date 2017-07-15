@@ -1,4 +1,4 @@
-var json_sample1k =
+var sample =
     "[\r\n" +
     "  {\r\n" +
     '    "_id": "5789f4e5688f478d31e213cb",\r\n' +

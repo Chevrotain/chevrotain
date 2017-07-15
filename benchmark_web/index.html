@@ -8,8 +8,6 @@
 <body>
 <script src="https://unpkg.com/lodash@4.17.2/lodash.min.js"></script>
 <script src="https://unpkg.com/benchmark@2.1.2"></script>
-<script src="samples/1K_json.js"></script>
-<script src="samples/1K_css.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.1.0.slim.min.js"
         integrity="sha256-cRpWjoSOw5KcyIOaZNo4i6fZ9tKPhYYb6i5T9RSVJG8=" crossorigin="anonymous"></script>
@@ -154,30 +152,34 @@
         clearData()
     }
 
-    function addTest(suite, id, action, input) {
+    function addTest(suite, id, action) {
         var $el = $('.' + id + ' input')
         if ($el && $el.is(':checked')) {
-            suite.add(id, function() {
-                action(input, {lexerOnly:lexerOnly, parserOnly:parserOnly})
-            })
+            suite.add(id,
+                {
+                    defer: true,
+                    fn:       function(deferred) {
+                        action({lexerOnly: lexerOnly, parserOnly: parserOnly}, deferred)
+                    }
+                })
         }
     }
 
     var testCases = {
         JSON_Dev: function(suite) {
-            addTest(suite, 'JSON_Dev', jsonDevFrame.parse, json_sample1k)
+            addTest(suite, 'JSON_Dev', jsonDevFrame.parse)
         },
 
         JSON_Latest: function(suite) {
-            addTest(suite, 'JSON_Latest', jsonLatestFrame.parse, json_sample1k)
+            addTest(suite, 'JSON_Latest', jsonLatestFrame.parse)
         },
 
         CSS_Dev: function(suite) {
-            addTest(suite, 'CSS_Dev', cssDevFrame.parse, css_sample1k)
+            addTest(suite, 'CSS_Dev', cssDevFrame.parse)
         },
 
         CSS_Latest: function(suite) {
-            addTest(suite, 'CSS_Latest', cssLatestFrame.parse, css_sample1k)
+            addTest(suite, 'CSS_Latest', cssLatestFrame.parse)
         }
     }
 
