@@ -987,7 +987,7 @@ function defineRecognizerSpecs(
                     })
                 }
                 let parser: any = new InRuleParser([createToken(IntTok, "1")])
-                ;(parser as any).consumeInternalOptimized = () => {
+                ;(parser as any).consumeInternal = () => {
                     throw Error("oops")
                 }
                 expect(() => parser.someRule()).to.throw("oops")

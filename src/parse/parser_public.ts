@@ -635,7 +635,6 @@ export class Parser {
             this.atLeastOneInternal = this.atLeastOneInternalNoCst
             this.manySepFirstInternal = this.manySepFirstInternalNoCst
             this.atLeastOneSepFirstInternal = this.atLeastOneSepFirstInternalNoCst
-            this.invokeRuleNoTry = <any>this.invokeRuleNoTryNoCst
         }
 
         this.className = classNameFromInstance(this)
@@ -1783,25 +1782,22 @@ export class Parser {
      * @returns {Token} - The consumed Token.
      */
     protected consumeInternal(tokClass: TokenConstructor, idx: number): IToken {
-        // TODO: this is an hack to avoid try catch block in V8, should be removed once V8 supports try/catch optimizations.
-        // as the IF/ELSE itself has some overhead.
         let consumedToken
-        if (!this.recoveryEnabled) {
-            consumedToken = this.consumeInternalOptimized(tokClass)
-        } else {
-            consumedToken = this.consumeInternalWithTryCatch(tokClass, idx)
-        }
-
-        this.cstPostTerminal(tokClass, consumedToken)
-        return consumedToken
-    }
-
-    protected consumeInternalWithTryCatch(
-        tokClass: TokenConstructor,
-        idx: number
-    ): IToken {
         try {
-            return this.consumeInternalOptimized(tokClass)
+            let nextToken = this.LA(1)
+            if (this.tokenMatcher(nextToken, tokClass)) {
+                this.consumeToken()
+                consumedToken = nextToken
+            } else {
+                let msg = this.errorMessageProvider.buildMismatchTokenMessage({
+                    expected: tokClass,
+                    actual: nextToken,
+                    ruleName: this.getCurrRuleFullName()
+                })
+                throw this.SAVE_ERROR(
+                    new exceptions.MismatchedTokenException(msg, nextToken)
+                )
+            }
         } catch (eFromConsumption) {
             // no recovery allowed during backtracking, otherwise backtracking may recover invalid syntax and accept it
             // but the original syntax could have been parsed successfully without any backtracking + recovery
@@ -1813,7 +1809,7 @@ export class Parser {
             ) {
                 let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
                 try {
-                    return this.tryInRuleRecovery(tokClass, follows)
+                    consumedToken = this.tryInRuleRecovery(tokClass, follows)
                 } catch (eFromInRuleRecovery) {
                     if (
                         eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION
@@ -1829,6 +1825,9 @@ export class Parser {
                 throw eFromConsumption
             }
         }
+
+        this.cstPostTerminal(tokClass, consumedToken)
+        return consumedToken
     }
 
     /**
@@ -1894,20 +1893,6 @@ export class Parser {
         this.RULE_STACK = newState.RULE_STACK
     }
 
-    private invokeRuleNoTryNoCst(args: any[], impl: Function) {
-        let result = impl.apply(this, args)
-        this.ruleFinallyStateUpdate()
-        return result
-    }
-
-    private invokeRuleNoTry(args: any[], impl: Function) {
-        impl.apply(this, args)
-        let result = this.CST_STACK[this.CST_STACK.length - 1]
-        this.ruleFinallyStateUpdate()
-
-        return result
-    }
-
     private defineRule<T>(
         ruleName: string,
         impl: (...implArgs: any[]) => T,
@@ -1938,7 +1923,7 @@ export class Parser {
         this.shortRuleNameToFull.put(shortName, ruleName)
         this.fullRuleNameToShort.put(ruleName, shortName)
 
-        function invokeRuleWithTry(args: any[], isFirstRule: boolean) {
+        function invokeRuleWithTry(args: any[]) {
             try {
                 // TODO: dynamically get rid of this?
                 if (this.outputCst) {
@@ -1948,17 +1933,6 @@ export class Parser {
                     return impl.apply(this, args)
                 }
             } catch (e) {
-                // TODO: this is part of a Performance hack for V8 due to lack of support
-                // of try/catch optimizations. Should be removed once V8 supports that.
-                // This is needed because in case of an error during a nested subRule
-                // there will be no "finally" block to perform the "ruleFinallyStateUpdate"
-                // So this block properly rewinds the parser's state in the case error recovery is disabled.
-                if (isFirstRule) {
-                    for (let i = this.RULE_STACK.length; i > 1; i--) {
-                        this.ruleFinallyStateUpdate()
-                    }
-                }
-
                 let isFirstInvokedRule = this.RULE_STACK.length === 1
                 // note the reSync is always enabled for the first rule invocation, because we must always be able to
                 // reSync with EOF and just output some INVALID ParseTree
@@ -2023,40 +1997,16 @@ export class Parser {
 
         let wrappedGrammarRule
 
-        if (this.recoveryEnabled) {
-            wrappedGrammarRule = function(
-                idxInCallingRule: number = 1,
-                args: any[]
-            ) {
-                this.ruleInvocationStateUpdate(
-                    shortName,
-                    ruleName,
-                    idxInCallingRule
-                )
-                // TODO: performance hack due to V8 lack of try/catch optimizations.
-                // should be removed once V8 support those.
-                let isFirstRule = this.RULE_STACK.length === 1
-                return invokeRuleWithTry.call(this, args, isFirstRule)
-            }
-        } else {
-            wrappedGrammarRule = function(
-                idxInCallingRule: number = 1,
-                args: any[]
-            ) {
-                this.ruleInvocationStateUpdate(
-                    shortName,
-                    ruleName,
-                    idxInCallingRule
-                )
-                // TODO: performance hack due to V8 lack of try/catch optimizations.
-                // should be removed once V8 support those.
-                let isFirstRule = this.RULE_STACK.length === 1
-                if (!isFirstRule) {
-                    return this.invokeRuleNoTry(args, impl)
-                } else {
-                    return invokeRuleWithTry.call(this, args, isFirstRule)
-                }
-            }
+        wrappedGrammarRule = function(
+            idxInCallingRule: number = 1,
+            args: any[]
+        ) {
+            this.ruleInvocationStateUpdate(
+                shortName,
+                ruleName,
+                idxInCallingRule
+            )
+            return invokeRuleWithTry.call(this, args)
         }
 
         let ruleNamePropName = "ruleName"
@@ -2956,26 +2906,6 @@ export class Parser {
             if (nestedName !== undefined) {
                 this.nestedRuleFinallyClause(laKey, nestedName)
             }
-        }
-    }
-
-    // to enable optimizations this logic has been extract to a method as its invoker contains try/catch
-    private consumeInternalOptimized(
-        expectedTokClass: TokenConstructor
-    ): IToken {
-        let nextToken = this.LA(1)
-        if (this.tokenMatcher(nextToken, expectedTokClass)) {
-            this.consumeToken()
-            return nextToken
-        } else {
-            let msg = this.errorMessageProvider.buildMismatchTokenMessage({
-                expected: expectedTokClass,
-                actual: nextToken,
-                ruleName: this.getCurrRuleFullName()
-            })
-            throw this.SAVE_ERROR(
-                new exceptions.MismatchedTokenException(msg, nextToken)
-            )
         }
     }
 
