@@ -75,18 +75,11 @@ class JsonParserES6 extends chevrotain.Parser {
         const $ = this
 
         $.RULE("json", () => {
+            // prettier-ignore
             $.OR([
                 // using ES6 Arrow functions to reduce verbosity.
-                {
-                    ALT: () => {
-                        $.SUBRULE($.object)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.SUBRULE($.array)
-                    }
-                }
+                {ALT: () => {$.SUBRULE($.object)}},
+                {ALT: () => {$.SUBRULE($.array)}}
             ])
         })
 
