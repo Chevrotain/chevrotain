@@ -67,18 +67,11 @@ class JsonParserTypeScript extends Parser {
     // about the API of our Parser, so referencing an invalid rule name (this.SUBRULE(this.oopsType);)
     // is now a TypeScript compilation error.
     public json = this.RULE("json", () => {
+        // prettier-ignore
         this.OR([
             // using ES6 Arrow functions to reduce verbosity.
-            {
-                ALT: () => {
-                    this.SUBRULE(this.object)
-                }
-            },
-            {
-                ALT: () => {
-                    this.SUBRULE(this.array)
-                }
-            }
+            {ALT: () => { this.SUBRULE(this.object)}},
+            {ALT: () => {this.SUBRULE(this.array)}}
         ])
     })
 
@@ -112,6 +105,7 @@ class JsonParserTypeScript extends Parser {
     })
 
     private value = this.RULE("value", () => {
+        // prettier-ignore
         this.OR([
             { ALT: () => this.CONSUME(StringLiteral) },
             { ALT: () => this.CONSUME(NumberLiteral) },

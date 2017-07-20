@@ -12,7 +12,7 @@
     "devDependencies": {
         "coffee-script": "^1.11.1",
         "mocha": "^3.2.0",
-        "typescript": "^2.0.10"
+        "typescript": "^2.4.0"
     },
     "private": true
 }
