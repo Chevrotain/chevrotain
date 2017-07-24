@@ -59,10 +59,13 @@ accomplished by marking them with the SKIP group.
 const WhiteSpace = createToken({
          name: "WhiteSpace", 
          pattern: /\s+/,
-         group: chevrotain.lexer.SKIPPED  
+         group: chevrotain.lexer.SKIPPED,
+         line_breaks: true
      });
 ```
 
+* Note that we used the **line_breaks** property to flag that the WhiteSpace token may contain line terminators.
+  This is needed by the lexer to keep track of line and column numbers.
 
 #### Let us define all our nine Tokens:
 
@@ -87,7 +90,8 @@ const LessThan = createToken({name: "LessThan", pattern: />/});
 const WhiteSpace = createToken({
         name: "WhiteSpace",
         pattern: /\s+/,
-        group: chevrotain.lexer.SKIPPED
+        group: chevrotain.lexer.SKIPPED,
+        line_breaks: true
     }); 
 ```
 
