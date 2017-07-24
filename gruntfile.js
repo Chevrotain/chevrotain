@@ -95,7 +95,7 @@ module.exports = function(grunt) {
             },
             test_tutorial: {
                 options: {
-                    cwd: process.cwd() + "/tutorial/src/"
+                    cwd: process.cwd() + "/docs/tutorial/src/"
                 },
                 exec: INSTALL_LINK + " && npm test"
             },
