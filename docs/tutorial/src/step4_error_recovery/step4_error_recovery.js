@@ -1,34 +1,36 @@
-let chevrotain = require("chevrotain")
+"use strict"
+
+const chevrotain = require("chevrotain")
 
 // ----------------- lexer -----------------
-let createToken = chevrotain.createToken
-let Lexer = chevrotain.Lexer
-let Parser = chevrotain.Parser
+const createToken = chevrotain.createToken
+const Lexer = chevrotain.Lexer
+const Parser = chevrotain.Parser
 
-let True = createToken({ name: "True", pattern: /true/ })
-let False = createToken({ name: "False", pattern: /false/ })
-let Null = createToken({ name: "Null", pattern: /null/ })
-let LCurly = createToken({ name: "LCurly", pattern: /{/ })
-let RCurly = createToken({ name: "RCurly", pattern: /}/ })
-let LSquare = createToken({ name: "LSquare", pattern: /\[/ })
-let RSquare = createToken({ name: "RSquare", pattern: /]/ })
-let Comma = createToken({ name: "Comma", pattern: /,/ })
-let Colon = createToken({ name: "Colon", pattern: /:/ })
-let StringLiteral = createToken({
+const True = createToken({ name: "True", pattern: /true/ })
+const False = createToken({ name: "False", pattern: /false/ })
+const Null = createToken({ name: "Null", pattern: /null/ })
+const LCurly = createToken({ name: "LCurly", pattern: /{/ })
+const RCurly = createToken({ name: "RCurly", pattern: /}/ })
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+const RSquare = createToken({ name: "RSquare", pattern: /]/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Colon = createToken({ name: "Colon", pattern: /:/ })
+const StringLiteral = createToken({
     name: "StringLiteral",
     pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 })
-let NumberLiteral = createToken({
+const NumberLiteral = createToken({
     name: "NumberLiteral",
     pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 })
-let WhiteSpace = createToken({
+const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
     group: Lexer.SKIPPED
 })
 
-let allTokens = [
+const allTokens = [
     WhiteSpace,
     NumberLiteral,
     StringLiteral,
@@ -42,7 +44,7 @@ let allTokens = [
     False,
     Null
 ]
-let JsonLexer = new Lexer(allTokens, {
+const JsonLexer = new Lexer(allTokens, {
     // Less verbose tokens will make the test's assertions easier to understand
     positionTracking: "onlyOffset"
 })
@@ -59,7 +61,7 @@ class JsonParser extends Parser {
         })
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
-        let $ = this
+        const $ = this
 
         this.RULE("json", () => {
             // prettier-ignore
@@ -125,13 +127,13 @@ const parser = new JsonParser([])
 // ----------------- wrapping it all together -----------------
 module.exports = {
     parse: function parse(text) {
-        let lexResult = JsonLexer.tokenize(text)
+        const lexResult = JsonLexer.tokenize(text)
 
         // setting a new input will RESET the parser instance's state.
         parser.input = lexResult.tokens
 
         // any top level rule may be used as an entry point
-        let cst = parser.json()
+        const cst = parser.json()
 
         return {
             cst: cst,
