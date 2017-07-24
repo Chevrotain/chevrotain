@@ -29,7 +29,12 @@ createToken({ name: "Identifier", pattern: /\w+/ })
 createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
 createToken({ name: "GreaterThan", pattern: /</ })
 createToken({ name: "LessThan", pattern: />/ })
-createToken({ name: "WhiteSpace", pattern: /\s+/, group: Lexer.SKIPPED })
+createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
 const SelectLexer = new Lexer(allTokens)
 

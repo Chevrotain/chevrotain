@@ -17,7 +17,7 @@ describe("Chevrotain Tutorial", () => {
                 "expecting at least one iteration which starts with one of these possible Token sequences"
             )
             expect(() => parse(inputText)).to.throw(
-                "<[Identifier]> but found: 'FROM'"
+                "<[Identifier]>\nbut found: 'FROM'"
             )
         })
     })

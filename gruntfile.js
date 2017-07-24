@@ -326,7 +326,8 @@ module.exports = function(grunt) {
         "run:test_examples_grammars",
         "run:test_examples_parser",
         "run:test_examples_lexer",
-        "run:test_examples_implementation_languages"
+        "run:test_examples_implementation_languages",
+        "run:test_tutorial"
     ]
 
     var browsers_tests = [
