@@ -2,8 +2,17 @@
 
 import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
 import { Lexer, TokenConstructor } from "../../../src/scan/lexer_public"
-import { END_OF_FILE, Parser } from "../../../src/parse/parser_public"
+import {
+    END_OF_FILE,
+    IAnyOrAlt,
+    lookAheadSequence,
+    Parser,
+    TokenClassIdentityFunc,
+    TokenInstanceIdentityFunc,
+    TokenMatcher
+} from "../../../src/parse/parser_public"
 import { exceptions } from "../../../src/parse/exceptions_public"
+import { every, flatten, map } from "../../../src/utils/utils"
 
 const Return = createToken({
     name: "Return",
@@ -57,7 +66,9 @@ class EcmaScriptQuirksParser extends Parser {
 
     public statement = this.RULE("statement", () => {
         this.CONSUME(Return)
-        // this.SUBRULE(this.expression)
+        this.OPTION(() => {
+            this.SUBRULE(this.expression)
+        })
         this.CONSUME(Semicolon)
     })
 
@@ -89,7 +100,9 @@ class EcmaScriptQuirksParser extends Parser {
         return this.orgText
     }
 
-    protected resetLexerState(): void {
+    // TODO: this should be protected at least but there seems some strange bug in the
+    // definitions generation, try adding protected in newer releases of typescript.
+    resetLexerState(): void {
         this.textIdx = 0
     }
 
@@ -160,6 +173,87 @@ class EcmaScriptQuirksParser extends Parser {
 
     protected importLexerState(newState: number) {
         this.textIdx = newState
+    }
+
+    protected lookAheadBuilderForOptional(
+        alt: lookAheadSequence,
+        tokenMatcher: TokenMatcher,
+        tokenClassIdentityFunc: TokenClassIdentityFunc,
+        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
+        dynamicTokensEnabled: boolean
+    ): () => boolean {
+        if (!every(alt, currAlt => currAlt.length === 1)) {
+            throw Error(
+                "This scannerLess parser only supports LL(1) lookahead."
+            )
+        }
+
+        const allTokenTypes = flatten(alt)
+
+        return function() {
+            // save & restore lexer state as otherwise the text index will move ahead
+            // and the parser will fail consuming the tokens we have looked ahead for.
+            let lexerState = this.exportLexerState()
+            try {
+                for (let i = 0; i < allTokenTypes.length; i++) {
+                    const nextToken = this.IS_NEXT_TOKEN(allTokenTypes[i])
+                    if (nextToken !== false) {
+                        return true
+                    }
+                }
+                return false
+            } finally {
+                // this scannerLess parser is not very smart and efficient
+                // because we do not remember the last token was saw while lookahead
+                // we will have to lex it twice, once during lookahead and once during consumption...
+                this.importLexerState(lexerState)
+            }
+        }
+    }
+
+    protected lookAheadBuilderForAlternatives(
+        alts: lookAheadSequence[],
+        hasPredicates: boolean,
+        tokenMatcher: TokenMatcher,
+        tokenClassIdentityFunc: TokenClassIdentityFunc,
+        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
+        dynamicTokensEnabled: boolean
+    ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
+        if (
+            !every(alts, currPath =>
+                every(currPath, currAlt => currAlt.length === 1)
+            )
+        ) {
+            throw Error(
+                "This scannerLess parser only supports LL(1) lookahead."
+            )
+        }
+
+        const allTokenTypesPerAlt = map(alts, flatten)
+
+        return function() {
+            // save & restore lexer state as otherwise the text index will move ahead
+            // and the parser will fail consuming the tokens we have looked ahead for.
+            let lexerState = this.exportLexerState()
+            try {
+                for (let i = 0; i < allTokenTypesPerAlt.length; i++) {
+                    const currAltTypes = allTokenTypesPerAlt[i]
+
+                    for (let j = 0; j < currAltTypes.length; j++) {
+                        const nextToken = this.IS_NEXT_TOKEN(currAltTypes[j])
+                        if (nextToken !== false) {
+                            return i
+                        }
+                    }
+                }
+                return undefined
+            } finally {
+                // this scannerLess parser is not very smart and efficient
+                // because we do not remember the last token was saw while lookahead
+                // we will have to lex it twice, once during lookahead and once during consumption...
+                this.importLexerState(lexerState)
+            }
+        }
     }
 }
 

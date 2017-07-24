@@ -53,7 +53,6 @@ import {
     buildSingleAlternativeLookaheadFunction,
     getLookaheadPathsForOptionalProd,
     getLookaheadPathsForOr,
-    lookAheadSequence,
     PROD_TYPE
 } from "./grammar/lookahead"
 import {
@@ -143,6 +142,8 @@ export type TokenMatcher = (
 ) => boolean
 export type TokenInstanceIdentityFunc = (tok: IToken) => string
 export type TokenClassIdentityFunc = (tok: TokenConstructor) => string
+
+export type lookAheadSequence = TokenConstructor[][]
 
 export interface IParserConfig {
     /**
@@ -2990,12 +2991,12 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncFor<T>(
+    private getLookaheadFuncFor(
         key: number,
         occurrence: number,
         maxLookahead: number,
         prodType
-    ): () => T {
+    ): () => boolean {
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
@@ -3220,7 +3221,7 @@ export class Parser {
         this.currIdx = newState
     }
 
-    protected resetLexerState(): void {
+    resetLexerState(): void {
         this.currIdx = -1
     }
 
@@ -3251,7 +3252,7 @@ export class Parser {
         tokenClassIdentityFunc: TokenClassIdentityFunc,
         tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
         dynamicTokensEnabled: boolean
-    ): (orAlts?: IAnyOrAlt<any>[]) => number {
+    ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
         return buildAlternativesLookAheadFunc(
             alts,
             hasPredicates,

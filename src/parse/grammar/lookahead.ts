@@ -16,7 +16,8 @@ import {
     IAnyOrAlt,
     TokenMatcher,
     TokenInstanceIdentityFunc,
-    TokenClassIdentityFunc
+    TokenClassIdentityFunc,
+    lookAheadSequence
 } from "../parser_public"
 import { TokenConstructor } from "../../scan/lexer_public"
 
@@ -116,7 +117,6 @@ export function buildLookaheadFuncForOptionalProd(
 }
 
 export type Alternative = TokenConstructor[][]
-export type lookAheadSequence = TokenConstructor[][]
 
 export function buildAlternativesLookAheadFunc(
     alts: lookAheadSequence[],
