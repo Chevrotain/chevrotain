@@ -1,7 +1,5 @@
-import { gt } from "semver"
-
 // the ecmaQuirks parser uses /y regExp flag
-if (gt(process.version, "5.0.0")) {
+if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
     const parse = require("./ecma_quirks").parse
     describe("ECMAScript Quirks Example (ScannerLess Mode)", () => {
         it("can parse a valid text successfully", () => {
