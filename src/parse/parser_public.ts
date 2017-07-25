@@ -47,12 +47,10 @@ import {
     tokenName
 } from "../scan/tokens_public"
 import {
-    buildLookaheadForAtLeastOne,
-    buildLookaheadForAtLeastOneSep,
-    buildLookaheadForMany,
-    buildLookaheadForManySep,
-    buildLookaheadForOption,
+    buildAlternativesLookAheadFunc,
+    buildLookaheadFuncForOptionalProd,
     buildLookaheadFuncForOr,
+    buildSingleAlternativeLookaheadFunction,
     getLookaheadPathsForOptionalProd,
     getLookaheadPathsForOr,
     PROD_TYPE
@@ -126,7 +124,16 @@ export type IgnoredRuleIssues = { [dslNameAndOccurrence: string]: boolean }
 export type IgnoredParserIssues = { [ruleName: string]: IgnoredRuleIssues }
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
-const END_OF_FILE = createTokenInstance(EOF, "", NaN, NaN, NaN, NaN, NaN, NaN)
+export const END_OF_FILE = createTokenInstance(
+    EOF,
+    "",
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN
+)
 Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (
@@ -135,6 +142,8 @@ export type TokenMatcher = (
 ) => boolean
 export type TokenInstanceIdentityFunc = (tok: IToken) => string
 export type TokenClassIdentityFunc = (tok: TokenConstructor) => string
+
+export type lookAheadSequence = TokenConstructor[][]
 
 export interface IParserConfig {
     /**
@@ -543,11 +552,10 @@ export class Parser {
     protected maxLookahead: number
     protected ignoredIssues: IgnoredParserIssues
     protected outputCst: boolean
+
+    // adapters
     protected errorMessageProvider: IErrorMessageProvider
 
-    protected _input: IToken[] = []
-    protected inputIdx = -1
-    protected savedTokenIdx = -1
     protected isBackTrackingStack = []
     protected className: string
     protected RULE_STACK: string[] = []
@@ -572,6 +580,11 @@ export class Parser {
     private LAST_EXPLICIT_RULE_STACK: number[] = []
     private selfAnalysisDone = false
 
+    // lexerState
+    private tokVector: IToken[]
+    private tokVectorLength
+    private currIdx: number = -1
+
     /**
      * Only used internally for storing productions as they are built for the first time.
      * The final productions should be accessed from the static cache.
@@ -586,7 +599,7 @@ export class Parser {
             | IMultiModeLexerDefinition,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
-        this._input = input
+        this.input = input
 
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled")
@@ -716,15 +729,6 @@ export class Parser {
         this._errors = newErrors
     }
 
-    public set input(newInput: IToken[]) {
-        this.reset()
-        this._input = newInput
-    }
-
-    public get input(): IToken[] {
-        return cloneArr(this._input)
-    }
-
     /**
      * Resets the parser state, should be overridden for custom parsers which "carry" additional state.
      * When overriding, remember to also invoke the super implementation!
@@ -734,7 +738,6 @@ export class Parser {
 
         this.isBackTrackingStack = []
         this.errors = []
-        this._input = []
         this.RULE_STACK = []
         this.LAST_EXPLICIT_RULE_STACK = []
         this.CST_STACK = []
@@ -896,19 +899,6 @@ export class Parser {
                 this.reloadRecogState(orgState)
                 this.isBackTrackingStack.pop()
             }
-        }
-    }
-
-    // skips a token and returns the next token
-    protected SKIP_TOKEN(): IToken {
-        // example: assume 45 tokens in the input, if input index is 44 it means that NEXT_TOKEN will return
-        // input[45] which is the 46th item and no longer exists,
-        // so in this case the largest valid input index is 43 (input.length - 2 )
-        if (this.inputIdx <= this._input.length - 2) {
-            this.consumeToken()
-            return this.LA(1)
-        } else {
-            return END_OF_FILE
         }
     }
 
@@ -1830,49 +1820,6 @@ export class Parser {
         return consumedToken
     }
 
-    /**
-     * Convenience method equivalent to LA(1)
-     * It is no longer used directly in chevrotain due to
-     * performance considerations (avoid the need for inlining optimizations).
-     *
-     * But it is maintained for backward compatibility reasons.
-     *
-     * @deprecated
-     */
-    protected NEXT_TOKEN(): IToken {
-        return this.LA(1)
-    }
-
-    // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
-    // or lexers dependent on parser context.
-    protected LA(howMuch: number): IToken {
-        if (this._input.length <= this.inputIdx + howMuch) {
-            return END_OF_FILE
-        } else {
-            return this._input[this.inputIdx + howMuch]
-        }
-    }
-
-    protected consumeToken() {
-        this.inputIdx++
-    }
-
-    protected saveLexerState() {
-        this.savedTokenIdx = this.inputIdx
-    }
-
-    protected restoreLexerState() {
-        this.inputIdx = this.savedTokenIdx
-    }
-
-    protected resetLexerState(): void {
-        this.inputIdx = -1
-    }
-
-    protected moveLexerStateToEnd(): void {
-        this.inputIdx = this.input.length - 1
-    }
-
     // other functionality
     private saveRecogState(): IParserState {
         // errors is a getter which will clone the errors array
@@ -1880,7 +1827,7 @@ export class Parser {
         let savedRuleStack = cloneArr(this.RULE_STACK)
         return {
             errors: savedErrors,
-            lexerState: this.inputIdx,
+            lexerState: this.exportLexerState(),
             RULE_STACK: savedRuleStack,
             CST_STACK: this.CST_STACK,
             LAST_EXPLICIT_RULE_STACK: this.LAST_EXPLICIT_RULE_STACK
@@ -1889,7 +1836,7 @@ export class Parser {
 
     private reloadRecogState(newState: IParserState) {
         this.errors = newState.errors
-        this.inputIdx = newState.lexerState
+        this.importLexerState(newState.lexerState)
         this.RULE_STACK = newState.RULE_STACK
     }
 
@@ -1978,7 +1925,7 @@ export class Parser {
                         }
                     } else if (isFirstInvokedRule) {
                         // otherwise a Redundant input error will be created as well and we cannot guarantee that this is indeed the case
-                        this.moveLexerStateToEnd()
+                        this.moveToTerminatedState()
                         // the parser should never throw one of its own errors outside its flow.
                         // even if error recovery is disabled
                         return recoveryValueFunc()
@@ -2022,7 +1969,7 @@ export class Parser {
     ): void {
         // TODO: can the resyncTokenType be cached?
         let reSyncTokType = this.findReSyncTokenType()
-        this.saveLexerState()
+        let savedLexerState = this.exportLexerState()
         let resyncedTokens = []
         let passedResyncPoint = false
 
@@ -2068,7 +2015,7 @@ export class Parser {
         // we were unable to find a CLOSER point to resync inside the Repetition, reset the state.
         // The parsing exception we were trying to prevent will happen in the NEXT parsing step. it may be handled by
         // "between rules" resync recovery later in the flow.
-        this.restoreLexerState()
+        this.importLexerState(savedLexerState)
     }
 
     private shouldInRepetitionRecoveryBeTried(
@@ -2945,7 +2892,8 @@ export class Parser {
                 this.tokenMatcher,
                 this.tokenClassIdentityFunc,
                 this.tokenInstanceIdentityFunc,
-                this.dynamicTokensEnabled
+                this.dynamicTokensEnabled,
+                this.lookAheadBuilderForAlternatives
             )
             this.classLAFuncs.put(key, laFunc)
             return laFunc
@@ -2962,8 +2910,8 @@ export class Parser {
         return this.getLookaheadFuncFor(
             key,
             occurrence,
-            buildLookaheadForOption,
-            this.maxLookahead
+            this.maxLookahead,
+            PROD_TYPE.OPTION
         )
     }
 
@@ -2974,8 +2922,8 @@ export class Parser {
         return this.getLookaheadFuncFor(
             key,
             occurrence,
-            buildLookaheadForMany,
-            this.maxLookahead
+            this.maxLookahead,
+            PROD_TYPE.REPETITION
         )
     }
 
@@ -2986,8 +2934,8 @@ export class Parser {
         return this.getLookaheadFuncFor(
             key,
             occurrence,
-            buildLookaheadForManySep,
-            this.maxLookahead
+            this.maxLookahead,
+            PROD_TYPE.REPETITION_WITH_SEPARATOR
         )
     }
 
@@ -2998,8 +2946,8 @@ export class Parser {
         return this.getLookaheadFuncFor(
             key,
             occurrence,
-            buildLookaheadForAtLeastOne,
-            this.maxLookahead
+            this.maxLookahead,
+            PROD_TYPE.REPETITION_MANDATORY
         )
     }
 
@@ -3010,8 +2958,8 @@ export class Parser {
         return this.getLookaheadFuncFor(
             key,
             occurrence,
-            buildLookaheadForAtLeastOneSep,
-            this.maxLookahead
+            this.maxLookahead,
+            PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
         )
     }
 
@@ -3043,33 +2991,27 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncFor<T>(
+    private getLookaheadFuncFor(
         key: number,
         occurrence: number,
-        laFuncBuilder: (
-            number,
-            rule,
-            k,
-            tokenMatcher,
-            tokenClassIdentityFunc,
-            tokenInstanceIdentityFunc,
-            dynamicTokensEnabled
-        ) => () => T,
-        maxLookahead: number
-    ): () => T {
+        maxLookahead: number,
+        prodType
+    ): () => boolean {
         let laFunc = <any>this.classLAFuncs.get(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
-            laFunc = laFuncBuilder.apply(null, [
+            laFunc = buildLookaheadFuncForOptionalProd(
                 occurrence,
                 ruleGrammar,
                 maxLookahead,
                 this.tokenMatcher,
                 this.tokenClassIdentityFunc,
                 this.tokenInstanceIdentityFunc,
-                this.dynamicTokensEnabled
-            ])
+                this.dynamicTokensEnabled,
+                prodType,
+                this.lookAheadBuilderForOptional
+            )
             this.classLAFuncs.put(key, laFunc)
             return laFunc
         } else {
@@ -3219,6 +3161,105 @@ export class Parser {
             this.CST_STACK[this.CST_STACK.length - 2],
             ruleName,
             ruleCstResult
+        )
+    }
+
+    // lexer related methods
+    public set input(newInput: IToken[]) {
+        this.reset()
+        this.tokVector = newInput
+        this.tokVectorLength = newInput.length
+    }
+
+    public get input(): IToken[] {
+        return this.tokVector
+    }
+
+    // skips a token and returns the next token
+    protected SKIP_TOKEN(): IToken {
+        if (this.currIdx <= this.tokVector.length - 2) {
+            this.consumeToken()
+            return this.LA(1)
+        } else {
+            return END_OF_FILE
+        }
+    }
+
+    /**
+     * Convenience method equivalent to LA(1)
+     * It is no longer used directly in chevrotain due to
+     * performance considerations (avoid the need for inlining optimizations).
+     *
+     * But it is maintained for backward compatibility reasons.
+     *
+     * @deprecated
+     */
+    protected NEXT_TOKEN(): IToken {
+        return this.LA(1)
+    }
+
+    // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
+    // or lexers dependent on parser context.
+    protected LA(howMuch: number): IToken {
+        // TODO: is this optimization (saving tokVectorLength benefits?)
+        if (this.tokVectorLength <= this.currIdx + howMuch) {
+            return END_OF_FILE
+        } else {
+            return this.tokVector[this.currIdx + howMuch]
+        }
+    }
+
+    protected consumeToken() {
+        this.currIdx++
+    }
+
+    protected exportLexerState(): number {
+        return this.currIdx
+    }
+
+    protected importLexerState(newState: number) {
+        this.currIdx = newState
+    }
+
+    resetLexerState(): void {
+        this.currIdx = -1
+    }
+
+    protected moveToTerminatedState(): void {
+        this.currIdx = this.tokVector.length - 1
+    }
+
+    protected lookAheadBuilderForOptional(
+        alt: lookAheadSequence,
+        tokenMatcher: TokenMatcher,
+        tokenClassIdentityFunc: TokenClassIdentityFunc,
+        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
+        dynamicTokensEnabled: boolean
+    ): () => boolean {
+        return buildSingleAlternativeLookaheadFunction(
+            alt,
+            tokenMatcher,
+            tokenClassIdentityFunc,
+            tokenInstanceIdentityFunc,
+            dynamicTokensEnabled
+        )
+    }
+
+    protected lookAheadBuilderForAlternatives(
+        alts: lookAheadSequence[],
+        hasPredicates: boolean,
+        tokenMatcher: TokenMatcher,
+        tokenClassIdentityFunc: TokenClassIdentityFunc,
+        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
+        dynamicTokensEnabled: boolean
+    ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
+        return buildAlternativesLookAheadFunc(
+            alts,
+            hasPredicates,
+            tokenMatcher,
+            tokenClassIdentityFunc,
+            tokenInstanceIdentityFunc,
+            dynamicTokensEnabled
         )
     }
 }

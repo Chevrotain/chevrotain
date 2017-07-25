@@ -16,7 +16,8 @@ import {
     IAnyOrAlt,
     TokenMatcher,
     TokenInstanceIdentityFunc,
-    TokenClassIdentityFunc
+    TokenClassIdentityFunc,
+    lookAheadSequence
 } from "../parser_public"
 import { TokenConstructor } from "../../scan/lexer_public"
 
@@ -55,10 +56,12 @@ export function buildLookaheadFuncForOr(
     tokenMatcher: TokenMatcher,
     tokenClassIdentityFunc: TokenClassIdentityFunc,
     tokenIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
+    dynamicTokensEnabled: boolean,
+    laFuncBuilder: Function
 ): (orAlts?: IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
-    return buildAlternativesLookAheadFunc(
+
+    return laFuncBuilder(
         lookAheadPaths,
         hasPredicates,
         tokenMatcher,
@@ -83,12 +86,19 @@ export function buildLookaheadFuncForOr(
 export function buildLookaheadFuncForOptionalProd(
     occurrence: number,
     ruleGrammar: gast.Rule,
-    prodType: PROD_TYPE,
     k: number,
     tokenMatcher: TokenMatcher,
     tokenClassIdentityFunc: TokenClassIdentityFunc,
     tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
+    dynamicTokensEnabled: boolean,
+    prodType: PROD_TYPE,
+    lookaheadBuilder: (
+        lookAheadSequence,
+        TokenMatcher,
+        TokenClassIdentityFunc,
+        TokenInstanceIdentityFunc,
+        boolean
+    ) => () => boolean
 ): () => boolean {
     let lookAheadPaths = getLookaheadPathsForOptionalProd(
         occurrence,
@@ -96,7 +106,8 @@ export function buildLookaheadFuncForOptionalProd(
         prodType,
         k
     )
-    return buildSingleAlternativeLookaheadFunction(
+
+    return lookaheadBuilder(
         lookAheadPaths[0],
         tokenMatcher,
         tokenClassIdentityFunc,
@@ -105,113 +116,7 @@ export function buildLookaheadFuncForOptionalProd(
     )
 }
 
-export function buildLookaheadForOption(
-    optionOccurrence: number,
-    ruleGrammar: gast.Rule,
-    k: number,
-    tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
-): () => boolean {
-    return buildLookaheadFuncForOptionalProd(
-        optionOccurrence,
-        ruleGrammar,
-        PROD_TYPE.OPTION,
-        k,
-        tokenMatcher,
-        tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc,
-        dynamicTokensEnabled
-    )
-}
-
-export function buildLookaheadForMany(
-    optionOccurrence: number,
-    ruleGrammar: gast.Rule,
-    k: number,
-    tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
-): () => boolean {
-    return buildLookaheadFuncForOptionalProd(
-        optionOccurrence,
-        ruleGrammar,
-        PROD_TYPE.REPETITION,
-        k,
-        tokenMatcher,
-        tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc,
-        dynamicTokensEnabled
-    )
-}
-
-export function buildLookaheadForManySep(
-    optionOccurrence: number,
-    ruleGrammar: gast.Rule,
-    k: number,
-    tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
-): () => boolean {
-    return buildLookaheadFuncForOptionalProd(
-        optionOccurrence,
-        ruleGrammar,
-        PROD_TYPE.REPETITION_WITH_SEPARATOR,
-        k,
-        tokenMatcher,
-        tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc,
-        dynamicTokensEnabled
-    )
-}
-
-export function buildLookaheadForAtLeastOne(
-    optionOccurrence: number,
-    ruleGrammar: gast.Rule,
-    k: number,
-    tokenMatcher: TokenMatcher,
-    tokenIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
-): () => boolean {
-    return buildLookaheadFuncForOptionalProd(
-        optionOccurrence,
-        ruleGrammar,
-        PROD_TYPE.REPETITION_MANDATORY,
-        k,
-        tokenMatcher,
-        tokenIdentityFunc,
-        tokenInstanceIdentityFunc,
-        dynamicTokensEnabled
-    )
-}
-
-export function buildLookaheadForAtLeastOneSep(
-    optionOccurrence: number,
-    ruleGrammar: gast.Rule,
-    k: number,
-    tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
-    dynamicTokensEnabled: boolean
-): () => boolean {
-    return buildLookaheadFuncForOptionalProd(
-        optionOccurrence,
-        ruleGrammar,
-        PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR,
-        k,
-        tokenMatcher,
-        tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc,
-        dynamicTokensEnabled
-    )
-}
-
 export type Alternative = TokenConstructor[][]
-export type lookAheadSequence = TokenConstructor[][]
 
 export function buildAlternativesLookAheadFunc(
     alts: lookAheadSequence[],
@@ -387,10 +292,9 @@ export function buildSingleAlternativeLookaheadFunction(
             )
             return function(): boolean {
                 let nextToken = this.LA(1)
-                return choiceToAlt[tokenInstanceIdentityFunc(nextToken)] ===
-                true
-                    ? true
-                    : false
+                return (
+                    choiceToAlt[tokenInstanceIdentityFunc(nextToken)] === true
+                )
             }
         }
     } else {
