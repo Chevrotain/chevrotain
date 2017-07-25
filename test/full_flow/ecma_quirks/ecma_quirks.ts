@@ -12,39 +12,39 @@ import {
     TokenMatcher
 } from "../../../src/parse/parser_public"
 import { exceptions } from "../../../src/parse/exceptions_public"
-import { every, flatten, map } from "../../../src/utils/utils"
+import { every, flatten, forEach, map } from "../../../src/utils/utils"
 
 const Return = createToken({
     name: "Return",
-    pattern: /return/y
+    pattern: /return/
 })
 
 const DivisionOperator = createToken({
     name: "DivisionOperator",
-    pattern: /\//y
+    pattern: /\//
 })
 
 const RegExpLiteral = createToken({
     name: "RegExpLiteral",
-    pattern: /\/\d+\//y
+    pattern: /\/\d+\//
 })
 
 const NumberLiteral = createToken({
     name: "NumberLiteral",
-    pattern: /\d+/y
+    pattern: /\d+/
 })
 
 // todo differentiate line terminators and other whitespace?
 const WhiteSpace = createToken({
     name: "WhiteSpace",
-    pattern: /\s+/y,
+    pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
 const Semicolon = createToken({
     name: "Semicolon",
-    pattern: /;/y
+    pattern: /;/
 })
 
 const allTokens = [
@@ -55,6 +55,14 @@ const allTokens = [
     RegExpLiteral,
     Semicolon
 ]
+
+// Avoids errors in browser tests where the bundled specs will execute this
+// file even if the tests will avoid running it.
+if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
+    forEach(allTokens, currTokType => {
+        currTokType.PATTERN = new RegExp(currTokType.PATTERN.source, "y")
+    })
+}
 
 const ErrorToken = createToken({ name: "ErrorToken" })
 
