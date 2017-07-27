@@ -18,27 +18,17 @@ const LineTerminator = createToken({
 })
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.4
-const AbsComment = createToken({ name: "AbsComment" })
-
 const SingleLineComment = createToken({
-    name: "SingleLineComment",
-    parent: AbsComment
+    name: "SingleLineComment"
 })
 
 /*
- * The following two classes exist due to the following reason:
- * Quoting the spec: "Comments behave like white space and are discarded except that, if a MultiLineComment contains a
+ * Note that: "Comments behave like white space and are discarded except that, if a MultiLineComment contains a
  * line terminator character, then the entire comment is considered to be a LineTerminator for purposes of parsing
  * by the syntactic grammar."
  */
-const MultipleLineCommentWithTerminator = createToken({
-    name: "MultipleLineCommentWithTerminator",
-    parent: AbsComment
-})
-
-const MultipleLineCommentWithoutTerminator = createToken({
-    name: "MultipleLineCommentWithoutTerminator",
-    parent: AbsComment
+const MultipleLineComment = createToken({
+    name: "MultipleLineComment"
 })
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.6
@@ -102,95 +92,6 @@ const DeleteTok = createToken({ name: "DeleteTok", parent: AbsKeyword })
 const InTok = createToken({ name: "InTok", parent: AbsKeyword })
 
 const TryTok = createToken({ name: "TryTok", parent: AbsKeyword })
-
-const AbsAnyFutureReservedWords = createToken({
-    name: "AbsAnyFutureReservedWords",
-    parent: AbsAnyKeyword
-})
-
-const AbsFutureReservedWord = createToken({
-    name: "AbsFutureReservedWord",
-    parent: AbsAnyFutureReservedWords
-})
-
-const ClassTok = createToken({
-    name: "ClassTok",
-    parent: AbsFutureReservedWord
-})
-
-const EnumTok = createToken({ name: "EnumTok", parent: AbsFutureReservedWord })
-
-const ExtendsTok = createToken({
-    name: "ExtendsTok",
-    parent: AbsFutureReservedWord
-})
-
-const SuperTok = createToken({
-    name: "SuperTok",
-    parent: AbsFutureReservedWord
-})
-
-const ConstTok = createToken({
-    name: "ConstTok",
-    parent: AbsFutureReservedWord
-})
-
-const Tok = createToken({ name: "Tok", parent: AbsFutureReservedWord })
-
-const ImportTok = createToken({
-    name: "ImportTok",
-    parent: AbsFutureReservedWord
-})
-
-const AbsFutureReservedWordStrictMode = createToken({
-    name: "AbsFutureReservedWordStrictMode",
-    parent: AbsAnyFutureReservedWords
-})
-
-const ImplementsTok = createToken({
-    name: "ImplementsTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const LetTok = createToken({
-    name: "LetTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const PrivateTok = createToken({
-    name: "PrivateTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const PublicTok = createToken({
-    name: "PublicTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const YieldTok = createToken({
-    name: "YieldTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const InterfaceTok = createToken({
-    name: "InterfaceTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const PackageTok = createToken({
-    name: "PackageTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const ProtectedTok = createToken({
-    name: "ProtectedTok",
-    parent: AbsFutureReservedWordStrictMode
-})
-
-const StaticTok = createToken({
-    name: "StaticTok",
-    parent: AbsFutureReservedWordStrictMode
-})
 
 const Identifier = createToken({ name: "Identifier", parent: IdentifierName })
 
@@ -387,10 +288,8 @@ const RegularExpressionLiteral = createToken({
 module.exports = {
     Whitespace,
     LineTerminator,
-    AbsComment,
     SingleLineComment,
-    MultipleLineCommentWithTerminator,
-    MultipleLineCommentWithoutTerminator,
+    MultipleLineComment,
     IdentifierName,
     AbsAnyKeyword,
     AbsKeyword,
@@ -420,25 +319,6 @@ module.exports = {
     DeleteTok,
     InTok,
     TryTok,
-    AbsAnyFutureReservedWords,
-    AbsFutureReservedWord,
-    ClassTok,
-    EnumTok,
-    ExtendsTok,
-    SuperTok,
-    ConstTok,
-    Tok,
-    ImportTok,
-    AbsFutureReservedWordStrictMode,
-    ImplementsTok,
-    LetTok,
-    PrivateTok,
-    PublicTok,
-    YieldTok,
-    InterfaceTok,
-    PackageTok,
-    ProtectedTok,
-    StaticTok,
     Identifier,
     GetTok,
     SetTok,
