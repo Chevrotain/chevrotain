@@ -220,9 +220,9 @@ class SelectParser extends chevrotain.Parser {
 
      $.RULE("selectClause", () => {
          $.CONSUME(Select)
-         $.AT_LEAST_ONE_SEP(Comma, () => {
+         $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
              $.CONSUME(Identifier)
-         })
+         }})
      })
 
      $.RULE("fromClause", () => {
