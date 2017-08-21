@@ -23,8 +23,8 @@ const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
 class SelectParser extends Parser {
-    constructor(input, config) {
-        super(input, tokenVocabulary, config)
+    constructor(input) {
+        super(input, tokenVocabulary)
         const $ = this
 
         this.selectStatement = $.RULE("selectStatement", () => {
