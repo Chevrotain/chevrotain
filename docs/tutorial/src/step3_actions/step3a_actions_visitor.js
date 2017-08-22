@@ -7,10 +7,11 @@
 // Adding Actions(semantics) to our grammar using a CST Visitor.
 
 const selectLexer = require("../step1_lexing/step1_lexing")
+// re-using the parser implemented in step two.
 const parser = require("../step2_parsing/step2_parsing")
 const SelectParser = parser.SelectParser
 
-// A new parser instance with CST output enabled.
+// A new parser instance  with CST output enabled.
 const parserInstance = new SelectParser([], { outputCst: true })
 // The base visitor class can be accessed via the a parser instance.
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()

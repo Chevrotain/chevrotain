@@ -23,6 +23,8 @@ const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
 class SelectParser extends Parser {
+    // A config object as a constructor argument is normally not needed.
+    // Our use case requires a dynamic configuration to support step3 without duplicating code.
     constructor(input, config) {
         super(input, tokenVocabulary, config)
         const $ = this
