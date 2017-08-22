@@ -12,3 +12,6 @@
 To run the tests for all the tutorial parts:
 * ```npm update``` (only once)
 * ```npm test```
+
+Each step also contains a **main.js** which can be easily debugged
+using your favorite node.js debugger. 
