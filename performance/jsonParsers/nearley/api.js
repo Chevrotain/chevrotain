@@ -1,4 +1,4 @@
-var mooLexer = Moo.compile({
+var mooLexer = moo.compile({
     WS: {match: /\s+/, lineBreaks: true},
     StringLiteral: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/,
     NumberLiteral: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/,
