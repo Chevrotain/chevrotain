@@ -73,7 +73,7 @@
     "grunt-coveralls": "^1.0.1",
     "grunt-karma": "~2.0.0",
     "grunt-mocha-istanbul": "^5.0.2",
-    "grunt-run": "^0.7.0",
+    "grunt-run": "^0.8.0",
     "grunt-text-replace": "^0.4.0",
     "istanbul": "^0.4.5",
     "jsonfile": "^3.0.0",
