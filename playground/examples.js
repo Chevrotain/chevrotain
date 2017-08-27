@@ -215,7 +215,13 @@ function jsonGrammarOnlyExample() {
     var jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
         LSquare, RSquare, Comma, Colon, True, False, Null];
 
-    var JsonLexer = new Lexer(jsonTokens);
+    var JsonLexer = new Lexer(jsonTokens, {
+        // Less position info tracked, reduces verbosity of the playground output.
+        positionTracking: "onlyStart",
+        // Adds tokenClassName property to the output for easier debugging in the playground
+        // Do not use this flag in a productive env, as it will hurt performance.
+        debug: true
+    });
 
     // Labels only affect error messages and Diagrams.
     LCurly.LABEL = "'{'";
@@ -452,7 +458,13 @@ function cssExample() {
     var Num = createToken({name: 'Num', pattern: MAKE_PATTERN('{{num}}')});
 
 
-    var CssLexer = new Lexer(cssTokens);
+    var CssLexer = new Lexer(cssTokens, {
+        // Less position info tracked, reduces verbosity of the playground output.
+        positionTracking:"onlyStart",
+        // Adds tokenClassName property to the output for easier debugging in the playground
+        // Do not use this flag in a productive env, as it will hurt performance.
+        debug: true
+    });
 
     // ----------------- parser -----------------
     var Parser = chevrotain.Parser;

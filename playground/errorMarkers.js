@@ -32,8 +32,14 @@ function markInputErrors(lexErrors, parseErrors) {
         }
 
         end = {
-            line: lastToken.endLine - 1,
-            ch  : lastToken.endColumn
+            line: lastToken.endLine ?
+                lastToken.endLine - 1 :
+                // assume startLine === endLine if we endLine is not tracked
+                lastToken.startLine - 1,
+            ch  : lastToken.endColumn ?
+                lastToken.endColumn :
+                // compute the endColumn ourselves
+                lastToken.startColumn + lastToken.image.length
         }
 
         marker = inputEditor.markText(start, end, {
