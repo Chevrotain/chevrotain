@@ -93,7 +93,7 @@
     "semver": "^5.3.0",
     "tslint": "^5.4.2",
     "typedoc": "^0.8.0",
-    "typescript": "~2.4.1",
+    "typescript": "~2.5.2",
     "webpack": "^3.0.0",
     "wrench": "^1.5.9",
     "xregexp": "^3.2.0"
