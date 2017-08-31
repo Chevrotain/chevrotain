@@ -28,7 +28,7 @@ as any other JavaScript code without requiring any new tools or processes.
       * [Grammar Inheritance.][grammar_inheritance]
       * [Multiple starting rules.][starting_rules]
       * [Parametrized Rules.][parametrized_rules]
-      * [Syntactic Content Assist][content assist]
+      * [Syntactic Content Assist.][content assist]
       * **No code generation**.
         * The DSL is just JavaScript, not an external language.
         * The grammar is directly debuggable as plain JavaScript source.
