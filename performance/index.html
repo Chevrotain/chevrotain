@@ -378,7 +378,6 @@
         var iframe = document.createElement("iframe")
         iframe.src = url
         iframe.id = id
-        iframe.style = "visibility: hidden;";
         document.body.appendChild(iframe)
         return iframe.contentWindow
     }
@@ -395,6 +394,7 @@
     var parsimmonFrame = includeTestIFrame("parsimmon", "./jsonParsers/parsimmon/parsimmon.html")
     var pegjsFrame = includeTestIFrame("pegjs", "./jsonParsers/pegjs/pegjs.html")
 
+    $("iframe").css("visibility", "hidden")
 
     var styleCss = _.find(document.styleSheets, function (styleSheet) {
         return _.endsWith(styleSheet.href, "performance/style.css");
