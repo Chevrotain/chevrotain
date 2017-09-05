@@ -48,10 +48,7 @@ function defineLookaheadSpecs(
 
                 public manyOptionsRule = this.RULE(
                     "manyOptionsRule",
-                    this.parseManyOptionsRule,
-                    () => {
-                        return "-666"
-                    }
+                    this.parseManyOptionsRule
                 )
 
                 private parseManyOptionsRule(): string {
@@ -140,13 +137,7 @@ function defineLookaheadSpecs(
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
 
-                public manyRule = this.RULE(
-                    "manyRule",
-                    this.parseManyRule,
-                    () => {
-                        return "-666"
-                    }
-                )
+                public manyRule = this.RULE("manyRule", this.parseManyRule)
 
                 private parseManyRule(): string {
                     let total = ""
@@ -249,13 +240,7 @@ function defineLookaheadSpecs(
 
                 public manySepRule = this.RULE(
                     "manySepRule",
-                    this.parseManyRule,
-                    () => {
-                        return {
-                            total: 666,
-                            separators: []
-                        }
-                    }
+                    this.parseManyRule
                 )
 
                 private parseManyRule(): any {
