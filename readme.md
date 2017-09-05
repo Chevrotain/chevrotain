@@ -108,6 +108,7 @@ A interesting samples:
 * [Metabase BI expression parser][sample_metabase].
 * [Eve Programing Language][sample_eve].
 * [BioModelAnalyzer's ChatBot parser][sample_biomodel].
+* [Bombadil Toml Parser][sample_bombadil]
 
 
 [benchmark]: http://sap.github.io/chevrotain/performance/
@@ -124,3 +125,4 @@ A interesting samples:
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
 [sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
 [sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
+[sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
