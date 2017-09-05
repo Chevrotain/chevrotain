@@ -16,6 +16,13 @@ to full fledged programing languages.
 It is important to note that Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without any code generation. Chevrotain Grammars are pure JavaScript code which can be created/debugged/edited
 as any other JavaScript code without requiring any new tools or processes.
 
+The general workflow is that you create a grammar based on a javascript DSL (check out the playground, the grammar is on the left). The grammar will be used by the parser to parse an input text to confirm that it's parseable and optionally return an AST. 
+The grammar uses tokens that you define to parse an input text. A token is something that contains the logic to split text into distinct parts, usually with the help of a  Regex. 
+The javascript DSL that I mentioned earlier is just regular javascript but it's designed to be as short and convenient to write as possible.
+Currently per default you actually don't get any AST out of the parsing step and it only does parsing, nothing else. But you can enable CST generation like so: `outputCst : true`. CST is a longform AST that could regenerate the entire source code. You could also create your own, smaller AST by inserting parsing functions into the grammar, which will return whatever you want to return in whatever format.
+
+
+
 ## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
 ## Features
   1. **Parsing DSL**.
