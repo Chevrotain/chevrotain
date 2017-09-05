@@ -14,15 +14,17 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                                   ^
             var inputText = "SELECT name, age, salary managers WHERE ag > 67" // MISSING the <FROM> between salary and managers
             var suggestions = getContentAssist(inputText, 42, symbolTable)
-            expect(suggestions).to.have.members(["age"]).and.to.have.lengthOf(1)
+            expect(suggestions)
+                .to.have.members(["age"])
+                .and.to.have.lengthOf(1)
         })
 
         it("redundant Comma", function() {
             // content assist point:                    ^
             var inputText = "SELECT name, age, FROM empl " // redundant <comma> after age
             var suggestions = getContentAssist(inputText, 27, symbolTable)
-            expect(suggestions).to.have
-                .members(["employees"])
+            expect(suggestions)
+                .to.have.members(["employees"])
                 .and.to.have.lengthOf(1)
         })
 
@@ -30,8 +32,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:   ^
             var inputText = "name, age  " // missing the <SELECT> at the beginning of the statement
             var suggestions = getContentAssist(inputText, 10, symbolTable)
-            expect(suggestions).to.have
-                .members(["FROM"])
+            expect(suggestions)
+                .to.have.members(["FROM"])
                 .and.to.have.lengthOf(1)
         })
     })
@@ -41,8 +43,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:          ^
             var inputText = "SELECT name, age  "
             var suggestions = getContentAssist(inputText, 17, symbolTable)
-            expect(suggestions).to.have
-                .members(["FROM"])
+            expect(suggestions)
+                .to.have.members(["FROM"])
                 .and.to.have.lengthOf(1)
 
             // content assist point:                    ^
@@ -56,8 +58,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:       ^
             var inputText = "SELECT name FR  "
             var suggestions = getContentAssist(inputText, 13, symbolTable)
-            expect(suggestions).to.have
-                .members(["FROM"])
+            expect(suggestions)
+                .to.have.members(["FROM"])
                 .and.to.have.lengthOf(1)
 
             // content assist point:                 ^
@@ -71,8 +73,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:      ^
             var inputText = "SELECT name,  "
             var suggestions = getContentAssist(inputText, 13, symbolTable)
-            expect(suggestions).to.have
-                .members(["name", "age", "tenure", "salary"])
+            expect(suggestions)
+                .to.have.members(["name", "age", "tenure", "salary"])
                 .and.to.have.lengthOf(4)
 
             // content assist point:                ^
@@ -86,8 +88,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:         ^
             var inputText = "SELECT name, sal "
             var suggestions = getContentAssist(inputText, 16, symbolTable)
-            expect(suggestions).to.have
-                .members(["salary"])
+            expect(suggestions)
+                .to.have.members(["salary"])
                 .and.to.have.lengthOf(1)
 
             // content assist point:                   ^
@@ -103,8 +105,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                      ^
             var inputText = "SELECT name, age FROM aliens  "
             var suggestions = getContentAssist(inputText, 29, symbolTable)
-            expect(suggestions).to.have
-                .members(["WHERE"])
+            expect(suggestions)
+                .to.have.members(["WHERE"])
                 .and.to.have.lengthOf(1)
 
             // content assist point:                                ^
@@ -118,8 +120,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                         ^
             var inputText = "SELECT name, age FROM aliens WHE "
             var suggestions = getContentAssist(inputText, 32, symbolTable)
-            expect(suggestions).to.have
-                .members(["WHERE"])
+            expect(suggestions)
+                .to.have.members(["WHERE"])
                 .and.to.have.lengthOf(1)
 
             // content assist point:                                   ^
@@ -134,8 +136,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:               ^
             var inputText = "SELECT name, age FROM  "
             var suggestions = getContentAssist(inputText, 22, symbolTable)
-            expect(suggestions).to.have
-                .members(["employees", "managers", "aliens", "allies"])
+            expect(suggestions)
+                .to.have.members(["employees", "managers", "aliens", "allies"])
                 .and.to.have.lengthOf(4)
 
             // content assist point:                         ^
@@ -149,8 +151,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:            ^
             var inputText = "SELECT name FROM al "
             var suggestions = getContentAssist(inputText, 19, symbolTable)
-            expect(suggestions).to.have
-                .members(["aliens", "allies"])
+            expect(suggestions)
+                .to.have.members(["aliens", "allies"])
                 .and.to.have.lengthOf(2)
 
             // content assist point:                      ^
@@ -166,8 +168,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                            ^
             var inputText = "SELECT name, age FROM aliens WHERE  "
             var suggestions = getContentAssist(inputText, 35, symbolTable)
-            expect(suggestions).to.have
-                .members(["name", "age", "tenure", "salary"])
+            expect(suggestions)
+                .to.have.members(["name", "age", "tenure", "salary"])
                 .and.to.have.lengthOf(4)
 
             // content assist point:                                      ^
@@ -182,8 +184,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                               ^
             var inputText = "SELECT name, age FROM aliens WHERE ten  "
             var suggestions = getContentAssist(inputText, 38, symbolTable)
-            expect(suggestions).to.have
-                .members(["tenure"])
+            expect(suggestions)
+                .to.have.members(["tenure"])
                 .and.to.have.lengthOf(1)
 
             // content assist point:                                         ^
@@ -198,8 +200,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                                    ^
             var inputText = "SELECT name, age FROM managers WHERE age >  "
             var suggestions = getContentAssist(inputText, 43, symbolTable)
-            expect(suggestions).to.have
-                .members(["name", "age", "tenure", "salary"])
+            expect(suggestions)
+                .to.have.members(["name", "age", "tenure", "salary"])
                 .and.to.have.lengthOf(4)
         })
 
@@ -207,8 +209,8 @@ describe("The Content Assist Parser Example using ES6 syntax", function() {
             // content assist point:                                       ^
             var inputText = "SELECT name, age FROM managers WHERE age >  na "
             var suggestions = getContentAssist(inputText, 46, symbolTable)
-            expect(suggestions).to.have
-                .members(["name"])
+            expect(suggestions)
+                .to.have.members(["name"])
                 .and.to.have.lengthOf(1)
         })
     })

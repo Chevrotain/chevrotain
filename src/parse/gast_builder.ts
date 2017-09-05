@@ -556,7 +556,11 @@ function createRefOrTerminalProdRangeInternal(
         let stop = pattern.lastIndex
         let currRange = new Range(start, stop)
         let currText = matched[0]
-        prodRanges.push({ range: currRange, text: currText, type: prodType })
+        prodRanges.push({
+            range: currRange,
+            text: currText,
+            type: prodType
+        })
     }
     return prodRanges
 }

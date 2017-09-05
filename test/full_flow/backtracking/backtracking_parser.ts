@@ -70,7 +70,9 @@ export class BackTrackingParser extends Parser {
     public withDefaultStatement = this.RULE(
         "withDefaultStatement",
         this.parseWithDefaultStatement,
-        { recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_DEFAULT) }
+        {
+            recoveryValueFunc: INVALID(RET_TYPE.INVALID_WITH_DEFAULT)
+        }
     )
     public qualifiedName = this.RULE("qualifiedName", this.parseQualifiedName, {
         recoveryValueFunc: INVALID(RET_TYPE.INVALID_FQN),

@@ -1,12 +1,10 @@
 {
-  "compilerOptions": {
-    "mode": "file",
-    "module": "commonjs",
-    "removeComments": false,
-    "target": "ES5",
-    "sourceMap": true
-  },
-  "files": [
-    "lib/chevrotain.d.ts"
-  ]
+    "compilerOptions": {
+        "mode": "file",
+        "module": "commonjs",
+        "removeComments": false,
+        "target": "ES5",
+        "sourceMap": true
+    },
+    "files": ["lib/chevrotain.d.ts"]
 }

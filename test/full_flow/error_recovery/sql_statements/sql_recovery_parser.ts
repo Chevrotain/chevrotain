@@ -48,7 +48,9 @@ export class DDLExampleRecoveryParser extends Parser {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
-        super(input, <any>allTokens, { recoveryEnabled: isRecoveryEnabled })
+        super(input, <any>allTokens, {
+            recoveryEnabled: isRecoveryEnabled
+        })
         // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
         //       The typescript compiler places the constructor body last after initializations in the class's body
         //       which is why place the call here meets the criteria.

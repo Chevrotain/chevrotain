@@ -289,18 +289,18 @@ export function possiblePathsFrom(
             const newDef = [
                 new gast.Flat(prod.definition),
                 new gast.Repetition(
-                    [new gast.Terminal(prod.separator)].concat(
-                        <any>prod.definition
-                    )
+                    [
+                        new gast.Terminal(prod.separator)
+                    ].concat(<any>prod.definition)
                 )
             ]
             return getAlternativesForProd(newDef)
         } else if (prod instanceof gast.RepetitionWithSeparator) {
             const newDef = prod.definition.concat([
                 new gast.Repetition(
-                    [new gast.Terminal(prod.separator)].concat(
-                        <any>prod.definition
-                    )
+                    [
+                        new gast.Terminal(prod.separator)
+                    ].concat(<any>prod.definition)
                 )
             ])
             result = getAlternativesForProd(newDef)

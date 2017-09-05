@@ -146,7 +146,11 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
                     node.occurrenceInParent,
                     altIdx
                 )
-                this.result.push({ def, key, name: currFlatAlt.name })
+                this.result.push({
+                    def,
+                    key,
+                    name: currFlatAlt.name
+                })
             }
         })
     }

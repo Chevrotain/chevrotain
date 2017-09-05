@@ -27,8 +27,16 @@ describe("The Chevrotain Tokens namespace", () => {
 
         B.GROUP = "Special"
 
-        let C = createToken({ name: "C", pattern: /\d+/, parent: B })
-        let D = createToken({ name: "D", pattern: /\w+/, parent: B })
+        let C = createToken({
+            name: "C",
+            pattern: /\d+/,
+            parent: B
+        })
+        let D = createToken({
+            name: "D",
+            pattern: /\w+/,
+            parent: B
+        })
         let Plus = createToken({ name: "Plus", pattern: /\+/ })
         Plus.LABEL = "+"
 
@@ -81,8 +89,12 @@ describe("The Chevrotain Tokens namespace", () => {
         })
 
         it("provides a utility to verify if a token instance matches a Token Type", () => {
-            let ATokRegular = createToken({ name: "ATokRegular" })
-            let BTokRegular = createToken({ name: "BTokRegular" })
+            let ATokRegular = createToken({
+                name: "ATokRegular"
+            })
+            let BTokRegular = createToken({
+                name: "BTokRegular"
+            })
             let AInstanceRegular = createTokenInstance(
                 ATokRegular,
                 "a",
@@ -124,18 +136,27 @@ describe("The Chevrotain Tokens namespace", () => {
         })
 
         it("can define a token Label via the createToken utilities", () => {
-            let A = createToken({ name: "A", label: "bamba" })
+            let A = createToken({
+                name: "A",
+                label: "bamba"
+            })
             expect(tokenLabel(A)).to.equal("bamba")
         })
 
         it("can define a POP_MODE via the createToken utilities", () => {
-            let A = createToken({ name: "A", pop_mode: true })
+            let A = createToken({
+                name: "A",
+                pop_mode: true
+            })
             expect(A).to.haveOwnProperty("POP_MODE")
             expect(A.POP_MODE).to.be.true
         })
 
         it("can define a PUSH_MODE via the createToken utilities", () => {
-            let A = createToken({ name: "A", push_mode: "attribute" })
+            let A = createToken({
+                name: "A",
+                push_mode: "attribute"
+            })
             expect(A).to.haveOwnProperty("PUSH_MODE")
             expect(A.PUSH_MODE).to.equal("attribute")
         })
@@ -148,7 +169,10 @@ describe("The Chevrotain Tokens namespace", () => {
         })
 
         it("can define a token group via the createToken utilities", () => {
-            let A = createToken({ name: "A", group: Lexer.SKIPPED })
+            let A = createToken({
+                name: "A",
+                group: Lexer.SKIPPED
+            })
             expect(A).to.haveOwnProperty("GROUP")
             expect(A.GROUP).to.equal(Lexer.SKIPPED)
         })

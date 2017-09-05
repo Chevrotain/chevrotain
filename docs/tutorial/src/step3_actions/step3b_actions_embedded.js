@@ -116,8 +116,12 @@ class SelectParserEmbedded extends Parser {
 
         this.relationalOperator = $.RULE("relationalOperator", () => {
             return $.OR([
-                { ALT: () => $.CONSUME(GreaterThan) },
-                { ALT: () => $.CONSUME(LessThan) }
+                {
+                    ALT: () => $.CONSUME(GreaterThan)
+                },
+                {
+                    ALT: () => $.CONSUME(LessThan)
+                }
             ]).image
         })
 

@@ -18,8 +18,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members(["static", "enum", "function"])
+                expect(suggestions)
+                    .to.have.members(["static", "enum", "function"])
                     .and.to.have.lengthOf(3)
             })
 
@@ -33,8 +33,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members(["function"])
+                expect(suggestions)
+                    .to.have.members(["function"])
                     .and.to.have.lengthOf(1)
             })
 
@@ -48,8 +48,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members([
+                expect(suggestions)
+                    .to.have.members([
                         "private",
                         "public",
                         "static",
@@ -70,8 +70,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members(["foo", "bar", "average"])
+                expect(suggestions)
+                    .to.have.members(["foo", "bar", "average"])
                     .and.to.have.lengthOf(3)
             })
 
@@ -85,8 +85,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members(["average"])
+                expect(suggestions)
+                    .to.have.members(["average"])
                     .and.to.have.lengthOf(1)
             })
 
@@ -100,8 +100,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members(["enum"])
+                expect(suggestions)
+                    .to.have.members(["enum"])
                     .and.to.have.lengthOf(1)
             })
 
@@ -116,7 +116,9 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have.members([]).and.to.have.lengthOf(0)
+                expect(suggestions)
+                    .to.have.members([])
+                    .and.to.have.lengthOf(0)
             })
 
             it('Text: "private enum MONTHS\n' + '      static "', function() {
@@ -129,8 +131,8 @@ describe("The Official Content Assist Feature example Example - using ES6 syntax
                     inputText,
                     symbolTable
                 )
-                expect(suggestions).to.have
-                    .members(["function"])
+                expect(suggestions)
+                    .to.have.members(["function"])
                     .and.to.have.lengthOf(1)
             })
         }

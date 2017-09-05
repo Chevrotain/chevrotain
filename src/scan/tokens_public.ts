@@ -150,9 +150,11 @@ export function extendToken(
         pattern = undefined
     }
 
-    return createTokenInternal(
-        <any>{ name: tokenName, parent: parentConstructor, pattern: pattern }
-    )
+    return createTokenInternal(<any>{
+        name: tokenName,
+        parent: parentConstructor,
+        pattern: pattern
+    })
 }
 
 function createTokenInternal(config: ITokenConfig): TokenConstructor {

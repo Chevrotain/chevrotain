@@ -86,7 +86,10 @@ function defineRecognizerSpecs(
                         this.SUBRULE3(this.subRule, [3, "d"])
                         this.SUBRULE4(this.subRule, [2, "e"])
                         this.SUBRULE5(this.subRule, [1, "f"])
-                        return { numbers: this.numbers, letters: this.letters }
+                        return {
+                            numbers: this.numbers,
+                            letters: this.letters
+                        }
                     })
 
                     public subRule = this.RULE(
@@ -155,7 +158,9 @@ function defineRecognizerSpecs(
                                     return "-"
                                 }
                             },
-                            { ALT: EMPTY_ALT("EMPTY_ALT") }
+                            {
+                                ALT: EMPTY_ALT("EMPTY_ALT")
+                            }
                         ])
                     }
                 }
@@ -197,7 +202,9 @@ function defineRecognizerSpecs(
                 public qualifiedName = this.RULE(
                     "qualifiedName",
                     this.parseQualifiedName,
-                    { recoveryValueFunc: () => ["666"] }
+                    {
+                        recoveryValueFunc: () => ["666"]
+                    }
                 )
 
                 private parseQualifiedName(): string[] {
@@ -231,7 +238,9 @@ function defineRecognizerSpecs(
                 public qualifiedName = this.RULE(
                     "qualifiedName",
                     this.parseQualifiedName,
-                    { recoveryValueFunc: () => ["333"] }
+                    {
+                        recoveryValueFunc: () => ["333"]
+                    }
                 )
 
                 private parseQualifiedName(): string[] {
@@ -255,7 +264,9 @@ function defineRecognizerSpecs(
 
             class ManySepSubRuleRepetitionRecovery extends Parser {
                 constructor(input: Token[] = []) {
-                    super(input, ALL_TOKENS, { recoveryEnabled: true })
+                    super(input, ALL_TOKENS, {
+                        recoveryEnabled: true
+                    })
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
 
@@ -314,7 +325,9 @@ function defineRecognizerSpecs(
                 public qualifiedName = this.RULE(
                     "qualifiedName",
                     this.parseQualifiedName,
-                    { recoveryValueFunc: () => ["777"] }
+                    {
+                        recoveryValueFunc: () => ["777"]
+                    }
                 )
 
                 private parseQualifiedName(): string[] {
@@ -349,7 +362,9 @@ function defineRecognizerSpecs(
                 public qualifiedName = this.RULE(
                     "qualifiedName",
                     this.parseQualifiedName,
-                    { recoveryValueFunc: () => ["999"] }
+                    {
+                        recoveryValueFunc: () => ["999"]
+                    }
                 )
 
                 private parseQualifiedName(): string[] {
@@ -544,7 +559,9 @@ function defineRecognizerSpecs(
 
                 class SingleTokenInsertRegular extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, allTokens, { recoveryEnabled: true })
+                        super(input, allTokens, {
+                            recoveryEnabled: true
+                        })
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
 
@@ -960,7 +977,9 @@ function defineRecognizerSpecs(
             it("will not swallow none Recognizer errors when attempting 'in rule error recovery'", () => {
                 class InRuleParser extends Parser {
                     constructor(input: Token[] = []) {
-                        super(input, ALL_TOKENS, { recoveryEnabled: true })
+                        super(input, ALL_TOKENS, {
+                            recoveryEnabled: true
+                        })
                         ;(Parser as any).performSelfAnalysis(this)
                     }
 
@@ -978,7 +997,9 @@ function defineRecognizerSpecs(
             it("will not swallow none Recognizer errors during Token consumption", () => {
                 class InRuleParser extends Parser {
                     constructor(input: Token[] = []) {
-                        super(input, ALL_TOKENS, { recoveryEnabled: true })
+                        super(input, ALL_TOKENS, {
+                            recoveryEnabled: true
+                        })
                         ;(Parser as any).performSelfAnalysis(this)
                     }
 
@@ -996,7 +1017,9 @@ function defineRecognizerSpecs(
             it("will rethrow none Recognizer errors during Token consumption - recovery disabled + nested rule", () => {
                 class InRuleParser extends Parser {
                     constructor(input: Token[] = []) {
-                        super(input, ALL_TOKENS, { recoveryEnabled: true })
+                        super(input, ALL_TOKENS, {
+                            recoveryEnabled: true
+                        })
                         ;(Parser as any).performSelfAnalysis(this)
                     }
 
@@ -1012,7 +1035,9 @@ function defineRecognizerSpecs(
                             this.CONSUME1(DotTok)
                             this.CONSUME1(IdentTok)
                         },
-                        { resyncEnabled: false }
+                        {
+                            resyncEnabled: false
+                        }
                     )
                 }
                 let parser: any = new InRuleParser([createToken(IntTok, "1")])
@@ -1103,7 +1128,9 @@ function defineRecognizerSpecs(
             it("Will use Token LABELS for noViableAlt error messages when unavailable - nestedRuleNames", () => {
                 class LabelAltParserNested extends Parser {
                     constructor(input: Token[] = []) {
-                        super(input, [PlusTok, MinusTok], { outputCst: true })
+                        super(input, [PlusTok, MinusTok], {
+                            outputCst: true
+                        })
                         ;(Parser as any).performSelfAnalysis(this)
                     }
 

@@ -110,7 +110,11 @@
         var headerName = target.getAttribute("rulename")
         var rects = getUsageSvgRect(headerName, "non-terminal", "rulename")
         var header = findHeader(headerName)
-        return { rects: rects, header: header, ruleName: headerName }
+        return {
+            rects: rects,
+            header: header,
+            ruleName: headerName
+        }
     }
 
     // utils

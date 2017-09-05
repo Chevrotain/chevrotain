@@ -1,19 +1,12 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "removeComments": false,
-    "target": "ES5",
-    "outDir": "lib",
-    "sourceMap": true,
-    "declaration": true
-  },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "examples",
-    "test_integration"
-  ]
+    "compilerOptions": {
+        "module": "commonjs",
+        "removeComments": false,
+        "target": "ES5",
+        "outDir": "lib",
+        "sourceMap": true,
+        "declaration": true
+    },
+    "include": ["src/**/*.ts", "test/**/*.ts"],
+    "exclude": ["node_modules", "examples", "test_integration"]
 }

@@ -75,7 +75,10 @@ describe("GAst namespace", () => {
         let C = extendToken("C")
         let D = extendToken("D")
         let Comma = extendToken("Comma")
-        let WithLiteral = createToken({ name: "WithLiteral", pattern: "bamba" })
+        let WithLiteral = createToken({
+            name: "WithLiteral",
+            pattern: "bamba"
+        })
 
         it("can serialize a NonTerminal", () => {
             let input = new gast.NonTerminal("qualifiedName")
