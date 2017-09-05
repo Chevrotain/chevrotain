@@ -42,7 +42,11 @@ var createToken = chevrotain.createToken
 // all keywords (from/select/where/...) extend a base Keyword class, thus
 // they will be easy to identify for the purpose of content assist.
 var Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
-var Select = createToken({ name: "Select", pattern: /SELECT/, parent: Keyword })
+var Select = createToken({
+    name: "Select",
+    pattern: /SELECT/,
+    parent: Keyword
+})
 var From = createToken({ name: "From", pattern: /FROM/, parent: Keyword })
 var Where = createToken({ name: "Where", pattern: /WHERE/, parent: Keyword })
 var Comma = createToken({ name: "Comma", pattern: /,/ })

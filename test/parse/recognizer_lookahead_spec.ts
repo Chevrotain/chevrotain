@@ -251,7 +251,10 @@ function defineLookaheadSpecs(
                     "manySepRule",
                     this.parseManyRule,
                     () => {
-                        return { total: 666, separators: [] }
+                        return {
+                            total: 666,
+                            separators: []
+                        }
                     }
                 )
 
@@ -309,7 +312,10 @@ function defineLookaheadSpecs(
                         }).separators
                     )
 
-                    return { total: total, separators: separators }
+                    return {
+                        total: total,
+                        separators: separators
+                    }
                 }
             }
 
@@ -486,7 +492,10 @@ function defineLookaheadSpecs(
                     this.parseAtLeastOneRule,
                     {
                         recoveryValueFunc: () => {
-                            return { total: "-666", separators: [] }
+                            return {
+                                total: "-666",
+                                separators: []
+                            }
                         }
                     }
                 )
@@ -545,7 +554,10 @@ function defineLookaheadSpecs(
                         }).separators
                     )
 
-                    return { total: total, separators: separators }
+                    return {
+                        total: total,
+                        separators: separators
+                    }
                 }
             }
 

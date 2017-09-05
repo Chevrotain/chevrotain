@@ -266,14 +266,18 @@
         for (var i = 0; i < this.items.length; i++) {
             var item = this.items[i]
             if (item.needsSpace) {
-                Path(x, y).h(10).addTo(g)
+                Path(x, y)
+                    .h(10)
+                    .addTo(g)
                 x += 10
             }
             item.format(x, y, item.width + item.offsetX).addTo(g)
             x += item.width + item.offsetX
             y += item.height
             if (item.needsSpace) {
-                Path(x, y).h(10).addTo(g)
+                Path(x, y)
+                    .h(10)
+                    .addTo(g)
                 x += 10
             }
         }
@@ -344,21 +348,29 @@
     Sequence.prototype.format = function(x, y, width) {
         // Hook up the two sides if this is narrower than its stated width.
         var gaps = determineGaps(width, this.width)
-        Path(x, y).h(gaps[0]).addTo(this)
-        Path(x + gaps[0] + this.width, y + this.height).h(gaps[1]).addTo(this)
+        Path(x, y)
+            .h(gaps[0])
+            .addTo(this)
+        Path(x + gaps[0] + this.width, y + this.height)
+            .h(gaps[1])
+            .addTo(this)
         x += gaps[0]
 
         for (var i = 0; i < this.items.length; i++) {
             var item = this.items[i]
             if (item.needsSpace) {
-                Path(x, y).h(10).addTo(this)
+                Path(x, y)
+                    .h(10)
+                    .addTo(this)
                 x += 10
             }
             item.format(x, y, item.width).addTo(this)
             x += item.width
             y += item.height
             if (item.needsSpace) {
-                Path(x, y).h(10).addTo(this)
+                Path(x, y)
+                    .h(10)
+                    .addTo(this)
                 x += 10
             }
         }
@@ -423,7 +435,9 @@
         for (var i = 0; i < this.items.length; i++) {
             var item = this.items[i]
             if (item.needsSpace) {
-                Path(x, y).h(10).addTo(this)
+                Path(x, y)
+                    .h(10)
+                    .addTo(this)
                 x += 10
             }
             item
@@ -436,7 +450,9 @@
             x += Math.max(item.width + item.offsetX, Diagram.ARC_RADIUS * 2)
             y += item.height
             if (item.needsSpace) {
-                Path(x, y).h(10).addTo(this)
+                Path(x, y)
+                    .h(10)
+                    .addTo(this)
                 x += 10
             }
 
@@ -467,7 +483,9 @@
             }
         }
 
-        Path(x, y).h(width - (this.width + this.offsetX)).addTo(this)
+        Path(x, y)
+            .h(width - (this.width + this.offsetX))
+            .addTo(this)
 
         return this
     }
@@ -526,8 +544,12 @@
     Choice.prototype.format = function(x, y, width) {
         // Hook up the two sides if this is narrower than its stated width.
         var gaps = determineGaps(width, this.width)
-        Path(x, y).h(gaps[0]).addTo(this)
-        Path(x + gaps[0] + this.width, y + this.height).h(gaps[1]).addTo(this)
+        Path(x, y)
+            .h(gaps[0])
+            .addTo(this)
+        Path(x + gaps[0] + this.width, y + this.height)
+            .h(gaps[1])
+            .addTo(this)
         x += gaps[0]
 
         var last = this.items.length - 1
@@ -581,7 +603,9 @@
         }
 
         // Do the straight-line path.
-        Path(x, y).right(Diagram.ARC_RADIUS * 2).addTo(this)
+        Path(x, y)
+            .right(Diagram.ARC_RADIUS * 2)
+            .addTo(this)
         this.items[this.normal]
             .format(x + Diagram.ARC_RADIUS * 2, y, innerWidth)
             .addTo(this)
@@ -669,12 +693,18 @@
     OneOrMore.prototype.format = function(x, y, width) {
         // Hook up the two sides if this is narrower than its stated width.
         var gaps = determineGaps(width, this.width)
-        Path(x, y).h(gaps[0]).addTo(this)
-        Path(x + gaps[0] + this.width, y + this.height).h(gaps[1]).addTo(this)
+        Path(x, y)
+            .h(gaps[0])
+            .addTo(this)
+        Path(x + gaps[0] + this.width, y + this.height)
+            .h(gaps[1])
+            .addTo(this)
         x += gaps[0]
 
         // Draw item
-        Path(x, y).right(Diagram.ARC_RADIUS).addTo(this)
+        Path(x, y)
+            .right(Diagram.ARC_RADIUS)
+            .addTo(this)
         this.item
             .format(
                 x + Diagram.ARC_RADIUS,
@@ -814,8 +844,12 @@
     Terminal.prototype.format = function(x, y, width) {
         // Hook up the two sides if this is narrower than its stated width.
         var gaps = determineGaps(width, this.width)
-        Path(x, y).h(gaps[0]).addTo(this)
-        Path(x + gaps[0] + this.width, y).h(gaps[1]).addTo(this)
+        Path(x, y)
+            .h(gaps[0])
+            .addTo(this)
+        Path(x + gaps[0] + this.width, y)
+            .h(gaps[1])
+            .addTo(this)
         x += gaps[0]
 
         FakeSVG("rect", {
@@ -872,8 +906,12 @@
     NonTerminal.prototype.format = function(x, y, width) {
         // Hook up the two sides if this is narrower than its stated width.
         var gaps = determineGaps(width, this.width)
-        Path(x, y).h(gaps[0]).addTo(this)
-        Path(x + gaps[0] + this.width, y).h(gaps[1]).addTo(this)
+        Path(x, y)
+            .h(gaps[0])
+            .addTo(this)
+        Path(x + gaps[0] + this.width, y)
+            .h(gaps[1])
+            .addTo(this)
         x += gaps[0]
 
         FakeSVG("rect", {
@@ -914,13 +952,21 @@
     Comment.prototype.format = function(x, y, width) {
         // Hook up the two sides if this is narrower than its stated width.
         var gaps = determineGaps(width, this.width)
-        Path(x, y).h(gaps[0]).addTo(this)
-        Path(x + gaps[0] + this.width, y + this.height).h(gaps[1]).addTo(this)
+        Path(x, y)
+            .h(gaps[0])
+            .addTo(this)
+        Path(x + gaps[0] + this.width, y + this.height)
+            .h(gaps[1])
+            .addTo(this)
         x += gaps[0]
 
         FakeSVG(
             "text",
-            { x: x + this.width / 2, y: y + 5, class: "comment" },
+            {
+                x: x + this.width / 2,
+                y: y + 5,
+                class: "comment"
+            },
             this.text
         ).addTo(this)
         return this
@@ -937,7 +983,9 @@
     }
     subclassOf(Skip, FakeSVG)
     Skip.prototype.format = function(x, y, width) {
-        Path(x, y).right(width).addTo(this)
+        Path(x, y)
+            .right(width)
+            .addTo(this)
         return this
     }
 

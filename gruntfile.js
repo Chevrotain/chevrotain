@@ -148,7 +148,10 @@ module.exports = function(grunt) {
                     files: [
                         "lib/chevrotain.js",
                         "test/test.config.js",
-                        { pattern: "test_integration/*/*.js", included: false },
+                        {
+                            pattern: "test_integration/*/*.js",
+                            included: false
+                        },
                         "test_integration/integration_tests_main.js"
                     ]
                 }
@@ -172,7 +175,10 @@ module.exports = function(grunt) {
                     files: [
                         "lib/chevrotain.min.js",
                         "test/test.config.js",
-                        { pattern: "test_integration/*/*.js", included: false },
+                        {
+                            pattern: "test_integration/*/*.js",
+                            included: false
+                        },
                         "test_integration/integration_tests_main.js"
                     ]
                 }

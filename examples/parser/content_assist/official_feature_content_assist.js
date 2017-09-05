@@ -84,8 +84,12 @@ class StatementsParser extends Parser {
 
         $.RULE("stmt", () => {
             $.OR([
-                { ALT: () => $.SUBRULE($.functionInvocation) },
-                { ALT: () => $.SUBRULE($.functionStmt) },
+                {
+                    ALT: () => $.SUBRULE($.functionInvocation)
+                },
+                {
+                    ALT: () => $.SUBRULE($.functionStmt)
+                },
                 { ALT: () => $.SUBRULE($.enumStmt) }
             ])
         })

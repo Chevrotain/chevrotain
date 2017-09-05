@@ -1544,10 +1544,19 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
 describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahead", () => {
     it("Reproduce issue", () => {
-        const LParen = createToken({ name: "LParen", pattern: /\(/ })
-        const RParen = createToken({ name: "RParen", pattern: /\)/ })
+        const LParen = createToken({
+            name: "LParen",
+            pattern: /\(/
+        })
+        const RParen = createToken({
+            name: "RParen",
+            pattern: /\)/
+        })
         const Comma = createToken({ name: "Comma", pattern: /,/ })
-        const FatArrow = createToken({ name: "FatArrow", pattern: /=>/ })
+        const FatArrow = createToken({
+            name: "FatArrow",
+            pattern: /=>/
+        })
         const Identifier = createToken({
             name: "Identifier",
             pattern: /[a-zA-Z]+/
@@ -1571,7 +1580,9 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
 
         class Issue391Parser extends Parser {
             constructor(input: Token[] = []) {
-                super(input, allTokens, { maxLookahead: 4 })
+                super(input, allTokens, {
+                    maxLookahead: 4
+                })
                 ;(Parser as any).performSelfAnalysis(this)
             }
 

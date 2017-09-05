@@ -323,9 +323,9 @@ export class Lexer {
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
             actualDefinition = <any>{ modes: {} }
-            actualDefinition.modes[DEFAULT_MODE] = cloneArr(
-                <SingleModeLexerDefinition>lexerDefinition
-            )
+            actualDefinition.modes[
+                DEFAULT_MODE
+            ] = cloneArr(<SingleModeLexerDefinition>lexerDefinition)
             actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
         } else {
             // no conversion needed, input should already be a IMultiModeLexerDefinition
@@ -761,7 +761,11 @@ export class Lexer {
             matchedTokens.length = matchedTokensIndex
         }
 
-        return { tokens: matchedTokens, groups: groups, errors: errors }
+        return {
+            tokens: matchedTokens,
+            groups: groups,
+            errors: errors
+        }
     }
 
     private handleModes(i, config, pop_mode, push_mode, newToken) {

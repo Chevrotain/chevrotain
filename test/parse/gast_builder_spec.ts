@@ -311,9 +311,21 @@ describe("The GAst Builder namespace", () => {
 
     it("can find the direct 'childs' of another Production from an IProd representation", () => {
         let allProdRanges: IProdRange[] = [
-            { range: new Range(1, 10), text: "1.1", type: ProdType.TERMINAL },
-            { range: new Range(11, 200), text: "1.2", type: ProdType.OR },
-            { range: new Range(20, 180), text: "1.2.1", type: ProdType.MANY },
+            {
+                range: new Range(1, 10),
+                text: "1.1",
+                type: ProdType.TERMINAL
+            },
+            {
+                range: new Range(11, 200),
+                text: "1.2",
+                type: ProdType.OR
+            },
+            {
+                range: new Range(20, 180),
+                text: "1.2.1",
+                type: ProdType.MANY
+            },
             {
                 range: new Range(30, 100),
                 text: "1.2.1.1",
@@ -329,7 +341,11 @@ describe("The GAst Builder namespace", () => {
                 text: "1.2.2",
                 type: ProdType.TERMINAL
             },
-            { range: new Range(201, 209), text: "1.3", type: ProdType.TERMINAL }
+            {
+                range: new Range(201, 209),
+                text: "1.3",
+                type: ProdType.TERMINAL
+            }
         ]
 
         let topRange = getDirectlyContainedRanges(
@@ -406,7 +422,11 @@ describe("The GAst Builder namespace", () => {
 
     it("can build an OR Production from a RangeProd", () => {
         let actual = buildProdGast(
-            { range: new Range(1, 2), text: "this.OR(...)", type: ProdType.OR },
+            {
+                range: new Range(1, 2),
+                text: "this.OR(...)",
+                type: ProdType.OR
+            },
             []
         )
         expect(actual).to.be.an.instanceof(Alternation)
@@ -481,7 +501,11 @@ describe("The GAst Builder namespace", () => {
 
     it("can build an OR Production from a RangeProd", () => {
         let actual = buildProdGast(
-            { range: new Range(1, 2), text: "this.OR(...)", type: ProdType.OR },
+            {
+                range: new Range(1, 2),
+                text: "this.OR(...)",
+                type: ProdType.OR
+            },
             []
         )
         expect(actual).to.be.an.instanceof(Alternation)

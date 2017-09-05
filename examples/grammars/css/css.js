@@ -129,7 +129,10 @@
         name: "StringLiteral",
         pattern: MAKE_PATTERN("{{string1}}|{{string2}}")
     })
-    var Hash = createToken({ name: "Hash", pattern: MAKE_PATTERN("#{{name}}") })
+    var Hash = createToken({
+        name: "Hash",
+        pattern: MAKE_PATTERN("#{{name}}")
+    })
 
     // note that the spec defines import as : @{I}{M}{P}{O}{R}{T}
     // Where every letter is defined in this pattern:
@@ -146,10 +149,16 @@
     // This gives us 73^6 options to write the word "import" which is a number with 12 digits...
     // This implementation does not bother with this crap :) and instead settles for
     // "just" 64 option to write "impPorT" (case due to case insensitivity)
-    var ImportSym = createToken({ name: "ImportSym", pattern: /@import/i })
+    var ImportSym = createToken({
+        name: "ImportSym",
+        pattern: /@import/i
+    })
     var PageSym = createToken({ name: "PageSym", pattern: /@page/i })
     var MediaSym = createToken({ name: "MediaSym", pattern: /@media/i })
-    var CharsetSym = createToken({ name: "CharsetSym", pattern: /@charset/i })
+    var CharsetSym = createToken({
+        name: "CharsetSym",
+        pattern: /@charset/i
+    })
     var ImportantSym = createToken({
         name: "ImportantSym",
         pattern: /important/i
@@ -243,7 +252,10 @@
     })
 
     // Num must appear after all the num forms with a suffix
-    var Num = createToken({ name: "Num", pattern: MAKE_PATTERN("{{num}}") })
+    var Num = createToken({
+        name: "Num",
+        pattern: MAKE_PATTERN("{{num}}")
+    })
 
     var CssLexer = new Lexer(cssTokens)
 

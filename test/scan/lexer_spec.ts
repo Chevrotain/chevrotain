@@ -510,7 +510,10 @@ function defineLexerSpecs(
                         pattern: /\s+/,
                         line_breaks: true
                     }),
-                    createToken({ name: "num", pattern: /\d+/ })
+                    createToken({
+                        name: "num",
+                        pattern: /\d+/
+                    })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)
                 expect(lastToken.startLine).to.equal(3)
@@ -532,7 +535,10 @@ function defineLexerSpecs(
                         pattern: "\n",
                         line_breaks: true
                     }),
-                    createToken({ name: "num", pattern: /\d+/ })
+                    createToken({
+                        name: "num",
+                        pattern: /\d+/
+                    })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
                 expect(lastToken.startLine).to.equal(3)
@@ -740,7 +746,10 @@ function defineLexerSpecs(
             if (!skipValidationChecks) {
                 it("Will throw an error during the creation of a Lexer if the lexer config argument is a boolean", () => {
                     expect(
-                        () => new Lexer([], { positionTracking: <any>"oops" })
+                        () =>
+                            new Lexer([], {
+                                positionTracking: <any>"oops"
+                            })
                     ).to.throw(
                         "Invalid <positionTracking> config option:" + ' "oops"'
                     )
@@ -779,7 +788,9 @@ function defineLexerSpecs(
 
                     let lexerWithErrs = new Lexer(
                         [EndOfInputAnchor, If, Else],
-                        { deferDefinitionErrorsHandling: true }
+                        {
+                            deferDefinitionErrorsHandling: true
+                        }
                     )
                     //noinspection BadExpressionStatementJS
                     expect(lexerWithErrs.lexerDefinitionErrors).to.not.be.empty
@@ -1499,7 +1510,10 @@ function defineLexerSpecs(
                                 return result
                             }
 
-                            let A = createToken({ name: "A", pattern: "A" })
+                            let A = createToken({
+                                name: "A",
+                                pattern: "A"
+                            })
                             let B = createToken({
                                 name: "B",
                                 pattern: <any>extraContextValidator

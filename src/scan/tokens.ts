@@ -39,7 +39,7 @@ export function tokenStructuredIdentity(
 }
 
 export function isBaseTokenOrObject(tokClass: TokenConstructor): boolean {
-    return isBaseTokenClass(tokClass) || (<any>tokClass) === Object
+    return isBaseTokenClass(tokClass) || <any>tokClass === Object
 }
 
 export function isBaseTokenClass(tokClass: Function): boolean {
