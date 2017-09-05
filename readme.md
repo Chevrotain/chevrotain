@@ -104,7 +104,7 @@ Contributions are **greatly** appreciated.
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
 
 ## Where used
-A interesting samples:
+Some interesting samples:
 * [Metabase BI expression parser][sample_metabase].
 * [Eve Programing Language][sample_eve].
 * [BioModelAnalyzer's ChatBot parser][sample_biomodel].
