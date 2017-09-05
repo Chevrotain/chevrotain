@@ -136,13 +136,7 @@ function defineRecognizerSpecs(
                         ;(Parser as any).performSelfAnalysis(this)
                     }
 
-                    public orRule = this.RULE(
-                        "orRule",
-                        this.parseOrRule,
-                        () => {
-                            return "-666"
-                        }
-                    )
+                    public orRule = this.RULE("orRule", this.parseOrRule)
 
                     private parseOrRule(): string {
                         return this.OR1([
@@ -272,17 +266,11 @@ function defineRecognizerSpecs(
 
                 public qualifiedName = this.RULE(
                     "qualifiedName",
-                    this.parseQualifiedName,
-                    () => {
-                        return undefined
-                    }
+                    this.parseQualifiedName
                 )
                 public identifier = this.RULE(
                     "identifier",
-                    this.parseIdentifier,
-                    () => {
-                        return undefined
-                    }
+                    this.parseIdentifier
                 )
                 public idents = []
 

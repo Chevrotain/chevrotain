@@ -2330,7 +2330,10 @@ export class Parser {
         occurrence: number
     ): OUT {
         let key = this.getKeyForAutomaticLookahead(OPTION_IDX, occurrence)
-        let nestedName = this.nestedRuleBeforeClause(actionORMethodDef, key)
+        let nestedName = this.nestedRuleBeforeClause(
+            actionORMethodDef as DSLMethodOpts<OUT>,
+            key
+        )
         try {
             return this.optionInternalLogic(actionORMethodDef, occurrence, key)
         } finally {
@@ -2387,7 +2390,10 @@ export class Parser {
             AT_LEAST_ONE_IDX,
             prodOccurrence
         )
-        let nestedName = this.nestedRuleBeforeClause(actionORMethodDef, laKey)
+        let nestedName = this.nestedRuleBeforeClause(
+            actionORMethodDef as DSLMethodOptsWithErr<OUT>,
+            laKey
+        )
         try {
             return this.atLeastOneInternalLogic(
                 prodOccurrence,
@@ -2584,7 +2590,10 @@ export class Parser {
         result: OUT[]
     ): OUT[] {
         let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
-        let nestedName = this.nestedRuleBeforeClause(actionORMethodDef, laKey)
+        let nestedName = this.nestedRuleBeforeClause(
+            actionORMethodDef as DSLMethodOpts<OUT>,
+            laKey
+        )
         try {
             return this.manyInternalLogic(
                 prodOccurrence,

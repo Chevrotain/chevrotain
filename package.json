@@ -99,7 +99,7 @@
         "semver": "^5.4.1",
         "tslint": "^5.7.0",
         "typedoc": "^0.8.0",
-        "typescript": "~2.5.2",
+        "typescript": "^2.5.2",
         "webpack": "^3.5.5",
         "wrench": "^1.5.9",
         "xregexp": "^3.2.0"
