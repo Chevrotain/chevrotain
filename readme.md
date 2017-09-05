@@ -9,6 +9,7 @@
 
 # Chevrotain
 
+## Introduction
 Chevrotain is a [**very fast**][benchmark] and **feature rich** JavaScript LL(k) **Parsing DSL**.
 It can be used to build parsers/compilers/interperters for various use cases ranging from simple configuration files, 
 to full fledged programing languages.
@@ -16,7 +17,10 @@ to full fledged programing languages.
 It is important to note that Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without any code generation. Chevrotain Grammars are pure JavaScript code which can be created/debugged/edited
 as any other JavaScript code without requiring any new tools or processes.
 
-## [---> Try it online <---](http://sap.github.io/chevrotain/playground/)
+## TLDR
+* [**Online Playground**](http://sap.github.io/chevrotain/playground/)
+* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**.
+
 ## Features
   1. **Parsing DSL**.
       * **LL(k)** grammars support.  
@@ -90,7 +94,7 @@ None.
 Chevrotain should run on any modern JavaScript ES5.1 runtime. 
 * The CI build runs the tests under: 
   * Node.js (4 / 6 / 8).
-  * Latest stable: Chrome, FireFox, IE Edge, IE 11 and Safari 10.
+  * Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.
   
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
   
@@ -98,7 +102,13 @@ Chevrotain should run on any modern JavaScript ES5.1 runtime.
 ## Contributions
 Contributions are **greatly** appreciated.
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
-  
+
+## Where used
+A few samples:
+* [Metabase BI expression parser][sample_metabase].
+* [Eve Programing Language][sample_eve].
+* [BioModelAnalyzer's ChatBot parser][sample_biomodel].
+
 
 [benchmark]: http://sap.github.io/chevrotain/performance/
 [lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
@@ -111,3 +121,6 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
 [content assist]: https://github.com/SAP/chevrotain/blob/master/docs/syntactic_content_assist.md
 [separation]: https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
 [custom_errors]: https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js
+[sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
+[sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
+[sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
