@@ -20,7 +20,7 @@ Chevrotain supports two **very different** solutions to this problem:
    
 Before we continue one of the two approaches must be chosen.
 
-The main different between the two approaches is in regards to the question:
+The main difference between the two approaches is in regards to the question:
 **Where are the user actions (a.k.a semantics) written?**
 
 When using a CST Visitor the semantics are **completely separated** from the grammar
