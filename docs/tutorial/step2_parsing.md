@@ -244,7 +244,7 @@ class SelectParser extends chevrotain.Parser {
      })
 
      $.RULE("atomicExpression", () => {
-// prettier-ignore
+         // prettier-ignore
          $.OR([
              {ALT: () => { $.CONSUME(Integer)}},
              {ALT: () => { $.CONSUME(Identifier)}}
@@ -252,8 +252,8 @@ class SelectParser extends chevrotain.Parser {
      })
 
      $.RULE("relationalOperator", () => {
-         return// prettier-ignore
- $.OR([
+         // prettier-ignore
+         $.OR([
              {ALT: function(){ $.CONSUME(GreaterThan)}},
              {ALT: function(){ $.CONSUME(LessThan)}}
          ]);
