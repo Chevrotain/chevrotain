@@ -283,7 +283,7 @@ const toAstVisitorInstance = new SQLToAstVisitor()
 
 function toAst(inputText) {
     // Lex
-    let lexResult = selectLexer.lex(inputText)
+    let lexResult = selectLexer.tokenize(inputText)
     parserInstance.input = lexResult.tokens
     
     // Automatic CST created when parsing
