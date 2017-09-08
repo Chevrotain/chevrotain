@@ -6,7 +6,7 @@
 
 * [Step 3a:_Adding_actions_with a CST **Visitor separately** from the grammar.](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step3_actions/)
 
-* [Step 3b:_Adding_**embedded** actions **inside** the grammar.](hhttps://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step3_actions/)
+* [Step 3b:_Adding **embedded** actions **inside** the grammar.](https://github.com/SAP/chevrotain/tree/master/docs/tutorial/src/step3_actions/)
 
 
 To run the tests for all the tutorial parts:
