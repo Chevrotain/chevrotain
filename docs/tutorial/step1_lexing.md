@@ -59,7 +59,7 @@ accomplished by marking them with the SKIP group.
 const WhiteSpace = createToken({
          name: "WhiteSpace", 
          pattern: /\s+/,
-         group: chevrotain.lexer.SKIPPED,
+         group: chevrotain.Lexer.SKIPPED,
          line_breaks: true
      });
 ```
@@ -90,7 +90,7 @@ const LessThan = createToken({name: "LessThan", pattern: />/});
 const WhiteSpace = createToken({
         name: "WhiteSpace",
         pattern: /\s+/,
-        group: chevrotain.lexer.SKIPPED,
+        group: chevrotain.Lexer.SKIPPED,
         line_breaks: true
     }); 
 ```
