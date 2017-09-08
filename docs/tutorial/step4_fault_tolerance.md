@@ -1,5 +1,5 @@
 * Previous tutorial steps
-  * [Step 3a - Separated Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_separated.md).
+  * [Step 3a - Separated Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3a_adding_actions_visitor.md).
   * [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
 
 # Tutorial Step 4 - Fault tolerance and Error recovery.
