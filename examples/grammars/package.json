@@ -6,12 +6,12 @@
     },
     "dependencies": {
         "chevrotain": "*",
-        "lodash": "~3.10.1"
+        "lodash": "4.17.4"
     },
     "devDependencies": {
         "acorn": "^5.1.1",
         "benchmark": "^2.1.4",
-        "mocha": "^3.2.0",
+        "mocha": "^3.5.3",
         "typescript": "^2.4.2",
         "xregexp": "^3.1.1"
     },

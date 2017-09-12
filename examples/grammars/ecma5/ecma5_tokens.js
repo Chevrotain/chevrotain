@@ -93,13 +93,14 @@ const InTok = createToken({ name: "InTok", parent: AbsKeyword })
 
 const TryTok = createToken({ name: "TryTok", parent: AbsKeyword })
 
+// An IdentifierName, but not a reservedKeyword
 const Identifier = createToken({ name: "Identifier", parent: IdentifierName })
 
-// The 'get' and 'set' identifiers require a Token class as they have special handling in the grammar
-// @link http://www.ecma-international.org/ecma-262/5.1/#sec-11.1.5
-const GetTok = createToken({ name: "GetTok", parent: Identifier })
-
+// Set/Get are not reservedKeywords so they are modeled as a TypeOf Identifier.
 const SetTok = createToken({ name: "SetTok", parent: Identifier })
+const GetTok = createToken({ name: "SetTok", parent: Identifier })
+
+// TODO: Missing the future reservedKeywords here.
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.7
 const AbsPunctuator = createToken({ name: "AbsPunctuator" })
@@ -240,6 +241,7 @@ const SlashEq = createToken({ name: "SlashEq", parent: AbsAssignmentOperator })
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.8
 const AbsLiteral = createToken({ name: "AbsLiteral" })
 
+// TODO: "true" and "false" should extend Identifier and act like reservedKeywords
 const NullTok = createToken({ name: "NullTok", parent: AbsLiteral })
 
 const AbsBooleanLiteral = createToken({
@@ -247,37 +249,19 @@ const AbsBooleanLiteral = createToken({
     parent: AbsLiteral
 })
 
+// TODO: "true" and "false" should extend Identifier and act like reservedKeywords
 const TrueTok = createToken({ name: "TrueTok", parent: AbsBooleanLiteral })
 
 const FalseTok = createToken({ name: "FalseTok", parent: AbsBooleanLiteral })
 
-const AbsNumericLiteral = createToken({
-    name: "AbsNumericLiteral",
+const NumericLiteral = createToken({
+    name: "NumericLiteral",
     parent: AbsLiteral
 })
 
-const DecimalLiteral = createToken({
-    name: "DecimalLiteral",
-    parent: AbsNumericLiteral
-})
-const HexIntegerLiteral = createToken({
-    name: "HexIntegerLiteral",
-    parent: AbsNumericLiteral
-})
-
-const AbsStringLiteral = createToken({
-    name: "AbsStringLiteral",
+const StringLiteral = createToken({
+    name: "StringLiteral",
     parent: AbsLiteral
-})
-
-const DoubleQuotationStringLiteral = createToken({
-    name: "DoubleQuotationStringLiteral",
-    parent: AbsStringLiteral
-})
-
-const SingleQuotationStringLiteral = createToken({
-    name: "SingleQuotationStringLiteral",
-    parent: AbsStringLiteral
 })
 
 const RegularExpressionLiteral = createToken({
@@ -320,8 +304,8 @@ module.exports = {
     InTok,
     TryTok,
     Identifier,
-    GetTok,
     SetTok,
+    GetTok,
     AbsPunctuator,
     LCurly,
     RCurly,
@@ -382,11 +366,7 @@ module.exports = {
     AbsBooleanLiteral,
     TrueTok,
     FalseTok,
-    AbsNumericLiteral,
-    DecimalLiteral,
-    HexIntegerLiteral,
-    AbsStringLiteral,
-    DoubleQuotationStringLiteral,
-    SingleQuotationStringLiteral,
+    NumericLiteral,
+    StringLiteral,
     RegularExpressionLiteral
 }

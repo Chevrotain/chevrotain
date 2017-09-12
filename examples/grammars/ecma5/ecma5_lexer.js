@@ -14,296 +14,307 @@ function createChevToken(chevTokenClass, acornToken) {
 }
 
 function tokenize(str) {
-    var result = []
+    const result = []
     for (let token of acorn.tokenizer(str, { ecmaVersion: 6 })) {
         let acornType = token.type
-        let chevTokenType
+        let ctt
         // https://github.com/ternjs/acorn/blob/master/src/tokentype.js#L54
         switch (acornType) {
             case acornTokTypes._var:
-                chevTokenType = tokens.VarTok
+                ctt = tokens.VarTok
                 break
             case acornTokTypes.name:
-                chevTokenType = tokens.Identifier
+                switch (token.value) {
+                    case "set":
+                        ctt = tokens.SetTok
+                        break
+                    case "get":
+                        ctt = tokens.GetTok
+                        break
+                    default:
+                        ctt = tokens.Identifier
+                        break
+                }
                 break
             case acornTokTypes._break:
-                chevTokenType = tokens.BreakTok
+                ctt = tokens.BreakTok
                 break
-            case acornTokTypes.dot:
-                chevTokenType = tokens.DoTok
+            case acornTokTypes._do:
+                ctt = tokens.DoTok
                 break
             case acornTokTypes._instanceof:
-                chevTokenType = tokens.InstanceOfTok
+                ctt = tokens.InstanceOfTok
                 break
             case acornTokTypes._typeof:
-                chevTokenType = tokens.TypeOfTok
+                ctt = tokens.TypeOfTok
                 break
             case acornTokTypes._case:
-                chevTokenType = tokens.CaseTok
+                ctt = tokens.CaseTok
                 break
             case acornTokTypes._else:
-                chevTokenType = tokens.ElseTok
+                ctt = tokens.ElseTok
                 break
             case acornTokTypes._new:
-                chevTokenType = tokens.NewTok
+                ctt = tokens.NewTok
                 break
             case acornTokTypes._catch:
-                chevTokenType = tokens.CatchTok
+                ctt = tokens.CatchTok
                 break
             case acornTokTypes._finally:
-                chevTokenType = tokens.FinallyTok
+                ctt = tokens.FinallyTok
                 break
             case acornTokTypes._return:
-                chevTokenType = tokens.ReturnTok
+                ctt = tokens.ReturnTok
                 break
             case acornTokTypes._void:
-                chevTokenType = tokens.VoidTok
+                ctt = tokens.VoidTok
                 break
             case acornTokTypes._continue:
-                chevTokenType = tokens.ContinueTok
+                ctt = tokens.ContinueTok
                 break
             case acornTokTypes._for:
-                chevTokenType = tokens.ForTok
+                ctt = tokens.ForTok
                 break
             case acornTokTypes._switch:
-                chevTokenType = tokens.SwitchTok
+                ctt = tokens.SwitchTok
                 break
             case acornTokTypes._while:
-                chevTokenType = tokens.WhileTok
+                ctt = tokens.WhileTok
                 break
             case acornTokTypes._debugger:
-                chevTokenType = tokens.DebuggerTok
+                ctt = tokens.DebuggerTok
                 break
             case acornTokTypes._function:
-                chevTokenType = tokens.FunctionTok
+                ctt = tokens.FunctionTok
                 break
             case acornTokTypes._this:
-                chevTokenType = tokens.ThisTok
+                ctt = tokens.ThisTok
                 break
             case acornTokTypes._with:
-                chevTokenType = tokens.WithTok
+                ctt = tokens.WithTok
                 break
             case acornTokTypes._default:
-                chevTokenType = tokens.DefaultTok
+                ctt = tokens.DefaultTok
                 break
             case acornTokTypes._if:
-                chevTokenType = tokens.IfTok
+                ctt = tokens.IfTok
                 break
             case acornTokTypes._throw:
-                chevTokenType = tokens.ThrowTok
+                ctt = tokens.ThrowTok
                 break
             case acornTokTypes._delete:
-                chevTokenType = tokens.DeleteTok
+                ctt = tokens.DeleteTok
                 break
             case acornTokTypes._in:
-                chevTokenType = tokens.InTok
+                ctt = tokens.InTok
                 break
             case acornTokTypes._try:
-                chevTokenType = tokens.TryTok
+                ctt = tokens.TryTok
                 break
             case acornTokTypes._super:
-                chevTokenType = tokens.SuperTok
-                break
-            // TODO: set/get is not a keyword in Acorn and thus does not have a tokenType
-            case acornTokTypes.XXX:
-                chevTokenType = tokens.GetTok
-                break
-            // TODO: set/get is not a keyword in Acorn and thus does not have a tokenType
-            case acornTokTypes.XXX:
-                chevTokenType = tokens.SetTok
+                ctt = tokens.SuperTok
                 break
             case acornTokTypes.braceL:
-                chevTokenType = tokens.LCurly
+                ctt = tokens.LCurly
                 break
             case acornTokTypes.braceR:
-                chevTokenType = tokens.RCurly
+                ctt = tokens.RCurly
                 break
             case acornTokTypes.parenL:
-                chevTokenType = tokens.LParen
+                ctt = tokens.LParen
                 break
             case acornTokTypes.parenR:
-                chevTokenType = tokens.RParen
+                ctt = tokens.RParen
                 break
             case acornTokTypes.bracketL:
-                chevTokenType = tokens.LBracket
+                ctt = tokens.LBracket
                 break
             case acornTokTypes.bracketR:
-                chevTokenType = tokens.RBracket
+                ctt = tokens.RBracket
                 break
             case acornTokTypes.dot:
-                chevTokenType = tokens.Dot
+                ctt = tokens.Dot
                 break
             case acornTokTypes.semi:
-                chevTokenType = tokens.Semicolon
+                ctt = tokens.Semicolon
                 break
             case acornTokTypes.comma:
-                chevTokenType = tokens.Comma
-                break
-            // TODO: "incDec" seems to cover both ++ and --
-            // perform additional logic to decide which?
-            case acornTokTypes.incDec:
-                chevTokenType = tokens.PlusPlus
+                ctt = tokens.Comma
                 break
             case acornTokTypes.incDec:
-                chevTokenType = tokens.MinusMinus
+                switch (token.value) {
+                    case "++":
+                        ctt = tokens.PlusPlus
+                        break
+                    case "--":
+                        ctt = tokens.MinusMinus
+                        break
+                }
                 break
             case acornTokTypes.bitwiseAND:
-                chevTokenType = tokens.Ampersand
+                ctt = tokens.Ampersand
                 break
             case acornTokTypes.bitwiseOR:
-                chevTokenType = tokens.VerticalBar
+                ctt = tokens.VerticalBar
                 break
             case acornTokTypes.bitwiseXOR:
-                chevTokenType = tokens.Circumflex
+                ctt = tokens.Circumflex
                 break
             case acornTokTypes.prefix:
-                chevTokenType = tokens.Exclamation
-                break
-            case acornTokTypes.prefix:
-                chevTokenType = tokens.Tilde
+                switch (token.value) {
+                    case "!":
+                        ctt = tokens.Exclamation
+                        break
+                    case "~":
+                        ctt = tokens.Tilde
+                        break
+                }
                 break
             case acornTokTypes.logicalAND:
-                chevTokenType = tokens.AmpersandAmpersand
+                ctt = tokens.AmpersandAmpersand
                 break
             case acornTokTypes.logicalOR:
-                chevTokenType = tokens.VerticalBarVerticalBar
+                ctt = tokens.VerticalBarVerticalBar
                 break
             case acornTokTypes.question:
-                chevTokenType = tokens.Question
+                ctt = tokens.Question
                 break
             case acornTokTypes.colon:
-                chevTokenType = tokens.Colon
+                ctt = tokens.Colon
                 break
             case acornTokTypes.star:
-                chevTokenType = tokens.Asterisk
+                ctt = tokens.Asterisk
                 break
             case acornTokTypes.slash:
-                chevTokenType = tokens.Slash
+                ctt = tokens.Slash
                 break
             case acornTokTypes.modulo:
-                chevTokenType = tokens.Percent
-                break
-
-            // TODO: plusMin used for both Plus and Min
-            case acornTokTypes.plusMin:
-                chevTokenType = tokens.Plus
+                ctt = tokens.Percent
                 break
             case acornTokTypes.plusMin:
-                chevTokenType = tokens.Minus
-                break
+                switch (token.value) {
+                    case "+":
+                        ctt = tokens.Plus
 
-            // TODO: combine bitshift operators
+                        break
+                    case "-":
+                        ctt = tokens.Minus
+                        break
+                }
+                break
             case acornTokTypes.bitShift:
-                chevTokenType = tokens.LessLess
-                break
-            case acornTokTypes.bitShift:
-                chevTokenType = tokens.MoreMore
-                break
-            case acornTokTypes.bitShift:
-                chevTokenType = tokens.MoreMoreMore
-                break
-
-            // TODO: combine relational operators
-            case acornTokTypes.relational:
-                chevTokenType = tokens.Less
-                break
-            case acornTokTypes.relational:
-                chevTokenType = tokens.Greater
+                switch (token.value) {
+                    case "<<":
+                        ctt = tokens.LessLess
+                        break
+                    case ">>":
+                        ctt = tokens.MoreMore
+                        break
+                    case ">>>":
+                        ctt = tokens.MoreMoreMore
+                        break
+                }
                 break
             case acornTokTypes.relational:
-                chevTokenType = tokens.LessEq
+                switch (token.value) {
+                    case "<":
+                        ctt = tokens.Less
+                        break
+                    case ">":
+                        ctt = tokens.Greater
+                        break
+                    case "<=":
+                        ctt = tokens.LessEq
+                        break
+                    case ">=":
+                        ctt = tokens.GreaterEq
+                        break
+                }
                 break
-            case acornTokTypes.relational:
-                chevTokenType = tokens.GreaterEq
-                break
-
-            // TODO: combine equality operators
             case acornTokTypes.equality:
-                chevTokenType = tokens.EqEq
+                switch (token.value) {
+                    case "==":
+                        ctt = tokens.EqEq
+                        break
+                    case "!=":
+                        ctt = tokens.NotEq
+                        break
+                    case "===":
+                        ctt = tokens.EqEqEq
+                        break
+                    case "!==":
+                        ctt = tokens.NotEqEq
+                        break
+                }
                 break
-            case acornTokTypes.equality:
-                chevTokenType = tokens.NotEq
-                break
-            case acornTokTypes.equality:
-                chevTokenType = tokens.EqEqEq
-                break
-            case acornTokTypes.equality:
-                chevTokenType = tokens.NotEqEq
-                break
-
-            // TODO: combine assign operators
-            case acornTokTypes.assign:
-                chevTokenType = tokens.Eq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.PlusEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.MinusEq
+            case acornTokTypes.eq:
+                ctt = tokens.Eq
                 break
             case acornTokTypes.assign:
-                chevTokenType = tokens.AsteriskEq
+                switch (token.value) {
+                    case "+=":
+                        ctt = tokens.PlusEq
+                        break
+                    case "-=":
+                        ctt = tokens.MinusEq
+                        break
+                    case "*=":
+                        ctt = tokens.AsteriskEq
+                        break
+                    case "%=":
+                        ctt = tokens.PercentEq
+                        break
+                    case "<<=":
+                        ctt = tokens.LessLessEq
+                        break
+                    case ">>=":
+                        ctt = tokens.MoreMoreEq
+                        break
+                    case ">>>=":
+                        ctt = tokens.MoreMoreMoreEq
+                        break
+                    case "&=":
+                        ctt = tokens.AmpersandEq
+                        break
+                    case "|=":
+                        ctt = tokens.VerticalBarEq
+                        break
+                    case "^=":
+                        ctt = tokens.CircumflexEq
+                        break
+                    case "/=":
+                        ctt = tokens.SlashEq
+                        break
+                }
                 break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.PercentEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.LessLessEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.MoreMoreEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.MoreMoreMoreEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.AmpersandEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.VerticalBarEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.CircumflexEq
-                break
-            case acornTokTypes.assign:
-                chevTokenType = tokens.SlashEq
-                break
-
             case acornTokTypes._null:
-                chevTokenType = tokens.NullTok
+                ctt = tokens.NullTok
                 break
             case acornTokTypes._true:
-                chevTokenType = tokens.TrueTok
+                ctt = tokens.TrueTok
                 break
             case acornTokTypes._false:
-                chevTokenType = tokens.FalseTok
-                break
-
-            // TODO: combine num literals
-            case acornTokTypes.num:
-                chevTokenType = tokens.DecimalLiteral
+                ctt = tokens.FalseTok
                 break
             case acornTokTypes.num:
-                chevTokenType = tokens.HexIntegerLiteral
-                break
-
-            // TODO: combine string literals
-            case acornTokTypes.string:
-                chevTokenType = tokens.DoubleQuotationStringLiteral
+                ctt = tokens.NumericLiteral
                 break
             case acornTokTypes.string:
-                chevTokenType = tokens.SingleQuotationStringLiteral
+                ctt = tokens.StringLiteral
                 break
             case acornTokTypes.regexp:
-                chevTokenType = tokens.RegularExpressionLiteral
+                ctt = tokens.RegularExpressionLiteral
                 break
             default:
                 throw Error("bamba")
         }
-        const chevToken = createChevToken(chevTokenType, token)
-        var x = 5
-        // iterate over the tokens
+        const chevToken = createChevToken(ctt, token)
+        result.push(chevToken)
     }
+
+    return result
 }
 
-tokenize("var x = 5;")
+module.exports = {
+    tokenize
+}
