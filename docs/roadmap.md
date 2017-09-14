@@ -7,8 +7,8 @@ This release will focus on improving the docs, adding a few more example grammar
 and minor fixes.
 
 #### Version 2.0
-The main focus of this version will be the addition of declarative style APIs.
-Either Generator EBNF style API, Combinator Style APIs or both.
+The main focus of version 2.0 will be the addition of **declarative style APIs.**
+Either Generator EBNF style API, Combinator Style APIs or even both.
 
 This will transform Chevrotain from being a JavaScript Parsing DSL to a more general JavaScript Parsing Toolkit/Runtime engine.
 
