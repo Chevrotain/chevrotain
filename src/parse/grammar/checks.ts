@@ -674,7 +674,7 @@ function checkAlternativesAmbiguities(
             "3. This issue can be ignored (if you know what you are doing...), see" +
             " http://sap.github.io/chevrotain/documentation/" +
             docs_version +
-            "/interfaces/iparserconfig.html#ignoredissues for more" +
+            "/interfaces/_chevrotain_d_.iparserconfig.html#ignoredissues for more" +
             " details\n"
 
         return {
