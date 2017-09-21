@@ -4,6 +4,8 @@ const fs = require("fs")
 const path = require("path")
 const adapterLex = require("./ecma5_lexer")
 const chevParse = require("./ecma5_api").parse
+const pegParse = require("./other_libs/peg/peg_ecma").parse
+const ohmParse = require("ohm-grammar-ecmascript")
 
 function newSuite(name) {
     return new Benchmark.Suite(name, {
@@ -26,6 +28,8 @@ function acornLexAndConvertToChev(input) {
 }
 
 var samplePath = path.join(__dirname, "../node_modules/lodash/lodash.js")
+// var samplePath = path.join(__dirname, "../node_modules/commander/index.js")
+
 var sampleString = fs.readFileSync(samplePath, "utf8").toString()
 
 // newSuite("lexer")
@@ -38,9 +42,21 @@ var sampleString = fs.readFileSync(samplePath, "utf8").toString()
 //         async: false
 //     })
 
+chevParse(sampleString)
+
+// const result = ohmParse.grammar.match(sampleString)
+// console.log(result.succeeded())
+
+// pegParse(sampleString)
+
 newSuite("parser")
     .add("Acorn", () => acorn.parse(sampleString, { ecmaVersion: 5 }))
     .add("Chevrotain", () => chevParse(sampleString))
+    // .add("ohm", () => {
+    //     const result = ohmParse.grammar.match(sampleString)
+    //     assert(result.succeeded())
+    // })
+    // .add("peg", () => pegParse(sampleString))
     .run({
         async: false
     })

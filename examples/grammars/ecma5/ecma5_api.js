@@ -14,11 +14,11 @@ function parse(str) {
     parserInstance.input = tokens
     parserInstance.Program()
 
-    if (parserInstance.errors.length > 1) {
+    if (parserInstance.errors.length > 0) {
         throw Error("Sad Sad Panda")
     }
 }
-parse("var x = 5;")
+// parse("var x = 5;")
 
 module.exports = {
     parse
