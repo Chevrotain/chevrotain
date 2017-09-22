@@ -1,5 +1,3 @@
-// Using TypeScript we have both classes and static properties to define Tokens
-
 import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
 import { Lexer, TokenConstructor } from "../../../src/scan/lexer_public"
 import {
