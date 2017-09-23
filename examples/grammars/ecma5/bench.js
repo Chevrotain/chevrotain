@@ -5,7 +5,7 @@ const path = require("path")
 const adapterLex = require("./ecma5_lexer")
 const chevParse = require("./ecma5_api").parse
 const babylonParse = require("babylon").parse
-const esprimaParse = require("esprima").parse
+const antlrParse = require("./antlr/antlr_api").parse
 
 function newSuite(name) {
     return new Benchmark.Suite(name, {
@@ -29,7 +29,7 @@ function acornLexAndConvertToChev(input) {
 
 const benchmarkSample = fs
     .readFileSync(
-        path.join(__dirname, "../node_modules/benchmark/benchmark.js"),
+        path.join(__dirname, "../node_modules/minimist/index.js"),
         "utf8"
     )
     .toString()
@@ -61,19 +61,22 @@ chevParse(lodashSample)
 // 1. If you want the fastest possible parser, write one by hand...
 // 2. Chevrotain seems able to compete with the less optimized hand built parsers.
 //    - Assuming the AST building phase does not consume most of the CPU resources of the whole flow.
-newSuite("parser - lodash.js")
-    .add("Chevrotain", () => chevParse(lodashSample))
-    // .add("Acorn", () => acorn.parse(lodashSample, { ecmaVersion: 5 }))
-    // .add("Babylon", () =>
-    //     babylonParse(lodashSample, { ranges: true, tokens: false })
-    // )
-    .run({
-        async: false
-    })
+antlrParse(benchmarkSample)
+// newSuite("parser - lodash.js")
+//     .add("Chevrotain", () => chevParse(lodashSample))
+//     .add("antlr", () => antlrParse(lodashSample))
+//     // .add("Acorn", () => acorn.parse(lodashSample, { ecmaVersion: 5 }))
+//     // .add("Babylon", () =>
+//     //     babylonParse(lodashSample, { ranges: true, tokens: false })
+//     // )
+//     .run({
+//         async: false
+//     })
 
 newSuite("parser - benchmark.js")
     .add("Chevrotain", () => chevParse(benchmarkSample))
-    // .add("Acorn", () => acorn.parse(benchmarkSample, { ecmaVersion: 5 }))
+    .add("antlr", () => antlrParse(benchmarkSample))
+    .add("Acorn", () => acorn.parse(benchmarkSample, { ecmaVersion: 5 }))
     // .add("Babylon", () =>
     //     babylonParse(benchmarkSample, { ranges: true, tokens: false })
     // )
