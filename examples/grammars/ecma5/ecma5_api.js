@@ -12,6 +12,7 @@ function parse(str) {
     // }
     const tokens = lexResult
     parserInstance.input = tokens
+    parserInstance.orgText = str
     parserInstance.Program()
 
     if (parserInstance.errors.length > 0) {

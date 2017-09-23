@@ -13,18 +13,34 @@ const DISABLE_SEMICOLON_INSERTION = false
 
 // as defined in https://www.ecma-international.org/ecma-262/5.1/index.html
 class ECMAScript5Parser extends Parser {
+    set orgText(newText) {
+        this._orgText = newText
+    }
+
     constructor() {
         super([], tokens, {
-            // outputCst: true,
+            outputCst: false,
             ignoredIssues: {
                 Statement: { OR1: true },
                 SourceElements: { OR1: true }
             }
         })
 
+        this._orgText = ""
+
         const $ = this
 
         // A.3 Expressions
+        // Note that the binary expression operators are treated as a flat list
+        // instead of using a new rule for each precedence level.
+        // This is both faster and less verbose but it means additional logic must be used to re-order the flat list
+        // into a precedence tree.
+        // This approach was used in the swift compiler.
+        // https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Expressions.html#//apple_ref/doc/uid/TP40014097-CH32-ID383
+        // (scroll down to the note on binary expressions)
+
+        // Also note that such logic can only be implemented once the parser actually outputs some data structure...
+
         // See 11.1
         $.RULE("PrimaryExpression", () => {
             $.OR([
@@ -48,7 +64,8 @@ class ECMAScript5Parser extends Parser {
             $.CONSUME(t.LBracket)
             $.MANY(() => {
                 $.OR([
-                    // TODO: fix ambiguities with commas // WHICH AMBIGUITIES?! :)
+                    // TODO: fix ambiguities with commas
+                    // TODO2: WHICH AMBIGUITIES?! :)
                     { ALT: () => $.SUBRULE($.ElementList) },
                     { ALT: () => $.SUBRULE($.Elision) }
                 ])
@@ -206,186 +223,86 @@ class ECMAScript5Parser extends Parser {
                 { ALT: () => $.SUBRULE($.PostfixExpression) },
                 {
                     ALT: () => {
-                        $.OR2([
-                            { ALT: () => $.CONSUME(t.DeleteTok) },
-                            { ALT: () => $.CONSUME(t.VoidTok) },
-                            { ALT: () => $.CONSUME(t.TypeOfTok) },
-                            { ALT: () => $.CONSUME(t.PlusPlus) },
-                            { ALT: () => $.CONSUME(t.MinusMinus) },
-                            { ALT: () => $.CONSUME(t.Plus) },
-                            { ALT: () => $.CONSUME(t.Minus) },
-                            { ALT: () => $.CONSUME(t.Tilde) },
-                            { ALT: () => $.CONSUME(t.Exclamation) }
-                        ])
+                        $.OR2(
+                            $.c1 ||
+                                ($.c1 = [
+                                    { ALT: () => $.CONSUME(t.DeleteTok) },
+                                    { ALT: () => $.CONSUME(t.VoidTok) },
+                                    { ALT: () => $.CONSUME(t.TypeOfTok) },
+                                    { ALT: () => $.CONSUME(t.PlusPlus) },
+                                    { ALT: () => $.CONSUME(t.MinusMinus) },
+                                    { ALT: () => $.CONSUME(t.Plus) },
+                                    { ALT: () => $.CONSUME(t.Minus) },
+                                    { ALT: () => $.CONSUME(t.Tilde) },
+                                    { ALT: () => $.CONSUME(t.Exclamation) }
+                                ])
+                        )
                         $.SUBRULE($.UnaryExpression)
                     }
                 }
             ])
         })
 
-        // See 11.5
-        $.RULE("MultiplicativeExpression", () => {
+        $.RULE("BinaryExpression", () => {
             $.SUBRULE($.UnaryExpression)
             $.MANY(() => {
-                $.CONSUME(t.AbsMultiplicativeOperator)
+                $.OR(
+                    $.c3 ||
+                        ($.c3 = [
+                            // flat list of binary operators
+                            { ALT: () => $.CONSUME(t.AbsAssignmentOperator) },
+                            { ALT: () => $.CONSUME(t.VerticalBarVerticalBar) },
+                            { ALT: () => $.CONSUME(t.AmpersandAmpersand) },
+                            { ALT: () => $.CONSUME(t.VerticalBar) },
+                            { ALT: () => $.CONSUME(t.Circumflex) },
+                            { ALT: () => $.CONSUME(t.Ampersand) },
+                            { ALT: () => $.CONSUME(t.AbsEqualityOperator) },
+                            { ALT: () => $.CONSUME(t.AbsRelationalOperator) },
+                            { ALT: () => $.CONSUME(t.InstanceOfTok) },
+                            { ALT: () => $.CONSUME(t.InTok) },
+                            { ALT: () => $.CONSUME(t.AbsShiftOperator) },
+                            {
+                                ALT: () =>
+                                    $.CONSUME(t.AbsMultiplicativeOperator)
+                            },
+                            { ALT: () => $.CONSUME(t.AbsAdditiveOperator) }
+                        ])
+                )
                 $.SUBRULE2($.UnaryExpression)
             })
         })
 
-        // See 11.6
-        $.RULE("AdditiveExpression", () => {
-            $.SUBRULE($.MultiplicativeExpression)
+        $.RULE("BinaryExpressionNoIn", () => {
+            $.SUBRULE($.UnaryExpression)
             $.MANY(() => {
-                $.CONSUME(t.AbsAdditiveOperator)
-                $.SUBRULE2($.MultiplicativeExpression)
+                $.OR(
+                    $.c4 ||
+                        ($.c4 = [
+                            // flat list of binary operators
+                            { ALT: () => $.CONSUME(t.AbsAssignmentOperator) },
+                            { ALT: () => $.CONSUME(t.VerticalBarVerticalBar) },
+                            { ALT: () => $.CONSUME(t.AmpersandAmpersand) },
+                            { ALT: () => $.CONSUME(t.VerticalBar) },
+                            { ALT: () => $.CONSUME(t.Circumflex) },
+                            { ALT: () => $.CONSUME(t.Ampersand) },
+                            { ALT: () => $.CONSUME(t.AbsEqualityOperator) },
+                            { ALT: () => $.CONSUME(t.AbsRelationalOperator) },
+                            { ALT: () => $.CONSUME(t.InstanceOfTok) },
+                            { ALT: () => $.CONSUME(t.AbsShiftOperator) },
+                            {
+                                ALT: () =>
+                                    $.CONSUME(t.AbsMultiplicativeOperator)
+                            },
+                            { ALT: () => $.CONSUME(t.AbsAdditiveOperator) }
+                        ])
+                )
+                $.SUBRULE2($.UnaryExpression)
             })
         })
 
-        // See 11.7
-        $.RULE("ShiftExpression", () => {
-            $.SUBRULE($.AdditiveExpression)
-            $.MANY(() => {
-                $.CONSUME(t.AbsShiftOperator)
-                $.SUBRULE2($.AdditiveExpression)
-            })
-        })
-
-        // See 11.8
-        $.RULE("RelationalExpression", () => {
-            $.SUBRULE($.ShiftExpression)
-            $.MANY(() => {
-                $.OR([
-                    { ALT: () => $.CONSUME(t.AbsRelationalOperator) },
-                    { ALT: () => $.CONSUME(t.InstanceOfTok) },
-                    { ALT: () => $.CONSUME(t.InTok) }
-                ])
-                $.SUBRULE2($.ShiftExpression)
-            })
-        })
-
-        // See 11.8
-        $.RULE("RelationalExpressionNoIn", () => {
-            $.SUBRULE($.ShiftExpression)
-            $.MANY(() => {
-                $.OR([
-                    { ALT: () => $.CONSUME(t.AbsRelationalOperator) },
-                    { ALT: () => $.CONSUME(t.InstanceOfTok) }
-                ])
-                $.SUBRULE2($.ShiftExpression)
-            })
-        })
-
-        // See 11.9
-        $.RULE("EqualityExpression", () => {
-            $.SUBRULE($.RelationalExpression)
-            $.MANY(() => {
-                $.CONSUME(t.AbsEqualityOperator)
-                $.SUBRULE2($.RelationalExpression)
-            })
-        })
-
-        // See 11.9
-        $.RULE("EqualityExpressionNoIn", () => {
-            $.SUBRULE($.RelationalExpressionNoIn)
-            $.MANY(() => {
-                $.CONSUME(t.AbsEqualityOperator)
-                $.SUBRULE2($.RelationalExpressionNoIn)
-            })
-        })
-
-        // See 11.10
-        $.RULE("BitwiseANDExpression", () => {
-            $.SUBRULE($.EqualityExpression)
-            $.MANY(() => {
-                $.CONSUME(t.Ampersand)
-                $.SUBRULE2($.EqualityExpression)
-            })
-        })
-
-        // See 11.10
-        $.RULE("BitwiseANDExpressionNoIn", () => {
-            $.SUBRULE($.EqualityExpressionNoIn)
-            $.MANY(() => {
-                $.CONSUME(t.Ampersand)
-                $.SUBRULE2($.EqualityExpressionNoIn)
-            })
-        })
-
-        // See 11.10
-        $.RULE("BitwiseXORExpression", () => {
-            $.SUBRULE($.BitwiseANDExpression)
-            $.MANY(() => {
-                $.CONSUME(t.Circumflex)
-                $.SUBRULE2($.BitwiseANDExpression)
-            })
-        })
-
-        // See 11.10
-        $.RULE("BitwiseXORExpressionNoIn", () => {
-            $.SUBRULE($.BitwiseANDExpressionNoIn)
-            $.MANY(() => {
-                $.CONSUME(t.Circumflex)
-                $.SUBRULE2($.BitwiseANDExpressionNoIn)
-            })
-        })
-
-        // See 11.10
-        $.RULE("BitwiseORExpression", () => {
-            $.SUBRULE($.BitwiseXORExpression)
-            $.MANY(() => {
-                $.CONSUME(t.VerticalBar)
-                $.SUBRULE2($.BitwiseXORExpression)
-            })
-        })
-
-        // See 11.10
-        $.RULE("BitwiseORExpressionNoIn", () => {
-            $.SUBRULE($.BitwiseXORExpressionNoIn)
-            $.MANY(() => {
-                $.CONSUME(t.VerticalBar)
-                $.SUBRULE2($.BitwiseXORExpressionNoIn)
-            })
-        })
-
-        // See 11.11
-        $.RULE("LogicalANDExpression", () => {
-            $.SUBRULE($.BitwiseORExpression)
-            $.MANY(() => {
-                $.CONSUME(t.AmpersandAmpersand)
-                $.SUBRULE2($.BitwiseORExpression)
-            })
-        })
-
-        // See 11.11
-        $.RULE("LogicalANDExpressionNoIn", () => {
-            $.SUBRULE($.BitwiseORExpressionNoIn)
-            $.MANY(() => {
-                $.CONSUME(t.AmpersandAmpersand)
-                $.SUBRULE2($.BitwiseORExpressionNoIn)
-            })
-        })
-
-        // See 11.11
-        $.RULE("LogicalORExpression", () => {
-            $.SUBRULE($.LogicalANDExpression)
-            $.MANY(() => {
-                $.CONSUME(t.VerticalBarVerticalBar)
-                $.SUBRULE2($.LogicalANDExpression)
-            })
-        })
-
-        // See 11.11
-        $.RULE("LogicalORExpressionNoIn", () => {
-            $.SUBRULE($.LogicalANDExpressionNoIn)
-            $.MANY(() => {
-                $.CONSUME(t.VerticalBarVerticalBar)
-                $.SUBRULE2($.LogicalANDExpressionNoIn)
-            })
-        })
-
-        // See 11.12
-        $.RULE("ConditionalExpression", () => {
-            $.SUBRULE($.LogicalORExpression)
+        // See 11.13
+        $.RULE("AssignmentExpression", () => {
+            $.SUBRULE($.BinaryExpression)
             $.OPTION(() => {
                 $.CONSUME(t.Question)
                 $.SUBRULE($.AssignmentExpression)
@@ -394,34 +311,14 @@ class ECMAScript5Parser extends Parser {
             })
         })
 
-        // See 11.12
-        $.RULE("ConditionalExpressionNoIn", () => {
-            $.SUBRULE($.LogicalORExpressionNoIn)
+        // See 11.13
+        $.RULE("AssignmentExpressionNoIn", () => {
+            $.SUBRULE($.BinaryExpressionNoIn)
             $.OPTION(() => {
                 $.CONSUME(t.Question)
-                // TODO: why does spec not say "NoIn" here?
                 $.SUBRULE($.AssignmentExpression)
                 $.CONSUME(t.Colon)
                 $.SUBRULE2($.AssignmentExpressionNoIn)
-            })
-        })
-
-        // See 11.13
-        $.RULE("AssignmentExpression", () => {
-            $.SUBRULE($.ConditionalExpression)
-            $.OPTION(() => {
-                $.CONSUME(t.AbsAssignmentOperator)
-                $.SUBRULE($.AssignmentExpression)
-            })
-        })
-
-        // See 11.13
-        $.RULE("AssignmentExpressionNoIn", () => {
-            $.SUBRULE($.ConditionalExpressionNoIn)
-            $.OPTION(() => {
-                // AssignmentOperator See 11.13 --> this is implemented as a Token Abs class
-                $.CONSUME(t.AbsAssignmentOperator)
-                $.SUBRULE($.AssignmentExpressionNoIn)
             })
         })
 
@@ -447,24 +344,27 @@ class ECMAScript5Parser extends Parser {
 
         // See clause 12
         $.RULE("Statement", () => {
-            $.OR([
-                { ALT: () => $.SUBRULE($.Block) },
-                { ALT: () => $.SUBRULE($.VariableStatement) },
-                { ALT: () => $.SUBRULE($.EmptyStatement) },
-                // "LabelledStatement" must appear before "ExpressionStatement" due to common lookahead prefix ("inner :" vs "inner")
-                { ALT: () => $.SUBRULE($.LabelledStatement) },
-                { ALT: () => $.SUBRULE($.ExpressionStatement) },
-                { ALT: () => $.SUBRULE($.IfStatement) },
-                { ALT: () => $.SUBRULE($.IterationStatement) },
-                { ALT: () => $.SUBRULE($.ContinueStatement) },
-                { ALT: () => $.SUBRULE($.BreakStatement) },
-                { ALT: () => $.SUBRULE($.ReturnStatement) },
-                { ALT: () => $.SUBRULE($.WithStatement) },
-                { ALT: () => $.SUBRULE($.SwitchStatement) },
-                { ALT: () => $.SUBRULE($.ThrowStatement) },
-                { ALT: () => $.SUBRULE($.TryStatement) },
-                { ALT: () => $.SUBRULE($.DebuggerStatement) }
-            ])
+            $.OR(
+                $.c2 ||
+                    ($.c2 = [
+                        { ALT: () => $.SUBRULE($.Block) },
+                        { ALT: () => $.SUBRULE($.VariableStatement) },
+                        { ALT: () => $.SUBRULE($.EmptyStatement) },
+                        // "LabelledStatement" must appear before "ExpressionStatement" due to common lookahead prefix ("inner :" vs "inner")
+                        { ALT: () => $.SUBRULE($.LabelledStatement) },
+                        { ALT: () => $.SUBRULE($.ExpressionStatement) },
+                        { ALT: () => $.SUBRULE($.IfStatement) },
+                        { ALT: () => $.SUBRULE($.IterationStatement) },
+                        { ALT: () => $.SUBRULE($.ContinueStatement) },
+                        { ALT: () => $.SUBRULE($.BreakStatement) },
+                        { ALT: () => $.SUBRULE($.ReturnStatement) },
+                        { ALT: () => $.SUBRULE($.WithStatement) },
+                        { ALT: () => $.SUBRULE($.SwitchStatement) },
+                        { ALT: () => $.SUBRULE($.ThrowStatement) },
+                        { ALT: () => $.SUBRULE($.TryStatement) },
+                        { ALT: () => $.SUBRULE($.DebuggerStatement) }
+                    ])
+            )
         })
 
         // See 12.1
@@ -487,7 +387,6 @@ class ECMAScript5Parser extends Parser {
         $.RULE("VariableStatement", () => {
             $.CONSUME(t.VarTok)
             $.SUBRULE($.VariableDeclarationList)
-            // TODO: constant
             $.CONSUME(t.Semicolon, ENABLE_SEMICOLON_INSERTION)
         })
 
@@ -502,11 +401,15 @@ class ECMAScript5Parser extends Parser {
 
         //// See 12.2
         $.RULE("VariableDeclarationListNoIn", () => {
+            // needed to distinguish between for and for-in
+            let numOfVars = 1
             $.SUBRULE($.VariableDeclarationNoIn)
             $.MANY(() => {
                 $.CONSUME(t.Comma)
                 $.SUBRULE2($.VariableDeclarationNoIn)
+                numOfVars++
             })
+            return numOfVars
         })
 
         // See 12.2
@@ -597,7 +500,6 @@ class ECMAScript5Parser extends Parser {
         })
 
         $.RULE("ForIteration", () => {
-            let headerExp
             let inPossible = false
 
             $.CONSUME(t.ForTok)
@@ -606,19 +508,19 @@ class ECMAScript5Parser extends Parser {
                 {
                     ALT: () => {
                         $.CONSUME(t.VarTok)
-                        headerExp = $.SUBRULE($.VariableDeclarationListNoIn)
-
+                        const numOfVars = $.SUBRULE(
+                            $.VariableDeclarationListNoIn
+                        )
                         // 'in' is only possible if there was just one VarDec
-                        // TODO, compute this without CST
-                        // inPossible = headerExp.children.Comma.length === 1
-                        inPossible = true
+                        // TODO: when CST output is enabled this check breaks
+                        inPossible = numOfVars === 1
                         $.SUBRULE($.ForHeaderParts, [inPossible])
                     }
                 },
                 {
                     ALT: () => {
                         $.OPTION(() => {
-                            headerExp = $.SUBRULE($.ExpressionNoIn)
+                            const headerExp = $.SUBRULE($.ExpressionNoIn)
                             inPossible = this.canInComeAfterExp(headerExp)
                         })
                         $.SUBRULE2($.ForHeaderParts, [inPossible])
@@ -914,25 +816,19 @@ class ECMAScript5Parser extends Parser {
     canAndShouldDoSemiColonInsertion() {
         const isNextTokenSemiColon = tokenMatcher(this.LA(1), t.Semicolon)
         return (
-            !isNextTokenSemiColon &&
+            isNextTokenSemiColon === false &&
             (this.lineTerminatorHere() || // basic rule 1a and 3
             tokenMatcher(this.LA(1), t.RCurly) || // basic rule 1b
                 tokenMatcher(this.LA(1), EOF))
         ) // basic rule 2
     }
 
+    // // TODO: performance: semicolon insertion costs 5-10% of runtime, can this be improved?
     CONSUME(tokClass, trySemiColonInsertion) {
         if (
             trySemiColonInsertion === true &&
             this.canAndShouldDoSemiColonInsertion()
         ) {
-            const insertedSemiColon = {
-                tokenType: t.Semicolon.tokenType,
-                image: ";",
-                startOffset: NaN,
-                endOffset: NaN,
-                automaticallyInserted: true
-            }
             return insertedSemiColon
         }
         return super.CONSUME1(tokClass)
@@ -943,32 +839,19 @@ class ECMAScript5Parser extends Parser {
             trySemiColonInsertion === true &&
             this.canAndShouldDoSemiColonInsertion()
         ) {
-            const insertedSemiColon = {
-                tokenType: t.Semicolon.tokenType,
-                image: ";",
-                startOffset: NaN,
-                endOffset: NaN,
-                automaticallyInserted: true
-            }
             return insertedSemiColon
         }
         return super.CONSUME2(tokClass)
     }
 
+    // TODO: implement once the parser builds some data structure we can explore.
+    // in the case of "for (x in y)" form.
+    // the "IN" is only allowed if x is a left hand side expression
+    // http://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.6
+    // so this method must verify that the exp parameter fulfills this condition.
     canInComeAfterExp(exp) {
-        // anything that a call to MemberCallNewExpression rule may return
-        // TODO: update logic to match vs CST, remove instanceof usage
-        // TODO: exploring the CST will be very ugly here due to the deep depth of the hierarcay.
-        // TODO: perhaps extract precedence from the grammar like in the swift parser?
-        return (
-            exp.payload instanceof MemberCallNewExpression ||
-            exp.payload instanceof ObjectLiteral ||
-            exp.payload instanceof ArrayLiteral ||
-            exp.payload instanceof ParenthesisExpression ||
-            exp.payload instanceof t.AbsLiteral ||
-            exp.payload instanceof t.ThisTok ||
-            exp.payload instanceof t.Identifier
-        )
+        // TODO: temp implemntatoin, will always allow IN style iteration for now.
+        return true
     }
 
     noLineTerminatorHere() {
@@ -976,9 +859,34 @@ class ECMAScript5Parser extends Parser {
     }
 
     lineTerminatorHere() {
-        // TODO implement
+        const prevToken = this.LA(0)
+        const nextToken = this.LA(1)
+        const seekStart = prevToken.endOffset
+        const seekEnd = nextToken.startOffset - 1
+
+        let i = seekStart
+        while (i < seekEnd) {
+            const code = this._orgText.charCodeAt(i)
+            if (
+                code === 10 ||
+                code === 13 ||
+                code === 0x2028 ||
+                code === 0x2029
+            ) {
+                return true
+            }
+            i++
+        }
         return false
     }
+}
+
+const insertedSemiColon = {
+    tokenType: t.Semicolon.tokenType,
+    image: ";",
+    startOffset: NaN,
+    endOffset: NaN,
+    automaticallyInserted: true
 }
 
 module.exports = {

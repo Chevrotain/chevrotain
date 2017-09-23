@@ -4,8 +4,8 @@ const fs = require("fs")
 const path = require("path")
 const adapterLex = require("./ecma5_lexer")
 const chevParse = require("./ecma5_api").parse
-const pegParse = require("./other_libs/peg/peg_ecma").parse
-const ohmParse = require("ohm-grammar-ecmascript")
+const babylonParse = require("babylon").parse
+const esprimaParse = require("esprima").parse
 
 function newSuite(name) {
     return new Benchmark.Suite(name, {
@@ -27,36 +27,56 @@ function acornLexAndConvertToChev(input) {
     return adapterLex.tokenize(input)
 }
 
-var samplePath = path.join(__dirname, "../node_modules/lodash/lodash.js")
-// var samplePath = path.join(__dirname, "../node_modules/commander/index.js")
+const benchmarkSample = fs
+    .readFileSync(
+        path.join(__dirname, "../node_modules/benchmark/benchmark.js"),
+        "utf8"
+    )
+    .toString()
+const lodashSample = fs
+    .readFileSync(
+        path.join(__dirname, "../node_modules/lodash/lodash.js"),
+        "utf8"
+    )
+    .toString()
 
-var sampleString = fs.readFileSync(samplePath, "utf8").toString()
-
+acorn.parse("for ([] in x) {}")
+// This Lexer benchmark shows the adapter to convert to Chevrotain tokens has a substantial overhead.
+// The performance of the ECMA5 parser implemented using Chevrotain could be increased using a dedicated tokenizer.
+// Farther optimizations may be possible if that lexer would "Just in time" as was implemented in
+// https://github.com/SAP/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
 // newSuite("lexer")
-//     .add("Acorn", () => acornLex(sampleString))
+//     .add("Acorn", () => acornLex(lodashSample))
 //     .add("Acorn To Chevrotain Adapter", () =>
-//         acornLexAndConvertToChev(sampleString)
+//         acornLexAndConvertToChev(lodashSample)
 //     )
-//     // .add("Acorne full", () => acorn.parse(sampleString))
 //     .run({
 //         async: false
 //     })
 
-chevParse(sampleString)
+chevParse(lodashSample)
+// This parser benchmark is a bit of apples versus oranges
+// The Chevrotain grammar in particular does less work as there is no output data structure (ast) yet.
+// The interim conclusions are:
+// 1. If you want the fastest possible parser, write one by hand...
+// 2. Chevrotain seems able to compete with the less optimized hand built parsers.
+//    - Assuming the AST building phase does not consume most of the CPU resources of the whole flow.
+newSuite("parser - lodash.js")
+    .add("Chevrotain", () => chevParse(lodashSample))
+    // .add("Acorn", () => acorn.parse(lodashSample, { ecmaVersion: 5 }))
+    // .add("Babylon", () =>
+    //     babylonParse(lodashSample, { ranges: true, tokens: false })
+    // )
+    .run({
+        async: false
+    })
 
-// const result = ohmParse.grammar.match(sampleString)
-// console.log(result.succeeded())
-
-// pegParse(sampleString)
-
-newSuite("parser")
-    .add("Acorn", () => acorn.parse(sampleString, { ecmaVersion: 5 }))
-    .add("Chevrotain", () => chevParse(sampleString))
-    // .add("ohm", () => {
-    //     const result = ohmParse.grammar.match(sampleString)
-    //     assert(result.succeeded())
-    // })
-    // .add("peg", () => pegParse(sampleString))
+newSuite("parser - benchmark.js")
+    .add("Chevrotain", () => chevParse(benchmarkSample))
+    // .add("Acorn", () => acorn.parse(benchmarkSample, { ecmaVersion: 5 }))
+    // .add("Babylon", () =>
+    //     babylonParse(benchmarkSample, { ranges: true, tokens: false })
+    // )
     .run({
         async: false
     })

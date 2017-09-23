@@ -306,7 +306,7 @@ function tokenize(str) {
                 ctt = tokens.RegularExpressionLiteral
                 break
             default:
-                throw Error("bamba")
+                throw Error("sad sad panda")
         }
         const chevToken = createChevToken(ctt, token)
         result.push(chevToken)
