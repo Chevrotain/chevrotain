@@ -1,9 +1,9 @@
 // Generated from ECMAScript.g4 by ANTLR 4.7
 // jshint ignore: start
-var antlr4 = require('antlr4/index');
+var antlr4 = require("antlr4/index")
 
-
-var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
+var serializedATN = [
+    "\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0002i\u03b7\b\u0001\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004",
     "\u0004\t\u0004\u0004\u0005\t\u0005\u0004\u0006\t\u0006\u0004\u0007\t",
     "\u0007\u0004\b\t\b\u0004\t\t\t\u0004\n\t\n\u0004\u000b\t\u000b\u0004",
@@ -12,8 +12,8 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0004\u0014\t\u0014\u0004\u0015\t\u0015\u0004\u0016\t\u0016\u0004\u0017",
     "\t\u0017\u0004\u0018\t\u0018\u0004\u0019\t\u0019\u0004\u001a\t\u001a",
     "\u0004\u001b\t\u001b\u0004\u001c\t\u001c\u0004\u001d\t\u001d\u0004\u001e",
-    "\t\u001e\u0004\u001f\t\u001f\u0004 \t \u0004!\t!\u0004\"\t\"\u0004#",
-    "\t#\u0004$\t$\u0004%\t%\u0004&\t&\u0004\'\t\'\u0004(\t(\u0004)\t)\u0004",
+    '\t\u001e\u0004\u001f\t\u001f\u0004 \t \u0004!\t!\u0004"\t"\u0004#',
+    "\t#\u0004$\t$\u0004%\t%\u0004&\t&\u0004'\t'\u0004(\t(\u0004)\t)\u0004",
     "*\t*\u0004+\t+\u0004,\t,\u0004-\t-\u0004.\t.\u0004/\t/\u00040\t0\u0004",
     "1\t1\u00042\t2\u00043\t3\u00044\t4\u00045\t5\u00046\t6\u00047\t7\u0004",
     "8\t8\u00049\t9\u0004:\t:\u0004;\t;\u0004<\t<\u0004=\t=\u0004>\t>\u0004",
@@ -41,9 +41,9 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u001a\u0003\u001a\u0003\u001a\u0003\u001b\u0003\u001b\u0003\u001b\u0003",
     "\u001b\u0003\u001c\u0003\u001c\u0003\u001d\u0003\u001d\u0003\u001e\u0003",
     "\u001e\u0003\u001e\u0003\u001f\u0003\u001f\u0003\u001f\u0003 \u0003",
-    " \u0003 \u0003!\u0003!\u0003!\u0003\"\u0003\"\u0003\"\u0003\"\u0003",
+    ' \u0003 \u0003!\u0003!\u0003!\u0003"\u0003"\u0003"\u0003"\u0003',
     "#\u0003#\u0003#\u0003#\u0003$\u0003$\u0003%\u0003%\u0003&\u0003&\u0003",
-    "\'\u0003\'\u0003\'\u0003(\u0003(\u0003(\u0003)\u0003)\u0003)\u0003*",
+    "'\u0003'\u0003'\u0003(\u0003(\u0003(\u0003)\u0003)\u0003)\u0003*",
     "\u0003*\u0003*\u0003+\u0003+\u0003+\u0003,\u0003,\u0003,\u0003-\u0003",
     "-\u0003-\u0003.\u0003.\u0003.\u0003.\u0003/\u0003/\u0003/\u0003/\u0003",
     "0\u00030\u00030\u00030\u00030\u00031\u00031\u00031\u00032\u00032\u0003",
@@ -109,8 +109,8 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0003\u0088\u0003\u0088\u0005\u0088\u03b6\n\u0088\u0003\u0311\u0002",
     "\u0089\u0003\u0003\u0005\u0004\u0007\u0005\t\u0006\u000b\u0007\r\b\u000f",
     "\t\u0011\n\u0013\u000b\u0015\f\u0017\r\u0019\u000e\u001b\u000f\u001d",
-    "\u0010\u001f\u0011!\u0012#\u0013%\u0014\'\u0015)\u0016+\u0017-\u0018",
-    "/\u00191\u001a3\u001b5\u001c7\u001d9\u001e;\u001f= ?!A\"C#E$G%I&K\'",
+    "\u0010\u001f\u0011!\u0012#\u0013%\u0014'\u0015)\u0016+\u0017-\u0018",
+    "/\u00191\u001a3\u001b5\u001c7\u001d9\u001e;\u001f= ?!A\"C#E$G%I&K'",
     "M(O)Q*S+U,W-Y.[/]0_1a2c3e4g5i6k7m8o9q:s;u<w=y>{?}@\u007fA\u0081B\u0083",
     "C\u0085D\u0087E\u0089F\u008bG\u008dH\u008fI\u0091J\u0093K\u0095L\u0097",
     "M\u0099N\u009bO\u009dP\u009fQ\u00a1R\u00a3S\u00a5T\u00a7U\u00a9V\u00ab",
@@ -122,7 +122,7 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u00f7\u0002\u00f9\u0002\u00fb\u0002\u00fd\u0002\u00ff\u0002\u0101\u0002",
     "\u0103\u0002\u0105\u0002\u0107\u0002\u0109\u0002\u010b\u0002\u010d\u0002",
     "\u010f\u0002\u0003\u0002\u0018\u0005\u0002\f\f\u000f\u000f\u202a\u202b",
-    "\u0004\u0002ZZzz\u0006\u0002\u000b\u000b\r\u000e\"\"\u00a2\u00a2\u0006",
+    '\u0004\u0002ZZzz\u0006\u0002\u000b\u000b\r\u000e""\u00a2\u00a2\u0006',
     "\u0002\f\f\u000f\u000f$$^^\u0006\u0002\f\f\u000f\u000f))^^\u000b\u0002",
     "$$))^^ddhhppttvvxx\u000e\u0002\f\f\u000f\u000f$$))2;^^ddhhppttvxzz\u0004",
     "\u0002wwzz\u0003\u00022;\u0005\u00022;CHch\u0003\u000229\u0003\u0002",
@@ -202,7 +202,7 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0002\u0002\u0002\u001b\u0003\u0002\u0002\u0002\u0002\u001d\u0003\u0002",
     "\u0002\u0002\u0002\u001f\u0003\u0002\u0002\u0002\u0002!\u0003\u0002",
     "\u0002\u0002\u0002#\u0003\u0002\u0002\u0002\u0002%\u0003\u0002\u0002",
-    "\u0002\u0002\'\u0003\u0002\u0002\u0002\u0002)\u0003\u0002\u0002\u0002",
+    "\u0002\u0002'\u0003\u0002\u0002\u0002\u0002)\u0003\u0002\u0002\u0002",
     "\u0002+\u0003\u0002\u0002\u0002\u0002-\u0003\u0002\u0002\u0002\u0002",
     "/\u0003\u0002\u0002\u0002\u00021\u0003\u0002\u0002\u0002\u00023\u0003",
     "\u0002\u0002\u0002\u00025\u0003\u0002\u0002\u0002\u00027\u0003\u0002",
@@ -251,7 +251,7 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0002\u0019\u012d\u0003\u0002\u0002\u0002\u001b\u012f\u0003\u0002\u0002",
     "\u0002\u001d\u0131\u0003\u0002\u0002\u0002\u001f\u0133\u0003\u0002\u0002",
     "\u0002!\u0136\u0003\u0002\u0002\u0002#\u0139\u0003\u0002\u0002\u0002",
-    "%\u013b\u0003\u0002\u0002\u0002\'\u013d\u0003\u0002\u0002\u0002)\u013f",
+    "%\u013b\u0003\u0002\u0002\u0002'\u013d\u0003\u0002\u0002\u0002)\u013f",
     "\u0003\u0002\u0002\u0002+\u0141\u0003\u0002\u0002\u0002-\u0143\u0003",
     "\u0002\u0002\u0002/\u0145\u0003\u0002\u0002\u00021\u0147\u0003\u0002",
     "\u0002\u00023\u014a\u0003\u0002\u0002\u00025\u014d\u0003\u0002\u0002",
@@ -327,13 +327,13 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "0\u0002\u0002\u0132\u001e\u0003\u0002\u0002\u0002\u0133\u0134\u0007",
     "-\u0002\u0002\u0134\u0135\u0007-\u0002\u0002\u0135 \u0003\u0002\u0002",
     "\u0002\u0136\u0137\u0007/\u0002\u0002\u0137\u0138\u0007/\u0002\u0002",
-    "\u0138\"\u0003\u0002\u0002\u0002\u0139\u013a\u0007-\u0002\u0002\u013a",
+    '\u0138"\u0003\u0002\u0002\u0002\u0139\u013a\u0007-\u0002\u0002\u013a',
     "$\u0003\u0002\u0002\u0002\u013b\u013c\u0007/\u0002\u0002\u013c&\u0003",
     "\u0002\u0002\u0002\u013d\u013e\u0007\u0080\u0002\u0002\u013e(\u0003",
     "\u0002\u0002\u0002\u013f\u0140\u0007#\u0002\u0002\u0140*\u0003\u0002",
     "\u0002\u0002\u0141\u0142\u0007,\u0002\u0002\u0142,\u0003\u0002\u0002",
     "\u0002\u0143\u0144\u00071\u0002\u0002\u0144.\u0003\u0002\u0002\u0002",
-    "\u0145\u0146\u0007\'\u0002\u0002\u01460\u0003\u0002\u0002\u0002\u0147",
+    "\u0145\u0146\u0007'\u0002\u0002\u01460\u0003\u0002\u0002\u0002\u0147",
     "\u0148\u0007@\u0002\u0002\u0148\u0149\u0007@\u0002\u0002\u01492\u0003",
     "\u0002\u0002\u0002\u014a\u014b\u0007>\u0002\u0002\u014b\u014c\u0007",
     ">\u0002\u0002\u014c4\u0003\u0002\u0002\u0002\u014d\u014e\u0007@\u0002",
@@ -357,7 +357,7 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0174\u0007~\u0002\u0002\u0174P\u0003\u0002\u0002\u0002\u0175\u0176",
     "\u0007,\u0002\u0002\u0176\u0177\u0007?\u0002\u0002\u0177R\u0003\u0002",
     "\u0002\u0002\u0178\u0179\u00071\u0002\u0002\u0179\u017a\u0007?\u0002",
-    "\u0002\u017aT\u0003\u0002\u0002\u0002\u017b\u017c\u0007\'\u0002\u0002",
+    "\u0002\u017aT\u0003\u0002\u0002\u0002\u017b\u017c\u0007'\u0002\u0002",
     "\u017c\u017d\u0007?\u0002\u0002\u017dV\u0003\u0002\u0002\u0002\u017e",
     "\u017f\u0007-\u0002\u0002\u017f\u0180\u0007?\u0002\u0002\u0180X\u0003",
     "\u0002\u0002\u0002\u0181\u0182\u0007/\u0002\u0002\u0182\u0183\u0007",
@@ -655,258 +655,486 @@ var serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964",
     "\u0002\u0002)\u0002\u01a8\u01af\u01b3\u01b9\u01bc\u01c0\u01c2\u01c9",
     "\u01d0\u02ef\u02f6\u02fe\u0302\u0307\u0311\u031f\u032a\u0330\u0336\u033a",
     "\u034d\u0355\u0362\u0365\u0369\u036e\u0374\u037c\u037f\u0382\u0385\u0388",
-    "\u0392\u0398\u039e\u03a3\u03ae\u03b5\u0003\u0002\u0003\u0002"].join("");
+    "\u0392\u0398\u039e\u03a3\u03ae\u03b5\u0003\u0002\u0003\u0002"
+].join("")
 
+var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN)
 
-var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
-
-var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
+var decisionsToDFA = atn.decisionToState.map(function(ds, index) {
+    return new antlr4.dfa.DFA(ds, index)
+})
 
 function ECMAScriptLexer(input) {
-	antlr4.Lexer.call(this, input);
-    this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
-    return this;
+    antlr4.Lexer.call(this, input)
+    this._interp = new antlr4.atn.LexerATNSimulator(
+        this,
+        atn,
+        decisionsToDFA,
+        new antlr4.PredictionContextCache()
+    )
+    return this
 }
 
-ECMAScriptLexer.prototype = Object.create(antlr4.Lexer.prototype);
-ECMAScriptLexer.prototype.constructor = ECMAScriptLexer;
+ECMAScriptLexer.prototype = Object.create(antlr4.Lexer.prototype)
+ECMAScriptLexer.prototype.constructor = ECMAScriptLexer
 
-ECMAScriptLexer.EOF = antlr4.Token.EOF;
-ECMAScriptLexer.RegularExpressionLiteral = 1;
-ECMAScriptLexer.LineTerminator = 2;
-ECMAScriptLexer.OpenBracket = 3;
-ECMAScriptLexer.CloseBracket = 4;
-ECMAScriptLexer.OpenParen = 5;
-ECMAScriptLexer.CloseParen = 6;
-ECMAScriptLexer.OpenBrace = 7;
-ECMAScriptLexer.CloseBrace = 8;
-ECMAScriptLexer.SemiColon = 9;
-ECMAScriptLexer.Comma = 10;
-ECMAScriptLexer.Assign = 11;
-ECMAScriptLexer.QuestionMark = 12;
-ECMAScriptLexer.Colon = 13;
-ECMAScriptLexer.Dot = 14;
-ECMAScriptLexer.PlusPlus = 15;
-ECMAScriptLexer.MinusMinus = 16;
-ECMAScriptLexer.Plus = 17;
-ECMAScriptLexer.Minus = 18;
-ECMAScriptLexer.BitNot = 19;
-ECMAScriptLexer.Not = 20;
-ECMAScriptLexer.Multiply = 21;
-ECMAScriptLexer.Divide = 22;
-ECMAScriptLexer.Modulus = 23;
-ECMAScriptLexer.RightShiftArithmetic = 24;
-ECMAScriptLexer.LeftShiftArithmetic = 25;
-ECMAScriptLexer.RightShiftLogical = 26;
-ECMAScriptLexer.LessThan = 27;
-ECMAScriptLexer.MoreThan = 28;
-ECMAScriptLexer.LessThanEquals = 29;
-ECMAScriptLexer.GreaterThanEquals = 30;
-ECMAScriptLexer.Equals = 31;
-ECMAScriptLexer.NotEquals = 32;
-ECMAScriptLexer.IdentityEquals = 33;
-ECMAScriptLexer.IdentityNotEquals = 34;
-ECMAScriptLexer.BitAnd = 35;
-ECMAScriptLexer.BitXOr = 36;
-ECMAScriptLexer.BitOr = 37;
-ECMAScriptLexer.And = 38;
-ECMAScriptLexer.Or = 39;
-ECMAScriptLexer.MultiplyAssign = 40;
-ECMAScriptLexer.DivideAssign = 41;
-ECMAScriptLexer.ModulusAssign = 42;
-ECMAScriptLexer.PlusAssign = 43;
-ECMAScriptLexer.MinusAssign = 44;
-ECMAScriptLexer.LeftShiftArithmeticAssign = 45;
-ECMAScriptLexer.RightShiftArithmeticAssign = 46;
-ECMAScriptLexer.RightShiftLogicalAssign = 47;
-ECMAScriptLexer.BitAndAssign = 48;
-ECMAScriptLexer.BitXorAssign = 49;
-ECMAScriptLexer.BitOrAssign = 50;
-ECMAScriptLexer.NullLiteral = 51;
-ECMAScriptLexer.BooleanLiteral = 52;
-ECMAScriptLexer.DecimalLiteral = 53;
-ECMAScriptLexer.HexIntegerLiteral = 54;
-ECMAScriptLexer.OctalIntegerLiteral = 55;
-ECMAScriptLexer.Break = 56;
-ECMAScriptLexer.Do = 57;
-ECMAScriptLexer.Instanceof = 58;
-ECMAScriptLexer.Typeof = 59;
-ECMAScriptLexer.Case = 60;
-ECMAScriptLexer.Else = 61;
-ECMAScriptLexer.New = 62;
-ECMAScriptLexer.Var = 63;
-ECMAScriptLexer.Catch = 64;
-ECMAScriptLexer.Finally = 65;
-ECMAScriptLexer.Return = 66;
-ECMAScriptLexer.Void = 67;
-ECMAScriptLexer.Continue = 68;
-ECMAScriptLexer.For = 69;
-ECMAScriptLexer.Switch = 70;
-ECMAScriptLexer.While = 71;
-ECMAScriptLexer.Debugger = 72;
-ECMAScriptLexer.Function = 73;
-ECMAScriptLexer.This = 74;
-ECMAScriptLexer.With = 75;
-ECMAScriptLexer.Default = 76;
-ECMAScriptLexer.If = 77;
-ECMAScriptLexer.Throw = 78;
-ECMAScriptLexer.Delete = 79;
-ECMAScriptLexer.In = 80;
-ECMAScriptLexer.Try = 81;
-ECMAScriptLexer.Class = 82;
-ECMAScriptLexer.Enum = 83;
-ECMAScriptLexer.Extends = 84;
-ECMAScriptLexer.Super = 85;
-ECMAScriptLexer.Const = 86;
-ECMAScriptLexer.Export = 87;
-ECMAScriptLexer.Import = 88;
-ECMAScriptLexer.Implements = 89;
-ECMAScriptLexer.Let = 90;
-ECMAScriptLexer.Private = 91;
-ECMAScriptLexer.Public = 92;
-ECMAScriptLexer.Interface = 93;
-ECMAScriptLexer.Package = 94;
-ECMAScriptLexer.Protected = 95;
-ECMAScriptLexer.Static = 96;
-ECMAScriptLexer.Yield = 97;
-ECMAScriptLexer.Identifier = 98;
-ECMAScriptLexer.StringLiteral = 99;
-ECMAScriptLexer.WhiteSpaces = 100;
-ECMAScriptLexer.MultiLineComment = 101;
-ECMAScriptLexer.SingleLineComment = 102;
-ECMAScriptLexer.UnexpectedCharacter = 103;
+ECMAScriptLexer.EOF = antlr4.Token.EOF
+ECMAScriptLexer.RegularExpressionLiteral = 1
+ECMAScriptLexer.LineTerminator = 2
+ECMAScriptLexer.OpenBracket = 3
+ECMAScriptLexer.CloseBracket = 4
+ECMAScriptLexer.OpenParen = 5
+ECMAScriptLexer.CloseParen = 6
+ECMAScriptLexer.OpenBrace = 7
+ECMAScriptLexer.CloseBrace = 8
+ECMAScriptLexer.SemiColon = 9
+ECMAScriptLexer.Comma = 10
+ECMAScriptLexer.Assign = 11
+ECMAScriptLexer.QuestionMark = 12
+ECMAScriptLexer.Colon = 13
+ECMAScriptLexer.Dot = 14
+ECMAScriptLexer.PlusPlus = 15
+ECMAScriptLexer.MinusMinus = 16
+ECMAScriptLexer.Plus = 17
+ECMAScriptLexer.Minus = 18
+ECMAScriptLexer.BitNot = 19
+ECMAScriptLexer.Not = 20
+ECMAScriptLexer.Multiply = 21
+ECMAScriptLexer.Divide = 22
+ECMAScriptLexer.Modulus = 23
+ECMAScriptLexer.RightShiftArithmetic = 24
+ECMAScriptLexer.LeftShiftArithmetic = 25
+ECMAScriptLexer.RightShiftLogical = 26
+ECMAScriptLexer.LessThan = 27
+ECMAScriptLexer.MoreThan = 28
+ECMAScriptLexer.LessThanEquals = 29
+ECMAScriptLexer.GreaterThanEquals = 30
+ECMAScriptLexer.Equals = 31
+ECMAScriptLexer.NotEquals = 32
+ECMAScriptLexer.IdentityEquals = 33
+ECMAScriptLexer.IdentityNotEquals = 34
+ECMAScriptLexer.BitAnd = 35
+ECMAScriptLexer.BitXOr = 36
+ECMAScriptLexer.BitOr = 37
+ECMAScriptLexer.And = 38
+ECMAScriptLexer.Or = 39
+ECMAScriptLexer.MultiplyAssign = 40
+ECMAScriptLexer.DivideAssign = 41
+ECMAScriptLexer.ModulusAssign = 42
+ECMAScriptLexer.PlusAssign = 43
+ECMAScriptLexer.MinusAssign = 44
+ECMAScriptLexer.LeftShiftArithmeticAssign = 45
+ECMAScriptLexer.RightShiftArithmeticAssign = 46
+ECMAScriptLexer.RightShiftLogicalAssign = 47
+ECMAScriptLexer.BitAndAssign = 48
+ECMAScriptLexer.BitXorAssign = 49
+ECMAScriptLexer.BitOrAssign = 50
+ECMAScriptLexer.NullLiteral = 51
+ECMAScriptLexer.BooleanLiteral = 52
+ECMAScriptLexer.DecimalLiteral = 53
+ECMAScriptLexer.HexIntegerLiteral = 54
+ECMAScriptLexer.OctalIntegerLiteral = 55
+ECMAScriptLexer.Break = 56
+ECMAScriptLexer.Do = 57
+ECMAScriptLexer.Instanceof = 58
+ECMAScriptLexer.Typeof = 59
+ECMAScriptLexer.Case = 60
+ECMAScriptLexer.Else = 61
+ECMAScriptLexer.New = 62
+ECMAScriptLexer.Var = 63
+ECMAScriptLexer.Catch = 64
+ECMAScriptLexer.Finally = 65
+ECMAScriptLexer.Return = 66
+ECMAScriptLexer.Void = 67
+ECMAScriptLexer.Continue = 68
+ECMAScriptLexer.For = 69
+ECMAScriptLexer.Switch = 70
+ECMAScriptLexer.While = 71
+ECMAScriptLexer.Debugger = 72
+ECMAScriptLexer.Function = 73
+ECMAScriptLexer.This = 74
+ECMAScriptLexer.With = 75
+ECMAScriptLexer.Default = 76
+ECMAScriptLexer.If = 77
+ECMAScriptLexer.Throw = 78
+ECMAScriptLexer.Delete = 79
+ECMAScriptLexer.In = 80
+ECMAScriptLexer.Try = 81
+ECMAScriptLexer.Class = 82
+ECMAScriptLexer.Enum = 83
+ECMAScriptLexer.Extends = 84
+ECMAScriptLexer.Super = 85
+ECMAScriptLexer.Const = 86
+ECMAScriptLexer.Export = 87
+ECMAScriptLexer.Import = 88
+ECMAScriptLexer.Implements = 89
+ECMAScriptLexer.Let = 90
+ECMAScriptLexer.Private = 91
+ECMAScriptLexer.Public = 92
+ECMAScriptLexer.Interface = 93
+ECMAScriptLexer.Package = 94
+ECMAScriptLexer.Protected = 95
+ECMAScriptLexer.Static = 96
+ECMAScriptLexer.Yield = 97
+ECMAScriptLexer.Identifier = 98
+ECMAScriptLexer.StringLiteral = 99
+ECMAScriptLexer.WhiteSpaces = 100
+ECMAScriptLexer.MultiLineComment = 101
+ECMAScriptLexer.SingleLineComment = 102
+ECMAScriptLexer.UnexpectedCharacter = 103
 
-ECMAScriptLexer.prototype.channelNames = [ "DEFAULT_TOKEN_CHANNEL", "HIDDEN" ];
+ECMAScriptLexer.prototype.channelNames = ["DEFAULT_TOKEN_CHANNEL", "HIDDEN"]
 
-ECMAScriptLexer.prototype.modeNames = [ "DEFAULT_MODE" ];
+ECMAScriptLexer.prototype.modeNames = ["DEFAULT_MODE"]
 
-ECMAScriptLexer.prototype.literalNames = [ null, null, null, "'['", "']'", 
-                                           "'('", "')'", "'{'", "'}'", "';'", 
-                                           "','", "'='", "'?'", "':'", "'.'", 
-                                           "'++'", "'--'", "'+'", "'-'", 
-                                           "'~'", "'!'", "'*'", "'/'", "'%'", 
-                                           "'>>'", "'<<'", "'>>>'", "'<'", 
-                                           "'>'", "'<='", "'>='", "'=='", 
-                                           "'!='", "'==='", "'!=='", "'&'", 
-                                           "'^'", "'|'", "'&&'", "'||'", 
-                                           "'*='", "'/='", "'%='", "'+='", 
-                                           "'-='", "'<<='", "'>>='", "'>>>='", 
-                                           "'&='", "'^='", "'|='", "'null'", 
-                                           null, null, null, null, "'break'", 
-                                           "'do'", "'instanceof'", "'typeof'", 
-                                           "'case'", "'else'", "'new'", 
-                                           "'var'", "'catch'", "'finally'", 
-                                           "'return'", "'void'", "'continue'", 
-                                           "'for'", "'switch'", "'while'", 
-                                           "'debugger'", "'function'", "'this'", 
-                                           "'with'", "'default'", "'if'", 
-                                           "'throw'", "'delete'", "'in'", 
-                                           "'try'", "'class'", "'enum'", 
-                                           "'extends'", "'super'", "'const'", 
-                                           "'export'", "'import'" ];
+ECMAScriptLexer.prototype.literalNames = [
+    null,
+    null,
+    null,
+    "'['",
+    "']'",
+    "'('",
+    "')'",
+    "'{'",
+    "'}'",
+    "';'",
+    "','",
+    "'='",
+    "'?'",
+    "':'",
+    "'.'",
+    "'++'",
+    "'--'",
+    "'+'",
+    "'-'",
+    "'~'",
+    "'!'",
+    "'*'",
+    "'/'",
+    "'%'",
+    "'>>'",
+    "'<<'",
+    "'>>>'",
+    "'<'",
+    "'>'",
+    "'<='",
+    "'>='",
+    "'=='",
+    "'!='",
+    "'==='",
+    "'!=='",
+    "'&'",
+    "'^'",
+    "'|'",
+    "'&&'",
+    "'||'",
+    "'*='",
+    "'/='",
+    "'%='",
+    "'+='",
+    "'-='",
+    "'<<='",
+    "'>>='",
+    "'>>>='",
+    "'&='",
+    "'^='",
+    "'|='",
+    "'null'",
+    null,
+    null,
+    null,
+    null,
+    "'break'",
+    "'do'",
+    "'instanceof'",
+    "'typeof'",
+    "'case'",
+    "'else'",
+    "'new'",
+    "'var'",
+    "'catch'",
+    "'finally'",
+    "'return'",
+    "'void'",
+    "'continue'",
+    "'for'",
+    "'switch'",
+    "'while'",
+    "'debugger'",
+    "'function'",
+    "'this'",
+    "'with'",
+    "'default'",
+    "'if'",
+    "'throw'",
+    "'delete'",
+    "'in'",
+    "'try'",
+    "'class'",
+    "'enum'",
+    "'extends'",
+    "'super'",
+    "'const'",
+    "'export'",
+    "'import'"
+]
 
-ECMAScriptLexer.prototype.symbolicNames = [ null, "RegularExpressionLiteral", 
-                                            "LineTerminator", "OpenBracket", 
-                                            "CloseBracket", "OpenParen", 
-                                            "CloseParen", "OpenBrace", "CloseBrace", 
-                                            "SemiColon", "Comma", "Assign", 
-                                            "QuestionMark", "Colon", "Dot", 
-                                            "PlusPlus", "MinusMinus", "Plus", 
-                                            "Minus", "BitNot", "Not", "Multiply", 
-                                            "Divide", "Modulus", "RightShiftArithmetic", 
-                                            "LeftShiftArithmetic", "RightShiftLogical", 
-                                            "LessThan", "MoreThan", "LessThanEquals", 
-                                            "GreaterThanEquals", "Equals", 
-                                            "NotEquals", "IdentityEquals", 
-                                            "IdentityNotEquals", "BitAnd", 
-                                            "BitXOr", "BitOr", "And", "Or", 
-                                            "MultiplyAssign", "DivideAssign", 
-                                            "ModulusAssign", "PlusAssign", 
-                                            "MinusAssign", "LeftShiftArithmeticAssign", 
-                                            "RightShiftArithmeticAssign", 
-                                            "RightShiftLogicalAssign", "BitAndAssign", 
-                                            "BitXorAssign", "BitOrAssign", 
-                                            "NullLiteral", "BooleanLiteral", 
-                                            "DecimalLiteral", "HexIntegerLiteral", 
-                                            "OctalIntegerLiteral", "Break", 
-                                            "Do", "Instanceof", "Typeof", 
-                                            "Case", "Else", "New", "Var", 
-                                            "Catch", "Finally", "Return", 
-                                            "Void", "Continue", "For", "Switch", 
-                                            "While", "Debugger", "Function", 
-                                            "This", "With", "Default", "If", 
-                                            "Throw", "Delete", "In", "Try", 
-                                            "Class", "Enum", "Extends", 
-                                            "Super", "Const", "Export", 
-                                            "Import", "Implements", "Let", 
-                                            "Private", "Public", "Interface", 
-                                            "Package", "Protected", "Static", 
-                                            "Yield", "Identifier", "StringLiteral", 
-                                            "WhiteSpaces", "MultiLineComment", 
-                                            "SingleLineComment", "UnexpectedCharacter" ];
+ECMAScriptLexer.prototype.symbolicNames = [
+    null,
+    "RegularExpressionLiteral",
+    "LineTerminator",
+    "OpenBracket",
+    "CloseBracket",
+    "OpenParen",
+    "CloseParen",
+    "OpenBrace",
+    "CloseBrace",
+    "SemiColon",
+    "Comma",
+    "Assign",
+    "QuestionMark",
+    "Colon",
+    "Dot",
+    "PlusPlus",
+    "MinusMinus",
+    "Plus",
+    "Minus",
+    "BitNot",
+    "Not",
+    "Multiply",
+    "Divide",
+    "Modulus",
+    "RightShiftArithmetic",
+    "LeftShiftArithmetic",
+    "RightShiftLogical",
+    "LessThan",
+    "MoreThan",
+    "LessThanEquals",
+    "GreaterThanEquals",
+    "Equals",
+    "NotEquals",
+    "IdentityEquals",
+    "IdentityNotEquals",
+    "BitAnd",
+    "BitXOr",
+    "BitOr",
+    "And",
+    "Or",
+    "MultiplyAssign",
+    "DivideAssign",
+    "ModulusAssign",
+    "PlusAssign",
+    "MinusAssign",
+    "LeftShiftArithmeticAssign",
+    "RightShiftArithmeticAssign",
+    "RightShiftLogicalAssign",
+    "BitAndAssign",
+    "BitXorAssign",
+    "BitOrAssign",
+    "NullLiteral",
+    "BooleanLiteral",
+    "DecimalLiteral",
+    "HexIntegerLiteral",
+    "OctalIntegerLiteral",
+    "Break",
+    "Do",
+    "Instanceof",
+    "Typeof",
+    "Case",
+    "Else",
+    "New",
+    "Var",
+    "Catch",
+    "Finally",
+    "Return",
+    "Void",
+    "Continue",
+    "For",
+    "Switch",
+    "While",
+    "Debugger",
+    "Function",
+    "This",
+    "With",
+    "Default",
+    "If",
+    "Throw",
+    "Delete",
+    "In",
+    "Try",
+    "Class",
+    "Enum",
+    "Extends",
+    "Super",
+    "Const",
+    "Export",
+    "Import",
+    "Implements",
+    "Let",
+    "Private",
+    "Public",
+    "Interface",
+    "Package",
+    "Protected",
+    "Static",
+    "Yield",
+    "Identifier",
+    "StringLiteral",
+    "WhiteSpaces",
+    "MultiLineComment",
+    "SingleLineComment",
+    "UnexpectedCharacter"
+]
 
-ECMAScriptLexer.prototype.ruleNames = [ "RegularExpressionLiteral", "LineTerminator", 
-                                        "OpenBracket", "CloseBracket", "OpenParen", 
-                                        "CloseParen", "OpenBrace", "CloseBrace", 
-                                        "SemiColon", "Comma", "Assign", 
-                                        "QuestionMark", "Colon", "Dot", 
-                                        "PlusPlus", "MinusMinus", "Plus", 
-                                        "Minus", "BitNot", "Not", "Multiply", 
-                                        "Divide", "Modulus", "RightShiftArithmetic", 
-                                        "LeftShiftArithmetic", "RightShiftLogical", 
-                                        "LessThan", "MoreThan", "LessThanEquals", 
-                                        "GreaterThanEquals", "Equals", "NotEquals", 
-                                        "IdentityEquals", "IdentityNotEquals", 
-                                        "BitAnd", "BitXOr", "BitOr", "And", 
-                                        "Or", "MultiplyAssign", "DivideAssign", 
-                                        "ModulusAssign", "PlusAssign", "MinusAssign", 
-                                        "LeftShiftArithmeticAssign", "RightShiftArithmeticAssign", 
-                                        "RightShiftLogicalAssign", "BitAndAssign", 
-                                        "BitXorAssign", "BitOrAssign", "NullLiteral", 
-                                        "BooleanLiteral", "DecimalLiteral", 
-                                        "HexIntegerLiteral", "OctalIntegerLiteral", 
-                                        "Break", "Do", "Instanceof", "Typeof", 
-                                        "Case", "Else", "New", "Var", "Catch", 
-                                        "Finally", "Return", "Void", "Continue", 
-                                        "For", "Switch", "While", "Debugger", 
-                                        "Function", "This", "With", "Default", 
-                                        "If", "Throw", "Delete", "In", "Try", 
-                                        "Class", "Enum", "Extends", "Super", 
-                                        "Const", "Export", "Import", "Implements", 
-                                        "Let", "Private", "Public", "Interface", 
-                                        "Package", "Protected", "Static", 
-                                        "Yield", "Identifier", "StringLiteral", 
-                                        "WhiteSpaces", "MultiLineComment", 
-                                        "SingleLineComment", "UnexpectedCharacter", 
-                                        "DoubleStringCharacter", "SingleStringCharacter", 
-                                        "EscapeSequence", "CharacterEscapeSequence", 
-                                        "HexEscapeSequence", "UnicodeEscapeSequence", 
-                                        "SingleEscapeCharacter", "NonEscapeCharacter", 
-                                        "EscapeCharacter", "LineContinuation", 
-                                        "LineTerminatorSequence", "DecimalDigit", 
-                                        "HexDigit", "OctalDigit", "DecimalIntegerLiteral", 
-                                        "ExponentPart", "IdentifierStart", 
-                                        "IdentifierPart", "UnicodeLetter", 
-                                        "UnicodeCombiningMark", "UnicodeDigit", 
-                                        "UnicodeConnectorPunctuation", "ZWNJ", 
-                                        "ZWJ", "RegularExpressionBody", 
-                                        "RegularExpressionFlags", "RegularExpressionFirstChar", 
-                                        "RegularExpressionChar", "RegularExpressionNonTerminator", 
-                                        "RegularExpressionBackslashSequence", 
-                                        "RegularExpressionClass", "RegularExpressionClassChar" ];
+ECMAScriptLexer.prototype.ruleNames = [
+    "RegularExpressionLiteral",
+    "LineTerminator",
+    "OpenBracket",
+    "CloseBracket",
+    "OpenParen",
+    "CloseParen",
+    "OpenBrace",
+    "CloseBrace",
+    "SemiColon",
+    "Comma",
+    "Assign",
+    "QuestionMark",
+    "Colon",
+    "Dot",
+    "PlusPlus",
+    "MinusMinus",
+    "Plus",
+    "Minus",
+    "BitNot",
+    "Not",
+    "Multiply",
+    "Divide",
+    "Modulus",
+    "RightShiftArithmetic",
+    "LeftShiftArithmetic",
+    "RightShiftLogical",
+    "LessThan",
+    "MoreThan",
+    "LessThanEquals",
+    "GreaterThanEquals",
+    "Equals",
+    "NotEquals",
+    "IdentityEquals",
+    "IdentityNotEquals",
+    "BitAnd",
+    "BitXOr",
+    "BitOr",
+    "And",
+    "Or",
+    "MultiplyAssign",
+    "DivideAssign",
+    "ModulusAssign",
+    "PlusAssign",
+    "MinusAssign",
+    "LeftShiftArithmeticAssign",
+    "RightShiftArithmeticAssign",
+    "RightShiftLogicalAssign",
+    "BitAndAssign",
+    "BitXorAssign",
+    "BitOrAssign",
+    "NullLiteral",
+    "BooleanLiteral",
+    "DecimalLiteral",
+    "HexIntegerLiteral",
+    "OctalIntegerLiteral",
+    "Break",
+    "Do",
+    "Instanceof",
+    "Typeof",
+    "Case",
+    "Else",
+    "New",
+    "Var",
+    "Catch",
+    "Finally",
+    "Return",
+    "Void",
+    "Continue",
+    "For",
+    "Switch",
+    "While",
+    "Debugger",
+    "Function",
+    "This",
+    "With",
+    "Default",
+    "If",
+    "Throw",
+    "Delete",
+    "In",
+    "Try",
+    "Class",
+    "Enum",
+    "Extends",
+    "Super",
+    "Const",
+    "Export",
+    "Import",
+    "Implements",
+    "Let",
+    "Private",
+    "Public",
+    "Interface",
+    "Package",
+    "Protected",
+    "Static",
+    "Yield",
+    "Identifier",
+    "StringLiteral",
+    "WhiteSpaces",
+    "MultiLineComment",
+    "SingleLineComment",
+    "UnexpectedCharacter",
+    "DoubleStringCharacter",
+    "SingleStringCharacter",
+    "EscapeSequence",
+    "CharacterEscapeSequence",
+    "HexEscapeSequence",
+    "UnicodeEscapeSequence",
+    "SingleEscapeCharacter",
+    "NonEscapeCharacter",
+    "EscapeCharacter",
+    "LineContinuation",
+    "LineTerminatorSequence",
+    "DecimalDigit",
+    "HexDigit",
+    "OctalDigit",
+    "DecimalIntegerLiteral",
+    "ExponentPart",
+    "IdentifierStart",
+    "IdentifierPart",
+    "UnicodeLetter",
+    "UnicodeCombiningMark",
+    "UnicodeDigit",
+    "UnicodeConnectorPunctuation",
+    "ZWNJ",
+    "ZWJ",
+    "RegularExpressionBody",
+    "RegularExpressionFlags",
+    "RegularExpressionFirstChar",
+    "RegularExpressionChar",
+    "RegularExpressionNonTerminator",
+    "RegularExpressionBackslashSequence",
+    "RegularExpressionClass",
+    "RegularExpressionClassChar"
+]
 
-ECMAScriptLexer.prototype.grammarFileName = "ECMAScript.g4";
+ECMAScriptLexer.prototype.grammarFileName = "ECMAScript.g4"
 
-
-ECMAScriptLexer.prototype.strictMode = true;
-ECMAScriptLexer.prototype.lastToken = null;
+ECMAScriptLexer.prototype.strictMode = true
+ECMAScriptLexer.prototype.lastToken = null
 
 /**
  * @returns {Boolean} Returns true if the lexer operates in strict mode.
  */
 ECMAScriptLexer.prototype.getStrictMode = function() {
-    return this.strictMode;
-};
+    return this.strictMode
+}
 
 /**
  * Sets whether the lexer operates in strict mode or not.
@@ -914,8 +1142,8 @@ ECMAScriptLexer.prototype.getStrictMode = function() {
  * @param strictMode {Boolean} The flag indicating the lexer operates in strict mode or not.
  */
 ECMAScriptLexer.prototype.setStrictMode = function(strictMode) {
-    this.strictMode = strictMode;
-};
+    this.strictMode = strictMode
+}
 
 /**
  * Return the next token from the character stream and records this last
@@ -925,183 +1153,181 @@ ECMAScriptLexer.prototype.setStrictMode = function(strictMode) {
  *
  */
 ECMAScriptLexer.prototype.nextToken = function() {
+    var next = antlr4.Lexer.prototype.nextToken.call(this)
 
-    var next = antlr4.Lexer.prototype.nextToken.call(this);
+    if (next.channel == antlr4.Token.DEFAULT_CHANNEL) this.lastToken = next
 
-    if (next.channel == antlr4.Token.DEFAULT_CHANNEL)
-        this.lastToken = next;
-
-    return next;
-};
+    return next
+}
 
 /**
  * @returns {Boolean} Returns true if the lexer can match a regex literal.
  */
 ECMAScriptLexer.prototype.isRegexPossible = function() {
-
-    if (this.lastToken == null)
-        return true;
+    if (this.lastToken == null) return true
 
     switch (this.lastToken.type) {
         case ECMAScriptLexer.Identifier:
-            return false;
+            return false
         case ECMAScriptLexer.NullLiteral:
-            return false;
+            return false
         case ECMAScriptLexer.BooleanLiteral:
-            return false;
+            return false
         case ECMAScriptLexer.This:
-            return false;
+            return false
         case ECMAScriptLexer.CloseBracket:
-            return false;
+            return false
         case ECMAScriptLexer.CloseParen:
-            return false;
+            return false
         case ECMAScriptLexer.OctalIntegerLiteral:
-            return false;
+            return false
         case ECMAScriptLexer.DecimalLiteral:
-            return false;
+            return false
         case ECMAScriptLexer.HexIntegerLiteral:
-            return false;
+            return false
         case ECMAScriptLexer.StringLiteral:
-            return false;
+            return false
         case ECMAScriptLexer.PlusPlus:
-            return false;
+            return false
         case ECMAScriptLexer.MinusMinus:
-            return false;
+            return false
         default:
-            return true;
+            return true
     }
-};
-
+}
 
 ECMAScriptLexer.prototype.sempred = function(localctx, ruleIndex, predIndex) {
-	switch (ruleIndex) {
-		case 0:
-			return this.RegularExpressionLiteral_sempred(localctx, predIndex);
-		case 54:
-			return this.OctalIntegerLiteral_sempred(localctx, predIndex);
-		case 88:
-			return this.Implements_sempred(localctx, predIndex);
-		case 89:
-			return this.Let_sempred(localctx, predIndex);
-		case 90:
-			return this.Private_sempred(localctx, predIndex);
-		case 91:
-			return this.Public_sempred(localctx, predIndex);
-		case 92:
-			return this.Interface_sempred(localctx, predIndex);
-		case 93:
-			return this.Package_sempred(localctx, predIndex);
-		case 94:
-			return this.Protected_sempred(localctx, predIndex);
-		case 95:
-			return this.Static_sempred(localctx, predIndex);
-		case 96:
-			return this.Yield_sempred(localctx, predIndex);
-    	default:
-    		throw "No registered predicate for:" + ruleIndex;
+    switch (ruleIndex) {
+        case 0:
+            return this.RegularExpressionLiteral_sempred(localctx, predIndex)
+        case 54:
+            return this.OctalIntegerLiteral_sempred(localctx, predIndex)
+        case 88:
+            return this.Implements_sempred(localctx, predIndex)
+        case 89:
+            return this.Let_sempred(localctx, predIndex)
+        case 90:
+            return this.Private_sempred(localctx, predIndex)
+        case 91:
+            return this.Public_sempred(localctx, predIndex)
+        case 92:
+            return this.Interface_sempred(localctx, predIndex)
+        case 93:
+            return this.Package_sempred(localctx, predIndex)
+        case 94:
+            return this.Protected_sempred(localctx, predIndex)
+        case 95:
+            return this.Static_sempred(localctx, predIndex)
+        case 96:
+            return this.Yield_sempred(localctx, predIndex)
+        default:
+            throw "No registered predicate for:" + ruleIndex
     }
-};
+}
 
-ECMAScriptLexer.prototype.RegularExpressionLiteral_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 0:
-			return this.isRegexPossible();
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+ECMAScriptLexer.prototype.RegularExpressionLiteral_sempred = function(
+    localctx,
+    predIndex
+) {
+    switch (predIndex) {
+        case 0:
+            return this.isRegexPossible()
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
-ECMAScriptLexer.prototype.OctalIntegerLiteral_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 1:
-			return !this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+ECMAScriptLexer.prototype.OctalIntegerLiteral_sempred = function(
+    localctx,
+    predIndex
+) {
+    switch (predIndex) {
+        case 1:
+            return !this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Implements_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 2:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 2:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Let_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 3:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 3:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Private_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 4:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 4:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Public_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 5:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 5:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Interface_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 6:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 6:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Package_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 7:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 7:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Protected_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 8:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 8:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Static_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 9:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 9:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
 ECMAScriptLexer.prototype.Yield_sempred = function(localctx, predIndex) {
-	switch(predIndex) {
-		case 10:
-			return this.strictMode;
-		default:
-			throw "No predicate with index:" + predIndex;
-	}
-};
+    switch (predIndex) {
+        case 10:
+            return this.strictMode
+        default:
+            throw "No predicate with index:" + predIndex
+    }
+}
 
-
-
-exports.ECMAScriptLexer = ECMAScriptLexer;
-
+exports.ECMAScriptLexer = ECMAScriptLexer
