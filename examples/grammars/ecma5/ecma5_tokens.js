@@ -1,3 +1,5 @@
+"use strict"
+
 /*
  * Spec: http://www.ecma-international.org/ecma-262/5.1/#sec-7
  * important notes:

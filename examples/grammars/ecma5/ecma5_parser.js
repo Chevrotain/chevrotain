@@ -1,3 +1,5 @@
+"use strict"
+
 const chevrotain = require("chevrotain")
 const tokens = require("./ecma5_tokens")
 

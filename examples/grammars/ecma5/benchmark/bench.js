@@ -1,3 +1,5 @@
+"use strict"
+
 const acorn = require("acorn")
 const Benchmark = require("benchmark")
 const fs = require("fs")
@@ -9,7 +11,7 @@ const uglifyParse = require("uglify-js").parse
 const antlrParse = require("./antlr/antlr_api").parse
 const pegParse = require("./peg/javascript_peg").parse
 const es5 = require("./ohm/es5")
-var shiftParse = require("shift-parser").parseScript
+const shiftParse = require("shift-parser").parseScript
 
 const bigSample = fs
     .readFileSync(

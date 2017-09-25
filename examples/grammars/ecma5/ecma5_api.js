@@ -1,3 +1,5 @@
+"use strict"
+
 const tokenize = require("./ecma5_lexer").tokenize
 const ECMAScript5Parser = require("./ecma5_parser").ECMAScript5Parser
 
