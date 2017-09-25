@@ -167,8 +167,10 @@ CalculatorPure.prototype.constructor = CalculatorPure
 var parser = new CalculatorPure([])
 
 // ----------------- Interpreter -----------------
+// Obtains the default CstVisitor constructor to extend.
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor()
 
+// All our semantics go into the visitor, completly separated from the grammar.
 class CalculatorInterpreter extends BaseCstVisitor {
     constructor() {
         super()

@@ -84,6 +84,8 @@ as any other JavaScript code without requiring any new tools or processes.
 
 * **[HTML docs](http://sap.github.io/chevrotain/documentation).**
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#at_least_one).
+
+* **[RoadMap](https://github.com/SAP/chevrotain/blob/master/docs/roadmap.md)**.
    
    
 ## Dependencies
