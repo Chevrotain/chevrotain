@@ -5,10 +5,11 @@ const path = require("path")
 const adapterLex = require("./ecma5_lexer")
 const chevParse = require("./ecma5_api").parse
 const babylonParse = require("babylon").parse
+const uglifyParse = require("uglify-js").parse
 const antlrParse = require("./antlr/antlr_api").parse
 const pegParse = require("./peg/javascript_peg").parse
-// TODO: cant really use the "ohm-grammar-ecmascript" package as it is broken and requires manual fixing.
-const es5 = require("ohm-grammar-ecmascript")
+const es5 = require("./ohm/es5")
+var shiftParse = require("shift-parser").parseScript
 
 const bigSample = fs
     .readFileSync(
@@ -59,12 +60,14 @@ newSuite("lexer")
 
 // We are only using a very small ~150lines input as it seems some of these example grammars have performance issues:
 // See: https://github.com/pegjs/pegjs/issues/259
-//      https://github.com/antlr/antlr4/issues/1243 (Same grammmar but python runtime.
+//      https://github.com/antlr/antlr4/issues/1243 (Same grammar but python runtime).
 // This suite is also a bit apples vs oranges:
-// * Chevrotain and Antlr grammars don't handle binary expressions precedence (left to post processing)
+// * Chevrotain and Antlr grammars don't handle binary expressions precedence (left to post processing phase)
 // * Chevrotain uses Acorn as the tokenizer.
 // However, the multiple orders of magnitudes differences in the results cannot be explained by these factors.
 // My guess is that Antlr and peg.js have issues (possibly specific to their ECMA5 grammars with deep expression hierarchies).
+// As the relative differences are drastically different when benchmarking a simple JSON grammar
+// http://sap.github.io/chevrotain/performance/
 newSuite("Versus Generic Parsing Libraries - small input")
     .add("Chevrotain", () => chevParse(smallSample))
     .add("antlr", () => antlrParse(smallSample))
@@ -86,6 +89,8 @@ newSuite(
     "Versus hand crafted ECMAScript parsers - lodash.js as the input source"
 )
     .add("Chevrotain", () => chevParse(bigSample))
+    .add("Shift", () => shiftParse(bigSample))
+    .add("Uglify V2", () => uglifyParse(bigSample))
     .add("Acorn", () => acorn.parse(bigSample, { ecmaVersion: 5 }))
     .add("Babylon", () =>
         babylonParse(bigSample, { ranges: true, tokens: false })
