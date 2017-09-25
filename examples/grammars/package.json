@@ -5,11 +5,20 @@
         "test": "mocha '!(node_modules)/**/*spec.js'"
     },
     "dependencies": {
-        "chevrotain": "*",
-        "lodash": "~3.10.1"
+        "chevrotain": "*"
     },
     "devDependencies": {
-        "mocha": "^3.2.0",
+        "acorn": "^5.1.1",
+        "antlr4": "^4.7.0",
+        "babylon": "^6.18.0",
+        "benchmark": "^2.1.4",
+        "chai": "^4.1.2",
+        "lodash": "^4.17.4",
+        "mocha": "^3.5.3",
+        "ohm-js": "^0.13.1",
+        "shift-parser": "^5.2.1",
+        "typescript": "^2.4.2",
+        "uglify-js": "^2.8.29",
         "xregexp": "^3.1.1"
     },
     "private": true
