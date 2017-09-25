@@ -6,9 +6,7 @@ const ECMAScript5Parser = require("./ecma5_parser").ECMAScript5Parser
 const parserInstance = new ECMAScript5Parser()
 
 function parse(str) {
-    lexResult = tokenize(str)
-
-    const tokens = lexResult
+    const tokens = tokenize(str)
     parserInstance.input = tokens
     parserInstance.orgText = str
     parserInstance.Program()
