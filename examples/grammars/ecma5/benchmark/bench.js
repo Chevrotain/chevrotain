@@ -2,8 +2,8 @@ const acorn = require("acorn")
 const Benchmark = require("benchmark")
 const fs = require("fs")
 const path = require("path")
-const adapterLex = require("./ecma5_lexer")
-const chevParse = require("./ecma5_api").parse
+const adapterLex = require("../ecma5_lexer")
+const chevParse = require("../ecma5_api").parse
 const babylonParse = require("babylon").parse
 const uglifyParse = require("uglify-js").parse
 const antlrParse = require("./antlr/antlr_api").parse
@@ -13,14 +13,14 @@ var shiftParse = require("shift-parser").parseScript
 
 const bigSample = fs
     .readFileSync(
-        path.join(__dirname, "../node_modules/lodash/lodash.js"),
+        path.join(__dirname, "../../node_modules/lodash/lodash.js"),
         "utf8"
     )
     .toString()
 
 const smallSample = fs
     .readFileSync(
-        path.join(__dirname, "../node_modules/antlr4/Token.js"),
+        path.join(__dirname, "../../node_modules/antlr4/Token.js"),
         "utf8"
     )
     .toString()
