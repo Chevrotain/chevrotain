@@ -10,7 +10,7 @@
 # Chevrotain
 
 ## Introduction
-Chevrotain is a [**very fast**][benchmark] and **feature rich** JavaScript LL(k) **Parsing DSL**.
+Chevrotain is a [**very fast**][benchmark] and **feature rich** JavaScript LL(k) **Parsing Toolkit**.
 It can be used to build parsers/compilers/interperters for various use cases ranging from simple configuration files, 
 to full fledged programing languages.
 
