@@ -70,7 +70,7 @@
         "@types/chai": "^4.0.4",
         "@types/mocha": "^2.2.42",
         "chai": "^4.1.2",
-        "coveralls": "^2.13.1",
+        "coveralls": "^3.0.0",
         "gitty": "^3.6.0",
         "grunt": "^1.0.1",
         "grunt-cli": "~1.2.0",
