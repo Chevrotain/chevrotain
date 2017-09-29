@@ -28,14 +28,13 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     }
 }
 
-export function tokenClassIdentity(tokenConstructor: TokenConstructor): string {
-    return (<any>tokenConstructor).tokenType
-}
-
-export function tokenStructuredIdentity(
-    token: TokenConstructor | IToken
-): string {
-    return (<any>token).tokenType
+// Optimized tokenMatcher in case our grammar does not use token inheritance
+// Being so tiny it is much more likely to be in-lined and this avoid the function call overhead
+export function tokenStructuredMatcherNoInheritance(
+    tokInstance,
+    tokConstructor
+) {
+    return tokInstance.tokenType === tokConstructor.tokenType
 }
 
 export function isBaseTokenOrObject(tokClass: TokenConstructor): boolean {

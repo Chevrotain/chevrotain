@@ -13,8 +13,6 @@ import {
 import { map } from "../../../src/utils/utils"
 import {
     augmentTokenClasses,
-    tokenClassIdentity,
-    tokenStructuredIdentity,
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
 import { createRegularToken } from "../../utils/matchers"
@@ -29,15 +27,11 @@ import Flat = gast.Flat
 import Alternation = gast.Alternation
 import RepetitionMandatory = gast.RepetitionMandatory
 
-// TODO: convert this whole test to test on all types of Tokens.
-
 function defineLookaheadSpecs(
     contextName,
     extendToken,
     createToken,
-    tokenMatcher,
-    tokenTypeIdentity,
-    tokenIdentity
+    tokenMatcher
 ) {
     const IdentTok = extendToken("IdentTok")
     const DotTok = extendToken("DotTok")
@@ -298,9 +292,6 @@ function defineLookaheadSpecs(
                     1,
                     actionDec,
                     1,
-                    tokenMatcher,
-                    tokenTypeIdentity,
-                    tokenIdentity,
                     false,
                     PROD_TYPE.OPTION,
                     buildSingleAlternativeLookaheadFunction
@@ -318,9 +309,6 @@ function defineLookaheadSpecs(
                     2,
                     actionDec,
                     1,
-                    tokenMatcher,
-                    tokenTypeIdentity,
-                    tokenIdentity,
                     false,
                     PROD_TYPE.OPTION,
                     buildSingleAlternativeLookaheadFunction
@@ -338,9 +326,6 @@ function defineLookaheadSpecs(
                     1,
                     actionDec,
                     1,
-                    tokenMatcher,
-                    tokenTypeIdentity,
-                    tokenIdentity,
                     false,
                     PROD_TYPE.REPETITION,
                     buildSingleAlternativeLookaheadFunction
@@ -361,9 +346,6 @@ function defineLookaheadSpecs(
                     lotsOfOrs,
                     1,
                     false,
-                    tokenMatcher,
-                    tokenTypeIdentity,
-                    tokenIdentity,
                     false,
                     buildAlternativesLookAheadFunc
                 )
@@ -384,9 +366,6 @@ function defineLookaheadSpecs(
                     emptyAltOr,
                     1,
                     false,
-                    tokenMatcher,
-                    tokenTypeIdentity,
-                    tokenIdentity,
                     false,
                     buildAlternativesLookAheadFunc
                 )
@@ -623,8 +602,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -647,8 +624,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -668,8 +643,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -688,8 +661,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -720,8 +691,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -745,8 +714,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -771,8 +738,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -792,8 +757,6 @@ function defineLookaheadSpecs(
                         alternatives,
                         false,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -807,8 +770,6 @@ function defineLookaheadSpecs(
                     let laFunc = buildSingleAlternativeLookaheadFunction(
                         alternative,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -822,8 +783,6 @@ function defineLookaheadSpecs(
                     let laFunc = buildSingleAlternativeLookaheadFunction(
                         alternative,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -840,8 +799,6 @@ function defineLookaheadSpecs(
                     let laFunc = buildSingleAlternativeLookaheadFunction(
                         alternative,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -861,8 +818,6 @@ function defineLookaheadSpecs(
                     let laFunc = buildSingleAlternativeLookaheadFunction(
                         alternative,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -878,8 +833,6 @@ function defineLookaheadSpecs(
                     let laFunc = buildSingleAlternativeLookaheadFunction(
                         alternative,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -926,8 +879,6 @@ function defineLookaheadSpecs(
                     let laFunc = buildSingleAlternativeLookaheadFunction(
                         alternative,
                         tokenMatcher,
-                        tokenTypeIdentity,
-                        tokenIdentity,
                         false
                     )
 
@@ -968,7 +919,5 @@ defineLookaheadSpecs(
     "Regular Tokens Mode",
     extendToken,
     createRegularToken,
-    tokenStructuredMatcher,
-    tokenClassIdentity,
-    tokenStructuredIdentity
+    tokenStructuredMatcher
 )
