@@ -25,6 +25,12 @@ export class IntTok extends LiteralTok {
     }
 }
 
+export class BigIntTok extends IntTok {
+    constructor() {
+        super()
+    }
+}
+
 export class Keyword extends Token {}
 
 export class CreateTok extends Keyword {

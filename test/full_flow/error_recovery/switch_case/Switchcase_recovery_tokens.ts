@@ -59,3 +59,10 @@ export class SemiColonTok extends Token {
         super()
     }
 }
+
+// to force some branches for coverage
+export class DoubleSemiColonTok extends SemiColonTok {
+    constructor() {
+        super()
+    }
+}
