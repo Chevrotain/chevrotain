@@ -5,8 +5,6 @@ import {
     IAnyOrAlt,
     lookAheadSequence,
     Parser,
-    TokenClassIdentityFunc,
-    TokenInstanceIdentityFunc,
     TokenMatcher
 } from "../../../src/parse/parser_public"
 import { exceptions } from "../../../src/parse/exceptions_public"
@@ -184,8 +182,6 @@ class EcmaScriptQuirksParser extends Parser {
     protected lookAheadBuilderForOptional(
         alt: lookAheadSequence,
         tokenMatcher: TokenMatcher,
-        tokenClassIdentityFunc: TokenClassIdentityFunc,
-        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
         dynamicTokensEnabled: boolean
     ): () => boolean {
         if (!every(alt, currAlt => currAlt.length === 1)) {
@@ -221,8 +217,6 @@ class EcmaScriptQuirksParser extends Parser {
         alts: lookAheadSequence[],
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,
-        tokenClassIdentityFunc: TokenClassIdentityFunc,
-        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
         dynamicTokensEnabled: boolean
     ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
         if (

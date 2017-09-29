@@ -15,8 +15,6 @@ import {
     Predicate,
     IAnyOrAlt,
     TokenMatcher,
-    TokenInstanceIdentityFunc,
-    TokenClassIdentityFunc,
     lookAheadSequence
 } from "../parser_public"
 import { TokenConstructor } from "../../scan/lexer_public"
@@ -54,8 +52,6 @@ export function buildLookaheadFuncForOr(
     k: number,
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenIdentityFunc: TokenInstanceIdentityFunc,
     dynamicTokensEnabled: boolean,
     laFuncBuilder: Function
 ): (orAlts?: IAnyOrAlt<any>[]) => number {
@@ -65,8 +61,6 @@ export function buildLookaheadFuncForOr(
         lookAheadPaths,
         hasPredicates,
         tokenMatcher,
-        tokenClassIdentityFunc,
-        tokenIdentityFunc,
         dynamicTokensEnabled
     )
 }
@@ -88,15 +82,11 @@ export function buildLookaheadFuncForOptionalProd(
     ruleGrammar: gast.Rule,
     k: number,
     tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
     dynamicTokensEnabled: boolean,
     prodType: PROD_TYPE,
     lookaheadBuilder: (
         lookAheadSequence,
         TokenMatcher,
-        TokenClassIdentityFunc,
-        TokenInstanceIdentityFunc,
         boolean
     ) => () => boolean
 ): () => boolean {
@@ -110,8 +100,6 @@ export function buildLookaheadFuncForOptionalProd(
     return lookaheadBuilder(
         lookAheadPaths[0],
         tokenMatcher,
-        tokenClassIdentityFunc,
-        tokenInstanceIdentityFunc,
         dynamicTokensEnabled
     )
 }
@@ -122,8 +110,6 @@ export function buildAlternativesLookAheadFunc(
     alts: lookAheadSequence[],
     hasPredicates: boolean,
     tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
     dynamicTokensEnabled: boolean
 ): (orAlts?: IAnyOrAlt<any>[]) => number {
     let numOfAlts = alts.length
@@ -185,8 +171,8 @@ export function buildAlternativesLookAheadFunc(
             singleTokenAlts,
             (result, currAlt, idx) => {
                 forEach(currAlt, currTokClass => {
-                    if (!has(result, tokenClassIdentityFunc(currTokClass))) {
-                        result[tokenClassIdentityFunc(currTokClass)] = idx
+                    if (!has(result, currTokClass.tokenType)) {
+                        result[currTokClass.tokenType] = idx
                     }
                     forEach(
                         currTokClass.extendingTokenTypes,
@@ -207,7 +193,7 @@ export function buildAlternativesLookAheadFunc(
          */
         return function(): number {
             let nextToken = this.LA(1)
-            return choiceToAlt[tokenInstanceIdentityFunc(nextToken)]
+            return choiceToAlt[nextToken.tokenType]
         }
     } else {
         // optimized lookahead without needing to check the predicates at all.
@@ -246,8 +232,6 @@ export function buildAlternativesLookAheadFunc(
 export function buildSingleAlternativeLookaheadFunction(
     alt: lookAheadSequence,
     tokenMatcher: TokenMatcher,
-    tokenClassIdentityFunc: TokenClassIdentityFunc,
-    tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
     dynamicTokensEnabled: boolean
 ): () => boolean {
     let areAllOneTokenLookahead = every(alt, currPath => {
@@ -266,20 +250,16 @@ export function buildSingleAlternativeLookaheadFunction(
             isEmpty((<any>singleTokensClasses[0]).extendingTokenTypes)
         ) {
             let expectedTokenType = singleTokensClasses[0]
-            let expectedTokenUniqueKey = tokenClassIdentityFunc(
-                <any>expectedTokenType
-            )
+            let expectedTokenUniqueKey = (<any>expectedTokenType).tokenType
+
             return function(): boolean {
-                return (
-                    tokenInstanceIdentityFunc(this.LA(1)) ===
-                    expectedTokenUniqueKey
-                )
+                return this.LA(1).tokenType === expectedTokenUniqueKey
             }
         } else {
             let choiceToAlt = reduce(
                 singleTokensClasses,
                 (result, currTokClass, idx) => {
-                    result[tokenClassIdentityFunc(currTokClass)] = true
+                    result[currTokClass.tokenType] = true
                     forEach(
                         currTokClass.extendingTokenTypes,
                         currExtendingType => {
@@ -292,9 +272,7 @@ export function buildSingleAlternativeLookaheadFunction(
             )
             return function(): boolean {
                 let nextToken = this.LA(1)
-                return (
-                    choiceToAlt[tokenInstanceIdentityFunc(nextToken)] === true
-                )
+                return choiceToAlt[nextToken.tokenType] === true
             }
         }
     } else {
@@ -304,7 +282,7 @@ export function buildSingleAlternativeLookaheadFunction(
                 let currPathLength = currPath.length
                 for (let i = 0; i < currPathLength; i++) {
                     let nextToken = this.LA(i + 1)
-                    if (!tokenMatcher(nextToken, currPath[i])) {
+                    if (tokenMatcher(nextToken, currPath[i]) === false) {
                         // mismatch in current path
                         // try the next pth
                         continue nextPath

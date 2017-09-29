@@ -79,7 +79,6 @@ import {
 import {
     augmentTokenClasses,
     isExtendingTokenType,
-    tokenStructuredIdentity,
     tokenStructuredMatcher
 } from "../scan/tokens"
 import { CstNode, ICstVisitor } from "./cst/cst_public"
@@ -140,8 +139,6 @@ export type TokenMatcher = (
     token: IToken,
     tokClass: TokenConstructor
 ) => boolean
-export type TokenInstanceIdentityFunc = (tok: IToken) => string
-export type TokenClassIdentityFunc = (tok: TokenConstructor) => string
 
 export type lookAheadSequence = TokenConstructor[][]
 
@@ -575,8 +572,6 @@ export class Parser {
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
     private ruleShortNameIdx = 256
     private tokenMatcher: TokenMatcher
-    private tokenClassIdentityFunc: TokenClassIdentityFunc
-    private tokenInstanceIdentityFunc: TokenInstanceIdentityFunc
     private LAST_EXPLICIT_RULE_STACK: number[] = []
     private selfAnalysisDone = false
 
@@ -704,10 +699,8 @@ export class Parser {
             )
         }
 
+        // TODO: do we really want to keep this on the "this" instance?
         this.tokenMatcher = tokenStructuredMatcher
-        this.tokenClassIdentityFunc = tokenStructuredIdentity
-        // same IdentityFunc used in structured Mode
-        this.tokenInstanceIdentityFunc = tokenStructuredIdentity
 
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
         // parsed with a clear error message ("expecting EOF but found ...")
@@ -2899,8 +2892,6 @@ export class Parser {
                 this.maxLookahead,
                 hasPredicates,
                 this.tokenMatcher,
-                this.tokenClassIdentityFunc,
-                this.tokenInstanceIdentityFunc,
                 this.dynamicTokensEnabled,
                 this.lookAheadBuilderForAlternatives
             )
@@ -3015,8 +3006,6 @@ export class Parser {
                 ruleGrammar,
                 maxLookahead,
                 this.tokenMatcher,
-                this.tokenClassIdentityFunc,
-                this.tokenInstanceIdentityFunc,
                 this.dynamicTokensEnabled,
                 prodType,
                 this.lookAheadBuilderForOptional
@@ -3241,15 +3230,11 @@ export class Parser {
     protected lookAheadBuilderForOptional(
         alt: lookAheadSequence,
         tokenMatcher: TokenMatcher,
-        tokenClassIdentityFunc: TokenClassIdentityFunc,
-        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
         dynamicTokensEnabled: boolean
     ): () => boolean {
         return buildSingleAlternativeLookaheadFunction(
             alt,
             tokenMatcher,
-            tokenClassIdentityFunc,
-            tokenInstanceIdentityFunc,
             dynamicTokensEnabled
         )
     }
@@ -3258,16 +3243,12 @@ export class Parser {
         alts: lookAheadSequence[],
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,
-        tokenClassIdentityFunc: TokenClassIdentityFunc,
-        tokenInstanceIdentityFunc: TokenInstanceIdentityFunc,
         dynamicTokensEnabled: boolean
     ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
         return buildAlternativesLookAheadFunc(
             alts,
             hasPredicates,
             tokenMatcher,
-            tokenClassIdentityFunc,
-            tokenInstanceIdentityFunc,
             dynamicTokensEnabled
         )
     }

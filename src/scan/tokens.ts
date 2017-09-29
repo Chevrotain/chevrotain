@@ -28,16 +28,6 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     }
 }
 
-export function tokenClassIdentity(tokenConstructor: TokenConstructor): string {
-    return (<any>tokenConstructor).tokenType
-}
-
-export function tokenStructuredIdentity(
-    token: TokenConstructor | IToken
-): string {
-    return (<any>token).tokenType
-}
-
 export function isBaseTokenOrObject(tokClass: TokenConstructor): boolean {
     return isBaseTokenClass(tokClass) || <any>tokClass === Object
 }
