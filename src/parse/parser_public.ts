@@ -79,7 +79,8 @@ import {
 import {
     augmentTokenClasses,
     isExtendingTokenType,
-    tokenStructuredMatcher
+    tokenStructuredMatcher,
+    tokenStructuredMatcherNoInheritance
 } from "../scan/tokens"
 import { CstNode, ICstVisitor } from "./cst/cst_public"
 import { addNoneTerminalToCst, addTerminalToCst, analyzeCst } from "./cst/cst"
@@ -699,8 +700,13 @@ export class Parser {
             )
         }
 
-        // TODO: do we really want to keep this on the "this" instance?
-        this.tokenMatcher = tokenStructuredMatcher
+        const noTokenInheritanceUsed = every(
+            values(tokensDictionary),
+            tokenConstructor => isEmpty(tokenConstructor.extendingTokenTypes)
+        )
+        this.tokenMatcher = noTokenInheritanceUsed
+            ? tokenStructuredMatcherNoInheritance
+            : tokenStructuredMatcher
 
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
         // parsed with a clear error message ("expecting EOF but found ...")
@@ -1768,7 +1774,7 @@ export class Parser {
         let consumedToken
         try {
             let nextToken = this.LA(1)
-            if (this.tokenMatcher(nextToken, tokClass)) {
+            if (this.tokenMatcher(nextToken, tokClass) === true) {
                 this.consumeToken()
                 consumedToken = nextToken
             } else {
@@ -1866,7 +1872,7 @@ export class Parser {
         function invokeRuleWithTry(args: any[]) {
             try {
                 // TODO: dynamically get rid of this?
-                if (this.outputCst) {
+                if (this.outputCst === true) {
                     impl.apply(this, args)
                     return this.CST_STACK[this.CST_STACK.length - 1]
                 } else {
@@ -2368,7 +2374,7 @@ export class Parser {
             action = actionORMethodDef
         }
 
-        if (lookAheadFunc.call(this)) {
+        if (lookAheadFunc.call(this) === true) {
             return action.call(this)
         }
         return undefined
@@ -2447,9 +2453,9 @@ export class Parser {
             action = actionORMethodDef
         }
 
-        if ((<Function>lookAheadFunc).call(this)) {
+        if ((<Function>lookAheadFunc).call(this) === true) {
             result.push((<any>action).call(this))
-            while ((<Function>lookAheadFunc).call(this)) {
+            while ((<Function>lookAheadFunc).call(this) === true) {
                 result.push((<any>action).call(this))
             }
         } else {
@@ -2536,14 +2542,14 @@ export class Parser {
         let separators = result.separators
 
         // 1st iteration
-        if (firstIterationLookaheadFunc.call(this)) {
+        if (firstIterationLookaheadFunc.call(this) === true) {
             values.push((<GrammarAction<OUT>>action).call(this))
 
             let separatorLookAheadFunc = () => {
                 return this.tokenMatcher(this.LA(1), separator)
             }
             // 2nd..nth iterations
-            while (this.tokenMatcher(this.LA(1), separator)) {
+            while (this.tokenMatcher(this.LA(1), separator) === true) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
                 separators.push(this.CONSUME(separator))
@@ -2720,14 +2726,14 @@ export class Parser {
         let separators = result.separators
 
         // 1st iteration
-        if (firstIterationLaFunc.call(this)) {
+        if (firstIterationLaFunc.call(this) === true) {
             values.push(action.call(this))
 
             let separatorLookAheadFunc = () => {
                 return this.tokenMatcher(this.LA(1), separator)
             }
             // 2nd..nth iterations
-            while (this.tokenMatcher(this.LA(1), separator)) {
+            while (this.tokenMatcher(this.LA(1), separator) === true) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
                 separators.push(this.CONSUME(separator))

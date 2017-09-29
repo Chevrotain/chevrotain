@@ -144,7 +144,7 @@ export function buildAlternativesLookAheadFunc(
                     let currPathLength = currPath.length
                     for (let i = 0; i < currPathLength; i++) {
                         let nextToken = this.LA(i + 1)
-                        if (!tokenMatcher(nextToken, currPath[i])) {
+                        if (tokenMatcher(nextToken, currPath[i]) === false) {
                             // mismatch in current path
                             // try the next pth
                             continue nextPath
@@ -210,7 +210,7 @@ export function buildAlternativesLookAheadFunc(
                     let currPathLength = currPath.length
                     for (let i = 0; i < currPathLength; i++) {
                         let nextToken = this.LA(i + 1)
-                        if (!tokenMatcher(nextToken, currPath[i])) {
+                        if (tokenMatcher(nextToken, currPath[i]) === false) {
                             // mismatch in current path
                             // try the next pth
                             continue nextPath
