@@ -292,7 +292,6 @@ function defineLookaheadSpecs(
                     1,
                     actionDec,
                     1,
-                    tokenMatcher,
                     false,
                     PROD_TYPE.OPTION,
                     buildSingleAlternativeLookaheadFunction
@@ -310,7 +309,6 @@ function defineLookaheadSpecs(
                     2,
                     actionDec,
                     1,
-                    tokenMatcher,
                     false,
                     PROD_TYPE.OPTION,
                     buildSingleAlternativeLookaheadFunction
@@ -328,7 +326,6 @@ function defineLookaheadSpecs(
                     1,
                     actionDec,
                     1,
-                    tokenMatcher,
                     false,
                     PROD_TYPE.REPETITION,
                     buildSingleAlternativeLookaheadFunction
@@ -349,7 +346,6 @@ function defineLookaheadSpecs(
                     lotsOfOrs,
                     1,
                     false,
-                    tokenMatcher,
                     false,
                     buildAlternativesLookAheadFunc
                 )
@@ -370,7 +366,6 @@ function defineLookaheadSpecs(
                     emptyAltOr,
                     1,
                     false,
-                    tokenMatcher,
                     false,
                     buildAlternativesLookAheadFunc
                 )

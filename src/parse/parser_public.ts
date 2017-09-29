@@ -2897,7 +2897,6 @@ export class Parser {
                 ruleGrammar,
                 this.maxLookahead,
                 hasPredicates,
-                this.tokenMatcher,
                 this.dynamicTokensEnabled,
                 this.lookAheadBuilderForAlternatives
             )
@@ -3011,7 +3010,6 @@ export class Parser {
                 occurrence,
                 ruleGrammar,
                 maxLookahead,
-                this.tokenMatcher,
                 this.dynamicTokensEnabled,
                 prodType,
                 this.lookAheadBuilderForOptional

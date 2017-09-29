@@ -18,6 +18,10 @@ import {
     lookAheadSequence
 } from "../parser_public"
 import { TokenConstructor } from "../../scan/lexer_public"
+import {
+    tokenStructuredMatcher,
+    tokenStructuredMatcherNoInheritance
+} from "../../scan/tokens"
 
 export enum PROD_TYPE {
     OPTION,
@@ -51,11 +55,14 @@ export function buildLookaheadFuncForOr(
     ruleGrammar: gast.Rule,
     k: number,
     hasPredicates: boolean,
-    tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean,
     laFuncBuilder: Function
 ): (orAlts?: IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
+
+    const tokenMatcher = isTokenInheritanceNotUsed(lookAheadPaths)
+        ? tokenStructuredMatcherNoInheritance
+        : tokenStructuredMatcher
 
     return laFuncBuilder(
         lookAheadPaths,
@@ -81,7 +88,6 @@ export function buildLookaheadFuncForOptionalProd(
     occurrence: number,
     ruleGrammar: gast.Rule,
     k: number,
-    tokenMatcher: TokenMatcher,
     dynamicTokensEnabled: boolean,
     prodType: PROD_TYPE,
     lookaheadBuilder: (
@@ -96,6 +102,10 @@ export function buildLookaheadFuncForOptionalProd(
         prodType,
         k
     )
+
+    const tokenMatcher = isTokenInheritanceNotUsed(lookAheadPaths)
+        ? tokenStructuredMatcherNoInheritance
+        : tokenStructuredMatcher
 
     return lookaheadBuilder(
         lookAheadPaths[0],
@@ -627,5 +637,15 @@ export function isStrictPrefixOfPath(
         every(prefix, (tokType, idx) => {
             return tokType === other[idx]
         })
+    )
+}
+
+export function isTokenInheritanceNotUsed(
+    lookAheadPaths: lookAheadSequence[]
+): boolean {
+    return every(lookAheadPaths, singleAltPaths =>
+        every(singleAltPaths, singlePath =>
+            every(singlePath, token => isEmpty(token.extendingTokenTypes))
+        )
     )
 }
