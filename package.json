@@ -94,7 +94,7 @@
         "load-grunt-tasks": "^3.5.2",
         "lodash": "^4.17.4",
         "mocha": "^3.5.0",
-        "prettier": "1.6.1",
+        "prettier": "1.7.3",
         "requirejs": "2.3.5",
         "semver": "^5.4.1",
         "tslint": "^5.7.0",
