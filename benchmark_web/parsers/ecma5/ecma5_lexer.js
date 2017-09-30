@@ -312,7 +312,7 @@ function tokenize(str) {
         result.push(chevToken)
     }
 
-    return { tokens: result }
+    return { tokens: result, errors: [] }
 }
 
 self.lexer = { tokenize }

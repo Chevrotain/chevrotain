@@ -2,7 +2,6 @@ var initialized = false
 var startRule
 onmessage = function(event) {
     if (!initialized) {
-        debugger
         initialized = true
         event.data.importScripts.forEach(function(elem) {
             importScripts(elem)
@@ -25,6 +24,7 @@ onmessage = function(event) {
             postMessage(0)
         } catch (e) {
             console.error(e.message)
+            console.error(e.stack)
             postMessage(1)
         }
     }

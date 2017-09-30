@@ -27,6 +27,14 @@ class ECMAScript5Parser extends Parser {
             }
         })
 
+        // by setting this properties during the constructor
+        // our instance has a static structure and avoids V8 hidden class changes.
+        this.c1 = undefined
+        this.c2 = undefined
+        this.c3 = undefined
+        this.c4 = undefined
+        this.c5 = undefined
+
         this._orgText = ""
 
         const $ = this
@@ -44,14 +52,17 @@ class ECMAScript5Parser extends Parser {
 
         // See 11.1
         $.RULE("PrimaryExpression", () => {
-            $.OR([
-                { ALT: () => $.CONSUME(t.ThisTok) },
-                { ALT: () => $.CONSUME(t.Identifier) },
-                { ALT: () => $.CONSUME(t.AbsLiteral) },
-                { ALT: () => $.SUBRULE($.ArrayLiteral) },
-                { ALT: () => $.SUBRULE($.ObjectLiteral) },
-                { ALT: () => $.SUBRULE($.ParenthesisExpression) }
-            ])
+            $.OR(
+                $.c5 ||
+                    ($.c5 = [
+                        { ALT: () => $.CONSUME(t.ThisTok) },
+                        { ALT: () => $.CONSUME(t.Identifier) },
+                        { ALT: () => $.CONSUME(t.AbsLiteral) },
+                        { ALT: () => $.SUBRULE($.ArrayLiteral) },
+                        { ALT: () => $.SUBRULE($.ObjectLiteral) },
+                        { ALT: () => $.SUBRULE($.ParenthesisExpression) }
+                    ])
+            )
         })
 
         $.RULE("ParenthesisExpression", () => {
