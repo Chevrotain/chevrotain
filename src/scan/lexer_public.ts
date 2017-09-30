@@ -42,6 +42,8 @@ export interface TokenConstructor extends Function {
     tokenName?: string
     tokenType?: number
     extendingTokenTypes?: number[]
+    extendingTokenTypesMap?: { [tokType: number]: boolean }
+    isParent?: boolean
 
     new (...args: any[]): IToken
 }

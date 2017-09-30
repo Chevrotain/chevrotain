@@ -10,21 +10,15 @@ import {
 import { IToken, Token, tokenName } from "./tokens_public"
 import { HashTable } from "../lang/lang_extensions"
 
-// TODO: rename "tokenInstanceOf" ?
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
-    if (tokInstance.tokenType === tokConstructor.tokenType) {
+    const instanceType = tokInstance.tokenType
+    if (instanceType === tokConstructor.tokenType) {
         return true
-    } else if (tokConstructor.extendingTokenTypes.length > 0) {
-        let extendingTokenTypes = tokConstructor.extendingTokenTypes
-        let extendingTokenTypesLength = extendingTokenTypes.length
-        for (let i = 0; i < extendingTokenTypesLength; i++) {
-            if (extendingTokenTypes[i] === tokInstance.tokenType) {
-                return true
-            }
-        }
-        return false
     } else {
-        return false
+        return (
+            tokConstructor.isParent === true &&
+            tokConstructor.extendingTokenTypesMap[instanceType] === true
+        )
     }
 }
 
@@ -57,6 +51,11 @@ export function augmentTokenClasses(tokenClasses: TokenConstructor[]): void {
 
     // 3. fill up the extendingTokenTypes
     assignExtendingTokensProp(tokenClassesAndParents)
+    assignExtendingTokensMapProp(tokenClassesAndParents)
+
+    forEach(tokenClassesAndParents, tokClass => {
+        tokClass.isParent = tokClass.extendingTokenTypes.length > 0
+    })
 }
 
 export function expandTokenHierarchy(
@@ -90,6 +89,10 @@ export function assignTokenDefaultProps(
             currTokClass.extendingTokenTypes = []
         }
 
+        if (!hasExtendingTokensTypesMapProperty(currTokClass)) {
+            currTokClass.extendingTokenTypesMap = {}
+        }
+
         if (!hasTokenNameProperty(currTokClass)) {
             // saved for fast access during CST building.
             currTokClass.tokenName = tokenName(currTokClass)
@@ -121,6 +124,16 @@ export function assignExtendingTokensProp(
     })
 }
 
+export function assignExtendingTokensMapProp(
+    tokenClasses: TokenConstructor[]
+): void {
+    forEach(tokenClasses, currTokClass => {
+        forEach(currTokClass.extendingTokenTypes, currExtendingType => {
+            currTokClass.extendingTokenTypesMap[currExtendingType] = true
+        })
+    })
+}
+
 export function hasShortKeyProperty(tokClass: TokenConstructor): boolean {
     return has(tokClass, "tokenType")
 }
@@ -129,6 +142,12 @@ export function hasExtendingTokensTypesProperty(
     tokClass: TokenConstructor
 ): boolean {
     return has(tokClass, "extendingTokenTypes")
+}
+
+export function hasExtendingTokensTypesMapProperty(
+    tokClass: TokenConstructor
+): boolean {
+    return has(tokClass, "extendingTokenTypesMap")
 }
 
 export function hasTokenNameProperty(tokClass: TokenConstructor): boolean {
