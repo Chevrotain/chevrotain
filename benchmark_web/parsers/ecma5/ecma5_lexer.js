@@ -1,19 +1,8 @@
 "use strict"
 
-/**
- * ECMAScript cannot be easily lexed with a distinct lexing phase.
- * See: https://users.soe.ucsc.edu/~cormac/papers/dls14a.pdf
- *
- * So to expedite the creation of the chevrotain ECMA5 grammar.
- * The Acorn project was used to tokenize the input text
- *
- * In the future this should be refactored to avoid the distinct lexing phase based on:
- * https://github.com/SAP/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
- *
- */
-const acorn = require("acorn")
+const acorn = self.acorn
 const acornTokTypes = acorn.tokTypes
-const tokens = require("./ecma5_tokens")
+const tokens = self.tokens
 
 function createChevToken(chevTokenClass, acornToken) {
     return {
@@ -323,9 +312,7 @@ function tokenize(str) {
         result.push(chevToken)
     }
 
-    return result
+    return { tokens: result }
 }
 
-module.exports = {
-    tokenize
-}
+self.lexer = { tokenize }

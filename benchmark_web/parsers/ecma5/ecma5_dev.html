@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script src="../worker_api.js"></script>
+
+<script>
+    // relative to the worker impel file
+    initWorker({
+        startRule:     "Program",
+        importScripts: [
+            "../../lib/chevrotain.js",
+            "https://unpkg.com/acorn@5.1.2/dist/acorn.js",
+            "./ecma5/ecma5_tokens.js",
+            "./ecma5/ecma5_lexer.js",
+            "./ecma5/ecma5_parser.js",
+            "./api.js"],
+        sampleUrl:     "https://unpkg.com/lodash@4.17.4/lodash.js"
+    })
+</script>
+
+
+</body>
+</html>
+

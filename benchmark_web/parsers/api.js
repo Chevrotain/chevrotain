@@ -3,6 +3,7 @@ var parserInstance
 var lexResult
 
 function parseBench(text, lexer, parser, rootRule, options) {
+    debugger
     if (lexResult === undefined || options.lexerOnly) {
         lexResult = lexer.tokenize(text)
         if (lexResult.errors.length > 0) {

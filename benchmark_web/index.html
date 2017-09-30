@@ -88,6 +88,32 @@
 
                     </div>
 
+                    <div class="dataRow ECMA5_Dev">
+
+                        <div class="benchName"><a rel="nofollow" href="../lib/chevrotain.js">ECMA5_Dev</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
+                    <div class="dataRow ECMA5_Latest">
+
+                        <div class="benchName"><a rel="nofollow" href="https://unpkg.com/chevrotain/lib/chevrotain.js">ECMA5_Latest</a>
+                        </div>
+                        <div class="benchRate">
+                            <div class="value">&nbsp;</div>
+                            <div class="delta">&nbsp;</div>
+                        </div>
+                        <div class="benchSpeed">&nbsp;</div>
+                        <div class="benchInclude"><input type="checkbox" checked=checked/></div>
+
+                    </div>
+
                 </div>
             </div>
 
@@ -117,6 +143,9 @@
 
     var cssLatestFrame = includeTestIFrame("CSS_Latest", "./parsers/css/css_latest.html")
     var cssDevFrame = includeTestIFrame("CSS_Dev", "./parsers/css/css_dev.html")
+
+    var ecma5LatestFrame = includeTestIFrame("ECMA5_Latest", "./parsers/ecma5/ecma5_latest.html")
+    var ecma5DevFrame = includeTestIFrame("ECMA5_Dev", "./parsers/ecma5/ecma5_dev.html")
 
     var orgData = {
         labels:   [],
@@ -158,7 +187,7 @@
             suite.add(id,
                 {
                     defer: true,
-                    fn:       function(deferred) {
+                    fn:    function(deferred) {
                         action({lexerOnly: lexerOnly, parserOnly: parserOnly}, deferred)
                     }
                 })
@@ -180,6 +209,14 @@
 
         CSS_Latest: function(suite) {
             addTest(suite, 'CSS_Latest', cssLatestFrame.parse)
+        },
+
+        ECMA5_Dev: function(suite) {
+            addTest(suite, 'ECMA5_Dev', ecma5DevFrame.parse)
+        },
+
+        ECMA5_Latest: function(suite) {
+            addTest(suite, 'ECMA5_Latest', ecma5LatestFrame.parse)
         }
     }
 
