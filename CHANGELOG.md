@@ -1,4 +1,21 @@
-## 0.32.1 (2017-7-8)
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- Removed "extendToken" and "NEXT_TOKEN" deprecated APIs.
+  Use [createToken](http://sap.github.io/chevrotain/documentation/0_32_1/modules/_chevrotain_d_.html#createtoken)
+  and [LA(1)](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#la) instead.
+
+#### Minor Changes
+
+- Tiny performance improvements and optimizations.
+  * [1](https://github.com/SAP/chevrotain/commit/0567813bea6c2d32d01fc2aaf39f5290c7e02f0b)
+  * [2](https://github.com/SAP/chevrotain/commit/26703756b17c71391f51fbecf08d06cba6c8734e)
+  * [3](https://github.com/SAP/chevrotain/commit/d82fb7afdc386005995a58b5d192641403931c16)
+
+
+
+## 0.32.1 (7-8-2017)
 
 #### Bug Fixes
 
@@ -6,7 +23,7 @@
 
 
 
-## 0.32.0 (2017-7-6)
+## 0.32.0 (7-6-2017)
 
 #### Major Changes
 
@@ -18,7 +35,7 @@ Lexer Performance oriented release.
 
 
 
-## 0.31.0 (2017-7-1)
+## 0.31.0 (7-1-2017)
 
 #### Breaking Changes
 - [Token patterns which may include line terminators must be explicitly flagged with the "line_breaks" property.](https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS)
