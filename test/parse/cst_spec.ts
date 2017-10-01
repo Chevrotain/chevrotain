@@ -1,28 +1,29 @@
-import { extendToken, Token } from "../../src/scan/tokens_public"
+import { createToken, Token } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
-import { exceptions } from "../../src/parse/exceptions_public"
 import { clearCache } from "../../src/parse/cache_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { TokenConstructor } from "../../src/scan/lexer_public"
 import { map } from "../../src/utils/utils"
-import MismatchedTokenException = exceptions.MismatchedTokenException
-import NoViableAltException = exceptions.NoViableAltException
-import EarlyExitException = exceptions.EarlyExitException
 
-function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
+function defineCstSpecs(
+    contextName,
+    createToken,
+    createTokenInstance,
+    tokenMatcher
+) {
     function createTokenVector(tokTypes: TokenConstructor[]): any[] {
         return map(tokTypes, curTokType => {
-            return createToken(curTokType)
+            return createTokenInstance(curTokType)
         })
     }
 
     context("CST " + contextName, () => {
-        let A = extendToken("A")
-        let B = extendToken("B")
-        let C = extendToken("C")
-        let D = extendToken("D")
-        let E = extendToken("E")
+        let A = createToken({ name: "A" })
+        let B = createToken({ name: "B" })
+        let C = createToken({ name: "C" })
+        let D = createToken({ name: "D" })
+        let E = createToken({ name: "E" })
 
         const ALL_TOKENS = [A, B, C, D, E]
 
@@ -46,7 +47,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(B), createToken(C)]
+            let input = [
+                createTokenInstance(A),
+                createTokenInstance(B),
+                createTokenInstance(C)
+            ]
             let parser = new CstTerminalParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -88,7 +93,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A)]
+            let input = [createTokenInstance(A)]
             let parser = new CstTerminalAlternationParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -118,7 +123,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(B)]
+            let input = [createTokenInstance(A), createTokenInstance(B)]
             let parser = new CstTerminalAlternationSingleAltParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -143,7 +148,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
             }
 
-            let input = [createToken(A), createToken(B), createToken(A)]
+            let input = [
+                createTokenInstance(A),
+                createTokenInstance(B),
+                createTokenInstance(A)
+            ]
             let parser = new CstMultiTerminalParser(input)
             let cst = parser.testRule()
             expect(cst.name).to.equal("testRule")
@@ -177,13 +186,13 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             }
 
             let input = [
-                createToken(A),
-                createToken(C),
-                createToken(A),
-                createToken(C),
-                createToken(A),
-                createToken(C),
-                createToken(B)
+                createTokenInstance(A),
+                createTokenInstance(C),
+                createTokenInstance(A),
+                createTokenInstance(C),
+                createTokenInstance(A),
+                createTokenInstance(C),
+                createTokenInstance(B)
             ]
             let parser = new CstMultiTerminalWithManyParser(input)
             let cst = parser.testRule()
@@ -226,7 +235,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             }
 
             it("path taken", () => {
-                let input = [createToken(A), createToken(C), createToken(B)]
+                let input = [
+                    createTokenInstance(A),
+                    createTokenInstance(C),
+                    createTokenInstance(B)
+                ]
                 let parser = new CstOptionalTerminalParser(input)
                 let cst = parser.ruleWithOptional()
                 expect(cst.name).to.equal("ruleWithOptional")
@@ -239,7 +252,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             })
 
             it("path NOT taken", () => {
-                let input = [createToken(B)]
+                let input = [createTokenInstance(B)]
                 let parser = new CstOptionalTerminalParser(input)
                 let cst = parser.ruleWithOptional()
                 expect(cst.name).to.equal("ruleWithOptional")
@@ -268,10 +281,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             }
 
             let input = [
-                createToken(A),
-                createToken(A),
-                createToken(A),
-                createToken(B)
+                createTokenInstance(A),
+                createTokenInstance(A),
+                createTokenInstance(A),
+                createTokenInstance(B)
             ]
             let parser = new CstMultiTerminalWithAtLeastOneParser(input)
             let cst = parser.testRule()
@@ -305,10 +318,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             }
 
             let input = [
-                createToken(A),
-                createToken(C),
-                createToken(A),
-                createToken(B)
+                createTokenInstance(A),
+                createTokenInstance(C),
+                createTokenInstance(A),
+                createTokenInstance(B)
             ]
             let parser = new CstMultiTerminalWithManySepParser(input)
             let cst = parser.testRule()
@@ -344,10 +357,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
             }
 
             let input = [
-                createToken(A),
-                createToken(C),
-                createToken(A),
-                createToken(B)
+                createTokenInstance(A),
+                createTokenInstance(C),
+                createTokenInstance(A),
+                createTokenInstance(B)
             ]
             let parser = new CstMultiTerminalWithAtLeastOneSepParser(input)
             let cst = parser.testRule()
@@ -392,7 +405,11 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 }
 
                 it("path taken", () => {
-                    let input = [createToken(A), createToken(C), createToken(B)]
+                    let input = [
+                        createTokenInstance(A),
+                        createTokenInstance(C),
+                        createTokenInstance(B)
+                    ]
                     let parser = new CstOptionalNestedTerminalParser(input)
                     let cst = parser.ruleWithOptional()
                     expect(cst.name).to.equal("ruleWithOptional")
@@ -413,7 +430,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 })
 
                 it("path NOT taken", () => {
-                    let input = [createToken(B)]
+                    let input = [createTokenInstance(B)]
                     let parser = new CstOptionalNestedTerminalParser(input)
                     let cst = parser.ruleWithOptional()
                     expect(cst.name).to.equal("ruleWithOptional")
@@ -456,7 +473,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(A)]
+                let input = [createTokenInstance(A)]
                 let parser = new CstAlternationNestedAltParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -504,7 +521,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(A)]
+                let input = [createTokenInstance(A)]
                 let parser = new CstAlternationNestedParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -542,7 +559,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                     })
                 }
 
-                let input = [createToken(B), createToken(C)]
+                let input = [createTokenInstance(B), createTokenInstance(C)]
                 let parser = new CstAlternationNestedAltSingleParser(input)
                 let cst = parser.testRule()
                 expect(cst.name).to.equal("testRule")
@@ -579,13 +596,13 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 }
 
                 let input = [
-                    createToken(A),
-                    createToken(C),
-                    createToken(A),
-                    createToken(C),
-                    createToken(A),
-                    createToken(C),
-                    createToken(B)
+                    createTokenInstance(A),
+                    createTokenInstance(C),
+                    createTokenInstance(A),
+                    createTokenInstance(C),
+                    createTokenInstance(A),
+                    createTokenInstance(C),
+                    createTokenInstance(B)
                 ]
                 let parser = new CstMultiTerminalWithManyNestedParser(input)
                 let cst = parser.testRule()
@@ -642,10 +659,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 }
 
                 let input = [
-                    createToken(A),
-                    createToken(A),
-                    createToken(A),
-                    createToken(B)
+                    createTokenInstance(A),
+                    createTokenInstance(A),
+                    createTokenInstance(A),
+                    createTokenInstance(B)
                 ]
                 let parser = new CstAtLeastOneNestedParser(input)
                 let cst = parser.testRule()
@@ -682,10 +699,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 }
 
                 let input = [
-                    createToken(A),
-                    createToken(C),
-                    createToken(A),
-                    createToken(B)
+                    createTokenInstance(A),
+                    createTokenInstance(C),
+                    createTokenInstance(A),
+                    createTokenInstance(B)
                 ]
                 let parser = new CstNestedRuleWithManySepParser(input)
                 let cst = parser.testRule()
@@ -722,10 +739,10 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
                 }
 
                 let input = [
-                    createToken(A),
-                    createToken(C),
-                    createToken(A),
-                    createToken(B)
+                    createTokenInstance(A),
+                    createTokenInstance(C),
+                    createTokenInstance(A),
+                    createTokenInstance(B)
                 ]
                 let parser = new CstAtLeastOneSepNestedParser(input)
                 let cst = parser.testRule()
@@ -912,7 +929,7 @@ function defineCstSpecs(contextName, extendToken, createToken, tokenMatcher) {
 
 defineCstSpecs(
     "Regular Tokens Mode",
-    extendToken,
+    createToken,
     createRegularToken,
     tokenStructuredMatcher
 )

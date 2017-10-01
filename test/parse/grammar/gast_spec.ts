@@ -1,10 +1,6 @@
 import { gast } from "../../../src/parse/grammar/gast_public"
 import { getProductionDslName } from "../../../src/parse/grammar/gast"
-import {
-    createToken,
-    extendToken,
-    Token
-} from "../../../src/scan/tokens_public"
+import { createToken, Token } from "../../../src/scan/tokens_public"
 import Terminal = gast.Terminal
 import NonTerminal = gast.NonTerminal
 import Flat = gast.Flat
@@ -69,12 +65,12 @@ describe("GAst namespace", () => {
     })
 
     describe("the GAst serialization capabilities", () => {
-        let A = extendToken("A")
+        let A = createToken({ name: "A" })
         A.LABEL = "bamba"
-        let B = extendToken("B", /[a-zA-Z]\w*/)
-        let C = extendToken("C")
-        let D = extendToken("D")
-        let Comma = extendToken("Comma")
+        let B = createToken({ name: "B", pattern: /[a-zA-Z]\w*/ })
+        let C = createToken({ name: "C" })
+        let D = createToken({ name: "D" })
+        let Comma = createToken({ name: "Comma" })
         let WithLiteral = createToken({
             name: "WithLiteral",
             pattern: "bamba"

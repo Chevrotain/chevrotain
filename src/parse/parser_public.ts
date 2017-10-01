@@ -3187,19 +3187,6 @@ export class Parser {
         }
     }
 
-    /**
-     * Convenience method equivalent to LA(1)
-     * It is no longer used directly in chevrotain due to
-     * performance considerations (avoid the need for inlining optimizations).
-     *
-     * But it is maintained for backward compatibility reasons.
-     *
-     * @deprecated
-     */
-    protected NEXT_TOKEN(): IToken {
-        return this.LA(1)
-    }
-
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
     protected LA(howMuch: number): IToken {

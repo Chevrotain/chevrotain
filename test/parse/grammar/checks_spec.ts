@@ -14,7 +14,7 @@ import {
     validateRuleDoesNotAlreadyExist,
     validateRuleIsOverridden
 } from "../../../src/parse/grammar/checks"
-import { Token, extendToken } from "../../../src/scan/tokens_public"
+import { Token, createToken } from "../../../src/scan/tokens_public"
 import { forEach, first, map } from "../../../src/utils/utils"
 
 let Rule = gast.Rule
@@ -359,8 +359,8 @@ class ErroneousOccurrenceNumUsageParser3 extends Parser {
     })
 }
 
-let myToken = extendToken("myToken")
-let myOtherToken = extendToken("myOtherToken")
+let myToken = createToken({ name: "myToken" })
+let myOtherToken = createToken({ name: "myOtherToken" })
 
 class ValidOccurrenceNumUsageParser extends Parser {
     constructor(input: Token[] = []) {

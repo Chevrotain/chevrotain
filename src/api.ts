@@ -12,8 +12,7 @@ import {
     getTokenConstructor,
     tokenMatcher,
     createToken,
-    createTokenInstance,
-    extendToken
+    createTokenInstance
 } from "./scan/tokens_public"
 import { exceptions } from "./parse/exceptions_public"
 import { gast } from "./parse/grammar/gast_public"
@@ -44,7 +43,6 @@ API.tokenName = tokenName
 API.tokenLabel = tokenLabel
 API.tokenMatcher = tokenMatcher
 API.createToken = createToken
-API.extendToken = extendToken
 API.createTokenInstance = createTokenInstance
 API.getTokenConstructor = getTokenConstructor
 

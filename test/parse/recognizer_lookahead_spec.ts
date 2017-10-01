@@ -1,4 +1,4 @@
-import { Token, extendToken } from "../../src/scan/tokens_public"
+import { Token, createToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"
@@ -8,8 +8,8 @@ import { createRegularToken } from "../utils/matchers"
 
 function defineLookaheadSpecs(
     contextName,
-    extendToken,
     createToken,
+    createTokenInstance,
     tokenMatcher
 ) {
     context("lookahead " + contextName, () => {
@@ -17,13 +17,13 @@ function defineLookaheadSpecs(
             clearCache()
         })
 
-        let OneTok = extendToken("OneTok")
-        let TwoTok = extendToken("TwoTok")
-        let ThreeTok = extendToken("ThreeTok")
-        let FourTok = extendToken("FourTok")
-        let FiveTok = extendToken("FiveTok")
-        let SixTok = extendToken("SixTok")
-        let Comma = extendToken("Comma")
+        let OneTok = createToken({ name: "OneTok" })
+        let TwoTok = createToken({ name: "TwoTok" })
+        let ThreeTok = createToken({ name: "ThreeTok" })
+        let FourTok = createToken({ name: "FourTok" })
+        let FiveTok = createToken({ name: "FiveTok" })
+        let SixTok = createToken({ name: "SixTok" })
+        let Comma = createToken({ name: "Comma" })
 
         const ALL_TOKENS = [
             OneTok,
@@ -90,31 +90,31 @@ function defineLookaheadSpecs(
             })
 
             it("can automatically compute lookahead for OPTION1", () => {
-                let input = [createToken(OneTok)]
+                let input = [createTokenInstance(OneTok)]
                 let parser = new OptionsImplicitLookAheadParser(input)
                 expect(parser.manyOptionsRule()).to.equal("1")
             })
 
             it("can automatically compute lookahead for OPTION2", () => {
-                let input = [createToken(TwoTok)]
+                let input = [createTokenInstance(TwoTok)]
                 let parser = new OptionsImplicitLookAheadParser(input)
                 expect(parser.manyOptionsRule()).to.equal("2")
             })
 
             it("can automatically compute lookahead for OPTION3", () => {
-                let input = [createToken(ThreeTok)]
+                let input = [createTokenInstance(ThreeTok)]
                 let parser = new OptionsImplicitLookAheadParser(input)
                 expect(parser.manyOptionsRule()).to.equal("3")
             })
 
             it("can automatically compute lookahead for OPTION4", () => {
-                let input = [createToken(FourTok)]
+                let input = [createTokenInstance(FourTok)]
                 let parser = new OptionsImplicitLookAheadParser(input)
                 expect(parser.manyOptionsRule()).to.equal("4")
             })
 
             it("can automatically compute lookahead for OPTION5", () => {
-                let input = [createToken(FiveTok)]
+                let input = [createTokenInstance(FiveTok)]
                 let parser = new OptionsImplicitLookAheadParser(input)
                 expect(parser.manyOptionsRule()).to.equal("5")
             })
@@ -178,43 +178,43 @@ function defineLookaheadSpecs(
             })
 
             it("can automatically compute lookahead for MANY1", () => {
-                let input = [createToken(OneTok)]
+                let input = [createTokenInstance(OneTok)]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("1")
             })
 
             it("can automatically compute lookahead for MANY2", () => {
-                let input = [createToken(TwoTok)]
+                let input = [createTokenInstance(TwoTok)]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("2")
             })
 
             it("can automatically compute lookahead for MANY3", () => {
-                let input = [createToken(ThreeTok)]
+                let input = [createTokenInstance(ThreeTok)]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("3")
             })
 
             it("can automatically compute lookahead for MANY4", () => {
-                let input = [createToken(FourTok)]
+                let input = [createTokenInstance(FourTok)]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("4")
             })
 
             it("can automatically compute lookahead for MANY5", () => {
-                let input = [createToken(FiveTok)]
+                let input = [createTokenInstance(FiveTok)]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("5")
             })
 
             it("can accept lookahead function param for flow mixing several MANYs", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(OneTok),
-                    createToken(ThreeTok),
-                    createToken(ThreeTok),
-                    createToken(ThreeTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(OneTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new ManyImplicitLookAheadParser(input)
                 expect(parser.manyRule()).to.equal("113335")
@@ -311,55 +311,55 @@ function defineLookaheadSpecs(
             })
 
             it("can automatically compute lookahead for MANY_SEP1", () => {
-                let input = [createToken(OneTok)]
+                let input = [createTokenInstance(OneTok)]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 expect(parser.manySepRule().total).to.equal("1")
             })
 
             it("can automatically compute lookahead for MANY_SEP2", () => {
-                let input = [createToken(TwoTok)]
+                let input = [createTokenInstance(TwoTok)]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 expect(parser.manySepRule().total).to.equal("2")
             })
 
             it("can automatically compute lookahead for MANY_SEP3", () => {
-                let input = [createToken(ThreeTok)]
+                let input = [createTokenInstance(ThreeTok)]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 expect(parser.manySepRule().total).to.equal("3")
             })
 
             it("can automatically compute lookahead for MANY_SEP4", () => {
-                let input = [createToken(FourTok)]
+                let input = [createTokenInstance(FourTok)]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 expect(parser.manySepRule().total).to.equal("4")
             })
 
             it("can automatically compute lookahead for MANY_SEP5", () => {
-                let input = [createToken(FiveTok)]
+                let input = [createTokenInstance(FiveTok)]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 expect(parser.manySepRule().total).to.equal("5")
             })
 
             it("can accept lookahead function param for flow mixing several MANY_SEPs", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(Comma),
-                    createToken(OneTok),
-                    createToken(ThreeTok),
-                    createToken(Comma),
-                    createToken(ThreeTok),
-                    createToken(Comma),
-                    createToken(ThreeTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(OneTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new ManySepImplicitLookAheadParser(input)
                 let result = parser.manySepRule()
                 expect(result.total).to.equal("113335")
                 expect(result.separators).to.have.length(3)
                 expect(result.separators).to.deep.equal([
-                    createToken(Comma),
-                    createToken(Comma),
-                    createToken(Comma)
+                    createTokenInstance(Comma),
+                    createTokenInstance(Comma),
+                    createTokenInstance(Comma)
                 ])
             })
 
@@ -431,13 +431,13 @@ function defineLookaheadSpecs(
 
             it("can accept lookahead function param for AT_LEAST_ONE1-5", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(FourTok),
-                    createToken(FourTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(FourTok),
+                    createTokenInstance(FourTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new AtLeastOneImplicitLookAheadParser(input)
                 expect(parser.atLeastOneRule()).to.equal("1223445")
@@ -445,10 +445,10 @@ function defineLookaheadSpecs(
 
             it("will fail when zero occurrences of AT_LEAST_ONE in input", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(TwoTok) /*createToken(ThreeTok),*/,
-                    createToken(FourTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok) /*createToken(ThreeTok),*/,
+                    createTokenInstance(FourTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new AtLeastOneImplicitLookAheadParser(input)
                 expect(parser.atLeastOneRule()).to.equal("-666")
@@ -554,31 +554,31 @@ function defineLookaheadSpecs(
 
             it("can accept lookahead function param for AT_LEAST_ONE_SEP1-5", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(Comma),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(FourTok),
-                    createToken(Comma),
-                    createToken(FourTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(FourTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(FourTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new AtLeastOneSepImplicitLookAheadParser(input)
                 let parseResult = parser.atLeastOneSepRule()
                 expect(parseResult.total).to.equal("1223445")
                 expect(parseResult.separators).to.deep.equal([
-                    createToken(Comma),
-                    createToken(Comma)
+                    createTokenInstance(Comma),
+                    createTokenInstance(Comma)
                 ])
             })
 
             it("will fail when zero occurrences of AT_LEAST_ONE_SEP in input", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    /*createToken(ThreeTok),*/ createToken(FourTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    /*createToken(ThreeTok),*/ createTokenInstance(FourTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new AtLeastOneSepImplicitLookAheadParser(input)
                 expect(parser.atLeastOneSepRule().total).to.equal("-666")
@@ -786,18 +786,18 @@ function defineLookaheadSpecs(
 
             it("can compute the lookahead automatically for OR1-5", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(FourTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(FourTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new OrImplicitLookAheadParser(input)
                 expect(parser.orRule()).to.equal("A1B2C3D4E5")
             })
 
             it("will fail when none of the alternatives match", () => {
-                let input = [createToken(SixTok)]
+                let input = [createTokenInstance(SixTok)]
                 let parser = new OrImplicitLookAheadParser(input)
                 expect(parser.orRule()).to.equal("-666")
             })
@@ -1101,11 +1101,11 @@ function defineLookaheadSpecs(
 
             it("can compute the lookahead automatically for OR1-5", () => {
                 let input = [
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(FourTok),
-                    createToken(FiveTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(FourTok),
+                    createTokenInstance(FiveTok)
                 ]
                 let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(
                     input
@@ -1114,7 +1114,7 @@ function defineLookaheadSpecs(
             })
 
             it("will fail when none of the alternatives match", () => {
-                let input = [createToken(SixTok)]
+                let input = [createTokenInstance(SixTok)]
                 let parser = new OrImplicitLookAheadParserIgnoreAmbiguities(
                     input
                 )
@@ -1151,17 +1151,17 @@ function defineLookaheadSpecs(
                 }
 
                 let parser = new MultiTokenLookAheadForOptionParser([
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
                 expect(parser.rule()).to.equal("OPTION Not Taken")
 
                 let parser2 = new MultiTokenLookAheadForOptionParser([
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
                 expect(parser2.rule()).to.equal("OPTION Taken")
             })
@@ -1188,29 +1188,29 @@ function defineLookaheadSpecs(
                 }
 
                 let parser = new MultiTokenLookAheadForManyParser([
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
                 expect(parser.rule()).to.equal(0)
 
                 let oneIterationParser = new MultiTokenLookAheadForManyParser([
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
                 expect(oneIterationParser.rule()).to.equal(1)
 
                 let twoIterationsParser = new MultiTokenLookAheadForManyParser([
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok),
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok),
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
 
                 expect(twoIterationsParser.rule()).to.equal(2)
@@ -1241,33 +1241,33 @@ function defineLookaheadSpecs(
                 }
 
                 let parser = new MultiTokenLookAheadForManySepParser([
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
                 expect(parser.rule()).to.equal(0)
 
                 let oneIterationParser = new MultiTokenLookAheadForManySepParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
                 expect(oneIterationParser.rule()).to.equal(1)
 
                 let twoIterationsParser = new MultiTokenLookAheadForManySepParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(Comma),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(Comma),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
                 expect(twoIterationsParser.rule()).to.equal(2)
@@ -1315,26 +1315,26 @@ function defineLookaheadSpecs(
                 }
 
                 let alt1Parser = new MultiTokenLookAheadForOrParser([
-                    createToken(OneTok),
-                    createToken(OneTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(OneTok)
                 ])
                 expect(alt1Parser.orRule()).to.equal("alt1 Taken")
 
                 let alt2Parser = new MultiTokenLookAheadForOrParser([
-                    createToken(OneTok),
-                    createToken(TwoTok),
-                    createToken(ThreeTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok),
+                    createTokenInstance(ThreeTok)
                 ])
                 expect(alt2Parser.orRule()).to.equal("alt2 Taken")
 
                 let alt3Parser = new MultiTokenLookAheadForOrParser([
-                    createToken(OneTok),
-                    createToken(TwoTok)
+                    createTokenInstance(OneTok),
+                    createTokenInstance(TwoTok)
                 ])
                 expect(alt3Parser.orRule()).to.equal("alt3 Taken")
 
                 let alt4Parser = new MultiTokenLookAheadForOrParser([
-                    createToken(FourTok)
+                    createTokenInstance(FourTok)
                 ])
                 expect(alt4Parser.orRule()).to.equal("alt4 Taken")
             })
@@ -1362,25 +1362,25 @@ function defineLookaheadSpecs(
 
                 let oneIterationParser = new MultiTokenLookAheadForAtLeastOneParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
                 expect(oneIterationParser.rule()).to.equal(1)
 
                 let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
 
@@ -1388,17 +1388,17 @@ function defineLookaheadSpecs(
 
                 let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
 
@@ -1431,45 +1431,45 @@ function defineLookaheadSpecs(
 
                 let oneIterationParser = new MultiTokenLookAheadForAtLeastOneSepParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
                 expect(oneIterationParser.rule()).to.equal(1)
 
                 let twoIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(Comma),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(Comma),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
                 expect(twoIterationsParser.rule()).to.equal(2)
 
                 let threeIterationsParser = new MultiTokenLookAheadForAtLeastOneSepParser(
                     [
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(Comma),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(Comma),
-                        createToken(OneTok),
-                        createToken(TwoTok),
-                        createToken(ThreeTok),
-                        createToken(OneTok),
-                        createToken(TwoTok)
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(Comma),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(Comma),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok),
+                        createTokenInstance(ThreeTok),
+                        createTokenInstance(OneTok),
+                        createTokenInstance(TwoTok)
                     ]
                 )
                 expect(threeIterationsParser.rule()).to.equal(3)
@@ -1480,8 +1480,7 @@ function defineLookaheadSpecs(
 
 defineLookaheadSpecs(
     "Regular Tokens Mode",
-    extendToken,
+    createToken,
     createRegularToken,
     tokenStructuredMatcher
 )
-// TODO: variant probably not needed

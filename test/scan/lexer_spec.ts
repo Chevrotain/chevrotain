@@ -7,7 +7,7 @@ import {
     last,
     map
 } from "../../src/utils/utils"
-import { createToken, extendToken } from "../../src/scan/tokens_public"
+import { createToken } from "../../src/scan/tokens_public"
 import {
     IMultiModeLexerDefinition,
     Lexer,
@@ -34,7 +34,7 @@ import { tokenStructuredMatcher } from "../../src/scan/tokens"
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
 function defineLexerSpecs(
     contextName,
-    extendToken,
+    createToken,
     tokenMatcher,
     skipValidationChecks = false,
     lexerConfig
@@ -43,9 +43,15 @@ function defineLexerSpecs(
     const testStart = lexerConfig.positionTracking === "onlyStart" || testFull
 
     function lexerSpecs() {
-        const IntegerTok = extendToken("IntegerTok", /[1-9]\d*/)
-        const IdentifierTok = extendToken("IdentifierTok", /[A-Za-z_]\w*/)
-        const BambaTok = extendToken("BambaTok", /bamba/)
+        const IntegerTok = createToken({
+            name: "IntegerTok",
+            pattern: /[1-9]\d*/
+        })
+        const IdentifierTok = createToken({
+            name: "IdentifierTok",
+            pattern: /[A-Za-z_]\w*/
+        })
+        const BambaTok = createToken({ name: "BambaTok", pattern: /bamba/ })
 
         BambaTok.LONGER_ALT = IdentifierTok
 
@@ -72,10 +78,19 @@ function defineLexerSpecs(
             })
 
             it("can create a token from a string with priority to the First Token class with the longest match - negative", () => {
-                const IntegerTok = extendToken("IntegerTok", /[1-9]\d*/)
-                const IdentTok = extendToken("IdentifierTok", /[A-Za-z]+/)
+                const IntegerTok = createToken({
+                    name: "IntegerTok",
+                    pattern: /[1-9]\d*/
+                })
+                const IdentTok = createToken({
+                    name: "IdentifierTok",
+                    pattern: /[A-Za-z]+/
+                })
                 // a bit contrived to test all code branches, the BambaTok is not actually prefix of Identifier tok due to the "_"
-                const BambaTok = extendToken("BambaTok", /_bamba/)
+                const BambaTok = createToken({
+                    name: "BambaTok",
+                    pattern: /_bamba/
+                })
                 BambaTok.LONGER_ALT = IdentTok
 
                 const myLexer = new Lexer([BambaTok, IntegerTok, IdentTok], {
@@ -99,36 +114,63 @@ function defineLexerSpecs(
             })
         })
 
-        const ValidNaPattern = extendToken("ValidNaPattern", Lexer.NA)
+        const ValidNaPattern = createToken({
+            name: "ValidNaPattern",
+            pattern: Lexer.NA
+        })
 
-        const ValidNaPattern2 = extendToken("ValidNaPattern2", Lexer.NA)
+        const ValidNaPattern2 = createToken({
+            name: "ValidNaPattern2",
+            pattern: Lexer.NA
+        })
 
         // TODO: not sure this API allows invalid stuff
-        const InvalidPattern = extendToken("InvalidPattern", 666)
-        const MissingPattern = extendToken("MissingPattern", undefined)
+        const InvalidPattern = createToken({
+            name: "InvalidPattern",
+            pattern: 666
+        })
+        const MissingPattern = createToken({
+            name: "MissingPattern",
+            pattern: undefined
+        })
 
-        const MultiLinePattern = extendToken("MultiLinePattern", /bamba/m)
+        const MultiLinePattern = createToken({
+            name: "MultiLinePattern",
+            pattern: /bamba/m
+        })
 
-        const GlobalPattern = extendToken("GlobalPattern", /bamba/g)
+        const GlobalPattern = createToken({
+            name: "GlobalPattern",
+            pattern: /bamba/g
+        })
 
-        const CaseInsensitivePattern = extendToken(
-            "CaseInsensitivePattern",
-            /bamba/i
-        )
+        const CaseInsensitivePattern = createToken({
+            name: "CaseInsensitivePattern",
+            pattern: /bamba/i
+        })
 
-        const IntegerValid = extendToken("IntegerValid", /0\d*/)
+        const IntegerValid = createToken({
+            name: "IntegerValid",
+            pattern: /0\d*/
+        })
 
         // oops we did copy paste and forgot to change the pattern (same as Integer)
-        const DecimalInvalid = extendToken("DecimalInvalid", /0\d*/)
+        const DecimalInvalid = createToken({
+            name: "DecimalInvalid",
+            pattern: /0\d*/
+        })
 
-        const Skipped = extendToken("Skipped")
+        const Skipped = createToken({ name: "Skipped" })
         Skipped.GROUP = Lexer.SKIPPED
 
-        const Special = extendToken("Special")
+        const Special = createToken({ name: "Special" })
         Special.GROUP = "Strange"
 
-        const InvalidGroupNumber = extendToken("InvalidGroupNumber", /\d\d\d/)
-        InvalidGroupNumber.GROUP = 666
+        const InvalidGroupNumber = createToken({
+            name: "InvalidGroupNumber",
+            pattern: /\d\d\d/
+        })
+        InvalidGroupNumber.GROUP = <any>666
 
         if (!skipValidationChecks) {
             describe("The Simple Lexer Validations", () => {
@@ -247,7 +289,10 @@ function defineLexerSpecs(
                 })
 
                 it("will detect patterns using unsupported end of input anchor", () => {
-                    let InvalidToken = extendToken("InvalidToken", /BAMBA$/)
+                    let InvalidToken = createToken({
+                        name: "InvalidToken",
+                        pattern: /BAMBA$/
+                    })
                     let tokenClasses = [ValidNaPattern, InvalidToken]
                     let errors = findEndOfInputAnchor(tokenClasses)
                     expect(errors.length).to.equal(1)
@@ -267,7 +312,10 @@ function defineLexerSpecs(
                 })
 
                 it("will detect patterns using unsupported start of input anchor", () => {
-                    let InvalidToken = extendToken("InvalidToken", /^BAMBA/)
+                    let InvalidToken = createToken({
+                        name: "InvalidToken",
+                        pattern: /^BAMBA/
+                    })
                     let tokenClasses = [ValidNaPattern, InvalidToken]
                     let errors = findStartOfInputAnchor(tokenClasses)
                     expect(errors.length).to.equal(1)
@@ -279,10 +327,10 @@ function defineLexerSpecs(
                 })
 
                 it("won't detect negation as using unsupported start of input anchor", () => {
-                    let negationPattern = extendToken(
-                        "negationPattern",
-                        /[^\\]/
-                    )
+                    let negationPattern = createToken({
+                        name: "negationPattern",
+                        pattern: /[^\\]/
+                    })
                     let errors = findStartOfInputAnchor([negationPattern])
                     expect(errors).to.be.empty
                 })
@@ -312,7 +360,10 @@ function defineLexerSpecs(
 
                 it("will detect patterns that can match an empty string", () => {
                     // should use \d+ as * allows zero repetitions
-                    const emptyMatch = extendToken("emptyMatch", /\d*/)
+                    const emptyMatch = createToken({
+                        name: "emptyMatch",
+                        pattern: /\d*/
+                    })
 
                     let tokenClasses = [emptyMatch]
                     let errors = findEmptyMatchRegExps(tokenClasses)
@@ -352,38 +403,72 @@ function defineLexerSpecs(
             })
         }
 
-        const PatternNoStart = extendToken("PatternNoStart", /bamba/i)
+        const PatternNoStart = createToken({
+            name: "PatternNoStart",
+            pattern: /bamba/i
+        })
 
-        const Keyword = extendToken("Keyword", Lexer.NA)
-        const If = extendToken("If", /if/, Keyword)
-        const Else = extendToken("Else", "else", Keyword)
-        const Return = extendToken("Return", /return/i, Keyword)
-        const Integer = extendToken("Integer", /[1-9]\d*/)
+        const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
+        const If = createToken({ name: "If", pattern: /if/, parent: Keyword })
+        const Else = createToken({
+            name: "Else",
+            pattern: "else",
+            parent: Keyword
+        })
+        const Return = createToken({
+            name: "Return",
+            pattern: /return/i,
+            parent: Keyword
+        })
+        const Integer = createToken({ name: "Integer", pattern: /[1-9]\d*/ })
 
-        const Punctuation = extendToken("Punctuation", Lexer.NA)
-        const LParen = extendToken("Return", /\(/, Punctuation)
-        const RParen = extendToken("Return", /\)/, Punctuation)
+        const Punctuation = createToken({
+            name: "Punctuation",
+            pattern: Lexer.NA
+        })
+        const LParen = createToken({
+            name: "Return",
+            pattern: /\(/,
+            parent: Punctuation
+        })
+        const RParen = createToken({
+            name: "Return",
+            pattern: /\)/,
+            parent: Punctuation
+        })
 
-        const Whitespace = extendToken("Whitespace", /(\t| )/)
+        const Whitespace = createToken({
+            name: "Whitespace",
+            pattern: /(\t| )/
+        })
         Whitespace.GROUP = Lexer.SKIPPED
 
-        const NewLine = extendToken("NewLine", /(\n|\r|\r\n)/)
+        const NewLine = createToken({
+            name: "NewLine",
+            pattern: /(\n|\r|\r\n)/
+        })
         NewLine.GROUP = Lexer.SKIPPED
         NewLine.LINE_BREAKS = true
 
-        const WhitespaceNotSkipped = extendToken("WhitespaceNotSkipped", /\s+/)
+        const WhitespaceNotSkipped = createToken({
+            name: "WhitespaceNotSkipped",
+            pattern: /\s+/
+        })
         WhitespaceNotSkipped.LINE_BREAKS = true
 
-        const Comment = extendToken("Comment", /\/\/.+/)
+        const Comment = createToken({ name: "Comment", pattern: /\/\/.+/ })
         Comment.GROUP = "comments"
 
-        const WhitespaceOrAmp = extendToken("WhitespaceOrAmp", /\s+|&/)
+        const WhitespaceOrAmp = createToken({
+            name: "WhitespaceOrAmp",
+            pattern: /\s+|&/
+        })
         WhitespaceOrAmp.LINE_BREAKS = true
 
         describe("The Simple Lexer transformations", () => {
             it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", () => {
-                let orgSource = BambaTok.PATTERN.source
-                let transPattern = addStartOfInput(BambaTok.PATTERN)
+                let orgSource = (<any>BambaTok.PATTERN).source
+                let transPattern = addStartOfInput(<any>BambaTok.PATTERN)
                 expect(transPattern.source).to.equal("^(?:" + orgSource + ")")
                 expect(/^\^/.test(transPattern.source)).to.equal(true)
             })
@@ -615,7 +700,10 @@ function defineLexerSpecs(
                 expect(spacesGroups[0].tokenClassName).to.equal("WS")
             })
 
-            const EndOfInputAnchor = extendToken("EndOfInputAnchor", /BAMBA$/)
+            const EndOfInputAnchor = createToken({
+                name: "EndOfInputAnchor",
+                pattern: /BAMBA$/
+            })
             it("can create a simple Lexer from a List of Token Classes", () => {
                 let ifElseLexer = new Lexer(
                     [
@@ -1164,44 +1252,62 @@ function defineLexerSpecs(
             })
 
             context("lexer modes", () => {
-                const One = extendToken("One", "1")
-                const Two = extendToken("Two", /2/)
-                const Three = extendToken("Three", /3/)
+                const One = createToken({ name: "One", pattern: "1" })
+                const Two = createToken({ name: "Two", pattern: /2/ })
+                const Three = createToken({ name: "Three", pattern: /3/ })
 
-                const Alpha = extendToken("Alpha", "A")
-                const Beta = extendToken("Beta", /B/)
-                const Gamma = extendToken("Gamma", /G/)
+                const Alpha = createToken({ name: "Alpha", pattern: "A" })
+                const Beta = createToken({ name: "Beta", pattern: /B/ })
+                const Gamma = createToken({ name: "Gamma", pattern: /G/ })
 
-                const Hash = extendToken("Hash", /#/)
-                const Caret = extendToken("Caret", /\^/)
-                const Amp = extendToken("Amp", /&/)
+                const Hash = createToken({ name: "Hash", pattern: /#/ })
+                const Caret = createToken({ name: "Caret", pattern: /\^/ })
+                const Amp = createToken({ name: "Amp", pattern: /&/ })
 
-                const NUMBERS = extendToken("NUMBERS", /NUMBERS/)
+                const NUMBERS = createToken({
+                    name: "NUMBERS",
+                    pattern: /NUMBERS/
+                })
                 NUMBERS.PUSH_MODE = "numbers"
 
-                const LETTERS = extendToken("LETTERS", /LETTERS/)
+                const LETTERS = createToken({
+                    name: "LETTERS",
+                    pattern: /LETTERS/
+                })
                 LETTERS.PUSH_MODE = "letters"
 
-                const SIGNS = extendToken("SIGNS", /SIGNS/)
+                const SIGNS = createToken({ name: "SIGNS", pattern: /SIGNS/ })
                 SIGNS.PUSH_MODE = "signs"
 
-                const SIGNS_AND_EXIT_LETTERS = extendToken(
-                    "SIGNS_AND_EXIT_LETTERS",
-                    /SIGNS_AND_EXIT_LETTERS/
-                )
+                const SIGNS_AND_EXIT_LETTERS = createToken({
+                    name: "SIGNS_AND_EXIT_LETTERS",
+                    pattern: /SIGNS_AND_EXIT_LETTERS/
+                })
                 SIGNS_AND_EXIT_LETTERS.PUSH_MODE = "signs"
                 SIGNS_AND_EXIT_LETTERS.POP_MODE = true
 
-                const ExitNumbers = extendToken("ExitNumbers", /EXIT_NUMBERS/)
+                const ExitNumbers = createToken({
+                    name: "ExitNumbers",
+                    pattern: /EXIT_NUMBERS/
+                })
                 ExitNumbers.POP_MODE = true
 
-                const ExitLetters = extendToken("ExitLetters", /EXIT_LETTERS/)
+                const ExitLetters = createToken({
+                    name: "ExitLetters",
+                    pattern: /EXIT_LETTERS/
+                })
                 ExitLetters.POP_MODE = true
 
-                const ExitSigns = extendToken("ExitSigns", /EXIT_SIGNS/)
+                const ExitSigns = createToken({
+                    name: "ExitSigns",
+                    pattern: /EXIT_SIGNS/
+                })
                 ExitSigns.POP_MODE = true
 
-                const Whitespace = extendToken("Whitespace", /(\t| )/)
+                const Whitespace = createToken({
+                    name: "Whitespace",
+                    pattern: /(\t| )/
+                })
                 Whitespace.GROUP = Lexer.SKIPPED
 
                 let modeLexerDefinition: IMultiModeLexerDefinition = {
@@ -1323,14 +1429,17 @@ function defineLexerSpecs(
                 })
 
                 it("Will detect Token definitions with push modes values that does not exist", () => {
-                    const One = extendToken("One", /1/)
-                    const Two = extendToken("Two", /2/)
+                    const One = createToken({ name: "One", pattern: /1/ })
+                    const Two = createToken({ name: "Two", pattern: /2/ })
 
-                    const Alpha = extendToken("Alpha", /A/)
-                    const Beta = extendToken("Beta", /B/)
-                    const Gamma = extendToken("Gamma", /G/)
+                    const Alpha = createToken({ name: "Alpha", pattern: /A/ })
+                    const Beta = createToken({ name: "Beta", pattern: /B/ })
+                    const Gamma = createToken({ name: "Gamma", pattern: /G/ })
 
-                    const EnterNumbers = extendToken("EnterNumbers", /NUMBERS/)
+                    const EnterNumbers = createToken({
+                        name: "EnterNumbers",
+                        pattern: /NUMBERS/
+                    })
                     EnterNumbers.PUSH_MODE = "numbers"
 
                     let lexerDef: IMultiModeLexerDefinition = {
@@ -1604,14 +1713,14 @@ function wrapWithCustom(baseExtendToken) {
 
 defineLexerSpecs(
     "Regular Tokens Mode",
-    extendToken,
+    createToken,
     tokenStructuredMatcher,
     false,
     { positionTracking: "full" }
 )
 defineLexerSpecs(
     "Regular Tokens Mode (custom mode)",
-    wrapWithCustom(extendToken),
+    wrapWithCustom(createToken),
     tokenStructuredMatcher,
     true,
     { positionTracking: "full" }
@@ -1619,14 +1728,14 @@ defineLexerSpecs(
 
 defineLexerSpecs(
     "Regular Tokens Mode - only start",
-    extendToken,
+    createToken,
     tokenStructuredMatcher,
     false,
     { positionTracking: "onlyStart" }
 )
 defineLexerSpecs(
     "Regular Tokens Mode (custom mode) - only start",
-    wrapWithCustom(extendToken),
+    wrapWithCustom(createToken),
     tokenStructuredMatcher,
     true,
     { positionTracking: "onlyStart" }
@@ -1634,14 +1743,14 @@ defineLexerSpecs(
 
 defineLexerSpecs(
     "Regular Tokens Mode - onlyOffset",
-    extendToken,
+    createToken,
     tokenStructuredMatcher,
     false,
     { positionTracking: "onlyOffset" }
 )
 defineLexerSpecs(
     "Regular Tokens Mode (custom mode)",
-    wrapWithCustom(extendToken),
+    wrapWithCustom(createToken),
     tokenStructuredMatcher,
     true,
     { positionTracking: "onlyOffset" }

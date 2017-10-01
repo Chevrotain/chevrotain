@@ -1,4 +1,4 @@
-import { Token, EOF, extendToken, IToken } from "../../src/scan/tokens_public"
+import { Token, EOF, createToken, IToken } from "../../src/scan/tokens_public"
 import { IMultiModeLexerDefinition, Lexer } from "../../src/scan/lexer_public"
 import { Parser, EMPTY_ALT } from "../../src/parse/parser_public"
 import { HashTable } from "../../src/lang/lang_extensions"
@@ -16,17 +16,17 @@ import EarlyExitException = exceptions.EarlyExitException
 
 function defineRecognizerSpecs(
     contextName,
-    extendToken,
     createToken,
+    createTokenInstance,
     tokenMatcher
 ) {
     context("Recognizer  " + contextName, () => {
-        let PlusTok = extendToken("PlusTok")
+        let PlusTok = createToken({ name: "PlusTok" })
         PlusTok.LABEL = "+"
-        let MinusTok = extendToken("MinusTok")
-        let IntTok = extendToken("IntTok")
-        let DotTok = extendToken("DotTok")
-        let IdentTok = extendToken("IdentTok")
+        let MinusTok = createToken({ name: "MinusTok" })
+        let IntTok = createToken({ name: "IntTok" })
+        let DotTok = createToken({ name: "DotTok" })
+        let IdentTok = createToken({ name: "IdentTok" })
 
         const ALL_TOKENS = [PlusTok, MinusTok, IntTok, IdentTok, DotTok]
         augmentTokenClasses(ALL_TOKENS)
@@ -58,11 +58,11 @@ function defineRecognizerSpecs(
                 }
 
                 let input = [
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok)
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok)
                 ]
                 let parser = new SubRuleTestParser(input)
                 let result = parser.topRule()
@@ -112,12 +112,12 @@ function defineRecognizerSpecs(
                 }
 
                 let input = [
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok),
-                    createToken(PlusTok)
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(PlusTok)
                 ]
                 let parser = new SubRuleArgsParser(input)
                 let result = parser.topRule()
@@ -160,7 +160,7 @@ function defineRecognizerSpecs(
                 }
 
                 it("can match an non-empty alternative in an OR with an empty alternative", () => {
-                    let input = [createToken(PlusTok)]
+                    let input = [createTokenInstance(PlusTok)]
                     let parser = new EmptyAltParser(input)
                     expect(parser.orRule()).to.equal("+")
                 })
@@ -377,11 +377,11 @@ function defineRecognizerSpecs(
                 })
                 parser.reset()
                 let testInput = [
-                    createToken(IntTok, "1"),
-                    createToken(PlusTok),
-                    createToken(IntTok, "2"),
-                    createToken(PlusTok),
-                    createToken(IntTok, "3")
+                    createTokenInstance(IntTok, "1"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(IntTok, "2"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(IntTok, "3")
                 ]
 
                 parser.input = testInput
@@ -390,7 +390,7 @@ function defineRecognizerSpecs(
                 expect(parser.CONSUME1(IntTok)).to.equal(testInput[2])
                 expect(parser.CONSUME3(PlusTok)).to.equal(testInput[3])
                 expect(parser.CONSUME1(IntTok)).to.equal(testInput[4])
-                expect(tokenMatcher(parser.NEXT_TOKEN(), EOF))
+                expect(tokenMatcher(parser.LA(1), EOF))
             })
 
             it("will not perform inRepetition recovery while in backtracking mode", () => {
@@ -404,12 +404,12 @@ function defineRecognizerSpecs(
             it("can perform in-repetition recovery for MANY grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new ManyRepetitionRecovery(input)
                 expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
@@ -419,12 +419,12 @@ function defineRecognizerSpecs(
             it("can disable in-repetition recovery for MANY grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new ManyRepetitionRecovery(input, false)
                 expect(parser.qualifiedName()).to.deep.equal(["666"])
@@ -434,12 +434,12 @@ function defineRecognizerSpecs(
             it("can perform in-repetition recovery for MANY_SEP grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new ManySepRepetitionRecovery(input)
                 expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
@@ -449,12 +449,12 @@ function defineRecognizerSpecs(
             it("can disable in-repetition recovery for MANY_SEP grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new ManySepRepetitionRecovery(input, false)
                 expect(parser.qualifiedName()).to.deep.equal(["333"])
@@ -464,11 +464,11 @@ function defineRecognizerSpecs(
             it("can perform in-repetition recovery for MANY_SEP grammar rule #2", () => {
                 // a.b..c...d
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(DotTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b")
                 ]
                 let parser = new ManySepSubRuleRepetitionRecovery(input)
                 expect(parser.qualifiedName()).to.deep.equal(["a", "b"])
@@ -478,12 +478,12 @@ function defineRecognizerSpecs(
             it("can perform in-repetition recovery for AT_LEAST_ONE grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new AtLeastOneRepetitionRecovery(input)
                 expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
@@ -493,12 +493,12 @@ function defineRecognizerSpecs(
             it("can disable in-repetition recovery for AT_LEAST_ONE grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new AtLeastOneRepetitionRecovery(input, false)
                 expect(parser.qualifiedName()).to.deep.equal(["777"])
@@ -508,12 +508,12 @@ function defineRecognizerSpecs(
             it("can perform in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new AtLeastOneSepRepetitionRecovery(input)
                 expect(parser.qualifiedName()).to.deep.equal(["a", "b", "c"])
@@ -523,12 +523,12 @@ function defineRecognizerSpecs(
             it("can disable in-repetition recovery for AT_LEAST_ONE_SEP grammar rule", () => {
                 // a.b+.c
                 let input = [
-                    createToken(IdentTok, "a"),
-                    createToken(DotTok),
-                    createToken(IdentTok, "b"),
-                    createToken(PlusTok),
-                    createToken(DotTok),
-                    createToken(IdentTok, "c")
+                    createTokenInstance(IdentTok, "a"),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "b"),
+                    createTokenInstance(PlusTok),
+                    createTokenInstance(DotTok),
+                    createTokenInstance(IdentTok, "c")
                 ]
                 let parser = new AtLeastOneSepRepetitionRecovery(input, false)
                 expect(parser.qualifiedName()).to.deep.equal(["999"])
@@ -536,9 +536,9 @@ function defineRecognizerSpecs(
             })
 
             it("can perform single Token insertion", () => {
-                let A = extendToken("A", /A/)
-                let B = extendToken("B", /B/)
-                let C = extendToken("C", /C/)
+                let A = createToken({ name: "A", pattern: /A/ })
+                let B = createToken({ name: "B", pattern: /B/ })
+                let C = createToken({ name: "C", pattern: /C/ })
                 let allTokens = [A, B, C]
 
                 let lexer = new Lexer(allTokens, {
@@ -605,10 +605,10 @@ function defineRecognizerSpecs(
 
                 let parser = new OrExpressionParser([])
 
-                parser.input = [createToken(MinusTok)]
+                parser.input = [createTokenInstance(MinusTok)]
                 expect(parser.or()).to.equal(666)
 
-                parser.input = [createToken(PlusTok)]
+                parser.input = [createTokenInstance(PlusTok)]
                 expect(parser.or()).to.equal("bamba")
             })
 
@@ -629,10 +629,10 @@ function defineRecognizerSpecs(
 
                 let parser = new OptionExpressionParser([])
 
-                parser.input = [createToken(IdentTok)]
+                parser.input = [createTokenInstance(IdentTok)]
                 expect(parser.option()).to.equal("bamba")
 
-                parser.input = [createToken(IntTok)]
+                parser.input = [createTokenInstance(IntTok)]
                 expect(parser.option()).to.be.undefined
             })
 
@@ -655,9 +655,9 @@ function defineRecognizerSpecs(
                 let parser = new ManyExpressionParser([])
 
                 parser.input = [
-                    createToken(IntTok),
-                    createToken(IntTok),
-                    createToken(IntTok)
+                    createTokenInstance(IntTok),
+                    createTokenInstance(IntTok),
+                    createTokenInstance(IntTok)
                 ]
                 expect(parser.many()).to.deep.equal([0, 1, 2])
 
@@ -685,14 +685,14 @@ function defineRecognizerSpecs(
                 let parser = new AtLeastOneExpressionParser([])
 
                 parser.input = [
-                    createToken(IntTok),
-                    createToken(IntTok),
-                    createToken(IntTok),
-                    createToken(IntTok)
+                    createTokenInstance(IntTok),
+                    createTokenInstance(IntTok),
+                    createTokenInstance(IntTok),
+                    createTokenInstance(IntTok)
                 ]
                 expect(parser.atLeastOne()).to.deep.equal([3, 6, 9, 12])
 
-                parser.input = [createToken(IntTok)]
+                parser.input = [createTokenInstance(IntTok)]
                 expect(parser.atLeastOne()).to.deep.equal([3])
             })
 
@@ -717,14 +717,14 @@ function defineRecognizerSpecs(
 
                 let parser = new ManySepExpressionParser([])
 
-                let separator1 = createToken(PlusTok)
-                let separator2 = createToken(PlusTok)
+                let separator1 = createTokenInstance(PlusTok)
+                let separator2 = createTokenInstance(PlusTok)
                 parser.input = [
-                    createToken(IntTok),
+                    createTokenInstance(IntTok),
                     separator1,
-                    createToken(IntTok),
+                    createTokenInstance(IntTok),
                     separator2,
-                    createToken(IntTok)
+                    createTokenInstance(IntTok)
                 ]
                 expect(parser.manySep()).to.deep.equal({
                     values: [0, 1, 2],
@@ -760,21 +760,21 @@ function defineRecognizerSpecs(
 
                 let parser = new AtLeastOneSepExpressionParser([])
 
-                let separator1 = createToken(PlusTok)
-                let separator2 = createToken(PlusTok)
+                let separator1 = createTokenInstance(PlusTok)
+                let separator2 = createTokenInstance(PlusTok)
                 parser.input = [
-                    createToken(IntTok),
+                    createTokenInstance(IntTok),
                     separator1,
-                    createToken(IntTok),
+                    createTokenInstance(IntTok),
                     separator2,
-                    createToken(IntTok)
+                    createTokenInstance(IntTok)
                 ]
                 expect(parser.atLeastOneSep()).to.deep.equal({
                     values: [3, 6, 9],
                     separators: [separator1, separator2]
                 })
 
-                parser.input = [createToken(IntTok)]
+                parser.input = [createTokenInstance(IntTok)]
                 expect(parser.atLeastOneSep()).to.deep.equal({
                     values: [3],
                     separators: []
@@ -801,7 +801,10 @@ function defineRecognizerSpecs(
 
             it("when it runs out of input EOF will be returned", () => {
                 let parser: any = new Parser(
-                    [createToken(IntTok, "1"), createToken(PlusTok)],
+                    [
+                        createTokenInstance(IntTok, "1"),
+                        createTokenInstance(PlusTok)
+                    ],
                     [IntTok, PlusTok]
                 )
                 parser.CONSUME(IntTok)
@@ -816,7 +819,9 @@ function defineRecognizerSpecs(
 
             it("invoking an OPTION will return the inner grammar action's value or undefined", () => {
                 class OptionsReturnValueParser extends Parser {
-                    constructor(input: Token[] = [createToken(IntTok, "666")]) {
+                    constructor(
+                        input: Token[] = [createTokenInstance(IntTok, "666")]
+                    ) {
                         super(input, ALL_TOKENS)
                         ;(Parser as any).performSelfAnalysis(this)
                     }
@@ -869,7 +874,7 @@ function defineRecognizerSpecs(
                 let throwsRecogError = () => {
                     throw new exceptions.NotAllInputParsedException(
                         "sad sad panda",
-                        createToken(PlusTok)
+                        createTokenInstance(PlusTok)
                     )
                 }
                 let backTrackingFalse = parser.BACKTRACK(
@@ -975,7 +980,9 @@ function defineRecognizerSpecs(
                         this.CONSUME1(DotTok)
                     })
                 }
-                let parser: any = new InRuleParser([createToken(IntTok, "1")])
+                let parser: any = new InRuleParser([
+                    createTokenInstance(IntTok, "1")
+                ])
                 parser.tryInRuleRecovery = () => {
                     throw Error("oops")
                 }
@@ -995,7 +1002,9 @@ function defineRecognizerSpecs(
                         this.CONSUME1(DotTok)
                     })
                 }
-                let parser: any = new InRuleParser([createToken(IntTok, "1")])
+                let parser: any = new InRuleParser([
+                    createTokenInstance(IntTok, "1")
+                ])
                 ;(parser as any).consumeInternal = () => {
                     throw Error("oops")
                 }
@@ -1028,7 +1037,9 @@ function defineRecognizerSpecs(
                         }
                     )
                 }
-                let parser: any = new InRuleParser([createToken(IntTok, "1")])
+                let parser: any = new InRuleParser([
+                    createTokenInstance(IntTok, "1")
+                ])
                 parser.someRule()
             })
 
@@ -1044,7 +1055,7 @@ function defineRecognizerSpecs(
                     })
                 }
 
-                let parser = new LabelTokParser([createToken(MinusTok)])
+                let parser = new LabelTokParser([createTokenInstance(MinusTok)])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(
                     MismatchedTokenException
@@ -1065,7 +1076,9 @@ function defineRecognizerSpecs(
                     })
                 }
 
-                let parser = new NoLabelTokParser([createToken(PlusTok)])
+                let parser = new NoLabelTokParser([
+                    createTokenInstance(PlusTok)
+                ])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(
                     MismatchedTokenException
@@ -1219,8 +1232,8 @@ function defineRecognizerSpecs(
                 }
 
                 let parser = new NestedRulesParser([
-                    createToken(MinusTok),
-                    createToken(MinusTok)
+                    createTokenInstance(MinusTok),
+                    createTokenInstance(MinusTok)
                 ])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(
@@ -1266,9 +1279,9 @@ function defineRecognizerSpecs(
                 }
 
                 let parser = new ImplicitAtLeastOneErrParser([
-                    createToken(IntTok, "666"),
-                    createToken(MinusTok),
-                    createToken(MinusTok)
+                    createTokenInstance(IntTok, "666"),
+                    createTokenInstance(MinusTok),
+                    createTokenInstance(MinusTok)
                 ])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
@@ -1316,9 +1329,9 @@ function defineRecognizerSpecs(
                 }
 
                 let parser = new ExplicitAtLeastOneErrParser([
-                    createToken(IntTok, "666"),
-                    createToken(MinusTok),
-                    createToken(MinusTok)
+                    createTokenInstance(IntTok, "666"),
+                    createTokenInstance(MinusTok),
+                    createTokenInstance(MinusTok)
                 ])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
@@ -1361,9 +1374,9 @@ function defineRecognizerSpecs(
                 }
 
                 let parser = new ImplicitAtLeastOneSepErrParser([
-                    createToken(IntTok, "666"),
-                    createToken(MinusTok),
-                    createToken(MinusTok)
+                    createTokenInstance(IntTok, "666"),
+                    createTokenInstance(MinusTok),
+                    createTokenInstance(MinusTok)
                 ])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
@@ -1468,7 +1481,7 @@ function defineRecognizerSpecs(
 
                 setEquality(
                     parser.computeContentAssist("topRule", [
-                        createToken(MinusTok)
+                        createTokenInstance(MinusTok)
                     ]),
                     [
                         {
@@ -1500,7 +1513,7 @@ function defineRecognizerSpecs(
 
 defineRecognizerSpecs(
     "Regular Tokens Mode",
-    extendToken,
+    createToken,
     createRegularToken,
     tokenStructuredMatcher
 )

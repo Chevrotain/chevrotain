@@ -119,44 +119,6 @@ export function createToken(config: ITokenConfig): TokenConstructor {
     return createTokenInternal(config)
 }
 
-/**
- *
- * @deprecated - Use the new CreateToken API
- *
- * utility to help the poor souls who are still stuck writing pure javascript 5.1
- * extend and create Token subclasses in a less verbose manner
- *
- * @param {string} tokenName - The name of the new TokenClass
- * @param {RegExp|CustomPatternMatcherFunc|Function} patternOrParent - RegExp Pattern or Parent Token Constructor
- * @param {Function} parentConstructor - The Token class to be extended
- * @returns {Function} - A constructor for the new extended Token subclass
- */
-export function extendToken(
-    tokenName: string,
-    patternOrParent: any = undefined,
-    parentConstructor: Function = Token
-): TokenConstructor {
-    let pattern
-
-    if (
-        isRegExp(patternOrParent) ||
-        patternOrParent === Lexer.SKIPPED ||
-        patternOrParent === Lexer.NA ||
-        isString(patternOrParent)
-    ) {
-        pattern = patternOrParent
-    } else if (isFunction(patternOrParent)) {
-        parentConstructor = patternOrParent
-        pattern = undefined
-    }
-
-    return createTokenInternal(<any>{
-        name: tokenName,
-        parent: parentConstructor,
-        pattern: pattern
-    })
-}
-
 function createTokenInternal(config: ITokenConfig): TokenConstructor {
     let tokenName = config.name
     let parentConstructor = config.parent
