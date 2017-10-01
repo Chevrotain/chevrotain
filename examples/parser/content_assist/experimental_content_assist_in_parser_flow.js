@@ -163,7 +163,7 @@ class SelectContentAssistParser extends SelectParser {
             this.lastGrammarPath = this.getCurrentGrammarPath(tokClass, idx)
             consumedToken = super.consumeInternal(tokClass, idx)
 
-            var nextToken = this.NEXT_TOKEN()
+            var nextToken = this.LA(1)
             var nextTokenEndOffset =
                 nextToken.startOffset + nextToken.image.length
 
@@ -172,9 +172,9 @@ class SelectContentAssistParser extends SelectParser {
                 consumedToken !== undefined &&
                 // we have reached the end of the input without encountering the contentAssist offset
                 // this means the content assist offset is AFTER the input
-                (tokenMatcher(this.NEXT_TOKEN(), chevrotain.EOF) ||
+                (tokenMatcher(this.LA(1), chevrotain.EOF) ||
                     // we consumed the last token BEFORE the content assist of offset
-                    this.NEXT_TOKEN().startOffset > this.assistOffset)
+                    this.LA(1).startOffset > this.assistOffset)
             ) {
                 // reached the content assist point AFTER consuming some token successfully.
                 contentAssistPointReached = true
