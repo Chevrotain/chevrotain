@@ -52,7 +52,7 @@ fs.writeFileSync(config.versionPath, bumpedApiString)
 
 // updating CHANGELOG.md date
 var nowDate = new Date()
-var nowDateString = nowDate.toLocaleDateString().replace(/\//g, "-")
+var nowDateString = nowDate.toLocaleDateString("en-US").replace(/\//g, "-")
 var changeLogDate = config.changeLogString.replace(
     dateTemplateRegExp,
     "## " + newVersion + " " + "(" + nowDateString + ")"
