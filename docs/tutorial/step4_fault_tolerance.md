@@ -49,9 +49,9 @@ Therefore the missing colon will be automatically "inserted".
 
 This heuristic's behavior can be customized by the following methods:
 
-* [canTokenTypeBeInsertedInRecovery](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#cantokentypebeinsertedinrecovery)
+* [canTokenTypeBeInsertedInRecovery](http://sap.github.io/chevrotain/documentation/0_33_0/classes/_chevrotain_d_.parser.html#cantokentypebeinsertedinrecovery)
   
-* [getTokenToInsert](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#gettokentoinsert)
+* [getTokenToInsert](http://sap.github.io/chevrotain/documentation/0_33_0/classes/_chevrotain_d_.parser.html#gettokentoinsert)
         
             
 ### In Rule Single Token deletion:
@@ -202,12 +202,12 @@ For the following invalid json input:
 #### Enabling All Recovery mechanisms
 By default fault tolerance and error recovery heuristics are disabled.
 They can be enabled by passing a optional **recoveryEnabled** parameter (default true)
-To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#constructor).
+To the parser's constructor [constructor](http://sap.github.io/chevrotain/documentation/0_33_0/classes/_chevrotain_d_.parser.html#constructor).
 
 
 #### CST output for re-synced rules:
 When using [Concrete Syntax Tree]((https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md)) output
-A re-synced will return a CSTNode with the boolean ["recoveredNode"](http://sap.github.io/chevrotain/documentation/0_32_1/interfaces/_chevrotain_d_.cstnode.html#recoverednode) flag marked as true.
+A re-synced will return a CSTNode with the boolean ["recoveredNode"](http://sap.github.io/chevrotain/documentation/0_33_0/interfaces/_chevrotain_d_.cstnode.html#recoverednode) flag marked as true.
 Additionally a recovered node **may not** have all its contents (children dictionary) filled
 as only the Terminals and None-Terminals encountered **before** the error which triggered the re-sync
 will be present. This means that code that handles the CST (CST Walker or Visitor) **must not** 
@@ -222,7 +222,7 @@ from the sub-rule we have recovered from.
 By default **undefined** will be returned from a recovered rule, however this should most likely be customize
 in any but the most simple cases.
 
-Customization is done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#rule).
+Customization is done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_33_0/classes/_chevrotain_d_.parser.html#rule).
 The third parameter(**config**) may contain a **recoveryValueFunc** property which is a function that will be invoked to produce the returned value in 
 case of re-sync recovery. 
 
@@ -230,7 +230,7 @@ case of re-sync recovery.
 #### Disabling Re-Sync Recovery per rule.:
 Re-Sync recovery is enabled by default for all rules.
 In some cases it may be appropriate to disable re-sync recovery for a specific rule.
-This is (once again) done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#rule).
+This is (once again) done during the definition of the grammar [RULE](http://sap.github.io/chevrotain/documentation/0_33_0/classes/_chevrotain_d_.parser.html#rule).
 The third parameter(**config**) may contain a *resyncEnabled** property that controls whether or not re-sync is enabled for the 
 rule.
  
