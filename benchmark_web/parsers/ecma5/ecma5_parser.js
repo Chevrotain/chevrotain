@@ -27,6 +27,8 @@ class ECMAScript5Parser extends Parser {
             }
         })
 
+        this.SUPER_CONSUME = super.CONSUME
+        this.SUPER_CONSUME2 = super.CONSUME2
         // by setting this properties during the constructor
         // our instance has a static structure and avoids V8 hidden class changes.
         this.c1 = undefined
@@ -826,12 +828,13 @@ class ECMAScript5Parser extends Parser {
      * to the CONSUME parsing DSL method
      */
     canAndShouldDoSemiColonInsertion() {
-        const isNextTokenSemiColon = tokenMatcher(this.LA(1), t.Semicolon)
+        const nextToken = this.LA(1)
+        const isNextTokenSemiColon = tokenMatcher(nextToken, t.Semicolon)
         return (
             isNextTokenSemiColon === false &&
             (this.lineTerminatorHere() || // basic rule 1a and 3
-            tokenMatcher(this.LA(1), t.RCurly) || // basic rule 1b
-                tokenMatcher(this.LA(1), EOF))
+            tokenMatcher(nextToken, t.RCurly) || // basic rule 1b
+                tokenMatcher(nextToken, EOF))
         ) // basic rule 2
     }
 
@@ -843,7 +846,7 @@ class ECMAScript5Parser extends Parser {
         ) {
             return insertedSemiColon
         }
-        return super.CONSUME1(tokClass)
+        return this.SUPER_CONSUME(tokClass)
     }
 
     CONSUME2(tokClass, trySemiColonInsertion) {
@@ -862,7 +865,7 @@ class ECMAScript5Parser extends Parser {
     // http://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.6
     // so this method must verify that the exp parameter fulfills this condition.
     canInComeAfterExp(exp) {
-        // TODO: temp implemntatoin, will always allow IN style iteration for now.
+        // TODO: temp implementation, will always allow IN style iteration for now.
         return true
     }
 

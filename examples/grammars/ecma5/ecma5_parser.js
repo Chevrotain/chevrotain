@@ -28,7 +28,19 @@ class ECMAScript5Parser extends Parser {
             }
         })
 
+        // Optimization to avoid traversing the prototype chain at hotspots.
+        this.SUPER_CONSUME = super.CONSUME
+        this.SUPER_CONSUME2 = super.CONSUME2
+
         this._orgText = ""
+
+        // to avoid V8 hidden class changes by dynamic definition
+        // of properties on "this"
+        this.c1 = undefined
+        this.c2 = undefined
+        this.c3 = undefined
+        this.c4 = undefined
+        this.c5 = undefined
 
         const $ = this
 
@@ -45,14 +57,17 @@ class ECMAScript5Parser extends Parser {
 
         // See 11.1
         $.RULE("PrimaryExpression", () => {
-            $.OR([
-                { ALT: () => $.CONSUME(t.ThisTok) },
-                { ALT: () => $.CONSUME(t.Identifier) },
-                { ALT: () => $.CONSUME(t.AbsLiteral) },
-                { ALT: () => $.SUBRULE($.ArrayLiteral) },
-                { ALT: () => $.SUBRULE($.ObjectLiteral) },
-                { ALT: () => $.SUBRULE($.ParenthesisExpression) }
-            ])
+            $.OR(
+                $.c5 ||
+                    ($.c5 = [
+                        { ALT: () => $.CONSUME(t.ThisTok) },
+                        { ALT: () => $.CONSUME(t.Identifier) },
+                        { ALT: () => $.CONSUME(t.AbsLiteral) },
+                        { ALT: () => $.SUBRULE($.ArrayLiteral) },
+                        { ALT: () => $.SUBRULE($.ObjectLiteral) },
+                        { ALT: () => $.SUBRULE($.ParenthesisExpression) }
+                    ])
+            )
         })
 
         $.RULE("ParenthesisExpression", () => {
@@ -816,12 +831,13 @@ class ECMAScript5Parser extends Parser {
      * to the CONSUME parsing DSL method
      */
     canAndShouldDoSemiColonInsertion() {
-        const isNextTokenSemiColon = tokenMatcher(this.LA(1), t.Semicolon)
+        const nextToken = this.LA(1)
+        const isNextTokenSemiColon = tokenMatcher(nextToken, t.Semicolon)
         return (
             isNextTokenSemiColon === false &&
             (this.lineTerminatorHere() || // basic rule 1a and 3
-            tokenMatcher(this.LA(1), t.RCurly) || // basic rule 1b
-                tokenMatcher(this.LA(1), EOF))
+            tokenMatcher(nextToken, t.RCurly) || // basic rule 1b
+                tokenMatcher(nextToken, EOF))
         ) // basic rule 2
     }
 
@@ -833,7 +849,7 @@ class ECMAScript5Parser extends Parser {
         ) {
             return insertedSemiColon
         }
-        return super.CONSUME1(tokClass)
+        return this.SUPER_CONSUME(tokClass)
     }
 
     CONSUME2(tokClass, trySemiColonInsertion) {
@@ -843,7 +859,7 @@ class ECMAScript5Parser extends Parser {
         ) {
             return insertedSemiColon
         }
-        return super.CONSUME2(tokClass)
+        return this.SUPER_CONSUME2(tokClass)
     }
 
     // TODO: implement once the parser builds some data structure we can explore.
