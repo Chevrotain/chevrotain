@@ -10,22 +10,24 @@
 # Chevrotain
 
 ## Introduction
-Chevrotain is a [**very fast**][benchmark] and **feature rich** JavaScript LL(k) **Parsing Toolkit**.
+Chevrotain is a [**very fast**][benchmark] and **feature rich** **Parser Building Toolkit** for **ECMAScript**.
 It can be used to build parsers/compilers/interperters for various use cases ranging from simple configuration files, 
 to full fledged programing languages.
 
 A more in depth description of Chevrotain can be found in this great article on: [Parsing in JavaScript: Tools and Libraries](https://tomassetti.me/parsing-in-javascript/#chevrotain).
 
-It is important to note that Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just without any code generation. Chevrotain Grammars are pure JavaScript code which can be created/debugged/edited
-as any other JavaScript code without requiring any new tools or processes.
+It is important to note that Chevrotain is **NOT** a parser generator. It solves the same kind of problems as a parser generator, just **without any code generation**. Chevrotain Grammars are pure code which can be created/debugged/edited
+as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 * [**Online Playground**](http://sap.github.io/chevrotain/playground/)
 * **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**.
+* [**Performance benchmark**][benchmark] 
 
 ## Features
   1. **Parsing DSL**.
       * **LL(k)** grammars support.  
+      * Useable from [JavaScript / TypeScript / CoffeeScript][languages].
       * [**Separation** of grammar and semantics.][separation]
       * [Customizable][custom_errors] **Error Reporting** with full location information. 
       * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
@@ -36,10 +38,10 @@ as any other JavaScript code without requiring any new tools or processes.
       * [Parametrized Rules.][parametrized_rules]
       * [Syntactic Content Assist.][content assist]
       * **No code generation**.
-        * The DSL is just JavaScript, not an external language.
-        * The grammar is directly debuggable as plain JavaScript source.
-        * Short feedback loops.
-        * Allows great flexibility for inserting custom Parser actions 
+         * The DSL is just JavaScript, not an external language.
+         * The grammar is directly debuggable as plain JavaScript source.
+         * Short feedback loops.
+         * Allows great flexibility for inserting custom Parser actions. 
    
   2.  **Lexer Engine** 
       * Based on Regular Expressions.
@@ -130,3 +132,4 @@ Some interesting samples:
 [sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
 [sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
+[languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
