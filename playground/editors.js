@@ -108,7 +108,7 @@ function onImplementationEditorContentChange() {
 
         // may be falsy if the example is for the lexer only
         if (parserConstructor) {
-            parser = new parserConstructor()
+            parser = new parserConstructor([])
             markParserDefinitionErrors(parser)
             var topRules = parser.getSerializedGastProductions()
             renderDiagramsAndAttachHighlightEvents(topRules)
