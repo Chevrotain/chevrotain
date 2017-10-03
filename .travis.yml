@@ -51,10 +51,10 @@ deploy:
     skip_cleanup: true
 
   - provider: script
-    script: grunt coveralls:publish
+    script: npm run post_coverage
     on:
+      all_branches: true
       condition: $DEPLOY = true
-      branch: master
     skip_cleanup: true
 notifications:
   email: false

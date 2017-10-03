@@ -213,10 +213,8 @@ module.exports = function(grunt) {
             release: ["lib/**/*", "dev/**/*"]
         },
 
-        // TODO: this is quite slow, need to examine if it is still needed...
         replace: {
             coverage_ignore: {
-                // d.prototype = b === null ? Object.create(b) :
                 src: ["lib/src/**/*.js"],
                 overwrite: true,
                 replacements: [
@@ -288,12 +286,6 @@ module.exports = function(grunt) {
                 files: {
                     "lib/chevrotain.d.ts": PUBLIC_API_DTS_FILES
                 }
-            }
-        },
-
-        coveralls: {
-            publish: {
-                src: "dev/coverage/lcov.info"
             }
         }
     })
