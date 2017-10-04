@@ -21,7 +21,7 @@ as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 * [**Online Playground**](http://sap.github.io/chevrotain/playground/)
-* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**.
+* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**
 * [**Performance benchmark**][benchmark] 
 
 ## Features
