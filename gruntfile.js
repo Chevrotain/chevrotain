@@ -13,6 +13,8 @@ const PUBLIC_API_DTS_FILES = [
     "lib/src/parse/cache_public.d.ts"
 ]
 
+const karmaConf = process.env.TRAVIS ? "karma_sauce.conf.js" : "karma.conf.js"
+
 const PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
     return binDefFile.replace("lib/", "").replace(".d", "")
 })
@@ -85,7 +87,7 @@ module.exports = function(grunt) {
 
         karma: {
             options: {
-                configFile: "karma_sauce.conf.js",
+                configFile: karmaConf,
                 singleRun: true,
                 client: {
                     captureConsole: true

@@ -33,37 +33,57 @@ This can be more complex as more in-depth knowledge of chevrotain internals may 
 
 Details:
 * ~100% code coverage is **required**. 
-  - It is possible to disable coverage for specific code, but there must be a very good reason.
+  - It is possible to disable coverage for specific code, but there must be a very good reason to do so.
 * Try to maintain the same code style used in the rest of Chevrotain's source code.
   - The linting will take care of most of this automatically.
 
 
 ## Development Environment
 
-Chevrotain uses grunt for most development tasks.
-Examine the [grunt file][grunt_file] for all the available tasks:
+Chevrotain uses npm tasks for the development flows.
+Examine the [package.json][package] scripts for all the available tasks:
 
 #### Initial Setup
 
 * ```npm install```
-* ```npm install -g grunt-cli```
 
-#### Building
+#### Some basic dev flows to get started
 
 Chevrotain is written using Typescript, so compilation to javascript is needed.
-This will run the full build, including linting/packaging:
-* ```grunt build```
+* ```npm run compile```
 
-Alternatively during development many times only the TypeScript compilation step is needed:
+Alternatively during development one would want to recompile on file changes.
 * ```npm run watch```
+
+The compilation result will appear in the **lib** folder.
+
+#### Code Formatting
+
+Chevrotain uses **prettier** to avoid caring about code formatting...
+To format your new code use:
+```npm run format```
 
 #### Testing
 
-To run the build **and** the unit tests:
-* ```grunt build_test```
+Chevrotain uses several different types of tests to promote high quality.
+
+The most basic ones are the **mocha unit tests**, which are also the most relevant ones.
+* ```npm run dev_unit_tests```
  
-To only run the unit tests:
-* ```npm run unit_tests```
+Additionally **integration tests** are used to test Chevrotain as an end user with the help of **npm link**  
+* ```npm run dev_integration_tests```
+
+And last but not least **browser tests** run the unit tests on multiple browsers using **karma and sauce labs**
+On the central CI and Chrome on a local dev machine.
+* ```npm run dev_browser_tests```
+
+#### Running the central CI flow locally.
+
+This is just another npm task which performs the whole flow 
+including linting / doc generation / d.ts API creation / ...
+* ```npm run ci_full_build```
+  - Node > 4 is required to pass the coverage checks.
+
 
 #### Legal
 
@@ -75,4 +95,4 @@ simply follow the instructions in the pull request.
 [sample_grammars]: https://github.com/SAP/chevrotain/tree/master/examples/grammars
 [cond_import]: https://github.com/SAP/chevrotain/blob/ab686d96aedb375515a14adad79b1ae8b91af2df/examples/parser/parametrized_rules/parametrized_spec.js#L8
 [cla]: https://cla-assistant.io/SAP/chevrotain
-[grunt_file]: https://github.com/SAP/chevrotain/blob/master/gruntfile.js
+[package]: https://github.com/SAP/chevrotain/blob/master/package.json
