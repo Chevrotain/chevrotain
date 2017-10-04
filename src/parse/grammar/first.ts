@@ -21,6 +21,7 @@ export function first(prod: gast.IProduction): TokenConstructor[] {
     } else if (isBranchingProd(prod)) {
         return firstForBranching(<gast.AbstractProduction>prod)
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

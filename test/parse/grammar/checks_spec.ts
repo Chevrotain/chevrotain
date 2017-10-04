@@ -776,28 +776,6 @@ describe("The prefix ambiguity detection full flow", () => {
     })
 })
 
-describe("The anonymous Parser constructor detection full flow", () => {
-    it("will throw an error when an anonymous function is used as a Parser constructor", () => {
-        // hack to make sure the constructor function is indeed anonymous.
-        // in ES2015 the function name can be inferred using the scope. so:
-        // var foo = function(){}
-        // foo.name --> foo (was "" in ES5)
-        function generateAnonymousConstructor() {
-            return function(input) {
-                Parser.call(this, input, [])
-                ;(<any>Parser).performSelfAnalysis(this)
-            }
-        }
-
-        let AnonymousParser = generateAnonymousConstructor()
-        AnonymousParser.prototype = Object.create(Parser.prototype)
-        AnonymousParser.prototype.constructor = AnonymousParser
-        expect(() => new AnonymousParser([])).to.throw(
-            "constructor may not be an anonymous Function"
-        )
-    })
-})
-
 describe("The namespace conflict detection full flow", () => {
     it("will throw an error when a Terminal and a NoneTerminal have the same name", () => {
         class Bamba extends Token {}

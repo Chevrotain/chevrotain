@@ -30,6 +30,7 @@ export abstract class RestWalker {
             } else if (subProd instanceof gast.Alternation) {
                 this.walkOr(subProd, currRest, prevRest)
             } else {
+                /* istanbul ignore next */
                 throw Error("non exhaustive match")
             }
         })
