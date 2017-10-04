@@ -199,6 +199,7 @@ export namespace gast {
             } else if (node instanceof Rule) {
                 return this.visitRule(node)
             } else {
+                /* istanbul ignore next */
                 throw Error("non exhaustive match")
             }
         }
@@ -346,6 +347,7 @@ export namespace gast {
                 definition: convertDefinition(node.definition)
             }
         } else {
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     }

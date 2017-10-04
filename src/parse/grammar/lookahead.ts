@@ -46,6 +46,7 @@ export function getProdType(prod: gast.IProduction): PROD_TYPE {
     } else if (prod instanceof gast.Alternation) {
         return PROD_TYPE.ALTERNATION
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

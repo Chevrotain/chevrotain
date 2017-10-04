@@ -285,6 +285,7 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
                 possiblePaths.push(nextPath)
             }
         } else if (prod instanceof gast.Alternation) {
+            /* istanbul ignore else */
             // IGNORE ABOVE ELSE
             if (!isUndefined(prod.name)) {
                 addSingleItemToResult(prod.name)
@@ -305,7 +306,7 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
                 }
             }
         } else {
-            throw Error("non exhaustive match")
+            /* istanbul ignore next */ throw Error("non exhaustive match")
         }
     }
     return result

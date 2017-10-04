@@ -314,6 +314,7 @@ export function possiblePathsFrom(
         } else if (prod instanceof gast.Terminal) {
             currPath.push(prod.terminalType)
         } else {
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
 
@@ -417,6 +418,7 @@ export function nextPossibleTokensAfter(
                 })
                 foundCompletePath = true
             } else {
+                /* istanbul ignore next */
                 throw Error("non exhaustive match")
             }
         } else if (prod instanceof gast.NonTerminal) {
@@ -571,6 +573,7 @@ export function nextPossibleTokensAfter(
                 )
             )
         } else {
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     }

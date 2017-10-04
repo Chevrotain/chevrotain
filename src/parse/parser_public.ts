@@ -440,9 +440,12 @@ export class Parser {
         parserInstance.selfAnalysisDone = true
         let className = classNameFromInstance(parserInstance)
 
+        // can't test this with nyc tool, instrumentation causes the class name to be not empty.
+        /* istanbul ignore if */
         if (className === "") {
             // just a simple "throw Error" without any fancy "definition error" because the logic below relies on a unique parser name to
             // save/access those definition errors...
+            /* istanbul ignore next */
             throw Error(
                 "A Parser's constructor may not be an anonymous Function, it must be a named function\n" +
                     "The constructor's name is used at runtime for performance (caching) purposes."

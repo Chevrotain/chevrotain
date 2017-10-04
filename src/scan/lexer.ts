@@ -145,6 +145,7 @@ export function analyzeTokenClasses(
                     : addStartOfInput(wrappedRegExp)
             }
         } else {
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     })
@@ -163,6 +164,7 @@ export function analyzeTokenClasses(
         } else if (isUndefined(groupName)) {
             return false
         } else {
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     })
@@ -643,6 +645,7 @@ export function cloneEmptyGroups(emptyGroups: {
         if (isArray(currGroupValue)) {
             clonedResult[currKey] = []
         } else {
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     })
@@ -664,6 +667,7 @@ export function isCustomPattern(tokenType: any): boolean {
     } else if (isString(pattern)) {
         return false
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

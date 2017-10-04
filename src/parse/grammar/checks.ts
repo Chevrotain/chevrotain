@@ -431,6 +431,7 @@ export function getFirstNoneTerminal(
     } else if (firstProd instanceof gast.Terminal) {
         // nothing to see, move along
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 

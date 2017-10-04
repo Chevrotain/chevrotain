@@ -159,6 +159,7 @@ export function buildProdGast(
             return buildTerminalProd(prodRange)
         /* istanbul ignore next */
         default:
+            /* istanbul ignore next */
             throw Error("non exhaustive match")
     }
 }

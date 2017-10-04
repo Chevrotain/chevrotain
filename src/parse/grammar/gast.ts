@@ -82,6 +82,7 @@ export function getProductionDslName(
     } else if (prod instanceof gast.Terminal) {
         return "CONSUME"
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

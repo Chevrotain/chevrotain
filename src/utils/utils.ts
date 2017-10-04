@@ -84,6 +84,7 @@ export function forEach(collection: any, iteratorCallback: Function): void {
             iteratorCallback.call(null, value, key)
         }
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }
