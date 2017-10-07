@@ -10,7 +10,7 @@
 # Chevrotain
 
 ## Introduction
-Chevrotain is a [**very fast**][benchmark] and **feature rich** **Parser Building Toolkit** for **ECMAScript**.
+Chevrotain is a [**very fast**][benchmark] and **feature rich** **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interperters for various use cases ranging from simple configuration files, 
 to full fledged programing languages.
 
