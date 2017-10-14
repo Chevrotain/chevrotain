@@ -11,7 +11,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
     const serializedGrammar = new DDLExampleRecoveryParser().getSerializedGastProductions()
 
     let skipOnNode4AndBrowser = it
-    if (lt(process.version, "6.0.0") || window) {
+    if (typeof window !== "undefined" || lt(process.version, "6.0.0")) {
         skipOnNode4AndBrowser = <any>it.skip
     }
 
@@ -56,13 +56,13 @@ describe("The Chevrotain diagrams rendering APIs", function() {
     skipOnNode4AndBrowser("Produces valid and executable html text", done => {
         const jsdom = require("jsdom")
         const { JSDOM } = jsdom
-        const htmlText = createSyntaxDiagramsCode(serializedGrammar)
+        let htmlText = createSyntaxDiagramsCode(serializedGrammar)
 
+        // using a version in the url will fail in release build as the new version number has not been deployed yet.
+        htmlText = htmlText.replace(`@${VERSION}`, "")
         const dom = new JSDOM(htmlText, {
-            // not loading the scripts and resources because by default we would point to the latest version on unpkg
-            // and this version will not exist during the release build (chicken and egg problem).
-            // runScripts: "dangerously",
-            // resources: "usable"
+            runScripts: "dangerously",
+            resources: "usable"
         })
 
         const document = dom.window.document
