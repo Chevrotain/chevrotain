@@ -1,7 +1,5 @@
 var config = require("./release_config")
 var git = require("gitty")
-var fs = require("fs")
-var path = require("path")
 
 var newTagName = config.tagPrefix + config.currVersion
 var myRepo = git("")

@@ -4,7 +4,6 @@ var _ = require("lodash")
 var semver = require("semver")
 var jf = require("jsonfile")
 var fs = require("fs")
-var wrench = require("wrench")
 
 var myRepo = git("")
 var status = myRepo.statusSync()
@@ -46,8 +45,7 @@ var bumpedApiString = config.apiString.replace(
     newVersion
 )
 
-jf.spaces = 2
-jf.writeFileSync(config.packagePath, bumpedPkgJson)
+jf.writeFileSync(config.packagePath, bumpedPkgJson, {spaces: 2})
 fs.writeFileSync(config.versionPath, bumpedApiString)
 
 // updating CHANGELOG.md date
