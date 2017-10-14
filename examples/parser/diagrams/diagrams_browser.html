@@ -1,0 +1,53 @@
+<!--
+A template for dynamically generating diagrams in the browser
+This can be useful if your diagrams generating needs are more dynamic in nature
+(for example an IDE scenario) or if your project targets browsers and is not even runnable in
+node.js
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Syntax Diagrams generated dynamically in the browser</title>
+</head>
+
+<body>
+<!-- https://stackoverflow.com/a/14738668 -->
+<iframe id="innerFrame" src=""
+        style="position:fixed;
+        top:0px;
+        left:0px;
+        bottom:0px;
+        right:0px;
+        width:100%;
+        height:100%;
+        border:none;
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        z-index:999999;">
+</iframe>
+</body>
+
+<!-- Load Chevrotain and our grammar in the browser, may require using UMD / Webpack / Browserify / rollup
+     or some other way to make the grammar browser compatible-->
+<!--<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>-->
+<script src="../../../lib/chevrotain.js"></script>
+<script src="grammar.js"></script>
+
+<script>
+    // extract the serialized grammar.
+    var parserInstance = grammar.parserInstance
+    var serialziedGrammar = parserInstance.getSerializedGastProductions()
+
+    // create the HTML Text
+    var htmlText = chevrotain.createSyntaxDiagramsCode(serialziedGrammar)
+    var innerFrame = document.getElementById("innerFrame")
+
+    // Update the iframe src to visually render the diagrams.
+    // https://stackoverflow.com/questions/10418644/creating-an-iframe-with-given-html-dynamically/10419102#10419102
+    innerFrame.src = 'data:text/html;charset=utf-8,' + encodeURI(htmlText);
+
+</script>
+</html>

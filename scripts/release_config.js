@@ -21,7 +21,7 @@ docFilesPaths = _.filter(docFilesPaths, function(currDocEntry) {
 var readmePath = path.join(__dirname, "../readme.md")
 docFilesPaths.push(readmePath)
 
-var readmeDiagramsPath = path.join(__dirname, "../diagrams/readme.md")
+var readmeDiagramsPath = path.join(__dirname, "../diagrams/README.md")
 docFilesPaths.push(readmeDiagramsPath)
 
 var pkgJson = jf.readFileSync(packagePath)

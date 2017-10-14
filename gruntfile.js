@@ -1,6 +1,5 @@
 const _ = require("lodash")
 
-// TODO: write these files to tsdocsconfig.json
 const PUBLIC_API_DTS_FILES = [
     "lib/src/scan/tokens_public.d.ts",
     "lib/src/scan/lexer_public.d.ts",
@@ -10,7 +9,8 @@ const PUBLIC_API_DTS_FILES = [
     "lib/src/parse/exceptions_public.d.ts",
     "lib/src/parse/grammar/path_public.d.ts",
     "lib/src/parse/grammar/gast_public.d.ts",
-    "lib/src/parse/cache_public.d.ts"
+    "lib/src/parse/cache_public.d.ts",
+    "lib/src/diagrams/render_public.d.ts"
 ]
 
 const karmaConf = process.env.TRAVIS ? "karma_sauce.conf.js" : "karma.conf.js"

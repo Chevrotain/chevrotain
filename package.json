@@ -1,8 +1,7 @@
 {
     "name": "chevrotain",
     "version": "0.33.0",
-    "description":
-        "Chevrotain is a high performance fault tolerant javascript parsing DSL for building recursive decent parsers",
+    "description": "Chevrotain is a high performance fault tolerant javascript parsing DSL for building recursive decent parsers",
     "keywords": [
         "parser",
         "syntax",
@@ -46,8 +45,7 @@
     },
     "scripts": {
         "---------- CI FLOWS --------": "",
-        "ci_full_build":
-            "npm-run-all clean lint verify_format compile dts compile_def coverage check_coverage docs bundle integration_tests",
+        "ci_full_build": "npm-run-all clean lint verify_format compile dts compile_def coverage check_coverage docs bundle integration_tests",
         "ci_browser_tests": "npm-run-all clean compile bundle karma",
         "ci_full_build_coveralls": "npm-run-all ci_full_build coveralls",
         "dev_unit_tests": "npm-run-all clean compile unit_tests",
@@ -96,6 +94,7 @@
         "grunt-run": "^0.8.0",
         "if-env": "^1.0.0",
         "istanbul": "^0.4.5",
+        "jsdom": "^11.3.0",
         "jsonfile": "^4.0.0",
         "karma": "~1.7.1",
         "karma-chai": "^0.1.0",
@@ -126,7 +125,13 @@
         "tab-width": 4
     },
     "nyc": {
-        "reporter": ["lcov", "text"],
-        "exclude": ["lib/test/**.*", "test/test.config.js"]
+        "reporter": [
+            "lcov",
+            "text"
+        ],
+        "exclude": [
+            "lib/test/**.*",
+            "test/test.config.js"
+        ]
     }
 }

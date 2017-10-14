@@ -13,6 +13,7 @@
     },
     "scripts": {
         "install": "webpack",
-        "bundle": "webpack"
+        "bundle": "webpack",
+        "test" : "mocha"
     }
 }
