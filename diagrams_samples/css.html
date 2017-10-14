@@ -1,0 +1,1207 @@
+
+<!-- This is a generated file -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body {
+    background-color: hsl(30, 20%, 95%)
+  }
+</style>
+
+
+<link rel='stylesheet' href='https://unpkg.com/chevrotain@0.33.0/diagrams/diagrams.css'>
+
+<script src='https://unpkg.com/chevrotain@0.33.0/diagrams/vendor/railroad-diagrams.js'></script>
+<script src='https://unpkg.com/chevrotain@0.33.0/diagrams/src/diagrams_builder.js'></script>
+<script src='https://unpkg.com/chevrotain@0.33.0/diagrams/src/diagrams_behavior.js'></script>
+<script src='https://unpkg.com/chevrotain@0.33.0/diagrams/src/main.js'></script>
+
+<div id="diagrams" align="center"></div>    
+
+<script>
+    window.serializedGrammar = [
+  {
+    "type": "Rule",
+    "name": "stylesheet",
+    "definition": [
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "charsetHeader",
+            "occurrenceInParent": 1
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "cdcCdo",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Repetition",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "cssImport",
+            "occurrenceInParent": 1
+          },
+          {
+            "type": "NonTerminal",
+            "name": "cdcCdo",
+            "occurrenceInParent": 2
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "contents",
+            "occurrenceInParent": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "charsetHeader",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "CharsetSym",
+        "label": "CharsetSym",
+        "occurrenceInParent": 1,
+        "pattern": "@charset"
+      },
+      {
+        "type": "Terminal",
+        "name": "StringLiteral",
+        "label": "StringLiteral",
+        "occurrenceInParent": 1,
+        "pattern": "(?:\\\"([^\\n\\r\\f\\\"]|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\\")|(?:\\'([^\\n\\r\\f\\']|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\')"
+      },
+      {
+        "type": "Terminal",
+        "name": "SemiColon",
+        "label": "SemiColon",
+        "occurrenceInParent": 1,
+        "pattern": ";"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "contents",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "ruleset",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "media",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "page",
+                "occurrenceInParent": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "cdcCdo",
+        "occurrenceInParent": 3
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "cdcCdo",
+    "definition": [
+      {
+        "type": "Repetition",
+        "definition": [
+          {
+            "type": "Alternation",
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Cdo",
+                    "label": "Cdo",
+                    "occurrenceInParent": 1,
+                    "pattern": "<!--"
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Cdc",
+                    "label": "Cdc",
+                    "occurrenceInParent": 1,
+                    "pattern": "-->"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "cssImport",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "ImportSym",
+        "label": "ImportSym",
+        "occurrenceInParent": 1,
+        "pattern": "@import"
+      },
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "StringLiteral",
+                "label": "StringLiteral",
+                "occurrenceInParent": 1,
+                "pattern": "(?:\\\"([^\\n\\r\\f\\\"]|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\\")|(?:\\'([^\\n\\r\\f\\']|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\')"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Uri",
+                "label": "Uri",
+                "occurrenceInParent": 1,
+                "pattern": "NOT_APPLICABLE"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "media_list",
+            "occurrenceInParent": 1
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "SemiColon",
+        "label": "SemiColon",
+        "occurrenceInParent": 1,
+        "pattern": ";"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "media",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "MediaSym",
+        "label": "MediaSym",
+        "occurrenceInParent": 1,
+        "pattern": "@media"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "media_list",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Terminal",
+        "name": "LCurly",
+        "label": "LCurly",
+        "occurrenceInParent": 1,
+        "pattern": "{"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "ruleset",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Terminal",
+        "name": "RCurly",
+        "label": "RCurly",
+        "occurrenceInParent": 1,
+        "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "media_list",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "medium",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "RepetitionWithSeparator",
+        "separator": {
+          "type": "Terminal",
+          "name": "Comma",
+          "label": "Comma",
+          "occurrenceInParent": 1,
+          "pattern": ","
+        },
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "medium",
+            "occurrenceInParent": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "medium",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Ident",
+        "label": "Ident",
+        "occurrenceInParent": 1,
+        "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "page",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "PageSym",
+        "label": "PageSym",
+        "occurrenceInParent": 1,
+        "pattern": "@page"
+      },
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "pseudo_page",
+            "occurrenceInParent": 1
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "declarationsGroup",
+        "occurrenceInParent": 1
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "declarationsGroup",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "LCurly",
+        "label": "LCurly",
+        "occurrenceInParent": 1,
+        "pattern": "{"
+      },
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "declaration",
+            "occurrenceInParent": 1
+          }
+        ]
+      },
+      {
+        "type": "Repetition",
+        "definition": [
+          {
+            "type": "Terminal",
+            "name": "SemiColon",
+            "label": "SemiColon",
+            "occurrenceInParent": 1,
+            "pattern": ";"
+          },
+          {
+            "type": "Option",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "declaration",
+                "occurrenceInParent": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "RCurly",
+        "label": "RCurly",
+        "occurrenceInParent": 1,
+        "pattern": "}"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "pseudo_page",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Colon",
+        "label": "Colon",
+        "occurrenceInParent": 1,
+        "pattern": ":"
+      },
+      {
+        "type": "Terminal",
+        "name": "Ident",
+        "label": "Ident",
+        "occurrenceInParent": 1,
+        "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "operator",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Slash",
+                "label": "Slash",
+                "occurrenceInParent": 1,
+                "pattern": "\\/"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Comma",
+                "label": "Comma",
+                "occurrenceInParent": 1,
+                "pattern": ","
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "combinator",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Plus",
+                "label": "Plus",
+                "occurrenceInParent": 1,
+                "pattern": "\\+"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "GreaterThan",
+                "label": "GreaterThan",
+                "occurrenceInParent": 1,
+                "pattern": ">"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "unary_operator",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Minus",
+                "label": "Minus",
+                "occurrenceInParent": 1,
+                "pattern": "-"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Plus",
+                "label": "Plus",
+                "occurrenceInParent": 1,
+                "pattern": "\\+"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "property",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Ident",
+        "label": "Ident",
+        "occurrenceInParent": 1,
+        "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "ruleset",
+    "definition": [
+      {
+        "type": "RepetitionWithSeparator",
+        "separator": {
+          "type": "Terminal",
+          "name": "Comma",
+          "label": "Comma",
+          "occurrenceInParent": 1,
+          "pattern": ","
+        },
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "selector",
+            "occurrenceInParent": 1
+          }
+        ]
+      },
+      {
+        "type": "NonTerminal",
+        "name": "declarationsGroup",
+        "occurrenceInParent": 1
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "selector",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "simple_selector",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "Option",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "combinator",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "NonTerminal",
+            "name": "selector",
+            "occurrenceInParent": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "simple_selector",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "element_name",
+                "occurrenceInParent": 1
+              },
+              {
+                "type": "Repetition",
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "simple_selector_suffix",
+                    "occurrenceInParent": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "RepetitionMandatory",
+                "definition": [
+                  {
+                    "type": "NonTerminal",
+                    "name": "simple_selector_suffix",
+                    "occurrenceInParent": 2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "simple_selector_suffix",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Hash",
+                "label": "Hash",
+                "occurrenceInParent": 1,
+                "pattern": "#(?:([_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))+)"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "class",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "attrib",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "pseudo",
+                "occurrenceInParent": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "class",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Dot",
+        "label": "Dot",
+        "occurrenceInParent": 1,
+        "pattern": "\\."
+      },
+      {
+        "type": "Terminal",
+        "name": "Ident",
+        "label": "Ident",
+        "occurrenceInParent": 1,
+        "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "element_name",
+    "definition": [
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Ident",
+                "label": "Ident",
+                "occurrenceInParent": 1,
+                "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Star",
+                "label": "Star",
+                "occurrenceInParent": 1,
+                "pattern": "\\*"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "attrib",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "LSquare",
+        "label": "LSquare",
+        "occurrenceInParent": 1,
+        "pattern": "\\["
+      },
+      {
+        "type": "Terminal",
+        "name": "Ident",
+        "label": "Ident",
+        "occurrenceInParent": 1,
+        "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+      },
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "Alternation",
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Equals",
+                    "label": "Equals",
+                    "occurrenceInParent": 1,
+                    "pattern": "="
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Includes",
+                    "label": "Includes",
+                    "occurrenceInParent": 1,
+                    "pattern": "~="
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Dasmatch",
+                    "label": "Dasmatch",
+                    "occurrenceInParent": 1,
+                    "pattern": "\\|="
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Alternation",
+            "definition": [
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Ident",
+                    "label": "Ident",
+                    "occurrenceInParent": 2,
+                    "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+                  }
+                ]
+              },
+              {
+                "type": "Flat",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "StringLiteral",
+                    "label": "StringLiteral",
+                    "occurrenceInParent": 1,
+                    "pattern": "(?:\\\"([^\\n\\r\\f\\\"]|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\\")|(?:\\'([^\\n\\r\\f\\']|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\')"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Terminal",
+        "name": "RSquare",
+        "label": "RSquare",
+        "occurrenceInParent": 1,
+        "pattern": "]"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "pseudo",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Colon",
+        "label": "Colon",
+        "occurrenceInParent": 1,
+        "pattern": ":"
+      },
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Ident",
+                "label": "Ident",
+                "occurrenceInParent": 1,
+                "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Func",
+                "label": "Func",
+                "occurrenceInParent": 1,
+                "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)\\("
+              },
+              {
+                "type": "Option",
+                "definition": [
+                  {
+                    "type": "Terminal",
+                    "name": "Ident",
+                    "label": "Ident",
+                    "occurrenceInParent": 2,
+                    "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+                  }
+                ]
+              },
+              {
+                "type": "Terminal",
+                "name": "RParen",
+                "label": "RParen",
+                "occurrenceInParent": 1,
+                "pattern": "\\)"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "declaration",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "property",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Terminal",
+        "name": "Colon",
+        "label": "Colon",
+        "occurrenceInParent": 1,
+        "pattern": ":"
+      },
+      {
+        "type": "NonTerminal",
+        "name": "expr",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "prio",
+            "occurrenceInParent": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "prio",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "ImportantSym",
+        "label": "ImportantSym",
+        "occurrenceInParent": 1,
+        "pattern": "important"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "expr",
+    "definition": [
+      {
+        "type": "NonTerminal",
+        "name": "term",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Repetition",
+        "definition": [
+          {
+            "type": "Option",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "operator",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "NonTerminal",
+            "name": "term",
+            "occurrenceInParent": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "term",
+    "definition": [
+      {
+        "type": "Option",
+        "definition": [
+          {
+            "type": "NonTerminal",
+            "name": "unary_operator",
+            "occurrenceInParent": 1
+          }
+        ]
+      },
+      {
+        "type": "Alternation",
+        "definition": [
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Num",
+                "label": "Num",
+                "occurrenceInParent": 1,
+                "pattern": "(?:[0-9]+|[0-9]*\\.[0-9]+)"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Percentage",
+                "label": "Percentage",
+                "occurrenceInParent": 1,
+                "pattern": "(?:[0-9]+|[0-9]*\\.[0-9]+)%"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Length",
+                "label": "Length",
+                "occurrenceInParent": 1,
+                "pattern": "NOT_APPLICABLE"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Ems",
+                "label": "Ems",
+                "occurrenceInParent": 1,
+                "pattern": "(?:[0-9]+|[0-9]*\\.[0-9]+)em"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Exs",
+                "label": "Exs",
+                "occurrenceInParent": 1,
+                "pattern": "(?:[0-9]+|[0-9]*\\.[0-9]+)ex"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Angle",
+                "label": "Angle",
+                "occurrenceInParent": 1,
+                "pattern": "NOT_APPLICABLE"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Time",
+                "label": "Time",
+                "occurrenceInParent": 1,
+                "pattern": "NOT_APPLICABLE"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Freq",
+                "label": "Freq",
+                "occurrenceInParent": 1,
+                "pattern": "NOT_APPLICABLE"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "StringLiteral",
+                "label": "StringLiteral",
+                "occurrenceInParent": 1,
+                "pattern": "(?:\\\"([^\\n\\r\\f\\\"]|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\\")|(?:\\'([^\\n\\r\\f\\']|\\{{nl}}|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*\\')"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Ident",
+                "label": "Ident",
+                "occurrenceInParent": 1,
+                "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "Terminal",
+                "name": "Uri",
+                "label": "Uri",
+                "occurrenceInParent": 1,
+                "pattern": "NOT_APPLICABLE"
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "hexcolor",
+                "occurrenceInParent": 1
+              }
+            ]
+          },
+          {
+            "type": "Flat",
+            "definition": [
+              {
+                "type": "NonTerminal",
+                "name": "cssFunction",
+                "occurrenceInParent": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "cssFunction",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Func",
+        "label": "Func",
+        "occurrenceInParent": 1,
+        "pattern": "(?:-?(?:[_a-zA-Z]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))(?:[_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))*)\\("
+      },
+      {
+        "type": "NonTerminal",
+        "name": "expr",
+        "occurrenceInParent": 1
+      },
+      {
+        "type": "Terminal",
+        "name": "RParen",
+        "label": "RParen",
+        "occurrenceInParent": 1,
+        "pattern": "\\)"
+      }
+    ]
+  },
+  {
+    "type": "Rule",
+    "name": "hexcolor",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Hash",
+        "label": "Hash",
+        "occurrenceInParent": 1,
+        "pattern": "#(?:([_a-zA-Z0-9-]|(?:[\\u0240-\\uffff])|(?:(?:\\{{h}}{1,6})|\\\\[^\\r\\n\\f0-9a-f]))+)"
+      }
+    ]
+  }
+];
+</script>
+
+<script>
+    var diagramsDiv = document.getElementById("diagrams");
+    main.drawDiagramsFromSerializedGrammar(serializedGrammar, diagramsDiv);
+</script>
