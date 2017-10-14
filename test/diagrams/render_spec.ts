@@ -21,7 +21,8 @@ describe("The Chevrotain diagrams rendering APIs", function() {
             const jsdom = require("jsdom")
             const { JSDOM } = jsdom
             const htmlText = createSyntaxDiagramsCode(serializedGrammar, {
-                resourceBase: `https://cdn.jsdelivr.net/npm/chevrotain@${VERSION}/diagrams/`
+                resourceBase: `https://cdn.jsdelivr.net/npm/chevrotain/diagrams/`,
+                css: `https://cdn.jsdelivr.net/npm/chevrotain/diagrams/diagrams.css`
             })
 
             const dom = new JSDOM(htmlText, {
@@ -58,8 +59,10 @@ describe("The Chevrotain diagrams rendering APIs", function() {
         const htmlText = createSyntaxDiagramsCode(serializedGrammar)
 
         const dom = new JSDOM(htmlText, {
-            runScripts: "dangerously",
-            resources: "usable"
+            // not loading the scripts and resources because by default we would point to the latest version on unpkg
+            // and this version will not exist during the release build (chicken and egg problem).
+            // runScripts: "dangerously",
+            // resources: "usable"
         })
 
         const document = dom.window.document
