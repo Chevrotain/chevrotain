@@ -78,8 +78,8 @@
         "bundle_min": "webpack --config webpack_release_min.config.js",
         "bundle_spec": "webpack --config webpack_specs.config.js",
         "---------- RELEASES --------": "",
-        "release_patch": "git fetch && git rebase && node --max-old-space-size=4096 scripts/pre_release_build.js patch && npm run ci_full_build && node --max-old-space-size=4096 scripts/post_release_build.js patch && node ../chevrotain_docs/scripts/upload_docs.js",
-        "release_minor": "git fetch && git rebase && node --max-old-space-size=4096 scripts/pre_release_build.js minor && npm run ci_full_build && node --max-old-space-size=4096 scripts/post_release_build.js minor && node ../chevrotain_docs/scripts/upload_docs.js"
+        "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && npm run ci_full_build && node scripts/post_release_build.js patch && node ../chevrotain_docs/scripts/upload_docs.js",
+        "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && npm run ci_full_build && node scripts/post_release_build.js minor && node ../chevrotain_docs/scripts/upload_docs.js"
     },
     "devDependencies": {
         "@types/chai": "^4.0.4",
@@ -116,7 +116,6 @@
         "typedoc": "^0.8.0",
         "typescript": "^2.5.2",
         "webpack": "^3.5.5",
-        "wrench": "^1.5.9",
         "xregexp": "^3.2.0"
     },
     "typings": "lib/chevrotain.d.ts",

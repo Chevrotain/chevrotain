@@ -2,19 +2,29 @@ var fs = require("fs")
 var jf = require("jsonfile")
 var path = require("path")
 var _ = require("lodash")
-var wrench = require("wrench")
 
 var versionPath = path.join(__dirname, "../src/version.ts")
 var packagePath = path.join(__dirname, "../package.json")
 var changeLogPath = path.join(__dirname, "../CHANGELOG.md")
 
 // docs (.md files for bumping versions)
+// TODO: have to manually add new subfolders here.
+// TODO: implement something recursive that will not crash due to symlinks of "npm link"
 var docsDirPath = path.join(__dirname, "../docs")
-var docFiles = wrench.readdirSyncRecursive(docsDirPath)
+var docTutorialPath = docsDirPath + "/tutorial"
+var docFiles = fs.readdirSync(docsDirPath)
+var docTutorialFiles = fs.readdirSync(docTutorialPath)
 
-var docFilesPaths = _.map(docFiles, function(currDocFile) {
-    return path.join(docsDirPath, currDocFile)
+var docFilesPaths = _.map(docFiles, function(file) {
+    return path.join(docsDirPath, file)
 })
+
+var docTutorialFilesPaths = _.map(docTutorialFiles, function(file) {
+    return path.join(docTutorialPath, file)
+})
+
+docFilesPaths = docFilesPaths.concat(docTutorialFilesPaths)
+
 docFilesPaths = _.filter(docFilesPaths, function(currDocEntry) {
     return /\.md$/.test(currDocEntry)
 })
