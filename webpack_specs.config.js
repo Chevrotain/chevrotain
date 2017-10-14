@@ -18,5 +18,8 @@ module.exports = {
         path: path.resolve(__dirname, "./lib/"),
         filename: "chevrotainSpecs.js"
     },
-    plugins: [new webpack.BannerPlugin({ banner: banner, raw: true })]
+    plugins: [new webpack.BannerPlugin({ banner: banner, raw: true })],
+    externals: {
+        jsdom: "jsdom"
+    }
 }

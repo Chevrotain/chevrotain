@@ -20,6 +20,7 @@ import { clearCache } from "./parse/cache_public"
 import { NextAfterTokenWalker } from "./parse/grammar/interpreter"
 import { VERSION } from "./version"
 import { defaultErrorProvider } from "./parse/errors_public"
+import { createSyntaxDiagramsCode } from "./diagrams/render_public"
 
 /**
  * defines the public API of
@@ -79,5 +80,7 @@ API.interperter = {}
 API.interperter.NextAfterTokenWalker = NextAfterTokenWalker
 
 API.clearCache = clearCache
+
+API.createSyntaxDiagramsCode = createSyntaxDiagramsCode
 
 module.exports = API
