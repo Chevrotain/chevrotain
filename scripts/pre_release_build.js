@@ -45,7 +45,7 @@ var bumpedApiString = config.apiString.replace(
     newVersion
 )
 
-jf.writeFileSync(config.packagePath, bumpedPkgJson, {spaces: 2})
+jf.writeFileSync(config.packagePath, bumpedPkgJson, { spaces: 2 })
 fs.writeFileSync(config.versionPath, bumpedApiString)
 
 // updating CHANGELOG.md date
