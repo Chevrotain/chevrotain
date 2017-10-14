@@ -10,12 +10,12 @@ const { lt } = require("semver")
 describe("The Chevrotain diagrams rendering APIs", function() {
     const serializedGrammar = new DDLExampleRecoveryParser().getSerializedGastProductions()
 
-    let skipOnNode4 = it
-    if (lt(process.version, "6.0.0")) {
-        skipOnNode4 = <any>it.skip
+    let skipOnNode4AndBrowser = it
+    if (lt(process.version, "6.0.0") || window) {
+        skipOnNode4AndBrowser = <any>it.skip
     }
 
-    skipOnNode4(
+    skipOnNode4AndBrowser(
         "Produces valid and executable html text with custom options",
         function(done) {
             const jsdom = require("jsdom")
@@ -52,7 +52,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
         }
     )
 
-    skipOnNode4("Produces valid and executable html text", done => {
+    skipOnNode4AndBrowser("Produces valid and executable html text", done => {
         const jsdom = require("jsdom")
         const { JSDOM } = jsdom
         const htmlText = createSyntaxDiagramsCode(serializedGrammar)
