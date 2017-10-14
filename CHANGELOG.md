@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- [Rework syntax diagrams creation for ease of use and simplicity.](https://github.com/SAP/chevrotain/issues/583)
+
+
+
 ## 0.33.0 (10-2-2017)
 
 #### Breaking Changes
