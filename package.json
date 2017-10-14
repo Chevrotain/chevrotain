@@ -78,8 +78,8 @@
         "bundle_min": "webpack --config webpack_release_min.config.js",
         "bundle_spec": "webpack --config webpack_specs.config.js",
         "---------- RELEASES --------": "",
-        "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && grunt build && node scripts/post_release_build.js patch && node ../chevrotain_docs/scripts/upload_docs.js",
-        "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && grunt build && node scripts/post_release_build.js minor && node ../chevrotain_docs/scripts/upload_docs.js"
+        "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && npm run ci_full_build && node scripts/post_release_build.js patch && node ../chevrotain_docs/scripts/upload_docs.js",
+        "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && npm run ci_full_build && node scripts/post_release_build.js minor && node ../chevrotain_docs/scripts/upload_docs.js"
     },
     "devDependencies": {
         "@types/chai": "^4.0.4",
