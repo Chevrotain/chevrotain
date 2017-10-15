@@ -2,7 +2,7 @@
     "name": "chevrotain_examples_parser",
     "version": "0.1.0",
     "scripts": {
-        "test": "grunt --gruntfile minification/gruntfile.js && npm --prefix ./webpack install ./webpack && mocha '!(node_modules)/**/*spec.js'"
+        "test": "grunt --gruntfile minification/gruntfile.js && npm --prefix ./webpack install ./webpack && mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
         "chevrotain": "*",

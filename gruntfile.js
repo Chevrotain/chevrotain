@@ -23,8 +23,7 @@ const PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
 PUBLIC_API_TS_FILES.push("./node_modules/@types/node/index.d.ts")
 
 const fourSpaces = "    "
-const examples_test_command =
-    "./node_modules/.bin/mocha '!(node_modules)/**/*spec.js'"
+const examples_test_command = "npm test"
 
 const INSTALL_LINK = "npm install && npm link chevrotain"
 const INSTALL_LINK_TEST = INSTALL_LINK + " && " + examples_test_command
