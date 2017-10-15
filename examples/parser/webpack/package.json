@@ -1,0 +1,19 @@
+{
+  "name": "webpack2-chevrotain-example",
+  "version": "1.0.0",
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.18.0",
+    "mocha": "^3.2.0",
+    "webpack": "2.3.1"
+  },
+  "dependencies": {
+    "chevrotain": "*"
+  },
+  "scripts": {
+    "install": "webpack",
+    "bundle": "webpack",
+    "test" : "mocha"
+  }
+}
