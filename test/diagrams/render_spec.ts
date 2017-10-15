@@ -54,7 +54,9 @@ describe("The Chevrotain diagrams rendering APIs", function() {
         }
     )
 
-    skipOnNode4AndBrowser("Produces valid and executable html text", function(done) {
+    skipOnNode4AndBrowser("Produces valid and executable html text", function(
+        done
+    ) {
         this.timeout(5000)
         const jsdom = require("jsdom")
         const { JSDOM } = jsdom
