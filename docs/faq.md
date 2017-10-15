@@ -221,6 +221,16 @@ These are highly recommended for each and every parser.
         result = $.OR(myAlts);
      })
      ```
+     
+   - Avoid dynamically changing the parser instance. The line:
+     > "$.c1 || ($.c1 = ..." ($ is 'this')
+     
+     Will cause a 'c1' property to be assigned to the parser instance.
+     This may seem innocent but if enough properties are added dynamically to an instance
+     its V8 hidden class will change which could cause a severe performance reduction.
+     
+     To avoid this, simpliy define these "cache properties" in the constructor.
+     See an example in the [ECMAScript5 grammar's constructor](https://github.com/SAP/chevrotain/blob/ac21570b97a8de0d6b91f29979aed8041455cacd/examples/grammars/ecma5/ecma5_parser.js#L37-L43).
    
       
 
