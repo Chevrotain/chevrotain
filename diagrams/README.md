@@ -9,7 +9,7 @@ library by @tabatkins.
 
 ### Examples:
 * [JSON Syntax diagrams](http://sap.github.io/chevrotain/diagrams_samples/json.html).
-* [JSON Syntax diagrams](http://sap.github.io/chevrotain/diagrams_samples/css.html).
+* [CSS Syntax diagrams](http://sap.github.io/chevrotain/diagrams_samples/css.html).
  
  
 ### Features:
