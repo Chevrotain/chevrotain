@@ -96,11 +96,6 @@
         name: "Func",
         pattern: MAKE_PATTERN("{{ident}}\\(")
     })
-    // Ident must be before Minus
-    var Ident = createToken({
-        name: "Ident",
-        pattern: MAKE_PATTERN("{{ident}}")
-    })
 
     var Cdo = createToken({ name: "Cdo", pattern: /<!--/ })
     // Cdc must be before Minus
@@ -121,7 +116,6 @@
     var Equals = createToken({ name: "Equals", pattern: /=/ })
     var Star = createToken({ name: "Star", pattern: /\*/ })
     var Plus = createToken({ name: "Plus", pattern: /\+/ })
-    var Minus = createToken({ name: "Minus", pattern: /-/ })
     var GreaterThan = createToken({ name: "GreaterThan", pattern: />/ })
     var Slash = createToken({ name: "Slash", pattern: /\// })
 
@@ -256,6 +250,14 @@
         name: "Num",
         pattern: MAKE_PATTERN("{{num}}")
     })
+
+    // Ident must be before Minus
+    var Ident = createToken({
+        name: "Ident",
+        pattern: MAKE_PATTERN("{{ident}}")
+    })
+
+    var Minus = createToken({ name: "Minus", pattern: /-/ })
 
     var CssLexer = new Lexer(cssTokens)
 
