@@ -2,6 +2,7 @@
 
 * [No LINE_BREAKS Error.](#LINE_BREAKS)
 * [Unexpected RegExp Anchor Error.](#ANCHORS)
+* [Token Can Never Be Matched.](#UNREACHABLE)
 
 
 ### <a name="LINE_BREAKS"></a> No LINE_BREAKS Error. 
@@ -97,5 +98,64 @@ const semVer = createToken({
 })
 ``` 
 
+
+
+### <a name="UNREACHABLE"></a> Token can never be matched.
+
+This error means that A Token type can never be successfully matched as
+a **previous** Token type in the lexer definition will **always** matched instead.
+This happens because the default behavior of Chevrotain is to attempt to match
+tokens **by the order** described in the lexer definition.
+   
+For example:
+
+```javascript
+const ForKeyword = createToken({
+    name: "ForKeyword",
+    pattern: /for/
+})
+
+const Identifier = createToken({
+    name: "Identifier",
+    pattern: /[a-zA-z]+/
+})
+
+// Will throw Token <ForKeyword> can never be matched...
+// Because the input "for" is also a valid identifier
+// and matching an identifier will be attempted first.
+const myLexer = new chevrotain.Lexer([Identifier, ForKeyword])
+``` 
+
+* Note that this validation is limited to simple patterns such as keywords
+  The more general case of any pattern being a strict subset of a preceding pattern
+  will require much more in depth RegExp analysis capabilities.
+
+To resolve this simply re-arrange the order of Token types in the lexer
+definition such that the more specific Token types will be listed first.
+
+```javascript
+// Identifier is now listed as the last Token type.
+const myLexer = new chevrotain.Lexer([ForKeyword, Identifier])
+```
+
+Note that the solution provided above will create a new problem.
+Any identifier **starting with** "for" will be lexed as **two separate** tokens,
+a ForKeyword and an identifier. For example:
+
+```javascript
+const myLexer = new chevrotain.Lexer([ForKeyword, Identifier])
+
+// [
+//    {image:"for"}
+//    {image:"ward"}
+// ]
+const tokensResult = myLexer.tokenize("forward")
+```
+
+To resolve this second problem see how to prefer the **longest match**
+as demonstrated in the [keywords vs identifiers example][keywords_idents]
+ 
+
 [position_tracking]: http://sap.github.io/chevrotain/documentation/0_34_0/interfaces/_chevrotain_d_.ilexerconfig.html#positiontracking
 [line_terminator_docs]: http://sap.github.io/chevrotain/documentation/0_34_0/interfaces/_chevrotain_d_.ilexerconfig.html#lineTerminatorsPattern   
+[keywords_idents] https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js

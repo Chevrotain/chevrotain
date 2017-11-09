@@ -24,7 +24,8 @@ import {
     findInvalidGroupType,
     findInvalidPatterns,
     findMissingPatterns,
-    findStartOfInputAnchor, findUnreachablePatterns,
+    findStartOfInputAnchor,
+    findUnreachablePatterns,
     findUnsupportedFlags,
     SUPPORT_STICKY
 } from "../../src/scan/lexer"
@@ -340,7 +341,10 @@ function defineLexerSpecs(
                     let tokenClasses = [Identifier, ClassKeyword]
                     let errors = findUnreachablePatterns(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([Identifier, ClassKeyword])
+                    expect(errors[0].tokenClasses).to.deep.equal([
+                        Identifier,
+                        ClassKeyword
+                    ])
                     expect(errors[0].type).to.equal(
                         LexerDefinitionErrorType.UNREACHABLE_PATTERN
                     )
@@ -725,7 +729,7 @@ function defineLexerSpecs(
                 name: "EndOfInputAnchor",
                 pattern: /BAMBA$/
             })
-            it.only("can create a simple Lexer from a List of Token Classes", () => {
+            it("can create a simple Lexer from a List of Token Classes", () => {
                 let ifElseLexer = new Lexer(
                     [
                         Keyword,

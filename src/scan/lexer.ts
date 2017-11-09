@@ -549,6 +549,11 @@ export function findUnreachablePatterns(
         tokenClasses,
         (result, tokClass, idx) => {
             const pattern = tokClass.PATTERN
+
+            if (pattern === Lexer.NA) {
+                return result
+            }
+
             // a more comprehensive validation for all forms of regExps would require
             // deeper regExp analysis capabilities
             if (isString(pattern)) {
@@ -605,9 +610,25 @@ function testTokenClass(str: string, pattern: any): boolean {
 
 function noMetaChar(regExp: RegExp): boolean {
     //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-    const metaChars = [".", "\\", "[", "]", "|", "^", "$", "(", ")", "?", "*", "+", "{"]
-    return find(metaChars, char =>
-        regExp.source.indexOf(char) !== -1) === undefined
+    const metaChars = [
+        ".",
+        "\\",
+        "[",
+        "]",
+        "|",
+        "^",
+        "$",
+        "(",
+        ")",
+        "?",
+        "*",
+        "+",
+        "{"
+    ]
+    return (
+        find(metaChars, char => regExp.source.indexOf(char) !== -1) ===
+        undefined
+    )
 }
 
 export function addStartOfInput(pattern: RegExp): RegExp {
