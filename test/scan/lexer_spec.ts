@@ -25,6 +25,7 @@ import {
     findInvalidPatterns,
     findMissingPatterns,
     findStartOfInputAnchor,
+    findUnreachablePatterns,
     findUnsupportedFlags,
     SUPPORT_STICKY
 } from "../../src/scan/lexer"
@@ -324,6 +325,30 @@ function defineLexerSpecs(
                         LexerDefinitionErrorType.SOI_ANCHOR_FOUND
                     )
                     expect(errors[0].message).to.contain("InvalidToken")
+                })
+
+                it("will detect unreachable patterns", () => {
+                    const ClassKeyword = createToken({
+                        name: "ClassKeyword",
+                        pattern: /class/
+                    })
+
+                    const Identifier = createToken({
+                        name: "Identifier",
+                        pattern: /\w+/
+                    })
+
+                    let tokenClasses = [Identifier, ClassKeyword]
+                    let errors = findUnreachablePatterns(tokenClasses)
+                    expect(errors.length).to.equal(1)
+                    expect(errors[0].tokenClasses).to.deep.equal([
+                        Identifier,
+                        ClassKeyword
+                    ])
+                    expect(errors[0].type).to.equal(
+                        LexerDefinitionErrorType.UNREACHABLE_PATTERN
+                    )
+                    expect(errors[0].message).to.contain("can never be matched")
                 })
 
                 it("won't detect negation as using unsupported start of input anchor", () => {

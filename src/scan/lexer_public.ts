@@ -68,7 +68,8 @@ export enum LexerDefinitionErrorType {
     LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED,
     SOI_ANCHOR_FOUND,
     EMPTY_MATCH_PATTERN,
-    NO_LINE_BREAKS_FLAGS
+    NO_LINE_BREAKS_FLAGS,
+    UNREACHABLE_PATTERN
 }
 
 export interface ILexerDefinitionError {

@@ -27,7 +27,8 @@ import {
     map,
     reduce,
     reject,
-    mapValues
+    mapValues,
+    cloneArr
 } from "../utils/utils"
 import { flatten } from "../utils/utils"
 
@@ -251,6 +252,8 @@ export function validatePatterns(
     errors = errors.concat(
         findModesThatDoNotExist(validTokenClasses, validModesNames)
     )
+
+    errors = errors.concat(findUnreachablePatterns(validTokenClasses))
 
     return errors
 }
@@ -535,6 +538,97 @@ export function findModesThatDoNotExist(
     })
 
     return errors
+}
+
+export function findUnreachablePatterns(
+    tokenClasses: TokenConstructor[]
+): ILexerDefinitionError[] {
+    const errors = []
+
+    const canBeTested = reduce(
+        tokenClasses,
+        (result, tokClass, idx) => {
+            const pattern = tokClass.PATTERN
+
+            if (pattern === Lexer.NA) {
+                return result
+            }
+
+            // a more comprehensive validation for all forms of regExps would require
+            // deeper regExp analysis capabilities
+            if (isString(pattern)) {
+                result.push({ str: pattern, idx, tokenType: tokClass })
+            } else if (isRegExp(pattern) && noMetaChar(pattern)) {
+                result.push({ str: pattern.source, idx, tokenType: tokClass })
+            }
+            return result
+        },
+        []
+    )
+
+    forEach(tokenClasses, (tokClass, testIdx) => {
+        forEach(canBeTested, ({ str, idx, tokenType }) => {
+            if (testIdx < idx && testTokenClass(str, tokClass.PATTERN)) {
+                let msg =
+                    `Token: ->${tokenName(
+                        tokenType
+                    )}<- can never be matched.\n` +
+                    `Because it appears AFTER the token ->${tokenName(
+                        tokClass
+                    )}<-` +
+                    `in the lexer's definition.\n` +
+                    `See https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#UNREACHABLE`
+                errors.push({
+                    message: msg,
+                    type: LexerDefinitionErrorType.UNREACHABLE_PATTERN,
+                    tokenClasses: [tokClass, tokenType]
+                })
+            }
+        })
+    })
+
+    return errors
+}
+
+function testTokenClass(str: string, pattern: any): boolean {
+    if (isRegExp(pattern)) {
+        const regExpArray = pattern.exec(str)
+        return regExpArray !== null && regExpArray.index === 0
+    } else if (isFunction(pattern)) {
+        // maintain the API of custom patterns
+        return pattern(str, 0, [], {})
+    } else if (has(pattern, "exec")) {
+        // maintain the API of custom patterns
+        return pattern.exec(str, 0, [], {})
+    } else if (typeof pattern === "string") {
+        return pattern === str
+    } else {
+        /* istanbul ignore next */
+        throw Error("non exhaustive match")
+    }
+}
+
+function noMetaChar(regExp: RegExp): boolean {
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+    const metaChars = [
+        ".",
+        "\\",
+        "[",
+        "]",
+        "|",
+        "^",
+        "$",
+        "(",
+        ")",
+        "?",
+        "*",
+        "+",
+        "{"
+    ]
+    return (
+        find(metaChars, char => regExp.source.indexOf(char) !== -1) ===
+        undefined
+    )
 }
 
 export function addStartOfInput(pattern: RegExp): RegExp {
