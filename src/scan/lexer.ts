@@ -567,10 +567,11 @@ export function findUnreachablePatterns(
                 let msg =
                     `Token: ->${tokenName(
                         tokenType
-                    )}<- can never be matched because it appears AFTER the token ->${tokenName(
+                    )}<- can never be matched.\n` +
+                    `Because it appears AFTER the token ->${tokenName(
                         tokClass
                     )}<-` +
-                    `in the lexer's definition.` +
+                    `in the lexer's definition.\n` +
                     `See https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#UNREACHABLE`
                 errors.push({
                     message: msg,
@@ -586,7 +587,8 @@ export function findUnreachablePatterns(
 
 function testTokenClass(str: string, pattern: any): boolean {
     if (isRegExp(pattern)) {
-        return pattern.test(str)
+        const regExpArray = pattern.exec(str)
+        return regExpArray !== null && regExpArray.index === 0
     } else if (isFunction(pattern)) {
         // maintain the API of custom patterns
         return pattern(str, 0, [], {})
@@ -601,7 +603,12 @@ function testTokenClass(str: string, pattern: any): boolean {
     }
 }
 
-function noMetaChar(regExp: RegExp): boolean {}
+function noMetaChar(regExp: RegExp): boolean {
+    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+    const metaChars = [".", "\\", "[", "]", "|", "^", "$", "(", ")", "?", "*", "+", "{"]
+    return find(metaChars, char =>
+        regExp.source.indexOf(char) !== -1) === undefined
+}
 
 export function addStartOfInput(pattern: RegExp): RegExp {
     let flags = pattern.ignoreCase ? "i" : ""
