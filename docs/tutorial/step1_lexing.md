@@ -79,9 +79,9 @@ const Where = createToken({name: "Where", pattern: /WHERE/});
 
 const Comma = createToken({name: "Comma", pattern: /,/});
 
-const Identifier = createToken({name: "Identifier", pattern: /\w+/});
+const Identifier = createToken({name: "Identifier", pattern: /[a-zA-Z]\w*/});
 
-const Integer = createToken({name: "Integer", pattern: /0|[1-9]\d+/});
+const Integer = createToken({name: "Integer", pattern: /0|[1-9]\d*/});
 
 const GreaterThan = createToken({name: "GreaterThan", pattern: /</});
 
