@@ -71,11 +71,17 @@ const WhiteSpace = createToken({
 
 ```javascript
 
-const Select = createToken({name: "Select", pattern: /SELECT/});
+const Keyword = createToken({
+    name: "Keyword",
+    pattern: Lexer.NA,
+    // the longer alt property allows resolving the keywords vs identifiers ambiguity
+    // See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
+    longer_alt:tokenVocabulary.Identifier
+});
 
-const From = createToken({name: "From", pattern: /FROM/});
-
-const Where = createToken({name: "Where", pattern: /WHERE/});
+const Select = createToken({name: "Select", pattern: /SELECT/, parent: Keyword});
+const From = createToken({name: "From", pattern: /FROM/, parent: Keyword});
+const Where = createToken({name: "Where", pattern: /WHERE/, parent: Keyword});
 
 const Comma = createToken({name: "Comma", pattern: /,/});
 
@@ -101,7 +107,18 @@ const WhiteSpace = createToken({
 ```javascript
 
 // note we are placing WhiteSpace first as it is very common thus it will speed up the lexer.
-let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
+let allTokens = [
+    WhiteSpace,
+    // "keywords" appear before the Identifier
+    Select, 
+    From,
+    Where,
+    Comma,
+    // The Identifier must appear after the keywords because all keywords are valid identifiers.
+    Identifier, 
+    Integer, 
+    GreaterThan, 
+    LessThan]
 let SelectLexer = new Lexer(allTokens);
 
 ```
