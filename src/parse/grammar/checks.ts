@@ -85,6 +85,8 @@ export function validateGrammar(
         maxLookahead
     )
 
+    const tooManyAltsErrors = utils.map(topLevels, validateTooManyAlts)
+
     return <any>utils.flatten(
         duplicateErrors.concat(
             tokenNameErrors,
@@ -94,7 +96,8 @@ export function validateGrammar(
             leftRecursionErrors,
             emptyAltErrors,
             ambiguousAltsErrors,
-            termsNamespaceConflictErrors
+            termsNamespaceConflictErrors,
+            tooManyAltsErrors
         )
     )
 }
@@ -564,6 +567,35 @@ export class RepetionCollector extends gast.GAstVisitor {
     public visitRepetition(many: gast.Repetition): void {
         this.allProductions.push(many)
     }
+}
+
+export function validateTooManyAlts(
+    topLevelRule: gast.Rule
+): IParserDefinitionError[] {
+    let orCollector = new OrCollector()
+    topLevelRule.accept(orCollector)
+    let ors = orCollector.alternations
+
+    let errors = utils.reduce(
+        ors,
+        (errors, currOr) => {
+            if (currOr.definition.length > 255) {
+                errors.push({
+                    message:
+                        `An Alternation cannot have more than 256 alternatives:\n` +
+                        `<OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n has ${currOr
+                            .definition.length + 1} alternatives.`,
+                    type: ParserDefinitionErrorType.TOO_MANY_ALTS,
+                    ruleName: topLevelRule.name,
+                    occurrence: currOr.occurrenceInParent
+                })
+            }
+            return errors
+        },
+        []
+    )
+
+    return errors
 }
 
 export function validateSomeNonEmptyLookaheadPath(

@@ -117,7 +117,8 @@ export enum ParserDefinitionErrorType {
     INVALID_NESTED_RULE_NAME,
     DUPLICATE_NESTED_NAME,
     NO_NON_EMPTY_LOOKAHEAD,
-    AMBIGUOUS_PREFIX_ALTS
+    AMBIGUOUS_PREFIX_ALTS,
+    TOO_MANY_ALTS
 }
 
 export type IgnoredRuleIssues = { [dslNameAndOccurrence: string]: boolean }
