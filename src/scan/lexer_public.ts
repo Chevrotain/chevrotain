@@ -1,9 +1,4 @@
-import {
-    CustomPatternMatcherFunc,
-    getTokenConstructor,
-    IToken,
-    tokenName
-} from "./tokens_public"
+import { CustomPatternMatcherFunc, IToken } from "./tokens_public"
 import {
     analyzeTokenClasses,
     cloneEmptyGroups,
@@ -136,17 +131,6 @@ export interface ILexerConfig {
     positionTracking?: "full" | "onlyStart" | "onlyOffset"
 
     /**
-     * Run the Lexer in debug mode.
-     * Features:
-     * - The output tokens will contain their tokenConstructor name in a human readable manner.
-     *   This information is always available by using the <getTokenConstructor> function on the official API.
-     *   However, this is less convenient then a direct property when inspecting values in a debugger.
-     *
-     * DO NOT ENABLE THIS IN PRODUCTION, has a large performance penalty.
-     */
-    debug?: boolean
-
-    /**
      * A regExp defining custom line terminators.
      * This will be used to calculate the line and column information.
      *
@@ -173,7 +157,6 @@ export interface ILexerConfig {
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
     positionTracking: "full",
-    debug: false,
     lineTerminatorsPattern: /\n|\r\n?/g
 }
 
@@ -307,12 +290,6 @@ export class Lexer {
         ) {
             // optimized built-in implementation for the defaults definition of lineTerminators
             this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
-        }
-
-        if (this.config.debug === true) {
-            console.log(
-                "Running the Lexer in Debug Mode, DO NOT ENABLE THIS IN PRODUCTIVE ENV!"
-            )
         }
 
         this.trackStartLines = /full|onlyStart/i.test(
@@ -479,10 +456,6 @@ export class Lexer {
 
         let lexResult = this.tokenizeInternal(text, initialMode)
 
-        if (this.config.debug === true) {
-            this.addTokenTypeNamesToResult(lexResult)
-        }
-
         return lexResult
     }
 
@@ -497,6 +470,7 @@ export class Lexer {
             imageLength,
             group,
             tokType,
+            bamba,
             newToken,
             errLength,
             droppedChar,
@@ -643,6 +617,7 @@ export class Lexer {
                         matchedImage,
                         offset,
                         tokType,
+                        currConfig.type,
                         line,
                         column,
                         imageLength
@@ -829,11 +804,12 @@ export class Lexer {
         return null
     }
 
-    private createOffsetOnlyToken(image, startOffset, tokenType) {
+    private createOffsetOnlyToken(image, startOffset, tokenType, type) {
         return {
             image,
             startOffset,
-            tokenType
+            tokenType,
+            type
         }
     }
 
@@ -841,6 +817,7 @@ export class Lexer {
         image,
         startOffset,
         tokenType,
+        type,
         startLine,
         startColumn
     ) {
@@ -849,7 +826,8 @@ export class Lexer {
             startOffset,
             startLine,
             startColumn,
-            tokenType
+            tokenType,
+            type
         }
     }
 
@@ -857,6 +835,7 @@ export class Lexer {
         image,
         startOffset,
         tokenType,
+        type,
         startLine,
         startColumn,
         imageLength
@@ -869,22 +848,9 @@ export class Lexer {
             endLine: startLine,
             startColumn,
             endColumn: startColumn + imageLength - 1,
-            tokenType
+            tokenType,
+            type
         }
-    }
-
-    private addTokenTypeNamesToResult(lexResult: ILexingResult): void {
-        forEach(lexResult.tokens, currToken => {
-            currToken.tokenClassName = tokenName(getTokenConstructor(currToken))
-        })
-
-        forEach(lexResult.groups, currGroup => {
-            forEach(currGroup, currToken => {
-                currToken.tokenClassName = tokenName(
-                    getTokenConstructor(currToken)
-                )
-            })
-        })
     }
 
     // Place holder, will be replaced by the correct variant according to the locationTracking option at runtime.

@@ -1,6 +1,5 @@
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
 
 // Based on the specs in:
 // https://www.w3.org/TR/CSS21/grammar.html
@@ -21,12 +20,8 @@ function MAKE_PATTERN(def, flags) {
 // A Little wrapper to save us the trouble of manually building the
 // array of cssTokens
 var cssTokens = []
-var extendToken = function(name, pattern, parent) {
-    var options = { name: name, pattern: pattern }
-    if (parent) {
-        options.parent = parent
-    }
-    var newToken = chevrotain.createToken(options)
+var createToken = function() {
+    var newToken = chevrotain.createToken.apply(null, arguments)
     cssTokens.push(newToken)
     return newToken
 }
@@ -48,60 +43,74 @@ FRAGMENT("spaces", "[ \\t\\r\\n\\f]+")
 FRAGMENT("ident", "-?{{nmstart}}{{nmchar}}*")
 FRAGMENT("num", "[0-9]+|[0-9]*\\.[0-9]+")
 
-var Whitespace = extendToken("Whitespace", MAKE_PATTERN("{{spaces}}"))
-var Comment = extendToken("Comment", /\/\*[^*]*\*+([^/*][^*]*\*+)*\//)
-// the W3C specs are are defined in a whitespace sensitive manner.
-// This implementation ignores that crazy mess, This means that this grammar may be a superset of the css 2.1 grammar.
-// Checking for whitespace related errors can be done in a separate process AFTER parsing.
-Whitespace.GROUP = Lexer.SKIPPED
-Comment.GROUP = Lexer.SKIPPED
+var Whitespace = createToken({
+    name: "Whitespace",
+    pattern: MAKE_PATTERN("{{spaces}}"),
+    // the W3C specs are are defined in a whitespace sensitive manner.
+    // This implementation ignores that crazy mess, This means that this grammar may be a superset of the css 2.1 grammar.
+    // Checking for whitespace related errors can be done in a separate process AFTER parsing.
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
+
+var Comment = createToken({
+    name: "Comment",
+    pattern: /\/\*[^*]*\*+([^/*][^*]*\*+})*\//,
+    group: Lexer.SKIPPED,
+    // note that comments could span multiple lines.
+    // forgetting to enable this flag will cause inaccuracies in the lexer location tracking.
+    line_breaks: true
+})
 
 // This group has to be defined BEFORE Ident as their prefix is a valid Ident
-var Uri = extendToken("Uri", Lexer.NA)
-var UriString = extendToken(
-    "UriString",
-    MAKE_PATTERN(
-        "url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
+var Uri = createToken({ name: "Uri", pattern: Lexer.NA })
+var UriString = createToken({
+    name: "UriString",
+    pattern: MAKE_PATTERN(
+        "url\\((:?{{spaces}}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
     ),
-    Uri
-)
-var UriUrl = extendToken(
-    "UriUrl",
-    MAKE_PATTERN("url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)"),
-    Uri
-)
-var Func = extendToken("Func", MAKE_PATTERN("{{ident}}\\("))
-// Ident must be before Minus
-var Ident = extendToken("Ident", MAKE_PATTERN("{{ident}}"))
+    parent: Uri
+})
+var UriUrl = createToken({
+    name: "UriUrl",
+    pattern: MAKE_PATTERN("url\\((:?{{spaces}}})?{{url}}(:?{{spaces}})?\\)"),
+    parent: Uri
+})
+var Func = createToken({
+    name: "Func",
+    pattern: MAKE_PATTERN("{{ident}}\\(")
+})
 
-var Cdo = extendToken("Cdo", /<!--/)
+var Cdo = createToken({ name: "Cdo", pattern: /<!--/ })
 // Cdc must be before Minus
-var Cdc = extendToken("Cdc", /-->/)
-var Includes = extendToken("Includes", /~=/)
-var Dasmatch = extendToken("Dasmatch", /\|=/)
-var Exclamation = extendToken("Exclamation", "!")
-var Dot = extendToken("Dot", ".")
-var LCurly = extendToken("LCurly", "{")
-var RCurly = extendToken("RCurly", "}")
-var LSquare = extendToken("LSquare", "[")
-var RSquare = extendToken("RSquare", "]")
-var LParen = extendToken("LParen", "(")
-var RParen = extendToken("RParen", ")")
-var Comma = extendToken("Comma", ",")
-var Colon = extendToken("Colon", ":")
-var SemiColon = extendToken("SemiColon", ";")
-var Equals = extendToken("Equals", "=")
-var Star = extendToken("Star", "*")
-var Plus = extendToken("Plus", "+")
-var Minus = extendToken("Minus", "-")
-var GreaterThan = extendToken("GreaterThan", ">")
-var Slash = extendToken("Slash", "/")
+var Cdc = createToken({ name: "Cdc", pattern: /-->/ })
+var Includes = createToken({ name: "Includes", pattern: /~=/ })
+var Dasmatch = createToken({ name: "Dasmatch", pattern: /\|=/ })
+var Exclamation = createToken({ name: "Exclamation", pattern: /!/ })
+var Dot = createToken({ name: "Dot", pattern: /\./ })
+var LCurly = createToken({ name: "LCurly", pattern: /{/ })
+var RCurly = createToken({ name: "RCurly", pattern: /}/ })
+var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+var RSquare = createToken({ name: "RSquare", pattern: /]/ })
+var LParen = createToken({ name: "LParen", pattern: /\(/ })
+var RParen = createToken({ name: "RParen", pattern: /\)/ })
+var Comma = createToken({ name: "Comma", pattern: /,/ })
+var Colon = createToken({ name: "Colon", pattern: /:/ })
+var SemiColon = createToken({ name: "SemiColon", pattern: /;/ })
+var Equals = createToken({ name: "Equals", pattern: /=/ })
+var Star = createToken({ name: "Star", pattern: /\*/ })
+var Plus = createToken({ name: "Plus", pattern: /\+/ })
+var GreaterThan = createToken({ name: "GreaterThan", pattern: />/ })
+var Slash = createToken({ name: "Slash", pattern: /\// })
 
-var StringLiteral = extendToken(
-    "StringLiteral",
-    MAKE_PATTERN("{{string1}}|{{string2}}")
-)
-var Hash = extendToken("Hash", MAKE_PATTERN("#{{name}}"))
+var StringLiteral = createToken({
+    name: "StringLiteral",
+    pattern: MAKE_PATTERN("{{string1}}|{{string2}}")
+})
+var Hash = createToken({
+    name: "Hash",
+    pattern: MAKE_PATTERN("#{{name}}")
+})
 
 // note that the spec defines import as : @{I}{M}{P}{O}{R}{T}
 // Where every letter is defined in this pattern:
@@ -118,50 +127,131 @@ var Hash = extendToken("Hash", MAKE_PATTERN("#{{name}}"))
 // This gives us 73^6 options to write the word "import" which is a number with 12 digits...
 // This implementation does not bother with this crap :) and instead settles for
 // "just" 64 option to write "impPorT" (case due to case insensitivity)
-var ImportSym = extendToken("ImportSym", /@import/i)
-var PageSym = extendToken("PageSym", /@page/i)
-var MediaSym = extendToken("MediaSym", /@media/i)
-var CharsetSym = extendToken("CharsetSym", /@charset/i)
-var ImportantSym = extendToken("ImportantSym", /important/i)
+var ImportSym = createToken({
+    name: "ImportSym",
+    pattern: /@import/i
+})
+var PageSym = createToken({ name: "PageSym", pattern: /@page/i })
+var MediaSym = createToken({ name: "MediaSym", pattern: /@media/i })
+var CharsetSym = createToken({
+    name: "CharsetSym",
+    pattern: /@charset/i
+})
+var ImportantSym = createToken({
+    name: "ImportantSym",
+    pattern: /important/i
+})
 
-var Ems = extendToken("Ems", MAKE_PATTERN("{{num}}em", "i"))
-var Exs = extendToken("Exs", MAKE_PATTERN("{{num}}ex", "i"))
+var Ems = createToken({
+    name: "Ems",
+    pattern: MAKE_PATTERN("{{num}}em", "i")
+})
+var Exs = createToken({
+    name: "Exs",
+    pattern: MAKE_PATTERN("{{num}}ex", "i")
+})
 
-var Length = extendToken("Length", Lexer.NA)
-var Px = extendToken("Px", MAKE_PATTERN("{{num}}px", "i"), Length)
-var Cm = extendToken("Cm", MAKE_PATTERN("{{num}}cm", "i"), Length)
-var Mm = extendToken("Mm", MAKE_PATTERN("{{num}}mm", "i"), Length)
-var In = extendToken("In", MAKE_PATTERN("{{num}}in", "i"), Length)
-var Pt = extendToken("Pt", MAKE_PATTERN("{{num}}pt", "i"), Length)
-var Pc = extendToken("Pc", MAKE_PATTERN("{{num}}pc", "i"), Length)
+var Length = createToken({ name: "Length", pattern: Lexer.NA })
+var Px = createToken({
+    name: "Px",
+    pattern: MAKE_PATTERN("{{num}}px", "i"),
+    parent: Length
+})
+var Cm = createToken({
+    name: "Cm",
+    pattern: MAKE_PATTERN("{{num}}cm", "i"),
+    parent: Length
+})
+var Mm = createToken({
+    name: "Mm",
+    pattern: MAKE_PATTERN("{{num}}mm", "i"),
+    parent: Length
+})
+var In = createToken({
+    name: "In",
+    pattern: MAKE_PATTERN("{{num}}in", "i"),
+    parent: Length
+})
+var Pt = createToken({
+    name: "Pt",
+    pattern: MAKE_PATTERN("{{num}}pt", "i"),
+    parent: Length
+})
+var Pc = createToken({
+    name: "Pc",
+    pattern: MAKE_PATTERN("{{num}}pc", "i"),
+    parent: Length
+})
 
-var Angle = extendToken("Angle", Lexer.NA)
-var Deg = extendToken("Deg", MAKE_PATTERN("{{num}}deg", "i"), Angle)
-var Rad = extendToken("Rad", MAKE_PATTERN("{{num}}rad", "i"), Angle)
-var Grad = extendToken("Grad", MAKE_PATTERN("{{num}}grad", "i"), Angle)
+var Angle = createToken({ name: "Angle", pattern: Lexer.NA })
+var Deg = createToken({
+    name: "Deg",
+    pattern: MAKE_PATTERN("{{num}}deg", "i"),
+    parent: Angle
+})
+var Rad = createToken({
+    name: "Rad",
+    pattern: MAKE_PATTERN("{{num}}rad", "i"),
+    parent: Angle
+})
+var Grad = createToken({
+    name: "Grad",
+    pattern: MAKE_PATTERN("{{num}}grad", "i"),
+    parent: Angle
+})
 
-var Time = extendToken("Time", Lexer.NA)
-var Ms = extendToken("Ms", MAKE_PATTERN("{{num}}ms", "i"), Time)
-var Sec = extendToken("Sec", MAKE_PATTERN("{{num}}sec", "i"), Time)
+var Time = createToken({ name: "Time", pattern: Lexer.NA })
+var Ms = createToken({
+    name: "Ms",
+    pattern: MAKE_PATTERN("{{num}}ms", "i"),
+    parent: Time
+})
+var Sec = createToken({
+    name: "Sec",
+    pattern: MAKE_PATTERN("{{num}}sec", "i"),
+    parent: Time
+})
 
-var Freq = extendToken("Freq", Lexer.NA)
-var Hz = extendToken("Hz", MAKE_PATTERN("{{num}}hz", "i"), Freq)
-var Khz = extendToken("Khz", MAKE_PATTERN("{{num}}khz", "i"), Freq)
+var Freq = createToken({ name: "Freq", pattern: Lexer.NA })
+var Hz = createToken({
+    name: "Hz",
+    pattern: MAKE_PATTERN("{{num}}hz", "i"),
+    parent: Freq
+})
+var Khz = createToken({
+    name: "Khz",
+    pattern: MAKE_PATTERN("{{num}}khz", "i"),
+    parent: Freq
+})
 
-var Percentage = extendToken("Percentage", MAKE_PATTERN("{{num}}%", "i"))
+var Percentage = createToken({
+    name: "Percentage",
+    pattern: MAKE_PATTERN("{{num}}%", "i")
+})
 
 // Num must appear after all the num forms with a suffix
-var Num = extendToken("Num", MAKE_PATTERN("{{num}}"))
+var Num = createToken({
+    name: "Num",
+    pattern: MAKE_PATTERN("{{num}}")
+})
 
-var lexer = new Lexer(cssTokens, { positionTracking: "onlyOffset" })
+// Ident must be before Minus
+var Ident = createToken({
+    name: "Ident",
+    pattern: MAKE_PATTERN("{{ident}}")
+})
+
+var Minus = createToken({ name: "Minus", pattern: /-/ })
+
+var lexer = new Lexer(cssTokens)
 
 // ----------------- parser -----------------
 
 function parser(input) {
-    Parser.call(this, input, cssTokens)
+    chevrotain.Parser.call(this, input, cssTokens)
     var $ = this
 
-    this.stylesheet = this.RULE("stylesheet", function() {
+    this.RULE("stylesheet", function() {
         // [ CHARSET_SYM STRING ';' ]?
         $.OPTION(function() {
             $.SUBRULE($.charsetHeader)
@@ -182,13 +272,13 @@ function parser(input) {
         })
     })
 
-    this.charsetHeader = this.RULE("charsetHeader", function() {
+    this.RULE("charsetHeader", function() {
         $.CONSUME(CharsetSym)
         $.CONSUME(StringLiteral)
         $.CONSUME(SemiColon)
     })
 
-    this.contents = this.RULE("contents", function() {
+    this.RULE("contents", function() {
         // prettier-ignore
         $.OR([
             {ALT: function() {$.SUBRULE($.ruleset)}},
@@ -199,7 +289,7 @@ function parser(input) {
     })
 
     // factor out repeating pattern for cdc/cdo
-    this.cdcCdo = this.RULE("cdcCdo", function() {
+    this.RULE("cdcCdo", function() {
         $.MANY(function() {
             // prettier-ignore
             $.OR([
@@ -211,9 +301,8 @@ function parser(input) {
 
     // IMPORT_SYM S*
     // [STRING|URI] S* media_list? ';' S*
-    this.cssImport = this.RULE("cssImport", function() {
+    this.RULE("cssImport", function() {
         $.CONSUME(ImportSym)
-
         // prettier-ignore
         $.OR([
             {ALT: function() {$.CONSUME(StringLiteral)}},
@@ -228,7 +317,7 @@ function parser(input) {
     })
 
     // MEDIA_SYM S* media_list '{' S* ruleset* '}' S*
-    this.media = this.RULE("media", function() {
+    this.RULE("media", function() {
         $.CONSUME(MediaSym)
         $.SUBRULE($.media_list)
         $.CONSUME(LCurly)
@@ -237,7 +326,8 @@ function parser(input) {
     })
 
     // medium [ COMMA S* medium]*
-    this.media_list = this.RULE("media_list", function() {
+    this.RULE("media_list", function() {
+        $.SUBRULE($.medium)
         $.MANY_SEP({
             SEP: Comma,
             DEF: function() {
@@ -247,13 +337,13 @@ function parser(input) {
     })
 
     // IDENT S*
-    this.medium = this.RULE("medium", function() {
+    this.RULE("medium", function() {
         $.CONSUME(Ident)
     })
 
     // PAGE_SYM S* pseudo_page?
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-    this.page = this.RULE("page", function() {
+    this.RULE("page", function() {
         $.CONSUME(PageSym)
         $.OPTION(function() {
             $.SUBRULE($.pseudo_page)
@@ -264,7 +354,7 @@ function parser(input) {
 
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
     // factored out repeating grammar pattern
-    this.declarationsGroup = this.RULE("declarationsGroup", function() {
+    this.RULE("declarationsGroup", function() {
         $.CONSUME(LCurly)
         $.OPTION(function() {
             $.SUBRULE($.declaration)
@@ -280,13 +370,13 @@ function parser(input) {
     })
 
     // ':' IDENT S*
-    this.pseudo_page = this.RULE("pseudo_page", function() {
+    this.RULE("pseudo_page", function() {
         $.CONSUME(Colon)
         $.CONSUME(Ident)
     })
 
     // '/' S* | ',' S*
-    this.operator = this.RULE("operator", function() {
+    this.RULE("operator", function() {
         // prettier-ignore
         $.OR([
             {ALT: function() {$.CONSUME(Slash)}},
@@ -295,7 +385,7 @@ function parser(input) {
     })
 
     // '+' S* | '>' S*
-    this.combinator = this.RULE("combinator", function() {
+    this.RULE("combinator", function() {
         // prettier-ignore
         $.OR([
             {ALT: function() {$.CONSUME(Plus)}},
@@ -304,7 +394,7 @@ function parser(input) {
     })
 
     // '-' | '+'
-    this.unary_operator = this.RULE("unary_operator", function() {
+    this.RULE("unary_operator", function() {
         // prettier-ignore
         $.OR([
             {ALT: function() {$.CONSUME(Minus)}},
@@ -313,15 +403,14 @@ function parser(input) {
     })
 
     // IDENT S*
-    this.property = this.RULE("property", function() {
+    this.RULE("property", function() {
         $.CONSUME(Ident)
     })
 
     // selector [ ',' S* selector ]*
     // '{' S* declaration? [ ';' S* declaration? ]* '}' S*
-    this.ruleset = this.RULE("ruleset", function() {
-        // TODO: try without SEP?
-        $.AT_LEAST_ONE_SEP({
+    this.RULE("ruleset", function() {
+        $.MANY_SEP({
             SEP: Comma,
             DEF: function() {
                 $.SUBRULE($.selector)
@@ -332,10 +421,10 @@ function parser(input) {
     })
 
     // simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
-    this.selector = this.RULE("selector", function() {
+    this.RULE("selector", function() {
         $.SUBRULE($.simple_selector)
-        $.MANY(() => {
-            $.OPTION1(function() {
+        $.OPTION(function() {
+            $.OPTION2(function() {
                 $.SUBRULE($.combinator)
             })
             $.SUBRULE($.selector)
@@ -344,7 +433,7 @@ function parser(input) {
 
     // element_name [ HASH | class | attrib | pseudo ]*
     // | [ HASH | class | attrib | pseudo ]+
-    this.simple_selector = this.RULE("simple_selector", function() {
+    this.RULE("simple_selector", function() {
         $.OR([
             {
                 ALT: function() {
@@ -366,27 +455,24 @@ function parser(input) {
 
     // helper grammar rule to avoid repetition
     // [ HASH | class | attrib | pseudo ]+
-    this.simple_selector_suffix = this.RULE(
-        "simple_selector_suffix",
-        function() {
-            // prettier-ignore
-            $.OR([
-                {ALT: function() {$.CONSUME(Hash)}},
-                {ALT: function() {$.SUBRULE($.class)}},
-                {ALT: function() {$.SUBRULE($.attrib)}},
-                {ALT: function() {$.SUBRULE($.pseudo)}}
-            ])
-        }
-    )
+    this.RULE("simple_selector_suffix", function() {
+        // prettier-ignore
+        $.OR([
+            {ALT: function() {$.CONSUME(Hash)}},
+            {ALT: function() {$.SUBRULE($.class)}},
+            {ALT: function() {$.SUBRULE($.attrib)}},
+            {ALT: function() {$.SUBRULE($.pseudo)}}
+        ])
+    })
 
     // '.' IDENT
-    this.class = this.RULE("class", function() {
+    this.RULE("class", function() {
         $.CONSUME(Dot)
         $.CONSUME(Ident)
     })
 
     // IDENT | '*'
-    this.element_name = this.RULE("element_name", function() {
+    this.RULE("element_name", function() {
         // prettier-ignore
         $.OR([
             {ALT: function() {$.CONSUME(Ident)}},
@@ -395,7 +481,7 @@ function parser(input) {
     })
 
     // '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [ IDENT | STRING ] S* ]? ']'
-    this.attrib = this.RULE("attrib", function() {
+    this.RULE("attrib", function() {
         $.CONSUME(LSquare)
         $.CONSUME(Ident)
 
@@ -417,7 +503,7 @@ function parser(input) {
     })
 
     // ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
-    this.pseudo = this.RULE("pseudo", function() {
+    this.RULE("pseudo", function() {
         $.CONSUME(Colon)
 
         // prettier-ignore
@@ -436,7 +522,7 @@ function parser(input) {
     })
 
     // property ':' S* expr prio?
-    this.declaration = this.RULE("declaration", function() {
+    this.RULE("declaration", function() {
         $.SUBRULE($.property)
         $.CONSUME(Colon)
         $.SUBRULE($.expr)
@@ -447,12 +533,12 @@ function parser(input) {
     })
 
     // IMPORTANT_SYM S*
-    this.prio = this.RULE("prio", function() {
+    this.RULE("prio", function() {
         $.CONSUME(ImportantSym)
     })
 
     // term [ operator? term ]*
-    this.expr = this.RULE("expr", function() {
+    this.RULE("expr", function() {
         $.SUBRULE($.term)
         $.MANY(function() {
             $.OPTION(function() {
@@ -466,7 +552,7 @@ function parser(input) {
     // [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* |
     // TIME S* | FREQ S* ]
     // | STRING S* | IDENT S* | URI S* | hexcolor | function
-    this.term = this.RULE("term", function() {
+    this.RULE("term", function() {
         $.OPTION(function() {
             $.SUBRULE($.unary_operator)
         })
@@ -490,21 +576,23 @@ function parser(input) {
     })
 
     // FUNCTION S* expr ')' S*
-    this.cssFunction = this.RULE("cssFunction", function() {
+    this.RULE("cssFunction", function() {
         $.CONSUME(Func)
         $.SUBRULE($.expr)
         $.CONSUME(RParen)
     })
 
-    this.hexcolor = this.RULE("hexcolor", function() {
+    this.RULE("hexcolor", function() {
         $.CONSUME(Hash)
     })
 
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
     // derived from the self analysis.
-    Parser.performSelfAnalysis(this)
+    chevrotain.Parser.performSelfAnalysis(this)
 }
 
-parser.prototype = Object.create(Parser.prototype)
+parser.prototype = Object.create(chevrotain.Parser.prototype)
 parser.prototype.constructor = parser
+
+// ----------------- wrapping it all together -----------------

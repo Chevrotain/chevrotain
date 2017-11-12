@@ -702,29 +702,6 @@ function defineLexerSpecs(
                 let spacesGroups: any = lexResult.groups.spaces
                 expect(spacesGroups[0].image).to.equal("\t")
             })
-
-            it("can run a simpleLexer in debug mode", () => {
-                let WS = createToken({
-                    name: "WS",
-                    pattern: /(\t| )/,
-                    group: "spaces"
-                })
-                let ifElseLexer = new Lexer([WS, If, Else], {
-                    debug: true,
-                    positionTracking: "onlyOffset"
-                })
-
-                let input = "if else"
-
-                let lexResult = ifElseLexer.tokenize(input)
-                let tokens: any = lexResult.tokens
-                expect(tokens[0].tokenClassName).to.equal("If")
-                expect(tokens[1].tokenClassName).to.equal("Else")
-
-                let spacesGroups: any = lexResult.groups.spaces
-                expect(spacesGroups[0].tokenClassName).to.equal("WS")
-            })
-
             const EndOfInputAnchor = createToken({
                 name: "EndOfInputAnchor",
                 pattern: /BAMBA$/

@@ -221,7 +221,8 @@ export function analyzeTokenClasses(
             group: patternIdxToGroup[idx],
             push: patternIdxToPushMode[idx],
             pop: patternIdxToPopMode[idx],
-            tokenType: patternIdxToType[idx]
+            tokenType: patternIdxToType[idx],
+            type: onlyRelevantClasses[idx]
         }
     })
 
