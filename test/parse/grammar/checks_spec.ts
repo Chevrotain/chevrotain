@@ -12,7 +12,8 @@ import {
     OccurrenceValidationCollector,
     getFirstNoneTerminal,
     validateRuleDoesNotAlreadyExist,
-    validateRuleIsOverridden
+    validateRuleIsOverridden,
+    validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { Token, createToken } from "../../../src/scan/tokens_public"
 import { forEach, first, map } from "../../../src/utils/utils"
@@ -965,6 +966,27 @@ describe("The no non-empty lookahead validation", () => {
         )
         expect(() => new EmptyLookaheadParserManySep()).to.throw(
             "within Rule <someRule>"
+        )
+    })
+
+    it("will throw an error when there are too many alternatives in an alternation", () => {
+        const alternatives = []
+        for (let i = 0; i < 256; i++) {
+            alternatives.push(
+                new Flat([new NonTerminal("dummyRule", dummyRule)])
+            )
+        }
+
+        const ruleWithTooManyAlts = new Rule("blah", [
+            new Alternation(alternatives)
+        ])
+
+        const actual = validateTooManyAlts(ruleWithTooManyAlts)
+        expect(actual).to.have.lengthOf(1)
+        expect(actual[0].type).to.equal(ParserDefinitionErrorType.TOO_MANY_ALTS)
+        expect(actual[0].ruleName).to.equal("blah")
+        expect(actual[0].message).to.contain(
+            "An Alternation cannot have more than 256 alternatives"
         )
     })
 })
