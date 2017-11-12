@@ -1,7 +1,8 @@
 "use strict"
 const expect = require("chai").expect
 const _ = require("lodash")
-const parseJsonToCst = require("./step4_error_recovery").parse
+const errRecovery = require("./step4_error_recovery")
+const parseJsonToCst = errRecovery.parse
 
 describe("Chevrotain Tutorial", () => {
     context("Step 4 - Fault tolerance and error recovery", () => {
@@ -43,7 +44,8 @@ describe("Chevrotain Tutorial", () => {
                                 LCurly: [
                                     {
                                         image: "{",
-                                        startOffset: 0
+                                        startOffset: 0,
+                                        type: errRecovery.LCurly
                                     }
                                 ],
                                 objectItem: [
@@ -53,7 +55,9 @@ describe("Chevrotain Tutorial", () => {
                                             StringLiteral: [
                                                 {
                                                     image: '"key"',
-                                                    startOffset: 2
+                                                    startOffset: 2,
+                                                    type:
+                                                        errRecovery.StringLiteral
                                                 }
                                             ],
                                             // This missing colon token was inserted in recovery.
@@ -78,7 +82,9 @@ describe("Chevrotain Tutorial", () => {
                                                         NumberLiteral: [
                                                             {
                                                                 image: "666",
-                                                                startOffset: 10
+                                                                startOffset: 10,
+                                                                type:
+                                                                    errRecovery.NumberLiteral
                                                             }
                                                         ]
                                                     }
@@ -90,7 +96,8 @@ describe("Chevrotain Tutorial", () => {
                                 RCurly: [
                                     {
                                         image: "}",
-                                        startOffset: 13
+                                        startOffset: 13,
+                                        type: errRecovery.RCurly
                                     }
                                 ]
                             }
@@ -120,7 +127,8 @@ describe("Chevrotain Tutorial", () => {
                                 LCurly: [
                                     {
                                         image: "{",
-                                        startOffset: 0
+                                        startOffset: 0,
+                                        type: errRecovery.LCurly
                                     }
                                 ],
                                 objectItem: [
@@ -130,14 +138,17 @@ describe("Chevrotain Tutorial", () => {
                                             StringLiteral: [
                                                 {
                                                     image: '"key"',
-                                                    startOffset: 2
+                                                    startOffset: 2,
+                                                    type:
+                                                        errRecovery.StringLiteral
                                                 }
                                             ],
                                             // The out of place '}' brackets were ignored and the colon token was parsed instead.
                                             Colon: [
                                                 {
                                                     image: ":",
-                                                    startOffset: 9
+                                                    startOffset: 9,
+                                                    type: errRecovery.Colon
                                                 }
                                             ],
                                             // the value rule appears AFTER the error (out of place '}' brackets) yet it was still parsed
@@ -149,7 +160,9 @@ describe("Chevrotain Tutorial", () => {
                                                         NumberLiteral: [
                                                             {
                                                                 image: "666",
-                                                                startOffset: 11
+                                                                startOffset: 11,
+                                                                type:
+                                                                    errRecovery.NumberLiteral
                                                             }
                                                         ]
                                                     }
@@ -161,7 +174,8 @@ describe("Chevrotain Tutorial", () => {
                                 RCurly: [
                                     {
                                         image: "}",
-                                        startOffset: 14
+                                        startOffset: 14,
+                                        type: errRecovery.RCurly
                                     }
                                 ]
                             }
