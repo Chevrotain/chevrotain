@@ -218,6 +218,13 @@ export interface IToken {
     /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
     tokenType?: number
 
+    /**
+     * The actual Token Type of this Token "instance"
+     * This is the same Object returned by the "createToken" API.
+     * This property is very useful for debugging the Lexing and Parsing phases.
+     */
+    type?: TokenConstructor
+
     /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
      *  @see {ILexerConfig} debug flag.
      *

@@ -140,5 +140,17 @@ module.exports = {
             lexErrors: lexResult.errors,
             parseErrors: parser.errors
         }
-    }
+    },
+    True,
+    False,
+    Null,
+    LCurly,
+    RCurly,
+    LSquare,
+    RSquare,
+    Comma,
+    Colon,
+    StringLiteral,
+    NumberLiteral,
+    WhiteSpace
 }
