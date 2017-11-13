@@ -99,7 +99,7 @@ None.
 ## Compatibility
 Chevrotain should run on any modern JavaScript ES5.1 runtime. 
 * The CI build runs the tests under: 
-  * Node.js (4 / 6 / 8).
+  * Node.js (6 / 8 / 9).
   * Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.
   
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).

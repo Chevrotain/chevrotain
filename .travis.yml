@@ -7,15 +7,14 @@ cache:
     - node_modules
 matrix:
   include:
-    - node_js: "8"
+    - node_js: "9"
       env: NPM_TASK=ci_full_build_coveralls DEPLOY=true
-    - node_js: "8"
+    - node_js: "9"
       env: NPM_TASK=ci_browser_tests
+    - node_js: "8"
+      env: NPM_TASK=ci_full_build
     - node_js: "6"
       env: NPM_TASK=ci_full_build
-    - node_js: "4"
-      # under node.js 4 not all tests are executed because the sticky regExp flag is unsupported.
-      env: NPM_TASK=ci_full_build SKIP_CHECK_COV=true
   allow_failures:
     - node_js: "8"
       env: NPM_TASK=ci_browser_tests
