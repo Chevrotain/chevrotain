@@ -16,7 +16,7 @@ matrix:
     - node_js: "6"
       env: NPM_TASK=ci_full_build
   allow_failures:
-    - node_js: "8"
+    - node_js: "9"
       env: NPM_TASK=ci_browser_tests
 addons:
   apt:
