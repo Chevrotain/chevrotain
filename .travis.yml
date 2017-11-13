@@ -25,7 +25,6 @@ addons:
     packages:
       - g++-4.8
 install:
-  - npm install -g npm
   - npm install
 script:
   - npm run $NPM_TASK
