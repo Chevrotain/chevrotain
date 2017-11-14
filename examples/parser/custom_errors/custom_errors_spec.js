@@ -36,9 +36,8 @@ describe("The Chevrotain support for custom error provider", function() {
     })
 
     it("can customize a EarlyExit exception", function() {})
-    const errors = rules.parseEarlyExit("A")
-    expect(errors).to.have.lengthOf(1)
-    expect(errors[0].message).to.equal(
-        "Esperando por lo menos una iteración de: Bravo"
+        const errors = rules.parseEarlyExit("A")
+        expect(errors).to.have.lengthOf(1)
+        expect(errors[0].message).to.equal("Esperando por lo menos una iteración de: Bravo"
     )
 })
