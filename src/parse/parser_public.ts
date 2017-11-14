@@ -882,7 +882,8 @@ export class Parser {
      * @return {Function():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
      */
     protected BACKTRACK<T>(
-        grammarRule: (...args: any[]) => T, args?:any[]
+        grammarRule: (...args: any[]) => T,
+        args?: any[]
     ): () => boolean {
         return function() {
             // save org state
