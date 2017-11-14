@@ -504,7 +504,7 @@ export class Lexer {
                 modeStack.length === 1 &&
                 // if we have both a POP_MODE and a PUSH_MODE this is in-fact a "transition"
                 // So no error should occur.
-                popToken.PUSH_MODE === undefined
+                popToken.type.PUSH_MODE === undefined
             ) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
