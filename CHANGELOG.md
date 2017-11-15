@@ -1,3 +1,17 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+- ["Type" Property on Tokens "instances" for easier debugging.](https://github.com/SAP/chevrotain/issues/542)
+- [Support both "push_mode" and "pop_mode" on a Token to support transitions.](https://github.com/SAP/chevrotain/issues/597)
+- [Validation to check for too many alternatives.](https://github.com/SAP/chevrotain/issues/388)
+
+#### Examples
+
+- [TinyC Grammar Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/tinyc/tinyc.js)
+- [Backtracking Example.](https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js)
+
+
 ## 0.34.0 (10-15-2017)
 
 #### Minor Changes
