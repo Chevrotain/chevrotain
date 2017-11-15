@@ -346,8 +346,8 @@ export function assignNoOverwrite(
     return target
 }
 
-export function defaults(...sources:any[]):any {
-    return assignNoOverwrite.apply(null,[{}].concat(sources))
+export function defaults(...sources: any[]): any {
+    return assignNoOverwrite.apply(null, [{}].concat(sources))
 }
 
 export function groupBy<T>(
