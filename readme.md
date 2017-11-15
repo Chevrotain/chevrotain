@@ -32,7 +32,7 @@ as any other pure code without requiring any new tools or processes.
       * [Customizable][custom_errors] **Error Reporting** with full location information. 
       * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
       * Supports [gates/predicates][gates].
-      * Backtracking support.
+      * [Backtracking][backtracking] support.
       * [Grammar Inheritance.][grammar_inheritance]
       * [Multiple starting rules.][starting_rules]
       * [Parametrized Rules.][parametrized_rules]
@@ -133,3 +133,4 @@ Some interesting samples:
 [sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
+[backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
