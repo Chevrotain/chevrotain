@@ -877,21 +877,22 @@ export class Parser {
 
     /**
      * @param grammarRule - The rule to try and parse in backtracking mode.
-     * @param isValid - A predicate that given the result of the parse attempt will "decide" if the parse was successfully or not.
+     * @param args - argumens to be passed to the grammar rule execution
      *
      * @return {Function():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
      */
     protected BACKTRACK<T>(
         grammarRule: (...args: any[]) => T,
-        isValid: (T: any) => boolean
+        args?: any[]
     ): () => boolean {
         return function() {
             // save org state
             this.isBackTrackingStack.push(1)
-            let orgState = this.saveRecogState()
+            const orgState = this.saveRecogState()
             try {
-                let ruleResult = grammarRule.call(this)
-                return isValid(ruleResult)
+                grammarRule.apply(this, args)
+                // if no exception was thrown we have succeed parsing the rule.
+                return true
             } catch (e) {
                 if (exceptions.isRecognitionException(e)) {
                     return false
