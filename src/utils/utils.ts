@@ -346,7 +346,9 @@ export function assignNoOverwrite(
     return target
 }
 
-export const defaults = partial(assignNoOverwrite, {})
+export function defaults(...sources:any[]):any {
+    return assignNoOverwrite.apply(null,[{}].concat(sources))
+}
 
 export function groupBy<T>(
     arr: T[],
