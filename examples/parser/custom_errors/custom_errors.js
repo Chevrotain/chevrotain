@@ -75,6 +75,13 @@ class CustomErrorsParser extends Parser {
             $.CONSUME(Bravo)
         })
 
+        $.RULE("mis_match_override", function() {
+            $.CONSUME(Alpha)
+            // we will call this rule with [Alpha, Charlie] to produce a mismatch Token Exception.
+            // This time we are overriding the message created by the ErrorProvider
+            $.CONSUME(Bravo, { ERR_MSG: "We want Bravo!!!" })
+        })
+
         $.RULE("redundant_input", function() {
             $.CONSUME(Alpha)
             $.CONSUME(Bravo)
@@ -131,6 +138,7 @@ function parseStartingWithRule(ruleName) {
 
 module.exports = {
     parseMismatch: parseStartingWithRule("mis_match"),
+    parseMismatchOverride: parseStartingWithRule("mis_match_override"),
     parseRedundant: parseStartingWithRule("redundant_input"),
     parseNoViable: parseStartingWithRule("no_viable_alternative"),
     parseEarlyExit: parseStartingWithRule("early_exit")

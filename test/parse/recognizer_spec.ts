@@ -1090,6 +1090,37 @@ function defineRecognizerSpecs(
                 ])
             })
 
+            it("Supports custom overriding of the mismatch token error message", () => {
+                const SemiColon = createToken({ name: "SemiColon" })
+
+                class CustomConsumeErrorParser extends Parser {
+                    constructor(input: Token[] = []) {
+                        super(input, [SemiColon])
+                        ;(Parser as any).performSelfAnalysis(this)
+                    }
+
+                    public myStatement = this.RULE("myStatement", () => {
+                        this.CONSUME1(SemiColon, {
+                            ERR_MSG: "expecting semiColon at end of myStatement"
+                        })
+                    })
+                }
+
+                let parser = new CustomConsumeErrorParser([
+                    createTokenInstance(PlusTok)
+                ])
+                parser.myStatement()
+                expect(parser.errors[0]).to.be.an.instanceof(
+                    MismatchedTokenException
+                )
+                expect(parser.errors[0].message).to.equal(
+                    "expecting semiColon at end of myStatement"
+                )
+                expect(parser.errors[0].context.ruleStack).to.deep.equal([
+                    "myStatement"
+                ])
+            })
+
             it("Will use Token LABELS for noViableAlt error messages when unavailable", () => {
                 class LabelAltParser extends Parser {
                     constructor(input: Token[] = []) {

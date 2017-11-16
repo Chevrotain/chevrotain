@@ -19,6 +19,12 @@ describe("The Chevrotain support for custom error provider", function() {
         )
     })
 
+    it("can customize a misMatchToken exception by overriding", function() {
+        const errorsOverride = rules.parseMismatchOverride("A C")
+        expect(errorsOverride).to.have.lengthOf(1)
+        expect(errorsOverride[0].message).to.equal("We want Bravo!!!")
+    })
+
     it("can customize a NotAllInputParsed exception", function() {
         const errors = rules.parseRedundant("A B C")
         expect(errors).to.have.lengthOf(1)

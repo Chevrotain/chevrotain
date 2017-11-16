@@ -365,6 +365,14 @@ export interface AtLeastOneSepMethodOpts<T> extends ManySepMethodOpts<T> {
     ERR_MSG?: string
 }
 
+export interface ConsumeMethodOpts {
+    /**
+     *  A custom Error message if the Token could not be consumed.
+     *  This will override any error message provided by the parser's "errorMessageProvider"
+     */
+    ERR_MSG?: string
+}
+
 export type Predicate = () => boolean
 export type GrammarAction<OUT> = () => OUT
 
@@ -911,8 +919,11 @@ export class Parser {
      * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
      */
-    protected CONSUME(tokClass: TokenConstructor): IToken {
-        return this.CONSUME1(tokClass)
+    protected CONSUME(
+        tokClass: TokenConstructor,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.CONSUME1(tokClass, options)
     }
 
     /**
@@ -937,39 +948,53 @@ export class Parser {
      * }
      *
      * @param {Function} tokClass - A constructor function specifying the type of token to be consumed.
-     *
-     * @returns {Token} - The consumed token.
+     * @param options - optional properties to modify the behavior of CONSUME.
      */
-    protected CONSUME1(tokClass: TokenConstructor): IToken {
-        return this.consumeInternal(tokClass, 1)
+    protected CONSUME1(
+        tokClass: TokenConstructor,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokClass, 1, options)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME2(tokClass: TokenConstructor): IToken {
-        return this.consumeInternal(tokClass, 2)
+    protected CONSUME2(
+        tokClass: TokenConstructor,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokClass, 2, options)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME3(tokClass: TokenConstructor): IToken {
-        return this.consumeInternal(tokClass, 3)
+    protected CONSUME3(
+        tokClass: TokenConstructor,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokClass, 3, options)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME4(tokClass: TokenConstructor): IToken {
-        return this.consumeInternal(tokClass, 4)
+    protected CONSUME4(
+        tokClass: TokenConstructor,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokClass, 4, options)
     }
 
     /**
      * @see CONSUME1
      */
-    protected CONSUME5(tokClass: TokenConstructor): IToken {
-        return this.consumeInternal(tokClass, 5)
+    protected CONSUME5(
+        tokClass: TokenConstructor,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokClass, 5, options)
     }
 
     /**
@@ -1772,10 +1797,15 @@ export class Parser {
      *         * note that for the second ident the idx is always 2 even if its invoked 30 times in the same rule
      *           the idx is about the position in grammar (source code) and has nothing to do with a specific invocation
      *           details.
+     * @param options -
      *
      * @returns {Token} - The consumed Token.
      */
-    protected consumeInternal(tokClass: TokenConstructor, idx: number): IToken {
+    protected consumeInternal(
+        tokClass: TokenConstructor,
+        idx: number,
+        options: ConsumeMethodOpts
+    ): IToken {
         let consumedToken
         try {
             let nextToken = this.LA(1)
@@ -1783,11 +1813,16 @@ export class Parser {
                 this.consumeToken()
                 consumedToken = nextToken
             } else {
-                let msg = this.errorMessageProvider.buildMismatchTokenMessage({
-                    expected: tokClass,
-                    actual: nextToken,
-                    ruleName: this.getCurrRuleFullName()
-                })
+                let msg
+                if (options !== undefined && options.ERR_MSG) {
+                    msg = options.ERR_MSG
+                } else {
+                    msg = this.errorMessageProvider.buildMismatchTokenMessage({
+                        expected: tokClass,
+                        actual: nextToken,
+                        ruleName: this.getCurrRuleFullName()
+                    })
+                }
                 throw this.SAVE_ERROR(
                     new exceptions.MismatchedTokenException(msg, nextToken)
                 )
