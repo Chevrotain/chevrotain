@@ -36,6 +36,7 @@ import {
 import { VERSION } from "../../version"
 import { TokenConstructor } from "../../scan/lexer_public"
 import { NamedDSLMethodsCollectorVisitor } from "../cst/cst"
+import { nextPossibleTokensAfter } from "./interpreter"
 
 export function validateGrammar(
     topLevels: gast.Rule[],
@@ -470,7 +471,13 @@ export function validateEmptyOrAlternative(
             let currErrors = utils.map(
                 exceptLast,
                 (currAlternative: gast.IProduction, currAltIdx) => {
-                    if (utils.isEmpty(first(currAlternative))) {
+                    const possibleFirstInAlt = nextPossibleTokensAfter(
+                        [currAlternative],
+                        [],
+                        null,
+                        1
+                    )
+                    if (utils.isEmpty(possibleFirstInAlt)) {
                         return {
                             message:
                                 `Ambiguous empty alternative: <${currAltIdx +

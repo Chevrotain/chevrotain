@@ -628,6 +628,44 @@ describe("The empty alternative detection full flow", () => {
         expect(() => new EmptyAltAmbiguityParser()).to.throw("2")
     })
 
+    it("will throw an error when an empty alternative is not the last alternative - Indirect", () => {
+        class EmptyAltIndirectAmbiguityParser extends Parser {
+            constructor(input: Token[] = []) {
+                super(input, [PlusTok, StarTok])
+                ;(<any>Parser).performSelfAnalysis(this)
+            }
+
+            public noneLastEmpty = this.RULE("noneLastEmpty", () => {
+                this.OR1([
+                    {
+                        ALT: () => {
+                            this.CONSUME1(PlusTok)
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            this.SUBRULE(this.emptyRule)
+                        }
+                    }, // empty alternative #2 which is not the last one!
+                    // empty alternative #3 which is not the last one!
+                    { ALT: () => {} },
+                    {
+                        ALT: () => {
+                            this.CONSUME2(StarTok)
+                        }
+                    }
+                ])
+            })
+
+            public emptyRule = this.RULE("emptyRule", () => {})
+        }
+        expect(() => new EmptyAltIndirectAmbiguityParser()).to.throw(
+            "Ambiguous empty alternative"
+        )
+        expect(() => new EmptyAltIndirectAmbiguityParser()).to.throw("3")
+        expect(() => new EmptyAltIndirectAmbiguityParser()).to.throw("2")
+    })
+
     it("will detect alternative ambiguity with identical lookaheads", () => {
         class AltAmbiguityParserImplicitOccurence extends Parser {
             constructor(input: Token[] = []) {

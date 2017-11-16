@@ -132,5 +132,6 @@
       "lib/test/**.*",
       "test/test.config.js"
     ]
-  }
+  },
+  "dependencies": {}
 }
