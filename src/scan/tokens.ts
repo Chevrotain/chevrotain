@@ -24,10 +24,6 @@ export function tokenStructuredMatcherNoInheritance(
     return tokInstance.tokenType === tokConstructor.tokenType
 }
 
-export function isBaseTokenOrObject(tokClass: TokenConstructor): boolean {
-    return isBaseTokenClass(tokClass) || <any>tokClass === Object
-}
-
 export function isBaseTokenClass(tokClass: Function): boolean {
     return tokClass === Token
 }
