@@ -250,9 +250,9 @@ module.exports = {
                 var nextPossibleKeywordsTypes = _.filter(
                     nextPossibleTokTypes,
                     function(currPossibleTokType) {
-                        return Keyword.prototype.isPrototypeOf(
-                            currPossibleTokType.prototype
-                        )
+                        return Keyword.extendingTokenTypesMap[
+                            currPossibleTokType.tokenType
+                        ]
                     }
                 )
                 var possibleKeywordSuggestions = _.map(
