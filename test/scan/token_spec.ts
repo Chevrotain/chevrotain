@@ -62,20 +62,6 @@ describe("The Chevrotain Tokens namespace", () => {
             expect(aInstance.endColumn).to.equal(5)
         })
 
-        it("provides an extendToken utility - inheritance chain", () => {
-            let dInstance = new D("world", 0, 1, 1)
-            expect(dInstance).to.be.an.instanceof(A)
-            expect(dInstance).to.be.an.instanceof(B)
-            expect(dInstance).not.to.be.an.instanceof(C)
-
-            let cInstance = new C("666", 0, 1, 1)
-            expect(cInstance).to.be.an.instanceof(A)
-            expect(cInstance).to.be.an.instanceof(B)
-
-            let bInstance = new B("666", 0, 1, 1)
-            expect(bInstance).to.be.an.instanceof(A)
-        })
-
         it("provides an extendToken utility - static properties inheritance", () => {
             expect(D.GROUP).to.equal("Special")
             expect(C.GROUP).to.equal("Special")

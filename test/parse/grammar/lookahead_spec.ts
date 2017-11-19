@@ -1,4 +1,4 @@
-import { Parser } from "../../../src/parse/parser_public"
+import { END_OF_FILE, Parser } from "../../../src/parse/parser_public"
 import { EOF, createToken, Token } from "../../../src/scan/tokens_public"
 import { gast } from "../../../src/parse/grammar/gast_public"
 import {
@@ -562,7 +562,7 @@ context("lookahead specs", () => {
 
                 LA(howMuch: number): Token {
                     if (this.input.length <= howMuch - 1) {
-                        return new EOF()
+                        return END_OF_FILE
                     } else {
                         return this.input[howMuch - 1]
                     }

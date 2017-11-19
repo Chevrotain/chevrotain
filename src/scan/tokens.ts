@@ -1,13 +1,6 @@
 import { TokenConstructor } from "./lexer_public"
-import {
-    cloneArr,
-    contains,
-    difference,
-    forEach,
-    getSuperClass,
-    has
-} from "../utils/utils"
-import { IToken, Token, tokenName } from "./tokens_public"
+import { cloneArr, contains, difference, forEach, has } from "../utils/utils"
+import { Token, tokenName } from "./tokens_public"
 import { HashTable } from "../lang/lang_extensions"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
@@ -42,44 +35,42 @@ export function isBaseTokenClass(tokClass: Function): boolean {
 export let tokenShortNameIdx = 1
 export const tokenIdxToClass = new HashTable<TokenConstructor>()
 
-export function augmentTokenClasses(tokenClasses: TokenConstructor[]): void {
-    // 1. collect the parent Token classes as well.
-    let tokenClassesAndParents = expandTokenHierarchy(tokenClasses)
+export function augmentTokenTypes(tokenTypes: TokenConstructor[]): void {
+    // 1. collect the parent Token Types as well.
+    let tokenTypesAndParents = expandTokenHierarchy(tokenTypes)
 
     // 2. add required tokenType and extendingTokenTypes properties
-    assignTokenDefaultProps(tokenClassesAndParents)
+    assignTokenDefaultProps(tokenTypesAndParents)
 
     // 3. fill up the extendingTokenTypes
-    assignExtendingTokensProp(tokenClassesAndParents)
-    assignExtendingTokensMapProp(tokenClassesAndParents)
+    assignExtendingTokensProp(tokenTypesAndParents)
+    assignExtendingTokensMapProp(tokenTypesAndParents)
 
-    forEach(tokenClassesAndParents, tokClass => {
+    forEach(tokenTypesAndParents, tokClass => {
         tokClass.isParent = tokClass.extendingTokenTypes.length > 0
     })
 }
 
 export function expandTokenHierarchy(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): TokenConstructor[] {
-    let tokenClassesAndParents = cloneArr(tokenClasses)
+    let tokenTypesAndParents = cloneArr(tokenTypes)
 
-    forEach(tokenClasses, currTokClass => {
+    forEach(tokenTypes, currTokClass => {
         let currParentType: any = currTokClass.parent
         while (currParentType && currParentType !== Token) {
-            if (!contains(tokenClassesAndParents, currParentType)) {
-                tokenClassesAndParents.push(currParentType)
+            if (!contains(tokenTypesAndParents, currParentType)) {
+                tokenTypesAndParents.push(currParentType)
             }
             currParentType = currParentType.parent
         }
     })
 
-    return tokenClassesAndParents
+    return tokenTypesAndParents
 }
 
-export function assignTokenDefaultProps(
-    tokenClasses: TokenConstructor[]
-): void {
-    forEach(tokenClasses, currTokClass => {
+export function assignTokenDefaultProps(tokenTypes: TokenConstructor[]): void {
+    forEach(tokenTypes, currTokClass => {
         if (!hasShortKeyProperty(currTokClass)) {
             tokenIdxToClass.put(tokenShortNameIdx, currTokClass)
             ;(<any>currTokClass).tokenType = tokenShortNameIdx++
@@ -101,33 +92,34 @@ export function assignTokenDefaultProps(
 }
 
 export function assignExtendingTokensProp(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): void {
-    forEach(tokenClasses, currTokType => {
-        let currSubClassesExtendingTypes = [currTokType.tokenType]
+    forEach(tokenTypes, currTokType => {
+        let currSubTypesExtendingTypes = [currTokType.tokenType]
         let currParentClass: any = currTokType.parent
 
         while (
-            currParentClass && !isBaseTokenClass(currParentClass) &&
+            currParentClass &&
+            !isBaseTokenClass(currParentClass) &&
             currParentClass !== Object
         ) {
             let newExtendingTypes = difference(
-                currSubClassesExtendingTypes,
+                currSubTypesExtendingTypes,
                 currParentClass.extendingTokenTypes
             )
             currParentClass.extendingTokenTypes = currParentClass.extendingTokenTypes.concat(
                 newExtendingTypes
             )
-            currSubClassesExtendingTypes.push(currParentClass.tokenType)
+            currSubTypesExtendingTypes.push(currParentClass.tokenType)
             currParentClass = currParentClass.parent
         }
     })
 }
 
 export function assignExtendingTokensMapProp(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): void {
-    forEach(tokenClasses, currTokClass => {
+    forEach(tokenTypes, currTokClass => {
         forEach(currTokClass.extendingTokenTypes, currExtendingType => {
             currTokClass.extendingTokenTypesMap[currExtendingType] = true
         })
@@ -155,5 +147,5 @@ export function hasTokenNameProperty(tokClass: TokenConstructor): boolean {
 }
 
 export function isExtendingTokenType(tokType: TokenConstructor): boolean {
-    return Token.prototype.isPrototypeOf(tokType.prototype)
+    return has(tokType, "tokenType")
 }

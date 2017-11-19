@@ -13,7 +13,7 @@ import {
     tokenStructuredMatcher
 } from "./tokens"
 
-import {Lexer} from "./lexer_public"
+import { Lexer } from "./lexer_public"
 /**
  *  The type of custom pattern matcher functions.
  *  Matches should only be done on the start of the text.
@@ -123,7 +123,7 @@ function createTokenInternal(config: ITokenConfig): TokenConstructor {
     let parentType = config.parent
     let pattern = config.pattern
 
-    let tokenType:any = {}
+    let tokenType: any = {}
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
     // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
@@ -144,10 +144,7 @@ function createTokenInternal(config: ITokenConfig): TokenConstructor {
     augmentTokenClasses([tokenType])
 
     // static properties mixing
-    tokenType = assignNoOverwrite(
-        tokenType,
-        parentType
-    )
+    tokenType = assignNoOverwrite(tokenType, parentType)
 
     if (has(config, LABEL)) {
         tokenType.LABEL = config[LABEL]
@@ -268,7 +265,7 @@ export class Token implements IToken {
     constructor() {}
 }
 
-export const EOF = createToken({name:"EOF", pattern: Lexer.NA})
+export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })
 augmentTokenClasses([EOF])
 
 /**
