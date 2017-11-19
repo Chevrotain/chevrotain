@@ -1,20 +1,19 @@
 import {
     assignNoOverwrite,
     has,
-    isFunction,
     isObject,
-    isRegExp,
     isString,
     isUndefined
 } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
-import { Lexer, TokenConstructor } from "./lexer_public"
+import { TokenConstructor } from "./lexer_public"
 import {
     augmentTokenClasses,
     tokenIdxToClass,
     tokenStructuredMatcher
 } from "./tokens"
 
+import {Lexer} from "./lexer_public"
 /**
  *  The type of custom pattern matcher functions.
  *  Matches should only be done on the start of the text.
@@ -121,61 +120,60 @@ export function createToken(config: ITokenConfig): TokenConstructor {
 
 function createTokenInternal(config: ITokenConfig): TokenConstructor {
     let tokenName = config.name
-    let parentConstructor = config.parent
+    let parentType = config.parent
     let pattern = config.pattern
 
-    let derivedConstructor: any = function() {
-        parentConstructor.apply(this, arguments)
-    }
-
+    let tokenType:any = {}
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
     // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
     /* istanbul ignore if -> will only run in old versions of node.js */
-    if (!defineNameProp(derivedConstructor, tokenName)) {
+    if (!defineNameProp(tokenType, tokenName)) {
         // hack to save the tokenName in situations where the constructor's name property cannot be reconfigured
-        derivedConstructor.tokenName = tokenName
+        tokenType.tokenName = tokenName
     }
 
-    derivedConstructor.prototype = Object.create(parentConstructor.prototype)
-    derivedConstructor.prototype.constructor = derivedConstructor
     if (!isUndefined(pattern)) {
-        derivedConstructor.PATTERN = pattern
+        tokenType.PATTERN = pattern
     }
 
-    augmentTokenClasses([derivedConstructor])
+    if (has(config, PARENT)) {
+        tokenType.parent = config[PARENT]
+    }
+
+    augmentTokenClasses([tokenType])
 
     // static properties mixing
-    derivedConstructor = assignNoOverwrite(
-        derivedConstructor,
-        parentConstructor
+    tokenType = assignNoOverwrite(
+        tokenType,
+        parentType
     )
 
     if (has(config, LABEL)) {
-        derivedConstructor.LABEL = config[LABEL]
+        tokenType.LABEL = config[LABEL]
     }
 
     if (has(config, GROUP)) {
-        derivedConstructor.GROUP = config[GROUP]
+        tokenType.GROUP = config[GROUP]
     }
 
     if (has(config, POP_MODE)) {
-        derivedConstructor.POP_MODE = config[POP_MODE]
+        tokenType.POP_MODE = config[POP_MODE]
     }
 
     if (has(config, PUSH_MODE)) {
-        derivedConstructor.PUSH_MODE = config[PUSH_MODE]
+        tokenType.PUSH_MODE = config[PUSH_MODE]
     }
 
     if (has(config, LONGER_ALT)) {
-        derivedConstructor.LONGER_ALT = config[LONGER_ALT]
+        tokenType.LONGER_ALT = config[LONGER_ALT]
     }
 
     if (has(config, LINE_BREAKS)) {
-        derivedConstructor.LINE_BREAKS = config[LINE_BREAKS]
+        tokenType.LINE_BREAKS = config[LINE_BREAKS]
     }
 
-    return derivedConstructor
+    return tokenType
 }
 
 /**
@@ -233,6 +231,7 @@ export interface IToken {
     tokenClassName?: number
 }
 
+// TODO: should this be a class?
 export class Token implements IToken {
     /**
      * A "human readable" Label for a Token.
@@ -269,7 +268,7 @@ export class Token implements IToken {
     constructor() {}
 }
 
-export class EOF extends Token {}
+export const EOF = createToken({name:"EOF", pattern: Lexer.NA})
 augmentTokenClasses([EOF])
 
 /**

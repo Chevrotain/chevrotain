@@ -64,12 +64,12 @@ export function expandTokenHierarchy(
     let tokenClassesAndParents = cloneArr(tokenClasses)
 
     forEach(tokenClasses, currTokClass => {
-        let currParentClass: any = getSuperClass(currTokClass)
-        while (!isBaseTokenOrObject(currParentClass)) {
-            if (!contains(tokenClassesAndParents, currParentClass)) {
-                tokenClassesAndParents.push(currParentClass)
+        let currParentType: any = currTokClass.parent
+        while (currParentType && currParentType !== Token) {
+            if (!contains(tokenClassesAndParents, currParentType)) {
+                tokenClassesAndParents.push(currParentType)
             }
-            currParentClass = getSuperClass(currParentClass)
+            currParentType = currParentType.parent
         }
     })
 
@@ -103,12 +103,12 @@ export function assignTokenDefaultProps(
 export function assignExtendingTokensProp(
     tokenClasses: TokenConstructor[]
 ): void {
-    forEach(tokenClasses, currTokClass => {
-        let currSubClassesExtendingTypes = [currTokClass.tokenType]
-        let currParentClass: any = getSuperClass(currTokClass)
+    forEach(tokenClasses, currTokType => {
+        let currSubClassesExtendingTypes = [currTokType.tokenType]
+        let currParentClass: any = currTokType.parent
 
         while (
-            !isBaseTokenClass(currParentClass) &&
+            currParentClass && !isBaseTokenClass(currParentClass) &&
             currParentClass !== Object
         ) {
             let newExtendingTypes = difference(
@@ -119,7 +119,7 @@ export function assignExtendingTokensProp(
                 newExtendingTypes
             )
             currSubClassesExtendingTypes.push(currParentClass.tokenType)
-            currParentClass = getSuperClass(currParentClass)
+            currParentClass = currParentClass.parent
         }
     })
 }
