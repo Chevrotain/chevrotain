@@ -7,7 +7,7 @@ import { exceptions } from "../../src/parse/exceptions_public"
 import { clearCache } from "../../src/parse/cache_public"
 import {
     tokenStructuredMatcher,
-    augmentTokenClasses
+    augmentTokenTypes
 } from "../../src/scan/tokens"
 import { createRegularToken, setEquality } from "../utils/matchers"
 import MismatchedTokenException = exceptions.MismatchedTokenException
@@ -29,7 +29,7 @@ function defineRecognizerSpecs(
         let IdentTok = createToken({ name: "IdentTok" })
 
         const ALL_TOKENS = [PlusTok, MinusTok, IntTok, IdentTok, DotTok]
-        augmentTokenClasses(ALL_TOKENS)
+        augmentTokenTypes(ALL_TOKENS)
 
         describe("The Parsing DSL", () => {
             it("provides a production SUBRULE1-5 that invokes another rule", () => {

@@ -77,7 +77,7 @@ import {
     ITokenGrammarPath
 } from "./grammar/path_public"
 import {
-    augmentTokenClasses,
+    augmentTokenTypes,
     isExtendingTokenType,
     tokenStructuredMatcher,
     tokenStructuredMatcherNoInheritance
@@ -729,7 +729,7 @@ export class Parser {
         // Because ES2015+ syntax should be supported for creating Token classes
         // We cannot assume that the Token classes were created using the "extendToken" utilities
         // Therefore we must augment the Token classes both on Lexer initialization and on Parser initialization
-        augmentTokenClasses(values(this.tokensMap))
+        augmentTokenTypes(values(this.tokensMap))
     }
 
     public get errors(): exceptions.IRecognitionException[] {

@@ -1,7 +1,7 @@
 import { IToken, Token } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { exceptions } from "../../src/parse/exceptions_public"
-import { augmentTokenClasses } from "../../src/scan/tokens"
+import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
@@ -24,7 +24,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
     }
 
     let ALL_TOKENS = [A, B, C]
-    augmentTokenClasses(ALL_TOKENS)
+    augmentTokenTypes(ALL_TOKENS)
 
     it("OPTION", () => {
         function gateFunc() {

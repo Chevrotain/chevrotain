@@ -8,7 +8,7 @@ import {
 import { defineNameProp, functionName } from "../lang/lang_extensions"
 import { TokenConstructor } from "./lexer_public"
 import {
-    augmentTokenClasses,
+    augmentTokenTypes,
     tokenIdxToClass,
     tokenStructuredMatcher
 } from "./tokens"
@@ -141,7 +141,7 @@ function createTokenInternal(config: ITokenConfig): TokenConstructor {
         tokenType.parent = config[PARENT]
     }
 
-    augmentTokenClasses([tokenType])
+    augmentTokenTypes([tokenType])
 
     // static properties mixing
     tokenType = assignNoOverwrite(tokenType, parentType)
@@ -266,7 +266,7 @@ export class Token implements IToken {
 }
 
 export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })
-augmentTokenClasses([EOF])
+augmentTokenTypes([EOF])
 
 /**
  * Utility to create Chevrotain Token "instances"

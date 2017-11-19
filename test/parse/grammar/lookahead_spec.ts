@@ -12,7 +12,7 @@ import {
 } from "../../../src/parse/grammar/lookahead"
 import { map } from "../../../src/utils/utils"
 import {
-    augmentTokenClasses,
+    augmentTokenTypes,
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
 import { createRegularToken } from "../../utils/matchers"
@@ -381,7 +381,7 @@ context("lookahead specs", () => {
         const Delta = createToken({ name: "Delta" })
         const Gamma = createToken({ name: "Gamma" })
 
-        augmentTokenClasses([
+        augmentTokenTypes([
             Alpha,
             Beta,
             Delta,

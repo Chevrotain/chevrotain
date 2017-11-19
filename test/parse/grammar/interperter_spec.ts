@@ -33,7 +33,7 @@ import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
 import { map } from "../../../src/utils/utils"
 import { Lexer, TokenConstructor } from "../../../src/scan/lexer_public"
 import {
-    augmentTokenClasses,
+    augmentTokenTypes,
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
 import { Parser } from "../../../src/parse/parser_public"
@@ -566,7 +566,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
     class Comma extends Token {}
 
-    augmentTokenClasses([Alpha, Beta, Gamma, Comma])
+    augmentTokenTypes([Alpha, Beta, Gamma, Comma])
 
     context("can calculate the next possible paths in a", () => {
         it("Sequence", () => {

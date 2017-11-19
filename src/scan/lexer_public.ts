@@ -23,7 +23,7 @@ import {
     NOOP,
     reject
 } from "../utils/utils"
-import { augmentTokenClasses } from "./tokens"
+import { augmentTokenTypes } from "./tokens"
 
 export interface TokenConstructor extends Function {
     GROUP?: string
@@ -349,7 +349,7 @@ export class Lexer {
                 // Considering a lexer with definition errors may never be used, there is no point
                 // to performing the analysis anyhow...
                 if (isEmpty(this.lexerDefinitionErrors)) {
-                    augmentTokenClasses(currModDef)
+                    augmentTokenTypes(currModDef)
                     let currAnalyzeResult = analyzeTokenClasses(currModDef)
 
                     this.patternIdxToConfig[currModName] =

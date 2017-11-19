@@ -38,9 +38,9 @@ import {
     VirtualToken
 } from "./sql_recovery_tokens"
 import { ParseTree } from "../../parse_tree"
-import { augmentTokenClasses } from "../../../../src/scan/tokens"
+import { augmentTokenTypes } from "../../../../src/scan/tokens"
 
-augmentTokenClasses(<any>allTokens)
+augmentTokenTypes(<any>allTokens)
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends Parser {

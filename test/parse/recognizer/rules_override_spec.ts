@@ -1,7 +1,7 @@
 import { IToken, Token } from "../../../src/scan/tokens_public"
 import { Parser } from "../../../src/parse/parser_public"
 import { createRegularToken } from "../../utils/matchers"
-import { augmentTokenClasses } from "../../../src/scan/tokens"
+import { augmentTokenTypes } from "../../../src/scan/tokens"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
     class PlusTok extends Token {
@@ -16,7 +16,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
         }
     }
 
-    augmentTokenClasses([PlusTok, MinusTok])
+    augmentTokenTypes([PlusTok, MinusTok])
 
     it("Can override an existing rule", () => {
         class SuperOverrideParser extends Parser {
