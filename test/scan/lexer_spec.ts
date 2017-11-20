@@ -264,9 +264,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, GlobalPattern]
                     let errors = findUnsupportedFlags(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenTypes).to.deep.equal([
-                        GlobalPattern
-                    ])
+                    expect(errors[0].tokenTypes).to.deep.equal([GlobalPattern])
                     expect(errors[0].type).to.equal(
                         LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND
                     )

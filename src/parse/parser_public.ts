@@ -137,10 +137,7 @@ export const END_OF_FILE = createTokenInstance(
 )
 Object.freeze(END_OF_FILE)
 
-export type TokenMatcher = (
-    token: IToken,
-    tokType: TokenConstructor
-) => boolean
+export type TokenMatcher = (token: IToken, tokType: TokenConstructor) => boolean
 
 export type lookAheadSequence = TokenConstructor[][]
 

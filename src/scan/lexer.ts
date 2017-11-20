@@ -1,4 +1,4 @@
-import {IToken, Token, tokenName} from "./tokens_public"
+import { IToken, Token, tokenName } from "./tokens_public"
 import {
     ILexerDefinitionError,
     ILineTerminatorsTester,
@@ -169,17 +169,14 @@ export function analyzeTokenTypes(
         }
     })
 
-    let patternIdxToLongerAltIdx: any = map(
-        onlyRelevantTypes,
-        (clazz: any) => {
-            let longerAltType = clazz.LONGER_ALT
+    let patternIdxToLongerAltIdx: any = map(onlyRelevantTypes, (clazz: any) => {
+        let longerAltType = clazz.LONGER_ALT
 
-            if (longerAltType) {
-                let longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
-                return longerAltIdx
-            }
+        if (longerAltType) {
+            let longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
+            return longerAltIdx
         }
-    )
+    })
 
     let patternIdxToPushMode = map(
         onlyRelevantTypes,
