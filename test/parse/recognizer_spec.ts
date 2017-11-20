@@ -1,5 +1,5 @@
 import { Token, EOF, createToken, IToken } from "../../src/scan/tokens_public"
-import { IMultiModeLexerDefinition, Lexer } from "../../src/scan/lexer_public"
+import {IMultiModeLexerDefinition, Lexer, TokenType} from "../../src/scan/lexer_public"
 import { Parser, EMPTY_ALT } from "../../src/parse/parser_public"
 import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"
@@ -127,7 +127,7 @@ function defineRecognizerSpecs(
 
             describe("supports EMPTY(...) alternative convenience function", () => {
                 class EmptyAltParser extends Parser {
-                    public getLookAheadCache(): HashTable<Function> {
+                    public getLookAheadCache(): HashTable<TokenType> {
                         return getLookaheadFuncsForClass(this.className)
                     }
 
@@ -293,7 +293,7 @@ function defineRecognizerSpecs(
                     this.idents.push(this.CONSUME1(IdentTok).image)
                 }
 
-                protected canTokenTypeBeInsertedInRecovery(tokClass: Function) {
+                protected canTokenTypeBeInsertedInRecovery(tokClass: TokenType) {
                     // this parser is meant to test a scenario with re-sync recovery and MANY_SEP --> disable TokenInsertion
                     return false
                 }

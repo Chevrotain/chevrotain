@@ -1,6 +1,6 @@
-import { END_OF_FILE, Parser } from "../../../src/parse/parser_public"
-import { EOF, createToken, Token } from "../../../src/scan/tokens_public"
-import { gast } from "../../../src/parse/grammar/gast_public"
+import {END_OF_FILE, Parser} from "../../../src/parse/parser_public"
+import {createToken, Token} from "../../../src/scan/tokens_public"
+import {gast} from "../../../src/parse/grammar/gast_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -10,12 +10,10 @@ import {
     lookAheadSequenceFromAlternatives,
     PROD_TYPE
 } from "../../../src/parse/grammar/lookahead"
-import { map } from "../../../src/utils/utils"
-import {
-    augmentTokenTypes,
-    tokenStructuredMatcher
-} from "../../../src/scan/tokens"
-import { createRegularToken } from "../../utils/matchers"
+import {map} from "../../../src/utils/utils"
+import {augmentTokenTypes, tokenStructuredMatcher} from "../../../src/scan/tokens"
+import {createRegularToken} from "../../utils/matchers"
+import {TokenType} from "../../../src/scan/lexer_public"
 import Terminal = gast.Terminal
 import RepetitionMandatoryWithSeparator = gast.RepetitionMandatoryWithSeparator
 import Repetition = gast.Repetition
@@ -554,7 +552,7 @@ context("lookahead specs", () => {
             class MockParser {
                 public input: Token[]
 
-                constructor(public inputConstructors: Function[]) {
+                constructor(public inputConstructors: TokenType[]) {
                     this.input = map(inputConstructors, currConst =>
                         createRegularToken(currConst)
                     )

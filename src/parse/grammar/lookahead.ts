@@ -17,7 +17,7 @@ import {
     TokenMatcher,
     lookAheadSequence
 } from "../parser_public"
-import { TokenConstructor } from "../../scan/lexer_public"
+import { TokenType } from "../../scan/lexer_public"
 import {
     tokenStructuredMatcher,
     tokenStructuredMatcherNoInheritance
@@ -115,7 +115,7 @@ export function buildLookaheadFuncForOptionalProd(
     )
 }
 
-export type Alternative = TokenConstructor[][]
+export type Alternative = TokenType[][]
 
 export function buildAlternativesLookAheadFunc(
     alts: lookAheadSequence[],
@@ -486,7 +486,7 @@ export function lookAheadSequenceFromAlternatives(
     altsDefs: gast.IProduction[],
     k: number
 ): lookAheadSequence[] {
-    function getOtherPaths(pathsAndSuffixes, filterIdx): Function[][] {
+    function getOtherPaths(pathsAndSuffixes, filterIdx): TokenType[][] {
         return reduce(
             pathsAndSuffixes,
             (result, currPathsAndSuffixes, currIdx) => {
@@ -616,7 +616,7 @@ export function getLookaheadPathsForOptionalProd(
 
 export function containsPath(
     alternative: Alternative,
-    path: Function[]
+    path: TokenType[]
 ): boolean {
     let found = find(alternative, otherPath => {
         return (
@@ -630,8 +630,8 @@ export function containsPath(
 }
 
 export function isStrictPrefixOfPath(
-    prefix: Function[],
-    other: Function[]
+    prefix: TokenType[],
+    other: TokenType[]
 ): boolean {
     return (
         prefix.length < other.length &&

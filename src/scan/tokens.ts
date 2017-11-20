@@ -1,4 +1,4 @@
-import { TokenConstructor } from "./lexer_public"
+import { TokenType } from "./lexer_public"
 import { cloneArr, contains, difference, forEach, has } from "../utils/utils"
 import { Token, tokenName } from "./tokens_public"
 import { HashTable } from "../lang/lang_extensions"
@@ -24,14 +24,14 @@ export function tokenStructuredMatcherNoInheritance(
     return tokInstance.tokenType === tokConstructor.tokenType
 }
 
-export function isBaseTokenClass(tokType: Function): boolean {
+export function isBaseTokenClass(tokType: TokenType): boolean {
     return tokType === Token
 }
 
 export let tokenShortNameIdx = 1
-export const tokenIdxToClass = new HashTable<TokenConstructor>()
+export const tokenIdxToClass = new HashTable<TokenType>()
 
-export function augmentTokenTypes(tokenTypes: TokenConstructor[]): void {
+export function augmentTokenTypes(tokenTypes: TokenType[]): void {
     // 1. collect the parent Token Types as well.
     let tokenTypesAndParents = expandTokenHierarchy(tokenTypes)
 
@@ -48,8 +48,8 @@ export function augmentTokenTypes(tokenTypes: TokenConstructor[]): void {
 }
 
 export function expandTokenHierarchy(
-    tokenTypes: TokenConstructor[]
-): TokenConstructor[] {
+    tokenTypes: TokenType[]
+): TokenType[] {
     let tokenTypesAndParents = cloneArr(tokenTypes)
 
     forEach(tokenTypes, currTokType => {
@@ -65,7 +65,7 @@ export function expandTokenHierarchy(
     return tokenTypesAndParents
 }
 
-export function assignTokenDefaultProps(tokenTypes: TokenConstructor[]): void {
+export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         if (!hasShortKeyProperty(currTokType)) {
             tokenIdxToClass.put(tokenShortNameIdx, currTokType)
@@ -88,7 +88,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenConstructor[]): void {
 }
 
 export function assignExtendingTokensProp(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): void {
     forEach(tokenTypes, currTokType => {
         let currSubTypesExtendingTypes = [currTokType.tokenType]
@@ -113,7 +113,7 @@ export function assignExtendingTokensProp(
 }
 
 export function assignExtendingTokensMapProp(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): void {
     forEach(tokenTypes, currTokType => {
         forEach(currTokType.extendingTokenTypes, currExtendingType => {
@@ -122,26 +122,26 @@ export function assignExtendingTokensMapProp(
     })
 }
 
-export function hasShortKeyProperty(tokType: TokenConstructor): boolean {
+export function hasShortKeyProperty(tokType: TokenType): boolean {
     return has(tokType, "tokenType")
 }
 
 export function hasExtendingTokensTypesProperty(
-    tokType: TokenConstructor
+    tokType: TokenType
 ): boolean {
     return has(tokType, "extendingTokenTypes")
 }
 
 export function hasExtendingTokensTypesMapProperty(
-    tokType: TokenConstructor
+    tokType: TokenType
 ): boolean {
     return has(tokType, "extendingTokenTypesMap")
 }
 
-export function hasTokenNameProperty(tokType: TokenConstructor): boolean {
+export function hasTokenNameProperty(tokType: TokenType): boolean {
     return has(tokType, "tokenName")
 }
 
-export function isExtendingTokenType(tokType: TokenConstructor): boolean {
+export function isExtendingTokenType(tokType: TokenType): boolean {
     return has(tokType, "tokenType")
 }

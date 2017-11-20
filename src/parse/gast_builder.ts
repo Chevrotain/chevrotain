@@ -10,7 +10,7 @@ import {
     sortBy,
     uniq
 } from "../utils/utils"
-import { TokenConstructor } from "../scan/lexer_public"
+import { TokenType } from "../scan/lexer_public"
 import IProduction = gast.IProduction
 import Terminal = gast.Terminal
 import NonTerminal = gast.NonTerminal
@@ -98,7 +98,7 @@ const orPartRegEx = new RegExp(
 const orPartRegExGlobal = new RegExp(orPartRegEx.source, "g")
 
 export interface ITerminalNameToConstructor {
-    [fqn: string]: TokenConstructor
+    [fqn: string]: TokenType
 }
 
 export let terminalNameToConstructor: ITerminalNameToConstructor = {}
@@ -267,7 +267,7 @@ function buildManySepProd(
 function buildRepetitionWithSep(
     prodRange: IProdRange,
     allRanges: IProdRange[],
-    repConstructor: Function,
+    repConstructor: TokenType,
     regExp: RegExp
 ): gast.RepetitionWithSeparator {
     let reResult = regExp.exec(prodRange.text)

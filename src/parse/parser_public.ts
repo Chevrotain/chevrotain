@@ -1,18 +1,9 @@
 import * as cache from "./cache"
-import {
-    CLASS_TO_ALL_RULE_NAMES,
-    CLASS_TO_BASE_CST_VISITOR,
-    CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS
-} from "./cache"
-import { exceptions } from "./exceptions_public"
-import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
-import { resolveGrammar } from "./grammar/resolver"
-import {
-    validateGrammar,
-    validateRuleDoesNotAlreadyExist,
-    validateRuleIsOverridden,
-    validateRuleName
-} from "./grammar/checks"
+import {CLASS_TO_ALL_RULE_NAMES, CLASS_TO_BASE_CST_VISITOR, CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS} from "./cache"
+import {exceptions} from "./exceptions_public"
+import {classNameFromInstance, HashTable} from "../lang/lang_extensions"
+import {resolveGrammar} from "./grammar/resolver"
+import {validateGrammar, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden, validateRuleName} from "./grammar/checks"
 import {
     cloneArr,
     cloneObj,
@@ -37,15 +28,8 @@ import {
     uniq,
     values
 } from "../utils/utils"
-import { computeAllProdsFollows } from "./grammar/follow"
-import {
-    createTokenInstance,
-    EOF,
-    getTokenConstructor,
-    IToken,
-    Token,
-    tokenName
-} from "../scan/tokens_public"
+import {computeAllProdsFollows} from "./grammar/follow"
+import {createTokenInstance, EOF, getTokenConstructor, IToken, Token, tokenName} from "../scan/tokens_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -55,11 +39,8 @@ import {
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "./grammar/lookahead"
-import {
-    IMultiModeLexerDefinition,
-    TokenConstructor
-} from "../scan/lexer_public"
-import { buildTopProduction } from "./gast_builder"
+import {IMultiModeLexerDefinition, TokenType} from "../scan/lexer_public"
+import {buildTopProduction} from "./gast_builder"
 import {
     AbstractNextTerminalAfterProductionWalker,
     NextAfterTokenWalker,
@@ -69,21 +50,13 @@ import {
     NextTerminalAfterManySepWalker,
     NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
-import { IN } from "./constants"
-import { gast } from "./grammar/gast_public"
-import { cloneProduction } from "./grammar/gast"
-import {
-    ISyntacticContentAssistPath,
-    ITokenGrammarPath
-} from "./grammar/path_public"
-import {
-    augmentTokenTypes,
-    isExtendingTokenType,
-    tokenStructuredMatcher,
-    tokenStructuredMatcherNoInheritance
-} from "../scan/tokens"
-import { CstNode, ICstVisitor } from "./cst/cst_public"
-import { addNoneTerminalToCst, addTerminalToCst, analyzeCst } from "./cst/cst"
+import {IN} from "./constants"
+import {gast} from "./grammar/gast_public"
+import {cloneProduction} from "./grammar/gast"
+import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
+import {augmentTokenTypes, isExtendingTokenType, tokenStructuredMatcher, tokenStructuredMatcherNoInheritance} from "../scan/tokens"
+import {CstNode, ICstVisitor} from "./cst/cst_public"
+import {addNoneTerminalToCst, addTerminalToCst, analyzeCst} from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -96,11 +69,8 @@ import {
     OPTION_IDX,
     OR_IDX
 } from "./grammar/keys"
-import {
-    createBaseSemanticVisitorConstructor,
-    createBaseVisitorConstructorWithDefaults
-} from "./cst/cst_visitor"
-import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
+import {createBaseSemanticVisitorConstructor, createBaseVisitorConstructorWithDefaults} from "./cst/cst_visitor"
+import {defaultErrorProvider, IErrorMessageProvider} from "./errors_public"
 import serializeGrammar = gast.serializeGrammar
 
 export enum ParserDefinitionErrorType {
@@ -137,9 +107,9 @@ export const END_OF_FILE = createTokenInstance(
 )
 Object.freeze(END_OF_FILE)
 
-export type TokenMatcher = (token: IToken, tokType: TokenConstructor) => boolean
+export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
-export type lookAheadSequence = TokenConstructor[][]
+export type lookAheadSequence = TokenType[][]
 
 export interface IParserConfig {
     /**
@@ -349,7 +319,7 @@ export interface ManySepMethodOpts<T> {
     /**
      * The separator between each iteration.
      */
-    SEP: TokenConstructor
+    SEP: TokenType
 }
 
 export interface AtLeastOneSepMethodOpts<T> extends ManySepMethodOpts<T> {
@@ -568,7 +538,7 @@ export class Parser {
     protected RULE_STACK: string[] = []
     protected RULE_OCCURRENCE_STACK: number[] = []
     protected CST_STACK: CstNode[] = []
-    protected tokensMap: { [fqn: string]: TokenConstructor } = undefined
+    protected tokensMap: { [fqn: string]: TokenType } = undefined
 
     private firstAfterRepMap
     private classLAFuncs
@@ -599,8 +569,8 @@ export class Parser {
     constructor(
         input: IToken[],
         tokensDictionary:
-            | { [fqn: string]: TokenConstructor }
-            | TokenConstructor[]
+            | { [fqn: string]: TokenType }
+            | TokenType[]
             | IMultiModeLexerDefinition,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
@@ -677,7 +647,7 @@ export class Parser {
         if (isArray(tokensDictionary)) {
             this.tokensMap = <any>reduce(
                 <any>tokensDictionary,
-                (acc, tokenClazz: TokenConstructor) => {
+                (acc, tokenClazz: TokenType) => {
                     acc[tokenName(tokenClazz)] = tokenClazz
                     return acc
                 },
@@ -694,7 +664,7 @@ export class Parser {
             let uniqueTokens = uniq(allTokenTypes)
             this.tokensMap = <any>reduce(
                 uniqueTokens,
-                (acc, tokenClazz: TokenConstructor) => {
+                (acc, tokenClazz: TokenType) => {
                     acc[tokenName(tokenClazz)] = tokenClazz
                     return acc
                 },
@@ -884,7 +854,7 @@ export class Parser {
      * @param grammarRule - The rule to try and parse in backtracking mode.
      * @param args - argumens to be passed to the grammar rule execution
      *
-     * @return {Function():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
+     * @return {TokenType():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
      */
     protected BACKTRACK<T>(
         grammarRule: (...args: any[]) => T,
@@ -917,7 +887,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.CONSUME1(tokType, options)
@@ -944,11 +914,11 @@ export class Parser {
      *                                  //     the rule 'parseQualifiedName'
      * }
      *
-     * @param {Function} tokType - A constructor function specifying the type of token to be consumed.
+     * @param {TokenType} tokType - A constructor function specifying the type of token to be consumed.
      * @param options - optional properties to modify the behavior of CONSUME.
      */
     protected CONSUME1(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.consumeInternal(tokType, 1, options)
@@ -958,7 +928,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME2(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.consumeInternal(tokType, 2, options)
@@ -968,7 +938,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME3(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.consumeInternal(tokType, 3, options)
@@ -978,7 +948,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME4(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.consumeInternal(tokType, 4, options)
@@ -988,7 +958,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME5(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.consumeInternal(tokType, 5, options)
@@ -1019,7 +989,7 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the sub rule invocation in its rule.
      *
-     * @param {Function} ruleToCall - The rule to invoke.
+     * @param {TokenType} ruleToCall - The rule to invoke.
      * @param {*[]} args - The arguments to pass to the invoked subrule.
      * @returns {*} - The result of invoking ruleToCall.
      */
@@ -1273,7 +1243,7 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * @param {Function} actionORMethodDef - The grammar action to optionally invoke multiple times
+     * @param {TokenType} actionORMethodDef - The grammar action to optionally invoke multiple times
      *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
      * @returns {OUT[]}
@@ -1565,10 +1535,10 @@ export class Parser {
     /**
      *
      * @param {string} name - The name of the rule.
-     * @param {Function} implementation - The implementation of the rule.
+     * @param {TokenType} implementation - The implementation of the rule.
      * @param {IRuleConfig} [config] - The rule's optional configuration.
      *
-     * @returns {Function} - The parsing rule which is the production implementation wrapped with the parsing logic that handles
+     * @returns {TokenType} - The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
      */
     protected RULE<T>(
@@ -1717,7 +1687,7 @@ export class Parser {
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
-    protected getTokenToInsert(tokType: TokenConstructor): IToken {
+    protected getTokenToInsert(tokType: TokenType): IToken {
         let tokToInsert = createTokenInstance(
             tokType,
             "",
@@ -1739,12 +1709,12 @@ export class Parser {
      * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
      * as the max of the cardinality will be greater than the min value (and this is a false error!).
      */
-    protected canTokenTypeBeInsertedInRecovery(tokType: TokenConstructor) {
+    protected canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
         return true
     }
 
     protected getCurrentGrammarPath(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         tokIdxInRule: number
     ): ITokenGrammarPath {
         let pathRuleStack: string[] = this.getHumanReadableRuleStack()
@@ -1763,7 +1733,7 @@ export class Parser {
     // TODO: should this be more explicitly part of the public API?
     protected getNextPossibleTokenTypes(
         grammarPath: ITokenGrammarPath
-    ): TokenConstructor[] {
+    ): TokenType[] {
         let topRuleName = first(grammarPath.ruleStack)
         let gastProductions = this.getGAstProductions()
         let topProduction = gastProductions.get(topRuleName)
@@ -1799,7 +1769,7 @@ export class Parser {
      * @returns {Token} - The consumed Token.
      */
     protected consumeInternal(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         idx: number,
         options: ConsumeMethodOpts
     ): IToken {
@@ -2001,7 +1971,7 @@ export class Parser {
         grammarRule: Function,
         grammarRuleArgs: any[],
         lookAheadFunc: () => boolean,
-        expectedTokType: TokenConstructor
+        expectedTokType: TokenType
     ): void {
         // TODO: can the resyncTokenType be cached?
         let reSyncTokType = this.findReSyncTokenType()
@@ -2055,7 +2025,7 @@ export class Parser {
     }
 
     private shouldInRepetitionRecoveryBeTried(
-        expectTokAfterLastMatch?: TokenConstructor,
+        expectTokAfterLastMatch?: TokenType,
         nextTokIdx?: number
     ): boolean {
         // arguments to try and perform resync into the next iteration of the many are missing
@@ -2094,17 +2064,17 @@ export class Parser {
 
     // Error Recovery functionality
     private getFollowsForInRuleRecovery(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         tokIdxInRule: number
-    ): TokenConstructor[] {
+    ): TokenType[] {
         let grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule)
         let follows = this.getNextPossibleTokenTypes(grammarPath)
         return follows
     }
 
     private tryInRuleRecovery(
-        expectedTokType: TokenConstructor,
-        follows: TokenConstructor[]
+        expectedTokType: TokenType,
+        follows: TokenType[]
     ): IToken {
         if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
             let tokToInsert = this.getTokenToInsert(expectedTokType)
@@ -2121,8 +2091,8 @@ export class Parser {
     }
 
     private canPerformInRuleRecovery(
-        expectedToken: TokenConstructor,
-        follows: TokenConstructor[]
+        expectedToken: TokenType,
+        follows: TokenType[]
     ): boolean {
         return (
             this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
@@ -2131,8 +2101,8 @@ export class Parser {
     }
 
     private canRecoverWithSingleTokenInsertion(
-        expectedTokType: TokenConstructor,
-        follows: TokenConstructor[]
+        expectedTokType: TokenType,
+        follows: TokenType[]
     ): boolean {
         if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
             return false
@@ -2145,7 +2115,7 @@ export class Parser {
 
         let mismatchedTok = this.LA(1)
         let isMisMatchedTokInFollows =
-            find(follows, (possibleFollowsTokType: TokenConstructor) => {
+            find(follows, (possibleFollowsTokType: TokenType) => {
                 return this.tokenMatcher(mismatchedTok, possibleFollowsTokType)
             }) !== undefined
 
@@ -2153,7 +2123,7 @@ export class Parser {
     }
 
     private canRecoverWithSingleTokenDeletion(
-        expectedTokType: TokenConstructor
+        expectedTokType: TokenType
     ): boolean {
         let isNextTokenWhatIsExpected = this.tokenMatcher(
             this.LA(2),
@@ -2162,13 +2132,13 @@ export class Parser {
         return isNextTokenWhatIsExpected
     }
 
-    private isInCurrentRuleReSyncSet(tokenType: TokenConstructor): boolean {
+    private isInCurrentRuleReSyncSet(tokenType: TokenType): boolean {
         let followKey = this.getCurrFollowKey()
         let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
         return contains(currentRuleReSyncSet, tokenType)
     }
 
-    private findReSyncTokenType(): TokenConstructor {
+    private findReSyncTokenType(): TokenType {
         let allPossibleReSyncTokTypes = this.flattenFollowSet()
         // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
         let nextToken = this.LA(1)
@@ -2228,7 +2198,7 @@ export class Parser {
         })
     }
 
-    private flattenFollowSet(): TokenConstructor[] {
+    private flattenFollowSet(): TokenType[] {
         let followStack = map(this.buildFullFollowKeyStack(), currKey => {
             return this.getFollowSetFromFollowKey(currKey)
         })
@@ -2237,7 +2207,7 @@ export class Parser {
 
     private getFollowSetFromFollowKey(
         followKey: IFollowKey
-    ): TokenConstructor[] {
+    ): TokenType[] {
         if (followKey === EOF_FOLLOW_KEY) {
             return [EOF]
         }
@@ -2259,7 +2229,7 @@ export class Parser {
         return resyncTokens
     }
 
-    private reSyncTo(tokType: TokenConstructor): IToken[] {
+    private reSyncTo(tokType: TokenType): IToken[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
         while (this.tokenMatcher(nextTok, tokType) === false) {
@@ -2799,7 +2769,7 @@ export class Parser {
 
     private repetitionSepSecondInternal<OUT>(
         prodOccurrence: number,
-        separator: TokenConstructor,
+        separator: TokenType,
         separatorLookAheadFunc: () => boolean,
         action: GrammarAction<OUT>,
         nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker,
@@ -3175,7 +3145,7 @@ export class Parser {
     }
 
     private cstPostTerminal(
-        tokType: TokenConstructor,
+        tokType: TokenType,
         consumedToken: IToken
     ): void {
         let currTokTypeName = tokType.tokenName

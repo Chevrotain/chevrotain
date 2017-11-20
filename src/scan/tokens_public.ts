@@ -6,7 +6,7 @@ import {
     isUndefined
 } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
-import { TokenConstructor } from "./lexer_public"
+import { TokenType } from "./lexer_public"
 import {
     augmentTokenTypes,
     tokenIdxToClass,
@@ -51,10 +51,10 @@ export interface ICustomPattern {
 /**
  *  This can be used to improve the quality/readability of error messages or syntax diagrams.
  *
- * @param {Function} clazz - A constructor for a Token subclass
+ * @param {TokenType} clazz - A constructor for a Token subclass
  * @returns {string} - The Human readable label for a Token if it exists.
  */
-export function tokenLabel(clazz: Function): string {
+export function tokenLabel(clazz: TokenType): string {
     if (hasTokenLabel(clazz)) {
         return (<any>clazz).LABEL
     } else {
@@ -62,35 +62,35 @@ export function tokenLabel(clazz: Function): string {
     }
 }
 
-export function hasTokenLabel(clazz: Function): boolean {
-    return isString((<any>clazz).LABEL) && (<any>clazz).LABEL !== ""
+export function hasTokenLabel(obj: TokenType): boolean {
+    return isString((<any>obj).LABEL) && (<any>obj).LABEL !== ""
 }
 
-export function tokenName(clazz: Function): string {
+export function tokenName(obj: TokenType | TokenType): string {
     // The tokenName property is needed under some old versions of node.js (0.10/0.12)
     // where the Function.prototype.name property is not defined as a 'configurable' property
     // enable producing readable error messages.
     /* istanbul ignore if -> will only run in old versions of node.js */
     if (
-        isObject(clazz) &&
-        clazz.hasOwnProperty("tokenName") &&
-        isString((<any>clazz).tokenName)
+        isObject(obj) &&
+        obj.hasOwnProperty("tokenName") &&
+        isString((<any>obj).tokenName)
     ) {
-        return (<any>clazz).tokenName
+        return (<any>obj).tokenName
     } else {
-        return functionName(clazz)
+        return functionName(obj as TokenType)
     }
 }
 
 export interface ITokenConfig {
     name: string
-    parent?: TokenConstructor
+    parent?: TokenType
     label?: string
     pattern?: RegExp | CustomPatternMatcherFunc | ICustomPattern | string
     group?: string | any
     push_mode?: string
     pop_mode?: boolean
-    longer_alt?: TokenConstructor
+    longer_alt?: TokenType
     /**
      * Can a String matching this token's pattern possibly contain a line terminator?
      * If true and the line_breaks property is not also true this will cause inaccuracies in the Lexer's line / column tracking.
@@ -108,9 +108,9 @@ const LINE_BREAKS = "line_breaks"
 
 /**
  * @param {ITokenConfig} config - The configuration for
- * @returns {TokenConstructor} - A constructor for the new Token subclass
+ * @returns {TokenType} - A constructor for the new Token subclass
  */
-export function createToken(config: ITokenConfig): TokenConstructor {
+export function createToken(config: ITokenConfig): TokenType {
     if (!has(config, PARENT)) {
         config.parent = Token
     }
@@ -118,7 +118,7 @@ export function createToken(config: ITokenConfig): TokenConstructor {
     return createTokenInternal(config)
 }
 
-function createTokenInternal(config: ITokenConfig): TokenConstructor {
+function createTokenInternal(config: ITokenConfig): TokenType {
     let tokenName = config.name
     let parentType = config.parent
     let pattern = config.pattern
@@ -218,7 +218,7 @@ export interface IToken {
      * This is the same Object returned by the "createToken" API.
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
-    type?: TokenConstructor
+    type?: TokenType
 
     /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
      *  @see {ILexerConfig} debug flag.
@@ -290,7 +290,7 @@ augmentTokenTypes([EOF])
  *            tokenType}}
  */
 export function createTokenInstance(
-    tokType: TokenConstructor,
+    tokType: TokenType,
     image: string,
     startOffset: number,
     endOffset: number,
@@ -318,9 +318,9 @@ export function createTokenInstance(
  * by traversing the prototype chain.
  *
  * @param tokenInstance {IToken}
- * @returns {TokenConstructor}
+ * @returns {TokenType}
  */
-export function getTokenConstructor(tokenInstance: IToken): TokenConstructor {
+export function getTokenConstructor(tokenInstance: IToken): TokenType {
     let tokenIdx
     tokenIdx = tokenInstance.tokenType
     return tokenIdxToClass.get(tokenIdx)
@@ -335,12 +335,12 @@ export function getTokenConstructor(tokenInstance: IToken): TokenConstructor {
  * Chevrotain Tokens have their own performance optimized inheritance mechanism.
  *
  * @param tokInstance {IToken}
- * @param tokType {TokenConstructor}
+ * @param tokType {TokenType}
  * @returns {boolean}
  */
 export function tokenMatcher(
     tokInstance: IToken,
-    tokType: TokenConstructor
+    tokType: TokenType
 ): boolean {
     return tokenStructuredMatcher(tokInstance, tokType)
 }

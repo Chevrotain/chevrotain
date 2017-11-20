@@ -39,6 +39,7 @@ import {
 } from "./sql_recovery_tokens"
 import { ParseTree } from "../../parse_tree"
 import { augmentTokenTypes } from "../../../../src/scan/tokens"
+import {TokenType} from "../../../../src/scan/lexer_public"
 
 augmentTokenTypes(<any>allTokens)
 
@@ -244,7 +245,7 @@ export function WRAP_IN_PT(toks: Token[]): ParseTree[] {
 /* tslint:disable:class-name */
 export class INVALID_INPUT extends VirtualToken {}
 /* tslint:enable:class-name */
-export function INVALID(tokType: Function = INVALID_INPUT): () => ParseTree {
+export function INVALID(tokType: TokenType = INVALID_INPUT): () => ParseTree {
     // virtual invalid tokens should have no parameters...
     return () => {
         return PT(new (<any>tokType)())

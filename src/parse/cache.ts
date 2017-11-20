@@ -2,12 +2,12 @@
  * module used to cache static information about parsers,
  */
 
-import { IParserDefinitionError } from "./parser_public"
-import { HashTable } from "../lang/lang_extensions"
-import { gast } from "./grammar/gast_public"
-import { IFirstAfterRepetition } from "./grammar/interpreter"
-import { filter, forEach, values } from "../utils/utils"
-import { TokenConstructor } from "../scan/lexer_public"
+import {IParserDefinitionError} from "./parser_public"
+import {HashTable} from "../lang/lang_extensions"
+import {gast} from "./grammar/gast_public"
+import {IFirstAfterRepetition} from "./grammar/interpreter"
+import {filter, forEach, values} from "../utils/utils"
+import {TokenType} from "../scan/lexer_public"
 
 export let CLASS_TO_DEFINITION_ERRORS = new HashTable<
     IParserDefinitionError[]
@@ -23,17 +23,17 @@ export function getProductionsForClass(
     return getFromNestedHashTable(className, CLASS_TO_GRAMMAR_PRODUCTIONS)
 }
 
-export let CLASS_TO_RESYNC_FOLLOW_SETS = new HashTable<HashTable<Function[]>>()
+export let CLASS_TO_RESYNC_FOLLOW_SETS = new HashTable<HashTable<TokenType[]>>()
 
 export function getResyncFollowsForClass(
     className: string
-): HashTable<TokenConstructor[]> {
+): HashTable<TokenType[]> {
     return getFromNestedHashTable(className, CLASS_TO_RESYNC_FOLLOW_SETS)
 }
 
 export function setResyncFollowsForClass(
     className: string,
-    followSet: HashTable<Function[]>
+    followSet: HashTable<TokenType[]>
 ): void {
     CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
 }

@@ -1,5 +1,6 @@
 import * as utils from "../utils/utils"
-import { isUndefined } from "../utils/utils"
+import {isUndefined} from "../utils/utils"
+import {TokenType} from "../scan/lexer_public"
 
 export function classNameFromInstance(instance: any): string {
     return functionName(instance.constructor)
@@ -9,7 +10,7 @@ const FUNC_NAME_REGEXP = /^\s*function\s*(\S*)\s*\(/
 const NAME = "name"
 
 /* istanbul ignore next too many hacks for IE/old versions of node.js here*/
-export function functionName(func: Function): string {
+export function functionName(func: TokenType): string {
     // Engines that support Function.prototype.name OR the nth (n>1) time after
     // the name has been computed in the following else block.
     let existingNameProp = (<any>func).name

@@ -3,7 +3,7 @@ import { Parser } from "../../src/parse/parser_public"
 import { clearCache } from "../../src/parse/cache_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
-import { TokenConstructor } from "../../src/scan/lexer_public"
+import { TokenType } from "../../src/scan/lexer_public"
 import { map } from "../../src/utils/utils"
 
 function defineCstSpecs(
@@ -12,7 +12,7 @@ function defineCstSpecs(
     createTokenInstance,
     tokenMatcher
 ) {
-    function createTokenVector(tokTypes: TokenConstructor[]): any[] {
+    function createTokenVector(tokTypes: TokenType[]): any[] {
         return map(tokTypes, curTokType => {
             return createTokenInstance(curTokType)
         })
@@ -798,7 +798,7 @@ function defineCstSpecs(
                     })
 
                     protected canTokenTypeBeInsertedInRecovery(
-                        tokClass: Function
+                        tokType: TokenType
                     ): boolean {
                         // we want to force re-sync recovery
                         return false
@@ -879,7 +879,7 @@ function defineCstSpecs(
                     })
 
                     protected canTokenTypeBeInsertedInRecovery(
-                        tokClass: Function
+                        tokType: TokenType
                     ): boolean {
                         // we want to force re-sync recovery
                         return false

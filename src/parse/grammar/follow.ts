@@ -5,17 +5,18 @@ import { first } from "./first"
 import { forEach } from "../../utils/utils"
 import { IN } from "../constants"
 import { tokenName } from "../../scan/tokens_public"
+import {TokenType} from "../../scan/lexer_public"
 
 // This ResyncFollowsWalker computes all of the follows required for RESYNC
 // (skipping reference production).
 export class ResyncFollowsWalker extends RestWalker {
-    public follows = new HashTable<Function[]>()
+    public follows = new HashTable<TokenType[]>()
 
     constructor(private topProd: gast.Rule) {
         super()
     }
 
-    startWalking(): HashTable<Function[]> {
+    startWalking(): HashTable<TokenType[]> {
         this.walk(this.topProd)
         return this.follows
     }
@@ -47,8 +48,8 @@ export class ResyncFollowsWalker extends RestWalker {
 
 export function computeAllProdsFollows(
     topProductions: gast.Rule[]
-): HashTable<Function[]> {
-    let reSyncFollows = new HashTable<Function[]>()
+): HashTable<TokenType[]> {
+    let reSyncFollows = new HashTable<TokenType[]>()
 
     forEach(topProductions, topProd => {
         let currRefsFollow = new ResyncFollowsWalker(topProd).startWalking()

@@ -31,7 +31,7 @@ import { createRegularToken, setEquality } from "../../utils/matchers"
 import { gast } from "../../../src/parse/grammar/gast_public"
 import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
 import { map } from "../../../src/utils/utils"
-import { Lexer, TokenConstructor } from "../../../src/scan/lexer_public"
+import { Lexer, TokenType } from "../../../src/scan/lexer_public"
 import {
     augmentTokenTypes,
     tokenStructuredMatcher
@@ -772,11 +772,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     context("can calculate the next possible single tokens for: ", () => {
-        function INPUT(tokTypes: TokenConstructor[]): IToken[] {
+        function INPUT(tokTypes: TokenType[]): IToken[] {
             return map(tokTypes, currTokType => createRegularToken(currTokType))
         }
 
-        function pluckTokenTypes(arr: any[]): TokenConstructor[] {
+        function pluckTokenTypes(arr: any[]): TokenType[] {
             return map(arr, currItem => currItem.nextTokenType)
         }
 

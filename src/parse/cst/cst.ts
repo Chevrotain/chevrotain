@@ -1,16 +1,8 @@
-import { IToken, tokenName } from "../../scan/tokens_public"
-import { CstNode } from "./cst_public"
-import { gast } from "../grammar/gast_public"
-import {
-    cloneObj,
-    drop,
-    forEach,
-    has,
-    isEmpty,
-    isUndefined,
-    map
-} from "../../utils/utils"
-import { HashTable } from "../../lang/lang_extensions"
+import {IToken, tokenName} from "../../scan/tokens_public"
+import {CstNode} from "./cst_public"
+import {gast} from "../grammar/gast_public"
+import {cloneObj, drop, forEach, has, isEmpty, isUndefined, map} from "../../utils/utils"
+import {HashTable} from "../../lang/lang_extensions"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -23,8 +15,6 @@ import {
 } from "../grammar/keys"
 import IProduction = gast.IProduction
 import GAstVisitor = gast.GAstVisitor
-import NonTerminal = gast.NonTerminal
-import Terminal = gast.Terminal
 import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
 import IProductionWithOccurrence = gast.IProductionWithOccurrence
 import AbstractProduction = gast.AbstractProduction

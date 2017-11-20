@@ -25,11 +25,11 @@ import {
 } from "../utils/utils"
 import { augmentTokenTypes } from "./tokens"
 
-export interface TokenConstructor extends Function {
+export interface TokenType {
     GROUP?: string
     PATTERN?: RegExp | string
     LABEL?: string
-    LONGER_ALT?: TokenConstructor
+    LONGER_ALT?: TokenType
     POP_MODE?: boolean
     PUSH_MODE?: string
     LINE_BREAKS?: boolean
@@ -39,8 +39,6 @@ export interface TokenConstructor extends Function {
     extendingTokenTypes?: number[]
     extendingTokenTypesMap?: { [tokType: number]: boolean }
     isParent?: boolean
-
-    new (...args: any[]): IToken
 }
 
 export interface ILexingResult {
@@ -70,7 +68,7 @@ export enum LexerDefinitionErrorType {
 export interface ILexerDefinitionError {
     message: string
     type: LexerDefinitionErrorType
-    tokenTypes?: Function[]
+    tokenTypes?: TokenType[]
 }
 
 export interface ILexingError {
@@ -81,8 +79,8 @@ export interface ILexingError {
     message: string
 }
 
-export type SingleModeLexerDefinition = TokenConstructor[]
-export type MultiModesDefinition = { [modeName: string]: TokenConstructor[] }
+export type SingleModeLexerDefinition = TokenType[]
+export type MultiModesDefinition = { [modeName: string]: TokenType[] }
 
 export interface IMultiModeLexerDefinition {
     modes: MultiModesDefinition
@@ -328,7 +326,7 @@ export class Lexer {
         // this transformation is to increase robustness in the case of partially invalid lexer definition.
         forEach(actualDefinition.modes, (currModeValue, currModeName) => {
             actualDefinition.modes[currModeName] = reject<
-                TokenConstructor
+                TokenType
             >(currModeValue, currTokType => isUndefined(currTokType))
         })
 
@@ -336,7 +334,7 @@ export class Lexer {
 
         forEach(
             actualDefinition.modes,
-            (currModDef: TokenConstructor[], currModName) => {
+            (currModDef: TokenType[], currModName) => {
                 this.modes.push(currModName)
                 this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
                     validatePatterns(

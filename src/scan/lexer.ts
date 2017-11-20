@@ -6,7 +6,7 @@ import {
     IRegExpExec,
     Lexer,
     LexerDefinitionErrorType,
-    TokenConstructor
+    TokenType
 } from "./lexer_public"
 import {
     compact,
@@ -65,7 +65,7 @@ export function enableSticky() {
 }
 
 export function analyzeTokenTypes(
-    tokenTypes: TokenConstructor[],
+    tokenTypes: TokenType[],
     useSticky: boolean = SUPPORT_STICKY
 ): IAnalyzeResult {
     let onlyRelevantTypes = reject(tokenTypes, currType => {
@@ -230,7 +230,7 @@ export function analyzeTokenTypes(
 }
 
 export function validatePatterns(
-    tokenTypes: TokenConstructor[],
+    tokenTypes: TokenType[],
     validModesNames: string[]
 ): ILexerDefinitionError[] {
     let errors = []
@@ -256,7 +256,7 @@ export function validatePatterns(
 }
 
 function validateRegExpPattern(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let errors = []
     let withRegExpPatterns = filter(tokenTypes, currTokType =>
@@ -278,11 +278,11 @@ function validateRegExpPattern(
 
 export interface ILexerFilterResult {
     errors: ILexerDefinitionError[]
-    valid: TokenConstructor[]
+    valid: TokenType[]
 }
 
 export function findMissingPatterns(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerFilterResult {
     let tokenTypesWithMissingPattern = filter(tokenTypes, currType => {
         return !has(currType, PATTERN)
@@ -304,7 +304,7 @@ export function findMissingPatterns(
 }
 
 export function findInvalidPatterns(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerFilterResult {
     let tokenTypesWithInvalidPattern = filter(tokenTypes, currType => {
         let pattern = currType[PATTERN]
@@ -335,7 +335,7 @@ export function findInvalidPatterns(
 const end_of_input = /[^\\][\$]/
 
 export function findEndOfInputAnchor(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let invalidRegex = filter(tokenTypes, currType => {
         let pattern = currType[PATTERN]
@@ -360,7 +360,7 @@ export function findEndOfInputAnchor(
 }
 
 export function findEmptyMatchRegExps(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let matchesEmptyString = filter(tokenTypes, currType => {
         let pattern = currType[PATTERN]
@@ -384,7 +384,7 @@ export function findEmptyMatchRegExps(
 const start_of_input = /[^\\[][\^]|^\^/
 
 export function findStartOfInputAnchor(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let invalidRegex = filter(tokenTypes, currType => {
         let pattern = currType[PATTERN]
@@ -409,7 +409,7 @@ export function findStartOfInputAnchor(
 }
 
 export function findUnsupportedFlags(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let invalidFlags = filter(tokenTypes, currType => {
         let pattern = currType[PATTERN]
@@ -434,7 +434,7 @@ export function findUnsupportedFlags(
 
 // This can only test for identical duplicate RegExps, not semantically equivalent ones.
 export function findDuplicatePatterns(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let found = []
     let identicalPatterns = map(tokenTypes, (outerType: any) => {
@@ -485,7 +485,7 @@ export function findDuplicatePatterns(
 }
 
 export function findInvalidGroupType(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     let invalidTypes = filter(tokenTypes, (clazz: any) => {
         if (!has(clazz, "GROUP")) {
@@ -511,7 +511,7 @@ export function findInvalidGroupType(
 }
 
 export function findModesThatDoNotExist(
-    tokenTypes: TokenConstructor[],
+    tokenTypes: TokenType[],
     validModes: string[]
 ): ILexerDefinitionError[] {
     let invalidModes = filter(tokenTypes, (clazz: any) => {
@@ -538,7 +538,7 @@ export function findModesThatDoNotExist(
 }
 
 export function findUnreachablePatterns(
-    tokenTypes: TokenConstructor[]
+    tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
     const errors = []
 
@@ -706,7 +706,7 @@ export function performRuntimeChecks(
         trackLines &&
         find(
             allTokenTypes,
-            (currTokType: TokenConstructor) => currTokType.LINE_BREAKS
+            (currTokType: TokenType) => currTokType.LINE_BREAKS
         ) === undefined
     ) {
         errors.push({
