@@ -61,7 +61,7 @@ function defineLexerSpecs(
         })
 
         describe("The Chevrotain Lexers", () => {
-            it("can create a token from a string with priority to the First Token class with the longest match #1", () => {
+            it("can create a token from a string with priority to the First Token Type with the longest match #1", () => {
                 // this can match either IdentifierTok or BambaTok but should match BambaTok has its pattern is defined before IdentifierTok
                 let input = "bamba"
                 let result = testLexer.tokenize(input)
@@ -70,7 +70,7 @@ function defineLexerSpecs(
                 expect(result.tokens[0].startOffset).to.equal(0)
             })
 
-            it("can create a token from a string with priority to the First Token class with the longest match #2", () => {
+            it("can create a token from a string with priority to the First Token Type with the longest match #2", () => {
                 let input = "bambaMIA"
                 let result = testLexer.tokenize(input)
                 expect(tokenMatcher(result.tokens[0], IdentifierTok)).to.be.true
@@ -78,7 +78,7 @@ function defineLexerSpecs(
                 expect(result.tokens[0].startOffset).to.equal(0)
             })
 
-            it("can create a token from a string with priority to the First Token class with the longest match - negative", () => {
+            it("can create a token from a string with priority to the First Token Type with the longest match - negative", () => {
                 const IntegerTok = createToken({
                     name: "IntegerTok",
                     pattern: /[1-9]\d*/
@@ -504,7 +504,7 @@ function defineLexerSpecs(
             })
 
             if (!skipValidationChecks) {
-                it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass", () => {
+                it("can transform/analyze an array of Token Typees into matched/ignored/patternToClass", () => {
                     let tokenClasses = [
                         Keyword,
                         If,
@@ -556,7 +556,7 @@ function defineLexerSpecs(
             }
 
             if (!skipValidationChecks && ORG_SUPPORT_STICKY) {
-                it("can transform/analyze an array of Token Classes into matched/ignored/patternToClass - sticky", () => {
+                it("can transform/analyze an array of Token Typees into matched/ignored/patternToClass - sticky", () => {
                     let tokenClasses = [
                         Keyword,
                         If,
@@ -704,7 +704,7 @@ function defineLexerSpecs(
                 name: "EndOfInputAnchor",
                 pattern: /BAMBA$/
             })
-            it("can create a simple Lexer from a List of Token Classes", () => {
+            it("can create a simple Lexer from a List of Token Typees", () => {
                 let ifElseLexer = new Lexer(
                     [
                         Keyword,
@@ -1560,7 +1560,7 @@ function defineLexerSpecs(
                     }
                 )
 
-                it("Will detect a Lexer definition which has undefined Token classes", () => {
+                it("Will detect a Lexer definition which has undefined Token Typees", () => {
                     let lexerDef: any = [
                         Alpha,
                         Beta /* this is undefined */,
@@ -1578,7 +1578,7 @@ function defineLexerSpecs(
                     expect(
                         badLexer.lexerDefinitionErrors[0].message
                     ).to.include(
-                        "A Lexer cannot be initialized using an undefined Token Class"
+                        "A Lexer cannot be initialized using an undefined Token Type"
                     )
                     expect(
                         badLexer.lexerDefinitionErrors[0].message
