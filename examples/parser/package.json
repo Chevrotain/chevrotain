@@ -5,7 +5,7 @@
         "test": "grunt --gruntfile minification/gruntfile.js && npm --prefix ./webpack install ./webpack && mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
-        "chevrotain": "*",
+        "chevrotain": "^0.35.0",
         "lodash": "~3.10.1"
     },
     "devDependencies": {
