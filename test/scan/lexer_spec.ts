@@ -15,7 +15,7 @@ import {
 } from "../../src/scan/lexer_public"
 import {
     addStartOfInput,
-    analyzeTokenClasses,
+    analyzeTokenTypes,
     disableSticky,
     enableSticky,
     findDuplicatePatterns,
@@ -193,7 +193,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, MissingPattern]
                     let result = findMissingPatterns(tokenClasses)
                     expect(result.errors.length).to.equal(1)
-                    expect(result.errors[0].tokenClasses).to.deep.equal([
+                    expect(result.errors[0].tokenTypes).to.deep.equal([
                         MissingPattern
                     ])
                     expect(result.errors[0].type).to.equal(
@@ -225,7 +225,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, InvalidPattern]
                     let result = findInvalidPatterns(tokenClasses)
                     expect(result.errors.length).to.equal(1)
-                    expect(result.errors[0].tokenClasses).to.deep.equal([
+                    expect(result.errors[0].tokenTypes).to.deep.equal([
                         InvalidPattern
                     ])
                     expect(result.errors[0].type).to.equal(
@@ -251,7 +251,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, MultiLinePattern]
                     let errors = findUnsupportedFlags(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([
+                    expect(errors[0].tokenTypes).to.deep.equal([
                         MultiLinePattern
                     ])
                     expect(errors[0].type).to.equal(
@@ -264,7 +264,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, GlobalPattern]
                     let errors = findUnsupportedFlags(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([
+                    expect(errors[0].tokenTypes).to.deep.equal([
                         GlobalPattern
                     ])
                     expect(errors[0].type).to.equal(
@@ -297,7 +297,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, InvalidToken]
                     let errors = findEndOfInputAnchor(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([InvalidToken])
+                    expect(errors[0].tokenTypes).to.deep.equal([InvalidToken])
                     expect(errors[0].type).to.equal(
                         LexerDefinitionErrorType.EOI_ANCHOR_FOUND
                     )
@@ -320,7 +320,7 @@ function defineLexerSpecs(
                     let tokenClasses = [ValidNaPattern, InvalidToken]
                     let errors = findStartOfInputAnchor(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([InvalidToken])
+                    expect(errors[0].tokenTypes).to.deep.equal([InvalidToken])
                     expect(errors[0].type).to.equal(
                         LexerDefinitionErrorType.SOI_ANCHOR_FOUND
                     )
@@ -341,7 +341,7 @@ function defineLexerSpecs(
                     let tokenClasses = [Identifier, ClassKeyword]
                     let errors = findUnreachablePatterns(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([
+                    expect(errors[0].tokenTypes).to.deep.equal([
                         Identifier,
                         ClassKeyword
                     ])
@@ -372,7 +372,7 @@ function defineLexerSpecs(
                     let tokenClasses = [DecimalInvalid, IntegerValid]
                     let errors = findDuplicatePatterns(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([
+                    expect(errors[0].tokenTypes).to.deep.equal([
                         DecimalInvalid,
                         IntegerValid
                     ])
@@ -393,7 +393,7 @@ function defineLexerSpecs(
                     let tokenClasses = [emptyMatch]
                     let errors = findEmptyMatchRegExps(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([emptyMatch])
+                    expect(errors[0].tokenTypes).to.deep.equal([emptyMatch])
                     expect(errors[0].type).to.equal(
                         LexerDefinitionErrorType.EMPTY_MATCH_PATTERN
                     )
@@ -417,7 +417,7 @@ function defineLexerSpecs(
                     let tokenClasses = [InvalidGroupNumber]
                     let errors = findInvalidGroupType(tokenClasses)
                     expect(errors.length).to.equal(1)
-                    expect(errors[0].tokenClasses).to.deep.equal([
+                    expect(errors[0].tokenTypes).to.deep.equal([
                         InvalidGroupNumber
                     ])
                     expect(errors[0].type).to.equal(
@@ -519,7 +519,7 @@ function defineLexerSpecs(
                         Whitespace,
                         NewLine
                     ]
-                    let analyzeResult = analyzeTokenClasses(tokenClasses, false)
+                    let analyzeResult = analyzeTokenTypes(tokenClasses, false)
 
                     let allPatterns = map(
                         analyzeResult.patternIdxToConfig,
@@ -572,7 +572,7 @@ function defineLexerSpecs(
                         NewLine
                     ]
                     // on newer node.js this will run with the 2nd argument as true.
-                    let analyzeResult = analyzeTokenClasses(tokenClasses, true)
+                    let analyzeResult = analyzeTokenTypes(tokenClasses, true)
                     let allPatterns = map(
                         analyzeResult.patternIdxToConfig,
                         currConfig => currConfig.pattern
@@ -1465,7 +1465,7 @@ function defineLexerSpecs(
                     })
                     expect(badLexer.lexerDefinitionErrors).to.have.lengthOf(1)
                     expect(
-                        badLexer.lexerDefinitionErrors[0].tokenClasses
+                        badLexer.lexerDefinitionErrors[0].tokenTypes
                     ).to.deep.equal([EnterNumbers])
                     expect(badLexer.lexerDefinitionErrors[0].type).to.equal(
                         LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST

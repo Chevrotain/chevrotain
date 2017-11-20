@@ -1,6 +1,6 @@
 import { CustomPatternMatcherFunc, IToken } from "./tokens_public"
 import {
-    analyzeTokenClasses,
+    analyzeTokenTypes,
     cloneEmptyGroups,
     DEFAULT_MODE,
     LineTerminatorOptimizedTester,
@@ -70,7 +70,7 @@ export enum LexerDefinitionErrorType {
 export interface ILexerDefinitionError {
     message: string
     type: LexerDefinitionErrorType
-    tokenClasses?: Function[]
+    tokenTypes?: Function[]
 }
 
 export interface ILexingError {
@@ -207,7 +207,7 @@ export class Lexer {
      *  The current lexing mode is selected via a "mode stack".
      *  The last (peek) value in the stack will be the current mode of the lexer.
      *
-     *  Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token):
+     *  Each Token Type can define that it will cause the Lexer to (after consuming an instance of the Token):
      *  1. PUSH_MODE : push a new mode to the "mode stack"
      *  2. POP_MODE  : pop the last mode from the "mode stack"
      *
@@ -324,12 +324,12 @@ export class Lexer {
             ? actualDefinition.modes
             : {}
 
-        // an error of undefined TokenClasses will be detected in "performRuntimeChecks" above.
+        // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
         // this transformation is to increase robustness in the case of partially invalid lexer definition.
         forEach(actualDefinition.modes, (currModeValue, currModeName) => {
             actualDefinition.modes[currModeName] = reject<
                 TokenConstructor
-            >(currModeValue, currTokClass => isUndefined(currTokClass))
+            >(currModeValue, currTokType => isUndefined(currTokType))
         })
 
         let allModeNames = keys(actualDefinition.modes)
@@ -350,7 +350,7 @@ export class Lexer {
                 // to performing the analysis anyhow...
                 if (isEmpty(this.lexerDefinitionErrors)) {
                     augmentTokenTypes(currModDef)
-                    let currAnalyzeResult = analyzeTokenClasses(currModDef)
+                    let currAnalyzeResult = analyzeTokenTypes(currModDef)
 
                     this.patternIdxToConfig[currModName] =
                         currAnalyzeResult.patternIdxToConfig

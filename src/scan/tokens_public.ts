@@ -272,7 +272,7 @@ augmentTokenTypes([EOF])
  * Utility to create Chevrotain Token "instances"
  * Note that Chevrotain tokens are not real instances, and thus the instanceOf cannot be used.
  *
- * @param tokClass
+ * @param tokType
  * @param image
  * @param startOffset
  * @param endOffset
@@ -290,7 +290,7 @@ augmentTokenTypes([EOF])
  *            tokenType}}
  */
 export function createTokenInstance(
-    tokClass: TokenConstructor,
+    tokType: TokenConstructor,
     image: string,
     startOffset: number,
     endOffset: number,
@@ -307,7 +307,7 @@ export function createTokenInstance(
         endLine,
         startColumn,
         endColumn,
-        tokenType: (<any>tokClass).tokenType
+        tokenType: (<any>tokType).tokenType
     }
 }
 
@@ -335,12 +335,12 @@ export function getTokenConstructor(tokenInstance: IToken): TokenConstructor {
  * Chevrotain Tokens have their own performance optimized inheritance mechanism.
  *
  * @param tokInstance {IToken}
- * @param tokClass {TokenConstructor}
+ * @param tokType {TokenConstructor}
  * @returns {boolean}
  */
 export function tokenMatcher(
     tokInstance: IToken,
-    tokClass: TokenConstructor
+    tokType: TokenConstructor
 ): boolean {
-    return tokenStructuredMatcher(tokInstance, tokClass)
+    return tokenStructuredMatcher(tokInstance, tokType)
 }

@@ -1,4 +1,4 @@
-import { IToken, Token, tokenName } from "./tokens_public"
+import {IToken, Token, tokenName} from "./tokens_public"
 import {
     ILexerDefinitionError,
     ILineTerminatorsTester,
@@ -15,6 +15,7 @@ import {
     filter,
     find,
     first,
+    flatten,
     forEach,
     has,
     indexOf,
@@ -25,12 +26,10 @@ import {
     isUndefined,
     keys,
     map,
-    reduce,
-    reject,
     mapValues,
-    cloneArr
+    reduce,
+    reject
 } from "../utils/utils"
-import { flatten } from "../utils/utils"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -65,17 +64,17 @@ export function enableSticky() {
     SUPPORT_STICKY = true
 }
 
-export function analyzeTokenClasses(
-    tokenClasses: TokenConstructor[],
+export function analyzeTokenTypes(
+    tokenTypes: TokenConstructor[],
     useSticky: boolean = SUPPORT_STICKY
 ): IAnalyzeResult {
-    let onlyRelevantClasses = reject(tokenClasses, currClass => {
-        return currClass[PATTERN] === Lexer.NA
+    let onlyRelevantTypes = reject(tokenTypes, currType => {
+        return currType[PATTERN] === Lexer.NA
     })
 
     let hasCustom = false
-    let allTransformedPatterns = map(onlyRelevantClasses, currClass => {
-        let currPattern = currClass[PATTERN]
+    let allTransformedPatterns = map(onlyRelevantTypes, currType => {
+        let currPattern = currType[PATTERN]
 
         if (isRegExp(currPattern)) {
             let regExpSource = currPattern.source
@@ -152,11 +151,11 @@ export function analyzeTokenClasses(
     })
 
     let patternIdxToType = map(
-        onlyRelevantClasses,
-        currClass => currClass.tokenType
+        onlyRelevantTypes,
+        currType => currType.tokenType
     )
 
-    let patternIdxToGroup = map(onlyRelevantClasses, (clazz: any) => {
+    let patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
         let groupName = clazz.GROUP
         if (groupName === Lexer.SKIPPED) {
             return undefined
@@ -171,36 +170,36 @@ export function analyzeTokenClasses(
     })
 
     let patternIdxToLongerAltIdx: any = map(
-        onlyRelevantClasses,
+        onlyRelevantTypes,
         (clazz: any) => {
-            let longerAltClass = clazz.LONGER_ALT
+            let longerAltType = clazz.LONGER_ALT
 
-            if (longerAltClass) {
-                let longerAltIdx = indexOf(onlyRelevantClasses, longerAltClass)
+            if (longerAltType) {
+                let longerAltIdx = indexOf(onlyRelevantTypes, longerAltType)
                 return longerAltIdx
             }
         }
     )
 
     let patternIdxToPushMode = map(
-        onlyRelevantClasses,
+        onlyRelevantTypes,
         (clazz: any) => clazz.PUSH_MODE
     )
 
-    let patternIdxToPopMode = map(onlyRelevantClasses, (clazz: any) =>
+    let patternIdxToPopMode = map(onlyRelevantTypes, (clazz: any) =>
         has(clazz, "POP_MODE")
     )
 
     let patternIdxToCanLineTerminator = map(
-        onlyRelevantClasses,
+        onlyRelevantTypes,
         clazz => clazz.LINE_BREAKS === true
     )
 
-    let patternIdxToIsCustom = map(onlyRelevantClasses, isCustomPattern)
+    let patternIdxToIsCustom = map(onlyRelevantTypes, isCustomPattern)
     let patternIdxToShort = map(allTransformedPatterns, isShortPattern)
 
     let emptyGroups = reduce(
-        onlyRelevantClasses,
+        onlyRelevantTypes,
         (acc, clazz: any) => {
             let groupName = clazz.GROUP
             if (isString(groupName) && !(groupName === Lexer.SKIPPED)) {
@@ -222,7 +221,7 @@ export function analyzeTokenClasses(
             push: patternIdxToPushMode[idx],
             pop: patternIdxToPopMode[idx],
             tokenType: patternIdxToType[idx],
-            type: onlyRelevantClasses[idx]
+            type: onlyRelevantTypes[idx]
         }
     })
 
@@ -234,37 +233,37 @@ export function analyzeTokenClasses(
 }
 
 export function validatePatterns(
-    tokenClasses: TokenConstructor[],
+    tokenTypes: TokenConstructor[],
     validModesNames: string[]
 ): ILexerDefinitionError[] {
     let errors = []
 
-    let missingResult = findMissingPatterns(tokenClasses)
+    let missingResult = findMissingPatterns(tokenTypes)
     errors = errors.concat(missingResult.errors)
 
     let invalidResult = findInvalidPatterns(missingResult.valid)
-    let validTokenClasses = invalidResult.valid
+    let validTokenTypes = invalidResult.valid
     errors = errors.concat(invalidResult.errors)
 
-    errors = errors.concat(validateRegExpPattern(validTokenClasses))
+    errors = errors.concat(validateRegExpPattern(validTokenTypes))
 
-    errors = errors.concat(findInvalidGroupType(validTokenClasses))
+    errors = errors.concat(findInvalidGroupType(validTokenTypes))
 
     errors = errors.concat(
-        findModesThatDoNotExist(validTokenClasses, validModesNames)
+        findModesThatDoNotExist(validTokenTypes, validModesNames)
     )
 
-    errors = errors.concat(findUnreachablePatterns(validTokenClasses))
+    errors = errors.concat(findUnreachablePatterns(validTokenTypes))
 
     return errors
 }
 
 function validateRegExpPattern(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
     let errors = []
-    let withRegExpPatterns = filter(tokenClasses, currTokClass =>
-        isRegExp(currTokClass[PATTERN])
+    let withRegExpPatterns = filter(tokenTypes, currTokType =>
+        isRegExp(currTokType[PATTERN])
     )
 
     errors = errors.concat(findEndOfInputAnchor(withRegExpPatterns))
@@ -286,32 +285,32 @@ export interface ILexerFilterResult {
 }
 
 export function findMissingPatterns(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerFilterResult {
-    let tokenClassesWithMissingPattern = filter(tokenClasses, currClass => {
-        return !has(currClass, PATTERN)
+    let tokenTypesWithMissingPattern = filter(tokenTypes, currType => {
+        return !has(currType, PATTERN)
     })
 
-    let errors = map(tokenClassesWithMissingPattern, currClass => {
+    let errors = map(tokenTypesWithMissingPattern, currType => {
         return {
             message:
-                "Token class: ->" +
-                tokenName(currClass) +
+                "Token Type: ->" +
+                tokenName(currType) +
                 "<- missing static 'PATTERN' property",
             type: LexerDefinitionErrorType.MISSING_PATTERN,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
-    let valid = difference(tokenClasses, tokenClassesWithMissingPattern)
+    let valid = difference(tokenTypes, tokenTypesWithMissingPattern)
     return { errors, valid }
 }
 
 export function findInvalidPatterns(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerFilterResult {
-    let tokenClassesWithInvalidPattern = filter(tokenClasses, currClass => {
-        let pattern = currClass[PATTERN]
+    let tokenTypesWithInvalidPattern = filter(tokenTypes, currType => {
+        let pattern = currType[PATTERN]
         return (
             !isRegExp(pattern) &&
             !isFunction(pattern) &&
@@ -320,43 +319,43 @@ export function findInvalidPatterns(
         )
     })
 
-    let errors = map(tokenClassesWithInvalidPattern, currClass => {
+    let errors = map(tokenTypesWithInvalidPattern, currType => {
         return {
             message:
-                "Token class: ->" +
-                tokenName(currClass) +
+                "Token Type: ->" +
+                tokenName(currType) +
                 "<- static 'PATTERN' can only be a RegExp, a" +
                 " Function matching the {CustomPatternMatcherFunc} type or an Object matching the {ICustomPattern} interface.",
             type: LexerDefinitionErrorType.INVALID_PATTERN,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
-    let valid = difference(tokenClasses, tokenClassesWithInvalidPattern)
+    let valid = difference(tokenTypes, tokenTypesWithInvalidPattern)
     return { errors, valid }
 }
 
 const end_of_input = /[^\\][\$]/
 
 export function findEndOfInputAnchor(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
-    let invalidRegex = filter(tokenClasses, currClass => {
-        let pattern = currClass[PATTERN]
+    let invalidRegex = filter(tokenTypes, currType => {
+        let pattern = currType[PATTERN]
         return end_of_input.test(pattern.source)
     })
 
-    let errors = map(invalidRegex, currClass => {
+    let errors = map(invalidRegex, currType => {
         return {
             message:
                 "Unexpected RegExp Anchor Error:\n" +
-                "\tToken class: ->" +
-                tokenName(currClass) +
+                "\tToken Type: ->" +
+                tokenName(currType) +
                 "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
                 "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS \n" +
                 "\tfor details.",
             type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
@@ -364,21 +363,21 @@ export function findEndOfInputAnchor(
 }
 
 export function findEmptyMatchRegExps(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
-    let matchesEmptyString = filter(tokenClasses, currClass => {
-        let pattern = currClass[PATTERN]
+    let matchesEmptyString = filter(tokenTypes, currType => {
+        let pattern = currType[PATTERN]
         return pattern.test("")
     })
 
-    let errors = map(matchesEmptyString, currClass => {
+    let errors = map(matchesEmptyString, currType => {
         return {
             message:
-                "Token class: ->" +
-                tokenName(currClass) +
+                "Token Type: ->" +
+                tokenName(currType) +
                 "<- static 'PATTERN' must not match an empty string",
             type: LexerDefinitionErrorType.EMPTY_MATCH_PATTERN,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
@@ -388,24 +387,24 @@ export function findEmptyMatchRegExps(
 const start_of_input = /[^\\[][\^]|^\^/
 
 export function findStartOfInputAnchor(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
-    let invalidRegex = filter(tokenClasses, currClass => {
-        let pattern = currClass[PATTERN]
+    let invalidRegex = filter(tokenTypes, currType => {
+        let pattern = currType[PATTERN]
         return start_of_input.test(pattern.source)
     })
 
-    let errors = map(invalidRegex, currClass => {
+    let errors = map(invalidRegex, currType => {
         return {
             message:
                 "Unexpected RegExp Anchor Error:\n" +
-                "\tToken class: ->" +
-                tokenName(currClass) +
+                "\tToken Type: ->" +
+                tokenName(currType) +
                 "<- static 'PATTERN' cannot contain start of input anchor '^'\n" +
                 "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS\n" +
                 "\tfor details.",
             type: LexerDefinitionErrorType.SOI_ANCHOR_FOUND,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
@@ -413,23 +412,23 @@ export function findStartOfInputAnchor(
 }
 
 export function findUnsupportedFlags(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
-    let invalidFlags = filter(tokenClasses, currClass => {
-        let pattern = currClass[PATTERN]
+    let invalidFlags = filter(tokenTypes, currType => {
+        let pattern = currType[PATTERN]
         return (
             pattern instanceof RegExp && (pattern.multiline || pattern.global)
         )
     })
 
-    let errors = map(invalidFlags, currClass => {
+    let errors = map(invalidFlags, currType => {
         return {
             message:
-                "Token class: ->" +
-                tokenName(currClass) +
+                "Token Type: ->" +
+                tokenName(currType) +
                 "<- static 'PATTERN' may NOT contain global('g') or multiline('m')",
             type: LexerDefinitionErrorType.UNSUPPORTED_FLAGS_FOUND,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
@@ -438,22 +437,22 @@ export function findUnsupportedFlags(
 
 // This can only test for identical duplicate RegExps, not semantically equivalent ones.
 export function findDuplicatePatterns(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
     let found = []
-    let identicalPatterns = map(tokenClasses, (outerClass: any) => {
+    let identicalPatterns = map(tokenTypes, (outerType: any) => {
         return reduce(
-            tokenClasses,
-            (result, innerClass: any) => {
+            tokenTypes,
+            (result, innerType: any) => {
                 if (
-                    outerClass.PATTERN.source === innerClass.PATTERN.source &&
-                    !contains(found, innerClass) &&
-                    innerClass.PATTERN !== Lexer.NA
+                    outerType.PATTERN.source === innerType.PATTERN.source &&
+                    !contains(found, innerType) &&
+                    innerType.PATTERN !== Lexer.NA
                 ) {
-                    // this avoids duplicates in the result, each class may only appear in one "set"
+                    // this avoids duplicates in the result, each Token Type may only appear in one "set"
                     // in essence we are creating Equivalence classes on equality relation.
-                    found.push(innerClass)
-                    result.push(innerClass)
+                    found.push(innerType)
+                    result.push(innerType)
                     return result
                 }
                 return result
@@ -469,19 +468,19 @@ export function findDuplicatePatterns(
     })
 
     let errors = map(duplicatePatterns, (setOfIdentical: any) => {
-        let classNames = map(setOfIdentical, (currClass: any) => {
-            return tokenName(currClass)
+        let tokenTypeNames = map(setOfIdentical, (currType: any) => {
+            return tokenName(currType)
         })
 
         let dupPatternSrc = (<any>first(setOfIdentical)).PATTERN
         return {
             message:
                 `The same RegExp pattern ->${dupPatternSrc}<-` +
-                `has been used in all the following classes: ${classNames.join(
+                `has been used in all of the following Token Types: ${tokenTypeNames.join(
                     ", "
                 )} <-`,
             type: LexerDefinitionErrorType.DUPLICATE_PATTERNS_FOUND,
-            tokenClasses: setOfIdentical
+            tokenTypes: setOfIdentical
         }
     })
 
@@ -489,9 +488,9 @@ export function findDuplicatePatterns(
 }
 
 export function findInvalidGroupType(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
-    let invalidTypes = filter(tokenClasses, (clazz: any) => {
+    let invalidTypes = filter(tokenTypes, (clazz: any) => {
         if (!has(clazz, "GROUP")) {
             return false
         }
@@ -500,14 +499,14 @@ export function findInvalidGroupType(
         return group !== Lexer.SKIPPED && group !== Lexer.NA && !isString(group)
     })
 
-    let errors = map(invalidTypes, currClass => {
+    let errors = map(invalidTypes, currType => {
         return {
             message:
-                "Token class: ->" +
-                tokenName(currClass) +
+                "Token Type: ->" +
+                tokenName(currType) +
                 "<- static 'GROUP' can only be Lexer.SKIPPED/Lexer.NA/A String",
             type: LexerDefinitionErrorType.INVALID_GROUP_TYPE_FOUND,
-            tokenClasses: [currClass]
+            tokenTypes: [currType]
         }
     })
 
@@ -515,10 +514,10 @@ export function findInvalidGroupType(
 }
 
 export function findModesThatDoNotExist(
-    tokenClasses: TokenConstructor[],
+    tokenTypes: TokenConstructor[],
     validModes: string[]
 ): ILexerDefinitionError[] {
-    let invalidModes = filter(tokenClasses, (clazz: any) => {
+    let invalidModes = filter(tokenTypes, (clazz: any) => {
         return (
             clazz.PUSH_MODE !== undefined &&
             !contains(validModes, clazz.PUSH_MODE)
@@ -527,14 +526,14 @@ export function findModesThatDoNotExist(
 
     let errors = map(invalidModes, clazz => {
         let msg =
-            `Token class: ->${tokenName(
+            `Token Type: ->${tokenName(
                 clazz
             )}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${clazz.PUSH_MODE}<-` +
             `which does not exist`
         return {
             message: msg,
             type: LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
-            tokenClasses: [clazz]
+            tokenTypes: [clazz]
         }
     })
 
@@ -542,14 +541,14 @@ export function findModesThatDoNotExist(
 }
 
 export function findUnreachablePatterns(
-    tokenClasses: TokenConstructor[]
+    tokenTypes: TokenConstructor[]
 ): ILexerDefinitionError[] {
     const errors = []
 
     const canBeTested = reduce(
-        tokenClasses,
-        (result, tokClass, idx) => {
-            const pattern = tokClass.PATTERN
+        tokenTypes,
+        (result, tokType, idx) => {
+            const pattern = tokType.PATTERN
 
             if (pattern === Lexer.NA) {
                 return result
@@ -558,31 +557,31 @@ export function findUnreachablePatterns(
             // a more comprehensive validation for all forms of regExps would require
             // deeper regExp analysis capabilities
             if (isString(pattern)) {
-                result.push({ str: pattern, idx, tokenType: tokClass })
+                result.push({ str: pattern, idx, tokenType: tokType })
             } else if (isRegExp(pattern) && noMetaChar(pattern)) {
-                result.push({ str: pattern.source, idx, tokenType: tokClass })
+                result.push({ str: pattern.source, idx, tokenType: tokType })
             }
             return result
         },
         []
     )
 
-    forEach(tokenClasses, (tokClass, testIdx) => {
+    forEach(tokenTypes, (tokType, testIdx) => {
         forEach(canBeTested, ({ str, idx, tokenType }) => {
-            if (testIdx < idx && testTokenClass(str, tokClass.PATTERN)) {
+            if (testIdx < idx && testTokenType(str, tokType.PATTERN)) {
                 let msg =
                     `Token: ->${tokenName(
                         tokenType
                     )}<- can never be matched.\n` +
-                    `Because it appears AFTER the token ->${tokenName(
-                        tokClass
+                    `Because it appears AFTER the Token Type ->${tokenName(
+                        tokType
                     )}<-` +
                     `in the lexer's definition.\n` +
                     `See https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#UNREACHABLE`
                 errors.push({
                     message: msg,
                     type: LexerDefinitionErrorType.UNREACHABLE_PATTERN,
-                    tokenClasses: [tokClass, tokenType]
+                    tokenTypes: [tokType, tokenType]
                 })
             }
         })
@@ -591,7 +590,7 @@ export function findUnreachablePatterns(
     return errors
 }
 
-function testTokenClass(str: string, pattern: any): boolean {
+function testTokenType(str: string, pattern: any): boolean {
     if (isRegExp(pattern)) {
         const regExpArray = pattern.exec(str)
         return regExpArray !== null && regExpArray.index === 0
@@ -689,11 +688,11 @@ export function performRuntimeChecks(
 
     if (has(lexerDefinition, MODES)) {
         forEach(lexerDefinition.modes, (currModeValue, currModeName) => {
-            forEach(currModeValue, (currTokClass, currIdx) => {
-                if (isUndefined(currTokClass)) {
+            forEach(currModeValue, (currTokType, currIdx) => {
+                if (isUndefined(currTokType)) {
                     errors.push({
                         message:
-                            `A Lexer cannot be initialized using an undefined Token Class. Mode:` +
+                            `A Lexer cannot be initialized using an undefined Token Type. Mode:` +
                             `<${currModeName}> at index: <${currIdx}>\n`,
                         type:
                             LexerDefinitionErrorType.LEXER_DEFINITION_CANNOT_CONTAIN_UNDEFINED

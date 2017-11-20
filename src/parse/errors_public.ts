@@ -126,8 +126,8 @@ export const defaultErrorProvider: IErrorMessageProvider = {
             let nextValidTokenSequences = map(
                 allLookAheadPaths,
                 currPath =>
-                    `[${map(currPath, currTokenClass =>
-                        tokenLabel(currTokenClass)
+                    `[${map(currPath, currTokenType =>
+                        tokenLabel(currTokenType)
                     ).join(", ")}]`
             )
             let nextValidSequenceItems = map(
@@ -159,8 +159,8 @@ export const defaultErrorProvider: IErrorMessageProvider = {
             let nextValidTokenSequences = map(
                 expectedIterationPaths,
                 currPath =>
-                    `[${map(currPath, currTokenClass =>
-                        tokenLabel(currTokenClass)
+                    `[${map(currPath, currTokenType =>
+                        tokenLabel(currTokenType)
                     ).join(",")}]`
             )
             let calculatedDescription =

@@ -139,7 +139,7 @@ Object.freeze(END_OF_FILE)
 
 export type TokenMatcher = (
     token: IToken,
-    tokClass: TokenConstructor
+    tokType: TokenConstructor
 ) => boolean
 
 export type lookAheadSequence = TokenConstructor[][]
@@ -920,16 +920,16 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.CONSUME1(tokClass, options)
+        return this.CONSUME1(tokType, options)
     }
 
     /**
      *
      * A Parsing DSL method use to consume a single terminal Token.
-     * a Token will be consumed, IFF the next token in the token vector is an instanceof tokClass.
+     * a Token will be consumed, IFF the next token in the token vector is an instanceof tokType.
      * otherwise the parser will attempt to perform error recovery.
      *
      * The index in the method name indicates the unique occurrence of a terminal consumption
@@ -947,54 +947,54 @@ export class Parser {
      *                                  //     the rule 'parseQualifiedName'
      * }
      *
-     * @param {Function} tokClass - A constructor function specifying the type of token to be consumed.
+     * @param {Function} tokType - A constructor function specifying the type of token to be consumed.
      * @param options - optional properties to modify the behavior of CONSUME.
      */
     protected CONSUME1(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokClass, 1, options)
+        return this.consumeInternal(tokType, 1, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME2(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokClass, 2, options)
+        return this.consumeInternal(tokType, 2, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME3(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokClass, 3, options)
+        return this.consumeInternal(tokType, 3, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME4(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokClass, 4, options)
+        return this.consumeInternal(tokType, 4, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME5(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokClass, 5, options)
+        return this.consumeInternal(tokType, 5, options)
     }
 
     /**
@@ -1720,9 +1720,9 @@ export class Parser {
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
-    protected getTokenToInsert(tokClass: TokenConstructor): IToken {
+    protected getTokenToInsert(tokType: TokenConstructor): IToken {
         let tokToInsert = createTokenInstance(
-            tokClass,
+            tokType,
             "",
             NaN,
             NaN,
@@ -1742,12 +1742,12 @@ export class Parser {
      * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
      * as the max of the cardinality will be greater than the min value (and this is a false error!).
      */
-    protected canTokenTypeBeInsertedInRecovery(tokClass: TokenConstructor) {
+    protected canTokenTypeBeInsertedInRecovery(tokType: TokenConstructor) {
         return true
     }
 
     protected getCurrentGrammarPath(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         tokIdxInRule: number
     ): ITokenGrammarPath {
         let pathRuleStack: string[] = this.getHumanReadableRuleStack()
@@ -1755,7 +1755,7 @@ export class Parser {
         let grammarPath: any = {
             ruleStack: pathRuleStack,
             occurrenceStack: pathOccurrenceStack,
-            lastTok: tokClass,
+            lastTok: tokType,
             lastTokOccurrence: tokIdxInRule
         }
 
@@ -1789,7 +1789,7 @@ export class Parser {
     }
 
     /**
-     * @param tokClass - The Type of Token we wish to consume (Reference to its constructor function).
+     * @param tokType - The Type of Token we wish to consume (Reference to its constructor function).
      * @param idx - Occurrence index of consumed token in the invoking parser rule text
      *         for example:
      *         IDENT (DOT IDENT)*
@@ -1802,14 +1802,14 @@ export class Parser {
      * @returns {Token} - The consumed Token.
      */
     protected consumeInternal(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         idx: number,
         options: ConsumeMethodOpts
     ): IToken {
         let consumedToken
         try {
             let nextToken = this.LA(1)
-            if (this.tokenMatcher(nextToken, tokClass) === true) {
+            if (this.tokenMatcher(nextToken, tokType) === true) {
                 this.consumeToken()
                 consumedToken = nextToken
             } else {
@@ -1818,7 +1818,7 @@ export class Parser {
                     msg = options.ERR_MSG
                 } else {
                     msg = this.errorMessageProvider.buildMismatchTokenMessage({
-                        expected: tokClass,
+                        expected: tokType,
                         actual: nextToken,
                         ruleName: this.getCurrRuleFullName()
                     })
@@ -1836,9 +1836,9 @@ export class Parser {
                 eFromConsumption.name === "MismatchedTokenException" &&
                 !this.isBackTracking()
             ) {
-                let follows = this.getFollowsForInRuleRecovery(tokClass, idx)
+                let follows = this.getFollowsForInRuleRecovery(tokType, idx)
                 try {
-                    consumedToken = this.tryInRuleRecovery(tokClass, follows)
+                    consumedToken = this.tryInRuleRecovery(tokType, follows)
                 } catch (eFromInRuleRecovery) {
                     if (
                         eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION
@@ -1855,7 +1855,7 @@ export class Parser {
             }
         }
 
-        this.cstPostTerminal(tokClass, consumedToken)
+        this.cstPostTerminal(tokType, consumedToken)
         return consumedToken
     }
 
@@ -2097,10 +2097,10 @@ export class Parser {
 
     // Error Recovery functionality
     private getFollowsForInRuleRecovery(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         tokIdxInRule: number
     ): TokenConstructor[] {
-        let grammarPath = this.getCurrentGrammarPath(tokClass, tokIdxInRule)
+        let grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule)
         let follows = this.getNextPossibleTokenTypes(grammarPath)
         return follows
     }
@@ -2262,10 +2262,10 @@ export class Parser {
         return resyncTokens
     }
 
-    private reSyncTo(tokClass: TokenConstructor): IToken[] {
+    private reSyncTo(tokType: TokenConstructor): IToken[] {
         let resyncedTokens = []
         let nextTok = this.LA(1)
-        while (this.tokenMatcher(nextTok, tokClass) === false) {
+        while (this.tokenMatcher(nextTok, tokType) === false) {
             nextTok = this.SKIP_TOKEN()
             this.addToResyncTokens(nextTok, resyncedTokens)
         }
@@ -3178,10 +3178,10 @@ export class Parser {
     }
 
     private cstPostTerminal(
-        tokClass: TokenConstructor,
+        tokType: TokenConstructor,
         consumedToken: IToken
     ): void {
-        let currTokTypeName = tokClass.tokenName
+        let currTokTypeName = tokType.tokenName
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, currTokTypeName)
     }

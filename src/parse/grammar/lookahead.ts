@@ -181,12 +181,12 @@ export function buildAlternativesLookAheadFunc(
         let choiceToAlt = reduce(
             singleTokenAlts,
             (result, currAlt, idx) => {
-                forEach(currAlt, currTokClass => {
-                    if (!has(result, currTokClass.tokenType)) {
-                        result[currTokClass.tokenType] = idx
+                forEach(currAlt, currTokType => {
+                    if (!has(result, currTokType.tokenType)) {
+                        result[currTokType.tokenType] = idx
                     }
                     forEach(
-                        currTokClass.extendingTokenTypes,
+                        currTokType.extendingTokenTypes,
                         currExtendingType => {
                             if (!has(result, currExtendingType)) {
                                 result[currExtendingType] = idx
@@ -254,13 +254,13 @@ export function buildSingleAlternativeLookaheadFunction(
     // optimized (common) case of all the lookaheads paths requiring only
     // a single token lookahead.
     if (areAllOneTokenLookahead && !dynamicTokensEnabled) {
-        let singleTokensClasses = flatten(alt)
+        let singleTokensTypes = flatten(alt)
 
         if (
-            singleTokensClasses.length === 1 &&
-            isEmpty((<any>singleTokensClasses[0]).extendingTokenTypes)
+            singleTokensTypes.length === 1 &&
+            isEmpty((<any>singleTokensTypes[0]).extendingTokenTypes)
         ) {
-            let expectedTokenType = singleTokensClasses[0]
+            let expectedTokenType = singleTokensTypes[0]
             let expectedTokenUniqueKey = (<any>expectedTokenType).tokenType
 
             return function(): boolean {
@@ -268,11 +268,11 @@ export function buildSingleAlternativeLookaheadFunction(
             }
         } else {
             let choiceToAlt = reduce(
-                singleTokensClasses,
-                (result, currTokClass, idx) => {
-                    result[currTokClass.tokenType] = true
+                singleTokensTypes,
+                (result, currTokType, idx) => {
+                    result[currTokType.tokenType] = true
                     forEach(
-                        currTokClass.extendingTokenTypes,
+                        currTokType.extendingTokenTypes,
                         currExtendingType => {
                             result[currExtendingType] = true
                         }

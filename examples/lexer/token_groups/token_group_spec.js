@@ -18,7 +18,7 @@ describe("The Chevrotain Lexer ability to group the Tokens.", function() {
 
         lexResult.tokens.forEach(function(lexedToken) {
             // the whitespace has been completely skipped/ignored
-            assert.notEqual(lexedToken instanceof groupsLexer.Whitespace, true)
+            assert.notEqual(chevrotain.tokenMatcher(lexedToken, groupsLexer.Whitespace), true)
         })
 
         var commentsGroup = lexResult.groups.singleLineComments
