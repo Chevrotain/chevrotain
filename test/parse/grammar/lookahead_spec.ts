@@ -1,5 +1,5 @@
 import {END_OF_FILE, Parser} from "../../../src/parse/parser_public"
-import {createToken, Token} from "../../../src/scan/tokens_public"
+import {createToken, IToken, Token} from "../../../src/scan/tokens_public"
 import {gast} from "../../../src/parse/grammar/gast_public"
 import {
     buildAlternativesLookAheadFunc,
@@ -225,7 +225,7 @@ context("lookahead specs", () => {
             super([], [ColonTok])
         }
 
-        protected LA(): Token {
+        protected LA(): IToken {
             return createRegularToken(ColonTok, ":")
         }
     }
@@ -235,7 +235,7 @@ context("lookahead specs", () => {
             super([], [IdentTok])
         }
 
-        protected LA(): Token {
+        protected LA(): IToken {
             return createRegularToken(IdentTok, "bamba")
         }
     }
@@ -245,7 +245,7 @@ context("lookahead specs", () => {
             super([], [CommaTok])
         }
 
-        protected LA(): Token {
+        protected LA(): IToken {
             return createRegularToken(CommaTok, ",")
         }
     }
@@ -255,7 +255,7 @@ context("lookahead specs", () => {
             super([], [EntityTok])
         }
 
-        protected LA(): Token {
+        protected LA(): IToken {
             return createRegularToken(EntityTok, ",")
         }
     }
@@ -265,7 +265,7 @@ context("lookahead specs", () => {
             super([], [KeyTok])
         }
 
-        protected LA(): Token {
+        protected LA(): IToken {
             return createRegularToken(KeyTok, ",")
         }
     }
@@ -550,15 +550,15 @@ context("lookahead specs", () => {
 
         context("computing lookahead functions for", () => {
             class MockParser {
-                public input: Token[]
+                public input: IToken[]
 
-                constructor(public inputConstructors: TokenType[]) {
+                constructor(public inputConstructors: ITokenType[]) {
                     this.input = map(inputConstructors, currConst =>
                         createRegularToken(currConst)
                     )
                 }
 
-                LA(howMuch: number): Token {
+                LA(howMuch: number): IToken {
                     if (this.input.length <= howMuch - 1) {
                         return END_OF_FILE
                     } else {

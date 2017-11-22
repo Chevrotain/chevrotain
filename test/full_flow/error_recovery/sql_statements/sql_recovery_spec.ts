@@ -118,7 +118,7 @@ describe("Error Recovery SQL DDL Example", () => {
             expect(parser.isAtEndOfInput()).to.equal(true)
             // and the output parseTree contains ALL three statements
             assertAllThreeStatementsPresentAndValid(ptResult)
-            let insertedSemiColon: Token =
+            let insertedSemiColon: IToken =
                 ptResult.children[1].children[4].payload
             // the semicolon is present even though it did not exist in the input, magic!
             expect(tokenMatcher(insertedSemiColon, SemiColonTok)).to.be.true

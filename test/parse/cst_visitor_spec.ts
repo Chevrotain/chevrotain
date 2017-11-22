@@ -11,7 +11,7 @@ describe("The CSTVisitor", () => {
     const ALL_TOKENS = [A, B, C]
 
     class CstTerminalParserReturnVisitor extends Parser {
-        constructor(input: Token[] = []) {
+        constructor(input: IToken[] = []) {
             super(input, ALL_TOKENS, { outputCst: true })
             ;(<any>Parser).performSelfAnalysis(this)
         }

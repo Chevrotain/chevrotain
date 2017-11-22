@@ -1,25 +1,21 @@
-import { IToken, Token } from "../../src/scan/tokens_public"
+import { IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { exceptions } from "../../src/parse/exceptions_public"
 import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
-    class A extends Token {
+    class A  {
+        constructor() {}
+    }
+
+    class B  {
         constructor() {
-            super()
         }
     }
 
-    class B extends Token {
+    class C  {
         constructor() {
-            super()
-        }
-    }
-
-    class C extends Token {
-        constructor() {
-            super()
         }
     }
 

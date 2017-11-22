@@ -45,7 +45,7 @@ augmentTokenTypes(<any>allTokens)
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends Parser {
-    constructor(input: Token[] = [], isRecoveryEnabled = true) {
+    constructor(input: IToken[] = [], isRecoveryEnabled = true) {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
@@ -230,11 +230,11 @@ export class DDLExampleRecoveryParser extends Parser {
 }
 
 // HELPER FUNCTIONS
-function PT(token: Token, children: ParseTree[] = []): ParseTree {
+function PT(token: IToken, children: ParseTree[] = []): ParseTree {
     return new ParseTree(token, children)
 }
 
-export function WRAP_IN_PT(toks: Token[]): ParseTree[] {
+export function WRAP_IN_PT(toks: IToken[]): ParseTree[] {
     let parseTrees = new Array(toks.length)
     for (let i = 0; i < toks.length; i++) {
         parseTrees[i] = PT(toks[i])
@@ -245,7 +245,7 @@ export function WRAP_IN_PT(toks: Token[]): ParseTree[] {
 /* tslint:disable:class-name */
 export class INVALID_INPUT extends VirtualToken {}
 /* tslint:enable:class-name */
-export function INVALID(tokType: TokenType = INVALID_INPUT): () => ParseTree {
+export function INVALID(tokType: ITokenType = INVALID_INPUT): () => ParseTree {
     // virtual invalid tokens should have no parameters...
     return () => {
         return PT(new (<any>tokType)())

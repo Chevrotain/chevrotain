@@ -772,11 +772,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     context("can calculate the next possible single tokens for: ", () => {
-        function INPUT(tokTypes: TokenType[]): IToken[] {
+        function INPUT(tokTypes: ITokenType[]): IToken[] {
             return map(tokTypes, currTokType => createRegularToken(currTokType))
         }
 
-        function pluckTokenTypes(arr: any[]): TokenType[] {
+        function pluckTokenTypes(arr: any[]): ITokenType[] {
             return map(arr, currItem => currItem.nextTokenType)
         }
 
@@ -1579,7 +1579,7 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
         const issue391Lexer = new Lexer(allTokens)
 
         class Issue391Parser extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, allTokens, {
                     maxLookahead: 4
                 })

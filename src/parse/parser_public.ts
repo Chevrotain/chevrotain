@@ -29,7 +29,7 @@ import {
     values
 } from "../utils/utils"
 import {computeAllProdsFollows} from "./grammar/follow"
-import {createTokenInstance, EOF, getTokenConstructor, IToken, Token, tokenName} from "../scan/tokens_public"
+import {createTokenInstance, EOF, getTokenConstructor, IToken, tokenName} from "../scan/tokens_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -887,7 +887,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME(
-        tokType: TokenType,
+        tokType: TokenType | Function,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.CONSUME1(tokType, options)
@@ -918,50 +918,50 @@ export class Parser {
      * @param options - optional properties to modify the behavior of CONSUME.
      */
     protected CONSUME1(
-        tokType: TokenType,
+        tokType: TokenType | Function,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokType, 1, options)
+        return this.consumeInternal(<any>tokType, 1, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME2(
-        tokType: TokenType,
+        tokType: TokenType | Function,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokType, 2, options)
+        return this.consumeInternal(<any>tokType, 2, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME3(
-        tokType: TokenType,
+        tokType: TokenType | Function,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokType, 3, options)
+        return this.consumeInternal(<any>tokType, 3, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME4(
-        tokType: TokenType,
+        tokType: TokenType | Function,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokType, 4, options)
+        return this.consumeInternal(<any>tokType, 4, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME5(
-        tokType: TokenType,
+        tokType: TokenType | Function,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(tokType, 5, options)
+        return this.consumeInternal(<any>tokType, 5, options)
     }
 
     /**
@@ -1803,9 +1803,9 @@ export class Parser {
                 eFromConsumption.name === "MismatchedTokenException" &&
                 !this.isBackTracking()
             ) {
-                let follows = this.getFollowsForInRuleRecovery(tokType, idx)
+                let follows = this.getFollowsForInRuleRecovery(<any>tokType, idx)
                 try {
-                    consumedToken = this.tryInRuleRecovery(tokType, follows)
+                    consumedToken = this.tryInRuleRecovery(<any>tokType, follows)
                 } catch (eFromInRuleRecovery) {
                     if (
                         eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION

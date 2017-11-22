@@ -88,7 +88,7 @@ export class SwitchCaseRecoveryParser extends Parser {
 
     // DOCS: overriding this method allows us to customize the logic for which tokens may not be automaticaly inserted
     // during error recovery.
-    public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
+    public canTokenTypeBeInsertedInRecovery(tokType: ITokenType) {
         return !contains(this.tokTypesThatCannotBeInsertedInRecovery, tokType)
     }
 

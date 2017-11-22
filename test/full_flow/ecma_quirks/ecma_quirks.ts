@@ -63,7 +63,7 @@ if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
 const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksParser extends Parser {
-    constructor(input: Token[]) {
+    constructor(input: IToken[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
     }
@@ -110,7 +110,7 @@ class EcmaScriptQuirksParser extends Parser {
         this.textIdx = 0
     }
 
-    protected IS_NEXT_TOKEN(expectedType: TokenType): IToken | boolean {
+    protected IS_NEXT_TOKEN(expectedType: ITokenType): IToken | boolean {
         if (this.orgText.length <= this.textIdx) {
             return END_OF_FILE
         } else {
@@ -129,7 +129,7 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    private consumeExpected(expectedType: TokenType): IToken | false {
+    private consumeExpected(expectedType: ITokenType): IToken | false {
         // match expected
         const expectedPattern = expectedType.PATTERN as RegExp
         expectedPattern.lastIndex = this.textIdx
@@ -149,7 +149,7 @@ class EcmaScriptQuirksParser extends Parser {
         return false
     }
 
-    protected consumeInternal(tokClass: TokenType, idx: number): IToken {
+    protected consumeInternal(tokClass: ITokenType, idx: number): IToken {
         this.skipWhitespace()
         let nextToken = this.consumeExpected(tokClass)
         if (nextToken !== false) {
@@ -181,7 +181,7 @@ class EcmaScriptQuirksParser extends Parser {
 
     protected lookAheadBuilderForOptional(
         alt: lookAheadSequence,
-        tokenMatcher: TokenMatcher,
+        tokenMatcher: ITokenMatcher,
         dynamicTokensEnabled: boolean
     ): () => boolean {
         if (!every(alt, currAlt => currAlt.length === 1)) {
@@ -216,7 +216,7 @@ class EcmaScriptQuirksParser extends Parser {
     protected lookAheadBuilderForAlternatives(
         alts: lookAheadSequence[],
         hasPredicates: boolean,
-        tokenMatcher: TokenMatcher,
+        tokenMatcher: ITokenMatcher,
         dynamicTokensEnabled: boolean
     ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
         if (

@@ -1,22 +1,18 @@
-import { IToken, Token } from "../../../src/scan/tokens_public"
+import { IToken } from "../../../src/scan/tokens_public"
 import { Parser } from "../../../src/parse/parser_public"
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
-    class PlusTok extends Token {
-        constructor() {
-            super()
-        }
+    class PlusTok {
+        constructor() {}
     }
 
-    class MinusTok extends Token {
-        constructor() {
-            super()
-        }
+    class MinusTok {
+        constructor() {}
     }
 
-    augmentTokenTypes([PlusTok, MinusTok])
+    augmentTokenTypes(<any>[PlusTok, MinusTok])
 
     it("Can override an existing rule", () => {
         class SuperOverrideParser extends Parser {
@@ -24,7 +20,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
                 input: IToken[] = [],
                 isInvokedByChildConstructor = false
             ) {
-                super(input, [PlusTok, MinusTok])
+                super(input, <any>[PlusTok, MinusTok])
 
                 // performSelfAnalysis should only be invoked once.
                 if (!isInvokedByChildConstructor) {
@@ -78,7 +74,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
 
     it("Can not override a rule which does not exist", () => {
         class InvalidOverrideParser extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, MinusTok])
                 Parser.performSelfAnalysis(this)
             }

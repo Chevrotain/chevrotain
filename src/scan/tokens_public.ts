@@ -66,7 +66,7 @@ export function hasTokenLabel(obj: TokenType): boolean {
     return isString((<any>obj).LABEL) && (<any>obj).LABEL !== ""
 }
 
-export function tokenName(obj: TokenType | TokenType): string {
+export function tokenName(obj: TokenType | Function): string {
     // The tokenName property is needed under some old versions of node.js (0.10/0.12)
     // where the Function.prototype.name property is not defined as a 'configurable' property
     // enable producing readable error messages.
@@ -84,7 +84,7 @@ export function tokenName(obj: TokenType | TokenType): string {
 
 export interface ITokenConfig {
     name: string
-    parent?: TokenType
+    parent?: TokenType | TokenType[]
     label?: string
     pattern?: RegExp | CustomPatternMatcherFunc | ICustomPattern | string
     group?: string | any
@@ -111,10 +111,6 @@ const LINE_BREAKS = "line_breaks"
  * @returns {TokenType} - A constructor for the new Token subclass
  */
 export function createToken(config: ITokenConfig): TokenType {
-    if (!has(config, PARENT)) {
-        config.parent = Token
-    }
-
     return createTokenInternal(config)
 }
 
@@ -226,43 +222,6 @@ export interface IToken {
      *  This property should not be used in productive flows as it will not always exist!
      * */
     tokenClassName?: number
-}
-
-// TODO: should this be a class?
-export class Token implements IToken {
-    /**
-     * A "human readable" Label for a Token.
-     * Subclasses of Token may define their own static LABEL property.
-     * This label will be used in error messages and drawing syntax diagrams.
-     *
-     * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
-     * or too unwieldy to be used in error messages.
-     *
-     * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
-     *
-     * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
-     * "expecting '{' but found ')'"
-     */
-    static LABEL: string = undefined
-
-    // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
-    public isInsertedInRecovery?: boolean = false
-
-    public image: string
-    public startOffset: number
-    public startLine?: number
-    public startColumn?: number
-    public endLine?: number
-    public endColumn?: number
-    public endOffset?: number
-
-    /**
-     * This class is never meant to be initialized.
-     * The class hierarchy is used to organize Token metadata, not to create instances of Tokens.
-     * Tokens are simple JavaScript objects which are NOT created using the <new> operator.
-     * To get the class of a Token "instance" use <getTokenConstructor>.
-     */
-    constructor() {}
 }
 
 export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })

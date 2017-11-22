@@ -15,7 +15,7 @@ export class ParseTree {
         return this.payload.startColumn
     }
 
-    constructor(public payload: Token, public children: ParseTree[] = []) {}
+    constructor(public payload: IToken, public children: ParseTree[] = []) {}
 }
 
 /**
@@ -27,7 +27,7 @@ export class ParseTree {
  * @returns {ParseTree}
  */
 export function PT(
-    tokenOrTokenClass: TokenType | Token,
+    tokenOrTokenClass: ITokenType | Token,
     children: ParseTree[] = []
 ): ParseTree {
     let childrenCompact = compact(children)

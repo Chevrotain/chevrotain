@@ -1,7 +1,7 @@
 import { TokenType } from "./lexer_public"
 import { cloneArr, contains, difference, forEach, has } from "../utils/utils"
-import { Token, tokenName } from "./tokens_public"
 import { HashTable } from "../lang/lang_extensions"
+import {tokenName} from "./tokens_public"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     const instanceType = tokInstance.tokenType
@@ -22,10 +22,6 @@ export function tokenStructuredMatcherNoInheritance(
     tokConstructor
 ) {
     return tokInstance.tokenType === tokConstructor.tokenType
-}
-
-export function isBaseTokenClass(tokType: TokenType): boolean {
-    return tokType === Token
 }
 
 export let tokenShortNameIdx = 1
@@ -52,9 +48,10 @@ export function expandTokenHierarchy(
 ): TokenType[] {
     let tokenTypesAndParents = cloneArr(tokenTypes)
 
+    // TODO: modify this to scan over an array of parents?
     forEach(tokenTypes, currTokType => {
         let currParentType: any = currTokType.parent
-        while (currParentType && currParentType !== Token) {
+        while (currParentType) {
             if (!contains(tokenTypesAndParents, currParentType)) {
                 tokenTypesAndParents.push(currParentType)
             }
@@ -96,7 +93,6 @@ export function assignExtendingTokensProp(
 
         while (
             currParentClass &&
-            !isBaseTokenClass(currParentClass) &&
             currParentClass !== Object
         ) {
             let newExtendingTypes = difference(

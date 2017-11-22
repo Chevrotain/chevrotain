@@ -4,7 +4,7 @@
 // generally one should avoid having to use backtracking, and this specific example can be resolved by parsing
 // both statements in a single rule and only distinguishing between them later, but lets see an example of using backtracking :)
 
-import { Token } from "../../../src/scan/tokens_public"
+import { IToken } from "../../../src/scan/tokens_public"
 import { Parser, IParserConfig } from "../../../src/parse/parser_public"
 
 export enum RET_TYPE {
@@ -17,14 +17,14 @@ export enum RET_TYPE {
     INVALID_FQN
 }
 
-export class NumberTok extends Token {}
-export class ElementTok extends Token {}
-export class DefaultTok extends Token {}
-export class DotTok extends Token {}
-export class ColonTok extends Token {}
-export class EqualsTok extends Token {}
-export class SemiColonTok extends Token {}
-export class IdentTok extends Token {}
+export class NumberTok {}
+export class ElementTok {}
+export class DefaultTok {}
+export class DotTok {}
+export class ColonTok {}
+export class EqualsTok {}
+export class SemiColonTok {}
+export class IdentTok {}
 
 const configuration: IParserConfig = {
     ignoredIssues: {
@@ -35,7 +35,7 @@ const configuration: IParserConfig = {
 // extending the BaseErrorRecoveryRecognizer in this example because it too has logic related to backtracking
 // that needs to be tested too.
 export class BackTrackingParser extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.

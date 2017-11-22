@@ -1,4 +1,3 @@
-import { Token } from "../../../src/scan/tokens_public"
 import { gast } from "../../../src/parse/grammar/gast_public"
 
 let Rule = gast.Rule

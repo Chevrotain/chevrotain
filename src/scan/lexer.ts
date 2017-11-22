@@ -1,4 +1,4 @@
-import { IToken, Token, tokenName } from "./tokens_public"
+import {IToken, tokenName} from "./tokens_public"
 import {
     ILexerDefinitionError,
     ILineTerminatorsTester,
@@ -49,7 +49,7 @@ export interface IPatternConfig {
 
 export interface IAnalyzeResult {
     patternIdxToConfig: IPatternConfig[]
-    emptyGroups: { [groupName: string]: Token[] }
+    emptyGroups: { [groupName: string]: IToken[] }
     hasCustom: boolean
 }
 

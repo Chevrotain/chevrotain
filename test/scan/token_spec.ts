@@ -1,6 +1,5 @@
 import {
     createToken,
-    Token,
     tokenLabel,
     tokenMatcher,
     tokenName
@@ -10,10 +9,9 @@ import { createTokenInstance } from "../../src/scan/tokens_public"
 
 describe("The Chevrotain Tokens namespace", () => {
     context("createToken", () => {
-        ;("use strict")
 
         let TrueLiteral = createToken({ name: "TrueLiteral" })
-        class FalseLiteral extends Token {}
+        class FalseLiteral {}
 
         it("exports a utility function that returns a token's name", () => {
             // FalseLiteral was created with an anonymous function as its constructor yet tokenName(...)

@@ -1,4 +1,4 @@
-import { IToken, Token } from "../scan/tokens_public"
+import { IToken } from "../scan/tokens_public"
 import { contains } from "../utils/utils"
 
 export namespace exceptions {
@@ -22,13 +22,13 @@ export namespace exceptions {
         /**
          * The token which caused the parser error.
          */
-        token: Token
+        token: IToken
         /**
          * Additional tokens which have been re-synced in error recovery due to the original error.
          * This information can be used the calculate the whole text area which has been skipped due to an error.
          * For example for displaying with a red underline in a text editor.
          */
-        resyncedTokens: Token[]
+        resyncedTokens: IToken[]
 
         context: IRecognizerContext
     }
