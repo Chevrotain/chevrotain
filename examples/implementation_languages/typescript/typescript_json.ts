@@ -1,4 +1,4 @@
-import { Lexer, Parser } from "chevrotain"
+import { Lexer, Parser, IToken } from "chevrotain"
 
 // Using TypeScript we have both classes and static properties to define Tokens
 class True {
@@ -57,7 +57,7 @@ const allTokens = [
 const JsonLexer = new Lexer(allTokens)
 
 class JsonParserTypeScript extends Parser {
-    constructor(input: Token[]) {
+    constructor(input: IToken[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
     }
