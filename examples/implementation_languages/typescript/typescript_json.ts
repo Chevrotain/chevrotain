@@ -1,4 +1,4 @@
-import { Lexer, Parser, Token } from "chevrotain"
+import { Lexer, Parser } from "chevrotain"
 
 // Using TypeScript we have both classes and static properties to define Tokens
 class True {
