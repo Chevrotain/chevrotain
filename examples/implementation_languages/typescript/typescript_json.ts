@@ -1,40 +1,40 @@
 import { Lexer, Parser, Token } from "chevrotain"
 
 // Using TypeScript we have both classes and static properties to define Tokens
-class True extends Token {
+class True {
     static PATTERN = /true/
 }
-class False extends Token {
+class False {
     static PATTERN = /false/
 }
-class Null extends Token {
+class Null {
     static PATTERN = /null/
 }
-class LCurly extends Token {
+class LCurly {
     static PATTERN = /{/
 }
-class RCurly extends Token {
+class RCurly {
     static PATTERN = /}/
 }
-class LSquare extends Token {
+class LSquare {
     static PATTERN = /\[/
 }
-class RSquare extends Token {
+class RSquare {
     static PATTERN = /]/
 }
-class Comma extends Token {
+class Comma {
     static PATTERN = /,/
 }
-class Colon extends Token {
+class Colon {
     static PATTERN = /:/
 }
-class StringLiteral extends Token {
+class StringLiteral {
     static PATTERN = /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 }
-class NumberLiteral extends Token {
+class NumberLiteral {
     static PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 }
-class WhiteSpace extends Token {
+class WhiteSpace {
     static PATTERN = /\s+/
     static GROUP = Lexer.SKIPPED
     static LINE_BREAKS = true

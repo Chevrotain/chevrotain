@@ -2,7 +2,6 @@
 const chevrotain = require("chevrotain")
 
 // ----------------- lexer -----------------
-const Token = chevrotain.Token
 const Lexer = chevrotain.Lexer
 const Parser = chevrotain.Parser
 
@@ -11,40 +10,40 @@ const Parser = chevrotain.Parser
 // Unfortunately no support for static class properties in ES2015, only in ES2016...
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class True extends Token {}
+class True {}
 True.PATTERN = /true/
 
-class False extends Token {}
+class False {}
 False.PATTERN = /false/
 
-class Null extends Token {}
+class Null {}
 Null.PATTERN = /null/
 
-class LCurly extends Token {}
+class LCurly {}
 LCurly.PATTERN = /{/
 
-class RCurly extends Token {}
+class RCurly {}
 RCurly.PATTERN = /}/
 
-class LSquare extends Token {}
+class LSquare {}
 LSquare.PATTERN = /\[/
 
-class RSquare extends Token {}
+class RSquare {}
 RSquare.PATTERN = /]/
 
-class Comma extends Token {}
+class Comma {}
 Comma.PATTERN = /,/
 
-class Colon extends Token {}
+class Colon {}
 Colon.PATTERN = /:/
 
-class StringLiteral extends Token {}
+class StringLiteral {}
 StringLiteral.PATTERN = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 
-class NumberLiteral extends Token {}
+class NumberLiteral {}
 NumberLiteral.PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 
-class WhiteSpace extends Token {}
+class WhiteSpace {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 WhiteSpace.LINE_BREAKS = true

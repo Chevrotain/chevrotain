@@ -1,39 +1,39 @@
 {Token, Lexer, Parser} = require 'chevrotain'
 
-class True extends Token
+class True 
   @PATTERN: /true/
 
-class False extends Token
+class False 
   @PATTERN: /false/
 
-class Null extends Token
+class Null 
   @PATTERN: /null/
 
-class LCurly extends Token
+class LCurly 
   @PATTERN: /{/
 
-class RCurly extends Token
+class RCurly 
   @PATTERN: /}/
 
-class LSquare extends Token
+class LSquare 
   @PATTERN: /\[/
 
-class RSquare extends Token
+class RSquare 
   @PATTERN: /]/
 
-class Comma extends Token
+class Comma 
   @PATTERN: /,/
 
-class Colon extends Token
+class Colon 
   @PATTERN: /:/
 
-class StringLiteral extends Token
+class StringLiteral 
   @PATTERN: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 
-class NumberLiteral extends Token
+class NumberLiteral 
   @PATTERN: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 
-class WhiteSpace extends Token
+class WhiteSpace 
   @PATTERN = /\s+/
   @GROUP = Lexer.SKIPPED
   @LINE_BREAKS = true
