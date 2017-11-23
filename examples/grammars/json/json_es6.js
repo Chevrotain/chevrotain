@@ -9,41 +9,41 @@ var Parser = chevrotain.Parser
 // Unfortunately no support for static class properties in ES2015, only in ES2016...
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class True  {}
+class True {}
 
 True.PATTERN = /true/
 
-class False  {}
+class False {}
 False.PATTERN = /false/
 
-class Null  {}
+class Null {}
 Null.PATTERN = /null/
 
-class LCurly  {}
+class LCurly {}
 LCurly.PATTERN = /{/
 
-class RCurly  {}
+class RCurly {}
 RCurly.PATTERN = /}/
 
-class LSquare  {}
+class LSquare {}
 LSquare.PATTERN = /\[/
 
-class RSquare  {}
+class RSquare {}
 RSquare.PATTERN = /]/
 
-class Comma  {}
+class Comma {}
 Comma.PATTERN = /,/
 
-class Colon  {}
+class Colon {}
 Colon.PATTERN = /:/
 
-class StringLiteral  {}
+class StringLiteral {}
 StringLiteral.PATTERN = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 
-class NumberLiteral  {}
+class NumberLiteral {}
 NumberLiteral.PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 
-class WhiteSpace  {}
+class WhiteSpace {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 WhiteSpace.LINE_BREAKS = true

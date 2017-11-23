@@ -31,74 +31,74 @@ FRAGMENT("Name", "{{NameStartChar}}({{NameChar}})*")
 // Unfortunately no support for static class properties in ES2015, only in ES2016...
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class Comment  {}
+class Comment {}
 Comment.PATTERN = /<!--.*?-->/
 // A Comment may span multiple lines.
 Comment.LINE_BREAKS = true
 
-class CData  {}
+class CData {}
 CData.PATTERN = /<!\[CDATA\[.*?]]>/
 
-class DTD  {}
+class DTD {}
 DTD.PATTERN = /<!.*?>/
 DTD.GROUP = Lexer.SKIPPED
 
-class EntityRef  {}
+class EntityRef {}
 EntityRef.PATTERN = MAKE_PATTERN("&{{Name}};")
 
-class CharRef  {}
+class CharRef {}
 CharRef.PATTERN = /&#\d+;|&#x[a-fA-F0-9]/
 
-class SEA_WS  {}
+class SEA_WS {}
 SEA_WS.PATTERN = /( |\t|\n|\r\n)+/
 SEA_WS.LINE_BREAKS = true
 
-class XMLDeclOpen  {}
+class XMLDeclOpen {}
 XMLDeclOpen.PATTERN = /<\?xml[ \t\r\n]/
 XMLDeclOpen.PUSH_MODE = "INSIDE"
 XMLDeclOpen.LINE_BREAKS = true
 
-class SLASH_OPEN  {}
+class SLASH_OPEN {}
 SLASH_OPEN.PATTERN = /<\//
 SLASH_OPEN.PUSH_MODE = "INSIDE"
 
-class OPEN  {}
+class OPEN {}
 OPEN.PATTERN = /</
 OPEN.PUSH_MODE = "INSIDE"
 
-class PROCESSING_INSTRUCTION  {}
+class PROCESSING_INSTRUCTION {}
 PROCESSING_INSTRUCTION.PATTERN = MAKE_PATTERN("<\\?{{Name}}.*\\?>")
 
-class TEXT  {}
+class TEXT {}
 TEXT.PATTERN = /[^<&]+/
 TEXT.LINE_BREAKS = true
 
-class CLOSE  {}
+class CLOSE {}
 CLOSE.PATTERN = />/
 CLOSE.POP_MODE = true
 
-class SPECIAL_CLOSE  {}
+class SPECIAL_CLOSE {}
 SPECIAL_CLOSE.PATTERN = /\?>/
 SPECIAL_CLOSE.POP_MODE = true
 
-class SLASH_CLOSE  {}
+class SLASH_CLOSE {}
 SLASH_CLOSE.PATTERN = /\/>/
 SLASH_CLOSE.POP_MODE = true
 
-class SLASH  {}
+class SLASH {}
 SLASH.PATTERN = /\//
 
-class STRING  {}
+class STRING {}
 STRING.PATTERN = /"[^<"]*"|'[^<']*'/
 STRING.LINE_BREAKS = true
 
-class EQUALS  {}
+class EQUALS {}
 EQUALS.PATTERN = /=/
 
-class Name  {}
+class Name {}
 Name.PATTERN = MAKE_PATTERN("{{Name}}")
 
-class S  {}
+class S {}
 S.PATTERN = /[ \t\r\n]/
 S.GROUP = Lexer.SKIPPED
 S.LINE_BREAKS = true
