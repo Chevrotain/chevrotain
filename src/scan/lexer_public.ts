@@ -210,12 +210,12 @@ export class Lexer {
      *  2. POP_MODE  : pop the last mode from the "mode stack"
      *
      *  Examples:
-     *       export class Attribute extends Token {
+     *       export class Attribute {
      *          static PATTERN = ...
      *          static PUSH_MODE = "modeY"
      *       }
      *
-     *       export class EndAttribute extends Token {
+     *       export class EndAttribute {
      *          static PATTERN = ...
      *          static POP_MODE = true
      *       }
@@ -223,11 +223,11 @@ export class Lexer {
      *  The Token constructors must be in one of these forms:
      *
      *  1. With a PATTERN property that has a RegExp value for tokens to match:
-     *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
+     *     example: -->class Integer { static PATTERN = /[1-9]\d }<--
      *
      *  2. With a PATTERN property that has the value of the var Lexer.NA defined above.
      *     This is a convenience form used to avoid matching Token classes that only act as categories.
-     *     example: -->class Keyword extends Token { static PATTERN = NA }<--
+     *     example: -->class Keyword { static PATTERN = NA }<--
      *
      *
      *   The following RegExp patterns are not supported:
@@ -252,8 +252,8 @@ export class Lexer {
      *   example:
      *
      *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
-     *       export class Keyword extends Token {
-     *          static PATTERN = lex.NA
+     *       export class Keyword Token {
+     *          static PATTERN = Lexer.NA
      *          static LONGER_ALT = Identifier
      *       }
      *       export class Do extends Keyword { static PATTERN = /do/ }
