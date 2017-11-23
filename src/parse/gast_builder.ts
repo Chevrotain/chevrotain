@@ -267,7 +267,7 @@ function buildManySepProd(
 function buildRepetitionWithSep(
     prodRange: IProdRange,
     allRanges: IProdRange[],
-    repConstructor: TokenType,
+    repConstructor: Function,
     regExp: RegExp
 ): gast.RepetitionWithSeparator {
     let reResult = regExp.exec(prodRange.text)

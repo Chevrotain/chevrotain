@@ -1,9 +1,18 @@
 import * as cache from "./cache"
-import {CLASS_TO_ALL_RULE_NAMES, CLASS_TO_BASE_CST_VISITOR, CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS} from "./cache"
-import {exceptions} from "./exceptions_public"
-import {classNameFromInstance, HashTable} from "../lang/lang_extensions"
-import {resolveGrammar} from "./grammar/resolver"
-import {validateGrammar, validateRuleDoesNotAlreadyExist, validateRuleIsOverridden, validateRuleName} from "./grammar/checks"
+import {
+    CLASS_TO_ALL_RULE_NAMES,
+    CLASS_TO_BASE_CST_VISITOR,
+    CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS
+} from "./cache"
+import { exceptions } from "./exceptions_public"
+import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
+import { resolveGrammar } from "./grammar/resolver"
+import {
+    validateGrammar,
+    validateRuleDoesNotAlreadyExist,
+    validateRuleIsOverridden,
+    validateRuleName
+} from "./grammar/checks"
 import {
     cloneArr,
     cloneObj,
@@ -28,8 +37,14 @@ import {
     uniq,
     values
 } from "../utils/utils"
-import {computeAllProdsFollows} from "./grammar/follow"
-import {createTokenInstance, EOF, getTokenConstructor, IToken, tokenName} from "../scan/tokens_public"
+import { computeAllProdsFollows } from "./grammar/follow"
+import {
+    createTokenInstance,
+    EOF,
+    getTokenConstructor,
+    IToken,
+    tokenName
+} from "../scan/tokens_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -39,8 +54,8 @@ import {
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "./grammar/lookahead"
-import {IMultiModeLexerDefinition, TokenType} from "../scan/lexer_public"
-import {buildTopProduction} from "./gast_builder"
+import { IMultiModeLexerDefinition, TokenType } from "../scan/lexer_public"
+import { buildTopProduction } from "./gast_builder"
 import {
     AbstractNextTerminalAfterProductionWalker,
     NextAfterTokenWalker,
@@ -50,13 +65,21 @@ import {
     NextTerminalAfterManySepWalker,
     NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
-import {IN} from "./constants"
-import {gast} from "./grammar/gast_public"
-import {cloneProduction} from "./grammar/gast"
-import {ISyntacticContentAssistPath, ITokenGrammarPath} from "./grammar/path_public"
-import {augmentTokenTypes, isExtendingTokenType, tokenStructuredMatcher, tokenStructuredMatcherNoInheritance} from "../scan/tokens"
-import {CstNode, ICstVisitor} from "./cst/cst_public"
-import {addNoneTerminalToCst, addTerminalToCst, analyzeCst} from "./cst/cst"
+import { IN } from "./constants"
+import { gast } from "./grammar/gast_public"
+import { cloneProduction } from "./grammar/gast"
+import {
+    ISyntacticContentAssistPath,
+    ITokenGrammarPath
+} from "./grammar/path_public"
+import {
+    augmentTokenTypes,
+    isExtendingTokenType,
+    tokenStructuredMatcher,
+    tokenStructuredMatcherNoInheritance
+} from "../scan/tokens"
+import { CstNode, ICstVisitor } from "./cst/cst_public"
+import { addNoneTerminalToCst, addTerminalToCst, analyzeCst } from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
@@ -69,8 +92,11 @@ import {
     OPTION_IDX,
     OR_IDX
 } from "./grammar/keys"
-import {createBaseSemanticVisitorConstructor, createBaseVisitorConstructorWithDefaults} from "./cst/cst_visitor"
-import {defaultErrorProvider, IErrorMessageProvider} from "./errors_public"
+import {
+    createBaseSemanticVisitorConstructor,
+    createBaseVisitorConstructorWithDefaults
+} from "./cst/cst_visitor"
+import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
 import serializeGrammar = gast.serializeGrammar
 
 export enum ParserDefinitionErrorType {
@@ -886,10 +912,7 @@ export class Parser {
      * Convenience method equivalent to CONSUME1.
      * @see CONSUME1
      */
-    protected CONSUME(
-        tokType: TokenType | Function,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    protected CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.CONSUME1(tokType, options)
     }
 
@@ -918,50 +941,50 @@ export class Parser {
      * @param options - optional properties to modify the behavior of CONSUME.
      */
     protected CONSUME1(
-        tokType: TokenType | Function,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(<any>tokType, 1, options)
+        return this.consumeInternal(tokType, 1, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME2(
-        tokType: TokenType | Function,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(<any>tokType, 2, options)
+        return this.consumeInternal(tokType, 2, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME3(
-        tokType: TokenType | Function,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(<any>tokType, 3, options)
+        return this.consumeInternal(tokType, 3, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME4(
-        tokType: TokenType | Function,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(<any>tokType, 4, options)
+        return this.consumeInternal(tokType, 4, options)
     }
 
     /**
      * @see CONSUME1
      */
     protected CONSUME5(
-        tokType: TokenType | Function,
+        tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
-        return this.consumeInternal(<any>tokType, 5, options)
+        return this.consumeInternal(tokType, 5, options)
     }
 
     /**
@@ -1803,9 +1826,15 @@ export class Parser {
                 eFromConsumption.name === "MismatchedTokenException" &&
                 !this.isBackTracking()
             ) {
-                let follows = this.getFollowsForInRuleRecovery(<any>tokType, idx)
+                let follows = this.getFollowsForInRuleRecovery(
+                    <any>tokType,
+                    idx
+                )
                 try {
-                    consumedToken = this.tryInRuleRecovery(<any>tokType, follows)
+                    consumedToken = this.tryInRuleRecovery(
+                        <any>tokType,
+                        follows
+                    )
                 } catch (eFromInRuleRecovery) {
                     if (
                         eFromInRuleRecovery.name === IN_RULE_RECOVERY_EXCEPTION
@@ -2205,9 +2234,7 @@ export class Parser {
         return <any>flatten(followStack)
     }
 
-    private getFollowSetFromFollowKey(
-        followKey: IFollowKey
-    ): TokenType[] {
+    private getFollowSetFromFollowKey(followKey: IFollowKey): TokenType[] {
         if (followKey === EOF_FOLLOW_KEY) {
             return [EOF]
         }
@@ -3144,10 +3171,7 @@ export class Parser {
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
-    private cstPostTerminal(
-        tokType: TokenType,
-        consumedToken: IToken
-    ): void {
+    private cstPostTerminal(tokType: TokenType, consumedToken: IToken): void {
         let currTokTypeName = tokType.tokenName
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, currTokTypeName)

@@ -2,12 +2,12 @@
  * module used to cache static information about parsers,
  */
 
-import {IParserDefinitionError} from "./parser_public"
-import {HashTable} from "../lang/lang_extensions"
-import {gast} from "./grammar/gast_public"
-import {IFirstAfterRepetition} from "./grammar/interpreter"
-import {filter, forEach, values} from "../utils/utils"
-import {TokenType} from "../scan/lexer_public"
+import { IParserDefinitionError } from "./parser_public"
+import { HashTable } from "../lang/lang_extensions"
+import { gast } from "./grammar/gast_public"
+import { IFirstAfterRepetition } from "./grammar/interpreter"
+import { filter, forEach, values } from "../utils/utils"
+import { TokenType } from "../scan/lexer_public"
 
 export let CLASS_TO_DEFINITION_ERRORS = new HashTable<
     IParserDefinitionError[]

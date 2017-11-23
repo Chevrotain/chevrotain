@@ -1,4 +1,4 @@
-import { createToken, Token } from "../../src/scan/tokens_public"
+import { createToken, IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { clearCache } from "../../src/parse/cache_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
@@ -12,7 +12,7 @@ function defineCstSpecs(
     createTokenInstance,
     tokenMatcher
 ) {
-    function createTokenVector(tokTypes: ITokenType[]): any[] {
+    function createTokenVector(tokTypes: TokenType[]): any[] {
         return map(tokTypes, curTokType => {
             return createTokenInstance(curTokType)
         })
@@ -798,7 +798,7 @@ function defineCstSpecs(
                     })
 
                     protected canTokenTypeBeInsertedInRecovery(
-                        tokType: ITokenType
+                        tokType: TokenType
                     ): boolean {
                         // we want to force re-sync recovery
                         return false
@@ -879,7 +879,7 @@ function defineCstSpecs(
                     })
 
                     protected canTokenTypeBeInsertedInRecovery(
-                        tokType: ITokenType
+                        tokType: TokenType
                     ): boolean {
                         // we want to force re-sync recovery
                         return false

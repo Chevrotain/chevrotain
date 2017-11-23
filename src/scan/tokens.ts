@@ -1,7 +1,7 @@
 import { TokenType } from "./lexer_public"
 import { cloneArr, contains, difference, forEach, has } from "../utils/utils"
 import { HashTable } from "../lang/lang_extensions"
-import {tokenName} from "./tokens_public"
+import { tokenName } from "./tokens_public"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     const instanceType = tokInstance.tokenType
@@ -43,9 +43,7 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
     })
 }
 
-export function expandTokenHierarchy(
-    tokenTypes: TokenType[]
-): TokenType[] {
+export function expandTokenHierarchy(tokenTypes: TokenType[]): TokenType[] {
     let tokenTypesAndParents = cloneArr(tokenTypes)
 
     // TODO: modify this to scan over an array of parents?
@@ -84,17 +82,12 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     })
 }
 
-export function assignExtendingTokensProp(
-    tokenTypes: TokenType[]
-): void {
+export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         let currSubTypesExtendingTypes = [currTokType.tokenType]
         let currParentClass: any = currTokType.parent
 
-        while (
-            currParentClass &&
-            currParentClass !== Object
-        ) {
+        while (currParentClass && currParentClass !== Object) {
             let newExtendingTypes = difference(
                 currSubTypesExtendingTypes,
                 currParentClass.extendingTokenTypes
@@ -108,9 +101,7 @@ export function assignExtendingTokensProp(
     })
 }
 
-export function assignExtendingTokensMapProp(
-    tokenTypes: TokenType[]
-): void {
+export function assignExtendingTokensMapProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         forEach(currTokType.extendingTokenTypes, currExtendingType => {
             currTokType.extendingTokenTypesMap[currExtendingType] = true
@@ -122,9 +113,7 @@ export function hasShortKeyProperty(tokType: TokenType): boolean {
     return has(tokType, "tokenType")
 }
 
-export function hasExtendingTokensTypesProperty(
-    tokType: TokenType
-): boolean {
+export function hasExtendingTokensTypesProperty(tokType: TokenType): boolean {
     return has(tokType, "extendingTokenTypes")
 }
 

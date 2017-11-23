@@ -5,11 +5,11 @@ import { augmentTokenTypes } from "../../../src/scan/tokens"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
     class PlusTok {
-        constructor() {}
+        static PATTERN = /\+/
     }
 
     class MinusTok {
-        constructor() {}
+        static PATTERN = /-/
     }
 
     augmentTokenTypes(<any>[PlusTok, MinusTok])

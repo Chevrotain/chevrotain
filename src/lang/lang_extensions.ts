@@ -1,6 +1,6 @@
 import * as utils from "../utils/utils"
-import {isUndefined} from "../utils/utils"
-import {TokenType} from "../scan/lexer_public"
+import { isUndefined } from "../utils/utils"
+import { TokenType } from "../scan/lexer_public"
 
 export function classNameFromInstance(instance: any): string {
     return functionName(instance.constructor)

@@ -6,10 +6,11 @@ export function setEquality(actual: any[], expected: any[]): void {
     expect(expected).to.have.lengthOf(actual.length)
 }
 
-export function createRegularToken(tokClass, image = ""): IToken {
+export function createRegularToken(tokType, image = ""): IToken {
     return {
         image: image,
         startOffset: 1,
-        tokenType: tokClass.tokenType
+        tokenType: tokType.tokenType,
+        type: tokType
     }
 }

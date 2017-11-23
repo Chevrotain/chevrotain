@@ -1,4 +1,4 @@
-import {createToken, IToken} from "../../src/scan/tokens_public"
+import { createToken, IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"

@@ -5,7 +5,7 @@ import { first } from "./first"
 import { forEach } from "../../utils/utils"
 import { IN } from "../constants"
 import { tokenName } from "../../scan/tokens_public"
-import {TokenType} from "../../scan/lexer_public"
+import { TokenType } from "../../scan/lexer_public"
 
 // This ResyncFollowsWalker computes all of the follows required for RESYNC
 // (skipping reference production).

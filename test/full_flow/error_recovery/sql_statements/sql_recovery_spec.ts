@@ -27,7 +27,7 @@ import {
     IntTok
 } from "./sql_recovery_tokens"
 import { DDLExampleRecoveryParser } from "./sql_recovery_parser"
-import { Token, tokenMatcher } from "../../../../src/scan/tokens_public"
+import { IToken, tokenMatcher } from "../../../../src/scan/tokens_public"
 import { exceptions } from "../../../../src/parse/exceptions_public"
 import { ParseTree } from "../../parse_tree"
 import { flatten } from "../../../../src/utils/utils"
@@ -36,8 +36,6 @@ import { createRegularToken } from "../../../utils/matchers"
 // for side effect if augmenting the Token classes.
 new DDLExampleRecoveryParser([])
 describe("Error Recovery SQL DDL Example", () => {
-    ;("use strict")
-
     let schemaFQN = [
         createRegularToken(IdentTok, "schema2"),
         createRegularToken(DotTok),
@@ -130,7 +128,7 @@ describe("Error Recovery SQL DDL Example", () => {
             let ptResult: any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
-            expect(ptResult.payload).to.be.an.instanceof(INVALID_DDL)
+            expect(ptResult.payload.type).to.equal(INVALID_DDL)
             expect(ptResult.children).to.have.length(0)
         })
     })
@@ -173,7 +171,7 @@ describe("Error Recovery SQL DDL Example", () => {
             let ptResult: any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
-            expect(ptResult.payload).to.be.an.instanceof(INVALID_DDL)
+            expect(ptResult.payload.type).to.equal(INVALID_DDL)
             expect(ptResult.children).to.have.length(0)
         })
     })
@@ -208,24 +206,20 @@ describe("Error Recovery SQL DDL Example", () => {
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
             expect(parser.isAtEndOfInput()).to.equal(true)
-            expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
+            expect(ptResult.payload.type).to.equal(STATEMENTS)
             // 3 statements found
             expect(ptResult.children.length).to.equal(3)
-            expect(ptResult.children[0].payload).to.be.an.instanceOf(
-                CREATE_STMT
-            )
-            expect(ptResult.children[0].payload).not.to.be.an.instanceof(
+            expect(ptResult.children[0].payload.type).to.equal(CREATE_STMT)
+            expect(ptResult.children[0].payload.type).to.not.equal(
                 INVALID_CREATE_STMT
             )
             // but the second one is marked as invalid
-            expect(ptResult.children[1].payload).to.be.an.instanceof(
+            expect(ptResult.children[1].payload.type).to.equal(
                 INVALID_INSERT_STMT
             )
             // yet the third one is still valid!, we recovered and continued parsing.
-            expect(ptResult.children[2].payload).to.be.an.instanceof(
-                DELETE_STMT
-            )
-            expect(ptResult.children[2].payload).not.to.be.an.instanceof(
+            expect(ptResult.children[2].payload.type).to.equal(DELETE_STMT)
+            expect(ptResult.children[2].payload.type).to.not.equal(
                 INVALID_DELETE_STMT
             )
         })
@@ -267,24 +261,20 @@ describe("Error Recovery SQL DDL Example", () => {
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
             expect(parser.isAtEndOfInput()).to.equal(true)
-            expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
+            expect(ptResult.payload.type).to.equal(STATEMENTS)
             // 3 statements found
             expect(ptResult.children.length).to.equal(3)
-            expect(ptResult.children[0].payload).to.be.an.instanceof(
-                CREATE_STMT
-            )
-            expect(ptResult.children[0].payload).not.to.be.an.instanceof(
+            expect(ptResult.children[0].payload.type).to.equal(CREATE_STMT)
+            expect(ptResult.children[0].payload.type).to.not.equal(
                 INVALID_CREATE_STMT
             )
             // but the second one is marked as invalid, this means we kept trying to re-sync to an "higher" rule
-            expect(ptResult.children[1].payload).to.be.an.instanceof(
+            expect(ptResult.children[1].payload.type).to.equal(
                 INVALID_INSERT_STMT
             )
             // yet the third one is still valid!, we recovered and continued parsing.
-            expect(ptResult.children[2].payload).to.be.an.instanceof(
-                DELETE_STMT
-            )
-            expect(ptResult.children[2].payload).not.to.be.an.instanceof(
+            expect(ptResult.children[2].payload.type).to.equal(DELETE_STMT)
+            expect(ptResult.children[2].payload.type).to.not.equal(
                 INVALID_DELETE_STMT
             )
         })
@@ -296,7 +286,7 @@ describe("Error Recovery SQL DDL Example", () => {
             expect(parser.errors.length).to.equal(1)
             // yet the whole input has been parsed
             expect(parser.isAtEndOfInput()).to.equal(true)
-            expect(ptResult.payload).to.be.an.instanceof(INVALID_DDL)
+            expect(ptResult.payload.type).to.equal(INVALID_DDL)
             expect(ptResult.children).to.have.length(0)
         })
     })
@@ -304,19 +294,19 @@ describe("Error Recovery SQL DDL Example", () => {
     function assertAllThreeStatementsPresentAndValid(
         ptResult: ParseTree
     ): void {
-        expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
+        expect(ptResult.payload.type).to.equal(STATEMENTS)
         // 3 statements found
         expect(ptResult.children.length).to.equal(3)
-        expect(ptResult.children[0].payload).to.be.an.instanceof(CREATE_STMT)
-        expect(ptResult.children[0].payload).not.to.be.an.instanceof(
+        expect(ptResult.children[0].payload.type).to.equal(CREATE_STMT)
+        expect(ptResult.children[0].payload.type).to.not.equal(
             INVALID_CREATE_STMT
         )
-        expect(ptResult.children[1].payload).to.be.an.instanceof(INSERT_STMT)
-        expect(ptResult.children[1].payload).not.to.be.an.instanceof(
+        expect(ptResult.children[1].payload.type).to.equal(INSERT_STMT)
+        expect(ptResult.children[1].payload.type).to.not.equal(
             INVALID_INSERT_STMT
         )
-        expect(ptResult.children[2].payload).to.be.an.instanceof(DELETE_STMT)
-        expect(ptResult.children[2].payload).not.to.be.an.instanceof(
+        expect(ptResult.children[2].payload.type).to.equal(DELETE_STMT)
+        expect(ptResult.children[2].payload.type).to.not.equal(
             INVALID_DELETE_STMT
         )
     }
@@ -367,10 +357,10 @@ describe("Error Recovery SQL DDL Example", () => {
         expect(parser.errors.length).to.equal(0)
         expect(parser.isAtEndOfInput()).to.equal(true)
         // verify returned ParseTree
-        expect(ptResult.payload).to.be.an.instanceof(STATEMENTS)
+        expect(ptResult.payload.type).to.equal(STATEMENTS)
         expect(ptResult.children.length).to.equal(1)
-        expect(ptResult.children[0].payload).to.be.an.instanceof(DELETE_STMT)
-        expect(ptResult.children[0].payload).not.to.be.an.instanceof(
+        expect(ptResult.children[0].payload.type).to.equal(DELETE_STMT)
+        expect(ptResult.children[0].payload.type).to.not.equal(
             INVALID_DELETE_STMT
         )
     })

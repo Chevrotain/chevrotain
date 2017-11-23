@@ -9,7 +9,6 @@ import { createTokenInstance } from "../../src/scan/tokens_public"
 
 describe("The Chevrotain Tokens namespace", () => {
     context("createToken", () => {
-
         let TrueLiteral = createToken({ name: "TrueLiteral" })
         class FalseLiteral {}
 

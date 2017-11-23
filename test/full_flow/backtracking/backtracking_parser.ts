@@ -17,14 +17,30 @@ export enum RET_TYPE {
     INVALID_FQN
 }
 
-export class NumberTok {}
-export class ElementTok {}
-export class DefaultTok {}
-export class DotTok {}
-export class ColonTok {}
-export class EqualsTok {}
-export class SemiColonTok {}
-export class IdentTok {}
+export class NumberTok {
+    static PATTERN = /NA/
+}
+export class ElementTok {
+    static PATTERN = /NA/
+}
+export class DefaultTok {
+    static PATTERN = /NA/
+}
+export class DotTok {
+    static PATTERN = /NA/
+}
+export class ColonTok {
+    static PATTERN = /NA/
+}
+export class EqualsTok {
+    static PATTERN = /NA/
+}
+export class SemiColonTok {
+    static PATTERN = /NA/
+}
+export class IdentTok {
+    static PATTERN = /NA/
+}
 
 const configuration: IParserConfig = {
     ignoredIssues: {

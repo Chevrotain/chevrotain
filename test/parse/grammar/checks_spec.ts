@@ -15,7 +15,7 @@ import {
     validateRuleIsOverridden,
     validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
-import { Token, createToken } from "../../../src/scan/tokens_public"
+import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { forEach, first, map } from "../../../src/utils/utils"
 
 let Rule = gast.Rule
@@ -212,7 +212,9 @@ describe("OccurrenceValidationCollector GASTVisitor class", () => {
     })
 })
 
-class DummyToken extends Token {}
+class DummyToken {
+    static PATTERN = /NA/
+}
 let dummyRule = new Rule("dummyRule", [new Terminal(DummyToken)])
 let dummyRule2 = new Rule("dummyRule2", [new Terminal(DummyToken)])
 let dummyRule3 = new Rule("dummyRule3", [new Terminal(DummyToken)])
@@ -298,22 +300,16 @@ describe("the getFirstNoneTerminal function", () => {
     })
 })
 
-export class PlusTok extends Token {
-    constructor() {
-        super()
-    }
+export class PlusTok {
+    static PATTERN = /NA/
 }
 
-export class MinusTok extends Token {
-    constructor() {
-        super()
-    }
+export class MinusTok {
+    static PATTERN = /NA/
 }
 
-export class StarTok extends Token {
-    constructor() {
-        super()
-    }
+export class StarTok {
+    static PATTERN = /NA/
 }
 
 class ErroneousOccurrenceNumUsageParser1 extends Parser {
@@ -522,7 +518,9 @@ describe("The rule names validation full flow", () => {
     )
 })
 
-class StarToken extends Token {}
+class StarToken {
+    static PATTERN = /NA/
+}
 
 class DirectlyLeftRecursive extends Parser {
     constructor(input: IToken[] = []) {
@@ -817,8 +815,12 @@ describe("The prefix ambiguity detection full flow", () => {
 
 describe("The namespace conflict detection full flow", () => {
     it("will throw an error when a Terminal and a NoneTerminal have the same name", () => {
-        class Bamba extends Token {}
-        class A extends Token {}
+        class Bamba {
+            static PATTERN = /NA/
+        }
+        class A {
+            static PATTERN = /NA/
+        }
 
         class NameSpaceConflict extends Parser {
             constructor(input: IToken[] = []) {
@@ -839,7 +841,9 @@ describe("The namespace conflict detection full flow", () => {
 
 describe("The nested rule name validation full flow", () => {
     it("will throw an error when a nested name does not start with $(dollar)", () => {
-        class A extends Token {}
+        class A {
+            static PATTERN = /NA/
+        }
 
         class NestedNamedInvalid extends Parser {
             constructor(input: IToken[] = []) {
@@ -865,8 +869,12 @@ describe("The nested rule name validation full flow", () => {
 
 describe("The duplicated nested name validation full flow", () => {
     it("will throw an error when two nested rules share the same name", () => {
-        class A extends Token {}
-        class B extends Token {}
+        class A {
+            static PATTERN = /NA/
+        }
+        class B {
+            static PATTERN = /NA/
+        }
 
         class NestedNamedDuplicate extends Parser {
             constructor(input: IToken[] = []) {
@@ -898,8 +906,12 @@ describe("The duplicated nested name validation full flow", () => {
 
 describe("The invalid token name validation", () => {
     it("will throw an error when a Token is using an invalid name", () => {
-        class במבה extends Token {}
-        class A extends Token {}
+        class במבה {
+            static PATTERN = /NA/
+        }
+        class A {
+            static PATTERN = /NA/
+        }
 
         class InvalidTokenName extends Parser {
             constructor(input: IToken[] = []) {

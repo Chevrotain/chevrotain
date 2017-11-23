@@ -26,9 +26,7 @@ export function first(prod: gast.IProduction): TokenType[] {
     }
 }
 
-export function firstForSequence(
-    prod: gast.AbstractProduction
-): TokenType[] {
+export function firstForSequence(prod: gast.AbstractProduction): TokenType[] {
     let firstSet: TokenType[] = []
     let seq = prod.definition
     let nextSubProdIdx = 0
@@ -48,9 +46,7 @@ export function firstForSequence(
     return uniq(firstSet)
 }
 
-export function firstForBranching(
-    prod: gast.AbstractProduction
-): TokenType[] {
+export function firstForBranching(prod: gast.AbstractProduction): TokenType[] {
     let allAlternativesFirsts: TokenType[][] = map(
         prod.definition,
         innerProd => {

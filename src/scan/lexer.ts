@@ -1,4 +1,4 @@
-import {IToken, tokenName} from "./tokens_public"
+import { IToken, tokenName } from "./tokens_public"
 import {
     ILexerDefinitionError,
     ILineTerminatorsTester,

@@ -5,18 +5,16 @@ import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
-    class A  {
-        constructor() {}
+    class A {
+        static PATTERN = /a/
     }
 
-    class B  {
-        constructor() {
-        }
+    class B {
+        static PATTERN = /a/
     }
 
-    class C  {
-        constructor() {
-        }
+    class C {
+        static PATTERN = /a/
     }
 
     let ALL_TOKENS = [A, B, C]

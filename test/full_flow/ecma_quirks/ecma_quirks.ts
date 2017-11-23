@@ -1,4 +1,4 @@
-import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
+import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { Lexer, TokenType } from "../../../src/scan/lexer_public"
 import {
     END_OF_FILE,
@@ -110,7 +110,7 @@ class EcmaScriptQuirksParser extends Parser {
         this.textIdx = 0
     }
 
-    protected IS_NEXT_TOKEN(expectedType: ITokenType): IToken | boolean {
+    protected IS_NEXT_TOKEN(expectedType: TokenType): IToken | boolean {
         if (this.orgText.length <= this.textIdx) {
             return END_OF_FILE
         } else {
@@ -129,7 +129,7 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    private consumeExpected(expectedType: ITokenType): IToken | false {
+    private consumeExpected(expectedType: TokenType): IToken | false {
         // match expected
         const expectedPattern = expectedType.PATTERN as RegExp
         expectedPattern.lastIndex = this.textIdx
@@ -149,7 +149,7 @@ class EcmaScriptQuirksParser extends Parser {
         return false
     }
 
-    protected consumeInternal(tokClass: ITokenType, idx: number): IToken {
+    protected consumeInternal(tokClass: TokenType, idx: number): IToken {
         this.skipWhitespace()
         let nextToken = this.consumeExpected(tokClass)
         if (nextToken !== false) {
@@ -181,7 +181,7 @@ class EcmaScriptQuirksParser extends Parser {
 
     protected lookAheadBuilderForOptional(
         alt: lookAheadSequence,
-        tokenMatcher: ITokenMatcher,
+        tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
     ): () => boolean {
         if (!every(alt, currAlt => currAlt.length === 1)) {
@@ -216,7 +216,7 @@ class EcmaScriptQuirksParser extends Parser {
     protected lookAheadBuilderForAlternatives(
         alts: lookAheadSequence[],
         hasPredicates: boolean,
-        tokenMatcher: ITokenMatcher,
+        tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
     ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
         if (

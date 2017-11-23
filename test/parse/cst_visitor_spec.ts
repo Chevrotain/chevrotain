@@ -1,4 +1,4 @@
-import { createToken, Token } from "../../src/scan/tokens_public"
+import { createToken, IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { createRegularToken } from "../utils/matchers"
 import { keys } from "../../src/utils/utils"

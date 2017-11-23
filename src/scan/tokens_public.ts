@@ -297,9 +297,6 @@ export function getTokenConstructor(tokenInstance: IToken): TokenType {
  * @param tokType {TokenType}
  * @returns {boolean}
  */
-export function tokenMatcher(
-    tokInstance: IToken,
-    tokType: TokenType
-): boolean {
+export function tokenMatcher(tokInstance: IToken, tokType: TokenType): boolean {
     return tokenStructuredMatcher(tokInstance, tokType)
 }
