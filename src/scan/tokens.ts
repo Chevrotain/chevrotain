@@ -1,5 +1,15 @@
 import { TokenType } from "./lexer_public"
-import { cloneArr, contains, difference, forEach, has } from "../utils/utils"
+import {
+    cloneArr,
+    compact,
+    contains,
+    difference,
+    flatten,
+    forEach,
+    has,
+    isEmpty,
+    map
+} from "../utils/utils"
 import { HashTable } from "../lang/lang_extensions"
 import { tokenName } from "./tokens_public"
 
@@ -29,7 +39,7 @@ export const tokenIdxToClass = new HashTable<TokenType>()
 
 export function augmentTokenTypes(tokenTypes: TokenType[]): void {
     // 1. collect the parent Token Types as well.
-    let tokenTypesAndParents = expandTokenHierarchy(tokenTypes)
+    let tokenTypesAndParents = expandCategories(tokenTypes)
 
     // 2. add required tokenType and extendingTokenTypes properties
     assignTokenDefaultProps(tokenTypesAndParents)
@@ -43,21 +53,27 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
     })
 }
 
-export function expandTokenHierarchy(tokenTypes: TokenType[]): TokenType[] {
-    let tokenTypesAndParents = cloneArr(tokenTypes)
+export function expandCategories(tokenTypes: TokenType[]): TokenType[] {
+    let result = cloneArr(tokenTypes)
 
-    // TODO: modify this to scan over an array of parents?
-    forEach(tokenTypes, currTokType => {
-        let currParentType: any = currTokType.parent
-        while (currParentType) {
-            if (!contains(tokenTypesAndParents, currParentType)) {
-                tokenTypesAndParents.push(currParentType)
-            }
-            currParentType = currParentType.parent
+    let categories = tokenTypes
+    let searching = true
+    while (searching) {
+        categories = compact(
+            flatten(map(categories, currTokType => currTokType.CATEGORIES))
+        )
+
+        let newCategories = difference(categories, result)
+
+        result = result.concat(newCategories)
+
+        if (isEmpty(newCategories)) {
+            searching = false
+        } else {
+            categories = newCategories
         }
-    })
-
-    return tokenTypesAndParents
+    }
+    return result
 }
 
 export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
@@ -83,6 +99,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
 }
 
 export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
+    // TODO update this logic to use the categories properties.
     forEach(tokenTypes, currTokType => {
         let currSubTypesExtendingTypes = [currTokType.tokenType]
         let currParentClass: any = currTokType.parent

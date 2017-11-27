@@ -33,6 +33,7 @@ export interface TokenType {
     POP_MODE?: boolean
     PUSH_MODE?: string
     LINE_BREAKS?: boolean
+    CATEGORIES?: TokenType | TokenType[]
 
     tokenName?: string
     tokenType?: number

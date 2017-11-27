@@ -432,16 +432,20 @@ function defineLexerSpecs(
         })
 
         const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
-        const If = createToken({ name: "If", pattern: /if/, parent: Keyword })
+        const If = createToken({
+            name: "If",
+            pattern: /if/,
+            categories: Keyword
+        })
         const Else = createToken({
             name: "Else",
             pattern: "else",
-            parent: Keyword
+            categories: Keyword
         })
         const Return = createToken({
             name: "Return",
             pattern: /return/i,
-            parent: Keyword
+            categories: Keyword
         })
         const Integer = createToken({ name: "Integer", pattern: /[1-9]\d*/ })
 
@@ -452,12 +456,12 @@ function defineLexerSpecs(
         const LParen = createToken({
             name: "Return",
             pattern: /\(/,
-            parent: Punctuation
+            categories: Punctuation
         })
         const RParen = createToken({
             name: "Return",
             pattern: /\)/,
-            parent: Punctuation
+            categories: Punctuation
         })
 
         const Whitespace = createToken({

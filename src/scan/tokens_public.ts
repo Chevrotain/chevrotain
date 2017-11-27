@@ -84,7 +84,7 @@ export function tokenName(obj: TokenType | Function): string {
 
 export interface ITokenConfig {
     name: string
-    parent?: TokenType | TokenType[]
+    categories?: TokenType | TokenType[]
     label?: string
     pattern?: RegExp | CustomPatternMatcherFunc | ICustomPattern | string
     group?: string | any
@@ -99,6 +99,7 @@ export interface ITokenConfig {
 }
 
 const PARENT = "parent"
+const CATEGORIES = "categories"
 const LABEL = "label"
 const GROUP = "group"
 const PUSH_MODE = "push_mode"
@@ -116,7 +117,6 @@ export function createToken(config: ITokenConfig): TokenType {
 
 function createTokenInternal(config: ITokenConfig): TokenType {
     let tokenName = config.name
-    let parentType = config.parent
     let pattern = config.pattern
 
     let tokenType: any = {}
@@ -134,13 +134,15 @@ function createTokenInternal(config: ITokenConfig): TokenType {
     }
 
     if (has(config, PARENT)) {
-        tokenType.parent = config[PARENT]
+        throw "The parent property is no longer supported.\n" +
+            "See: [TODO-add link] for details."
+    }
+
+    if (has(config, CATEGORIES)) {
+        tokenType.CATEGORIES = config[CATEGORIES]
     }
 
     augmentTokenTypes([tokenType])
-
-    // static properties mixing
-    tokenType = assignNoOverwrite(tokenType, parentType)
 
     if (has(config, LABEL)) {
         tokenType.LABEL = config[LABEL]

@@ -20,19 +20,19 @@ describe("The Chevrotain Tokens namespace", () => {
         })
 
         let A = createToken({ name: "A" })
-        let B = createToken({ name: "B", parent: A })
+        let B = createToken({ name: "B", categories: A })
 
         B.GROUP = "Special"
 
         let C = createToken({
             name: "C",
             pattern: /\d+/,
-            parent: B
+            categories: B
         })
         let D = createToken({
             name: "D",
             pattern: /\w+/,
-            parent: B
+            categories: B
         })
         let Plus = createToken({ name: "Plus", pattern: /\+/ })
         Plus.LABEL = "+"
