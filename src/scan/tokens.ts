@@ -7,7 +7,9 @@ import {
     flatten,
     forEach,
     has,
+    isArray,
     isEmpty,
+    isUndefined,
     map
 } from "../utils/utils"
 import { HashTable } from "../lang/lang_extensions"
@@ -38,15 +40,15 @@ export let tokenShortNameIdx = 1
 export const tokenIdxToClass = new HashTable<TokenType>()
 
 export function augmentTokenTypes(tokenTypes: TokenType[]): void {
-    // 1. collect the parent Token Types as well.
+    // collect the parent Token Types as well.
     let tokenTypesAndParents = expandCategories(tokenTypes)
 
-    // 2. add required tokenType and extendingTokenTypes properties
+    // add required tokenType and extendingTokenTypes properties
     assignTokenDefaultProps(tokenTypesAndParents)
 
-    // 3. fill up the extendingTokenTypes
-    assignExtendingTokensProp(tokenTypesAndParents)
+    // fill up the extendingTokenTypes
     assignExtendingTokensMapProp(tokenTypesAndParents)
+    assignExtendingTokensProp(tokenTypesAndParents)
 
     forEach(tokenTypesAndParents, tokType => {
         tokType.isParent = tokType.extendingTokenTypes.length > 0
@@ -83,6 +85,20 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
             ;(<any>currTokType).tokenType = tokenShortNameIdx++
         }
 
+        // CATEGORIES? : TokenType | TokenType[]
+        if (
+            hasCategoriesProperty(currTokType) &&
+            !isArray(currTokType.CATEGORIES)
+            // &&
+            // !isUndefined(currTokType.CATEGORIES.PATTERN)
+        ) {
+            currTokType.CATEGORIES = [currTokType.CATEGORIES]
+        }
+
+        if (!hasCategoriesProperty(currTokType)) {
+            currTokType.CATEGORIES = []
+        }
+
         if (!hasExtendingTokensTypesProperty(currTokType)) {
             currTokType.extendingTokenTypes = []
         }
@@ -99,35 +115,41 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
 }
 
 export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
-    // TODO update this logic to use the categories properties.
     forEach(tokenTypes, currTokType => {
-        let currSubTypesExtendingTypes = [currTokType.tokenType]
-        let currParentClass: any = currTokType.parent
-
-        while (currParentClass && currParentClass !== Object) {
-            let newExtendingTypes = difference(
-                currSubTypesExtendingTypes,
-                currParentClass.extendingTokenTypes
-            )
-            currParentClass.extendingTokenTypes = currParentClass.extendingTokenTypes.concat(
-                newExtendingTypes
-            )
-            currSubTypesExtendingTypes.push(currParentClass.tokenType)
-            currParentClass = currParentClass.parent
-        }
+        forEach(currTokType.extendingTokenTypesMap, (val, key) => {
+            currTokType.extendingTokenTypes.push(tokenIdxToClass[key])
+        })
     })
 }
 
 export function assignExtendingTokensMapProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
-        forEach(currTokType.extendingTokenTypes, currExtendingType => {
-            currTokType.extendingTokenTypesMap[currExtendingType] = true
-        })
+        singleAssignExtendingToksMap([], currTokType)
+    })
+}
+
+function singleAssignExtendingToksMap(
+    path: TokenType[],
+    nextNode: TokenType
+): void {
+    forEach(path, pathNode => {
+        nextNode.extendingTokenTypesMap[pathNode.tokenType] = true
+    })
+
+    forEach(nextNode.CATEGORIES, nextCategory => {
+        const newPath = path.concat(nextNode)
+        if (!contains(newPath, nextCategory)) {
+            singleAssignExtendingToksMap(newPath, nextCategory)
+        }
     })
 }
 
 export function hasShortKeyProperty(tokType: TokenType): boolean {
     return has(tokType, "tokenType")
+}
+
+export function hasCategoriesProperty(tokType: TokenType): boolean {
+    return has(tokType, "CATEGORIES")
 }
 
 export function hasExtendingTokensTypesProperty(tokType: TokenType): boolean {

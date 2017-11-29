@@ -59,11 +59,6 @@ describe("The Chevrotain Tokens namespace", () => {
             expect(aInstance.endColumn).to.equal(5)
         })
 
-        it("provides an extendToken utility - static properties inheritance", () => {
-            expect(D.GROUP).to.equal("Special")
-            expect(C.GROUP).to.equal("Special")
-        })
-
         it("Allows customization of the label", () => {
             // Default to class name
             expect(tokenLabel(B)).to.equal("B")

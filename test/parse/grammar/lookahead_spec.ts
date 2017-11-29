@@ -677,7 +677,7 @@ context("lookahead specs", () => {
                     .to.be.undefined
             })
 
-            it.only("complex alternatives with inheritance - positive", () => {
+            it("complex alternatives with inheritance - positive", () => {
                 let alternatives = [
                     [[ExtendsAlpha, Beta]], // 0
                     [[Alpha, Beta]] // 1
