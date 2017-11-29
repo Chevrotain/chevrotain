@@ -1,20 +1,41 @@
-var chevrotain = require("chevrotain")
-var createToken = chevrotain.createToken
-var Lexer = chevrotain.Lexer
+/**
+ * This example shows how to resolve the keywords vs identifiers ambiguity.
+ * The order of TokenTypes in the lexer definition matters.
+ *
+ * If we place keywords before the Identifier than identifiers that have a keyword like prefix will not be
+ * lexer correctly. For example, the keyword "for" and the identifier "formal".
+ * The token vector will be ["for", "mal"] instead of ["formal"].
+ *
+ * On the other hand if we place keywords after the Identifier than they will never
+ * be lexed as keywords as all keywords are usually valid identifiers.
+ *
+ * The solution is to place the keywords BEFORE the Identifier with an added property
+ * telling the lexer to prefer the longer identifier alternative if one is found.
+ */
 
-// using extendToken utility to create the Token constructors and hierarchy
-var Identifier = createToken({ name: "Identifier", pattern: /[a-zA-z]\w+/ })
-var Keyword = createToken({
-    name: "Keyword",
-    // LONGER_ALT will make the Lexer prefer a longer Identifier over a Keyword.
-    pattern: Lexer.NA,
+const chevrotain = require("chevrotain")
+const createToken = chevrotain.createToken
+const Lexer = chevrotain.Lexer
+
+const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-z]\w+/ })
+
+// A utility to create "keywords" token.
+function createkeywordToken(config) {
+    // The longer_alt property ensures the lexer will try to lex a LONGER identifier
+    // each time a keyword is lexed.
+    config.longer_alt = Identifier
+    return createToken(config)
+}
+
+const While = createToken({
+    name: "While",
+    pattern: /while/,
     longer_alt: Identifier
 })
 
-var While = createToken({ name: "While", pattern: /while/, parent: Keyword })
-var For = createToken({ name: "For", pattern: /for/, parent: Keyword })
-var Do = createToken({ name: "Do", pattern: /do/, parent: Keyword })
-var Whitespace = createToken({
+const For = createToken({ name: "For", pattern: /for/ })
+const Do = createToken({ name: "Do", pattern: /do/ })
+const Whitespace = createToken({
     name: "Whitespace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
@@ -23,8 +44,6 @@ var Whitespace = createToken({
 
 keywordsVsIdentifiersLexer = new Lexer([
     Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
-
-    Keyword, // Adding keyword here is optional as its pattern is defined as 'lexer.NA' thus the lexer will completely ignore it
 
     While, // the actual keywords (While/For/Do) must appear BEFORE the Identifier Token as they are all a valid prefix of it's PATTERN.
     For, // However the edge case of an Identifier with a prefix which is a valid keyword must still be handled, for example:
@@ -36,16 +55,15 @@ keywordsVsIdentifiersLexer = new Lexer([
 
 module.exports = {
     Identifier: Identifier,
-    Keyword: Keyword,
     While: While,
     For: For,
     Do: Do,
     Whitespace: Whitespace,
 
     tokenize: function(text) {
-        var lexResult = keywordsVsIdentifiersLexer.tokenize(text)
+        const lexResult = keywordsVsIdentifiersLexer.tokenize(text)
 
-        if (lexResult.errors.length >= 1) {
+        if (lexResult.errors.length > 0) {
             throw new Error("sad sad panda lexing errors detected")
         }
         return lexResult

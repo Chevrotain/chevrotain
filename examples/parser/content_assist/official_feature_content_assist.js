@@ -23,29 +23,29 @@ const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
 const Private = createToken({
     name: "Private",
     pattern: /private/,
-    parent: Keyword
+    categories: Keyword
 })
 const Public = createToken({
     name: "Public",
     pattern: /public/,
-    parent: Keyword
+    categories: Keyword
 })
 const Static = createToken({
     name: "Static",
     pattern: /static/,
-    parent: Keyword
+    categories: Keyword
 })
 const Declare = createToken({
     name: "Declare",
     pattern: /declare/,
-    parent: Keyword
+    categories: Keyword
 })
-const Call = createToken({ name: "Call", pattern: /call/, parent: Keyword })
-const Enum = createToken({ name: "Enum", pattern: /enum/, parent: Keyword })
+const Call = createToken({ name: "Call", pattern: /call/, categories: Keyword })
+const Enum = createToken({ name: "Enum", pattern: /enum/, categories: Keyword })
 const Function = createToken({
     name: "Function",
     pattern: /function/,
-    parent: Keyword
+    categories: Keyword
 })
 const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
 const WhiteSpace = createToken({

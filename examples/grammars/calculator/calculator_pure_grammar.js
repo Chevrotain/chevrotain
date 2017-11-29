@@ -28,12 +28,12 @@ var AdditionOperator = createToken({
 var Plus = createToken({
     name: "Plus",
     pattern: /\+/,
-    parent: AdditionOperator
+    categories: AdditionOperator
 })
 var Minus = createToken({
     name: "Minus",
     pattern: /-/,
-    parent: AdditionOperator
+    categories: AdditionOperator
 })
 
 var MultiplicationOperator = createToken({
@@ -43,12 +43,12 @@ var MultiplicationOperator = createToken({
 var Multi = createToken({
     name: "Multi",
     pattern: /\*/,
-    parent: MultiplicationOperator
+    categories: MultiplicationOperator
 })
 var Div = createToken({
     name: "Div",
     pattern: /\//,
-    parent: MultiplicationOperator
+    categories: MultiplicationOperator
 })
 
 var LParen = createToken({ name: "LParen", pattern: /\(/ })
@@ -118,11 +118,11 @@ function CalculatorPure(input) {
 
     $.RULE("atomicExpression", function() {
         return $.OR([
-            // parenthesisExpression has the highest precedence and thus it appears
+            // categorieshesisExpression has the highest precedence and thus it appears
             // in the "lowest" leaf in the expression ParseTree.
             {
                 ALT: function() {
-                    return $.SUBRULE($.parenthesisExpression)
+                    return $.SUBRULE($.categorieshesisExpression)
                 }
             },
             {
@@ -138,7 +138,7 @@ function CalculatorPure(input) {
         ])
     })
 
-    $.RULE("parenthesisExpression", function() {
+    $.RULE("categorieshesisExpression", function() {
         $.CONSUME(LParen)
         $.SUBRULE($.expression)
         $.CONSUME(RParen)
@@ -219,9 +219,9 @@ class CalculatorInterpreter extends BaseCstVisitor {
     }
 
     atomicExpression(ctx) {
-        if (ctx.parenthesisExpression.length > 0) {
+        if (ctx.categorieshesisExpression.length > 0) {
             // TODO: allow accepting array for less verbose syntax
-            return this.visit(ctx.parenthesisExpression[0])
+            return this.visit(ctx.categorieshesisExpression[0])
         } else if (ctx.NumberLiteral.length > 0) {
             return parseInt(ctx.NumberLiteral[0].image, 10)
         } else if (ctx.powerFunction.length > 0) {
@@ -229,8 +229,8 @@ class CalculatorInterpreter extends BaseCstVisitor {
         }
     }
 
-    parenthesisExpression(ctx) {
-        // The ctx will also contain the parenthesis tokens, but we don't care about those
+    categorieshesisExpression(ctx) {
+        // The ctx will also contain the categorieshesis tokens, but we don't care about those
         // in the context of calculating the result.
         return this.visit(ctx.expression[0])
     }

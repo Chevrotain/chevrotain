@@ -45,10 +45,14 @@ var Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
 var Select = createToken({
     name: "Select",
     pattern: /SELECT/,
-    parent: Keyword
+    categories: Keyword
 })
-var From = createToken({ name: "From", pattern: /FROM/, parent: Keyword })
-var Where = createToken({ name: "Where", pattern: /WHERE/, parent: Keyword })
+var From = createToken({ name: "From", pattern: /FROM/, categories: Keyword })
+var Where = createToken({
+    name: "Where",
+    pattern: /WHERE/,
+    categories: Keyword
+})
 var Comma = createToken({ name: "Comma", pattern: /,/ })
 var Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
 var Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
