@@ -154,5 +154,14 @@ describe("The Chevrotain Tokens namespace", () => {
             expect(A).to.haveOwnProperty("GROUP")
             expect(A.GROUP).to.equal(Lexer.SKIPPED)
         })
+
+        it("Will throw when using the deprecated parent flag", () => {
+            expect(() =>
+                createToken(<any>{
+                    name: "A",
+                    parent: "oops"
+                })
+            ).to.throw("The parent property is no longer supported")
+        })
     })
 })
