@@ -119,7 +119,9 @@ export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
         // avoid duplications
         currTokType.extendingTokenTypes = []
         forEach(currTokType.extendingTokenTypesMap, (val, key) => {
-            currTokType.extendingTokenTypes.push(tokenIdxToClass.get(key))
+            currTokType.extendingTokenTypes.push(
+                tokenIdxToClass.get(key).tokenType
+            )
         })
     })
 }
