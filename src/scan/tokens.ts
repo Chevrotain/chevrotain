@@ -117,7 +117,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
 export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         forEach(currTokType.extendingTokenTypesMap, (val, key) => {
-            currTokType.extendingTokenTypes.push(tokenIdxToClass[key])
+            currTokType.extendingTokenTypes.push(tokenIdxToClass.get(key))
         })
     })
 }
