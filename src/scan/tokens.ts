@@ -9,7 +9,6 @@ import {
     has,
     isArray,
     isEmpty,
-    isUndefined,
     map
 } from "../utils/utils"
 import { HashTable } from "../lang/lang_extensions"
@@ -29,6 +28,7 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
 
 // Optimized tokenMatcher in case our grammar does not use token inheritance
 // Being so tiny it is much more likely to be in-lined and this avoid the function call overhead
+// TODO: rename to categories
 export function tokenStructuredMatcherNoInheritance(
     tokInstance,
     tokConstructor
@@ -116,6 +116,8 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
 
 export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
+        // avoid duplications
+        currTokType.extendingTokenTypes = []
         forEach(currTokType.extendingTokenTypesMap, (val, key) => {
             currTokType.extendingTokenTypes.push(tokenIdxToClass.get(key))
         })
