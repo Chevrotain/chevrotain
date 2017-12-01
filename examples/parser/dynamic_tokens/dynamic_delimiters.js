@@ -21,9 +21,13 @@ var Parser = chevrotain.Parser
 var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
 var RSquare = createToken({ name: "RSquare", pattern: /]/ })
 
-// base delimiter classes
+// base delimiter TokenTypes
 var BaseDelimiter = createToken({ name: "BaseDelimiter", pattern: Lexer.NA })
-var Comma = createToken({ name: "Comma", pattern: /,/, parent: BaseDelimiter })
+var Comma = createToken({
+    name: "Comma",
+    pattern: /,/,
+    categories: BaseDelimiter
+})
 var NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ })
 var WhiteSpace = createToken({
     name: "WhiteSpace",
@@ -96,7 +100,7 @@ module.exports = function(text, dynamicDelimiterRegExp) {
     var dynamicDelimiter = createToken({
         name: "dynamicDelimiter",
         pattern: dynamicDelimiterRegExp,
-        parent: BaseDelimiter
+        categories: BaseDelimiter
     })
 
     // dynamically create a Lexer which can Lex all our language including the dynamic delimiters.
