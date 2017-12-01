@@ -33,8 +33,16 @@ const While = createToken({
     longer_alt: Identifier
 })
 
-const For = createToken({ name: "For", pattern: /for/ })
-const Do = createToken({ name: "Do", pattern: /do/ })
+const For = createToken({
+    name: "For",
+    pattern: /for/,
+    longer_alt: Identifier
+})
+const Do = createToken({
+    name: "Do",
+    pattern: /do/,
+    longer_alt: Identifier
+})
 const Whitespace = createToken({
     name: "Whitespace",
     pattern: /\s+/,
