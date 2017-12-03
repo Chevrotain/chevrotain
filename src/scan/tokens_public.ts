@@ -256,7 +256,8 @@ export function createTokenInstance(
         endLine,
         startColumn,
         endColumn,
-        tokenType: (<any>tokType).tokenType
+        tokenType: (<any>tokType).tokenType,
+        type: tokType
     }
 }
 
