@@ -158,7 +158,8 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
 
 export function analyzeCst(
     topRules: gast.Rule[],
-    fullToShortName: HashTable<number>
+    fullToShortName: HashTable<number>,
+    avoidDynamicCodeDuringAnalysis?: boolean
 ): {
     dictDef: HashTable<Function>
     allRuleNames: string[]
@@ -170,7 +171,7 @@ export function analyzeCst(
         let currTopRuleShortName = fullToShortName.get(currTopRule.name)
         result.dictDef.put(
             currTopRuleShortName,
-            buildInitDefFunc(currChildrenNames)
+            buildInitDefFunc(currChildrenNames, avoidDynamicCodeDuringAnalysis)
         )
         result.allRuleNames.push(currTopRule.name)
 
@@ -180,14 +181,37 @@ export function analyzeCst(
         currTopRule.accept(namedCollectorVisitor)
         forEach(namedCollectorVisitor.result, ({ def, key, name }) => {
             let currNestedChildrenNames = buildChildDictionaryDef(def)
-            result.dictDef.put(key, buildInitDefFunc(currNestedChildrenNames))
+            result.dictDef.put(key, buildInitDefFunc(currNestedChildrenNames, avoidDynamicCodeDuringAnalysis))
             result.allRuleNames.push(currTopRule.name + name)
         })
     })
 
     return result
 }
-function buildInitDefFunc(childrenNames: string[]): Function {
+
+function buildInitDefFuncNoDynamic(childrenNames: string[]): Function {
+    // the standard buildInitDefFunc uses "new Function" which will trigger
+    // unsafe-eval warnings in some web contexts.
+    // this workaround uses JSON instead to return clones of the initial object.
+
+    let initialObject = {}
+    map(childrenNames, (currName) => {
+        initialObject[currName] = []
+    })
+
+    let serialized = JSON.stringify(initialObject)
+
+    return function() {
+        // return a deep clone of the initial object.
+        return JSON.parse(serialized)
+    }
+}
+
+function buildInitDefFunc(childrenNames: string[], avoidDynamicCodeDuringAnalysis?: boolean): Function {
+    if (avoidDynamicCodeDuringAnalysis) {
+        return buildInitDefFuncNoDynamic(childrenNames)
+    }
+    
     let funcString = `return {\n`
 
     funcString += map(childrenNames, currName => `"${currName}" : []`).join(
