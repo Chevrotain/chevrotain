@@ -39,7 +39,7 @@ var Parser = chevrotain.Parser
 var tokenMatcher = chevrotain.tokenMatcher
 var createToken = chevrotain.createToken
 
-// all keywords (from/select/where/...) extend a base Keyword class, thus
+// all keywords (from/select/where/...) belong to the Keyword category thus
 // they will be easy to identify for the purpose of content assist.
 var Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
 var Select = createToken({
@@ -254,7 +254,7 @@ module.exports = {
                 var nextPossibleKeywordsTypes = _.filter(
                     nextPossibleTokTypes,
                     function(currPossibleTokType) {
-                        return Keyword.extendingTokenTypesMap[
+                        return Keyword.categoryMatchesMap[
                             currPossibleTokType.tokenType
                         ]
                     }

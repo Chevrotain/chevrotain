@@ -43,8 +43,8 @@ export function augmentTokenTypes(tokenTypes: TokenType[]): void {
     assignTokenDefaultProps(tokenTypesAndParents)
 
     // fill up the categoryMatches
-    assignExtendingTokensMapProp(tokenTypesAndParents)
-    assignExtendingTokensProp(tokenTypesAndParents)
+    assignCategoriesMapProp(tokenTypesAndParents)
+    assignCategoriesTokensProp(tokenTypesAndParents)
 
     forEach(tokenTypesAndParents, tokType => {
         tokType.isParent = tokType.categoryMatches.length > 0
@@ -110,7 +110,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     })
 }
 
-export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
+export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         // avoid duplications
         currTokType.categoryMatches = []
@@ -120,13 +120,13 @@ export function assignExtendingTokensProp(tokenTypes: TokenType[]): void {
     })
 }
 
-export function assignExtendingTokensMapProp(tokenTypes: TokenType[]): void {
+export function assignCategoriesMapProp(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
-        singleAssignExtendingToksMap([], currTokType)
+        singleAssignCategoriesToksMap([], currTokType)
     })
 }
 
-function singleAssignExtendingToksMap(
+function singleAssignCategoriesToksMap(
     path: TokenType[],
     nextNode: TokenType
 ): void {
@@ -137,7 +137,7 @@ function singleAssignExtendingToksMap(
     forEach(nextNode.CATEGORIES, nextCategory => {
         const newPath = path.concat(nextNode)
         if (!contains(newPath, nextCategory)) {
-            singleAssignExtendingToksMap(newPath, nextCategory)
+            singleAssignCategoriesToksMap(newPath, nextCategory)
         }
     })
 }
