@@ -37,8 +37,8 @@ export interface TokenType {
 
     tokenName?: string
     tokenType?: number
-    extendingTokenTypes?: number[]
-    extendingTokenTypesMap?: { [tokType: number]: boolean }
+    categoryMatches?: number[]
+    categoryMatchesMap?: { [tokType: number]: boolean }
     isParent?: boolean
 }
 
@@ -183,12 +183,10 @@ export class Lexer {
      * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
      *  Structure composed of constructor functions for the Tokens types this lexer will support.
      *
-     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
+     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of TokenTypes.
      *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties:
-     *    1. a "modes" property where each value is an array of Token.
+     *    1. a "modes" property where each value is an array of TokenTypes.
      *    2. a "defaultMode" property specifying the initial lexer mode.
-     *
-     *  constructors.
      *
      *  for example:
      *  {
@@ -206,7 +204,7 @@ export class Lexer {
      *  The current lexing mode is selected via a "mode stack".
      *  The last (peek) value in the stack will be the current mode of the lexer.
      *
-     *  Each Token Type can define that it will cause the Lexer to (after consuming an instance of the Token):
+     *  Each Token Type can define that it will cause the Lexer to (after consuming an "instance" of the Token):
      *  1. PUSH_MODE : push a new mode to the "mode stack"
      *  2. POP_MODE  : pop the last mode from the "mode stack"
      *
@@ -221,7 +219,7 @@ export class Lexer {
      *          static POP_MODE = true
      *       }
      *
-     *  The Token constructors must be in one of these forms:
+     *  The TokenTypes must be in one of these forms:
      *
      *  1. With a PATTERN property that has a RegExp value for tokens to match:
      *     example: -->class Integer { static PATTERN = /[1-9]\d }<--

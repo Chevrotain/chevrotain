@@ -8,7 +8,6 @@ import {
     tokenName,
     tokenLabel,
     EOF,
-    getTokenConstructor,
     tokenMatcher,
     createToken,
     createTokenInstance
@@ -43,7 +42,6 @@ API.tokenLabel = tokenLabel
 API.tokenMatcher = tokenMatcher
 API.createToken = createToken
 API.createTokenInstance = createTokenInstance
-API.getTokenConstructor = getTokenConstructor
 
 // Other Utilities
 API.EMPTY_ALT = EMPTY_ALT

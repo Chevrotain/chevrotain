@@ -20,7 +20,7 @@ import {
 import { TokenType } from "../../scan/lexer_public"
 import {
     tokenStructuredMatcher,
-    tokenStructuredMatcherNoInheritance
+    tokenStructuredMatcherNoCategories
 } from "../../scan/tokens"
 
 export enum PROD_TYPE {
@@ -61,8 +61,8 @@ export function buildLookaheadFuncForOr(
 ): (orAlts?: IAnyOrAlt<any>[]) => number {
     let lookAheadPaths = getLookaheadPathsForOr(occurrence, ruleGrammar, k)
 
-    const tokenMatcher = isTokenInheritanceNotUsed(lookAheadPaths)
-        ? tokenStructuredMatcherNoInheritance
+    const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
+        ? tokenStructuredMatcherNoCategories
         : tokenStructuredMatcher
 
     return laFuncBuilder(
@@ -104,8 +104,8 @@ export function buildLookaheadFuncForOptionalProd(
         k
     )
 
-    const tokenMatcher = isTokenInheritanceNotUsed(lookAheadPaths)
-        ? tokenStructuredMatcherNoInheritance
+    const tokenMatcher = areTokenCategoriesNotUsed(lookAheadPaths)
+        ? tokenStructuredMatcherNoCategories
         : tokenStructuredMatcher
 
     return lookaheadBuilder(
@@ -185,14 +185,11 @@ export function buildAlternativesLookAheadFunc(
                     if (!has(result, currTokType.tokenType)) {
                         result[currTokType.tokenType] = idx
                     }
-                    forEach(
-                        currTokType.extendingTokenTypes,
-                        currExtendingType => {
-                            if (!has(result, currExtendingType)) {
-                                result[currExtendingType] = idx
-                            }
+                    forEach(currTokType.categoryMatches, currExtendingType => {
+                        if (!has(result, currExtendingType)) {
+                            result[currExtendingType] = idx
                         }
-                    )
+                    })
                 })
                 return result
             },
@@ -258,7 +255,7 @@ export function buildSingleAlternativeLookaheadFunction(
 
         if (
             singleTokensTypes.length === 1 &&
-            isEmpty((<any>singleTokensTypes[0]).extendingTokenTypes)
+            isEmpty((<any>singleTokensTypes[0]).categoryMatches)
         ) {
             let expectedTokenType = singleTokensTypes[0]
             let expectedTokenUniqueKey = (<any>expectedTokenType).tokenType
@@ -271,12 +268,9 @@ export function buildSingleAlternativeLookaheadFunction(
                 singleTokensTypes,
                 (result, currTokType, idx) => {
                     result[currTokType.tokenType] = true
-                    forEach(
-                        currTokType.extendingTokenTypes,
-                        currExtendingType => {
-                            result[currExtendingType] = true
-                        }
-                    )
+                    forEach(currTokType.categoryMatches, currExtendingType => {
+                        result[currExtendingType] = true
+                    })
                     return result
                 },
                 {}
@@ -641,12 +635,12 @@ export function isStrictPrefixOfPath(
     )
 }
 
-export function isTokenInheritanceNotUsed(
+export function areTokenCategoriesNotUsed(
     lookAheadPaths: lookAheadSequence[]
 ): boolean {
     return every(lookAheadPaths, singleAltPaths =>
         every(singleAltPaths, singlePath =>
-            every(singlePath, token => isEmpty(token.extendingTokenTypes))
+            every(singlePath, token => isEmpty(token.categoryMatches))
         )
     )
 }

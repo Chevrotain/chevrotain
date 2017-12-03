@@ -285,20 +285,21 @@ const SlashEq = createToken({
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.8
 const AbsLiteral = createToken({ name: "AbsLiteral" })
 
-// TODO: "true" and "false" should extend Identifier and act like reservedKeywords
-const NullTok = createToken({ name: "NullTok", categories: AbsLiteral })
+const NullTok = createToken({ name: "NullTok", categories: [AbsLiteral] })
 
 const AbsBooleanLiteral = createToken({
     name: "AbsBooleanLiteral",
     categories: AbsLiteral
 })
 
-// TODO: "true" and "false" should extend Identifier and act like reservedKeywords
-const TrueTok = createToken({ name: "TrueTok", categories: AbsBooleanLiteral })
+const TrueTok = createToken({
+    name: "TrueTok",
+    categories: [AbsBooleanLiteral, AbsKeyword]
+})
 
 const FalseTok = createToken({
     name: "FalseTok",
-    categories: AbsBooleanLiteral
+    categories: [AbsBooleanLiteral, AbsKeyword]
 })
 
 const NumericLiteral = createToken({

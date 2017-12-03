@@ -41,7 +41,6 @@ import { computeAllProdsFollows } from "./grammar/follow"
 import {
     createTokenInstance,
     EOF,
-    getTokenConstructor,
     IToken,
     tokenName
 } from "../scan/tokens_public"
@@ -76,7 +75,7 @@ import {
     augmentTokenTypes,
     isExtendingTokenType,
     tokenStructuredMatcher,
-    tokenStructuredMatcherNoInheritance
+    tokenStructuredMatcherNoCategories
 } from "../scan/tokens"
 import { CstNode, ICstVisitor } from "./cst/cst_public"
 import { addNoneTerminalToCst, addTerminalToCst, analyzeCst } from "./cst/cst"
@@ -168,7 +167,7 @@ export interface IParserConfig {
     ignoredIssues?: IgnoredParserIssues
 
     /**
-     * Enable This Flag to to support Dynamically defined Tokens via inheritance.
+     * Enable This Flag to to support Dynamically defined Tokens.
      * This will disable performance optimizations which cannot work if the whole Token vocabulary is not known
      * During Parser initialization.
      */
@@ -705,12 +704,12 @@ export class Parser {
             )
         }
 
-        const noTokenInheritanceUsed = every(
+        const noTokenCategoriesUsed = every(
             values(tokensDictionary),
-            tokenConstructor => isEmpty(tokenConstructor.extendingTokenTypes)
+            tokenConstructor => isEmpty(tokenConstructor.categoryMatches)
         )
-        this.tokenMatcher = noTokenInheritanceUsed
-            ? tokenStructuredMatcherNoInheritance
+        this.tokenMatcher = noTokenCategoriesUsed
+            ? tokenStructuredMatcherNoCategories
             : tokenStructuredMatcher
 
         // always add EOF to the tokenNames -> constructors map. it is useful to assure all the input has been
@@ -919,7 +918,7 @@ export class Parser {
     /**
      *
      * A Parsing DSL method use to consume a single terminal Token.
-     * a Token will be consumed, IFF the next token in the token vector is an instanceof tokType.
+     * a Token will be consumed, IFF the next token in the token vector matches <tokType>.
      * otherwise the parser will attempt to perform error recovery.
      *
      * The index in the method name indicates the unique occurrence of a terminal consumption
@@ -937,7 +936,7 @@ export class Parser {
      *                                  //     the rule 'parseQualifiedName'
      * }
      *
-     * @param {TokenType} tokType - A constructor function specifying the type of token to be consumed.
+     * @param {TokenType} tokType - The Type of the token to be consumed.
      * @param options - optional properties to modify the behavior of CONSUME.
      */
     protected CONSUME1(
@@ -2173,7 +2172,7 @@ export class Parser {
         let nextToken = this.LA(1)
         let k = 2
         while (true) {
-            let nextTokenType: any = getTokenConstructor(nextToken)
+            let nextTokenType: any = nextToken.type
             if (contains(allPossibleReSyncTokTypes, nextTokenType)) {
                 return nextTokenType
             }

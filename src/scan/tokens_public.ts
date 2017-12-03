@@ -1,19 +1,7 @@
-import {
-    assignNoOverwrite,
-    has,
-    isObject,
-    isString,
-    isUndefined
-} from "../utils/utils"
+import { has, isObject, isString, isUndefined } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
-import { TokenType } from "./lexer_public"
-import {
-    augmentTokenTypes,
-    tokenIdxToClass,
-    tokenStructuredMatcher
-} from "./tokens"
-
-import { Lexer } from "./lexer_public"
+import { Lexer, TokenType } from "./lexer_public"
+import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 /**
  *  The type of custom pattern matcher functions.
  *  Matches should only be done on the start of the text.
@@ -273,32 +261,15 @@ export function createTokenInstance(
 }
 
 /**
- * Given a Token instance, will return the Token Constructor.
- * Note that this function is not just for convenience, Because a Token "instance'
- * Does not use standard prototype inheritance and thus it's constructor cannot be accessed
- * by traversing the prototype chain.
- *
- * @param tokenInstance {IToken}
- * @returns {TokenType}
- */
-export function getTokenConstructor(tokenInstance: IToken): TokenType {
-    let tokenIdx
-    tokenIdx = tokenInstance.tokenType
-    return tokenIdxToClass.get(tokenIdx)
-}
-
-/**
  * A Utility method to check if a token is of the type of the argument Token class.
- * Not that while this utility has similar semantics to ECMAScript "instanceOf"
- * As Chevrotain tokens support inheritance.
+ * This utility is needed because Chevrotain tokens support "categories" which means
+ * A TokenType may have multiple categories, so a TokenType for the "true" literal in JavaScript
+ * May be both a Keyword Token and a Literal Token.
  *
- * It is not actually implemented using the "instanceOf" operator because
- * Chevrotain Tokens have their own performance optimized inheritance mechanism.
- *
- * @param tokInstance {IToken}
+ * @param token {IToken}
  * @param tokType {TokenType}
  * @returns {boolean}
  */
-export function tokenMatcher(tokInstance: IToken, tokType: TokenType): boolean {
-    return tokenStructuredMatcher(tokInstance, tokType)
+export function tokenMatcher(token: IToken, tokType: TokenType): boolean {
+    return tokenStructuredMatcher(token, tokType)
 }

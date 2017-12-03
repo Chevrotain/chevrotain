@@ -107,10 +107,10 @@ describe("The Chevrotain Tokens namespace", () => {
             expect(A.tokenType).to.be.greaterThan(0)
             expect(B.tokenType).to.be.greaterThan(A.tokenType)
 
-            expect(A.extendingTokenTypes).to.be.an.instanceOf(Array)
-            expect(A.extendingTokenTypes).to.be.empty
-            expect(B.extendingTokenTypes).to.be.an.instanceOf(Array)
-            expect(B.extendingTokenTypes).to.be.empty
+            expect(A.categoryMatches).to.be.an.instanceOf(Array)
+            expect(A.categoryMatches).to.be.empty
+            expect(B.categoryMatches).to.be.an.instanceOf(Array)
+            expect(B.categoryMatches).to.be.empty
         })
 
         it("can define a token Label via the createToken utilities", () => {
