@@ -185,6 +185,42 @@ function defineRecognizerSpecs(
             })
         })
 
+        describe("Token categories support", () => {
+            it("Can consume a Token that belongs to multiple categories", () => {
+                let Keyword = createToken({ name: "Keyword" })
+                let Literal = createToken({ name: "Literal" })
+                let TrueLiteral = createToken({
+                    name: "TrueLiteral",
+                    categories: [Keyword, Literal]
+                })
+
+                class CategoriesParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super(input, [Keyword, Literal], {})
+                        ;(<any>Parser).performSelfAnalysis(this)
+                    }
+
+                    public keyRule = this.RULE("keyRule", () => {
+                        this.CONSUME(Keyword)
+                    })
+
+                    public litRule = this.RULE("litRule", () => {
+                        this.CONSUME(Literal)
+                    })
+                }
+
+                const parser = new CategoriesParser([])
+
+                parser.input = [createTokenInstance(TrueLiteral)]
+                parser.keyRule()
+                expect(parser.errors).to.be.empty
+
+                parser.input = [createTokenInstance(TrueLiteral)]
+                parser.litRule()
+                expect(parser.errors).to.be.empty
+            })
+        })
+
         describe("The Error Recovery functionality of the Chevrotain Parser", () => {
             class ManyRepetitionRecovery extends Parser {
                 constructor(
