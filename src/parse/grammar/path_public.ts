@@ -1,4 +1,4 @@
-import { TokenConstructor } from "../../scan/lexer_public"
+import { TokenType } from "../../scan/lexer_public"
 /**
  * this interfaces defines the path the parser "took" to reach a certain position
  * in the grammar.
@@ -17,12 +17,12 @@ export interface IGrammarPath {
 }
 
 export interface ITokenGrammarPath extends IGrammarPath {
-    lastTok: Function
+    lastTok: TokenType
     lastTokOccurrence: number
 }
 
 export interface ISyntacticContentAssistPath extends IGrammarPath {
-    nextTokenType: TokenConstructor
+    nextTokenType: TokenType
     nextTokenOccurrence: number
 }
 

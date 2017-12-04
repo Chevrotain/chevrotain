@@ -46,6 +46,7 @@ import {
 } from "./Switchcase_recovery_tokens"
 import { IToken } from "../../../../src/scan/tokens_public"
 import { assign, contains } from "../../../../src/utils/utils"
+import { TokenType } from "../../../../src/scan/lexer_public"
 
 export interface RetType {
     [caseValue: string]: number
@@ -87,7 +88,7 @@ export class SwitchCaseRecoveryParser extends Parser {
 
     // DOCS: overriding this method allows us to customize the logic for which tokens may not be automaticaly inserted
     // during error recovery.
-    public canTokenTypeBeInsertedInRecovery(tokType: Function) {
+    public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
         return !contains(this.tokTypesThatCannotBeInsertedInRecovery, tokType)
     }
 

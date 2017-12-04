@@ -17,14 +17,14 @@ import {
 } from "../../utils/utils"
 import { IToken, tokenName } from "../../scan/tokens_public"
 import { first } from "./first"
-import { TokenConstructor } from "../../scan/lexer_public"
+import { TokenType } from "../../scan/lexer_public"
 import { TokenMatcher } from "../parser_public"
 import IProduction = gast.IProduction
 
 /* tslint:enable:no-use-before-declare */
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
-    protected possibleTokTypes: TokenConstructor[] = []
+    protected possibleTokTypes: TokenType[] = []
     protected ruleStack: string[]
     protected occurrenceStack: number[]
 
@@ -37,7 +37,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
         super()
     }
 
-    startWalking(): TokenConstructor[] {
+    startWalking(): TokenType[] {
         this.found = false
 
         if (this.path.ruleStack[0] !== this.topProd.name) {
@@ -128,10 +128,10 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
     }
 }
 
-export type AlternativesFirstTokens = Function[][]
+export type AlternativesFirstTokens = TokenType[][]
 
 export interface IFirstAfterRepetition {
-    token: Function
+    token: TokenType
     occurrence: number
     isEndOfRule: boolean
 }
@@ -240,7 +240,7 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
 }
 
 export interface PartialPathAndSuffixes {
-    partialPath: Function[]
+    partialPath: TokenType[]
     suffixDef: gast.IProduction[]
 }
 

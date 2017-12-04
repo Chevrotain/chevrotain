@@ -27,12 +27,12 @@ var AdditionOperator = createToken({
 var Plus = createToken({
     name: "Plus",
     pattern: /\+/,
-    parent: AdditionOperator
+    categories: AdditionOperator
 })
 var Minus = createToken({
     name: "Minus",
     pattern: /-/,
-    parent: AdditionOperator
+    categories: AdditionOperator
 })
 
 var MultiplicationOperator = createToken({
@@ -42,12 +42,12 @@ var MultiplicationOperator = createToken({
 var Multi = createToken({
     name: "Multi",
     pattern: /\*/,
-    parent: MultiplicationOperator
+    categories: MultiplicationOperator
 })
 var Div = createToken({
     name: "Div",
     pattern: /\//,
-    parent: MultiplicationOperator
+    categories: MultiplicationOperator
 })
 
 var LParen = createToken({ name: "LParen", pattern: /\(/ })
@@ -141,11 +141,11 @@ function Calculator(input) {
 
     $.RULE("atomicExpression", function() {
         return $.OR([
-            // parenthesisExpression has the highest precedence and thus it appears
+            // categorieshesisExpression has the highest precedence and thus it appears
             // in the "lowest" leaf in the expression ParseTree.
             {
                 ALT: function() {
-                    return $.SUBRULE($.parenthesisExpression)
+                    return $.SUBRULE($.categorieshesisExpression)
                 }
             },
             {
@@ -161,7 +161,7 @@ function Calculator(input) {
         ])
     })
 
-    $.RULE("parenthesisExpression", function() {
+    $.RULE("categorieshesisExpression", function() {
         var expValue
 
         $.CONSUME(LParen)

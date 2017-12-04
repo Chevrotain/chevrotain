@@ -1,9 +1,9 @@
 import { forEach, isRegExp, map } from "../../utils/utils"
-import { TokenConstructor } from "../../scan/lexer_public"
+import { TokenType } from "../../scan/lexer_public"
 import { tokenLabel, tokenName } from "../../scan/tokens_public"
 
 export namespace gast {
-    export interface INamedProductionConstructor extends Function {
+    export interface INamedProductionConstructor extends TokenType {
         new (
             definition: IProduction[],
             occurrenceInParent: number,
@@ -11,10 +11,10 @@ export namespace gast {
         ): AbstractProduction
     }
 
-    export interface INamedSepProductionConstructor extends Function {
+    export interface INamedSepProductionConstructor extends TokenType {
         new (
             definition: IProduction[],
-            separator: TokenConstructor,
+            separator: TokenType,
             occurrenceInParent: number,
             name?: string
         ): AbstractProduction
@@ -118,7 +118,7 @@ export namespace gast {
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         constructor(
             definition: IProduction[],
-            public separator: TokenConstructor,
+            public separator: TokenType,
             public occurrenceInParent: number = 1,
             public name?: string,
             public implicitOccurrenceIndex: boolean = false
@@ -143,7 +143,7 @@ export namespace gast {
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         constructor(
             definition: IProduction[],
-            public separator: TokenConstructor,
+            public separator: TokenType,
             public occurrenceInParent: number = 1,
             public name?: string,
             public implicitOccurrenceIndex: boolean = false
@@ -166,7 +166,7 @@ export namespace gast {
 
     export class Terminal implements IProductionWithOccurrence {
         constructor(
-            public terminalType: TokenConstructor,
+            public terminalType: TokenType,
             public occurrenceInParent: number = 1,
             public implicitOccurrenceIndex: boolean = false
         ) {}

@@ -5,11 +5,9 @@ import {
 } from "./parse/parser_public"
 import { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
 import {
-    Token,
     tokenName,
     tokenLabel,
     EOF,
-    getTokenConstructor,
     tokenMatcher,
     createToken,
     createTokenInstance
@@ -36,7 +34,6 @@ API.Parser = Parser
 API.ParserDefinitionErrorType = ParserDefinitionErrorType
 API.Lexer = Lexer
 API.LexerDefinitionErrorType = LexerDefinitionErrorType
-API.Token = Token
 API.EOF = EOF
 
 // Tokens utilities
@@ -45,7 +42,6 @@ API.tokenLabel = tokenLabel
 API.tokenMatcher = tokenMatcher
 API.createToken = createToken
 API.createTokenInstance = createTokenInstance
-API.getTokenConstructor = getTokenConstructor
 
 // Other Utilities
 API.EMPTY_ALT = EMPTY_ALT

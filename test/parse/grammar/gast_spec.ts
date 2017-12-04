@@ -1,6 +1,6 @@
 import { gast } from "../../../src/parse/grammar/gast_public"
 import { getProductionDslName } from "../../../src/parse/grammar/gast"
-import { createToken, Token } from "../../../src/scan/tokens_public"
+import { createToken } from "../../../src/scan/tokens_public"
 import Terminal = gast.Terminal
 import NonTerminal = gast.NonTerminal
 import Flat = gast.Flat
@@ -16,7 +16,9 @@ describe("GAst namespace", () => {
     })
 
     describe("the mappings between a GAst instance and its matching DSL method name for: ", () => {
-        class Comma extends Token {}
+        class Comma {
+            static PATTERN = /NA/
+        }
 
         it("Terminal", () => {
             let gastInstance = new gast.Terminal(Comma)

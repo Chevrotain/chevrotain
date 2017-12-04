@@ -31,74 +31,74 @@ FRAGMENT("Name", "{{NameStartChar}}({{NameChar}})*")
 // Unfortunately no support for static class properties in ES2015, only in ES2016...
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class Comment extends Token {}
+class Comment {}
 Comment.PATTERN = /<!--.*?-->/
 // A Comment may span multiple lines.
 Comment.LINE_BREAKS = true
 
-class CData extends Token {}
+class CData {}
 CData.PATTERN = /<!\[CDATA\[.*?]]>/
 
-class DTD extends Token {}
+class DTD {}
 DTD.PATTERN = /<!.*?>/
 DTD.GROUP = Lexer.SKIPPED
 
-class EntityRef extends Token {}
+class EntityRef {}
 EntityRef.PATTERN = MAKE_PATTERN("&{{Name}};")
 
-class CharRef extends Token {}
+class CharRef {}
 CharRef.PATTERN = /&#\d+;|&#x[a-fA-F0-9]/
 
-class SEA_WS extends Token {}
+class SEA_WS {}
 SEA_WS.PATTERN = /( |\t|\n|\r\n)+/
 SEA_WS.LINE_BREAKS = true
 
-class XMLDeclOpen extends Token {}
+class XMLDeclOpen {}
 XMLDeclOpen.PATTERN = /<\?xml[ \t\r\n]/
 XMLDeclOpen.PUSH_MODE = "INSIDE"
 XMLDeclOpen.LINE_BREAKS = true
 
-class SLASH_OPEN extends Token {}
+class SLASH_OPEN {}
 SLASH_OPEN.PATTERN = /<\//
 SLASH_OPEN.PUSH_MODE = "INSIDE"
 
-class OPEN extends Token {}
+class OPEN {}
 OPEN.PATTERN = /</
 OPEN.PUSH_MODE = "INSIDE"
 
-class PROCESSING_INSTRUCTION extends Token {}
+class PROCESSING_INSTRUCTION {}
 PROCESSING_INSTRUCTION.PATTERN = MAKE_PATTERN("<\\?{{Name}}.*\\?>")
 
-class TEXT extends Token {}
+class TEXT {}
 TEXT.PATTERN = /[^<&]+/
 TEXT.LINE_BREAKS = true
 
-class CLOSE extends Token {}
+class CLOSE {}
 CLOSE.PATTERN = />/
 CLOSE.POP_MODE = true
 
-class SPECIAL_CLOSE extends Token {}
+class SPECIAL_CLOSE {}
 SPECIAL_CLOSE.PATTERN = /\?>/
 SPECIAL_CLOSE.POP_MODE = true
 
-class SLASH_CLOSE extends Token {}
+class SLASH_CLOSE {}
 SLASH_CLOSE.PATTERN = /\/>/
 SLASH_CLOSE.POP_MODE = true
 
-class SLASH extends Token {}
+class SLASH {}
 SLASH.PATTERN = /\//
 
-class STRING extends Token {}
+class STRING {}
 STRING.PATTERN = /"[^<"]*"|'[^<']*'/
 STRING.LINE_BREAKS = true
 
-class EQUALS extends Token {}
+class EQUALS {}
 EQUALS.PATTERN = /=/
 
-class Name extends Token {}
+class Name {}
 Name.PATTERN = MAKE_PATTERN("{{Name}}")
 
-class S extends Token {}
+class S {}
 S.PATTERN = /[ \t\r\n]/
 S.GROUP = Lexer.SKIPPED
 S.LINE_BREAKS = true

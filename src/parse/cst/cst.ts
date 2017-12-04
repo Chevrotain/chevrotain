@@ -23,8 +23,6 @@ import {
 } from "../grammar/keys"
 import IProduction = gast.IProduction
 import GAstVisitor = gast.GAstVisitor
-import NonTerminal = gast.NonTerminal
-import Terminal = gast.Terminal
 import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
 import IProductionWithOccurrence = gast.IProductionWithOccurrence
 import AbstractProduction = gast.AbstractProduction

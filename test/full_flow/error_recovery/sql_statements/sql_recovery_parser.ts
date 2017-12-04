@@ -6,7 +6,7 @@
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
 import { Parser } from "../../../../src/parse/parser_public"
-import { Token } from "../../../../src/scan/tokens_public"
+import { IToken } from "../../../../src/scan/tokens_public"
 import * as allTokens from "./sql_recovery_tokens"
 import {
     INVALID_DDL,
@@ -38,13 +38,15 @@ import {
     VirtualToken
 } from "./sql_recovery_tokens"
 import { ParseTree } from "../../parse_tree"
-import { augmentTokenClasses } from "../../../../src/scan/tokens"
+import { augmentTokenTypes } from "../../../../src/scan/tokens"
+import { TokenType } from "../../../../src/scan/lexer_public"
+import { createRegularToken } from "../../../utils/matchers"
 
-augmentTokenClasses(<any>allTokens)
+augmentTokenTypes(<any>allTokens)
 
 // DOCS: to enable error recovery functionality one must extend BaseErrorRecoveryRecognizer
 export class DDLExampleRecoveryParser extends Parser {
-    constructor(input: Token[] = [], isRecoveryEnabled = true) {
+    constructor(input: IToken[] = [], isRecoveryEnabled = true) {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
@@ -110,7 +112,7 @@ export class DDLExampleRecoveryParser extends Parser {
             ])
         })
 
-        return PT(new STATEMENTS(), stmts)
+        return PT(createRegularToken(STATEMENTS), stmts)
     }
 
     private parseCreateStmt(): ParseTree {
@@ -121,7 +123,7 @@ export class DDLExampleRecoveryParser extends Parser {
         qn = this.SUBRULE(this.qualifiedName)
         semiColon = this.CONSUME1(SemiColonTok)
 
-        return PT(new CREATE_STMT(), [
+        return PT(createRegularToken(CREATE_STMT), [
             PT(createKW),
             PT(tableKW),
             qn,
@@ -140,7 +142,7 @@ export class DDLExampleRecoveryParser extends Parser {
         semiColon = this.CONSUME1(SemiColonTok)
 
         // tree rewrite
-        return PT(new INSERT_STMT(), [
+        return PT(createRegularToken(INSERT_STMT), [
             PT(insertKW),
             recordValue,
             PT(intoKW),
@@ -160,7 +162,7 @@ export class DDLExampleRecoveryParser extends Parser {
         semiColon = this.CONSUME1(SemiColonTok)
 
         // tree rewrite
-        return PT(new DELETE_STMT(), [
+        return PT(createRegularToken(DELETE_STMT), [
             PT(deleteKW),
             recordValue,
             PT(fromKW),
@@ -186,9 +188,9 @@ export class DDLExampleRecoveryParser extends Parser {
 
         // tree rewrite
         let allIdentsPts = WRAP_IN_PT(idents)
-        let dotsPt = PT(new DOTS(), WRAP_IN_PT(dots))
+        let dotsPt = PT(createRegularToken(DOTS), WRAP_IN_PT(dots))
         let allPtChildren = allIdentsPts.concat([dotsPt])
-        return PT(new QUALIFIED_NAME(), <any>allPtChildren)
+        return PT(createRegularToken(QUALIFIED_NAME), <any>allPtChildren)
     }
 
     private parseRecordValue(): ParseTree {
@@ -204,9 +206,9 @@ export class DDLExampleRecoveryParser extends Parser {
         })
         this.CONSUME1(RParenTok)
         // tree rewrite
-        let commasPt = PT(new COMMAS(), WRAP_IN_PT(commas))
+        let commasPt = PT(createRegularToken(COMMAS), WRAP_IN_PT(commas))
         let allPtChildren = values.concat([commasPt])
-        return PT(new QUALIFIED_NAME(), allPtChildren)
+        return PT(createRegularToken(QUALIFIED_NAME), allPtChildren)
     }
 
     private parseValue(): ParseTree {
@@ -229,11 +231,11 @@ export class DDLExampleRecoveryParser extends Parser {
 }
 
 // HELPER FUNCTIONS
-function PT(token: Token, children: ParseTree[] = []): ParseTree {
+function PT(token: IToken, children: ParseTree[] = []): ParseTree {
     return new ParseTree(token, children)
 }
 
-export function WRAP_IN_PT(toks: Token[]): ParseTree[] {
+export function WRAP_IN_PT(toks: IToken[]): ParseTree[] {
     let parseTrees = new Array(toks.length)
     for (let i = 0; i < toks.length; i++) {
         parseTrees[i] = PT(toks[i])
@@ -242,11 +244,13 @@ export function WRAP_IN_PT(toks: Token[]): ParseTree[] {
 }
 
 /* tslint:disable:class-name */
-export class INVALID_INPUT extends VirtualToken {}
+export class INVALID_INPUT extends VirtualToken {
+    static PATTERN = /NA/
+}
 /* tslint:enable:class-name */
-export function INVALID(tokType: Function = INVALID_INPUT): () => ParseTree {
+export function INVALID(tokType: TokenType = INVALID_INPUT): () => ParseTree {
     // virtual invalid tokens should have no parameters...
     return () => {
-        return PT(new (<any>tokType)())
+        return PT(createRegularToken(tokType))
     }
 }

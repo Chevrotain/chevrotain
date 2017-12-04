@@ -70,7 +70,8 @@ describe("Chevrotain Tutorial", () => {
                                                     endLine: NaN,
                                                     startColumn: NaN,
                                                     endColumn: NaN,
-                                                    isInsertedInRecovery: true
+                                                    isInsertedInRecovery: true,
+                                                    type: errRecovery.Colon
                                                 }
                                             ],
                                             // the value rule appears AFTER the error (missing colon) yet it was still parsed successfully

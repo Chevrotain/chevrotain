@@ -15,7 +15,7 @@ import {
     validateRuleIsOverridden,
     validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
-import { Token, createToken } from "../../../src/scan/tokens_public"
+import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { forEach, first, map } from "../../../src/utils/utils"
 
 let Rule = gast.Rule
@@ -212,7 +212,9 @@ describe("OccurrenceValidationCollector GASTVisitor class", () => {
     })
 })
 
-class DummyToken extends Token {}
+class DummyToken {
+    static PATTERN = /NA/
+}
 let dummyRule = new Rule("dummyRule", [new Terminal(DummyToken)])
 let dummyRule2 = new Rule("dummyRule2", [new Terminal(DummyToken)])
 let dummyRule3 = new Rule("dummyRule3", [new Terminal(DummyToken)])
@@ -298,26 +300,20 @@ describe("the getFirstNoneTerminal function", () => {
     })
 })
 
-export class PlusTok extends Token {
-    constructor() {
-        super()
-    }
+export class PlusTok {
+    static PATTERN = /NA/
 }
 
-export class MinusTok extends Token {
-    constructor() {
-        super()
-    }
+export class MinusTok {
+    static PATTERN = /NA/
 }
 
-export class StarTok extends Token {
-    constructor() {
-        super()
-    }
+export class StarTok {
+    static PATTERN = /NA/
 }
 
 class ErroneousOccurrenceNumUsageParser1 extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [PlusTok])
         Parser.performSelfAnalysis(this)
     }
@@ -333,7 +329,7 @@ class ErroneousOccurrenceNumUsageParser1 extends Parser {
 }
 
 class ErroneousOccurrenceNumUsageParser2 extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [PlusTok])
         Parser.performSelfAnalysis(this)
     }
@@ -345,7 +341,7 @@ class ErroneousOccurrenceNumUsageParser2 extends Parser {
 }
 
 class ErroneousOccurrenceNumUsageParser3 extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [PlusTok, MinusTok])
         Parser.performSelfAnalysis(this)
     }
@@ -364,7 +360,7 @@ let myToken = createToken({ name: "myToken" })
 let myOtherToken = createToken({ name: "myOtherToken" })
 
 class ValidOccurrenceNumUsageParser extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
         Parser.performSelfAnalysis(this)
     }
@@ -423,7 +419,7 @@ describe("The duplicate occurrence validations full flow", () => {
 })
 
 class InvalidRefParser extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
         Parser.performSelfAnalysis(this)
     }
@@ -434,7 +430,7 @@ class InvalidRefParser extends Parser {
 }
 
 class InvalidRefParser2 extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
         Parser.performSelfAnalysis(this)
     }
@@ -469,7 +465,7 @@ describe("The reference resolver validation full flow", () => {
 })
 
 class DuplicateRulesParser extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
         Parser.performSelfAnalysis(this)
     }
@@ -479,7 +475,7 @@ class DuplicateRulesParser extends Parser {
 }
 
 class InvalidRuleNameParser extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
         Parser.performSelfAnalysis(this)
     }
@@ -522,10 +518,12 @@ describe("The rule names validation full flow", () => {
     )
 })
 
-class StarToken extends Token {}
+class StarToken {
+    static PATTERN = /NA/
+}
 
 class DirectlyLeftRecursive extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [StarToken])
         Parser.performSelfAnalysis(this)
     }
@@ -536,7 +534,7 @@ class DirectlyLeftRecursive extends Parser {
 }
 
 class InDirectlyLeftRecursive extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [StarToken])
         Parser.performSelfAnalysis(this)
     }
@@ -551,7 +549,7 @@ class InDirectlyLeftRecursive extends Parser {
 }
 
 class ComplexInDirectlyLeftRecursive extends Parser {
-    constructor(input: Token[] = []) {
+    constructor(input: IToken[] = []) {
         super(input, [StarToken])
         Parser.performSelfAnalysis(this)
     }
@@ -596,7 +594,7 @@ describe("The left recursion detection full flow", () => {
 describe("The empty alternative detection full flow", () => {
     it("will throw an error when an empty alternative is not the last alternative", () => {
         class EmptyAltAmbiguityParser extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -630,7 +628,7 @@ describe("The empty alternative detection full flow", () => {
 
     it("will throw an error when an empty alternative is not the last alternative - Indirect", () => {
         class EmptyAltIndirectAmbiguityParser extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -668,7 +666,7 @@ describe("The empty alternative detection full flow", () => {
 
     it("will detect alternative ambiguity with identical lookaheads", () => {
         class AltAmbiguityParserImplicitOccurence extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -702,7 +700,7 @@ describe("The empty alternative detection full flow", () => {
 
     it("will throw an error when an empty alternative is not the last alternative #2", () => {
         class EmptyAltAmbiguityParser extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -740,7 +738,7 @@ describe("The empty alternative detection full flow", () => {
 describe("The prefix ambiguity detection full flow", () => {
     it("will throw an error when an a common prefix ambiguity is detected", () => {
         class PrefixAltAmbiguity extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, MinusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -778,7 +776,7 @@ describe("The prefix ambiguity detection full flow", () => {
 
     it("will throw an error when an a common prefix ambiguity is detected - implicit occurrence idx", () => {
         class PrefixAltAmbiguity2 extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [PlusTok, MinusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -817,11 +815,15 @@ describe("The prefix ambiguity detection full flow", () => {
 
 describe("The namespace conflict detection full flow", () => {
     it("will throw an error when a Terminal and a NoneTerminal have the same name", () => {
-        class Bamba extends Token {}
-        class A extends Token {}
+        class Bamba {
+            static PATTERN = /NA/
+        }
+        class A {
+            static PATTERN = /NA/
+        }
 
         class NameSpaceConflict extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [Bamba, A])
                 Parser.performSelfAnalysis(this)
             }
@@ -839,10 +841,12 @@ describe("The namespace conflict detection full flow", () => {
 
 describe("The nested rule name validation full flow", () => {
     it("will throw an error when a nested name does not start with $(dollar)", () => {
-        class A extends Token {}
+        class A {
+            static PATTERN = /NA/
+        }
 
         class NestedNamedInvalid extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [A])
                 Parser.performSelfAnalysis(this)
             }
@@ -865,11 +869,15 @@ describe("The nested rule name validation full flow", () => {
 
 describe("The duplicated nested name validation full flow", () => {
     it("will throw an error when two nested rules share the same name", () => {
-        class A extends Token {}
-        class B extends Token {}
+        class A {
+            static PATTERN = /NA/
+        }
+        class B {
+            static PATTERN = /NA/
+        }
 
         class NestedNamedDuplicate extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [A, B])
                 Parser.performSelfAnalysis(this)
             }
@@ -898,11 +906,15 @@ describe("The duplicated nested name validation full flow", () => {
 
 describe("The invalid token name validation", () => {
     it("will throw an error when a Token is using an invalid name", () => {
-        class במבה extends Token {}
-        class A extends Token {}
+        class במבה {
+            static PATTERN = /NA/
+        }
+        class A {
+            static PATTERN = /NA/
+        }
 
         class InvalidTokenName extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, [במבה, A])
                 Parser.performSelfAnalysis(this)
             }
@@ -919,7 +931,7 @@ describe("The invalid token name validation", () => {
 
 describe("The no non-empty lookahead validation", () => {
     class EmptyLookaheadParser extends Parser {
-        constructor(input: Token[] = []) {
+        constructor(input: IToken[] = []) {
             super(input, [PlusTok])
         }
 
@@ -927,7 +939,7 @@ describe("The no non-empty lookahead validation", () => {
     }
     it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE", () => {
         class EmptyLookaheadParserAtLeastOne extends EmptyLookaheadParser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input)
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -946,7 +958,7 @@ describe("The no non-empty lookahead validation", () => {
 
     it("will throw an error when there are no non-empty lookaheads for AT_LEAST_ONE_SEP", () => {
         class EmptyLookaheadParserAtLeastOneSep extends EmptyLookaheadParser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input)
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -968,7 +980,7 @@ describe("The no non-empty lookahead validation", () => {
 
     it("will throw an error when there are no non-empty lookaheads for MANY", () => {
         class EmptyLookaheadParserMany extends EmptyLookaheadParser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input)
                 ;(<any>Parser).performSelfAnalysis(this)
             }
@@ -987,7 +999,7 @@ describe("The no non-empty lookahead validation", () => {
 
     it("will throw an error when there are no non-empty lookaheads for MANY_SEP", () => {
         class EmptyLookaheadParserManySep extends EmptyLookaheadParser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input)
                 ;(<any>Parser).performSelfAnalysis(this)
             }

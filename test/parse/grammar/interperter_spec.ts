@@ -29,11 +29,11 @@ import {
 } from "../../../src/parse/grammar/interpreter"
 import { createRegularToken, setEquality } from "../../utils/matchers"
 import { gast } from "../../../src/parse/grammar/gast_public"
-import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
+import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { map } from "../../../src/utils/utils"
-import { Lexer, TokenConstructor } from "../../../src/scan/lexer_public"
+import { Lexer, TokenType } from "../../../src/scan/lexer_public"
 import {
-    augmentTokenClasses,
+    augmentTokenTypes,
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
 import { Parser } from "../../../src/parse/parser_public"
@@ -44,8 +44,6 @@ let Repetition = gast.Repetition
 let Rule = gast.Rule
 
 describe("The Grammar Interpeter namespace", () => {
-    ;("use strict")
-
     describe("The NextAfterTokenWalker", () => {
         it("can compute the next possible token types From ActionDec in scope of ActionDec #1", () => {
             let caPath: ITokenGrammarPath = {
@@ -558,15 +556,23 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         return map(newResultFormat, currItem => currItem.partialPath)
     }
 
-    class Alpha extends Token {}
+    class Alpha {
+        static PATTERN = /NA/
+    }
 
-    class Beta extends Token {}
+    class Beta {
+        static PATTERN = /NA/
+    }
 
-    class Gamma extends Token {}
+    class Gamma {
+        static PATTERN = /NA/
+    }
 
-    class Comma extends Token {}
+    class Comma {
+        static PATTERN = /NA/
+    }
 
-    augmentTokenClasses([Alpha, Beta, Gamma, Comma])
+    augmentTokenTypes([Alpha, Beta, Gamma, Comma])
 
     context("can calculate the next possible paths in a", () => {
         it("Sequence", () => {
@@ -772,11 +778,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     })
 
     context("can calculate the next possible single tokens for: ", () => {
-        function INPUT(tokTypes: TokenConstructor[]): IToken[] {
+        function INPUT(tokTypes: TokenType[]): IToken[] {
             return map(tokTypes, currTokType => createRegularToken(currTokType))
         }
 
-        function pluckTokenTypes(arr: any[]): TokenConstructor[] {
+        function pluckTokenTypes(arr: any[]): TokenType[] {
             return map(arr, currItem => currItem.nextTokenType)
         }
 
@@ -1579,7 +1585,7 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
         const issue391Lexer = new Lexer(allTokens)
 
         class Issue391Parser extends Parser {
-            constructor(input: Token[] = []) {
+            constructor(input: IToken[] = []) {
                 super(input, allTokens, {
                     maxLookahead: 4
                 })

@@ -1,5 +1,5 @@
-import { createToken, IToken, Token } from "../../../src/scan/tokens_public"
-import { Lexer, TokenConstructor } from "../../../src/scan/lexer_public"
+import { createToken, IToken } from "../../../src/scan/tokens_public"
+import { Lexer, TokenType } from "../../../src/scan/lexer_public"
 import {
     END_OF_FILE,
     IAnyOrAlt,
@@ -63,7 +63,7 @@ if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
 const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksParser extends Parser {
-    constructor(input: Token[]) {
+    constructor(input: IToken[]) {
         super(input, allTokens)
         Parser.performSelfAnalysis(this)
     }
@@ -110,7 +110,7 @@ class EcmaScriptQuirksParser extends Parser {
         this.textIdx = 0
     }
 
-    protected IS_NEXT_TOKEN(expectedType: TokenConstructor): IToken | boolean {
+    protected IS_NEXT_TOKEN(expectedType: TokenType): IToken | boolean {
         if (this.orgText.length <= this.textIdx) {
             return END_OF_FILE
         } else {
@@ -129,7 +129,7 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    private consumeExpected(expectedType: TokenConstructor): IToken | false {
+    private consumeExpected(expectedType: TokenType): IToken | false {
         // match expected
         const expectedPattern = expectedType.PATTERN as RegExp
         expectedPattern.lastIndex = this.textIdx
@@ -149,7 +149,7 @@ class EcmaScriptQuirksParser extends Parser {
         return false
     }
 
-    protected consumeInternal(tokClass: TokenConstructor, idx: number): IToken {
+    protected consumeInternal(tokClass: TokenType, idx: number): IToken {
         this.skipWhitespace()
         let nextToken = this.consumeExpected(tokClass)
         if (nextToken !== false) {

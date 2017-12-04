@@ -1,4 +1,3 @@
-import { Token } from "../../../src/scan/tokens_public"
 import { gast } from "../../../src/parse/grammar/gast_public"
 
 let Rule = gast.Rule
@@ -12,27 +11,69 @@ let Option = gast.Option
 let Alternation = gast.Alternation
 let Flat = gast.Flat
 
-export class IdentTok extends Token {}
-export class DotTok extends Token {}
-export class DotDotTok extends Token {}
-export class ColonTok extends Token {}
-export class LSquareTok extends Token {}
-export class RSquareTok extends Token {}
-export class ActionTok extends Token {}
-export class LParenTok extends Token {}
-export class RParenTok extends Token {}
-export class CommaTok extends Token {}
-export class SemicolonTok extends Token {}
-export class UnsignedIntegerLiteralTok extends Token {}
-export class DefaultTok extends Token {}
-export class AsteriskTok extends Token {}
-export class EntityTok extends Token {}
-export class NamespaceTok extends Token {}
-export class TypeTok extends Token {}
-export class ConstTok extends Token {}
-export class RequiredTok extends Token {}
-export class KeyTok extends Token {}
-export class ElementTok extends Token {}
+export class IdentTok {
+    static PATTERN = /NA/
+}
+export class DotTok {
+    static PATTERN = /NA/
+}
+export class DotDotTok {
+    static PATTERN = /NA/
+}
+export class ColonTok {
+    static PATTERN = /NA/
+}
+export class LSquareTok {
+    static PATTERN = /NA/
+}
+export class RSquareTok {
+    static PATTERN = /NA/
+}
+export class ActionTok {
+    static PATTERN = /NA/
+}
+export class LParenTok {
+    static PATTERN = /NA/
+}
+export class RParenTok {
+    static PATTERN = /NA/
+}
+export class CommaTok {
+    static PATTERN = /NA/
+}
+export class SemicolonTok {
+    static PATTERN = /NA/
+}
+export class UnsignedIntegerLiteralTok {
+    static PATTERN = /NA/
+}
+export class DefaultTok {
+    static PATTERN = /NA/
+}
+export class AsteriskTok {
+    static PATTERN = /NA/
+}
+export class EntityTok {
+    static PATTERN = /NA/
+}
+export class NamespaceTok {
+    static PATTERN = /NA/
+}
+export class TypeTok {
+    static PATTERN = /NA/
+}
+export class ConstTok {
+    static PATTERN = /NA/
+}
+export class RequiredTok {
+    static PATTERN = /NA/
+}
+export class KeyTok {
+    static PATTERN = /NA/
+}
+export class ElementTok {
+    static PATTERN = /NA/
+}
 
 export let atLeastOneRule = new Rule("atLeastOneRule", [
     new RepetitionMandatory([

@@ -4,7 +4,9 @@
     "scripts": {
         "test": "mocha \"!(node_modules)/**/*spec.js\""
     },
-    "dependencies": {},
+    "dependencies": {
+        "chevrotain": "*"
+    },
     "devDependencies": {
         "acorn": "^5.1.1",
         "antlr4": "^4.7.0",

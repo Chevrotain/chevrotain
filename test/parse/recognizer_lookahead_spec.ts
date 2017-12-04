@@ -1,4 +1,4 @@
-import { Token, createToken } from "../../src/scan/tokens_public"
+import { createToken, IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"
@@ -41,7 +41,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
@@ -132,7 +132,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
@@ -233,7 +233,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
@@ -376,7 +376,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
@@ -467,7 +467,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
@@ -597,7 +597,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
                     ;(<any>Parser).performSelfAnalysis(this)
                 }
@@ -812,7 +812,7 @@ function defineLookaheadSpecs(
         describe("OR production ambiguity detection when using implicit lookahead calculation", () => {
             it("will throw an error when two alternatives have the same single token (lookahead 1) prefix", () => {
                 class OrAmbiguityLookAheadParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -859,7 +859,7 @@ function defineLookaheadSpecs(
 
             it("will throw an error when two alternatives have the same multi token (lookahead > 1) prefix", () => {
                 class OrAmbiguityMultiTokenLookAheadParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -908,7 +908,7 @@ function defineLookaheadSpecs(
                     return getLookaheadFuncsForClass(this.className)
                 }
 
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         ignoredIssues: {
                             orRule: {
@@ -1131,7 +1131,7 @@ function defineLookaheadSpecs(
         describe("The support for MultiToken (K>1) implicit lookahead capabilities in DSL Production:", () => {
             it("OPTION", () => {
                 class MultiTokenLookAheadForOptionParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -1168,7 +1168,7 @@ function defineLookaheadSpecs(
 
             it("MANY", () => {
                 class MultiTokenLookAheadForManyParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -1218,7 +1218,7 @@ function defineLookaheadSpecs(
 
             it("MANY_SEP", () => {
                 class MultiTokenLookAheadForManySepParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -1275,7 +1275,7 @@ function defineLookaheadSpecs(
 
             it("OR", () => {
                 class MultiTokenLookAheadForOrParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -1341,7 +1341,7 @@ function defineLookaheadSpecs(
 
             it("AT_LEAST_ONE", () => {
                 class MultiTokenLookAheadForAtLeastOneParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }
@@ -1407,7 +1407,7 @@ function defineLookaheadSpecs(
 
             it("AT_LEAST_ONE_SEP", () => {
                 class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         ;(<any>Parser).performSelfAnalysis(this)
                     }

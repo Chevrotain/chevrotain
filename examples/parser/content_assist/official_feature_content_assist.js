@@ -17,36 +17,35 @@ const Parser = chevrotain.Parser
 const tokenMatcher = chevrotain.tokenMatcher
 const createToken = chevrotain.createToken
 const EMPTY_ALT = chevrotain.EMPTY_ALT
-const getImage = chevrotain.getImage
 
 const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
 
 const Private = createToken({
     name: "Private",
     pattern: /private/,
-    parent: Keyword
+    categories: Keyword
 })
 const Public = createToken({
     name: "Public",
     pattern: /public/,
-    parent: Keyword
+    categories: Keyword
 })
 const Static = createToken({
     name: "Static",
     pattern: /static/,
-    parent: Keyword
+    categories: Keyword
 })
 const Declare = createToken({
     name: "Declare",
     pattern: /declare/,
-    parent: Keyword
+    categories: Keyword
 })
-const Call = createToken({ name: "Call", pattern: /call/, parent: Keyword })
-const Enum = createToken({ name: "Enum", pattern: /enum/, parent: Keyword })
+const Call = createToken({ name: "Call", pattern: /call/, categories: Keyword })
+const Enum = createToken({ name: "Enum", pattern: /enum/, categories: Keyword })
 const Function = createToken({
     name: "Function",
     pattern: /function/,
-    parent: Keyword
+    categories: Keyword
 })
 const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
 const WhiteSpace = createToken({
@@ -170,7 +169,7 @@ function getContentAssistSuggestions(text, symbolTable) {
         const lastRuleName = _.last(currRuleStack)
 
         // easy case where a keyword is suggested.
-        if (Keyword.prototype.isPrototypeOf(currTokenType.prototype)) {
+        if (Keyword.categoryMatchesMap[currTokenType.tokenType]) {
             finalSuggestions.push(currTokenType.PATTERN.source)
         } else if (currTokenType === Identifier) {
             // in declarations, should not provide content assist for new symbols (Identifiers)

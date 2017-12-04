@@ -17,20 +17,24 @@ var createToken = chevrotain.createToken
 var RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA })
 
 // Token inheritance CONSUME(RelationWord) will work on any Token extending RelationWord
-var And = createToken({ name: "And", pattern: /and/, parent: RelationWord })
+var And = createToken({ name: "And", pattern: /and/, categories: RelationWord })
 var Before = createToken({
     name: "Before",
     pattern: /before/,
-    parent: RelationWord
+    categories: RelationWord
 })
 var After = createToken({
     name: "After",
     pattern: /after/,
-    parent: RelationWord
+    categories: RelationWord
 })
-var Und = createToken({ name: "Und", pattern: /und/, parent: RelationWord })
-var Vor = createToken({ name: "Vor", pattern: /vor/, parent: RelationWord })
-var Nach = createToken({ name: "Nach", pattern: /nach/, parent: RelationWord })
+var Und = createToken({ name: "Und", pattern: /und/, categories: RelationWord })
+var Vor = createToken({ name: "Vor", pattern: /vor/, categories: RelationWord })
+var Nach = createToken({
+    name: "Nach",
+    pattern: /nach/,
+    categories: RelationWord
+})
 
 /// English Tokens
 var Cook = createToken({ name: "Cook", pattern: /cooking|cook/ })

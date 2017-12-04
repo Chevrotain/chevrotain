@@ -1,6 +1,6 @@
 import { CustomPatternMatcherFunc, IToken } from "./tokens_public"
 import {
-    analyzeTokenClasses,
+    analyzeTokenTypes,
     cloneEmptyGroups,
     DEFAULT_MODE,
     LineTerminatorOptimizedTester,
@@ -23,24 +23,23 @@ import {
     NOOP,
     reject
 } from "../utils/utils"
-import { augmentTokenClasses } from "./tokens"
+import { augmentTokenTypes } from "./tokens"
 
-export interface TokenConstructor extends Function {
+export interface TokenType {
     GROUP?: string
     PATTERN?: RegExp | string
     LABEL?: string
-    LONGER_ALT?: TokenConstructor
+    LONGER_ALT?: TokenType
     POP_MODE?: boolean
     PUSH_MODE?: string
     LINE_BREAKS?: boolean
+    CATEGORIES?: TokenType[]
 
     tokenName?: string
     tokenType?: number
-    extendingTokenTypes?: number[]
-    extendingTokenTypesMap?: { [tokType: number]: boolean }
+    categoryMatches?: number[]
+    categoryMatchesMap?: { [tokType: number]: boolean }
     isParent?: boolean
-
-    new (...args: any[]): IToken
 }
 
 export interface ILexingResult {
@@ -70,7 +69,7 @@ export enum LexerDefinitionErrorType {
 export interface ILexerDefinitionError {
     message: string
     type: LexerDefinitionErrorType
-    tokenClasses?: Function[]
+    tokenTypes?: TokenType[]
 }
 
 export interface ILexingError {
@@ -81,8 +80,8 @@ export interface ILexingError {
     message: string
 }
 
-export type SingleModeLexerDefinition = TokenConstructor[]
-export type MultiModesDefinition = { [modeName: string]: TokenConstructor[] }
+export type SingleModeLexerDefinition = TokenType[]
+export type MultiModesDefinition = { [modeName: string]: TokenType[] }
 
 export interface IMultiModeLexerDefinition {
     modes: MultiModesDefinition
@@ -184,12 +183,10 @@ export class Lexer {
      * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
      *  Structure composed of constructor functions for the Tokens types this lexer will support.
      *
-     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of Token constructors.
+     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of TokenTypes.
      *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties:
-     *    1. a "modes" property where each value is an array of Token.
+     *    1. a "modes" property where each value is an array of TokenTypes.
      *    2. a "defaultMode" property specifying the initial lexer mode.
-     *
-     *  constructors.
      *
      *  for example:
      *  {
@@ -207,29 +204,29 @@ export class Lexer {
      *  The current lexing mode is selected via a "mode stack".
      *  The last (peek) value in the stack will be the current mode of the lexer.
      *
-     *  Each Token class can define that it will cause the Lexer to (after consuming an instance of the Token):
+     *  Each Token Type can define that it will cause the Lexer to (after consuming an "instance" of the Token):
      *  1. PUSH_MODE : push a new mode to the "mode stack"
      *  2. POP_MODE  : pop the last mode from the "mode stack"
      *
      *  Examples:
-     *       export class Attribute extends Token {
+     *       export class Attribute {
      *          static PATTERN = ...
      *          static PUSH_MODE = "modeY"
      *       }
      *
-     *       export class EndAttribute extends Token {
+     *       export class EndAttribute {
      *          static PATTERN = ...
      *          static POP_MODE = true
      *       }
      *
-     *  The Token constructors must be in one of these forms:
+     *  The TokenTypes must be in one of these forms:
      *
      *  1. With a PATTERN property that has a RegExp value for tokens to match:
-     *     example: -->class Integer extends Token { static PATTERN = /[1-9]\d }<--
+     *     example: -->class Integer { static PATTERN = /[1-9]\d }<--
      *
      *  2. With a PATTERN property that has the value of the var Lexer.NA defined above.
      *     This is a convenience form used to avoid matching Token classes that only act as categories.
-     *     example: -->class Keyword extends Token { static PATTERN = NA }<--
+     *     example: -->class Keyword { static PATTERN = NA }<--
      *
      *
      *   The following RegExp patterns are not supported:
@@ -254,8 +251,8 @@ export class Lexer {
      *   example:
      *
      *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
-     *       export class Keyword extends Token {
-     *          static PATTERN = lex.NA
+     *       export class Keyword Token {
+     *          static PATTERN = Lexer.NA
      *          static LONGER_ALT = Identifier
      *       }
      *       export class Do extends Keyword { static PATTERN = /do/ }
@@ -324,19 +321,19 @@ export class Lexer {
             ? actualDefinition.modes
             : {}
 
-        // an error of undefined TokenClasses will be detected in "performRuntimeChecks" above.
+        // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
         // this transformation is to increase robustness in the case of partially invalid lexer definition.
         forEach(actualDefinition.modes, (currModeValue, currModeName) => {
             actualDefinition.modes[currModeName] = reject<
-                TokenConstructor
-            >(currModeValue, currTokClass => isUndefined(currTokClass))
+                TokenType
+            >(currModeValue, currTokType => isUndefined(currTokType))
         })
 
         let allModeNames = keys(actualDefinition.modes)
 
         forEach(
             actualDefinition.modes,
-            (currModDef: TokenConstructor[], currModName) => {
+            (currModDef: TokenType[], currModName) => {
                 this.modes.push(currModName)
                 this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
                     validatePatterns(
@@ -349,8 +346,8 @@ export class Lexer {
                 // Considering a lexer with definition errors may never be used, there is no point
                 // to performing the analysis anyhow...
                 if (isEmpty(this.lexerDefinitionErrors)) {
-                    augmentTokenClasses(currModDef)
-                    let currAnalyzeResult = analyzeTokenClasses(currModDef)
+                    augmentTokenTypes(currModDef)
+                    let currAnalyzeResult = analyzeTokenTypes(currModDef)
 
                     this.patternIdxToConfig[currModName] =
                         currAnalyzeResult.patternIdxToConfig

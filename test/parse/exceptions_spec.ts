@@ -1,4 +1,4 @@
-import { EOF } from "../../src/scan/tokens_public"
+import { createTokenInstance, EOF } from "../../src/scan/tokens_public"
 import { exceptions } from "../../src/parse/exceptions_public"
 import { functionName } from "../../src/lang/lang_extensions"
 
@@ -7,7 +7,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         let isRunningInNodeJS = module && module.exports
         let it_node = isRunningInNodeJS ? it : it.skip
 
-        let dummyToken = new EOF()
+        let dummyToken = createTokenInstance(EOF, "", -1, -1, -1, -1, -1, -1)
 
         it_node("EarlyExitException", () => {
             let exceptionInstance = new exceptions.EarlyExitException(

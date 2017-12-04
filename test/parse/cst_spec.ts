@@ -1,9 +1,9 @@
-import { createToken, Token } from "../../src/scan/tokens_public"
+import { createToken, IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { clearCache } from "../../src/parse/cache_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
-import { TokenConstructor } from "../../src/scan/lexer_public"
+import { TokenType } from "../../src/scan/lexer_public"
 import { map } from "../../src/utils/utils"
 
 function defineCstSpecs(
@@ -12,7 +12,7 @@ function defineCstSpecs(
     createTokenInstance,
     tokenMatcher
 ) {
-    function createTokenVector(tokTypes: TokenConstructor[]): any[] {
+    function createTokenVector(tokTypes: TokenType[]): any[] {
         return map(tokTypes, curTokType => {
             return createTokenInstance(curTokType)
         })
@@ -29,7 +29,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a flat structure", () => {
             class CstTerminalParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -65,7 +65,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal - alternations", () => {
             class CstTerminalAlternationParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -104,7 +104,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal - alternations - single", () => {
             class CstTerminalAlternationSingleAltParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -134,7 +134,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal with multiple occurrences", () => {
             class CstMultiTerminalParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -165,7 +165,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration", () => {
             class CstMultiTerminalWithManyParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -214,7 +214,7 @@ function defineCstSpecs(
 
         context("Can output a CST for an optional terminal", () => {
             class CstOptionalTerminalParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -265,7 +265,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration mandatory", () => {
             class CstMultiTerminalWithAtLeastOneParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -299,7 +299,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP", () => {
             class CstMultiTerminalWithManySepParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -338,7 +338,7 @@ function defineCstSpecs(
 
         it("Can output a CST for a Terminal with multiple occurrences - iteration SEP mandatory", () => {
             class CstMultiTerminalWithAtLeastOneSepParser extends Parser {
-                constructor(input: Token[] = []) {
+                constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
@@ -378,7 +378,7 @@ function defineCstSpecs(
         context("nested rules", () => {
             context("Can output cst when using OPTION", () => {
                 class CstOptionalNestedTerminalParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -444,7 +444,7 @@ function defineCstSpecs(
 
             it("Can output a CST when using OR with nested named Alternatives", () => {
                 class CstAlternationNestedAltParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -490,7 +490,7 @@ function defineCstSpecs(
 
             it("Can output a CST when using OR", () => {
                 class CstAlternationNestedParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -535,7 +535,7 @@ function defineCstSpecs(
 
             it("Can output a CST when using OR - single Alt", () => {
                 class CstAlternationNestedAltSingleParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -572,7 +572,7 @@ function defineCstSpecs(
 
             it("Can output a CST using Repetitions", () => {
                 class CstMultiTerminalWithManyNestedParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -640,7 +640,7 @@ function defineCstSpecs(
 
             it("Can output a CST using mandatory Repetitions", () => {
                 class CstAtLeastOneNestedParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -679,7 +679,7 @@ function defineCstSpecs(
 
             it("Can output a CST using Repetitions with separator", () => {
                 class CstNestedRuleWithManySepParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -719,7 +719,7 @@ function defineCstSpecs(
 
             it("Can output a CST using Repetitions with separator - mandatory", () => {
                 class CstAtLeastOneSepNestedParser extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true
                         })
@@ -762,7 +762,7 @@ function defineCstSpecs(
         context("Error Recovery", () => {
             it("re-sync recovery", () => {
                 class CstRecoveryParserReSync extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true,
                             recoveryEnabled: true
@@ -798,7 +798,7 @@ function defineCstSpecs(
                     })
 
                     protected canTokenTypeBeInsertedInRecovery(
-                        tokClass: Function
+                        tokType: TokenType
                     ): boolean {
                         // we want to force re-sync recovery
                         return false
@@ -839,7 +839,7 @@ function defineCstSpecs(
 
             it("re-sync recovery nested", () => {
                 class CstRecoveryParserReSyncNested extends Parser {
-                    constructor(input: Token[] = []) {
+                    constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             outputCst: true,
                             recoveryEnabled: true
@@ -879,7 +879,7 @@ function defineCstSpecs(
                     })
 
                     protected canTokenTypeBeInsertedInRecovery(
-                        tokClass: Function
+                        tokType: TokenType
                     ): boolean {
                         // we want to force re-sync recovery
                         return false

@@ -11,33 +11,32 @@
 "use strict"
 
 var chevrotain = require("chevrotain")
-var Token = chevrotain.Token
 
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer
 var Parser = chevrotain.Parser
 var createToken = chevrotain.createToken
 
-class Hello extends Token {}
+class Hello {}
 Hello.PATTERN = /hello/
-class World extends Token {}
+class World {}
 World.PATTERN = /world/
 
-class Cruel extends Token {}
+class Cruel {}
 Cruel.PATTERN = /cruel/
-class Bad extends Token {}
+class Bad {}
 Bad.PATTERN = /bad/
-class Evil extends Token {}
+class Evil {}
 Evil.PATTERN = /evil/
 
-class Good extends Token {}
+class Good {}
 Good.PATTERN = /good/
-class Wonderful extends Token {}
+class Wonderful {}
 Wonderful.PATTERN = /wonderful/
-class Amazing extends Token {}
+class Amazing {}
 Amazing.PATTERN = /amazing/
 
-class WhiteSpace extends Token {}
+class WhiteSpace {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED
 WhiteSpace.LINE_BREAKS = true

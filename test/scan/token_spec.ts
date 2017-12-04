@@ -1,6 +1,5 @@
 import {
     createToken,
-    Token,
     tokenLabel,
     tokenMatcher,
     tokenName
@@ -10,10 +9,8 @@ import { createTokenInstance } from "../../src/scan/tokens_public"
 
 describe("The Chevrotain Tokens namespace", () => {
     context("createToken", () => {
-        ;("use strict")
-
         let TrueLiteral = createToken({ name: "TrueLiteral" })
-        class FalseLiteral extends Token {}
+        class FalseLiteral {}
 
         it("exports a utility function that returns a token's name", () => {
             // FalseLiteral was created with an anonymous function as its constructor yet tokenName(...)
@@ -23,19 +20,19 @@ describe("The Chevrotain Tokens namespace", () => {
         })
 
         let A = createToken({ name: "A" })
-        let B = createToken({ name: "B", parent: A })
+        let B = createToken({ name: "B", categories: A })
 
         B.GROUP = "Special"
 
         let C = createToken({
             name: "C",
             pattern: /\d+/,
-            parent: B
+            categories: B
         })
         let D = createToken({
             name: "D",
             pattern: /\w+/,
-            parent: B
+            categories: B
         })
         let Plus = createToken({ name: "Plus", pattern: /\+/ })
         Plus.LABEL = "+"
@@ -60,25 +57,6 @@ describe("The Chevrotain Tokens namespace", () => {
             expect(aInstance.endLine).to.equal(1)
             expect(aInstance.startColumn).to.equal(1)
             expect(aInstance.endColumn).to.equal(5)
-        })
-
-        it("provides an extendToken utility - inheritance chain", () => {
-            let dInstance = new D("world", 0, 1, 1)
-            expect(dInstance).to.be.an.instanceof(A)
-            expect(dInstance).to.be.an.instanceof(B)
-            expect(dInstance).not.to.be.an.instanceof(C)
-
-            let cInstance = new C("666", 0, 1, 1)
-            expect(cInstance).to.be.an.instanceof(A)
-            expect(cInstance).to.be.an.instanceof(B)
-
-            let bInstance = new B("666", 0, 1, 1)
-            expect(bInstance).to.be.an.instanceof(A)
-        })
-
-        it("provides an extendToken utility - static properties inheritance", () => {
-            expect(D.GROUP).to.equal("Special")
-            expect(C.GROUP).to.equal("Special")
         })
 
         it("Allows customization of the label", () => {
@@ -129,10 +107,10 @@ describe("The Chevrotain Tokens namespace", () => {
             expect(A.tokenType).to.be.greaterThan(0)
             expect(B.tokenType).to.be.greaterThan(A.tokenType)
 
-            expect(A.extendingTokenTypes).to.be.an.instanceOf(Array)
-            expect(A.extendingTokenTypes).to.be.empty
-            expect(B.extendingTokenTypes).to.be.an.instanceOf(Array)
-            expect(B.extendingTokenTypes).to.be.empty
+            expect(A.categoryMatches).to.be.an.instanceOf(Array)
+            expect(A.categoryMatches).to.be.empty
+            expect(B.categoryMatches).to.be.an.instanceOf(Array)
+            expect(B.categoryMatches).to.be.empty
         })
 
         it("can define a token Label via the createToken utilities", () => {
@@ -175,6 +153,15 @@ describe("The Chevrotain Tokens namespace", () => {
             })
             expect(A).to.haveOwnProperty("GROUP")
             expect(A.GROUP).to.equal(Lexer.SKIPPED)
+        })
+
+        it("Will throw when using the deprecated parent flag", () => {
+            expect(() =>
+                createToken(<any>{
+                    name: "A",
+                    parent: "oops"
+                })
+            ).to.throw("The parent property is no longer supported")
         })
     })
 })

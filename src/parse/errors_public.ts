@@ -1,4 +1,4 @@
-import { TokenConstructor } from "../scan/lexer_public"
+import { TokenType } from "../scan/lexer_public"
 import {
     hasTokenLabel,
     IToken,
@@ -19,7 +19,7 @@ export interface IErrorMessageProvider {
      * @param options.ruleName - The rule in which the error occurred.
      */
     buildMismatchTokenMessage?(options: {
-        expected: TokenConstructor
+        expected: TokenType
         actual: IToken
         ruleName: string
     }): string
@@ -53,7 +53,7 @@ export interface IErrorMessageProvider {
      * @param options.ruleName - The rule in which the error occurred.
      */
     buildNoViableAltMessage?(options: {
-        expectedPathsPerAlt: TokenConstructor[][][]
+        expectedPathsPerAlt: TokenType[][][]
         actual: IToken[]
         customUserDescription: string
         ruleName: string
@@ -74,7 +74,7 @@ export interface IErrorMessageProvider {
      * @param options.ruleName - The rule in which the error occurred.
      */
     buildEarlyExitMessage?(options: {
-        expectedIterationPaths: TokenConstructor[][]
+        expectedIterationPaths: TokenType[][]
         actual: IToken[]
         customUserDescription: string
         ruleName: string
@@ -126,8 +126,8 @@ export const defaultErrorProvider: IErrorMessageProvider = {
             let nextValidTokenSequences = map(
                 allLookAheadPaths,
                 currPath =>
-                    `[${map(currPath, currTokenClass =>
-                        tokenLabel(currTokenClass)
+                    `[${map(currPath, currTokenType =>
+                        tokenLabel(currTokenType)
                     ).join(", ")}]`
             )
             let nextValidSequenceItems = map(
@@ -159,8 +159,8 @@ export const defaultErrorProvider: IErrorMessageProvider = {
             let nextValidTokenSequences = map(
                 expectedIterationPaths,
                 currPath =>
-                    `[${map(currPath, currTokenClass =>
-                        tokenLabel(currTokenClass)
+                    `[${map(currPath, currTokenType =>
+                        tokenLabel(currTokenType)
                     ).join(",")}]`
             )
             let calculatedDescription =

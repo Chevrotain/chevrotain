@@ -1,5 +1,6 @@
-import { Token } from "../../src/scan/tokens_public"
+import { IToken } from "../../src/scan/tokens_public"
 import { compact, isFunction, isUndefined } from "../../src/utils/utils"
+import { TokenType } from "../../src/scan/lexer_public"
 
 export class ParseTree {
     getImage(): string {
@@ -14,25 +15,25 @@ export class ParseTree {
         return this.payload.startColumn
     }
 
-    constructor(public payload: Token, public children: ParseTree[] = []) {}
+    constructor(public payload: IToken, public children: ParseTree[] = []) {}
 }
 
 /**
  * convenience factory for ParseTrees
  *
- * @param {Function|Token} tokenOrTokenClass The Token instance to be used as the root node, or a constructor Function
+ * @param {TokenType|Token} tokenOrTokenClass The Token instance to be used as the root node, or a constructor Function
  *                         that will create the root node.
  * @param {ParseTree[]} children The sub nodes of the ParseTree to the built
  * @returns {ParseTree}
  */
 export function PT(
-    tokenOrTokenClass: Function | Token,
+    tokenOrTokenClass: TokenType | IToken,
     children: ParseTree[] = []
 ): ParseTree {
     let childrenCompact = compact(children)
 
-    if (tokenOrTokenClass instanceof Token) {
-        return new ParseTree(tokenOrTokenClass, childrenCompact)
+    if ((<IToken>tokenOrTokenClass).image !== undefined) {
+        return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact)
     } else if (isFunction(tokenOrTokenClass)) {
         return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
     } else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {

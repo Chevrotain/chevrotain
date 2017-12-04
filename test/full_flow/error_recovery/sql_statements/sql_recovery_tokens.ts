@@ -1,102 +1,54 @@
-import { Token } from "../../../../src/scan/tokens_public"
-
-export class VirtualToken extends Token {
-    constructor() {
-        super()
-    }
+export class VirtualToken {
+    static PATTERN = /NA/
 }
 
-export class IdentTok extends Token {
-    constructor() {
-        super()
-    }
+export class IdentTok {
+    static PATTERN = /NA/
 }
 
 // DOCS: once again an example of Token types hierarchies
-export class LiteralTok extends Token {}
-export class StringTok extends LiteralTok {
-    constructor() {
-        super()
-    }
+export class LiteralTok {
+    static PATTERN = /NA/
 }
-export class IntTok extends LiteralTok {
-    constructor() {
-        super()
-    }
-}
+export class StringTok extends LiteralTok {}
+export class IntTok extends LiteralTok {}
 
-export class BigIntTok extends IntTok {
-    constructor() {
-        super()
-    }
+export class BigIntTok extends IntTok {}
+
+export class Keyword {
+    static PATTERN = /NA/
 }
 
-export class Keyword extends Token {}
+export class CreateTok extends Keyword {}
 
-export class CreateTok extends Keyword {
-    constructor() {
-        super()
-    }
+export class TableTok extends Keyword {}
+
+export class InsertTok extends Keyword {}
+
+export class IntoTok extends Keyword {}
+
+export class DeleteTok extends Keyword {}
+
+export class FromTok extends Keyword {}
+
+export class LParenTok {
+    static PATTERN = /NA/
 }
 
-export class TableTok extends Keyword {
-    constructor() {
-        super()
-    }
+export class RParenTok {
+    static PATTERN = /NA/
 }
 
-export class InsertTok extends Keyword {
-    constructor() {
-        super()
-    }
+export class CommaTok {
+    static PATTERN = /NA/
 }
 
-export class IntoTok extends Keyword {
-    constructor() {
-        super()
-    }
+export class SemiColonTok {
+    static PATTERN = /NA/
 }
 
-export class DeleteTok extends Keyword {
-    constructor() {
-        super()
-    }
-}
-
-export class FromTok extends Keyword {
-    constructor() {
-        super()
-    }
-}
-
-export class LParenTok extends Token {
-    constructor() {
-        super()
-    }
-}
-
-export class RParenTok extends Token {
-    constructor() {
-        super()
-    }
-}
-
-export class CommaTok extends Token {
-    constructor() {
-        super()
-    }
-}
-
-export class SemiColonTok extends Token {
-    constructor() {
-        super()
-    }
-}
-
-export class DotTok extends Token {
-    constructor() {
-        super()
-    }
+export class DotTok {
+    static PATTERN = /NA/
 }
 
 /* tslint:disable:class-name */

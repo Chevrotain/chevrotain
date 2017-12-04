@@ -1,20 +1,7 @@
-import {
-    assignNoOverwrite,
-    has,
-    isFunction,
-    isObject,
-    isRegExp,
-    isString,
-    isUndefined
-} from "../utils/utils"
+import { has, isObject, isString, isUndefined } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
-import { Lexer, TokenConstructor } from "./lexer_public"
-import {
-    augmentTokenClasses,
-    tokenIdxToClass,
-    tokenStructuredMatcher
-} from "./tokens"
-
+import { Lexer, TokenType } from "./lexer_public"
+import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
 /**
  *  The type of custom pattern matcher functions.
  *  Matches should only be done on the start of the text.
@@ -52,10 +39,10 @@ export interface ICustomPattern {
 /**
  *  This can be used to improve the quality/readability of error messages or syntax diagrams.
  *
- * @param {Function} clazz - A constructor for a Token subclass
+ * @param {TokenType} clazz - A constructor for a Token subclass
  * @returns {string} - The Human readable label for a Token if it exists.
  */
-export function tokenLabel(clazz: Function): string {
+export function tokenLabel(clazz: TokenType): string {
     if (hasTokenLabel(clazz)) {
         return (<any>clazz).LABEL
     } else {
@@ -63,35 +50,35 @@ export function tokenLabel(clazz: Function): string {
     }
 }
 
-export function hasTokenLabel(clazz: Function): boolean {
-    return isString((<any>clazz).LABEL) && (<any>clazz).LABEL !== ""
+export function hasTokenLabel(obj: TokenType): boolean {
+    return isString((<any>obj).LABEL) && (<any>obj).LABEL !== ""
 }
 
-export function tokenName(clazz: Function): string {
+export function tokenName(obj: TokenType | Function): string {
     // The tokenName property is needed under some old versions of node.js (0.10/0.12)
     // where the Function.prototype.name property is not defined as a 'configurable' property
     // enable producing readable error messages.
     /* istanbul ignore if -> will only run in old versions of node.js */
     if (
-        isObject(clazz) &&
-        clazz.hasOwnProperty("tokenName") &&
-        isString((<any>clazz).tokenName)
+        isObject(obj) &&
+        obj.hasOwnProperty("tokenName") &&
+        isString((<any>obj).tokenName)
     ) {
-        return (<any>clazz).tokenName
+        return (<any>obj).tokenName
     } else {
-        return functionName(clazz)
+        return functionName(obj as TokenType)
     }
 }
 
 export interface ITokenConfig {
     name: string
-    parent?: TokenConstructor
+    categories?: TokenType | TokenType[]
     label?: string
     pattern?: RegExp | CustomPatternMatcherFunc | ICustomPattern | string
     group?: string | any
     push_mode?: string
     pop_mode?: boolean
-    longer_alt?: TokenConstructor
+    longer_alt?: TokenType
     /**
      * Can a String matching this token's pattern possibly contain a line terminator?
      * If true and the line_breaks property is not also true this will cause inaccuracies in the Lexer's line / column tracking.
@@ -100,6 +87,7 @@ export interface ITokenConfig {
 }
 
 const PARENT = "parent"
+const CATEGORIES = "categories"
 const LABEL = "label"
 const GROUP = "group"
 const PUSH_MODE = "push_mode"
@@ -109,73 +97,66 @@ const LINE_BREAKS = "line_breaks"
 
 /**
  * @param {ITokenConfig} config - The configuration for
- * @returns {TokenConstructor} - A constructor for the new Token subclass
+ * @returns {TokenType} - A constructor for the new Token subclass
  */
-export function createToken(config: ITokenConfig): TokenConstructor {
-    if (!has(config, PARENT)) {
-        config.parent = Token
-    }
-
+export function createToken(config: ITokenConfig): TokenType {
     return createTokenInternal(config)
 }
 
-function createTokenInternal(config: ITokenConfig): TokenConstructor {
+function createTokenInternal(config: ITokenConfig): TokenType {
     let tokenName = config.name
-    let parentConstructor = config.parent
     let pattern = config.pattern
 
-    let derivedConstructor: any = function() {
-        parentConstructor.apply(this, arguments)
-    }
-
+    let tokenType: any = {}
     // can be overwritten according to:
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/
     // name?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fname
     /* istanbul ignore if -> will only run in old versions of node.js */
-    if (!defineNameProp(derivedConstructor, tokenName)) {
+    if (!defineNameProp(tokenType, tokenName)) {
         // hack to save the tokenName in situations where the constructor's name property cannot be reconfigured
-        derivedConstructor.tokenName = tokenName
+        tokenType.tokenName = tokenName
     }
 
-    derivedConstructor.prototype = Object.create(parentConstructor.prototype)
-    derivedConstructor.prototype.constructor = derivedConstructor
     if (!isUndefined(pattern)) {
-        derivedConstructor.PATTERN = pattern
+        tokenType.PATTERN = pattern
     }
 
-    augmentTokenClasses([derivedConstructor])
+    if (has(config, PARENT)) {
+        throw "The parent property is no longer supported.\n" +
+            "See: [TODO-add link] for details."
+    }
 
-    // static properties mixing
-    derivedConstructor = assignNoOverwrite(
-        derivedConstructor,
-        parentConstructor
-    )
+    if (has(config, CATEGORIES)) {
+        tokenType.CATEGORIES = config[CATEGORIES]
+    }
+
+    augmentTokenTypes([tokenType])
 
     if (has(config, LABEL)) {
-        derivedConstructor.LABEL = config[LABEL]
+        tokenType.LABEL = config[LABEL]
     }
 
     if (has(config, GROUP)) {
-        derivedConstructor.GROUP = config[GROUP]
+        tokenType.GROUP = config[GROUP]
     }
 
     if (has(config, POP_MODE)) {
-        derivedConstructor.POP_MODE = config[POP_MODE]
+        tokenType.POP_MODE = config[POP_MODE]
     }
 
     if (has(config, PUSH_MODE)) {
-        derivedConstructor.PUSH_MODE = config[PUSH_MODE]
+        tokenType.PUSH_MODE = config[PUSH_MODE]
     }
 
     if (has(config, LONGER_ALT)) {
-        derivedConstructor.LONGER_ALT = config[LONGER_ALT]
+        tokenType.LONGER_ALT = config[LONGER_ALT]
     }
 
     if (has(config, LINE_BREAKS)) {
-        derivedConstructor.LINE_BREAKS = config[LINE_BREAKS]
+        tokenType.LINE_BREAKS = config[LINE_BREAKS]
     }
 
-    return derivedConstructor
+    return tokenType
 }
 
 /**
@@ -223,7 +204,7 @@ export interface IToken {
      * This is the same Object returned by the "createToken" API.
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
-    type?: TokenConstructor
+    type?: TokenType
 
     /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
      *  @see {ILexerConfig} debug flag.
@@ -233,50 +214,14 @@ export interface IToken {
     tokenClassName?: number
 }
 
-export class Token implements IToken {
-    /**
-     * A "human readable" Label for a Token.
-     * Subclasses of Token may define their own static LABEL property.
-     * This label will be used in error messages and drawing syntax diagrams.
-     *
-     * For example a Token constructor may be called LCurly, which is short for LeftCurlyBrackets, These names are either too short
-     * or too unwieldy to be used in error messages.
-     *
-     * Imagine : "expecting LCurly but found ')'" or "expecting LeftCurlyBrackets but found ')'"
-     *
-     * However if a static property LABEL with the value '{' exists on LCurly class, that error message will be:
-     * "expecting '{' but found ')'"
-     */
-    static LABEL: string = undefined
-
-    // this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery
-    public isInsertedInRecovery?: boolean = false
-
-    public image: string
-    public startOffset: number
-    public startLine?: number
-    public startColumn?: number
-    public endLine?: number
-    public endColumn?: number
-    public endOffset?: number
-
-    /**
-     * This class is never meant to be initialized.
-     * The class hierarchy is used to organize Token metadata, not to create instances of Tokens.
-     * Tokens are simple JavaScript objects which are NOT created using the <new> operator.
-     * To get the class of a Token "instance" use <getTokenConstructor>.
-     */
-    constructor() {}
-}
-
-export class EOF extends Token {}
-augmentTokenClasses([EOF])
+export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })
+augmentTokenTypes([EOF])
 
 /**
  * Utility to create Chevrotain Token "instances"
  * Note that Chevrotain tokens are not real instances, and thus the instanceOf cannot be used.
  *
- * @param tokClass
+ * @param tokType
  * @param image
  * @param startOffset
  * @param endOffset
@@ -294,7 +239,7 @@ augmentTokenClasses([EOF])
  *            tokenType}}
  */
 export function createTokenInstance(
-    tokClass: TokenConstructor,
+    tokType: TokenType,
     image: string,
     startOffset: number,
     endOffset: number,
@@ -311,40 +256,21 @@ export function createTokenInstance(
         endLine,
         startColumn,
         endColumn,
-        tokenType: (<any>tokClass).tokenType
+        tokenType: (<any>tokType).tokenType,
+        type: tokType
     }
 }
 
 /**
- * Given a Token instance, will return the Token Constructor.
- * Note that this function is not just for convenience, Because a Token "instance'
- * Does not use standard prototype inheritance and thus it's constructor cannot be accessed
- * by traversing the prototype chain.
- *
- * @param tokenInstance {IToken}
- * @returns {TokenConstructor}
- */
-export function getTokenConstructor(tokenInstance: IToken): TokenConstructor {
-    let tokenIdx
-    tokenIdx = tokenInstance.tokenType
-    return tokenIdxToClass.get(tokenIdx)
-}
-
-/**
  * A Utility method to check if a token is of the type of the argument Token class.
- * Not that while this utility has similar semantics to ECMAScript "instanceOf"
- * As Chevrotain tokens support inheritance.
+ * This utility is needed because Chevrotain tokens support "categories" which means
+ * A TokenType may have multiple categories, so a TokenType for the "true" literal in JavaScript
+ * May be both a Keyword Token and a Literal Token.
  *
- * It is not actually implemented using the "instanceOf" operator because
- * Chevrotain Tokens have their own performance optimized inheritance mechanism.
- *
- * @param tokInstance {IToken}
- * @param tokClass {TokenConstructor}
+ * @param token {IToken}
+ * @param tokType {TokenType}
  * @returns {boolean}
  */
-export function tokenMatcher(
-    tokInstance: IToken,
-    tokClass: TokenConstructor
-): boolean {
-    return tokenStructuredMatcher(tokInstance, tokClass)
+export function tokenMatcher(token: IToken, tokType: TokenType): boolean {
+    return tokenStructuredMatcher(token, tokType)
 }

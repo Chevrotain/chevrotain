@@ -83,14 +83,14 @@
         pattern: MAKE_PATTERN(
             "url\\((:?{{spaces}}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
         ),
-        parent: Uri
+        categories: Uri
     })
     var UriUrl = createToken({
         name: "UriUrl",
         pattern: MAKE_PATTERN(
             "url\\((:?{{spaces}}})?{{url}}(:?{{spaces}})?\\)"
         ),
-        parent: Uri
+        categories: Uri
     })
     var Func = createToken({
         name: "Func",
@@ -171,73 +171,73 @@
     var Px = createToken({
         name: "Px",
         pattern: MAKE_PATTERN("{{num}}px", "i"),
-        parent: Length
+        categories: Length
     })
     var Cm = createToken({
         name: "Cm",
         pattern: MAKE_PATTERN("{{num}}cm", "i"),
-        parent: Length
+        categories: Length
     })
     var Mm = createToken({
         name: "Mm",
         pattern: MAKE_PATTERN("{{num}}mm", "i"),
-        parent: Length
+        categories: Length
     })
     var In = createToken({
         name: "In",
         pattern: MAKE_PATTERN("{{num}}in", "i"),
-        parent: Length
+        categories: Length
     })
     var Pt = createToken({
         name: "Pt",
         pattern: MAKE_PATTERN("{{num}}pt", "i"),
-        parent: Length
+        categories: Length
     })
     var Pc = createToken({
         name: "Pc",
         pattern: MAKE_PATTERN("{{num}}pc", "i"),
-        parent: Length
+        categories: Length
     })
 
     var Angle = createToken({ name: "Angle", pattern: Lexer.NA })
     var Deg = createToken({
         name: "Deg",
         pattern: MAKE_PATTERN("{{num}}deg", "i"),
-        parent: Angle
+        categories: Angle
     })
     var Rad = createToken({
         name: "Rad",
         pattern: MAKE_PATTERN("{{num}}rad", "i"),
-        parent: Angle
+        categories: Angle
     })
     var Grad = createToken({
         name: "Grad",
         pattern: MAKE_PATTERN("{{num}}grad", "i"),
-        parent: Angle
+        categories: Angle
     })
 
     var Time = createToken({ name: "Time", pattern: Lexer.NA })
     var Ms = createToken({
         name: "Ms",
         pattern: MAKE_PATTERN("{{num}}ms", "i"),
-        parent: Time
+        categories: Time
     })
     var Sec = createToken({
         name: "Sec",
         pattern: MAKE_PATTERN("{{num}}sec", "i"),
-        parent: Time
+        categories: Time
     })
 
     var Freq = createToken({ name: "Freq", pattern: Lexer.NA })
     var Hz = createToken({
         name: "Hz",
         pattern: MAKE_PATTERN("{{num}}hz", "i"),
-        parent: Freq
+        categories: Freq
     })
     var Khz = createToken({
         name: "Khz",
         pattern: MAKE_PATTERN("{{num}}khz", "i"),
-        parent: Freq
+        categories: Freq
     })
 
     var Percentage = createToken({

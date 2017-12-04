@@ -71,17 +71,11 @@ const WhiteSpace = createToken({
 
 ```javascript
 
-const Keyword = createToken({
-    name: "Keyword",
-    pattern: Lexer.NA,
-    // the longer alt property allows resolving the keywords vs identifiers ambiguity
-    // See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
-    longer_alt:tokenVocabulary.Identifier
-});
-
-const Select = createToken({name: "Select", pattern: /SELECT/, parent: Keyword});
-const From = createToken({name: "From", pattern: /FROM/, parent: Keyword});
-const Where = createToken({name: "Where", pattern: /WHERE/, parent: Keyword});
+// We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
+// See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
+const Select = createToken({name: "Select", pattern: /SELECT/, longer_alt: Identifier});
+const From = createToken({name: "From", pattern: /FROM/, longer_alt: Identifier});
+const Where = createToken({name: "Where", pattern: /WHERE/, longer_alt: Identifier});
 
 const Comma = createToken({name: "Comma", pattern: /,/});
 

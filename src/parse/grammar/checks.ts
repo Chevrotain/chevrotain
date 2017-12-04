@@ -34,14 +34,14 @@ import {
     isStrictPrefixOfPath
 } from "./lookahead"
 import { VERSION } from "../../version"
-import { TokenConstructor } from "../../scan/lexer_public"
+import { TokenType } from "../../scan/lexer_public"
 import { NamedDSLMethodsCollectorVisitor } from "../cst/cst"
 import { nextPossibleTokensAfter } from "./interpreter"
 
 export function validateGrammar(
     topLevels: gast.Rule[],
     maxLookahead: number,
-    tokens: TokenConstructor[],
+    tokens: TokenType[],
     ignoredIssues: IgnoredParserIssues
 ): IParserDefinitionError[] {
     let duplicateErrors: any = utils.map(
@@ -647,7 +647,7 @@ export function validateSomeNonEmptyLookaheadPath(
 
 export interface IAmbiguityDescriptor {
     alts: number[]
-    path: Function[]
+    path: TokenType[]
 }
 
 function checkAlternativesAmbiguities(
