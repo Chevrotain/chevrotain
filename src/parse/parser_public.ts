@@ -197,6 +197,13 @@ export interface IParserConfig {
      *   - Providing special error messages under certain conditions - missing semicolons
      */
     errorMessageProvider?: IErrorMessageProvider
+
+    /**
+     * During cst analysis, the standard buildInitDefFunc uses "new Function" 
+     * which will trigger unsafe-eval warnings in some web contexts.
+     * You can use this optional flag to avoid the warning.
+     */
+    avoidDynamicCodeDuringAnalysis?: boolean
 }
 
 const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
@@ -627,8 +634,11 @@ export class Parser {
         this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
             ? config.dynamicTokensEnabled
             : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
-        
-        this.avoidDynamicCodeDuringAnalysis = has(config, "avoidDynamicCodeDuringAnalysis")
+
+        this.avoidDynamicCodeDuringAnalysis = has(
+            config,
+            "avoidDynamicCodeDuringAnalysis"
+        )
             ? config.avoidDynamicCodeDuringAnalysis
             : DEFAULT_PARSER_CONFIG.avoidDynamicCodeDuringAnalysis
 

@@ -181,7 +181,14 @@ export function analyzeCst(
         currTopRule.accept(namedCollectorVisitor)
         forEach(namedCollectorVisitor.result, ({ def, key, name }) => {
             let currNestedChildrenNames = buildChildDictionaryDef(def)
-            result.dictDef.put(key, buildInitDefFunc(currNestedChildrenNames, avoidDynamicCodeDuringAnalysis))
+            result.dictDef.put(
+                key,
+                buildInitDefFunc(
+                    currNestedChildrenNames,
+                    avoidDynamicCodeDuringAnalysis
+                )
+            )
+
             result.allRuleNames.push(currTopRule.name + name)
         })
     })
@@ -195,7 +202,7 @@ function buildInitDefFuncNoDynamic(childrenNames: string[]): Function {
     // this workaround uses JSON instead to return clones of the initial object.
 
     let initialObject = {}
-    map(childrenNames, (currName) => {
+    map(childrenNames, currName => {
         initialObject[currName] = []
     })
 
@@ -207,11 +214,14 @@ function buildInitDefFuncNoDynamic(childrenNames: string[]): Function {
     }
 }
 
-function buildInitDefFunc(childrenNames: string[], avoidDynamicCodeDuringAnalysis?: boolean): Function {
+function buildInitDefFunc(
+    childrenNames: string[],
+    avoidDynamicCodeDuringAnalysis?: boolean
+): Function {
     if (avoidDynamicCodeDuringAnalysis) {
         return buildInitDefFuncNoDynamic(childrenNames)
     }
-    
+
     let funcString = `return {\n`
 
     funcString += map(childrenNames, currName => `"${currName}" : []`).join(
