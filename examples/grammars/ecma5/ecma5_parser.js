@@ -900,7 +900,7 @@ class ECMAScript5Parser extends Parser {
 }
 
 const insertedSemiColon = {
-    tokenType: t.Semicolon.tokenType,
+    tokenTypeIdx: t.Semicolon.tokenTypeIdx,
     image: ";",
     startOffset: NaN,
     endOffset: NaN,
