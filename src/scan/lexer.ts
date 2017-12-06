@@ -44,7 +44,7 @@ export interface IPatternConfig {
     group: any
     push: string
     pop: boolean
-    tokenType: number
+    tokenTypeIdx: number
 }
 
 export interface IAnalyzeResult {
@@ -152,7 +152,7 @@ export function analyzeTokenTypes(
 
     let patternIdxToType = map(
         onlyRelevantTypes,
-        currType => currType.tokenType
+        currType => currType.tokenTypeIdx
     )
 
     let patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
@@ -217,7 +217,7 @@ export function analyzeTokenTypes(
             group: patternIdxToGroup[idx],
             push: patternIdxToPushMode[idx],
             pop: patternIdxToPopMode[idx],
-            tokenType: patternIdxToType[idx],
+            tokenTypeIdx: patternIdxToType[idx],
             type: onlyRelevantTypes[idx]
         }
     })

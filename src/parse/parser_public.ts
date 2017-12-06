@@ -73,7 +73,7 @@ import {
 } from "./grammar/path_public"
 import {
     augmentTokenTypes,
-    isExtendingTokenType,
+    isTokenType,
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
 } from "../scan/tokens"
@@ -680,10 +680,7 @@ export class Parser {
             )
         } else if (
             has(tokensDictionary, "modes") &&
-            every(
-                flatten(values((<any>tokensDictionary).modes)),
-                isExtendingTokenType
-            )
+            every(flatten(values((<any>tokensDictionary).modes)), isTokenType)
         ) {
             let allTokenTypes = flatten(values((<any>tokensDictionary).modes))
             let uniqueTokens = uniq(allTokenTypes)
@@ -2160,10 +2157,10 @@ export class Parser {
         return isNextTokenWhatIsExpected
     }
 
-    private isInCurrentRuleReSyncSet(tokenType: TokenType): boolean {
+    private isInCurrentRuleReSyncSet(tokenTypeIdx: TokenType): boolean {
         let followKey = this.getCurrFollowKey()
         let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
-        return contains(currentRuleReSyncSet, tokenType)
+        return contains(currentRuleReSyncSet, tokenTypeIdx)
     }
 
     private findReSyncTokenType(): TokenType {

@@ -10,7 +10,7 @@ export function createRegularToken(tokType, image = ""): IToken {
     return {
         image: image,
         startOffset: 1,
-        tokenType: tokType.tokenType,
+        tokenTypeIdx: tokType.tokenTypeIdx,
         type: tokType
     }
 }

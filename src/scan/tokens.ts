@@ -15,8 +15,8 @@ import { HashTable } from "../lang/lang_extensions"
 import { tokenName } from "./tokens_public"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
-    const instanceType = tokInstance.tokenType
-    if (instanceType === tokConstructor.tokenType) {
+    const instanceType = tokInstance.tokenTypeIdx
+    if (instanceType === tokConstructor.tokenTypeIdx) {
         return true
     } else {
         return (
@@ -29,7 +29,7 @@ export function tokenStructuredMatcher(tokInstance, tokConstructor) {
 // Optimized tokenMatcher in case our grammar does not use token categories
 // Being so tiny it is much more likely to be in-lined and this avoid the function call overhead
 export function tokenStructuredMatcherNoCategories(token, tokType) {
-    return token.tokenType === tokType.tokenType
+    return token.tokenTypeIdx === tokType.tokenTypeIdx
 }
 
 export let tokenShortNameIdx = 1
@@ -78,7 +78,7 @@ export function assignTokenDefaultProps(tokenTypes: TokenType[]): void {
     forEach(tokenTypes, currTokType => {
         if (!hasShortKeyProperty(currTokType)) {
             tokenIdxToClass.put(tokenShortNameIdx, currTokType)
-            ;(<any>currTokType).tokenType = tokenShortNameIdx++
+            ;(<any>currTokType).tokenTypeIdx = tokenShortNameIdx++
         }
 
         // CATEGORIES? : TokenType | TokenType[]
@@ -115,7 +115,9 @@ export function assignCategoriesTokensProp(tokenTypes: TokenType[]): void {
         // avoid duplications
         currTokType.categoryMatches = []
         forEach(currTokType.categoryMatchesMap, (val, key) => {
-            currTokType.categoryMatches.push(tokenIdxToClass.get(key).tokenType)
+            currTokType.categoryMatches.push(
+                tokenIdxToClass.get(key).tokenTypeIdx
+            )
         })
     })
 }
@@ -131,7 +133,7 @@ function singleAssignCategoriesToksMap(
     nextNode: TokenType
 ): void {
     forEach(path, pathNode => {
-        nextNode.categoryMatchesMap[pathNode.tokenType] = true
+        nextNode.categoryMatchesMap[pathNode.tokenTypeIdx] = true
     })
 
     forEach(nextNode.CATEGORIES, nextCategory => {
@@ -143,7 +145,7 @@ function singleAssignCategoriesToksMap(
 }
 
 export function hasShortKeyProperty(tokType: TokenType): boolean {
-    return has(tokType, "tokenType")
+    return has(tokType, "tokenTypeIdx")
 }
 
 export function hasCategoriesProperty(tokType: TokenType): boolean {
@@ -164,6 +166,6 @@ export function hasTokenNameProperty(tokType: TokenType): boolean {
     return has(tokType, "tokenName")
 }
 
-export function isExtendingTokenType(tokType: TokenType): boolean {
-    return has(tokType, "tokenType")
+export function isTokenType(tokType: TokenType): boolean {
+    return has(tokType, "tokenTypeIdx")
 }

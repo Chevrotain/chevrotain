@@ -182,8 +182,8 @@ export function buildAlternativesLookAheadFunc(
             singleTokenAlts,
             (result, currAlt, idx) => {
                 forEach(currAlt, currTokType => {
-                    if (!has(result, currTokType.tokenType)) {
-                        result[currTokType.tokenType] = idx
+                    if (!has(result, currTokType.tokenTypeIdx)) {
+                        result[currTokType.tokenTypeIdx] = idx
                     }
                     forEach(currTokType.categoryMatches, currExtendingType => {
                         if (!has(result, currExtendingType)) {
@@ -201,7 +201,7 @@ export function buildAlternativesLookAheadFunc(
          */
         return function(): number {
             let nextToken = this.LA(1)
-            return choiceToAlt[nextToken.tokenType]
+            return choiceToAlt[nextToken.tokenTypeIdx]
         }
     } else {
         // optimized lookahead without needing to check the predicates at all.
@@ -258,16 +258,16 @@ export function buildSingleAlternativeLookaheadFunction(
             isEmpty((<any>singleTokensTypes[0]).categoryMatches)
         ) {
             let expectedTokenType = singleTokensTypes[0]
-            let expectedTokenUniqueKey = (<any>expectedTokenType).tokenType
+            let expectedTokenUniqueKey = (<any>expectedTokenType).tokenTypeIdx
 
             return function(): boolean {
-                return this.LA(1).tokenType === expectedTokenUniqueKey
+                return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey
             }
         } else {
             let choiceToAlt = reduce(
                 singleTokensTypes,
                 (result, currTokType, idx) => {
-                    result[currTokType.tokenType] = true
+                    result[currTokType.tokenTypeIdx] = true
                     forEach(currTokType.categoryMatches, currExtendingType => {
                         result[currExtendingType] = true
                     })
@@ -277,7 +277,7 @@ export function buildSingleAlternativeLookaheadFunction(
             )
             return function(): boolean {
                 let nextToken = this.LA(1)
-                return choiceToAlt[nextToken.tokenType] === true
+                return choiceToAlt[nextToken.tokenTypeIdx] === true
             }
         }
     } else {

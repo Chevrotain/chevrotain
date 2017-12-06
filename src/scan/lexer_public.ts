@@ -36,7 +36,7 @@ export interface TokenType {
     CATEGORIES?: TokenType[]
 
     tokenName?: string
-    tokenType?: number
+    tokenTypeIdx?: number
     categoryMatches?: number[]
     categoryMatchesMap?: { [tokType: number]: boolean }
     isParent?: boolean
@@ -611,7 +611,7 @@ export class Lexer {
                 imageLength = matchedImage.length
                 group = currConfig.group
                 if (group !== undefined) {
-                    tokType = currConfig.tokenType
+                    tokType = currConfig.tokenTypeIdx
                     // TODO: "offset + imageLength" and the new column may be computed twice in case of "full" location information inside
                     // createFullToken method
                     newToken = this.createTokenInstance(
@@ -805,11 +805,11 @@ export class Lexer {
         return null
     }
 
-    private createOffsetOnlyToken(image, startOffset, tokenType, type) {
+    private createOffsetOnlyToken(image, startOffset, tokenTypeIdx, type) {
         return {
             image,
             startOffset,
-            tokenType,
+            tokenTypeIdx,
             type
         }
     }
@@ -817,7 +817,7 @@ export class Lexer {
     private createStartOnlyToken(
         image,
         startOffset,
-        tokenType,
+        tokenTypeIdx,
         type,
         startLine,
         startColumn
@@ -827,7 +827,7 @@ export class Lexer {
             startOffset,
             startLine,
             startColumn,
-            tokenType,
+            tokenTypeIdx,
             type
         }
     }
@@ -835,7 +835,7 @@ export class Lexer {
     private createFullToken(
         image,
         startOffset,
-        tokenType,
+        tokenTypeIdx,
         type,
         startLine,
         startColumn,
@@ -849,7 +849,7 @@ export class Lexer {
             endLine: startLine,
             startColumn,
             endColumn: startColumn + imageLength - 1,
-            tokenType,
+            tokenTypeIdx,
             type
         }
     }

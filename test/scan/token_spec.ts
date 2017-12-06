@@ -104,8 +104,8 @@ describe("The Chevrotain Tokens namespace", () => {
             let A = createToken({ name: "A" })
             let B = createToken({ name: "B" })
 
-            expect(A.tokenType).to.be.greaterThan(0)
-            expect(B.tokenType).to.be.greaterThan(A.tokenType)
+            expect(A.tokenTypeIdx).to.be.greaterThan(0)
+            expect(B.tokenTypeIdx).to.be.greaterThan(A.tokenTypeIdx)
 
             expect(A.categoryMatches).to.be.an.instanceOf(Array)
             expect(A.categoryMatches).to.be.empty

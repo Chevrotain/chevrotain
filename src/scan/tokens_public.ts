@@ -197,7 +197,7 @@ export interface IToken {
     isInsertedInRecovery?: boolean
 
     /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
-    tokenType?: number
+    tokenTypeIdx?: number
 
     /**
      * The actual Token Type of this Token "instance"
@@ -256,7 +256,7 @@ export function createTokenInstance(
         endLine,
         startColumn,
         endColumn,
-        tokenType: (<any>tokType).tokenType,
+        tokenTypeIdx: (<any>tokType).tokenTypeIdx,
         type: tokType
     }
 }
