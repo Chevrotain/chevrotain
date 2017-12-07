@@ -255,7 +255,7 @@ module.exports = {
                     nextPossibleTokTypes,
                     function(currPossibleTokType) {
                         return Keyword.categoryMatchesMap[
-                            currPossibleTokType.tokenType
+                            currPossibleTokType.tokenTypeIdx
                         ]
                     }
                 )
