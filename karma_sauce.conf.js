@@ -23,8 +23,8 @@ module.exports = function(config) {
         SL_Chrome: {
             base: "SauceLabs",
             browserName: "chrome",
-            platform: "Windows 10",
-            version: "latest"
+            version: "latest",
+            platform: "Linux"
         },
         SL_InternetExplorer: {
             base: "SauceLabs",
@@ -42,7 +42,7 @@ module.exports = function(config) {
             base: "SauceLabs",
             browserName: "firefox",
             version: "latest",
-            platform: "Windows 10"
+            platform: "Linux"
         },
         SL_SAFARI10: {
             base: "SauceLabs",
