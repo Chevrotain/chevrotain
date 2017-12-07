@@ -11,10 +11,6 @@ import {
     uniq
 } from "../utils/utils"
 import { TokenType } from "../scan/lexer_public"
-import IProduction = gast.IProduction
-import Terminal = gast.Terminal
-import NonTerminal = gast.NonTerminal
-import AbstractProduction = gast.AbstractProduction
 import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
 
 export enum ProdType {

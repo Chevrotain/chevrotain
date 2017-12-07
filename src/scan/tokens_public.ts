@@ -204,7 +204,7 @@ export interface IToken {
      * This is the same Object returned by the "createToken" API.
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
-    type?: TokenType
+    tokenType?: TokenType
 
     /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
      *  @see {ILexerConfig} debug flag.
@@ -257,7 +257,7 @@ export function createTokenInstance(
         startColumn,
         endColumn,
         tokenTypeIdx: (<any>tokType).tokenTypeIdx,
-        type: tokType
+        tokenType: tokType
     }
 }
 

@@ -2169,7 +2169,7 @@ export class Parser {
         let nextToken = this.LA(1)
         let k = 2
         while (true) {
-            let nextTokenType: any = nextToken.type
+            let nextTokenType: any = nextToken.tokenType
             if (contains(allPossibleReSyncTokTypes, nextTokenType)) {
                 return nextTokenType
             }

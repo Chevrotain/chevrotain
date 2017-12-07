@@ -11,6 +11,6 @@ export function createRegularToken(tokType, image = ""): IToken {
         image: image,
         startOffset: 1,
         tokenTypeIdx: tokType.tokenTypeIdx,
-        type: tokType
+        tokenType: tokType
     }
 }

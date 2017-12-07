@@ -294,19 +294,19 @@ describe("Error Recovery SQL DDL Example", () => {
     function assertAllThreeStatementsPresentAndValid(
         ptResult: ParseTree
     ): void {
-        expect(ptResult.payload.type).to.equal(STATEMENTS)
+        expect(ptResult.payload.tokenType).to.equal(STATEMENTS)
         // 3 statements found
         expect(ptResult.children.length).to.equal(3)
-        expect(ptResult.children[0].payload.type).to.equal(CREATE_STMT)
-        expect(ptResult.children[0].payload.type).to.not.equal(
+        expect(ptResult.children[0].payload.tokenType).to.equal(CREATE_STMT)
+        expect(ptResult.children[0].payload.tokenType).to.not.equal(
             INVALID_CREATE_STMT
         )
-        expect(ptResult.children[1].payload.type).to.equal(INSERT_STMT)
-        expect(ptResult.children[1].payload.type).to.not.equal(
+        expect(ptResult.children[1].payload.tokenType).to.equal(INSERT_STMT)
+        expect(ptResult.children[1].payload.tokenType).to.not.equal(
             INVALID_INSERT_STMT
         )
-        expect(ptResult.children[2].payload.type).to.equal(DELETE_STMT)
-        expect(ptResult.children[2].payload.type).to.not.equal(
+        expect(ptResult.children[2].payload.tokenType).to.equal(DELETE_STMT)
+        expect(ptResult.children[2].payload.tokenType).to.not.equal(
             INVALID_DELETE_STMT
         )
     }
