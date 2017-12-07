@@ -218,7 +218,7 @@ export function analyzeTokenTypes(
             push: patternIdxToPushMode[idx],
             pop: patternIdxToPopMode[idx],
             tokenTypeIdx: patternIdxToType[idx],
-            type: onlyRelevantTypes[idx]
+            tokenType: onlyRelevantTypes[idx]
         }
     })
 

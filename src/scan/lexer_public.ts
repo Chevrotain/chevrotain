@@ -805,12 +805,12 @@ export class Lexer {
         return null
     }
 
-    private createOffsetOnlyToken(image, startOffset, tokenTypeIdx, type) {
+    private createOffsetOnlyToken(image, startOffset, tokenTypeIdx, tokenType) {
         return {
             image,
             startOffset,
             tokenTypeIdx,
-            type
+            tokenType
         }
     }
 
@@ -818,7 +818,7 @@ export class Lexer {
         image,
         startOffset,
         tokenTypeIdx,
-        type,
+        tokenType,
         startLine,
         startColumn
     ) {
@@ -828,7 +828,7 @@ export class Lexer {
             startLine,
             startColumn,
             tokenTypeIdx,
-            type
+            tokenType
         }
     }
 
@@ -836,7 +836,7 @@ export class Lexer {
         image,
         startOffset,
         tokenTypeIdx,
-        type,
+        tokenType,
         startLine,
         startColumn,
         imageLength
@@ -850,7 +850,7 @@ export class Lexer {
             startColumn,
             endColumn: startColumn + imageLength - 1,
             tokenTypeIdx,
-            type
+            tokenType
         }
     }
 
