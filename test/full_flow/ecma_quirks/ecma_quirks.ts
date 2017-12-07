@@ -156,7 +156,7 @@ class EcmaScriptQuirksParser extends Parser {
             return nextToken
         } else {
             const errorToken = {
-                tokenType: ErrorToken.tokenTypeIdx,
+                tokenTypeIdx: ErrorToken.tokenTypeIdx,
                 image: this.orgText[this.textIdx],
                 startOffset: this.textIdx
             }
