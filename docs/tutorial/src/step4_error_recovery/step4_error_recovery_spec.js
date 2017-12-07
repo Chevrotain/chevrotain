@@ -9,8 +9,8 @@ describe("Chevrotain Tutorial", () => {
         // to make it easier to understand the assertions
         function minimizeCst(cstElement) {
             // tokenType idx is auto generated, can't assert over it
-            if (cstElement.tokenType) {
-                delete cstElement.tokenType
+            if (cstElement.tokenTypeIdx) {
+                delete cstElement.tokenTypeIdx
             }
 
             // CstNode
