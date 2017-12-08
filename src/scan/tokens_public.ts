@@ -205,13 +205,6 @@ export interface IToken {
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
     tokenType?: TokenType
-
-    /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
-     *  @see {ILexerConfig} debug flag.
-     *
-     *  This property should not be used in productive flows as it will not always exist!
-     * */
-    tokenClassName?: number
 }
 
 export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })
