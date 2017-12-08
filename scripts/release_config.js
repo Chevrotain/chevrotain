@@ -43,6 +43,8 @@ if (_.includes(process.argv, "patch")) {
     mode = "patch"
 } else if (_.includes(process.argv, "minor")) {
     mode = "minor"
+} else if (_.includes(process.argv, "major")) {
+    mode = "major"
 } else {
     console.log("release mode (patch|minor) not provided")
     process.exit(-1)
