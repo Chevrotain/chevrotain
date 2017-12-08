@@ -8,6 +8,7 @@
 #### Minor Changes
 - [Custom Error Message argument for CONSUME.](https://github.com/SAP/chevrotain/issues/543)
 - [Improved empty empty alternatives detection.](https://github.com/SAP/chevrotain/issues/196)
+- [previousToken information for EarlyExitException.](https://github.com/SAP/chevrotain/pull/616)
 
 #### Bug Fixes
 
