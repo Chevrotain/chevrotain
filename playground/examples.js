@@ -432,25 +432,25 @@ function cssExample() {
     const Exs = createToken({name: 'Exs', pattern: MAKE_PATTERN('{{num}}ex', 'i')});
 
     const Length = createToken({name: 'Length', pattern: Lexer.NA});
-    const Px = createToken({name: 'Px', pattern: MAKE_PATTERN('{{num}}px', 'i'), parent: Length});
-    const Cm = createToken({name: 'Cm', pattern: MAKE_PATTERN('{{num}}cm', 'i'), parent: Length});
-    const Mm = createToken({name: 'Mm', pattern: MAKE_PATTERN('{{num}}mm', 'i'), parent: Length});
-    const In = createToken({name: 'In', pattern: MAKE_PATTERN('{{num}}in', 'i'), parent: Length});
-    const Pt = createToken({name: 'Pt', pattern: MAKE_PATTERN('{{num}}pt', 'i'), parent: Length});
-    const Pc = createToken({name: 'Pc', pattern: MAKE_PATTERN('{{num}}pc', 'i'), parent: Length});
+    const Px = createToken({name: 'Px', pattern: MAKE_PATTERN('{{num}}px', 'i'), categories: Length});
+    const Cm = createToken({name: 'Cm', pattern: MAKE_PATTERN('{{num}}cm', 'i'), categories: Length});
+    const Mm = createToken({name: 'Mm', pattern: MAKE_PATTERN('{{num}}mm', 'i'), categories: Length});
+    const In = createToken({name: 'In', pattern: MAKE_PATTERN('{{num}}in', 'i'), categories: Length});
+    const Pt = createToken({name: 'Pt', pattern: MAKE_PATTERN('{{num}}pt', 'i'), categories: Length});
+    const Pc = createToken({name: 'Pc', pattern: MAKE_PATTERN('{{num}}pc', 'i'), categories: Length});
 
     const Angle = createToken({name: 'Angle', pattern: Lexer.NA});
-    const Deg = createToken({name: 'Deg', pattern: MAKE_PATTERN('{{num}}deg', 'i'), parent: Angle});
-    const Rad = createToken({name: 'Rad', pattern: MAKE_PATTERN('{{num}}rad', 'i'), parent: Angle});
-    const Grad = createToken({name: 'Grad', pattern: MAKE_PATTERN('{{num}}grad', 'i'), parent: Angle});
+    const Deg = createToken({name: 'Deg', pattern: MAKE_PATTERN('{{num}}deg', 'i'), categories: Angle});
+    const Rad = createToken({name: 'Rad', pattern: MAKE_PATTERN('{{num}}rad', 'i'), categories: Angle});
+    const Grad = createToken({name: 'Grad', pattern: MAKE_PATTERN('{{num}}grad', 'i'), categories: Angle});
 
     const Time = createToken({name: 'Time', pattern: Lexer.NA});
-    const Ms = createToken({name: 'Ms', pattern: MAKE_PATTERN('{{num}}ms', 'i'), parent: Time});
-    const Sec = createToken({name: 'Sec', pattern: MAKE_PATTERN('{{num}}sec', 'i'), parent: Time});
+    const Ms = createToken({name: 'Ms', pattern: MAKE_PATTERN('{{num}}ms', 'i'), categories: Time});
+    const Sec = createToken({name: 'Sec', pattern: MAKE_PATTERN('{{num}}sec', 'i'), categories: Time});
 
     const Freq = createToken({name: 'Freq', pattern: Lexer.NA});
-    const Hz = createToken({name: 'Hz', pattern: MAKE_PATTERN('{{num}}hz', 'i'), parent: Freq});
-    const Khz = createToken({name: 'Khz', pattern: MAKE_PATTERN('{{num}}khz', 'i'), parent: Freq});
+    const Hz = createToken({name: 'Hz', pattern: MAKE_PATTERN('{{num}}hz', 'i'), categories: Freq});
+    const Khz = createToken({name: 'Khz', pattern: MAKE_PATTERN('{{num}}khz', 'i'), categories: Freq});
 
     const Percentage = createToken({name: 'Percentage', pattern: MAKE_PATTERN('{{num}}%', 'i')});
 
@@ -828,12 +828,12 @@ function calculatorExample() {
     // AdditionOperator defines a Tokens hierarchy but only leafs in this hierarchy
     // define actual Tokens that can appear in the text
     const AdditionOperator = createToken({name: "AdditionOperator", pattern: Lexer.NA});
-    const Plus = createToken({name: "Plus", pattern: /\+/, parent: AdditionOperator});
-    const Minus = createToken({name: "Minus", pattern: /-/, parent: AdditionOperator});
+    const Plus = createToken({name: "Plus", pattern: /\+/, categories: AdditionOperator});
+    const Minus = createToken({name: "Minus", pattern: /-/, categories: AdditionOperator});
 
     const MultiplicationOperator = createToken({name: "MultiplicationOperator", pattern: Lexer.NA});
-    const Multi = createToken({name: "Multi", pattern: /\*/, parent: MultiplicationOperator});
-    const Div = createToken({name: "Div", pattern: /\//, parent: MultiplicationOperator});
+    const Multi = createToken({name: "Multi", pattern: /\*/, categories: MultiplicationOperator});
+    const Div = createToken({name: "Div", pattern: /\//, categories: MultiplicationOperator});
 
     const LParen = createToken({name: "LParen", pattern: /\(/});
     const RParen = createToken({name: "RParen", pattern: /\)/});
@@ -1003,12 +1003,12 @@ function calculatorExampleCst() {
     // AdditionOperator defines a Tokens hierarchy but only the leafs in this hierarchy define
     // actual Tokens that can appear in the text
     const AdditionOperator = createToken({name: "AdditionOperator", pattern: Lexer.NA});
-    const Plus = createToken({name: "Plus", pattern: /\+/, parent: AdditionOperator});
-    const Minus = createToken({name: "Minus", pattern: /-/, parent: AdditionOperator});
+    const Plus = createToken({name: "Plus", pattern: /\+/, categories: AdditionOperator});
+    const Minus = createToken({name: "Minus", pattern: /-/, categories: AdditionOperator});
 
     const MultiplicationOperator = createToken({name: "MultiplicationOperator", pattern: Lexer.NA});
-    const Multi = createToken({name: "Multi", pattern: /\*/, parent: MultiplicationOperator});
-    const Div = createToken({name: "Div", pattern: /\//, parent: MultiplicationOperator});
+    const Multi = createToken({name: "Multi", pattern: /\*/, categories: MultiplicationOperator});
+    const Div = createToken({name: "Div", pattern: /\//, categories: MultiplicationOperator});
 
     const LParen = createToken({name: "LParen", pattern: /\(/});
     const RParen = createToken({name: "RParen", pattern: /\)/});
