@@ -67,6 +67,9 @@ export interface IErrorMessageProvider {
      *
      * @param options.actual - The actual sequence of tokens encountered.
      *
+     * @param options.previous - The previous token parsed. 
+     *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
+     *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the "AT_LEAST_ONE" DSL method.
      *                                http://sap.github.io/chevrotain/documentation/0_29_0/interfaces/_chevrotain_d_.dslmethodoptswitherr.html#err_msg
      *                                This is that custom message.
@@ -76,6 +79,7 @@ export interface IErrorMessageProvider {
     buildEarlyExitMessage?(options: {
         expectedIterationPaths: TokenType[][]
         actual: IToken[]
+        previous: IToken
         customUserDescription: string
         ruleName: string
     }): string
