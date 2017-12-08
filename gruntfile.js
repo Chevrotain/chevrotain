@@ -68,6 +68,8 @@ module.exports = function(grunt) {
                     "npm --prefix ./webpack" +
                     " install  ./webpack" +
                     " && " +
+                    "npm --prefix ./webpack link chevrotain" +
+                    " && " +
                     examples_test_command
             },
             test_examples_implementation_languages: {

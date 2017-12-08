@@ -5,19 +5,19 @@ import { Token, Lexer, Parser } from "chevrotain"
 // Unfortunately no support for static class properties in ES2015, only in ES2016...
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class LSquare extends Token {}
+class LSquare {}
 LSquare.PATTERN = /\[/
 
-class RSquare extends Token {}
+class RSquare {}
 RSquare.PATTERN = /]/
 
-class Comma extends Token {}
+class Comma {}
 Comma.PATTERN = /,/
 
-class Integer extends Token {}
+class Integer {}
 Integer.PATTERN = /\d+/
 
-class WhiteSpace extends Token {}
+class WhiteSpace {}
 WhiteSpace.PATTERN = /\s+/
 WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 WhiteSpace.LINE_BREAKS = true
