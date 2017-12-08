@@ -12,6 +12,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         it_node("EarlyExitException", () => {
             let exceptionInstance = new exceptions.EarlyExitException(
                 "",
+                dummyToken,
                 dummyToken
             )
             expect(exceptionInstance.name).to.equal(

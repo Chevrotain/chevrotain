@@ -3073,12 +3073,13 @@ export class Parser {
         let msg = this.errorMessageProvider.buildEarlyExitMessage({
             expectedIterationPaths: insideProdPaths,
             actual: actualTokens,
+            previous: this.LA(0),
             customUserDescription: userDefinedErrMsg,
             ruleName: ruleName
         })
 
         throw this.SAVE_ERROR(
-            new exceptions.EarlyExitException(msg, this.LA(1))
+            new exceptions.EarlyExitException(msg, this.LA(1), this.LA(0))
         )
     }
 
@@ -3218,7 +3219,10 @@ export class Parser {
     // or lexers dependent on parser context.
     protected LA(howMuch: number): IToken {
         // TODO: is this optimization (saving tokVectorLength benefits?)
-        if (this.tokVectorLength <= this.currIdx + howMuch) {
+        if (
+            this.currIdx + howMuch < 0 ||
+            this.tokVectorLength <= this.currIdx + howMuch
+        ) {
             return END_OF_FILE
         } else {
             return this.tokVector[this.currIdx + howMuch]

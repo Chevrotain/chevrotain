@@ -82,10 +82,15 @@ export namespace exceptions {
 
     NotAllInputParsedException.prototype = Error.prototype
 
-    export function EarlyExitException(message: string, token: IToken) {
+    export function EarlyExitException(
+        message: string,
+        token: IToken,
+        previousToken: IToken
+    ) {
         this.name = EARLY_EXIT_EXCEPTION
         this.message = message
         this.token = token
+        this.previousToken = previousToken
         this.resyncedTokens = []
     }
 
