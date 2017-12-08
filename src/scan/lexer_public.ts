@@ -36,7 +36,7 @@ export interface TokenType {
     CATEGORIES?: TokenType[]
 
     tokenName?: string
-    tokenType?: number
+    tokenTypeIdx?: number
     categoryMatches?: number[]
     categoryMatchesMap?: { [tokType: number]: boolean }
     isParent?: boolean
@@ -501,7 +501,7 @@ export class Lexer {
                 modeStack.length === 1 &&
                 // if we have both a POP_MODE and a PUSH_MODE this is in-fact a "transition"
                 // So no error should occur.
-                popToken.type.PUSH_MODE === undefined
+                popToken.tokenType.PUSH_MODE === undefined
             ) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
@@ -611,14 +611,14 @@ export class Lexer {
                 imageLength = matchedImage.length
                 group = currConfig.group
                 if (group !== undefined) {
-                    tokType = currConfig.tokenType
+                    tokType = currConfig.tokenTypeIdx
                     // TODO: "offset + imageLength" and the new column may be computed twice in case of "full" location information inside
                     // createFullToken method
                     newToken = this.createTokenInstance(
                         matchedImage,
                         offset,
                         tokType,
-                        currConfig.type,
+                        currConfig.tokenType,
                         line,
                         column,
                         imageLength
@@ -805,20 +805,20 @@ export class Lexer {
         return null
     }
 
-    private createOffsetOnlyToken(image, startOffset, tokenType, type) {
+    private createOffsetOnlyToken(image, startOffset, tokenTypeIdx, tokenType) {
         return {
             image,
             startOffset,
-            tokenType,
-            type
+            tokenTypeIdx,
+            tokenType
         }
     }
 
     private createStartOnlyToken(
         image,
         startOffset,
+        tokenTypeIdx,
         tokenType,
-        type,
         startLine,
         startColumn
     ) {
@@ -827,16 +827,16 @@ export class Lexer {
             startOffset,
             startLine,
             startColumn,
-            tokenType,
-            type
+            tokenTypeIdx,
+            tokenType
         }
     }
 
     private createFullToken(
         image,
         startOffset,
+        tokenTypeIdx,
         tokenType,
-        type,
         startLine,
         startColumn,
         imageLength
@@ -849,8 +849,8 @@ export class Lexer {
             endLine: startLine,
             startColumn,
             endColumn: startColumn + imageLength - 1,
-            tokenType,
-            type
+            tokenTypeIdx,
+            tokenType
         }
     }
 

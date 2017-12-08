@@ -9,8 +9,8 @@ describe("Chevrotain Tutorial", () => {
         // to make it easier to understand the assertions
         function minimizeCst(cstElement) {
             // tokenType idx is auto generated, can't assert over it
-            if (cstElement.tokenType) {
-                delete cstElement.tokenType
+            if (cstElement.tokenTypeIdx) {
+                delete cstElement.tokenTypeIdx
             }
 
             // CstNode
@@ -45,7 +45,7 @@ describe("Chevrotain Tutorial", () => {
                                     {
                                         image: "{",
                                         startOffset: 0,
-                                        type: errRecovery.LCurly
+                                        tokenType: errRecovery.LCurly
                                     }
                                 ],
                                 objectItem: [
@@ -56,7 +56,7 @@ describe("Chevrotain Tutorial", () => {
                                                 {
                                                     image: '"key"',
                                                     startOffset: 2,
-                                                    type:
+                                                    tokenType:
                                                         errRecovery.StringLiteral
                                                 }
                                             ],
@@ -71,7 +71,7 @@ describe("Chevrotain Tutorial", () => {
                                                     startColumn: NaN,
                                                     endColumn: NaN,
                                                     isInsertedInRecovery: true,
-                                                    type: errRecovery.Colon
+                                                    tokenType: errRecovery.Colon
                                                 }
                                             ],
                                             // the value rule appears AFTER the error (missing colon) yet it was still parsed successfully
@@ -84,7 +84,7 @@ describe("Chevrotain Tutorial", () => {
                                                             {
                                                                 image: "666",
                                                                 startOffset: 10,
-                                                                type:
+                                                                tokenType:
                                                                     errRecovery.NumberLiteral
                                                             }
                                                         ]
@@ -98,7 +98,7 @@ describe("Chevrotain Tutorial", () => {
                                     {
                                         image: "}",
                                         startOffset: 13,
-                                        type: errRecovery.RCurly
+                                        tokenType: errRecovery.RCurly
                                     }
                                 ]
                             }
@@ -129,7 +129,7 @@ describe("Chevrotain Tutorial", () => {
                                     {
                                         image: "{",
                                         startOffset: 0,
-                                        type: errRecovery.LCurly
+                                        tokenType: errRecovery.LCurly
                                     }
                                 ],
                                 objectItem: [
@@ -140,7 +140,7 @@ describe("Chevrotain Tutorial", () => {
                                                 {
                                                     image: '"key"',
                                                     startOffset: 2,
-                                                    type:
+                                                    tokenType:
                                                         errRecovery.StringLiteral
                                                 }
                                             ],
@@ -149,7 +149,7 @@ describe("Chevrotain Tutorial", () => {
                                                 {
                                                     image: ":",
                                                     startOffset: 9,
-                                                    type: errRecovery.Colon
+                                                    tokenType: errRecovery.Colon
                                                 }
                                             ],
                                             // the value rule appears AFTER the error (out of place '}' brackets) yet it was still parsed
@@ -162,7 +162,7 @@ describe("Chevrotain Tutorial", () => {
                                                             {
                                                                 image: "666",
                                                                 startOffset: 11,
-                                                                type:
+                                                                tokenType:
                                                                     errRecovery.NumberLiteral
                                                             }
                                                         ]
@@ -176,7 +176,7 @@ describe("Chevrotain Tutorial", () => {
                                     {
                                         image: "}",
                                         startOffset: 14,
-                                        type: errRecovery.RCurly
+                                        tokenType: errRecovery.RCurly
                                     }
                                 ]
                             }

@@ -17,7 +17,7 @@ const tokens = require("./ecma5_tokens")
 
 function createChevToken(chevTokenClass, acornToken) {
     return {
-        tokenType: chevTokenClass.tokenType,
+        tokenTypeIdx: chevTokenClass.tokenTypeIdx,
         image: acornToken.value,
         startOffset: acornToken.start,
         endOffset: acornToken.end

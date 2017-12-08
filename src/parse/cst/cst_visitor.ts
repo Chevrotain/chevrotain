@@ -22,7 +22,7 @@ export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
         for (let j = 0; j < currChildArrayLength; j++) {
             let currChild: any = currChildArray[j]
             // distinction between Tokens Children and CstNode children
-            if (currChild.tokenType === undefined) {
+            if (currChild.tokenTypeIdx === undefined) {
                 if (currChild.fullName !== undefined) {
                     this[currChild.fullName](currChild.children, param)
                 } else {

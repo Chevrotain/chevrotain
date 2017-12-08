@@ -197,21 +197,14 @@ export interface IToken {
     isInsertedInRecovery?: boolean
 
     /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
-    tokenType?: number
+    tokenTypeIdx?: number
 
     /**
      * The actual Token Type of this Token "instance"
      * This is the same Object returned by the "createToken" API.
      * This property is very useful for debugging the Lexing and Parsing phases.
      */
-    type?: TokenType
-
-    /** A human readable name of the Token Class, This property will only be avilaible if the Lexer has run in <debugMode>
-     *  @see {ILexerConfig} debug flag.
-     *
-     *  This property should not be used in productive flows as it will not always exist!
-     * */
-    tokenClassName?: number
+    tokenType?: TokenType
 }
 
 export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })
@@ -256,8 +249,8 @@ export function createTokenInstance(
         endLine,
         startColumn,
         endColumn,
-        tokenType: (<any>tokType).tokenType,
-        type: tokType
+        tokenTypeIdx: (<any>tokType).tokenTypeIdx,
+        tokenType: tokType
     }
 }
 

@@ -138,7 +138,7 @@ class EcmaScriptQuirksParser extends Parser {
             const image = match[0]
             const startOffset = this.textIdx
             const newToken = {
-                tokenType: expectedType.tokenType,
+                tokenTypeIdx: expectedType.tokenTypeIdx,
                 image,
                 startOffset
             }
@@ -156,7 +156,7 @@ class EcmaScriptQuirksParser extends Parser {
             return nextToken
         } else {
             const errorToken = {
-                tokenType: ErrorToken.tokenType,
+                tokenTypeIdx: ErrorToken.tokenTypeIdx,
                 image: this.orgText[this.textIdx],
                 startOffset: this.textIdx
             }

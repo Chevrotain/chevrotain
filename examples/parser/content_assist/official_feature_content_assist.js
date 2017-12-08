@@ -169,7 +169,7 @@ function getContentAssistSuggestions(text, symbolTable) {
         const lastRuleName = _.last(currRuleStack)
 
         // easy case where a keyword is suggested.
-        if (Keyword.categoryMatchesMap[currTokenType.tokenType]) {
+        if (Keyword.categoryMatchesMap[currTokenType.tokenTypeIdx]) {
             finalSuggestions.push(currTokenType.PATTERN.source)
         } else if (currTokenType === Identifier) {
             // in declarations, should not provide content assist for new symbols (Identifiers)
