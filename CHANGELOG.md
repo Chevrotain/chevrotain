@@ -1,4 +1,4 @@
--## X.Y.Z (INSERT_DATE_HERE)
+## X.Y.Z (INSERT_DATE_HERE)
 
 #### Breaking Changes
 
