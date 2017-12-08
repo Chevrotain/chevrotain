@@ -1,3 +1,20 @@
+-## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [Rework token single inheritance into multiple classifications/ categories.](https://github.com/SAP/chevrotain/issues/564#issuecomment-349062346)
+- [Tokens properties renaming.](https://github.com/SAP/chevrotain/issues/610#issuecomment-350244423)
+
+#### Minor Changes
+- [Custom Error Message argument for CONSUME.](https://github.com/SAP/chevrotain/issues/543)
+- [Improved empty empty alternatives detection.](https://github.com/SAP/chevrotain/issues/196)
+
+#### Bug Fixes
+
+- [Missing token location in EarlyExitException if token is EOF.](https://github.com/SAP/chevrotain/issues/613)
+
+
+
 ## 0.35.0 (11-15-2017)
 
 #### Minor Changes
