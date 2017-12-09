@@ -329,8 +329,8 @@ function cssExample() {
     // A Little wrapper to save us the trouble of manually building the
     // array of cssTokens
     const cssTokens = [];
-    const createToken = () => {
-        const newToken = chevrotain.createToken.apply(null, arguments);
+    const createToken = (config) => {
+        const newToken = chevrotain.createToken(config);
         cssTokens.push(newToken);
         return newToken;
     };
