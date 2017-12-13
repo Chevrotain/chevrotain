@@ -213,9 +213,9 @@ describe("The Utils functions namespace", () => {
     })
 
     it("exports a pick utility", () => {
-        expect(
-            pick({ bamba: true, bisli: false }, item => item)
-        ).to.deep.equal({ bamba: true })
+        expect(pick({ bamba: true, bisli: false }, item => item)).to.deep.equal(
+            { bamba: true }
+        )
         expect(pick({}, item => item)).to.be.empty
     })
 

@@ -177,13 +177,17 @@ function createDuplicatesErrorMessage(
 
     let msg = `->${dslName}<- with occurrence index: ->${index}<-
                   ${extraArgument ? `and argument: ${extraArgument}` : ""}
-                  appears more than once (${duplicateProds.length} times) in the top level rule: ${topLevelName}.
-                  ${index === 1
-                      ? `note that ${dslName} and ${dslName}1 both have the same occurrence index 1}`
-                      : ""}}
-                  to fix this make sure each usage of ${dslName} ${extraArgument
-        ? `with the argument: ${extraArgument}`
-        : ""}
+                  appears more than once (${
+                      duplicateProds.length
+                  } times) in the top level rule: ${topLevelName}.
+                  ${
+                      index === 1
+                          ? `note that ${dslName} and ${dslName}1 both have the same occurrence index 1}`
+                          : ""
+                  }}
+                  to fix this make sure each usage of ${dslName} ${
+        extraArgument ? `with the argument: ${extraArgument}` : ""
+    }
                   in the rule ${topLevelName} has a different occurrence index (1-5), as that combination acts as a unique
                   position key in the grammar, which is needed by the parsing engine.`
 
@@ -197,9 +201,9 @@ function createDuplicatesErrorMessage(
 export function identifyProductionForDuplicates(
     prod: gast.IProductionWithOccurrence
 ): string {
-    return `${getProductionDslName(
-        prod
-    )}_#_${prod.occurrenceInParent}_#_${getExtraProductionArgument(prod)}`
+    return `${getProductionDslName(prod)}_#_${
+        prod.occurrenceInParent
+    }_#_${getExtraProductionArgument(prod)}`
 }
 
 function getExtraProductionArgument(
@@ -482,7 +486,9 @@ export function validateEmptyOrAlternative(
                             message:
                                 `Ambiguous empty alternative: <${currAltIdx +
                                     1}>` +
-                                ` in <OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n` +
+                                ` in <OR${currOr.occurrenceInParent}> inside <${
+                                    topLevelRule.name
+                                }> Rule.\n` +
                                 `Only the last alternative may be an empty alternative.`,
                             type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
                             ruleName: topLevelRule.name,
@@ -590,8 +596,10 @@ export function validateTooManyAlts(
                 errors.push({
                     message:
                         `An Alternation cannot have more than 256 alternatives:\n` +
-                        `<OR${currOr.occurrenceInParent}> inside <${topLevelRule.name}> Rule.\n has ${currOr
-                            .definition.length + 1} alternatives.`,
+                        `<OR${currOr.occurrenceInParent}> inside <${
+                            topLevelRule.name
+                        }> Rule.\n has ${currOr.definition.length +
+                            1} alternatives.`,
                     type: ParserDefinitionErrorType.TOO_MANY_ALTS,
                     ruleName: topLevelRule.name,
                     occurrence: currOr.occurrenceInParent
@@ -631,7 +639,9 @@ export function validateSomeNonEmptyLookaheadPath(
                     dslName += currOccurrence
                 }
                 let errMsg =
-                    `The repetition <${dslName}> within Rule <${currTopRule.name}> can never consume any tokens.\n` +
+                    `The repetition <${dslName}> within Rule <${
+                        currTopRule.name
+                    }> can never consume any tokens.\n` +
                     `This could lead to an infinite loop.`
                 errors.push({
                     message: errMsg,
@@ -846,7 +856,9 @@ function validateDuplicateNestedRules(
         forEach(values(duplicates), (currDuplicates: any) => {
             let duplicateName = utils.first(currDuplicates)
             let errMsg =
-                `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${currTopRule.name}<-\n` +
+                `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${
+                    currTopRule.name
+                }<-\n` +
                 `A nested name must be unique in the scope of a top level grammar rule.`
             errors.push({
                 message: errMsg,

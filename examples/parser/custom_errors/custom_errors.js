@@ -44,8 +44,9 @@ const myErrorProvider = {
     },
     buildNotAllInputParsedMessage: function(options) {
         // changing the template of the error message #1
-        return `very bad dog! you still have some input remaining at offset:${options
-            .firstRedundant.startOffset}`
+        return `very bad dog! you still have some input remaining at offset:${
+            options.firstRedundant.startOffset
+        }`
     },
     // we are not overriding "buildNoViableAltMessage"
     // the default implementation will be automatically used instead.

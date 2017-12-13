@@ -525,8 +525,9 @@ export function findModesThatDoNotExist(
         let msg =
             `Token Type: ->${tokenName(
                 clazz
-            )}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${clazz.PUSH_MODE}<-` +
-            `which does not exist`
+            )}<- static 'PUSH_MODE' value cannot refer to a Lexer Mode ->${
+                clazz.PUSH_MODE
+            }<-` + `which does not exist`
         return {
             message: msg,
             type: LexerDefinitionErrorType.PUSH_MODE_DOES_NOT_EXIST,
@@ -676,8 +677,9 @@ export function performRuntimeChecks(
     ) {
         errors.push({
             message:
-                `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${lexerDefinition.defaultMode}>` +
-                `which does not exist\n`,
+                `A MultiMode Lexer cannot be initialized with a ${DEFAULT_MODE}: <${
+                    lexerDefinition.defaultMode
+                }>` + `which does not exist\n`,
             type:
                 LexerDefinitionErrorType.MULTI_MODE_LEXER_DEFAULT_MODE_VALUE_DOES_NOT_EXIST
         })

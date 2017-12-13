@@ -300,9 +300,9 @@ export class Lexer {
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
             actualDefinition = <any>{ modes: {} }
-            actualDefinition.modes[
-                DEFAULT_MODE
-            ] = cloneArr(<SingleModeLexerDefinition>lexerDefinition)
+            actualDefinition.modes[DEFAULT_MODE] = cloneArr(
+                <SingleModeLexerDefinition>lexerDefinition
+            )
             actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
         } else {
             // no conversion needed, input should already be a IMultiModeLexerDefinition
@@ -324,9 +324,10 @@ export class Lexer {
         // an error of undefined TokenTypes will be detected in "performRuntimeChecks" above.
         // this transformation is to increase robustness in the case of partially invalid lexer definition.
         forEach(actualDefinition.modes, (currModeValue, currModeName) => {
-            actualDefinition.modes[currModeName] = reject<
-                TokenType
-            >(currModeValue, currTokType => isUndefined(currTokType))
+            actualDefinition.modes[currModeName] = reject<TokenType>(
+                currModeValue,
+                currTokType => isUndefined(currTokType)
+            )
         })
 
         let allModeNames = keys(actualDefinition.modes)
@@ -411,8 +412,9 @@ export class Lexer {
             this.createTokenInstance = this.createOffsetOnlyToken
         } else {
             throw Error(
-                `Invalid <positionTracking> config option: "${this.config
-                    .positionTracking}"`
+                `Invalid <positionTracking> config option: "${
+                    this.config.positionTracking
+                }"`
             )
         }
 
@@ -505,7 +507,9 @@ export class Lexer {
             ) {
                 // if we try to pop the last mode there lexer will no longer have ANY mode.
                 // thus the pop is ignored, an error will be created and the lexer will continue parsing in the previous mode.
-                let msg = `Unable to pop Lexer Mode after encountering Token ->${popToken.image}<- The Mode Stack is empty`
+                let msg = `Unable to pop Lexer Mode after encountering Token ->${
+                    popToken.image
+                }<- The Mode Stack is empty`
                 errors.push({
                     offset: popToken.startOffset,
                     line:

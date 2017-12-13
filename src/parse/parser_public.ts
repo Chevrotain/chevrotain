@@ -2833,7 +2833,7 @@ export class Parser {
         occurrence: number
     ): T {
         let alts = isArray(altsOrOpts)
-            ? altsOrOpts as IAnyOrAlt<T>[]
+            ? (altsOrOpts as IAnyOrAlt<T>[])
             : (altsOrOpts as OrMethodOpts<T>).DEF
         let laFunc = this.getLookaheadFuncForOr(occurrence, alts)
         let altIdxToTake = laFunc.call(this, alts)
@@ -2859,7 +2859,7 @@ export class Parser {
 
         try {
             let alts = isArray(altsOrOpts)
-                ? altsOrOpts as IAnyOrAlt<T>[]
+                ? (altsOrOpts as IAnyOrAlt<T>[])
                 : (altsOrOpts as OrMethodOpts<T>).DEF
 
             let laFunc = this.getLookaheadFuncForOr(occurrence, alts)

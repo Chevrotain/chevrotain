@@ -67,7 +67,7 @@ export interface IErrorMessageProvider {
      *
      * @param options.actual - The actual sequence of tokens encountered.
      *
-     * @param options.previous - The previous token parsed. 
+     * @param options.previous - The previous token parsed.
      *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
      *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the "AT_LEAST_ONE" DSL method.

@@ -690,11 +690,11 @@ function ECMAScriptParser(input) {
     this.symbolicNames = symbolicNames
 
     /**
-	 * Returns true if, on the current index of the parser's token stream,
-	 * a token of the given type exists on the HIDDEN channel.
-	 * @param type {Number} The type of the token on the HIDDEN channel to check.
-	 * @returns {Boolean}
-	 */
+     * Returns true if, on the current index of the parser's token stream,
+     * a token of the given type exists on the HIDDEN channel.
+     * @param type {Number} The type of the token on the HIDDEN channel to check.
+     * @returns {Boolean}
+     */
     ECMAScriptParser.prototype.here = function(type) {
         var possibleIndexEosToken =
             antlr4.Parser.prototype.getCurrentToken.call(this).tokenIndex - 1
@@ -703,12 +703,12 @@ function ECMAScriptParser(input) {
     }
 
     /**
-	 * Returns true if, on the current index of the parser's
-	 * token stream, a token exists on the HIDDEN channel which
-	 * either is a line terminator, or is a multi line comment that
-	 * contains a line terminator.
-	 * @returns {Boolean}
-	 */
+     * Returns true if, on the current index of the parser's
+     * token stream, a token exists on the HIDDEN channel which
+     * either is a line terminator, or is a multi line comment that
+     * contains a line terminator.
+     * @returns {Boolean}
+     */
     ECMAScriptParser.prototype.lineTerminatorAhead = function() {
         var possibleIndexEosToken =
             antlr4.Parser.prototype.getCurrentToken.call(this).tokenIndex - 1

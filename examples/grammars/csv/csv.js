@@ -30,14 +30,10 @@ const CsvLexer = new Lexer(allTokens)
 // Parser
 class CsvParser extends Parser {
     constructor(input) {
-        super(
-            input,
-            allTokens,
-            {
-                // uncomment this to enable automatic CstOutput.
-                // outputCst: true
-            }
-        )
+        super(input, allTokens, {
+            // uncomment this to enable automatic CstOutput.
+            // outputCst: true
+        })
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
