@@ -16,17 +16,17 @@ var docFiles = fs.readdirSync(docsDirPath)
 var docTutorialFiles = fs.readdirSync(docTutorialPath)
 
 var docFilesPaths = _.map(docFiles, function(file) {
-    return path.join(docsDirPath, file)
+	return path.join(docsDirPath, file)
 })
 
 var docTutorialFilesPaths = _.map(docTutorialFiles, function(file) {
-    return path.join(docTutorialPath, file)
+	return path.join(docTutorialPath, file)
 })
 
 docFilesPaths = docFilesPaths.concat(docTutorialFilesPaths)
 
 docFilesPaths = _.filter(docFilesPaths, function(currDocEntry) {
-    return /\.md$/.test(currDocEntry)
+	return /\.md$/.test(currDocEntry)
 })
 var readmePath = path.join(__dirname, "../readme.md")
 docFilesPaths.push(readmePath)
@@ -40,26 +40,26 @@ var changeLogString = fs.readFileSync(changeLogPath, "utf8").toString()
 
 var mode = ""
 if (_.includes(process.argv, "patch")) {
-    mode = "patch"
+	mode = "patch"
 } else if (_.includes(process.argv, "minor")) {
-    mode = "minor"
+	mode = "minor"
 } else if (_.includes(process.argv, "major")) {
-    mode = "major"
+	mode = "major"
 } else {
-    console.log("release mode (patch|minor) not provided")
-    process.exit(-1)
+	console.log("release mode (patch|minor) not provided")
+	process.exit(-1)
 }
 
 module.exports = {
-    versionPath: versionPath,
-    packagePath: packagePath,
-    changeLogPath: changeLogPath,
-    docFilesPaths: docFilesPaths,
-    readmePath: readmePath,
-    pkgJson: pkgJson,
-    apiString: apiString,
-    changeLogString: changeLogString,
-    currVersion: pkgJson.version,
-    mode: mode,
-    tagPrefix: "v"
+	versionPath: versionPath,
+	packagePath: packagePath,
+	changeLogPath: changeLogPath,
+	docFilesPaths: docFilesPaths,
+	readmePath: readmePath,
+	pkgJson: pkgJson,
+	apiString: apiString,
+	changeLogString: changeLogString,
+	currVersion: pkgJson.version,
+	mode: mode,
+	tagPrefix: "v"
 }

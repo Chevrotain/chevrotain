@@ -4,24 +4,24 @@ import { Parser } from "chevrotain"
 const tokens = require("./tokens_only")
 
 class ArrayParserCommonJS extends Parser {
-    constructor(input) {
-        super(input, tokens.allTokens)
-        const $ = this
+	constructor(input) {
+		super(input, tokens.allTokens)
+		const $ = this
 
-        $.RULE("array", () => {
-            $.CONSUME(tokens.LSquare)
-            $.OPTION(() => {
-                $.CONSUME(tokens.Integer)
-                $.MANY(() => {
-                    $.CONSUME(tokens.Comma)
-                    $.CONSUME2(tokens.Integer)
-                })
-            })
-            $.CONSUME(tokens.RSquare)
-        })
+		$.RULE("array", () => {
+			$.CONSUME(tokens.LSquare)
+			$.OPTION(() => {
+				$.CONSUME(tokens.Integer)
+				$.MANY(() => {
+					$.CONSUME(tokens.Comma)
+					$.CONSUME2(tokens.Integer)
+				})
+			})
+			$.CONSUME(tokens.RSquare)
+		})
 
-        Parser.performSelfAnalysis(this)
-    }
+		Parser.performSelfAnalysis(this)
+	}
 }
 
 // ----------------- wrapping it all together -----------------
@@ -30,15 +30,15 @@ class ArrayParserCommonJS extends Parser {
 const parser = new ArrayParserCommonJS([])
 
 export function parse(text) {
-    const lexResult = tokens.ArrayLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const value = parser.array()
+	const lexResult = tokens.ArrayLexer.tokenize(text)
+	// setting a new input will RESET the parser instance's state.
+	parser.input = lexResult.tokens
+	// any top level rule may be used as an entry point
+	const value = parser.array()
 
-    return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
-    }
+	return {
+		value: value, // this is a pure grammar, the value will always be <undefined>
+		lexErrors: lexResult.errors,
+		parseErrors: parser.errors
+	}
 }

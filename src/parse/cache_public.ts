@@ -7,5 +7,5 @@ import { clearCache as internalClearCache } from "./cache"
  * different implementations multiple times.
  */
 export function clearCache(): void {
-    internalClearCache()
+	internalClearCache()
 }

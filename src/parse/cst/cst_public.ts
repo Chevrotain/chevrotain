@@ -13,25 +13,25 @@ export type CstChildrenDictionary = { [identifier: string]: CstElement[] }
  * of Commas, Semi colons, redundant parenthesis ect, however a CST would have that information.
  */
 export interface CstNode {
-    readonly name: string
+	readonly name: string
 
-    readonly children: CstChildrenDictionary
+	readonly children: CstChildrenDictionary
 
-    readonly recoveredNode?: boolean
+	readonly recoveredNode?: boolean
 
-    /**
-     * Only for "in-lined" rules, the name of the top level rule containing this nested rule
-     */
-    readonly fullName?: string
+	/**
+	 * Only for "in-lined" rules, the name of the top level rule containing this nested rule
+	 */
+	readonly fullName?: string
 }
 
 // TODO: use default generics arguments in typescript 2.3
 export interface ICstVisitor<IN, OUT> {
-    // If an array is passed as the first argument it is equivalent to passing the first item of the array.
-    visit(cstNode: CstNode | CstNode[], param?: IN): OUT
-    validateVisitor(): void
+	// If an array is passed as the first argument it is equivalent to passing the first item of the array.
+	visit(cstNode: CstNode | CstNode[], param?: IN): OUT
+	validateVisitor(): void
 }
 
 export interface CstVisitorConstructor extends Function {
-    new <IN, OUT>(...args: any[]): ICstVisitor<IN, OUT>
+	new <IN, OUT>(...args: any[]): ICstVisitor<IN, OUT>
 }

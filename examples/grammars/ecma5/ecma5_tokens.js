@@ -15,13 +15,13 @@ const Whitespace = createToken({ name: "Whitespace" })
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
 const LineTerminator = createToken({
-    name: "LineTerminator",
-    categories: Whitespace
+	name: "LineTerminator",
+	categories: Whitespace
 })
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.4
 const SingleLineComment = createToken({
-    name: "SingleLineComment"
+	name: "SingleLineComment"
 })
 
 /*
@@ -30,20 +30,20 @@ const SingleLineComment = createToken({
  * by the syntactic grammar."
  */
 const MultipleLineComment = createToken({
-    name: "MultipleLineComment"
+	name: "MultipleLineComment"
 })
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.6
 const IdentifierName = createToken({ name: "IdentifierName" })
 
 const AbsAnyKeyword = createToken({
-    name: "AbsAnyKeyword",
-    categories: IdentifierName
+	name: "AbsAnyKeyword",
+	categories: IdentifierName
 })
 
 const AbsKeyword = createToken({
-    name: "AbsKeyword",
-    categories: AbsAnyKeyword
+	name: "AbsKeyword",
+	categories: AbsAnyKeyword
 })
 
 const BreakTok = createToken({ name: "BreakTok", categories: AbsKeyword })
@@ -51,8 +51,8 @@ const BreakTok = createToken({ name: "BreakTok", categories: AbsKeyword })
 const DoTok = createToken({ name: "DoTok", categories: AbsKeyword })
 
 const InstanceOfTok = createToken({
-    name: "InstanceOfTok",
-    categories: AbsKeyword
+	name: "InstanceOfTok",
+	categories: AbsKeyword
 })
 
 const TypeOfTok = createToken({ name: "TypeOfTok", categories: AbsKeyword })
@@ -103,8 +103,8 @@ const TryTok = createToken({ name: "TryTok", categories: AbsKeyword })
 
 // An IdentifierName, but not a reservedKeyword
 const Identifier = createToken({
-    name: "Identifier",
-    categories: IdentifierName
+	name: "Identifier",
+	categories: IdentifierName
 })
 
 // Set/Get are not reservedKeywords so they are modeled as a TypeOf Identifier.
@@ -130,156 +130,156 @@ const Comma = createToken({ name: "Comma", categories: AbsPunctuator })
 
 const PlusPlus = createToken({ name: "PlusPlus", categories: AbsPunctuator })
 const MinusMinus = createToken({
-    name: "MinusMinus",
-    categories: AbsPunctuator
+	name: "MinusMinus",
+	categories: AbsPunctuator
 })
 
 const Ampersand = createToken({ name: "Ampersand", categories: AbsPunctuator })
 const VerticalBar = createToken({
-    name: "VerticalBar",
-    categories: AbsPunctuator
+	name: "VerticalBar",
+	categories: AbsPunctuator
 })
 const Circumflex = createToken({
-    name: "Circumflex",
-    categories: AbsPunctuator
+	name: "Circumflex",
+	categories: AbsPunctuator
 })
 const Exclamation = createToken({
-    name: "Exclamation",
-    categories: AbsPunctuator
+	name: "Exclamation",
+	categories: AbsPunctuator
 })
 const Tilde = createToken({ name: "Tilde", categories: AbsPunctuator })
 
 const AmpersandAmpersand = createToken({
-    name: "AmpersandAmpersand",
-    categories: AbsPunctuator
+	name: "AmpersandAmpersand",
+	categories: AbsPunctuator
 })
 const VerticalBarVerticalBar = createToken({
-    name: "VerticalBarVerticalBar",
-    categories: AbsPunctuator
+	name: "VerticalBarVerticalBar",
+	categories: AbsPunctuator
 })
 
 const Question = createToken({ name: "Question", categories: AbsPunctuator })
 const Colon = createToken({ name: "Colon", categories: AbsPunctuator })
 
 const AbsMultiplicativeOperator = createToken({
-    name: "AbsMultiplicativeOperator",
-    categories: AbsPunctuator
+	name: "AbsMultiplicativeOperator",
+	categories: AbsPunctuator
 })
 
 const Asterisk = createToken({
-    name: "Asterisk",
-    categories: AbsMultiplicativeOperator
+	name: "Asterisk",
+	categories: AbsMultiplicativeOperator
 })
 const Slash = createToken({
-    name: "Slash",
-    categories: AbsMultiplicativeOperator
+	name: "Slash",
+	categories: AbsMultiplicativeOperator
 })
 const Percent = createToken({
-    name: "Percent",
-    categories: AbsMultiplicativeOperator
+	name: "Percent",
+	categories: AbsMultiplicativeOperator
 })
 
 const AbsAdditiveOperator = createToken({
-    name: "AbsAdditiveOperator",
-    categories: AbsPunctuator
+	name: "AbsAdditiveOperator",
+	categories: AbsPunctuator
 })
 
 const Plus = createToken({ name: "Plus", categories: AbsAdditiveOperator })
 const Minus = createToken({ name: "Minus", categories: AbsAdditiveOperator })
 
 const AbsShiftOperator = createToken({
-    name: "AbsShiftOperator",
-    categories: AbsPunctuator
+	name: "AbsShiftOperator",
+	categories: AbsPunctuator
 })
 
 const LessLess = createToken({ name: "LessLess", categories: AbsShiftOperator })
 const MoreMore = createToken({ name: "MoreMore", categories: AbsShiftOperator })
 const MoreMoreMore = createToken({
-    name: "MoreMoreMore",
-    categories: AbsShiftOperator
+	name: "MoreMoreMore",
+	categories: AbsShiftOperator
 })
 
 const AbsRelationalOperator = createToken({
-    name: "AbsRelationalOperator",
-    categories: AbsPunctuator
+	name: "AbsRelationalOperator",
+	categories: AbsPunctuator
 })
 
 const Less = createToken({ name: "Less", categories: AbsRelationalOperator })
 const Greater = createToken({
-    name: "Greater",
-    categories: AbsRelationalOperator
+	name: "Greater",
+	categories: AbsRelationalOperator
 })
 const LessEq = createToken({
-    name: "LessEq",
-    categories: AbsRelationalOperator
+	name: "LessEq",
+	categories: AbsRelationalOperator
 })
 const GreaterEq = createToken({
-    name: "GreaterEq",
-    categories: AbsRelationalOperator
+	name: "GreaterEq",
+	categories: AbsRelationalOperator
 })
 
 const AbsEqualityOperator = createToken({
-    name: "AbsEqualityOperator",
-    categories: AbsPunctuator
+	name: "AbsEqualityOperator",
+	categories: AbsPunctuator
 })
 
 const EqEq = createToken({ name: "EqEq", categories: AbsEqualityOperator })
 const NotEq = createToken({ name: "NotEq", categories: AbsEqualityOperator })
 const EqEqEq = createToken({ name: "EqEqEq", categories: AbsEqualityOperator })
 const NotEqEq = createToken({
-    name: "NotEqEq",
-    categories: AbsEqualityOperator
+	name: "NotEqEq",
+	categories: AbsEqualityOperator
 })
 
 const AbsAssignmentOperator = createToken({
-    name: "AbsAssignmentOperator",
-    categories: AbsPunctuator
+	name: "AbsAssignmentOperator",
+	categories: AbsPunctuator
 })
 
 const Eq = createToken({ name: "Eq", categories: AbsAssignmentOperator })
 const PlusEq = createToken({
-    name: "PlusEq",
-    categories: AbsAssignmentOperator
+	name: "PlusEq",
+	categories: AbsAssignmentOperator
 })
 const MinusEq = createToken({
-    name: "MinusEq",
-    categories: AbsAssignmentOperator
+	name: "MinusEq",
+	categories: AbsAssignmentOperator
 })
 const AsteriskEq = createToken({
-    name: "AsteriskEq",
-    categories: AbsAssignmentOperator
+	name: "AsteriskEq",
+	categories: AbsAssignmentOperator
 })
 const PercentEq = createToken({
-    name: "PercentEq",
-    categories: AbsAssignmentOperator
+	name: "PercentEq",
+	categories: AbsAssignmentOperator
 })
 const LessLessEq = createToken({
-    name: "LessLessEq",
-    categories: AbsAssignmentOperator
+	name: "LessLessEq",
+	categories: AbsAssignmentOperator
 })
 const MoreMoreEq = createToken({
-    name: "MoreMoreEq",
-    categories: AbsAssignmentOperator
+	name: "MoreMoreEq",
+	categories: AbsAssignmentOperator
 })
 const MoreMoreMoreEq = createToken({
-    name: "MoreMoreMoreEq",
-    categories: AbsAssignmentOperator
+	name: "MoreMoreMoreEq",
+	categories: AbsAssignmentOperator
 })
 const AmpersandEq = createToken({
-    name: "AmpersandEq",
-    categories: AbsAssignmentOperator
+	name: "AmpersandEq",
+	categories: AbsAssignmentOperator
 })
 const VerticalBarEq = createToken({
-    name: "VerticalBarEq",
-    categories: AbsAssignmentOperator
+	name: "VerticalBarEq",
+	categories: AbsAssignmentOperator
 })
 const CircumflexEq = createToken({
-    name: "CircumflexEq",
-    categories: AbsAssignmentOperator
+	name: "CircumflexEq",
+	categories: AbsAssignmentOperator
 })
 const SlashEq = createToken({
-    name: "SlashEq",
-    categories: AbsAssignmentOperator
+	name: "SlashEq",
+	categories: AbsAssignmentOperator
 })
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.8
@@ -288,133 +288,133 @@ const AbsLiteral = createToken({ name: "AbsLiteral" })
 const NullTok = createToken({ name: "NullTok", categories: [AbsLiteral] })
 
 const AbsBooleanLiteral = createToken({
-    name: "AbsBooleanLiteral",
-    categories: AbsLiteral
+	name: "AbsBooleanLiteral",
+	categories: AbsLiteral
 })
 
 const TrueTok = createToken({
-    name: "TrueTok",
-    categories: [AbsBooleanLiteral, AbsKeyword]
+	name: "TrueTok",
+	categories: [AbsBooleanLiteral, AbsKeyword]
 })
 
 const FalseTok = createToken({
-    name: "FalseTok",
-    categories: [AbsBooleanLiteral, AbsKeyword]
+	name: "FalseTok",
+	categories: [AbsBooleanLiteral, AbsKeyword]
 })
 
 const NumericLiteral = createToken({
-    name: "NumericLiteral",
-    categories: AbsLiteral
+	name: "NumericLiteral",
+	categories: AbsLiteral
 })
 
 const StringLiteral = createToken({
-    name: "StringLiteral",
-    categories: AbsLiteral
+	name: "StringLiteral",
+	categories: AbsLiteral
 })
 
 const RegularExpressionLiteral = createToken({
-    name: "RegularExpressionLiteral",
-    categories: AbsLiteral
+	name: "RegularExpressionLiteral",
+	categories: AbsLiteral
 })
 
 module.exports = {
-    Whitespace,
-    LineTerminator,
-    SingleLineComment,
-    MultipleLineComment,
-    IdentifierName,
-    AbsAnyKeyword,
-    AbsKeyword,
-    BreakTok,
-    DoTok,
-    InstanceOfTok,
-    TypeOfTok,
-    CaseTok,
-    ElseTok,
-    NewTok,
-    VarTok,
-    CatchTok,
-    FinallyTok,
-    ReturnTok,
-    VoidTok,
-    ContinueTok,
-    ForTok,
-    SwitchTok,
-    WhileTok,
-    DebuggerTok,
-    FunctionTok,
-    ThisTok,
-    WithTok,
-    DefaultTok,
-    IfTok,
-    ThrowTok,
-    DeleteTok,
-    InTok,
-    TryTok,
-    Identifier,
-    SetTok,
-    GetTok,
-    AbsPunctuator,
-    LCurly,
-    RCurly,
-    LParen,
-    RParen,
-    LBracket,
-    RBracket,
-    Dot,
-    Semicolon,
-    Comma,
-    PlusPlus,
-    MinusMinus,
-    Ampersand,
-    VerticalBar,
-    Circumflex,
-    Exclamation,
-    Tilde,
-    AmpersandAmpersand,
-    VerticalBarVerticalBar,
-    Question,
-    Colon,
-    AbsMultiplicativeOperator,
-    Asterisk,
-    Slash,
-    Percent,
-    AbsAdditiveOperator,
-    Plus,
-    Minus,
-    AbsShiftOperator,
-    LessLess,
-    MoreMore,
-    MoreMoreMore,
-    AbsRelationalOperator,
-    Less,
-    Greater,
-    LessEq,
-    GreaterEq,
-    AbsEqualityOperator,
-    EqEq,
-    NotEq,
-    EqEqEq,
-    NotEqEq,
-    AbsAssignmentOperator,
-    Eq,
-    PlusEq,
-    MinusEq,
-    AsteriskEq,
-    PercentEq,
-    LessLessEq,
-    MoreMoreEq,
-    MoreMoreMoreEq,
-    AmpersandEq,
-    VerticalBarEq,
-    CircumflexEq,
-    SlashEq,
-    AbsLiteral,
-    NullTok,
-    AbsBooleanLiteral,
-    TrueTok,
-    FalseTok,
-    NumericLiteral,
-    StringLiteral,
-    RegularExpressionLiteral
+	Whitespace,
+	LineTerminator,
+	SingleLineComment,
+	MultipleLineComment,
+	IdentifierName,
+	AbsAnyKeyword,
+	AbsKeyword,
+	BreakTok,
+	DoTok,
+	InstanceOfTok,
+	TypeOfTok,
+	CaseTok,
+	ElseTok,
+	NewTok,
+	VarTok,
+	CatchTok,
+	FinallyTok,
+	ReturnTok,
+	VoidTok,
+	ContinueTok,
+	ForTok,
+	SwitchTok,
+	WhileTok,
+	DebuggerTok,
+	FunctionTok,
+	ThisTok,
+	WithTok,
+	DefaultTok,
+	IfTok,
+	ThrowTok,
+	DeleteTok,
+	InTok,
+	TryTok,
+	Identifier,
+	SetTok,
+	GetTok,
+	AbsPunctuator,
+	LCurly,
+	RCurly,
+	LParen,
+	RParen,
+	LBracket,
+	RBracket,
+	Dot,
+	Semicolon,
+	Comma,
+	PlusPlus,
+	MinusMinus,
+	Ampersand,
+	VerticalBar,
+	Circumflex,
+	Exclamation,
+	Tilde,
+	AmpersandAmpersand,
+	VerticalBarVerticalBar,
+	Question,
+	Colon,
+	AbsMultiplicativeOperator,
+	Asterisk,
+	Slash,
+	Percent,
+	AbsAdditiveOperator,
+	Plus,
+	Minus,
+	AbsShiftOperator,
+	LessLess,
+	MoreMore,
+	MoreMoreMore,
+	AbsRelationalOperator,
+	Less,
+	Greater,
+	LessEq,
+	GreaterEq,
+	AbsEqualityOperator,
+	EqEq,
+	NotEq,
+	EqEqEq,
+	NotEqEq,
+	AbsAssignmentOperator,
+	Eq,
+	PlusEq,
+	MinusEq,
+	AsteriskEq,
+	PercentEq,
+	LessLessEq,
+	MoreMoreEq,
+	MoreMoreMoreEq,
+	AmpersandEq,
+	VerticalBarEq,
+	CircumflexEq,
+	SlashEq,
+	AbsLiteral,
+	NullTok,
+	AbsBooleanLiteral,
+	TrueTok,
+	FalseTok,
+	NumericLiteral,
+	StringLiteral,
+	RegularExpressionLiteral
 }

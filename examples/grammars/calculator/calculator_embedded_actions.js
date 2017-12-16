@@ -21,33 +21,33 @@ var Parser = chevrotain.Parser
 // AdditionOperator defines a Tokens hierarchy but only the leafs in this hierarchy define
 // actual Tokens that can appear in the text
 var AdditionOperator = createToken({
-    name: "AdditionOperator",
-    pattern: Lexer.NA
+	name: "AdditionOperator",
+	pattern: Lexer.NA
 })
 var Plus = createToken({
-    name: "Plus",
-    pattern: /\+/,
-    categories: AdditionOperator
+	name: "Plus",
+	pattern: /\+/,
+	categories: AdditionOperator
 })
 var Minus = createToken({
-    name: "Minus",
-    pattern: /-/,
-    categories: AdditionOperator
+	name: "Minus",
+	pattern: /-/,
+	categories: AdditionOperator
 })
 
 var MultiplicationOperator = createToken({
-    name: "MultiplicationOperator",
-    pattern: Lexer.NA
+	name: "MultiplicationOperator",
+	pattern: Lexer.NA
 })
 var Multi = createToken({
-    name: "Multi",
-    pattern: /\*/,
-    categories: MultiplicationOperator
+	name: "Multi",
+	pattern: /\*/,
+	categories: MultiplicationOperator
 })
 var Div = createToken({
-    name: "Div",
-    pattern: /\//,
-    categories: MultiplicationOperator
+	name: "Div",
+	pattern: /\//,
+	categories: MultiplicationOperator
 })
 
 var LParen = createToken({ name: "LParen", pattern: /\(/ })
@@ -59,141 +59,141 @@ var Comma = createToken({ name: "Comma", pattern: /,/ })
 
 // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
 var WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+	name: "WhiteSpace",
+	pattern: /\s+/,
+	group: Lexer.SKIPPED,
+	line_breaks: true
 })
 
 var allTokens = [
-    WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
-    Plus,
-    Minus,
-    Multi,
-    Div,
-    LParen,
-    RParen,
-    NumberLiteral,
-    AdditionOperator,
-    MultiplicationOperator,
-    PowerFunc,
-    Comma
+	WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+	Plus,
+	Minus,
+	Multi,
+	Div,
+	LParen,
+	RParen,
+	NumberLiteral,
+	AdditionOperator,
+	MultiplicationOperator,
+	PowerFunc,
+	Comma
 ]
 var CalculatorLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 function Calculator(input) {
-    Parser.call(this, input, allTokens)
+	Parser.call(this, input, allTokens)
 
-    var $ = this
+	var $ = this
 
-    $.RULE("expression", function() {
-        return $.SUBRULE($.additionExpression)
-    })
+	$.RULE("expression", function() {
+		return $.SUBRULE($.additionExpression)
+	})
 
-    //  lowest precedence thus it is first in the rule chain
-    // The precedence of binary expressions is determined by how far down the Parse Tree
-    // The binary expression appears.
-    $.RULE("additionExpression", function() {
-        var value, op, rhsVal
+	//  lowest precedence thus it is first in the rule chain
+	// The precedence of binary expressions is determined by how far down the Parse Tree
+	// The binary expression appears.
+	$.RULE("additionExpression", function() {
+		var value, op, rhsVal
 
-        // parsing part
-        value = $.SUBRULE($.multiplicationExpression)
-        $.MANY(function() {
-            // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
-            op = $.CONSUME(AdditionOperator)
-            //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-            rhsVal = $.SUBRULE2($.multiplicationExpression)
+		// parsing part
+		value = $.SUBRULE($.multiplicationExpression)
+		$.MANY(function() {
+			// consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
+			op = $.CONSUME(AdditionOperator)
+			//  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+			rhsVal = $.SUBRULE2($.multiplicationExpression)
 
-            // interpreter part
-            if (tokenMatcher(op, Plus)) {
-                value += rhsVal
-            } else {
-                // op instanceof Minus
-                value -= rhsVal
-            }
-        })
+			// interpreter part
+			if (tokenMatcher(op, Plus)) {
+				value += rhsVal
+			} else {
+				// op instanceof Minus
+				value -= rhsVal
+			}
+		})
 
-        return value
-    })
+		return value
+	})
 
-    $.RULE("multiplicationExpression", function() {
-        var value, op, rhsVal
+	$.RULE("multiplicationExpression", function() {
+		var value, op, rhsVal
 
-        // parsing part
-        value = $.SUBRULE($.atomicExpression)
-        $.MANY(function() {
-            op = $.CONSUME(MultiplicationOperator)
-            //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-            rhsVal = $.SUBRULE2($.atomicExpression)
+		// parsing part
+		value = $.SUBRULE($.atomicExpression)
+		$.MANY(function() {
+			op = $.CONSUME(MultiplicationOperator)
+			//  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+			rhsVal = $.SUBRULE2($.atomicExpression)
 
-            // interpreter part
-            if (tokenMatcher(op, Multi)) {
-                value *= rhsVal
-            } else {
-                // op instanceof Div
-                value /= rhsVal
-            }
-        })
+			// interpreter part
+			if (tokenMatcher(op, Multi)) {
+				value *= rhsVal
+			} else {
+				// op instanceof Div
+				value /= rhsVal
+			}
+		})
 
-        return value
-    })
+		return value
+	})
 
-    $.RULE("atomicExpression", function() {
-        return $.OR([
-            // categorieshesisExpression has the highest precedence and thus it appears
-            // in the "lowest" leaf in the expression ParseTree.
-            {
-                ALT: function() {
-                    return $.SUBRULE($.categorieshesisExpression)
-                }
-            },
-            {
-                ALT: function() {
-                    return parseInt($.CONSUME(NumberLiteral).image, 10)
-                }
-            },
-            {
-                ALT: function() {
-                    return $.SUBRULE($.powerFunction)
-                }
-            }
-        ])
-    })
+	$.RULE("atomicExpression", function() {
+		return $.OR([
+			// categorieshesisExpression has the highest precedence and thus it appears
+			// in the "lowest" leaf in the expression ParseTree.
+			{
+				ALT: function() {
+					return $.SUBRULE($.categorieshesisExpression)
+				}
+			},
+			{
+				ALT: function() {
+					return parseInt($.CONSUME(NumberLiteral).image, 10)
+				}
+			},
+			{
+				ALT: function() {
+					return $.SUBRULE($.powerFunction)
+				}
+			}
+		])
+	})
 
-    $.RULE("categorieshesisExpression", function() {
-        var expValue
+	$.RULE("categorieshesisExpression", function() {
+		var expValue
 
-        $.CONSUME(LParen)
-        expValue = $.SUBRULE($.expression)
-        $.CONSUME(RParen)
+		$.CONSUME(LParen)
+		expValue = $.SUBRULE($.expression)
+		$.CONSUME(RParen)
 
-        return expValue
-    })
+		return expValue
+	})
 
-    $.RULE("powerFunction", function() {
-        var base, exponent
+	$.RULE("powerFunction", function() {
+		var base, exponent
 
-        $.CONSUME(PowerFunc)
-        $.CONSUME(LParen)
-        base = $.SUBRULE($.expression)
-        $.CONSUME(Comma)
-        exponent = $.SUBRULE2($.expression)
-        $.CONSUME(RParen)
+		$.CONSUME(PowerFunc)
+		$.CONSUME(LParen)
+		base = $.SUBRULE($.expression)
+		$.CONSUME(Comma)
+		exponent = $.SUBRULE2($.expression)
+		$.CONSUME(RParen)
 
-        return Math.pow(base, exponent)
-    })
+		return Math.pow(base, exponent)
+	})
 
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
+	// very important to call this after all the rules have been defined.
+	// otherwise the parser may not work correctly as it will lack information
+	// derived during the self analysis phase.
+	Parser.performSelfAnalysis(this)
 }
 
 // avoids inserting number literals as these can have multiple(and infinite) semantic values, thus it is unlikely
 // we can choose the correct number value to insert.
 Calculator.prototype.canTokenTypeBeInsertedInRecovery = function(tokClass) {
-    return tokClass !== NumberLiteral
+	return tokClass !== NumberLiteral
 }
 
 Calculator.prototype = Object.create(Parser.prototype)
@@ -204,15 +204,15 @@ Calculator.prototype.constructor = Calculator
 var parser = new Calculator([])
 
 module.exports = function(text) {
-    var lexResult = CalculatorLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    var value = parser.expression()
+	var lexResult = CalculatorLexer.tokenize(text)
+	// setting a new input will RESET the parser instance's state.
+	parser.input = lexResult.tokens
+	// any top level rule may be used as an entry point
+	var value = parser.expression()
 
-    return {
-        value: value,
-        lexResult: lexResult,
-        parseErrors: parser.errors
-    }
+	return {
+		value: value,
+		lexResult: lexResult,
+		parseErrors: parser.errors
+	}
 }

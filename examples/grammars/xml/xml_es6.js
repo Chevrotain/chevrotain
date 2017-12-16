@@ -11,20 +11,20 @@ var Parser = chevrotain.Parser
 var fragments = {}
 
 function FRAGMENT(name, def) {
-    fragments[name] = XRegExp.build(def, fragments)
+	fragments[name] = XRegExp.build(def, fragments)
 }
 
 function MAKE_PATTERN(def, flags) {
-    return XRegExp.build(def, fragments, flags)
+	return XRegExp.build(def, fragments, flags)
 }
 
 FRAGMENT(
-    "NameStartChar",
-    "([a-zA-Z]|\\u2070-\\u218F|\\u2C00-\\u2FEF|\\u3001-\\uD7FF|\\uF900-\\uFDCF|\\uFDF0-\\uFFFD)"
+	"NameStartChar",
+	"([a-zA-Z]|\\u2070-\\u218F|\\u2C00-\\u2FEF|\\u3001-\\uD7FF|\\uF900-\\uFDCF|\\uFDF0-\\uFFFD)"
 )
 FRAGMENT(
-    "NameChar",
-    "{{NameStartChar}}|-|_|\\.|\\d|\\u00B7||[\\u0300-\\u036F]|[\\u203F-\\u2040]"
+	"NameChar",
+	"{{NameStartChar}}|-|_|\\.|\\d|\\u00B7||[\\u0300-\\u036F]|[\\u203F-\\u2040]"
 )
 FRAGMENT("Name", "{{NameStartChar}}({{NameChar}})*")
 
@@ -104,91 +104,91 @@ S.GROUP = Lexer.SKIPPED
 S.LINE_BREAKS = true
 
 var XmlLexerDefinition = {
-    defaultMode: "OUTSIDE",
+	defaultMode: "OUTSIDE",
 
-    modes: {
-        // the default (inital) mode is "numbers_mode"
-        OUTSIDE: [
-            Comment,
-            CData,
-            DTD,
-            EntityRef,
-            CharRef,
-            SEA_WS,
-            XMLDeclOpen,
-            SLASH_OPEN,
-            OPEN,
-            PROCESSING_INSTRUCTION,
-            TEXT
-        ],
-        INSIDE: [
-            CLOSE,
-            SPECIAL_CLOSE,
-            SLASH_CLOSE,
-            SLASH,
-            EQUALS,
-            STRING,
-            Name,
-            S
-        ]
-    }
+	modes: {
+		// the default (inital) mode is "numbers_mode"
+		OUTSIDE: [
+			Comment,
+			CData,
+			DTD,
+			EntityRef,
+			CharRef,
+			SEA_WS,
+			XMLDeclOpen,
+			SLASH_OPEN,
+			OPEN,
+			PROCESSING_INSTRUCTION,
+			TEXT
+		],
+		INSIDE: [
+			CLOSE,
+			SPECIAL_CLOSE,
+			SLASH_CLOSE,
+			SLASH,
+			EQUALS,
+			STRING,
+			Name,
+			S
+		]
+	}
 }
 
 var XmlLexer = new Lexer(XmlLexerDefinition)
 var allTokens = XmlLexerDefinition.modes.INSIDE.concat(
-    XmlLexerDefinition.modes.OUTSIDE
+	XmlLexerDefinition.modes.OUTSIDE
 )
 
 // ----------------- parser -----------------
 class XmlParserES6 extends chevrotain.Parser {
-    // Unfortunately no support for class fields with initializer in ES2015, only in ES2016...
-    // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
-    // invoking RULE(...)
-    // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) {
-        super(
-            input,
-            allTokens,
-            // by default the error recovery / fault tolerance capabilities are disabled
-            // use this flag to enable them
-            { recoveryEnabled: true }
-        )
+	// Unfortunately no support for class fields with initializer in ES2015, only in ES2016...
+	// so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
+	// invoking RULE(...)
+	// see: https://github.com/jeffmo/es-class-fields-and-static-properties
+	constructor(input) {
+		super(
+			input,
+			allTokens,
+			// by default the error recovery / fault tolerance capabilities are disabled
+			// use this flag to enable them
+			{ recoveryEnabled: true }
+		)
 
-        // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
-        var $ = this
+		// not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
+		var $ = this
 
-        $.document = $.RULE("document", () => {
-            $.OPTION(() => {
-                $.SUBRULE($.prolog)
-            })
+		$.document = $.RULE("document", () => {
+			$.OPTION(() => {
+				$.SUBRULE($.prolog)
+			})
 
-            $.MANY(() => {
-                $.SUBRULE($.misc)
-            })
+			$.MANY(() => {
+				$.SUBRULE($.misc)
+			})
 
-            $.SUBRULE($.element)
+			$.SUBRULE($.element)
 
-            $.MANY2(() => {
-                $.SUBRULE2($.misc)
-            })
-        })
+			$.MANY2(() => {
+				$.SUBRULE2($.misc)
+			})
+		})
 
-        $.prolog = $.RULE("prolog", () => {
-            $.CONSUME(XMLDeclOpen)
-            $.MANY2(() => {
-                $.SUBRULE($.attribute)
-            })
-            $.CONSUME(SPECIAL_CLOSE)
-        })
+		$.prolog = $.RULE("prolog", () => {
+			$.CONSUME(XMLDeclOpen)
+			$.MANY2(() => {
+				$.SUBRULE($.attribute)
+			})
+			$.CONSUME(SPECIAL_CLOSE)
+		})
 
-        $.content = $.RULE("content", () => {
-            $.OPTION(() => {
-                $.SUBRULE($.chardata)
-            })
+		$.content = $.RULE("content", () => {
+			$.OPTION(() => {
+				$.SUBRULE($.chardata)
+			})
 
-            $.MANY(() => {
-                // prettier-ignore
-                $.OR([
+			$.MANY(() => {
+				// prettier-ignore
+				$.OR([
                     {ALT: () => {$.SUBRULE($.element)}},
                     {ALT: () => {$.SUBRULE($.reference)}},
                     {ALT: () => {$.CONSUME(CData)}},
@@ -196,73 +196,73 @@ class XmlParserES6 extends chevrotain.Parser {
                     {ALT: () => {$.CONSUME(Comment)}}
                 ])
 
-                $.OPTION2(() => {
-                    $.SUBRULE2($.chardata)
-                })
-            })
-        })
+				$.OPTION2(() => {
+					$.SUBRULE2($.chardata)
+				})
+			})
+		})
 
-        $.element = $.RULE("element", () => {
-            $.CONSUME(OPEN)
-            $.CONSUME(Name)
-            $.MANY(() => {
-                $.SUBRULE($.attribute)
-            })
+		$.element = $.RULE("element", () => {
+			$.CONSUME(OPEN)
+			$.CONSUME(Name)
+			$.MANY(() => {
+				$.SUBRULE($.attribute)
+			})
 
-            $.OR([
-                {
-                    ALT: () => {
-                        $.CONSUME(CLOSE)
-                        $.SUBRULE($.content)
-                        $.CONSUME(SLASH_OPEN)
-                        $.CONSUME2(Name)
-                        $.CONSUME2(CLOSE)
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.CONSUME(SLASH_CLOSE)
-                    }
-                }
-            ])
-        })
+			$.OR([
+				{
+					ALT: () => {
+						$.CONSUME(CLOSE)
+						$.SUBRULE($.content)
+						$.CONSUME(SLASH_OPEN)
+						$.CONSUME2(Name)
+						$.CONSUME2(CLOSE)
+					}
+				},
+				{
+					ALT: () => {
+						$.CONSUME(SLASH_CLOSE)
+					}
+				}
+			])
+		})
 
-        $.reference = $.RULE("reference", () => {
-            // prettier-ignore
-            $.OR([
+		$.reference = $.RULE("reference", () => {
+			// prettier-ignore
+			$.OR([
                 {ALT: () => {$.CONSUME(EntityRef)}},
                 {ALT: () => {$.CONSUME(CharRef)}}
             ])
-        })
+		})
 
-        $.attribute = $.RULE("attribute", () => {
-            $.CONSUME(Name)
-            $.CONSUME(EQUALS)
-            $.CONSUME(STRING)
-        })
+		$.attribute = $.RULE("attribute", () => {
+			$.CONSUME(Name)
+			$.CONSUME(EQUALS)
+			$.CONSUME(STRING)
+		})
 
-        $.chardata = $.RULE("chardata", () => {
-            // prettier-ignore
-            $.OR([
+		$.chardata = $.RULE("chardata", () => {
+			// prettier-ignore
+			$.OR([
                 {ALT: () => {$.CONSUME(TEXT)}},
                 {ALT: () => {$.CONSUME(SEA_WS)}}
             ])
-        })
+		})
 
-        $.misc = $.RULE("misc", () => {
-            // prettier-ignore
-            $.OR([
+		$.misc = $.RULE("misc", () => {
+			// prettier-ignore
+			$.OR([
                 {ALT: () => {$.CONSUME(Comment)}},
                 {ALT: () => {$.CONSUME(PROCESSING_INSTRUCTION)}},
                 {ALT: () => {$.CONSUME(SEA_WS)}}
             ])
-        })
+		})
 
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this)
-    }
+		// very important to call this after all the rules have been defined.
+		// otherwise the parser may not work correctly as it will lack information
+		// derived during the self analysis phase.
+		Parser.performSelfAnalysis(this)
+	}
 }
 
 // ----------------- wrapping it all together -----------------
@@ -271,15 +271,15 @@ class XmlParserES6 extends chevrotain.Parser {
 var parser = new XmlParserES6([])
 
 module.exports = function(text) {
-    var lexResult = XmlLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    var value = parser.document()
+	var lexResult = XmlLexer.tokenize(text)
+	// setting a new input will RESET the parser instance's state.
+	parser.input = lexResult.tokens
+	// any top level rule may be used as an entry point
+	var value = parser.document()
 
-    return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
-    }
+	return {
+		value: value, // this is a pure grammar, the value will always be <undefined>
+		lexErrors: lexResult.errors,
+		parseErrors: parser.errors
+	}
 }

@@ -20,20 +20,20 @@ const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 // We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
 // See: https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 const Select = createToken({
-    name: "Select",
-    pattern: /SELECT/,
-    longer_alt: Identifier
+	name: "Select",
+	pattern: /SELECT/,
+	longer_alt: Identifier
 })
 
 const From = createToken({
-    name: "From",
-    pattern: /FROM/,
-    longer_alt: Identifier
+	name: "From",
+	pattern: /FROM/,
+	longer_alt: Identifier
 })
 const Where = createToken({
-    name: "Where",
-    pattern: /WHERE/,
-    longer_alt: Identifier
+	name: "Where",
+	pattern: /WHERE/,
+	longer_alt: Identifier
 })
 
 const Comma = createToken({ name: "Comma", pattern: /,/ })
@@ -41,43 +41,43 @@ const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ })
 const GreaterThan = createToken({ name: "GreaterThan", pattern: /</ })
 const LessThan = createToken({ name: "LessThan", pattern: />/ })
 const WhiteSpace = createToken({
-    name: "WhiteSpace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+	name: "WhiteSpace",
+	pattern: /\s+/,
+	group: Lexer.SKIPPED,
+	line_breaks: true
 })
 
 // The order of tokens is important
 const allTokens = [
-    WhiteSpace,
-    // "keywords" appear before the Identifier
-    Select,
-    From,
-    Where,
-    Comma,
-    // The Identifier must appear after the keywords because all keywords are valid identifiers.
-    Identifier,
-    Integer,
-    GreaterThan,
-    LessThan
+	WhiteSpace,
+	// "keywords" appear before the Identifier
+	Select,
+	From,
+	Where,
+	Comma,
+	// The Identifier must appear after the keywords because all keywords are valid identifiers.
+	Identifier,
+	Integer,
+	GreaterThan,
+	LessThan
 ]
 
 const SelectLexer = new Lexer(allTokens)
 
 allTokens.forEach(tokenType => {
-    tokenVocabulary[tokenType.name] = tokenType
+	tokenVocabulary[tokenType.name] = tokenType
 })
 
 module.exports = {
-    tokenVocabulary: tokenVocabulary,
+	tokenVocabulary: tokenVocabulary,
 
-    lex: function(inputText) {
-        let lexingResult = SelectLexer.tokenize(inputText)
+	lex: function(inputText) {
+		let lexingResult = SelectLexer.tokenize(inputText)
 
-        if (lexingResult.errors.length > 0) {
-            throw Error("Sad Sad Panda, lexing errors detected")
-        }
+		if (lexingResult.errors.length > 0) {
+			throw Error("Sad Sad Panda, lexing errors detected")
+		}
 
-        return lexingResult
-    }
+		return lexingResult
+	}
 }

@@ -16,49 +16,49 @@ let Lexer = chevrotain.Lexer
 // This function's signature matches the RegExp.prototype.exec function.
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec
 function matchInteger(text, startOffset) {
-    let endOffset = startOffset
-    let charCode = text.charCodeAt(endOffset)
-    while (charCode >= 48 && charCode <= 57) {
-        endOffset++
-        charCode = text.charCodeAt(endOffset)
-    }
+	let endOffset = startOffset
+	let charCode = text.charCodeAt(endOffset)
+	while (charCode >= 48 && charCode <= 57) {
+		endOffset++
+		charCode = text.charCodeAt(endOffset)
+	}
 
-    // No match, must return null to conform with the RegExp.prototype.exec signature
-    if (endOffset === startOffset) {
-        return null
-    } else {
-        let matchedString = text.substring(startOffset, endOffset)
-        // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
-        return [matchedString]
-    }
+	// No match, must return null to conform with the RegExp.prototype.exec signature
+	if (endOffset === startOffset) {
+		return null
+	} else {
+		let matchedString = text.substring(startOffset, endOffset)
+		// according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
+		return [matchedString]
+	}
 }
 
 // Now we can simply replace the regExp pattern with our custom pattern.
 // Consult the Docs (linked above) for additional syntax variants.
 let IntegerLiteral = createToken({
-    name: "IntegerLiteral",
-    pattern: matchInteger
+	name: "IntegerLiteral",
+	pattern: matchInteger
 })
 let Comma = createToken({ name: "Comma", pattern: /,/ })
 let Whitespace = createToken({
-    name: "Whitespace",
-    pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+	name: "Whitespace",
+	pattern: /\s+/,
+	group: Lexer.SKIPPED,
+	line_breaks: true
 })
 
 let customPatternLexer = new Lexer([Whitespace, Comma, IntegerLiteral])
 
 module.exports = {
-    IntegerLiteral: IntegerLiteral,
-    Comma: Comma,
+	IntegerLiteral: IntegerLiteral,
+	Comma: Comma,
 
-    tokenize: function(text) {
-        let lexResult = customPatternLexer.tokenize(text)
+	tokenize: function(text) {
+		let lexResult = customPatternLexer.tokenize(text)
 
-        if (lexResult.errors.length >= 1) {
-            throw new Error("sad sad panda lexing errors detected")
-        }
-        return lexResult
-    }
+		if (lexResult.errors.length >= 1) {
+			throw new Error("sad sad panda lexing errors detected")
+		}
+		return lexResult
+	}
 }

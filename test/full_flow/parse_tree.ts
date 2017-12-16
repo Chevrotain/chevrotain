@@ -3,19 +3,19 @@ import { compact, isFunction, isUndefined } from "../../src/utils/utils"
 import { TokenType } from "../../src/scan/lexer_public"
 
 export class ParseTree {
-    getImage(): string {
-        return this.payload.image
-    }
+	getImage(): string {
+		return this.payload.image
+	}
 
-    getLine(): number {
-        return this.payload.startLine
-    }
+	getLine(): number {
+		return this.payload.startLine
+	}
 
-    getColumn(): number {
-        return this.payload.startColumn
-    }
+	getColumn(): number {
+		return this.payload.startColumn
+	}
 
-    constructor(public payload: IToken, public children: ParseTree[] = []) {}
+	constructor(public payload: IToken, public children: ParseTree[] = []) {}
 }
 
 /**
@@ -27,18 +27,18 @@ export class ParseTree {
  * @returns {ParseTree}
  */
 export function PT(
-    tokenOrTokenClass: TokenType | IToken,
-    children: ParseTree[] = []
+	tokenOrTokenClass: TokenType | IToken,
+	children: ParseTree[] = []
 ): ParseTree {
-    let childrenCompact = compact(children)
+	let childrenCompact = compact(children)
 
-    if ((<IToken>tokenOrTokenClass).image !== undefined) {
-        return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact)
-    } else if (isFunction(tokenOrTokenClass)) {
-        return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
-    } else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
-        return null
-    } else {
-        throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`
-    }
+	if ((<IToken>tokenOrTokenClass).image !== undefined) {
+		return new ParseTree(<IToken>tokenOrTokenClass, childrenCompact)
+	} else if (isFunction(tokenOrTokenClass)) {
+		return new ParseTree(new (<any>tokenOrTokenClass)(), childrenCompact)
+	} else if (isUndefined(tokenOrTokenClass) || tokenOrTokenClass === null) {
+		return null
+	} else {
+		throw `Invalid parameter ${tokenOrTokenClass} to PT factory.`
+	}
 }
