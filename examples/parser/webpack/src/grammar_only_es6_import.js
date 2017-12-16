@@ -1,34 +1,34 @@
 // Using ES6 style imports, this means Webpack 2 can perform tree shaking
 import { Parser } from "chevrotain"
 import {
-	ArrayLexer,
-	allTokens,
-	Integer,
-	Comma,
-	LSquare,
-	RSquare
+    ArrayLexer,
+    allTokens,
+    Integer,
+    Comma,
+    LSquare,
+    RSquare
 } from "./tokens_only"
 
 class ArrayParserES6 extends Parser {
-	constructor(input) {
-		super(input, allTokens)
+    constructor(input) {
+        super(input, allTokens)
 
-		const $ = this
+        const $ = this
 
-		$.RULE("array", () => {
-			$.CONSUME(LSquare)
-			$.OPTION(() => {
-				$.CONSUME(Integer)
-				$.MANY(() => {
-					$.CONSUME(Comma)
-					$.CONSUME2(Integer)
-				})
-			})
-			$.CONSUME(RSquare)
-		})
+        $.RULE("array", () => {
+            $.CONSUME(LSquare)
+            $.OPTION(() => {
+                $.CONSUME(Integer)
+                $.MANY(() => {
+                    $.CONSUME(Comma)
+                    $.CONSUME2(Integer)
+                })
+            })
+            $.CONSUME(RSquare)
+        })
 
-		Parser.performSelfAnalysis(this)
-	}
+        Parser.performSelfAnalysis(this)
+    }
 }
 
 // ----------------- wrapping it all together -----------------
@@ -37,15 +37,15 @@ class ArrayParserES6 extends Parser {
 const parser = new ArrayParserES6([])
 
 export function parse(text) {
-	const lexResult = ArrayLexer.tokenize(text)
-	// setting a new input will RESET the parser instance's state.
-	parser.input = lexResult.tokens
-	// any top level rule may be used as an entry point
-	const value = parser.json()
+    const lexResult = ArrayLexer.tokenize(text)
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens
+    // any top level rule may be used as an entry point
+    const value = parser.json()
 
-	return {
-		value: value, // this is a pure grammar, the value will always be <undefined>
-		lexErrors: lexResult.errors,
-		parseErrors: parser.errors
-	}
+    return {
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
+        parseErrors: parser.errors
+    }
 }

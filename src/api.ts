@@ -1,16 +1,16 @@
 import {
-	Parser,
-	EMPTY_ALT,
-	ParserDefinitionErrorType
+    Parser,
+    EMPTY_ALT,
+    ParserDefinitionErrorType
 } from "./parse/parser_public"
 import { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
 import {
-	tokenName,
-	tokenLabel,
-	EOF,
-	tokenMatcher,
-	createToken,
-	createTokenInstance
+    tokenName,
+    tokenLabel,
+    EOF,
+    tokenMatcher,
+    createToken,
+    createTokenInstance
 } from "./scan/tokens_public"
 import { exceptions } from "./parse/exceptions_public"
 import { gast } from "./parse/grammar/gast_public"
@@ -52,7 +52,7 @@ API.exceptions.isRecognitionException = exceptions.isRecognitionException
 API.exceptions.EarlyExitException = exceptions.EarlyExitException
 API.exceptions.MismatchedTokenException = exceptions.MismatchedTokenException
 API.exceptions.NotAllInputParsedException =
-	exceptions.NotAllInputParsedException
+    exceptions.NotAllInputParsedException
 API.exceptions.NoViableAltException = exceptions.NoViableAltException
 
 // grammar reflection API
@@ -63,7 +63,7 @@ API.gast.Repetition = gast.Repetition
 API.gast.RepetitionWithSeparator = gast.RepetitionWithSeparator
 API.gast.RepetitionMandatory = gast.RepetitionMandatory
 API.gast.RepetitionMandatoryWithSeparator =
-	gast.RepetitionMandatoryWithSeparator
+    gast.RepetitionMandatoryWithSeparator
 API.gast.Option = gast.Option
 API.gast.Alternation = gast.Alternation
 API.gast.NonTerminal = gast.NonTerminal

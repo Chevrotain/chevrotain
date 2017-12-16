@@ -5,16 +5,16 @@ var newTagName = config.tagPrefix + config.currVersion
 var myRepo = git("")
 
 myRepo.addSync(
-	[config.versionPath, config.packagePath, config.changeLogPath].concat(
-		config.docFilesPaths
-	)
+    [config.versionPath, config.packagePath, config.changeLogPath].concat(
+        config.docFilesPaths
+    )
 )
 
 myRepo.commitSync("release " + config.currVersion) // version has already been increased...
 myRepo.createTagSync(newTagName)
 myRepo.push("origin", "master", function() {
-	console.log("finished push to branch")
+    console.log("finished push to branch")
 })
 myRepo.push("origin", newTagName, function() {
-	console.log("finished push tag")
+    console.log("finished push tag")
 })

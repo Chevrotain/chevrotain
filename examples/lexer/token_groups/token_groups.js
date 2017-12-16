@@ -11,45 +11,45 @@ var RParen = createToken({ name: "RParen", pattern: /\)/ })
 var IntegerLiteral = createToken({ name: "IntegerLiteral", pattern: /\d+/ })
 
 var Whitespace = createToken({
-	name: "Whitespace",
-	pattern: /\s+/,
-	// the Lexer.SKIPPED group is a special group that will cause the lexer to "ignore"
-	// certain Tokens. these tokens are still consumed from the text, they just don't appear in the
-	// lexer's output. the is especially useful for ignoring whitespace and in some use cases comments too.
-	group: Lexer.SKIPPED,
-	line_breaks: true
+    name: "Whitespace",
+    pattern: /\s+/,
+    // the Lexer.SKIPPED group is a special group that will cause the lexer to "ignore"
+    // certain Tokens. these tokens are still consumed from the text, they just don't appear in the
+    // lexer's output. the is especially useful for ignoring whitespace and in some use cases comments too.
+    group: Lexer.SKIPPED,
+    line_breaks: true
 })
 
 var Comment = createToken({
-	name: "Comment",
-	pattern: /\/\/.+/,
-	// a Token's group may be a 'free' String, in that case the lexer's result will contain
-	// an additional array of all the tokens matched for each group under the 'group' object
-	// for example in this case: lexResult.groups["singleLineComments"]
-	group: "singleLineComments"
+    name: "Comment",
+    pattern: /\/\/.+/,
+    // a Token's group may be a 'free' String, in that case the lexer's result will contain
+    // an additional array of all the tokens matched for each group under the 'group' object
+    // for example in this case: lexResult.groups["singleLineComments"]
+    group: "singleLineComments"
 })
 
 TokenGroupsLexer = new Lexer([
-	Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
-	If,
-	Else,
-	Return,
-	LParen,
-	RParen,
-	IntegerLiteral,
-	Comment
+    Whitespace, // Whitespace is very common in most languages so placing it first generally speeds up the lexing.
+    If,
+    Else,
+    Return,
+    LParen,
+    RParen,
+    IntegerLiteral,
+    Comment
 ])
 
 module.exports = {
-	Comment: Comment,
-	Whitespace: Whitespace,
+    Comment: Comment,
+    Whitespace: Whitespace,
 
-	tokenize: function(text) {
-		var lexResult = TokenGroupsLexer.tokenize(text)
+    tokenize: function(text) {
+        var lexResult = TokenGroupsLexer.tokenize(text)
 
-		if (lexResult.errors.length >= 1) {
-			throw new Error("sad sad panda lexing errors detected")
-		}
-		return lexResult
-	}
+        if (lexResult.errors.length >= 1) {
+            throw new Error("sad sad panda lexing errors detected")
+        }
+        return lexResult
+    }
 }

@@ -14,37 +14,37 @@ const es5 = require("./ohm/es5")
 const shiftParse = require("shift-parser").parseScript
 
 const bigSample = fs
-	.readFileSync(
-		path.join(__dirname, "../../node_modules/lodash/lodash.js"),
-		"utf8"
-	)
-	.toString()
+    .readFileSync(
+        path.join(__dirname, "../../node_modules/lodash/lodash.js"),
+        "utf8"
+    )
+    .toString()
 
 const smallSample = fs
-	.readFileSync(
-		path.join(__dirname, "../../node_modules/antlr4/Token.js"),
-		"utf8"
-	)
-	.toString()
+    .readFileSync(
+        path.join(__dirname, "../../node_modules/antlr4/Token.js"),
+        "utf8"
+    )
+    .toString()
 
 function newSuite(name) {
-	return new Benchmark.Suite(name, {
-		onStart: () => console.log(`\n\n${name}`),
-		onCycle: event => console.log(String(event.target)),
-		onComplete: function() {
-			console.log("Fastest is " + this.filter("fastest").map("name"))
-		}
-	})
+    return new Benchmark.Suite(name, {
+        onStart: () => console.log(`\n\n${name}`),
+        onCycle: event => console.log(String(event.target)),
+        onComplete: function() {
+            console.log("Fastest is " + this.filter("fastest").map("name"))
+        }
+    })
 }
 
 function acornLex(input) {
-	for (let token of acorn.tokenizer(input)) {
-		// iterate over the tokens
-	}
+    for (let token of acorn.tokenizer(input)) {
+        // iterate over the tokens
+    }
 }
 
 function acornLexAndConvertToChev(input) {
-	return adapterLex.tokenize(input)
+    return adapterLex.tokenize(input)
 }
 
 // This Lexer benchmark shows the adapter to convert to Chevrotain tokens has a substantial overhead.
@@ -52,13 +52,13 @@ function acornLexAndConvertToChev(input) {
 // Farther optimizations may be possible if that lexer would "Just in time" (scannerless) as was implemented in
 // https://github.com/SAP/chevrotain/blob/master/test/full_flow/ecma_quirks/ecma_quirks.ts
 newSuite("lexer")
-	.add("Acorn", () => acornLex(bigSample))
-	.add("Acorn To Chevrotain Adapter", () =>
-		acornLexAndConvertToChev(bigSample)
-	)
-	.run({
-		async: false
-	})
+    .add("Acorn", () => acornLex(bigSample))
+    .add("Acorn To Chevrotain Adapter", () =>
+        acornLexAndConvertToChev(bigSample)
+    )
+    .run({
+        async: false
+    })
 
 // We are only using a very small ~150lines input as it seems some of these example grammars have performance issues:
 // See: https://github.com/pegjs/pegjs/issues/259
@@ -71,15 +71,15 @@ newSuite("lexer")
 // As the relative differences are drastically different when benchmarking a simple JSON grammar
 // http://sap.github.io/chevrotain/performance/
 newSuite("Versus Generic Parsing Libraries - small input")
-	.add("Chevrotain", () => chevParse(smallSample))
-	.add("antlr", () => antlrParse(smallSample))
-	.add("peg", () => pegParse(smallSample))
-	.add("ohm", () => {
-		es5.grammar.match(smallSample)
-	})
-	.run({
-		async: false
-	})
+    .add("Chevrotain", () => chevParse(smallSample))
+    .add("antlr", () => antlrParse(smallSample))
+    .add("peg", () => pegParse(smallSample))
+    .add("ohm", () => {
+        es5.grammar.match(smallSample)
+    })
+    .run({
+        async: false
+    })
 
 // This benchmark suite is a bit of apples versus oranges
 // The Chevrotain grammar in particular does less work as there is no output data structure (ast) yet.
@@ -88,15 +88,15 @@ newSuite("Versus Generic Parsing Libraries - small input")
 // 2. Chevrotain seems potentially able to compete with the less optimized / slower hand built parsers.
 //    - Assuming the missing AST building phase does not consume MOST of the CPU resources of the whole flow.
 newSuite(
-	"Versus hand crafted ECMAScript parsers - lodash.js as the input source"
+    "Versus hand crafted ECMAScript parsers - lodash.js as the input source"
 )
-	.add("Chevrotain", () => chevParse(bigSample))
-	.add("Shift", () => shiftParse(bigSample))
-	.add("Uglify V2", () => uglifyParse(bigSample))
-	.add("Acorn", () => acorn.parse(bigSample, { ecmaVersion: 5 }))
-	.add("Babylon", () =>
-		babylonParse(bigSample, { ranges: true, tokens: false })
-	)
-	.run({
-		async: false
-	})
+    .add("Chevrotain", () => chevParse(bigSample))
+    .add("Shift", () => shiftParse(bigSample))
+    .add("Uglify V2", () => uglifyParse(bigSample))
+    .add("Acorn", () => acorn.parse(bigSample, { ecmaVersion: 5 }))
+    .add("Babylon", () =>
+        babylonParse(bigSample, { ranges: true, tokens: false })
+    )
+    .run({
+        async: false
+    })

@@ -27,27 +27,27 @@ const ArrayLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class ArrayParserCombined extends Parser {
-	constructor(input) {
-		super(input, allTokens)
-		const $ = this
+    constructor(input) {
+        super(input, allTokens)
+        const $ = this
 
-		$.RULE("array", () => {
-			$.CONSUME(LSquare)
-			$.OPTION(() => {
-				$.CONSUME(Integer)
-				$.MANY(() => {
-					$.CONSUME(Comma)
-					$.CONSUME2(Integer)
-				})
-			})
-			$.CONSUME(RSquare)
-		})
+        $.RULE("array", () => {
+            $.CONSUME(LSquare)
+            $.OPTION(() => {
+                $.CONSUME(Integer)
+                $.MANY(() => {
+                    $.CONSUME(Comma)
+                    $.CONSUME2(Integer)
+                })
+            })
+            $.CONSUME(RSquare)
+        })
 
-		// very important to call this after all the rules have been defined.
-		// otherwise the parser may not work correctly as it will lack information
-		// derived during the self analysis phase.
-		Parser.performSelfAnalysis(this)
-	}
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this)
+    }
 }
 
 // ----------------- wrapping it all together -----------------
@@ -56,15 +56,15 @@ class ArrayParserCombined extends Parser {
 const parser = new ArrayParserCombined([])
 
 export function parse(text) {
-	const lexResult = ArrayLexer.tokenize(text)
-	// setting a new input will RESET the parser instance's state.
-	parser.input = lexResult.tokens
-	// any top level rule may be used as an entry point
-	const value = parser.array()
+    const lexResult = ArrayLexer.tokenize(text)
+    // setting a new input will RESET the parser instance's state.
+    parser.input = lexResult.tokens
+    // any top level rule may be used as an entry point
+    const value = parser.array()
 
-	return {
-		value: value, // this is a pure grammar, the value will always be <undefined>
-		lexErrors: lexResult.errors,
-		parseErrors: parser.errors
-	}
+    return {
+        value: value, // this is a pure grammar, the value will always be <undefined>
+        lexErrors: lexResult.errors,
+        parseErrors: parser.errors
+    }
 }

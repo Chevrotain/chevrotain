@@ -24,61 +24,61 @@ var RSquare = createToken({ name: "RSquare", pattern: /]/ })
 // base delimiter TokenTypes
 var BaseDelimiter = createToken({ name: "BaseDelimiter", pattern: Lexer.NA })
 var Comma = createToken({
-	name: "Comma",
-	pattern: /,/,
-	categories: BaseDelimiter
+    name: "Comma",
+    pattern: /,/,
+    categories: BaseDelimiter
 })
 var NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ })
 var WhiteSpace = createToken({
-	name: "WhiteSpace",
-	pattern: /\s+/,
-	group: Lexer.SKIPPED,
-	line_breaks: true
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
 })
 
 var allTokens = [
-	WhiteSpace,
-	LSquare,
-	RSquare,
-	BaseDelimiter,
-	Comma,
-	NumberLiteral
+    WhiteSpace,
+    LSquare,
+    RSquare,
+    BaseDelimiter,
+    Comma,
+    NumberLiteral
 ]
 
 // ----------------- parser -----------------
 function DynamicDelimiterParser(input) {
-	// invoke super constructor
-	Parser.call(this, input, allTokens, {
-		// by default the error recovery / fault tolerance capabilities are disabled
-		// use this flag to enable them
-		recoveryEnabled: true,
-		// IMPORTANT: must be enabled to support dynamically defined Tokens
-		dynamicTokensEnabled: true
-	})
+    // invoke super constructor
+    Parser.call(this, input, allTokens, {
+        // by default the error recovery / fault tolerance capabilities are disabled
+        // use this flag to enable them
+        recoveryEnabled: true,
+        // IMPORTANT: must be enabled to support dynamically defined Tokens
+        dynamicTokensEnabled: true
+    })
 
-	// not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
-	var $ = this
+    // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
+    var $ = this
 
-	this.RULE("array", function() {
-		var result = ""
+    this.RULE("array", function() {
+        var result = ""
 
-		$.CONSUME(LSquare) // This will match any Token Class which extends BaseLeftDelimiter
-		$.OPTION(function() {
-			result += $.CONSUME(NumberLiteral).image
-			$.MANY(function() {
-				$.CONSUME(BaseDelimiter)
-				result += $.CONSUME2(NumberLiteral).image
-			})
-		})
-		$.CONSUME(RSquare) // This will match any Token Class which extends BaseRightDelimiter
+        $.CONSUME(LSquare) // This will match any Token Class which extends BaseLeftDelimiter
+        $.OPTION(function() {
+            result += $.CONSUME(NumberLiteral).image
+            $.MANY(function() {
+                $.CONSUME(BaseDelimiter)
+                result += $.CONSUME2(NumberLiteral).image
+            })
+        })
+        $.CONSUME(RSquare) // This will match any Token Class which extends BaseRightDelimiter
 
-		return result
-	})
+        return result
+    })
 
-	// very important to call this after all the rules have been defined.
-	// otherwise the parser may not work correctly as it will lack information
-	// derived during the self analysis phase.
-	Parser.performSelfAnalysis(this)
+    // very important to call this after all the rules have been defined.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived during the self analysis phase.
+    Parser.performSelfAnalysis(this)
 }
 
 // inheritance as implemented in javascript in the previous decade... :(
@@ -91,32 +91,32 @@ DynamicDelimiterParser.prototype.constructor = DynamicDelimiterParser
 var parser = new DynamicDelimiterParser([])
 
 module.exports = function(text, dynamicDelimiterRegExp) {
-	// make this parameter optional
-	if (dynamicDelimiterRegExp === undefined) {
-		dynamicDelimiterRegExp = Lexer.NA
-	}
+    // make this parameter optional
+    if (dynamicDelimiterRegExp === undefined) {
+        dynamicDelimiterRegExp = Lexer.NA
+    }
 
-	// dynamically create Token classes which extend the BaseXXXDelimiters
-	var dynamicDelimiter = createToken({
-		name: "dynamicDelimiter",
-		pattern: dynamicDelimiterRegExp,
-		categories: BaseDelimiter
-	})
+    // dynamically create Token classes which extend the BaseXXXDelimiters
+    var dynamicDelimiter = createToken({
+        name: "dynamicDelimiter",
+        pattern: dynamicDelimiterRegExp,
+        categories: BaseDelimiter
+    })
 
-	// dynamically create a Lexer which can Lex all our language including the dynamic delimiters.
-	var dynamicDelimiterLexer = new Lexer(allTokens.concat([dynamicDelimiter]))
+    // dynamically create a Lexer which can Lex all our language including the dynamic delimiters.
+    var dynamicDelimiterLexer = new Lexer(allTokens.concat([dynamicDelimiter]))
 
-	// lex
-	var lexResult = dynamicDelimiterLexer.tokenize(text)
+    // lex
+    var lexResult = dynamicDelimiterLexer.tokenize(text)
 
-	// parse
-	// setting the input will reset the parser's state
-	parser.input = lexResult.tokens
-	var value = parser.array()
+    // parse
+    // setting the input will reset the parser's state
+    parser.input = lexResult.tokens
+    var value = parser.array()
 
-	return {
-		value: value,
-		lexErrors: lexResult.errors,
-		parseErrors: parser.errors
-	}
+    return {
+        value: value,
+        lexErrors: lexResult.errors,
+        parseErrors: parser.errors
+    }
 }

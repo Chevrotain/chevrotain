@@ -23,93 +23,93 @@ const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
 class SelectParser extends Parser {
-	// A config object as a constructor argument is normally not needed.
-	// Our use case requires a dynamic configuration to support step3 without duplicating code.
-	constructor(input, config) {
-		super(input, tokenVocabulary, config)
-		const $ = this
+    // A config object as a constructor argument is normally not needed.
+    // Our use case requires a dynamic configuration to support step3 without duplicating code.
+    constructor(input, config) {
+        super(input, tokenVocabulary, config)
+        const $ = this
 
-		this.selectStatement = $.RULE("selectStatement", () => {
-			$.SUBRULE($.selectClause)
-			$.SUBRULE($.fromClause)
-			$.OPTION(() => {
-				$.SUBRULE($.whereClause)
-			})
-		})
+        this.selectStatement = $.RULE("selectStatement", () => {
+            $.SUBRULE($.selectClause)
+            $.SUBRULE($.fromClause)
+            $.OPTION(() => {
+                $.SUBRULE($.whereClause)
+            })
+        })
 
-		this.selectClause = $.RULE("selectClause", () => {
-			$.CONSUME(Select)
-			$.AT_LEAST_ONE_SEP({
-				SEP: Comma,
-				DEF: () => {
-					$.CONSUME(Identifier)
-				}
-			})
-		})
+        this.selectClause = $.RULE("selectClause", () => {
+            $.CONSUME(Select)
+            $.AT_LEAST_ONE_SEP({
+                SEP: Comma,
+                DEF: () => {
+                    $.CONSUME(Identifier)
+                }
+            })
+        })
 
-		this.fromClause = $.RULE("fromClause", () => {
-			$.CONSUME(From)
-			$.CONSUME(Identifier)
-		})
+        this.fromClause = $.RULE("fromClause", () => {
+            $.CONSUME(From)
+            $.CONSUME(Identifier)
+        })
 
-		this.whereClause = $.RULE("whereClause", () => {
-			$.CONSUME(Where)
-			$.SUBRULE($.expression)
-		})
+        this.whereClause = $.RULE("whereClause", () => {
+            $.CONSUME(Where)
+            $.SUBRULE($.expression)
+        })
 
-		this.expression = $.RULE("expression", () => {
-			$.SUBRULE($.atomicExpression)
-			$.SUBRULE($.relationalOperator)
-			$.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
-			// from the 'SUBRULE(atomicExpression)'
-			// 2 lines above.
-		})
+        this.expression = $.RULE("expression", () => {
+            $.SUBRULE($.atomicExpression)
+            $.SUBRULE($.relationalOperator)
+            $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
+            // from the 'SUBRULE(atomicExpression)'
+            // 2 lines above.
+        })
 
-		this.atomicExpression = $.RULE("atomicExpression", () => {
-			// prettier-ignore
-			$.OR([
+        this.atomicExpression = $.RULE("atomicExpression", () => {
+            // prettier-ignore
+            $.OR([
                 {ALT: () => {$.CONSUME(Integer)}},
                 {ALT: () => {$.CONSUME(Identifier)}}
             ])
-		})
+        })
 
-		this.relationalOperator = $.RULE("relationalOperator", () => {
-			// prettier-ignore
-			$.OR([
+        this.relationalOperator = $.RULE("relationalOperator", () => {
+            // prettier-ignore
+            $.OR([
                 {ALT: () => {$.CONSUME(GreaterThan)}},
                 {ALT: () => {$.CONSUME(LessThan)}}
             ])
-		})
+        })
 
-		// very important to call this after all the rules have been defined.
-		// otherwise the parser may not work correctly as it will lack information
-		// derived during the self analysis phase.
-		Parser.performSelfAnalysis(this)
-	}
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this)
+    }
 }
 
 // We only ever need one as the parser internal state is reset for each new input.
 const parserInstance = new SelectParser([])
 
 module.exports = {
-	parserInstance: parserInstance,
+    parserInstance: parserInstance,
 
-	SelectParser: SelectParser,
+    SelectParser: SelectParser,
 
-	parse: function(inputText) {
-		let lexResult = selectLexer.lex(inputText)
+    parse: function(inputText) {
+        let lexResult = selectLexer.lex(inputText)
 
-		// ".input" is a setter which will reset the parser's internal's state.
-		parserInstance.input = lexResult.tokens
+        // ".input" is a setter which will reset the parser's internal's state.
+        parserInstance.input = lexResult.tokens
 
-		// No semantic actions so this won't return anything yet.
-		parserInstance.selectStatement()
+        // No semantic actions so this won't return anything yet.
+        parserInstance.selectStatement()
 
-		if (parserInstance.errors.length > 0) {
-			throw Error(
-				"Sad sad panda, parsing errors detected!\n" +
-					parserInstance.errors[0].message
-			)
-		}
-	}
+        if (parserInstance.errors.length > 0) {
+            throw Error(
+                "Sad sad panda, parsing errors detected!\n" +
+                    parserInstance.errors[0].message
+            )
+        }
+    }
 }

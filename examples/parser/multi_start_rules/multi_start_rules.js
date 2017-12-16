@@ -19,51 +19,51 @@ var Bravo = createToken({ name: "Bravo", pattern: /B/ })
 var Charlie = createToken({ name: "Charlie", pattern: /C/ })
 
 var WhiteSpace = createToken({
-	name: "WhiteSpace",
-	pattern: /\s+/,
-	group: Lexer.SKIPPED,
-	line_breaks: true
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
 })
 
 var allTokens = [
-	WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
-	Alpha,
-	Bravo,
-	Charlie
+    WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+    Alpha,
+    Bravo,
+    Charlie
 ]
 
 var PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 function MultiStartParser(input) {
-	Parser.call(this, input, allTokens)
+    Parser.call(this, input, allTokens)
 
-	var $ = this
+    var $ = this
 
-	$.RULE("firstRule", function() {
-		$.CONSUME(Alpha)
+    $.RULE("firstRule", function() {
+        $.CONSUME(Alpha)
 
-		$.OPTION(function() {
-			$.SUBRULE($.secondRule)
-		})
-	})
+        $.OPTION(function() {
+            $.SUBRULE($.secondRule)
+        })
+    })
 
-	$.RULE("secondRule", function() {
-		$.CONSUME(Bravo)
+    $.RULE("secondRule", function() {
+        $.CONSUME(Bravo)
 
-		$.OPTION(function() {
-			$.SUBRULE($.thirdRule)
-		})
-	})
+        $.OPTION(function() {
+            $.SUBRULE($.thirdRule)
+        })
+    })
 
-	$.RULE("thirdRule", function() {
-		$.CONSUME(Charlie)
-	})
+    $.RULE("thirdRule", function() {
+        $.CONSUME(Charlie)
+    })
 
-	// very important to call this after all the rules have been defined.
-	// otherwise the parser may not work correctly as it will lack information
-	// derived during the self analysis phase.
-	Parser.performSelfAnalysis(this)
+    // very important to call this after all the rules have been defined.
+    // otherwise the parser may not work correctly as it will lack information
+    // derived during the self analysis phase.
+    Parser.performSelfAnalysis(this)
 }
 
 MultiStartParser.prototype = Object.create(Parser.prototype)
@@ -75,23 +75,23 @@ MultiStartParser.prototype.constructor = MultiStartParser
 var parser = new MultiStartParser([])
 
 function parseStartingWithRule(ruleName) {
-	return function(text) {
-		var lexResult = PhoneticLexer.tokenize(text)
-		// setting a new input will RESET the parser instance's state.
-		parser.input = lexResult.tokens
-		// just invoke which ever rule you want as the start rule. its all just plain javascript...
-		var value = parser[ruleName]()
+    return function(text) {
+        var lexResult = PhoneticLexer.tokenize(text)
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens
+        // just invoke which ever rule you want as the start rule. its all just plain javascript...
+        var value = parser[ruleName]()
 
-		return {
-			value: value, // this is a pure grammar, the value will always be <undefined>
-			lexErrors: lexResult.errors,
-			parseErrors: parser.errors
-		}
-	}
+        return {
+            value: value, // this is a pure grammar, the value will always be <undefined>
+            lexErrors: lexResult.errors,
+            parseErrors: parser.errors
+        }
+    }
 }
 
 module.exports = {
-	parseFirst: parseStartingWithRule("firstRule"),
-	parseSecond: parseStartingWithRule("secondRule"),
-	parseThird: parseStartingWithRule("thirdRule")
+    parseFirst: parseStartingWithRule("firstRule"),
+    parseSecond: parseStartingWithRule("secondRule"),
+    parseThird: parseStartingWithRule("thirdRule")
 }
