@@ -54,12 +54,12 @@
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit_tests": "node_modules/.bin/_mocha \"./lib/test/**/*spec.js\"",
-    "format": "prettier --write \"**/*.@(ts|js)\"",
+    "format": "prettier --no-editorconfig --write \"**/*.@(ts|js)\"",
     "quick_build": "tsc && npm run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "rm -rf coverage dev lib",
     "lint": "tslint --project tsconfig.json",
-    "verify_format": "prettier --list-different  \"**/*.@(ts|js)\"",
+    "verify_format": "prettier --no-editorconfig --list-different  \"**/*.@(ts|js)\"",
     "compile": "tsc",
     "dts": "grunt concat",
     "compile_def": "npm-run-all compile_def_modules compile_def_namespace",
@@ -109,8 +109,8 @@
     "lodash": "^4.17.4",
     "mocha": "^4.0.1",
     "npm-run-all": "^4.1.2",
-    "nyc": "^11.4.0",
-    "prettier": "1.8.2",
+    "nyc": "^11.4.1",
+    "prettier": "1.9.2",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
     "tslint": "^5.8.0",
@@ -123,7 +123,7 @@
   "prettier": {
     "semi": false,
     "tab-width": 4,
-    "use-tabs" : false
+    "use-tabs": false
   },
   "nyc": {
     "reporter": [
