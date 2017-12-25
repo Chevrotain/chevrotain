@@ -21,7 +21,7 @@ as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 * [**Online Playground**](http://sap.github.io/chevrotain/playground/)
-* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/)**
+* **[Getting Started Tutorial](http://sap.github.io/chevrotain/website/Tutorial/step1_lexing.html)**
 * [**Performance benchmark**][benchmark] 
 
 ## Features
@@ -82,14 +82,14 @@ as any other pure code without requiring any new tools or processes.
 
 * **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 
-* **[FAQ](docs/faq.md).**
+* **[FAQ](http://sap.github.io/chevrotain/website/FAQ.html).**
  
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
 * **[HTML docs](http://sap.github.io/chevrotain/documentation).**
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#at_least_one).
 
-* **[RoadMap](https://github.com/SAP/chevrotain/blob/master/docs/Roadmap.md)**.
+* **[RoadMap](http://sap.github.io/chevrotain/website/Roadmap.html)**.
    
    
 ## Dependencies
@@ -125,7 +125,7 @@ Some interesting samples:
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
 [parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
-[content assist]: https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/syntactic_content_assist.md
+[content assist]: http://sap.github.io/chevrotain/website/Deep_Dive/syntactic_content_assist.html
 [separation]: https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
 [custom_errors]: https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
