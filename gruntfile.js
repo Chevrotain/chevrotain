@@ -80,7 +80,7 @@ module.exports = function(grunt) {
             },
             test_tutorial: {
                 options: {
-                    cwd: process.cwd() + "/docs/tutorial/src/"
+                    cwd: process.cwd() + "/docs/01_Tutorial/src/"
                 },
                 exec: INSTALL_LINK + " && npm test"
             }
