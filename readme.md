@@ -50,12 +50,12 @@ as any other pure code without requiring any new tools or processes.
       * Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
       * [Multiple Lexer Modes][lexer_modes] depending on the context.
       * [Tokens Grouping][lexer_groups].
-      * [Custom Token patterns(none RegExp) support](docs/02_Deep_Dive/custom_token_patterns.md)
+      * [Custom Token patterns(none RegExp) support](http://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html)
       * **No code generation** The Lexer does not require any code generation phase. 
 
   3. [**High Performance**][benchmark].
   
-  4. [**Railroad Diagrams Generation**](https://github.com/SAP/chevrotain/tree/master/diagrams).
+  4. [**Railroad Diagrams Generation**](http://sap.github.io/chevrotain/website/Building_Grammars/generating_syntax_diagrams.html).
 
   5. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
