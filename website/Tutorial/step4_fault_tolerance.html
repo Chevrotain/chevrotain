@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <title>step4 fault tolerance - Chevrotain</title>
+    <meta name="description" content="JavaScript Parser Building Toolkit" />
+    <meta name="author" content="Shahar Soel">
+    <meta charset="UTF-8">
+    <link rel="icon" href="../themes/daux/img/favicon-blue.png" type="image/x-icon">
+    <!-- Mobile -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700&subset=latin,cyrillic-ext,cyrillic' rel='stylesheet' type='text/css'>
+    <!-- CSS -->
+    <link href='../themes/daux/css/theme-blue.min.css' rel='stylesheet' type='text/css'>
+            <!-- Tipue Search -->
+        <link href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body class=" ">
+    <div class="Columns content">
+    <aside class="Columns__left Collapsible">
+        <button type="button" class="Button Collapsible__trigger">
+            <span class="Collapsible__trigger--bar"></span>
+            <span class="Collapsible__trigger--bar"></span>
+            <span class="Collapsible__trigger--bar"></span>
+        </button>
+
+        <a class="Brand" href="../index.html">Chevrotain</a>
+
+    <div class="Search">
+        <svg class="Search__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 451 451">
+            <path d="M447.05 428l-109.6-109.6c29.4-33.8 47.2-77.9 47.2-126.1C384.65 86.2 298.35 0 192.35 0 86.25 0 .05 86.3.05 192.3s86.3 192.3 192.3 192.3c48.2 0 92.3-17.8 126.1-47.2L428.05 447c2.6 2.6 6.1 4 9.5 4s6.9-1.3 9.5-4c5.2-5.2 5.2-13.8 0-19zM26.95 192.3c0-91.2 74.2-165.3 165.3-165.3 91.2 0 165.3 74.2 165.3 165.3s-74.1 165.4-165.3 165.4c-91.1 0-165.3-74.2-165.3-165.4z"/>
+        </svg>
+        <input type="search" id="tipue_search_input" class="Search__field" placeholder="Search..." autocomplete="on"
+               results=25 autosave=text_search>
+    </div>
+
+        <div class="Collapsible__content">
+            <!-- Navigation -->
+            <ul class='Nav'><li class='Nav__item Nav__item--open has-children'><a href="../Tutorial/src/README.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Tutorial</a><ul class='Nav'><li class='Nav__item  has-children'><a href="../Tutorial/src/README.html" class="folder"><i class="Nav__arrow">&nbsp;</i>src</a><ul class='Nav'><li class='Nav__item '><a href="../Tutorial/src/README.html">README</a></li></ul></li><li class='Nav__item '><a href="../Tutorial/step1_lexing.html">step1 lexing</a></li><li class='Nav__item '><a href="../Tutorial/step2_parsing.html">step2 parsing</a></li><li class='Nav__item '><a href="../Tutorial/step3_adding_actions_root.html">step3 adding actions root</a></li><li class='Nav__item '><a href="../Tutorial/step3a_adding_actions_visitor.html">step3a adding actions visitor</a></li><li class='Nav__item '><a href="../Tutorial/step3b_adding_actions_embedded.html">step3b adding actions embedded</a></li><li class='Nav__item Nav__item--active'><a href="../Tutorial/step4_fault_tolerance.html">step4 fault tolerance</a></li></ul></li><li class='Nav__item  has-children'><a href="../Deep_Dive/concrete_syntax_tree.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Deep Dive</a><ul class='Nav'><li class='Nav__item '><a href="../Deep_Dive/concrete_syntax_tree.html">concrete syntax tree</a></li><li class='Nav__item '><a href="../Deep_Dive/custom_token_patterns.html">custom token patterns</a></li><li class='Nav__item '><a href="../Deep_Dive/syntactic_content_assist.html">syntactic content assist</a></li></ul></li><li class='Nav__item  has-children'><a href="../Building_Grammars/resolving_grammar_errors.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Building Grammars</a><ul class='Nav'><li class='Nav__item '><a href="../Building_Grammars/resolving_grammar_errors.html">resolving grammar errors</a></li><li class='Nav__item '><a href="../Building_Grammars/resolving_lexer_errors.html">resolving lexer errors</a></li></ul></li><li class='Nav__item '><a href="../FAQ.html">FAQ</a></li><li class='Nav__item '><a href="../Roadmap.html">Roadmap</a></li></ul>
+
+            <div class="Links">
+                                    <hr/>
+                                            <a href="http://sap.github.io/chevrotain/playground/" target="_blank">Online Playground</a>
+                        <br />
+                                            <a href="http://sap.github.io/chevrotain/performance/" target="_blank">Performance Benchmark</a>
+                        <br />
+                                            <a href="https://github.com/sap/chevrotain/issues" target="_blank">Help/Support/Bugs</a>
+                        <br />
+                                            <a href="https://github.com/sap/chevrotain" target="_blank">GitHub Repo</a>
+                        <br />
+                                    
+                                    <div class="CodeToggler">
+                        <hr/>
+                                                    <a class="CodeToggler__button CodeToggler__button--main" href="#">Show Code Blocks Inline</a><br>
+                                            </div>
+                
+                            </div>
+        </div>
+    </aside>
+    <div class="Columns__right ">
+        <div class="Columns__right__content">
+            <div class="doc_content">
+                <article class="Page">
+
+    <div class="Page__header">
+        <h1><a href="../Tutorial/src/README.html">Tutorial</a> <svg class="Page__header--separator" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.73 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg> <a href="../Tutorial/step4_fault_tolerance.html">step4 fault tolerance</a></h1>
+                <span style="float: left; font-size: 10px; color: gray;">
+            Monday, December 25, 2017 10:30 AM        </span>
+                        <span style="float: right; font-size: 10px; color: gray;">
+            <a href="https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/step4_fault_tolerance.md" target="_blank">Edit on GitHub</a>
+        </span>
+            </div>
+
+
+    <div class="s-content">
+        <ul>
+<li>Previous tutorial steps
+<ul>
+<li>
+<a href="step3a_adding_actions_visitor.html">Step 3a - Separated Actions</a>.</li>
+<li>
+<a href="step3b_adding_actions_embedded.html">Step 3b - Embedded Actions</a>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="page_Tutorial-Step-4-Fault-tolerance-and-Error-recovery">Tutorial Step 4 - Fault tolerance and Error recovery.</h1>
+<h3 id="page_Source-Code-for-this-step">---&gt; <a href="https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step4_error_recovery" class="external">Source Code</a> for this step &lt;---</h3>
+<h3 id="page_Introduction">Introduction:</h3>
+<p>In the previous tutorial steps we have learned how to build a parser for a simple grammar.
+Our parser can handle valid inputs just fine, but what happens if the input is not perfectly valid?
+For example when building an editor for a programing language, the input is often not completely valid,
+yet the editor is still expected to provide functionality (outline/auto-complete/navigation/error locations...)
+even for invalid inputs.</p>
+<p>Chevrotain uses several fault tolerance / error recovery heuristics, which generally follow error recovery heuristics
+used in Antlr3.</p>
+<h3 id="page_In-Rule-Single-Token-insertion">In Rule Single Token insertion:</h3>
+<p>Happens when:</p>
+<ul>
+<li>A token Y is expected.</li>
+<li>But a token X is found.</li>
+<li>X is a valid token after the missing Y token.</li>
+</ul>
+<p>A Y token will be automatically <strong>inserted</strong> into the token stream.</p>
+<p>For example: in a JSON text colons are used between keys and values.</p>
+<pre><code class="language-javascript">// GOOD
+{ &quot;key&quot; : 666}
+
+// BAD, missing colon
+{ &quot;key&quot;   666}
+</code></pre>
+<p>If we try parsing the &quot;bad&quot; example, after consuming:</p>
+<pre><code class="language-javascript">{ &quot;key&quot;
+</code></pre>
+<ul>
+<li>We expect a colon token (Y).</li>
+<li>We will find a number(666) token (X).</li>
+<li>After the colon token, a number token is valid.</li>
+</ul>
+<p>Therefore the missing colon will be automatically &quot;inserted&quot;.</p>
+<p>This heuristic's behavior can be customized by the following methods:</p>
+<ul>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#cantokentypebeinsertedinrecovery" class="external">canTokenTypeBeInsertedInRecovery</a></p>
+</li>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#gettokentoinsert" class="external">getTokenToInsert</a></p>
+</li>
+</ul>
+<h3 id="page_In-Rule-Single-Token-deletion">In Rule Single Token deletion:</h3>
+<p>Happens when:</p>
+<ul>
+<li>A token Y is expected.</li>
+<li>But a token X is found.</li>
+<li>And immediately after X an Y is found.</li>
+</ul>
+<p>The unexpected token X  will be skipped (<strong>deleted</strong>) and the parsing will continue.</p>
+<p>For example: lets look at the case of a</p>
+<pre><code class="language-javascript">// GOOD
+{ &quot;key&quot; : 666}
+
+// BAD, redundant &quot;}&quot;
+{ &quot;key&quot; }: 666}
+</code></pre>
+<p>If we try parsing the &quot;bad&quot; example, after consuming:</p>
+<pre><code class="language-javascript">{ &quot;key&quot; 
+</code></pre>
+<ul>
+<li>We are expecting a colon token (Y).</li>
+<li>But we found right brackets (X) instead.</li>
+<li>The next token (&quot;:&quot;) is a colon token (Y) which the one we originally expected.</li>
+</ul>
+<p>Therefore the redundant right brackets &quot;}&quot; will be skipped (deleted) and the parser will consume the number token.</p>
+<h3 id="page_The-following-re-sync-recovery-examples-use-this-sample-json-like-grammar">The following re-sync recovery examples use this sample json like grammar:</h3>
+<pre><code class="language-ANTLR"> 
+object
+   : &quot;{&quot; objectItem (comma objectItem)* &quot;}&quot;
+   
+objectItem
+   : stringLiteral &quot;:&quot; value
+   
+value
+   : object | stringLiteral | number | ...
+</code></pre>
+<h3 id="page_In-Rule-Repetition-Re-Sync-recovery">In Rule Repetition Re-Sync recovery:</h3>
+<p>Repetition re-sync recovery happens when:</p>
+<ul>
+<li>The parser is in a repetition(MANY/AT_LEAST_ONE/MANY_SEP/AT_LEAST_ONE_SEP).</li>
+<li>The parser has consumed the last iteration and is about to &quot;exit&quot; the repetition.</li>
+<li>The next token X is invalid right after the repetition ended.</li>
+</ul>
+<p>In such a situation the parser will attempt to skip tokens until it detects the beginning of a another iteration of
+the repetition <strong>or</strong> the token it originally expected after the last iteration.</p>
+<p>There are a couple of edge cases in which <strong>other</strong> recovery methods will be preferred:</p>
+<ul>
+<li>If single token insertion/deletion can be performed, it is always preferred as it skips fewer tokens.</li>
+<li>If between rules re-sync recovery can be performed (see below) <strong>and</strong> it can be done by skipping <strong>fewer</strong> tokens.
+Between rules re-sync will be preferred over repetition re-sync recovery. The same principle applies, the heuristics are greedy
+and &quot;prefer&quot; to skip the fewest number of tokens.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-javascript">{ 
+  &quot;key1&quot; : 1,
+  &quot;key2&quot; : 2 666 // '666' should not appear here!
+  &quot;key3  : 3,
+  &quot;key4  : 4 
+}
+</code></pre>
+<p>If we try parsing this input example, after consuming:</p>
+<pre><code class="language-javascript">{ 
+  &quot;key1&quot; : 1,
+  &quot;key2&quot; : 2
+</code></pre>
+<ul>
+<li>The parser in in a repetition of *<em>(comma objectItem)</em> **</li>
+<li>After consuming '&quot;key2&quot; : 2' the parser &quot;thinks&quot; it has consumed the last iteration as the next comma is missing.</li>
+<li>The next token (X) encountered is &quot;666&quot; which is invalid in that position as the parser expected a &quot;}&quot; after the repetition ends.</li>
+<li>The parser will throw away the following tokens [666, &quot;key3&quot;, :, 3] and re-sync to the next comma (,) to continue a another iteration.</li>
+</ul>
+<p>Note that in such a situation some input would be lost, (the third key), however the fourth key will still be parsed successfully!</p>
+<h3 id="page_Between-Rules-Re-Sync-recovery">Between Rules Re-Sync recovery:</h3>
+<p>Between Rules re-sync recovery happens when the parser encounters a parser error inside a rule which
+it cannot recover from in other ways.
+For example:</p>
+<ul>
+<li>An unexpected Token as been found (MisMatchTokenException) but single token insertion/deletion cannot resolve it.</li>
+<li>None of the alternatives in an OR match.</li>
+<li>A Repetition of AT_LEAST_ONE cannot match even one iteration.</li>
+<li>...</li>
+</ul>
+<p>In re-sync recovery the parser will skip tokens from the token stream until it detects a point it can continue parsing from.
+The parser will try to skip as few tokens as possible and re-sync to the closest rule in the rule stack.</p>
+<p><strong>An Abstract example:</strong></p>
+<ul>
+<li>Grammar Rule A called Grammar Rule B which called Grammar Rule C (A -&gt; B -&gt; C).</li>
+<li>In Grammar Rule C a parsing error happened which we can not recover from.</li>
+<li>The Parser will now skip tokens until it find a token that can appear immediately after either:
+<ul>
+<li>The call of C in B</li>
+<li>The call of B in A</li>
+</ul>
+</li>
+</ul>
+<p><strong>A concrete example:</strong></p>
+<p>For the following invalid json input:</p>
+<pre><code class="language-javascript">{
+	&quot;firstName&quot;: &quot;John&quot;,
+	&quot;someData&quot;: 
+	   { &quot;bad&quot; :: &quot;part&quot; }, // &lt;-- too many colons in the nested object   
+	&quot;isAlive&quot;: true,
+	&quot;age&quot;: 25
+}
+</code></pre>
+<ul>
+<li>
+<p>When encountering the the redundant colon the rule stack will be as follows:</p>
+<ul>
+<li>
+<strong>object</strong> --&gt; top level object</li>
+<li>
+<strong>objectItem</strong> --&gt; &quot;someData&quot;: ... - second item in the top level object</li>
+<li>
+<strong>value</strong> --&gt; { &quot;bad&quot; :: &quot;part&quot; } - the value of the &quot;someData&quot; key</li>
+<li>
+<strong>object</strong> --&gt; { &quot;bad&quot; :: &quot;part&quot; } - the value of the &quot;someData&quot; key</li>
+<li>
+<strong>objectItem</strong> --&gt; &quot;bad&quot; :: &quot;part&quot; - the single item in the inner object.</li>
+<li>
+<strong>value</strong> --&gt; : &quot;part&quot; - the value with the colon prefix</li>
+</ul>
+</li>
+<li>
+<p>The redundant colon will cause an error (NoViableAltException) as the value rule will not be able to decide
+which alternative to take as none would match.</p>
+</li>
+<li>
+<p>This means the parser needs to find a token to synchronize to, lets check the options:</p>
+<ul>
+<li>After value called by ObjectItem --&gt; none</li>
+<li>After objectItem called by object --&gt; comma.</li>
+<li>After object called by value --&gt; none.</li>
+<li>After value called by ObjectItem --&gt; none</li>
+<li>after objectItem called by object --&gt; comma (again).</li>
+</ul>
+</li>
+<li>
+<p>so the Parser will re-sync to the closest ObjectItem if it finds a comma in the remaining token stream.</p>
+</li>
+<li>
+<p>Therefore the following tokens will be skipped: [':', '&quot;part&quot;', '}']</p>
+</li>
+<li>
+<p>And the Parser continue from the &quot;nearest&quot; objectItem rule as if it was successfully invoked.</p>
+</li>
+<li>
+<p>Thus the next two items will appear be parsed successfully even though they were preceded by a syntax error!</p>
+</li>
+</ul>
+<h4 id="page_Enabling-All-Recovery-mechanisms">Enabling All Recovery mechanisms</h4>
+<p>By default fault tolerance and error recovery heuristics are disabled.
+They can be enabled by passing a optional <strong>recoveryEnabled</strong> parameter (default true)
+To the parser's constructor <a href="http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#constructor" class="external">constructor</a>.</p>
+<h4 id="page_CST-output-for-re-synced-rules">CST output for re-synced rules:</h4>
+<p>When using <a href="../Deep_Dive/concrete_syntax_tree.html">Concrete Syntax Tree</a> output
+A re-synced will return a CSTNode with the boolean <a href="http://sap.github.io/chevrotain/documentation/1_0_0/interfaces/_chevrotain_d_.cstnode.html#recoverednode" class="external">&quot;recoveredNode&quot;</a> flag marked as true.
+Additionally a recovered node <strong>may not</strong> have all its contents (children dictionary) filled
+as only the Terminals and None-Terminals encountered <strong>before</strong> the error which triggered the re-sync
+will be present. This means that code that handles the CST (CST Walker or Visitor) <strong>must not</strong>
+assume certain content is always present on a CstNode. Instead it must be very defensive to avoid runtime
+errors.</p>
+<h4 id="page_Embedded-Actions-semantics-and-the-return-values-of-re-synced-rules">Embedded Actions (semantics) and the return values of re-synced rules:</h4>
+<p>Just being able to continue parsing is not enough, as &quot;someone&quot; probably expects a returned value
+from the sub-rule we have recovered from.</p>
+<p>By default <strong>undefined</strong> will be returned from a recovered rule, however this should most likely be customize
+in any but the most simple cases.</p>
+<p>Customization is done during the definition of the grammar <a href="http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#rule" class="external">RULE</a>.
+The third parameter(<strong>config</strong>) may contain a <strong>recoveryValueFunc</strong> property which is a function that will be invoked to produce the returned value in
+case of re-sync recovery.</p>
+<h4 id="page_Disabling-Re-Sync-Recovery-per-rule">Disabling Re-Sync Recovery per rule.:</h4>
+<p>Re-Sync recovery is enabled by default for all rules.
+In some cases it may be appropriate to disable re-sync recovery for a specific rule.
+This is (once again) done during the definition of the grammar <a href="http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#rule" class="external">RULE</a>.
+The third parameter(<strong>config</strong>) may contain a <em>resyncEnabled</em>* property that controls whether or not re-sync is enabled for the
+rule.</p>
+<h4 id="page_Difference-between-In-Rule-and-Between-Rules-recovery">Difference between &quot;In-Rule&quot; and &quot;Between Rules&quot; recovery.</h4>
+<p>The main difference is that &quot;In-Rule&quot; recovery fixes the problem in the scope of a single rule, while Between Rules recovery will fail at
+least one parsing rule (and perhaps many more). Thus the latter tends to &quot;lose&quot; more of the original input and requires
+additional definitions (what should be returned value of a re-synced rule?).</p>
+<h4 id="page_What-is-Next">What is Next?</h4>
+<ul>
+<li>Run &amp; Debug the <a href="https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step4_error_recovery" class="external">source code</a> of
+this tutorial step.</li>
+</ul>
+    </div>
+
+        <nav>
+        <ul class="Pager">
+            <li class=Pager--prev><a href="../Tutorial/step3b_adding_actions_embedded.html">Previous</a></li>            <li class=Pager--next><a href="../Deep_Dive/concrete_syntax_tree.html">Next</a></li>        </ul>
+    </nav>
+    </article>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    <!-- jQuery -->
+    <script src="../themes/daux/js/jquery-1.11.3.min.js"></script>
+
+    <!-- hightlight.js -->
+    <script src="../themes/daux/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- JS -->
+    
+    <script src="../themes/daux/js/daux.js"></script>
+
+            <!-- Tipue Search -->
+        <script type="text/javascript" src="../tipuesearch/tipuesearch.js"></script>
+
+        <script>
+            window.onunload = function(){}; // force $(document).ready to be called on back/forward navigation in firefox
+            $(function() {
+                tipuesearch({
+                    'base_url': '../'
+                });
+            });
+        </script>
+    
+</body>
+</html>

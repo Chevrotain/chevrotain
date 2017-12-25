@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <title>custom token patterns - Chevrotain</title>
+    <meta name="description" content="JavaScript Parser Building Toolkit" />
+    <meta name="author" content="Shahar Soel">
+    <meta charset="UTF-8">
+    <link rel="icon" href="../themes/daux/img/favicon-blue.png" type="image/x-icon">
+    <!-- Mobile -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700&subset=latin,cyrillic-ext,cyrillic' rel='stylesheet' type='text/css'>
+    <!-- CSS -->
+    <link href='../themes/daux/css/theme-blue.min.css' rel='stylesheet' type='text/css'>
+            <!-- Tipue Search -->
+        <link href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body class=" ">
+    <div class="Columns content">
+    <aside class="Columns__left Collapsible">
+        <button type="button" class="Button Collapsible__trigger">
+            <span class="Collapsible__trigger--bar"></span>
+            <span class="Collapsible__trigger--bar"></span>
+            <span class="Collapsible__trigger--bar"></span>
+        </button>
+
+        <a class="Brand" href="../index.html">Chevrotain</a>
+
+    <div class="Search">
+        <svg class="Search__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 451 451">
+            <path d="M447.05 428l-109.6-109.6c29.4-33.8 47.2-77.9 47.2-126.1C384.65 86.2 298.35 0 192.35 0 86.25 0 .05 86.3.05 192.3s86.3 192.3 192.3 192.3c48.2 0 92.3-17.8 126.1-47.2L428.05 447c2.6 2.6 6.1 4 9.5 4s6.9-1.3 9.5-4c5.2-5.2 5.2-13.8 0-19zM26.95 192.3c0-91.2 74.2-165.3 165.3-165.3 91.2 0 165.3 74.2 165.3 165.3s-74.1 165.4-165.3 165.4c-91.1 0-165.3-74.2-165.3-165.4z"/>
+        </svg>
+        <input type="search" id="tipue_search_input" class="Search__field" placeholder="Search..." autocomplete="on"
+               results=25 autosave=text_search>
+    </div>
+
+        <div class="Collapsible__content">
+            <!-- Navigation -->
+            <ul class='Nav'><li class='Nav__item  has-children'><a href="../Tutorial/src/README.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Tutorial</a><ul class='Nav'><li class='Nav__item  has-children'><a href="../Tutorial/src/README.html" class="folder"><i class="Nav__arrow">&nbsp;</i>src</a><ul class='Nav'><li class='Nav__item '><a href="../Tutorial/src/README.html">README</a></li></ul></li><li class='Nav__item '><a href="../Tutorial/step1_lexing.html">step1 lexing</a></li><li class='Nav__item '><a href="../Tutorial/step2_parsing.html">step2 parsing</a></li><li class='Nav__item '><a href="../Tutorial/step3_adding_actions_root.html">step3 adding actions root</a></li><li class='Nav__item '><a href="../Tutorial/step3a_adding_actions_visitor.html">step3a adding actions visitor</a></li><li class='Nav__item '><a href="../Tutorial/step3b_adding_actions_embedded.html">step3b adding actions embedded</a></li><li class='Nav__item '><a href="../Tutorial/step4_fault_tolerance.html">step4 fault tolerance</a></li></ul></li><li class='Nav__item Nav__item--open has-children'><a href="../Deep_Dive/concrete_syntax_tree.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Deep Dive</a><ul class='Nav'><li class='Nav__item '><a href="../Deep_Dive/concrete_syntax_tree.html">concrete syntax tree</a></li><li class='Nav__item Nav__item--active'><a href="../Deep_Dive/custom_token_patterns.html">custom token patterns</a></li><li class='Nav__item '><a href="../Deep_Dive/syntactic_content_assist.html">syntactic content assist</a></li></ul></li><li class='Nav__item  has-children'><a href="../Building_Grammars/resolving_grammar_errors.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Building Grammars</a><ul class='Nav'><li class='Nav__item '><a href="../Building_Grammars/resolving_grammar_errors.html">resolving grammar errors</a></li><li class='Nav__item '><a href="../Building_Grammars/resolving_lexer_errors.html">resolving lexer errors</a></li></ul></li><li class='Nav__item '><a href="../FAQ.html">FAQ</a></li><li class='Nav__item '><a href="../Roadmap.html">Roadmap</a></li></ul>
+
+            <div class="Links">
+                                    <hr/>
+                                            <a href="http://sap.github.io/chevrotain/playground/" target="_blank">Online Playground</a>
+                        <br />
+                                            <a href="http://sap.github.io/chevrotain/performance/" target="_blank">Performance Benchmark</a>
+                        <br />
+                                            <a href="https://github.com/sap/chevrotain/issues" target="_blank">Help/Support/Bugs</a>
+                        <br />
+                                            <a href="https://github.com/sap/chevrotain" target="_blank">GitHub Repo</a>
+                        <br />
+                                    
+                                    <div class="CodeToggler">
+                        <hr/>
+                                                    <a class="CodeToggler__button CodeToggler__button--main" href="#">Show Code Blocks Inline</a><br>
+                                            </div>
+                
+                            </div>
+        </div>
+    </aside>
+    <div class="Columns__right ">
+        <div class="Columns__right__content">
+            <div class="doc_content">
+                <article class="Page">
+
+    <div class="Page__header">
+        <h1><a href="../Deep_Dive/concrete_syntax_tree.html">Deep Dive</a> <svg class="Page__header--separator" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.73 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg> <a href="../Deep_Dive/custom_token_patterns.html">custom token patterns</a></h1>
+                <span style="float: left; font-size: 10px; color: gray;">
+            Sunday, December 24, 2017 12:25 PM        </span>
+                        <span style="float: right; font-size: 10px; color: gray;">
+            <a href="https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/custom_token_patterns.md" target="_blank">Edit on GitHub</a>
+        </span>
+            </div>
+
+
+    <div class="s-content">
+        <h2 id="page_Custom-Token-Patterns">Custom Token Patterns</h2>
+<p>See: <a href="https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js" class="external"><strong>Runnable example</strong></a> for quick starting.</p>
+<h3 id="page_Background">Background</h3>
+<p>Normally a Token's pattern is defined using a JavaScript regular expression:</p>
+<pre><code class="language-JavaScript">let IntegerToken = createToken({name: &quot;IntegerToken&quot;, pattern: /\d+/})
+</code></pre>
+<p>However in some circumstances the capability to provide a custom pattern matching implementation may be required.
+There are a few use cases in which a custom pattern could be used:</p>
+<ul>
+<li>
+<p>The token cannot be easily (or at all) defined using pure regular expressions.</p>
+<ul>
+<li>When context on previously lexed tokens is needed.
+For example: <a href="https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js" class="external">Lexing Python like indentation using Chevrotain</a>.</li>
+</ul>
+</li>
+<li>
+<p>Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:</p>
+<ul>
+<li>
+<a href="https://bugs.webkit.org/show_bug.cgi?id=152578" class="external">WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns</a> 😞</li>
+</ul>
+</li>
+</ul>
+<h3 id="page_Usage">Usage</h3>
+<p>A custom pattern has a similar API to the API of the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec" class="external">RegExp.prototype.exec</a>
+function. But with a small constraint.</p>
+<ul>
+<li>A custom pattern should behave as though the RegExp <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky" class="external">sticky flag</a> has been set.
+This means that attempted matches must begin at the offset argument, <strong>not</strong> at the start of the input.</li>
+</ul>
+<p>The basic syntax for supplying a custom pattern is defined by the <a href="http://sap.github.io/chevrotain/documentation/1_0_0/interfaces/_chevrotain_d_.icustompattern.html" class="external">ICustomPattern</a> interface.
+Example:</p>
+<pre><code class="language-JavaScript">function matchInteger(text, startOffset) {
+    let endOffset = startOffset
+    let charCode = text.charCodeAt(endOffset)
+    while (charCode &gt;= 48 &amp;&amp; charCode &lt;= 57) {
+        endOffset++
+        charCode = text.charCodeAt(endOffset)
+    }
+
+    // No match, must return null to conform with the RegExp.prototype.exec signature
+    if (endOffset === startOffset) {
+        return null
+    } else {
+        let matchedString = text.substring(startOffset, endOffset)
+        // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
+        return [matchedString]
+    }
+}
+
+let IntegerToken = createToken({
+                                 name: &quot;IntegerToken&quot;,
+                                 pattern: {
+                                   exec:  matchInteger
+                              }})
+</code></pre>
+<pre><code class="language-JavaScript">let IntegerToken = createToken({
+                                 name: &quot;IntegerToken&quot;,
+                                 pattern: {
+                                   exec:  matchInteger
+                              }})
+</code></pre>
+<p>Using an Object literal with only a single property is still a little verbose so an even more concise syntax is also supported:</p>
+<pre><code class="language-JavaScript">let IntegerToken = createToken({name: &quot;IntegerToken&quot;, pattern: matchInteger})
+</code></pre>
+<h3 id="page_Using-Previous-Lexing-Context">Using Previous Lexing Context</h3>
+<p>A custom token matcher has two optional arguments which allows accessing the current result of the tokenizer.
+Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).</p>
+<pre><code class="language-JavaScript">function matchInteger(text, offset, matchedTokens, groups) {
+   let lastMatchedToken = _.last(matchedTokens)
+   if (lastMatchedToken instanceof Identifier) {
+       return null
+   }
+       
+   // rest of the code from the example above...
+} 
+</code></pre>
+<p>A larger and non contrived example can seen here: <a href="https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js" class="external">Lexing Python like indentation using Chevrotain</a>.</p>
+<p>It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output (<a href="http://sap.github.io/chevrotain/documentation/1_0_0/interfaces/_chevrotain_d_.ilexingresult.html" class="external">ILexingResult</a>).
+These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
+in those arguments are still guaranteed to be in the final result.</p>
+    </div>
+
+        <nav>
+        <ul class="Pager">
+            <li class=Pager--prev><a href="../Deep_Dive/concrete_syntax_tree.html">Previous</a></li>            <li class=Pager--next><a href="../Deep_Dive/syntactic_content_assist.html">Next</a></li>        </ul>
+    </nav>
+    </article>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    <!-- jQuery -->
+    <script src="../themes/daux/js/jquery-1.11.3.min.js"></script>
+
+    <!-- hightlight.js -->
+    <script src="../themes/daux/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- JS -->
+    
+    <script src="../themes/daux/js/daux.js"></script>
+
+            <!-- Tipue Search -->
+        <script type="text/javascript" src="../tipuesearch/tipuesearch.js"></script>
+
+        <script>
+            window.onunload = function(){}; // force $(document).ready to be called on back/forward navigation in firefox
+            $(function() {
+                tipuesearch({
+                    'base_url': '../'
+                });
+            });
+        </script>
+    
+</body>
+</html>
