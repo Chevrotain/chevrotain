@@ -791,7 +791,7 @@ function checkPrefixAlternativesAmbiguities(
                     )}> due to common lookahead prefix\n` +
                     `in <OR${occurrence}> inside <${ruleName}> Rule,\n` +
                     `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-                    `See https://github.com/SAP/chevrotain/blob/master/docs/03_Building_Grammars/resolving_grammar_errors.md#COMMON_PREFIX\n` +
+                    `http://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX ` +
                     `For farther details.`
 
                 return {

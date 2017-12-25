@@ -349,7 +349,7 @@ export function findEndOfInputAnchor(
                 "\tToken Type: ->" +
                 tokenName(currType) +
                 "<- static 'PATTERN' cannot contain end of input anchor '$'\n" +
-                "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#ANCHORS \n" +
+                "\tSee sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#ANCHORS" +
                 "\tfor details.",
             type: LexerDefinitionErrorType.EOI_ANCHOR_FOUND,
             tokenTypes: [currType]
@@ -575,7 +575,7 @@ export function findUnreachablePatterns(
                         tokType
                     )}<-` +
                     `in the lexer's definition.\n` +
-                    `See https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#UNREACHABLE`
+                    `See http://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#UNREACHABLE`
                 errors.push({
                     message: msg,
                     type: LexerDefinitionErrorType.UNREACHABLE_PATTERN,
@@ -716,7 +716,7 @@ export function performRuntimeChecks(
                 "No LINE_BREAKS Error:\n" +
                 "\tThis Lexer has been defined to track line and column information,\n" +
                 "\tyet none of the Token definitions contain a LINE_BREAK flag.\n" +
-                "\tSee https://github.com/SAP/chevrotain/blob/master/docs/resolving_lexer_errors.md#LINE_BREAKS \n" +
+                "\tSee http://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#LINE_BREAKS \n" +
                 "\tfor details.",
             type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
         })

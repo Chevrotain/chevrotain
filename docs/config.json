@@ -3,6 +3,7 @@
   "tagline": "JavaScript Parser Building Toolkit",
   "author": "Shahar Soel",
   "ignore": {
+    "files" : ["01_Tutorial/src/README.md"],
     "folders": ["01_Tutorial/src"]
   },
   "live": {

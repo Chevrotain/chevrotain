@@ -770,7 +770,7 @@ describe("The prefix ambiguity detection full flow", () => {
         )
         expect(() => new PrefixAltAmbiguity()).to.throw("<PlusTok, MinusTok>")
         expect(() => new PrefixAltAmbiguity()).to.throw(
-            "See https://github.com/SAP/chevrotain/blob/master/docs/resolving_grammar_errors.md#COMMON_PREFIX"
+            "http://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX"
         )
     })
 
@@ -808,7 +808,7 @@ describe("The prefix ambiguity detection full flow", () => {
         )
         expect(() => new PrefixAltAmbiguity2()).to.throw("<PlusTok, MinusTok>")
         expect(() => new PrefixAltAmbiguity2()).to.throw(
-            "See https://github.com/SAP/chevrotain/blob/master/docs/resolving_grammar_errors.md#COMMON_PREFIX"
+            "http://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX"
         )
     })
 })
