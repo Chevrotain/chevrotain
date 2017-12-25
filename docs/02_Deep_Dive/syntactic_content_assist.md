@@ -1,6 +1,6 @@
 ## Syntactic Content Assist
 
-See: [**Runnable example**](../examples/parser/content_assist/official_feature_content_assist.js) for quick starting.
+See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/parser/content_assist/official_feature_content_assist.js) for quick starting.
 
 ### Detailed Docs:
 Chevrotain provides Syntactic Content assist Capabilities.

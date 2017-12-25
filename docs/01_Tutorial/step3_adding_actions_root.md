@@ -1,9 +1,9 @@
-* Previous tutorial step - [Step 2 - Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md)
+* Previous tutorial step - [Step 2 - Parsing](./step2_parsing.md)
 
 # Tutorial Step 3 - Adding Actions to the Parser.
 
 ### Introduction - The Problem:
-In the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md) tutorial step
+In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
 validates that the input conforms to the grammar. In most real world use cases the parser will also have to output some 
 result/data structure/value.
@@ -47,5 +47,5 @@ but that is not the case:
 * Prefer embedding the semantics (actions) in the grammar only in use cases where performance is of utmost concern.
 
 #### What is Next?
-* Next step in the tutorial: [Step 3a - Separated Actions with a Visitor](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3a_adding_actions_visitor.md).
-* Next step in the tutorial: [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
+* Next step in the tutorial: [Step 3a - Separated Actions with a Visitor](./step3a_adding_actions_visitor.md).
+* Next step in the tutorial: [Step 3b - Embedded Actions](./step3b_adding_actions_embedded.md).

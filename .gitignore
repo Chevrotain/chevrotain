@@ -22,3 +22,5 @@
 
 # we want to avoid locking version of Chevrotain in the examples sub packages.
 package-lock.json
+
+/static

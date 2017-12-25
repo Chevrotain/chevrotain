@@ -21,7 +21,7 @@ as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 * [**Online Playground**](http://sap.github.io/chevrotain/playground/)
-* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**
+* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/)**
 * [**Performance benchmark**][benchmark] 
 
 ## Features
@@ -50,7 +50,7 @@ as any other pure code without requiring any new tools or processes.
       * Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
       * [Multiple Lexer Modes][lexer_modes] depending on the context.
       * [Tokens Grouping][lexer_groups].
-      * [Custom Token patterns(none RegExp) support](docs/custom_token_patterns.md)
+      * [Custom Token patterns(none RegExp) support](docs/02_Deep_Dive/custom_token_patterns.md)
       * **No code generation** The Lexer does not require any code generation phase. 
 
   3. [**High Performance**][benchmark].
@@ -78,7 +78,7 @@ as any other pure code without requiring any new tools or processes.
 
 ## Documentation & Resources
 
-* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/)**.
+* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/)**.
 
 * **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 
@@ -89,7 +89,7 @@ as any other pure code without requiring any new tools or processes.
 * **[HTML docs](http://sap.github.io/chevrotain/documentation).**
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/1_0_0/classes/_chevrotain_d_.parser.html#at_least_one).
 
-* **[RoadMap](https://github.com/SAP/chevrotain/blob/master/docs/roadmap.md)**.
+* **[RoadMap](https://github.com/SAP/chevrotain/blob/master/docs/Roadmap.md)**.
    
    
 ## Dependencies
@@ -125,7 +125,7 @@ Some interesting samples:
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
 [parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
-[content assist]: https://github.com/SAP/chevrotain/blob/master/docs/syntactic_content_assist.md
+[content assist]: https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/syntactic_content_assist.md
 [separation]: https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
 [custom_errors]: https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js

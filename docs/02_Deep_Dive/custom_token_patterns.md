@@ -1,6 +1,6 @@
 ## Custom Token Patterns
 
-See: [**Runnable example**](../examples/lexer/custom_patterns/custom_patterns.js) for quick starting.
+See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js) for quick starting.
 
 ### Background
 Normally a Token's pattern is defined using a JavaScript regular expression:
@@ -14,7 +14,7 @@ There are a few use cases in which a custom pattern could be used:
 
 * The token cannot be easily (or at all) defined using pure regular expressions.
   - When context on previously lexed tokens is needed.
-    For example: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js). 
+    For example: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js). 
 
 * Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:
   - [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞 
@@ -84,7 +84,7 @@ function matchInteger(text, offset, matchedTokens, groups) {
 } 
 ```
 
-A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](../examples/lexer/python_indentation/python_indentation.js).
+A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
 It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/1_0_0/interfaces/_chevrotain_d_.ilexingresult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found

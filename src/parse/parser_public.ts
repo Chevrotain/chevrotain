@@ -176,7 +176,7 @@ export interface IParserConfig {
     /**
      * Enable automatic Concrete Syntax Tree creation
      * For in-depth docs:
-     * {@link https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md}
+     * {@link https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/concrete_syntax_tree.md}
      */
     outputCst?: boolean
 

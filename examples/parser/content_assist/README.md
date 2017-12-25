@@ -10,4 +10,4 @@ It is recommended to use and expand upon the **official** Chevrotain **computeCo
 content assist purposes. The Experimental example only exists to be used as a basis to build upon if the limitations of the official API
 cannot be worked around in specific use cases.
 
-For farther details, see: [in-depth documentation on Content Assist](../../../docs/syntactic_content_assist.md).
+For farther details, see: [in-depth documentation on Content Assist](../../../docs/02_deep_dive/syntactic_content_assist.md).

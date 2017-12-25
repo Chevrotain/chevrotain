@@ -45,7 +45,7 @@
   },
   "scripts": {
     "---------- CI FLOWS --------": "",
-    "ci_full_build": "npm-run-all clean lint verify_format compile dts compile_def coverage check_coverage docs bundle integration_tests",
+    "ci_full_build": "npm-run-all clean lint verify_format compile dts compile_def coverage check_coverage docs website bundle integration_tests",
     "ci_browser_tests": "npm-run-all clean compile bundle karma",
     "ci_full_build_coveralls": "npm-run-all ci_full_build coveralls",
     "dev_unit_tests": "npm-run-all clean compile unit_tests",
@@ -67,6 +67,7 @@
     "check_coverage": "nyc check-coverage --lines 100 --statements 100 --functions 100",
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
     "docs": "typedoc --tsconfig tsdocsconfig.json --out dev/docs --module commonjs --name Chevrotain --excludeExternals  --includeDeclarations",
+    "website" : "daux -ddev/website",
     "integration_tests": "grunt integration_tests",
     "karma": "grunt browsers_tests",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",

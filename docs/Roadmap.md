@@ -1,6 +1,6 @@
 ## RoadMap
 
-#### [Version 1.0](https://github.com/SAP/chevrotain/milestone/4)
+#### [~~Version 1.0~~](https://github.com/SAP/chevrotain/milestone/4)
 
 The APIs have been pretty stable for a while so Version 1.0 is in the works.
 This release will focus on improving the docs, adding a few more example grammars

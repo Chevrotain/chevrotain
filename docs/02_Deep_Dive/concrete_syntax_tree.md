@@ -74,9 +74,7 @@ output = {
 ```
 
 Each Terminal will appear in the children dictionary using the terminal's name
-as the key and an **array** of IToken as the value. These array items will be either 
-a Token instance of a Token structure depending on the [Token type](docs/token_types.md) used.
-
+as the key and an **array** of IToken as the value.
 
 ```JavaScript
 $.RULE("qualifiedName", () => {

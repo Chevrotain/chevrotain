@@ -1,9 +1,9 @@
-* Previous tutorial step - [Step 2 - Parsing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md)
+* Previous tutorial step - [Step 2 - Parsing](./step2_parsing.md)
 
 # Tutorial Step 3 - Adding Actions using a CST Visitor.
 
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3_actions/step3a_actions_visitor.js) for this step <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/01_tutorial/src/step3_actions/step3a_actions_visitor.js) for this step <---
 
 
 ### On code samples:
@@ -12,7 +12,7 @@ See examples of using Chevrotain in other [implementation languages](https://git
 
 
 ### Introduction:
-In the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step2_parsing.md) tutorial step
+In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
 validates the input conforms to the grammar, in other words it is just a recognizer. 
 But in most real world use cases the parser will **also** have to output some result/data structure/value.
@@ -299,6 +299,6 @@ function toAst(inputText) {
 ``` 
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step3a_actions_visitor) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_tutorial/src/step3a_actions_visitor) of 
   this tutorial step.
-* Next step in the tutorial: [Step 4 - Fault Tolerance](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step4_fault_tolerance.md).
+* Next step in the tutorial: [Step 4 - Fault Tolerance](./step4_fault_tolerance.md).

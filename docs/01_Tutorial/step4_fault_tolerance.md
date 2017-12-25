@@ -1,6 +1,6 @@
 * Previous tutorial steps
-  * [Step 3a - Separated Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3a_adding_actions_visitor.md).
-  * [Step 3b - Embedded Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3b_adding_actions_embedded.md).
+  * [Step 3a - Separated Actions](./step3a_adding_actions_visitor.md).
+  * [Step 3b - Embedded Actions](./step3b_adding_actions_embedded.md).
 
 # Tutorial Step 4 - Fault tolerance and Error recovery.
 
@@ -206,7 +206,7 @@ To the parser's constructor [constructor](http://sap.github.io/chevrotain/docume
 
 
 #### CST output for re-synced rules:
-When using [Concrete Syntax Tree]((https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md)) output
+When using [Concrete Syntax Tree](../02_Deep_Dive/concrete_syntax_tree.md) output
 A re-synced will return a CSTNode with the boolean ["recoveredNode"](http://sap.github.io/chevrotain/documentation/1_0_0/interfaces/_chevrotain_d_.cstnode.html#recoverednode) flag marked as true.
 Additionally a recovered node **may not** have all its contents (children dictionary) filled
 as only the Terminals and None-Terminals encountered **before** the error which triggered the re-sync

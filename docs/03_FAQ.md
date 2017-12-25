@@ -82,7 +82,7 @@ used for many things such as:
 Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive minification options can break Chevrotain grammars.
 
-See [related documentation](../examples/parser/minification/README.md) for details & workarounds.
+See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/minification/README.md) for details & workarounds.
 
 
 ### <a name="WEBPACK"></a> Why does Chevrotain not work correctly after I webpacked my Grammar?
@@ -90,7 +90,7 @@ Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive webpack 2 optimizations (tree shaking) can break Chevrotain grammars under
 certain conditions.
 
-See [related documentation](../examples/parser/webpack/README.md) for details & workarounds.
+See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/webpack/README.md) for details & workarounds.
 
 
 ### <a name="STUCK_AMBIGUITY"></a> Why does my parser appear to be stuck during it's initialization?

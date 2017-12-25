@@ -1,9 +1,9 @@
-* Previous tutorial step - [Step 1 - Lexing](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md)
+* Previous tutorial step - [Step 1 - Lexing](https://github.com/SAP/chevrotain/blob/master/docs/01_tutorial/step1_lexing.md)
 
 # Tutorial Step 2 - Building a Parser.
 
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing) for this step <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/01_tutorial/src/step2_parsing) for this step <---
 
 
 ### On code samples:
@@ -13,7 +13,7 @@ See examples of using Chevrotain in other [implementation languages](https://git
 
 ### Introduction:
 In this tutorial we will implement a Parser for a simple SQL Select statement language
-introduced in the [previous](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step1_lexing.md) tutorial step. 
+introduced in the [previous](./step1_lexing.md) tutorial step. 
 
 The grammar for our language:
 
@@ -295,6 +295,6 @@ parseInput(inputText)
 
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step2_parsing) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_tutorial/src/step2_parsing) of 
   this tutorial step.
-* Next step in the tutorial: [Step 3 - Grammar Actions](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/step3_adding_actions_root.md).
+* Next step in the tutorial: [Step 3 - Grammar Actions](./step3_adding_actions_root.md).
