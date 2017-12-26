@@ -24,7 +24,7 @@ var orgWebsiteLocation = path.join(__dirname, '../../chevrotain/dev/website')
 wrench.copyDirSyncRecursive(orgWebsiteLocation, targetWebsiteDir)
 
 myRepo.addSync([targetWebsiteDir])
-myRepo.commitSync("docs for release " + version)
+myRepo.commitSync("Updating Website")
 myRepo.push("origin", "gh-pages", function () {
     console.log("finished push to branch")
 })
