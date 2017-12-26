@@ -21,7 +21,7 @@ if (branchesInfo.current !== 'gh-pages') {
 
 var targetWebsiteDir = path.join(__dirname, '../website/')
 var orgWebsiteLocation = path.join(__dirname, '../../chevrotain/dev/website')
-wrench.copyDirSyncRecursive(orgWebsiteLocation, targetWebsiteDir)
+wrench.copyDirSyncRecursive(orgWebsiteLocation, targetWebsiteDir, {forceDelete: true})
 
 myRepo.addSync([targetWebsiteDir])
 myRepo.commitSync("Updating Website")
