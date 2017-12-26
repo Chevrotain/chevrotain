@@ -1,3 +1,15 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Documentation
+
+- [New Documentation Website.](http://sap.github.io/chevrotain/website/)
+
+#### Bug Fixes
+
+- Parser exceptions will now reference the new docs page.
+
+
+
 ## 1.0.0 (12-8-2017)
 
 #### Breaking Changes
