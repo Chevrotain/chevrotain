@@ -78,7 +78,7 @@ as any other pure code without requiring any new tools or processes.
 
 ## Documentation & Resources
 
-* **[Getting Started Tutorial](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/)**.
+* **[Getting Started Tutorial](http://sap.github.io/chevrotain/website/Tutorial/step1_lexing.html)**.
 
 * **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 

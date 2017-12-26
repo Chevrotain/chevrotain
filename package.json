@@ -68,6 +68,7 @@
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
     "docs": "typedoc --tsconfig tsdocsconfig.json --out dev/docs --module commonjs --name Chevrotain --excludeExternals  --includeDeclarations",
     "website": "daux -ddev/website",
+    "upload_website": "npm run website && node ../chevrotain_docs/scripts/upload_website.js",
     "integration_tests": "grunt integration_tests",
     "karma": "grunt browsers_tests",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
