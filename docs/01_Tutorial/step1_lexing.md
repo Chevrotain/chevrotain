@@ -1,6 +1,6 @@
 # Tutorial Step 1 - Building a Lexer.
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/tree/master/docs/01_tutorial/src/step1_lexing) for this step <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/tree/master/docs/01_Tutorial/src/step1_lexing) for this step <---
 
 
 ### On code samples:
@@ -139,6 +139,6 @@ The Lexing Result will contain:
 
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_tutorial/src/step1_lexing) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/src/step1_lexing) of 
   this tutorial step.
 * Move to the next step: [Step 2 - Parsing](./step2_parsing.md).

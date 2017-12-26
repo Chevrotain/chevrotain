@@ -11,7 +11,7 @@ var changeLogPath = path.join(__dirname, "../CHANGELOG.md")
 // TODO: have to manually add new subfolders here.
 // TODO: implement something recursive that will not crash due to symlinks of "npm link"
 var docsDirPath = path.join(__dirname, "../docs")
-var docTutorialPath = docsDirPath + "/tutorial"
+var docTutorialPath = docsDirPath + "/01_Tutorial"
 var docFiles = fs.readdirSync(docsDirPath)
 var docTutorialFiles = fs.readdirSync(docTutorialPath)
 
