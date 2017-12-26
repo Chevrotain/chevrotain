@@ -1,44 +1,53 @@
-var fs = require("fs")
-var jf = require("jsonfile")
-var path = require("path")
-var _ = require("lodash")
+const fs = require("fs")
+const jf = require("jsonfile")
+const path = require("path")
+const _ = require("lodash")
 
-var versionPath = path.join(__dirname, "../src/version.ts")
-var packagePath = path.join(__dirname, "../package.json")
-var changeLogPath = path.join(__dirname, "../CHANGELOG.md")
+const versionPath = path.join(__dirname, "../src/version.ts")
+const packagePath = path.join(__dirname, "../package.json")
+const changeLogPath = path.join(__dirname, "../CHANGELOG.md")
 
-// docs (.md files for bumping versions)
-// TODO: have to manually add new subfolders here.
-// TODO: implement something recursive that will not crash due to symlinks of "npm link"
-var docsDirPath = path.join(__dirname, "../docs")
-var docTutorialPath = docsDirPath + "/01_Tutorial"
-var docFiles = fs.readdirSync(docsDirPath)
-var docTutorialFiles = fs.readdirSync(docTutorialPath)
+const docsDirPath = path.join(__dirname, "../docs")
+const docFiles = fs.readdirSync(docsDirPath)
 
-var docFilesPaths = _.map(docFiles, function(file) {
+const docFilesPaths = _.map(docFiles, function(file) {
     return path.join(docsDirPath, file)
 })
 
-var docTutorialFilesPaths = _.map(docTutorialFiles, function(file) {
-    return path.join(docTutorialPath, file)
-})
+const markdownDocsFiles = _.reduce(
+    docFilesPaths,
+    (result, currPath) => {
+        // Only scan 2 directories deep.
+        if (fs.lstatSync(currPath).isDirectory()) {
+            const nestedFiles = fs.readdirSync(currPath)
+            const nestedPaths = _.map(nestedFiles, currFile =>
+                path.join(currPath, currFile)
+            )
+            const newMarkdowns = _.filter(nestedPaths, currPath =>
+                _.endsWith(currPath, ".md")
+            )
 
-docFilesPaths = docFilesPaths.concat(docTutorialFilesPaths)
+            result = result.concat(newMarkdowns)
+        } else if (
+            fs.lstatSync(currPath).isFile() &&
+            _.endsWith(currPath, ".md")
+        ) {
+            result.push(currPath)
+        }
 
-docFilesPaths = _.filter(docFilesPaths, function(currDocEntry) {
-    return /\.md$/.test(currDocEntry)
-})
-var readmePath = path.join(__dirname, "../readme.md")
-docFilesPaths.push(readmePath)
+        return result
+    },
+    []
+)
 
-var readmeDiagramsPath = path.join(__dirname, "../diagrams/README.md")
-docFilesPaths.push(readmeDiagramsPath)
+const mainReadmePath = path.join(__dirname, "../readme.md")
+docFilesPaths.push(mainReadmePath)
 
-var pkgJson = jf.readFileSync(packagePath)
-var apiString = fs.readFileSync(versionPath, "utf8").toString()
-var changeLogString = fs.readFileSync(changeLogPath, "utf8").toString()
+const pkgJson = jf.readFileSync(packagePath)
+const apiString = fs.readFileSync(versionPath, "utf8").toString()
+const changeLogString = fs.readFileSync(changeLogPath, "utf8").toString()
 
-var mode = ""
+let mode = ""
 if (_.includes(process.argv, "patch")) {
     mode = "patch"
 } else if (_.includes(process.argv, "minor")) {
@@ -54,8 +63,8 @@ module.exports = {
     versionPath: versionPath,
     packagePath: packagePath,
     changeLogPath: changeLogPath,
-    docFilesPaths: docFilesPaths,
-    readmePath: readmePath,
+    docFilesPaths: markdownDocsFiles,
+    readmePath: mainReadmePath,
     pkgJson: pkgJson,
     apiString: apiString,
     changeLogString: changeLogString,
