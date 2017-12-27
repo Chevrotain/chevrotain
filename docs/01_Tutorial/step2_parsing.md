@@ -3,7 +3,7 @@
 # Tutorial Step 2 - Building a Parser.
 
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/src/step2_parsing) for this step <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step2_parsing) for this step <---
 
 
 ### On code samples:
@@ -295,6 +295,6 @@ parseInput(inputText)
 
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/src/step2_parsing) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step2_parsing) of 
   this tutorial step.
 * Next step in the tutorial: [Step 3 - Grammar Actions](./step3_adding_actions_root.md).

@@ -77,12 +77,11 @@ module.exports = function(grunt) {
                 },
                 exec: INSTALL_LINK + " && npm test"
             },
-            test_tutorial: {
+            test_examples_tutorial: {
                 options: {
-                    cwd: process.cwd() + "/docs/01_Tutorial/src/"
+                    cwd: process.cwd() + "/examples/tutorial/"
                 },
-                // removing the node modules post install to avoid errors with website generation.
-                exec: INSTALL_LINK + " && npm test && rm -r node_modules"
+                exec: INSTALL_LINK + " && npm test"
             }
         },
 
@@ -199,7 +198,7 @@ module.exports = function(grunt) {
         "run:test_examples_parser",
         "run:test_examples_lexer",
         "run:test_examples_implementation_languages",
-        "run:test_tutorial"
+        "run:test_examples_tutorial"
     ]
 
     const browserTestsTasks = [

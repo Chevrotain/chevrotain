@@ -3,7 +3,7 @@
 # Tutorial Step 3 - Adding Actions using a CST Visitor.
 
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/src/step3_actions/step3a_actions_visitor.js) for this step <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3a_actions_visitor.js) for this step <---
 
 
 ### On code samples:
@@ -299,6 +299,6 @@ function toAst(inputText) {
 ``` 
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/src/step3a_actions_visitor) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/step3a_actions_visitor) of 
   this tutorial step.
 * Next step in the tutorial: [Step 4 - Fault Tolerance](./step4_fault_tolerance.md).

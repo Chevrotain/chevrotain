@@ -5,7 +5,7 @@
 # Tutorial Step 4 - Fault tolerance and Error recovery.
 
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step4_error_recovery) for this step <---
+### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step4_error_recovery) for this step <---
 
 
 ### Introduction:
@@ -242,5 +242,5 @@ additional definitions (what should be returned value of a re-synced rule?).
  
    
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/docs/tutorial/src/step4_error_recovery) of 
+* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step4_error_recovery) of 
   this tutorial step.
