@@ -1,4 +1,4 @@
-* Previous tutorial step - [Step 1 - Lexing](https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/step1_lexing.md)
+* Previous tutorial step - [Step 1 - Lexing](./step1_lexing.md)
 
 # Tutorial Step 2 - Building a Parser.
 
