@@ -1,4 +1,4 @@
-[![Discord](https://img.shields.io/discord/393479922372313090.svg)]()
+[![Discord](https://img.shields.io/discord/393479922372313090.svg)](https://discord.gg/J5Nx6r9)
 [![npm](https://img.shields.io/npm/v/chevrotain.svg)](https://www.npmjs.com/package/chevrotain)
 [![Build Status](https://travis-ci.org/SAP/chevrotain.svg?branch=master)](https://travis-ci.org/SAP/chevrotain)
 [![Coverage Status](https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master)](https://coveralls.io/r/SAP/chevrotain?branch=master)
