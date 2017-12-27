@@ -41,7 +41,7 @@ const markdownDocsFiles = _.reduce(
 )
 
 const mainReadmePath = path.join(__dirname, "../readme.md")
-docFilesPaths.push(mainReadmePath)
+markdownDocsFiles.push(mainReadmePath)
 
 const pkgJson = jf.readFileSync(packagePath)
 const apiString = fs.readFileSync(versionPath, "utf8").toString()

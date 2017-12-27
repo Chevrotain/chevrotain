@@ -82,7 +82,8 @@ module.exports = function(grunt) {
                 options: {
                     cwd: process.cwd() + "/docs/01_Tutorial/src/"
                 },
-                exec: INSTALL_LINK + " && npm test"
+                // removing the node modules post install to avoid errors with website generation.
+                exec: INSTALL_LINK + " && npm test && rm -r node_modules"
             }
         },
 
