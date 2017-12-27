@@ -65,8 +65,7 @@ module.exports = function(grunt) {
                     " && " +
                     "grunt --gruntfile minification/gruntfile.js" +
                     " && " +
-                    "npm --prefix ./webpack" +
-                    " install  ./webpack" +
+                    "npm install --prefix ./webpack" +
                     " && " +
                     "npm --prefix ./webpack link chevrotain" +
                     " && " +

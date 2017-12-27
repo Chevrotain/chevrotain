@@ -49,7 +49,7 @@
     "ci_browser_tests": "npm-run-all clean compile bundle karma",
     "ci_full_build_coveralls": "npm-run-all ci_full_build coveralls",
     "dev_unit_tests": "npm-run-all clean compile unit_tests",
-    "dev_integration_tests": "npm-run-all clean compile integration_tests",
+    "dev_integration_tests": "npm-run-all clean quick_build dts integration_tests",
     "dev_browser_tests": "npm-run-all clean compile bundle karma",
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
