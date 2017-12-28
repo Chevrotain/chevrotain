@@ -99,7 +99,7 @@
     "istanbul": "^0.4.5",
     "jsdom": "^11.5.1",
     "jsonfile": "^4.0.0",
-    "karma": "~1.7.1",
+    "karma": "~2.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "~2.2.0",
     "karma-firefox-launcher": "~1.1.0",
