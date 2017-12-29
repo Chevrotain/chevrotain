@@ -17,10 +17,10 @@ const grammar = require("./grammar")
 
 // extract the serialized grammar.
 const parserInstance = grammar.parserInstance
-const serialziedGrammar = parserInstance.getSerializedGastProductions()
+const serializedGrammar = parserInstance.getSerializedGastProductions()
 
 // create the HTML Text
-const htmlText = chevrotain.createSyntaxDiagramsCode(serialziedGrammar)
+const htmlText = chevrotain.createSyntaxDiagramsCode(serializedGrammar)
 
 // Write the HTML file to disk
 const outPath = path.resolve(__dirname, "./")
