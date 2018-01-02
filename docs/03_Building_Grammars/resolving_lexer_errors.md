@@ -156,6 +156,6 @@ To resolve this second problem see how to prefer the **longest match**
 as demonstrated in the [keywords vs identifiers example][keywords_idents]
  
 
-[position_tracking]: http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/_chevrotain_d_.ilexerconfig.html#positiontracking
-[line_terminator_docs]: http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/_chevrotain_d_.ilexerconfig.html#lineTerminatorsPattern   
+[position_tracking]: http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ilexerconfig.html#positiontracking
+[line_terminator_docs]: http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ilexerconfig.html#lineTerminatorsPattern   
 [keywords_idents] https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js

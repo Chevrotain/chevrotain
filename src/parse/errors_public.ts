@@ -47,7 +47,7 @@ export interface IErrorMessageProvider {
      * @param options.actual - The actual sequence of tokens encountered.
      *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the "OR" DSL method.
-     *                                http://sap.github.io/chevrotain/documentation/0_29_0/interfaces/_chevrotain_d_.ormethodopts.html#err_msg
+     *                                http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ormethodopts.html#err_msg
      *                                This is that custom message.
      *
      * @param options.ruleName - The rule in which the error occurred.
@@ -71,7 +71,7 @@ export interface IErrorMessageProvider {
      *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
      *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the "AT_LEAST_ONE" DSL method.
-     *                                http://sap.github.io/chevrotain/documentation/0_29_0/interfaces/_chevrotain_d_.dslmethodoptswitherr.html#err_msg
+     *                                http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/dslmethodoptswitherr.html#err_msg
      *                                This is that custom message.
      *
      * @param options.ruleName - The rule in which the error occurred.

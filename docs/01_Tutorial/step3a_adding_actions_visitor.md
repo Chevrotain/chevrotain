@@ -24,7 +24,7 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
 ### Enabling CST output in our parser.
 
 First we need to enable CST (Concrete Syntax Tree) creation by our parser.
-This is easily done by passing the ["outputCst"](http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/_chevrotain_d_.iparserconfig.html#outputcst) parser options object in
+This is easily done by passing the ["outputCst"](http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/iparserconfig.html#outputcst) parser options object in
 the super constructor.
 
 ```javascript
