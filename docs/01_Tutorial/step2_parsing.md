@@ -162,7 +162,7 @@ this.selectClause =
 There **do not** exist two different representations for the grammar
 and the runnable implementation (for example, grammar file vs generated code in the case of parser generators).
 Again, please note that Chevrotain is **NOT** a parser generator.
-Extra details can be found [in the FAQ](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#-why-should-i-use-a-parsing-dsl-instead-of-a-parser-generator).
+Extra details can be found [in the FAQ](http://sap.github.io/chevrotain/website/FAQ.html#VS_GENERATORS).
 
 
 #### But how does it work? (skip if you don't care :) )

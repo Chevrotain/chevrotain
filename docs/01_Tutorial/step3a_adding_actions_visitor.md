@@ -18,7 +18,7 @@ validates the input conforms to the grammar, in other words it is just a recogni
 But in most real world use cases the parser will **also** have to output some result/data structure/value.
 
 This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **outside** our grammar:
- * See in depth documentation of Chevrotain's [CST capabilities](https://github.com/SAP/chevrotain/blob/master/docs/concrete_syntax_tree.md)
+ * See in depth documentation of Chevrotain's [CST capabilities](http://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html)
 
 
 ### Enabling CST output in our parser.

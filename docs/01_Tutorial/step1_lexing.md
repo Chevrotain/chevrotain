@@ -35,7 +35,7 @@ From.PATTERN = /FROM/
 There is nothing much to it. The pattern/PATTERN property is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
-We will use the [**createToken** API](http://sap.github.io/chevrotain/documentation/1_0_1/modules/html#createtoken) 
+We will use the [**createToken** API](http://sap.github.io/chevrotain/documentation/1_0_1/globals.html#createtoken) 
 in the rest of tutorial because ES2015 has no support for static fields.
  
  
