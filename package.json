@@ -87,7 +87,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.0.10",
-    "@types/mocha": "^2.2.44",
+    "@types/mocha": "^2.2.45",
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
     "gitty": "^3.6.0",
@@ -110,14 +110,14 @@
     "karma-sauce-launcher": "^1.2.0",
     "load-grunt-tasks": "^3.5.2",
     "lodash": "^4.17.4",
-    "mocha": "^4.0.1",
+    "mocha": "^4.1.0",
     "npm-run-all": "^4.1.2",
     "nyc": "^11.4.1",
     "prettier": "1.9.2",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
     "tslint": "^5.8.0",
-    "typedoc": "^0.8.0",
+    "typedoc": "^0.9.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0",
     "xregexp": "^4.0.0"
@@ -138,5 +138,7 @@
       "test/test.config.js"
     ]
   },
-  "dependencies": {}
+  "dependencies": {
+    "npm-check-updates": "^2.14.0"
+  }
 }
