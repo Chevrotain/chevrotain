@@ -68,7 +68,7 @@
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
     "docs": "typedoc --tsconfig tsdocsconfig.json --out dev/docs --module commonjs --name Chevrotain --excludeExternals  --includeDeclarations",
     "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",
-    "website": "npm run dead_links && daux -ddev/website",
+    "website": "daux -ddev/website",
     "upload_website": "npm run website && node ../chevrotain_docs/scripts/upload_website.js",
     "integration_tests": "grunt integration_tests",
     "karma": "grunt browsers_tests",
