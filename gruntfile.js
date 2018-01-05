@@ -23,9 +23,9 @@ const PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
 PUBLIC_API_TS_FILES.push("./node_modules/@types/node/index.d.ts")
 
 const fourSpaces = "    "
-const examples_test_command = "npm test"
+const examples_test_command = "yarn test"
 
-const INSTALL_LINK = "npm install && npm link chevrotain"
+const INSTALL_LINK = "yarn install && yarn link chevrotain"
 const INSTALL_LINK_TEST = INSTALL_LINK + " && " + examples_test_command
 
 const banner = "/*! <%= pkg.name %> - v<%= pkg.version %> */"
@@ -41,8 +41,8 @@ module.exports = function(grunt) {
             options: {
                 failOnError: true
             },
-            npm_link: {
-                exec: "npm link"
+            yarn_link: {
+                exec: "yarn link"
             },
             test_examples_lexer: {
                 options: {
@@ -65,9 +65,9 @@ module.exports = function(grunt) {
                     " && " +
                     "grunt --gruntfile minification/gruntfile.js" +
                     " && " +
-                    "npm install --prefix ./webpack" +
+                    "yarn install --prefix ./webpack" +
                     " && " +
-                    "npm --prefix ./webpack link chevrotain" +
+                    "yarn --prefix ./webpack link chevrotain" +
                     " && " +
                     examples_test_command
             },
@@ -75,13 +75,13 @@ module.exports = function(grunt) {
                 options: {
                     cwd: process.cwd() + "/examples/implementation_languages/"
                 },
-                exec: INSTALL_LINK + " && npm test"
+                exec: INSTALL_LINK + " && yarn test"
             },
             test_examples_tutorial: {
                 options: {
                     cwd: process.cwd() + "/examples/tutorial/"
                 },
-                exec: INSTALL_LINK + " && npm test"
+                exec: INSTALL_LINK + " && yarn test"
             }
         },
 
@@ -193,7 +193,7 @@ module.exports = function(grunt) {
     require("load-grunt-tasks")(grunt)
 
     const integrationTestsNodeTasks = [
-        "run:npm_link",
+        "run:yarn_link",
         "run:test_examples_grammars",
         "run:test_examples_parser",
         "run:test_examples_lexer",

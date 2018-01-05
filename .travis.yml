@@ -25,9 +25,9 @@ addons:
     packages:
       - g++-4.8
 install:
-  - npm install
+  - yarn
 script:
-  - npm run $NPM_TASK
+  - yarn run $NPM_TASK
 deploy:
   - provider: npm
     email: shahar.soel@gmail.com
