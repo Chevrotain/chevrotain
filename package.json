@@ -55,7 +55,7 @@
     "watch": "tsc -w",
     "unit_tests": "node_modules/.bin/_mocha \"./lib/test/**/*spec.js\"",
     "format": "prettier --no-editorconfig --write \"**/*.@(ts|js)\"",
-    "quick_build": "tsc && npm run bundle",
+    "quick_build": "tsc && yarn run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "rm -rf coverage dev lib",
     "lint": "tslint --project tsconfig.json",
@@ -69,7 +69,7 @@
     "docs": "typedoc --tsconfig tsdocsconfig.json --out dev/docs --module commonjs --name Chevrotain --excludeExternals  --includeDeclarations",
     "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",
     "website": "daux -ddev/website",
-    "upload_website": "npm run website && node ../chevrotain_docs/scripts/upload_website.js",
+    "upload_website": "yarn run website && node ../chevrotain_docs/scripts/upload_website.js",
     "integration_tests": "grunt integration_tests",
     "karma": "grunt browsers_tests",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
@@ -81,9 +81,9 @@
     "bundle_min": "webpack --config webpack_release_min.config.js",
     "bundle_spec": "webpack --config webpack_specs.config.js",
     "---------- RELEASES --------": "",
-    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && npm run ci_full_build && node scripts/post_release_build.js patch && npm run website && node ../chevrotain_docs/scripts/upload_docs.js",
-    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && npm run ci_full_build && node scripts/post_release_build.js minor && npm run website && node ../chevrotain_docs/scripts/upload_docs.js",
-    "release_major": "git fetch && git rebase && node scripts/pre_release_build.js major && npm run ci_full_build && node scripts/post_release_build.js major && npm run website && node ../chevrotain_docs/scripts/upload_docs.js"
+    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && yarn run ci_full_build && node scripts/post_release_build.js patch && yarn run website && node ../chevrotain_docs/scripts/upload_docs.js",
+    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && yarn run ci_full_build && node scripts/post_release_build.js minor && yarn run website && node ../chevrotain_docs/scripts/upload_docs.js",
+    "release_major": "git fetch && git rebase && node scripts/pre_release_build.js major && yarn run ci_full_build && node scripts/post_release_build.js major && yarn run website && node ../chevrotain_docs/scripts/upload_docs.js"
   },
   "devDependencies": {
     "@types/chai": "^4.0.10",
