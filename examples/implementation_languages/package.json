@@ -4,7 +4,7 @@
     "scripts": {
         "build_ts": "tsc ./typescript/typescript_json.ts",
         "build_coffee": "coffee -c ./coffeescript/coffeescript_json.coffee",
-        "test": "npm run build_ts && npm run build_coffee && mocha \"*spec.js\""
+        "test": "yarn run build_ts && yarn run build_coffee && mocha \"*spec.js\""
     },
     "dependencies": {
         "chevrotain": "*"

@@ -40,20 +40,20 @@ Details:
 
 ## Development Environment
 
-Chevrotain uses npm tasks for the development flows.
+Chevrotain uses **yarn** tasks for the development flows.
 Examine the [package.json][package] scripts for all the available tasks:
 
 #### Initial Setup
 
-* ```npm install```
+* ```yarn install```
 
 #### Some basic dev flows to get started
 
 Chevrotain is written using Typescript, so compilation to javascript is needed.
-* ```npm run compile```
+* ```yarn run compile```
 
 Alternatively during development one would want to recompile on file changes.
-* ```npm run watch```
+* ```yarn run watch```
 
 The compilation result will appear in the **lib** folder.
 
@@ -61,27 +61,27 @@ The compilation result will appear in the **lib** folder.
 
 Chevrotain uses **prettier** to avoid caring about code formatting...
 To format your new code use:
-```npm run format```
+```yarn run format```
 
 #### Testing
 
 Chevrotain uses several different types of tests to promote high quality.
 
 The most basic ones are the **mocha unit tests**, which are also the most relevant ones.
-* ```npm run dev_unit_tests```
+* ```yarn run dev_unit_tests```
  
-Additionally **integration tests** are used to test Chevrotain as an end user with the help of **npm link**  
-* ```npm run dev_integration_tests```
+Additionally **integration tests** are used to test Chevrotain as an end user with the help of **yarn link**  
+* ```yarn run dev_integration_tests```
 
 And last but not least **browser tests** run the unit tests on multiple browsers using **karma and sauce labs**
 On the central CI and Chrome on a local dev machine.
-* ```npm run dev_browser_tests```
+* ```yarn run dev_browser_tests```
 
 #### Running the central CI flow locally.
 
-This is just another npm task which performs the whole flow 
+This is just another yarn task which performs the whole flow 
 including linting / doc generation / d.ts API creation / ...
-* ```npm run ci_full_build```
+* ```yarn run ci_full_build```
   - Node > 4 is required to pass the coverage checks.
 
 

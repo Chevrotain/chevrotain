@@ -65,9 +65,13 @@ module.exports = function(grunt) {
                     " && " +
                     "grunt --gruntfile minification/gruntfile.js" +
                     " && " +
-                    "yarn install --prefix ./webpack" +
+                    "cd webpack" +
                     " && " +
-                    "yarn --prefix ./webpack link chevrotain" +
+                    "yarn install" +
+                    " && " +
+                    "yarn link chevrotain" +
+                    " && " +
+                    "cd .." +
                     " && " +
                     examples_test_command
             },
