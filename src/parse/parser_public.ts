@@ -189,6 +189,13 @@ export interface IParserConfig {
      *   - Providing special error messages under certain conditions - missing semicolons
      */
     errorMessageProvider?: IErrorMessageProvider
+
+    /**
+     * During cst analysis, the standard buildInitDefFunc uses "new Function" 
+     * which will trigger unsafe-eval warnings in some web contexts.
+     * You can use this optional flag to avoid the warning.
+     */
+    avoidDynamicCodeDuringAnalysis?: boolean
 }
 
 const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
@@ -196,6 +203,7 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     maxLookahead: 4,
     ignoredIssues: <any>{},
     dynamicTokensEnabled: false,
+    avoidDynamicCodeDuringAnalysis: false,
     // TODO: Document this breaking change, can it be mitigated?
     // TODO: change to true
     outputCst: false,
@@ -515,7 +523,8 @@ export class Parser {
 
             let cstAnalysisResult = analyzeCst(
                 clonedProductions.values(),
-                parserInstance.fullRuleNameToShort
+                parserInstance.fullRuleNameToShort,
+                parserInstance.avoidDynamicCodeDuringAnalysis
             )
             cache
                 .getCstDictDefPerRuleForClass(className)
@@ -551,6 +560,7 @@ export class Parser {
      */
     protected recoveryEnabled: boolean
     protected dynamicTokensEnabled: boolean
+    protected avoidDynamicCodeDuringAnalysis: boolean
     protected maxLookahead: number
     protected ignoredIssues: IgnoredParserIssues
     protected outputCst: boolean
@@ -616,6 +626,13 @@ export class Parser {
         this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
             ? config.dynamicTokensEnabled
             : DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
+
+        this.avoidDynamicCodeDuringAnalysis = has(
+            config,
+            "avoidDynamicCodeDuringAnalysis"
+        )
+            ? config.avoidDynamicCodeDuringAnalysis
+            : DEFAULT_PARSER_CONFIG.avoidDynamicCodeDuringAnalysis
 
         this.maxLookahead = has(config, "maxLookahead")
             ? config.maxLookahead
