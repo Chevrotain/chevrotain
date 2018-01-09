@@ -36,7 +36,7 @@ export function genWrapperFunction(options: {
     name: string
     rules: gast.Rule[]
 }): string {
-    return `
+    return `    
 ${genClass(options)}
 return new ${options.name}(tokenVocabulary, config)    
 `
@@ -47,10 +47,11 @@ export function genClass(options: {
     rules: gast.Rule[]
 }): string {
     // TODO: how to pass the token vocabulary? Constructor? other?
+    // TODO: should outputCst be enabled by default?
     let result = `
 function ${options.name}(tokenVocabulary, config) {
     // invoke super constructor
-    Parser.call(this, [], tokenVocabulary, config)
+    chevrotain.Parser.call(this, [], tokenVocabulary, config)
 
     const $ = this
 
@@ -59,12 +60,12 @@ function ${options.name}(tokenVocabulary, config) {
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    performSelfAnalysis(this)
+    chevrotain.Parser.performSelfAnalysis(this)
 }
 
 // inheritance as implemented in javascript in the previous decade... :(
-myParser.prototype = Object.create(Parser.prototype)
-myParser.prototype.constructor = myParser    
+${options.name}.prototype = Object.create(chevrotain.Parser.prototype)
+${options.name}.prototype.constructor = ${options.name}    
     `
 
     return result
@@ -77,10 +78,13 @@ export function genAllRules(rules: gast.Rule[]): string {
 }
 
 export function genRule(prod: gast.Rule, n: number): string {
+    if (n === undefined) {
+        n = 1
+    }
     // TODO: how to define and support arguments
     let result = indent(n, `$.RULE("${prod.name}", function() {`)
     result += genDefinition(prod.definition, n + 1)
-    result += indent(n, `})`)
+    result += indent(n + 1, `})`)
     return result
 }
 
@@ -93,14 +97,14 @@ export function genTerminal(prod: gast.Terminal, n: number): string {
     // TODO: potential performance optimization, avoid tokenMap Dictionary access
     return indent(
         n,
-        `$.CONSUME${prod.occurrenceInParent}(this.tokensMap.${name}})`
+        `$.CONSUME${prod.occurrenceInParent}(this.tokensMap.${name})`
     )
 }
 
 export function genNonTerminal(prod: gast.NonTerminal, n: number): string {
     return indent(
         n,
-        `$.SUBRULE${prod.occurrenceInParent}($.${prod.nonTerminalName}})`
+        `$.SUBRULE${prod.occurrenceInParent}($.${prod.nonTerminalName})`
     )
 }
 
@@ -120,7 +124,11 @@ export function genSingleAlt(prod: gast.Flat, n: number): string {
 }
 
 export function genOption(prod: gast.Option, n: number): string {
-    return "todo"
+    // TODO: support inlined-rules
+    let result = indent(n, `$.OPTION${prod.occurrenceInParent}(function() {`)
+    result += genDefinition(prod.definition, n + 1)
+    result += indent(n, `})`)
+    return result
 }
 
 export function genRepetition(prod: gast.Repetition, n: number): string {
@@ -183,6 +191,6 @@ function genDefinition(def: IProduction[], n: number): string {
 }
 
 function indent(howMuch: number, text: string): string {
-    const spaces = Array(howMuch * 4).join(" ")
+    const spaces = Array(howMuch * 5).join(" ")
     return spaces + text + "\n"
 }
