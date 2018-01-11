@@ -113,7 +113,7 @@
     "mocha": "^4.1.0",
     "npm-run-all": "^4.1.2",
     "nyc": "^11.4.1",
-    "prettier": "1.9.2",
+    "prettier": "1.10.0",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
     "tslint": "^5.8.0",
