@@ -81,13 +81,203 @@ describe.only("The Code Generation capabilities", () => {
         expect(myParser.errors).to.be.empty
     })
 
-    it("can generate a Or", () => {})
+    it("can generate a Or", () => {
+        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const Integer = createToken({ name: "Integer", pattern: /\d+/ })
 
-    it("can generate a Repetition", () => {})
+        const rules = [
+            new gast.Rule("topRule", [
+                new gast.Alternation([
+                    new gast.Flat([new gast.Terminal(Identifier)]),
+                    new gast.Flat([new gast.Terminal(Integer)])
+                ])
+            ])
+        ]
 
-    it("can generate a Mandatory Repetition", () => {})
+        const wrapperText = genWrapperFunction({
+            name: "genOrParser",
+            rules
+        })
 
-    it("can generate a Repetition with separator", () => {})
+        const testWrapper = new Function(
+            "tokenVocabulary",
+            "config",
+            "chevrotain",
+            wrapperText
+        )
 
-    it("can generate a Mandatory Repetition with separator", () => {})
+        const myParser = testWrapper.call(
+            null,
+            [Identifier, Integer],
+            {},
+            { Parser }
+        )
+        myParser.input = [createRegularToken(Identifier)]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+
+        myParser.input = [createRegularToken(Integer)]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+    })
+
+    it("can generate a Repetition", () => {
+        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const rules = [
+            new gast.Rule("topRule", [
+                new gast.Repetition([new gast.Terminal(Identifier)])
+            ])
+        ]
+
+        const wrapperText = genWrapperFunction({
+            name: "genRepetitionParser",
+            rules
+        })
+
+        const testWrapper = new Function(
+            "tokenVocabulary",
+            "config",
+            "chevrotain",
+            wrapperText
+        )
+
+        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
+        myParser.input = [createRegularToken(Identifier)]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+
+        myParser.input = [
+            createRegularToken(Identifier),
+            createRegularToken(Identifier),
+            createRegularToken(Identifier)
+        ]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+    })
+
+    it("can generate a Mandatory Repetition", () => {
+        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const rules = [
+            new gast.Rule("topRule", [
+                new gast.RepetitionMandatory([new gast.Terminal(Identifier)])
+            ])
+        ]
+
+        const wrapperText = genWrapperFunction({
+            name: "genRepetitionMandatoryParser",
+            rules
+        })
+
+        const testWrapper = new Function(
+            "tokenVocabulary",
+            "config",
+            "chevrotain",
+            wrapperText
+        )
+
+        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
+        myParser.input = [createRegularToken(Identifier)]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+
+        myParser.input = [
+            createRegularToken(Identifier),
+            createRegularToken(Identifier),
+            createRegularToken(Identifier)
+        ]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+    })
+
+    it("can generate a Repetition with separator", () => {
+        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const Comma = createToken({ name: "Comma", pattern: /,/ })
+
+        const rules = [
+            new gast.Rule("topRule", [
+                new gast.RepetitionWithSeparator(
+                    [new gast.Terminal(Identifier)],
+                    Comma
+                )
+            ])
+        ]
+
+        const wrapperText = genWrapperFunction({
+            name: "genRepetitionSeparatorParser",
+            rules
+        })
+
+        const testWrapper = new Function(
+            "tokenVocabulary",
+            "config",
+            "chevrotain",
+            wrapperText
+        )
+
+        const myParser = testWrapper.call(
+            null,
+            [Identifier, Comma],
+            {},
+            { Parser }
+        )
+        myParser.input = []
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+
+        myParser.input = [
+            createRegularToken(Identifier),
+            createRegularToken(Comma),
+            createRegularToken(Identifier),
+            createRegularToken(Comma),
+            createRegularToken(Identifier)
+        ]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+    })
+
+    it("can generate a Mandatory Repetition with separator", () => {
+        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const Comma = createToken({ name: "Comma", pattern: /,/ })
+
+        const rules = [
+            new gast.Rule("topRule", [
+                new gast.RepetitionWithSeparator(
+                    [new gast.Terminal(Identifier)],
+                    Comma
+                )
+            ])
+        ]
+
+        const wrapperText = genWrapperFunction({
+            name: "genRepetitionMandatorySeparatorParser",
+            rules
+        })
+
+        const testWrapper = new Function(
+            "tokenVocabulary",
+            "config",
+            "chevrotain",
+            wrapperText
+        )
+
+        const myParser = testWrapper.call(
+            null,
+            [Identifier, Comma],
+            {},
+            { Parser }
+        )
+        myParser.input = [createRegularToken(Identifier)]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+
+        myParser.input = [
+            createRegularToken(Identifier),
+            createRegularToken(Comma),
+            createRegularToken(Identifier),
+            createRegularToken(Comma),
+            createRegularToken(Identifier)
+        ]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+    })
 })
