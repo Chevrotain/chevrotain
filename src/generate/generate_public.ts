@@ -1,53 +1,40 @@
 import { gast } from "../parse/grammar/gast_public"
 import { IToken } from "../scan/tokens_public"
 import { IParserConfig, Parser, TokenVocabulary } from "../parse/parser_public"
+import { genUmdModule, genWrapperFunction } from "./generate"
 
-export function genParserConstructor(options: {
+export function genParserfactory(options: {
     name: string
-    rules: { [ruleName: string]: gast.IProduction[] }
+    rules: gast.Rule[]
     tokenVocabulary: TokenVocabulary
-}): { new (tokens: IToken[], config: IParserConfig): Parser } {
-    const funcText = generateParserText(options)
-    const parseFunc = Function(funcText)
-    return <any>parseFunc
+}): (config: IParserConfig) => Parser {
+    const wrapperText = genWrapperFunction({
+        name: options.name,
+        rules: options.rules
+    })
+
+    const testWrapper = new Function(
+        "tokenVocabulary",
+        "config",
+        "chevrotain",
+        wrapperText
+    )
+
+    return function(config) {
+        // TODO: check how the require is transpiled/webpacked
+        return new (<any>testWrapper(
+            options.tokenVocabulary,
+            config,
+            require("../api")
+        ))()
+    }
 }
 
-export function generateParserText(options: {
+export function generateParserModule(options: {
     name: string
-    rules: { [ruleName: string]: gast.IProduction[] }
+    rules: gast.Rule[]
     tokenVocabulary: TokenVocabulary
 }): string {
-    // wrapper
-    function wrapper(tokenVocabulary) {
-        function myParser(input, config) {
-            // invoke super constructor
-            Parser.call(this, input, tokenVocabulary, config)
-
-            // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
-            const $ = this
-
-            this.RULE("json", function() {
-                // prettier-ignore
-                $.OR([
-                    {ALT: function() {$.SUBRULE($.object)}},
-                    {ALT: function() {$.SUBRULE($.array)}}
-                ])
-            })
-
-            // very important to call this after all the rules have been defined.
-            // otherwise the parser may not work correctly as it will lack information
-            // derived during the self analysis phase.
-            ;(<any>Parser).performSelfAnalysis(this)
-        }
-
-        // inheritance as implemented in javascript in the previous decade... :(
-        myParser.prototype = Object.create(Parser.prototype)
-        myParser.prototype.constructor = myParser
-
-        return {
-            myParser: myParser
-        }
-    }
-
-    return "x"
+    // TODO: any better manner to pass the tokenVocabulary?
+    return genUmdModule({ name: options.name, rules: options.rules })
 }

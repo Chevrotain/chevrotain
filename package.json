@@ -114,6 +114,7 @@
     "npm-run-all": "^4.1.2",
     "nyc": "^11.4.1",
     "prettier": "1.9.2",
+    "require-from-string": "^2.0.1",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
     "tslint": "^5.8.0",

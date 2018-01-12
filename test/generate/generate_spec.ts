@@ -4,6 +4,11 @@ import { createToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { createRegularToken } from "../utils/matchers"
 
+let describeNodeOnly = describe
+if (typeof window !== "undefined") {
+    describeNodeOnly = <any>describe.skip
+}
+
 describe.only("The Code Generation capabilities", () => {
     it("can generate a Terminal", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
