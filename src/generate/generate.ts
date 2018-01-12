@@ -3,6 +3,13 @@ import { forEach, map } from "../utils/utils"
 import IProduction = gast.IProduction
 import { tokenName } from "../scan/tokens_public"
 
+/**
+ * Missing features
+ * 1. Rule arguments
+ * 2. Gates
+ * 3. embedded actions
+ */
+
 const NL = "\n"
 
 export function genUmdModule(options: {
@@ -83,7 +90,6 @@ export function genRule(prod: gast.Rule, n: number): string {
     if (n === undefined) {
         n = 1
     }
-    // TODO: how to define and support arguments
     let result = indent(n, `$.RULE("${prod.name}", function() {`) + NL
     result += genDefinition(prod.definition, n + 1)
     result += indent(n + 1, `})`) + NL
@@ -119,10 +125,16 @@ export function genAlternation(prod: gast.Alternation, n: number): string {
 }
 
 export function genSingleAlt(prod: gast.Flat, n: number): string {
-    // TODO: support in-lined rules
-    let result = indent(n, `{ALT: function() {`) + NL
-    result += genDefinition(prod.definition, n + 1)
-    result += indent(n, `}}`) + NL
+    let result = indent(n, `{`) + NL
+
+    if (prod.name) {
+        result += indent(n + 1, `NAME: ${prod.name},`) + NL
+    }
+    result += indent(n + 1, "ALT: function() {") + NL
+    result += genDefinition(prod.definition, n + 2)
+    result += indent(n + 1, `}`) + NL
+    result += indent(n, `}`) + NL
+
     return result
 }
 
@@ -136,9 +148,9 @@ function genProd(prod: gast.IProduction, n: number): string {
     } else if (prod instanceof gast.RepetitionMandatory) {
         return genDSLRule("AT_LEAST_ONE", prod, n)
     } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
-        return genRepetitionMandatorySep(prod, n)
+        return genDSLRule("AT_LEAST_ONE_SEP", prod, n)
     } else if (prod instanceof gast.RepetitionWithSeparator) {
-        return genRepetitionSep(prod, n)
+        return genDSLRule("MANY_SEP", prod, n)
     } else if (prod instanceof gast.Repetition) {
         return genDSLRule("MANY", prod, n)
     } else if (prod instanceof gast.Alternation) {
@@ -152,18 +164,36 @@ function genProd(prod: gast.IProduction, n: number): string {
     }
 }
 
-function genDSLRule(dslName, prod:{definition:IProduction[], occurrenceInParent:number, name?:string}, n:number):string {
-    // TODO: support SEP
-
+function genDSLRule(
+    dslName,
+    prod: {
+        definition: IProduction[]
+        occurrenceInParent: number
+        name?: string
+        separator?
+    },
+    n: number
+): string {
     let result = indent(n, `$.${dslName + prod.occurrenceInParent}(`) + NL
 
-    if (prod.name) {
+    if (prod.name || prod.separator) {
         result += "{" + NL
-        result += indent(n + 1,`NAME: ${prod.name}`) + "," + NL
-        result += indent(n + 1,`DEF: ${genDefFunction(prod.definition, n + 2)}`) + NL
+        if (prod.name) {
+            result += indent(n + 1, `NAME: ${prod.name}`) + "," + NL
+        }
+        if (prod.separator) {
+            result +=
+                indent(
+                    n + 1,
+                    `SEP: this.tokensMap.${tokenName(prod.separator)}`
+                ) +
+                "," +
+                NL
+        }
+        result +=
+            indent(n + 1, `DEF: ${genDefFunction(prod.definition, n + 2)}`) + NL
         result += indent(n, "}") + NL
-    }
-    else {
+    } else {
         result += genDefFunction(prod.definition, n + 1)
     }
 
@@ -171,7 +201,7 @@ function genDSLRule(dslName, prod:{definition:IProduction[], occurrenceInParent:
     return result
 }
 
-function genDefFunction(definition: IProduction[], n:number):string {
+function genDefFunction(definition: IProduction[], n: number): string {
     let def = "function() {" + NL
     def += genDefinition(definition, n + 1)
     def += indent(n, `}`) + NL
