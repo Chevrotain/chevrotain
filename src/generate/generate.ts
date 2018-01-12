@@ -3,6 +3,8 @@ import { forEach, map } from "../utils/utils"
 import IProduction = gast.IProduction
 import { tokenName } from "../scan/tokens_public"
 
+const NL = "\n"
+
 export function genUmdModule(options: {
     name: string
     rules: gast.Rule[]
@@ -82,9 +84,9 @@ export function genRule(prod: gast.Rule, n: number): string {
         n = 1
     }
     // TODO: how to define and support arguments
-    let result = indent(n, `$.RULE("${prod.name}", function() {`)
+    let result = indent(n, `$.RULE("${prod.name}", function() {`) + NL
     result += genDefinition(prod.definition, n + 1)
-    result += indent(n + 1, `})`)
+    result += indent(n + 1, `})`) + NL
     return result
 }
 
@@ -97,63 +99,31 @@ export function genTerminal(prod: gast.Terminal, n: number): string {
     // TODO: potential performance optimization, avoid tokenMap Dictionary access
     return indent(
         n,
-        `$.CONSUME${prod.occurrenceInParent}(this.tokensMap.${name})`
+        `$.CONSUME${prod.occurrenceInParent}(this.tokensMap.${name})` + NL
     )
 }
 
 export function genNonTerminal(prod: gast.NonTerminal, n: number): string {
     return indent(
         n,
-        `$.SUBRULE${prod.occurrenceInParent}($.${prod.nonTerminalName})`
+        `$.SUBRULE${prod.occurrenceInParent}($.${prod.nonTerminalName})` + NL
     )
 }
 
 export function genAlternation(prod: gast.Alternation, n: number): string {
-    let result = indent(n, `$.OR${prod.occurrenceInParent}([`)
+    let result = indent(n, `$.OR${prod.occurrenceInParent}([`) + NL
     const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
-    result += alts.join(indent(n + 1, ","))
-    result += indent(n, `])`)
+    result += alts.join(indent(n + 1, ",") + NL)
+    result += indent(n, `])`) + NL
     return result
 }
 
 export function genSingleAlt(prod: gast.Flat, n: number): string {
-    let result = indent(n, `{ALT: function() {`)
+    // TODO: support in-lined rules
+    let result = indent(n, `{ALT: function() {`) + NL
     result += genDefinition(prod.definition, n + 1)
-    result += indent(n, `}}`)
+    result += indent(n, `}}`) + NL
     return result
-}
-
-export function genOption(prod: gast.Option, n: number): string {
-    // TODO: support inlined-rules
-    let result = indent(n, `$.OPTION${prod.occurrenceInParent}(function() {`)
-    result += genDefinition(prod.definition, n + 1)
-    result += indent(n, `})`)
-    return result
-}
-
-export function genRepetition(prod: gast.Repetition, n: number): string {
-    return "todo"
-}
-
-export function genRepetitionMandatory(
-    prod: gast.RepetitionMandatory,
-    n: number
-): string {
-    return "todo"
-}
-
-export function genRepetitionSep(
-    prod: gast.RepetitionWithSeparator,
-    n: number
-): string {
-    return "todo"
-}
-
-export function genRepetitionMandatorySep(
-    prod: gast.RepetitionMandatoryWithSeparator,
-    n: number
-): string {
-    return "todo"
 }
 
 function genProd(prod: gast.IProduction, n: number): string {
@@ -162,15 +132,15 @@ function genProd(prod: gast.IProduction, n: number): string {
     } else if (prod instanceof gast.Flat) {
         return genFlat(prod, n)
     } else if (prod instanceof gast.Option) {
-        return genOption(prod, n)
+        return genDSLRule("OPTION", prod, n)
     } else if (prod instanceof gast.RepetitionMandatory) {
-        return genRepetitionMandatory(prod, n)
+        return genDSLRule("AT_LEAST_ONE", prod, n)
     } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
         return genRepetitionMandatorySep(prod, n)
     } else if (prod instanceof gast.RepetitionWithSeparator) {
         return genRepetitionSep(prod, n)
     } else if (prod instanceof gast.Repetition) {
-        return genRepetition(prod, n)
+        return genDSLRule("MANY", prod, n)
     } else if (prod instanceof gast.Alternation) {
         return genAlternation(prod, n)
     } else if (prod instanceof gast.Terminal) {
@@ -180,6 +150,32 @@ function genProd(prod: gast.IProduction, n: number): string {
     } else {
         throw Error("non exhaustive match")
     }
+}
+
+function genDSLRule(dslName, prod:{definition:IProduction[], occurrenceInParent:number, name?:string}, n:number):string {
+    // TODO: support SEP
+
+    let result = indent(n, `$.${dslName + prod.occurrenceInParent}(`) + NL
+
+    if (prod.name) {
+        result += "{" + NL
+        result += indent(n + 1,`NAME: ${prod.name}`) + "," + NL
+        result += indent(n + 1,`DEF: ${genDefFunction(prod.definition, n + 2)}`) + NL
+        result += indent(n, "}") + NL
+    }
+    else {
+        result += genDefFunction(prod.definition, n + 1)
+    }
+
+    result += indent(n, `)`) + NL
+    return result
+}
+
+function genDefFunction(definition: IProduction[], n:number):string {
+    let def = "function() {" + NL
+    def += genDefinition(definition, n + 1)
+    def += indent(n, `}`) + NL
+    return def
 }
 
 function genDefinition(def: IProduction[], n: number): string {
@@ -192,5 +188,5 @@ function genDefinition(def: IProduction[], n: number): string {
 
 function indent(howMuch: number, text: string): string {
     const spaces = Array(howMuch * 5).join(" ")
-    return spaces + text + "\n"
+    return spaces + text
 }
