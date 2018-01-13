@@ -1,14 +1,12 @@
-import {
-    generateParserModule,
-    genParserFactory
-} from "../../src/generate/generate_public"
+import { Parser } from "../../src/parse/parser_public"
+import { generation as gen } from "../../src/generate/generate_public"
 import { gast } from "../../src/parse/grammar/gast_public"
 import { createToken } from "../../src/scan/tokens_public"
 import { createRegularToken } from "../utils/matchers"
 
-let itNodeOnly = it
+let describeNodeOnly = describe
 if (typeof window !== "undefined") {
-    itNodeOnly = <any>it.skip
+    describeNodeOnly = <any>describe.skip
 }
 
 describe("The Code Generation capabilities", () => {
@@ -20,7 +18,7 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule("topRule", [new gast.Terminal(Identifier)])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genTerminalParser",
             rules,
             tokenVocabulary
@@ -41,7 +39,7 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule("nestedRules", [new gast.Terminal(Identifier)])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genNoneTerminalParser",
             rules,
             tokenVocabulary
@@ -63,7 +61,7 @@ describe("The Code Generation capabilities", () => {
             ])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genOptionParser",
             rules,
             tokenVocabulary
@@ -94,7 +92,7 @@ describe("The Code Generation capabilities", () => {
             ])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genOrParser",
             rules,
             tokenVocabulary
@@ -124,7 +122,7 @@ describe("The Code Generation capabilities", () => {
             ])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genManyParser",
             rules,
             tokenVocabulary
@@ -154,7 +152,7 @@ describe("The Code Generation capabilities", () => {
             ])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genAtLeastOneParser",
             rules,
             tokenVocabulary
@@ -188,7 +186,7 @@ describe("The Code Generation capabilities", () => {
             ])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genManySepParser",
             rules,
             tokenVocabulary
@@ -224,7 +222,7 @@ describe("The Code Generation capabilities", () => {
             ])
         ]
 
-        const parserFactory = genParserFactory<any>({
+        const parserFactory = gen.genParserFactory<any>({
             name: "genAtLeastOneSepParser",
             rules,
             tokenVocabulary
@@ -246,40 +244,53 @@ describe("The Code Generation capabilities", () => {
         expect(myParser.errors).to.be.empty
     })
 
-    itNodeOnly("Can generate a module", () => {
-        const requireFromString = require("require-from-string")
-
-        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
-        const Integer = createToken({ name: "Integer", pattern: /\d+/ })
-        const tokenVocabulary = [Identifier, Integer]
-
-        const rules = [
-            new gast.Rule("topRule", [
-                new gast.Alternation([
-                    new gast.Flat([
-                        new gast.RepetitionMandatory([
-                            new gast.Terminal(Identifier)
-                        ])
-                    ]),
-                    new gast.Flat([new gast.Terminal(Integer)])
-                ])
-            ])
-        ]
-
-        const parserModuleText = generateParserModule({
-            name: "genOrParserModule",
-            rules,
-            tokenVocabulary
+    describeNodeOnly("moduleGeneration", () => {
+        before(() => {
+            const mock = require('mock-require');
+            mock('chevrotain', { Parser: Parser});
         })
-        const parserModule = requireFromString(parserModuleText)
-        const myParser = new parserModule.genOrParserModule(tokenVocabulary)
 
-        myParser.input = [createRegularToken(Identifier)]
-        myParser.topRule()
-        expect(myParser.errors).to.be.empty
+        it("Can generate a module", () => {
+            const requireFromString = require("require-from-string")
 
-        myParser.input = [createRegularToken(Integer)]
-        myParser.topRule()
-        expect(myParser.errors).to.be.empty
+            const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+            const Integer = createToken({ name: "Integer", pattern: /\d+/ })
+            const tokenVocabulary = [Identifier, Integer]
+
+            const rules = [
+                new gast.Rule("topRule", [
+                    new gast.Alternation([
+                        new gast.Flat([
+                            new gast.RepetitionMandatory([
+                                new gast.Terminal(Identifier)
+                            ])
+                        ]),
+                        new gast.Flat([new gast.Terminal(Integer)])
+                    ])
+                ])
+            ]
+
+            const parserModuleText = gen.generateParserModule({
+                name: "genOrParserModule",
+                rules,
+                tokenVocabulary
+            })
+            const parserModule = requireFromString(parserModuleText)
+            const myParser = new parserModule.genOrParserModule(tokenVocabulary)
+
+            myParser.input = [createRegularToken(Identifier)]
+            myParser.topRule()
+            expect(myParser.errors).to.be.empty
+
+            myParser.input = [createRegularToken(Integer)]
+            myParser.topRule()
+            expect(myParser.errors).to.be.empty
+        })
+
+        after(() => {
+            const mock = require('mock-require');
+            mock.stop("chevrotain")
+        })
     })
+
 })

@@ -2241,7 +2241,7 @@ generate-object-property@^1.1.0:
   dependencies:
     is-property "^1.0.0"
 
-get-caller-file@^1.0.1:
+get-caller-file@^1.0.1, get-caller-file@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.2.tgz#f702e63127e7e231c160a80c1554acb70d5047e5"
 
@@ -3835,6 +3835,12 @@ mocha@^4.1.0:
     he "1.1.1"
     mkdirp "0.5.1"
     supports-color "4.4.0"
+
+mock-require@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/mock-require/-/mock-require-3.0.1.tgz#d5efd834c0da0cec73c7b67763d8167d32d851de"
+  dependencies:
+    get-caller-file "^1.0.2"
 
 module-deps@^4.0.8:
   version "4.1.1"
