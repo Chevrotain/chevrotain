@@ -2,6 +2,7 @@ import { gast } from "../parse/grammar/gast_public"
 import { forEach, map } from "../utils/utils"
 import IProduction = gast.IProduction
 import { tokenName } from "../scan/tokens_public"
+import { TokenType } from "../scan/lexer_public"
 
 /**
  * Missing features
@@ -32,11 +33,11 @@ export function genUmdModule(options: {
     }
 }(typeof self !== 'undefined' ? self : this, function (chevrotain) {
 
-    ${genClass(options)}
+${genClass(options)}
     
-    return {
-        ${options.name}: ${options.name} 
-    }
+return {
+    ${options.name}: ${options.name} 
+}
 }));
 `
 }
@@ -81,23 +82,18 @@ ${options.name}.prototype.constructor = ${options.name}
 }
 
 export function genAllRules(rules: gast.Rule[]): string {
-    let rulesText = map(rules, genRule)
+    let rulesText = map(rules, currRule => {
+        return genRule(currRule, 1)
+    })
 
     return rulesText.join("\n")
 }
 
 export function genRule(prod: gast.Rule, n: number): string {
-    if (n === undefined) {
-        n = 1
-    }
     let result = indent(n, `$.RULE("${prod.name}", function() {`) + NL
     result += genDefinition(prod.definition, n + 1)
     result += indent(n + 1, `})`) + NL
     return result
-}
-
-export function genFlat(prod: gast.Flat, n: number): string {
-    return genDefinition(prod.definition, n)
 }
 
 export function genTerminal(prod: gast.Terminal, n: number): string {
@@ -119,8 +115,8 @@ export function genNonTerminal(prod: gast.NonTerminal, n: number): string {
 export function genAlternation(prod: gast.Alternation, n: number): string {
     let result = indent(n, `$.OR${prod.occurrenceInParent}([`) + NL
     const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
-    result += alts.join(indent(n + 1, ",") + NL)
-    result += indent(n, `])`) + NL
+    result += alts.join("," + NL)
+    result += NL + indent(n, `])` + NL)
     return result
 }
 
@@ -128,12 +124,12 @@ export function genSingleAlt(prod: gast.Flat, n: number): string {
     let result = indent(n, `{`) + NL
 
     if (prod.name) {
-        result += indent(n + 1, `NAME: ${prod.name},`) + NL
+        result += indent(n + 1, `NAME: "${prod.name}",`) + NL
     }
     result += indent(n + 1, "ALT: function() {") + NL
-    result += genDefinition(prod.definition, n + 2)
+    result += genDefinition(prod.definition, n + 1)
     result += indent(n + 1, `}`) + NL
-    result += indent(n, `}`) + NL
+    result += indent(n, `}`)
 
     return result
 }
@@ -141,8 +137,6 @@ export function genSingleAlt(prod: gast.Flat, n: number): string {
 function genProd(prod: gast.IProduction, n: number): string {
     if (prod instanceof gast.NonTerminal) {
         return genNonTerminal(prod, n)
-    } else if (prod instanceof gast.Flat) {
-        return genFlat(prod, n)
     } else if (prod instanceof gast.Option) {
         return genDSLRule("OPTION", prod, n)
     } else if (prod instanceof gast.RepetitionMandatory) {
@@ -157,8 +151,6 @@ function genProd(prod: gast.IProduction, n: number): string {
         return genAlternation(prod, n)
     } else if (prod instanceof gast.Terminal) {
         return genTerminal(prod, n)
-    } else if (prod instanceof gast.Rule) {
-        return genRule(prod, n)
     } else {
         throw Error("non exhaustive match")
     }
@@ -170,16 +162,16 @@ function genDSLRule(
         definition: IProduction[]
         occurrenceInParent: number
         name?: string
-        separator?
+        separator?: TokenType
     },
     n: number
 ): string {
-    let result = indent(n, `$.${dslName + prod.occurrenceInParent}(`) + NL
+    let result = indent(n, `$.${dslName + prod.occurrenceInParent}(`)
 
     if (prod.name || prod.separator) {
         result += "{" + NL
         if (prod.name) {
-            result += indent(n + 1, `NAME: ${prod.name}`) + "," + NL
+            result += indent(n + 1, `NAME: "${prod.name}"`) + "," + NL
         }
         if (prod.separator) {
             result +=
@@ -190,8 +182,7 @@ function genDSLRule(
                 "," +
                 NL
         }
-        result +=
-            indent(n + 1, `DEF: ${genDefFunction(prod.definition, n + 2)}`) + NL
+        result += `DEF: ${genDefFunction(prod.definition, n + 2)}` + NL
         result += indent(n, "}") + NL
     } else {
         result += genDefFunction(prod.definition, n + 1)
@@ -203,7 +194,7 @@ function genDSLRule(
 
 function genDefFunction(definition: IProduction[], n: number): string {
     let def = "function() {" + NL
-    def += genDefinition(definition, n + 1)
+    def += genDefinition(definition, n)
     def += indent(n, `}`) + NL
     return def
 }
@@ -217,6 +208,6 @@ function genDefinition(def: IProduction[], n: number): string {
 }
 
 function indent(howMuch: number, text: string): string {
-    const spaces = Array(howMuch * 5).join(" ")
+    const spaces = Array(howMuch * 4 + 1).join(" ")
     return spaces + text
 }

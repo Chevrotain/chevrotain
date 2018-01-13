@@ -3,17 +3,17 @@ import { IToken } from "../scan/tokens_public"
 import { IParserConfig, Parser, TokenVocabulary } from "../parse/parser_public"
 import { genUmdModule, genWrapperFunction } from "./generate"
 
-export function genParserfactory(options: {
+export function genParserFactory<T extends Parser>(options: {
     name: string
     rules: gast.Rule[]
     tokenVocabulary: TokenVocabulary
-}): (config: IParserConfig) => Parser {
+}): (config?: IParserConfig) => T {
     const wrapperText = genWrapperFunction({
         name: options.name,
         rules: options.rules
     })
 
-    const testWrapper = new Function(
+    const constructorWrapper = new Function(
         "tokenVocabulary",
         "config",
         "chevrotain",
@@ -22,11 +22,11 @@ export function genParserfactory(options: {
 
     return function(config) {
         // TODO: check how the require is transpiled/webpacked
-        return new (<any>testWrapper(
+        return constructorWrapper(
             options.tokenVocabulary,
             config,
             require("../api")
-        ))()
+        )
     }
 }
 

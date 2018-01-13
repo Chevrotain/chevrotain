@@ -1,33 +1,32 @@
-import { genWrapperFunction } from "../../src/generate/generate"
+import {
+    generateParserModule,
+    genParserFactory
+} from "../../src/generate/generate_public"
 import { gast } from "../../src/parse/grammar/gast_public"
 import { createToken } from "../../src/scan/tokens_public"
-import { Parser } from "../../src/parse/parser_public"
 import { createRegularToken } from "../utils/matchers"
 
-let describeNodeOnly = describe
+let itNodeOnly = it
 if (typeof window !== "undefined") {
-    describeNodeOnly = <any>describe.skip
+    itNodeOnly = <any>it.skip
 }
 
-describe.only("The Code Generation capabilities", () => {
+describe("The Code Generation capabilities", () => {
     it("can generate a Terminal", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const tokenVocabulary = [Identifier]
+
         const rules = [
             new gast.Rule("topRule", [new gast.Terminal(Identifier)])
         ]
-        const wrapperText = genWrapperFunction({
+
+        const parserFactory = genParserFactory<any>({
             name: "genTerminalParser",
-            rules
+            rules,
+            tokenVocabulary
         })
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
+        const myParser = parserFactory({})
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -35,22 +34,20 @@ describe.only("The Code Generation capabilities", () => {
 
     it("can generate a NonTerminal", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const tokenVocabulary = [Identifier]
+
         const rules = [
-            new gast.Rule("topRule", [new gast.Terminal(Identifier)])
+            new gast.Rule("topRule", [new gast.NonTerminal("nestedRules")]),
+            new gast.Rule("nestedRules", [new gast.Terminal(Identifier)])
         ]
-        const wrapperText = genWrapperFunction({
-            name: "genTerminalParser",
-            rules
+
+        const parserFactory = genParserFactory<any>({
+            name: "genNoneTerminalParser",
+            rules,
+            tokenVocabulary
         })
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
+        const myParser = parserFactory()
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -58,25 +55,22 @@ describe.only("The Code Generation capabilities", () => {
 
     it("can generate a Option", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const tokenVocabulary = [Identifier]
+
         const rules = [
             new gast.Rule("topRule", [
                 new gast.Option([new gast.Terminal(Identifier)])
             ])
         ]
 
-        const wrapperText = genWrapperFunction({
+        const parserFactory = genParserFactory<any>({
             name: "genOptionParser",
-            rules
+            rules,
+            tokenVocabulary
         })
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
+        const myParser = parserFactory()
 
-        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -89,34 +83,24 @@ describe.only("The Code Generation capabilities", () => {
     it("can generate a Or", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
         const Integer = createToken({ name: "Integer", pattern: /\d+/ })
+        const tokenVocabulary = [Identifier, Integer]
 
         const rules = [
             new gast.Rule("topRule", [
                 new gast.Alternation([
                     new gast.Flat([new gast.Terminal(Identifier)]),
-                    new gast.Flat([new gast.Terminal(Integer)])
+                    new gast.Flat([new gast.Terminal(Integer)], "$inlinedRule")
                 ])
             ])
         ]
 
-        const wrapperText = genWrapperFunction({
+        const parserFactory = genParserFactory<any>({
             name: "genOrParser",
-            rules
+            rules,
+            tokenVocabulary
         })
+        const myParser = parserFactory()
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(
-            null,
-            [Identifier, Integer],
-            {},
-            { Parser }
-        )
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -128,25 +112,25 @@ describe.only("The Code Generation capabilities", () => {
 
     it("can generate a Repetition", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const tokenVocabulary = [Identifier]
+
         const rules = [
             new gast.Rule("topRule", [
-                new gast.Repetition([new gast.Terminal(Identifier)])
+                new gast.Repetition(
+                    [new gast.Terminal(Identifier)],
+                    1,
+                    "$inlinedRule"
+                )
             ])
         ]
 
-        const wrapperText = genWrapperFunction({
-            name: "genRepetitionParser",
-            rules
+        const parserFactory = genParserFactory<any>({
+            name: "genManyParser",
+            rules,
+            tokenVocabulary
         })
+        const myParser = parserFactory()
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -162,25 +146,21 @@ describe.only("The Code Generation capabilities", () => {
 
     it("can generate a Mandatory Repetition", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const tokenVocabulary = [Identifier]
+
         const rules = [
             new gast.Rule("topRule", [
                 new gast.RepetitionMandatory([new gast.Terminal(Identifier)])
             ])
         ]
 
-        const wrapperText = genWrapperFunction({
-            name: "genRepetitionMandatoryParser",
-            rules
+        const parserFactory = genParserFactory<any>({
+            name: "genAtLeastOneParser",
+            rules,
+            tokenVocabulary
         })
+        const myParser = parserFactory()
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(null, [Identifier], {}, { Parser })
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -197,6 +177,7 @@ describe.only("The Code Generation capabilities", () => {
     it("can generate a Repetition with separator", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
         const Comma = createToken({ name: "Comma", pattern: /,/ })
+        const tokenVocabulary = [Identifier, Comma]
 
         const rules = [
             new gast.Rule("topRule", [
@@ -207,24 +188,13 @@ describe.only("The Code Generation capabilities", () => {
             ])
         ]
 
-        const wrapperText = genWrapperFunction({
-            name: "genRepetitionSeparatorParser",
-            rules
+        const parserFactory = genParserFactory<any>({
+            name: "genManySepParser",
+            rules,
+            tokenVocabulary
         })
+        const myParser = parserFactory()
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(
-            null,
-            [Identifier, Comma],
-            {},
-            { Parser }
-        )
         myParser.input = []
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -243,34 +213,24 @@ describe.only("The Code Generation capabilities", () => {
     it("can generate a Mandatory Repetition with separator", () => {
         const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
         const Comma = createToken({ name: "Comma", pattern: /,/ })
+        const tokenVocabulary = [Identifier, Comma]
 
         const rules = [
             new gast.Rule("topRule", [
-                new gast.RepetitionWithSeparator(
+                new gast.RepetitionMandatoryWithSeparator(
                     [new gast.Terminal(Identifier)],
                     Comma
                 )
             ])
         ]
 
-        const wrapperText = genWrapperFunction({
-            name: "genRepetitionMandatorySeparatorParser",
-            rules
+        const parserFactory = genParserFactory<any>({
+            name: "genAtLeastOneSepParser",
+            rules,
+            tokenVocabulary
         })
+        const myParser = parserFactory()
 
-        const testWrapper = new Function(
-            "tokenVocabulary",
-            "config",
-            "chevrotain",
-            wrapperText
-        )
-
-        const myParser = testWrapper.call(
-            null,
-            [Identifier, Comma],
-            {},
-            { Parser }
-        )
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -282,6 +242,43 @@ describe.only("The Code Generation capabilities", () => {
             createRegularToken(Comma),
             createRegularToken(Identifier)
         ]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+    })
+
+    itNodeOnly("Can generate a module", () => {
+        const requireFromString = require("require-from-string")
+
+        const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+        const Integer = createToken({ name: "Integer", pattern: /\d+/ })
+        const tokenVocabulary = [Identifier, Integer]
+
+        const rules = [
+            new gast.Rule("topRule", [
+                new gast.Alternation([
+                    new gast.Flat([
+                        new gast.RepetitionMandatory([
+                            new gast.Terminal(Identifier)
+                        ])
+                    ]),
+                    new gast.Flat([new gast.Terminal(Integer)])
+                ])
+            ])
+        ]
+
+        const parserModuleText = generateParserModule({
+            name: "genOrParserModule",
+            rules,
+            tokenVocabulary
+        })
+        const parserModule = requireFromString(parserModuleText)
+        const myParser = new parserModule.genOrParserModule(tokenVocabulary)
+
+        myParser.input = [createRegularToken(Identifier)]
+        myParser.topRule()
+        expect(myParser.errors).to.be.empty
+
+        myParser.input = [createRegularToken(Integer)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
     })
