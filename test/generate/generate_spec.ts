@@ -246,14 +246,17 @@ describe("The Code Generation capabilities", () => {
 
     describeNodeOnly("moduleGeneration", () => {
         before(() => {
-            const mock = require('mock-require');
-            mock('chevrotain', { Parser: Parser});
+            const mock = require("mock-require")
+            mock("chevrotain", { Parser: Parser })
         })
 
         it("Can generate a module", () => {
             const requireFromString = require("require-from-string")
 
-            const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+            const Identifier = createToken({
+                name: "Identifier",
+                pattern: /\w+/
+            })
             const Integer = createToken({ name: "Integer", pattern: /\d+/ })
             const tokenVocabulary = [Identifier, Integer]
 
@@ -272,8 +275,7 @@ describe("The Code Generation capabilities", () => {
 
             const parserModuleText = gen.generateParserModule({
                 name: "genOrParserModule",
-                rules,
-                tokenVocabulary
+                rules
             })
             const parserModule = requireFromString(parserModuleText)
             const myParser = new parserModule.genOrParserModule(tokenVocabulary)
@@ -288,9 +290,8 @@ describe("The Code Generation capabilities", () => {
         })
 
         after(() => {
-            const mock = require('mock-require');
+            const mock = require("mock-require")
             mock.stop("chevrotain")
         })
     })
-
 })
