@@ -152,6 +152,7 @@ function genProd(prod: gast.IProduction, n: number): string {
     } else if (prod instanceof gast.Terminal) {
         return genTerminal(prod, n)
     } else {
+        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }
