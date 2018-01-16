@@ -100,11 +100,13 @@ describe("The Code Generation capabilities", () => {
                 name: "topRule",
                 definition: [
                     new gast.Alternation([
-                        new gast.Flat([new gast.Terminal(Identifier)]),
-                        new gast.Flat(
-                            [new gast.Terminal(Integer)],
-                            "$inlinedRule"
-                        )
+                        new gast.Flat({
+                            definition: [new gast.Terminal(Identifier)]
+                        }),
+                        new gast.Flat({
+                            definition: [new gast.Terminal(Integer)],
+                            name: "$inlinedRule"
+                        })
                     ])
                 ]
             })
@@ -297,12 +299,16 @@ describe("The Code Generation capabilities", () => {
                     name: "topRule",
                     definition: [
                         new gast.Alternation([
-                            new gast.Flat([
-                                new gast.RepetitionMandatory([
-                                    new gast.Terminal(Identifier)
-                                ])
-                            ]),
-                            new gast.Flat([new gast.Terminal(Integer)])
+                            new gast.Flat({
+                                definition: [
+                                    new gast.RepetitionMandatory([
+                                        new gast.Terminal(Identifier)
+                                    ])
+                                ]
+                            }),
+                            new gast.Flat({
+                                definition: [new gast.Terminal(Integer)]
+                            })
                         ])
                     ]
                 })

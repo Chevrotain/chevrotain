@@ -121,7 +121,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
             !this.found
         ) {
             let fullRest = currRest.concat(prevRest)
-            let restProd = new gast.Flat(<any>fullRest)
+            let restProd = new gast.Flat({ definition: fullRest })
             this.possibleTokTypes = first(restProd)
             this.found = true
         }
@@ -287,7 +287,7 @@ export function possiblePathsFrom(
             return getAlternativesForProd(prod.definition)
         } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
             const newDef = [
-                new gast.Flat(prod.definition),
+                new gast.Flat({ definition: prod.definition }),
                 new gast.Repetition(
                     [new gast.Terminal(prod.separator)].concat(
                         <any>prod.definition

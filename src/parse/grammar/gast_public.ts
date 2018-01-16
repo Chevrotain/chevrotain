@@ -77,9 +77,12 @@ export namespace gast {
 
     export class Flat extends AbstractProduction
         implements IOptionallyNamedProduction {
+        public name: string
+
         // A named Flat production is used to indicate a Nested Rule in an alternation
-        constructor(definition: IProduction[], public name?: string) {
-            super(definition)
+        constructor(options: { definition: IProduction[]; name?: string }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 

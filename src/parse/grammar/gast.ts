@@ -100,7 +100,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.Flat(definition, node.name)
+        return new gast.Flat({ definition: definition, name: node.name })
     }
 
     public visitOption(node: gast.Option): gast.Option {

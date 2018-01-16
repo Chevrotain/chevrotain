@@ -208,8 +208,10 @@ let cardinality = new Rule({
         new Terminal(UnsignedIntegerLiteralTok),
         new Terminal(DotDotTok),
         new Alternation([
-            new Flat([new Terminal(UnsignedIntegerLiteralTok, 2)]),
-            new Flat([new Terminal(AsteriskTok)])
+            new Flat({
+                definition: [new Terminal(UnsignedIntegerLiteralTok, 2)]
+            }),
+            new Flat({ definition: [new Terminal(AsteriskTok)] })
         ]),
         new Terminal(RSquareTok)
     ]
@@ -237,18 +239,25 @@ let lotsOfOrs = new Rule({
     name: "lotsOfOrs",
     definition: [
         new Alternation([
-            new Flat([
-                new Alternation(
-                    [
-                        new Flat([new Terminal(CommaTok, 1)]),
-                        new Flat([new Terminal(KeyTok, 1)])
-                    ],
-                    2
-                )
-            ]),
-            new Flat([new Terminal(EntityTok, 1)])
+            new Flat({
+                definition: [
+                    new Alternation(
+                        [
+                            new Flat({
+                                definition: [new Terminal(CommaTok, 1)]
+                            }),
+                            new Flat({ definition: [new Terminal(KeyTok, 1)] })
+                        ],
+                        2
+                    )
+                ]
+            }),
+            new Flat({ definition: [new Terminal(EntityTok, 1)] })
         ]),
-        new Alternation([new Flat([new Terminal(DotTok, 1)])], 3)
+        new Alternation(
+            [new Flat({ definition: [new Terminal(DotTok, 1)] })],
+            3
+        )
     ]
 })
 
@@ -256,9 +265,9 @@ let emptyAltOr = new Rule({
     name: "emptyAltOr",
     definition: [
         new Alternation([
-            new Flat([new Terminal(KeyTok, 1)]),
-            new Flat([new Terminal(EntityTok, 1)]),
-            new Flat([]) // an empty alternative
+            new Flat({ definition: [new Terminal(KeyTok, 1)] }),
+            new Flat({ definition: [new Terminal(EntityTok, 1)] }),
+            new Flat({ definition: [] }) // an empty alternative
         ])
     ]
 })
@@ -470,9 +479,9 @@ context("lookahead specs", () => {
         context("computing lookahead sequences for", () => {
             it("two simple one token alternatives", () => {
                 let alt1 = new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([new gast.Terminal(Beta)]),
-                    new gast.Flat([new gast.Terminal(Beta)])
+                    new gast.Flat({ definition: [new gast.Terminal(Alpha)] }),
+                    new gast.Flat({ definition: [new gast.Terminal(Beta)] }),
+                    new gast.Flat({ definition: [new gast.Terminal(Beta)] })
                 ])
                 let alt2 = new gast.Terminal(Gamma)
 
@@ -482,15 +491,17 @@ context("lookahead specs", () => {
 
             it("three simple one token alternatives", () => {
                 let alt1 = new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([new gast.Terminal(Beta)]),
-                    new gast.Flat([new gast.Terminal(Beta)])
+                    new gast.Flat({ definition: [new gast.Terminal(Alpha)] }),
+                    new gast.Flat({ definition: [new gast.Terminal(Beta)] }),
+                    new gast.Flat({ definition: [new gast.Terminal(Beta)] })
                 ])
                 let alt2 = new gast.Terminal(Gamma)
-                let alt3 = new gast.Flat([
-                    new gast.Terminal(Delta),
-                    new gast.Terminal(Charlie)
-                ])
+                let alt3 = new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Delta),
+                        new gast.Terminal(Charlie)
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives(
                     [alt1, alt2, alt3],
@@ -505,23 +516,29 @@ context("lookahead specs", () => {
 
             it("two complex multi token alternatives", () => {
                 let alt1 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Beta)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Beta)]),
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Gamma),
-                        new gast.Terminal(Delta)
-                    ])
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Beta)
+                        ]
+                    }),
+                    new gast.Flat({ definition: [new gast.Terminal(Beta)] }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Gamma),
+                            new gast.Terminal(Delta)
+                        ]
+                    })
                 ])
                 let alt2 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Delta)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Charlie)])
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Delta)
+                        ]
+                    }),
+                    new gast.Flat({ definition: [new gast.Terminal(Charlie)] })
                 ])
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
@@ -533,34 +550,44 @@ context("lookahead specs", () => {
 
             it("three complex multi token alternatives", () => {
                 let alt1 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Gamma)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Beta)])
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Gamma)
+                        ]
+                    }),
+                    new gast.Flat({ definition: [new gast.Terminal(Beta)] })
                 ])
                 let alt2 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Delta)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Charlie)]),
-                    new gast.Flat([
-                        new gast.Terminal(Gamma),
-                        new gast.Terminal(Gamma)
-                    ])
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Delta)
+                        ]
+                    }),
+                    new gast.Flat({ definition: [new gast.Terminal(Charlie)] }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Gamma),
+                            new gast.Terminal(Gamma)
+                        ]
+                    })
                 ])
                 let alt3 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Delta)
-                    ]),
-                    new gast.Flat([
-                        new gast.Terminal(Charlie),
-                        new gast.Terminal(Beta)
-                    ])
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Delta)
+                        ]
+                    }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Charlie),
+                            new gast.Terminal(Beta)
+                        ]
+                    })
                 ])
 
                 let actual = lookAheadSequenceFromAlternatives(
@@ -575,21 +602,25 @@ context("lookahead specs", () => {
             })
 
             it("two complex multi token alternatives with shared prefix", () => {
-                let alt1 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie),
-                    new gast.Terminal(Delta)
-                ])
+                let alt1 = new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Charlie),
+                        new gast.Terminal(Delta)
+                    ]
+                })
 
-                let alt2 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie),
-                    new gast.Terminal(Delta),
-                    new gast.Terminal(Gamma),
-                    new gast.Terminal(Alpha)
-                ])
+                let alt2 = new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Charlie),
+                        new gast.Terminal(Delta),
+                        new gast.Terminal(Gamma),
+                        new gast.Terminal(Alpha)
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([
@@ -599,25 +630,33 @@ context("lookahead specs", () => {
             })
 
             it("simple ambiguous alternatives", () => {
-                let alt1 = new gast.Flat([new gast.Terminal(Alpha)])
-                let alt2 = new gast.Flat([new gast.Terminal(Alpha)])
+                let alt1 = new gast.Flat({
+                    definition: [new gast.Terminal(Alpha)]
+                })
+                let alt2 = new gast.Flat({
+                    definition: [new gast.Terminal(Alpha)]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([[[Alpha]], [[Alpha]]])
             })
 
             it("complex(multi-token) ambiguous alternatives", () => {
-                let alt1 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie)
-                ])
+                let alt1 = new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Charlie)
+                    ]
+                })
 
-                let alt2 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie)
-                ])
+                let alt2 = new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Charlie)
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([

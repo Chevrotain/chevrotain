@@ -602,8 +602,8 @@ export function getLookaheadPathsForOptionalProd(
     )
     let afterDef = afterDefWalker.startWalking()
 
-    let insideFlat = new gast.Flat(insideDef)
-    let afterFlat = new gast.Flat(afterDef)
+    let insideFlat = new gast.Flat({ definition: insideDef })
+    let afterFlat = new gast.Flat({ definition: afterDef })
 
     return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }

@@ -328,7 +328,7 @@ function buildFlatProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
 ): gast.Flat {
-    let prodInstance = new gast.Flat([])
+    let prodInstance = new gast.Flat({ definition: [] })
     let reResult = orPartRegEx.exec(prodRange.text)
 
     let nestedName = reResult[1]

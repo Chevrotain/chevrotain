@@ -132,7 +132,7 @@ export abstract class RestWalker {
             // wrapping each alternative in a single definition wrapper
             // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
             // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
-            let prodWrapper = new gast.Flat([alt])
+            let prodWrapper = new gast.Flat({ definition: [alt] })
             this.walk(prodWrapper, <any>fullOrRest)
         })
     }

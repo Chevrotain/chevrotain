@@ -236,8 +236,10 @@ export let cardinality = new Rule({
         new Terminal(UnsignedIntegerLiteralTok),
         new Terminal(DotDotTok),
         new Alternation([
-            new Flat([new Terminal(UnsignedIntegerLiteralTok, 2)]),
-            new Flat([new Terminal(AsteriskTok)])
+            new Flat({
+                definition: [new Terminal(UnsignedIntegerLiteralTok, 2)]
+            }),
+            new Flat({ definition: [new Terminal(AsteriskTok)] })
         ]),
         new Terminal(RSquareTok)
     ]
@@ -265,18 +267,25 @@ export let lotsOfOrs = new Rule({
     name: "lotsOfOrs",
     definition: [
         new Alternation([
-            new Flat([
-                new Alternation(
-                    [
-                        new Flat([new Terminal(CommaTok, 1)]),
-                        new Flat([new Terminal(KeyTok, 1)])
-                    ],
-                    2
-                )
-            ]),
-            new Flat([new Terminal(EntityTok, 1)])
+            new Flat({
+                definition: [
+                    new Alternation(
+                        [
+                            new Flat({
+                                definition: [new Terminal(CommaTok, 1)]
+                            }),
+                            new Flat({ definition: [new Terminal(KeyTok, 1)] })
+                        ],
+                        2
+                    )
+                ]
+            }),
+            new Flat({ definition: [new Terminal(EntityTok, 1)] })
         ]),
-        new Alternation([new Flat([new Terminal(DotTok, 1)])], 3)
+        new Alternation(
+            [new Flat({ definition: [new Terminal(DotTok, 1)] })],
+            3
+        )
     ]
 })
 
@@ -284,9 +293,9 @@ export let emptyAltOr = new Rule({
     name: "emptyAltOr",
     definition: [
         new Alternation([
-            new Flat([new Terminal(KeyTok, 1)]),
-            new Flat([new Terminal(EntityTok, 1)]),
-            new Flat([]) // an empty alternative
+            new Flat({ definition: [new Terminal(KeyTok, 1)] }),
+            new Flat({ definition: [new Terminal(EntityTok, 1)] }),
+            new Flat({ definition: [] }) // an empty alternative
         ])
     ]
 })

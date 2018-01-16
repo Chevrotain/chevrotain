@@ -95,10 +95,12 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Flat", () => {
-            let input = new gast.Flat([
-                new Terminal(WithLiteral),
-                new NonTerminal({ nonTerminalName: "bamba" })
-            ])
+            let input = new gast.Flat({
+                definition: [
+                    new Terminal(WithLiteral),
+                    new NonTerminal({ nonTerminalName: "bamba" })
+                ]
+            })
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
                 type: "Flat",
@@ -259,9 +261,9 @@ describe("GAst namespace", () => {
 
         it("can serialize a Alternation", () => {
             let input = new gast.Alternation([
-                new Flat([new Terminal(A)]),
-                new Flat([new Terminal(B)]),
-                new Flat([new Terminal(C)])
+                new Flat({ definition: [new Terminal(A)] }),
+                new Flat({ definition: [new Terminal(B)] }),
+                new Flat({ definition: [new Terminal(C)] })
             ])
 
             let actual = serializeProduction(input)

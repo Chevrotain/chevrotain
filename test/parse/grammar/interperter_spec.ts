@@ -627,16 +627,20 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         it("Alternation", () => {
             let alts = [
                 new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Beta)
-                    ]),
-                    new gast.Flat([
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Gamma)
-                    ])
+                    new gast.Flat({ definition: [new gast.Terminal(Alpha)] }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Beta)
+                        ]
+                    }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Gamma)
+                        ]
+                    })
                 ])
             ]
 
@@ -801,11 +805,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Sequence positive", () => {
             let seq = [
-                new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Gamma)
-                ])
+                new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Gamma)
+                    ]
+                })
             ]
 
             setEquality(
@@ -845,11 +851,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Sequence negative", () => {
             let seq = [
-                new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Gamma)
-                ])
+                new gast.Flat({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta),
+                        new gast.Terminal(Gamma)
+                    ]
+                })
             ]
 
             // negative
@@ -937,17 +945,21 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         it("Alternation positive", () => {
             let alts = [
                 new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Beta)
-                    ]),
-                    new gast.Flat([
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Gamma)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Gamma)])
+                    new gast.Flat({ definition: [new gast.Terminal(Alpha)] }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Beta)
+                        ]
+                    }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Gamma)
+                        ]
+                    }),
+                    new gast.Flat({ definition: [new gast.Terminal(Gamma)] })
                 ])
             ]
 
@@ -989,16 +1001,20 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         it("Alternation Negative", () => {
             let alts = [
                 new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Beta)
-                    ]),
-                    new gast.Flat([
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Gamma)
-                    ])
+                    new gast.Flat({ definition: [new gast.Terminal(Alpha)] }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Beta)
+                        ]
+                    }),
+                    new gast.Flat({
+                        definition: [
+                            new gast.Terminal(Beta),
+                            new gast.Terminal(Alpha),
+                            new gast.Terminal(Gamma)
+                        ]
+                    })
                 ])
             ]
 

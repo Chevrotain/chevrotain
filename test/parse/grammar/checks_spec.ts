@@ -294,24 +294,30 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of an alternation", () => {
         let alternation = [
             new Alternation([
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule",
-                        referencedRule: dummyRule
-                    })
-                ]),
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule2",
-                        referencedRule: dummyRule2
-                    })
-                ]),
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule3",
-                        referencedRule: dummyRule3
-                    })
-                ])
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule",
+                            referencedRule: dummyRule
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule2",
+                            referencedRule: dummyRule2
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule3",
+                            referencedRule: dummyRule3
+                        })
+                    ]
+                })
             ])
         ]
         let result = getFirstNoneTerminal(alternation)
@@ -327,18 +333,22 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of an optional repetition", () => {
         let alternation = [
             new Repetition([
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule",
-                        referencedRule: dummyRule
-                    })
-                ]),
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule2",
-                        referencedRule: dummyRule2
-                    })
-                ])
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule",
+                            referencedRule: dummyRule
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule2",
+                            referencedRule: dummyRule2
+                        })
+                    ]
+                })
             ]),
             new NonTerminal({
                 nonTerminalName: "dummyRule3",
@@ -354,18 +364,22 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of a mandatory repetition", () => {
         let alternation = [
             new RepetitionMandatory([
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule",
-                        referencedRule: dummyRule
-                    })
-                ]),
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule2",
-                        referencedRule: dummyRule2
-                    })
-                ])
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule",
+                            referencedRule: dummyRule
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule2",
+                            referencedRule: dummyRule2
+                        })
+                    ]
+                })
             ]),
             new NonTerminal({
                 nonTerminalName: "dummyRule3",
@@ -1102,12 +1116,14 @@ describe("The no non-empty lookahead validation", () => {
         const alternatives = []
         for (let i = 0; i < 256; i++) {
             alternatives.push(
-                new Flat([
-                    new NonTerminal({
-                        nonTerminalName: "dummyRule",
-                        referencedRule: dummyRule
-                    })
-                ])
+                new Flat({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "dummyRule",
+                            referencedRule: dummyRule
+                        })
+                    ]
+                })
             )
         }
 
