@@ -1,25 +1,8 @@
-import { forEach, isRegExp, map } from "../../utils/utils"
+import { assign, forEach, isRegExp, map } from "../../utils/utils"
 import { TokenType } from "../../scan/lexer_public"
 import { tokenLabel, tokenName } from "../../scan/tokens_public"
 
 export namespace gast {
-    export interface INamedProductionConstructor extends TokenType {
-        new (
-            definition: IProduction[],
-            occurrenceInParent: number,
-            name?: string
-        ): AbstractProduction
-    }
-
-    export interface INamedSepProductionConstructor extends TokenType {
-        new (
-            definition: IProduction[],
-            separator: TokenType,
-            occurrenceInParent: number,
-            name?: string
-        ): AbstractProduction
-    }
-
     export interface IOptionallyNamedProduction {
         name?: string
     }
@@ -46,13 +29,19 @@ export namespace gast {
 
     export class NonTerminal extends AbstractProduction
         implements IProductionWithOccurrence {
-        constructor(
-            public nonTerminalName: string,
-            public referencedRule: Rule = undefined,
-            public occurrenceInParent: number = 1,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
+        public nonTerminalName: string
+        public referencedRule: Rule
+        public occurrenceInParent: number = 1
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            nonTerminalName: string
+            referencedRule?: Rule
+            occurrenceInParent?: number
+            implicitOccurrenceIndex?: boolean
+        }) {
             super([])
+            assign(this, options)
         }
 
         set definition(definition: IProduction[]) {
@@ -73,12 +62,16 @@ export namespace gast {
     }
 
     export class Rule extends AbstractProduction {
-        constructor(
-            public name: string,
-            definition: IProduction[],
-            public orgText: string = ""
-        ) {
-            super(definition)
+        public name: string
+        public orgText: string = ""
+
+        constructor(options: {
+            name: string
+            definition: IProduction[]
+            orgText?: string
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 

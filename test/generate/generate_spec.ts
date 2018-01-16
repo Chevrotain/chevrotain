@@ -15,7 +15,10 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule("topRule", [new gast.Terminal(Identifier)])
+            new gast.Rule({
+                name: "topRule",
+                definition: [new gast.Terminal(Identifier)]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -35,8 +38,16 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule("topRule", [new gast.NonTerminal("nestedRules")]),
-            new gast.Rule("nestedRules", [new gast.Terminal(Identifier)])
+            new gast.Rule({
+                name: "topRule",
+                definition: [
+                    new gast.NonTerminal({ nonTerminalName: "nestedRules" })
+                ]
+            }),
+            new gast.Rule({
+                name: "nestedRules",
+                definition: [new gast.Terminal(Identifier)]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -56,9 +67,10 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule("topRule", [
-                new gast.Option([new gast.Terminal(Identifier)])
-            ])
+            new gast.Rule({
+                name: "topRule",
+                definition: [new gast.Option([new gast.Terminal(Identifier)])]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -84,12 +96,18 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier, Integer]
 
         const rules = [
-            new gast.Rule("topRule", [
-                new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Identifier)]),
-                    new gast.Flat([new gast.Terminal(Integer)], "$inlinedRule")
-                ])
-            ])
+            new gast.Rule({
+                name: "topRule",
+                definition: [
+                    new gast.Alternation([
+                        new gast.Flat([new gast.Terminal(Identifier)]),
+                        new gast.Flat(
+                            [new gast.Terminal(Integer)],
+                            "$inlinedRule"
+                        )
+                    ])
+                ]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -113,13 +131,16 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule("topRule", [
-                new gast.Repetition(
-                    [new gast.Terminal(Identifier)],
-                    1,
-                    "$inlinedRule"
-                )
-            ])
+            new gast.Rule({
+                name: "topRule",
+                definition: [
+                    new gast.Repetition(
+                        [new gast.Terminal(Identifier)],
+                        1,
+                        "$inlinedRule"
+                    )
+                ]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -147,9 +168,14 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule("topRule", [
-                new gast.RepetitionMandatory([new gast.Terminal(Identifier)])
-            ])
+            new gast.Rule({
+                name: "topRule",
+                definition: [
+                    new gast.RepetitionMandatory([
+                        new gast.Terminal(Identifier)
+                    ])
+                ]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -178,12 +204,15 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier, Comma]
 
         const rules = [
-            new gast.Rule("topRule", [
-                new gast.RepetitionWithSeparator(
-                    [new gast.Terminal(Identifier)],
-                    Comma
-                )
-            ])
+            new gast.Rule({
+                name: "topRule",
+                definition: [
+                    new gast.RepetitionWithSeparator(
+                        [new gast.Terminal(Identifier)],
+                        Comma
+                    )
+                ]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -214,12 +243,15 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier, Comma]
 
         const rules = [
-            new gast.Rule("topRule", [
-                new gast.RepetitionMandatoryWithSeparator(
-                    [new gast.Terminal(Identifier)],
-                    Comma
-                )
-            ])
+            new gast.Rule({
+                name: "topRule",
+                definition: [
+                    new gast.RepetitionMandatoryWithSeparator(
+                        [new gast.Terminal(Identifier)],
+                        Comma
+                    )
+                ]
+            })
         ]
 
         const parserFactory = gen.genParserFactory<any>({
@@ -261,16 +293,19 @@ describe("The Code Generation capabilities", () => {
             const tokenVocabulary = [Identifier, Integer]
 
             const rules = [
-                new gast.Rule("topRule", [
-                    new gast.Alternation([
-                        new gast.Flat([
-                            new gast.RepetitionMandatory([
-                                new gast.Terminal(Identifier)
-                            ])
-                        ]),
-                        new gast.Flat([new gast.Terminal(Integer)])
-                    ])
-                ])
+                new gast.Rule({
+                    name: "topRule",
+                    definition: [
+                        new gast.Alternation([
+                            new gast.Flat([
+                                new gast.RepetitionMandatory([
+                                    new gast.Terminal(Identifier)
+                                ])
+                            ]),
+                            new gast.Flat([new gast.Terminal(Integer)])
+                        ])
+                    ]
+                })
             ]
 
             const parserModuleText = gen.generateParserModule({

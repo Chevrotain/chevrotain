@@ -89,12 +89,11 @@ export function getProductionDslName(
 
 class GastCloneVisitor extends gast.GAstVisitor {
     public visitNonTerminal(node: gast.NonTerminal): gast.NonTerminal {
-        return new gast.NonTerminal(
-            node.nonTerminalName,
-            undefined,
-            node.occurrenceInParent,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.NonTerminal({
+            nonTerminalName: node.nonTerminalName,
+            occurrenceInParent: node.occurrenceInParent,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitFlat(node: gast.Flat): gast.Flat {
@@ -196,7 +195,11 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.Rule(node.name, definition, node.orgText)
+        return new gast.Rule({
+            name: node.name,
+            definition: definition,
+            orgText: node.orgText
+        })
     }
 }
 

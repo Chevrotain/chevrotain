@@ -1,22 +1,22 @@
 import {
+    EMPTY_ALT,
     Parser,
-    ParserDefinitionErrorType,
-    EMPTY_ALT
+    ParserDefinitionErrorType
 } from "../../../src/parse/parser_public"
-import { IdentTok, DotTok, qualifiedName, actionDec } from "./samples"
+import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
 import { gast } from "../../../src/parse/grammar/gast_public"
 import {
-    validateRuleName,
-    validateGrammar,
+    getFirstNoneTerminal,
     identifyProductionForDuplicates,
     OccurrenceValidationCollector,
-    getFirstNoneTerminal,
+    validateGrammar,
     validateRuleDoesNotAlreadyExist,
     validateRuleIsOverridden,
+    validateRuleName,
     validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
 import { createToken, IToken } from "../../../src/scan/tokens_public"
-import { forEach, first, map } from "../../../src/utils/utils"
+import { first, forEach, map } from "../../../src/utils/utils"
 
 let Rule = gast.Rule
 let RepetitionMandatory = gast.RepetitionMandatory
@@ -59,19 +59,31 @@ describe("the grammar validations", () => {
             }
         ]
 
-        let qualifiedNameErr1 = new Rule("qualifiedNameErr1", [
-            new Terminal(IdentTok, 1),
-            new Repetition([
-                new Terminal(DotTok),
-                new Terminal(IdentTok, 1) // duplicate Terminal IdentTok with occurrence index 1
-            ])
-        ])
+        let qualifiedNameErr1 = new Rule({
+            name: "qualifiedNameErr1",
+            definition: [
+                new Terminal(IdentTok, 1),
+                new Repetition([
+                    new Terminal(DotTok),
+                    new Terminal(IdentTok, 1) // duplicate Terminal IdentTok with occurrence index 1
+                ])
+            ]
+        })
 
-        let qualifiedNameErr2 = new Rule("qualifiedNameErr2", [
-            new Terminal(IdentTok, 1),
-            new Repetition([new Terminal(DotTok), new Terminal(IdentTok, 2)]),
-            new Repetition([new Terminal(DotTok), new Terminal(IdentTok, 2)])
-        ])
+        let qualifiedNameErr2 = new Rule({
+            name: "qualifiedNameErr2",
+            definition: [
+                new Terminal(IdentTok, 1),
+                new Repetition([
+                    new Terminal(DotTok),
+                    new Terminal(IdentTok, 2)
+                ]),
+                new Repetition([
+                    new Terminal(DotTok),
+                    new Terminal(IdentTok, 2)
+                ])
+            ]
+        })
         let actualErrors = validateGrammar(
             [qualifiedNameErr1, qualifiedNameErr2],
             5,
@@ -163,7 +175,7 @@ describe("the grammar validations", () => {
 describe("identifyProductionForDuplicates function", () => {
     it("generates DSL code for a ProdRef", () => {
         let dslCode = identifyProductionForDuplicates(
-            new NonTerminal("ActionDeclaration")
+            new NonTerminal({ nonTerminalName: "ActionDeclaration" })
         )
         expect(dslCode).to.equal("SUBRULE_#_1_#_ActionDeclaration")
     })
@@ -215,9 +227,18 @@ describe("OccurrenceValidationCollector GASTVisitor class", () => {
 class DummyToken {
     static PATTERN = /NA/
 }
-let dummyRule = new Rule("dummyRule", [new Terminal(DummyToken)])
-let dummyRule2 = new Rule("dummyRule2", [new Terminal(DummyToken)])
-let dummyRule3 = new Rule("dummyRule3", [new Terminal(DummyToken)])
+let dummyRule = new Rule({
+    name: "dummyRule",
+    definition: [new Terminal(DummyToken)]
+})
+let dummyRule2 = new Rule({
+    name: "dummyRule2",
+    definition: [new Terminal(DummyToken)]
+})
+let dummyRule3 = new Rule({
+    name: "dummyRule3",
+    definition: [new Terminal(DummyToken)]
+})
 
 describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of an empty sequence", () => {
@@ -226,7 +247,10 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of a sequence with only one item", () => {
         let result = getFirstNoneTerminal([
-            new NonTerminal("dummyRule", dummyRule)
+            new NonTerminal({
+                nonTerminalName: "dummyRule",
+                referencedRule: dummyRule
+            })
         ])
         expect(result).to.have.length(1)
         expect(first(result).name).to.equal("dummyRule")
@@ -234,8 +258,14 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of a sequence with two items", () => {
         let sqeuence = [
-            new NonTerminal("dummyRule", dummyRule),
-            new NonTerminal("dummyRule2", dummyRule2)
+            new NonTerminal({
+                nonTerminalName: "dummyRule",
+                referencedRule: dummyRule
+            }),
+            new NonTerminal({
+                nonTerminalName: "dummyRule2",
+                referencedRule: dummyRule2
+            })
         ]
         let result = getFirstNoneTerminal(sqeuence)
         expect(result).to.have.length(1)
@@ -244,8 +274,16 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
         let sqeuence = [
-            new Option([new NonTerminal("dummyRule", dummyRule)]),
-            new NonTerminal("dummyRule2", dummyRule2)
+            new Option([
+                new NonTerminal({
+                    nonTerminalName: "dummyRule",
+                    referencedRule: dummyRule
+                })
+            ]),
+            new NonTerminal({
+                nonTerminalName: "dummyRule2",
+                referencedRule: dummyRule2
+            })
         ]
         let result = getFirstNoneTerminal(sqeuence)
         expect(result).to.have.length(2)
@@ -256,9 +294,24 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of an alternation", () => {
         let alternation = [
             new Alternation([
-                new Flat([new NonTerminal("dummyRule", dummyRule)]),
-                new Flat([new NonTerminal("dummyRule2", dummyRule2)]),
-                new Flat([new NonTerminal("dummyRule3", dummyRule3)])
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule",
+                        referencedRule: dummyRule
+                    })
+                ]),
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule2",
+                        referencedRule: dummyRule2
+                    })
+                ]),
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule3",
+                        referencedRule: dummyRule3
+                    })
+                ])
             ])
         ]
         let result = getFirstNoneTerminal(alternation)
@@ -274,10 +327,23 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of an optional repetition", () => {
         let alternation = [
             new Repetition([
-                new Flat([new NonTerminal("dummyRule", dummyRule)]),
-                new Flat([new NonTerminal("dummyRule2", dummyRule2)])
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule",
+                        referencedRule: dummyRule
+                    })
+                ]),
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule2",
+                        referencedRule: dummyRule2
+                    })
+                ])
             ]),
-            new NonTerminal("dummyRule3", dummyRule3)
+            new NonTerminal({
+                nonTerminalName: "dummyRule3",
+                referencedRule: dummyRule3
+            })
         ]
         let result = getFirstNoneTerminal(alternation)
         expect(result).to.have.length(2)
@@ -288,10 +354,23 @@ describe("the getFirstNoneTerminal function", () => {
     it("can find the firstNoneTerminal of a mandatory repetition", () => {
         let alternation = [
             new RepetitionMandatory([
-                new Flat([new NonTerminal("dummyRule", dummyRule)]),
-                new Flat([new NonTerminal("dummyRule2", dummyRule2)])
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule",
+                        referencedRule: dummyRule
+                    })
+                ]),
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule2",
+                        referencedRule: dummyRule2
+                    })
+                ])
             ]),
-            new NonTerminal("dummyRule3", dummyRule3)
+            new NonTerminal({
+                nonTerminalName: "dummyRule3",
+                referencedRule: dummyRule3
+            })
         ]
         let result = getFirstNoneTerminal(alternation)
         expect(result).to.have.length(1)
@@ -1023,13 +1102,19 @@ describe("The no non-empty lookahead validation", () => {
         const alternatives = []
         for (let i = 0; i < 256; i++) {
             alternatives.push(
-                new Flat([new NonTerminal("dummyRule", dummyRule)])
+                new Flat([
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule",
+                        referencedRule: dummyRule
+                    })
+                ])
             )
         }
 
-        const ruleWithTooManyAlts = new Rule("blah", [
-            new Alternation(alternatives)
-        ])
+        const ruleWithTooManyAlts = new Rule({
+            name: "blah",
+            definition: [new Alternation(alternatives)]
+        })
 
         const actual = validateTooManyAlts(ruleWithTooManyAlts)
         expect(actual).to.have.lengthOf(1)

@@ -125,7 +125,11 @@ function buildTopLevel(
     allRanges: IProdRange[],
     orgText: string
 ): gast.Rule {
-    let topLevelProd = new gast.Rule(name, [], orgText)
+    let topLevelProd = new gast.Rule({
+        name: name,
+        definition: [],
+        orgText: orgText
+    })
     return buildAbstractProd(topLevelProd, topRange, allRanges)
 }
 
@@ -165,7 +169,10 @@ function buildRefProd(prodRange: IProdRange): gast.NonTerminal {
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
     let refProdName = reResult[2]
-    let newRef = new gast.NonTerminal(refProdName, undefined, refOccurrence)
+    let newRef = new gast.NonTerminal({
+        nonTerminalName: refProdName,
+        occurrenceInParent: refOccurrence
+    })
     newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     return newRef
 }

@@ -432,11 +432,17 @@ describe("The Grammar Interpeter namespace", () => {
 
 describe("The NextTerminalAfterManyWalker", () => {
     it("can compute the next possible token types after the MANY in QualifiedName", () => {
-        let rule = new Rule("TwoRepetitionRule", [
-            new Repetition([new Terminal(IdentTok, 1)], 2),
-            new Terminal(IdentTok, 2),
-            new Repetition([new Terminal(DotTok), new Terminal(IdentTok, 3)])
-        ])
+        let rule = new Rule({
+            name: "TwoRepetitionRule",
+            definition: [
+                new Repetition([new Terminal(IdentTok, 1)], 2),
+                new Terminal(IdentTok, 2),
+                new Repetition([
+                    new Terminal(DotTok),
+                    new Terminal(IdentTok, 3)
+                ])
+            ]
+        })
 
         let result = new NextTerminalAfterManyWalker(rule, 1).startWalking()
         //noinspection BadExpressionStatementJS
@@ -502,9 +508,10 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
     })
 
     it("can compute the next possible token types after an AT_LEAST_ONE production - EMPTY", () => {
-        let atLeastOneRule = new Rule("atLeastOneRule", [
-            new RepetitionMandatory([new Terminal(DotTok, 1)])
-        ])
+        let atLeastOneRule = new Rule({
+            name: "atLeastOneRule",
+            definition: [new RepetitionMandatory([new Terminal(DotTok, 1)])]
+        })
 
         let result = new NextTerminalAfterAtLeastOneWalker(
             atLeastOneRule,
@@ -754,11 +761,17 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         })
 
         it("NonTerminal", () => {
-            let someSubRule = new gast.Rule("blah", [new gast.Terminal(Beta)])
+            let someSubRule = new gast.Rule({
+                name: "blah",
+                definition: [new gast.Terminal(Beta)]
+            })
 
             let seq = [
                 new gast.Terminal(Alpha),
-                new gast.NonTerminal("blah", someSubRule),
+                new gast.NonTerminal({
+                    nonTerminalName: "blah",
+                    referencedRule: someSubRule
+                }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -1468,11 +1481,17 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         })
 
         it("NonTerminal - positive", () => {
-            let someSubRule = new gast.Rule("blah", [new gast.Terminal(Beta)])
+            let someSubRule = new gast.Rule({
+                name: "blah",
+                definition: [new gast.Terminal(Beta)]
+            })
 
             let seq = [
                 new gast.Terminal(Alpha),
-                new gast.NonTerminal("blah", someSubRule),
+                new gast.NonTerminal({
+                    nonTerminalName: "blah",
+                    referencedRule: someSubRule
+                }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -1512,11 +1531,17 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         })
 
         it("NonTerminal - negative", () => {
-            let someSubRule = new gast.Rule("blah", [new gast.Terminal(Beta)])
+            let someSubRule = new gast.Rule({
+                name: "blah",
+                definition: [new gast.Terminal(Beta)]
+            })
 
             let seq = [
                 new gast.Terminal(Alpha),
-                new gast.NonTerminal("blah", someSubRule),
+                new gast.NonTerminal({
+                    nonTerminalName: "blah",
+                    referencedRule: someSubRule
+                }),
                 new gast.Terminal(Gamma)
             ]
 

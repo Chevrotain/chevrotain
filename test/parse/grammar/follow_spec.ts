@@ -31,7 +31,7 @@ describe("The Grammar Ast Follows model", () => {
     })
 
     it("can build a followName prefix from a TopLevel Production and index", () => {
-        let prod = new Rule("bamba", [])
+        let prod = new Rule({ name: "bamba", definition: [] })
         let index = 5
 
         let actual = buildBetweenProdsFollowPrefix(prod, index)
