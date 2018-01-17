@@ -13,7 +13,7 @@ export namespace gast {
 
     export interface IProductionWithOccurrence extends IProduction {
         occurrenceInParent: number
-        implicitOccurrenceIndex: boolean
+        implicitOccurrenceIndex?: boolean
     }
 
     export abstract class AbstractProduction implements IProduction {
@@ -88,25 +88,35 @@ export namespace gast {
 
     export class Option extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public occurrenceInParent: number = 1
+        public name?: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class RepetitionMandatory extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public occurrenceInParent: number = 1
+        public name: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 

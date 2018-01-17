@@ -107,12 +107,12 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.Option(
-            definition,
-            node.occurrenceInParent,
-            node.name,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.Option({
+            definition: definition,
+            occurrenceInParent: node.occurrenceInParent,
+            name: node.name,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitRepetition(node: gast.Repetition): gast.Repetition {
@@ -133,12 +133,12 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.RepetitionMandatory(
-            definition,
-            node.occurrenceInParent,
-            node.name,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.RepetitionMandatory({
+            definition: definition,
+            occurrenceInParent: node.occurrenceInParent,
+            name: node.name,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitRepetitionMandatoryWithSeparator(

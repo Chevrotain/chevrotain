@@ -181,13 +181,15 @@ describe("identifyProductionForDuplicates function", () => {
     })
 
     it("generates DSL code for a OPTION", () => {
-        let dslCode = identifyProductionForDuplicates(new Option([], 3))
+        let dslCode = identifyProductionForDuplicates(
+            new Option({ definition: [], occurrenceInParent: 3 })
+        )
         expect(dslCode).to.equal("OPTION_#_3_#_")
     })
 
     it("generates DSL code for a AT_LEAST_ONE", () => {
         let dslCode = identifyProductionForDuplicates(
-            new RepetitionMandatory([])
+            new RepetitionMandatory({ definition: [] })
         )
         expect(dslCode).to.equal("AT_LEAST_ONE_#_1_#_")
     })
@@ -274,12 +276,14 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of a sequence with two items where the first is optional", () => {
         let sqeuence = [
-            new Option([
-                new NonTerminal({
-                    nonTerminalName: "dummyRule",
-                    referencedRule: dummyRule
-                })
-            ]),
+            new Option({
+                definition: [
+                    new NonTerminal({
+                        nonTerminalName: "dummyRule",
+                        referencedRule: dummyRule
+                    })
+                ]
+            }),
             new NonTerminal({
                 nonTerminalName: "dummyRule2",
                 referencedRule: dummyRule2
@@ -363,24 +367,26 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of a mandatory repetition", () => {
         let alternation = [
-            new RepetitionMandatory([
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule",
-                            referencedRule: dummyRule
-                        })
-                    ]
-                }),
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule2",
-                            referencedRule: dummyRule2
-                        })
-                    ]
-                })
-            ]),
+            new RepetitionMandatory({
+                definition: [
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule",
+                                referencedRule: dummyRule
+                            })
+                        ]
+                    }),
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule2",
+                                referencedRule: dummyRule2
+                            })
+                        ]
+                    })
+                ]
+            }),
             new NonTerminal({
                 nonTerminalName: "dummyRule3",
                 referencedRule: dummyRule3

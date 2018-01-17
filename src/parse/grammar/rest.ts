@@ -75,7 +75,7 @@ export abstract class RestWalker {
     ): void {
         // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
         let fullAtLeastOneRest: gast.IProduction[] = [
-            new gast.Option(atLeastOneProd.definition)
+            new gast.Option({ definition: atLeastOneProd.definition })
         ].concat(<any>currRest, <any>prevRest)
         this.walk(atLeastOneProd, fullAtLeastOneRest)
     }
@@ -101,7 +101,7 @@ export abstract class RestWalker {
     ): void {
         // ABC(DE)*F => after the (DE)* the rest is (DE)?F
         let fullManyRest: gast.IProduction[] = [
-            new gast.Option(manyProd.definition)
+            new gast.Option({ definition: manyProd.definition })
         ].concat(<any>currRest, <any>prevRest)
         this.walk(manyProd, fullManyRest)
     }
@@ -140,11 +140,11 @@ export abstract class RestWalker {
 
 function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
     let repSepRest = [
-        new gast.Option(
-            [<any>new gast.Terminal(repSepProd.separator)].concat(
+        new gast.Option({
+            definition: [<any>new gast.Terminal(repSepProd.separator)].concat(
                 repSepProd.definition
             )
-        )
+        })
     ]
     let fullRepSepRest: gast.IProduction[] = repSepRest.concat(
         <any>currRest,

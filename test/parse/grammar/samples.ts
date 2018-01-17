@@ -78,16 +78,21 @@ export class ElementTok {
 export let atLeastOneRule = new Rule({
     name: "atLeastOneRule",
     definition: [
-        new RepetitionMandatory([
-            new RepetitionMandatory(
-                [
-                    new RepetitionMandatory([new Terminal(EntityTok)], 3),
-                    new Terminal(CommaTok)
-                ],
-                2
-            ),
-            new Terminal(DotTok, 1)
-        ]),
+        new RepetitionMandatory({
+            definition: [
+                new RepetitionMandatory({
+                    definition: [
+                        new RepetitionMandatory({
+                            definition: [new Terminal(EntityTok)],
+                            occurrenceInParent: 3
+                        }),
+                        new Terminal(CommaTok)
+                    ],
+                    occurrenceInParent: 2
+                }),
+                new Terminal(DotTok, 1)
+            ]
+        }),
         new Terminal(DotTok, 2)
     ]
 })
@@ -144,7 +149,9 @@ export let paramSpec = new Rule({
             nonTerminalName: "qualifiedName",
             referencedRule: qualifiedName
         }),
-        new Option([new Terminal(LSquareTok), new Terminal(RSquareTok)])
+        new Option({
+            definition: [new Terminal(LSquareTok), new Terminal(RSquareTok)]
+        })
     ]
 })
 
@@ -154,31 +161,33 @@ export let actionDec = new Rule({
         new Terminal(ActionTok),
         new Terminal(IdentTok),
         new Terminal(LParenTok),
-        new Option([
-            new NonTerminal({
-                nonTerminalName: "paramSpec",
-                referencedRule: paramSpec
-            }),
-            new Repetition([
-                new Terminal(CommaTok),
+        new Option({
+            definition: [
                 new NonTerminal({
                     nonTerminalName: "paramSpec",
-                    referencedRule: paramSpec,
-                    occurrenceInParent: 2
-                })
-            ])
-        ]),
+                    referencedRule: paramSpec
+                }),
+                new Repetition([
+                    new Terminal(CommaTok),
+                    new NonTerminal({
+                        nonTerminalName: "paramSpec",
+                        referencedRule: paramSpec,
+                        occurrenceInParent: 2
+                    })
+                ])
+            ]
+        }),
         new Terminal(RParenTok),
-        new Option(
-            [
+        new Option({
+            definition: [
                 new Terminal(ColonTok),
                 new NonTerminal({
                     nonTerminalName: "qualifiedName",
                     referencedRule: qualifiedName
                 })
             ],
-            2
-        ),
+            occurrenceInParent: 2
+        }),
         new Terminal(SemicolonTok)
     ]
 })
@@ -202,16 +211,16 @@ export let actionDecSep = new Rule({
         ),
 
         new Terminal(RParenTok),
-        new Option(
-            [
+        new Option({
+            definition: [
                 new Terminal(ColonTok),
                 new NonTerminal({
                     nonTerminalName: "qualifiedName",
                     referencedRule: qualifiedName
                 })
             ],
-            2
-        ),
+            occurrenceInParent: 2
+        }),
         new Terminal(SemicolonTok)
     ]
 })
@@ -251,15 +260,17 @@ export let assignedTypeSpec = new Rule({
         new Terminal(ColonTok),
         new NonTerminal({ nonTerminalName: "assignedType" }),
 
-        new Option([new NonTerminal({ nonTerminalName: "enumClause" })]),
+        new Option({
+            definition: [new NonTerminal({ nonTerminalName: "enumClause" })]
+        }),
 
-        new Option(
-            [
+        new Option({
+            definition: [
                 new Terminal(DefaultTok),
                 new NonTerminal({ nonTerminalName: "expression" })
             ],
-            2
-        )
+            occurrenceInParent: 2
+        })
     ]
 })
 

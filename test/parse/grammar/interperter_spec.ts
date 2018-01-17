@@ -510,7 +510,11 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
     it("can compute the next possible token types after an AT_LEAST_ONE production - EMPTY", () => {
         let atLeastOneRule = new Rule({
             name: "atLeastOneRule",
-            definition: [new RepetitionMandatory([new Terminal(DotTok, 1)])]
+            definition: [
+                new RepetitionMandatory({
+                    definition: [new Terminal(DotTok, 1)]
+                })
+            ]
         })
 
         let result = new NextTerminalAfterAtLeastOneWalker(
@@ -606,7 +610,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         it("Optional", () => {
             let seq = [
                 new gast.Terminal(Alpha),
-                new gast.Option([new gast.Terminal(Beta)]),
+                new gast.Option({ definition: [new gast.Terminal(Beta)] }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -683,10 +687,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Mandatory Repetition", () => {
             let repMand = [
-                new gast.RepetitionMandatory([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Alpha)
-                ]),
+                new gast.RepetitionMandatory({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Alpha)
+                    ]
+                }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -890,7 +896,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         it("Optional positive", () => {
             let seq = [
                 new gast.Terminal(Alpha),
-                new gast.Option([new gast.Terminal(Beta)]),
+                new gast.Option({ definition: [new gast.Terminal(Beta)] }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -912,7 +918,7 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         it("Optional Negative", () => {
             let seq = [
                 new gast.Terminal(Alpha),
-                new gast.Option([new gast.Terminal(Beta)]),
+                new gast.Option({ definition: [new gast.Terminal(Beta)] }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -1163,10 +1169,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Mandatory Repetition - positive", () => {
             let repMand = [
-                new gast.RepetitionMandatory([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta)
-                ]),
+                new gast.RepetitionMandatory({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta)
+                    ]
+                }),
                 new gast.Terminal(Gamma)
             ]
 
@@ -1229,10 +1237,12 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Mandatory Repetition - negative", () => {
             let repMand = [
-                new gast.RepetitionMandatory([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta)
-                ]),
+                new gast.RepetitionMandatory({
+                    definition: [
+                        new gast.Terminal(Alpha),
+                        new gast.Terminal(Beta)
+                    ]
+                }),
                 new gast.Terminal(Gamma)
             ]
 

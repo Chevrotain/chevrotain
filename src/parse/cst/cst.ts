@@ -65,20 +65,31 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
         newNodeConstructor: any,
         methodIdx: number
     ): void {
+        // TODO: better hack to copy what we need here...
         if (!isUndefined(node.name)) {
             // copy without name so this will indeed be processed later.
             let nameLessNode
-            if (has(node, "separator")) {
+
+            if (
+                node instanceof gast.Option ||
+                node instanceof gast.RepetitionMandatory
+            ) {
+                nameLessNode = new (<any>newNodeConstructor)({
+                    definition: node.definition,
+                    occurrenceInParent: node.occurrenceInParent,
+                    implicitOccurrenceIndex: node.implicitOccurrenceIndex
+                })
+            } else if (has(node, "separator")) {
                 // hack to avoid code duplication and refactoring the Gast type declaration / constructors arguments order.
                 nameLessNode = new (<any>newNodeConstructor)(
-                    node.definition,
+                    (<any>node).definition,
                     (<any>node).separator,
-                    node.occurrenceInParent
+                    (<any>node).occurrenceInParent
                 )
             } else {
                 nameLessNode = new newNodeConstructor(
-                    node.definition,
-                    node.occurrenceInParent
+                    (<any>node).definition,
+                    (<any>node).occurrenceInParent
                 )
             }
             let def = [nameLessNode]
@@ -133,7 +144,9 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             if (!isUndefined(currFlatAlt.name)) {
                 let def = currFlatAlt.definition
                 if (hasMoreThanOneAlternative) {
-                    def = [new gast.Option(currFlatAlt.definition)]
+                    def = [
+                        new gast.Option({ definition: currFlatAlt.definition })
+                    ]
                 } else {
                     // mandatory
                     def = currFlatAlt.definition

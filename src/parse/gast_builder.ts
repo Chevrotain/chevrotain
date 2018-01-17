@@ -225,7 +225,7 @@ function buildAtLeastOneProd(
 ): gast.RepetitionMandatory {
     return buildProdWithOccurrence(
         atLeastOneRegEx,
-        new gast.RepetitionMandatory([]),
+        new gast.RepetitionMandatory({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -306,7 +306,7 @@ function buildOptionProd(
 ): gast.Option {
     return buildProdWithOccurrence(
         optionRegEx,
-        new gast.Option([]),
+        new gast.Option({ definition: [] }),
         prodRange,
         allRanges
     )

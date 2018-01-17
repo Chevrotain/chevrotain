@@ -37,7 +37,7 @@ describe("The Grammar Ast first model", () => {
         let seqProduction2 = new Flat({
             definition: [
                 new Terminal(EntityTok),
-                new Option([new Terminal(NamespaceTok)])
+                new Option({ definition: [new Terminal(NamespaceTok)] })
             ]
         })
         let actual2 = first(seqProduction2)
@@ -61,7 +61,7 @@ describe("The Grammar Ast first model", () => {
     it("can compute the first for an production with optional prefix", () => {
         let withOptionalPrefix = new Flat({
             definition: [
-                new Option([new Terminal(NamespaceTok)]),
+                new Option({ definition: [new Terminal(NamespaceTok)] }),
                 new Terminal(EntityTok)
             ]
         })
@@ -70,10 +70,10 @@ describe("The Grammar Ast first model", () => {
 
         let withTwoOptPrefix = new Flat({
             definition: [
-                new Option([new Terminal(NamespaceTok)]),
-                new Option([new Terminal(ColonTok)]),
+                new Option({ definition: [new Terminal(NamespaceTok)] }),
+                new Option({ definition: [new Terminal(ColonTok)] }),
                 new Terminal(EntityTok),
-                new Option([new Terminal(ConstTok)])
+                new Option({ definition: [new Terminal(ConstTok)] })
             ]
         })
         let actual2 = first(withTwoOptPrefix)

@@ -35,7 +35,7 @@ describe("GAst namespace", () => {
         })
 
         it("Option", () => {
-            let gastInstance = new gast.Option([])
+            let gastInstance = new gast.Option({ definition: [] })
             expect(getProductionDslName(gastInstance)).to.equal("OPTION")
         })
 
@@ -45,7 +45,7 @@ describe("GAst namespace", () => {
         })
 
         it("RepetitionMandatory", () => {
-            let gastInstance = new gast.RepetitionMandatory([])
+            let gastInstance = new gast.RepetitionMandatory({ definition: [] })
             expect(getProductionDslName(gastInstance)).to.equal("AT_LEAST_ONE")
         })
 
@@ -122,10 +122,12 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Option", () => {
-            let input = new gast.Option([
-                new Terminal(C),
-                new NonTerminal({ nonTerminalName: "bamba" })
-            ])
+            let input = new gast.Option({
+                definition: [
+                    new Terminal(C),
+                    new NonTerminal({ nonTerminalName: "bamba" })
+                ]
+            })
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
                 type: "Option",
@@ -146,10 +148,12 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a RepetitionMandatory", () => {
-            let input = new gast.RepetitionMandatory([
-                new Terminal(C),
-                new NonTerminal({ nonTerminalName: "bamba" })
-            ])
+            let input = new gast.RepetitionMandatory({
+                definition: [
+                    new Terminal(C),
+                    new NonTerminal({ nonTerminalName: "bamba" })
+                ]
+            })
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
                 type: "RepetitionMandatory",

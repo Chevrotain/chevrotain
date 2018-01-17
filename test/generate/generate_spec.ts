@@ -69,7 +69,11 @@ describe("The Code Generation capabilities", () => {
         const rules = [
             new gast.Rule({
                 name: "topRule",
-                definition: [new gast.Option([new gast.Terminal(Identifier)])]
+                definition: [
+                    new gast.Option({
+                        definition: [new gast.Terminal(Identifier)]
+                    })
+                ]
             })
         ]
 
@@ -173,9 +177,9 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule({
                 name: "topRule",
                 definition: [
-                    new gast.RepetitionMandatory([
-                        new gast.Terminal(Identifier)
-                    ])
+                    new gast.RepetitionMandatory({
+                        definition: [new gast.Terminal(Identifier)]
+                    })
                 ]
             })
         ]
@@ -301,9 +305,11 @@ describe("The Code Generation capabilities", () => {
                         new gast.Alternation([
                             new gast.Flat({
                                 definition: [
-                                    new gast.RepetitionMandatory([
-                                        new gast.Terminal(Identifier)
-                                    ])
+                                    new gast.RepetitionMandatory({
+                                        definition: [
+                                            new gast.Terminal(Identifier)
+                                        ]
+                                    })
                                 ]
                             }),
                             new gast.Flat({
