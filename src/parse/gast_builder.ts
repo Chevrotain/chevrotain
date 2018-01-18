@@ -189,7 +189,10 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
         throw Error("Terminal Token name: " + terminalName + " not found")
     }
 
-    let newTerminal = new gast.Terminal(terminalType, terminalOccurrence)
+    let newTerminal = new gast.Terminal({
+        terminalType: terminalType,
+        occurrenceInParent: terminalOccurrence
+    })
     newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     return newTerminal
 }
@@ -249,7 +252,7 @@ function buildManyProd(
 ): gast.Repetition {
     return buildProdWithOccurrence(
         manyRegEx,
-        new gast.Repetition([]),
+        new gast.Repetition({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -283,11 +286,11 @@ function buildRepetitionWithSep(
         throw Error("Separator Terminal Token name: " + sepName + " not found")
     }
 
-    let repetitionInstance: any = new (<any>repConstructor)(
-        [],
-        separatorType,
-        occurrenceIdx
-    )
+    let repetitionInstance: any = new (<any>repConstructor)({
+        definition: [],
+        separator: separatorType,
+        occurrenceInParent: occurrenceIdx
+    })
     repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     let nestedName = reResult[2]
     if (!isUndefined(nestedName)) {
@@ -318,7 +321,7 @@ function buildOrProd(
 ): gast.Alternation {
     return buildProdWithOccurrence(
         orRegEx,
-        new gast.Alternation([]),
+        new gast.Alternation({ definition: [] }),
         prodRange,
         allRanges
     )

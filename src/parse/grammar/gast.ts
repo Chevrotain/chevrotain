@@ -119,12 +119,12 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.Repetition(
-            definition,
-            node.occurrenceInParent,
-            node.name,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.Repetition({
+            definition: definition,
+            occurrenceInParent: node.occurrenceInParent,
+            name: node.name,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitRepetitionMandatory(
@@ -147,13 +147,14 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.RepetitionMandatoryWithSeparator(
-            definition,
-            node.separator,
-            node.occurrenceInParent,
-            node.name,
-            node.implicitOccurrenceIndex
-        )
+
+        return new gast.RepetitionMandatoryWithSeparator({
+            definition: definition,
+            separator: node.separator,
+            occurrenceInParent: node.occurrenceInParent,
+            name: node.name,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitRepetitionWithSeparator(
@@ -162,33 +163,33 @@ class GastCloneVisitor extends gast.GAstVisitor {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.RepetitionWithSeparator(
-            definition,
-            node.separator,
-            node.occurrenceInParent,
-            node.name,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.RepetitionWithSeparator({
+            definition: definition,
+            separator: node.separator,
+            occurrenceInParent: node.occurrenceInParent,
+            name: node.name,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitAlternation(node: gast.Alternation): gast.Alternation {
         let definition = map(node.definition, currSubDef =>
             this.visit(currSubDef)
         )
-        return new gast.Alternation(
-            definition,
-            node.occurrenceInParent,
-            node.name,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.Alternation({
+            definition: definition,
+            occurrenceInParent: node.occurrenceInParent,
+            name: node.name,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitTerminal(node: gast.Terminal): gast.Terminal {
-        return new gast.Terminal(
-            node.terminalType,
-            node.occurrenceInParent,
-            node.implicitOccurrenceIndex
-        )
+        return new gast.Terminal({
+            terminalType: node.terminalType,
+            occurrenceInParent: node.occurrenceInParent,
+            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+        })
     }
 
     public visitRule(node: gast.Rule): gast.Rule {

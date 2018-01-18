@@ -17,7 +17,7 @@ describe("The Code Generation capabilities", () => {
         const rules = [
             new gast.Rule({
                 name: "topRule",
-                definition: [new gast.Terminal(Identifier)]
+                definition: [new gast.Terminal({ terminalType: Identifier })]
             })
         ]
 
@@ -46,7 +46,7 @@ describe("The Code Generation capabilities", () => {
             }),
             new gast.Rule({
                 name: "nestedRules",
-                definition: [new gast.Terminal(Identifier)]
+                definition: [new gast.Terminal({ terminalType: Identifier })]
             })
         ]
 
@@ -71,7 +71,9 @@ describe("The Code Generation capabilities", () => {
                 name: "topRule",
                 definition: [
                     new gast.Option({
-                        definition: [new gast.Terminal(Identifier)]
+                        definition: [
+                            new gast.Terminal({ terminalType: Identifier })
+                        ]
                     })
                 ]
             })
@@ -103,15 +105,23 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule({
                 name: "topRule",
                 definition: [
-                    new gast.Alternation([
-                        new gast.Flat({
-                            definition: [new gast.Terminal(Identifier)]
-                        }),
-                        new gast.Flat({
-                            definition: [new gast.Terminal(Integer)],
-                            name: "$inlinedRule"
-                        })
-                    ])
+                    new gast.Alternation({
+                        definition: [
+                            new gast.Flat({
+                                definition: [
+                                    new gast.Terminal({
+                                        terminalType: Identifier
+                                    })
+                                ]
+                            }),
+                            new gast.Flat({
+                                definition: [
+                                    new gast.Terminal({ terminalType: Integer })
+                                ],
+                                name: "$inlinedRule"
+                            })
+                        ]
+                    })
                 ]
             })
         ]
@@ -140,11 +150,13 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule({
                 name: "topRule",
                 definition: [
-                    new gast.Repetition(
-                        [new gast.Terminal(Identifier)],
-                        1,
-                        "$inlinedRule"
-                    )
+                    new gast.Repetition({
+                        definition: [
+                            new gast.Terminal({ terminalType: Identifier })
+                        ],
+                        occurrenceInParent: 1,
+                        name: "$inlinedRule"
+                    })
                 ]
             })
         ]
@@ -178,7 +190,9 @@ describe("The Code Generation capabilities", () => {
                 name: "topRule",
                 definition: [
                     new gast.RepetitionMandatory({
-                        definition: [new gast.Terminal(Identifier)]
+                        definition: [
+                            new gast.Terminal({ terminalType: Identifier })
+                        ]
                     })
                 ]
             })
@@ -213,10 +227,12 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule({
                 name: "topRule",
                 definition: [
-                    new gast.RepetitionWithSeparator(
-                        [new gast.Terminal(Identifier)],
-                        Comma
-                    )
+                    new gast.RepetitionWithSeparator({
+                        definition: [
+                            new gast.Terminal({ terminalType: Identifier })
+                        ],
+                        separator: Comma
+                    })
                 ]
             })
         ]
@@ -252,10 +268,12 @@ describe("The Code Generation capabilities", () => {
             new gast.Rule({
                 name: "topRule",
                 definition: [
-                    new gast.RepetitionMandatoryWithSeparator(
-                        [new gast.Terminal(Identifier)],
-                        Comma
-                    )
+                    new gast.RepetitionMandatoryWithSeparator({
+                        definition: [
+                            new gast.Terminal({ terminalType: Identifier })
+                        ],
+                        separator: Comma
+                    })
                 ]
             })
         ]
@@ -302,20 +320,28 @@ describe("The Code Generation capabilities", () => {
                 new gast.Rule({
                     name: "topRule",
                     definition: [
-                        new gast.Alternation([
-                            new gast.Flat({
-                                definition: [
-                                    new gast.RepetitionMandatory({
-                                        definition: [
-                                            new gast.Terminal(Identifier)
-                                        ]
-                                    })
-                                ]
-                            }),
-                            new gast.Flat({
-                                definition: [new gast.Terminal(Integer)]
-                            })
-                        ])
+                        new gast.Alternation({
+                            definition: [
+                                new gast.Flat({
+                                    definition: [
+                                        new gast.RepetitionMandatory({
+                                            definition: [
+                                                new gast.Terminal({
+                                                    terminalType: Identifier
+                                                })
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                new gast.Flat({
+                                    definition: [
+                                        new gast.Terminal({
+                                            terminalType: Integer
+                                        })
+                                    ]
+                                })
+                            ]
+                        })
                     ]
                 })
             ]

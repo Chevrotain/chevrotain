@@ -141,9 +141,9 @@ export abstract class RestWalker {
 function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
     let repSepRest = [
         new gast.Option({
-            definition: [<any>new gast.Terminal(repSepProd.separator)].concat(
-                repSepProd.definition
-            )
+            definition: [
+                new gast.Terminal({ terminalType: repSepProd.separator })
+            ].concat(repSepProd.definition)
         })
     ]
     let fullRepSepRest: gast.IProduction[] = repSepRest.concat(

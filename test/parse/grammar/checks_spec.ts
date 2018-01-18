@@ -62,26 +62,41 @@ describe("the grammar validations", () => {
         let qualifiedNameErr1 = new Rule({
             name: "qualifiedNameErr1",
             definition: [
-                new Terminal(IdentTok, 1),
-                new Repetition([
-                    new Terminal(DotTok),
-                    new Terminal(IdentTok, 1) // duplicate Terminal IdentTok with occurrence index 1
-                ])
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 }),
+                new Repetition({
+                    definition: [
+                        new Terminal({ terminalType: DotTok }),
+                        new Terminal({
+                            terminalType: IdentTok,
+                            occurrenceInParent: 1
+                        }) // duplicate Terminal IdentTok with occurrence index 1
+                    ]
+                })
             ]
         })
 
         let qualifiedNameErr2 = new Rule({
             name: "qualifiedNameErr2",
             definition: [
-                new Terminal(IdentTok, 1),
-                new Repetition([
-                    new Terminal(DotTok),
-                    new Terminal(IdentTok, 2)
-                ]),
-                new Repetition([
-                    new Terminal(DotTok),
-                    new Terminal(IdentTok, 2)
-                ])
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 }),
+                new Repetition({
+                    definition: [
+                        new Terminal({ terminalType: DotTok }),
+                        new Terminal({
+                            terminalType: IdentTok,
+                            occurrenceInParent: 2
+                        })
+                    ]
+                }),
+                new Repetition({
+                    definition: [
+                        new Terminal({ terminalType: DotTok }),
+                        new Terminal({
+                            terminalType: IdentTok,
+                            occurrenceInParent: 2
+                        })
+                    ]
+                })
             ]
         })
         let actualErrors = validateGrammar(
@@ -195,17 +210,23 @@ describe("identifyProductionForDuplicates function", () => {
     })
 
     it("generates DSL code for a MANY", () => {
-        let dslCode = identifyProductionForDuplicates(new Repetition([], 5))
+        let dslCode = identifyProductionForDuplicates(
+            new Repetition({ definition: [], occurrenceInParent: 5 })
+        )
         expect(dslCode).to.equal("MANY_#_5_#_")
     })
 
     it("generates DSL code for a OR", () => {
-        let dslCode = identifyProductionForDuplicates(new Alternation([], 1))
+        let dslCode = identifyProductionForDuplicates(
+            new Alternation({ definition: [], occurrenceInParent: 1 })
+        )
         expect(dslCode).to.equal("OR_#_1_#_")
     })
 
     it("generates DSL code for a Terminal", () => {
-        let dslCode = identifyProductionForDuplicates(new Terminal(IdentTok, 4))
+        let dslCode = identifyProductionForDuplicates(
+            new Terminal({ terminalType: IdentTok, occurrenceInParent: 4 })
+        )
         expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
     })
 })
@@ -231,15 +252,15 @@ class DummyToken {
 }
 let dummyRule = new Rule({
     name: "dummyRule",
-    definition: [new Terminal(DummyToken)]
+    definition: [new Terminal({ terminalType: DummyToken })]
 })
 let dummyRule2 = new Rule({
     name: "dummyRule2",
-    definition: [new Terminal(DummyToken)]
+    definition: [new Terminal({ terminalType: DummyToken })]
 })
 let dummyRule3 = new Rule({
     name: "dummyRule3",
-    definition: [new Terminal(DummyToken)]
+    definition: [new Terminal({ terminalType: DummyToken })]
 })
 
 describe("the getFirstNoneTerminal function", () => {
@@ -297,32 +318,34 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of an alternation", () => {
         let alternation = [
-            new Alternation([
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule",
-                            referencedRule: dummyRule
-                        })
-                    ]
-                }),
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule2",
-                            referencedRule: dummyRule2
-                        })
-                    ]
-                }),
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule3",
-                            referencedRule: dummyRule3
-                        })
-                    ]
-                })
-            ])
+            new Alternation({
+                definition: [
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule",
+                                referencedRule: dummyRule
+                            })
+                        ]
+                    }),
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule2",
+                                referencedRule: dummyRule2
+                            })
+                        ]
+                    }),
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule3",
+                                referencedRule: dummyRule3
+                            })
+                        ]
+                    })
+                ]
+            })
         ]
         let result = getFirstNoneTerminal(alternation)
         expect(result).to.have.length(3)
@@ -336,24 +359,26 @@ describe("the getFirstNoneTerminal function", () => {
 
     it("can find the firstNoneTerminal of an optional repetition", () => {
         let alternation = [
-            new Repetition([
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule",
-                            referencedRule: dummyRule
-                        })
-                    ]
-                }),
-                new Flat({
-                    definition: [
-                        new NonTerminal({
-                            nonTerminalName: "dummyRule2",
-                            referencedRule: dummyRule2
-                        })
-                    ]
-                })
-            ]),
+            new Repetition({
+                definition: [
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule",
+                                referencedRule: dummyRule
+                            })
+                        ]
+                    }),
+                    new Flat({
+                        definition: [
+                            new NonTerminal({
+                                nonTerminalName: "dummyRule2",
+                                referencedRule: dummyRule2
+                            })
+                        ]
+                    })
+                ]
+            }),
             new NonTerminal({
                 nonTerminalName: "dummyRule3",
                 referencedRule: dummyRule3
@@ -1135,7 +1160,7 @@ describe("The no non-empty lookahead validation", () => {
 
         const ruleWithTooManyAlts = new Rule({
             name: "blah",
-            definition: [new Alternation(alternatives)]
+            definition: [new Alternation({ definition: alternatives })]
         })
 
         const actual = validateTooManyAlts(ruleWithTooManyAlts)

@@ -83,74 +83,88 @@ export let atLeastOneRule = new Rule({
                 new RepetitionMandatory({
                     definition: [
                         new RepetitionMandatory({
-                            definition: [new Terminal(EntityTok)],
+                            definition: [
+                                new Terminal({ terminalType: EntityTok })
+                            ],
                             occurrenceInParent: 3
                         }),
-                        new Terminal(CommaTok)
+                        new Terminal({ terminalType: CommaTok })
                     ],
                     occurrenceInParent: 2
                 }),
-                new Terminal(DotTok, 1)
+                new Terminal({ terminalType: DotTok, occurrenceInParent: 1 })
             ]
         }),
-        new Terminal(DotTok, 2)
+        new Terminal({ terminalType: DotTok, occurrenceInParent: 2 })
     ]
 })
 
 export let atLeastOneSepRule = new Rule({
     name: "atLeastOneSepRule",
     definition: [
-        new RepetitionMandatoryWithSeparator(
-            [
-                new RepetitionMandatoryWithSeparator(
-                    [
-                        new RepetitionMandatoryWithSeparator(
-                            [new Terminal(EntityTok)],
-                            SemicolonTok,
-                            3
-                        ),
-                        new Terminal(CommaTok)
+        new RepetitionMandatoryWithSeparator({
+            definition: [
+                new RepetitionMandatoryWithSeparator({
+                    definition: [
+                        new RepetitionMandatoryWithSeparator({
+                            definition: [
+                                new Terminal({ terminalType: EntityTok })
+                            ],
+                            separator: SemicolonTok,
+                            occurrenceInParent: 3
+                        }),
+                        new Terminal({ terminalType: CommaTok })
                     ],
-                    SemicolonTok,
-                    2
-                ),
-                new Terminal(DotTok, 1)
+                    separator: SemicolonTok,
+                    occurrenceInParent: 2
+                }),
+                new Terminal({ terminalType: DotTok, occurrenceInParent: 1 })
             ],
-            SemicolonTok
-        ),
-        new Terminal(DotTok, 2)
+            separator: SemicolonTok
+        }),
+        new Terminal({ terminalType: DotTok, occurrenceInParent: 2 })
     ]
 })
 
 export let qualifiedName = new Rule({
     name: "qualifiedName",
     definition: [
-        new Terminal(IdentTok),
-        new Repetition([new Terminal(DotTok), new Terminal(IdentTok, 2)])
+        new Terminal({ terminalType: IdentTok }),
+        new Repetition({
+            definition: [
+                new Terminal({ terminalType: DotTok }),
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 2 })
+            ]
+        })
     ]
 })
 
 export let qualifiedNameSep = new Rule({
     name: "qualifiedNameSep",
     definition: [
-        new RepetitionMandatoryWithSeparator(
-            [new Terminal(IdentTok, 1)],
-            DotTok
-        )
+        new RepetitionMandatoryWithSeparator({
+            definition: [
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 })
+            ],
+            separator: DotTok
+        })
     ]
 })
 
 export let paramSpec = new Rule({
     name: "paramSpec",
     definition: [
-        new Terminal(IdentTok),
-        new Terminal(ColonTok),
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: ColonTok }),
         new NonTerminal({
             nonTerminalName: "qualifiedName",
             referencedRule: qualifiedName
         }),
         new Option({
-            definition: [new Terminal(LSquareTok), new Terminal(RSquareTok)]
+            definition: [
+                new Terminal({ terminalType: LSquareTok }),
+                new Terminal({ terminalType: RSquareTok })
+            ]
         })
     ]
 })
@@ -158,29 +172,31 @@ export let paramSpec = new Rule({
 export let actionDec = new Rule({
     name: "actionDec",
     definition: [
-        new Terminal(ActionTok),
-        new Terminal(IdentTok),
-        new Terminal(LParenTok),
+        new Terminal({ terminalType: ActionTok }),
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: LParenTok }),
         new Option({
             definition: [
                 new NonTerminal({
                     nonTerminalName: "paramSpec",
                     referencedRule: paramSpec
                 }),
-                new Repetition([
-                    new Terminal(CommaTok),
-                    new NonTerminal({
-                        nonTerminalName: "paramSpec",
-                        referencedRule: paramSpec,
-                        occurrenceInParent: 2
-                    })
-                ])
+                new Repetition({
+                    definition: [
+                        new Terminal({ terminalType: CommaTok }),
+                        new NonTerminal({
+                            nonTerminalName: "paramSpec",
+                            referencedRule: paramSpec,
+                            occurrenceInParent: 2
+                        })
+                    ]
+                })
             ]
         }),
-        new Terminal(RParenTok),
+        new Terminal({ terminalType: RParenTok }),
         new Option({
             definition: [
-                new Terminal(ColonTok),
+                new Terminal({ terminalType: ColonTok }),
                 new NonTerminal({
                     nonTerminalName: "qualifiedName",
                     referencedRule: qualifiedName
@@ -188,32 +204,32 @@ export let actionDec = new Rule({
             ],
             occurrenceInParent: 2
         }),
-        new Terminal(SemicolonTok)
+        new Terminal({ terminalType: SemicolonTok })
     ]
 })
 
 export let actionDecSep = new Rule({
     name: "actionDecSep",
     definition: [
-        new Terminal(ActionTok),
-        new Terminal(IdentTok),
-        new Terminal(LParenTok),
+        new Terminal({ terminalType: ActionTok }),
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: LParenTok }),
 
-        new RepetitionWithSeparator(
-            [
+        new RepetitionWithSeparator({
+            definition: [
                 new NonTerminal({
                     nonTerminalName: "paramSpec",
                     referencedRule: paramSpec,
                     occurrenceInParent: 2
                 })
             ],
-            CommaTok
-        ),
+            separator: CommaTok
+        }),
 
-        new Terminal(RParenTok),
+        new Terminal({ terminalType: RParenTok }),
         new Option({
             definition: [
-                new Terminal(ColonTok),
+                new Terminal({ terminalType: ColonTok }),
                 new NonTerminal({
                     nonTerminalName: "qualifiedName",
                     referencedRule: qualifiedName
@@ -221,43 +237,54 @@ export let actionDecSep = new Rule({
             ],
             occurrenceInParent: 2
         }),
-        new Terminal(SemicolonTok)
+        new Terminal({ terminalType: SemicolonTok })
     ]
 })
 
 export let manyActions = new Rule({
     name: "manyActions",
     definition: [
-        new Repetition([
-            new NonTerminal({
-                nonTerminalName: "actionDec",
-                referencedRule: actionDec,
-                occurrenceInParent: 1
-            })
-        ])
+        new Repetition({
+            definition: [
+                new NonTerminal({
+                    nonTerminalName: "actionDec",
+                    referencedRule: actionDec,
+                    occurrenceInParent: 1
+                })
+            ]
+        })
     ]
 })
 
 export let cardinality = new Rule({
     name: "cardinality",
     definition: [
-        new Terminal(LSquareTok),
-        new Terminal(UnsignedIntegerLiteralTok),
-        new Terminal(DotDotTok),
-        new Alternation([
-            new Flat({
-                definition: [new Terminal(UnsignedIntegerLiteralTok, 2)]
-            }),
-            new Flat({ definition: [new Terminal(AsteriskTok)] })
-        ]),
-        new Terminal(RSquareTok)
+        new Terminal({ terminalType: LSquareTok }),
+        new Terminal({ terminalType: UnsignedIntegerLiteralTok }),
+        new Terminal({ terminalType: DotDotTok }),
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: UnsignedIntegerLiteralTok,
+                            occurrenceInParent: 2
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [new Terminal({ terminalType: AsteriskTok })]
+                })
+            ]
+        }),
+        new Terminal({ terminalType: RSquareTok })
     ]
 })
 
 export let assignedTypeSpec = new Rule({
     name: "assignedTypeSpec",
     definition: [
-        new Terminal(ColonTok),
+        new Terminal({ terminalType: ColonTok }),
         new NonTerminal({ nonTerminalName: "assignedType" }),
 
         new Option({
@@ -266,7 +293,7 @@ export let assignedTypeSpec = new Rule({
 
         new Option({
             definition: [
-                new Terminal(DefaultTok),
+                new Terminal({ terminalType: DefaultTok }),
                 new NonTerminal({ nonTerminalName: "expression" })
             ],
             occurrenceInParent: 2
@@ -277,44 +304,101 @@ export let assignedTypeSpec = new Rule({
 export let lotsOfOrs = new Rule({
     name: "lotsOfOrs",
     definition: [
-        new Alternation([
-            new Flat({
-                definition: [
-                    new Alternation(
-                        [
-                            new Flat({
-                                definition: [new Terminal(CommaTok, 1)]
-                            }),
-                            new Flat({ definition: [new Terminal(KeyTok, 1)] })
-                        ],
-                        2
-                    )
-                ]
-            }),
-            new Flat({ definition: [new Terminal(EntityTok, 1)] })
-        ]),
-        new Alternation(
-            [new Flat({ definition: [new Terminal(DotTok, 1)] })],
-            3
-        )
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Alternation({
+                            definition: [
+                                new Flat({
+                                    definition: [
+                                        new Terminal({
+                                            terminalType: CommaTok,
+                                            occurrenceInParent: 1
+                                        })
+                                    ]
+                                }),
+                                new Flat({
+                                    definition: [
+                                        new Terminal({
+                                            terminalType: KeyTok,
+                                            occurrenceInParent: 1
+                                        })
+                                    ]
+                                })
+                            ],
+                            occurrenceInParent: 2
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: EntityTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                })
+            ]
+        }),
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: DotTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                })
+            ],
+            occurrenceInParent: 3
+        })
     ]
 })
 
 export let emptyAltOr = new Rule({
     name: "emptyAltOr",
     definition: [
-        new Alternation([
-            new Flat({ definition: [new Terminal(KeyTok, 1)] }),
-            new Flat({ definition: [new Terminal(EntityTok, 1)] }),
-            new Flat({ definition: [] }) // an empty alternative
-        ])
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: KeyTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: EntityTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                }),
+                new Flat({ definition: [] }) // an empty alternative
+            ]
+        })
     ]
 })
 
 export let callArguments = new Rule({
     name: "callArguments",
     definition: [
-        new RepetitionWithSeparator([new Terminal(IdentTok, 1)], CommaTok),
-        new RepetitionWithSeparator([new Terminal(IdentTok, 2)], CommaTok, 2)
+        new RepetitionWithSeparator({
+            definition: [
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 })
+            ],
+            separator: CommaTok
+        }),
+        new RepetitionWithSeparator({
+            definition: [
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 2 })
+            ],
+            separator: CommaTok,
+            occurrenceInParent: 2
+        })
     ]
 })

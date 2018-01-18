@@ -288,20 +288,20 @@ export function possiblePathsFrom(
         } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
             const newDef = [
                 new gast.Flat({ definition: prod.definition }),
-                new gast.Repetition(
-                    [new gast.Terminal(prod.separator)].concat(
-                        <any>prod.definition
-                    )
-                )
+                new gast.Repetition({
+                    definition: [
+                        new gast.Terminal({ terminalType: prod.separator })
+                    ].concat(<any>prod.definition)
+                })
             ]
             return getAlternativesForProd(newDef)
         } else if (prod instanceof gast.RepetitionWithSeparator) {
             const newDef = prod.definition.concat([
-                new gast.Repetition(
-                    [new gast.Terminal(prod.separator)].concat(
-                        <any>prod.definition
-                    )
-                )
+                new gast.Repetition({
+                    definition: [
+                        new gast.Terminal({ terminalType: prod.separator })
+                    ].concat(<any>prod.definition)
+                })
             ])
             result = getAlternativesForProd(newDef)
         } else if (prod instanceof gast.Repetition) {
@@ -459,10 +459,10 @@ export function nextPossibleTokensAfter(
             possiblePaths.push(nextPathWith)
         } else if (prod instanceof gast.RepetitionMandatory) {
             // TODO:(THE NEW operators here take a while...) (convert once?)
-            let secondIteration = new gast.Repetition(
-                prod.definition,
-                prod.occurrenceInParent
-            )
+            let secondIteration = new gast.Repetition({
+                definition: prod.definition,
+                occurrenceInParent: prod.occurrenceInParent
+            })
             let nextDef = prod.definition.concat(
                 [secondIteration],
                 drop(currDef)
@@ -476,11 +476,13 @@ export function nextPossibleTokensAfter(
             possiblePaths.push(nextPath)
         } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
             // TODO:(THE NEW operators here take a while...) (convert once?)
-            let separatorGast = new gast.Terminal(prod.separator)
-            let secondIteration = new gast.Repetition(
-                [<any>separatorGast].concat(prod.definition),
-                prod.occurrenceInParent
-            )
+            let separatorGast = new gast.Terminal({
+                terminalType: prod.separator
+            })
+            let secondIteration = new gast.Repetition({
+                definition: [<any>separatorGast].concat(prod.definition),
+                occurrenceInParent: prod.occurrenceInParent
+            })
             let nextDef = prod.definition.concat(
                 [secondIteration],
                 drop(currDef)
@@ -504,11 +506,13 @@ export function nextPossibleTokensAfter(
             // required marker to avoid backtracking paths whose higher priority alternatives already matched
             possiblePaths.push(EXIT_ALTERNATIVE)
 
-            let separatorGast = new gast.Terminal(prod.separator)
-            let nthRepetition = new gast.Repetition(
-                [<any>separatorGast].concat(prod.definition),
-                prod.occurrenceInParent
-            )
+            let separatorGast = new gast.Terminal({
+                terminalType: prod.separator
+            })
+            let nthRepetition = new gast.Repetition({
+                definition: [<any>separatorGast].concat(prod.definition),
+                occurrenceInParent: prod.occurrenceInParent
+            })
             let nextDef = prod.definition.concat([nthRepetition], drop(currDef))
             let nextPathWith = {
                 idx: currIdx,
@@ -530,10 +534,10 @@ export function nextPossibleTokensAfter(
             possiblePaths.push(EXIT_ALTERNATIVE)
 
             // TODO: an empty repetition will cause infinite loops here, will the parser detect this in selfAnalysis?
-            let nthRepetition = new gast.Repetition(
-                prod.definition,
-                prod.occurrenceInParent
-            )
+            let nthRepetition = new gast.Repetition({
+                definition: prod.definition,
+                occurrenceInParent: prod.occurrenceInParent
+            })
             let nextDef = prod.definition.concat([nthRepetition], drop(currDef))
             let nextPathWith = {
                 idx: currIdx,
