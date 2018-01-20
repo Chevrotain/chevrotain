@@ -125,7 +125,11 @@ function buildTopLevel(
     allRanges: IProdRange[],
     orgText: string
 ): gast.Rule {
-    let topLevelProd = new gast.Rule(name, [], orgText)
+    let topLevelProd = new gast.Rule({
+        name: name,
+        definition: [],
+        orgText: orgText
+    })
     return buildAbstractProd(topLevelProd, topRange, allRanges)
 }
 
@@ -165,7 +169,10 @@ function buildRefProd(prodRange: IProdRange): gast.NonTerminal {
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
     let refProdName = reResult[2]
-    let newRef = new gast.NonTerminal(refProdName, undefined, refOccurrence)
+    let newRef = new gast.NonTerminal({
+        nonTerminalName: refProdName,
+        occurrenceInParent: refOccurrence
+    })
     newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     return newRef
 }
@@ -182,7 +189,10 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
         throw Error("Terminal Token name: " + terminalName + " not found")
     }
 
-    let newTerminal = new gast.Terminal(terminalType, terminalOccurrence)
+    let newTerminal = new gast.Terminal({
+        terminalType: terminalType,
+        occurrenceInParent: terminalOccurrence
+    })
     newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     return newTerminal
 }
@@ -218,7 +228,7 @@ function buildAtLeastOneProd(
 ): gast.RepetitionMandatory {
     return buildProdWithOccurrence(
         atLeastOneRegEx,
-        new gast.RepetitionMandatory([]),
+        new gast.RepetitionMandatory({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -242,7 +252,7 @@ function buildManyProd(
 ): gast.Repetition {
     return buildProdWithOccurrence(
         manyRegEx,
-        new gast.Repetition([]),
+        new gast.Repetition({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -276,11 +286,11 @@ function buildRepetitionWithSep(
         throw Error("Separator Terminal Token name: " + sepName + " not found")
     }
 
-    let repetitionInstance: any = new (<any>repConstructor)(
-        [],
-        separatorType,
-        occurrenceIdx
-    )
+    let repetitionInstance: any = new (<any>repConstructor)({
+        definition: [],
+        separator: separatorType,
+        occurrenceInParent: occurrenceIdx
+    })
     repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     let nestedName = reResult[2]
     if (!isUndefined(nestedName)) {
@@ -299,7 +309,7 @@ function buildOptionProd(
 ): gast.Option {
     return buildProdWithOccurrence(
         optionRegEx,
-        new gast.Option([]),
+        new gast.Option({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -311,7 +321,7 @@ function buildOrProd(
 ): gast.Alternation {
     return buildProdWithOccurrence(
         orRegEx,
-        new gast.Alternation([]),
+        new gast.Alternation({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -321,7 +331,7 @@ function buildFlatProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
 ): gast.Flat {
-    let prodInstance = new gast.Flat([])
+    let prodInstance = new gast.Flat({ definition: [] })
     let reResult = orPartRegEx.exec(prodRange.text)
 
     let nestedName = reResult[1]

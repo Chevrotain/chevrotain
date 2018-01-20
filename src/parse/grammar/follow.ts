@@ -40,7 +40,7 @@ export class ResyncFollowsWalker extends RestWalker {
                 refProd.occurrenceInParent
             ) + this.topProd.name
         let fullRest: gast.IProduction[] = currRest.concat(prevRest)
-        let restProd = new gast.Flat(fullRest)
+        let restProd = new gast.Flat({ definition: fullRest })
         let t_in_topProd_follows = first(restProd)
         this.follows.put(followName, t_in_topProd_follows)
     }

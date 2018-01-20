@@ -65,21 +65,35 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
         newNodeConstructor: any,
         methodIdx: number
     ): void {
+        // TODO: better hack to copy what we need here...
         if (!isUndefined(node.name)) {
             // copy without name so this will indeed be processed later.
             let nameLessNode
-            if (has(node, "separator")) {
-                // hack to avoid code duplication and refactoring the Gast type declaration / constructors arguments order.
-                nameLessNode = new (<any>newNodeConstructor)(
-                    node.definition,
-                    (<any>node).separator,
-                    node.occurrenceInParent
-                )
+
+            if (
+                node instanceof gast.Option ||
+                node instanceof gast.Repetition ||
+                node instanceof gast.RepetitionMandatory ||
+                node instanceof gast.Alternation
+            ) {
+                nameLessNode = new (<any>newNodeConstructor)({
+                    definition: node.definition,
+                    occurrenceInParent: node.occurrenceInParent,
+                    implicitOccurrenceIndex: node.implicitOccurrenceIndex
+                })
+            } else if (
+                node instanceof gast.RepetitionMandatoryWithSeparator ||
+                node instanceof gast.RepetitionWithSeparator
+            ) {
+                nameLessNode = new (<any>newNodeConstructor)({
+                    definition: node.definition,
+                    occurrenceInParent: node.occurrenceInParent,
+                    implicitOccurrenceIndex: node.implicitOccurrenceIndex,
+                    separator: node.separator
+                })
             } else {
-                nameLessNode = new newNodeConstructor(
-                    node.definition,
-                    node.occurrenceInParent
-                )
+                /* istanbul ignore next */
+                throw Error("non exhaustive match")
             }
             let def = [nameLessNode]
             let key = getKeyForAutomaticLookahead(
@@ -133,7 +147,9 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             if (!isUndefined(currFlatAlt.name)) {
                 let def = currFlatAlt.definition
                 if (hasMoreThanOneAlternative) {
-                    def = [new gast.Option(currFlatAlt.definition)]
+                    def = [
+                        new gast.Option({ definition: currFlatAlt.definition })
+                    ]
                 } else {
                     // mandatory
                     def = currFlatAlt.definition
@@ -270,11 +286,13 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
             if (!isUndefined(prod.name)) {
                 addSingleItemToResult(prod.name)
             } else {
-                let separatorGast = new gast.Terminal(prod.separator)
-                let secondIteration: any = new gast.Repetition(
-                    [<any>separatorGast].concat(prod.definition),
-                    prod.occurrenceInParent
-                )
+                let separatorGast = new gast.Terminal({
+                    terminalType: prod.separator
+                })
+                let secondIteration: any = new gast.Repetition({
+                    definition: [<any>separatorGast].concat(prod.definition),
+                    occurrenceInParent: prod.occurrenceInParent
+                })
                 // Hack: X (, X)* --> (, X) because it is identical in terms of identifying "isCollection?"
                 let nextDef = [secondIteration].concat(drop(currDef))
                 let nextPath = {

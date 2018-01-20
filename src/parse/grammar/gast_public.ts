@@ -1,25 +1,8 @@
-import { forEach, isRegExp, map } from "../../utils/utils"
+import { assign, forEach, isRegExp, map } from "../../utils/utils"
 import { TokenType } from "../../scan/lexer_public"
 import { tokenLabel, tokenName } from "../../scan/tokens_public"
 
 export namespace gast {
-    export interface INamedProductionConstructor extends TokenType {
-        new (
-            definition: IProduction[],
-            occurrenceInParent: number,
-            name?: string
-        ): AbstractProduction
-    }
-
-    export interface INamedSepProductionConstructor extends TokenType {
-        new (
-            definition: IProduction[],
-            separator: TokenType,
-            occurrenceInParent: number,
-            name?: string
-        ): AbstractProduction
-    }
-
     export interface IOptionallyNamedProduction {
         name?: string
     }
@@ -30,7 +13,7 @@ export namespace gast {
 
     export interface IProductionWithOccurrence extends IProduction {
         occurrenceInParent: number
-        implicitOccurrenceIndex: boolean
+        implicitOccurrenceIndex?: boolean
     }
 
     export abstract class AbstractProduction implements IProduction {
@@ -46,13 +29,19 @@ export namespace gast {
 
     export class NonTerminal extends AbstractProduction
         implements IProductionWithOccurrence {
-        constructor(
-            public nonTerminalName: string,
-            public referencedRule: Rule = undefined,
-            public occurrenceInParent: number = 1,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
+        public nonTerminalName: string
+        public referencedRule: Rule
+        public occurrenceInParent: number = 1
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            nonTerminalName: string
+            referencedRule?: Rule
+            occurrenceInParent?: number
+            implicitOccurrenceIndex?: boolean
+        }) {
             super([])
+            assign(this, options)
         }
 
         set definition(definition: IProduction[]) {
@@ -73,103 +62,149 @@ export namespace gast {
     }
 
     export class Rule extends AbstractProduction {
-        constructor(
-            public name: string,
-            definition: IProduction[],
-            public orgText: string = ""
-        ) {
-            super(definition)
+        public name: string
+        public orgText: string = ""
+
+        constructor(options: {
+            name: string
+            definition: IProduction[]
+            orgText?: string
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class Flat extends AbstractProduction
         implements IOptionallyNamedProduction {
+        public name: string
+
         // A named Flat production is used to indicate a Nested Rule in an alternation
-        constructor(definition: IProduction[], public name?: string) {
-            super(definition)
+        constructor(options: { definition: IProduction[]; name?: string }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class Option extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public occurrenceInParent: number = 1
+        public name?: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class RepetitionMandatory extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public name: string
+        public occurrenceInParent: number = 1
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class RepetitionMandatoryWithSeparator extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public separator: TokenType,
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public separator: TokenType
+        public occurrenceInParent: number = 1
+        public name: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            separator: TokenType
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class Repetition extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public separator: TokenType
+        public occurrenceInParent: number = 1
+        public name: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class RepetitionWithSeparator extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: IProduction[],
-            public separator: TokenType,
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public separator: TokenType
+        public occurrenceInParent: number = 1
+        public name: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            separator: TokenType
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class Alternation extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        constructor(
-            definition: Flat[],
-            public occurrenceInParent: number = 1,
-            public name?: string,
-            public implicitOccurrenceIndex: boolean = false
-        ) {
-            super(definition)
+        public occurrenceInParent: number = 1
+        public name: string
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            definition: IProduction[]
+            occurrenceInParent?: number
+            name?: string
+            implicitOccurrenceIndex?: boolean
+        }) {
+            super(options.definition)
+            assign(this, options)
         }
     }
 
     export class Terminal implements IProductionWithOccurrence {
-        constructor(
-            public terminalType: TokenType,
-            public occurrenceInParent: number = 1,
-            public implicitOccurrenceIndex: boolean = false
-        ) {}
+        public terminalType: TokenType
+        public occurrenceInParent: number = 1
+        public implicitOccurrenceIndex: boolean = false
+
+        constructor(options: {
+            terminalType: TokenType
+            occurrenceInParent?: number
+            implicitOccurrenceIndex?: boolean
+        }) {
+            assign(this, options)
+        }
 
         accept(visitor: GAstVisitor): void {
             visitor.visit(this)
@@ -301,7 +336,7 @@ export namespace gast {
             return <ISerializedTerminalWithSeparator>{
                 type: "RepetitionMandatoryWithSeparator",
                 separator: <ISerializedTerminal>serializeProduction(
-                    new Terminal(node.separator)
+                    new Terminal({ terminalType: node.separator })
                 ),
                 definition: convertDefinition(node.definition)
             }
@@ -309,7 +344,7 @@ export namespace gast {
             return <ISerializedTerminalWithSeparator>{
                 type: "RepetitionWithSeparator",
                 separator: <ISerializedTerminal>serializeProduction(
-                    new Terminal(node.separator)
+                    new Terminal({ terminalType: node.separator })
                 ),
                 definition: convertDefinition(node.definition)
             }

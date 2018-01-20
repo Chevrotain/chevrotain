@@ -373,6 +373,11 @@ export type ISeparatedIterationResult<OUT> = {
     separators: IToken[] // the separator tokens between the iterations
 }
 
+export type TokenVocabulary =
+    | { [tokenName: string]: TokenType }
+    | TokenType[]
+    | IMultiModeLexerDefinition
+
 /**
  * Convenience used to express an empty alternative in an OR (alternation).
  * can be used to more clearly describe the intent in a case of empty alternation.
@@ -593,10 +598,7 @@ export class Parser {
 
     constructor(
         input: IToken[],
-        tokensDictionary:
-            | { [fqn: string]: TokenType }
-            | TokenType[]
-            | IMultiModeLexerDefinition,
+        tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
         this.input = input
@@ -669,9 +671,9 @@ export class Parser {
             )
         }
 
-        if (isArray(tokensDictionary)) {
+        if (isArray(tokenVocabulary)) {
             this.tokensMap = <any>reduce(
-                <any>tokensDictionary,
+                <any>tokenVocabulary,
                 (acc, tokenClazz: TokenType) => {
                     acc[tokenName(tokenClazz)] = tokenClazz
                     return acc
@@ -679,10 +681,10 @@ export class Parser {
                 {}
             )
         } else if (
-            has(tokensDictionary, "modes") &&
-            every(flatten(values((<any>tokensDictionary).modes)), isTokenType)
+            has(tokenVocabulary, "modes") &&
+            every(flatten(values((<any>tokenVocabulary).modes)), isTokenType)
         ) {
-            let allTokenTypes = flatten(values((<any>tokensDictionary).modes))
+            let allTokenTypes = flatten(values((<any>tokenVocabulary).modes))
             let uniqueTokens = uniq(allTokenTypes)
             this.tokensMap = <any>reduce(
                 uniqueTokens,
@@ -692,8 +694,8 @@ export class Parser {
                 },
                 {}
             )
-        } else if (isObject(tokensDictionary)) {
-            this.tokensMap = cloneObj(tokensDictionary)
+        } else if (isObject(tokenVocabulary)) {
+            this.tokensMap = cloneObj(tokenVocabulary)
         } else {
             throw new Error(
                 "<tokensDictionary> argument must be An Array of Token constructors" +
@@ -702,7 +704,7 @@ export class Parser {
         }
 
         const noTokenCategoriesUsed = every(
-            values(tokensDictionary),
+            values(tokenVocabulary),
             tokenConstructor => isEmpty(tokenConstructor.categoryMatches)
         )
         this.tokenMatcher = noTokenCategoriesUsed

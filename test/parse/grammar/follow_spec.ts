@@ -20,18 +20,18 @@ let Terminal = gast.Terminal
 
 describe("The Grammar Ast Follows model", () => {
     it("can build a followNamePrefix from a Terminal", () => {
-        let terminal = new Terminal(IdentTok)
+        let terminal = new Terminal({ terminalType: IdentTok })
         let actual = buildInProdFollowPrefix(terminal)
         expect(actual).to.equal("IdentTok1_~IN~_")
 
-        let terminal2 = new Terminal(EntityTok)
+        let terminal2 = new Terminal({ terminalType: EntityTok })
         terminal2.occurrenceInParent = 3
         let actual2 = buildInProdFollowPrefix(terminal2)
         expect(actual2).to.equal("EntityTok3_~IN~_")
     })
 
     it("can build a followName prefix from a TopLevel Production and index", () => {
-        let prod = new Rule("bamba", [])
+        let prod = new Rule({ name: "bamba", definition: [] })
         let index = 5
 
         let actual = buildBetweenProdsFollowPrefix(prod, index)

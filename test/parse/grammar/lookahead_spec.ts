@@ -47,178 +47,371 @@ const AsteriskTok = createToken({ name: "AsteriskTok" })
 const EntityTok = createToken({ name: "EntityTok" })
 const KeyTok = createToken({ name: "KeyTok" })
 
-let atLeastOneRule = new Rule("atLeastOneRule", [
-    new RepetitionMandatory([
-        new RepetitionMandatory(
-            [
-                new RepetitionMandatory([new Terminal(EntityTok)], 3),
-                new Terminal(CommaTok)
+let atLeastOneRule = new Rule({
+    name: "atLeastOneRule",
+    definition: [
+        new RepetitionMandatory({
+            definition: [
+                new RepetitionMandatory({
+                    definition: [
+                        new RepetitionMandatory({
+                            definition: [
+                                new Terminal({ terminalType: EntityTok })
+                            ],
+                            occurrenceInParent: 3
+                        }),
+                        new Terminal({ terminalType: CommaTok })
+                    ],
+                    occurrenceInParent: 2
+                }),
+                new Terminal({ terminalType: DotTok, occurrenceInParent: 1 })
+            ]
+        }),
+        new Terminal({ terminalType: DotTok, occurrenceInParent: 2 })
+    ]
+})
+
+let atLeastOneSepRule = new Rule({
+    name: "atLeastOneSepRule",
+    definition: [
+        new RepetitionMandatoryWithSeparator({
+            definition: [
+                new RepetitionMandatoryWithSeparator({
+                    definition: [
+                        new RepetitionMandatoryWithSeparator({
+                            definition: [
+                                new Terminal({ terminalType: EntityTok })
+                            ],
+                            separator: SemicolonTok,
+                            occurrenceInParent: 3
+                        }),
+                        new Terminal({ terminalType: CommaTok })
+                    ],
+                    separator: SemicolonTok,
+                    occurrenceInParent: 2
+                }),
+                new Terminal({ terminalType: DotTok, occurrenceInParent: 1 })
             ],
-            2
-        ),
-        new Terminal(DotTok, 1)
-    ]),
-    new Terminal(DotTok, 2)
-])
+            separator: SemicolonTok
+        }),
+        new Terminal({ terminalType: DotTok, occurrenceInParent: 2 })
+    ]
+})
 
-let atLeastOneSepRule = new Rule("atLeastOneSepRule", [
-    new RepetitionMandatoryWithSeparator(
-        [
-            new RepetitionMandatoryWithSeparator(
-                [
-                    new RepetitionMandatoryWithSeparator(
-                        [new Terminal(EntityTok)],
-                        SemicolonTok,
-                        3
-                    ),
-                    new Terminal(CommaTok)
-                ],
-                SemicolonTok,
-                2
-            ),
-            new Terminal(DotTok, 1)
-        ],
-        SemicolonTok
-    ),
-    new Terminal(DotTok, 2)
-])
+let qualifiedName = new Rule({
+    name: "qualifiedName",
+    definition: [
+        new Terminal({ terminalType: IdentTok }),
+        new Repetition({
+            definition: [
+                new Terminal({ terminalType: DotTok }),
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 2 })
+            ]
+        })
+    ]
+})
 
-let qualifiedName = new Rule("qualifiedName", [
-    new Terminal(IdentTok),
-    new Repetition([new Terminal(DotTok), new Terminal(IdentTok, 2)])
-])
+let qualifiedNameSep = new Rule({
+    name: "qualifiedNameSep",
+    definition: [
+        new RepetitionMandatoryWithSeparator({
+            definition: [
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 })
+            ],
+            separator: DotTok
+        })
+    ]
+})
 
-let qualifiedNameSep = new Rule("qualifiedNameSep", [
-    new RepetitionMandatoryWithSeparator([new Terminal(IdentTok, 1)], DotTok)
-])
+let paramSpec = new Rule({
+    name: "paramSpec",
+    definition: [
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: ColonTok }),
+        new NonTerminal({
+            nonTerminalName: "qualifiedName",
+            referencedRule: qualifiedName
+        }),
+        new Option({
+            definition: [
+                new Terminal({ terminalType: LSquareTok }),
+                new Terminal({ terminalType: RSquareTok })
+            ]
+        })
+    ]
+})
 
-let paramSpec = new Rule("paramSpec", [
-    new Terminal(IdentTok),
-    new Terminal(ColonTok),
-    new NonTerminal("qualifiedName", qualifiedName),
-    new Option([new Terminal(LSquareTok), new Terminal(RSquareTok)])
-])
+let actionDec = new Rule({
+    name: "actionDec",
+    definition: [
+        new Terminal({ terminalType: ActionTok }),
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: LParenTok }),
+        new Option({
+            definition: [
+                new NonTerminal({
+                    nonTerminalName: "paramSpec",
+                    referencedRule: paramSpec
+                }),
+                new Repetition({
+                    definition: [
+                        new Terminal({ terminalType: CommaTok }),
+                        new NonTerminal({
+                            nonTerminalName: "paramSpec",
+                            referencedRule: paramSpec,
+                            occurrenceInParent: 2
+                        })
+                    ]
+                })
+            ]
+        }),
+        new Terminal({ terminalType: RParenTok }),
+        new Option({
+            definition: [
+                new Terminal({ terminalType: ColonTok }),
+                new NonTerminal({
+                    nonTerminalName: "qualifiedName",
+                    referencedRule: qualifiedName
+                })
+            ],
+            occurrenceInParent: 2
+        }),
+        new Terminal({ terminalType: SemicolonTok })
+    ]
+})
 
-let actionDec = new Rule("actionDec", [
-    new Terminal(ActionTok),
-    new Terminal(IdentTok),
-    new Terminal(LParenTok),
-    new Option([
-        new NonTerminal("paramSpec", paramSpec),
-        new Repetition([
-            new Terminal(CommaTok),
-            new NonTerminal("paramSpec", paramSpec, 2)
-        ])
-    ]),
-    new Terminal(RParenTok),
-    new Option(
-        [
-            new Terminal(ColonTok),
-            new NonTerminal("qualifiedName", qualifiedName)
-        ],
-        2
-    ),
-    new Terminal(SemicolonTok)
-])
+let actionDecSep = new Rule({
+    name: "actionDecSep",
+    definition: [
+        new Terminal({ terminalType: ActionTok }),
+        new Terminal({ terminalType: IdentTok }),
+        new Terminal({ terminalType: LParenTok }),
 
-let actionDecSep = new Rule("actionDecSep", [
-    new Terminal(ActionTok),
-    new Terminal(IdentTok),
-    new Terminal(LParenTok),
+        new RepetitionWithSeparator({
+            definition: [
+                new NonTerminal({
+                    nonTerminalName: "paramSpec",
+                    referencedRule: paramSpec,
+                    occurrenceInParent: 2
+                })
+            ],
+            separator: CommaTok
+        }),
 
-    new RepetitionWithSeparator(
-        [new NonTerminal("paramSpec", paramSpec, 2)],
-        CommaTok
-    ),
+        new Terminal({ terminalType: RParenTok }),
+        new Option({
+            definition: [
+                new Terminal({ terminalType: ColonTok }),
+                new NonTerminal({
+                    nonTerminalName: "qualifiedName",
+                    referencedRule: qualifiedName
+                })
+            ],
+            occurrenceInParent: 2
+        }),
+        new Terminal({ terminalType: SemicolonTok })
+    ]
+})
 
-    new Terminal(RParenTok),
-    new Option(
-        [
-            new Terminal(ColonTok),
-            new NonTerminal("qualifiedName", qualifiedName)
-        ],
-        2
-    ),
-    new Terminal(SemicolonTok)
-])
+let manyActions = new Rule({
+    name: "manyActions",
+    definition: [
+        new Repetition({
+            definition: [
+                new NonTerminal({
+                    nonTerminalName: "actionDec",
+                    referencedRule: actionDec,
+                    occurrenceInParent: 1
+                })
+            ]
+        })
+    ]
+})
 
-let manyActions = new Rule("manyActions", [
-    new Repetition([new NonTerminal("actionDec", actionDec, 1)])
-])
+let cardinality = new Rule({
+    name: "cardinality",
+    definition: [
+        new Terminal({ terminalType: LSquareTok }),
+        new Terminal({ terminalType: UnsignedIntegerLiteralTok }),
+        new Terminal({ terminalType: DotDotTok }),
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: UnsignedIntegerLiteralTok,
+                            occurrenceInParent: 2
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [new Terminal({ terminalType: AsteriskTok })]
+                })
+            ]
+        }),
+        new Terminal({ terminalType: RSquareTok })
+    ]
+})
 
-let cardinality = new Rule("cardinality", [
-    new Terminal(LSquareTok),
-    new Terminal(UnsignedIntegerLiteralTok),
-    new Terminal(DotDotTok),
-    new Alternation([
-        new Flat([new Terminal(UnsignedIntegerLiteralTok, 2)]),
-        new Flat([new Terminal(AsteriskTok)])
-    ]),
-    new Terminal(RSquareTok)
-])
+let assignedTypeSpec = new Rule({
+    name: "assignedTypeSpec",
+    definition: [
+        new Terminal({ terminalType: ColonTok }),
+        new NonTerminal({ nonTerminalName: "assignedType" }),
 
-let assignedTypeSpec = new Rule("assignedTypeSpec", [
-    new Terminal(ColonTok),
-    new NonTerminal("assignedType"),
+        new Option({
+            definition: [new NonTerminal({ nonTerminalName: "enumClause" })]
+        }),
 
-    new Option([new NonTerminal("enumClause")]),
+        new Option({
+            definition: [
+                new Terminal({ terminalType: DefaultTok }),
+                new NonTerminal({ nonTerminalName: "expression" })
+            ],
+            occurrenceInParent: 2
+        })
+    ]
+})
 
-    new Option([new Terminal(DefaultTok), new NonTerminal("expression")], 2)
-])
+let lotsOfOrs = new Rule({
+    name: "lotsOfOrs",
+    definition: [
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Alternation({
+                            definition: [
+                                new Flat({
+                                    definition: [
+                                        new Terminal({
+                                            terminalType: CommaTok,
+                                            occurrenceInParent: 1
+                                        })
+                                    ]
+                                }),
+                                new Flat({
+                                    definition: [
+                                        new Terminal({
+                                            terminalType: KeyTok,
+                                            occurrenceInParent: 1
+                                        })
+                                    ]
+                                })
+                            ],
+                            occurrenceInParent: 2
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: EntityTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                })
+            ]
+        }),
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: DotTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                })
+            ],
+            occurrenceInParent: 3
+        })
+    ]
+})
 
-let lotsOfOrs = new Rule("lotsOfOrs", [
-    new Alternation([
-        new Flat([
-            new Alternation(
-                [
-                    new Flat([new Terminal(CommaTok, 1)]),
-                    new Flat([new Terminal(KeyTok, 1)])
-                ],
-                2
-            )
-        ]),
-        new Flat([new Terminal(EntityTok, 1)])
-    ]),
-    new Alternation([new Flat([new Terminal(DotTok, 1)])], 3)
-])
+let emptyAltOr = new Rule({
+    name: "emptyAltOr",
+    definition: [
+        new Alternation({
+            definition: [
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: KeyTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                }),
+                new Flat({
+                    definition: [
+                        new Terminal({
+                            terminalType: EntityTok,
+                            occurrenceInParent: 1
+                        })
+                    ]
+                }),
+                new Flat({ definition: [] }) // an empty alternative
+            ]
+        })
+    ]
+})
 
-let emptyAltOr = new Rule("emptyAltOr", [
-    new Alternation([
-        new Flat([new Terminal(KeyTok, 1)]),
-        new Flat([new Terminal(EntityTok, 1)]),
-        new Flat([]) // an empty alternative
-    ])
-])
-
-let callArguments = new Rule("callArguments", [
-    new RepetitionWithSeparator([new Terminal(IdentTok, 1)], CommaTok),
-    new RepetitionWithSeparator([new Terminal(IdentTok, 2)], CommaTok, 2)
-])
+let callArguments = new Rule({
+    name: "callArguments",
+    definition: [
+        new RepetitionWithSeparator({
+            definition: [
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 })
+            ],
+            separator: CommaTok
+        }),
+        new RepetitionWithSeparator({
+            definition: [
+                new Terminal({ terminalType: IdentTok, occurrenceInParent: 2 })
+            ],
+            separator: CommaTok,
+            occurrenceInParent: 2
+        })
+    ]
+})
 
 describe("getProdType", () => {
     it("handles `Option`", () => {
-        expect(getProdType(new Option([]))).to.equal(PROD_TYPE.OPTION)
+        expect(getProdType(new Option({ definition: [] }))).to.equal(
+            PROD_TYPE.OPTION
+        )
     })
     it("handles `Repetition`", () => {
-        expect(getProdType(new Repetition([]))).to.equal(PROD_TYPE.REPETITION)
+        expect(getProdType(new Repetition({ definition: [] }))).to.equal(
+            PROD_TYPE.REPETITION
+        )
     })
     it("handles `RepetitionMandatory`", () => {
-        expect(getProdType(new RepetitionMandatory([]))).to.equal(
-            PROD_TYPE.REPETITION_MANDATORY
-        )
+        expect(
+            getProdType(new RepetitionMandatory({ definition: [] }))
+        ).to.equal(PROD_TYPE.REPETITION_MANDATORY)
     })
     it("handles `RepetitionWithSeparator`", () => {
-        expect(getProdType(new RepetitionWithSeparator([], null))).to.equal(
-            PROD_TYPE.REPETITION_WITH_SEPARATOR
-        )
+        expect(
+            getProdType(
+                new RepetitionWithSeparator({ definition: [], separator: null })
+            )
+        ).to.equal(PROD_TYPE.REPETITION_WITH_SEPARATOR)
     })
     it("handles `RepetitionMandatoryWithSeparator`", () => {
         expect(
-            getProdType(new RepetitionMandatoryWithSeparator([], null))
+            getProdType(
+                new RepetitionMandatoryWithSeparator({
+                    definition: [],
+                    separator: null
+                })
+            )
         ).to.equal(PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR)
     })
     it("handles `Alternation`", () => {
-        expect(getProdType(new Alternation([]))).to.equal(PROD_TYPE.ALTERNATION)
+        expect(getProdType(new Alternation({ definition: [] }))).to.equal(
+            PROD_TYPE.ALTERNATION
+        )
     })
 })
 
@@ -393,28 +586,46 @@ context("lookahead specs", () => {
 
         context("computing lookahead sequences for", () => {
             it("two simple one token alternatives", () => {
-                let alt1 = new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([new gast.Terminal(Beta)]),
-                    new gast.Flat([new gast.Terminal(Beta)])
-                ])
-                let alt2 = new gast.Terminal(Gamma)
+                let alt1 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Alpha })]
+                        }),
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Beta })]
+                        }),
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Beta })]
+                        })
+                    ]
+                })
+                let alt2 = new Terminal({ terminalType: Gamma })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([[[Alpha], [Beta]], [[Gamma]]])
             })
 
             it("three simple one token alternatives", () => {
-                let alt1 = new gast.Alternation([
-                    new gast.Flat([new gast.Terminal(Alpha)]),
-                    new gast.Flat([new gast.Terminal(Beta)]),
-                    new gast.Flat([new gast.Terminal(Beta)])
-                ])
-                let alt2 = new gast.Terminal(Gamma)
-                let alt3 = new gast.Flat([
-                    new gast.Terminal(Delta),
-                    new gast.Terminal(Charlie)
-                ])
+                let alt1 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Alpha })]
+                        }),
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Beta })]
+                        }),
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Beta })]
+                        })
+                    ]
+                })
+                let alt2 = new Terminal({ terminalType: Gamma })
+                let alt3 = new gast.Flat({
+                    definition: [
+                        new Terminal({ terminalType: Delta }),
+                        new Terminal({ terminalType: Charlie })
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives(
                     [alt1, alt2, alt3],
@@ -428,25 +639,41 @@ context("lookahead specs", () => {
             })
 
             it("two complex multi token alternatives", () => {
-                let alt1 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Beta)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Beta)]),
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Gamma),
-                        new gast.Terminal(Delta)
-                    ])
-                ])
-                let alt2 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Delta)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Charlie)])
-                ])
+                let alt1 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Beta })
+                            ]
+                        }),
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Beta })]
+                        }),
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Gamma }),
+                                new Terminal({ terminalType: Delta })
+                            ]
+                        })
+                    ]
+                })
+                let alt2 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Delta })
+                            ]
+                        }),
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Charlie })
+                            ]
+                        })
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([
@@ -456,36 +683,58 @@ context("lookahead specs", () => {
             })
 
             it("three complex multi token alternatives", () => {
-                let alt1 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Gamma)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Beta)])
-                ])
-                let alt2 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Delta)
-                    ]),
-                    new gast.Flat([new gast.Terminal(Charlie)]),
-                    new gast.Flat([
-                        new gast.Terminal(Gamma),
-                        new gast.Terminal(Gamma)
-                    ])
-                ])
-                let alt3 = new gast.Alternation([
-                    new gast.Flat([
-                        new gast.Terminal(Alpha),
-                        new gast.Terminal(Beta),
-                        new gast.Terminal(Delta)
-                    ]),
-                    new gast.Flat([
-                        new gast.Terminal(Charlie),
-                        new gast.Terminal(Beta)
-                    ])
-                ])
+                let alt1 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Gamma })
+                            ]
+                        }),
+                        new gast.Flat({
+                            definition: [new Terminal({ terminalType: Beta })]
+                        })
+                    ]
+                })
+                let alt2 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Delta })
+                            ]
+                        }),
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Charlie })
+                            ]
+                        }),
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Gamma }),
+                                new Terminal({ terminalType: Gamma })
+                            ]
+                        })
+                    ]
+                })
+                let alt3 = new gast.Alternation({
+                    definition: [
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Delta })
+                            ]
+                        }),
+                        new gast.Flat({
+                            definition: [
+                                new Terminal({ terminalType: Charlie }),
+                                new Terminal({ terminalType: Beta })
+                            ]
+                        })
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives(
                     [alt1, alt2, alt3],
@@ -499,21 +748,25 @@ context("lookahead specs", () => {
             })
 
             it("two complex multi token alternatives with shared prefix", () => {
-                let alt1 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie),
-                    new gast.Terminal(Delta)
-                ])
+                let alt1 = new gast.Flat({
+                    definition: [
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta }),
+                        new Terminal({ terminalType: Charlie }),
+                        new Terminal({ terminalType: Delta })
+                    ]
+                })
 
-                let alt2 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie),
-                    new gast.Terminal(Delta),
-                    new gast.Terminal(Gamma),
-                    new gast.Terminal(Alpha)
-                ])
+                let alt2 = new gast.Flat({
+                    definition: [
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta }),
+                        new Terminal({ terminalType: Charlie }),
+                        new Terminal({ terminalType: Delta }),
+                        new Terminal({ terminalType: Gamma }),
+                        new Terminal({ terminalType: Alpha })
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([
@@ -523,25 +776,33 @@ context("lookahead specs", () => {
             })
 
             it("simple ambiguous alternatives", () => {
-                let alt1 = new gast.Flat([new gast.Terminal(Alpha)])
-                let alt2 = new gast.Flat([new gast.Terminal(Alpha)])
+                let alt1 = new gast.Flat({
+                    definition: [new Terminal({ terminalType: Alpha })]
+                })
+                let alt2 = new gast.Flat({
+                    definition: [new Terminal({ terminalType: Alpha })]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([[[Alpha]], [[Alpha]]])
             })
 
             it("complex(multi-token) ambiguous alternatives", () => {
-                let alt1 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie)
-                ])
+                let alt1 = new gast.Flat({
+                    definition: [
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta }),
+                        new Terminal({ terminalType: Charlie })
+                    ]
+                })
 
-                let alt2 = new gast.Flat([
-                    new gast.Terminal(Alpha),
-                    new gast.Terminal(Beta),
-                    new gast.Terminal(Charlie)
-                ])
+                let alt2 = new gast.Flat({
+                    definition: [
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta }),
+                        new Terminal({ terminalType: Charlie })
+                    ]
+                })
 
                 let actual = lookAheadSequenceFromAlternatives([alt1, alt2], 5)
                 expect(actual).to.deep.equal([

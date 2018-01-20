@@ -20,6 +20,8 @@ module.exports = {
     },
     plugins: [new webpack.BannerPlugin({ banner: banner, raw: true })],
     externals: {
-        jsdom: "jsdom"
+        jsdom: "jsdom",
+        "mock-require": "mock-require",
+        "require-from-string": "require-from-string"
     }
 }
