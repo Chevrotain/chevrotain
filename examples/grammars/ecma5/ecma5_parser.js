@@ -23,8 +23,8 @@ class ECMAScript5Parser extends Parser {
         super([], tokens, {
             outputCst: false,
             ignoredIssues: {
-                Statement: { OR1: true },
-                SourceElements: { OR1: true }
+                Statement: { OR: true },
+                SourceElements: { OR: true }
             }
         })
 

@@ -416,7 +416,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>actual).occurrenceInParent).to.equal(1)
+        expect((<gast.NonTerminal>actual).occurrenceInParent).to.equal(0)
         expect((<gast.NonTerminal>actual).nonTerminalName).to.equal("bamba")
     })
 
@@ -527,7 +527,7 @@ describe("The GAst Builder namespace", () => {
         expect((<gast.Terminal>def[0]).terminalType).to.equal(LSquareTok)
 
         expect(def[1]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>def[1]).occurrenceInParent).to.equal(1)
+        expect((<gast.NonTerminal>def[1]).occurrenceInParent).to.equal(0)
         expect((<gast.NonTerminal>def[1]).nonTerminalName).to.equal(
             "expression"
         )
@@ -590,7 +590,7 @@ describe("The GAst Builder namespace", () => {
         let orPartDef1 = (<gast.Flat>orDef[0]).definition
         expect(orPartDef1.length).to.equal(1)
         expect(orPartDef1[0]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>orPartDef1[0]).occurrenceInParent).to.equal(1)
+        expect((<gast.NonTerminal>orPartDef1[0]).occurrenceInParent).to.equal(0)
         expect((<gast.NonTerminal>orPartDef1[0]).nonTerminalName).to.equal(
             "assignedTypeSpec"
         )
@@ -599,7 +599,7 @@ describe("The GAst Builder namespace", () => {
         let orPartDef2 = (<gast.Flat>orDef[1]).definition
         expect(orPartDef2.length).to.equal(1)
         expect(orPartDef2[0]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>orPartDef2[0]).occurrenceInParent).to.equal(1)
+        expect((<gast.NonTerminal>orPartDef2[0]).occurrenceInParent).to.equal(0)
         expect((<gast.NonTerminal>orPartDef2[0]).nonTerminalName).to.equal(
             "assignedTypeSpecImplicit"
         )

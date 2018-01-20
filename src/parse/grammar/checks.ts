@@ -175,21 +175,24 @@ function createDuplicatesErrorMessage(
     let dslName = getProductionDslName(firstProd)
     let extraArgument = getExtraProductionArgument(firstProd)
 
-    let msg = `->${dslName}<- with occurrence index: ->${index}<-
-                  ${extraArgument ? `and argument: ${extraArgument}` : ""}
+    let msg = `->${dslName}<- with numerical suffix: ->${index}<-
+                  ${extraArgument ? `and argument: ->${extraArgument}<-` : ""}
                   appears more than once (${
                       duplicateProds.length
-                  } times) in the top level rule: ${topLevelName}.
+                  } times) in the top level rule: ->${topLevelName}<-.
                   ${
-                      index === 1
-                          ? `note that ${dslName} and ${dslName}1 both have the same occurrence index 1}`
+                      index === 0
+                          ? `Also note that numerical suffix 0 means ${dslName} without any suffix.`
                           : ""
-                  }}
-                  to fix this make sure each usage of ${dslName} ${
-        extraArgument ? `with the argument: ${extraArgument}` : ""
+                  }
+                  To fix this make sure each usage of ${dslName} ${
+        extraArgument ? `with the argument: ->${extraArgument}<-` : ""
     }
-                  in the rule ${topLevelName} has a different occurrence index (1-5), as that combination acts as a unique
-                  position key in the grammar, which is needed by the parsing engine.`
+                  in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
+                  position key in the grammar, which is needed by the parsing engine.
+                  
+                  For further details see: http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
+                  `
 
     // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
     msg = msg.replace(/[ \t]+/g, " ")
@@ -523,7 +526,10 @@ export function validateAmbiguousAlternationAlternatives(
             ors,
             currOr =>
                 ignoredIssuesForCurrentRule[
-                    getProductionDslName(currOr) + currOr.occurrenceInParent
+                    getProductionDslName(currOr) +
+                        (currOr.occurrenceInParent === 0
+                            ? ""
+                            : currOr.occurrenceInParent)
                 ]
         )
     }
@@ -633,9 +639,8 @@ export function validateSomeNonEmptyLookaheadPath(
             )
             let pathsInsideProduction = paths[0]
             if (isEmpty(flatten(pathsInsideProduction))) {
-                let implicitOccurrence = currProd.implicitOccurrenceIndex
                 let dslName = getProductionDslName(currProd)
-                if (!implicitOccurrence) {
+                if (currOccurrence !== 0) {
                     dslName += currOccurrence
                 }
                 let errMsg =
@@ -704,9 +709,10 @@ function checkAlternativesAmbiguities(
         let pathMsg = map(currAmbDescriptor.path, currtok =>
             tokenLabel(currtok)
         ).join(", ")
-        let occurrence = alternation.implicitOccurrenceIndex
-            ? ""
-            : alternation.occurrenceInParent
+        let occurrence =
+            alternation.occurrenceInParent === 0
+                ? ""
+                : alternation.occurrenceInParent
         let currMessage =
             `Ambiguous alternatives: <${ambgIndices.join(
                 " ,"
@@ -782,9 +788,10 @@ function checkPrefixAlternativesAmbiguities(
                 let pathMsg = map(currAmbPathAndIdx.path, currTok =>
                     tokenLabel(currTok)
                 ).join(", ")
-                let occurrence = alternation.implicitOccurrenceIndex
-                    ? ""
-                    : alternation.occurrenceInParent
+                let occurrence =
+                    alternation.occurrenceInParent === 0
+                        ? ""
+                        : alternation.occurrenceInParent
                 let currMessage =
                     `Ambiguous alternatives: <${ambgIndices.join(
                         " ,"

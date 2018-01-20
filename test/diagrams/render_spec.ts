@@ -11,7 +11,12 @@ describe("The Chevrotain diagrams rendering APIs", function() {
     const serializedGrammar = new DDLExampleRecoveryParser().getSerializedGastProductions()
 
     let skipOnNode4AndBrowser = it
-    if (typeof window !== "undefined" || lt(process.version, "6.0.0")) {
+    if (
+        typeof window !== "undefined" ||
+        lt(process.version, "6.0.0") ||
+        // This makes the tests run x6 slower.
+        process.env.SKIP_JS_DOM
+    ) {
         skipOnNode4AndBrowser = <any>it.skip
     }
 

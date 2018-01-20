@@ -44,7 +44,7 @@ export class IdentTok {
 
 const configuration: IParserConfig = {
     ignoredIssues: {
-        statement: { OR1: true }
+        statement: { OR: true }
     }
 }
 

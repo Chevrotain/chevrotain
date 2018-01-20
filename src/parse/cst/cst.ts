@@ -59,9 +59,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
     }
 
     private collectNamedDSLMethod(
-        node: IOptionallyNamedProduction &
-            IProductionWithOccurrence &
-            AbstractProduction,
+        node: any,
         newNodeConstructor: any,
         methodIdx: number
     ): void {
@@ -78,8 +76,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             ) {
                 nameLessNode = new (<any>newNodeConstructor)({
                     definition: node.definition,
-                    occurrenceInParent: node.occurrenceInParent,
-                    implicitOccurrenceIndex: node.implicitOccurrenceIndex
+                    occurrenceInParent: node.occurrenceInParent
                 })
             } else if (
                 node instanceof gast.RepetitionMandatoryWithSeparator ||
@@ -88,7 +85,6 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
                 nameLessNode = new (<any>newNodeConstructor)({
                     definition: node.definition,
                     occurrenceInParent: node.occurrenceInParent,
-                    implicitOccurrenceIndex: node.implicitOccurrenceIndex,
                     separator: node.separator
                 })
             } else {

@@ -91,8 +91,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
     public visitNonTerminal(node: gast.NonTerminal): gast.NonTerminal {
         return new gast.NonTerminal({
             nonTerminalName: node.nonTerminalName,
-            occurrenceInParent: node.occurrenceInParent,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            occurrenceInParent: node.occurrenceInParent
         })
     }
 
@@ -110,8 +109,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
         return new gast.Option({
             definition: definition,
             occurrenceInParent: node.occurrenceInParent,
-            name: node.name,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            name: node.name
         })
     }
 
@@ -122,8 +120,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
         return new gast.Repetition({
             definition: definition,
             occurrenceInParent: node.occurrenceInParent,
-            name: node.name,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            name: node.name
         })
     }
 
@@ -136,8 +133,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
         return new gast.RepetitionMandatory({
             definition: definition,
             occurrenceInParent: node.occurrenceInParent,
-            name: node.name,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            name: node.name
         })
     }
 
@@ -152,8 +148,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
             definition: definition,
             separator: node.separator,
             occurrenceInParent: node.occurrenceInParent,
-            name: node.name,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            name: node.name
         })
     }
 
@@ -167,8 +162,7 @@ class GastCloneVisitor extends gast.GAstVisitor {
             definition: definition,
             separator: node.separator,
             occurrenceInParent: node.occurrenceInParent,
-            name: node.name,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            name: node.name
         })
     }
 
@@ -179,16 +173,14 @@ class GastCloneVisitor extends gast.GAstVisitor {
         return new gast.Alternation({
             definition: definition,
             occurrenceInParent: node.occurrenceInParent,
-            name: node.name,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            name: node.name
         })
     }
 
     public visitTerminal(node: gast.Terminal): gast.Terminal {
         return new gast.Terminal({
             terminalType: node.terminalType,
-            occurrenceInParent: node.occurrenceInParent,
-            implicitOccurrenceIndex: node.implicitOccurrenceIndex
+            occurrenceInParent: node.occurrenceInParent
         })
     }
 
