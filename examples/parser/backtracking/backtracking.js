@@ -45,7 +45,7 @@ class BackTrackingParser extends Parser {
             {
                 outputCst: true,
                 ignoredIssues: {
-                    statement: { OR1: true }
+                    statement: { OR: true }
                 }
             }
         )

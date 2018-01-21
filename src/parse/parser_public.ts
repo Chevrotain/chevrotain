@@ -505,7 +505,7 @@ export class Parser {
                     defError => defError.message
                 )
                 throw new Error(
-                    `Parser Definition Errors detected\n: ${defErrorsMsgs.join(
+                    `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
                         "\n-------------------------------\n"
                     )}`
                 )
@@ -541,7 +541,7 @@ export class Parser {
                 defError => defError.message
             )
             throw new Error(
-                `Parser Definition Errors detected\n: ${defErrorsMsgs.join(
+                `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
                     "\n-------------------------------\n"
                 )}`
             )
@@ -911,7 +911,7 @@ export class Parser {
      * @see CONSUME1
      */
     protected CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
-        return this.CONSUME1(tokType, options)
+        return this.consumeInternal(tokType, 0, options)
     }
 
     /**
@@ -993,7 +993,7 @@ export class Parser {
         ruleToCall: (idx: number) => T,
         args: any[] = undefined
     ): T {
-        return this.subruleInternal(ruleToCall, 1, args)
+        return this.subruleInternal(ruleToCall, 0, args)
     }
 
     /**
@@ -1068,7 +1068,7 @@ export class Parser {
     protected OPTION<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
-        return this.OPTION1(actionORMethodDef)
+        return this.optionInternal(actionORMethodDef, 0)
     }
 
     /**
@@ -1146,7 +1146,7 @@ export class Parser {
      * @see OR1
      */
     protected OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
-        return this.OR1(altsOrOpts)
+        return this.orInternal(altsOrOpts, 0)
     }
 
     /**
@@ -1235,7 +1235,7 @@ export class Parser {
     protected MANY<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
-        return this.MANY1(actionORMethodDef)
+        return this.manyInternal(0, actionORMethodDef, [])
     }
 
     /**
@@ -1318,7 +1318,10 @@ export class Parser {
     protected MANY_SEP<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
-        return this.MANY_SEP1(options)
+        return this.manySepFirstInternal(0, options, {
+            values: [],
+            separators: []
+        })
     }
 
     /**
@@ -1416,7 +1419,7 @@ export class Parser {
     protected AT_LEAST_ONE<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
-        return this.AT_LEAST_ONE1(actionORMethodDef)
+        return this.atLeastOneInternal(0, actionORMethodDef, [])
     }
 
     /**
@@ -1480,7 +1483,10 @@ export class Parser {
     protected AT_LEAST_ONE_SEP<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
-        return this.AT_LEAST_ONE_SEP1(options)
+        return this.atLeastOneSepFirstInternal(0, options, {
+            values: [],
+            separators: []
+        })
     }
 
     /**
@@ -1978,7 +1984,7 @@ export class Parser {
         let wrappedGrammarRule
 
         wrappedGrammarRule = function(
-            idxInCallingRule: number = 1,
+            idxInCallingRule: number = 0,
             args: any[]
         ) {
             this.ruleInvocationStateUpdate(

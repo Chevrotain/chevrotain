@@ -167,13 +167,12 @@ export function buildProdGast(
 function buildRefProd(prodRange: IProdRange): gast.NonTerminal {
     let reResult = refRegEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
-    let refOccurrence = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
+    let refOccurrence = isImplicitOccurrenceIdx ? 0 : parseInt(reResult[1], 10)
     let refProdName = reResult[2]
     let newRef = new gast.NonTerminal({
         nonTerminalName: refProdName,
         occurrenceInParent: refOccurrence
     })
-    newRef.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     return newRef
 }
 
@@ -181,7 +180,7 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
     let reResult = terminalRegEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let terminalOccurrence = isImplicitOccurrenceIdx
-        ? 1
+        ? 0
         : parseInt(reResult[1], 10)
     let terminalName = reResult[2]
     let terminalType = terminalNameToConstructor[terminalName]
@@ -193,7 +192,6 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
         terminalType: terminalType,
         occurrenceInParent: terminalOccurrence
     })
-    newTerminal.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     return newTerminal
 }
 
@@ -211,9 +209,8 @@ function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
     let reResult = regEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     prodInstance.occurrenceInParent = isImplicitOccurrenceIdx
-        ? 1
+        ? 0
         : parseInt(reResult[1], 10)
-    prodInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
 
     let nestedName = reResult[2]
     if (!isUndefined(nestedName)) {
@@ -278,7 +275,7 @@ function buildRepetitionWithSep(
 ): gast.RepetitionWithSeparator {
     let reResult = regExp.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
-    let occurrenceIdx = isImplicitOccurrenceIdx ? 1 : parseInt(reResult[1], 10)
+    let occurrenceIdx = isImplicitOccurrenceIdx ? 0 : parseInt(reResult[1], 10)
 
     let sepName = reResult[3]
     let separatorType = terminalNameToConstructor[sepName]

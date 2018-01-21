@@ -912,7 +912,7 @@ function defineLookaheadSpecs(
                     super(input, ALL_TOKENS, {
                         ignoredIssues: {
                             orRule: {
-                                OR1: true,
+                                OR: true,
                                 OR2: true,
                                 OR3: true,
                                 OR4: true,

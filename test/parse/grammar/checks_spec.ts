@@ -444,7 +444,7 @@ class ErroneousOccurrenceNumUsageParser1 extends Parser {
 
     public duplicateRef = this.RULE("duplicateRef", () => {
         this.SUBRULE1(this.anotherRule)
-        this.SUBRULE(this.anotherRule)
+        this.SUBRULE1(this.anotherRule)
     })
 
     public anotherRule = this.RULE("anotherRule", () => {
@@ -508,7 +508,7 @@ describe("The duplicate occurrence validations full flow", () => {
             "anotherRule"
         )
         expect(() => new ErroneousOccurrenceNumUsageParser1()).to.throw(
-            "both have the same occurrence index 1"
+            "with numerical suffix: ->1<-"
         )
     })
 
@@ -527,12 +527,12 @@ describe("The duplicate occurrence validations full flow", () => {
 
     it("will throw errors on duplicate MANY productions in the same top level rule", () => {
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("MANY")
-        expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("1")
+        expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw("0")
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
             "duplicateMany"
         )
         expect(() => new ErroneousOccurrenceNumUsageParser3()).to.throw(
-            "both have the same occurrence index 1"
+            "appears more than once (2 times)"
         )
     })
 

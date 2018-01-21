@@ -1319,7 +1319,7 @@ function defineRecognizerSpecs(
                 ])
                 expect(
                     parser.errors[0].context.ruleOccurrenceStack
-                ).to.deep.equal([1, 1, 5])
+                ).to.deep.equal([0, 1, 5])
             })
 
             it("Will build an error message for AT_LEAST_ONE automatically", () => {
@@ -1464,7 +1464,7 @@ function defineRecognizerSpecs(
                 ])
                 expect(
                     parser.errors[0].context.ruleOccurrenceStack
-                ).to.deep.equal([1])
+                ).to.deep.equal([0])
             })
 
             it("can serialize a Grammar's Structure", () => {

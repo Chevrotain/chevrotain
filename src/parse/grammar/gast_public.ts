@@ -13,7 +13,6 @@ export namespace gast {
 
     export interface IProductionWithOccurrence extends IProduction {
         occurrenceInParent: number
-        implicitOccurrenceIndex?: boolean
     }
 
     export abstract class AbstractProduction implements IProduction {
@@ -32,13 +31,11 @@ export namespace gast {
         public nonTerminalName: string
         public referencedRule: Rule
         public occurrenceInParent: number = 1
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             nonTerminalName: string
             referencedRule?: Rule
             occurrenceInParent?: number
-            implicitOccurrenceIndex?: boolean
         }) {
             super([])
             assign(this, options)
@@ -90,13 +87,11 @@ export namespace gast {
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public occurrenceInParent: number = 1
         public name?: string
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             definition: IProduction[]
             occurrenceInParent?: number
             name?: string
-            implicitOccurrenceIndex?: boolean
         }) {
             super(options.definition)
             assign(this, options)
@@ -107,13 +102,11 @@ export namespace gast {
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public name: string
         public occurrenceInParent: number = 1
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             definition: IProduction[]
             occurrenceInParent?: number
             name?: string
-            implicitOccurrenceIndex?: boolean
         }) {
             super(options.definition)
             assign(this, options)
@@ -125,14 +118,12 @@ export namespace gast {
         public separator: TokenType
         public occurrenceInParent: number = 1
         public name: string
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             definition: IProduction[]
             separator: TokenType
             occurrenceInParent?: number
             name?: string
-            implicitOccurrenceIndex?: boolean
         }) {
             super(options.definition)
             assign(this, options)
@@ -144,13 +135,11 @@ export namespace gast {
         public separator: TokenType
         public occurrenceInParent: number = 1
         public name: string
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             definition: IProduction[]
             occurrenceInParent?: number
             name?: string
-            implicitOccurrenceIndex?: boolean
         }) {
             super(options.definition)
             assign(this, options)
@@ -162,14 +151,12 @@ export namespace gast {
         public separator: TokenType
         public occurrenceInParent: number = 1
         public name: string
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             definition: IProduction[]
             separator: TokenType
             occurrenceInParent?: number
             name?: string
-            implicitOccurrenceIndex?: boolean
         }) {
             super(options.definition)
             assign(this, options)
@@ -180,13 +167,11 @@ export namespace gast {
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public occurrenceInParent: number = 1
         public name: string
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             definition: IProduction[]
             occurrenceInParent?: number
             name?: string
-            implicitOccurrenceIndex?: boolean
         }) {
             super(options.definition)
             assign(this, options)
@@ -196,12 +181,10 @@ export namespace gast {
     export class Terminal implements IProductionWithOccurrence {
         public terminalType: TokenType
         public occurrenceInParent: number = 1
-        public implicitOccurrenceIndex: boolean = false
 
         constructor(options: {
             terminalType: TokenType
             occurrenceInParent?: number
-            implicitOccurrenceIndex?: boolean
         }) {
             assign(this, options)
         }
