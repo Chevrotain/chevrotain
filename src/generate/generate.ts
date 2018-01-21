@@ -99,21 +99,15 @@ export function genRule(prod: gast.Rule, n: number): string {
 export function genTerminal(prod: gast.Terminal, n: number): string {
     const name = tokenName(prod.terminalType)
     // TODO: potential performance optimization, avoid tokenMap Dictionary access
-    return indent(
-        n,
-        `$.CONSUME${prod.occurrenceInParent}(this.tokensMap.${name})` + NL
-    )
+    return indent(n, `$.CONSUME${prod.idx}(this.tokensMap.${name})` + NL)
 }
 
 export function genNonTerminal(prod: gast.NonTerminal, n: number): string {
-    return indent(
-        n,
-        `$.SUBRULE${prod.occurrenceInParent}($.${prod.nonTerminalName})` + NL
-    )
+    return indent(n, `$.SUBRULE${prod.idx}($.${prod.nonTerminalName})` + NL)
 }
 
 export function genAlternation(prod: gast.Alternation, n: number): string {
-    let result = indent(n, `$.OR${prod.occurrenceInParent}([`) + NL
+    let result = indent(n, `$.OR${prod.idx}([`) + NL
     const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
     result += alts.join("," + NL)
     result += NL + indent(n, `])` + NL)
@@ -161,13 +155,13 @@ function genDSLRule(
     dslName,
     prod: {
         definition: IProduction[]
-        occurrenceInParent: number
+        idx: number
         name?: string
         separator?: TokenType
     },
     n: number
 ): string {
-    let result = indent(n, `$.${dslName + prod.occurrenceInParent}(`)
+    let result = indent(n, `$.${dslName + prod.idx}(`)
 
     if (prod.name || prod.separator) {
         result += "{" + NL

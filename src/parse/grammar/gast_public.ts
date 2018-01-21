@@ -12,7 +12,7 @@ export namespace gast {
     }
 
     export interface IProductionWithOccurrence extends IProduction {
-        occurrenceInParent: number
+        idx: number
     }
 
     export abstract class AbstractProduction implements IProduction {
@@ -30,12 +30,12 @@ export namespace gast {
         implements IProductionWithOccurrence {
         public nonTerminalName: string
         public referencedRule: Rule
-        public occurrenceInParent: number = 1
+        public idx: number = 1
 
         constructor(options: {
             nonTerminalName: string
             referencedRule?: Rule
-            occurrenceInParent?: number
+            idx?: number
         }) {
             super([])
             assign(this, options)
@@ -85,12 +85,12 @@ export namespace gast {
 
     export class Option extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        public occurrenceInParent: number = 1
+        public idx: number = 1
         public name?: string
 
         constructor(options: {
             definition: IProduction[]
-            occurrenceInParent?: number
+            idx?: number
             name?: string
         }) {
             super(options.definition)
@@ -101,11 +101,11 @@ export namespace gast {
     export class RepetitionMandatory extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public name: string
-        public occurrenceInParent: number = 1
+        public idx: number = 1
 
         constructor(options: {
             definition: IProduction[]
-            occurrenceInParent?: number
+            idx?: number
             name?: string
         }) {
             super(options.definition)
@@ -116,13 +116,13 @@ export namespace gast {
     export class RepetitionMandatoryWithSeparator extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public separator: TokenType
-        public occurrenceInParent: number = 1
+        public idx: number = 1
         public name: string
 
         constructor(options: {
             definition: IProduction[]
             separator: TokenType
-            occurrenceInParent?: number
+            idx?: number
             name?: string
         }) {
             super(options.definition)
@@ -133,12 +133,12 @@ export namespace gast {
     export class Repetition extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public separator: TokenType
-        public occurrenceInParent: number = 1
+        public idx: number = 1
         public name: string
 
         constructor(options: {
             definition: IProduction[]
-            occurrenceInParent?: number
+            idx?: number
             name?: string
         }) {
             super(options.definition)
@@ -149,13 +149,13 @@ export namespace gast {
     export class RepetitionWithSeparator extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
         public separator: TokenType
-        public occurrenceInParent: number = 1
+        public idx: number = 1
         public name: string
 
         constructor(options: {
             definition: IProduction[]
             separator: TokenType
-            occurrenceInParent?: number
+            idx?: number
             name?: string
         }) {
             super(options.definition)
@@ -165,12 +165,12 @@ export namespace gast {
 
     export class Alternation extends AbstractProduction
         implements IProductionWithOccurrence, IOptionallyNamedProduction {
-        public occurrenceInParent: number = 1
+        public idx: number = 1
         public name: string
 
         constructor(options: {
             definition: IProduction[]
-            occurrenceInParent?: number
+            idx?: number
             name?: string
         }) {
             super(options.definition)
@@ -180,12 +180,9 @@ export namespace gast {
 
     export class Terminal implements IProductionWithOccurrence {
         public terminalType: TokenType
-        public occurrenceInParent: number = 1
+        public idx: number = 1
 
-        constructor(options: {
-            terminalType: TokenType
-            occurrenceInParent?: number
-        }) {
+        constructor(options: { terminalType: TokenType; idx?: number }) {
             assign(this, options)
         }
 
@@ -269,14 +266,14 @@ export namespace gast {
 
     export interface ISerializedNonTerminal extends ISerializedGast {
         name: string
-        occurrenceInParent: number
+        idx: number
     }
 
     export interface ISerializedTerminal extends ISerializedGast {
         name: string
         label?: string
         pattern?: string
-        occurrenceInParent: number
+        idx: number
     }
 
     export interface ISerializedTerminalWithSeparator extends ISerializedGast {
@@ -298,7 +295,7 @@ export namespace gast {
             return <ISerializedNonTerminal>{
                 type: "NonTerminal",
                 name: node.nonTerminalName,
-                occurrenceInParent: node.occurrenceInParent
+                idx: node.idx
             }
         } else if (node instanceof Flat) {
             return {
@@ -346,7 +343,7 @@ export namespace gast {
                 type: "Terminal",
                 name: tokenName(node.terminalType),
                 label: tokenLabel(node.terminalType),
-                occurrenceInParent: node.occurrenceInParent
+                idx: node.idx
             }
 
             let pattern = node.terminalType.PATTERN

@@ -154,7 +154,7 @@ describe("The Code Generation capabilities", () => {
                         definition: [
                             new gast.Terminal({ terminalType: Identifier })
                         ],
-                        occurrenceInParent: 1,
+                        idx: 1,
                         name: "$inlinedRule"
                     })
                 ]

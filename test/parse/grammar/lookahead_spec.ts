@@ -58,16 +58,16 @@ let atLeastOneRule = new Rule({
                             definition: [
                                 new Terminal({ terminalType: EntityTok })
                             ],
-                            occurrenceInParent: 3
+                            idx: 3
                         }),
                         new Terminal({ terminalType: CommaTok })
                     ],
-                    occurrenceInParent: 2
+                    idx: 2
                 }),
-                new Terminal({ terminalType: DotTok, occurrenceInParent: 1 })
+                new Terminal({ terminalType: DotTok, idx: 1 })
             ]
         }),
-        new Terminal({ terminalType: DotTok, occurrenceInParent: 2 })
+        new Terminal({ terminalType: DotTok, idx: 2 })
     ]
 })
 
@@ -83,18 +83,18 @@ let atLeastOneSepRule = new Rule({
                                 new Terminal({ terminalType: EntityTok })
                             ],
                             separator: SemicolonTok,
-                            occurrenceInParent: 3
+                            idx: 3
                         }),
                         new Terminal({ terminalType: CommaTok })
                     ],
                     separator: SemicolonTok,
-                    occurrenceInParent: 2
+                    idx: 2
                 }),
-                new Terminal({ terminalType: DotTok, occurrenceInParent: 1 })
+                new Terminal({ terminalType: DotTok, idx: 1 })
             ],
             separator: SemicolonTok
         }),
-        new Terminal({ terminalType: DotTok, occurrenceInParent: 2 })
+        new Terminal({ terminalType: DotTok, idx: 2 })
     ]
 })
 
@@ -105,7 +105,7 @@ let qualifiedName = new Rule({
         new Repetition({
             definition: [
                 new Terminal({ terminalType: DotTok }),
-                new Terminal({ terminalType: IdentTok, occurrenceInParent: 2 })
+                new Terminal({ terminalType: IdentTok, idx: 2 })
             ]
         })
     ]
@@ -115,9 +115,7 @@ let qualifiedNameSep = new Rule({
     name: "qualifiedNameSep",
     definition: [
         new RepetitionMandatoryWithSeparator({
-            definition: [
-                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 })
-            ],
+            definition: [new Terminal({ terminalType: IdentTok, idx: 1 })],
             separator: DotTok
         })
     ]
@@ -159,7 +157,7 @@ let actionDec = new Rule({
                         new NonTerminal({
                             nonTerminalName: "paramSpec",
                             referencedRule: paramSpec,
-                            occurrenceInParent: 2
+                            idx: 2
                         })
                     ]
                 })
@@ -174,7 +172,7 @@ let actionDec = new Rule({
                     referencedRule: qualifiedName
                 })
             ],
-            occurrenceInParent: 2
+            idx: 2
         }),
         new Terminal({ terminalType: SemicolonTok })
     ]
@@ -192,7 +190,7 @@ let actionDecSep = new Rule({
                 new NonTerminal({
                     nonTerminalName: "paramSpec",
                     referencedRule: paramSpec,
-                    occurrenceInParent: 2
+                    idx: 2
                 })
             ],
             separator: CommaTok
@@ -207,7 +205,7 @@ let actionDecSep = new Rule({
                     referencedRule: qualifiedName
                 })
             ],
-            occurrenceInParent: 2
+            idx: 2
         }),
         new Terminal({ terminalType: SemicolonTok })
     ]
@@ -221,7 +219,7 @@ let manyActions = new Rule({
                 new NonTerminal({
                     nonTerminalName: "actionDec",
                     referencedRule: actionDec,
-                    occurrenceInParent: 1
+                    idx: 1
                 })
             ]
         })
@@ -240,7 +238,7 @@ let cardinality = new Rule({
                     definition: [
                         new Terminal({
                             terminalType: UnsignedIntegerLiteralTok,
-                            occurrenceInParent: 2
+                            idx: 2
                         })
                     ]
                 }),
@@ -268,7 +266,7 @@ let assignedTypeSpec = new Rule({
                 new Terminal({ terminalType: DefaultTok }),
                 new NonTerminal({ nonTerminalName: "expression" })
             ],
-            occurrenceInParent: 2
+            idx: 2
         })
     ]
 })
@@ -286,7 +284,7 @@ let lotsOfOrs = new Rule({
                                     definition: [
                                         new Terminal({
                                             terminalType: CommaTok,
-                                            occurrenceInParent: 1
+                                            idx: 1
                                         })
                                     ]
                                 }),
@@ -294,12 +292,12 @@ let lotsOfOrs = new Rule({
                                     definition: [
                                         new Terminal({
                                             terminalType: KeyTok,
-                                            occurrenceInParent: 1
+                                            idx: 1
                                         })
                                     ]
                                 })
                             ],
-                            occurrenceInParent: 2
+                            idx: 2
                         })
                     ]
                 }),
@@ -307,7 +305,7 @@ let lotsOfOrs = new Rule({
                     definition: [
                         new Terminal({
                             terminalType: EntityTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         })
                     ]
                 })
@@ -319,12 +317,12 @@ let lotsOfOrs = new Rule({
                     definition: [
                         new Terminal({
                             terminalType: DotTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         })
                     ]
                 })
             ],
-            occurrenceInParent: 3
+            idx: 3
         })
     ]
 })
@@ -338,7 +336,7 @@ let emptyAltOr = new Rule({
                     definition: [
                         new Terminal({
                             terminalType: KeyTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         })
                     ]
                 }),
@@ -346,7 +344,7 @@ let emptyAltOr = new Rule({
                     definition: [
                         new Terminal({
                             terminalType: EntityTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         })
                     ]
                 }),
@@ -360,17 +358,13 @@ let callArguments = new Rule({
     name: "callArguments",
     definition: [
         new RepetitionWithSeparator({
-            definition: [
-                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 })
-            ],
+            definition: [new Terminal({ terminalType: IdentTok, idx: 1 })],
             separator: CommaTok
         }),
         new RepetitionWithSeparator({
-            definition: [
-                new Terminal({ terminalType: IdentTok, occurrenceInParent: 2 })
-            ],
+            definition: [new Terminal({ terminalType: IdentTok, idx: 2 })],
             separator: CommaTok,
-            occurrenceInParent: 2
+            idx: 2
         })
     ]
 })

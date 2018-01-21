@@ -385,7 +385,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>actual).occurrenceInParent).to.equal(2)
+        expect((<gast.Terminal>actual).idx).to.equal(2)
         expect((<gast.Terminal>actual).terminalType).to.equal(IdentTok)
     })
 
@@ -416,7 +416,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>actual).occurrenceInParent).to.equal(0)
+        expect((<gast.NonTerminal>actual).idx).to.equal(0)
         expect((<gast.NonTerminal>actual).nonTerminalName).to.equal("bamba")
     })
 
@@ -523,11 +523,11 @@ describe("The GAst Builder namespace", () => {
         let def = actual.definition
         expect(def.length).to.equal(4)
         expect(def[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[0]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>def[0]).idx).to.equal(1)
         expect((<gast.Terminal>def[0]).terminalType).to.equal(LSquareTok)
 
         expect(def[1]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>def[1]).occurrenceInParent).to.equal(0)
+        expect((<gast.NonTerminal>def[1]).idx).to.equal(0)
         expect((<gast.NonTerminal>def[1]).nonTerminalName).to.equal(
             "expression"
         )
@@ -538,18 +538,18 @@ describe("The GAst Builder namespace", () => {
         expect(manyDef.length).to.equal(2)
 
         expect(manyDef[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>manyDef[0]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>manyDef[0]).idx).to.equal(1)
         expect((<gast.Terminal>manyDef[0]).terminalType).to.equal(CommaTok)
 
         expect(manyDef[1]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>manyDef[1]).occurrenceInParent).to.equal(2)
+        expect((<gast.NonTerminal>manyDef[1]).idx).to.equal(2)
         expect((<gast.NonTerminal>manyDef[1]).nonTerminalName).to.equal(
             "expression"
         )
         // -- MANY part end
 
         expect(def[3]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[3]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>def[3]).idx).to.equal(1)
         expect((<gast.Terminal>def[3]).terminalType).to.equal(RSquareTok)
     })
 
@@ -563,7 +563,7 @@ describe("The GAst Builder namespace", () => {
         let option1Def = (<gast.Option>def[0]).definition
         expect(option1Def.length).to.equal(1)
         expect(option1Def[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>option1Def[0]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>option1Def[0]).idx).to.equal(1)
         expect((<gast.Terminal>option1Def[0]).terminalType).to.equal(
             RequiredTok
         )
@@ -572,15 +572,15 @@ describe("The GAst Builder namespace", () => {
         let option2Def = (<gast.Option>def[1]).definition
         expect(option2Def.length).to.equal(1)
         expect(option2Def[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>option2Def[0]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>option2Def[0]).idx).to.equal(1)
         expect((<gast.Terminal>option2Def[0]).terminalType).to.equal(KeyTok)
 
         expect(def[2]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[2]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>def[2]).idx).to.equal(1)
         expect((<gast.Terminal>def[2]).terminalType).to.equal(ElementTok)
 
         expect(def[3]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[3]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>def[3]).idx).to.equal(1)
         expect((<gast.Terminal>def[3]).terminalType).to.equal(IdentTok)
 
         expect(def[4]).to.be.an.instanceof(Alternation)
@@ -590,7 +590,7 @@ describe("The GAst Builder namespace", () => {
         let orPartDef1 = (<gast.Flat>orDef[0]).definition
         expect(orPartDef1.length).to.equal(1)
         expect(orPartDef1[0]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>orPartDef1[0]).occurrenceInParent).to.equal(0)
+        expect((<gast.NonTerminal>orPartDef1[0]).idx).to.equal(0)
         expect((<gast.NonTerminal>orPartDef1[0]).nonTerminalName).to.equal(
             "assignedTypeSpec"
         )
@@ -599,13 +599,13 @@ describe("The GAst Builder namespace", () => {
         let orPartDef2 = (<gast.Flat>orDef[1]).definition
         expect(orPartDef2.length).to.equal(1)
         expect(orPartDef2[0]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>orPartDef2[0]).occurrenceInParent).to.equal(0)
+        expect((<gast.NonTerminal>orPartDef2[0]).idx).to.equal(0)
         expect((<gast.NonTerminal>orPartDef2[0]).nonTerminalName).to.equal(
             "assignedTypeSpecImplicit"
         )
 
         expect(def[5]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[5]).occurrenceInParent).to.equal(1)
+        expect((<gast.Terminal>def[5]).idx).to.equal(1)
         expect((<gast.Terminal>def[5]).terminalType).to.equal(SemicolonTok)
     })
 

@@ -439,21 +439,21 @@ describe("The NextTerminalAfterManyWalker", () => {
                     definition: [
                         new gast.Terminal({
                             terminalType: IdentTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         })
                     ],
-                    occurrenceInParent: 2
+                    idx: 2
                 }),
                 new gast.Terminal({
                     terminalType: IdentTok,
-                    occurrenceInParent: 2
+                    idx: 2
                 }),
                 new Repetition({
                     definition: [
                         new gast.Terminal({ terminalType: DotTok }),
                         new gast.Terminal({
                             terminalType: IdentTok,
-                            occurrenceInParent: 3
+                            idx: 3
                         })
                     ]
                 })
@@ -531,7 +531,7 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
                     definition: [
                         new gast.Terminal({
                             terminalType: DotTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         })
                     ]
                 })

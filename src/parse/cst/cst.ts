@@ -76,7 +76,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             ) {
                 nameLessNode = new (<any>newNodeConstructor)({
                     definition: node.definition,
-                    occurrenceInParent: node.occurrenceInParent
+                    idx: node.idx
                 })
             } else if (
                 node instanceof gast.RepetitionMandatoryWithSeparator ||
@@ -84,7 +84,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             ) {
                 nameLessNode = new (<any>newNodeConstructor)({
                     definition: node.definition,
-                    occurrenceInParent: node.occurrenceInParent,
+                    idx: node.idx,
                     separator: node.separator
                 })
             } else {
@@ -95,7 +95,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             let key = getKeyForAutomaticLookahead(
                 this.ruleIdx,
                 methodIdx,
-                node.occurrenceInParent
+                node.idx
             )
             this.result.push({ def, key, name: node.name })
         }
@@ -153,7 +153,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
                 let key = getKeyForAltIndex(
                     this.ruleIdx,
                     OR_IDX,
-                    node.occurrenceInParent,
+                    node.idx,
                     altIdx
                 )
                 this.result.push({
@@ -287,7 +287,7 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
                 })
                 let secondIteration: any = new gast.Repetition({
                     definition: [<any>separatorGast].concat(prod.definition),
-                    occurrenceInParent: prod.occurrenceInParent
+                    idx: prod.idx
                 })
                 // Hack: X (, X)* --> (, X) because it is identical in terms of identifying "isCollection?"
                 let nextDef = [secondIteration].concat(drop(currDef))

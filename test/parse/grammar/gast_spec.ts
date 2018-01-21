@@ -93,7 +93,7 @@ describe("GAst namespace", () => {
             expect(actual).to.deep.equal({
                 type: "NonTerminal",
                 name: "qualifiedName",
-                occurrenceInParent: 1
+                idx: 1
             })
         })
 
@@ -113,12 +113,12 @@ describe("GAst namespace", () => {
                         name: "WithLiteral",
                         pattern: "bamba",
                         label: "WithLiteral",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -139,12 +139,12 @@ describe("GAst namespace", () => {
                         type: "Terminal",
                         name: "C",
                         label: "C",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -165,12 +165,12 @@ describe("GAst namespace", () => {
                         type: "Terminal",
                         name: "C",
                         label: "C",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -191,19 +191,19 @@ describe("GAst namespace", () => {
                     type: "Terminal",
                     name: "Comma",
                     label: "Comma",
-                    occurrenceInParent: 1
+                    idx: 1
                 },
                 definition: [
                     {
                         type: "Terminal",
                         name: "C",
                         label: "C",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -224,12 +224,12 @@ describe("GAst namespace", () => {
                         type: "Terminal",
                         name: "C",
                         label: "C",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -250,19 +250,19 @@ describe("GAst namespace", () => {
                     type: "Terminal",
                     name: "Comma",
                     label: "Comma",
-                    occurrenceInParent: 1
+                    idx: 1
                 },
                 definition: [
                     {
                         type: "Terminal",
                         name: "C",
                         label: "C",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -294,7 +294,7 @@ describe("GAst namespace", () => {
                                 type: "Terminal",
                                 name: "A",
                                 label: "bamba",
-                                occurrenceInParent: 1
+                                idx: 1
                             }
                         ]
                     },
@@ -306,7 +306,7 @@ describe("GAst namespace", () => {
                                 name: "B",
                                 label: "B",
                                 pattern: "[a-zA-Z]\\w*",
-                                occurrenceInParent: 1
+                                idx: 1
                             }
                         ]
                     },
@@ -317,7 +317,7 @@ describe("GAst namespace", () => {
                                 type: "Terminal",
                                 name: "C",
                                 label: "C",
-                                occurrenceInParent: 1
+                                idx: 1
                             }
                         ]
                     }
@@ -332,7 +332,7 @@ describe("GAst namespace", () => {
                 type: "Terminal",
                 name: "A",
                 label: "bamba",
-                occurrenceInParent: 1
+                idx: 1
             })
         })
 
@@ -344,7 +344,7 @@ describe("GAst namespace", () => {
                 name: "B",
                 label: "B",
                 pattern: "[a-zA-Z]\\w*",
-                occurrenceInParent: 1
+                idx: 1
             })
         })
 
@@ -365,12 +365,12 @@ describe("GAst namespace", () => {
                         type: "Terminal",
                         name: "C",
                         label: "C",
-                        occurrenceInParent: 1
+                        idx: 1
                     },
                     {
                         type: "NonTerminal",
                         name: "bamba",
-                        occurrenceInParent: 1
+                        idx: 1
                     }
                 ]
             })
@@ -403,12 +403,12 @@ describe("GAst namespace", () => {
                             type: "Terminal",
                             name: "C",
                             label: "C",
-                            occurrenceInParent: 1
+                            idx: 1
                         },
                         {
                             type: "NonTerminal",
                             name: "bamba",
-                            occurrenceInParent: 1
+                            idx: 1
                         }
                     ]
                 },
@@ -420,12 +420,12 @@ describe("GAst namespace", () => {
                             type: "Terminal",
                             name: "D",
                             label: "D",
-                            occurrenceInParent: 1
+                            idx: 1
                         },
                         {
                             type: "NonTerminal",
                             name: "bisli",
-                            occurrenceInParent: 1
+                            idx: 1
                         }
                     ]
                 }

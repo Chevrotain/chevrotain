@@ -326,7 +326,7 @@ class RestDefinitionFinderWalker extends RestWalker {
         prevRest: gast.IProduction[]
     ): boolean {
         if (
-            node.occurrenceInParent === this.targetOccurrence &&
+            node.idx === this.targetOccurrence &&
             this.targetProdType === expectedProdType
         ) {
             this.restDef = currRest.concat(prevRest)
@@ -440,7 +440,7 @@ class InsideDefinitionFinderVisitor extends gast.GAstVisitor {
         expectedProdName: PROD_TYPE
     ): void {
         if (
-            node.occurrenceInParent === this.targetOccurrence &&
+            node.idx === this.targetOccurrence &&
             this.targetProdType === expectedProdName
         ) {
             this.result = node.definition

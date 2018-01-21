@@ -153,7 +153,7 @@ function validateDuplicateProductions(
             type: ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS,
             ruleName: topLevelRule.name,
             dslName: dslName,
-            occurrence: firstProd.occurrenceInParent
+            occurrence: firstProd.idx
         }
 
         let param = getExtraProductionArgument(firstProd)
@@ -171,7 +171,7 @@ function createDuplicatesErrorMessage(
     topLevelName
 ): string {
     let firstProd = utils.first(duplicateProds)
-    let index = firstProd.occurrenceInParent
+    let index = firstProd.idx
     let dslName = getProductionDslName(firstProd)
     let extraArgument = getExtraProductionArgument(firstProd)
 
@@ -205,7 +205,7 @@ export function identifyProductionForDuplicates(
     prod: gast.IProductionWithOccurrence
 ): string {
     return `${getProductionDslName(prod)}_#_${
-        prod.occurrenceInParent
+        prod.idx
     }_#_${getExtraProductionArgument(prod)}`
 }
 
@@ -489,13 +489,13 @@ export function validateEmptyOrAlternative(
                             message:
                                 `Ambiguous empty alternative: <${currAltIdx +
                                     1}>` +
-                                ` in <OR${currOr.occurrenceInParent}> inside <${
+                                ` in <OR${currOr.idx}> inside <${
                                     topLevelRule.name
                                 }> Rule.\n` +
                                 `Only the last alternative may be an empty alternative.`,
                             type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
                             ruleName: topLevelRule.name,
-                            occurrence: currOr.occurrenceInParent,
+                            occurrence: currOr.idx,
                             alternative: currAltIdx + 1
                         }
                     } else {
@@ -527,9 +527,7 @@ export function validateAmbiguousAlternationAlternatives(
             currOr =>
                 ignoredIssuesForCurrentRule[
                     getProductionDslName(currOr) +
-                        (currOr.occurrenceInParent === 0
-                            ? ""
-                            : currOr.occurrenceInParent)
+                        (currOr.idx === 0 ? "" : currOr.idx)
                 ]
         )
     }
@@ -537,7 +535,7 @@ export function validateAmbiguousAlternationAlternatives(
     let errors = utils.reduce(
         ors,
         (result, currOr: gast.Alternation) => {
-            let currOccurrence = currOr.occurrenceInParent
+            let currOccurrence = currOr.idx
             let alternatives = getLookaheadPathsForOr(
                 currOccurrence,
                 topLevelRule,
@@ -602,13 +600,13 @@ export function validateTooManyAlts(
                 errors.push({
                     message:
                         `An Alternation cannot have more than 256 alternatives:\n` +
-                        `<OR${currOr.occurrenceInParent}> inside <${
+                        `<OR${currOr.idx}> inside <${
                             topLevelRule.name
                         }> Rule.\n has ${currOr.definition.length +
                             1} alternatives.`,
                     type: ParserDefinitionErrorType.TOO_MANY_ALTS,
                     ruleName: topLevelRule.name,
-                    occurrence: currOr.occurrenceInParent
+                    occurrence: currOr.idx
                 })
             }
             return errors
@@ -630,7 +628,7 @@ export function validateSomeNonEmptyLookaheadPath(
         let allRuleProductions = collectorVisitor.allProductions
         forEach(allRuleProductions, currProd => {
             let prodType = getProdType(currProd)
-            let currOccurrence = currProd.occurrenceInParent
+            let currOccurrence = currProd.idx
             let paths = getLookaheadPathsForOptionalProd(
                 currOccurrence,
                 currTopRule,
@@ -709,10 +707,7 @@ function checkAlternativesAmbiguities(
         let pathMsg = map(currAmbDescriptor.path, currtok =>
             tokenLabel(currtok)
         ).join(", ")
-        let occurrence =
-            alternation.occurrenceInParent === 0
-                ? ""
-                : alternation.occurrenceInParent
+        let occurrence = alternation.idx === 0 ? "" : alternation.idx
         let currMessage =
             `Ambiguous alternatives: <${ambgIndices.join(
                 " ,"
@@ -737,7 +732,7 @@ function checkAlternativesAmbiguities(
             message: currMessage,
             type: ParserDefinitionErrorType.AMBIGUOUS_ALTS,
             ruleName: topRuleName,
-            occurrence: alternation.occurrenceInParent,
+            occurrence: alternation.idx,
             alternatives: [currAmbDescriptor.alts]
         }
     })
@@ -788,10 +783,7 @@ function checkPrefixAlternativesAmbiguities(
                 let pathMsg = map(currAmbPathAndIdx.path, currTok =>
                     tokenLabel(currTok)
                 ).join(", ")
-                let occurrence =
-                    alternation.occurrenceInParent === 0
-                        ? ""
-                        : alternation.occurrenceInParent
+                let occurrence = alternation.idx === 0 ? "" : alternation.idx
                 let currMessage =
                     `Ambiguous alternatives: <${ambgIndices.join(
                         " ,"
