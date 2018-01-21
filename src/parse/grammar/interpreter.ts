@@ -76,7 +76,7 @@ export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
         // found the next production, need to keep walking in it
         if (
             refProd.referencedRule.name === this.nextProductionName &&
-            refProd.occurrenceInParent === this.nextProductionOccurrence
+            refProd.idx === this.nextProductionOccurrence
         ) {
             let fullRest = currRest.concat(prevRest)
             this.updateExpectedNext()
@@ -117,7 +117,7 @@ export class NextAfterTokenWalker extends AbstractNextPossibleTokensWalker {
         if (
             this.isAtEndOfPath &&
             tokenName(terminal.terminalType) === this.nextTerminalName &&
-            terminal.occurrenceInParent === this.nextTerminalOccurrence &&
+            terminal.idx === this.nextTerminalOccurrence &&
             !this.found
         ) {
             let fullRest = currRest.concat(prevRest)
@@ -163,12 +163,12 @@ export class NextTerminalAfterManyWalker extends AbstractNextTerminalAfterProduc
         currRest: gast.IProduction[],
         prevRest: gast.IProduction[]
     ): void {
-        if (manyProd.occurrenceInParent === this.occurrence) {
+        if (manyProd.idx === this.occurrence) {
             let firstAfterMany = _first(currRest.concat(prevRest))
             this.result.isEndOfRule = firstAfterMany === undefined
             if (firstAfterMany instanceof gast.Terminal) {
                 this.result.token = firstAfterMany.terminalType
-                this.result.occurrence = firstAfterMany.occurrenceInParent
+                this.result.occurrence = firstAfterMany.idx
             }
         } else {
             super.walkMany(manyProd, currRest, prevRest)
@@ -182,12 +182,12 @@ export class NextTerminalAfterManySepWalker extends AbstractNextTerminalAfterPro
         currRest: gast.IProduction[],
         prevRest: gast.IProduction[]
     ): void {
-        if (manySepProd.occurrenceInParent === this.occurrence) {
+        if (manySepProd.idx === this.occurrence) {
             let firstAfterManySep = _first(currRest.concat(prevRest))
             this.result.isEndOfRule = firstAfterManySep === undefined
             if (firstAfterManySep instanceof gast.Terminal) {
                 this.result.token = firstAfterManySep.terminalType
-                this.result.occurrence = firstAfterManySep.occurrenceInParent
+                this.result.occurrence = firstAfterManySep.idx
             }
         } else {
             super.walkManySep(manySepProd, currRest, prevRest)
@@ -201,12 +201,12 @@ export class NextTerminalAfterAtLeastOneWalker extends AbstractNextTerminalAfter
         currRest: gast.IProduction[],
         prevRest: gast.IProduction[]
     ): void {
-        if (atLeastOneProd.occurrenceInParent === this.occurrence) {
+        if (atLeastOneProd.idx === this.occurrence) {
             let firstAfterAtLeastOne = _first(currRest.concat(prevRest))
             this.result.isEndOfRule = firstAfterAtLeastOne === undefined
             if (firstAfterAtLeastOne instanceof gast.Terminal) {
                 this.result.token = firstAfterAtLeastOne.terminalType
-                this.result.occurrence = firstAfterAtLeastOne.occurrenceInParent
+                this.result.occurrence = firstAfterAtLeastOne.idx
             }
         } else {
             super.walkAtLeastOne(atLeastOneProd, currRest, prevRest)
@@ -221,7 +221,7 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
         currRest: gast.IProduction[],
         prevRest: gast.IProduction[]
     ): void {
-        if (atleastOneSepProd.occurrenceInParent === this.occurrence) {
+        if (atleastOneSepProd.idx === this.occurrence) {
             let firstAfterfirstAfterAtLeastOneSep = _first(
                 currRest.concat(prevRest)
             )
@@ -230,8 +230,7 @@ export class NextTerminalAfterAtLeastOneSepWalker extends AbstractNextTerminalAf
             if (firstAfterfirstAfterAtLeastOneSep instanceof gast.Terminal) {
                 this.result.token =
                     firstAfterfirstAfterAtLeastOneSep.terminalType
-                this.result.occurrence =
-                    firstAfterfirstAfterAtLeastOneSep.occurrenceInParent
+                this.result.occurrence = firstAfterfirstAfterAtLeastOneSep.idx
             }
         } else {
             super.walkAtLeastOneSep(atleastOneSepProd, currRest, prevRest)
@@ -412,7 +411,7 @@ export function nextPossibleTokensAfter(
                 // IGNORE ABOVE ELSE
                 result.push({
                     nextTokenType: prod.terminalType,
-                    nextTokenOccurrence: prod.occurrenceInParent,
+                    nextTokenOccurrence: prod.idx,
                     ruleStack: currRuleStack,
                     occurrenceStack: currOccurrenceStack
                 })
@@ -426,7 +425,7 @@ export function nextPossibleTokensAfter(
             newRuleStack.push(prod.nonTerminalName)
 
             let newOccurrenceStack = cloneArr(currOccurrenceStack)
-            newOccurrenceStack.push(prod.occurrenceInParent)
+            newOccurrenceStack.push(prod.idx)
 
             let nextPath = {
                 idx: currIdx,
@@ -461,7 +460,7 @@ export function nextPossibleTokensAfter(
             // TODO:(THE NEW operators here take a while...) (convert once?)
             let secondIteration = new gast.Repetition({
                 definition: prod.definition,
-                occurrenceInParent: prod.occurrenceInParent
+                idx: prod.idx
             })
             let nextDef = prod.definition.concat(
                 [secondIteration],
@@ -481,7 +480,7 @@ export function nextPossibleTokensAfter(
             })
             let secondIteration = new gast.Repetition({
                 definition: [<any>separatorGast].concat(prod.definition),
-                occurrenceInParent: prod.occurrenceInParent
+                idx: prod.idx
             })
             let nextDef = prod.definition.concat(
                 [secondIteration],
@@ -511,7 +510,7 @@ export function nextPossibleTokensAfter(
             })
             let nthRepetition = new gast.Repetition({
                 definition: [<any>separatorGast].concat(prod.definition),
-                occurrenceInParent: prod.occurrenceInParent
+                idx: prod.idx
             })
             let nextDef = prod.definition.concat([nthRepetition], drop(currDef))
             let nextPathWith = {
@@ -536,7 +535,7 @@ export function nextPossibleTokensAfter(
             // TODO: an empty repetition will cause infinite loops here, will the parser detect this in selfAnalysis?
             let nthRepetition = new gast.Repetition({
                 definition: prod.definition,
-                occurrenceInParent: prod.occurrenceInParent
+                idx: prod.idx
             })
             let nextDef = prod.definition.concat([nthRepetition], drop(currDef))
             let nextPathWith = {

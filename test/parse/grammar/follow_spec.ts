@@ -25,7 +25,7 @@ describe("The Grammar Ast Follows model", () => {
         expect(actual).to.equal("IdentTok1_~IN~_")
 
         let terminal2 = new Terminal({ terminalType: EntityTok })
-        terminal2.occurrenceInParent = 3
+        terminal2.idx = 3
         let actual2 = buildInProdFollowPrefix(terminal2)
         expect(actual2).to.equal("EntityTok3_~IN~_")
     })

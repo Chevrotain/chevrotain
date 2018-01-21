@@ -171,7 +171,7 @@ function buildRefProd(prodRange: IProdRange): gast.NonTerminal {
     let refProdName = reResult[2]
     let newRef = new gast.NonTerminal({
         nonTerminalName: refProdName,
-        occurrenceInParent: refOccurrence
+        idx: refOccurrence
     })
     return newRef
 }
@@ -190,7 +190,7 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
 
     let newTerminal = new gast.Terminal({
         terminalType: terminalType,
-        occurrenceInParent: terminalOccurrence
+        idx: terminalOccurrence
     })
     return newTerminal
 }
@@ -208,9 +208,7 @@ function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
 ): T {
     let reResult = regEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
-    prodInstance.occurrenceInParent = isImplicitOccurrenceIdx
-        ? 0
-        : parseInt(reResult[1], 10)
+    prodInstance.idx = isImplicitOccurrenceIdx ? 0 : parseInt(reResult[1], 10)
 
     let nestedName = reResult[2]
     if (!isUndefined(nestedName)) {
@@ -286,7 +284,7 @@ function buildRepetitionWithSep(
     let repetitionInstance: any = new (<any>repConstructor)({
         definition: [],
         separator: separatorType,
-        occurrenceInParent: occurrenceIdx
+        idx: occurrenceIdx
     })
     repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     let nestedName = reResult[2]

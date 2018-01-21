@@ -62,13 +62,13 @@ describe("the grammar validations", () => {
         let qualifiedNameErr1 = new Rule({
             name: "qualifiedNameErr1",
             definition: [
-                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 }),
+                new Terminal({ terminalType: IdentTok, idx: 1 }),
                 new Repetition({
                     definition: [
                         new Terminal({ terminalType: DotTok }),
                         new Terminal({
                             terminalType: IdentTok,
-                            occurrenceInParent: 1
+                            idx: 1
                         }) // duplicate Terminal IdentTok with occurrence index 1
                     ]
                 })
@@ -78,13 +78,13 @@ describe("the grammar validations", () => {
         let qualifiedNameErr2 = new Rule({
             name: "qualifiedNameErr2",
             definition: [
-                new Terminal({ terminalType: IdentTok, occurrenceInParent: 1 }),
+                new Terminal({ terminalType: IdentTok, idx: 1 }),
                 new Repetition({
                     definition: [
                         new Terminal({ terminalType: DotTok }),
                         new Terminal({
                             terminalType: IdentTok,
-                            occurrenceInParent: 2
+                            idx: 2
                         })
                     ]
                 }),
@@ -93,7 +93,7 @@ describe("the grammar validations", () => {
                         new Terminal({ terminalType: DotTok }),
                         new Terminal({
                             terminalType: IdentTok,
-                            occurrenceInParent: 2
+                            idx: 2
                         })
                     ]
                 })
@@ -197,7 +197,7 @@ describe("identifyProductionForDuplicates function", () => {
 
     it("generates DSL code for a OPTION", () => {
         let dslCode = identifyProductionForDuplicates(
-            new Option({ definition: [], occurrenceInParent: 3 })
+            new Option({ definition: [], idx: 3 })
         )
         expect(dslCode).to.equal("OPTION_#_3_#_")
     })
@@ -211,21 +211,21 @@ describe("identifyProductionForDuplicates function", () => {
 
     it("generates DSL code for a MANY", () => {
         let dslCode = identifyProductionForDuplicates(
-            new Repetition({ definition: [], occurrenceInParent: 5 })
+            new Repetition({ definition: [], idx: 5 })
         )
         expect(dslCode).to.equal("MANY_#_5_#_")
     })
 
     it("generates DSL code for a OR", () => {
         let dslCode = identifyProductionForDuplicates(
-            new Alternation({ definition: [], occurrenceInParent: 1 })
+            new Alternation({ definition: [], idx: 1 })
         )
         expect(dslCode).to.equal("OR_#_1_#_")
     })
 
     it("generates DSL code for a Terminal", () => {
         let dslCode = identifyProductionForDuplicates(
-            new Terminal({ terminalType: IdentTok, occurrenceInParent: 4 })
+            new Terminal({ terminalType: IdentTok, idx: 4 })
         )
         expect(dslCode).to.equal("CONSUME_#_4_#_IdentTok")
     })

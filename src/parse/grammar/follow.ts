@@ -35,10 +35,8 @@ export class ResyncFollowsWalker extends RestWalker {
         prevRest: gast.IProduction[]
     ): void {
         let followName =
-            buildBetweenProdsFollowPrefix(
-                refProd.referencedRule,
-                refProd.occurrenceInParent
-            ) + this.topProd.name
+            buildBetweenProdsFollowPrefix(refProd.referencedRule, refProd.idx) +
+            this.topProd.name
         let fullRest: gast.IProduction[] = currRest.concat(prevRest)
         let restProd = new gast.Flat({ definition: fullRest })
         let t_in_topProd_follows = first(restProd)
@@ -67,5 +65,5 @@ export function buildBetweenProdsFollowPrefix(
 
 export function buildInProdFollowPrefix(terminal: gast.Terminal): string {
     let terminalName = tokenName(terminal.terminalType)
-    return terminalName + terminal.occurrenceInParent + IN
+    return terminalName + terminal.idx + IN
 }
