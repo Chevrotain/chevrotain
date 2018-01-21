@@ -1,8 +1,8 @@
-import { gast } from "../parse/grammar/gast_public"
 import { VERSION } from "../version"
+import { ISerializedGast } from "../parse/grammar/gast/gast_public"
 
 export function createSyntaxDiagramsCode(
-    grammar: gast.ISerializedGast[],
+    grammar: ISerializedGast[],
     {
         resourceBase = `https://unpkg.com/chevrotain@${VERSION}/diagrams/`,
         css = `https://unpkg.com/chevrotain@${VERSION}/diagrams/diagrams.css`

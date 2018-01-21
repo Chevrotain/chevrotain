@@ -4,22 +4,23 @@ import {
     IParserUnresolvedRefDefinitionError,
     ParserDefinitionErrorType
 } from "../parser_public"
-import { gast } from "./gast_public"
 import { forEach } from "../../utils/utils"
+import { NonTerminal, Rule } from "./gast/gast_public"
+import { GAstVisitor } from "./gast/gast_visitor_public"
 
 export function resolveGrammar(
-    topLevels: HashTable<gast.Rule>
+    topLevels: HashTable<Rule>
 ): IParserDefinitionError[] {
     let refResolver = new GastRefResolverVisitor(topLevels)
     refResolver.resolveRefs()
     return refResolver.errors
 }
 
-export class GastRefResolverVisitor extends gast.GAstVisitor {
+export class GastRefResolverVisitor extends GAstVisitor {
     public errors: IParserUnresolvedRefDefinitionError[] = []
-    private currTopLevel: gast.Rule
+    private currTopLevel: Rule
 
-    constructor(private nameToTopRule: HashTable<gast.Rule>) {
+    constructor(private nameToTopRule: HashTable<Rule>) {
         super()
     }
 
@@ -30,7 +31,7 @@ export class GastRefResolverVisitor extends gast.GAstVisitor {
         })
     }
 
-    public visitNonTerminal(node: gast.NonTerminal): void {
+    public visitNonTerminal(node: NonTerminal): void {
         let ref = this.nameToTopRule.get(node.nonTerminalName)
 
         if (!ref) {

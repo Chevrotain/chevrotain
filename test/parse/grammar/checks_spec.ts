@@ -4,7 +4,6 @@ import {
     ParserDefinitionErrorType
 } from "../../../src/parse/parser_public"
 import { actionDec, DotTok, IdentTok, qualifiedName } from "./samples"
-import { gast } from "../../../src/parse/grammar/gast_public"
 import {
     getFirstNoneTerminal,
     identifyProductionForDuplicates,
@@ -17,15 +16,16 @@ import {
 } from "../../../src/parse/grammar/checks"
 import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { first, forEach, map } from "../../../src/utils/utils"
-
-let Rule = gast.Rule
-let RepetitionMandatory = gast.RepetitionMandatory
-let Repetition = gast.Repetition
-let NonTerminal = gast.NonTerminal
-let Terminal = gast.Terminal
-let Option = gast.Option
-let Alternation = gast.Alternation
-let Flat = gast.Flat
+import {
+    Repetition,
+    Rule,
+    Terminal,
+    Option,
+    Alternation,
+    RepetitionMandatory,
+    Flat,
+    NonTerminal
+} from "../../../src/parse/grammar/gast/gast_public"
 
 describe("the grammar validations", () => {
     it("validates every one of the TOP_RULEs in the input", () => {

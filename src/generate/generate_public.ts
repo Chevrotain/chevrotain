@@ -1,6 +1,6 @@
-import { gast } from "../parse/grammar/gast_public"
 import { IParserConfig, Parser, TokenVocabulary } from "../parse/parser_public"
 import { genUmdModule, genWrapperFunction } from "./generate"
+import { Rule } from "../parse/grammar/gast/gast_public"
 
 export namespace generation {
     /**
@@ -17,7 +17,7 @@ export namespace generation {
      */
     export function genParserFactory<T extends Parser>(options: {
         name: string
-        rules: gast.Rule[]
+        rules: Rule[]
         tokenVocabulary: TokenVocabulary
     }): (config?: IParserConfig) => T {
         const wrapperText = genWrapperFunction({
@@ -51,7 +51,7 @@ export namespace generation {
      */
     export function generateParserModule(options: {
         name: string
-        rules: gast.Rule[]
+        rules: Rule[]
     }): string {
         return genUmdModule({ name: options.name, rules: options.rules })
     }

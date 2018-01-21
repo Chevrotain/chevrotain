@@ -8,7 +8,6 @@ import {
     forEach,
     has
 } from "../../utils/utils"
-import { gast } from "./gast_public"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
 import {
@@ -22,6 +21,20 @@ import {
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
 } from "../../scan/tokens"
+import {
+    AbstractProduction,
+    Alternation,
+    Flat,
+    IProduction,
+    IProductionWithOccurrence,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule
+} from "./gast/gast_public"
+import { GAstVisitor } from "./gast/gast_visitor_public"
 
 export enum PROD_TYPE {
     OPTION,
@@ -32,18 +45,18 @@ export enum PROD_TYPE {
     ALTERNATION
 }
 
-export function getProdType(prod: gast.IProduction): PROD_TYPE {
-    if (prod instanceof gast.Option) {
+export function getProdType(prod: IProduction): PROD_TYPE {
+    if (prod instanceof Option) {
         return PROD_TYPE.OPTION
-    } else if (prod instanceof gast.Repetition) {
+    } else if (prod instanceof Repetition) {
         return PROD_TYPE.REPETITION
-    } else if (prod instanceof gast.RepetitionMandatory) {
+    } else if (prod instanceof RepetitionMandatory) {
         return PROD_TYPE.REPETITION_MANDATORY
-    } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+    } else if (prod instanceof RepetitionMandatoryWithSeparator) {
         return PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
-    } else if (prod instanceof gast.RepetitionWithSeparator) {
+    } else if (prod instanceof RepetitionWithSeparator) {
         return PROD_TYPE.REPETITION_WITH_SEPARATOR
-    } else if (prod instanceof gast.Alternation) {
+    } else if (prod instanceof Alternation) {
         return PROD_TYPE.ALTERNATION
     } else {
         /* istanbul ignore next */
@@ -53,7 +66,7 @@ export function getProdType(prod: gast.IProduction): PROD_TYPE {
 
 export function buildLookaheadFuncForOr(
     occurrence: number,
-    ruleGrammar: gast.Rule,
+    ruleGrammar: Rule,
     k: number,
     hasPredicates: boolean,
     dynamicTokensEnabled: boolean,
@@ -87,7 +100,7 @@ export function buildLookaheadFuncForOr(
  */
 export function buildLookaheadFuncForOptionalProd(
     occurrence: number,
-    ruleGrammar: gast.Rule,
+    ruleGrammar: Rule,
     k: number,
     dynamicTokensEnabled: boolean,
     prodType: PROD_TYPE,
@@ -304,26 +317,26 @@ export function buildSingleAlternativeLookaheadFunction(
 }
 
 class RestDefinitionFinderWalker extends RestWalker {
-    private restDef: gast.IProduction[]
+    private restDef: IProduction[]
 
     constructor(
-        private topProd: gast.Rule,
+        private topProd: Rule,
         private targetOccurrence: number,
         private targetProdType: PROD_TYPE
     ) {
         super()
     }
 
-    startWalking(): gast.IProduction[] {
+    startWalking(): IProduction[] {
         this.walk(this.topProd)
         return this.restDef
     }
 
     private checkIsTarget(
-        node: gast.AbstractProduction & gast.IProductionWithOccurrence,
+        node: AbstractProduction & IProductionWithOccurrence,
         expectedProdType: PROD_TYPE,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): boolean {
         if (
             node.idx === this.targetOccurrence &&
@@ -337,9 +350,9 @@ class RestDefinitionFinderWalker extends RestWalker {
     }
 
     walkOption(
-        optionProd: gast.Option,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        optionProd: Option,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         if (
             !this.checkIsTarget(
@@ -354,9 +367,9 @@ class RestDefinitionFinderWalker extends RestWalker {
     }
 
     walkAtLeastOne(
-        atLeastOneProd: gast.RepetitionMandatory,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        atLeastOneProd: RepetitionMandatory,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         if (
             !this.checkIsTarget(
@@ -371,9 +384,9 @@ class RestDefinitionFinderWalker extends RestWalker {
     }
 
     walkAtLeastOneSep(
-        atLeastOneSepProd: gast.RepetitionMandatoryWithSeparator,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        atLeastOneSepProd: RepetitionMandatoryWithSeparator,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         if (
             !this.checkIsTarget(
@@ -388,9 +401,9 @@ class RestDefinitionFinderWalker extends RestWalker {
     }
 
     walkMany(
-        manyProd: gast.Repetition,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        manyProd: Repetition,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         if (
             !this.checkIsTarget(
@@ -405,9 +418,9 @@ class RestDefinitionFinderWalker extends RestWalker {
     }
 
     walkManySep(
-        manySepProd: gast.RepetitionWithSeparator,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        manySepProd: RepetitionWithSeparator,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         if (
             !this.checkIsTarget(
@@ -425,8 +438,8 @@ class RestDefinitionFinderWalker extends RestWalker {
 /**
  * Returns the definition of a target production in a top level level rule.
  */
-class InsideDefinitionFinderVisitor extends gast.GAstVisitor {
-    public result: gast.IProduction[] = []
+class InsideDefinitionFinderVisitor extends GAstVisitor {
+    public result: IProduction[] = []
 
     constructor(
         private targetOccurrence: number,
@@ -436,7 +449,7 @@ class InsideDefinitionFinderVisitor extends gast.GAstVisitor {
     }
 
     private checkIsTarget(
-        node: gast.AbstractProduction & gast.IProductionWithOccurrence,
+        node: AbstractProduction & IProductionWithOccurrence,
         expectedProdName: PROD_TYPE
     ): void {
         if (
@@ -447,37 +460,35 @@ class InsideDefinitionFinderVisitor extends gast.GAstVisitor {
         }
     }
 
-    public visitOption(node: gast.Option): void {
+    public visitOption(node: Option): void {
         this.checkIsTarget(node, PROD_TYPE.OPTION)
     }
 
-    public visitRepetition(node: gast.Repetition): void {
+    public visitRepetition(node: Repetition): void {
         this.checkIsTarget(node, PROD_TYPE.REPETITION)
     }
 
-    public visitRepetitionMandatory(node: gast.RepetitionMandatory): void {
+    public visitRepetitionMandatory(node: RepetitionMandatory): void {
         this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY)
     }
 
     public visitRepetitionMandatoryWithSeparator(
-        node: gast.RepetitionMandatoryWithSeparator
+        node: RepetitionMandatoryWithSeparator
     ): void {
         this.checkIsTarget(node, PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR)
     }
 
-    public visitRepetitionWithSeparator(
-        node: gast.RepetitionWithSeparator
-    ): void {
+    public visitRepetitionWithSeparator(node: RepetitionWithSeparator): void {
         this.checkIsTarget(node, PROD_TYPE.REPETITION_WITH_SEPARATOR)
     }
 
-    public visitAlternation(node: gast.Alternation): void {
+    public visitAlternation(node: Alternation): void {
         this.checkIsTarget(node, PROD_TYPE.ALTERNATION)
     }
 }
 
 export function lookAheadSequenceFromAlternatives(
-    altsDefs: gast.IProduction[],
+    altsDefs: IProduction[],
     k: number
 ): lookAheadSequence[] {
     function getOtherPaths(pathsAndSuffixes, filterIdx): TokenType[][] {
@@ -571,7 +582,7 @@ export function lookAheadSequenceFromAlternatives(
 
 export function getLookaheadPathsForOr(
     occurrence: number,
-    ruleGrammar: gast.Rule,
+    ruleGrammar: Rule,
     k: number
 ): lookAheadSequence[] {
     let visitor = new InsideDefinitionFinderVisitor(
@@ -584,7 +595,7 @@ export function getLookaheadPathsForOr(
 
 export function getLookaheadPathsForOptionalProd(
     occurrence: number,
-    ruleGrammar: gast.Rule,
+    ruleGrammar: Rule,
     prodType: PROD_TYPE,
     k: number
 ): lookAheadSequence[] {
@@ -602,8 +613,8 @@ export function getLookaheadPathsForOptionalProd(
     )
     let afterDef = afterDefWalker.startWalking()
 
-    let insideFlat = new gast.Flat({ definition: insideDef })
-    let afterFlat = new gast.Flat({ definition: afterDef })
+    let insideFlat = new Flat({ definition: insideDef })
+    let afterFlat = new Flat({ definition: afterDef })
 
     return lookAheadSequenceFromAlternatives([insideFlat, afterFlat], k)
 }

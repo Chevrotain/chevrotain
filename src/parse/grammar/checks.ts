@@ -21,10 +21,8 @@ import {
     IParserEmptyAlternativeDefinitionError,
     ParserDefinitionErrorType
 } from "../parser_public"
-import { gast } from "./gast_public"
-import { getProductionDslName, isOptionalProd } from "./gast"
+import { getProductionDslName, isOptionalProd } from "./gast/gast"
 import { tokenLabel, tokenName } from "../../scan/tokens_public"
-import { first } from "./first"
 import {
     Alternative,
     containsPath,
@@ -37,9 +35,24 @@ import { VERSION } from "../../version"
 import { TokenType } from "../../scan/lexer_public"
 import { NamedDSLMethodsCollectorVisitor } from "../cst/cst"
 import { nextPossibleTokensAfter } from "./interpreter"
+import {
+    Alternation,
+    Flat,
+    IProduction,
+    IProductionWithOccurrence,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal
+} from "./gast/gast_public"
+import { GAstVisitor } from "./gast/gast_visitor_public"
 
 export function validateGrammar(
-    topLevels: gast.Rule[],
+    topLevels: Rule[],
     maxLookahead: number,
     tokens: TokenType[],
     ignoredIssues: IgnoredParserIssues
@@ -103,9 +116,7 @@ export function validateGrammar(
     )
 }
 
-function validateNestedRulesNames(
-    topLevels: gast.Rule[]
-): IParserDefinitionError[] {
+function validateNestedRulesNames(topLevels: Rule[]): IParserDefinitionError[] {
     let result = []
     forEach(topLevels, curTopLevel => {
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
@@ -126,7 +137,7 @@ function validateNestedRulesNames(
 }
 
 function validateDuplicateProductions(
-    topLevelRule: gast.Rule
+    topLevelRule: Rule
 ): IParserDuplicatesDefinitionError[] {
     let collectorVisitor = new OccurrenceValidationCollector()
     topLevelRule.accept(collectorVisitor)
@@ -167,7 +178,7 @@ function validateDuplicateProductions(
 }
 
 function createDuplicatesErrorMessage(
-    duplicateProds: gast.IProductionWithOccurrence[],
+    duplicateProds: IProductionWithOccurrence[],
     topLevelName
 ): string {
     let firstProd = utils.first(duplicateProds)
@@ -202,63 +213,59 @@ function createDuplicatesErrorMessage(
 }
 
 export function identifyProductionForDuplicates(
-    prod: gast.IProductionWithOccurrence
+    prod: IProductionWithOccurrence
 ): string {
     return `${getProductionDslName(prod)}_#_${
         prod.idx
     }_#_${getExtraProductionArgument(prod)}`
 }
 
-function getExtraProductionArgument(
-    prod: gast.IProductionWithOccurrence
-): string {
-    if (prod instanceof gast.Terminal) {
+function getExtraProductionArgument(prod: IProductionWithOccurrence): string {
+    if (prod instanceof Terminal) {
         return tokenName(prod.terminalType)
-    } else if (prod instanceof gast.NonTerminal) {
+    } else if (prod instanceof NonTerminal) {
         return prod.nonTerminalName
     } else {
         return ""
     }
 }
 
-export class OccurrenceValidationCollector extends gast.GAstVisitor {
-    public allProductions: gast.IProduction[] = []
+export class OccurrenceValidationCollector extends GAstVisitor {
+    public allProductions: IProduction[] = []
 
-    public visitNonTerminal(subrule: gast.NonTerminal): void {
+    public visitNonTerminal(subrule: NonTerminal): void {
         this.allProductions.push(subrule)
     }
 
-    public visitOption(option: gast.Option): void {
+    public visitOption(option: Option): void {
         this.allProductions.push(option)
     }
 
     public visitRepetitionWithSeparator(
-        manySep: gast.RepetitionWithSeparator
+        manySep: RepetitionWithSeparator
     ): void {
         this.allProductions.push(manySep)
     }
 
-    public visitRepetitionMandatory(
-        atLeastOne: gast.RepetitionMandatory
-    ): void {
+    public visitRepetitionMandatory(atLeastOne: RepetitionMandatory): void {
         this.allProductions.push(atLeastOne)
     }
 
     public visitRepetitionMandatoryWithSeparator(
-        atLeastOneSep: gast.RepetitionMandatoryWithSeparator
+        atLeastOneSep: RepetitionMandatoryWithSeparator
     ): void {
         this.allProductions.push(atLeastOneSep)
     }
 
-    public visitRepetition(many: gast.Repetition): void {
+    public visitRepetition(many: Repetition): void {
         this.allProductions.push(many)
     }
 
-    public visitAlternation(or: gast.Alternation): void {
+    public visitAlternation(or: Alternation): void {
         this.allProductions.push(or)
     }
 
-    public visitTerminal(terminal: gast.Terminal): void {
+    public visitTerminal(terminal: Terminal): void {
         this.allProductions.push(terminal)
     }
 }
@@ -365,9 +372,9 @@ export function validateRuleIsOverridden(
 }
 
 export function validateNoLeftRecursion(
-    topRule: gast.Rule,
-    currRule: gast.Rule,
-    path: gast.Rule[] = []
+    topRule: Rule,
+    currRule: Rule,
+    path: Rule[] = []
 ): IParserDefinitionError[] {
     let errors = []
     let nextNonTerminals = getFirstNoneTerminal(currRule.definition)
@@ -410,36 +417,34 @@ export function validateNoLeftRecursion(
     }
 }
 
-export function getFirstNoneTerminal(
-    definition: gast.IProduction[]
-): gast.Rule[] {
+export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     let result = []
     if (utils.isEmpty(definition)) {
         return result
     }
     let firstProd = utils.first(definition)
 
-    if (firstProd instanceof gast.NonTerminal) {
+    if (firstProd instanceof NonTerminal) {
         result.push(firstProd.referencedRule)
     } else if (
-        firstProd instanceof gast.Flat ||
-        firstProd instanceof gast.Option ||
-        firstProd instanceof gast.RepetitionMandatory ||
-        firstProd instanceof gast.RepetitionMandatoryWithSeparator ||
-        firstProd instanceof gast.RepetitionWithSeparator ||
-        firstProd instanceof gast.Repetition
+        firstProd instanceof Flat ||
+        firstProd instanceof Option ||
+        firstProd instanceof RepetitionMandatory ||
+        firstProd instanceof RepetitionMandatoryWithSeparator ||
+        firstProd instanceof RepetitionWithSeparator ||
+        firstProd instanceof Repetition
     ) {
         result = result.concat(
-            getFirstNoneTerminal(<gast.IProduction[]>firstProd.definition)
+            getFirstNoneTerminal(<IProduction[]>firstProd.definition)
         )
-    } else if (firstProd instanceof gast.Alternation) {
+    } else if (firstProd instanceof Alternation) {
         // each sub definition in alternation is a FLAT
         result = utils.flatten(
             utils.map(firstProd.definition, currSubDef =>
-                getFirstNoneTerminal((<gast.Flat>currSubDef).definition)
+                getFirstNoneTerminal((<Flat>currSubDef).definition)
             )
         )
-    } else if (firstProd instanceof gast.Terminal) {
+    } else if (firstProd instanceof Terminal) {
         // nothing to see, move along
     } else {
         /* istanbul ignore next */
@@ -456,16 +461,16 @@ export function getFirstNoneTerminal(
     }
 }
 
-class OrCollector extends gast.GAstVisitor {
+class OrCollector extends GAstVisitor {
     public alternations = []
 
-    public visitAlternation(node: gast.Alternation): void {
+    public visitAlternation(node: Alternation): void {
         this.alternations.push(node)
     }
 }
 
 export function validateEmptyOrAlternative(
-    topLevelRule: gast.Rule
+    topLevelRule: Rule
 ): IParserEmptyAlternativeDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -477,7 +482,7 @@ export function validateEmptyOrAlternative(
             let exceptLast = utils.dropRight(currOr.definition)
             let currErrors = utils.map(
                 exceptLast,
-                (currAlternative: gast.IProduction, currAltIdx) => {
+                (currAlternative: IProduction, currAltIdx) => {
                     const possibleFirstInAlt = nextPossibleTokensAfter(
                         [currAlternative],
                         [],
@@ -512,7 +517,7 @@ export function validateEmptyOrAlternative(
 }
 
 export function validateAmbiguousAlternationAlternatives(
-    topLevelRule: gast.Rule,
+    topLevelRule: Rule,
     maxLookahead: number,
     ignoredIssues: IgnoredParserIssues
 ): IParserAmbiguousAlternativesDefinitionError[] {
@@ -534,7 +539,7 @@ export function validateAmbiguousAlternationAlternatives(
 
     let errors = utils.reduce(
         ors,
-        (result, currOr: gast.Alternation) => {
+        (result, currOr: Alternation) => {
             let currOccurrence = currOr.idx
             let alternatives = getLookaheadPathsForOr(
                 currOccurrence,
@@ -560,34 +565,32 @@ export function validateAmbiguousAlternationAlternatives(
     return errors
 }
 
-export class RepetionCollector extends gast.GAstVisitor {
-    public allProductions: gast.IProduction[] = []
+export class RepetionCollector extends GAstVisitor {
+    public allProductions: IProduction[] = []
 
     public visitRepetitionWithSeparator(
-        manySep: gast.RepetitionWithSeparator
+        manySep: RepetitionWithSeparator
     ): void {
         this.allProductions.push(manySep)
     }
 
-    public visitRepetitionMandatory(
-        atLeastOne: gast.RepetitionMandatory
-    ): void {
+    public visitRepetitionMandatory(atLeastOne: RepetitionMandatory): void {
         this.allProductions.push(atLeastOne)
     }
 
     public visitRepetitionMandatoryWithSeparator(
-        atLeastOneSep: gast.RepetitionMandatoryWithSeparator
+        atLeastOneSep: RepetitionMandatoryWithSeparator
     ): void {
         this.allProductions.push(atLeastOneSep)
     }
 
-    public visitRepetition(many: gast.Repetition): void {
+    public visitRepetition(many: Repetition): void {
         this.allProductions.push(many)
     }
 }
 
 export function validateTooManyAlts(
-    topLevelRule: gast.Rule
+    topLevelRule: Rule
 ): IParserDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -618,7 +621,7 @@ export function validateTooManyAlts(
 }
 
 export function validateSomeNonEmptyLookaheadPath(
-    topLevelRules: gast.Rule[],
+    topLevelRules: Rule[],
     maxLookahead: number
 ): IParserDefinitionError[] {
     let errors = []
@@ -665,7 +668,7 @@ export interface IAmbiguityDescriptor {
 
 function checkAlternativesAmbiguities(
     alternatives: Alternative[],
-    alternation: gast.Alternation,
+    alternation: Alternation,
     topRuleName: string
 ): IParserAmbiguousAlternativesDefinitionError[] {
     let foundAmbiguousPaths = []
@@ -742,7 +745,7 @@ function checkAlternativesAmbiguities(
 
 function checkPrefixAlternativesAmbiguities(
     alternatives: Alternative[],
-    alternation: gast.Alternation,
+    alternation: Alternation,
     ruleName
 ): IAmbiguityDescriptor[] {
     let errors = []
@@ -835,7 +838,7 @@ function checkTerminalAndNoneTerminalsNameSpace(
 }
 
 function validateDuplicateNestedRules(
-    topLevelRules: gast.Rule[]
+    topLevelRules: Rule[]
 ): IParserDefinitionError[] {
     let errors = []
 

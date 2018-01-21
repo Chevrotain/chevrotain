@@ -4,10 +4,10 @@
 
 import { IParserDefinitionError } from "./parser_public"
 import { HashTable } from "../lang/lang_extensions"
-import { gast } from "./grammar/gast_public"
 import { IFirstAfterRepetition } from "./grammar/interpreter"
 import { filter, forEach, values } from "../utils/utils"
 import { TokenType } from "../scan/lexer_public"
+import { Rule } from "./grammar/gast/gast_public"
 
 export let CLASS_TO_DEFINITION_ERRORS = new HashTable<
     IParserDefinitionError[]
@@ -15,11 +15,9 @@ export let CLASS_TO_DEFINITION_ERRORS = new HashTable<
 
 export let CLASS_TO_SELF_ANALYSIS_DONE = new HashTable<boolean>()
 
-export let CLASS_TO_GRAMMAR_PRODUCTIONS = new HashTable<HashTable<gast.Rule>>()
+export let CLASS_TO_GRAMMAR_PRODUCTIONS = new HashTable<HashTable<Rule>>()
 
-export function getProductionsForClass(
-    className: string
-): HashTable<gast.Rule> {
+export function getProductionsForClass(className: string): HashTable<Rule> {
     return getFromNestedHashTable(className, CLASS_TO_GRAMMAR_PRODUCTIONS)
 }
 

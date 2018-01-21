@@ -1,33 +1,43 @@
-import { gast } from "./gast_public"
 import { drop, forEach } from "../../utils/utils"
+import {
+    AbstractProduction,
+    Alternation,
+    Flat,
+    IProduction,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Terminal
+} from "./gast/gast_public"
 
 /**
  *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.
  */
 export abstract class RestWalker {
-    walk(prod: gast.AbstractProduction, prevRest: any[] = []): void {
-        forEach(prod.definition, (subProd: gast.IProduction, index) => {
+    walk(prod: AbstractProduction, prevRest: any[] = []): void {
+        forEach(prod.definition, (subProd: IProduction, index) => {
             let currRest = drop(prod.definition, index + 1)
 
-            if (subProd instanceof gast.NonTerminal) {
+            if (subProd instanceof NonTerminal) {
                 this.walkProdRef(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.Terminal) {
+            } else if (subProd instanceof Terminal) {
                 this.walkTerminal(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.Flat) {
+            } else if (subProd instanceof Flat) {
                 this.walkFlat(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.Option) {
+            } else if (subProd instanceof Option) {
                 this.walkOption(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.RepetitionMandatory) {
+            } else if (subProd instanceof RepetitionMandatory) {
                 this.walkAtLeastOne(subProd, currRest, prevRest)
-            } else if (
-                subProd instanceof gast.RepetitionMandatoryWithSeparator
-            ) {
+            } else if (subProd instanceof RepetitionMandatoryWithSeparator) {
                 this.walkAtLeastOneSep(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.RepetitionWithSeparator) {
+            } else if (subProd instanceof RepetitionWithSeparator) {
                 this.walkManySep(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.Repetition) {
+            } else if (subProd instanceof Repetition) {
                 this.walkMany(subProd, currRest, prevRest)
-            } else if (subProd instanceof gast.Alternation) {
+            } else if (subProd instanceof Alternation) {
                 this.walkOr(subProd, currRest, prevRest)
             } else {
                 /* istanbul ignore next */
@@ -37,21 +47,21 @@ export abstract class RestWalker {
     }
 
     walkTerminal(
-        terminal: gast.Terminal,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        terminal: Terminal,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {}
 
     walkProdRef(
-        refProd: gast.NonTerminal,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        refProd: NonTerminal,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {}
 
     walkFlat(
-        flatProd: gast.Flat,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        flatProd: Flat,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABCDEF => after the D the rest is EF
         let fullOrRest = currRest.concat(prevRest)
@@ -59,9 +69,9 @@ export abstract class RestWalker {
     }
 
     walkOption(
-        optionProd: gast.Option,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        optionProd: Option,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABC(DE)?F => after the (DE)? the rest is F
         let fullOrRest = currRest.concat(prevRest)
@@ -69,21 +79,21 @@ export abstract class RestWalker {
     }
 
     walkAtLeastOne(
-        atLeastOneProd: gast.RepetitionMandatory,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        atLeastOneProd: RepetitionMandatory,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABC(DE)+F => after the (DE)+ the rest is (DE)?F
-        let fullAtLeastOneRest: gast.IProduction[] = [
-            new gast.Option({ definition: atLeastOneProd.definition })
+        let fullAtLeastOneRest: IProduction[] = [
+            new Option({ definition: atLeastOneProd.definition })
         ].concat(<any>currRest, <any>prevRest)
         this.walk(atLeastOneProd, fullAtLeastOneRest)
     }
 
     walkAtLeastOneSep(
-        atLeastOneSepProd: gast.RepetitionMandatoryWithSeparator,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        atLeastOneSepProd: RepetitionMandatoryWithSeparator,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABC DE(,DE)* F => after the (,DE)+ the rest is (,DE)?F
         let fullAtLeastOneSepRest = restForRepetitionWithSeparator(
@@ -95,21 +105,21 @@ export abstract class RestWalker {
     }
 
     walkMany(
-        manyProd: gast.Repetition,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        manyProd: Repetition,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABC(DE)*F => after the (DE)* the rest is (DE)?F
-        let fullManyRest: gast.IProduction[] = [
-            new gast.Option({ definition: manyProd.definition })
+        let fullManyRest: IProduction[] = [
+            new Option({ definition: manyProd.definition })
         ].concat(<any>currRest, <any>prevRest)
         this.walk(manyProd, fullManyRest)
     }
 
     walkManySep(
-        manySepProd: gast.RepetitionWithSeparator,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        manySepProd: RepetitionWithSeparator,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABC (DE(,DE)*)? F => after the (,DE)* the rest is (,DE)?F
         let fullManySepRest = restForRepetitionWithSeparator(
@@ -121,9 +131,9 @@ export abstract class RestWalker {
     }
 
     walkOr(
-        orProd: gast.Alternation,
-        currRest: gast.IProduction[],
-        prevRest: gast.IProduction[]
+        orProd: Alternation,
+        currRest: IProduction[],
+        prevRest: IProduction[]
     ): void {
         // ABC(D|E|F)G => when finding the (D|E|F) the rest is G
         let fullOrRest = currRest.concat(prevRest)
@@ -132,7 +142,7 @@ export abstract class RestWalker {
             // wrapping each alternative in a single definition wrapper
             // to avoid errors in computing the rest of that alternative in the invocation to computeInProdFollows
             // (otherwise for OR([alt1,alt2]) alt2 will be considered in 'rest' of alt1
-            let prodWrapper = new gast.Flat({ definition: [alt] })
+            let prodWrapper = new Flat({ definition: [alt] })
             this.walk(prodWrapper, <any>fullOrRest)
         })
     }
@@ -140,13 +150,13 @@ export abstract class RestWalker {
 
 function restForRepetitionWithSeparator(repSepProd, currRest, prevRest) {
     let repSepRest = [
-        new gast.Option({
+        new Option({
             definition: [
-                new gast.Terminal({ terminalType: repSepProd.separator })
+                new Terminal({ terminalType: repSepProd.separator })
             ].concat(repSepProd.definition)
         })
     ]
-    let fullRepSepRest: gast.IProduction[] = repSepRest.concat(
+    let fullRepSepRest: IProduction[] = repSepRest.concat(
         <any>currRest,
         <any>prevRest
     )

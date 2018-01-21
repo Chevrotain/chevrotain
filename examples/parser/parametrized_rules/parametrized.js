@@ -15,7 +15,6 @@ var chevrotain = require("chevrotain")
 // ----------------- lexer -----------------
 var Lexer = chevrotain.Lexer
 var Parser = chevrotain.Parser
-var createToken = chevrotain.createToken
 
 class Hello {}
 Hello.PATTERN = /hello/

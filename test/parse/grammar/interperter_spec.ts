@@ -28,7 +28,6 @@ import {
     possiblePathsFrom
 } from "../../../src/parse/grammar/interpreter"
 import { createRegularToken, setEquality } from "../../utils/matchers"
-import { gast } from "../../../src/parse/grammar/gast_public"
 import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { map } from "../../../src/utils/utils"
 import { Lexer, TokenType } from "../../../src/scan/lexer_public"
@@ -37,11 +36,18 @@ import {
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
 import { Parser } from "../../../src/parse/parser_public"
-
-let RepetitionMandatory = gast.RepetitionMandatory
-let Terminal = gast.Terminal
-let Repetition = gast.Repetition
-let Rule = gast.Rule
+import {
+    Alternation,
+    Flat,
+    Repetition,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal,
+    Option,
+    RepetitionMandatory,
+    NonTerminal,
+    RepetitionMandatoryWithSeparator
+} from "../../../src/parse/grammar/gast/gast_public"
 
 describe("The Grammar Interpeter namespace", () => {
     describe("The NextAfterTokenWalker", () => {
@@ -437,21 +443,21 @@ describe("The NextTerminalAfterManyWalker", () => {
             definition: [
                 new Repetition({
                     definition: [
-                        new gast.Terminal({
+                        new Terminal({
                             terminalType: IdentTok,
                             idx: 1
                         })
                     ],
                     idx: 2
                 }),
-                new gast.Terminal({
+                new Terminal({
                     terminalType: IdentTok,
                     idx: 2
                 }),
                 new Repetition({
                     definition: [
-                        new gast.Terminal({ terminalType: DotTok }),
-                        new gast.Terminal({
+                        new Terminal({ terminalType: DotTok }),
+                        new Terminal({
                             terminalType: IdentTok,
                             idx: 3
                         })
@@ -529,7 +535,7 @@ describe("The NextTerminalAfterAtLeastOneWalker", () => {
             definition: [
                 new RepetitionMandatory({
                     definition: [
-                        new gast.Terminal({
+                        new Terminal({
                             terminalType: DotTok,
                             idx: 1
                         })
@@ -609,9 +615,9 @@ describe("The chevrotain grammar interpreter capabilities", () => {
     context("can calculate the next possible paths in a", () => {
         it("Sequence", () => {
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.Terminal({ terminalType: Beta }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Alpha }),
+                new Terminal({ terminalType: Beta }),
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -630,11 +636,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Optional", () => {
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.Option({
-                    definition: [new gast.Terminal({ terminalType: Beta })]
+                new Terminal({ terminalType: Alpha }),
+                new Option({
+                    definition: [new Terminal({ terminalType: Beta })]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -653,24 +659,22 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Alternation", () => {
             let alts = [
-                new gast.Alternation({
+                new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
+                            definition: [new Terminal({ terminalType: Alpha })]
+                        }),
+                        new Flat({
                             definition: [
-                                new gast.Terminal({ terminalType: Alpha })
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Beta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
-                                new gast.Terminal({ terminalType: Beta }),
-                                new gast.Terminal({ terminalType: Beta })
-                            ]
-                        }),
-                        new gast.Flat({
-                            definition: [
-                                new gast.Terminal({ terminalType: Beta }),
-                                new gast.Terminal({ terminalType: Alpha }),
-                                new gast.Terminal({ terminalType: Gamma })
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Gamma })
                             ]
                         })
                     ]
@@ -693,13 +697,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition", () => {
             let rep = [
-                new gast.Repetition({
+                new Repetition({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Alpha })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Alpha })
                     ]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -718,13 +722,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Mandatory Repetition", () => {
             let repMand = [
-                new gast.RepetitionMandatory({
+                new RepetitionMandatory({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Alpha })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Alpha })
                     ]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -745,14 +749,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             // same as Mandatory Repetition because currently possiblePaths only cares about
             // the first repetition.
             let rep = [
-                new gast.RepetitionWithSeparator({
+                new RepetitionWithSeparator({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Alpha })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Alpha })
                     ],
                     separator: Comma
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
             expect(
                 extractPartialPaths(possiblePathsFrom(rep, 1))
@@ -780,14 +784,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
             // same as Mandatory Repetition because currently possiblePaths only cares about
             // the first repetition.
             let repMandSep = [
-                new gast.RepetitionMandatoryWithSeparator({
+                new RepetitionMandatoryWithSeparator({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Alpha })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Alpha })
                     ],
                     separator: Comma
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -808,18 +812,18 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         })
 
         it("NonTerminal", () => {
-            let someSubRule = new gast.Rule({
+            let someSubRule = new Rule({
                 name: "blah",
-                definition: [new gast.Terminal({ terminalType: Beta })]
+                definition: [new Terminal({ terminalType: Beta })]
             })
 
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.NonTerminal({
+                new Terminal({ terminalType: Alpha }),
+                new NonTerminal({
                     nonTerminalName: "blah",
                     referencedRule: someSubRule
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -848,11 +852,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Sequence positive", () => {
             let seq = [
-                new gast.Flat({
+                new Flat({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta }),
-                        new gast.Terminal({ terminalType: Gamma })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta }),
+                        new Terminal({ terminalType: Gamma })
                     ]
                 })
             ]
@@ -894,11 +898,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Sequence negative", () => {
             let seq = [
-                new gast.Flat({
+                new Flat({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta }),
-                        new gast.Terminal({ terminalType: Gamma })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta }),
+                        new Terminal({ terminalType: Gamma })
                     ]
                 })
             ]
@@ -932,11 +936,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Optional positive", () => {
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.Option({
-                    definition: [new gast.Terminal({ terminalType: Beta })]
+                new Terminal({ terminalType: Alpha }),
+                new Option({
+                    definition: [new Terminal({ terminalType: Beta })]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             // setEquality(pluckTokenTypes(nextPossibleTokensAfter(seq, INPUT([]), tokenStructuredMatcher, 5)), [Alpha])
@@ -956,11 +960,11 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Optional Negative", () => {
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.Option({
-                    definition: [new gast.Terminal({ terminalType: Beta })]
+                new Terminal({ terminalType: Alpha }),
+                new Option({
+                    definition: [new Terminal({ terminalType: Beta })]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -991,30 +995,26 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Alternation positive", () => {
             let alts = [
-                new gast.Alternation({
+                new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
+                            definition: [new Terminal({ terminalType: Alpha })]
+                        }),
+                        new Flat({
                             definition: [
-                                new gast.Terminal({ terminalType: Alpha })
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Beta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
-                                new gast.Terminal({ terminalType: Beta }),
-                                new gast.Terminal({ terminalType: Beta })
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Gamma })
                             ]
                         }),
-                        new gast.Flat({
-                            definition: [
-                                new gast.Terminal({ terminalType: Beta }),
-                                new gast.Terminal({ terminalType: Alpha }),
-                                new gast.Terminal({ terminalType: Gamma })
-                            ]
-                        }),
-                        new gast.Flat({
-                            definition: [
-                                new gast.Terminal({ terminalType: Gamma })
-                            ]
+                        new Flat({
+                            definition: [new Terminal({ terminalType: Gamma })]
                         })
                     ]
                 })
@@ -1057,24 +1057,22 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Alternation Negative", () => {
             let alts = [
-                new gast.Alternation({
+                new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
+                            definition: [new Terminal({ terminalType: Alpha })]
+                        }),
+                        new Flat({
                             definition: [
-                                new gast.Terminal({ terminalType: Alpha })
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Beta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
-                                new gast.Terminal({ terminalType: Beta }),
-                                new gast.Terminal({ terminalType: Beta })
-                            ]
-                        }),
-                        new gast.Flat({
-                            definition: [
-                                new gast.Terminal({ terminalType: Beta }),
-                                new gast.Terminal({ terminalType: Alpha }),
-                                new gast.Terminal({ terminalType: Gamma })
+                                new Terminal({ terminalType: Beta }),
+                                new Terminal({ terminalType: Alpha }),
+                                new Terminal({ terminalType: Gamma })
                             ]
                         })
                     ]
@@ -1117,13 +1115,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition - positive", () => {
             let rep = [
-                new gast.Repetition({
+                new Repetition({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             setEquality(
@@ -1185,13 +1183,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition - negative", () => {
             let rep = [
-                new gast.Repetition({
+                new Repetition({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -1230,13 +1228,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Mandatory Repetition - positive", () => {
             let repMand = [
-                new gast.RepetitionMandatory({
+                new RepetitionMandatory({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             setEquality(
@@ -1298,13 +1296,13 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Mandatory Repetition - negative", () => {
             let repMand = [
-                new gast.RepetitionMandatory({
+                new RepetitionMandatory({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ]
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -1343,14 +1341,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition with Separator - positive", () => {
             let repSep = [
-                new gast.RepetitionWithSeparator({
+                new RepetitionWithSeparator({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ],
                     separator: Comma
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             setEquality(
@@ -1412,14 +1410,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition with Separator - negative", () => {
             let repMand = [
-                new gast.RepetitionWithSeparator({
+                new RepetitionWithSeparator({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ],
                     separator: Comma
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -1458,14 +1456,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition with Separator Mandatory - positive", () => {
             let repSep = [
-                new gast.RepetitionMandatoryWithSeparator({
+                new RepetitionMandatoryWithSeparator({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ],
                     separator: Comma
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             setEquality(
@@ -1527,14 +1525,14 @@ describe("The chevrotain grammar interpreter capabilities", () => {
 
         it("Repetition with Separator Mandatory - negative", () => {
             let repMand = [
-                new gast.RepetitionMandatoryWithSeparator({
+                new RepetitionMandatoryWithSeparator({
                     definition: [
-                        new gast.Terminal({ terminalType: Alpha }),
-                        new gast.Terminal({ terminalType: Beta })
+                        new Terminal({ terminalType: Alpha }),
+                        new Terminal({ terminalType: Beta })
                     ],
                     separator: Comma
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(
@@ -1580,18 +1578,18 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         })
 
         it("NonTerminal - positive", () => {
-            let someSubRule = new gast.Rule({
+            let someSubRule = new Rule({
                 name: "blah",
-                definition: [new gast.Terminal({ terminalType: Beta })]
+                definition: [new Terminal({ terminalType: Beta })]
             })
 
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.NonTerminal({
+                new Terminal({ terminalType: Alpha }),
+                new NonTerminal({
                     nonTerminalName: "blah",
                     referencedRule: someSubRule
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             setEquality(
@@ -1630,18 +1628,18 @@ describe("The chevrotain grammar interpreter capabilities", () => {
         })
 
         it("NonTerminal - negative", () => {
-            let someSubRule = new gast.Rule({
+            let someSubRule = new Rule({
                 name: "blah",
-                definition: [new gast.Terminal({ terminalType: Beta })]
+                definition: [new Terminal({ terminalType: Beta })]
             })
 
             let seq = [
-                new gast.Terminal({ terminalType: Alpha }),
-                new gast.NonTerminal({
+                new Terminal({ terminalType: Alpha }),
+                new NonTerminal({
                     nonTerminalName: "blah",
                     referencedRule: someSubRule
                 }),
-                new gast.Terminal({ terminalType: Gamma })
+                new Terminal({ terminalType: Gamma })
             ]
 
             expect(

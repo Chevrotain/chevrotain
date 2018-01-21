@@ -6,9 +6,7 @@ import {
 } from "./cache"
 import { exceptions } from "./exceptions_public"
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
-import { resolveGrammar } from "./grammar/resolver"
 import {
-    validateGrammar,
     validateRuleDoesNotAlreadyExist,
     validateRuleIsOverridden,
     validateRuleName
@@ -65,8 +63,7 @@ import {
     NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
 import { IN } from "./constants"
-import { gast } from "./grammar/gast_public"
-import { cloneProduction } from "./grammar/gast"
+import { cloneProduction } from "./grammar/gast/gast"
 import {
     ISyntacticContentAssistPath,
     ITokenGrammarPath
@@ -96,7 +93,15 @@ import {
     createBaseVisitorConstructorWithDefaults
 } from "./cst/cst_visitor"
 import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
-import serializeGrammar = gast.serializeGrammar
+import {
+    ISerializedGast,
+    Rule,
+    serializeGrammar
+} from "./grammar/gast/gast_public"
+import {
+    resolveGrammar,
+    validateGrammar
+} from "./grammar/gast/gast_resolver_public"
 
 export enum ParserDefinitionErrorType {
     INVALID_RULE_NAME,
@@ -463,7 +468,7 @@ export class Parser {
             cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
 
             let orgProductions = parserInstance._productions
-            let clonedProductions = new HashTable<gast.Rule>()
+            let clonedProductions = new HashTable<Rule>()
             // clone the grammar productions to support grammar inheritance. requirements:
             // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
             // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
@@ -480,18 +485,20 @@ export class Parser {
             // that way it won't be callable before the constructor has been invoked...
             definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className)
 
-            let resolverErrors = resolveGrammar(clonedProductions)
+            let resolverErrors = resolveGrammar({
+                rules: clonedProductions.values()
+            })
             definitionErrors.push.apply(definitionErrors, resolverErrors) // mutability for the win?
 
             // only perform additional grammar validations IFF no resolving errors have occurred.
             // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
             if (isEmpty(resolverErrors)) {
-                let validationErrors = validateGrammar(
-                    clonedProductions.values(),
-                    parserInstance.maxLookahead,
-                    values(parserInstance.tokensMap),
-                    parserInstance.ignoredIssues
-                )
+                let validationErrors = validateGrammar({
+                    rules: clonedProductions.values(),
+                    maxLookahead: parserInstance.maxLookahead,
+                    tokenTypes: values(parserInstance.tokensMap),
+                    ignoredIssues: parserInstance.ignoredIssues
+                })
 
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
             }
@@ -594,7 +601,7 @@ export class Parser {
      * Only used internally for storing productions as they are built for the first time.
      * The final productions should be accessed from the static cache.
      */
-    private _productions: HashTable<gast.Rule> = new HashTable<gast.Rule>()
+    private _productions: HashTable<Rule> = new HashTable<Rule>()
 
     constructor(
         input: IToken[],
@@ -791,7 +798,7 @@ export class Parser {
         return <any>cachedConstructor
     }
 
-    public getGAstProductions(): HashTable<gast.Rule> {
+    public getGAstProductions(): HashTable<Rule> {
         return cache.getProductionsForClass(this.className)
     }
 
@@ -799,7 +806,7 @@ export class Parser {
     // It is mostly used to draw the diagrams and having this method present on the parser instance
     // can avoid certain situations in which the serialization logic would fail due to multiple versions of chevrotain
     // bundled (due to multiple prototype chains and "instanceof" usage).
-    public getSerializedGastProductions(): gast.ISerializedGast[] {
+    public getSerializedGastProductions(): ISerializedGast[] {
         return serializeGrammar(
             cache.getProductionsForClass(this.className).values()
         )

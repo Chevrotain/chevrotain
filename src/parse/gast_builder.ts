@@ -1,5 +1,4 @@
 import { IRange, Range } from "../text/range"
-import { gast } from "./grammar/gast_public"
 import {
     every,
     filter,
@@ -11,7 +10,22 @@ import {
     uniq
 } from "../utils/utils"
 import { TokenType } from "../scan/lexer_public"
-import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
+import {
+    AbstractProduction,
+    Alternation,
+    Flat,
+    IOptionallyNamedProduction,
+    IProduction,
+    IProductionWithOccurrence,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal
+} from "./grammar/gast/gast_public"
 
 export enum ProdType {
     OPTION,
@@ -103,7 +117,7 @@ export function buildTopProduction(
     impelText: string,
     name: string,
     terminals: ITerminalNameToConstructor
-): gast.Rule {
+): Rule {
     // pseudo state. so little state does not yet mandate the complexity of wrapping in a class...
     // TODO: this is confusing, might be time to create a class..
     terminalNameToConstructor = terminals
@@ -124,8 +138,8 @@ function buildTopLevel(
     topRange: IRange,
     allRanges: IProdRange[],
     orgText: string
-): gast.Rule {
-    let topLevelProd = new gast.Rule({
+): Rule {
+    let topLevelProd = new Rule({
         name: name,
         definition: [],
         orgText: orgText
@@ -136,7 +150,7 @@ function buildTopLevel(
 export function buildProdGast(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.IProduction {
+): IProduction {
     ;("use strict")
     switch (prodRange.type) {
         case ProdType.AT_LEAST_ONE:
@@ -164,19 +178,19 @@ export function buildProdGast(
     }
 }
 
-function buildRefProd(prodRange: IProdRange): gast.NonTerminal {
+function buildRefProd(prodRange: IProdRange): NonTerminal {
     let reResult = refRegEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let refOccurrence = isImplicitOccurrenceIdx ? 0 : parseInt(reResult[1], 10)
     let refProdName = reResult[2]
-    let newRef = new gast.NonTerminal({
+    let newRef = new NonTerminal({
         nonTerminalName: refProdName,
         idx: refOccurrence
     })
     return newRef
 }
 
-function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
+function buildTerminalProd(prodRange: IProdRange): Terminal {
     let reResult = terminalRegEx.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let terminalOccurrence = isImplicitOccurrenceIdx
@@ -188,7 +202,7 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
         throw Error("Terminal Token name: " + terminalName + " not found")
     }
 
-    let newTerminal = new gast.Terminal({
+    let newTerminal = new Terminal({
         terminalType: terminalType,
         idx: terminalOccurrence
     })
@@ -197,8 +211,8 @@ function buildTerminalProd(prodRange: IProdRange): gast.Terminal {
 
 // http://stackoverflow.com/questions/17125764/can-you-specify-multiple-type-constraints-for-typescript-generics
 interface AbsProdWithOccurrence
-    extends gast.IProductionWithOccurrence,
-        gast.AbstractProduction {}
+    extends IProductionWithOccurrence,
+        AbstractProduction {}
 
 function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
     regEx: RegExp,
@@ -220,10 +234,10 @@ function buildProdWithOccurrence<T extends AbsProdWithOccurrence>(
 function buildAtLeastOneProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.RepetitionMandatory {
+): RepetitionMandatory {
     return buildProdWithOccurrence(
         atLeastOneRegEx,
-        new gast.RepetitionMandatory({ definition: [] }),
+        new RepetitionMandatory({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -232,11 +246,11 @@ function buildAtLeastOneProd(
 function buildAtLeastOneSepProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.RepetitionWithSeparator {
+): RepetitionWithSeparator {
     return buildRepetitionWithSep(
         prodRange,
         allRanges,
-        gast.RepetitionMandatoryWithSeparator,
+        RepetitionMandatoryWithSeparator,
         atLeastOneWithSeparatorRegEx
     )
 }
@@ -244,10 +258,10 @@ function buildAtLeastOneSepProd(
 function buildManyProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.Repetition {
+): Repetition {
     return buildProdWithOccurrence(
         manyRegEx,
-        new gast.Repetition({ definition: [] }),
+        new Repetition({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -256,11 +270,11 @@ function buildManyProd(
 function buildManySepProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.RepetitionWithSeparator {
+): RepetitionWithSeparator {
     return buildRepetitionWithSep(
         prodRange,
         allRanges,
-        gast.RepetitionWithSeparator,
+        RepetitionWithSeparator,
         manyWithSeparatorRegEx
     )
 }
@@ -270,7 +284,7 @@ function buildRepetitionWithSep(
     allRanges: IProdRange[],
     repConstructor: Function,
     regExp: RegExp
-): gast.RepetitionWithSeparator {
+): RepetitionWithSeparator {
     let reResult = regExp.exec(prodRange.text)
     let isImplicitOccurrenceIdx = reResult[1] === undefined
     let occurrenceIdx = isImplicitOccurrenceIdx ? 0 : parseInt(reResult[1], 10)
@@ -301,10 +315,10 @@ function buildRepetitionWithSep(
 function buildOptionProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.Option {
+): Option {
     return buildProdWithOccurrence(
         optionRegEx,
-        new gast.Option({ definition: [] }),
+        new Option({ definition: [] }),
         prodRange,
         allRanges
     )
@@ -313,20 +327,17 @@ function buildOptionProd(
 function buildOrProd(
     prodRange: IProdRange,
     allRanges: IProdRange[]
-): gast.Alternation {
+): Alternation {
     return buildProdWithOccurrence(
         orRegEx,
-        new gast.Alternation({ definition: [] }),
+        new Alternation({ definition: [] }),
         prodRange,
         allRanges
     )
 }
 
-function buildFlatProd(
-    prodRange: IProdRange,
-    allRanges: IProdRange[]
-): gast.Flat {
-    let prodInstance = new gast.Flat({ definition: [] })
+function buildFlatProd(prodRange: IProdRange, allRanges: IProdRange[]): Flat {
+    let prodInstance = new Flat({ definition: [] })
     let reResult = orPartRegEx.exec(prodRange.text)
 
     let nestedName = reResult[1]
@@ -336,7 +347,7 @@ function buildFlatProd(
     return buildAbstractProd(prodInstance, prodRange.range, allRanges)
 }
 
-function buildAbstractProd<T extends gast.AbstractProduction>(
+function buildAbstractProd<T extends AbstractProduction>(
     prod: T,
     topLevelRange: IRange,
     allRanges: IProdRange[]
@@ -346,7 +357,7 @@ function buildAbstractProd<T extends gast.AbstractProduction>(
         return prodRng.range.start
     })
 
-    let definition: gast.IProduction[] = []
+    let definition: IProduction[] = []
     forEach(secondLevelInOrder, prodRng => {
         definition.push(buildProdGast(prodRng, allRanges))
     })

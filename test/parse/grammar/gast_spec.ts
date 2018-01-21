@@ -1,16 +1,24 @@
-import { gast } from "../../../src/parse/grammar/gast_public"
-import { getProductionDslName } from "../../../src/parse/grammar/gast"
+import { getProductionDslName } from "../../../src/parse/grammar/gast/gast"
 import { createToken } from "../../../src/scan/tokens_public"
-import Terminal = gast.Terminal
-import NonTerminal = gast.NonTerminal
-import Flat = gast.Flat
-import serializeGrammar = gast.serializeGrammar
-import serializeProduction = gast.serializeProduction
+import {
+    Alternation,
+    NonTerminal,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    Terminal,
+    Option,
+    RepetitionWithSeparator,
+    Repetition,
+    serializeProduction,
+    Flat,
+    Rule,
+    serializeGrammar
+} from "../../../src/parse/grammar/gast/gast_public"
 
 describe("GAst namespace", () => {
     describe("the ProdRef class", () => {
         it("will always return a valid empty definition, even if it's ref is unresolved", () => {
-            let prodRef = new gast.NonTerminal({
+            let prodRef = new NonTerminal({
                 nonTerminalName: "SomeGrammarRuleName"
             })
             expect(prodRef.definition).to.be.an.instanceof(Array)
@@ -23,34 +31,34 @@ describe("GAst namespace", () => {
         }
 
         it("Terminal", () => {
-            let gastInstance = new gast.Terminal({ terminalType: Comma })
+            let gastInstance = new Terminal({ terminalType: Comma })
             expect(getProductionDslName(gastInstance)).to.equal("CONSUME")
         })
 
         it("NonTerminal", () => {
-            let gastInstance = new gast.NonTerminal({
+            let gastInstance = new NonTerminal({
                 nonTerminalName: "bamba"
             })
             expect(getProductionDslName(gastInstance)).to.equal("SUBRULE")
         })
 
         it("Option", () => {
-            let gastInstance = new gast.Option({ definition: [] })
+            let gastInstance = new Option({ definition: [] })
             expect(getProductionDslName(gastInstance)).to.equal("OPTION")
         })
 
         it("Alternation", () => {
-            let gastInstance = new gast.Alternation({ definition: [] })
+            let gastInstance = new Alternation({ definition: [] })
             expect(getProductionDslName(gastInstance)).to.equal("OR")
         })
 
         it("RepetitionMandatory", () => {
-            let gastInstance = new gast.RepetitionMandatory({ definition: [] })
+            let gastInstance = new RepetitionMandatory({ definition: [] })
             expect(getProductionDslName(gastInstance)).to.equal("AT_LEAST_ONE")
         })
 
         it("RepetitionMandatoryWithSeparator", () => {
-            let gastInstance = new gast.RepetitionMandatoryWithSeparator({
+            let gastInstance = new RepetitionMandatoryWithSeparator({
                 definition: [],
                 separator: Comma
             })
@@ -60,7 +68,7 @@ describe("GAst namespace", () => {
         })
 
         it("RepetitionWithSeparator", () => {
-            let gastInstance = new gast.RepetitionWithSeparator({
+            let gastInstance = new RepetitionWithSeparator({
                 definition: [],
                 separator: Comma
             })
@@ -68,7 +76,7 @@ describe("GAst namespace", () => {
         })
 
         it("Repetition", () => {
-            let gastInstance = new gast.Repetition({ definition: [] })
+            let gastInstance = new Repetition({ definition: [] })
             expect(getProductionDslName(gastInstance)).to.equal("MANY")
         })
     })
@@ -86,7 +94,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a NonTerminal", () => {
-            let input = new gast.NonTerminal({
+            let input = new NonTerminal({
                 nonTerminalName: "qualifiedName"
             })
             let actual = serializeProduction(input)
@@ -98,7 +106,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Flat", () => {
-            let input = new gast.Flat({
+            let input = new Flat({
                 definition: [
                     new Terminal({ terminalType: WithLiteral }),
                     new NonTerminal({ nonTerminalName: "bamba" })
@@ -125,7 +133,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Option", () => {
-            let input = new gast.Option({
+            let input = new Option({
                 definition: [
                     new Terminal({ terminalType: C }),
                     new NonTerminal({ nonTerminalName: "bamba" })
@@ -151,7 +159,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a RepetitionMandatory", () => {
-            let input = new gast.RepetitionMandatory({
+            let input = new RepetitionMandatory({
                 definition: [
                     new Terminal({ terminalType: C }),
                     new NonTerminal({ nonTerminalName: "bamba" })
@@ -177,7 +185,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a RepetitionMandatoryWithSeparator", () => {
-            let input = new gast.RepetitionMandatoryWithSeparator({
+            let input = new RepetitionMandatoryWithSeparator({
                 definition: [
                     new Terminal({ terminalType: C }),
                     new NonTerminal({ nonTerminalName: "bamba" })
@@ -210,7 +218,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Repetition", () => {
-            let input = new gast.Repetition({
+            let input = new Repetition({
                 definition: [
                     new Terminal({ terminalType: C }),
                     new NonTerminal({ nonTerminalName: "bamba" })
@@ -236,7 +244,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a RepetitionWithSeparator", () => {
-            let input = new gast.RepetitionWithSeparator({
+            let input = new RepetitionWithSeparator({
                 definition: [
                     new Terminal({ terminalType: C }),
                     new NonTerminal({ nonTerminalName: "bamba" })
@@ -269,7 +277,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Alternation", () => {
-            let input = new gast.Alternation({
+            let input = new Alternation({
                 definition: [
                     new Flat({
                         definition: [new Terminal({ terminalType: A })]
@@ -326,7 +334,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Terminal with a custom label", () => {
-            let input = new gast.Terminal({ terminalType: A })
+            let input = new Terminal({ terminalType: A })
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
                 type: "Terminal",
@@ -337,7 +345,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Terminal with a pattern", () => {
-            let input = new gast.Terminal({ terminalType: B })
+            let input = new Terminal({ terminalType: B })
             let actual = serializeProduction(input)
             expect(actual).to.deep.equal({
                 type: "Terminal",
@@ -349,7 +357,7 @@ describe("GAst namespace", () => {
         })
 
         it("can serialize a Rule", () => {
-            let input = new gast.Rule({
+            let input = new Rule({
                 name: "myRule",
                 definition: [
                     new Terminal({ terminalType: C }),
@@ -378,14 +386,14 @@ describe("GAst namespace", () => {
 
         it("can serialize an array of Rules", () => {
             let input = [
-                new gast.Rule({
+                new Rule({
                     name: "myRule",
                     definition: [
                         new Terminal({ terminalType: C }),
                         new NonTerminal({ nonTerminalName: "bamba" })
                     ]
                 }),
-                new gast.Rule({
+                new Rule({
                     name: "myRule2",
                     definition: [
                         new Terminal({ terminalType: D }),

@@ -1,4 +1,3 @@
-import { gast } from "../../../src/parse/grammar/gast_public"
 import { first } from "../../../src/parse/grammar/first"
 import {
     EntityTok,
@@ -9,11 +8,12 @@ import {
     ConstTok
 } from "./samples"
 import { setEquality } from "../../utils/matchers"
-
-let Terminal = gast.Terminal
-let Option = gast.Option
-let Alternation = gast.Alternation
-let Flat = gast.Flat
+import {
+    Flat,
+    Terminal,
+    Option,
+    Alternation
+} from "../../../src/parse/grammar/gast/gast_public"
 
 describe("The Grammar Ast first model", () => {
     it("can compute the first for a terminal", () => {

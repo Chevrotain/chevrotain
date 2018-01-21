@@ -1,13 +1,13 @@
-import { gast } from "../../../src/parse/grammar/gast_public"
 import { HashTable } from "../../../src/lang/lang_extensions"
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
 import { ParserDefinitionErrorType } from "../../../src/parse/parser_public"
+import { NonTerminal, Rule } from "../../../src/parse/grammar/gast/gast_public"
 
 describe("The RefResolverVisitor", () => {
     it("will fail when trying to resolve a ref to a grammar rule that does not exist", () => {
-        let ref = new gast.NonTerminal({ nonTerminalName: "missingRule" })
-        let topLevel = new gast.Rule({ name: "TOP", definition: [ref] })
-        let topLevelRules = new HashTable<gast.Rule>()
+        let ref = new NonTerminal({ nonTerminalName: "missingRule" })
+        let topLevel = new Rule({ name: "TOP", definition: [ref] })
+        let topLevelRules = new HashTable<Rule>()
         topLevelRules.put("TOP", topLevel)
         let resolver = new GastRefResolverVisitor(topLevelRules)
         resolver.resolveRefs()

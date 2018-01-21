@@ -1,8 +1,19 @@
-import { gast } from "../parse/grammar/gast_public"
 import { forEach, map } from "../utils/utils"
-import IProduction = gast.IProduction
 import { tokenName } from "../scan/tokens_public"
 import { TokenType } from "../scan/lexer_public"
+import {
+    RepetitionMandatory,
+    Option,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal,
+    NonTerminal,
+    Alternation,
+    Flat,
+    IProduction,
+    Repetition
+} from "../parse/grammar/gast/gast_public"
 
 /**
  * Missing features
@@ -13,10 +24,7 @@ import { TokenType } from "../scan/lexer_public"
 
 const NL = "\n"
 
-export function genUmdModule(options: {
-    name: string
-    rules: gast.Rule[]
-}): string {
+export function genUmdModule(options: { name: string; rules: Rule[] }): string {
     return `
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -44,7 +52,7 @@ return {
 
 export function genWrapperFunction(options: {
     name: string
-    rules: gast.Rule[]
+    rules: Rule[]
 }): string {
     return `    
 ${genClass(options)}
@@ -52,10 +60,7 @@ return new ${options.name}(tokenVocabulary, config)
 `
 }
 
-export function genClass(options: {
-    name: string
-    rules: gast.Rule[]
-}): string {
+export function genClass(options: { name: string; rules: Rule[] }): string {
     // TODO: how to pass the token vocabulary? Constructor? other?
     // TODO: should outputCst be enabled by default?
     let result = `
@@ -81,7 +86,7 @@ ${options.name}.prototype.constructor = ${options.name}
     return result
 }
 
-export function genAllRules(rules: gast.Rule[]): string {
+export function genAllRules(rules: Rule[]): string {
     let rulesText = map(rules, currRule => {
         return genRule(currRule, 1)
     })
@@ -89,24 +94,24 @@ export function genAllRules(rules: gast.Rule[]): string {
     return rulesText.join("\n")
 }
 
-export function genRule(prod: gast.Rule, n: number): string {
+export function genRule(prod: Rule, n: number): string {
     let result = indent(n, `$.RULE("${prod.name}", function() {`) + NL
     result += genDefinition(prod.definition, n + 1)
     result += indent(n + 1, `})`) + NL
     return result
 }
 
-export function genTerminal(prod: gast.Terminal, n: number): string {
+export function genTerminal(prod: Terminal, n: number): string {
     const name = tokenName(prod.terminalType)
     // TODO: potential performance optimization, avoid tokenMap Dictionary access
     return indent(n, `$.CONSUME${prod.idx}(this.tokensMap.${name})` + NL)
 }
 
-export function genNonTerminal(prod: gast.NonTerminal, n: number): string {
+export function genNonTerminal(prod: NonTerminal, n: number): string {
     return indent(n, `$.SUBRULE${prod.idx}($.${prod.nonTerminalName})` + NL)
 }
 
-export function genAlternation(prod: gast.Alternation, n: number): string {
+export function genAlternation(prod: Alternation, n: number): string {
     let result = indent(n, `$.OR${prod.idx}([`) + NL
     const alts = map(prod.definition, altDef => genSingleAlt(altDef, n + 1))
     result += alts.join("," + NL)
@@ -114,7 +119,7 @@ export function genAlternation(prod: gast.Alternation, n: number): string {
     return result
 }
 
-export function genSingleAlt(prod: gast.Flat, n: number): string {
+export function genSingleAlt(prod: Flat, n: number): string {
     let result = indent(n, `{`) + NL
 
     if (prod.name) {
@@ -128,22 +133,22 @@ export function genSingleAlt(prod: gast.Flat, n: number): string {
     return result
 }
 
-function genProd(prod: gast.IProduction, n: number): string {
-    if (prod instanceof gast.NonTerminal) {
+function genProd(prod: IProduction, n: number): string {
+    if (prod instanceof NonTerminal) {
         return genNonTerminal(prod, n)
-    } else if (prod instanceof gast.Option) {
+    } else if (prod instanceof Option) {
         return genDSLRule("OPTION", prod, n)
-    } else if (prod instanceof gast.RepetitionMandatory) {
+    } else if (prod instanceof RepetitionMandatory) {
         return genDSLRule("AT_LEAST_ONE", prod, n)
-    } else if (prod instanceof gast.RepetitionMandatoryWithSeparator) {
+    } else if (prod instanceof RepetitionMandatoryWithSeparator) {
         return genDSLRule("AT_LEAST_ONE_SEP", prod, n)
-    } else if (prod instanceof gast.RepetitionWithSeparator) {
+    } else if (prod instanceof RepetitionWithSeparator) {
         return genDSLRule("MANY_SEP", prod, n)
-    } else if (prod instanceof gast.Repetition) {
+    } else if (prod instanceof Repetition) {
         return genDSLRule("MANY", prod, n)
-    } else if (prod instanceof gast.Alternation) {
+    } else if (prod instanceof Alternation) {
         return genAlternation(prod, n)
-    } else if (prod instanceof gast.Terminal) {
+    } else if (prod instanceof Terminal) {
         return genTerminal(prod, n)
     } else {
         /* istanbul ignore next */
