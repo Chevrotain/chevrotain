@@ -1,6 +1,5 @@
 import { END_OF_FILE, Parser } from "../../../src/parse/parser_public"
 import { createToken, IToken } from "../../../src/scan/tokens_public"
-import { gast } from "../../../src/parse/grammar/gast_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -17,16 +16,18 @@ import {
 } from "../../../src/scan/tokens"
 import { createRegularToken } from "../../utils/matchers"
 import { TokenType } from "../../../src/scan/lexer_public"
-import Terminal = gast.Terminal
-import RepetitionMandatoryWithSeparator = gast.RepetitionMandatoryWithSeparator
-import Repetition = gast.Repetition
-import Rule = gast.Rule
-import NonTerminal = gast.NonTerminal
-import Option = gast.Option
-import RepetitionWithSeparator = gast.RepetitionWithSeparator
-import Flat = gast.Flat
-import Alternation = gast.Alternation
-import RepetitionMandatory = gast.RepetitionMandatory
+import {
+    Alternation,
+    Flat,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal
+} from "../../../src/parse/grammar/gast/gast_public"
 
 const IdentTok = createToken({ name: "IdentTok" })
 const DotTok = createToken({ name: "DotTok" })
@@ -580,15 +581,15 @@ context("lookahead specs", () => {
 
         context("computing lookahead sequences for", () => {
             it("two simple one token alternatives", () => {
-                let alt1 = new gast.Alternation({
+                let alt1 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Alpha })]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Beta })]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Beta })]
                         })
                     ]
@@ -600,21 +601,21 @@ context("lookahead specs", () => {
             })
 
             it("three simple one token alternatives", () => {
-                let alt1 = new gast.Alternation({
+                let alt1 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Alpha })]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Beta })]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Beta })]
                         })
                     ]
                 })
                 let alt2 = new Terminal({ terminalType: Gamma })
-                let alt3 = new gast.Flat({
+                let alt3 = new Flat({
                     definition: [
                         new Terminal({ terminalType: Delta }),
                         new Terminal({ terminalType: Charlie })
@@ -633,18 +634,18 @@ context("lookahead specs", () => {
             })
 
             it("two complex multi token alternatives", () => {
-                let alt1 = new gast.Alternation({
+                let alt1 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Alpha }),
                                 new Terminal({ terminalType: Beta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Beta })]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Alpha }),
                                 new Terminal({ terminalType: Gamma }),
@@ -653,15 +654,15 @@ context("lookahead specs", () => {
                         })
                     ]
                 })
-                let alt2 = new gast.Alternation({
+                let alt2 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Alpha }),
                                 new Terminal({ terminalType: Delta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Charlie })
                             ]
@@ -677,34 +678,34 @@ context("lookahead specs", () => {
             })
 
             it("three complex multi token alternatives", () => {
-                let alt1 = new gast.Alternation({
+                let alt1 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Alpha }),
                                 new Terminal({ terminalType: Beta }),
                                 new Terminal({ terminalType: Gamma })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [new Terminal({ terminalType: Beta })]
                         })
                     ]
                 })
-                let alt2 = new gast.Alternation({
+                let alt2 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Alpha }),
                                 new Terminal({ terminalType: Delta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Charlie })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Gamma }),
                                 new Terminal({ terminalType: Gamma })
@@ -712,16 +713,16 @@ context("lookahead specs", () => {
                         })
                     ]
                 })
-                let alt3 = new gast.Alternation({
+                let alt3 = new Alternation({
                     definition: [
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Alpha }),
                                 new Terminal({ terminalType: Beta }),
                                 new Terminal({ terminalType: Delta })
                             ]
                         }),
-                        new gast.Flat({
+                        new Flat({
                             definition: [
                                 new Terminal({ terminalType: Charlie }),
                                 new Terminal({ terminalType: Beta })
@@ -742,7 +743,7 @@ context("lookahead specs", () => {
             })
 
             it("two complex multi token alternatives with shared prefix", () => {
-                let alt1 = new gast.Flat({
+                let alt1 = new Flat({
                     definition: [
                         new Terminal({ terminalType: Alpha }),
                         new Terminal({ terminalType: Beta }),
@@ -751,7 +752,7 @@ context("lookahead specs", () => {
                     ]
                 })
 
-                let alt2 = new gast.Flat({
+                let alt2 = new Flat({
                     definition: [
                         new Terminal({ terminalType: Alpha }),
                         new Terminal({ terminalType: Beta }),
@@ -770,10 +771,10 @@ context("lookahead specs", () => {
             })
 
             it("simple ambiguous alternatives", () => {
-                let alt1 = new gast.Flat({
+                let alt1 = new Flat({
                     definition: [new Terminal({ terminalType: Alpha })]
                 })
-                let alt2 = new gast.Flat({
+                let alt2 = new Flat({
                     definition: [new Terminal({ terminalType: Alpha })]
                 })
 
@@ -782,7 +783,7 @@ context("lookahead specs", () => {
             })
 
             it("complex(multi-token) ambiguous alternatives", () => {
-                let alt1 = new gast.Flat({
+                let alt1 = new Flat({
                     definition: [
                         new Terminal({ terminalType: Alpha }),
                         new Terminal({ terminalType: Beta }),
@@ -790,7 +791,7 @@ context("lookahead specs", () => {
                     ]
                 })
 
-                let alt2 = new gast.Flat({
+                let alt2 = new Flat({
                     definition: [
                         new Terminal({ terminalType: Alpha }),
                         new Terminal({ terminalType: Beta }),

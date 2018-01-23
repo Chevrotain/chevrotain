@@ -1,11 +1,9 @@
 import { IToken, tokenName } from "../../scan/tokens_public"
 import { CstNode } from "./cst_public"
-import { gast } from "../grammar/gast_public"
 import {
     cloneObj,
     drop,
     forEach,
-    has,
     isEmpty,
     isUndefined,
     map
@@ -21,11 +19,20 @@ import {
     OPTION_IDX,
     OR_IDX
 } from "../grammar/keys"
-import IProduction = gast.IProduction
-import GAstVisitor = gast.GAstVisitor
-import IOptionallyNamedProduction = gast.IOptionallyNamedProduction
-import IProductionWithOccurrence = gast.IProductionWithOccurrence
-import AbstractProduction = gast.AbstractProduction
+import {
+    Alternation,
+    Flat,
+    IProduction,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal
+} from "../grammar/gast/gast_public"
+import { GAstVisitor } from "../grammar/gast/gast_visitor_public"
 
 export function addTerminalToCst(
     node: CstNode,
@@ -69,18 +76,18 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             let nameLessNode
 
             if (
-                node instanceof gast.Option ||
-                node instanceof gast.Repetition ||
-                node instanceof gast.RepetitionMandatory ||
-                node instanceof gast.Alternation
+                node instanceof Option ||
+                node instanceof Repetition ||
+                node instanceof RepetitionMandatory ||
+                node instanceof Alternation
             ) {
                 nameLessNode = new (<any>newNodeConstructor)({
                     definition: node.definition,
                     idx: node.idx
                 })
             } else if (
-                node instanceof gast.RepetitionMandatoryWithSeparator ||
-                node instanceof gast.RepetitionWithSeparator
+                node instanceof RepetitionMandatoryWithSeparator ||
+                node instanceof RepetitionWithSeparator
             ) {
                 nameLessNode = new (<any>newNodeConstructor)({
                     definition: node.definition,
@@ -101,51 +108,41 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
         }
     }
 
-    visitOption(node: gast.Option): void {
-        this.collectNamedDSLMethod(node, gast.Option, OPTION_IDX)
+    visitOption(node: Option): void {
+        this.collectNamedDSLMethod(node, Option, OPTION_IDX)
     }
 
-    visitRepetition(node: gast.Repetition): void {
-        this.collectNamedDSLMethod(node, gast.Repetition, MANY_IDX)
+    visitRepetition(node: Repetition): void {
+        this.collectNamedDSLMethod(node, Repetition, MANY_IDX)
     }
 
-    visitRepetitionMandatory(node: gast.RepetitionMandatory): void {
-        this.collectNamedDSLMethod(
-            node,
-            gast.RepetitionMandatory,
-            AT_LEAST_ONE_IDX
-        )
+    visitRepetitionMandatory(node: RepetitionMandatory): void {
+        this.collectNamedDSLMethod(node, RepetitionMandatory, AT_LEAST_ONE_IDX)
     }
 
     visitRepetitionMandatoryWithSeparator(
-        node: gast.RepetitionMandatoryWithSeparator
+        node: RepetitionMandatoryWithSeparator
     ): void {
         this.collectNamedDSLMethod(
             node,
-            gast.RepetitionMandatoryWithSeparator,
+            RepetitionMandatoryWithSeparator,
             AT_LEAST_ONE_SEP_IDX
         )
     }
 
-    visitRepetitionWithSeparator(node: gast.RepetitionWithSeparator): void {
-        this.collectNamedDSLMethod(
-            node,
-            gast.RepetitionWithSeparator,
-            MANY_SEP_IDX
-        )
+    visitRepetitionWithSeparator(node: RepetitionWithSeparator): void {
+        this.collectNamedDSLMethod(node, RepetitionWithSeparator, MANY_SEP_IDX)
     }
 
-    visitAlternation(node: gast.Alternation): void {
-        this.collectNamedDSLMethod(node, gast.Alternation, OR_IDX)
+    visitAlternation(node: Alternation): void {
+        this.collectNamedDSLMethod(node, Alternation, OR_IDX)
 
         const hasMoreThanOneAlternative = node.definition.length > 1
-        forEach(node.definition, (currFlatAlt: gast.Flat, altIdx) => {
+        forEach(node.definition, (currFlatAlt: Flat, altIdx) => {
             if (!isUndefined(currFlatAlt.name)) {
                 let def = currFlatAlt.definition
                 if (hasMoreThanOneAlternative) {
-                    def = [
-                        new gast.Option({ definition: currFlatAlt.definition })
-                    ]
+                    def = [new Option({ definition: currFlatAlt.definition })]
                 } else {
                     // mandatory
                     def = currFlatAlt.definition
@@ -167,7 +164,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
 }
 
 export function analyzeCst(
-    topRules: gast.Rule[],
+    topRules: Rule[],
     fullToShortName: HashTable<number>
 ): {
     dictDef: HashTable<Function>
@@ -247,13 +244,13 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
         }
 
         let prod = currDef[0]
-        if (prod instanceof gast.Terminal) {
+        if (prod instanceof Terminal) {
             let terminalName = tokenName(prod.terminalType)
             addSingleItemToResult(terminalName)
-        } else if (prod instanceof gast.NonTerminal) {
+        } else if (prod instanceof NonTerminal) {
             let nonTerminalName = prod.nonTerminalName
             addSingleItemToResult(nonTerminalName)
-        } else if (prod instanceof gast.Option) {
+        } else if (prod instanceof Option) {
             if (!isUndefined(prod.name)) {
                 addSingleItemToResult(prod.name)
             } else {
@@ -263,8 +260,8 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
                 possiblePaths.push(nextPathWith)
             }
         } else if (
-            prod instanceof gast.RepetitionMandatory ||
-            prod instanceof gast.Repetition
+            prod instanceof RepetitionMandatory ||
+            prod instanceof Repetition
         ) {
             if (!isUndefined(prod.name)) {
                 addSingleItemToResult(prod.name)
@@ -276,16 +273,16 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
                 possiblePaths.push(nextPath)
             }
         } else if (
-            prod instanceof gast.RepetitionMandatoryWithSeparator ||
-            prod instanceof gast.RepetitionWithSeparator
+            prod instanceof RepetitionMandatoryWithSeparator ||
+            prod instanceof RepetitionWithSeparator
         ) {
             if (!isUndefined(prod.name)) {
                 addSingleItemToResult(prod.name)
             } else {
-                let separatorGast = new gast.Terminal({
+                let separatorGast = new Terminal({
                     terminalType: prod.separator
                 })
-                let secondIteration: any = new gast.Repetition({
+                let secondIteration: any = new Repetition({
                     definition: [<any>separatorGast].concat(prod.definition),
                     idx: prod.idx
                 })
@@ -296,7 +293,7 @@ export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
                 }
                 possiblePaths.push(nextPath)
             }
-        } else if (prod instanceof gast.Alternation) {
+        } else if (prod instanceof Alternation) {
             /* istanbul ignore else */
             // IGNORE ABOVE ELSE
             if (!isUndefined(prod.name)) {

@@ -8,7 +8,9 @@ const PUBLIC_API_DTS_FILES = [
     "lib/src/parse/errors_public.d.ts",
     "lib/src/parse/exceptions_public.d.ts",
     "lib/src/parse/grammar/path_public.d.ts",
-    "lib/src/parse/grammar/gast_public.d.ts",
+    "lib/src/parse/grammar/gast/gast_public.d.ts",
+    "lib/src/parse/grammar/gast/gast_visitor.d.ts",
+    "lib/src/parse/grammar/gast/gast_resolver_public.d.ts",
     "lib/src/parse/cache_public.d.ts",
     "lib/src/diagrams/render_public.d.ts",
     "lib/src/parse/generate/generate_public.d.ts"

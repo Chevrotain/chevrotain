@@ -1,4 +1,3 @@
-import { gast } from "../../src/parse/grammar/gast_public"
 import * as gastBuilder from "../../src/parse/gast_builder"
 import {
     createTerminalRanges,
@@ -31,19 +30,18 @@ import {
     KeyTok
 } from "./grammar/samples"
 import { map, uniq, filter } from "../../src/utils/utils"
-
-let RepetitionMandatory = gast.RepetitionMandatory
-let Repetition = gast.Repetition
-let NonTerminal = gast.NonTerminal
-let RepetitionWithSeparator = gast.RepetitionWithSeparator
-let Terminal = gast.Terminal
-let Option = gast.Option
-let Alternation = gast.Alternation
-let Flat = gast.Flat
+import {
+    Alternation,
+    Flat,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionWithSeparator,
+    Terminal
+} from "../../src/parse/grammar/gast/gast_public"
 
 describe("The GAst Builder namespace", () => {
-    ;("use strict")
-
     let typeDefText =
         "// parse\r\n" +
         "            let typeKw = this.CONSUME1(TypeTok)\r\n" +
@@ -385,8 +383,8 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>actual).idx).to.equal(2)
-        expect((<gast.Terminal>actual).terminalType).to.equal(IdentTok)
+        expect((<Terminal>actual).idx).to.equal(2)
+        expect((<Terminal>actual).terminalType).to.equal(IdentTok)
     })
 
     it("will fail building a terminal if it cannot find it's constructor", () => {
@@ -416,8 +414,8 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>actual).idx).to.equal(0)
-        expect((<gast.NonTerminal>actual).nonTerminalName).to.equal("bamba")
+        expect((<NonTerminal>actual).idx).to.equal(0)
+        expect((<NonTerminal>actual).nonTerminalName).to.equal("bamba")
     })
 
     it("can build an OR Production from a RangeProd", () => {
@@ -430,7 +428,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(Alternation)
-        expect((<gast.Alternation>actual).definition.length).to.equal(0)
+        expect((<Alternation>actual).definition.length).to.equal(0)
     })
 
     it("can build a MANY Production from a RangeProd", () => {
@@ -443,7 +441,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(Repetition)
-        expect((<gast.Repetition>actual).definition.length).to.equal(0)
+        expect((<Repetition>actual).definition.length).to.equal(0)
     })
 
     it("can build a MANY_SEP Production from a RangeProd", () => {
@@ -457,7 +455,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(RepetitionWithSeparator)
-        expect((<gast.Repetition>actual).definition.length).to.equal(0)
+        expect((<Repetition>actual).definition.length).to.equal(0)
     })
 
     it("will fail when building a MANY_SEP Production from a RangeProd in the seperator is not known", () => {
@@ -483,7 +481,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(RepetitionMandatory)
-        expect((<gast.RepetitionMandatory>actual).definition.length).to.equal(0)
+        expect((<RepetitionMandatory>actual).definition.length).to.equal(0)
     })
 
     it("can build an OPTION Production from a RangeProd", () => {
@@ -496,7 +494,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(Option)
-        expect((<gast.Option>actual).definition.length).to.equal(0)
+        expect((<Option>actual).definition.length).to.equal(0)
     })
 
     it("can build an OR Production from a RangeProd", () => {
@@ -509,7 +507,7 @@ describe("The GAst Builder namespace", () => {
             []
         )
         expect(actual).to.be.an.instanceof(Alternation)
-        expect((<gast.Alternation>actual).definition.length).to.equal(0)
+        expect((<Alternation>actual).definition.length).to.equal(0)
     })
 
     it("can build The Gast representation of a literalArray Grammar Rule", () => {
@@ -523,34 +521,30 @@ describe("The GAst Builder namespace", () => {
         let def = actual.definition
         expect(def.length).to.equal(4)
         expect(def[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[0]).idx).to.equal(1)
-        expect((<gast.Terminal>def[0]).terminalType).to.equal(LSquareTok)
+        expect((<Terminal>def[0]).idx).to.equal(1)
+        expect((<Terminal>def[0]).terminalType).to.equal(LSquareTok)
 
         expect(def[1]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>def[1]).idx).to.equal(0)
-        expect((<gast.NonTerminal>def[1]).nonTerminalName).to.equal(
-            "expression"
-        )
+        expect((<NonTerminal>def[1]).idx).to.equal(0)
+        expect((<NonTerminal>def[1]).nonTerminalName).to.equal("expression")
 
         expect(def[2]).to.be.an.instanceof(Repetition)
         // -- MANY part begin
-        let manyDef = (<gast.Repetition>def[2]).definition
+        let manyDef = (<Repetition>def[2]).definition
         expect(manyDef.length).to.equal(2)
 
         expect(manyDef[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>manyDef[0]).idx).to.equal(1)
-        expect((<gast.Terminal>manyDef[0]).terminalType).to.equal(CommaTok)
+        expect((<Terminal>manyDef[0]).idx).to.equal(1)
+        expect((<Terminal>manyDef[0]).terminalType).to.equal(CommaTok)
 
         expect(manyDef[1]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>manyDef[1]).idx).to.equal(2)
-        expect((<gast.NonTerminal>manyDef[1]).nonTerminalName).to.equal(
-            "expression"
-        )
+        expect((<NonTerminal>manyDef[1]).idx).to.equal(2)
+        expect((<NonTerminal>manyDef[1]).nonTerminalName).to.equal("expression")
         // -- MANY part end
 
         expect(def[3]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[3]).idx).to.equal(1)
-        expect((<gast.Terminal>def[3]).terminalType).to.equal(RSquareTok)
+        expect((<Terminal>def[3]).idx).to.equal(1)
+        expect((<Terminal>def[3]).terminalType).to.equal(RSquareTok)
     })
 
     it("can build The Gast representation of an elementDefinition Grammar Rule", () => {
@@ -560,53 +554,51 @@ describe("The GAst Builder namespace", () => {
         let def = actual.definition
         expect(def.length).to.equal(6)
         expect(def[0]).to.be.an.instanceof(Option)
-        let option1Def = (<gast.Option>def[0]).definition
+        let option1Def = (<Option>def[0]).definition
         expect(option1Def.length).to.equal(1)
         expect(option1Def[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>option1Def[0]).idx).to.equal(1)
-        expect((<gast.Terminal>option1Def[0]).terminalType).to.equal(
-            RequiredTok
-        )
+        expect((<Terminal>option1Def[0]).idx).to.equal(1)
+        expect((<Terminal>option1Def[0]).terminalType).to.equal(RequiredTok)
 
         expect(def[1]).to.be.an.instanceof(Option)
-        let option2Def = (<gast.Option>def[1]).definition
+        let option2Def = (<Option>def[1]).definition
         expect(option2Def.length).to.equal(1)
         expect(option2Def[0]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>option2Def[0]).idx).to.equal(1)
-        expect((<gast.Terminal>option2Def[0]).terminalType).to.equal(KeyTok)
+        expect((<Terminal>option2Def[0]).idx).to.equal(1)
+        expect((<Terminal>option2Def[0]).terminalType).to.equal(KeyTok)
 
         expect(def[2]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[2]).idx).to.equal(1)
-        expect((<gast.Terminal>def[2]).terminalType).to.equal(ElementTok)
+        expect((<Terminal>def[2]).idx).to.equal(1)
+        expect((<Terminal>def[2]).terminalType).to.equal(ElementTok)
 
         expect(def[3]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[3]).idx).to.equal(1)
-        expect((<gast.Terminal>def[3]).terminalType).to.equal(IdentTok)
+        expect((<Terminal>def[3]).idx).to.equal(1)
+        expect((<Terminal>def[3]).terminalType).to.equal(IdentTok)
 
         expect(def[4]).to.be.an.instanceof(Alternation)
-        let orDef = (<gast.Alternation>def[4]).definition
+        let orDef = (<Alternation>def[4]).definition
         expect(orDef.length).to.equal(2)
         expect(orDef[0]).to.be.an.instanceof(Flat)
-        let orPartDef1 = (<gast.Flat>orDef[0]).definition
+        let orPartDef1 = (<Flat>orDef[0]).definition
         expect(orPartDef1.length).to.equal(1)
         expect(orPartDef1[0]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>orPartDef1[0]).idx).to.equal(0)
-        expect((<gast.NonTerminal>orPartDef1[0]).nonTerminalName).to.equal(
+        expect((<NonTerminal>orPartDef1[0]).idx).to.equal(0)
+        expect((<NonTerminal>orPartDef1[0]).nonTerminalName).to.equal(
             "assignedTypeSpec"
         )
 
         expect(orDef[1]).to.be.an.instanceof(Flat)
-        let orPartDef2 = (<gast.Flat>orDef[1]).definition
+        let orPartDef2 = (<Flat>orDef[1]).definition
         expect(orPartDef2.length).to.equal(1)
         expect(orPartDef2[0]).to.be.an.instanceof(NonTerminal)
-        expect((<gast.NonTerminal>orPartDef2[0]).idx).to.equal(0)
-        expect((<gast.NonTerminal>orPartDef2[0]).nonTerminalName).to.equal(
+        expect((<NonTerminal>orPartDef2[0]).idx).to.equal(0)
+        expect((<NonTerminal>orPartDef2[0]).nonTerminalName).to.equal(
             "assignedTypeSpecImplicit"
         )
 
         expect(def[5]).to.be.an.instanceof(Terminal)
-        expect((<gast.Terminal>def[5]).idx).to.equal(1)
-        expect((<gast.Terminal>def[5]).terminalType).to.equal(SemicolonTok)
+        expect((<Terminal>def[5]).idx).to.equal(1)
+        expect((<Terminal>def[5]).terminalType).to.equal(SemicolonTok)
     })
 
     it("can build nested OR grammar successfully", () => {

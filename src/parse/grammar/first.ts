@@ -1,10 +1,15 @@
-import { gast } from "./gast_public"
-import { isSequenceProd, isBranchingProd, isOptionalProd } from "./gast"
 import { uniq, map, flatten } from "../../utils/utils"
 import { TokenType } from "../../scan/lexer_public"
+import {
+    AbstractProduction,
+    IProduction,
+    NonTerminal,
+    Terminal
+} from "./gast/gast_public"
+import { isBranchingProd, isOptionalProd, isSequenceProd } from "./gast/gast"
 
-export function first(prod: gast.IProduction): TokenType[] {
-    if (prod instanceof gast.NonTerminal) {
+export function first(prod: IProduction): TokenType[] {
+    if (prod instanceof NonTerminal) {
         // this could in theory cause infinite loops if
         // (1) prod A refs prod B.
         // (2) prod B refs prod A
@@ -13,20 +18,20 @@ export function first(prod: gast.IProduction): TokenType[] {
         // looking ahead for the next optional part and will never exit
         // currently there is no safeguard for this unique edge case because
         // (1) not sure a grammar in which this can happen is useful for anything (productive)
-        return first((<gast.NonTerminal>prod).referencedRule)
-    } else if (prod instanceof gast.Terminal) {
-        return firstForTerminal(<gast.Terminal>prod)
+        return first((<NonTerminal>prod).referencedRule)
+    } else if (prod instanceof Terminal) {
+        return firstForTerminal(<Terminal>prod)
     } else if (isSequenceProd(prod)) {
-        return firstForSequence(<gast.AbstractProduction>prod)
+        return firstForSequence(<AbstractProduction>prod)
     } else if (isBranchingProd(prod)) {
-        return firstForBranching(<gast.AbstractProduction>prod)
+        return firstForBranching(<AbstractProduction>prod)
     } else {
         /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }
 
-export function firstForSequence(prod: gast.AbstractProduction): TokenType[] {
+export function firstForSequence(prod: AbstractProduction): TokenType[] {
     let firstSet: TokenType[] = []
     let seq = prod.definition
     let nextSubProdIdx = 0
@@ -46,7 +51,7 @@ export function firstForSequence(prod: gast.AbstractProduction): TokenType[] {
     return uniq(firstSet)
 }
 
-export function firstForBranching(prod: gast.AbstractProduction): TokenType[] {
+export function firstForBranching(prod: AbstractProduction): TokenType[] {
     let allAlternativesFirsts: TokenType[][] = map(
         prod.definition,
         innerProd => {
@@ -56,6 +61,6 @@ export function firstForBranching(prod: gast.AbstractProduction): TokenType[] {
     return uniq(flatten<TokenType>(allAlternativesFirsts))
 }
 
-export function firstForTerminal(terminal: gast.Terminal): TokenType[] {
+export function firstForTerminal(terminal: Terminal): TokenType[] {
     return [terminal.terminalType]
 }

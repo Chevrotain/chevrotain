@@ -1,4 +1,3 @@
-import { gast } from "../../../src/parse/grammar/gast_public"
 import {
     IdentTok,
     EntityTok,
@@ -14,9 +13,7 @@ import {
     computeAllProdsFollows
 } from "../../../src/parse/grammar/follow"
 import { setEquality } from "../../utils/matchers"
-
-let Rule = gast.Rule
-let Terminal = gast.Terminal
+import { Rule, Terminal } from "../../../src/parse/grammar/gast/gast_public"
 
 describe("The Grammar Ast Follows model", () => {
     it("can build a followNamePrefix from a Terminal", () => {

@@ -1,15 +1,15 @@
-import { gast } from "../../../src/parse/grammar/gast_public"
-
-let Rule = gast.Rule
-let RepetitionMandatory = gast.RepetitionMandatory
-let RepetitionMandatoryWithSeparator = gast.RepetitionMandatoryWithSeparator
-let Repetition = gast.Repetition
-let NonTerminal = gast.NonTerminal
-let RepetitionWithSeparator = gast.RepetitionWithSeparator
-let Terminal = gast.Terminal
-let Option = gast.Option
-let Alternation = gast.Alternation
-let Flat = gast.Flat
+import {
+    NonTerminal,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    Rule,
+    Option,
+    Terminal
+} from "../../../src/parse/grammar/gast/gast_public"
+import { Alternation } from "../../../src/parse/grammar/gast/gast_public"
+import { Flat } from "../../../src/parse/grammar/gast/gast_public"
+import { RepetitionWithSeparator } from "../../../src/parse/grammar/gast/gast_public"
 
 export class IdentTok {
     static PATTERN = /NA/

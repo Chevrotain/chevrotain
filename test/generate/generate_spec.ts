@@ -1,8 +1,19 @@
 import { Parser } from "../../src/parse/parser_public"
 import { generation as gen } from "../../src/generate/generate_public"
-import { gast } from "../../src/parse/grammar/gast_public"
 import { createToken } from "../../src/scan/tokens_public"
 import { createRegularToken } from "../utils/matchers"
+import {
+    Alternation,
+    Flat,
+    Rule,
+    Terminal,
+    Option,
+    NonTerminal,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionWithSeparator,
+    RepetitionMandatoryWithSeparator
+} from "../../src/parse/grammar/gast/gast_public"
 
 let describeNodeOnly = describe
 if (typeof window !== "undefined") {
@@ -15,9 +26,9 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
-                definition: [new gast.Terminal({ terminalType: Identifier })]
+                definition: [new Terminal({ terminalType: Identifier })]
             })
         ]
 
@@ -38,15 +49,15 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.NonTerminal({ nonTerminalName: "nestedRules" })
+                    new NonTerminal({ nonTerminalName: "nestedRules" })
                 ]
             }),
-            new gast.Rule({
+            new Rule({
                 name: "nestedRules",
-                definition: [new gast.Terminal({ terminalType: Identifier })]
+                definition: [new Terminal({ terminalType: Identifier })]
             })
         ]
 
@@ -67,13 +78,11 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.Option({
-                        definition: [
-                            new gast.Terminal({ terminalType: Identifier })
-                        ]
+                    new Option({
+                        definition: [new Terminal({ terminalType: Identifier })]
                     })
                 ]
             })
@@ -102,21 +111,21 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier, Integer]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.Alternation({
+                    new Alternation({
                         definition: [
-                            new gast.Flat({
+                            new Flat({
                                 definition: [
-                                    new gast.Terminal({
+                                    new Terminal({
                                         terminalType: Identifier
                                     })
                                 ]
                             }),
-                            new gast.Flat({
+                            new Flat({
                                 definition: [
-                                    new gast.Terminal({ terminalType: Integer })
+                                    new Terminal({ terminalType: Integer })
                                 ],
                                 name: "$inlinedRule"
                             })
@@ -147,12 +156,12 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.Repetition({
+                    new Repetition({
                         definition: [
-                            new gast.Terminal({ terminalType: Identifier })
+                            new Terminal({ terminalType: Identifier })
                         ],
                         idx: 1,
                         name: "$inlinedRule"
@@ -186,13 +195,11 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.RepetitionMandatory({
-                        definition: [
-                            new gast.Terminal({ terminalType: Identifier })
-                        ]
+                    new RepetitionMandatory({
+                        definition: [new Terminal({ terminalType: Identifier })]
                     })
                 ]
             })
@@ -224,12 +231,12 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier, Comma]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.RepetitionWithSeparator({
+                    new RepetitionWithSeparator({
                         definition: [
-                            new gast.Terminal({ terminalType: Identifier })
+                            new Terminal({ terminalType: Identifier })
                         ],
                         separator: Comma
                     })
@@ -265,12 +272,12 @@ describe("The Code Generation capabilities", () => {
         const tokenVocabulary = [Identifier, Comma]
 
         const rules = [
-            new gast.Rule({
+            new Rule({
                 name: "topRule",
                 definition: [
-                    new gast.RepetitionMandatoryWithSeparator({
+                    new RepetitionMandatoryWithSeparator({
                         definition: [
-                            new gast.Terminal({ terminalType: Identifier })
+                            new Terminal({ terminalType: Identifier })
                         ],
                         separator: Comma
                     })
@@ -317,25 +324,25 @@ describe("The Code Generation capabilities", () => {
             const tokenVocabulary = [Identifier, Integer]
 
             const rules = [
-                new gast.Rule({
+                new Rule({
                     name: "topRule",
                     definition: [
-                        new gast.Alternation({
+                        new Alternation({
                             definition: [
-                                new gast.Flat({
+                                new Flat({
                                     definition: [
-                                        new gast.RepetitionMandatory({
+                                        new RepetitionMandatory({
                                             definition: [
-                                                new gast.Terminal({
+                                                new Terminal({
                                                     terminalType: Identifier
                                                 })
                                             ]
                                         })
                                     ]
                                 }),
-                                new gast.Flat({
+                                new Flat({
                                     definition: [
-                                        new gast.Terminal({
+                                        new Terminal({
                                             terminalType: Integer
                                         })
                                     ]
