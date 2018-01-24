@@ -694,7 +694,7 @@ class ECMAScript5Parser extends Parser {
                 // there is no danger of inRule recovery (single token insertion/deletion)
                 // happening in this case because that type of recovery can only happen if CONSUME(...) was invoked.
                 this.SAVE_ERROR(
-                    new chevrotain.exceptions.MismatchedTokenException(
+                    new chevrotain.MismatchedTokenException(
                         "Line Terminator not allowed before Expression in Throw Statement"
                         // TODO: create line terminator token on the fly?
                     )

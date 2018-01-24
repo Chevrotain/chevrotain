@@ -16,12 +16,13 @@ import {
     SemiColonTok
 } from "./Switchcase_recovery_tokens"
 import { SwitchCaseRecoveryParser } from "./switchcase_recovery_parser"
-import { exceptions } from "../../../../src/parse/exceptions_public"
+import {
+    EarlyExitException,
+    MismatchedTokenException
+} from "../../../../src/parse/exceptions_public"
 import { createRegularToken } from "../../../utils/matchers"
 
 describe("Error Recovery switch-case Example", () => {
-    ;("use strict")
-
     // called for side effect of augmenting
     new SwitchCaseRecoveryParser([])
 
@@ -135,9 +136,7 @@ describe("Error Recovery switch-case Example", () => {
         let parser = new SwitchCaseRecoveryParser(input)
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.errors[0]).to.be.an.instanceof(
-            exceptions.EarlyExitException
-        )
+        expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
         // we have re-synced to the end of the input therefore all the input has been "parsed"
         expect(parser.isAtEndOfInput()).to.equal(true)
         expect(parseResult).to.deep.equal({})
@@ -302,9 +301,7 @@ describe("Error Recovery switch-case Example", () => {
         let parser = new SwitchCaseRecoveryParser(input)
         let parseResult = parser.caseStmt()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.errors[0]).to.be.an.instanceof(
-            exceptions.MismatchedTokenException
-        )
+        expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
         expect(parser.isAtEndOfInput()).to.equal(true)
         expect(parseResult).to.deep.equal({ Terry: 2 })
     })
@@ -322,9 +319,7 @@ describe("Error Recovery switch-case Example", () => {
         let parser = new SwitchCaseRecoveryParser(input)
         let parseResult = parser.caseStmt()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.errors[0]).to.be.an.instanceof(
-            exceptions.MismatchedTokenException
-        )
+        expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
         expect(parser.isAtEndOfInput()).to.equal(true) // in rule recovery failed, will now re-sync to EOF
         expect(parseResult).to.deep.equal({ invalid1: undefined })
     })

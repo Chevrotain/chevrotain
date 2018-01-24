@@ -1,6 +1,6 @@
 var expect = require("chai").expect
 var chevrotain = require("chevrotain")
-var NoViableAltException = chevrotain.exceptions.NoViableAltException
+var NoViableAltException = chevrotain.NoViableAltException
 
 var parseHello = (parseHello = require("./parametrized"))
 
