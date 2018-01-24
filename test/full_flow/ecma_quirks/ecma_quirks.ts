@@ -7,7 +7,7 @@ import {
     Parser,
     TokenMatcher
 } from "../../../src/parse/parser_public"
-import { exceptions } from "../../../src/parse/exceptions_public"
+import { MismatchedTokenException } from "../../../src/parse/exceptions_public"
 import { every, flatten, forEach, map } from "../../../src/utils/utils"
 
 const Return = createToken({
@@ -165,9 +165,7 @@ class EcmaScriptQuirksParser extends Parser {
                 actual: errorToken,
                 ruleName: this.getCurrRuleFullName()
             })
-            throw this.SAVE_ERROR(
-                new exceptions.MismatchedTokenException(msg, errorToken)
-            )
+            throw this.SAVE_ERROR(new MismatchedTokenException(msg, errorToken))
         }
     }
 

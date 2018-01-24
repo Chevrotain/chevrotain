@@ -1,37 +1,42 @@
 import {
-    Parser,
     EMPTY_ALT,
+    Parser,
     ParserDefinitionErrorType
 } from "./parse/parser_public"
 import { Lexer, LexerDefinitionErrorType } from "./scan/lexer_public"
 import {
-    tokenName,
-    tokenLabel,
-    EOF,
-    tokenMatcher,
     createToken,
-    createTokenInstance
+    createTokenInstance,
+    EOF,
+    tokenLabel,
+    tokenMatcher,
+    tokenName
 } from "./scan/tokens_public"
-import { exceptions } from "./parse/exceptions_public"
+import {
+    EarlyExitException,
+    isRecognitionException,
+    MismatchedTokenException,
+    NotAllInputParsedException,
+    NoViableAltException
+} from "./parse/exceptions_public"
 import { clearCache } from "./parse/cache_public"
-import { NextAfterTokenWalker } from "./parse/grammar/interpreter"
 import { VERSION } from "./version"
 import { defaultErrorProvider } from "./parse/errors_public"
 import { createSyntaxDiagramsCode } from "./diagrams/render_public"
 import { GAstVisitor } from "./parse/grammar/gast/gast_visitor_public"
 import {
     Alternation,
-    Option,
     Flat,
+    NonTerminal,
+    Option,
     Repetition,
     RepetitionMandatory,
     RepetitionMandatoryWithSeparator,
     RepetitionWithSeparator,
+    Rule,
     serializeGrammar,
     serializeProduction,
-    Rule,
-    Terminal,
-    NonTerminal
+    Terminal
 } from "./parse/grammar/gast/gast_public"
 import {
     resolveGrammar,
@@ -65,14 +70,11 @@ API.createTokenInstance = createTokenInstance
 API.EMPTY_ALT = EMPTY_ALT
 API.defaultErrorProvider = defaultErrorProvider
 
-// TODO: remove nested namespace usage
-API.exceptions = {}
-API.exceptions.isRecognitionException = exceptions.isRecognitionException
-API.exceptions.EarlyExitException = exceptions.EarlyExitException
-API.exceptions.MismatchedTokenException = exceptions.MismatchedTokenException
-API.exceptions.NotAllInputParsedException =
-    exceptions.NotAllInputParsedException
-API.exceptions.NoViableAltException = exceptions.NoViableAltException
+API.isRecognitionException = isRecognitionException
+API.EarlyExitException = EarlyExitException
+API.MismatchedTokenException = MismatchedTokenException
+API.NotAllInputParsedException = NotAllInputParsedException
+API.NoViableAltException = NoViableAltException
 
 // grammar reflection API
 API.gast = {}

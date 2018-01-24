@@ -1,6 +1,9 @@
 import { IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
-import { exceptions } from "../../src/parse/exceptions_public"
+import {
+    EarlyExitException,
+    NoViableAltException
+} from "../../src/parse/exceptions_public"
 import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 
@@ -157,7 +160,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         gateOpenInputBadParser.atLeastOneRule()
         expect(gateOpenInputBadParser.errors).to.have.lengthOf(1)
         expect(gateOpenInputBadParser.errors[0]).to.be.an.instanceOf(
-            exceptions.EarlyExitException
+            EarlyExitException
         )
 
         let gateClosedInputGood = new PredicateAtLeastOneParser(
@@ -167,7 +170,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         gateClosedInputGood.atLeastOneRule()
         expect(gateClosedInputGood.errors).to.have.lengthOf(1)
         expect(gateClosedInputGood.errors[0]).to.be.an.instanceOf(
-            exceptions.EarlyExitException
+            EarlyExitException
         )
 
         let gateClosedInputBad = new PredicateAtLeastOneParser(
@@ -177,7 +180,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         gateClosedInputBad.atLeastOneRule()
         expect(gateClosedInputBad.errors).to.have.lengthOf(1)
         expect(gateClosedInputBad.errors[0]).to.be.an.instanceOf(
-            exceptions.EarlyExitException
+            EarlyExitException
         )
     })
 
@@ -250,7 +253,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         gateClosedInputBad.orRule()
         expect(gateClosedInputBad.errors).to.have.lengthOf(1)
         expect(gateClosedInputBad.errors[0]).to.be.an.instanceOf(
-            exceptions.NoViableAltException
+            NoViableAltException
         )
 
         let gateClosedInputC = new PredicateOrParser(

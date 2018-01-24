@@ -7,16 +7,18 @@ import {
 import { Parser, EMPTY_ALT } from "../../src/parse/parser_public"
 import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"
-import { exceptions } from "../../src/parse/exceptions_public"
+import {
+    EarlyExitException,
+    MismatchedTokenException,
+    NotAllInputParsedException,
+    NoViableAltException
+} from "../../src/parse/exceptions_public"
 import { clearCache } from "../../src/parse/cache_public"
 import {
     tokenStructuredMatcher,
     augmentTokenTypes
 } from "../../src/scan/tokens"
 import { createRegularToken, setEquality } from "../utils/matchers"
-import MismatchedTokenException = exceptions.MismatchedTokenException
-import NoViableAltException = exceptions.NoViableAltException
-import EarlyExitException = exceptions.EarlyExitException
 
 function defineRecognizerSpecs(
     contextName,
@@ -914,7 +916,7 @@ function defineRecognizerSpecs(
                 )
 
                 let throwsRecogError = () => {
-                    throw new exceptions.NotAllInputParsedException(
+                    throw new NotAllInputParsedException(
                         "sad sad panda",
                         createTokenInstance(PlusTok)
                     )

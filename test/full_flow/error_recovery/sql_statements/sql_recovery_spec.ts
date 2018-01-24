@@ -28,7 +28,7 @@ import {
 } from "./sql_recovery_tokens"
 import { DDLExampleRecoveryParser } from "./sql_recovery_parser"
 import { IToken, tokenMatcher } from "../../../../src/scan/tokens_public"
-import { exceptions } from "../../../../src/parse/exceptions_public"
+import { NotAllInputParsedException } from "../../../../src/parse/exceptions_public"
 import { ParseTree } from "../../parse_tree"
 import { flatten } from "../../../../src/utils/utils"
 import { createRegularToken } from "../../../utils/matchers"
@@ -324,9 +324,7 @@ describe("Error Recovery SQL DDL Example", () => {
 
         parser.ddl()
         expect(parser.errors.length).to.equal(1)
-        expect(parser.errors[0]).to.be.an.instanceof(
-            exceptions.NotAllInputParsedException
-        )
+        expect(parser.errors[0]).to.be.an.instanceof(NotAllInputParsedException)
     })
 
     it("can use the same parser instance to parse multiple inputs", () => {

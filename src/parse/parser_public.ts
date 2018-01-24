@@ -4,7 +4,14 @@ import {
     CLASS_TO_BASE_CST_VISITOR,
     CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS
 } from "./cache"
-import { exceptions } from "./exceptions_public"
+import {
+    NoViableAltException,
+    MismatchedTokenException,
+    NotAllInputParsedException,
+    IRecognitionException,
+    isRecognitionException,
+    EarlyExitException
+} from "./exceptions_public"
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
 import {
     validateRuleDoesNotAlreadyExist,
@@ -290,7 +297,7 @@ export interface IOrAltWithGate<T> extends IOrAlt<T> {
 export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithGate<T>
 
 export interface IParserState {
-    errors: exceptions.IRecognitionException[]
+    errors: IRecognitionException[]
     lexerState: any
     RULE_STACK: string[]
     CST_STACK: CstNode[]
@@ -555,7 +562,7 @@ export class Parser {
         }
     }
 
-    protected _errors: exceptions.IRecognitionException[] = []
+    protected _errors: IRecognitionException[] = []
 
     /**
      * This flag enables or disables error recovery (fault tolerance) of the parser.
@@ -730,11 +737,11 @@ export class Parser {
         augmentTokenTypes(values(this.tokensMap))
     }
 
-    public get errors(): exceptions.IRecognitionException[] {
+    public get errors(): IRecognitionException[] {
         return cloneArr(this._errors)
     }
 
-    public set errors(newErrors: exceptions.IRecognitionException[]) {
+    public set errors(newErrors: IRecognitionException[]) {
         this._errors = newErrors
     }
 
@@ -864,10 +871,8 @@ export class Parser {
         }
     }
 
-    protected SAVE_ERROR(
-        error: exceptions.IRecognitionException
-    ): exceptions.IRecognitionException {
-        if (exceptions.isRecognitionException(error)) {
+    protected SAVE_ERROR(error: IRecognitionException): IRecognitionException {
+        if (isRecognitionException(error)) {
             error.context = {
                 ruleStack: this.getHumanReadableRuleStack(),
                 ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
@@ -900,7 +905,7 @@ export class Parser {
                 // if no exception was thrown we have succeed parsing the rule.
                 return true
             } catch (e) {
-                if (exceptions.isRecognitionException(e)) {
+                if (isRecognitionException(e)) {
                     return false
                 } else {
                     throw e
@@ -1691,10 +1696,7 @@ export class Parser {
                 }
             )
             this.SAVE_ERROR(
-                new exceptions.NotAllInputParsedException(
-                    errMsg,
-                    firstRedundantTok
-                )
+                new NotAllInputParsedException(errMsg, firstRedundantTok)
             )
         }
     }
@@ -1825,7 +1827,7 @@ export class Parser {
                     })
                 }
                 throw this.SAVE_ERROR(
-                    new exceptions.MismatchedTokenException(msg, nextToken)
+                    new MismatchedTokenException(msg, nextToken)
                 )
             }
         } catch (eFromConsumption) {
@@ -1936,7 +1938,7 @@ export class Parser {
                     !this.isBackTracking() &&
                     this.recoveryEnabled
 
-                if (exceptions.isRecognitionException(e)) {
+                if (isRecognitionException(e)) {
                     if (reSyncEnabled) {
                         let reSyncTokType = this.findReSyncTokenType()
                         if (this.isInCurrentRuleReSyncSet(reSyncTokType)) {
@@ -2030,7 +2032,7 @@ export class Parser {
                 actual: nextTokenWithoutResync,
                 ruleName: this.getCurrRuleFullName()
             })
-            let error = new exceptions.MismatchedTokenException(
+            let error = new MismatchedTokenException(
                 msg,
                 nextTokenWithoutResync
             )
@@ -3036,9 +3038,7 @@ export class Parser {
             ruleName: this.getCurrRuleFullName()
         })
 
-        throw this.SAVE_ERROR(
-            new exceptions.NoViableAltException(errMsg, this.LA(1))
-        )
+        throw this.SAVE_ERROR(new NoViableAltException(errMsg, this.LA(1)))
     }
 
     private getLookaheadFuncFor(
@@ -3094,7 +3094,7 @@ export class Parser {
         })
 
         throw this.SAVE_ERROR(
-            new exceptions.EarlyExitException(msg, this.LA(1), this.LA(0))
+            new EarlyExitException(msg, this.LA(1), this.LA(0))
         )
     }
 

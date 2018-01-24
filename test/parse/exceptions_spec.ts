@@ -1,5 +1,10 @@
 import { createTokenInstance, EOF } from "../../src/scan/tokens_public"
-import { exceptions } from "../../src/parse/exceptions_public"
+import {
+    EarlyExitException,
+    NoViableAltException,
+    NotAllInputParsedException,
+    MismatchedTokenException
+} from "../../src/parse/exceptions_public"
 import { functionName } from "../../src/lang/lang_extensions"
 
 describe("Chevrotain's Parsing Exceptions", () => {
@@ -10,7 +15,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         let dummyToken = createTokenInstance(EOF, "", -1, -1, -1, -1, -1, -1)
 
         it_node("EarlyExitException", () => {
-            let exceptionInstance = new exceptions.EarlyExitException(
+            let exceptionInstance = new EarlyExitException(
                 "",
                 dummyToken,
                 dummyToken
@@ -21,17 +26,14 @@ describe("Chevrotain's Parsing Exceptions", () => {
         })
 
         it_node("NoViableAltException", () => {
-            let exceptionInstance = new exceptions.NoViableAltException(
-                "",
-                dummyToken
-            )
+            let exceptionInstance = new NoViableAltException("", dummyToken)
             expect(exceptionInstance.name).to.equal(
                 functionName(exceptionInstance)
             )
         })
 
         it_node("NotAllInputParsedException", () => {
-            let exceptionInstance = new exceptions.NotAllInputParsedException(
+            let exceptionInstance = new NotAllInputParsedException(
                 "",
                 dummyToken
             )
@@ -41,10 +43,7 @@ describe("Chevrotain's Parsing Exceptions", () => {
         })
 
         it_node("MismatchedTokenException", () => {
-            let exceptionInstance = new exceptions.MismatchedTokenException(
-                "",
-                dummyToken
-            )
+            let exceptionInstance = new MismatchedTokenException("", dummyToken)
             expect(exceptionInstance.name).to.equal(
                 functionName(exceptionInstance)
             )
