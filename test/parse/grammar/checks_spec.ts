@@ -623,7 +623,7 @@ describe("The rule names validation full flow", () => {
             "it must match the pattern"
         )
         expect(() => new InvalidRuleNameParser()).to.throw(
-            "Invalid Grammar rule name"
+            "Invalid grammar rule name"
         )
         expect(() => new InvalidRuleNameParser()).to.throw("שלום")
     })

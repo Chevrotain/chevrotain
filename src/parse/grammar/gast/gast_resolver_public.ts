@@ -1,4 +1,4 @@
-import { Rule } from "./gast_public"
+import { NonTerminal, Rule } from "./gast_public"
 import {
     IgnoredParserIssues,
     IParserDefinitionError

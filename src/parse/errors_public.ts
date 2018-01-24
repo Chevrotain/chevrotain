@@ -6,8 +6,17 @@ import {
     tokenName
 } from "../scan/tokens_public"
 import { first, map, reduce } from "../utils/utils"
+import {
+    IOptionallyNamedProduction,
+    IProductionWithOccurrence,
+    NonTerminal,
+    Rule,
+    Terminal
+} from "./grammar/gast/gast_public"
+import { getProductionDslName } from "./grammar/gast/gast"
+import { validNestedRuleName } from "./grammar/checks"
 
-export interface IErrorMessageProvider {
+export interface IParserErrorMessageProvider {
     /**
      * Mismatched Token Error happens when the parser attempted to consume a terminal and failed.
      * It corresponds to a failed "CONSUME(expected)" in Chevrotain DSL terms.
@@ -90,7 +99,7 @@ export interface IErrorMessageProvider {
  * When constructing a custom error message provider it may be used as a reference
  * or reused.
  */
-export const defaultErrorProvider: IErrorMessageProvider = {
+export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     buildMismatchTokenMessage({ expected, actual, ruleName }): string {
         let hasLabel = hasTokenLabel(expected)
         let expectedMsg = hasLabel
@@ -176,4 +185,121 @@ export const defaultErrorProvider: IErrorMessageProvider = {
     }
 }
 
-Object.freeze(defaultErrorProvider)
+Object.freeze(defaultParserErrorProvider)
+
+export interface IGrammarResolverErrorMessageProvider {
+    buildRuleNotFoundError(
+        topLevelRule: Rule,
+        undefinedRule: NonTerminal
+    ): string
+}
+
+export interface IGrammarErrorMessageProvider
+    extends IGrammarResolverErrorMessageProvider {
+    buildDuplicateFoundError(
+        topLevelRule: Rule,
+        duplicateProds: IProductionWithOccurrence[]
+    ): string
+
+    buildInvalidNestedRuleNameError(
+        topLevelRule: Rule,
+        nestedProd: IOptionallyNamedProduction
+    ): string
+
+    buildDuplicateNestedRuleNameError(
+        topLevelRule: Rule,
+        nestedProd: IOptionallyNamedProduction[]
+    ): string
+}
+
+export const defaultGrammarErrorProvider: IGrammarErrorMessageProvider = {
+    buildRuleNotFoundError(
+        topLevelRule: Rule,
+        undefinedRule: NonTerminal
+    ): string {
+        const msg =
+            "Invalid grammar, reference to a rule which is not defined: ->" +
+            undefinedRule.nonTerminalName +
+            "<-\n" +
+            "inside top level rule: ->" +
+            topLevelRule.name +
+            "<-"
+        return msg
+    },
+
+    buildDuplicateFoundError(
+        topLevelRule: Rule,
+        duplicateProds: IProductionWithOccurrence[]
+    ): string {
+        function getExtraProductionArgument(
+            prod: IProductionWithOccurrence
+        ): string {
+            if (prod instanceof Terminal) {
+                return tokenName(prod.terminalType)
+            } else if (prod instanceof NonTerminal) {
+                return prod.nonTerminalName
+            } else {
+                return ""
+            }
+        }
+
+        const topLevelName = topLevelRule.name
+        const duplicateProd = first(duplicateProds)
+        const index = duplicateProd.idx
+        const dslName = getProductionDslName(duplicateProd)
+        let extraArgument = getExtraProductionArgument(duplicateProd)
+
+        let msg = `->${dslName}<- with numerical suffix: ->${index}<-
+                  ${extraArgument ? `and argument: ->${extraArgument}<-` : ""}
+                  appears more than once (${
+                      duplicateProds.length
+                  } times) in the top level rule: ->${topLevelName}<-.
+                  ${
+                      index === 0
+                          ? `Also note that numerical suffix 0 means ${dslName} without any suffix.`
+                          : ""
+                  }
+                  To fix this make sure each usage of ${dslName} ${
+            extraArgument ? `with the argument: ->${extraArgument}<-` : ""
+        }
+                  in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
+                  position key in the grammar, which is needed by the parsing engine.
+                  
+                  For further details see: http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
+                  `
+
+        // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
+        msg = msg.replace(/[ \t]+/g, " ")
+        msg = msg.replace(/\s\s+/g, "\n")
+
+        return msg
+    },
+
+    buildInvalidNestedRuleNameError(
+        topLevelRule: Rule,
+        nestedProd: IOptionallyNamedProduction
+    ): string {
+        const msg =
+            `Invalid nested rule name: ->${nestedProd.name}<- inside rule: ->${
+                topLevelRule.name
+            }<-\n` +
+            `it must match the pattern: ->${validNestedRuleName.toString()}<-.\n` +
+            `Note that this means a nested rule name must start with the '$'(dollar) sign.`
+
+        return msg
+    },
+
+    buildDuplicateNestedRuleNameError(
+        topLevelRule: Rule,
+        nestedProd: IOptionallyNamedProduction[]
+    ): string {
+        const duplicateName = first(nestedProd).name
+        const errMsg =
+            `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${
+                topLevelRule.name
+            }<-\n` +
+            `A nested name must be unique in the scope of a top level grammar rule.`
+
+        return errMsg
+    }
+}

@@ -38,6 +38,7 @@ import { nextPossibleTokensAfter } from "./interpreter"
 import {
     Alternation,
     Flat,
+    IOptionallyNamedProduction,
     IProduction,
     IProductionWithOccurrence,
     NonTerminal,
@@ -50,16 +51,20 @@ import {
     Terminal
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
+import {
+    defaultGrammarErrorProvider,
+    IGrammarErrorMessageProvider
+} from "../errors_public"
 
 export function validateGrammar(
     topLevels: Rule[],
     maxLookahead: number,
     tokens: TokenType[],
-    ignoredIssues: IgnoredParserIssues
+    ignoredIssues: IgnoredParserIssues,
+    errMsgProvider: IGrammarErrorMessageProvider = defaultGrammarErrorProvider
 ): IParserDefinitionError[] {
-    let duplicateErrors: any = utils.map(
-        topLevels,
-        validateDuplicateProductions
+    let duplicateErrors: any = utils.map(topLevels, currTopLevel =>
+        validateDuplicateProductions(currTopLevel, errMsgProvider)
     )
     let leftRecursionErrors: any = utils.map(topLevels, currTopRule =>
         validateNoLeftRecursion(currTopRule, currTopRule)
@@ -89,9 +94,13 @@ export function validateGrammar(
     )
 
     let tokenNameErrors: any = utils.map(tokenNames, validateTokenName)
-    let nestedRulesNameErrors: any = validateNestedRulesNames(topLevels)
+    let nestedRulesNameErrors: any = validateNestedRulesNames(
+        topLevels,
+        errMsgProvider
+    )
     let nestedRulesDuplicateErrors: any = validateDuplicateNestedRules(
-        topLevels
+        topLevels,
+        errMsgProvider
     )
 
     let emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
@@ -116,19 +125,25 @@ export function validateGrammar(
     )
 }
 
-function validateNestedRulesNames(topLevels: Rule[]): IParserDefinitionError[] {
+function validateNestedRulesNames(
+    topLevels: Rule[],
+    errMsgProvider: IGrammarErrorMessageProvider
+): IParserDefinitionError[] {
     let result = []
     forEach(topLevels, curTopLevel => {
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
         curTopLevel.accept(namedCollectorVisitor)
-        let nestedNamesPerRule = map(
+        let nestedProds = map(
             namedCollectorVisitor.result,
-            currItem => currItem.name
+            currItem => currItem.orgProd
         )
-        let currTopRuleName = curTopLevel.name
         result.push(
-            map(nestedNamesPerRule, currNestedName =>
-                validateNestedRuleName(currNestedName, currTopRuleName)
+            map(nestedProds, currNestedProd =>
+                validateNestedRuleName(
+                    curTopLevel,
+                    currNestedProd,
+                    errMsgProvider
+                )
             )
         )
     })
@@ -137,7 +152,8 @@ function validateNestedRulesNames(topLevels: Rule[]): IParserDefinitionError[] {
 }
 
 function validateDuplicateProductions(
-    topLevelRule: Rule
+    topLevelRule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDuplicatesDefinitionError[] {
     let collectorVisitor = new OccurrenceValidationCollector()
     topLevelRule.accept(collectorVisitor)
@@ -154,9 +170,9 @@ function validateDuplicateProductions(
 
     let errors = utils.map(utils.values(duplicates), (currDuplicates: any) => {
         let firstProd: any = utils.first(currDuplicates)
-        let msg = createDuplicatesErrorMessage(
-            currDuplicates,
-            topLevelRule.name
+        let msg = errMsgProvider.buildDuplicateFoundError(
+            topLevelRule,
+            currDuplicates
         )
         let dslName = getProductionDslName(firstProd)
         let defError: IParserDuplicatesDefinitionError = {
@@ -175,41 +191,6 @@ function validateDuplicateProductions(
         return defError
     })
     return errors
-}
-
-function createDuplicatesErrorMessage(
-    duplicateProds: IProductionWithOccurrence[],
-    topLevelName
-): string {
-    let firstProd = utils.first(duplicateProds)
-    let index = firstProd.idx
-    let dslName = getProductionDslName(firstProd)
-    let extraArgument = getExtraProductionArgument(firstProd)
-
-    let msg = `->${dslName}<- with numerical suffix: ->${index}<-
-                  ${extraArgument ? `and argument: ->${extraArgument}<-` : ""}
-                  appears more than once (${
-                      duplicateProds.length
-                  } times) in the top level rule: ->${topLevelName}<-.
-                  ${
-                      index === 0
-                          ? `Also note that numerical suffix 0 means ${dslName} without any suffix.`
-                          : ""
-                  }
-                  To fix this make sure each usage of ${dslName} ${
-        extraArgument ? `with the argument: ->${extraArgument}<-` : ""
-    }
-                  in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
-                  position key in the grammar, which is needed by the parsing engine.
-                  
-                  For further details see: http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
-                  `
-
-    // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
-    msg = msg.replace(/[ \t]+/g, " ")
-    msg = msg.replace(/\s\s+/g, "\n")
-
-    return msg
 }
 
 export function identifyProductionForDuplicates(
@@ -275,12 +256,13 @@ export const validNestedRuleName = new RegExp(
     validTermsPattern.source.replace("^", "^\\$")
 )
 
+// TODO: handle this validation in the analysis phase?
 export function validateRuleName(ruleName: string): IParserDefinitionError[] {
     let errors = []
     let errMsg
 
     if (!ruleName.match(validTermsPattern)) {
-        errMsg = `Invalid Grammar rule name: ->${ruleName}<- it must match the pattern: ->${validTermsPattern.toString()}<-`
+        errMsg = `Invalid grammar rule name: ->${ruleName}<- it must match the pattern: ->${validTermsPattern.toString()}<-`
         errors.push({
             message: errMsg,
             type: ParserDefinitionErrorType.INVALID_RULE_NAME,
@@ -292,21 +274,22 @@ export function validateRuleName(ruleName: string): IParserDefinitionError[] {
 }
 
 export function validateNestedRuleName(
-    nestedRuleName: string,
-    containingRuleName: string
+    topLevel: Rule,
+    nestedProd: IOptionallyNamedProduction,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
     let errMsg
 
-    if (!nestedRuleName.match(validNestedRuleName)) {
-        errMsg =
-            `Invalid nested rule name: ->${nestedRuleName}<- inside rule: ->${containingRuleName}<-\n` +
-            `it must match the pattern: ->${validNestedRuleName.toString()}<-.\n` +
-            `Note that this means a nested rule name must start with the '$'(dollar) sign.`
+    if (!nestedProd.name.match(validNestedRuleName)) {
+        errMsg = errMsgProvider.buildInvalidNestedRuleNameError(
+            topLevel,
+            nestedProd
+        )
         errors.push({
             message: errMsg,
             type: ParserDefinitionErrorType.INVALID_NESTED_RULE_NAME,
-            ruleName: nestedRuleName
+            ruleName: topLevel.name
         })
     }
 
@@ -838,30 +821,29 @@ function checkTerminalAndNoneTerminalsNameSpace(
 }
 
 function validateDuplicateNestedRules(
-    topLevelRules: Rule[]
+    topLevelRules: Rule[],
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
 
     forEach(topLevelRules, currTopRule => {
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
         currTopRule.accept(namedCollectorVisitor)
-        let nestedNames = map(
+        let prodsByGroup = groupBy(
             namedCollectorVisitor.result,
-            currItem => currItem.name
+            item => item.name
         )
-        let namesGroups = groupBy(nestedNames, item => item)
-
-        let duplicates: any = pick(namesGroups, currGroup => {
+        let duplicates: any = pick(prodsByGroup, currGroup => {
             return currGroup.length > 1
         })
 
-        forEach(values(duplicates), (currDuplicates: any) => {
-            let duplicateName = utils.first(currDuplicates)
-            let errMsg =
-                `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${
-                    currTopRule.name
-                }<-\n` +
-                `A nested name must be unique in the scope of a top level grammar rule.`
+        forEach(values(duplicates), (currDupGroup: any) => {
+            const currDupProds = map(currDupGroup, dupGroup => dupGroup.orgProd)
+            const errMsg = errMsgProvider.buildDuplicateNestedRuleNameError(
+                currTopRule,
+                currDupProds
+            )
+
             errors.push({
                 message: errMsg,
                 type: ParserDefinitionErrorType.DUPLICATE_NESTED_NAME,

@@ -7,11 +7,16 @@ import {
 import { forEach } from "../../utils/utils"
 import { NonTerminal, Rule } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
+import {
+    defaultGrammarErrorProvider,
+    IGrammarResolverErrorMessageProvider
+} from "../errors_public"
 
 export function resolveGrammar(
-    topLevels: HashTable<Rule>
+    topLevels: HashTable<Rule>,
+    errMsgProvider: IGrammarResolverErrorMessageProvider = defaultGrammarErrorProvider
 ): IParserDefinitionError[] {
-    let refResolver = new GastRefResolverVisitor(topLevels)
+    let refResolver = new GastRefResolverVisitor(topLevels, errMsgProvider)
     refResolver.resolveRefs()
     return refResolver.errors
 }
@@ -20,7 +25,10 @@ export class GastRefResolverVisitor extends GAstVisitor {
     public errors: IParserUnresolvedRefDefinitionError[] = []
     private currTopLevel: Rule
 
-    constructor(private nameToTopRule: HashTable<Rule>) {
+    constructor(
+        private nameToTopRule: HashTable<Rule>,
+        private errMsgProvider: IGrammarResolverErrorMessageProvider
+    ) {
         super()
     }
 
@@ -35,13 +43,10 @@ export class GastRefResolverVisitor extends GAstVisitor {
         let ref = this.nameToTopRule.get(node.nonTerminalName)
 
         if (!ref) {
-            let msg =
-                "Invalid grammar, reference to a rule which is not defined: ->" +
-                node.nonTerminalName +
-                "<-\n" +
-                "inside top level rule: ->" +
-                this.currTopLevel.name +
-                "<-"
+            let msg = this.errMsgProvider.buildRuleNotFoundError(
+                this.currTopLevel,
+                node
+            )
             this.errors.push({
                 message: msg,
                 type: ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF,

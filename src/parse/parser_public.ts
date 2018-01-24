@@ -99,7 +99,10 @@ import {
     createBaseSemanticVisitorConstructor,
     createBaseVisitorConstructorWithDefaults
 } from "./cst/cst_visitor"
-import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
+import {
+    defaultParserErrorProvider,
+    IParserErrorMessageProvider
+} from "./errors_public"
 import {
     ISerializedGast,
     Rule,
@@ -200,7 +203,7 @@ export interface IParserConfig {
      *   - Changing the formatting
      *   - Providing special error messages under certain conditions - missing semicolons
      */
-    errorMessageProvider?: IErrorMessageProvider
+    errorMessageProvider?: IParserErrorMessageProvider
 }
 
 const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
@@ -211,7 +214,7 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     // TODO: Document this breaking change, can it be mitigated?
     // TODO: change to true
     outputCst: false,
-    errorMessageProvider: defaultErrorProvider
+    errorMessageProvider: defaultParserErrorProvider
 })
 
 export interface IRuleConfig<T> {
@@ -575,7 +578,7 @@ export class Parser {
     protected outputCst: boolean
 
     // adapters
-    protected errorMessageProvider: IErrorMessageProvider
+    protected errorMessageProvider: IParserErrorMessageProvider
 
     protected isBackTrackingStack = []
     protected className: string
