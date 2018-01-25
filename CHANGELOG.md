@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [Added missing link to deprecated TokenType parent property.](https://github.com/SAP/chevrotain/issues/640)
+
+
+
 ## 1.0.1 (12-27-2017)
 
 #### Documentation
