@@ -21,7 +21,10 @@ import {
 } from "./parse/exceptions_public"
 import { clearCache } from "./parse/cache_public"
 import { VERSION } from "./version"
-import { defaultParserErrorProvider } from "./parse/errors_public"
+import {
+    defaultGrammarErrorProvider,
+    defaultParserErrorProvider
+} from "./parse/errors_public"
 import { createSyntaxDiagramsCode } from "./diagrams/render_public"
 import { GAstVisitor } from "./parse/grammar/gast/gast_visitor_public"
 import {
@@ -70,7 +73,8 @@ API.createTokenInstance = createTokenInstance
 API.EMPTY_ALT = EMPTY_ALT
 // TODO: Breaking Change -> renamed property
 API.defaultParserErrorProvider = defaultParserErrorProvider
-API.defaultGrammarErrorProvider = API.isRecognitionException = isRecognitionException
+API.defaultGrammarErrorProvider = defaultGrammarErrorProvider
+API.isRecognitionException = isRecognitionException
 API.EarlyExitException = EarlyExitException
 API.MismatchedTokenException = MismatchedTokenException
 API.NotAllInputParsedException = NotAllInputParsedException

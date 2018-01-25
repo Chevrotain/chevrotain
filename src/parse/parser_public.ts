@@ -5,19 +5,15 @@ import {
     CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS
 } from "./cache"
 import {
-    NoViableAltException,
-    MismatchedTokenException,
-    NotAllInputParsedException,
+    EarlyExitException,
     IRecognitionException,
     isRecognitionException,
-    EarlyExitException
+    MismatchedTokenException,
+    NotAllInputParsedException,
+    NoViableAltException
 } from "./exceptions_public"
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
-import {
-    validateRuleDoesNotAlreadyExist,
-    validateRuleIsOverridden,
-    validateRuleName
-} from "./grammar/checks"
+import { validateRuleIsOverridden } from "./grammar/checks"
 import {
     cloneArr,
     cloneObj,
@@ -100,6 +96,7 @@ import {
     createBaseVisitorConstructorWithDefaults
 } from "./cst/cst_visitor"
 import {
+    defaultGrammarErrorProvider,
     defaultParserErrorProvider,
     IParserErrorMessageProvider
 } from "./errors_public"
@@ -507,7 +504,9 @@ export class Parser {
                     rules: clonedProductions.values(),
                     maxLookahead: parserInstance.maxLookahead,
                     tokenTypes: values(parserInstance.tokensMap),
-                    ignoredIssues: parserInstance.ignoredIssues
+                    ignoredIssues: parserInstance.ignoredIssues,
+                    errMsgProvider: defaultGrammarErrorProvider,
+                    grammarName: className
                 })
 
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
@@ -1590,16 +1589,23 @@ export class Parser {
         // compatible, T|any is very general...
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
     ): (idxInCallingRule?: number, ...args: any[]) => T | any {
-        let ruleErrors = validateRuleName(name)
-        ruleErrors = ruleErrors.concat(
-            validateRuleDoesNotAlreadyExist(
-                name,
-                this.definedRulesNames,
-                this.className
+        if (contains(this.definedRulesNames, name)) {
+            const errMsg = defaultGrammarErrorProvider.buildDuplicateRuleNameError(
+                {
+                    topLevelRule: name,
+                    grammarName: this.className
+                }
             )
-        )
+
+            const error = {
+                message: errMsg,
+                type: ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+                ruleName: name
+            }
+            this.definitionErrors.push(error)
+        }
+
         this.definedRulesNames.push(name)
-        this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
         // only build the gast representation once.
         if (!this._productions.containsKey(name)) {
@@ -1637,7 +1643,7 @@ export class Parser {
         impl: (...implArgs: any[]) => T,
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
     ): (idxInCallingRule?: number, ...args: any[]) => T {
-        let ruleErrors = validateRuleName(name)
+        let ruleErrors = []
         ruleErrors = ruleErrors.concat(
             validateRuleIsOverridden(
                 name,

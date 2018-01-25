@@ -5,8 +5,10 @@ import {
     tokenLabel,
     tokenName
 } from "../scan/tokens_public"
+import * as utils from "../utils/utils"
 import { first, map, reduce } from "../utils/utils"
 import {
+    Alternation,
     IOptionallyNamedProduction,
     IProductionWithOccurrence,
     NonTerminal,
@@ -15,6 +17,7 @@ import {
 } from "./grammar/gast/gast_public"
 import { getProductionDslName } from "./grammar/gast/gast"
 import { validNestedRuleName } from "./grammar/checks"
+import { VERSION } from "../version"
 
 export interface IParserErrorMessageProvider {
     /**
@@ -210,6 +213,58 @@ export interface IGrammarErrorMessageProvider
         topLevelRule: Rule,
         nestedProd: IOptionallyNamedProduction[]
     ): string
+
+    buildNamespaceConflictError(topLevelRule: Rule): string
+
+    buildAlternationPrefixAmbiguityError(options: {
+        topLevelRule: Rule
+        prefixPath: TokenType[]
+        ambiguityIndices: number[]
+        alternation: Alternation
+    }): string
+
+    buildAlternationAmbiguityError(options: {
+        topLevelRule: Rule
+        prefixPath: TokenType[]
+        ambiguityIndices: number[]
+        alternation: Alternation
+    }): string
+
+    buildEmptyRepetitionError(options: {
+        topLevelRule: Rule
+        repetition: IProductionWithOccurrence
+    }): string
+
+    buildTokenNameError(options: {
+        tokenType: TokenType
+        expectedPattern: RegExp
+    })
+
+    buildEmptyAlternationError(options: {
+        topLevelRule: Rule
+        alternation: Alternation
+        emptyChoiceIdx: number
+    })
+
+    buildTooManyAlternativesError(options: {
+        topLevelRule: Rule
+        alternation: Alternation
+    }): string
+
+    buildLeftRecursionError(options: {
+        topLevelRule: Rule
+        leftRecursionPath: Rule[]
+    }): string
+
+    buildInvalidRuleNameError(options: {
+        topLevelRule: Rule
+        expectedPattern: RegExp
+    }): string
+
+    buildDuplicateRuleNameError(options: {
+        topLevelRule: Rule | string
+        grammarName: string
+    }): string
 }
 
 export const defaultGrammarErrorProvider: IGrammarErrorMessageProvider = {
@@ -299,6 +354,182 @@ export const defaultGrammarErrorProvider: IGrammarErrorMessageProvider = {
                 topLevelRule.name
             }<-\n` +
             `A nested name must be unique in the scope of a top level grammar rule.`
+
+        return errMsg
+    },
+
+    buildNamespaceConflictError(rule: Rule): string {
+        const errMsg =
+            `Namespace conflict found in grammar.\n` +
+            `The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${
+                rule.name
+            }>.\n` +
+            `To resolve this make sure each Terminal and Non-Terminal names are unique\n` +
+            `This is easy to accomplish by using the convention that Terminal names start with an uppercase letter\n` +
+            `and Non-Terminal names start with a lower case letter.`
+
+        return errMsg
+    },
+    buildAlternationPrefixAmbiguityError(options: {
+        topLevelRule: Rule
+        prefixPath: TokenType[]
+        ambiguityIndices: number[]
+        alternation: Alternation
+    }): string {
+        const pathMsg = map(options.prefixPath, currTok =>
+            tokenLabel(currTok)
+        ).join(", ")
+        const occurrence =
+            options.alternation.idx === 0 ? "" : options.alternation.idx
+        const errMsg =
+            `Ambiguous alternatives: <${options.ambiguityIndices.join(
+                " ,"
+            )}> due to common lookahead prefix\n` +
+            `in <OR${occurrence}> inside <${
+                options.topLevelRule.name
+            }> Rule,\n` +
+            `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
+            `http://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX ` +
+            `For farther details.`
+
+        return errMsg
+    },
+
+    buildAlternationAmbiguityError(options: {
+        topLevelRule: Rule
+        prefixPath: TokenType[]
+        ambiguityIndices: number[]
+        alternation: Alternation
+    }): string {
+        let pathMsg = map(options.prefixPath, currtok =>
+            tokenLabel(currtok)
+        ).join(", ")
+        let occurrence =
+            options.alternation.idx === 0 ? "" : options.alternation.idx
+        let currMessage =
+            `Ambiguous alternatives: <${options.ambiguityIndices.join(
+                " ,"
+            )}> in <OR${occurrence}>` +
+            ` inside <${options.topLevelRule.name}> Rule,\n` +
+            `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
+
+        let docs_version = VERSION.replace(/\./g, "_")
+        // Should this information be on the error message or in some common errors docs?
+        currMessage =
+            currMessage +
+            "To Resolve this, try one of of the following: \n" +
+            "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
+            "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
+            "3. This issue can be ignored (if you know what you are doing...), see" +
+            " http://sap.github.io/chevrotain/documentation/" +
+            docs_version +
+            "/interfaces/iparserconfig.html#ignoredissues for more" +
+            " details\n"
+        return currMessage
+    },
+
+    buildEmptyRepetitionError(options: {
+        topLevelRule: Rule
+        repetition: IProductionWithOccurrence
+    }): string {
+        let dslName = getProductionDslName(options.repetition)
+        if (options.repetition.idx !== 0) {
+            dslName += options.repetition.idx
+        }
+
+        const errMsg =
+            `The repetition <${dslName}> within Rule <${
+                options.topLevelRule.name
+            }> can never consume any tokens.\n` +
+            `This could lead to an infinite loop.`
+
+        return errMsg
+    },
+
+    buildTokenNameError(options: {
+        tokenType: TokenType
+        expectedPattern: RegExp
+    }): string {
+        const tokTypeName = tokenName(options.tokenType)
+        const errMsg = `Invalid Grammar Token name: ->${tokTypeName}<- it must match the pattern: ->${options.expectedPattern.toString()}<-`
+        return errMsg
+    },
+
+    buildEmptyAlternationError(options: {
+        topLevelRule: Rule
+        alternation: Alternation
+        emptyChoiceIdx: number
+    }): string {
+        const errMsg =
+            `Ambiguous empty alternative: <${options.emptyChoiceIdx + 1}>` +
+            ` in <OR${options.alternation.idx}> inside <${
+                options.topLevelRule.name
+            }> Rule.\n` +
+            `Only the last alternative may be an empty alternative.`
+
+        return errMsg
+    },
+
+    buildTooManyAlternativesError(options: {
+        topLevelRule: Rule
+        alternation: Alternation
+    }): string {
+        const errMsg =
+            `An Alternation cannot have more than 256 alternatives:\n` +
+            `<OR${options.alternation.idx}> inside <${
+                options.topLevelRule.name
+            }> Rule.\n has ${options.alternation.definition.length +
+                1} alternatives.`
+
+        return errMsg
+    },
+
+    buildLeftRecursionError(options: {
+        topLevelRule: Rule
+        leftRecursionPath: Rule[]
+    }): string {
+        const ruleName = options.topLevelRule.name
+        let pathNames = utils.map(
+            options.leftRecursionPath,
+            currRule => currRule.name
+        )
+        let leftRecursivePath = `${ruleName} --> ${pathNames
+            .concat([ruleName])
+            .join(" --> ")}`
+        let errMsg =
+            `Left Recursion found in grammar.\n` +
+            `rule: <${ruleName}> can be invoked from itself (directly or indirectly)\n` +
+            `without consuming any Tokens. The grammar path that causes this is: \n ${leftRecursivePath}\n` +
+            ` To fix this refactor your grammar to remove the left recursion.\n` +
+            `see: https://en.wikipedia.org/wiki/LL_parser#Left_Factoring.`
+
+        return errMsg
+    },
+
+    buildInvalidRuleNameError(options: {
+        topLevelRule: Rule
+        expectedPattern: RegExp
+    }): string {
+        const ruleName = options.topLevelRule.name
+        const expectedPatternString = options.expectedPattern.toString()
+        const errMsg = `Invalid grammar rule name: ->${ruleName}<- it must match the pattern: ->${expectedPatternString}<-`
+        return errMsg
+    },
+
+    buildDuplicateRuleNameError(options: {
+        topLevelRule: Rule | string
+        grammarName: string
+    }): string {
+        let ruleName
+        if (options.topLevelRule instanceof Rule) {
+            ruleName = options.topLevelRule.name
+        } else {
+            ruleName = options.topLevelRule
+        }
+
+        const errMsg = `Duplicate definition, rule: ->${ruleName}<- is already defined in the grammar: ->${
+            options.grammarName
+        }<-`
 
         return errMsg
     }

@@ -29,7 +29,7 @@ const allTokens = [WhiteSpace, Alpha, Bravo, Charlie]
 const PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- Custom Error Provider ------------
-const defaultErrorProvider = chevrotain.defaultErrorProvider
+const defaultParserErrorProvider = chevrotain.defaultParserErrorProvider
 
 const myErrorProvider = {
     buildMismatchTokenMessage: function(options) {
@@ -39,7 +39,7 @@ const myErrorProvider = {
             return "expecting Bravo at end of " + options.ruleName
         } else {
             // fallback to the default behavior otherwise.
-            return defaultErrorProvider.buildMismatchTokenMessage(options)
+            return defaultParserErrorProvider.buildMismatchTokenMessage(options)
         }
     },
     buildNotAllInputParsedMessage: function(options) {
