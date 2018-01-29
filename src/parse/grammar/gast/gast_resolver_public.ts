@@ -1,4 +1,4 @@
-import { Rule } from "./gast_public"
+import { NonTerminal, Rule } from "./gast_public"
 import {
     IgnoredParserIssues,
     IParserDefinitionError
@@ -8,6 +8,10 @@ import { HashTable } from "../../../lang/lang_extensions"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { TokenType } from "../../../scan/lexer_public"
 import { validateGrammar as orgValidateGrammar } from "../checks"
+import {
+    defaultGrammarErrorProvider,
+    IGrammarErrorMessageProvider
+} from "../../errors_public"
 
 export function resolveGrammar(options: {
     rules: Rule[]
@@ -24,11 +28,17 @@ export function validateGrammar(options: {
     maxLookahead: number
     tokenTypes: TokenType[]
     ignoredIssues: IgnoredParserIssues
+    grammarName: string
+    errMsgProvider?: IGrammarErrorMessageProvider
 }): IParserDefinitionError[] {
     return orgValidateGrammar(
         options.rules,
         options.maxLookahead,
         options.tokenTypes,
-        options.ignoredIssues
+        options.ignoredIssues,
+        options.errMsgProvider
+            ? options.errMsgProvider
+            : defaultGrammarErrorProvider,
+        options.grammarName
     )
 }

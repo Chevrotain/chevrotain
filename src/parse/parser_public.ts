@@ -5,19 +5,15 @@ import {
     CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS
 } from "./cache"
 import {
-    NoViableAltException,
-    MismatchedTokenException,
-    NotAllInputParsedException,
+    EarlyExitException,
     IRecognitionException,
     isRecognitionException,
-    EarlyExitException
+    MismatchedTokenException,
+    NotAllInputParsedException,
+    NoViableAltException
 } from "./exceptions_public"
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
-import {
-    validateRuleDoesNotAlreadyExist,
-    validateRuleIsOverridden,
-    validateRuleName
-} from "./grammar/checks"
+import { validateRuleIsOverridden } from "./grammar/checks"
 import {
     cloneArr,
     cloneObj,
@@ -99,7 +95,11 @@ import {
     createBaseSemanticVisitorConstructor,
     createBaseVisitorConstructorWithDefaults
 } from "./cst/cst_visitor"
-import { defaultErrorProvider, IErrorMessageProvider } from "./errors_public"
+import {
+    defaultGrammarErrorProvider,
+    defaultParserErrorProvider,
+    IParserErrorMessageProvider
+} from "./errors_public"
 import {
     ISerializedGast,
     Rule,
@@ -200,7 +200,7 @@ export interface IParserConfig {
      *   - Changing the formatting
      *   - Providing special error messages under certain conditions - missing semicolons
      */
-    errorMessageProvider?: IErrorMessageProvider
+    errorMessageProvider?: IParserErrorMessageProvider
 }
 
 const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
@@ -211,7 +211,7 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     // TODO: Document this breaking change, can it be mitigated?
     // TODO: change to true
     outputCst: false,
-    errorMessageProvider: defaultErrorProvider
+    errorMessageProvider: defaultParserErrorProvider
 })
 
 export interface IRuleConfig<T> {
@@ -504,7 +504,9 @@ export class Parser {
                     rules: clonedProductions.values(),
                     maxLookahead: parserInstance.maxLookahead,
                     tokenTypes: values(parserInstance.tokensMap),
-                    ignoredIssues: parserInstance.ignoredIssues
+                    ignoredIssues: parserInstance.ignoredIssues,
+                    errMsgProvider: defaultGrammarErrorProvider,
+                    grammarName: className
                 })
 
                 definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
@@ -575,7 +577,7 @@ export class Parser {
     protected outputCst: boolean
 
     // adapters
-    protected errorMessageProvider: IErrorMessageProvider
+    protected errorMessageProvider: IParserErrorMessageProvider
 
     protected isBackTrackingStack = []
     protected className: string
@@ -1587,16 +1589,23 @@ export class Parser {
         // compatible, T|any is very general...
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
     ): (idxInCallingRule?: number, ...args: any[]) => T | any {
-        let ruleErrors = validateRuleName(name)
-        ruleErrors = ruleErrors.concat(
-            validateRuleDoesNotAlreadyExist(
-                name,
-                this.definedRulesNames,
-                this.className
+        if (contains(this.definedRulesNames, name)) {
+            const errMsg = defaultGrammarErrorProvider.buildDuplicateRuleNameError(
+                {
+                    topLevelRule: name,
+                    grammarName: this.className
+                }
             )
-        )
+
+            const error = {
+                message: errMsg,
+                type: ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
+                ruleName: name
+            }
+            this.definitionErrors.push(error)
+        }
+
         this.definedRulesNames.push(name)
-        this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
         // only build the gast representation once.
         if (!this._productions.containsKey(name)) {
@@ -1634,7 +1643,7 @@ export class Parser {
         impl: (...implArgs: any[]) => T,
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
     ): (idxInCallingRule?: number, ...args: any[]) => T {
-        let ruleErrors = validateRuleName(name)
+        let ruleErrors = []
         ruleErrors = ruleErrors.concat(
             validateRuleIsOverridden(
                 name,

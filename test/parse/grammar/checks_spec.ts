@@ -17,15 +17,16 @@ import {
 import { createToken, IToken } from "../../../src/scan/tokens_public"
 import { first, forEach, map } from "../../../src/utils/utils"
 import {
-    Repetition,
-    Rule,
-    Terminal,
-    Option,
     Alternation,
-    RepetitionMandatory,
     Flat,
-    NonTerminal
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    Rule,
+    Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
+import { defaultGrammarErrorProvider } from "../../../src/parse/errors_public"
 
 describe("the grammar validations", () => {
     it("validates every one of the TOP_RULEs in the input", () => {
@@ -103,7 +104,9 @@ describe("the grammar validations", () => {
             [qualifiedNameErr1, qualifiedNameErr2],
             5,
             [],
-            {}
+            {},
+            defaultGrammarErrorProvider,
+            "bamba"
         )
         expect(actualErrors.length).to.equal(4)
 
@@ -114,17 +117,27 @@ describe("the grammar validations", () => {
 
     it("does not allow duplicate grammar rule names", () => {
         let noErrors = validateRuleDoesNotAlreadyExist(
-            "A",
-            ["B", "C"],
-            "className"
+            new Rule({ name: "A", definition: [] }),
+            [
+                new Rule({ name: "B", definition: [] }),
+                new Rule({ name: "C", definition: [] })
+            ],
+            "className",
+            defaultGrammarErrorProvider
         )
         //noinspection BadExpressionStatementJS
         expect(noErrors).to.be.empty
 
         let duplicateErr = validateRuleDoesNotAlreadyExist(
-            "A",
-            ["A", "B", "C"],
-            "className"
+            new Rule({ name: "A", definition: [] }),
+            [
+                new Rule({ name: "A", definition: [] }),
+                new Rule({ name: "A", definition: [] }),
+                new Rule({ name: "B", definition: [] }),
+                new Rule({ name: "C", definition: [] })
+            ],
+            "className",
+            defaultGrammarErrorProvider
         )
         //noinspection BadExpressionStatementJS
         expect(duplicateErr).to.have.length(1)
@@ -137,7 +150,10 @@ describe("the grammar validations", () => {
     })
 
     it("only allows a subset of ECMAScript identifiers as rule names", () => {
-        let res1 = validateRuleName("1baa")
+        let res1 = validateRuleName(
+            new Rule({ name: "1baa", definition: [] }),
+            defaultGrammarErrorProvider
+        )
         expect(res1).to.have.lengthOf(1)
         expect(res1[0]).to.have.property("message")
         expect(res1[0]).to.have.property(
@@ -146,7 +162,10 @@ describe("the grammar validations", () => {
         )
         expect(res1[0]).to.have.property("ruleName", "1baa")
 
-        let res2 = validateRuleName("שלום")
+        let res2 = validateRuleName(
+            new Rule({ name: "שלום", definition: [] }),
+            defaultGrammarErrorProvider
+        )
         expect(res2).to.have.lengthOf(1)
         expect(res2[0]).to.have.property("message")
         expect(res2[0]).to.have.property(
@@ -155,7 +174,10 @@ describe("the grammar validations", () => {
         )
         expect(res2[0]).to.have.property("ruleName", "שלום")
 
-        let res3 = validateRuleName("$bamba")
+        let res3 = validateRuleName(
+            new Rule({ name: "$bamba", definition: [] }),
+            defaultGrammarErrorProvider
+        )
         expect(res3).to.have.lengthOf(1)
         expect(res3[0]).to.have.property("message")
         expect(res3[0]).to.have.property(
@@ -623,7 +645,7 @@ describe("The rule names validation full flow", () => {
             "it must match the pattern"
         )
         expect(() => new InvalidRuleNameParser()).to.throw(
-            "Invalid Grammar rule name"
+            "Invalid grammar rule name"
         )
         expect(() => new InvalidRuleNameParser()).to.throw("שלום")
     })
@@ -1163,7 +1185,10 @@ describe("The no non-empty lookahead validation", () => {
             definition: [new Alternation({ definition: alternatives })]
         })
 
-        const actual = validateTooManyAlts(ruleWithTooManyAlts)
+        const actual = validateTooManyAlts(
+            ruleWithTooManyAlts,
+            defaultGrammarErrorProvider
+        )
         expect(actual).to.have.lengthOf(1)
         expect(actual[0].type).to.equal(ParserDefinitionErrorType.TOO_MANY_ALTS)
         expect(actual[0].ruleName).to.equal("blah")

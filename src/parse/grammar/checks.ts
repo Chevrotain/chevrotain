@@ -22,7 +22,7 @@ import {
     ParserDefinitionErrorType
 } from "../parser_public"
 import { getProductionDslName, isOptionalProd } from "./gast/gast"
-import { tokenLabel, tokenName } from "../../scan/tokens_public"
+import { tokenName } from "../../scan/tokens_public"
 import {
     Alternative,
     containsPath,
@@ -31,13 +31,13 @@ import {
     getProdType,
     isStrictPrefixOfPath
 } from "./lookahead"
-import { VERSION } from "../../version"
 import { TokenType } from "../../scan/lexer_public"
 import { NamedDSLMethodsCollectorVisitor } from "../cst/cst"
 import { nextPossibleTokensAfter } from "./interpreter"
 import {
     Alternation,
     Flat,
+    IOptionallyNamedProduction,
     IProduction,
     IProductionWithOccurrence,
     NonTerminal,
@@ -50,19 +50,24 @@ import {
     Terminal
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
+import {
+    defaultGrammarErrorProvider,
+    IGrammarErrorMessageProvider
+} from "../errors_public"
 
 export function validateGrammar(
     topLevels: Rule[],
     maxLookahead: number,
-    tokens: TokenType[],
-    ignoredIssues: IgnoredParserIssues
+    tokenTypes: TokenType[],
+    ignoredIssues: IgnoredParserIssues,
+    errMsgProvider: IGrammarErrorMessageProvider = defaultGrammarErrorProvider,
+    grammarName: string
 ): IParserDefinitionError[] {
-    let duplicateErrors: any = utils.map(
-        topLevels,
-        validateDuplicateProductions
+    let duplicateErrors: any = utils.map(topLevels, currTopLevel =>
+        validateDuplicateProductions(currTopLevel, errMsgProvider)
     )
     let leftRecursionErrors: any = utils.map(topLevels, currTopRule =>
-        validateNoLeftRecursion(currTopRule, currTopRule)
+        validateNoLeftRecursion(currTopRule, currTopRule, errMsgProvider)
     )
 
     let emptyAltErrors = []
@@ -71,35 +76,61 @@ export function validateGrammar(
     // left recursion could cause infinite loops in the following validations.
     // It is safest to first have the user fix the left recursion errors first and only then examine farther issues.
     if (every(leftRecursionErrors, isEmpty)) {
-        emptyAltErrors = map(topLevels, validateEmptyOrAlternative)
+        emptyAltErrors = map(topLevels, currTopRule =>
+            validateEmptyOrAlternative(currTopRule, errMsgProvider)
+        )
         ambiguousAltsErrors = map(topLevels, currTopRule =>
             validateAmbiguousAlternationAlternatives(
                 currTopRule,
                 maxLookahead,
-                ignoredIssues
+                ignoredIssues,
+                errMsgProvider
             )
         )
     }
 
-    let ruleNames = map(topLevels, currTopLevel => currTopLevel.name)
-    let tokenNames = map(tokens, currToken => tokenName(currToken))
     let termsNamespaceConflictErrors = checkTerminalAndNoneTerminalsNameSpace(
-        ruleNames,
-        tokenNames
+        topLevels,
+        tokenTypes,
+        errMsgProvider
     )
 
-    let tokenNameErrors: any = utils.map(tokenNames, validateTokenName)
-    let nestedRulesNameErrors: any = validateNestedRulesNames(topLevels)
+    let tokenNameErrors: any = utils.map(tokenTypes, currTokType =>
+        validateTokenName(currTokType, errMsgProvider)
+    )
+
+    let nestedRulesNameErrors: any = validateNestedRulesNames(
+        topLevels,
+        errMsgProvider
+    )
+
     let nestedRulesDuplicateErrors: any = validateDuplicateNestedRules(
-        topLevels
+        topLevels,
+        errMsgProvider
     )
 
     let emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
         topLevels,
-        maxLookahead
+        maxLookahead,
+        errMsgProvider
     )
 
-    const tooManyAltsErrors = utils.map(topLevels, validateTooManyAlts)
+    const tooManyAltsErrors = map(topLevels, curRule =>
+        validateTooManyAlts(curRule, errMsgProvider)
+    )
+
+    const ruleNameErrors = map(topLevels, curRule =>
+        validateRuleName(curRule, errMsgProvider)
+    )
+
+    const duplicateRulesError = map(topLevels, curRule =>
+        validateRuleDoesNotAlreadyExist(
+            curRule,
+            topLevels,
+            grammarName,
+            errMsgProvider
+        )
+    )
 
     return <any>utils.flatten(
         duplicateErrors.concat(
@@ -111,24 +142,32 @@ export function validateGrammar(
             emptyAltErrors,
             ambiguousAltsErrors,
             termsNamespaceConflictErrors,
-            tooManyAltsErrors
+            tooManyAltsErrors,
+            ruleNameErrors,
+            duplicateRulesError
         )
     )
 }
 
-function validateNestedRulesNames(topLevels: Rule[]): IParserDefinitionError[] {
+function validateNestedRulesNames(
+    topLevels: Rule[],
+    errMsgProvider: IGrammarErrorMessageProvider
+): IParserDefinitionError[] {
     let result = []
     forEach(topLevels, curTopLevel => {
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
         curTopLevel.accept(namedCollectorVisitor)
-        let nestedNamesPerRule = map(
+        let nestedProds = map(
             namedCollectorVisitor.result,
-            currItem => currItem.name
+            currItem => currItem.orgProd
         )
-        let currTopRuleName = curTopLevel.name
         result.push(
-            map(nestedNamesPerRule, currNestedName =>
-                validateNestedRuleName(currNestedName, currTopRuleName)
+            map(nestedProds, currNestedProd =>
+                validateNestedRuleName(
+                    curTopLevel,
+                    currNestedProd,
+                    errMsgProvider
+                )
             )
         )
     })
@@ -137,7 +176,8 @@ function validateNestedRulesNames(topLevels: Rule[]): IParserDefinitionError[] {
 }
 
 function validateDuplicateProductions(
-    topLevelRule: Rule
+    topLevelRule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDuplicatesDefinitionError[] {
     let collectorVisitor = new OccurrenceValidationCollector()
     topLevelRule.accept(collectorVisitor)
@@ -154,9 +194,9 @@ function validateDuplicateProductions(
 
     let errors = utils.map(utils.values(duplicates), (currDuplicates: any) => {
         let firstProd: any = utils.first(currDuplicates)
-        let msg = createDuplicatesErrorMessage(
-            currDuplicates,
-            topLevelRule.name
+        let msg = errMsgProvider.buildDuplicateFoundError(
+            topLevelRule,
+            currDuplicates
         )
         let dslName = getProductionDslName(firstProd)
         let defError: IParserDuplicatesDefinitionError = {
@@ -175,41 +215,6 @@ function validateDuplicateProductions(
         return defError
     })
     return errors
-}
-
-function createDuplicatesErrorMessage(
-    duplicateProds: IProductionWithOccurrence[],
-    topLevelName
-): string {
-    let firstProd = utils.first(duplicateProds)
-    let index = firstProd.idx
-    let dslName = getProductionDslName(firstProd)
-    let extraArgument = getExtraProductionArgument(firstProd)
-
-    let msg = `->${dslName}<- with numerical suffix: ->${index}<-
-                  ${extraArgument ? `and argument: ->${extraArgument}<-` : ""}
-                  appears more than once (${
-                      duplicateProds.length
-                  } times) in the top level rule: ->${topLevelName}<-.
-                  ${
-                      index === 0
-                          ? `Also note that numerical suffix 0 means ${dslName} without any suffix.`
-                          : ""
-                  }
-                  To fix this make sure each usage of ${dslName} ${
-        extraArgument ? `with the argument: ->${extraArgument}<-` : ""
-    }
-                  in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
-                  position key in the grammar, which is needed by the parsing engine.
-                  
-                  For further details see: http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
-                  `
-
-    // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
-    msg = msg.replace(/[ \t]+/g, " ")
-    msg = msg.replace(/\s\s+/g, "\n")
-
-    return msg
 }
 
 export function identifyProductionForDuplicates(
@@ -275,52 +280,62 @@ export const validNestedRuleName = new RegExp(
     validTermsPattern.source.replace("^", "^\\$")
 )
 
-export function validateRuleName(ruleName: string): IParserDefinitionError[] {
-    let errors = []
-    let errMsg
+export function validateRuleName(
+    rule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
+): IParserDefinitionError[] {
+    const errors = []
+    const ruleName = rule.name
 
     if (!ruleName.match(validTermsPattern)) {
-        errMsg = `Invalid Grammar rule name: ->${ruleName}<- it must match the pattern: ->${validTermsPattern.toString()}<-`
         errors.push({
-            message: errMsg,
+            message: errMsgProvider.buildInvalidRuleNameError({
+                topLevelRule: rule,
+                expectedPattern: validTermsPattern
+            }),
             type: ParserDefinitionErrorType.INVALID_RULE_NAME,
             ruleName: ruleName
         })
     }
-
     return errors
 }
 
 export function validateNestedRuleName(
-    nestedRuleName: string,
-    containingRuleName: string
+    topLevel: Rule,
+    nestedProd: IOptionallyNamedProduction,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
     let errMsg
 
-    if (!nestedRuleName.match(validNestedRuleName)) {
-        errMsg =
-            `Invalid nested rule name: ->${nestedRuleName}<- inside rule: ->${containingRuleName}<-\n` +
-            `it must match the pattern: ->${validNestedRuleName.toString()}<-.\n` +
-            `Note that this means a nested rule name must start with the '$'(dollar) sign.`
+    if (!nestedProd.name.match(validNestedRuleName)) {
+        errMsg = errMsgProvider.buildInvalidNestedRuleNameError(
+            topLevel,
+            nestedProd
+        )
         errors.push({
             message: errMsg,
             type: ParserDefinitionErrorType.INVALID_NESTED_RULE_NAME,
-            ruleName: nestedRuleName
+            ruleName: topLevel.name
         })
     }
 
     return errors
 }
 
-export function validateTokenName(tokenNAme: string): IParserDefinitionError[] {
-    let errors = []
-    let errMsg
+export function validateTokenName(
+    tokenType: TokenType,
+    errMsgProvider: IGrammarErrorMessageProvider
+): IParserDefinitionError[] {
+    const errors = []
+    const tokTypeName = tokenName(tokenType)
 
-    if (!tokenNAme.match(validTermsPattern)) {
-        errMsg = `Invalid Grammar Token name: ->${tokenNAme}<- it must match the pattern: ->${validTermsPattern.toString()}<-`
+    if (!tokTypeName.match(validTermsPattern)) {
         errors.push({
-            message: errMsg,
+            message: errMsgProvider.buildTokenNameError({
+                tokenType: tokenType,
+                expectedPattern: validTermsPattern
+            }),
             type: ParserDefinitionErrorType.INVALID_TOKEN_NAME
         })
     }
@@ -329,19 +344,31 @@ export function validateTokenName(tokenNAme: string): IParserDefinitionError[] {
 }
 
 export function validateRuleDoesNotAlreadyExist(
-    ruleName: string,
-    definedRulesNames: string[],
-    className
+    rule: Rule,
+    allRules: Rule[],
+    className,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
-    let errMsg
-
-    if (utils.contains(definedRulesNames, ruleName)) {
-        errMsg = `Duplicate definition, rule: ->${ruleName}<- is already defined in the grammar: ->${className}<-`
+    const occurrences = reduce(
+        allRules,
+        (result, curRule) => {
+            if (curRule.name === rule.name) {
+                return result + 1
+            }
+            return result
+        },
+        0
+    )
+    if (occurrences > 1) {
+        const errMsg = errMsgProvider.buildDuplicateRuleNameError({
+            topLevelRule: rule,
+            grammarName: className
+        })
         errors.push({
             message: errMsg,
             type: ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
-            ruleName: ruleName
+            ruleName: rule.name
         })
     }
 
@@ -349,6 +376,8 @@ export function validateRuleDoesNotAlreadyExist(
 }
 
 // TODO: is there anyway to get only the rule names of rules inherited from the super grammars?
+// This is not part of the IGrammarErrorProvider because the validation cannot be performed on
+// The grammar structure, only at runtime.
 export function validateRuleIsOverridden(
     ruleName: string,
     definedRulesNames: string[],
@@ -374,6 +403,7 @@ export function validateRuleIsOverridden(
 export function validateNoLeftRecursion(
     topRule: Rule,
     currRule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider,
     path: Rule[] = []
 ): IParserDefinitionError[] {
     let errors = []
@@ -383,19 +413,12 @@ export function validateNoLeftRecursion(
     } else {
         let ruleName = topRule.name
         let foundLeftRecursion = utils.contains(<any>nextNonTerminals, topRule)
-        let pathNames = utils.map(path, currRule => currRule.name)
-        let leftRecursivePath = `${ruleName} --> ${pathNames
-            .concat([ruleName])
-            .join(" --> ")}`
         if (foundLeftRecursion) {
-            let errMsg =
-                `Left Recursion found in grammar.\n` +
-                `rule: <${ruleName}> can be invoked from itself (directly or indirectly)\n` +
-                `without consuming any Tokens. The grammar path that causes this is: \n ${leftRecursivePath}\n` +
-                ` To fix this refactor your grammar to remove the left recursion.\n` +
-                `see: https://en.wikipedia.org/wiki/LL_parser#Left_Factoring.`
             errors.push({
-                message: errMsg,
+                message: errMsgProvider.buildLeftRecursionError({
+                    topLevelRule: topRule,
+                    leftRecursionPath: path
+                }),
                 type: ParserDefinitionErrorType.LEFT_RECURSION,
                 ruleName: ruleName
             })
@@ -410,7 +433,12 @@ export function validateNoLeftRecursion(
         let errorsFromNextSteps = utils.map(validNextSteps, currRefRule => {
             let newPath = utils.cloneArr(path)
             newPath.push(currRefRule)
-            return validateNoLeftRecursion(topRule, currRefRule, newPath)
+            return validateNoLeftRecursion(
+                topRule,
+                currRefRule,
+                errMsgProvider,
+                newPath
+            )
         })
 
         return errors.concat(utils.flatten(errorsFromNextSteps))
@@ -470,7 +498,8 @@ class OrCollector extends GAstVisitor {
 }
 
 export function validateEmptyOrAlternative(
-    topLevelRule: Rule
+    topLevelRule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserEmptyAlternativeDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -491,13 +520,11 @@ export function validateEmptyOrAlternative(
                     )
                     if (utils.isEmpty(possibleFirstInAlt)) {
                         return {
-                            message:
-                                `Ambiguous empty alternative: <${currAltIdx +
-                                    1}>` +
-                                ` in <OR${currOr.idx}> inside <${
-                                    topLevelRule.name
-                                }> Rule.\n` +
-                                `Only the last alternative may be an empty alternative.`,
+                            message: errMsgProvider.buildEmptyAlternationError({
+                                topLevelRule: topLevelRule,
+                                alternation: currOr,
+                                emptyChoiceIdx: currAltIdx
+                            }),
                             type: ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT,
                             ruleName: topLevelRule.name,
                             occurrence: currOr.idx,
@@ -519,7 +546,8 @@ export function validateEmptyOrAlternative(
 export function validateAmbiguousAlternationAlternatives(
     topLevelRule: Rule,
     maxLookahead: number,
-    ignoredIssues: IgnoredParserIssues
+    ignoredIssues: IgnoredParserIssues,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -549,12 +577,14 @@ export function validateAmbiguousAlternationAlternatives(
             let altsAmbiguityErrors = checkAlternativesAmbiguities(
                 alternatives,
                 currOr,
-                topLevelRule.name
+                topLevelRule,
+                errMsgProvider
             )
             let altsPrefixAmbiguityErrors = checkPrefixAlternativesAmbiguities(
                 alternatives,
                 currOr,
-                topLevelRule.name
+                topLevelRule,
+                errMsgProvider
             )
 
             return result.concat(altsAmbiguityErrors, altsPrefixAmbiguityErrors)
@@ -590,7 +620,8 @@ export class RepetionCollector extends GAstVisitor {
 }
 
 export function validateTooManyAlts(
-    topLevelRule: Rule
+    topLevelRule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -601,12 +632,10 @@ export function validateTooManyAlts(
         (errors, currOr) => {
             if (currOr.definition.length > 255) {
                 errors.push({
-                    message:
-                        `An Alternation cannot have more than 256 alternatives:\n` +
-                        `<OR${currOr.idx}> inside <${
-                            topLevelRule.name
-                        }> Rule.\n has ${currOr.definition.length +
-                            1} alternatives.`,
+                    message: errMsgProvider.buildTooManyAlternativesError({
+                        topLevelRule: topLevelRule,
+                        alternation: currOr
+                    }),
                     type: ParserDefinitionErrorType.TOO_MANY_ALTS,
                     ruleName: topLevelRule.name,
                     occurrence: currOr.idx
@@ -622,7 +651,8 @@ export function validateTooManyAlts(
 
 export function validateSomeNonEmptyLookaheadPath(
     topLevelRules: Rule[],
-    maxLookahead: number
+    maxLookahead: number,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
     forEach(topLevelRules, currTopRule => {
@@ -640,15 +670,10 @@ export function validateSomeNonEmptyLookaheadPath(
             )
             let pathsInsideProduction = paths[0]
             if (isEmpty(flatten(pathsInsideProduction))) {
-                let dslName = getProductionDslName(currProd)
-                if (currOccurrence !== 0) {
-                    dslName += currOccurrence
-                }
-                let errMsg =
-                    `The repetition <${dslName}> within Rule <${
-                        currTopRule.name
-                    }> can never consume any tokens.\n` +
-                    `This could lead to an infinite loop.`
+                const errMsg = errMsgProvider.buildEmptyRepetitionError({
+                    topLevelRule: currTopRule,
+                    repetition: currProd
+                })
                 errors.push({
                     message: errMsg,
                     type: ParserDefinitionErrorType.NO_NON_EMPTY_LOOKAHEAD,
@@ -669,7 +694,8 @@ export interface IAmbiguityDescriptor {
 function checkAlternativesAmbiguities(
     alternatives: Alternative[],
     alternation: Alternation,
-    topRuleName: string
+    rule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
     let foundAmbiguousPaths = []
     let identicalAmbiguities = reduce(
@@ -707,34 +733,18 @@ function checkAlternativesAmbiguities(
             currAmbDescriptor.alts,
             currAltIdx => currAltIdx + 1
         )
-        let pathMsg = map(currAmbDescriptor.path, currtok =>
-            tokenLabel(currtok)
-        ).join(", ")
-        let occurrence = alternation.idx === 0 ? "" : alternation.idx
-        let currMessage =
-            `Ambiguous alternatives: <${ambgIndices.join(
-                " ,"
-            )}> in <OR${occurrence}>` +
-            ` inside <${topRuleName}> Rule,\n` +
-            `<${pathMsg}> may appears as a prefix path in all these alternatives.\n`
 
-        let docs_version = VERSION.replace(/\./g, "_")
-        // Should this information be on the error message or in some common errors docs?
-        currMessage =
-            currMessage +
-            "To Resolve this, try one of of the following: \n" +
-            "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
-            "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
-            "3. This issue can be ignored (if you know what you are doing...), see" +
-            " http://sap.github.io/chevrotain/documentation/" +
-            docs_version +
-            "/interfaces/iparserconfig.html#ignoredissues for more" +
-            " details\n"
+        const currMessage = errMsgProvider.buildAlternationAmbiguityError({
+            topLevelRule: rule,
+            alternation: alternation,
+            ambiguityIndices: ambgIndices,
+            prefixPath: currAmbDescriptor.path
+        })
 
         return {
             message: currMessage,
             type: ParserDefinitionErrorType.AMBIGUOUS_ALTS,
-            ruleName: topRuleName,
+            ruleName: rule.name,
             occurrence: alternation.idx,
             alternatives: [currAmbDescriptor.alts]
         }
@@ -746,7 +756,8 @@ function checkAlternativesAmbiguities(
 function checkPrefixAlternativesAmbiguities(
     alternatives: Alternative[],
     alternation: Alternation,
-    ruleName
+    rule: Rule,
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IAmbiguityDescriptor[] {
     let errors = []
 
@@ -783,23 +794,20 @@ function checkPrefixAlternativesAmbiguities(
             prefixAmbiguitiesPathsAndIndices,
             currAmbPathAndIdx => {
                 let ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1]
-                let pathMsg = map(currAmbPathAndIdx.path, currTok =>
-                    tokenLabel(currTok)
-                ).join(", ")
-                let occurrence = alternation.idx === 0 ? "" : alternation.idx
-                let currMessage =
-                    `Ambiguous alternatives: <${ambgIndices.join(
-                        " ,"
-                    )}> due to common lookahead prefix\n` +
-                    `in <OR${occurrence}> inside <${ruleName}> Rule,\n` +
-                    `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-                    `http://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX ` +
-                    `For farther details.`
+                const occurrence = alternation.idx === 0 ? "" : alternation.idx
 
+                const message = errMsgProvider.buildAlternationPrefixAmbiguityError(
+                    {
+                        topLevelRule: rule,
+                        alternation: alternation,
+                        ambiguityIndices: ambgIndices,
+                        prefixPath: currAmbPathAndIdx.path
+                    }
+                )
                 return {
-                    message: currMessage,
+                    message: message,
                     type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
-                    ruleName: ruleName,
+                    ruleName: rule.name,
                     occurrence: occurrence,
                     alternatives: ambgIndices
                 }
@@ -812,19 +820,18 @@ function checkPrefixAlternativesAmbiguities(
 }
 
 function checkTerminalAndNoneTerminalsNameSpace(
-    ruleNames: string[],
-    terminalNames: string[]
+    topLevels: Rule[],
+    tokenTypes: TokenType[],
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
 
-    forEach(ruleNames, currRuleName => {
-        if (contains(terminalNames, currRuleName)) {
-            let errMsg =
-                `Namespace conflict found in grammar.\n` +
-                `The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${currRuleName}>.\n` +
-                `To resolve this make sure each Terminal and Non-Terminal names are unique\n` +
-                `This is easy to accomplish by using the convention that Terminal names start with an uppercase letter\n` +
-                `and Non-Terminal names start with a lower case letter.`
+    let tokenNames = map(tokenTypes, currToken => tokenName(currToken))
+
+    forEach(topLevels, currRule => {
+        const currRuleName = currRule.name
+        if (contains(tokenNames, currRuleName)) {
+            let errMsg = errMsgProvider.buildNamespaceConflictError(currRule)
 
             errors.push({
                 message: errMsg,
@@ -838,30 +845,29 @@ function checkTerminalAndNoneTerminalsNameSpace(
 }
 
 function validateDuplicateNestedRules(
-    topLevelRules: Rule[]
+    topLevelRules: Rule[],
+    errMsgProvider: IGrammarErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
 
     forEach(topLevelRules, currTopRule => {
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor("")
         currTopRule.accept(namedCollectorVisitor)
-        let nestedNames = map(
+        let prodsByGroup = groupBy(
             namedCollectorVisitor.result,
-            currItem => currItem.name
+            item => item.name
         )
-        let namesGroups = groupBy(nestedNames, item => item)
-
-        let duplicates: any = pick(namesGroups, currGroup => {
+        let duplicates: any = pick(prodsByGroup, currGroup => {
             return currGroup.length > 1
         })
 
-        forEach(values(duplicates), (currDuplicates: any) => {
-            let duplicateName = utils.first(currDuplicates)
-            let errMsg =
-                `Duplicate nested rule name: ->${duplicateName}<- inside rule: ->${
-                    currTopRule.name
-                }<-\n` +
-                `A nested name must be unique in the scope of a top level grammar rule.`
+        forEach(values(duplicates), (currDupGroup: any) => {
+            const currDupProds = map(currDupGroup, dupGroup => dupGroup.orgProd)
+            const errMsg = errMsgProvider.buildDuplicateNestedRuleNameError(
+                currTopRule,
+                currDupProds
+            )
+
             errors.push({
                 message: errMsg,
                 type: ParserDefinitionErrorType.DUPLICATE_NESTED_NAME,

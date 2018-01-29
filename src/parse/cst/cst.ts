@@ -22,6 +22,7 @@ import {
 import {
     Alternation,
     Flat,
+    IOptionallyNamedProduction,
     IProduction,
     NonTerminal,
     Option,
@@ -54,6 +55,7 @@ export interface DefAndKeyAndName {
     def: IProduction[]
     key: number
     name: string
+    orgProd: IOptionallyNamedProduction
 }
 
 export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
@@ -104,7 +106,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
                 methodIdx,
                 node.idx
             )
-            this.result.push({ def, key, name: node.name })
+            this.result.push({ def, key, name: node.name, orgProd: node })
         }
     }
 
@@ -156,7 +158,8 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
                 this.result.push({
                     def,
                     key,
-                    name: currFlatAlt.name
+                    name: currFlatAlt.name,
+                    orgProd: currFlatAlt
                 })
             }
         })

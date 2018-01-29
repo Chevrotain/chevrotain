@@ -2,6 +2,7 @@ import { HashTable } from "../../../src/lang/lang_extensions"
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
 import { ParserDefinitionErrorType } from "../../../src/parse/parser_public"
 import { NonTerminal, Rule } from "../../../src/parse/grammar/gast/gast_public"
+import { defaultGrammarErrorProvider } from "../../../src/parse/errors_public"
 
 describe("The RefResolverVisitor", () => {
     it("will fail when trying to resolve a ref to a grammar rule that does not exist", () => {
@@ -9,7 +10,10 @@ describe("The RefResolverVisitor", () => {
         let topLevel = new Rule({ name: "TOP", definition: [ref] })
         let topLevelRules = new HashTable<Rule>()
         topLevelRules.put("TOP", topLevel)
-        let resolver = new GastRefResolverVisitor(topLevelRules)
+        let resolver = new GastRefResolverVisitor(
+            topLevelRules,
+            defaultGrammarErrorProvider
+        )
         resolver.resolveRefs()
         expect(resolver.errors).to.have.lengthOf(1)
         expect(resolver.errors[0].message).to.contain(
