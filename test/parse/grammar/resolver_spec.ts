@@ -1,8 +1,30 @@
 import { HashTable } from "../../../src/lang/lang_extensions"
 import { GastRefResolverVisitor } from "../../../src/parse/grammar/resolver"
 import { ParserDefinitionErrorType } from "../../../src/parse/parser_public"
-import { NonTerminal, Rule } from "../../../src/parse/grammar/gast/gast_public"
-import { defaultGrammarErrorProvider } from "../../../src/parse/errors_public"
+import {
+    Alternation,
+    Flat,
+    NonTerminal,
+    Option,
+    Repetition,
+    RepetitionMandatory,
+    RepetitionMandatoryWithSeparator,
+    RepetitionWithSeparator,
+    Rule,
+    Terminal
+} from "../../../src/parse/grammar/gast/gast_public"
+import { defaultGrammarResolverErrorProvider } from "../../../src/parse/errors_public"
+import { assignOccurrenceIndices } from "../../../src/parse/grammar/gast/gast_resolver_public"
+import {
+    ColonTok,
+    IdentTok,
+    LSquareTok,
+    qualifiedName,
+    RSquareTok
+} from "./samples"
+import { createToken } from "../../../src/scan/tokens_public"
+import { DslMethodsCollectorVisitor } from "../../../src/parse/grammar/gast/gast"
+import { forEach, map, uniq } from "../../../src/utils/utils"
 
 describe("The RefResolverVisitor", () => {
     it("will fail when trying to resolve a ref to a grammar rule that does not exist", () => {
@@ -12,7 +34,7 @@ describe("The RefResolverVisitor", () => {
         topLevelRules.put("TOP", topLevel)
         let resolver = new GastRefResolverVisitor(
             topLevelRules,
-            defaultGrammarErrorProvider
+            defaultGrammarResolverErrorProvider
         )
         resolver.resolveRefs()
         expect(resolver.errors).to.have.lengthOf(1)
@@ -26,5 +48,87 @@ describe("The RefResolverVisitor", () => {
             ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF
         )
         expect(resolver.errors[0].ruleName).to.equal("TOP")
+    })
+})
+
+describe("The assignOccurrenceIndices utility", () => {
+    it("will correctly add indices for DSL methods", () => {
+        const A = createToken({ name: "A" })
+        const B = createToken({ name: "B" })
+
+        const rule = new Rule({
+            name: "rule",
+            definition: [
+                new Terminal({ terminalType: A }),
+                new NonTerminal({
+                    nonTerminalName: "otherRule"
+                }),
+                new Option({
+                    definition: [new Terminal({ terminalType: B })]
+                }),
+                new Alternation({
+                    definition: [
+                        new Flat({
+                            definition: [new Terminal({ terminalType: B })]
+                        })
+                    ]
+                }),
+                new Repetition({
+                    definition: [new Terminal({ terminalType: B })]
+                }),
+                new RepetitionMandatory({
+                    definition: [new Terminal({ terminalType: B })]
+                }),
+                new RepetitionWithSeparator({
+                    definition: [new Terminal({ terminalType: B })],
+                    separator: A
+                }),
+                new RepetitionMandatoryWithSeparator({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "otherRule"
+                        })
+                    ],
+                    separator: A
+                }),
+                new Option({
+                    definition: [new Terminal({ terminalType: B })]
+                }),
+                new Alternation({
+                    definition: [
+                        new Flat({
+                            definition: [new Terminal({ terminalType: B })]
+                        })
+                    ]
+                }),
+                new Repetition({
+                    definition: [new Terminal({ terminalType: B })]
+                }),
+                new RepetitionMandatory({
+                    definition: [new Terminal({ terminalType: B })]
+                }),
+                new RepetitionWithSeparator({
+                    definition: [new Terminal({ terminalType: B })],
+                    separator: A
+                }),
+                new RepetitionMandatoryWithSeparator({
+                    definition: [
+                        new NonTerminal({
+                            nonTerminalName: "otherRule"
+                        })
+                    ],
+                    separator: A
+                })
+            ]
+        })
+
+        assignOccurrenceIndices({ rules: [rule] })
+        const methodsCollector = new DslMethodsCollectorVisitor()
+        rule.accept(methodsCollector)
+
+        forEach(methodsCollector.dslMethods, currMethodArr => {
+            const indices = map(currMethodArr, currMethod => currMethod.idx)
+            expect(indices.length).to.equal(uniq(indices).length)
+        })
     })
 })

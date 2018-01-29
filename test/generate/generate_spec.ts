@@ -1,5 +1,8 @@
 import { Parser } from "../../src/parse/parser_public"
-import { generation as gen } from "../../src/generate/generate_public"
+import {
+    generateParserModule,
+    generateParserFactory
+} from "../../src/generate/generate_public"
 import { createToken } from "../../src/scan/tokens_public"
 import { createRegularToken } from "../utils/matchers"
 import {
@@ -32,7 +35,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genTerminalParser",
             rules,
             tokenVocabulary
@@ -61,7 +64,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genNoneTerminalParser",
             rules,
             tokenVocabulary
@@ -82,13 +85,19 @@ describe("The Code Generation capabilities", () => {
                 name: "topRule",
                 definition: [
                     new Option({
-                        definition: [new Terminal({ terminalType: Identifier })]
+                        definition: [
+                            new Flat({
+                                definition: [
+                                    new Terminal({ terminalType: Identifier })
+                                ]
+                            })
+                        ]
                     })
                 ]
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genOptionParser",
             rules,
             tokenVocabulary
@@ -135,7 +144,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genOrParser",
             rules,
             tokenVocabulary
@@ -170,7 +179,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genManyParser",
             rules,
             tokenVocabulary
@@ -205,7 +214,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genAtLeastOneParser",
             rules,
             tokenVocabulary
@@ -244,7 +253,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genManySepParser",
             rules,
             tokenVocabulary
@@ -285,7 +294,7 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = gen.genParserFactory<any>({
+        const parserFactory = generateParserFactory<any>({
             name: "genAtLeastOneSepParser",
             rules,
             tokenVocabulary
@@ -353,7 +362,7 @@ describe("The Code Generation capabilities", () => {
                 })
             ]
 
-            const parserModuleText = gen.generateParserModule({
+            const parserModuleText = generateParserModule({
                 name: "genOrParserModule",
                 rules
             })

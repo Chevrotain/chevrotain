@@ -96,7 +96,7 @@ import {
     createBaseVisitorConstructorWithDefaults
 } from "./cst/cst_visitor"
 import {
-    defaultGrammarErrorProvider,
+    defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider,
     IParserErrorMessageProvider
 } from "./errors_public"
@@ -505,7 +505,7 @@ export class Parser {
                     maxLookahead: parserInstance.maxLookahead,
                     tokenTypes: values(parserInstance.tokensMap),
                     ignoredIssues: parserInstance.ignoredIssues,
-                    errMsgProvider: defaultGrammarErrorProvider,
+                    errMsgProvider: defaultGrammarValidatorErrorProvider,
                     grammarName: className
                 })
 
@@ -1590,7 +1590,7 @@ export class Parser {
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
     ): (idxInCallingRule?: number, ...args: any[]) => T | any {
         if (contains(this.definedRulesNames, name)) {
-            const errMsg = defaultGrammarErrorProvider.buildDuplicateRuleNameError(
+            const errMsg = defaultGrammarValidatorErrorProvider.buildDuplicateRuleNameError(
                 {
                     topLevelRule: name,
                     grammarName: this.className

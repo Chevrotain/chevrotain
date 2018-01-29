@@ -150,6 +150,8 @@ function genProd(prod: IProduction, n: number): string {
         return genAlternation(prod, n)
     } else if (prod instanceof Terminal) {
         return genTerminal(prod, n)
+    } else if (prod instanceof Flat) {
+        return genDefinition(prod.definition, n)
     } else {
         /* istanbul ignore next */
         throw Error("non exhaustive match")

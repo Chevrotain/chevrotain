@@ -197,8 +197,23 @@ export interface IGrammarResolverErrorMessageProvider {
     ): string
 }
 
-export interface IGrammarErrorMessageProvider
-    extends IGrammarResolverErrorMessageProvider {
+export const defaultGrammarResolverErrorProvider: IGrammarResolverErrorMessageProvider = {
+    buildRuleNotFoundError(
+        topLevelRule: Rule,
+        undefinedRule: NonTerminal
+    ): string {
+        const msg =
+            "Invalid grammar, reference to a rule which is not defined: ->" +
+            undefinedRule.nonTerminalName +
+            "<-\n" +
+            "inside top level rule: ->" +
+            topLevelRule.name +
+            "<-"
+        return msg
+    }
+}
+
+export interface IGrammarValidatorErrorMessageProvider {
     buildDuplicateFoundError(
         topLevelRule: Rule,
         duplicateProds: IProductionWithOccurrence[]
@@ -267,21 +282,7 @@ export interface IGrammarErrorMessageProvider
     }): string
 }
 
-export const defaultGrammarErrorProvider: IGrammarErrorMessageProvider = {
-    buildRuleNotFoundError(
-        topLevelRule: Rule,
-        undefinedRule: NonTerminal
-    ): string {
-        const msg =
-            "Invalid grammar, reference to a rule which is not defined: ->" +
-            undefinedRule.nonTerminalName +
-            "<-\n" +
-            "inside top level rule: ->" +
-            topLevelRule.name +
-            "<-"
-        return msg
-    },
-
+export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessageProvider = {
     buildDuplicateFoundError(
         topLevelRule: Rule,
         duplicateProds: IProductionWithOccurrence[]
@@ -370,6 +371,7 @@ export const defaultGrammarErrorProvider: IGrammarErrorMessageProvider = {
 
         return errMsg
     },
+
     buildAlternationPrefixAmbiguityError(options: {
         topLevelRule: Rule
         prefixPath: TokenType[]

@@ -1,4 +1,4 @@
-import { contains, every, map, some } from "../../../utils/utils"
+import { contains, every, has, map, some } from "../../../utils/utils"
 import {
     AbstractProduction,
     Alternation,
@@ -15,6 +15,7 @@ import {
     Terminal
 } from "./gast_public"
 import { GAstVisitor } from "./gast_visitor_public"
+import { tokenName } from "../../../scan/tokens_public"
 
 export function isSequenceProd(prod: IProduction): boolean {
     return (
@@ -206,4 +207,62 @@ class GastCloneVisitor extends GAstVisitor {
 export function cloneProduction<T extends IProduction>(prod: T): T {
     let cloningVisitor = new GastCloneVisitor()
     return cloningVisitor.visit(prod)
+}
+
+export class DslMethodsCollectorVisitor extends GAstVisitor {
+    // A minus is never valid in an identifier name
+    public separator = "-"
+    public dslMethods = {
+        option: [],
+        alternation: [],
+        repetition: [],
+        repetitionWithSeparator: [],
+        repetitionMandatory: [],
+        repetitionMandatoryWithSeparator: []
+    }
+
+    public visitTerminal(terminal: Terminal): void {
+        const key =
+            tokenName(terminal.terminalType) + this.separator + "Terminal"
+        if (!has(this.dslMethods, key)) {
+            this.dslMethods[key] = []
+        }
+        this.dslMethods[key].push(terminal)
+    }
+
+    public visitNonTerminal(subrule: NonTerminal): void {
+        const key = subrule.nonTerminalName + this.separator + "Terminal"
+        if (!has(this.dslMethods, key)) {
+            this.dslMethods[key] = []
+        }
+        this.dslMethods[key].push(subrule)
+    }
+
+    public visitOption(option: Option): void {
+        this.dslMethods.option.push(option)
+    }
+
+    public visitRepetitionWithSeparator(
+        manySep: RepetitionWithSeparator
+    ): void {
+        this.dslMethods.repetitionWithSeparator.push(manySep)
+    }
+
+    public visitRepetitionMandatory(atLeastOne: RepetitionMandatory): void {
+        this.dslMethods.repetitionMandatory.push(atLeastOne)
+    }
+
+    public visitRepetitionMandatoryWithSeparator(
+        atLeastOneSep: RepetitionMandatoryWithSeparator
+    ): void {
+        this.dslMethods.repetitionMandatoryWithSeparator.push(atLeastOneSep)
+    }
+
+    public visitRepetition(many: Repetition): void {
+        this.dslMethods.repetition.push(many)
+    }
+
+    public visitAlternation(or: Alternation): void {
+        this.dslMethods.alternation.push(or)
+    }
 }

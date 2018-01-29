@@ -8,13 +8,13 @@ import { forEach } from "../../utils/utils"
 import { NonTerminal, Rule } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
-    defaultGrammarErrorProvider,
+    defaultGrammarResolverErrorProvider,
     IGrammarResolverErrorMessageProvider
 } from "../errors_public"
 
 export function resolveGrammar(
     topLevels: HashTable<Rule>,
-    errMsgProvider: IGrammarResolverErrorMessageProvider = defaultGrammarErrorProvider
+    errMsgProvider: IGrammarResolverErrorMessageProvider = defaultGrammarResolverErrorProvider
 ): IParserDefinitionError[] {
     let refResolver = new GastRefResolverVisitor(topLevels, errMsgProvider)
     refResolver.resolveRefs()
