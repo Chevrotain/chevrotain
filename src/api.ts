@@ -22,7 +22,8 @@ import {
 import { clearCache } from "./parse/cache_public"
 import { VERSION } from "./version"
 import {
-    defaultGrammarErrorProvider,
+    defaultGrammarResolverErrorProvider,
+    defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
 } from "./parse/errors_public"
 import { createSyntaxDiagramsCode } from "./diagrams/render_public"
@@ -42,9 +43,14 @@ import {
     Terminal
 } from "./parse/grammar/gast/gast_public"
 import {
+    assignOccurrenceIndices,
     resolveGrammar,
     validateGrammar
 } from "./parse/grammar/gast/gast_resolver_public"
+import {
+    generateParserFactory,
+    generateParserModule
+} from "./generate/generate_public"
 
 /**
  * defines the public API of
@@ -73,7 +79,6 @@ API.createTokenInstance = createTokenInstance
 API.EMPTY_ALT = EMPTY_ALT
 // TODO: Breaking Change -> renamed property
 API.defaultParserErrorProvider = defaultParserErrorProvider
-API.defaultGrammarErrorProvider = defaultGrammarErrorProvider
 API.isRecognitionException = isRecognitionException
 API.EarlyExitException = EarlyExitException
 API.MismatchedTokenException = MismatchedTokenException
@@ -82,7 +87,6 @@ API.NoViableAltException = NoViableAltException
 
 // grammar reflection API
 API.gast = {}
-API.GAstVisitor = GAstVisitor
 API.Flat = Flat
 API.Repetition = Repetition
 API.RepetitionWithSeparator = RepetitionWithSeparator
@@ -93,13 +97,22 @@ API.Alternation = Alternation
 API.NonTerminal = NonTerminal
 API.Terminal = Terminal
 API.Rule = Rule
+
+// GAST Utilities
+API.GAstVisitor = GAstVisitor
 API.serializeGrammar = serializeGrammar
 API.serializeProduction = serializeProduction
 API.resolveGrammar = resolveGrammar
+API.defaultGrammarResolverErrorProvider = defaultGrammarResolverErrorProvider
 API.validateGrammar = validateGrammar
+API.defaultGrammarValidatorErrorProvider = defaultGrammarValidatorErrorProvider
+API.assignOccurrenceIndices = assignOccurrenceIndices
 
 API.clearCache = clearCache
 
 API.createSyntaxDiagramsCode = createSyntaxDiagramsCode
+
+API.generateParserFactory = generateParserFactory
+API.generateParserModule = generateParserModule
 
 module.exports = API

@@ -1,4 +1,4 @@
-import { NonTerminal, Rule } from "./gast_public"
+import { IProductionWithOccurrence, Rule } from "./gast_public"
 import {
     IgnoredParserIssues,
     IParserDefinitionError
@@ -9,9 +9,10 @@ import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { TokenType } from "../../../scan/lexer_public"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {
-    defaultGrammarErrorProvider,
-    IGrammarErrorMessageProvider
+    defaultGrammarValidatorErrorProvider,
+    IGrammarValidatorErrorMessageProvider
 } from "../../errors_public"
+import { DslMethodsCollectorVisitor } from "./gast"
 
 export function resolveGrammar(options: {
     rules: Rule[]
@@ -27,9 +28,9 @@ export function validateGrammar(options: {
     rules: Rule[]
     maxLookahead: number
     tokenTypes: TokenType[]
-    ignoredIssues: IgnoredParserIssues
     grammarName: string
-    errMsgProvider?: IGrammarErrorMessageProvider
+    errMsgProvider?: IGrammarValidatorErrorMessageProvider
+    ignoredIssues?: IgnoredParserIssues
 }): IParserDefinitionError[] {
     return orgValidateGrammar(
         options.rules,
@@ -38,7 +39,22 @@ export function validateGrammar(options: {
         options.ignoredIssues,
         options.errMsgProvider
             ? options.errMsgProvider
-            : defaultGrammarErrorProvider,
+            : defaultGrammarValidatorErrorProvider,
         options.grammarName
     )
+}
+
+export function assignOccurrenceIndices(options: { rules: Rule[] }): void {
+    forEach(options.rules, currRule => {
+        const methodsCollector = new DslMethodsCollectorVisitor()
+        currRule.accept(methodsCollector)
+        forEach(methodsCollector.dslMethods, methods => {
+            forEach(
+                methods,
+                (currMethod: IProductionWithOccurrence, arrIdx) => {
+                    currMethod.idx = arrIdx + 1
+                }
+            )
+        })
+    })
 }

@@ -26,7 +26,7 @@ import {
     Rule,
     Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
-import { defaultGrammarErrorProvider } from "../../../src/parse/errors_public"
+import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
 
 describe("the grammar validations", () => {
     it("validates every one of the TOP_RULEs in the input", () => {
@@ -105,7 +105,7 @@ describe("the grammar validations", () => {
             5,
             [],
             {},
-            defaultGrammarErrorProvider,
+            defaultGrammarValidatorErrorProvider,
             "bamba"
         )
         expect(actualErrors.length).to.equal(4)
@@ -123,7 +123,7 @@ describe("the grammar validations", () => {
                 new Rule({ name: "C", definition: [] })
             ],
             "className",
-            defaultGrammarErrorProvider
+            defaultGrammarValidatorErrorProvider
         )
         //noinspection BadExpressionStatementJS
         expect(noErrors).to.be.empty
@@ -137,7 +137,7 @@ describe("the grammar validations", () => {
                 new Rule({ name: "C", definition: [] })
             ],
             "className",
-            defaultGrammarErrorProvider
+            defaultGrammarValidatorErrorProvider
         )
         //noinspection BadExpressionStatementJS
         expect(duplicateErr).to.have.length(1)
@@ -152,7 +152,7 @@ describe("the grammar validations", () => {
     it("only allows a subset of ECMAScript identifiers as rule names", () => {
         let res1 = validateRuleName(
             new Rule({ name: "1baa", definition: [] }),
-            defaultGrammarErrorProvider
+            defaultGrammarValidatorErrorProvider
         )
         expect(res1).to.have.lengthOf(1)
         expect(res1[0]).to.have.property("message")
@@ -164,7 +164,7 @@ describe("the grammar validations", () => {
 
         let res2 = validateRuleName(
             new Rule({ name: "שלום", definition: [] }),
-            defaultGrammarErrorProvider
+            defaultGrammarValidatorErrorProvider
         )
         expect(res2).to.have.lengthOf(1)
         expect(res2[0]).to.have.property("message")
@@ -176,7 +176,7 @@ describe("the grammar validations", () => {
 
         let res3 = validateRuleName(
             new Rule({ name: "$bamba", definition: [] }),
-            defaultGrammarErrorProvider
+            defaultGrammarValidatorErrorProvider
         )
         expect(res3).to.have.lengthOf(1)
         expect(res3[0]).to.have.property("message")
@@ -1187,7 +1187,7 @@ describe("The no non-empty lookahead validation", () => {
 
         const actual = validateTooManyAlts(
             ruleWithTooManyAlts,
-            defaultGrammarErrorProvider
+            defaultGrammarValidatorErrorProvider
         )
         expect(actual).to.have.lengthOf(1)
         expect(actual[0].type).to.equal(ParserDefinitionErrorType.TOO_MANY_ALTS)

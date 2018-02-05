@@ -130,6 +130,7 @@ module.exports = function(text) {
 
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
+    console.log(JSON.stringify(lexResult, null, 3))
 
     // any top level rule may be used as an entry point
     var value = parser.json()

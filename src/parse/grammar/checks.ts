@@ -51,16 +51,16 @@ import {
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
 import {
-    defaultGrammarErrorProvider,
-    IGrammarErrorMessageProvider
+    defaultGrammarValidatorErrorProvider,
+    IGrammarValidatorErrorMessageProvider
 } from "../errors_public"
 
 export function validateGrammar(
     topLevels: Rule[],
     maxLookahead: number,
     tokenTypes: TokenType[],
-    ignoredIssues: IgnoredParserIssues,
-    errMsgProvider: IGrammarErrorMessageProvider = defaultGrammarErrorProvider,
+    ignoredIssues: IgnoredParserIssues = {},
+    errMsgProvider: IGrammarValidatorErrorMessageProvider = defaultGrammarValidatorErrorProvider,
     grammarName: string
 ): IParserDefinitionError[] {
     let duplicateErrors: any = utils.map(topLevels, currTopLevel =>
@@ -151,7 +151,7 @@ export function validateGrammar(
 
 function validateNestedRulesNames(
     topLevels: Rule[],
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let result = []
     forEach(topLevels, curTopLevel => {
@@ -177,7 +177,7 @@ function validateNestedRulesNames(
 
 function validateDuplicateProductions(
     topLevelRule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDuplicatesDefinitionError[] {
     let collectorVisitor = new OccurrenceValidationCollector()
     topLevelRule.accept(collectorVisitor)
@@ -282,7 +282,7 @@ export const validNestedRuleName = new RegExp(
 
 export function validateRuleName(
     rule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     const errors = []
     const ruleName = rule.name
@@ -303,7 +303,7 @@ export function validateRuleName(
 export function validateNestedRuleName(
     topLevel: Rule,
     nestedProd: IOptionallyNamedProduction,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
     let errMsg
@@ -325,7 +325,7 @@ export function validateNestedRuleName(
 
 export function validateTokenName(
     tokenType: TokenType,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     const errors = []
     const tokTypeName = tokenName(tokenType)
@@ -347,7 +347,7 @@ export function validateRuleDoesNotAlreadyExist(
     rule: Rule,
     allRules: Rule[],
     className,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
     const occurrences = reduce(
@@ -403,7 +403,7 @@ export function validateRuleIsOverridden(
 export function validateNoLeftRecursion(
     topRule: Rule,
     currRule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider,
+    errMsgProvider: IGrammarValidatorErrorMessageProvider,
     path: Rule[] = []
 ): IParserDefinitionError[] {
     let errors = []
@@ -499,7 +499,7 @@ class OrCollector extends GAstVisitor {
 
 export function validateEmptyOrAlternative(
     topLevelRule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserEmptyAlternativeDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -547,7 +547,7 @@ export function validateAmbiguousAlternationAlternatives(
     topLevelRule: Rule,
     maxLookahead: number,
     ignoredIssues: IgnoredParserIssues,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -621,7 +621,7 @@ export class RepetionCollector extends GAstVisitor {
 
 export function validateTooManyAlts(
     topLevelRule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let orCollector = new OrCollector()
     topLevelRule.accept(orCollector)
@@ -652,7 +652,7 @@ export function validateTooManyAlts(
 export function validateSomeNonEmptyLookaheadPath(
     topLevelRules: Rule[],
     maxLookahead: number,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
     forEach(topLevelRules, currTopRule => {
@@ -695,7 +695,7 @@ function checkAlternativesAmbiguities(
     alternatives: Alternative[],
     alternation: Alternation,
     rule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserAmbiguousAlternativesDefinitionError[] {
     let foundAmbiguousPaths = []
     let identicalAmbiguities = reduce(
@@ -757,7 +757,7 @@ function checkPrefixAlternativesAmbiguities(
     alternatives: Alternative[],
     alternation: Alternation,
     rule: Rule,
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IAmbiguityDescriptor[] {
     let errors = []
 
@@ -822,7 +822,7 @@ function checkPrefixAlternativesAmbiguities(
 function checkTerminalAndNoneTerminalsNameSpace(
     topLevels: Rule[],
     tokenTypes: TokenType[],
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
 
@@ -846,7 +846,7 @@ function checkTerminalAndNoneTerminalsNameSpace(
 
 function validateDuplicateNestedRules(
     topLevelRules: Rule[],
-    errMsgProvider: IGrammarErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
 ): IParserDefinitionError[] {
     let errors = []
 
