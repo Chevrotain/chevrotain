@@ -36,7 +36,7 @@ as any other pure code without requiring any new tools or processes.
       * [Backtracking][backtracking] support.
       * [Grammar Inheritance.][grammar_inheritance]
       * [Multiple starting rules.][starting_rules]
-      * [Parametrized Rules.][parametrized_rules]
+      * [Parameterized Rules.][parametrized_rules]
       * [Syntactic Content Assist.][content assist]
       * **No code generation**.
          * The DSL is just JavaScript, not an external language.
