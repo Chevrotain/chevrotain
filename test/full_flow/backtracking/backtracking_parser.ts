@@ -104,13 +104,15 @@ export class BackTrackingParser extends Parser {
             {
                 GATE: this.BACKTRACK(this.withEqualsStatement),
                 ALT: () => {
-                    statementTypeFound = this.SUBRULE(this.withEqualsStatement)
+                    statementTypeFound = this.SUBRULE8(this.withEqualsStatement)
                 }
             },
             {
                 GATE: this.BACKTRACK(this.withDefaultStatement),
                 ALT: () => {
-                    statementTypeFound = this.SUBRULE(this.withDefaultStatement)
+                    statementTypeFound = this.SUBRULE9(
+                        this.withDefaultStatement
+                    )
                 }
             }
         ])
@@ -120,11 +122,11 @@ export class BackTrackingParser extends Parser {
 
     private parseWithEqualsStatement(): RET_TYPE {
         this.CONSUME(ElementTok)
-        this.CONSUME(IdentTok)
-        this.CONSUME(ColonTok)
-        this.SUBRULE(this.qualifiedName) // this rule creates the no fixed look ahead issue
-        this.CONSUME(EqualsTok)
-        this.CONSUME(NumberTok)
+        this.CONSUME6(IdentTok)
+        this.CONSUME7(ColonTok)
+        this.SUBRULE7(this.qualifiedName) // this rule creates the no fixed look ahead issue
+        this.CONSUME8(EqualsTok)
+        this.CONSUME9(NumberTok)
         this.CONSUME(SemiColonTok)
 
         return RET_TYPE.WITH_EQUALS
@@ -134,7 +136,7 @@ export class BackTrackingParser extends Parser {
         this.CONSUME(ElementTok)
         this.CONSUME(IdentTok)
         this.CONSUME(ColonTok)
-        this.SUBRULE(this.qualifiedName) // this rule creates the no fixed look ahead issue
+        this.SUBRULE6(this.qualifiedName) // this rule creates the no fixed look ahead issue
         this.CONSUME(DefaultTok)
         this.CONSUME(NumberTok)
         this.CONSUME(SemiColonTok)

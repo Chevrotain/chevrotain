@@ -122,7 +122,7 @@ export class SwitchCaseRecoveryParser extends Parser {
         this.CONSUME(ColonTok)
         this.CONSUME(ReturnTok)
         valueTok = this.CONSUME(IntTok)
-        this.OPTION(() => {
+        this.OPTION6(() => {
             this.CONSUME(SemiColonTok)
         })
 
