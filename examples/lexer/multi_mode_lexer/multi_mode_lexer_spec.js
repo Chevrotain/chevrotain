@@ -1,15 +1,13 @@
-var expect = require("chai").expect
-var multiModeLexer = require("./multi_mode_lexer")
+const expect = require("chai").expect
+const multiModeLexer = require("./multi_mode_lexer")
 
-describe("The Chevrotain Lexer ability switch between Lexer modes", function() {
-    it("Can Lex an input that requires multiple modes successfully", function() {
-        var input = "1 LETTERS G A G SIGNS & EXIT_SIGNS B EXIT_LETTERS 3"
-        var lexResult = multiModeLexer.tokenize(input)
+describe("The Chevrotain Lexer ability switch between Lexer modes", () => {
+    it("Can Lex an input that requires multiple modes successfully", () => {
+        const input = "1 LETTERS G A G SIGNS & EXIT_SIGNS B EXIT_LETTERS 3"
+        const lexResult = multiModeLexer.tokenize(input)
         expect(lexResult.errors).to.be.empty
 
-        var images = lexResult.tokens.map(function(currTok) {
-            return currTok.image
-        })
+        const images = lexResult.tokens.map(currTok => currTok.image)
         expect(images).to.deep.equal([
             // by default starting with the "first" mode "numbers_mode".
             // The ".tokenize" method can accept an optional inital mode argument as the second parameter.
@@ -27,17 +25,15 @@ describe("The Chevrotain Lexer ability switch between Lexer modes", function() {
         ])
     })
 
-    it("Will create a Lexing error when a Token which is not supported in the current mode is encountred", function() {
-        var input = "1 LETTERS 2" // 2 is not allowed in letters mode!
-        var lexResult = multiModeLexer.tokenize(input)
+    it("Will create a Lexing error when a Token which is not supported in the current mode is encountred", () => {
+        const input = "1 LETTERS 2" // 2 is not allowed in letters mode!
+        const lexResult = multiModeLexer.tokenize(input)
         expect(lexResult.errors).to.have.lengthOf(1)
         expect(lexResult.errors[0].message).to.contain("unexpected character")
         expect(lexResult.errors[0].message).to.contain("2")
         expect(lexResult.errors[0].message).to.contain("at offset: 10")
 
-        var images = lexResult.tokens.map(function(currTok) {
-            return currTok.image
-        })
+        const images = lexResult.tokens.map(currTok => currTok.image)
         expect(images).to.deep.equal(["1", "LETTERS"])
     })
 })

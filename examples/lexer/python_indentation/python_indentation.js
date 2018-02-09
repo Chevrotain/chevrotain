@@ -14,10 +14,7 @@
  */
 
 "use strict"
-const chevrotain = require("chevrotain")
-const createToken = chevrotain.createToken
-const createTokenInstance = chevrotain.createTokenInstance
-const Lexer = chevrotain.Lexer
+const { createToken, createTokenInstance, Lexer } = require("chevrotain")
 const _ = require("lodash")
 
 /**
@@ -55,7 +52,7 @@ let lastOffsetChecked
  * combined with state via closure ("indentStack" and "lastTextMatched") to match indentation.
  *
  * @param {string} text - remaining text to lex, sent by the Chevrotain lexer.
- * @param {ISimpleTokenOrIToken[]} matchedTokens - Tokens lexed so far, sent by the Chevrotain Lexer.
+ * @param {IToken[]} matchedTokens - Tokens lexed so far, sent by the Chevrotain Lexer.
  * @param {object} groups - Token groups already lexed, sent by the Chevrotain Lexer.
  * @param {string} type - determines if this function matches Indent or Outdent tokens.
  * @returns {*}
@@ -80,7 +77,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
     if (isFirstLine || isStartOfLine) {
         let match
         let currIndentLevel = undefined
-        let isZeroIndent = text.length < offset && text[offset] !== " "
+        const isZeroIndent = text.length < offset && text[offset] !== " "
         if (isZeroIndent) {
             // Matching zero spaces Outdent would not consume any chars, thus it would cause an infinite loop.
             // This check prevents matching a sequence of zero spaces outdents.
@@ -98,7 +95,7 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
         }
 
         if (currIndentLevel !== undefined) {
-            let lastIndentLevel = _.last(indentStack)
+            const lastIndentLevel = _.last(indentStack)
             if (currIndentLevel > lastIndentLevel && type === "indent") {
                 indentStack.push(currIndentLevel)
                 return match
@@ -149,17 +146,17 @@ function matchIndentBase(text, offset, matchedTokens, groups, type) {
 }
 
 // customize matchIndentBase to create separate functions of Indent and Outdent.
-let matchIndent = _.partialRight(matchIndentBase, "indent")
-let matchOutdent = _.partialRight(matchIndentBase, "outdent")
+const matchIndent = _.partialRight(matchIndentBase, "indent")
+const matchOutdent = _.partialRight(matchIndentBase, "outdent")
 
-let If = createToken({ name: "If", pattern: /if/ })
-let Else = createToken({ name: "Else", pattern: /else/ })
-let Print = createToken({ name: "Print", pattern: /print/ })
-let IntegerLiteral = createToken({ name: "IntegerLiteral", pattern: /\d+/ })
-let Colon = createToken({ name: "Colon", pattern: /:/ })
-let LParen = createToken({ name: "LParen", pattern: /\(/ })
-let RParen = createToken({ name: "RParen", pattern: /\)/ })
-let Spaces = createToken({
+const If = createToken({ name: "If", pattern: /if/ })
+const Else = createToken({ name: "Else", pattern: /else/ })
+const Print = createToken({ name: "Print", pattern: /print/ })
+const IntegerLiteral = createToken({ name: "IntegerLiteral", pattern: /\d+/ })
+const Colon = createToken({ name: "Colon", pattern: /:/ })
+const LParen = createToken({ name: "LParen", pattern: /\(/ })
+const RParen = createToken({ name: "RParen", pattern: /\)/ })
+const Spaces = createToken({
     name: "Spaces",
     pattern: / +/,
     group: Lexer.SKIPPED
@@ -167,7 +164,7 @@ let Spaces = createToken({
 
 // newlines are not skipped, by setting their group to "nl" they are saved in the lexer result
 // and thus we can check before creating an indentation token that the last token matched was a newline.
-let Newline = createToken({
+const Newline = createToken({
     name: "Newline",
     pattern: /\n|\r\n?/,
     group: "nl",
@@ -175,10 +172,10 @@ let Newline = createToken({
 })
 
 // define the indentation tokens using custom token patterns
-let Indent = createToken({ name: "Indent", pattern: matchIndent })
-let Outdent = createToken({ name: "Outdent", pattern: matchOutdent })
+const Indent = createToken({ name: "Indent", pattern: matchIndent })
+const Outdent = createToken({ name: "Outdent", pattern: matchOutdent })
 
-let customPatternLexer = new Lexer([
+const customPatternLexer = new Lexer([
     Newline,
     // indentation tokens must appear before Spaces, otherwise all indentation will always be consumed as spaces.
     // Outdent must appear before Indent for handling zero spaces outdents.
@@ -214,7 +211,7 @@ module.exports = {
         indentStack = [0]
         lastOffsetChecked = undefined
 
-        let lexResult = customPatternLexer.tokenize(text)
+        const lexResult = customPatternLexer.tokenize(text)
 
         //add remaining Outdents
         while (indentStack.length > 1) {

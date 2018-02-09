@@ -24,12 +24,14 @@ const Comma = tokenVocabulary.Comma
 // ----------------- parser -----------------
 class SelectParser extends Parser {
     // A config object as a constructor argument is normally not needed.
-    // Our use case requires a dynamic configuration to support step3 without duplicating code.
+    // Our tutorial scenario requires a dynamic configuration to support step3 without duplicating code.
     constructor(input, config) {
         super(input, tokenVocabulary, config)
+
+        // for conciseness
         const $ = this
 
-        this.selectStatement = $.RULE("selectStatement", () => {
+        $.RULE("selectStatement", () => {
             $.SUBRULE($.selectClause)
             $.SUBRULE($.fromClause)
             $.OPTION(() => {
@@ -37,7 +39,7 @@ class SelectParser extends Parser {
             })
         })
 
-        this.selectClause = $.RULE("selectClause", () => {
+        $.RULE("selectClause", () => {
             $.CONSUME(Select)
             $.AT_LEAST_ONE_SEP({
                 SEP: Comma,
@@ -47,17 +49,17 @@ class SelectParser extends Parser {
             })
         })
 
-        this.fromClause = $.RULE("fromClause", () => {
+        $.RULE("fromClause", () => {
             $.CONSUME(From)
             $.CONSUME(Identifier)
         })
 
-        this.whereClause = $.RULE("whereClause", () => {
+        $.RULE("whereClause", () => {
             $.CONSUME(Where)
             $.SUBRULE($.expression)
         })
 
-        this.expression = $.RULE("expression", () => {
+        $.RULE("expression", () => {
             $.SUBRULE($.atomicExpression)
             $.SUBRULE($.relationalOperator)
             $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
@@ -65,19 +67,17 @@ class SelectParser extends Parser {
             // 2 lines above.
         })
 
-        this.atomicExpression = $.RULE("atomicExpression", () => {
-            // prettier-ignore
+        $.RULE("atomicExpression", () => {
             $.OR([
-                {ALT: () => {$.CONSUME(Integer)}},
-                {ALT: () => {$.CONSUME(Identifier)}}
+                { ALT: () => $.CONSUME(Integer) },
+                { ALT: () => $.CONSUME(Identifier) }
             ])
         })
 
-        this.relationalOperator = $.RULE("relationalOperator", () => {
-            // prettier-ignore
+        $.RULE("relationalOperator", () => {
             $.OR([
-                {ALT: () => {$.CONSUME(GreaterThan)}},
-                {ALT: () => {$.CONSUME(LessThan)}}
+                { ALT: () => $.CONSUME(GreaterThan) },
+                { ALT: () => $.CONSUME(LessThan) }
             ])
         })
 
@@ -97,7 +97,7 @@ module.exports = {
     SelectParser: SelectParser,
 
     parse: function(inputText) {
-        let lexResult = selectLexer.lex(inputText)
+        const lexResult = selectLexer.lex(inputText)
 
         // ".input" is a setter which will reset the parser's internal's state.
         parserInstance.input = lexResult.tokens

@@ -1,10 +1,10 @@
-var assert = require("assert")
+const assert = require("assert")
 
-var parseXML = (parseXML = require("./xml_es6"))
+const parseXML = require("./xml")
 
-describe("The XML Grammar - Parser implemented using ES6 syntax", function() {
-    it("can parse a simple XML without errors", function() {
-        var inputText =
+describe("The XML Grammar - Parser implemented using ES6 syntax", () => {
+    it("can parse a simple XML without errors", () => {
+        const inputText =
             '<?xml version="1.0"?>\n' +
             "<catalog>\n" +
             '   <book id="bk101">\n' +
@@ -126,7 +126,7 @@ describe("The XML Grammar - Parser implemented using ES6 syntax", function() {
             "   </book>\n" +
             "</catalog>"
 
-        var lexAndParseResult = parseXML(inputText)
+        const lexAndParseResult = parseXML(inputText)
         assert.equal(lexAndParseResult.lexErrors.length, 0)
         assert.equal(lexAndParseResult.parseErrors.length, 0)
     })

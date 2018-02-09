@@ -7,19 +7,16 @@
  * "Public sta" --> ["static"]
  * "call f" --> ["foo"] // assuming foo is in the symbol table.
  */
-"use strict"
-
 const _ = require("lodash")
-const chevrotain = require("chevrotain")
-
-const Lexer = chevrotain.Lexer
-const Parser = chevrotain.Parser
-const tokenMatcher = chevrotain.tokenMatcher
-const createToken = chevrotain.createToken
-const EMPTY_ALT = chevrotain.EMPTY_ALT
+const {
+    createToken,
+    Lexer,
+    Parser,
+    tokenMatcher,
+    EMPTY_ALT
+} = require("chevrotain")
 
 const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
-
 const Private = createToken({
     name: "Private",
     pattern: /private/,
@@ -83,12 +80,8 @@ class StatementsParser extends Parser {
 
         $.RULE("stmt", () => {
             $.OR([
-                {
-                    ALT: () => $.SUBRULE($.functionInvocation)
-                },
-                {
-                    ALT: () => $.SUBRULE($.functionStmt)
-                },
+                { ALT: () => $.SUBRULE($.functionInvocation) },
+                { ALT: () => $.SUBRULE($.functionStmt) },
                 { ALT: () => $.SUBRULE($.enumStmt) }
             ])
         })

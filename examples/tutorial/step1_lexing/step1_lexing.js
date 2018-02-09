@@ -9,7 +9,7 @@ const Lexer = chevrotain.Lexer
 const createToken = chevrotain.createToken
 
 // the vocabulary will be exported and used in the Parser definition.
-let tokenVocabulary = {}
+const tokenVocabulary = {}
 
 // createToken is used to create a Token type class
 // The Lexer's output will contain an array of token Objects created by metadata

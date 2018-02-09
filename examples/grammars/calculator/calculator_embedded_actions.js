@@ -6,67 +6,67 @@
  * are written as part of (inside) the grammar rules.
  *
  * This can be useful for simple use cases and it is also very fast.
- * However for complex use cases see the same grammar with separated semantics:
+ * It can become very verbose for complex use cases, see the same grammar with separated semantics
+ * for an alternative:
  * https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
  */
-var chevrotain = require("chevrotain")
+const { createToken, Lexer, Parser, tokenMatcher } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var createToken = chevrotain.createToken
-var tokenMatcher = chevrotain.tokenMatcher
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-
 // using the NA pattern marks this Token class as 'irrelevant' for the Lexer.
-// AdditionOperator defines a Tokens hierarchy but only the leafs in this hierarchy define
-// actual Tokens that can appear in the text
-var AdditionOperator = createToken({
+// AdditionOperator defines a Tokens category, The parser can match against such categories
+// as a convenience to reduce verbosity.
+const AdditionOperator = createToken({
     name: "AdditionOperator",
     pattern: Lexer.NA
 })
-var Plus = createToken({
+const Plus = createToken({
     name: "Plus",
     pattern: /\+/,
     categories: AdditionOperator
 })
-var Minus = createToken({
+const Minus = createToken({
     name: "Minus",
     pattern: /-/,
     categories: AdditionOperator
 })
 
-var MultiplicationOperator = createToken({
+const MultiplicationOperator = createToken({
     name: "MultiplicationOperator",
     pattern: Lexer.NA
 })
-var Multi = createToken({
+const Multi = createToken({
     name: "Multi",
     pattern: /\*/,
     categories: MultiplicationOperator
 })
-var Div = createToken({
+const Div = createToken({
     name: "Div",
     pattern: /\//,
     categories: MultiplicationOperator
 })
 
-var LParen = createToken({ name: "LParen", pattern: /\(/ })
-var RParen = createToken({ name: "RParen", pattern: /\)/ })
-var NumberLiteral = createToken({ name: "NumberLiteral", pattern: /[1-9]\d*/ })
+const LParen = createToken({ name: "LParen", pattern: /\(/ })
+const RParen = createToken({ name: "RParen", pattern: /\)/ })
+const NumberLiteral = createToken({
+    name: "NumberLiteral",
+    pattern: /[1-9]\d*/
+})
 
-var PowerFunc = createToken({ name: "PowerFunc", pattern: /power/ })
-var Comma = createToken({ name: "Comma", pattern: /,/ })
+const PowerFunc = createToken({ name: "PowerFunc", pattern: /power/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
 
 // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
-var WhiteSpace = createToken({
+const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
-var allTokens = [
-    WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+const allTokens = [
+    // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+    WhiteSpace,
     Plus,
     Minus,
     Multi,
@@ -79,136 +79,121 @@ var allTokens = [
     PowerFunc,
     Comma
 ]
-var CalculatorLexer = new Lexer(allTokens)
+const CalculatorLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-function Calculator(input) {
-    Parser.call(this, input, allTokens)
+class Calculator extends Parser {
+    // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
+    // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
+    // invoking RULE(...)
+    // see: https://github.com/jeffmo/es-class-fields-and-static-properties
+    constructor(input) {
+        super(input, allTokens)
 
-    var $ = this
+        const $ = this
 
-    $.RULE("expression", function() {
-        return $.SUBRULE($.additionExpression)
-    })
-
-    //  lowest precedence thus it is first in the rule chain
-    // The precedence of binary expressions is determined by how far down the Parse Tree
-    // The binary expression appears.
-    $.RULE("additionExpression", function() {
-        var value, op, rhsVal
-
-        // parsing part
-        value = $.SUBRULE($.multiplicationExpression)
-        $.MANY(function() {
-            // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
-            op = $.CONSUME(AdditionOperator)
-            //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-            rhsVal = $.SUBRULE2($.multiplicationExpression)
-
-            // interpreter part
-            if (tokenMatcher(op, Plus)) {
-                value += rhsVal
-            } else {
-                // op instanceof Minus
-                value -= rhsVal
-            }
+        $.RULE("expression", () => {
+            return $.SUBRULE($.additionExpression)
         })
 
-        return value
-    })
+        //  lowest precedence thus it is first in the rule chain
+        // The precedence of binary expressions is determined by how far down the Parse Tree
+        // The binary expression appears.
+        $.RULE("additionExpression", () => {
+            let value, op, rhsVal
 
-    $.RULE("multiplicationExpression", function() {
-        var value, op, rhsVal
+            // parsing part
+            value = $.SUBRULE($.multiplicationExpression)
+            $.MANY(() => {
+                // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
+                op = $.CONSUME(AdditionOperator)
+                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                rhsVal = $.SUBRULE2($.multiplicationExpression)
 
-        // parsing part
-        value = $.SUBRULE($.atomicExpression)
-        $.MANY(function() {
-            op = $.CONSUME(MultiplicationOperator)
-            //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-            rhsVal = $.SUBRULE2($.atomicExpression)
+                // interpreter part
+                if (tokenMatcher(op, Plus)) {
+                    value += rhsVal
+                } else {
+                    // op instanceof Minus
+                    value -= rhsVal
+                }
+            })
 
-            // interpreter part
-            if (tokenMatcher(op, Multi)) {
-                value *= rhsVal
-            } else {
-                // op instanceof Div
-                value /= rhsVal
-            }
+            return value
         })
 
-        return value
-    })
+        $.RULE("multiplicationExpression", () => {
+            let value, op, rhsVal
 
-    $.RULE("atomicExpression", function() {
-        return $.OR([
-            // categorieshesisExpression has the highest precedence and thus it appears
-            // in the "lowest" leaf in the expression ParseTree.
-            {
-                ALT: function() {
-                    return $.SUBRULE($.categorieshesisExpression)
+            // parsing part
+            value = $.SUBRULE($.atomicExpression)
+            $.MANY(() => {
+                op = $.CONSUME(MultiplicationOperator)
+                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                rhsVal = $.SUBRULE2($.atomicExpression)
+
+                // interpreter part
+                if (tokenMatcher(op, Multi)) {
+                    value *= rhsVal
+                } else {
+                    // op instanceof Div
+                    value /= rhsVal
                 }
-            },
-            {
-                ALT: function() {
-                    return parseInt($.CONSUME(NumberLiteral).image, 10)
-                }
-            },
-            {
-                ALT: function() {
-                    return $.SUBRULE($.powerFunction)
-                }
-            }
-        ])
-    })
+            })
 
-    $.RULE("categorieshesisExpression", function() {
-        var expValue
+            return value
+        })
 
-        $.CONSUME(LParen)
-        expValue = $.SUBRULE($.expression)
-        $.CONSUME(RParen)
+        $.RULE("atomicExpression", () => {
+            return $.OR([
+                // categorieshesisExpression has the highest precedence and thus it appears
+                // in the "lowest" leaf in the expression ParseTree.
+                { ALT: () => $.SUBRULE($.categorieshesisExpression) },
+                { ALT: () => parseInt($.CONSUME(NumberLiteral).image, 10) },
+                { ALT: () => $.SUBRULE($.powerFunction) }
+            ])
+        })
 
-        return expValue
-    })
+        $.RULE("categorieshesisExpression", () => {
+            let expValue
 
-    $.RULE("powerFunction", function() {
-        var base, exponent
+            $.CONSUME(LParen)
+            expValue = $.SUBRULE($.expression)
+            $.CONSUME(RParen)
 
-        $.CONSUME(PowerFunc)
-        $.CONSUME(LParen)
-        base = $.SUBRULE($.expression)
-        $.CONSUME(Comma)
-        exponent = $.SUBRULE2($.expression)
-        $.CONSUME(RParen)
+            return expValue
+        })
 
-        return Math.pow(base, exponent)
-    })
+        $.RULE("powerFunction", () => {
+            let base, exponent
 
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
+            $.CONSUME(PowerFunc)
+            $.CONSUME(LParen)
+            base = $.SUBRULE($.expression)
+            $.CONSUME(Comma)
+            exponent = $.SUBRULE2($.expression)
+            $.CONSUME(RParen)
+
+            return Math.pow(base, exponent)
+        })
+
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this)
+    }
 }
 
-// avoids inserting number literals as these can have multiple(and infinite) semantic values, thus it is unlikely
-// we can choose the correct number value to insert.
-Calculator.prototype.canTokenTypeBeInsertedInRecovery = function(tokClass) {
-    return tokClass !== NumberLiteral
-}
-
-Calculator.prototype = Object.create(Parser.prototype)
-Calculator.prototype.constructor = Calculator
+// reuse the same parser instance.
+const parser = new Calculator([])
 
 // wrapping it all together
-// reuse the same parser instance.
-var parser = new Calculator([])
-
 module.exports = function(text) {
-    var lexResult = CalculatorLexer.tokenize(text)
+    const lexResult = CalculatorLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
-    var value = parser.expression()
+    const value = parser.expression()
 
     return {
         value: value,

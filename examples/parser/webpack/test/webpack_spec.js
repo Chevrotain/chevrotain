@@ -1,4 +1,4 @@
-const expect = require("chai").expect
+const { expect } = require("chai")
 
 describe("Chevrotain Webpacking support", () => {
     it("Can be webpacked without any special configuration when the grammar and tokens are defined in the same file", () => {

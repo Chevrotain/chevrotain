@@ -5,7 +5,6 @@ var createToken = chevrotain.createToken
 var Lexer = chevrotain.Lexer
 var Parser = chevrotain.Parser
 
-// In ES5 there are no classes, therefore utility methods must be used to create Token "classes".
 var True = createToken({ name: "True", pattern: /true/ })
 var False = createToken({ name: "False", pattern: /false/ })
 var Null = createToken({ name: "Null", pattern: /null/ })
@@ -128,7 +127,9 @@ module.exports = function(text) {
     var value = parser.json()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        // This is a pure grammar, the value will be undefined until we add embedded actions
+        // or enable automatic CST creation.
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

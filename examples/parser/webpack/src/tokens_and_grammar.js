@@ -1,26 +1,16 @@
-import { Token, Lexer, Parser } from "chevrotain"
+import { Token, Lexer, Parser, createToken } from "chevrotain"
 
 // ----------------- lexer -----------------
-// TODO: does babel support static properties?
-// Unfortunately no support for static class properties in ES2015, only in ES2016...
-// so the PATTERN/GROUP static props are defined outside the class declarations.
-// see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class LSquare {}
-LSquare.PATTERN = /\[/
-
-class RSquare {}
-RSquare.PATTERN = /]/
-
-class Comma {}
-Comma.PATTERN = /,/
-
-class Integer {}
-Integer.PATTERN = /\d+/
-
-class WhiteSpace {}
-WhiteSpace.PATTERN = /\s+/
-WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
-WhiteSpace.LINE_BREAKS = true
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+const RSquare = createToken({ name: "RSquare", pattern: /]/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Integer = createToken({ name: "Integer", pattern: /\d+/ })
+const WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
 export const allTokens = [WhiteSpace, LSquare, RSquare, Comma, Integer]
 const ArrayLexer = new Lexer(allTokens)
@@ -63,7 +53,7 @@ export function parse(text) {
     const value = parser.array()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

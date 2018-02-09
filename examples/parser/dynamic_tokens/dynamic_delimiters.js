@@ -11,32 +11,28 @@
  * Otherwise certain performance optimizations may break as those assume that the Token vocabulary is static.
  */
 
-var chevrotain = require("../../../lib/chevrotain")
+const { createToken, Lexer, Parser } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var createToken = chevrotain.createToken
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-
-var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
-var RSquare = createToken({ name: "RSquare", pattern: /]/ })
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+const RSquare = createToken({ name: "RSquare", pattern: /]/ })
 
 // base delimiter TokenTypes
-var BaseDelimiter = createToken({ name: "BaseDelimiter", pattern: Lexer.NA })
-var Comma = createToken({
+const BaseDelimiter = createToken({ name: "BaseDelimiter", pattern: Lexer.NA })
+const Comma = createToken({
     name: "Comma",
     pattern: /,/,
     categories: BaseDelimiter
 })
-var NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ })
-var WhiteSpace = createToken({
+const NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ })
+const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
-var allTokens = [
+const allTokens = [
     WhiteSpace,
     LSquare,
     RSquare,
@@ -57,15 +53,15 @@ function DynamicDelimiterParser(input) {
     })
 
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
-    var $ = this
+    const $ = this
 
-    this.RULE("array", function() {
-        var result = ""
+    this.RULE("array", () => {
+        let result = ""
 
         $.CONSUME(LSquare) // This will match any Token Class which extends BaseLeftDelimiter
-        $.OPTION(function() {
+        $.OPTION(() => {
             result += $.CONSUME(NumberLiteral).image
-            $.MANY(function() {
+            $.MANY(() => {
                 $.CONSUME(BaseDelimiter)
                 result += $.CONSUME2(NumberLiteral).image
             })
@@ -88,7 +84,7 @@ DynamicDelimiterParser.prototype.constructor = DynamicDelimiterParser
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new DynamicDelimiterParser([])
+const parser = new DynamicDelimiterParser([])
 
 module.exports = function(text, dynamicDelimiterRegExp) {
     // make this parameter optional
@@ -97,22 +93,24 @@ module.exports = function(text, dynamicDelimiterRegExp) {
     }
 
     // dynamically create Token classes which extend the BaseXXXDelimiters
-    var dynamicDelimiter = createToken({
+    const dynamicDelimiter = createToken({
         name: "dynamicDelimiter",
         pattern: dynamicDelimiterRegExp,
         categories: BaseDelimiter
     })
 
     // dynamically create a Lexer which can Lex all our language including the dynamic delimiters.
-    var dynamicDelimiterLexer = new Lexer(allTokens.concat([dynamicDelimiter]))
+    const dynamicDelimiterLexer = new Lexer(
+        allTokens.concat([dynamicDelimiter])
+    )
 
     // lex
-    var lexResult = dynamicDelimiterLexer.tokenize(text)
+    const lexResult = dynamicDelimiterLexer.tokenize(text)
 
-    // parse
     // setting the input will reset the parser's state
     parser.input = lexResult.tokens
-    var value = parser.array()
+    // parse
+    const value = parser.array()
 
     return {
         value: value,

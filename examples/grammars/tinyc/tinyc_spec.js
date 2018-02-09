@@ -1,8 +1,8 @@
 const assert = require("assert")
 const parseTinyC = require("./tinyc")
 
-describe("The TinyC Grammar", function() {
-    it("can parse a simple TinyC sample without errors", function() {
+describe("The TinyC Grammar", () => {
+    it("can parse a simple TinyC sample without errors", () => {
         const inputText =
             "{ " +
             "i=125;" +

@@ -4,12 +4,12 @@
  */
 
 const chevrotain = require("chevrotain")
+const { Lexer, Parser } = chevrotain
 
 // ----------------- lexer -----------------
-const Lexer = chevrotain.Lexer
-const Parser = chevrotain.Parser
-
 const allTokens = []
+
+// Utility to avoid manually building the allTokens array
 function createToken(options) {
     const newToken = chevrotain.createToken(options)
     allTokens.push(newToken)
@@ -44,8 +44,8 @@ const TinyCLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 
-class TinyCParser extends chevrotain.Parser {
-    // Unfortunately no support for class fields with initializer in ES2015, only in ES2016...
+class TinyCParser extends Parser {
+    // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
@@ -61,17 +61,14 @@ class TinyCParser extends chevrotain.Parser {
             })
         })
 
-        // ----------------------------
-        // the parsing methods
         $.RULE("statement", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.SUBRULE($.ifStatement)}},
-                {ALT: () => {$.SUBRULE($.whileStatement)}},
-                {ALT: () => {$.SUBRULE($.doStatement)}},
-                {ALT: () => {$.SUBRULE($.blockStatement)}},
-                {ALT: () => {$.SUBRULE($.expressionStatement)}},
-                {ALT: () => {$.SUBRULE($.emptyStatement)}}
+                { ALT: () => $.SUBRULE($.ifStatement) },
+                { ALT: () => $.SUBRULE($.whileStatement) },
+                { ALT: () => $.SUBRULE($.doStatement) },
+                { ALT: () => $.SUBRULE($.blockStatement) },
+                { ALT: () => $.SUBRULE($.expressionStatement) },
+                { ALT: () => $.SUBRULE($.emptyStatement) }
             ])
         })
 
@@ -113,10 +110,9 @@ class TinyCParser extends chevrotain.Parser {
         })
 
         $.RULE("expression", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.SUBRULE($.assignExpression)}},
-                {ALT: () => {$.SUBRULE($.relationExpression)}}
+                { ALT: () => $.SUBRULE($.assignExpression) },
+                { ALT: () => $.SUBRULE($.relationExpression) }
             ])
         })
 
@@ -131,10 +127,9 @@ class TinyCParser extends chevrotain.Parser {
         $.RULE("AdditionExpression", () => {
             $.SUBRULE($.term)
             $.MANY(() => {
-                // prettier-ignore
                 $.OR([
-                    {ALT: () => {$.CONSUME(Plus)}},
-                    {ALT: () => {$.CONSUME(Minus)}}
+                    { ALT: () => $.CONSUME(Plus) },
+                    { ALT: () => $.CONSUME(Minus) }
                 ])
                 $.SUBRULE2($.term)
             })
@@ -147,12 +142,10 @@ class TinyCParser extends chevrotain.Parser {
         })
 
         $.RULE("term", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.CONSUME(ID)}},
-                {ALT: () => {$.CONSUME(INT)}},
-                {ALT: () => {$.SUBRULE($.paren_expr)}}
-
+                { ALT: () => $.CONSUME(ID) },
+                { ALT: () => $.CONSUME(INT) },
+                { ALT: () => $.SUBRULE($.paren_expr) }
             ])
         })
 
@@ -188,7 +181,9 @@ module.exports = function(text) {
     const value = parser.program()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        // This is a pure grammar, the value will be undefined until we add embedded actions
+        // or enable automatic CST creation.
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

@@ -8,20 +8,20 @@ function clearJsonCache() {
     })
 }
 
-describe("Chevrotain minification support", function() {
+describe("Chevrotain minification support", () => {
     // hack to clean the chevrotain Cache because initializing multiple parsers with
     // the same name will not work correctly.
-    beforeEach(function() {
+    beforeEach(() => {
         clearJsonCache()
     })
 
-    it("Cannot be minified without custom compression options", function() {
-        expect(function() {
+    it("Cannot be minified without custom compression options", () => {
+        expect(() => {
             require("./gen/no_compression.min").parseJson("")
         }).to.throw(/Terminal Token name: \w+ not found/)
     })
 
-    it("Can be minified using selective name mangling", function() {
+    it("Can be minified using selective name mangling", () => {
         var parseJson = require("./gen/selective.min").parseJson
         var inputText = '{ "arr": [1,2,3], "obj": {"num":666}}'
         var lexAndParseResult = parseJson(inputText)
@@ -30,7 +30,7 @@ describe("Chevrotain minification support", function() {
         expect(lexAndParseResult.parseErrors).to.be.empty
     })
 
-    it("Can be minified using disabled mangling", function() {
+    it("Can be minified using disabled mangling", () => {
         var parseJson = require("./gen/disable_mangling.min").parseJson
         var inputText = '{ "arr": [1,2,3], "obj": {"num":666}}'
         var lexAndParseResult = parseJson(inputText)

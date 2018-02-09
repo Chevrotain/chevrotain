@@ -4,13 +4,9 @@
  * instead of being limited to only using regular expressions.
  *
  * For additional details see the docs:
- * https://github.com/SAP/chevrotain/blob/master/docs/custom_token_patterns.md
+ * http://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html
  */
-
-"use strict"
-let chevrotain = require("chevrotain")
-let createToken = chevrotain.createToken
-let Lexer = chevrotain.Lexer
+const { createToken, Lexer } = require("chevrotain")
 
 // First lets define our custom pattern for matching an Integer Literal.
 // This function's signature matches the RegExp.prototype.exec function.
@@ -27,7 +23,7 @@ function matchInteger(text, startOffset) {
     if (endOffset === startOffset) {
         return null
     } else {
-        let matchedString = text.substring(startOffset, endOffset)
+        const matchedString = text.substring(startOffset, endOffset)
         // according to the RegExp.prototype.exec API the first item in the returned array must be the whole matched string.
         return [matchedString]
     }
@@ -35,28 +31,28 @@ function matchInteger(text, startOffset) {
 
 // Now we can simply replace the regExp pattern with our custom pattern.
 // Consult the Docs (linked above) for additional syntax variants.
-let IntegerLiteral = createToken({
+const IntegerLiteral = createToken({
     name: "IntegerLiteral",
     pattern: matchInteger
 })
-let Comma = createToken({ name: "Comma", pattern: /,/ })
-let Whitespace = createToken({
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Whitespace = createToken({
     name: "Whitespace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
-let customPatternLexer = new Lexer([Whitespace, Comma, IntegerLiteral])
+const customPatternLexer = new Lexer([Whitespace, Comma, IntegerLiteral])
 
 module.exports = {
     IntegerLiteral: IntegerLiteral,
     Comma: Comma,
 
     tokenize: function(text) {
-        let lexResult = customPatternLexer.tokenize(text)
+        const lexResult = customPatternLexer.tokenize(text)
 
-        if (lexResult.errors.length >= 1) {
+        if (lexResult.errors.length < 0) {
             throw new Error("sad sad panda lexing errors detected")
         }
         return lexResult

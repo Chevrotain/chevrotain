@@ -1,14 +1,11 @@
 "use strict"
-var chevrotain = require("chevrotain")
-var XRegExp = require("xregexp")
+const chevrotain = require("chevrotain")
+const { Parser, Lexer, createToken } = chevrotain
+const XRegExp = require("xregexp")
 
 // ----------------- lexer -----------------
-var Token = chevrotain.Token
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-
 // A little mini DSL for easier lexer definition using xRegExp.
-var fragments = {}
+const fragments = {}
 
 function FRAGMENT(name, def) {
     fragments[name] = XRegExp.build(def, fragments)
@@ -28,86 +25,97 @@ FRAGMENT(
 )
 FRAGMENT("Name", "{{NameStartChar}}({{NameChar}})*")
 
-// Unfortunately no support for static class properties in ES2015, only in ES2016...
+// Unfortunately no support for static class properties in ES2015, only in esNext...
 // so the PATTERN/GROUP static props are defined outside the class declarations.
 // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class Comment {}
-Comment.PATTERN = /<!--.*?-->/
+const Comment = createToken({ name: "Comment", pattern: /<!--.*?-->/ })
 // A Comment may span multiple lines.
 Comment.LINE_BREAKS = true
 
-class CData {}
-CData.PATTERN = /<!\[CDATA\[.*?]]>/
+const CData = createToken({ name: "CData", pattern: /<!\[CDATA\[.*?]]>/ })
 
-class DTD {}
-DTD.PATTERN = /<!.*?>/
-DTD.GROUP = Lexer.SKIPPED
+const DTD = createToken({
+    name: "DTD",
+    pattern: /<!.*?>/,
+    group: Lexer.SKIPPED
+})
 
-class EntityRef {}
-EntityRef.PATTERN = MAKE_PATTERN("&{{Name}};")
+const EntityRef = createToken({
+    name: "EntityRef",
+    pattern: MAKE_PATTERN("&{{Name}};")
+})
 
-class CharRef {}
-CharRef.PATTERN = /&#\d+;|&#x[a-fA-F0-9]/
+const CharRef = createToken({
+    name: "CharRef",
+    pattern: /&#\d+;|&#x[a-fA-F0-9]/
+})
 
-class SEA_WS {}
-SEA_WS.PATTERN = /( |\t|\n|\r\n)+/
-SEA_WS.LINE_BREAKS = true
+const SEA_WS = createToken({
+    name: "SEA_WS",
+    pattern: /( |\t|\n|\r\n)+/,
+    line_breaks: true
+})
 
-class XMLDeclOpen {}
-XMLDeclOpen.PATTERN = /<\?xml[ \t\r\n]/
-XMLDeclOpen.PUSH_MODE = "INSIDE"
-XMLDeclOpen.LINE_BREAKS = true
+const XMLDeclOpen = createToken({
+    name: "XMLDeclOpen",
+    pattern: /<\?xml[ \t\r\n]/,
+    push_mode: "INSIDE",
+    line_breaks: true
+})
 
-class SLASH_OPEN {}
-SLASH_OPEN.PATTERN = /<\//
-SLASH_OPEN.PUSH_MODE = "INSIDE"
+const SLASH_OPEN = createToken({
+    name: "SLASH_OPEN",
+    pattern: /<\//,
+    push_mode: "INSIDE"
+})
 
-class OPEN {}
-OPEN.PATTERN = /</
-OPEN.PUSH_MODE = "INSIDE"
+const OPEN = createToken({ name: "OPEN", pattern: /</, push_mode: "INSIDE" })
 
-class PROCESSING_INSTRUCTION {}
-PROCESSING_INSTRUCTION.PATTERN = MAKE_PATTERN("<\\?{{Name}}.*\\?>")
+const PROCESSING_INSTRUCTION = createToken({
+    name: "PROCESSING_INSTRUCTION",
+    pattern: MAKE_PATTERN("<\\?{{Name}}.*\\?>")
+})
 
-class TEXT {}
-TEXT.PATTERN = /[^<&]+/
-TEXT.LINE_BREAKS = true
+const TEXT = createToken({ name: "TEXT", pattern: /[^<&]+/, line_breaks: true })
 
-class CLOSE {}
-CLOSE.PATTERN = />/
-CLOSE.POP_MODE = true
+const CLOSE = createToken({ name: "CLOSE", pattern: />/, pop_mode: true })
 
-class SPECIAL_CLOSE {}
-SPECIAL_CLOSE.PATTERN = /\?>/
-SPECIAL_CLOSE.POP_MODE = true
+const SPECIAL_CLOSE = createToken({
+    name: "SPECIAL_CLOSE",
+    pattern: /\?>/,
+    pop_mode: true
+})
 
-class SLASH_CLOSE {}
-SLASH_CLOSE.PATTERN = /\/>/
-SLASH_CLOSE.POP_MODE = true
+const SLASH_CLOSE = createToken({
+    name: "SLASH_CLOSE",
+    pattern: /\/>/,
+    pop_mode: true
+})
 
-class SLASH {}
-SLASH.PATTERN = /\//
+const SLASH = createToken({ name: "SLASH", pattern: /\// })
 
-class STRING {}
-STRING.PATTERN = /"[^<"]*"|'[^<']*'/
-STRING.LINE_BREAKS = true
+const STRING = createToken({
+    name: "STRING",
+    pattern: /"[^<"]*"|'[^<']*'/,
+    line_breaks: true
+})
 
-class EQUALS {}
-EQUALS.PATTERN = /=/
+const EQUALS = createToken({ name: "EQUALS", pattern: /=/ })
 
-class Name {}
-Name.PATTERN = MAKE_PATTERN("{{Name}}")
+const Name = createToken({ name: "Name", pattern: MAKE_PATTERN("{{Name}}") })
 
-class S {}
-S.PATTERN = /[ \t\r\n]/
-S.GROUP = Lexer.SKIPPED
-S.LINE_BREAKS = true
+const S = createToken({
+    name: "S",
+    pattern: /[ \t\r\n]/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
-var XmlLexerDefinition = {
+const XmlLexerDefinition = {
     defaultMode: "OUTSIDE",
 
     modes: {
-        // the default (inital) mode is "numbers_mode"
+        // the default (initial) mode is "numbers_mode"
         OUTSIDE: [
             Comment,
             CData,
@@ -134,14 +142,14 @@ var XmlLexerDefinition = {
     }
 }
 
-var XmlLexer = new Lexer(XmlLexerDefinition)
-var allTokens = XmlLexerDefinition.modes.INSIDE.concat(
+const XmlLexer = new Lexer(XmlLexerDefinition)
+const allTokens = XmlLexerDefinition.modes.INSIDE.concat(
     XmlLexerDefinition.modes.OUTSIDE
 )
 
 // ----------------- parser -----------------
-class XmlParserES6 extends chevrotain.Parser {
-    // Unfortunately no support for class fields with initializer in ES2015, only in ES2016...
+class XmlParser extends Parser {
+    // Unfortunately no support for class fields with initializer in ES2015, only in ESNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
@@ -155,7 +163,7 @@ class XmlParserES6 extends chevrotain.Parser {
         )
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
-        var $ = this
+        const $ = this
 
         $.document = $.RULE("document", () => {
             $.OPTION(() => {
@@ -187,13 +195,12 @@ class XmlParserES6 extends chevrotain.Parser {
             })
 
             $.MANY(() => {
-                // prettier-ignore
                 $.OR([
-                    {ALT: () => {$.SUBRULE($.element)}},
-                    {ALT: () => {$.SUBRULE($.reference)}},
-                    {ALT: () => {$.CONSUME(CData)}},
-                    {ALT: () => {$.CONSUME(PROCESSING_INSTRUCTION)}},
-                    {ALT: () => {$.CONSUME(Comment)}}
+                    { ALT: () => $.SUBRULE($.element) },
+                    { ALT: () => $.SUBRULE($.reference) },
+                    { ALT: () => $.CONSUME(CData) },
+                    { ALT: () => $.CONSUME(PROCESSING_INSTRUCTION) },
+                    { ALT: () => $.CONSUME(Comment) }
                 ])
 
                 $.OPTION2(() => {
@@ -228,10 +235,9 @@ class XmlParserES6 extends chevrotain.Parser {
         })
 
         $.reference = $.RULE("reference", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.CONSUME(EntityRef)}},
-                {ALT: () => {$.CONSUME(CharRef)}}
+                { ALT: () => $.CONSUME(EntityRef) },
+                { ALT: () => $.CONSUME(CharRef) }
             ])
         })
 
@@ -242,19 +248,17 @@ class XmlParserES6 extends chevrotain.Parser {
         })
 
         $.chardata = $.RULE("chardata", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.CONSUME(TEXT)}},
-                {ALT: () => {$.CONSUME(SEA_WS)}}
+                { ALT: () => $.CONSUME(TEXT) },
+                { ALT: () => $.CONSUME(SEA_WS) }
             ])
         })
 
         $.misc = $.RULE("misc", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.CONSUME(Comment)}},
-                {ALT: () => {$.CONSUME(PROCESSING_INSTRUCTION)}},
-                {ALT: () => {$.CONSUME(SEA_WS)}}
+                { ALT: () => $.CONSUME(Comment) },
+                { ALT: () => $.CONSUME(PROCESSING_INSTRUCTION) },
+                { ALT: () => $.CONSUME(SEA_WS) }
             ])
         })
 
@@ -268,17 +272,19 @@ class XmlParserES6 extends chevrotain.Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new XmlParserES6([])
+const parser = new XmlParser([])
 
 module.exports = function(text) {
-    var lexResult = XmlLexer.tokenize(text)
+    const lexResult = XmlLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
-    var value = parser.document()
+    const value = parser.document()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        // This is a pure grammar, the value will be undefined until we add embedded actions
+        // or enable automatic CST creation.
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

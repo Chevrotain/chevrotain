@@ -1,12 +1,7 @@
 "use strict"
 
-const chevrotain = require("chevrotain")
+const { Parser, EOF, tokenMatcher } = require("chevrotain")
 const tokens = require("./ecma5_tokens")
-
-const Parser = chevrotain.Parser
-const tokenMatcher = chevrotain.tokenMatcher
-const EOF = chevrotain.EOF
-
 // for conciseness
 const t = tokens
 

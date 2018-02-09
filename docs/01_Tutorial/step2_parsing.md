@@ -116,25 +116,20 @@ Important to note that:
 #### Let's look at two more grammar rule, this time with repetition and alternation.
 
 ```javascript
-// selectClause
-//   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
-this.selectClause =
-   $.RULE("selectClause", () => {
-       $.CONSUME(Select);
-       $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
-           $.CONSUME(Identifier);
-       }});
-   })
+$.RULE("selectClause", () => {
+   $.CONSUME(Select);
+   $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
+       $.CONSUME(Identifier);
+   }})
+})
  
 // atomicExpression
 //    : INTEGER | IDENTIFIER
-this.atomicExpression =
-   $.RULE("atomicExpression", () => {
-// prettier-ignore
-       $.OR([
-           {ALT: () => { $.CONSUME(Integer)}},
-           {ALT: () => { $.CONSUME(Identifier)}}
-       ]);
+$.RULE("atomicExpression", () => {
+   $.OR([
+       {ALT: () => $.CONSUME(Integer)},
+       {ALT: () => $.CONSUME(Identifier)}
+   ])
 })
 ```
 
@@ -147,15 +142,13 @@ point in the grammar**.
 ```javascript
 // selectClause
 //   : "SELECT" IDENTIFIER ("," IDENTIFIER)*;
-this.selectClause =
-   $.RULE("selectClause", () => {
-       $.CONSUME(Select);
-       // Can be debugged directly! no code generation.
-       debugger;
-       $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
-           $.CONSUME(Identifier);
-       }});
-   })
+$.RULE("selectClause", () => {
+   $.CONSUME(Select)
+   // Can be debugged directly! no code generation.
+   debugger;
+   $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
+       $.CONSUME(Identifier)
+   }})
 })
 ```
 
@@ -204,62 +197,61 @@ can be used for error messages and fault tolerance as well as deciding which pat
 let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 
 class SelectParser extends chevrotain.Parser {
-
     constructor(input) {
-     super(input, allTokens)
-     
-     const $ = this
-     
-     $.RULE("selectStatement", () => {
-         $.SUBRULE($.selectClause)
-         $.SUBRULE($.fromClause)
-         $.OPTION(() => {
-             $.SUBRULE($.whereClause)        
+         super(input, allTokens)
+         
+         const $ = this
+         
+         $.RULE("selectStatement", () => {
+             $.SUBRULE($.selectClause)
+             $.SUBRULE($.fromClause)
+             $.OPTION(() => {
+                 $.SUBRULE($.whereClause)        
+             })
          })
-     })
-
-     $.RULE("selectClause", () => {
-         $.CONSUME(Select)
-         $.AT_LEAST_ONE_SEP({SEP: Comma, DEF: () => {
-             $.CONSUME(Identifier)
-         }})
-     })
-
-     $.RULE("fromClause", () => {
-         $.CONSUME(From)
-         $.CONSUME(Identifier)
-     })
-
-     $.RULE("whereClause", () => {
-         $.CONSUME(Where)
-         $.SUBRULE($.expression)
-     }) 
-
-     $.RULE("expression", () => {
-         $.SUBRULE($.atomicExpression)
-         $.SUBRULE($.relationalOperator)
-         $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
-                       // from the 'SUBRULE(atomicExpression)'
-                       // 2 lines above.
-     })
-
-     $.RULE("atomicExpression", () => {
-         // prettier-ignore
-         $.OR([
-             {ALT: () => { $.CONSUME(Integer)}},
-             {ALT: () => { $.CONSUME(Identifier)}}
-         ]);
-     })
-
-     $.RULE("relationalOperator", () => {
-         // prettier-ignore
-         $.OR([
-             {ALT: function(){ $.CONSUME(GreaterThan)}},
-             {ALT: function(){ $.CONSUME(LessThan)}}
-         ]);
-     });
     
-     Parser.performSelfAnalysis(this)
+         $.RULE("selectClause", () => {
+             $.CONSUME(Select)
+             $.AT_LEAST_ONE_SEP({
+                 SEP: Comma, 
+                 DEF: () => {
+                     $.CONSUME(Identifier)
+             }})
+         })
+    
+         $.RULE("fromClause", () => {
+             $.CONSUME(From)
+             $.CONSUME(Identifier)
+         })
+    
+         $.RULE("whereClause", () => {
+             $.CONSUME(Where)
+             $.SUBRULE($.expression)
+         }) 
+    
+         $.RULE("expression", () => {
+             $.SUBRULE($.atomicExpression)
+             $.SUBRULE($.relationalOperator)
+             $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
+                           // from the 'SUBRULE(atomicExpression)'
+                           // 2 lines above.
+         })
+    
+         $.RULE("atomicExpression", () => {
+             $.OR([
+                 {ALT: () => $.CONSUME(Integer)},
+                 {ALT: () => $.CONSUME(Identifier)}
+             ]);
+         })
+    
+         $.RULE("relationalOperator", () => {
+             $.OR([
+                 {ALT: () => $.CONSUME(GreaterThan)},
+                 {ALT: () => $.CONSUME(LessThan)}
+             ])
+         })
+        
+         Parser.performSelfAnalysis(this)
     }    
 }
 ```
@@ -276,7 +268,7 @@ class SelectParser extends chevrotain.Parser {
 const parser = new SelectParser([]);
 
 function parseInput(text) {
-   let lexingResult = SelectLexer.tokenize(text)
+   const lexingResult = SelectLexer.tokenize(text)
    // "input" is a setter which will reset the parser's state.
    parser.input = lexingResult.tokens
    parser.selectStatement()
@@ -286,7 +278,7 @@ function parseInput(text) {
    }
 }
 
-let inputText = "SELECT column1 FROM table2"
+const inputText = "SELECT column1 FROM table2"
 parseInput(inputText)
 ```
 

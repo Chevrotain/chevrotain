@@ -13,19 +13,9 @@
  * telling the lexer to prefer the longer identifier alternative if one is found.
  */
 
-const chevrotain = require("chevrotain")
-const createToken = chevrotain.createToken
-const Lexer = chevrotain.Lexer
+const { createToken, Lexer } = require("chevrotain")
 
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-z]\w+/ })
-
-// A utility to create "keywords" token.
-function createkeywordToken(config) {
-    // The longer_alt property ensures the lexer will try to lex a LONGER identifier
-    // each time a keyword is lexed.
-    config.longer_alt = Identifier
-    return createToken(config)
-}
 
 const While = createToken({
     name: "While",
