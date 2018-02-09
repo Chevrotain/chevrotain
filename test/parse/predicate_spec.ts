@@ -196,7 +196,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             }
 
             public orRule = this.RULE("orRule", () => {
-                return this.OR1([
+                return this.OR7([
                     // no predicate
                     {
                         ALT: () => {

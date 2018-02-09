@@ -1715,7 +1715,7 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
             }
 
             topRule = this.RULE("topRule", () => {
-                return this.OR1([
+                return this.OR9([
                     {
                         // Lambda Function
                         ALT: () => {

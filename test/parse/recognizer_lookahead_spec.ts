@@ -23,6 +23,9 @@ function defineLookaheadSpecs(
         let FourTok = createToken({ name: "FourTok" })
         let FiveTok = createToken({ name: "FiveTok" })
         let SixTok = createToken({ name: "SixTok" })
+        let SevenTok = createToken({ name: "SevenTok" })
+        let EightTok = createToken({ name: "EightTok" })
+        let NineTok = createToken({ name: "NineTok" })
         let Comma = createToken({ name: "Comma" })
 
         const ALL_TOKENS = [
@@ -32,6 +35,9 @@ function defineLookaheadSpecs(
             FourTok,
             FiveTok,
             SixTok,
+            SevenTok,
+            EightTok,
+            NineTok,
             Comma
         ]
 
@@ -54,12 +60,12 @@ function defineLookaheadSpecs(
                 private parseManyOptionsRule(): string {
                     let total = ""
 
-                    this.OPTION1(() => {
+                    this.OPTION8(() => {
                         this.CONSUME1(OneTok)
                         total += "1"
                     })
 
-                    this.OPTION2(() => {
+                    this.OPTION9(() => {
                         this.CONSUME1(TwoTok)
                         total += "2"
                     })
@@ -167,6 +173,26 @@ function defineLookaheadSpecs(
                         total += "5"
                     })
 
+                    this.MANY6(() => {
+                        this.CONSUME1(SixTok)
+                        total += "6"
+                    })
+
+                    this.MANY7(() => {
+                        this.CONSUME1(SevenTok)
+                        total += "7"
+                    })
+
+                    this.MANY8(() => {
+                        this.CONSUME1(EightTok)
+                        total += "8"
+                    })
+
+                    this.MANY9(() => {
+                        this.CONSUME1(NineTok)
+                        total += "9"
+                    })
+
                     return total
                 }
             }
@@ -207,6 +233,30 @@ function defineLookaheadSpecs(
                 expect(parser.manyRule()).to.equal("5")
             })
 
+            it("can automatically compute lookahead for MANY6", () => {
+                let input = [createTokenInstance(SixTok)]
+                let parser = new ManyImplicitLookAheadParser(input)
+                expect(parser.manyRule()).to.equal("6")
+            })
+
+            it("can automatically compute lookahead for MANY7", () => {
+                let input = [createTokenInstance(SevenTok)]
+                let parser = new ManyImplicitLookAheadParser(input)
+                expect(parser.manyRule()).to.equal("7")
+            })
+
+            it("can automatically compute lookahead for MANY8", () => {
+                let input = [createTokenInstance(EightTok)]
+                let parser = new ManyImplicitLookAheadParser(input)
+                expect(parser.manyRule()).to.equal("8")
+            })
+
+            it("can automatically compute lookahead for MANY9", () => {
+                let input = [createTokenInstance(NineTok)]
+                let parser = new ManyImplicitLookAheadParser(input)
+                expect(parser.manyRule()).to.equal("9")
+            })
+
             it("can accept lookahead function param for flow mixing several MANYs", () => {
                 let input = [
                     createTokenInstance(OneTok),
@@ -223,7 +273,7 @@ function defineLookaheadSpecs(
             it("will cache the generatedLookAhead functions AFTER (check cache is filled)", () => {
                 let parser = new ManyImplicitLookAheadParser()
                 let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.keys().length).to.equal(5)
+                expect(lookaheadCache.keys().length).to.equal(9)
             })
         })
 
@@ -297,6 +347,46 @@ function defineLookaheadSpecs(
                         }).separators
                     )
 
+                    separators = separators.concat(
+                        this.MANY_SEP6({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(SixTok)
+                                total += "6"
+                            }
+                        }).separators
+                    )
+
+                    separators = separators.concat(
+                        this.MANY_SEP7({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(SevenTok)
+                                total += "7"
+                            }
+                        }).separators
+                    )
+
+                    separators = separators.concat(
+                        this.MANY_SEP8({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(EightTok)
+                                total += "8"
+                            }
+                        }).separators
+                    )
+
+                    separators = separators.concat(
+                        this.MANY_SEP9({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(NineTok)
+                                total += "9"
+                            }
+                        }).separators
+                    )
+
                     return {
                         total: total,
                         separators: separators
@@ -340,6 +430,30 @@ function defineLookaheadSpecs(
                 expect(parser.manySepRule().total).to.equal("5")
             })
 
+            it("can automatically compute lookahead for MANY_SEP6", () => {
+                let input = [createTokenInstance(SixTok)]
+                let parser = new ManySepImplicitLookAheadParser(input)
+                expect(parser.manySepRule().total).to.equal("6")
+            })
+
+            it("can automatically compute lookahead for MANY_SEP7", () => {
+                let input = [createTokenInstance(SevenTok)]
+                let parser = new ManySepImplicitLookAheadParser(input)
+                expect(parser.manySepRule().total).to.equal("7")
+            })
+
+            it("can automatically compute lookahead for MANY_SEP8", () => {
+                let input = [createTokenInstance(EightTok)]
+                let parser = new ManySepImplicitLookAheadParser(input)
+                expect(parser.manySepRule().total).to.equal("8")
+            })
+
+            it("can automatically compute lookahead for MANY_SEP9", () => {
+                let input = [createTokenInstance(NineTok)]
+                let parser = new ManySepImplicitLookAheadParser(input)
+                expect(parser.manySepRule().total).to.equal("9")
+            })
+
             it("can accept lookahead function param for flow mixing several MANY_SEPs", () => {
                 let input = [
                     createTokenInstance(OneTok),
@@ -366,7 +480,7 @@ function defineLookaheadSpecs(
             it("will cache the generatedLookAhead functions AFTER (check cache is filled)", () => {
                 let parser = new ManySepImplicitLookAheadParser()
                 let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.keys().length).to.equal(5)
+                expect(lookaheadCache.keys().length).to.equal(9)
             })
         })
 
@@ -419,6 +533,26 @@ function defineLookaheadSpecs(
                         total += "5"
                     })
 
+                    this.AT_LEAST_ONE6(() => {
+                        this.CONSUME1(SixTok)
+                        total += "6"
+                    })
+
+                    this.AT_LEAST_ONE7(() => {
+                        this.CONSUME1(SevenTok)
+                        total += "7"
+                    })
+
+                    this.AT_LEAST_ONE8(() => {
+                        this.CONSUME1(EightTok)
+                        total += "8"
+                    })
+
+                    this.AT_LEAST_ONE9(() => {
+                        this.CONSUME1(NineTok)
+                        total += "9"
+                    })
+
                     return total
                 }
             }
@@ -429,7 +563,7 @@ function defineLookaheadSpecs(
                 expect(lookaheadCache.keys().length).to.equal(0)
             })
 
-            it("can accept lookahead function param for AT_LEAST_ONE1-5", () => {
+            it("can accept lookahead function param for AT_LEAST_ONE", () => {
                 let input = [
                     createTokenInstance(OneTok),
                     createTokenInstance(TwoTok),
@@ -437,10 +571,16 @@ function defineLookaheadSpecs(
                     createTokenInstance(ThreeTok),
                     createTokenInstance(FourTok),
                     createTokenInstance(FourTok),
-                    createTokenInstance(FiveTok)
+                    createTokenInstance(FiveTok),
+                    createTokenInstance(SixTok),
+                    createTokenInstance(SevenTok),
+                    createTokenInstance(EightTok),
+                    createTokenInstance(EightTok),
+                    createTokenInstance(EightTok),
+                    createTokenInstance(NineTok)
                 ]
                 let parser = new AtLeastOneImplicitLookAheadParser(input)
-                expect(parser.atLeastOneRule()).to.equal("1223445")
+                expect(parser.atLeastOneRule()).to.equal("1223445678889")
             })
 
             it("will fail when zero occurrences of AT_LEAST_ONE in input", () => {
@@ -457,7 +597,7 @@ function defineLookaheadSpecs(
             it("will cache the generatedLookAhead functions AFTER (check cache is filled)", () => {
                 let parser = new AtLeastOneImplicitLookAheadParser()
                 let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.keys().length).to.equal(5)
+                expect(lookaheadCache.keys().length).to.equal(9)
             })
         })
 
@@ -539,6 +679,46 @@ function defineLookaheadSpecs(
                         }).separators
                     )
 
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP6({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(SixTok)
+                                total += "6"
+                            }
+                        }).separators
+                    )
+
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP7({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(SevenTok)
+                                total += "7"
+                            }
+                        }).separators
+                    )
+
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP8({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(EightTok)
+                                total += "8"
+                            }
+                        }).separators
+                    )
+
+                    separators = separators.concat(
+                        this.AT_LEAST_ONE_SEP9({
+                            SEP: Comma,
+                            DEF: () => {
+                                this.CONSUME1(NineTok)
+                                total += "9"
+                            }
+                        }).separators
+                    )
+
                     return {
                         total: total,
                         separators: separators
@@ -552,7 +732,7 @@ function defineLookaheadSpecs(
                 expect(lookaheadCache.keys().length).to.equal(0)
             })
 
-            it("can accept lookahead function param for AT_LEAST_ONE_SEP1-5", () => {
+            it("can accept lookahead function param for AT_LEAST_ONE_SEP", () => {
                 let input = [
                     createTokenInstance(OneTok),
                     createTokenInstance(TwoTok),
@@ -562,12 +742,22 @@ function defineLookaheadSpecs(
                     createTokenInstance(FourTok),
                     createTokenInstance(Comma),
                     createTokenInstance(FourTok),
-                    createTokenInstance(FiveTok)
+                    createTokenInstance(FiveTok),
+                    createTokenInstance(SixTok),
+                    createTokenInstance(SevenTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(SevenTok),
+                    createTokenInstance(Comma),
+                    createTokenInstance(SevenTok),
+                    createTokenInstance(EightTok),
+                    createTokenInstance(NineTok)
                 ]
                 let parser = new AtLeastOneSepImplicitLookAheadParser(input)
                 let parseResult = parser.atLeastOneSepRule()
-                expect(parseResult.total).to.equal("1223445")
+                expect(parseResult.total).to.equal("1223445677789")
                 expect(parseResult.separators).to.deep.equal([
+                    createTokenInstance(Comma),
+                    createTokenInstance(Comma),
                     createTokenInstance(Comma),
                     createTokenInstance(Comma)
                 ])
@@ -587,7 +777,7 @@ function defineLookaheadSpecs(
             it("will cache the generatedLookAhead functions AFTER (check cache is filled)", () => {
                 let parser = new AtLeastOneSepImplicitLookAheadParser()
                 let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.keys().length).to.equal(5)
+                expect(lookaheadCache.keys().length).to.equal(9)
             })
         })
 
@@ -609,7 +799,7 @@ function defineLookaheadSpecs(
                 private parseOrRule(): string {
                     let total = ""
 
-                    this.OR1([
+                    this.OR8([
                         {
                             ALT: () => {
                                 this.CONSUME1(OneTok)
@@ -784,7 +974,7 @@ function defineLookaheadSpecs(
                 expect(lookaheadCache.keys().length).to.equal(0)
             })
 
-            it("can compute the lookahead automatically for OR1-5", () => {
+            it("can compute the lookahead automatically for OR", () => {
                 let input = [
                     createTokenInstance(OneTok),
                     createTokenInstance(TwoTok),
@@ -1099,7 +1289,7 @@ function defineLookaheadSpecs(
                 expect(lookaheadCache.keys().length).to.equal(0)
             })
 
-            it("can compute the lookahead automatically for OR1-5", () => {
+            it("can compute the lookahead automatically for OR", () => {
                 let input = [
                     createTokenInstance(OneTok),
                     createTokenInstance(TwoTok),
@@ -1138,7 +1328,7 @@ function defineLookaheadSpecs(
 
                     public rule = this.RULE("rule", () => {
                         let result = "OPTION Not Taken"
-                        this.OPTION(() => {
+                        this.OPTION2(() => {
                             this.CONSUME1(OneTok)
                             this.CONSUME1(TwoTok)
                             this.CONSUME1(ThreeTok)

@@ -70,7 +70,7 @@ class EcmaScriptQuirksParser extends Parser {
 
     public statement = this.RULE("statement", () => {
         this.CONSUME(Return)
-        this.OPTION(() => {
+        this.OPTION7(() => {
             this.SUBRULE(this.expression)
         })
         this.CONSUME(Semicolon)
@@ -85,7 +85,7 @@ class EcmaScriptQuirksParser extends Parser {
     })
 
     public atomic = this.RULE("atomic", () => {
-        this.OR([
+        this.OR6([
             { ALT: () => this.CONSUME(RegExpLiteral) },
             { ALT: () => this.CONSUME(NumberLiteral) }
         ])

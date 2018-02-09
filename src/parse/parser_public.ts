@@ -1000,6 +1000,46 @@ export class Parser {
     }
 
     /**
+     * @see CONSUME1
+     */
+    protected CONSUME6(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokType, 6, options)
+    }
+
+    /**
+     * @see CONSUME1
+     */
+    protected CONSUME7(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokType, 7, options)
+    }
+
+    /**
+     * @see CONSUME1
+     */
+    protected CONSUME8(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokType, 8, options)
+    }
+
+    /**
+     * @see CONSUME1
+     */
+    protected CONSUME9(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken {
+        return this.consumeInternal(tokType, 9, options)
+    }
+
+    /**
      * Convenience method equivalent to SUBRULE1
      * @see SUBRULE1
      */
@@ -1073,6 +1113,46 @@ export class Parser {
         args: any[] = undefined
     ): T {
         return this.subruleInternal(ruleToCall, 5, args)
+    }
+
+    /**
+     * @see SUBRULE1
+     */
+    protected SUBRULE6<T>(
+        ruleToCall: (idx: number) => T,
+        args: any[] = undefined
+    ): T {
+        return this.subruleInternal(ruleToCall, 6, args)
+    }
+
+    /**
+     * @see SUBRULE1
+     */
+    protected SUBRULE7<T>(
+        ruleToCall: (idx: number) => T,
+        args: any[] = undefined
+    ): T {
+        return this.subruleInternal(ruleToCall, 7, args)
+    }
+
+    /**
+     * @see SUBRULE1
+     */
+    protected SUBRULE8<T>(
+        ruleToCall: (idx: number) => T,
+        args: any[] = undefined
+    ): T {
+        return this.subruleInternal(ruleToCall, 8, args)
+    }
+
+    /**
+     * @see SUBRULE1
+     */
+    protected SUBRULE9<T>(
+        ruleToCall: (idx: number) => T,
+        args: any[] = undefined
+    ): T {
+        return this.subruleInternal(ruleToCall, 9, args)
     }
 
     /**
@@ -1153,6 +1233,42 @@ export class Parser {
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 5)
+    }
+
+    /**
+     * @see OPTION1
+     */
+    protected OPTION6<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return this.optionInternal(actionORMethodDef, 6)
+    }
+
+    /**
+     * @see OPTION1
+     */
+    protected OPTION7<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return this.optionInternal(actionORMethodDef, 7)
+    }
+
+    /**
+     * @see OPTION1
+     */
+    protected OPTION8<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return this.optionInternal(actionORMethodDef, 8)
+    }
+
+    /**
+     * @see OPTION1
+     */
+    protected OPTION9<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return this.optionInternal(actionORMethodDef, 9)
     }
 
     /**
@@ -1243,6 +1359,34 @@ export class Parser {
     }
 
     /**
+     * @see OR1
+     */
+    protected OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return this.orInternal(altsOrOpts, 6)
+    }
+
+    /**
+     * @see OR1
+     */
+    protected OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return this.orInternal(altsOrOpts, 7)
+    }
+
+    /**
+     * @see OR1
+     */
+    protected OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return this.orInternal(altsOrOpts, 8)
+    }
+
+    /**
+     * @see OR1
+     */
+    protected OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return this.orInternal(altsOrOpts, 9)
+    }
+
+    /**
      * Convenience method equivalent to MANY1.
      * @see MANY1
      */
@@ -1323,6 +1467,42 @@ export class Parser {
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(5, actionORMethodDef, [])
+    }
+
+    /**
+     * @see MANY1
+     */
+    protected MANY6<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT[] {
+        return this.manyInternal(6, actionORMethodDef, [])
+    }
+
+    /**
+     * @see MANY1
+     */
+    protected MANY7<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT[] {
+        return this.manyInternal(7, actionORMethodDef, [])
+    }
+
+    /**
+     * @see MANY1
+     */
+    protected MANY8<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT[] {
+        return this.manyInternal(8, actionORMethodDef, [])
+    }
+
+    /**
+     * @see MANY1
+     */
+    protected MANY9<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT[] {
+        return this.manyInternal(9, actionORMethodDef, [])
     }
 
     /**
@@ -1427,6 +1607,54 @@ export class Parser {
     }
 
     /**
+     * @see MANY_SEP1
+     */
+    protected MANY_SEP6<OUT>(
+        options: ManySepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(6, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see MANY_SEP1
+     */
+    protected MANY_SEP7<OUT>(
+        options: ManySepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(7, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see MANY_SEP1
+     */
+    protected MANY_SEP8<OUT>(
+        options: ManySepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(8, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see MANY_SEP1
+     */
+    protected MANY_SEP9<OUT>(
+        options: ManySepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(9, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
      * Convenience method equivalent to AT_LEAST_ONE1.
      * @see AT_LEAST_ONE1
      */
@@ -1488,6 +1716,42 @@ export class Parser {
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(5, actionORMethodDef, [])
+    }
+
+    /**
+     * @see AT_LEAST_ONE1
+     */
+    protected AT_LEAST_ONE6<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): OUT[] {
+        return this.atLeastOneInternal(6, actionORMethodDef, [])
+    }
+
+    /**
+     * @see AT_LEAST_ONE1
+     */
+    protected AT_LEAST_ONE7<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): OUT[] {
+        return this.atLeastOneInternal(7, actionORMethodDef, [])
+    }
+
+    /**
+     * @see AT_LEAST_ONE1
+     */
+    protected AT_LEAST_ONE8<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): OUT[] {
+        return this.atLeastOneInternal(8, actionORMethodDef, [])
+    }
+
+    /**
+     * @see AT_LEAST_ONE1
+     */
+    protected AT_LEAST_ONE9<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): OUT[] {
+        return this.atLeastOneInternal(9, actionORMethodDef, [])
     }
 
     /**
@@ -1568,6 +1832,54 @@ export class Parser {
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(5, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see AT_LEAST_ONE_SEP1
+     */
+    protected AT_LEAST_ONE_SEP6<OUT>(
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(6, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see AT_LEAST_ONE_SEP1
+     */
+    protected AT_LEAST_ONE_SEP7<OUT>(
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(7, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see AT_LEAST_ONE_SEP1
+     */
+    protected AT_LEAST_ONE_SEP8<OUT>(
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(8, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see AT_LEAST_ONE_SEP1
+     */
+    protected AT_LEAST_ONE_SEP9<OUT>(
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.atLeastOneSepFirstInternal(9, options, {
             values: [],
             separators: []
         })

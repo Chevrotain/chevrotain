@@ -145,7 +145,7 @@ function defineRecognizerSpecs(
                     public orRule = this.RULE("orRule", this.parseOrRule)
 
                     private parseOrRule(): string {
-                        return this.OR1([
+                        return this.OR7([
                             {
                                 ALT: () => {
                                     this.CONSUME1(PlusTok)
