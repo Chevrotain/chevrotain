@@ -2,7 +2,7 @@
 
 #### Breaking Changes
 
-- [See BREAKING_CHANGES.md](https://github.com/SAP/chevrotain/blob/master/BREAKNIG_CHANGES.md#200)
+- [See BREAKING_CHANGES.md](https://github.com/SAP/chevrotain/blob/master/BREAKING_CHANGES.md#200)
 
 #### Major Changes
 

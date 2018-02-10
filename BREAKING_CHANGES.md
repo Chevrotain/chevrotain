@@ -31,14 +31,14 @@
 - The constructors of all the gast (Grammar AST) structure have been
   refactored to use the config object pattern additionally some properties have been renamed or removed.
   See the new SDK docs for details:
-   * [Rule](http://sap.github.io/chevrotain/documentation/1_0_1/classes/rule.html)
-   * [Terminal](http://sap.github.io/chevrotain/documentation/1_0_1/classes/terminal.html)
-   * [NonTerminal](http://sap.github.io/chevrotain/documentation/1_0_1/classes/nonterminal.html)
-   * [Alternation](http://sap.github.io/chevrotain/documentation/1_0_1/classes/alternation.html) 
-   * [Option](http://sap.github.io/chevrotain/documentation/1_0_1/classes/option.html)
-   * [Repetition](http://sap.github.io/chevrotain/documentation/1_0_1/classes/repetition.html)
-   * [RepetitionWithSeparator](http://sap.github.io/chevrotain/documentation/1_0_1/classes/repetitionwithseparator.html)
-   * [RepetitionMandatory](http://sap.github.io/chevrotain/documentation/1_0_1/classes/repetitionmandatory.html)
-   * [RepetitionMandatoryWithSeparator](http://sap.github.io/chevrotain/documentation/1_0_1/classes/repetitionmandatorywithseparator.html)
-   * [Flat](http://sap.github.io/chevrotain/documentation/1_0_1/classes/flat.html) (sequence)
+   * [Rule](http://sap.github.io/chevrotain/documentation/2_0_0/classes/rule.html)
+   * [Terminal](http://sap.github.io/chevrotain/documentation/2_0_0/classes/terminal.html)
+   * [NonTerminal](http://sap.github.io/chevrotain/documentation/2_0_0/classes/nonterminal.html)
+   * [Alternation](http://sap.github.io/chevrotain/documentation/2_0_0/classes/alternation.html) 
+   * [Option](http://sap.github.io/chevrotain/documentation/2_0_0/classes/option.html)
+   * [Repetition](http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetition.html)
+   * [RepetitionWithSeparator](http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionwithseparator.html)
+   * [RepetitionMandatory](http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionmandatory.html)
+   * [RepetitionMandatoryWithSeparator](http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionmandatorywithseparator.html)
+   * [Flat](http://sap.github.io/chevrotain/documentation/2_0_0/classes/flat.html) (sequence)
      
