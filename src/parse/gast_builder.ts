@@ -54,22 +54,22 @@ const namePropRegExpNoCurlyFirstOfTwo = new RegExp(
         .replace(")?", "\\s*,)?")
 )
 
-const terminalRegEx = /\.\s*CONSUME(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+const terminalRegEx = /\.\s*CONSUME(\d+)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
 const terminalRegGlobal = new RegExp(terminalRegEx.source, "g")
 
-const refRegEx = /\.\s*SUBRULE(\d)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
+const refRegEx = /\.\s*SUBRULE(\d+)?\s*\(\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
 const refRegExGlobal = new RegExp(refRegEx.source, "g")
 
-const optionPrefixRegEx = /\.\s*OPTION(\d)?\s*\(/
+const optionPrefixRegEx = /\.\s*OPTION(\d+)?\s*\(/
 const optionRegEx = new RegExp(optionPrefixRegEx.source + namePropRegExp.source)
 const optionRegExGlobal = new RegExp(optionPrefixRegEx.source, "g")
 
-const manyPrefixRegEx = /\.\s*MANY(\d)?\s*\(/
+const manyPrefixRegEx = /\.\s*MANY(\d+)?\s*\(/
 const manyRegEx = new RegExp(manyPrefixRegEx.source + namePropRegExp.source)
 const manyRegExGlobal = new RegExp(manyPrefixRegEx.source, "g")
 
 const sepPropRegEx = /\s*SEP\s*:\s*(?:[a-zA-Z_$]\w*\s*\.\s*)*([a-zA-Z_$]\w*)/
-const manySepPrefixRegEx = /\.\s*MANY_SEP(\d)?\s*\(\s*{/
+const manySepPrefixRegEx = /\.\s*MANY_SEP(\d+)?\s*\(\s*{/
 const manyWithSeparatorRegEx = new RegExp(
     manySepPrefixRegEx.source +
         namePropRegExpNoCurlyFirstOfTwo.source +
@@ -80,7 +80,7 @@ const manyWithSeparatorRegExGlobal = new RegExp(
     "g"
 )
 
-const atLeastOneSepPrefixRegEx = /\.\s*AT_LEAST_ONE_SEP(\d)?\s*\(\s*{/
+const atLeastOneSepPrefixRegEx = /\.\s*AT_LEAST_ONE_SEP(\d+)?\s*\(\s*{/
 const atLeastOneWithSeparatorRegEx = new RegExp(
     atLeastOneSepPrefixRegEx.source +
         namePropRegExpNoCurlyFirstOfTwo.source +
@@ -91,13 +91,13 @@ const atLeastOneWithSeparatorRegExGlobal = new RegExp(
     "g"
 )
 
-const atLeastOnePrefixRegEx = /\.\s*AT_LEAST_ONE(\d)?\s*\(/
+const atLeastOnePrefixRegEx = /\.\s*AT_LEAST_ONE(\d+)?\s*\(/
 const atLeastOneRegEx = new RegExp(
     atLeastOnePrefixRegEx.source + namePropRegExp.source
 )
 const atLeastOneRegExGlobal = new RegExp(atLeastOnePrefixRegEx.source, "g")
 
-const orPrefixRegEx = /\.\s*OR(\d)?\s*\(/
+const orPrefixRegEx = /\.\s*OR(\d+)?\s*\(/
 const orRegEx = new RegExp(orPrefixRegEx.source + namePropRegExp.source)
 const orRegExGlobal = new RegExp(orPrefixRegEx.source, "g")
 
