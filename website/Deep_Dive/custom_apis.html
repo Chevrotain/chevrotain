@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>       <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>          <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>          <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <title>custom apis - Chevrotain</title>
+    <meta name="description" content="JavaScript Parser Building Toolkit" />
+    <meta name="author" content="Shahar Soel">
+    <meta charset="UTF-8">
+    <link rel="icon" href="../themes/daux/img/favicon-blue.png" type="image/x-icon">
+    <!-- Mobile -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700&subset=latin,cyrillic-ext,cyrillic' rel='stylesheet' type='text/css'>
+    <!-- CSS -->
+    <link href='../themes/daux/css/theme-blue.min.css' rel='stylesheet' type='text/css'>
+            <!-- Tipue Search -->
+        <link href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body class=" ">
+    <div class="Columns content">
+    <aside class="Columns__left Collapsible">
+        <button type="button" class="Button Collapsible__trigger">
+            <span class="Collapsible__trigger--bar"></span>
+            <span class="Collapsible__trigger--bar"></span>
+            <span class="Collapsible__trigger--bar"></span>
+        </button>
+
+        <a class="Brand" href="../index.html">Chevrotain</a>
+
+    <div class="Search">
+        <svg class="Search__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 451 451">
+            <path d="M447.05 428l-109.6-109.6c29.4-33.8 47.2-77.9 47.2-126.1C384.65 86.2 298.35 0 192.35 0 86.25 0 .05 86.3.05 192.3s86.3 192.3 192.3 192.3c48.2 0 92.3-17.8 126.1-47.2L428.05 447c2.6 2.6 6.1 4 9.5 4s6.9-1.3 9.5-4c5.2-5.2 5.2-13.8 0-19zM26.95 192.3c0-91.2 74.2-165.3 165.3-165.3 91.2 0 165.3 74.2 165.3 165.3s-74.1 165.4-165.3 165.4c-91.1 0-165.3-74.2-165.3-165.4z"/>
+        </svg>
+        <input type="search" id="tipue_search_input" class="Search__field" placeholder="Search..." autocomplete="on"
+               results=25 autosave=text_search>
+    </div>
+
+        <div class="Collapsible__content">
+            <!-- Navigation -->
+            <ul class='Nav'><li class='Nav__item  has-children'><a href="../Tutorial/step1_lexing.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Tutorial</a><ul class='Nav'><li class='Nav__item '><a href="../Tutorial/step1_lexing.html">step1 lexing</a></li><li class='Nav__item '><a href="../Tutorial/step2_parsing.html">step2 parsing</a></li><li class='Nav__item '><a href="../Tutorial/step3_adding_actions_root.html">step3 adding actions root</a></li><li class='Nav__item '><a href="../Tutorial/step3a_adding_actions_visitor.html">step3a adding actions visitor</a></li><li class='Nav__item '><a href="../Tutorial/step3b_adding_actions_embedded.html">step3b adding actions embedded</a></li><li class='Nav__item '><a href="../Tutorial/step4_fault_tolerance.html">step4 fault tolerance</a></li></ul></li><li class='Nav__item Nav__item--open has-children'><a href="../Deep_Dive/concrete_syntax_tree.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Deep Dive</a><ul class='Nav'><li class='Nav__item '><a href="../Deep_Dive/concrete_syntax_tree.html">concrete syntax tree</a></li><li class='Nav__item Nav__item--active'><a href="../Deep_Dive/custom_apis.html">custom apis</a></li><li class='Nav__item '><a href="../Deep_Dive/custom_token_patterns.html">custom token patterns</a></li><li class='Nav__item '><a href="../Deep_Dive/syntactic_content_assist.html">syntactic content assist</a></li></ul></li><li class='Nav__item  has-children'><a href="../Building_Grammars/generating_syntax_diagrams.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Building Grammars</a><ul class='Nav'><li class='Nav__item '><a href="../Building_Grammars/generating_syntax_diagrams.html">generating syntax diagrams</a></li><li class='Nav__item '><a href="../Building_Grammars/resolving_grammar_errors.html">resolving grammar errors</a></li><li class='Nav__item '><a href="../Building_Grammars/resolving_lexer_errors.html">resolving lexer errors</a></li></ul></li><li class='Nav__item '><a href="../FAQ.html">FAQ</a></li><li class='Nav__item '><a href="../Roadmap.html">Roadmap</a></li></ul>
+
+            <div class="Links">
+                                    <hr/>
+                                            <a href="http://sap.github.io/chevrotain/playground/" target="_blank">Online Playground</a>
+                        <br />
+                                            <a href="http://sap.github.io/chevrotain/performance/" target="_blank">Performance Benchmark</a>
+                        <br />
+                                            <a href="https://github.com/sap/chevrotain/issues" target="_blank">Help/Support/Bugs</a>
+                        <br />
+                                            <a href="https://github.com/sap/chevrotain" target="_blank">GitHub Repo</a>
+                        <br />
+                                    
+                                    <div class="CodeToggler">
+                        <hr/>
+                                                    <a class="CodeToggler__button CodeToggler__button--main" href="#">Show Code Blocks Inline</a><br>
+                                            </div>
+                
+                            </div>
+        </div>
+    </aside>
+    <div class="Columns__right ">
+        <div class="Columns__right__content">
+            <div class="doc_content">
+                <article class="Page">
+
+    <div class="Page__header">
+        <h1><a href="../Deep_Dive/concrete_syntax_tree.html">Deep Dive</a> <svg class="Page__header--separator" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.73 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg> <a href="../Deep_Dive/custom_apis.html">custom apis</a></h1>
+                <span style="float: left; font-size: 10px; color: gray;">
+            Saturday, February 10, 2018 3:02 PM        </span>
+                        <span style="float: right; font-size: 10px; color: gray;">
+            <a href="https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/custom_apis.md" target="_blank">Edit on GitHub</a>
+        </span>
+            </div>
+
+
+    <div class="s-content">
+        <h2 id="page_Building-Custom-Parsing-APIs">Building Custom Parsing APIs</h2>
+<p>Chevrotain can be used as the underlying engine for other parsing libraries.</p>
+<p>The general flow is:</p>
+<ol>
+<li>Creating a GAST (Grammar AST) data structure.</li>
+<li>Resolving and validating the GAST Structure.</li>
+<li>Generating the parser code and executing.
+<ul>
+<li>Can be done &quot;in memory&quot; without writing to file in certain runtime envs.</li>
+</ul>
+</li>
+</ol>
+<h3 id="page_TLDR">TLDR</h3>
+<p>Skip to <a href="https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/" class="external">runnable examples</a></p>
+<h3 id="page_The-GAST-structure">The GAST structure</h3>
+<p>This structure is made up of the following classes:</p>
+<ul>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/rule.html" class="external">Rule</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/terminal.html" class="external">Terminal</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/nonterminal.html" class="external">NonTerminal</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/alternation.html" class="external">Alternation</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/option.html" class="external">Option</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetition.html" class="external">Repetition</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionwithseparator.html" class="external">RepetitionWithSeparator</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionmandatory.html" class="external">RepetitionMandatory</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/repetitionmandatorywithseparator.html" class="external">RepetitionMandatoryWithSeparator</a>
+</li>
+<li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/flat.html" class="external">Flat</a> (sequence)</li>
+</ul>
+<p>For example to define a grammar rule for a fully qualified name:</p>
+<pre><code class="language-antlr">fqn : Ident (Dot Ident)
+</code></pre>
+<p>Is equivalent to:</p>
+<pre><code class="language-javascript">const {createToken, Rule, Terminal, Repetition} = require(&quot;chevrotain&quot;)
+const Ident = createToken({name:&quot;Ident&quot;, pattern:/[a-zA-Z]\w+/})
+const Dot = createToken({name:&quot;Dot&quot;, pattern:/\./})
+
+
+const fqn = new Rule({name:&quot;fqn&quot;, definition:[
+    new Terminal({terminalType:Ident}),
+    new Repetition({definition:[
+        new Terminal({terminalType:Dot}),
+        new Terminal({terminalType:Ident})
+    ]})
+]})
+</code></pre>
+<p>Important to note that:</p>
+<ul>
+<li>
+<p>By default the definition array for each GAST class acts as a sequence,
+However in the case of Alternation each element in the definition array represents a different
+alternative which should be wrapped in a Flat class.</p>
+<p>e.g:</p>
+<pre><code class="language-javascript">const {Flat, Alternation} = require(&quot;chevrotain&quot;)
+
+const gastAlts = new Alternation({definition:[  
+    // first alternative
+    new Flat({definition:[/*...*/]}),
+    // second alternative
+    new Flat({definition:[/*...*/]}),
+    // third alternative
+    new Flat({definition:[/*...*/]})
+]})
+</code></pre>
+</li>
+</ul>
+<h3 id="page_Resolving-and-Validating-the-GAST-structure">Resolving and Validating the GAST structure</h3>
+<p>Chevrotain exposes three functions for this purpose:</p>
+<ol>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#resolvegrammar" class="external"><strong>resolveGrammar</strong></a>
+NonTerminals are often referenced by their name as cyclic references will make
+a direct object reference impossible, for example with right recursion:</p>
+<pre><code class="language-antlr">   rule1: A (rule1)?
+</code></pre>
+<p>The resolveGrammar function will resolve (mutate the input rules) such &quot;name only&quot; references
+to the actual Rule instance.</p>
+<p>For any reference that cannot be resolved an error object will be outputted,
+this object will contain an error message which can be customized by providing
+a custom implementation of <a href="http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/igrammarresolvererrormessageprovider.html" class="external">IGrammarResolverErrorMessageProvider</a>.
+The <a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#defaultgrammarresolvererrorprovider" class="external">default implementation</a> also exported as part of the public API.</p>
+</li>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#validategrammar" class="external"><strong>validateGrammar</strong></a>
+Chevrotain expose a set of checks on the grammar structure that it is <strong>highly recommended</strong> to execute.
+These checks will detect ambiguous alternatives, left recursion, conflicting Terminals &amp; NonTerminal names and more...</p>
+<p>validateGrammar is side effect free and like resolveGrammar will return an array of error objects.
+The error messages in these objects can once again be customized by providing a <a href="http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/igrammarvalidatorerrormessageprovider.html" class="external">IGrammarResolverErrorMessageProvider</a>
+optionally based on the <a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#defaultgrammarvalidatorerrorprovider" class="external">default implementation</a></p>
+</li>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#assignoccurrenceindices" class="external"><strong>assignOccurrenceIndices</strong></a>
+Chevrotain has certain constraint on the &quot;shape&quot; of the generated code. The relevant one in this case is the <a href="http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES" class="external">unique numerical suffixes</a> for the DSL methods.
+The assignOccurrenceIndices function will take care of this requirement by mutating the idx property on the GAST classes accordingly.</p>
+</li>
+</ol>
+<h3 id="page_A-Note-on-Custom-Error-Messages">A Note on Custom Error Messages</h3>
+<p>As mentioned earlier <strong>validateGrammar</strong> <strong>assignOccurrenceIndices</strong> optionally accept
+a <a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#validategrammar" class="external">errMsgProvider</a> option.
+Note that all custom error message builders receive a GAST instance as input. What this means is that
+the GAST classes created by the implementor of the custom API can be augmented with additional information to enable
+producing better error messages. e.g:</p>
+<ul>
+<li>
+<p>A Parser Generator style API using an EBNF notation in a <strong>separate file</strong>.
+may add location (line/column/offset) information to be able to link to locations in the original EBNF styled file.</p>
+</li>
+<li>
+<p>A Parser combinator API may attempt to reconstruct the original text of its API invocations to give better hints
+to assist in locating the original error.</p>
+</li>
+</ul>
+<h3 id="page_Code-Generation-Execution">Code Generation &amp; Execution</h3>
+<p>There are two APIs for code generation and execution.</p>
+<ul>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#generateparsermodule" class="external"><strong>generateParserModule</strong></a>
+This will generate the string literal of a <a href="https://github.com/umdjs/umd" class="external">UMD</a> module.
+This UMD pattern is consumable in all standard JS runtimes &amp; module implementations.
+The approach is to generate the string literal and write it to a file for later consumption.
+However for development purposes or under certain runtimes it is possible to skip the file creation
+For example see the <a href="https://github.com/floatdrop/require-from-string" class="external">require-from-string</a></p>
+</li>
+<li>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_0/globals.html#generateparserfactory" class="external"><strong>generateParserFactory</strong></a>
+This API skips string literal and directly evals (new Function(...)) the code and returns
+a factory that can be used to create Parser instances.</p>
+<p>This can be useful for development and testing purposes but be wary
+as certain execution environments disallow the use of eval/new Function.
+Specifically webpages with content security policy enabled and browser extensions.
+However if the custom API is targeting only a node.js runtime this can be very
+useful for example for a combinator style API in which code generation is best
+avoided.</p>
+</li>
+</ul>
+<h3 id="page_Runnable-Examples">Runnable Examples</h3>
+<ul>
+<li>
+<p><a href="https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator" class="external">Combinator Style</a></p>
+</li>
+<li>
+<p>Generator Style (TBD)</p>
+</li>
+</ul>
+<h3 id="page_Limitations">Limitations</h3>
+<p>The Following features are currently unsupported.</p>
+<ul>
+<li>
+<strong>Embedded actions</strong>, which means the only way to get output from the parser is by enabling automatic <a href="http://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html" class="external">Concrete Syntax Tree</a> creation.</li>
+<li>[<strong>Gates/Predicates</strong>](https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js.</li>
+<li>
+<a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js" class="external">Parameterized Rules</a>.</li>
+</ul>
+    </div>
+
+        <nav>
+        <ul class="Pager">
+            <li class=Pager--prev><a href="../Deep_Dive/concrete_syntax_tree.html">Previous</a></li>            <li class=Pager--next><a href="../Deep_Dive/custom_token_patterns.html">Next</a></li>        </ul>
+    </nav>
+    </article>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    <!-- jQuery -->
+    <script src="../themes/daux/js/jquery-1.11.3.min.js"></script>
+
+    <!-- hightlight.js -->
+    <script src="../themes/daux/js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- JS -->
+    
+    <script src="../themes/daux/js/daux.js"></script>
+
+            <!-- Tipue Search -->
+        <script type="text/javascript" src="../tipuesearch/tipuesearch.js"></script>
+
+        <script>
+            window.onunload = function(){}; // force $(document).ready to be called on back/forward navigation in firefox
+            $(function() {
+                tipuesearch({
+                    'base_url': '../'
+                });
+            });
+        </script>
+    
+</body>
+</html>

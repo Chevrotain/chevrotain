@@ -45,7 +45,7 @@
 
         <div class="Collapsible__content">
             <!-- Navigation -->
-            <ul class='Nav'><li class='Nav__item  has-children'><a href="Tutorial/step1_lexing.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Tutorial</a><ul class='Nav'><li class='Nav__item '><a href="Tutorial/step1_lexing.html">step1 lexing</a></li><li class='Nav__item '><a href="Tutorial/step2_parsing.html">step2 parsing</a></li><li class='Nav__item '><a href="Tutorial/step3_adding_actions_root.html">step3 adding actions root</a></li><li class='Nav__item '><a href="Tutorial/step3a_adding_actions_visitor.html">step3a adding actions visitor</a></li><li class='Nav__item '><a href="Tutorial/step3b_adding_actions_embedded.html">step3b adding actions embedded</a></li><li class='Nav__item '><a href="Tutorial/step4_fault_tolerance.html">step4 fault tolerance</a></li></ul></li><li class='Nav__item  has-children'><a href="Deep_Dive/concrete_syntax_tree.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Deep Dive</a><ul class='Nav'><li class='Nav__item '><a href="Deep_Dive/concrete_syntax_tree.html">concrete syntax tree</a></li><li class='Nav__item '><a href="Deep_Dive/custom_token_patterns.html">custom token patterns</a></li><li class='Nav__item '><a href="Deep_Dive/syntactic_content_assist.html">syntactic content assist</a></li></ul></li><li class='Nav__item  has-children'><a href="Building_Grammars/generating_syntax_diagrams.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Building Grammars</a><ul class='Nav'><li class='Nav__item '><a href="Building_Grammars/generating_syntax_diagrams.html">generating syntax diagrams</a></li><li class='Nav__item '><a href="Building_Grammars/resolving_grammar_errors.html">resolving grammar errors</a></li><li class='Nav__item '><a href="Building_Grammars/resolving_lexer_errors.html">resolving lexer errors</a></li></ul></li><li class='Nav__item Nav__item--active'><a href="FAQ.html">FAQ</a></li><li class='Nav__item '><a href="Roadmap.html">Roadmap</a></li></ul>
+            <ul class='Nav'><li class='Nav__item  has-children'><a href="Tutorial/step1_lexing.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Tutorial</a><ul class='Nav'><li class='Nav__item '><a href="Tutorial/step1_lexing.html">step1 lexing</a></li><li class='Nav__item '><a href="Tutorial/step2_parsing.html">step2 parsing</a></li><li class='Nav__item '><a href="Tutorial/step3_adding_actions_root.html">step3 adding actions root</a></li><li class='Nav__item '><a href="Tutorial/step3a_adding_actions_visitor.html">step3a adding actions visitor</a></li><li class='Nav__item '><a href="Tutorial/step3b_adding_actions_embedded.html">step3b adding actions embedded</a></li><li class='Nav__item '><a href="Tutorial/step4_fault_tolerance.html">step4 fault tolerance</a></li></ul></li><li class='Nav__item  has-children'><a href="Deep_Dive/concrete_syntax_tree.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Deep Dive</a><ul class='Nav'><li class='Nav__item '><a href="Deep_Dive/concrete_syntax_tree.html">concrete syntax tree</a></li><li class='Nav__item '><a href="Deep_Dive/custom_apis.html">custom apis</a></li><li class='Nav__item '><a href="Deep_Dive/custom_token_patterns.html">custom token patterns</a></li><li class='Nav__item '><a href="Deep_Dive/syntactic_content_assist.html">syntactic content assist</a></li></ul></li><li class='Nav__item  has-children'><a href="Building_Grammars/generating_syntax_diagrams.html" class="folder"><i class="Nav__arrow">&nbsp;</i>Building Grammars</a><ul class='Nav'><li class='Nav__item '><a href="Building_Grammars/generating_syntax_diagrams.html">generating syntax diagrams</a></li><li class='Nav__item '><a href="Building_Grammars/resolving_grammar_errors.html">resolving grammar errors</a></li><li class='Nav__item '><a href="Building_Grammars/resolving_lexer_errors.html">resolving lexer errors</a></li></ul></li><li class='Nav__item Nav__item--active'><a href="FAQ.html">FAQ</a></li><li class='Nav__item '><a href="Roadmap.html">Roadmap</a></li></ul>
 
             <div class="Links">
                                     <hr/>
@@ -74,7 +74,7 @@
     <div class="Page__header">
         <h1><a href="FAQ.html">FAQ</a></h1>
                 <span style="float: left; font-size: 10px; color: gray;">
-            Thursday, January 4, 2018 8:30 AM        </span>
+            Saturday, February 10, 2018 3:02 PM        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
             <a href="https://github.com/SAP/chevrotain/blob/master/docs/03_FAQ.md" target="_blank">Edit on GitHub</a>
         </span>
@@ -193,7 +193,7 @@ certain conditions.</p>
 <h3 id="page_Why-does-my-parser-appear-to-be-stuck-during-it-s-initialization"><a name="STUCK_AMBIGUITY"></a> Why does my parser appear to be stuck during it's initialization?</h3>
 <p>The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
-when the parser uses a larger than the default <a href="http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/iparserconfig.html#maxlookahead" class="external">maxLookahead</a>
+when the parser uses a larger than the default <a href="http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/iparserconfig.html#maxlookahead" class="external">maxLookahead</a>
 and there are many (thousands) of ambiguous paths.</p>
 <p>To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
 the grammar ambiguity which is the root cause of the problem.</p>
@@ -226,7 +226,7 @@ module.exports = function (text) {
 But more importantly this pattern seems to help V8 Engine to avoid de-optimizations.
 Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.</p>
 <p>Note that this means that if your parser &quot;carries&quot; additional state, that state should also be reset.
-Simply override the Parser's <a href="http://sap.github.io/chevrotain/documentation/1_0_1/classes/parser.html#reset" class="external">reset</a> method
+Simply override the Parser's <a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#reset" class="external">reset</a> method
 to accomplish that.</p>
 </li>
 <li>
@@ -324,7 +324,7 @@ See an example in the <a href="https://github.com/SAP/chevrotain/blob/ac21570b97
 <ol>
 <li>
 <p>Reduce the amount of Token position tracking the lexer performs.
-See The <a href="http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ilexerconfig.html" class="external">ILexerConfig.positionTracking</a> property.</p>
+See The <a href="http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/ilexerconfig.html" class="external">ILexerConfig.positionTracking</a> property.</p>
 </li>
 <li>
 <p><strong>Avoid creating parsing rules which only parse a single Terminal.</strong></p>
