@@ -96,7 +96,7 @@ See [related documentation](https://github.com/SAP/chevrotain/blob/master/exampl
 ### <a name="STUCK_AMBIGUITY"></a> Why does my parser appear to be stuck during it's initialization?
 The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
-when the parser uses a larger than the default [maxLookahead](http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/iparserconfig.html#maxlookahead)
+when the parser uses a larger than the default [maxLookahead](http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/iparserconfig.html#maxlookahead)
 and there are many (thousands) of ambiguous paths.
 
 To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
@@ -138,7 +138,7 @@ These are highly recommended for each and every parser.
    Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.
    
    Note that this means that if your parser "carries" additional state, that state should also be reset.
-   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/1_0_1/classes/parser.html#reset) method
+   Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#reset) method
    to accomplish that.
 
 2. **Avoid reinitializing large arrays of alternatives**.
@@ -239,7 +239,7 @@ These are highly recommended for each and every parser.
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
    
 1. Reduce the amount of Token position tracking the lexer performs.
-   See The [ILexerConfig.positionTracking](http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ilexerconfig.html) property.
+   See The [ILexerConfig.positionTracking](http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/ilexerconfig.html) property.
    
 2. **Avoid creating parsing rules which only parse a single Terminal.**
 
