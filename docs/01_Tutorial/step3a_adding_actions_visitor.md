@@ -31,26 +31,26 @@ the super constructor.
 class SelectParser extends chevrotain.Parser {
 
     constructor(input) {
-     // The "outputCst" flag will cause the parser to create a CST structure on rule invocation
-     super(input, allTokens, {outputCst: true})
-     
-     /* rule definitions... */
-    
-     Parser.performSelfAnalysis(this)
+        // The "outputCst" flag will cause the parser to create a CST structure on rule invocation
+        super(input, allTokens, {outputCst: true})
+        
+        /* rule definitions... */
+        
+        Parser.performSelfAnalysis(this)
     }    
 }
 ```
 
 Note that this is the **only** change needed in the parser.
-Invocation of any grammar rule will now automatically create a CST.
+The invocation of any grammar rule will now automatically create a CST.
 
 ```Javascript
 function parseInput(text) {
-   let lexingResult = SelectLexer.tokenize(text)
-   let parser = new SelectParser(lexingResult.tokens)
+   const lexingResult = SelectLexer.tokenize(text)
+   const parser = new SelectParser(lexingResult.tokens)
    
    // CST automatically created. 
-   let cstOutput = parser.selectStatement()
+   const cstOutput = parser.selectStatement()
 }
 ``` 
 
@@ -217,7 +217,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
     
     fromClause(ctx) {
-        let tableName = ctx.Identifier[0].image
+        const tableName = ctx.Identifier[0].image
         
         return {
             type    : "FROM_CLAUSE", 
@@ -226,7 +226,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
     
     whereClause(ctx) {
-        let condition = this.visit(ctx.expression)
+        const condition = this.visit(ctx.expression)
         
         return {
             type: "WHERE_CLAUSE",
@@ -236,10 +236,10 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
     
     expression(ctx) {
-        let lhs = this.visit(ctx.atomicExpression[0])
+        const lhs = this.visit(ctx.atomicExpression[0])
         // The second [1] atomicExpression is the right hand side
-        let rhs = this.visit(ctx.atomicExpression[1])
-        let operator = this.visit(ctx.relationalOperator)
+        const rhs = this.visit(ctx.atomicExpression[1])
+        const operator = this.visit(ctx.relationalOperator)
         
         return {
             type: "EXPRESSION", 
@@ -283,17 +283,17 @@ const toAstVisitorInstance = new SQLToAstVisitor()
 
 function toAst(inputText) {
     // Lex
-    let lexResult = selectLexer.tokenize(inputText)
+    const lexResult = selectLexer.tokenize(inputText)
     parserInstance.input = lexResult.tokens
     
     // Automatic CST created when parsing
-    let cst = parserInstance.selectStatement()
+    const cst = parserInstance.selectStatement()
     if (parserInstance.errors.length > 0) {
         throw Error("Sad sad panda, parsing errors detected!\n" + parserInstance.errors[0].message)
     }
     
     // Visit
-    let ast = toAstVisitorInstance.visit(cst)
+    const ast = toAstVisitorInstance.visit(cst)
     return ast
 }
 ``` 

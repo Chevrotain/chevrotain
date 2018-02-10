@@ -10,37 +10,29 @@
  */
 "use strict"
 
-var chevrotain = require("chevrotain")
+const { createToken, Lexer, Parser } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
 
-class Hello {}
-Hello.PATTERN = /hello/
-class World {}
-World.PATTERN = /world/
+const Hello = createToken({ name: "Hello", pattern: /hello/ })
+const World = createToken({ name: "World", pattern: /world/ })
 
-class Cruel {}
-Cruel.PATTERN = /cruel/
-class Bad {}
-Bad.PATTERN = /bad/
-class Evil {}
-Evil.PATTERN = /evil/
+const Cruel = createToken({ name: "Cruel", pattern: /cruel/ })
+const Bad = createToken({ name: "Bad", pattern: /bad/ })
+const Evil = createToken({ name: "Evil", pattern: /evil/ })
 
-class Good {}
-Good.PATTERN = /good/
-class Wonderful {}
-Wonderful.PATTERN = /wonderful/
-class Amazing {}
-Amazing.PATTERN = /amazing/
+const Good = createToken({ name: "Good", pattern: /good/ })
+const Wonderful = createToken({ name: "Wonderful", pattern: /wonderful/ })
+const Amazing = createToken({ name: "Amazing", pattern: /amazing/ })
 
-class WhiteSpace {}
-WhiteSpace.PATTERN = /\s+/
-WhiteSpace.GROUP = Lexer.SKIPPED
-WhiteSpace.LINE_BREAKS = true
+const WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
-var allTokens = [
+const allTokens = [
     WhiteSpace,
     Hello,
     World,
@@ -52,91 +44,69 @@ var allTokens = [
     Amazing
 ]
 
-var HelloLexer = new Lexer(allTokens)
+const HelloLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class HelloParser extends chevrotain.Parser {
+class HelloParser extends Parser {
     constructor(input) {
         super(input, allTokens)
 
-        this.RULE("topRule", mood => {
+        const $ = this
+
+        $.RULE("topRule", mood => {
             // SUBRULE may be called with a array of arguments which will be passed to the sub-rule's implementation
-            this.SUBRULE(this.hello, [mood])
+            $.SUBRULE($.hello, [mood])
         })
 
         // the <hello> rule's implementation is defined with a <mood> parameter
-        this.RULE("hello", mood => {
-            this.CONSUME(Hello)
+        $.RULE("hello", mood => {
+            $.CONSUME(Hello)
 
             // The mood parameter is used to determine which path to take
-            this.OR([
+            $.OR([
                 {
                     GATE: () => mood === "positive",
-                    ALT: () => this.SUBRULE(this.positive)
+                    ALT: () => $.SUBRULE($.positive)
                 },
                 {
                     GATE: () => mood === "negative",
-                    ALT: () => this.SUBRULE(this.negative)
+                    ALT: () => $.SUBRULE($.negative)
                 }
             ])
 
-            this.CONSUME(World)
+            $.CONSUME(World)
         })
 
-        this.RULE("negative", () => {
-            this.OR([
-                {
-                    ALT: () => {
-                        this.CONSUME(Cruel)
-                    }
-                },
-                {
-                    ALT: () => {
-                        this.CONSUME(Bad)
-                    }
-                },
-                {
-                    ALT: () => {
-                        this.CONSUME(Evil)
-                    }
-                }
+        $.RULE("negative", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(Cruel) },
+                { ALT: () => $.CONSUME(Bad) },
+                { ALT: () => $.CONSUME(Evil) }
             ])
         })
 
-        this.RULE("positive", () => {
-            this.OR([
-                {
-                    ALT: () => {
-                        this.CONSUME(Good)
-                    }
-                },
-                {
-                    ALT: () => {
-                        this.CONSUME(Wonderful)
-                    }
-                },
-                {
-                    ALT: () => {
-                        this.CONSUME(Amazing)
-                    }
-                }
+        $.RULE("positive", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(Good) },
+                { ALT: () => $.CONSUME(Wonderful) },
+                { ALT: () => $.CONSUME(Amazing) }
             ])
         })
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
         // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this)
+        Parser.performSelfAnalysis($)
     }
 }
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new HelloParser([])
+const parser = new HelloParser([])
 
 module.exports = function(text, mood) {
-    var lexResult = HelloLexer.tokenize(text)
+    const lexResult = HelloLexer.tokenize(text)
 
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
@@ -145,7 +115,7 @@ module.exports = function(text, mood) {
     // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
     // with the first parameter provided the value <1>
     // also note that the arguments are passed as an array
-    var value = parser.topRule(1, [mood])
+    const value = parser.topRule(1, [mood])
 
     return {
         value: value, // this is a pure grammar, the value will always be <undefined>

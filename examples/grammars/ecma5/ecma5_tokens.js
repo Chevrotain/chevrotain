@@ -8,7 +8,7 @@
  *    such as: parsing/syntax highlighting/refactoring
  */
 
-const createToken = require("chevrotain").createToken
+const { createToken } = require("chevrotain")
 
 // Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.2
 const Whitespace = createToken({ name: "Whitespace" })

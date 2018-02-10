@@ -4,15 +4,15 @@
  * The detailed API for the IErrorMessageProvider can be found here:
  * http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ierrormessageprovider.html
  */
-"use strict"
-
-const chevrotain = require("chevrotain")
+const {
+    createToken,
+    Lexer,
+    Parser,
+    defaultParserErrorProvider,
+    tokenName
+} = require("chevrotain")
 
 // ----------------- lexer -----------------
-const createToken = chevrotain.createToken
-const Lexer = chevrotain.Lexer
-const Parser = chevrotain.Parser
-
 const Alpha = createToken({ name: "Alpha", pattern: /A/ })
 const Bravo = createToken({ name: "Bravo", pattern: /B/ })
 const Charlie = createToken({ name: "Charlie", pattern: /C/ })
@@ -29,8 +29,6 @@ const allTokens = [WhiteSpace, Alpha, Bravo, Charlie]
 const PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- Custom Error Provider ------------
-const defaultParserErrorProvider = chevrotain.defaultParserErrorProvider
-
 const myErrorProvider = {
     buildMismatchTokenMessage: function(options) {
         // override mismatch tokens errors when Bravo is expected
@@ -54,7 +52,7 @@ const myErrorProvider = {
 
     buildEarlyExitMessage: function(options) {
         // translating the error message to Spanish
-        return `Esperando por lo menos una iteración de: ${chevrotain.tokenName(
+        return `Esperando por lo menos una iteración de: ${tokenName(
             options.expectedIterationPaths[0][0]
         )}`
     }
@@ -70,20 +68,20 @@ class CustomErrorsParser extends Parser {
 
         const $ = this
 
-        $.RULE("mis_match", function() {
+        $.RULE("mis_match", () => {
             $.CONSUME(Alpha)
             // we will call this rule with [Alpha, Charlie] to produce a mismatch Token Exception.
             $.CONSUME(Bravo)
         })
 
-        $.RULE("mis_match_override", function() {
+        $.RULE("mis_match_override", () => {
             $.CONSUME(Alpha)
             // we will call this rule with [Alpha, Charlie] to produce a mismatch Token Exception.
             // This time we are overriding the message created by the ErrorProvider
             $.CONSUME(Bravo, { ERR_MSG: "We want Bravo!!!" })
         })
 
-        $.RULE("redundant_input", function() {
+        $.RULE("redundant_input", () => {
             $.CONSUME(Alpha)
             $.CONSUME(Bravo)
 
@@ -92,17 +90,17 @@ class CustomErrorsParser extends Parser {
             console.log($.LA(1).image)
         })
 
-        $.RULE("no_viable_alternative", function() {
+        $.RULE("no_viable_alternative", () => {
             // prettier-ignore
             $.OR([
             // We will call this rule with an input: [Charlie] so none of the alternatives would match
             // and an error will be thrown
-            {ALT: function() {$.CONSUME(Alpha)}},
-            {ALT: function() {$.CONSUME(Bravo)}}
+            {ALT: () => $.CONSUME(Alpha)},
+            {ALT: () => $.CONSUME(Bravo)}
         ])
         })
 
-        $.RULE("early_exit", function() {
+        $.RULE("early_exit", () => {
             $.CONSUME(Alpha)
 
             // We will call thi rule with an input: [Alpha] so the mandatory repetition will

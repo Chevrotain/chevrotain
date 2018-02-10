@@ -1,9 +1,9 @@
 "use strict"
 
-let expect = require("chai").expect
-let indentationExample = require("./python_indentation")
-let tokenMatcher = require("chevrotain").tokenMatcher
-let tokenize = indentationExample.tokenize
+const expect = require("chai").expect
+const indentationExample = require("./python_indentation")
+const { tokenMatcher } = require("chevrotain")
+const tokenize = indentationExample.tokenize
 
 describe("The Chevrotain Lexer ability to lex python like indentation.", () => {
     it("Can Lex a simple python style if-else ", () => {

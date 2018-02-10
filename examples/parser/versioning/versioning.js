@@ -2,29 +2,25 @@
  * Example Of using Grammar inheritance to support multiple versions of the same grammar.
  */
 
-var chevrotain = require("chevrotain")
+const { createToken, Lexer, Parser } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-var createToken = chevrotain.createToken
-
-var Select = createToken({ name: "Select", pattern: /SELECT/i })
-var From = createToken({ name: "From", pattern: /FROM/i })
-var Where = createToken({ name: "Where", pattern: /WHERE/i })
-var Comma = createToken({ name: "Comma", pattern: /,/ })
-var Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
-var Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
-var GreaterThan = createToken({ name: "GreaterThan", pattern: /</ })
-var LessThan = createToken({ name: "LessThan", pattern: />/ })
-var WhiteSpace = createToken({
+const Select = createToken({ name: "Select", pattern: /SELECT/i })
+const From = createToken({ name: "From", pattern: /FROM/i })
+const Where = createToken({ name: "Where", pattern: /WHERE/i })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
+const GreaterThan = createToken({ name: "GreaterThan", pattern: /</ })
+const LessThan = createToken({ name: "LessThan", pattern: />/ })
+const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
-var allTokens = [
+const allTokens = [
     WhiteSpace,
     Select,
     From,
@@ -35,73 +31,96 @@ var allTokens = [
     GreaterThan,
     LessThan
 ]
-var SelectLexer = new Lexer(allTokens)
+const SelectLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-function SelectParserVersion1(input, isInvokedByChildConstructor) {
-    if (isInvokedByChildConstructor === undefined) {
-        isInvokedByChildConstructor = false
+
+class SelectParserVersion1 extends Parser {
+    constructor(input, isInvokedByChildConstructor = false) {
+        super(input, allTokens)
+
+        const $ = this
+
+        $.RULE("selectStatement", () => {
+            $.SUBRULE($.selectClause)
+            $.SUBRULE($.fromClause)
+            $.OPTION(() => {
+                $.SUBRULE($.whereClause)
+            })
+        })
+
+        $.RULE("selectClause", () => {
+            $.CONSUME(Select)
+            $.AT_LEAST_ONE_SEP({
+                SEP: Comma,
+                DEF: () => {
+                    $.CONSUME(Identifier)
+                }
+            })
+        })
+
+        // fromClause in version1 allows only a single column name.
+        $.RULE("fromClause", () => {
+            $.CONSUME(From)
+            $.CONSUME(Identifier)
+        })
+
+        $.RULE("whereClause", () => {
+            $.CONSUME(Where)
+            $.SUBRULE($.expression)
+        })
+
+        $.RULE("expression", () => {
+            $.SUBRULE($.atomicExpression)
+            $.SUBRULE($.relationalOperator)
+            $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
+            // from the 'SUBRULE(atomicExpression)' 2 lines above.
+        })
+
+        $.RULE("atomicExpression", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(Integer) },
+                { ALT: () => $.CONSUME(Identifier) }
+            ])
+        })
+
+        $.RULE("relationalOperator", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(GreaterThan) },
+                { ALT: () => $.CONSUME(LessThan) }
+            ])
+        })
+
+        // the selfAnalysis must only be performed ONCE during grammar construction.
+        // that invocation should be the in the LAST (bottom of the hierarchy) grammar.
+        // of in inheritance chain.
+        if (!isInvokedByChildConstructor) {
+            // very important to call this after all the rules have been defined.
+            // otherwise the parser may not work correctly as it will lack information
+            // derived during the self analysis phase.
+            Parser.performSelfAnalysis(this)
+        }
     }
+}
 
-    Parser.call(this, input, allTokens)
-    var $ = this
+// V2 extends V1
+class SelectParserVersion2 extends SelectParserVersion1 {
+    constructor(input) {
+        super(input, true)
 
-    $.RULE("selectStatement", function() {
-        $.SUBRULE($.selectClause)
-        $.SUBRULE($.fromClause)
-        $.OPTION(function() {
-            $.SUBRULE($.whereClause)
+        const $ = this
+
+        // "fromClause" production in version2 is overridden to allow multiple table names.
+        this.fromClause = $.OVERRIDE_RULE("fromClause", () => {
+            $.CONSUME(From)
+            $.AT_LEAST_ONE_SEP({
+                SEP: Comma,
+                DEF: () => {
+                    $.CONSUME(Identifier)
+                }
+            })
         })
-    })
 
-    $.RULE("selectClause", function() {
-        $.CONSUME(Select)
-        $.AT_LEAST_ONE_SEP({
-            SEP: Comma,
-            DEF: function() {
-                $.CONSUME(Identifier)
-            }
-        })
-    })
-
-    // fromClause in version1 allows only a single column name.
-    $.RULE("fromClause", function() {
-        $.CONSUME(From)
-        $.CONSUME(Identifier)
-    })
-
-    $.RULE("whereClause", function() {
-        $.CONSUME(Where)
-        $.SUBRULE($.expression)
-    })
-
-    $.RULE("expression", function() {
-        $.SUBRULE($.atomicExpression)
-        $.SUBRULE($.relationalOperator)
-        $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
-        // from the 'SUBRULE(atomicExpression)' 2 lines above.
-    })
-
-    $.RULE("atomicExpression", function() {
-        // prettier-ignore
-        $.OR([
-            {ALT: function() {$.CONSUME(Integer)}},
-            {ALT: function() {$.CONSUME(Identifier)}}
-        ])
-    })
-
-    $.RULE("relationalOperator", function() {
-        // prettier-ignore
-        $.OR([
-            {ALT: function() {$.CONSUME(GreaterThan)}},
-            {ALT: function() {$.CONSUME(LessThan)}}
-        ])
-    })
-
-    // the selfAnalysis must only be performed ONCE during grammar construction.
-    // that invocation should be the in the LAST (bottom of the hierarchy) grammar.
-    // of in inheritance chain.
-    if (!isInvokedByChildConstructor) {
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
         // derived during the self analysis phase.
@@ -109,48 +128,16 @@ function SelectParserVersion1(input, isInvokedByChildConstructor) {
     }
 }
 
-// V1 extends the base chevrotain Parser.
-SelectParserVersion1.prototype = Object.create(Parser.prototype)
-SelectParserVersion1.prototype.constructor = SelectParserVersion1
-
-// note that chevrotain caches information using the parser's name as the key
-// this means that different grammar versions require separate implementing classes with different names.
-function SelectParserVersion2(input) {
-    // V2 extends V1
-    SelectParserVersion1.call(this, input, true)
-    var $ = this
-
-    // "fromClause" production in version2 is overridden to allow multiple table names.
-    this.fromClause = $.OVERRIDE_RULE("fromClause", function() {
-        $.CONSUME(From)
-        $.AT_LEAST_ONE_SEP({
-            SEP: Comma,
-            DEF: function() {
-                $.CONSUME(Identifier)
-            }
-        })
-    })
-
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
-}
-
-// V2 extends V1.
-SelectParserVersion2.prototype = Object.create(SelectParserVersion1.prototype)
-SelectParserVersion2.prototype.constructor = SelectParserVersion2
-
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instances.
-var version1Parser = new SelectParserVersion1([])
-var version2Parser = new SelectParserVersion2([])
+const version1Parser = new SelectParserVersion1([])
+const version2Parser = new SelectParserVersion2([])
 
 module.exports = function(text, version) {
-    var lexResult = SelectLexer.tokenize(text)
+    const lexResult = SelectLexer.tokenize(text)
 
-    var parser
+    let parser
 
     // initialize a parser for the specific version version chosen.
     switch (version) {
@@ -166,7 +153,7 @@ module.exports = function(text, version) {
 
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
-    var value = parser.selectStatement()
+    const value = parser.selectStatement()
 
     return {
         value: value, // this is a pure grammar, the value will always be <undefined>

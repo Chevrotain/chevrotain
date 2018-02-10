@@ -6,15 +6,9 @@
  *
  * Note that this is a pure grammar without any actions (either embedded or via a CST Visitor).
  */
-
-var chevrotain = require("chevrotain")
+const { createToken, Lexer, Parser, EMPTY_ALT } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var createToken = chevrotain.createToken
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-
-// Lexer
 const Text = createToken({ name: "Text", pattern: /[^,\n\r"]+/ })
 const Comma = createToken({ name: "Comma", pattern: /,/ })
 const NewLine = createToken({
@@ -35,7 +29,7 @@ class CsvParser extends Parser {
             // outputCst: true
         })
 
-        // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
+        // not mandatory, using $ (or any other sign) to reduce verbosity
         const $ = this
 
         $.RULE("csvFile", () => {
@@ -49,9 +43,7 @@ class CsvParser extends Parser {
             $.SUBRULE($.row)
         })
 
-        // the parsing methods
         $.RULE("row", () => {
-            // using ES2015 Arrow functions to reduce verbosity.
             $.SUBRULE($.field)
             $.MANY(() => {
                 $.CONSUME(Comma)
@@ -61,11 +53,10 @@ class CsvParser extends Parser {
         })
 
         $.RULE("field", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.CONSUME(Text)}},
-                {ALT: () => {$.CONSUME(String)}},
-                {ALT: () => {/* empty alt */}}
+                { ALT: () => $.CONSUME(Text) },
+                { ALT: () => $.CONSUME(String) },
+                { ALT: EMPTY_ALT("empty field") }
             ])
         })
 
@@ -86,12 +77,13 @@ module.exports = function(text) {
 
     // 2. Set the Parser's input
     parser.input = lexResult.tokens
+
     // 3. invoke the desired parser rule
     const value = parser.csvFile()
 
     return {
-        // Unless we enable CstOutput the value will be undefined
-        // as our csvFile parser rule does not return anything.
+        // This is a pure grammar, the value will be undefined until we add embedded actions
+        // or enable automatic CST creation.
         value: value,
         lexResult: lexResult,
         parseErrors: parser.errors

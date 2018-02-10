@@ -1,42 +1,17 @@
-{Token, Lexer, Parser} = require 'chevrotain'
+{Token, Lexer, Parser, createToken} = require 'chevrotain'
 
-class True 
-  @PATTERN: /true/
-
-class False 
-  @PATTERN: /false/
-
-class Null 
-  @PATTERN: /null/
-
-class LCurly 
-  @PATTERN: /{/
-
-class RCurly 
-  @PATTERN: /}/
-
-class LSquare 
-  @PATTERN: /\[/
-
-class RSquare 
-  @PATTERN: /]/
-
-class Comma 
-  @PATTERN: /,/
-
-class Colon 
-  @PATTERN: /:/
-
-class StringLiteral 
-  @PATTERN: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-
-class NumberLiteral 
-  @PATTERN: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
-
-class WhiteSpace 
-  @PATTERN = /\s+/
-  @GROUP = Lexer.SKIPPED
-  @LINE_BREAKS = true
+True = createToken {name: 'True', pattern: /true/}
+False = createToken {name: 'False', pattern: /false/}
+Null = createToken {name: 'Null', pattern: /null/}
+LCurly = createToken {name: 'LCurly', pattern: /{/}
+RCurly = createToken {name: 'RCurly', pattern: /}/}
+LSquare = createToken {name: 'LSquare', pattern: /\[/}
+RSquare = createToken {name: 'RSquare', pattern: /]/}
+Comma = createToken {name: 'Comma', pattern: /,/}
+Colon = createToken {name: 'Colon', pattern: /:/}
+StringLiteral = createToken {name: 'StringLiteral', pattern: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/}
+NumberLiteral = createToken {name: 'NumberLiteral', pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/}
+WhiteSpace = createToken {name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED, line_breaks: true}
 
 allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
 JsonLexer = new Lexer allTokens
@@ -85,6 +60,7 @@ class JsonParserCoffeeScript extends Parser
 
     Parser.performSelfAnalysis(@)
 
+# Only init the parser once.
 parser = new JsonParserCoffeeScript
 
 module.exports = (text) ->

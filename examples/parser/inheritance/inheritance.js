@@ -7,56 +7,69 @@
  * 3. This also shows an example of using Token inheritance
  */
 
-var chevrotain = require("chevrotain")
+const { createToken, Lexer, Parser } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-var createToken = chevrotain.createToken
-
-var RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA })
+const RelationWord = createToken({ name: "RelationWord", pattern: Lexer.NA })
 
 // Token inheritance CONSUME(RelationWord) will work on any Token extending RelationWord
-var And = createToken({ name: "And", pattern: /and/, categories: RelationWord })
-var Before = createToken({
+const And = createToken({
+    name: "And",
+    pattern: /and/,
+    categories: RelationWord
+})
+const Before = createToken({
     name: "Before",
     pattern: /before/,
     categories: RelationWord
 })
-var After = createToken({
+const After = createToken({
     name: "After",
     pattern: /after/,
     categories: RelationWord
 })
-var Und = createToken({ name: "Und", pattern: /und/, categories: RelationWord })
-var Vor = createToken({ name: "Vor", pattern: /vor/, categories: RelationWord })
-var Nach = createToken({
+const Und = createToken({
+    name: "Und",
+    pattern: /und/,
+    categories: RelationWord
+})
+const Vor = createToken({
+    name: "Vor",
+    pattern: /vor/,
+    categories: RelationWord
+})
+const Nach = createToken({
     name: "Nach",
     pattern: /nach/,
     categories: RelationWord
 })
 
 /// English Tokens
-var Cook = createToken({ name: "Cook", pattern: /cooking|cook/ })
-var Some = createToken({ name: "Some", pattern: /some/ })
-var Sausages = createToken({ name: "Sausages", pattern: /sausages/ })
-var Clean = createToken({ name: "Clean", pattern: /clean/ })
-var The = createToken({ name: "The", pattern: /the/ })
-var Room = createToken({ name: "Room", pattern: /room/ })
+const Cook = createToken({ name: "Cook", pattern: /cooking|cook/ })
+const Some = createToken({ name: "Some", pattern: /some/ })
+const Sausages = createToken({ name: "Sausages", pattern: /sausages/ })
+const Clean = createToken({ name: "Clean", pattern: /clean/ })
+const The = createToken({ name: "The", pattern: /the/ })
+const Room = createToken({ name: "Room", pattern: /room/ })
 
 // German Tokens
-var Kochen = createToken({ name: "Kochen", pattern: /kochen/ })
-var Wurstchen = createToken({ name: "Wurstchen", pattern: /wurstchen/ })
-var Wurst = createToken({ name: "Wurst", pattern: /wurst/ })
-var Raum = createToken({ name: "Raum", pattern: /raum/ })
-var Auf = createToken({ name: "Auf", pattern: /auf/ })
-var Den = createToken({ name: "Den", pattern: /den/ })
+const Kochen = createToken({ name: "Kochen", pattern: /kochen/ })
+const Wurstchen = createToken({ name: "Wurstchen", pattern: /wurstchen/ })
+const Wurst = createToken({ name: "Wurst", pattern: /wurst/ })
+const Raum = createToken({ name: "Raum", pattern: /raum/ })
+const Auf = createToken({ name: "Auf", pattern: /auf/ })
+const Den = createToken({ name: "Den", pattern: /den/ })
 
-var WhiteSpace = createToken({ name: "WhiteSpace", pattern: /\s+/ })
-WhiteSpace.GROUP = Lexer.SKIPPED
-WhiteSpace.LINE_BREAKS = true
+const WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
-var englishTokens = [
+const abstractTokens = [RelationWord]
+
+const englishTokens = [
     WhiteSpace,
     RelationWord,
     And,
@@ -70,7 +83,7 @@ var englishTokens = [
     Room
 ]
 
-var germanTokens = [
+const germanTokens = [
     WhiteSpace,
     RelationWord,
     Und,
@@ -85,127 +98,109 @@ var germanTokens = [
 ]
 
 // We can define a different Lexer for each of the sub grammars.
-var EnglishLexer = new Lexer(englishTokens)
-var GermanLexer = new Lexer(germanTokens)
+const EnglishLexer = new Lexer(englishTokens)
+const GermanLexer = new Lexer(germanTokens)
 
 // ----------------- parser -----------------
-function AbstractCommandsParser(input, tokens) {
-    Parser.call(this, input, tokens)
-    var $ = this
 
-    $.RULE("commands", function() {
-        $.SUBRULE($.command)
+// Extending the base chevrotain Parser class
+class AbstractCommandsParser extends Parser {
+    constructor(input, tokenVocabulary) {
+        // combining the token vocabularies of parent and child.
+        super(input, abstractTokens.concat(tokenVocabulary))
 
-        $.MANY(function() {
-            $.CONSUME(RelationWord)
-            $.SUBRULE2($.command)
+        const $ = this
+
+        $.RULE("commands", () => {
+            $.SUBRULE($.command)
+
+            $.MANY(() => {
+                $.CONSUME(RelationWord)
+                $.SUBRULE2($.command)
+            })
         })
-    })
 
-    $.RULE("command", function() {
-        // The cook and clean commands must be implemented in each sub grammar
-        $.OR([
-            {
-                ALT: function() {
-                    $.SUBRULE($.cookCommand)
-                }
-            },
-            {
-                ALT: function() {
-                    $.SUBRULE($.cleanCommand)
-                }
-            }
-        ])
-    })
-
-    // this is an "abstract" base grammar it should not be instantiated directly
-    // therefor it does not invoke "performSelfAnalysis"
-}
-
-// MyBaseParser extends the base chevrotain Parser.
-AbstractCommandsParser.prototype = Object.create(Parser.prototype)
-AbstractCommandsParser.prototype.constructor = AbstractCommandsParser
-
-function EnglishCommandsParser(input) {
-    AbstractCommandsParser.call(this, input, englishTokens)
-    var $ = this
-
-    // implementing the 'cookCommand' referenced in the AbstractCommandsParser
-    $.RULE("cookCommand", function() {
-        $.CONSUME(Cook)
-        $.OPTION(function() {
-            $.CONSUME(Some)
+        $.RULE("command", () => {
+            // The cook and clean commands must be implemented in each sub grammar
+            $.OR([
+                { ALT: () => $.SUBRULE($.cookCommand) },
+                { ALT: () => $.SUBRULE($.cleanCommand) }
+            ])
         })
-        $.CONSUME(Sausages)
-    })
 
-    // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
-    $.RULE("cleanCommand", function() {
-        $.CONSUME(Clean)
-        $.CONSUME(The)
-        $.CONSUME(Room)
-    })
-
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
+        // this is an "abstract" base grammar it should not be instantiated directly
+        // therefor it does not invoke "performSelfAnalysis"
+    }
 }
 
-// EnglishCommandsParser extends AbstractCommandsParser
-EnglishCommandsParser.prototype = Object.create(
-    AbstractCommandsParser.prototype
-)
-EnglishCommandsParser.prototype.constructor = EnglishCommandsParser
+class EnglishCommandsParser extends AbstractCommandsParser {
+    constructor(input) {
+        super(input, englishTokens)
 
-function GermanCommandsParser(input) {
-    AbstractCommandsParser.call(this, input, germanTokens)
-    var $ = this
+        const $ = this
 
-    // implementing the 'cookCommand' referenced in the AbstractCommandsParser
-    $.RULE("cookCommand", function() {
-        $.CONSUME(Kochen)
-        $.OR([
-            {
-                ALT: function() {
-                    $.CONSUME(Wurstchen)
-                }
-            },
-            {
-                ALT: function() {
-                    $.CONSUME(Wurst)
-                }
-            }
-        ])
-    })
+        // implementing the 'cookCommand' referenced in the AbstractCommandsParser
+        $.RULE("cookCommand", () => {
+            $.CONSUME(Cook)
+            $.OPTION(() => {
+                $.CONSUME(Some)
+            })
+            $.CONSUME(Sausages)
+        })
 
-    // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
-    $.RULE("cleanCommand", function() {
-        $.CONSUME(Raum)
-        $.CONSUME(Den)
-        $.CONSUME2(Raum)
-        $.CONSUME(Auf)
-    })
+        // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
+        $.RULE("cleanCommand", () => {
+            $.CONSUME(Clean)
+            $.CONSUME(The)
+            $.CONSUME(Room)
+        })
 
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this)
+    }
 }
 
-// GermanCommandsParser extends AbstractCommandsParser
-GermanCommandsParser.prototype = Object.create(AbstractCommandsParser.prototype)
-GermanCommandsParser.prototype.constructor = GermanCommandsParser
+class GermanCommandsParser extends AbstractCommandsParser {
+    constructor(input) {
+        super(input, germanTokens)
+
+        const $ = this
+
+        // implementing the 'cookCommand' referenced in the AbstractCommandsParser
+        $.RULE("cookCommand", () => {
+            $.CONSUME(Kochen)
+            $.OR([
+                { ALT: () => $.CONSUME(Wurstchen) },
+                { ALT: () => $.CONSUME(Wurst) }
+            ])
+        })
+
+        // implementing the 'cleanCommand' referenced in the AbstractCommandsParser
+        $.RULE("cleanCommand", () => {
+            $.CONSUME(Raum)
+            $.CONSUME(Den)
+            $.CONSUME2(Raum)
+            $.CONSUME(Auf)
+        })
+
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this)
+    }
+}
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instances.
-var englishParser = new EnglishCommandsParser([])
-var germanParser = new GermanCommandsParser([])
+const englishParser = new EnglishCommandsParser([])
+const germanParser = new GermanCommandsParser([])
 
 module.exports = function(text, language) {
     // lex
-    var lexer
+    let lexer
     // match language and lexer.
     switch (language) {
         case "english":
@@ -218,10 +213,10 @@ module.exports = function(text, language) {
             throw Error("no valid language chosen")
     }
 
-    var lexResult = lexer.tokenize(text)
+    const lexResult = lexer.tokenize(text)
 
     // parse
-    var parser
+    let parser
     // match language and parser.
     switch (language) {
         case "english":
@@ -237,7 +232,7 @@ module.exports = function(text, language) {
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
-    var value = parser.commands()
+    const value = parser.commands()
 
     return {
         value: value, // this is a pure grammar, the value will always be <undefined>

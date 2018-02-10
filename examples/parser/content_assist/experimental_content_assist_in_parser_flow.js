@@ -5,7 +5,7 @@
  * you cannot work around it's limitations.
  *
  * This example is kept as a basis for expansion in the future, but currently has limitations
- * Paticulary around multiple Token lookahead.
+ * Particularly around multiple Token lookahead.
  * See Issue 290 for details: https://github.com/SAP/chevrotain/issues/290
  *
  *
@@ -31,41 +31,36 @@
 
 "use strict"
 
-var chevrotain = require("chevrotain")
-var _ = require("lodash")
-
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-var tokenMatcher = chevrotain.tokenMatcher
-var createToken = chevrotain.createToken
+const { createToken, Lexer, Parser, tokenMatcher, EOF } = require("chevrotain")
+const _ = require("lodash")
 
 // all keywords (from/select/where/...) belong to the Keyword category thus
 // they will be easy to identify for the purpose of content assist.
-var Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
-var Select = createToken({
+const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
+const Select = createToken({
     name: "Select",
     pattern: /SELECT/,
     categories: Keyword
 })
-var From = createToken({ name: "From", pattern: /FROM/, categories: Keyword })
-var Where = createToken({
+const From = createToken({ name: "From", pattern: /FROM/, categories: Keyword })
+const Where = createToken({
     name: "Where",
     pattern: /WHERE/,
     categories: Keyword
 })
-var Comma = createToken({ name: "Comma", pattern: /,/ })
-var Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
-var Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
-var GreaterThan = createToken({ name: "GreaterThan", pattern: /</ })
-var LessThan = createToken({ name: "LessThan", pattern: />/ })
-var WhiteSpace = createToken({
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
+const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
+const GreaterThan = createToken({ name: "GreaterThan", pattern: /</ })
+const LessThan = createToken({ name: "LessThan", pattern: />/ })
+const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
-var allTokens = [
+const allTokens = [
     WhiteSpace,
     Select,
     From,
@@ -76,61 +71,59 @@ var allTokens = [
     GreaterThan,
     LessThan
 ]
-var SelectLexer = new Lexer(allTokens)
+const SelectLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class SelectParser extends chevrotain.Parser {
+class SelectParser extends Parser {
     constructor(input) {
         super(input, allTokens, { recoveryEnabled: true })
 
-        var $ = this
+        const $ = this
 
-        $.RULE("selectStatement", function() {
+        $.RULE("selectStatement", () => {
             $.SUBRULE($.selectClause)
             $.SUBRULE($.fromClause)
-            $.OPTION(function() {
+            $.OPTION(() => {
                 $.SUBRULE($.whereClause)
             })
         })
 
-        $.RULE("selectClause", function() {
+        $.RULE("selectClause", () => {
             $.CONSUME(Select)
             $.CONSUME(Identifier)
-            $.MANY(function() {
+            $.MANY(() => {
                 $.CONSUME(Comma)
                 $.CONSUME2(Identifier)
             })
         })
 
-        $.RULE("fromClause", function() {
+        $.RULE("fromClause", () => {
             $.CONSUME(From)
             $.CONSUME(Identifier)
         })
 
-        $.RULE("whereClause", function() {
+        $.RULE("whereClause", () => {
             $.CONSUME(Where)
             $.SUBRULE($.expression)
         })
 
-        $.RULE("expression", function() {
+        $.RULE("expression", () => {
             $.SUBRULE($.atomicExpression)
             $.SUBRULE($.relationalOperator)
             $.SUBRULE2($.atomicExpression)
         })
 
-        $.RULE("atomicExpression", function() {
-            // prettier-ignore
+        $.RULE("atomicExpression", () => {
             $.OR([
-                {ALT: function() {$.CONSUME(Integer)}},
-                {ALT: function() {$.CONSUME(Identifier)}}
+                { ALT: () => $.CONSUME(Integer) },
+                { ALT: () => $.CONSUME(Identifier) }
             ])
         })
 
-        $.RULE("relationalOperator", function() {
-            // prettier-ignore
+        $.RULE("relationalOperator", () => {
             $.OR([
-                {ALT: function() {$.CONSUME(GreaterThan)}},
-                {ALT: function() {$.CONSUME(LessThan)}}
+                { ALT: () => $.CONSUME(GreaterThan) },
+                { ALT: () => $.CONSUME(LessThan) }
             ])
         })
 
@@ -158,17 +151,17 @@ class SelectContentAssistParser extends SelectParser {
      *
      */
     consumeInternal(tokClass, idx) {
-        var consumedToken
-        var contentAssistPointReached = false
-        var pathToTokenBeforeContentAssist
-        var prefix = ""
+        let consumedToken
+        let contentAssistPointReached = false
+        let pathToTokenBeforeContentAssist
+        let prefix = ""
 
         try {
             this.lastGrammarPath = this.getCurrentGrammarPath(tokClass, idx)
             consumedToken = super.consumeInternal(tokClass, idx)
 
-            var nextToken = this.LA(1)
-            var nextTokenEndOffset =
+            const nextToken = this.LA(1)
+            const nextTokenEndOffset =
                 nextToken.startOffset + nextToken.image.length
 
             // no prefix scenario (SELECT age FROM ^)
@@ -176,7 +169,7 @@ class SelectContentAssistParser extends SelectParser {
                 consumedToken !== undefined &&
                 // we have reached the end of the input without encountering the contentAssist offset
                 // this means the content assist offset is AFTER the input
-                (tokenMatcher(this.LA(1), chevrotain.EOF) ||
+                (tokenMatcher(this.LA(1), EOF) ||
                     // we consumed the last token BEFORE the content assist of offset
                     this.LA(1).startOffset > this.assistOffset)
             ) {
@@ -208,10 +201,10 @@ class SelectContentAssistParser extends SelectParser {
         } finally {
             // halt the parsing flow if we have reached the content assist point
             if (contentAssistPointReached) {
-                var nextPossibleTokTypes = this.getNextPossibleTokenTypes(
+                const nextPossibleTokTypes = this.getNextPossibleTokenTypes(
                     pathToTokenBeforeContentAssist
                 )
-                var contentAssistEarlyExitError = new Error(
+                const contentAssistEarlyExitError = new Error(
                     "Content Assist path found"
                 )
 
@@ -235,23 +228,23 @@ module.exports = {
      * @returns {Array<string>}
      */
     getContentAssist: function(text, offset, symbolTable) {
-        var lexResult = SelectLexer.tokenize(text)
+        const lexResult = SelectLexer.tokenize(text)
         if (lexResult.errors.length >= 1) {
             throw new Error("sad sad panda, lexing errors detected")
         }
 
-        var parser = new SelectContentAssistParser(lexResult.tokens, offset)
+        const parser = new SelectContentAssistParser(lexResult.tokens, offset)
 
         try {
             parser.selectStatement()
         } catch (e) {
             if (e.message === "Content Assist path found") {
-                var path = e.path
-                var nextPossibleTokTypes = e.nextPossibleTokTypes
-                var prefix = e.prefix
+                const path = e.path
+                const nextPossibleTokTypes = e.nextPossibleTokTypes
+                const prefix = e.prefix
 
                 // handling keyword suggestions
-                var nextPossibleKeywordsTypes = _.filter(
+                const nextPossibleKeywordsTypes = _.filter(
                     nextPossibleTokTypes,
                     function(currPossibleTokType) {
                         return Keyword.categoryMatchesMap[
@@ -259,7 +252,7 @@ module.exports = {
                         ]
                     }
                 )
-                var possibleKeywordSuggestions = _.map(
+                const possibleKeywordSuggestions = _.map(
                     nextPossibleKeywordsTypes,
                     function(currKeywordType) {
                         // relying on the fact that the keyword patterns(regexps) are identical to the strings they match. (very simple regexps)
@@ -268,9 +261,9 @@ module.exports = {
                 )
 
                 // handling Identifier Suggestions
-                var possibleIdentifierSuggestions = []
+                let possibleIdentifierSuggestions = []
                 if (_.contains(nextPossibleTokTypes, Identifier)) {
-                    var currentParsingRule = _.last(path.ruleStack)
+                    const currentParsingRule = _.last(path.ruleStack)
                     // filter the semantic options (available global symbols) using syntactic context.
                     if (currentParsingRule === "fromClause") {
                         possibleIdentifierSuggestions = symbolTable.tableNames
@@ -280,7 +273,7 @@ module.exports = {
                     }
                 }
 
-                var allPossibleSuggestions = possibleKeywordSuggestions.concat(
+                const allPossibleSuggestions = possibleKeywordSuggestions.concat(
                     possibleIdentifierSuggestions
                 )
                 return filterByPrefix(allPossibleSuggestions, prefix)

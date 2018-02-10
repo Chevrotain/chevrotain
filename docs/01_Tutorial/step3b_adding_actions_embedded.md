@@ -41,13 +41,13 @@ $.RULE("topRule", () => {
 })
    
 $.RULE("decimalRule", () => {
-    let decimalToken = $.CONSUME(Decimal)
+    const decimalToken = $.CONSUME(Decimal)
     return parseFloat(decimalToken.image)
   
 })
 
 $.RULE("IntegerRule", () => {
-    let intToken = $.CONSUME(Integer)
+    const intToken = $.CONSUME(Integer)
     return parseInt(intToken.image)
 })
 ```

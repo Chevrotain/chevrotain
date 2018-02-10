@@ -1,9 +1,9 @@
-var assert = require("assert")
-var parseCss = require("./css").parseCss
+const assert = require("assert")
+const parseCss = require("./css").parseCss
 
-describe("The CSS Grammar", function() {
-    it("can parse a simple CSS without errors", function() {
-        var inputText =
+describe("The CSS Grammar", () => {
+    it("can parse a simple CSS without errors", () => {
+        const inputText =
             "svg.railroad-diagram path {\r\n" +
             "    stroke-width: 3;\r\n" +
             "    stroke: black;\r\n" +
@@ -87,7 +87,7 @@ describe("The CSS Grammar", function() {
             "\r\nsvg.railroad-diagram g.non-terminal text {" +
             "\r\n    cursor: pointer;" +
             "\r\n}"
-        var result = parseCss(inputText)
+        const result = parseCss(inputText)
 
         assert.equal(result.lexErrors, 0)
         assert.equal(result.parseErrors.length, 0)

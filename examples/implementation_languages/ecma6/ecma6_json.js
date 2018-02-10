@@ -1,52 +1,34 @@
 "use strict"
-const chevrotain = require("chevrotain")
+const { createToken, Lexer, Parser } = require("chevrotain")
 
 // ----------------- lexer -----------------
-const Lexer = chevrotain.Lexer
-const Parser = chevrotain.Parser
+const True = createToken({ name: "True", pattern: /true/ })
+const False = createToken({ name: "False", pattern: /false/ })
+const Null = createToken({ name: "Null", pattern: /null/ })
+const LCurly = createToken({ name: "LCurly", pattern: /{/ })
+const RCurly = createToken({ name: "RCurly", pattern: /}/ })
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+const RSquare = createToken({ name: "RSquare", pattern: /]/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Colon = createToken({ name: "Colon", pattern: /:/ })
 
-// With ES6 we can define Tokens using the class keywords.
+const StringLiteral = createToken({
+    name: "StringLiteral",
+    pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
+})
 
-// Unfortunately no support for static class properties in ES2015, only in ES2016...
-// so the PATTERN/GROUP static props are defined outside the class declarations.
-// see: https://github.com/jeffmo/es-class-fields-and-static-properties
-class True {}
-True.PATTERN = /true/
+const NumberLiteral = createToken({
+    name: "NumberLiteral",
+    pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
+})
 
-class False {}
-False.PATTERN = /false/
-
-class Null {}
-Null.PATTERN = /null/
-
-class LCurly {}
-LCurly.PATTERN = /{/
-
-class RCurly {}
-RCurly.PATTERN = /}/
-
-class LSquare {}
-LSquare.PATTERN = /\[/
-
-class RSquare {}
-RSquare.PATTERN = /]/
-
-class Comma {}
-Comma.PATTERN = /,/
-
-class Colon {}
-Colon.PATTERN = /:/
-
-class StringLiteral {}
-StringLiteral.PATTERN = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
-
-class NumberLiteral {}
-NumberLiteral.PATTERN = /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
-
-class WhiteSpace {}
-WhiteSpace.PATTERN = /\s+/
-WhiteSpace.GROUP = Lexer.SKIPPED // marking WhiteSpace as 'SKIPPED' makes the lexer skip it.
-WhiteSpace.LINE_BREAKS = true
+const WhiteSpace = createToken({
+    name: "WhiteSpace",
+    pattern: /\s+/,
+    // ignore whitespace
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
 const allTokens = [
     WhiteSpace,
@@ -65,8 +47,7 @@ const allTokens = [
 const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-// Using ES6 the parser too can be defined as a class
-class JsonParserES6 extends chevrotain.Parser {
+class JsonParserES6 extends Parser {
     constructor(input) {
         super(input, allTokens)
 
@@ -74,11 +55,10 @@ class JsonParserES6 extends chevrotain.Parser {
         const $ = this
 
         $.RULE("json", () => {
-            // prettier-ignore
             $.OR([
                 // using ES6 Arrow functions to reduce verbosity.
-                {ALT: () => {$.SUBRULE($.object)}},
-                {ALT: () => {$.SUBRULE($.array)}}
+                { ALT: () => $.SUBRULE($.object) },
+                { ALT: () => $.SUBRULE($.array) }
             ])
         })
 
@@ -112,15 +92,14 @@ class JsonParserES6 extends chevrotain.Parser {
         })
 
         $.RULE("value", () => {
-            // prettier-ignore
             $.OR([
-                {ALT: () => {$.CONSUME(StringLiteral)}},
-                {ALT: () => {$.CONSUME(NumberLiteral)}},
-                {ALT: () => {$.SUBRULE($.object)}},
-                {ALT: () => {$.SUBRULE($.array)}},
-                {ALT: () => {$.CONSUME(True)}},
-                {ALT: () => {$.CONSUME(False)}},
-                {ALT: () => {$.CONSUME(Null)}}
+                { ALT: () => $.CONSUME(StringLiteral) },
+                { ALT: () => $.CONSUME(NumberLiteral) },
+                { ALT: () => $.SUBRULE($.object) },
+                { ALT: () => $.SUBRULE($.array) },
+                { ALT: () => $.CONSUME(True) },
+                { ALT: () => $.CONSUME(False) },
+                { ALT: () => $.CONSUME(Null) }
             ])
         })
 

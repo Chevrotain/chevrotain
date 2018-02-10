@@ -1,10 +1,8 @@
-"use strict"
-
-const expect = require("chai").expect
+const { expect } = require("chai")
 const rules = require("./custom_errors")
 
-describe("The Chevrotain support for custom error provider", function() {
-    it("can customize a misMatchToken exception", function() {
+describe("The Chevrotain support for custom error provider", () => {
+    it("can customize a misMatchToken exception", () => {
         const errorsOverride = rules.parseMismatch("A C")
         expect(errorsOverride).to.have.lengthOf(1)
         expect(errorsOverride[0].message).to.equal(
@@ -19,13 +17,13 @@ describe("The Chevrotain support for custom error provider", function() {
         )
     })
 
-    it("can customize a misMatchToken exception by overriding", function() {
+    it("can customize a misMatchToken exception by overriding", () => {
         const errorsOverride = rules.parseMismatchOverride("A C")
         expect(errorsOverride).to.have.lengthOf(1)
         expect(errorsOverride[0].message).to.equal("We want Bravo!!!")
     })
 
-    it("can customize a NotAllInputParsed exception", function() {
+    it("can customize a NotAllInputParsed exception", () => {
         const errors = rules.parseRedundant("A B C")
         expect(errors).to.have.lengthOf(1)
         expect(errors[0].message).to.equal(
@@ -33,7 +31,7 @@ describe("The Chevrotain support for custom error provider", function() {
         )
     })
 
-    it("can customize a NoViableAlt exception", function() {
+    it("can customize a NoViableAlt exception", () => {
         const errors = rules.parseNoViable("C")
         expect(errors).to.have.lengthOf(1)
         expect(errors[0].message).to.equal(
@@ -41,7 +39,7 @@ describe("The Chevrotain support for custom error provider", function() {
         )
     })
 
-    it("can customize a EarlyExit exception", function() {
+    it("can customize a EarlyExit exception", () => {
         const errors = rules.parseEarlyExit("A")
         expect(errors).to.have.lengthOf(1)
         expect(errors[0].message).to.equal(

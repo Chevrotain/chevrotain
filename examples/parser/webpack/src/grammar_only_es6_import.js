@@ -44,7 +44,7 @@ export function parse(text) {
     const value = parser.json()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

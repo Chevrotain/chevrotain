@@ -1,17 +1,11 @@
-"use strict"
-
-let expect = require("chai").expect
-let customPatternExample = require("./custom_patterns")
-
-let tokenize = customPatternExample.tokenize
-let tokenMatcher = require("chevrotain").tokenMatcher
-let Comma = customPatternExample.Comma
-let IntegerLiteral = customPatternExample.IntegerLiteral
+const expect = require("chai").expect
+const { tokenize, Comma, IntegerLiteral } = require("./custom_patterns")
+const tokenMatcher = require("chevrotain").tokenMatcher
 
 describe("The Chevrotain Lexer ability to use custom pattern implementations.", () => {
     it("Can Lex a simple input using a Custom Integer Literal RegExp", () => {
-        let text = `1 , 2 , 3`
-        let lexResult = tokenize(text)
+        const text = `1 , 2 , 3`
+        const lexResult = tokenize(text)
 
         expect(lexResult.errors).to.be.empty
         expect(lexResult.tokens).to.have.lengthOf(5)

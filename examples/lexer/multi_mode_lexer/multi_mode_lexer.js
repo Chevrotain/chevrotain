@@ -1,67 +1,68 @@
-var chevrotain = require("chevrotain")
-var createToken = chevrotain.createToken
-var Lexer = chevrotain.Lexer
+const { createToken, Lexer } = require("chevrotain")
 
 // numbers Tokens
-var One = createToken({ name: "One", pattern: /1/ })
-var Two = createToken({ name: "Two", pattern: /2/ })
-var Three = createToken({ name: "Three", pattern: /3/ })
+const One = createToken({ name: "One", pattern: /1/ })
+const Two = createToken({ name: "Two", pattern: /2/ })
+const Three = createToken({ name: "Three", pattern: /3/ })
 
 // Letter Tokens
-var Alpha = createToken({ name: "Alpha", pattern: /A/ })
-var Beta = createToken({ name: "Beta", pattern: /B/ })
-var Gamma = createToken({ name: "Gamma", pattern: /G/ })
+const Alpha = createToken({ name: "Alpha", pattern: /A/ })
+const Beta = createToken({ name: "Beta", pattern: /B/ })
+const Gamma = createToken({ name: "Gamma", pattern: /G/ })
 
 // signs Tokens
-var Hash = createToken({ name: "Hash", pattern: /#/ })
-var Caret = createToken({ name: "Caret", pattern: /\^/ })
-var Amp = createToken({ name: "Amp", pattern: /&/ })
+const Hash = createToken({ name: "Hash", pattern: /#/ })
+const Caret = createToken({ name: "Caret", pattern: /\^/ })
+const Amp = createToken({ name: "Amp", pattern: /&/ })
 
 // Tokens which control entering a new mode.
-var EnterNumbers = createToken({
+const EnterNumbers = createToken({
     name: "EnterNumbers",
     pattern: /NUMBERS/,
     push_mode: "numbers_mode"
 })
 
-var EnterLetters = createToken({
+const EnterLetters = createToken({
     name: "EnterLetters",
     pattern: /LETTERS/,
     push_mode: "letter_mode"
 })
 
-var EnterSigns = createToken({
+const EnterSigns = createToken({
     name: "EnterSigns",
     pattern: /SIGNS/,
     push_mode: "signs_mode"
 })
 
 // Tokens which control exiting modes
-var ExitNumbers = createToken({
+const ExitNumbers = createToken({
     name: "ExitNumbers",
     pattern: /EXIT_NUMBERS/,
     pop_mode: true
 })
 
-var ExitLetter = createToken({
+const ExitLetter = createToken({
     name: "ExitLetter",
     pattern: /EXIT_LETTERS/,
     pop_mode: true
 })
 
-var ExitSigns = createToken({
+const ExitSigns = createToken({
     name: "ExitSigns",
     pattern: /EXIT_SIGNS/,
     pop_mode: true
 })
 
-var Whitespace = createToken({ name: "Whitespace", pattern: /(\t| )/ })
-Whitespace.GROUP = Lexer.SKIPPED
-Whitespace.LINE_BREAKS = true
+const Whitespace = createToken({
+    name: "Whitespace",
+    pattern: /(\t| )/,
+    group: Lexer.SKIPPED,
+    line_breaks: true
+})
 
 // Each key defines a Lexer mode's name.
 // And each value is an array of Tokens which are valid in this Lexer mode.
-var multiModeLexerDefinition = {
+const multiModeLexerDefinition = {
     modes: {
         numbers_mode: [
             One,
@@ -95,6 +96,6 @@ var multiModeLexerDefinition = {
 // Our new lexer now support 3 different modes
 // To mode switching logic works by using a mode stack and pushing and popping modes.
 // using the PUSH_MODE and POP_MODE static properties defined on the Token classes
-var MultiModeLexer = new Lexer(multiModeLexerDefinition)
+const MultiModeLexer = new Lexer(multiModeLexerDefinition)
 
 module.exports = MultiModeLexer

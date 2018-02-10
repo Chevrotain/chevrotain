@@ -1,36 +1,32 @@
-var chevrotain = require("chevrotain")
+"use strict"
+const { Parser, Lexer, createToken } = require("chevrotain")
 
 // ----------------- lexer -----------------
-var createToken = chevrotain.createToken
-var Lexer = chevrotain.Lexer
-var Parser = chevrotain.Parser
-
-// In ES6, custom inheritance implementation (such as 'extendToken(...)') can be replaced with simple "class X extends Y"...
-var True = createToken({ name: "True", pattern: /true/ })
-var False = createToken({ name: "False", pattern: /false/ })
-var Null = createToken({ name: "Null", pattern: /null/ })
-var LCurly = createToken({ name: "LCurly", pattern: /{/ })
-var RCurly = createToken({ name: "RCurly", pattern: /}/ })
-var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
-var RSquare = createToken({ name: "RSquare", pattern: /]/ })
-var Comma = createToken({ name: "Comma", pattern: /,/ })
-var Colon = createToken({ name: "Colon", pattern: /:/ })
-var StringLiteral = createToken({
+const True = createToken({ name: "True", pattern: /true/ })
+const False = createToken({ name: "False", pattern: /false/ })
+const Null = createToken({ name: "Null", pattern: /null/ })
+const LCurly = createToken({ name: "LCurly", pattern: /{/ })
+const RCurly = createToken({ name: "RCurly", pattern: /}/ })
+const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
+const RSquare = createToken({ name: "RSquare", pattern: /]/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
+const Colon = createToken({ name: "Colon", pattern: /:/ })
+const StringLiteral = createToken({
     name: "StringLiteral",
     pattern: /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 })
-var NumberLiteral = createToken({
+const NumberLiteral = createToken({
     name: "NumberLiteral",
     pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/
 })
-var WhiteSpace = createToken({
+const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })
 
-var allTokens = [
+const allTokens = [
     WhiteSpace,
     NumberLiteral,
     StringLiteral,
@@ -44,99 +40,95 @@ var allTokens = [
     False,
     Null
 ]
-var JsonLexer = new Lexer(allTokens)
+
+const JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 
-function JsonParserES5(input) {
-    // invoke super constructor
-    Parser.call(this, input, allTokens, {
-        // by default the error recovery / fault tolerance capabilities are disabled
-        // use this flag to enable them
-        recoveryEnabled: true
-    })
+class JsonParser extends Parser {
+    // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
+    // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
+    // invoking RULE(...)
+    // see: https://github.com/jeffmo/es-class-fields-and-static-properties
+    constructor(input) {
+        super(input, allTokens)
 
-    // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
-    var $ = this
+        // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
+        const $ = this
 
-    this.RULE("json", function() {
-        // prettier-ignore
-        $.OR([
-            {ALT: function() {$.SUBRULE($.object)}},
-            {ALT: function() {$.SUBRULE($.array)}}
-        ])
-    })
-
-    this.RULE("object", function() {
-        $.CONSUME(LCurly)
-        $.OPTION(function() {
-            $.SUBRULE($.objectItem)
-            $.MANY(function() {
-                $.CONSUME(Comma)
-                $.SUBRULE2($.objectItem)
-            })
+        // the parsing methods
+        $.RULE("json", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.object) },
+                { ALT: () => $.SUBRULE($.array) }
+            ])
         })
-        $.CONSUME(RCurly)
-    })
 
-    this.RULE("objectItem", function() {
-        $.CONSUME(StringLiteral)
-        $.CONSUME(Colon)
-        $.SUBRULE($.value)
-    })
+        $.RULE("object", () => {
+            $.CONSUME(LCurly)
+            $.OPTION(() => {
+                $.SUBRULE($.objectItem)
+                $.MANY(() => {
+                    $.CONSUME(Comma)
+                    $.SUBRULE2($.objectItem)
+                })
+            })
+            $.CONSUME(RCurly)
+        })
 
-    this.RULE("array", function() {
-        $.CONSUME(LSquare)
-        $.OPTION(function() {
+        $.RULE("objectItem", () => {
+            $.CONSUME(StringLiteral)
+            $.CONSUME(Colon)
             $.SUBRULE($.value)
-            $.MANY(function() {
-                $.CONSUME(Comma)
-                $.SUBRULE2($.value)
-            })
         })
-        $.CONSUME(RSquare)
-    })
 
-    this.RULE("value", function() {
-        // prettier-ignore
-        $.OR([
-            {ALT: function() {$.CONSUME(StringLiteral)}},
-            {ALT: function() {$.CONSUME(NumberLiteral)}},
-            {ALT: function() {$.SUBRULE($.object)}},
-            {ALT: function() {$.SUBRULE($.array)}},
-            {ALT: function() {$.CONSUME(True)}},
-            {ALT: function() {$.CONSUME(False)}},
-            {ALT: function() {$.CONSUME(Null)}}
-        ])
-    })
+        $.RULE("array", () => {
+            $.CONSUME(LSquare)
+            $.OPTION(() => {
+                $.SUBRULE($.value)
+                $.MANY(() => {
+                    $.CONSUME(Comma)
+                    $.SUBRULE2($.value)
+                })
+            })
+            $.CONSUME(RSquare)
+        })
 
-    // very important to call this after all the rules have been defined.
-    // otherwise the parser may not work correctly as it will lack information
-    // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
+        $.RULE("value", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(StringLiteral) },
+                { ALT: () => $.CONSUME(NumberLiteral) },
+                { ALT: () => $.SUBRULE($.object) },
+                { ALT: () => $.SUBRULE($.array) },
+                { ALT: () => $.CONSUME(True) },
+                { ALT: () => $.CONSUME(False) },
+                { ALT: () => $.CONSUME(Null) }
+            ])
+        })
+
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        Parser.performSelfAnalysis(this)
+    }
 }
-
-// inheritance as implemented in javascript in the previous decade... :(
-JsonParserES5.prototype = Object.create(Parser.prototype)
-JsonParserES5.prototype.constructor = JsonParserES5
 
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new JsonParserES5([])
+const parser = new JsonParser([])
 
 module.exports = function(text) {
-    var lexResult = JsonLexer.tokenize(text)
-
+    const lexResult = JsonLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
-    console.log(JSON.stringify(lexResult, null, 3))
-
     // any top level rule may be used as an entry point
-    var value = parser.json()
+    const value = parser.json()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        // This is a pure grammar, the value will be undefined until we add embedded actions
+        // or enable automatic CST creation.
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
