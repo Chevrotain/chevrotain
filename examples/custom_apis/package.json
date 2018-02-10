@@ -2,7 +2,7 @@
     "name": "chevrotain_examples_custom_apis",
     "version": "0.1.0",
     "scripts": {
-        "test": "mocha \"step*/*spec.js\""
+        "test": "mocha \"**/*_spec.js\""
     },
     "dependencies": {
         "chevrotain": "*"

@@ -1,4 +1,19 @@
-## Version 2.0.0
+## 2.0.0
+
+- The creation of TokenTypes using the class keyword syntax has been soft deprecated.
+  and is no longer officially supported.
+  e.g:
+  ```javascript
+     // No longer officially supported
+     class Identifier {
+        static pattern = /[a-zA-Z_]\w+/
+     }
+   
+     // Use the createToken API instead
+     const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z_]\w+/ })
+  ```
+  See the reasoning in [this issue](https://github.com/SAP/chevrotain/issues/653).
+  
 
 - defaultErrorProvider was renamed to defaultParserErrorProvider
 

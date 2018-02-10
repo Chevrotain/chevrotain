@@ -89,6 +89,12 @@ module.exports = function(grunt) {
                     cwd: process.cwd() + "/examples/tutorial/"
                 },
                 exec: INSTALL_LINK + " && yarn test"
+            },
+            test_examples_custom_apis: {
+                options: {
+                    cwd: process.cwd() + "/examples/custom_apis/"
+                },
+                exec: INSTALL_LINK + " && yarn test"
             }
         },
 
@@ -205,7 +211,8 @@ module.exports = function(grunt) {
         "run:test_examples_parser",
         "run:test_examples_lexer",
         "run:test_examples_implementation_languages",
-        "run:test_examples_tutorial"
+        "run:test_examples_tutorial",
+        "run:test_examples_custom_apis"
     ]
 
     const browserTestsTasks = [

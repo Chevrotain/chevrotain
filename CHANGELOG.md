@@ -1,8 +1,19 @@
 ## X.Y.Z (INSERT_DATE_HERE)
 
+#### Breaking Changes
+
+- [See BREAKING_CHANGES.md](https://github.com/SAP/chevrotain/blob/master/BREAKNIG_CHANGES.md#200)
+
+#### Major Changes
+
+- [Support custom user defined declarative APIs](http://sap.github.io/chevrotain/website/Deep_Dive/custom_apis.html)
+
+#### Minor Changes
+- [Increase DSL methods suffix indices.](https://github.com/SAP/chevrotain/issues/606)
+
 #### Bug Fixes
 
-- [Added missing link to deprecated TokenType parent property.](https://github.com/SAP/chevrotain/issues/640)
+- [Added missing link to deprecated TokenType parent property error message.](https://github.com/SAP/chevrotain/issues/640)
 
 
 
@@ -26,6 +37,7 @@
 - [Tokens properties renaming.](https://github.com/SAP/chevrotain/issues/610#issuecomment-350244423)
 
 #### Minor Changes
+
 - [Custom Error Message argument for CONSUME.](https://github.com/SAP/chevrotain/issues/543)
 - [Improved empty empty alternatives detection.](https://github.com/SAP/chevrotain/issues/196)
 - [previousToken information for EarlyExitException.](https://github.com/SAP/chevrotain/pull/616)
