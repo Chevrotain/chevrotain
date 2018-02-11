@@ -14,6 +14,6 @@
   "scripts": {
     "install": "webpack",
     "bundle": "webpack",
-    "test": "mocha"
+    "test": "mocha test/*_spec.js"
   }
 }
