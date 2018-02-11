@@ -66,7 +66,7 @@
     "coverage": "nyc mocha \"./lib/test/**/*spec.js\"",
     "check_coverage": "nyc check-coverage --lines 100 --statements 100 --functions 100",
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
-    "docs": "typedoc --tsconfig tsdocsconfig.json --out dev/docs --module commonjs --name Chevrotain --excludeExternals  --includeDeclarations",
+    "docs": "typedoc lib/chevrotain.d.ts --mode file --out dev/docs --module commonjs --excludeExternals --includeDeclarations",
     "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",
     "website": "daux -ddev/website",
     "upload_website": "yarn run website && node ../chevrotain_docs/scripts/upload_website.js",
@@ -81,9 +81,9 @@
     "bundle_min": "webpack --config webpack_release_min.config.js",
     "bundle_spec": "webpack --config webpack_specs.config.js",
     "---------- RELEASES --------": "",
-    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && yarn run ci_full_build && node scripts/post_release_build.js patch && yarn run website && node ../chevrotain_docs/scripts/upload_docs.js",
-    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && yarn run ci_full_build && node scripts/post_release_build.js minor && yarn run website && node ../chevrotain_docs/scripts/upload_docs.js",
-    "release_major": "git fetch && git rebase && node scripts/pre_release_build.js major && yarn run ci_full_build && node scripts/post_release_build.js major && yarn run website && node ../chevrotain_docs/scripts/upload_docs.js"
+    "release_patch": "git fetch && git rebase && node scripts/pre_release_build.js patch && yarn run ci_full_build && node scripts/post_release_build.js patch && yarn run upload_website && node ../chevrotain_docs/scripts/upload_docs.js",
+    "release_minor": "git fetch && git rebase && node scripts/pre_release_build.js minor && yarn run ci_full_build && node scripts/post_release_build.js minor && yarn run upload_website && node ../chevrotain_docs/scripts/upload_docs.js",
+    "release_major": "git fetch && git rebase && node scripts/pre_release_build.js major && yarn run ci_full_build && node scripts/post_release_build.js major && yarn run upload_website && node ../chevrotain_docs/scripts/upload_docs.js"
   },
   "devDependencies": {
     "@types/chai": "^4.0.10",
@@ -119,7 +119,7 @@
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
     "tslint": "^5.8.0",
-    "typedoc": "0.8.0",
+    "typedoc": "0.10.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0",
     "xregexp": "^4.0.0"
@@ -139,8 +139,5 @@
       "lib/test/**.*",
       "test/test.config.js"
     ]
-  },
-  "dependencies": {
-    "npm-check-updates": "^2.14.0"
   }
 }

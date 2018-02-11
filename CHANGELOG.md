@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- Removed redundant dependency.
+
+
 ## 2.0.0 (2-11-2018)
 
 #### Breaking Changes
