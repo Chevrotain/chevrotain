@@ -68,7 +68,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
         let htmlText = createSyntaxDiagramsCode(serializedGrammar)
 
         // using a version in the url will fail in release build as the new version number has not been deployed yet.
-        htmlText = htmlText.replace(new RegExp(`@${VERSION}`), "")
+        htmlText = htmlText.replace(new RegExp(`@${VERSION}`, "g"), "")
         const dom = new JSDOM(htmlText, {
             runScripts: "dangerously",
             resources: "usable"
