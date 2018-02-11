@@ -74,7 +74,7 @@
     <div class="Page__header">
         <h1><a href="../Tutorial/step1_lexing.html">Tutorial</a> <svg class="Page__header--separator" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.73 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg> <a href="../Tutorial/step2_parsing.html">step2 parsing</a></h1>
                 <span style="float: left; font-size: 10px; color: gray;">
-            Saturday, February 10, 2018 3:02 PM        </span>
+            Saturday, February 10, 2018 4:05 PM        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
             <a href="https://github.com/SAP/chevrotain/blob/master/docs/01_Tutorial/step2_parsing.md" target="_blank">Edit on GitHub</a>
         </span>
@@ -118,25 +118,25 @@ relationalOperator
    : &quot;&gt;&quot; | &quot;&lt;&quot;
       
 </code></pre>
-<p>A Chevrotain Parser analyses an <a href="http://sap.github.io/chevrotain/documentation/2_0_0/interfaces/itoken.html" class="external">IToken</a> vector that conforms to some grammar.
-The grammar is defined using the <a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#at_least_one" class="external">parsing DSL</a>, which includes the following methods.</p>
+<p>A Chevrotain Parser analyses an <a href="http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/itoken.html" class="external">IToken</a> vector that conforms to some grammar.
+The grammar is defined using the <a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#at_least_one" class="external">parsing DSL</a>, which includes the following methods.</p>
 <ul>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#consume1" class="external">CONSUME</a> - 'eat' a Token.</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#consume1" class="external">CONSUME</a> - 'eat' a Token.</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#subrule1" class="external">SUBRULE</a> - reference to another rule.</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#subrule1" class="external">SUBRULE</a> - reference to another rule.</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#or1" class="external">OR</a> - Alternation</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#or1" class="external">OR</a> - Alternation</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#option1" class="external">OPTION</a> - optional production.</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#option1" class="external">OPTION</a> - optional production.</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#many1" class="external">MANY</a> - repetition zero or more.</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#many1" class="external">MANY</a> - repetition zero or more.</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#at_least_one1" class="external">AT_LEAST_ONE</a> - repetition one or more.</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#at_least_one1" class="external">AT_LEAST_ONE</a> - repetition one or more.</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#many_sep1" class="external">MANY_SEP</a> - repetition (zero or more) with a separator between any two items</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#many_sep1" class="external">MANY_SEP</a> - repetition (zero or more) with a separator between any two items</li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_0/classes/parser.html#at_least_one_sep1" class="external">AT_LEAST_ONE_SEP</a> - repetition (one or more) with a separator between any two items</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#at_least_one_sep1" class="external">AT_LEAST_ONE_SEP</a> - repetition (one or more) with a separator between any two items</li>
 </ul>
 <h4 id="page_Let-s-implement-our-first-grammar-rule">Let's implement our first grammar rule.</h4>
 <pre><code class="language-javascript">// selectStatement
