@@ -155,5 +155,5 @@ There are two APIs for code generation and execution.
 The Following features are currently unsupported.
 
 - **Embedded actions**, which means the only way to get output from the parser is by enabling automatic [Concrete Syntax Tree](http://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html) creation.
-- [**Gates/Predicates**](https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js.
-- [Parameterized Rules](https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js). 
+- [**Gates/Predicates**](https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js).
+- [**Parameterized Rules**](https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js). 
