@@ -11,10 +11,8 @@ const createToken = chevrotain.createToken
 // the vocabulary will be exported and used in the Parser definition.
 const tokenVocabulary = {}
 
-// createToken is used to create a Token type class
+// createToken is used to create a TokenType
 // The Lexer's output will contain an array of token Objects created by metadata
-// on these "constructors". Note that the Token "instances" are not proper class instances
-// So use chevrotain.tokenMatcher instead of "instanceof" when matching
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
 
 // We specify the "longer_alt" property to resolve keywords vs identifiers ambiguity.
