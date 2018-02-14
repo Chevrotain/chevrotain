@@ -36,8 +36,8 @@ const Where = createToken({
 
 const Comma = createToken({ name: "Comma", pattern: /,/ })
 const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d*/ })
-const GreaterThan = createToken({ name: "GreaterThan", pattern: /</ })
-const LessThan = createToken({ name: "LessThan", pattern: />/ })
+const GreaterThan = createToken({ name: "GreaterThan", pattern: />/ })
+const LessThan = createToken({ name: "LessThan", pattern: /</ })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
