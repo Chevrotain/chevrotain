@@ -87,7 +87,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 
     // these two visitor methods will return a string.
     atomicExpression(ctx) {
-        if (ctx.Integer[0]) {
+        if (ctx.Integer) {
             return ctx.Integer[0].image
         } else {
             return ctx.Identifier[0].image
@@ -95,7 +95,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
 
     relationalOperator(ctx) {
-        if (ctx.GreaterThan[0]) {
+        if (ctx.GreaterThan) {
             return ctx.GreaterThan[0].image
         } else {
             return ctx.LessThan[0].image

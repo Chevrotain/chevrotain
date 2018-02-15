@@ -207,12 +207,11 @@ class CalculatorInterpreter extends BaseCstVisitor {
     }
 
     atomicExpression(ctx) {
-        if (ctx.parenthesisExpression.length > 0) {
-            // TODO: allow accepting array for less verbose syntax
+        if (ctx.parenthesisExpression) {
             return this.visit(ctx.parenthesisExpression[0])
-        } else if (ctx.NumberLiteral.length > 0) {
+        } else if (ctx.NumberLiteral) {
             return parseInt(ctx.NumberLiteral[0].image, 10)
-        } else if (ctx.powerFunction.length > 0) {
+        } else if (ctx.powerFunction) {
             return this.visit(ctx.powerFunction[0])
         }
     }

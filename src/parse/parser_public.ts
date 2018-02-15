@@ -538,9 +538,6 @@ export class Parser {
                 clonedProductions.values(),
                 parserInstance.fullRuleNameToShort
             )
-            cache
-                .getCstDictDefPerRuleForClass(className)
-                .putAll(cstAnalysisResult.dictDef)
             cache.CLASS_TO_ALL_RULE_NAMES.put(
                 className,
                 cstAnalysisResult.allRuleNames
@@ -671,9 +668,6 @@ export class Parser {
         this.className = classNameFromInstance(this)
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
-        this.cstDictDefForRule = cache.getCstDictDefPerRuleForClass(
-            this.className
-        )
 
         if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
             this.definitionErrors = []
@@ -2659,14 +2653,13 @@ export class Parser {
         nestedName: string,
         shortName: string | number
     ): void {
-        let initDef = this.cstDictDefForRule.get(shortName)
         this.CST_STACK.push({
             name: nestedName,
             fullName:
                 this.shortRuleNameToFull.get(
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
-            children: initDef()
+            children: {}
         })
     }
 
@@ -2675,10 +2668,9 @@ export class Parser {
         shortName: string | number
     ): void {
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        let initDef = this.cstDictDefForRule.get(shortName)
         this.CST_STACK.push({
             name: fullRuleName,
-            children: initDef()
+            children: {}
         })
     }
 
@@ -3506,6 +3498,7 @@ export class Parser {
 
     private cstPostTerminal(tokType: TokenType, consumedToken: IToken): void {
         let currTokTypeName = tokType.tokenName
+        // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, currTokTypeName)
     }
