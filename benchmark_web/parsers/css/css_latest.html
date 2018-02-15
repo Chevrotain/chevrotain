@@ -12,6 +12,7 @@
     // relative to the worker impel file
     initWorker({
         startRule:     "stylesheet",
+        parserConfig:  {outputCst: true},
         importScripts: [
             "https://unpkg.com/chevrotain/lib/chevrotain.js",
             "https://unpkg.com/xregexp@3.2.0/xregexp-all.js",

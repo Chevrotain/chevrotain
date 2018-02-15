@@ -12,6 +12,7 @@
     // relative to the worker impel file
     initWorker({
         startRule:     "Program",
+        parserConfig:  {outputCst: true},
         importScripts: [
             "https://unpkg.com/chevrotain/lib/chevrotain.js",
             "https://unpkg.com/acorn@5.1.2/dist/acorn.js",
@@ -19,7 +20,7 @@
             "./ecma5/ecma5_lexer.js",
             "./ecma5/ecma5_parser.js",
             "./api.js"],
-        sampleUrl:     "https://unpkg.com/lodash@4.17.4/lodash.js"
+        sampleUrl:     "https://unpkg.com/benchmark@2.1.4/benchmark.js"
     })
 </script>
 

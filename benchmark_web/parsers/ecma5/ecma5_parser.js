@@ -18,14 +18,17 @@ class ECMAScript5Parser extends Parser {
         this._orgText = newText
     }
 
-    constructor() {
-        super([], tokens, {
-            outputCst: false,
-            ignoredIssues: {
-                Statement: { OR1: true },
-                SourceElements: { OR1: true }
-            }
-        })
+    constructor(input, config) {
+        super(
+            input,
+            tokens,
+            Object.assign({}, config, {
+                ignoredIssues: {
+                    Statement: { OR: true },
+                    SourceElements: { OR: true }
+                }
+            })
+        )
 
         this.SUPER_CONSUME = super.CONSUME
         this.SUPER_CONSUME2 = super.CONSUME2

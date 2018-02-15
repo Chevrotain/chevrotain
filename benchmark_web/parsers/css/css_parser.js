@@ -247,8 +247,8 @@ var lexer = new Lexer(cssTokens)
 
 // ----------------- parser -----------------
 
-function parser(input) {
-    chevrotain.Parser.call(this, input, cssTokens)
+function parser(input, config) {
+    chevrotain.Parser.call(this, input, cssTokens, config)
     var $ = this
 
     this.RULE("stylesheet", function() {

@@ -2,7 +2,7 @@
 var parserInstance
 var lexResult
 
-function parseBench(text, lexer, parser, rootRule, options) {
+function parseBench(text, lexer, parser, rootRule, options, parserConfig) {
     if (lexResult === undefined || options.lexerOnly) {
         lexResult = lexer.tokenize(text)
         if (lexResult.errors.length > 0) {
@@ -13,7 +13,7 @@ function parseBench(text, lexer, parser, rootRule, options) {
     // It is recommended to only initialize a Chevrotain Parser once
     // and reset it's state instead of re-initializing it
     if (parserInstance === undefined) {
-        parserInstance = new parser([])
+        parserInstance = new parser([], parserConfig)
     }
 
     if (options.lexerOnly) {

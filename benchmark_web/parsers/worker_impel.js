@@ -1,5 +1,6 @@
 var initialized = false
 var startRule
+var parserConfig = {}
 onmessage = function(event) {
     if (!initialized) {
         initialized = true
@@ -15,12 +16,14 @@ onmessage = function(event) {
             self.sample = xhrObj.responseText
         }
         startRule = event.data.startRule
+        if (event.data.parserConfig) {
+            parserConfig = event.data.parserConfig
+        }
     } else {
         var options = event.data[0]
 
         try {
-            // todo: dynamic root rule support
-            parseBench(sample, lexer, parser, startRule, options)
+            parseBench(sample, lexer, parser, startRule, options, parserConfig)
             postMessage(0)
         } catch (e) {
             console.error(e.message)
