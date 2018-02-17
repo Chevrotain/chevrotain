@@ -7,12 +7,13 @@
 <body>
 
 <script src="../worker_api.js"></script>
+<script src="../options.js"></script>
 
 <script>
     // relative to the worker impel file
     initWorker({
         startRule:     "Program",
-        // parserConfig:  {outputCst: true},
+        parserConfig:  window.globalOptions.latest,
         importScripts: [
             "https://unpkg.com/chevrotain/lib/chevrotain.js",
             "https://unpkg.com/acorn@5.1.2/dist/acorn.js",

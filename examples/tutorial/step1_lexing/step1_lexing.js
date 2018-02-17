@@ -70,7 +70,7 @@ module.exports = {
     tokenVocabulary: tokenVocabulary,
 
     lex: function(inputText) {
-        let lexingResult = SelectLexer.tokenize(inputText)
+        const lexingResult = SelectLexer.tokenize(inputText)
 
         if (lexingResult.errors.length > 0) {
             throw Error("Sad Sad Panda, lexing errors detected")

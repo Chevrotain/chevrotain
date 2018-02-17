@@ -231,10 +231,12 @@ class SelectParser extends Parser {
              $.SUBRULE($.expression)
          }) 
     
+         // The "rhs" and "lhs" (Right/Left Hand Side) labels will provide easy 
+         // to use names during CST Visitor (step 3a). 
          $.RULE("expression", () => {
-             $.SUBRULE($.atomicExpression)
+             $.SUBRULE($.atomicExpression, { LABEL: "lhs" })
              $.SUBRULE($.relationalOperator)
-             $.SUBRULE2($.atomicExpression) // note the '2' suffix to distinguish
+             $.SUBRULE2($.atomicExpression, { LABEL: "rhs" }) // note the '2' suffix to distinguish
                            // from the 'SUBRULE(atomicExpression)'
                            // 2 lines above.
          })

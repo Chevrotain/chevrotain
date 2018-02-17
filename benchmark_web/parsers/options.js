@@ -1,0 +1,4 @@
+window.globalOptions = {
+    dev: {},
+    latest: {}
+}

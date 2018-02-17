@@ -50,7 +50,7 @@ class SelectParserEmbedded extends Parser {
         })
 
         this.selectClause = $.RULE("selectClause", () => {
-            let columns = []
+            const columns = []
 
             $.CONSUME(Select)
             $.AT_LEAST_ONE_SEP({
@@ -137,13 +137,13 @@ const parserInstance = new SelectParserEmbedded([])
 
 module.exports = {
     toAst: function(inputText) {
-        let lexResult = selectLexer.lex(inputText)
+        const lexResult = selectLexer.lex(inputText)
 
         // ".input" is a setter which will reset the parser's internal's state.
         parserInstance.input = lexResult.tokens
 
         // No semantic actions so this won't return anything yet.
-        let ast = parserInstance.selectStatement()
+        const ast = parserInstance.selectStatement()
 
         if (parserInstance.errors.length > 0) {
             throw Error(

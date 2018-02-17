@@ -54,8 +54,8 @@ class HelloParser extends Parser {
         const $ = this
 
         $.RULE("topRule", mood => {
-            // SUBRULE may be called with a array of arguments which will be passed to the sub-rule's implementation
-            $.SUBRULE($.hello, [mood])
+            // Passing arguments via a SUBRULE is done using a config object
+            $.SUBRULE($.hello, { ARGS: [mood] })
         })
 
         // the <hello> rule's implementation is defined with a <mood> parameter
