@@ -34,6 +34,7 @@ Example:
 function matchInteger(text, startOffset) {
     let endOffset = startOffset
     let charCode = text.charCodeAt(endOffset)
+    // 0-9 digits
     while (charCode >= 48 && charCode <= 57) {
         endOffset++
         charCode = text.charCodeAt(endOffset)
@@ -49,43 +50,36 @@ function matchInteger(text, startOffset) {
     }
 }
 
-let IntegerToken = createToken({
-                                 name: "IntegerToken",
-                                 pattern: {
-                                   exec:  matchInteger
-                              }})
-```
-
-```JavaScript
-let IntegerToken = createToken({
-                                 name: "IntegerToken",
-                                 pattern: {
-                                   exec:  matchInteger
-                              }})
+const IntegerToken = createToken({name: "IntegerToken", pattern: { exec: matchInteger }})
 ```
 
 Using an Object literal with only a single property is still a little verbose so an even more concise syntax is also supported:
 ```JavaScript
-let IntegerToken = createToken({name: "IntegerToken", pattern: matchInteger})
+const IntegerToken = createToken({ name: "IntegerToken", pattern: matchInteger })
 ```
+
 
 ### Using Previous Lexing Context
 A custom token matcher has two optional arguments which allows accessing the current result of the tokenizer.
 Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
 ```JavaScript
+const { tokenMatcher } = require("chevrotain")
+
 function matchInteger(text, offset, matchedTokens, groups) {
    let lastMatchedToken = _.last(matchedTokens)
-   if (lastMatchedToken instanceof Identifier) {
+   
+   // An Integer may not follow an Identifier
+   if (tokenMatcher(lastMatchedToken, Identifier)) {
+       // No match, must return null to conform with the RegExp.prototype.exec signature
        return null
    }
-       
    // rest of the code from the example above...
 } 
 ```
 
 A larger and non contrived example can seen here: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
-It is important to note again that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/ilexingresult.html)).
+It is important to note that The matchedTokens and groups arguments match the token and groups properties of the tokenize output ([ILexingResult](http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/ilexingresult.html)).
 These arguments are the current state of the lexing result so even if the lexer has performed error recovery any tokens found
 in those arguments are still guaranteed to be in the final result.

@@ -81,9 +81,10 @@ Fairly straight forward translation:
 Each grammar rule is a property of a class that extends chevrotain.Parser.
 
 ```javascript
-let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
+const { Parser } = require("chevrotain")
+const allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 
-class SelectParser extends chevrotain.Parser {
+class SelectParser extends Parser {
     /**
     * @param {IToken[]} input 
     */
@@ -194,9 +195,10 @@ can be used for error messages and fault tolerance as well as deciding which pat
 
 ```javascript
 
-let allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
+const { Parser } = require("chevrotain")
+const allTokens = [WhiteSpace, Select, From, Where, Comma, Identifier, Integer, GreaterThan, LessThan]
 
-class SelectParser extends chevrotain.Parser {
+class SelectParser extends Parser {
     constructor(input) {
          super(input, allTokens)
          
