@@ -1,4 +1,4 @@
 window.globalOptions = {
-    dev: {},
-    latest: {}
+    dev: { outputCst: true },
+    latest: { outputCst: true }
 }
