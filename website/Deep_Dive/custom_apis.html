@@ -74,7 +74,7 @@
     <div class="Page__header">
         <h1><a href="../Deep_Dive/concrete_syntax_tree.html">Deep Dive</a> <svg class="Page__header--separator" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.73 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg> <a href="../Deep_Dive/custom_apis.html">custom apis</a></h1>
                 <span style="float: left; font-size: 10px; color: gray;">
-            Sunday, February 11, 2018 2:40 PM        </span>
+            Tuesday, February 20, 2018 3:02 PM        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
             <a href="https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/custom_apis.md" target="_blank">Edit on GitHub</a>
         </span>
@@ -100,34 +100,34 @@
 <p>This structure is made up of the following classes:</p>
 <ul>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/rule.html" class="external">Rule</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/rule.html" class="external">Rule</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/terminal.html" class="external">Terminal</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/terminal.html" class="external">Terminal</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/nonterminal.html" class="external">NonTerminal</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/nonterminal.html" class="external">NonTerminal</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/alternation.html" class="external">Alternation</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/alternation.html" class="external">Alternation</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/option.html" class="external">Option</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/option.html" class="external">Option</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/repetition.html" class="external">Repetition</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/repetition.html" class="external">Repetition</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/repetitionwithseparator.html" class="external">RepetitionWithSeparator</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/repetitionwithseparator.html" class="external">RepetitionWithSeparator</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/repetitionmandatory.html" class="external">RepetitionMandatory</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/repetitionmandatory.html" class="external">RepetitionMandatory</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/repetitionmandatorywithseparator.html" class="external">RepetitionMandatoryWithSeparator</a>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/repetitionmandatorywithseparator.html" class="external">RepetitionMandatoryWithSeparator</a>
 </li>
 <li>
-<a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/flat.html" class="external">Flat</a> (sequence)</li>
+<a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/flat.html" class="external">Flat</a> (sequence)</li>
 </ul>
 <p>For example to define a grammar rule for a fully qualified name:</p>
 <pre><code class="language-antlr">fqn : Ident (Dot Ident)
@@ -170,7 +170,7 @@ const gastAlts = new Alternation({definition:[
 <p>Chevrotain exposes three functions for this purpose:</p>
 <ol>
 <li>
-<p><a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#resolvegrammar" class="external"><strong>resolveGrammar</strong></a>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#resolvegrammar" class="external"><strong>resolveGrammar</strong></a>
 NonTerminals are often referenced by their name as cyclic references will make
 a direct object reference impossible, for example with right recursion:</p>
 <pre><code class="language-antlr">   rule1: A (rule1)?
@@ -179,26 +179,26 @@ a direct object reference impossible, for example with right recursion:</p>
 to the actual Rule instance.</p>
 <p>For any reference that cannot be resolved an error object will be outputted,
 this object will contain an error message which can be customized by providing
-a custom implementation of <a href="http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/igrammarresolvererrormessageprovider.html" class="external">IGrammarResolverErrorMessageProvider</a>.
-The <a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#defaultgrammarresolvererrorprovider" class="external">default implementation</a> also exported as part of the public API.</p>
+a custom implementation of <a href="http://sap.github.io/chevrotain/documentation/2_0_2/interfaces/igrammarresolvererrormessageprovider.html" class="external">IGrammarResolverErrorMessageProvider</a>.
+The <a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#defaultgrammarresolvererrorprovider" class="external">default implementation</a> also exported as part of the public API.</p>
 </li>
 <li>
-<p><a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#validategrammar" class="external"><strong>validateGrammar</strong></a>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#validategrammar" class="external"><strong>validateGrammar</strong></a>
 Chevrotain expose a set of checks on the grammar structure that it is <strong>highly recommended</strong> to execute.
 These checks will detect ambiguous alternatives, left recursion, conflicting Terminals &amp; NonTerminal names and more...</p>
 <p>validateGrammar is side effect free and like resolveGrammar will return an array of error objects.
-The error messages in these objects can once again be customized by providing a <a href="http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/igrammarvalidatorerrormessageprovider.html" class="external">IGrammarResolverErrorMessageProvider</a>
-optionally based on the <a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#defaultgrammarvalidatorerrorprovider" class="external">default implementation</a></p>
+The error messages in these objects can once again be customized by providing a <a href="http://sap.github.io/chevrotain/documentation/2_0_2/interfaces/igrammarvalidatorerrormessageprovider.html" class="external">IGrammarResolverErrorMessageProvider</a>
+optionally based on the <a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#defaultgrammarvalidatorerrorprovider" class="external">default implementation</a></p>
 </li>
 <li>
-<p><a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#assignoccurrenceindices" class="external"><strong>assignOccurrenceIndices</strong></a>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#assignoccurrenceindices" class="external"><strong>assignOccurrenceIndices</strong></a>
 Chevrotain has certain constraint on the &quot;shape&quot; of the generated code. The relevant one in this case is the <a href="http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES" class="external">unique numerical suffixes</a> for the DSL methods.
 The assignOccurrenceIndices function will take care of this requirement by mutating the idx property on the GAST classes accordingly.</p>
 </li>
 </ol>
 <h3 id="page_A-Note-on-Custom-Error-Messages">A Note on Custom Error Messages</h3>
 <p>As mentioned earlier <strong>validateGrammar</strong> <strong>assignOccurrenceIndices</strong> optionally accept
-a <a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#validategrammar" class="external">errMsgProvider</a> option.
+a <a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#validategrammar" class="external">errMsgProvider</a> option.
 Note that all custom error message builders receive a GAST instance as input. What this means is that
 the GAST classes created by the implementor of the custom API can be augmented with additional information to enable
 producing better error messages. e.g:</p>
@@ -216,7 +216,7 @@ to assist in locating the original error.</p>
 <p>There are two APIs for code generation and execution.</p>
 <ul>
 <li>
-<p><a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#generateparsermodule" class="external"><strong>generateParserModule</strong></a>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#generateparsermodule" class="external"><strong>generateParserModule</strong></a>
 This will generate the string literal of a <a href="https://github.com/umdjs/umd" class="external">UMD</a> module.
 This UMD pattern is consumable in all standard JS runtimes &amp; module implementations.
 The approach is to generate the string literal and write it to a file for later consumption.
@@ -224,7 +224,7 @@ However for development purposes or under certain runtimes it is possible to ski
 For example see the <a href="https://github.com/floatdrop/require-from-string" class="external">require-from-string</a></p>
 </li>
 <li>
-<p><a href="http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#generateparserfactory" class="external"><strong>generateParserFactory</strong></a>
+<p><a href="http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#generateparserfactory" class="external"><strong>generateParserFactory</strong></a>
 This API skips string literal and directly evals (new Function(...)) the code and returns
 a factory that can be used to create Parser instances.</p>
 <p>This can be useful for development and testing purposes but be wary

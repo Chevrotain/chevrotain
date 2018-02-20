@@ -74,7 +74,7 @@
     <div class="Page__header">
         <h1><a href="FAQ.html">FAQ</a></h1>
                 <span style="float: left; font-size: 10px; color: gray;">
-            Saturday, February 10, 2018 4:05 PM        </span>
+            Tuesday, February 20, 2018 3:02 PM        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
             <a href="https://github.com/SAP/chevrotain/blob/master/docs/03_FAQ.md" target="_blank">Edit on GitHub</a>
         </span>
@@ -193,7 +193,7 @@ certain conditions.</p>
 <h3 id="page_Why-does-my-parser-appear-to-be-stuck-during-it-s-initialization"><a name="STUCK_AMBIGUITY"></a> Why does my parser appear to be stuck during it's initialization?</h3>
 <p>The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
-when the parser uses a larger than the default <a href="http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/iparserconfig.html#maxlookahead" class="external">maxLookahead</a>
+when the parser uses a larger than the default <a href="http://sap.github.io/chevrotain/documentation/2_0_2/interfaces/iparserconfig.html#maxlookahead" class="external">maxLookahead</a>
 and there are many (thousands) of ambiguous paths.</p>
 <p>To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
 the grammar ambiguity which is the root cause of the problem.</p>
@@ -226,7 +226,7 @@ module.exports = function (text) {
 But more importantly this pattern seems to help V8 Engine to avoid de-optimizations.
 Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.</p>
 <p>Note that this means that if your parser &quot;carries&quot; additional state, that state should also be reset.
-Simply override the Parser's <a href="http://sap.github.io/chevrotain/documentation/2_0_1/classes/parser.html#reset" class="external">reset</a> method
+Simply override the Parser's <a href="http://sap.github.io/chevrotain/documentation/2_0_2/classes/parser.html#reset" class="external">reset</a> method
 to accomplish that.</p>
 </li>
 <li>
@@ -324,7 +324,7 @@ See an example in the <a href="https://github.com/SAP/chevrotain/blob/ac21570b97
 <ol>
 <li>
 <p>Reduce the amount of Token position tracking the lexer performs.
-See The <a href="http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/ilexerconfig.html" class="external">ILexerConfig.positionTracking</a> property.</p>
+See The <a href="http://sap.github.io/chevrotain/documentation/2_0_2/interfaces/ilexerconfig.html" class="external">ILexerConfig.positionTracking</a> property.</p>
 </li>
 <li>
 <p><strong>Avoid creating parsing rules which only parse a single Terminal.</strong></p>
