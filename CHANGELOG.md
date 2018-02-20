@@ -1,3 +1,10 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [Runtime Error During re-sync Recovery](https://github.com/SAP/chevrotain/issues/668).
+
+
 ## 2.0.1 (2-11-2018)
 
 #### Bug Fixes

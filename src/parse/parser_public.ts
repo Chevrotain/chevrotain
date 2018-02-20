@@ -659,7 +659,7 @@ export class Parser {
             this.cstPostNonTerminal = NOOP
             this.getLastExplicitRuleShortName = this.getLastExplicitRuleShortNameNoCst
             this.getPreviousExplicitRuleShortName = this.getPreviousExplicitRuleShortNameNoCst
-            this.getPreviousExplicitRuleOccurenceIndex = this.getPreviousExplicitRuleOccurenceIndexNoCst
+            this.getLastExplicitRuleOccurrenceIndex = this.getLastExplicitRuleOccurrenceIndexNoCst
             this.manyInternal = this.manyInternalNoCst
             this.orInternal = this.orInternalNoCst
             this.optionInternal = this.optionInternalNoCst
@@ -2523,12 +2523,12 @@ export class Parser {
         }
 
         let currRuleShortName = this.getLastExplicitRuleShortName()
+        let currRuleIdx = this.getLastExplicitRuleOccurrenceIndex()
         let prevRuleShortName = this.getPreviousExplicitRuleShortName()
-        let prevRuleIdx = this.getPreviousExplicitRuleOccurenceIndex()
 
         return {
             ruleName: this.shortRuleNameToFullName(currRuleShortName),
-            idxInCallingRule: prevRuleIdx,
+            idxInCallingRule: currRuleIdx,
             inRule: this.shortRuleNameToFullName(prevRuleShortName)
         }
     }
@@ -3443,16 +3443,16 @@ export class Parser {
         return ruleStack[ruleStack.length - 2]
     }
 
-    private getPreviousExplicitRuleOccurenceIndex(): number {
+    private getLastExplicitRuleOccurrenceIndex(): number {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-            this.LAST_EXPLICIT_RULE_STACK.length - 2
+            this.LAST_EXPLICIT_RULE_STACK.length - 1
         ]
         return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
     }
 
-    private getPreviousExplicitRuleOccurenceIndexNoCst(): number {
+    private getLastExplicitRuleOccurrenceIndexNoCst(): number {
         let occurrenceStack = this.RULE_OCCURRENCE_STACK
-        return occurrenceStack[occurrenceStack.length - 2]
+        return occurrenceStack[occurrenceStack.length - 1]
     }
 
     private nestedRuleBeforeClause(
