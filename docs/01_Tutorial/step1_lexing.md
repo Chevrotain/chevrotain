@@ -16,7 +16,7 @@ In This tutorial we will implement a Lexer for a simple SQL Select statement lan
  ...
 ```
 
-A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/2_0_1/interfaces/itoken.html) vector.
+A Lexer transforms a string input into a [Token](http://sap.github.io/chevrotain/documentation/2_0_2/interfaces/itoken.html) vector.
 Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
 To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
@@ -35,7 +35,7 @@ From.PATTERN = /FROM/
 There is nothing much to it. The pattern/PATTERN property is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
-We will use the [**createToken** API](http://sap.github.io/chevrotain/documentation/2_0_1/globals.html#createtoken) 
+We will use the [**createToken** API](http://sap.github.io/chevrotain/documentation/2_0_2/globals.html#createtoken) 
 in the rest of tutorial because ES2015 has no support for static fields.
  
  
