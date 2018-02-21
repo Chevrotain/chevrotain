@@ -1,8 +1,0 @@
-before_install:
-  - npm install -g cypress-cli
-#  The tests run on gh-pages, so assuming the deploy to gh-pages finished before the tests ran
-script:
-  - cypress run --record
-branches:
-  only:
-    - gh-pages
