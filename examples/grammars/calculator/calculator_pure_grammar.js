@@ -196,7 +196,7 @@ class CalculatorInterpreter extends BaseCstVisitor {
     }
 
     multiplicationExpression(ctx) {
-        let result = this.visit(ctx.lhs[0])
+        let result = this.visit(ctx.lhs)
 
         // "rhs" key may be undefined as the grammar defines it as optional (MANY === zero or more).
         if (ctx.rhs) {

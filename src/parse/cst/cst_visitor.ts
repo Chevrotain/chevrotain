@@ -6,6 +6,7 @@ import {
     isArray,
     isEmpty,
     isFunction,
+    isUndefined,
     keys,
     map
 } from "../../utils/utils"
@@ -50,12 +51,14 @@ export function createBaseSemanticVisitorConstructor(
         visit: function(cstNode, param) {
             // enables writing more concise visitor methods when CstNode has only a single child
             if (isArray(cstNode)) {
-                if (cstNode.length > 0) {
-                    cstNode = cstNode[0]
-                } else {
-                    // enables passing optional CstNodes concisely.
-                    return undefined
-                }
+                // A CST Node's children dictionary can never have empty arrays as values
+                // If a key is defined there will be at least one element in the corresponding value array.
+                cstNode = cstNode[0]
+            }
+
+            // enables passing optional CstNodes concisely.
+            if (isUndefined(cstNode)) {
+                return undefined
             }
 
             if (cstNode.fullName !== undefined) {

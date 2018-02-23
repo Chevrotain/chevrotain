@@ -28,6 +28,7 @@ export interface CstNode {
 // TODO: use default generics arguments in typescript 2.3
 export interface ICstVisitor<IN, OUT> {
     // If an array is passed as the first argument it is equivalent to passing the first item of the array.
+    // To ease the handling of optional properties visit(undefined) === undefined
     visit(cstNode: CstNode | CstNode[], param?: IN): OUT
     validateVisitor(): void
 }

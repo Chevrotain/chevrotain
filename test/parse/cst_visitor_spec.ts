@@ -98,6 +98,8 @@ describe("The CSTVisitor", () => {
             }
 
             bamba(ctx, param) {
+                // inspecting handling of optional arguments
+                expect(this.visit(ctx.missingKey)).to.be.undefined
                 expect(keys(ctx)).to.deep.equal(["C"])
                 return 666 + param
             }

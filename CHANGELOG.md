@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+- [Easier handling of optional CST Nodes.](https://github.com/SAP/chevrotain/issues/666)
+
+
+
 ## 3.0.0 (2-23-2018)
 
 #### Breaking Changes
