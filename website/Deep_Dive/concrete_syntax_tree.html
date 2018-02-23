@@ -74,7 +74,7 @@
     <div class="Page__header">
         <h1><a href="../Deep_Dive/concrete_syntax_tree.html">Deep Dive</a> <svg class="Page__header--separator" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 477.175 477.175"><path d="M360.73 229.075l-225.1-225.1c-5.3-5.3-13.8-5.3-19.1 0s-5.3 13.8 0 19.1l215.5 215.5-215.5 215.5c-5.3 5.3-5.3 13.8 0 19.1 2.6 2.6 6.1 4 9.5 4 3.4 0 6.9-1.3 9.5-4l225.1-225.1c5.3-5.2 5.3-13.8.1-19z"/></svg> <a href="../Deep_Dive/concrete_syntax_tree.html">concrete syntax tree</a></h1>
                 <span style="float: left; font-size: 10px; color: gray;">
-            Tuesday, February 20, 2018 3:02 PM        </span>
+            Thursday, February 22, 2018 4:31 PM        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
             <a href="https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/concrete_syntax_tree.md" target="_blank">Edit on GitHub</a>
         </span>
@@ -84,11 +84,11 @@
     <div class="s-content">
         <h2 id="page_Automatic-Concrete-Syntax-Tree-Creation">Automatic Concrete Syntax Tree Creation</h2>
 <p>Chevrotain has the capability to <strong>automatically</strong> create a concrete syntax tree (CST)
-during parsing. A CST is a simple structure which represents the entire parse tree.
+during parsing. A CST is a simple structure which represents the <strong>entire</strong> parse tree.
 It contains information on every token parsed.</p>
 <p>The main advantage of using the automatic CST creation is that it enables writing &quot;pure&quot; grammars.
 This means that the semantic actions are <strong>not</strong> embedded into the grammar implementation but are instead
-completely separated from it.</p>
+completely <strong>separated</strong> from it.</p>
 <p>This separation of concerns makes the grammar easier to maintain
 and makes it easier to implement different capabilities on the grammar,
 for example: separate logic for compilation and for IDE support.</p>
@@ -101,17 +101,18 @@ This mean the <strong>exact original</strong> text could not be re-constructed f
 </li>
 <li>
 <p>An Abstract Syntax Tree would not represent the whole syntactic parse tree.
-It would normally only contain nodes related to specific parse tree nodes, but not all of those (mostly leaf nodes).</p>
+It would normally only contain nodes related to specific parse tree nodes,
+but not all of those (mostly leaf nodes).</p>
 </li>
 </ol>
 <h3 id="page_How-to-enable-CST-output">How to enable CST output?</h3>
-<p>In the future this capability will be enabled by default.
+<p>In the future this capability may be enabled by default.
 Currently this feature must be explicitly enabled by setting the <strong>outputCst</strong> flag.</p>
-<p>In the parser <a href="http://sap.github.io/chevrotain/documentation/2_0_2/interfaces/iparserconfig.html" class="external">configuration object</a>.</p>
+<p>In the parser <a href="http://sap.github.io/chevrotain/documentation/3_0_0/interfaces/iparserconfig.html" class="external">configuration object</a>.</p>
 <pre><code class="language-JavaScript">class MyParser extends chevrotain.Parser {
 
     constructor(input) {
-        super(input, allTokens, {outputCst : true})
+        super(input, allTokens, { outputCst : true })
     }
 }        
 </code></pre>
@@ -119,7 +120,7 @@ Currently this feature must be explicitly enabled by setting the <strong>outputC
 <p>The structure of the CST is very simple.</p>
 <ul>
 <li>
-<p>Run the CST creation example in the <a href="http://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output" class="external"><strong>online playground</strong></a>.</p>
+<p>View it by running the CST creation example in the <a href="http://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output" class="external"><strong>online playground</strong></a>.</p>
 </li>
 <li>
 <p>Note that the following examples are not runnable nor contain the full information.
@@ -193,6 +194,42 @@ output = {
   }
 }
 </code></pre>
+<p>Note that Terminals and Non-Terminals will only appear in the children object
+if they were actually encountered during parsing.
+This means that optional grammar productions may or may not appear in a CST node
+depending on the actual input, e.g:</p>
+<pre><code class="language-JavaScript">$.RULE(&quot;variableStatement&quot;, () =&gt; {
+    $.CONSUME(Var)
+    $.CONSUME(Identifier)
+    $.OPTION(() =&gt; {
+        $.CONSUME(Equals)
+        $.CONSUME(Integer)
+    })
+})
+
+input1 = &quot;var x&quot;
+
+output1 = {
+  name: &quot;variableStatement&quot;,  
+  children: {
+      Var : [&quot;var&quot;],
+      Identifier : [&quot;x&quot;]
+      // no &quot;Equals&quot; or &quot;Integer&quot; keys
+  }
+}
+
+input2 = &quot;var x = 5&quot;
+
+output2 = {
+  name: &quot;variableStatement&quot;,  
+  children: {
+      Var : [&quot;var&quot;],
+      Identifier : [&quot;x&quot;],
+      Equals: [&quot;=&quot;],
+      Integer: [&quot;5&quot;]
+  }
+}
+</code></pre>
 <h3 id="page_In-Lined-Rules">In-Lined Rules</h3>
 <p>So far the CST structure is quite simple, but how would a more complex grammar be handled?</p>
 <pre><code class="language-JavaScript">$.RULE(&quot;statements&quot;, () =&gt; {
@@ -221,11 +258,11 @@ It is possible to check for the existence of distinguishing terminals such as th
 But this is not a robust approach.</p>
 <pre><code class="language-javaScript">let cstResult = parser.qualifiedName()
 
-if (cstResult.children.Let.length &gt; 0) {
+if (cstResult.children.Let !== undefined) {
     // Let statement
     // do something...
 }
-else if (cstResult.children.Select.length &gt; 0) {
+else if (cstResult.children.Select !== undefined) {
     // Select statement
     // do something else.
 }
@@ -241,8 +278,8 @@ Would be completely wrapped in their own Non-Terminal rules.</p>
 })
 </code></pre>
 <p>This is the recommended approach in this case as more and more alternations are added the grammar rule
-will become too difficult to understand and maintain due to verbosity.</p>
-<p>However sometimes refactoring out rules is too much, this is where <strong>in-lined</strong> rules arrive to the rescue.</p>
+will become too difficult to understand and maintain due to verbosity.<br />
+However, sometimes refactoring out rules is too much, this is where <strong>in-lined</strong> rules arrive to the rescue.</p>
 <pre><code class="language-JavaScript">$.RULE(&quot;statements&quot;, () =&gt; {
     $.OR([
         // let x = 5
@@ -269,7 +306,8 @@ will become too difficult to understand and maintain due to verbosity.</p>
 })
 
 output = {
-  name: &quot;statements&quot;,  
+  name: &quot;statements&quot;,
+  // only one of they keys depending on the actual alternative chosen  
   children: {
       $letStatement : [/*...*/],
       $$selectStatement : [/*...*/]
@@ -335,27 +373,29 @@ output = {
       Select: [&quot;select&quot;],
       Identifier: [&quot;age, persons&quot;],
       From: [&quot;from&quot;],
-      Where: [/*nothing here, due to parse error*/],
-      expression: [/*nothing here, due to parse error*/],
+      // No &quot;Where&quot; key d,ue to the parse error
+      // No &quot;expression&quot; key due to the parse error
   },
   // This marks a recovered node.
   recoveredNode: true
 }
 </code></pre>
 <p>This accessibility of <strong>partial parsing results</strong> means some post-parsing logic
-may be able to perform farther analysis for example: offer auto-fix suggestions or provide better error messages.</p>
+may be able to perform farther analysis.
+for example: offering auto-fix suggestions or provide better error messages.</p>
 <h3 id="page_Traversing-a-CST-Structure">Traversing a CST Structure.</h3>
 <p>So we now know how to create a CST and it's internal structure.
 But how do we traverse this structure and perform semantic actions?
-Examples for such semantic actions:</p>
+Some examples for such semantic actions:</p>
 <ul>
 <li>Creation of an Abstract Syntax Tree (AST) to be later used in the rest of the compilation pipeline.</li>
 <li>Running the input text in an interpreter, for example a Calculator's grammar and input can be evaluated to
 a numerical value.</li>
-<li>Extracting specific pieces of information from the input, I.E data mining.</li>
+<li>Extracting specific pieces of information from the input.</li>
 </ul>
 <p>One option would be to &quot;manually&quot; recursively &quot;walk&quot; the output CST structure.</p>
-<pre><code class="language-javascript">export function toAst(cst) {
+<pre><code class="language-javascript">// Tree Walker
+export function toAst(cst) {
 	const children = cst.children
 	switch (cst.name) {
 		case &quot;selectStatement&quot;: {
@@ -491,14 +531,27 @@ It is not possible to return values from the visit methods because
 the default implementation does not return any value, only traverses the CST
 thus the chain of returned values will be broken.</p>
 <h3 id="page_Performance-of-CST-building">Performance of CST building.</h3>
-<p>On V8 (Chrome/Node) building the CST was measured at about <strong>65%</strong> of the performance
-versus a pure grammar's runtime. This is substantial but considering Chevrotain is already <a href="http://sap.github.io/chevrotain/performance/" class="external">very fast</a>
-and that parsing is usually just one part of a larger flow, than unless there a special edge case which requires
-maximum performance than the benefits of using the CST (modularity / ease of maintenance) by far outweigh the costs (reduced performance).</p>
+<p>On V8 (Chrome/Node) building the CST was measured at anywhere from 35%-90% of the performance
+versus a pure grammar's runtime (no output) depending on the grammar used.
+Particularly on its level of rules nesting.</p>
+<p>This may be substantial yet please consider:</p>
 <ul>
-<li>Online <a href="http://sap.github.io/chevrotain/performance/cst/" class="external">CST Benchmark</a>
+<li>
+<p>Chevrotain is already <a href="http://sap.github.io/chevrotain/performance/" class="external">very fast</a>
+So at worst at will degrade to just &quot;fast&quot;...</p>
+</li>
+<li>
+<p>This comparison is not fair as a pure grammar that has no output also has very little use...
+The right comparison would be to versus embedding actions that built some alternative CST/AST output structure.</p>
+</li>
+<li>
+<p>Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
+would be reduced.</p>
 </li>
 </ul>
+<p>It is therefore recommended to use the CST creation capabilities<br />
+as its benefits (modularity / ease of maintenance) by far outweigh the costs (potentially reduced performance).
+except in unique edge cases.</p>
     </div>
 
         <nav>
