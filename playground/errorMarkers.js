@@ -243,7 +243,8 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
 
 
 var locateRuleDefinition = _.partial(locateGrammarDefinition, "RULE")
-var locateTokenDefinition = _.partial(locateGrammarDefinition, "extendToken")
+// TODO: this is not working, need to handle config object pattern.
+var locateTokenDefinition = _.partial(locateGrammarDefinition, "createToken")
 
 /**
  * @param {string} dslName - the chevrotain DSL name to look for (CONSUME/SUBRULE normally)
@@ -286,8 +287,8 @@ var locateAtLeastOneSepSeparator = _.partial(locateGrammarUsage, "AT_LEAST_ONE_S
  * @param {string} paramName - the name of the parameter for the DSL (CONSUME(XXX))
  * @param {{posFromIndex:{Function(Number):{line:number, ch:number}}}} positionHelper
  * @param {string} [text=fullText] - a subset of the full text to search in. by default will look in ALL the text.
- * @param {string} [occurrenceIdx] - a string which is a number between 1-5. This is the index
- *                                 of the SUBRULE[1-5]?(....)
+ * @param {string} [occurrenceIdx] - a string which is a number between 0-9. This is the index
+ *                                 of the SUBRULE[0-9]?(....)
  *
  * @return {{start:{line:number, column:number},
  *             end:{line:number, column:number}}
@@ -297,14 +298,10 @@ function locateGrammarUsage(dslName, fullText, paramName, positionHelper, text, 
         text = fullText
     }
 
-    if (occurrenceIdx === undefined) {
+    if (occurrenceIdx === undefined || occurrenceIdx === "undefined") {
         occurrenceIdx = '\\d?'
     }
 
-    // occurrenceIdx 1 may be implicit
-    if (occurrenceIdx === "1") {
-        occurrenceIdx = '1?'
-    }
     var textStartOffset = fullText.indexOf(text)
     // the capturing group for the '.rule(' part of the seekerRegExp
     var patternPrefixGroup = 1
