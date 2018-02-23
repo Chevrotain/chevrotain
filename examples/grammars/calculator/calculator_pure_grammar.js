@@ -138,9 +138,9 @@ class CalculatorPure extends Parser {
         $.RULE("powerFunction", () => {
             $.CONSUME(PowerFunc)
             $.CONSUME(LParen)
-            $.SUBRULE($.expression)
+            $.SUBRULE($.expression, { LABEL: "base" })
             $.CONSUME(Comma)
-            $.SUBRULE2($.expression)
+            $.SUBRULE2($.expression, { LABEL: "exponent" })
             $.CONSUME(RParen)
         })
 
@@ -168,12 +168,13 @@ class CalculatorInterpreter extends BaseCstVisitor {
     }
 
     expression(ctx) {
-        return this.visit(ctx.additionExpression[0])
+        // visiting an array is equivalent to visiting its first element.
+        return this.visit(ctx.additionExpression)
     }
 
     // Note the usage if the "rhs" and "lhs" labels to increase the readability.
     additionExpression(ctx) {
-        let result = this.visit(ctx.lhs[0])
+        let result = this.visit(ctx.lhs)
 
         // "rhs" key may be undefined as the grammar defines it as optional (MANY === zero or more).
         if (ctx.rhs) {
@@ -218,23 +219,23 @@ class CalculatorInterpreter extends BaseCstVisitor {
 
     atomicExpression(ctx) {
         if (ctx.parenthesisExpression) {
-            return this.visit(ctx.parenthesisExpression[0])
+            return this.visit(ctx.parenthesisExpression)
         } else if (ctx.NumberLiteral) {
             return parseInt(ctx.NumberLiteral[0].image, 10)
         } else if (ctx.powerFunction) {
-            return this.visit(ctx.powerFunction[0])
+            return this.visit(ctx.powerFunction)
         }
     }
 
     parenthesisExpression(ctx) {
-        // The ctx will also contain the categorieshesis tokens, but we don't care about those
+        // The ctx will also contain the parenthesis tokens, but we don't care about those
         // in the context of calculating the result.
-        return this.visit(ctx.expression[0])
+        return this.visit(ctx.expression)
     }
 
     powerFunction(ctx) {
-        let base = this.visit(ctx.expression[0])
-        let exponent = this.visit(ctx.expression[1])
+        const base = this.visit(ctx.base)
+        const exponent = this.visit(ctx.exponent)
         return Math.pow(base, exponent)
     }
 }
