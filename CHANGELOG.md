@@ -6,7 +6,7 @@
 
 #### Major Changes
 
-- [Optional Labels for CST Nodes](https://github.com/SAP/chevrotain/issues/668)
+- [Optional Labels for CST Nodes](https://github.com/SAP/chevrotain/issues/666)
 
 - [Performance Improvements for CST Creation](https://github.com/SAP/chevrotain/issues/572)
 
