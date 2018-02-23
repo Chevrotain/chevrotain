@@ -375,6 +375,24 @@ export interface ConsumeMethodOpts {
      *  This will override any error message provided by the parser's "errorMessageProvider"
      */
     ERR_MSG?: string
+
+    /**
+     * A label to be used instead of the TokenType name in the created CST.
+     */
+    LABEL?: string
+}
+
+export interface SubruleMethodOpts {
+    /**
+     * The arguments to parameterized rules, see:
+     * @link https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
+     */
+    ARGS?: any[]
+
+    /**
+     * A label to be used instead of the TokenType name in the created CST.
+     */
+    LABEL?: string
 }
 
 export type Predicate = () => boolean
@@ -538,9 +556,6 @@ export class Parser {
                 clonedProductions.values(),
                 parserInstance.fullRuleNameToShort
             )
-            cache
-                .getCstDictDefPerRuleForClass(className)
-                .putAll(cstAnalysisResult.dictDef)
             cache.CLASS_TO_ALL_RULE_NAMES.put(
                 className,
                 cstAnalysisResult.allRuleNames
@@ -671,9 +686,6 @@ export class Parser {
         this.className = classNameFromInstance(this)
         this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
         this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
-        this.cstDictDefForRule = cache.getCstDictDefPerRuleForClass(
-            this.className
-        )
 
         if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
             this.definitionErrors = []
@@ -949,7 +961,7 @@ export class Parser {
      *                                  //     the rule 'parseQualifiedName'
      * }
      *
-     * @param {TokenType} tokType - The Type of the token to be consumed.
+     * @param tokType - The Type of the token to be consumed.
      * @param options - optional properties to modify the behavior of CONSUME.
      */
     protected CONSUME1(
@@ -1045,9 +1057,9 @@ export class Parser {
      */
     protected SUBRULE<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 0, args)
+        return this.subruleInternal(ruleToCall, 0, options)
     }
 
     /**
@@ -1070,9 +1082,9 @@ export class Parser {
      */
     protected SUBRULE1<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 1, args)
+        return this.subruleInternal(ruleToCall, 1, options)
     }
 
     /**
@@ -1080,9 +1092,9 @@ export class Parser {
      */
     protected SUBRULE2<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 2, args)
+        return this.subruleInternal(ruleToCall, 2, options)
     }
 
     /**
@@ -1090,9 +1102,9 @@ export class Parser {
      */
     protected SUBRULE3<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 3, args)
+        return this.subruleInternal(ruleToCall, 3, options)
     }
 
     /**
@@ -1100,9 +1112,9 @@ export class Parser {
      */
     protected SUBRULE4<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 4, args)
+        return this.subruleInternal(ruleToCall, 4, options)
     }
 
     /**
@@ -1110,9 +1122,9 @@ export class Parser {
      */
     protected SUBRULE5<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 5, args)
+        return this.subruleInternal(ruleToCall, 5, options)
     }
 
     /**
@@ -1120,9 +1132,9 @@ export class Parser {
      */
     protected SUBRULE6<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 6, args)
+        return this.subruleInternal(ruleToCall, 6, options)
     }
 
     /**
@@ -1130,9 +1142,9 @@ export class Parser {
      */
     protected SUBRULE7<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 7, args)
+        return this.subruleInternal(ruleToCall, 7, options)
     }
 
     /**
@@ -1140,9 +1152,9 @@ export class Parser {
      */
     protected SUBRULE8<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 8, args)
+        return this.subruleInternal(ruleToCall, 8, options)
     }
 
     /**
@@ -1150,9 +1162,9 @@ export class Parser {
      */
     protected SUBRULE9<T>(
         ruleToCall: (idx: number) => T,
-        args: any[] = undefined
+        options?: SubruleMethodOpts
     ): T {
-        return this.subruleInternal(ruleToCall, 9, args)
+        return this.subruleInternal(ruleToCall, 9, options)
     }
 
     /**
@@ -2104,10 +2116,17 @@ export class Parser {
     protected subruleInternal<T>(
         ruleToCall: (idx: number) => T,
         idx: number,
-        args: any[]
+        options?: SubruleMethodOpts
     ) {
-        let ruleResult = ruleToCall.call(this, idx, args)
-        this.cstPostNonTerminal(ruleResult, (<any>ruleToCall).ruleName)
+        const args = options !== undefined ? options.ARGS : undefined
+        const ruleResult = ruleToCall.call(this, idx, args)
+
+        this.cstPostNonTerminal(
+            ruleResult,
+            options !== undefined && options.LABEL !== undefined
+                ? options.LABEL
+                : (<any>ruleToCall).ruleName
+        )
 
         return ruleResult
     }
@@ -2185,7 +2204,12 @@ export class Parser {
             }
         }
 
-        this.cstPostTerminal(tokType, consumedToken)
+        this.cstPostTerminal(
+            options !== undefined && options.LABEL !== undefined
+                ? options.LABEL
+                : tokType.tokenName,
+            consumedToken
+        )
         return consumedToken
     }
 
@@ -2659,14 +2683,13 @@ export class Parser {
         nestedName: string,
         shortName: string | number
     ): void {
-        let initDef = this.cstDictDefForRule.get(shortName)
         this.CST_STACK.push({
             name: nestedName,
             fullName:
                 this.shortRuleNameToFull.get(
                     this.getLastExplicitRuleShortName()
                 ) + nestedName,
-            children: initDef()
+            children: {}
         })
     }
 
@@ -2675,10 +2698,9 @@ export class Parser {
         shortName: string | number
     ): void {
         this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        let initDef = this.cstDictDefForRule.get(shortName)
         this.CST_STACK.push({
             name: fullRuleName,
-            children: initDef()
+            children: {}
         })
     }
 
@@ -3504,10 +3526,10 @@ export class Parser {
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
-    private cstPostTerminal(tokType: TokenType, consumedToken: IToken): void {
-        let currTokTypeName = tokType.tokenName
+    private cstPostTerminal(key: string, consumedToken: IToken): void {
+        // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
-        addTerminalToCst(rootCst, consumedToken, currTokTypeName)
+        addTerminalToCst(rootCst, consumedToken, key)
     }
 
     private cstPostNonTerminal(ruleCstResult: CstNode, ruleName: string): void {

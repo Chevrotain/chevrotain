@@ -1,12 +1,11 @@
 import { IToken, tokenName } from "../../scan/tokens_public"
-import { CstNode } from "./cst_public"
+import { CstChildrenDictionary, CstNode } from "./cst_public"
 import {
     cloneObj,
     drop,
     forEach,
     isEmpty,
-    isUndefined,
-    map
+    isUndefined
 } from "../../utils/utils"
 import { HashTable } from "../../lang/lang_extensions"
 import {
@@ -40,7 +39,11 @@ export function addTerminalToCst(
     token: IToken,
     tokenTypeName: string
 ): void {
-    ;(node.children[tokenTypeName] as Array<IToken>).push(token)
+    if (node.children[tokenTypeName] === undefined) {
+        node.children[tokenTypeName] = [token]
+    } else {
+        node.children[tokenTypeName].push(token)
+    }
 }
 
 export function addNoneTerminalToCst(
@@ -48,7 +51,11 @@ export function addNoneTerminalToCst(
     ruleName: string,
     ruleResult: any
 ): void {
-    ;(node.children[ruleName] as Array<CstNode>).push(ruleResult)
+    if (node.children[ruleName] === undefined) {
+        node.children[ruleName] = [ruleResult]
+    } else {
+        node.children[ruleName].push(ruleResult)
+    }
 }
 
 export interface DefAndKeyAndName {
@@ -170,18 +177,15 @@ export function analyzeCst(
     topRules: Rule[],
     fullToShortName: HashTable<number>
 ): {
-    dictDef: HashTable<Function>
     allRuleNames: string[]
 } {
-    let result = { dictDef: new HashTable<Function>(), allRuleNames: [] }
+    let result = {
+        dictDef: new HashTable<CstChildrenDictionary>(),
+        allRuleNames: []
+    }
 
     forEach(topRules, currTopRule => {
-        let currChildrenNames = buildChildDictionaryDef(currTopRule.definition)
         let currTopRuleShortName = fullToShortName.get(currTopRule.name)
-        result.dictDef.put(
-            currTopRuleShortName,
-            buildInitDefFunc(currChildrenNames)
-        )
         result.allRuleNames.push(currTopRule.name)
 
         let namedCollectorVisitor = new NamedDSLMethodsCollectorVisitor(
@@ -189,137 +193,9 @@ export function analyzeCst(
         )
         currTopRule.accept(namedCollectorVisitor)
         forEach(namedCollectorVisitor.result, ({ def, key, name }) => {
-            let currNestedChildrenNames = buildChildDictionaryDef(def)
-            result.dictDef.put(key, buildInitDefFunc(currNestedChildrenNames))
             result.allRuleNames.push(currTopRule.name + name)
         })
     })
 
-    return result
-}
-function buildInitDefFunc(childrenNames: string[]): Function {
-    let funcString = `return {\n`
-
-    funcString += map(childrenNames, currName => `"${currName}" : []`).join(
-        ",\n"
-    )
-    funcString += `}`
-
-    // major performance optimization, faster to create the children dictionary this way
-    // versus iterating over the childrenNames each time.
-    return Function(funcString)
-}
-
-export function buildChildDictionaryDef(initialDef: IProduction[]): string[] {
-    let result = []
-
-    let possiblePaths = []
-    possiblePaths.push({ def: initialDef })
-
-    let currDef: IProduction[]
-    let currInIteration
-    let currInOption
-    let currResult
-
-    function addSingleItemToResult(itemName) {
-        result.push(itemName)
-
-        let nextPath = {
-            def: drop(currDef),
-            inIteration: currInIteration,
-            inOption: currInOption,
-            currResult: cloneObj(currResult)
-        }
-        possiblePaths.push(nextPath)
-    }
-
-    while (!isEmpty(possiblePaths)) {
-        let currPath = possiblePaths.pop()
-
-        currDef = currPath.def
-        currInIteration = currPath.inIteration
-        currInOption = currPath.inOption
-        currResult = currPath.currResult
-
-        // For Example: an empty path could exist in a valid grammar in the case of an EMPTY_ALT
-        if (isEmpty(currDef)) {
-            continue
-        }
-
-        let prod = currDef[0]
-        if (prod instanceof Terminal) {
-            let terminalName = tokenName(prod.terminalType)
-            addSingleItemToResult(terminalName)
-        } else if (prod instanceof NonTerminal) {
-            let nonTerminalName = prod.nonTerminalName
-            addSingleItemToResult(nonTerminalName)
-        } else if (prod instanceof Option) {
-            if (!isUndefined(prod.name)) {
-                addSingleItemToResult(prod.name)
-            } else {
-                let nextPathWith = {
-                    def: prod.definition.concat(drop(currDef))
-                }
-                possiblePaths.push(nextPathWith)
-            }
-        } else if (
-            prod instanceof RepetitionMandatory ||
-            prod instanceof Repetition
-        ) {
-            if (!isUndefined(prod.name)) {
-                addSingleItemToResult(prod.name)
-            } else {
-                let nextDef = prod.definition.concat(drop(currDef))
-                let nextPath = {
-                    def: nextDef
-                }
-                possiblePaths.push(nextPath)
-            }
-        } else if (
-            prod instanceof RepetitionMandatoryWithSeparator ||
-            prod instanceof RepetitionWithSeparator
-        ) {
-            if (!isUndefined(prod.name)) {
-                addSingleItemToResult(prod.name)
-            } else {
-                let separatorGast = new Terminal({
-                    terminalType: prod.separator
-                })
-                let secondIteration: any = new Repetition({
-                    definition: [<any>separatorGast].concat(prod.definition),
-                    idx: prod.idx
-                })
-                // Hack: X (, X)* --> (, X) because it is identical in terms of identifying "isCollection?"
-                let nextDef = [secondIteration].concat(drop(currDef))
-                let nextPath = {
-                    def: nextDef
-                }
-                possiblePaths.push(nextPath)
-            }
-        } else if (prod instanceof Alternation) {
-            /* istanbul ignore else */
-            // IGNORE ABOVE ELSE
-            if (!isUndefined(prod.name)) {
-                addSingleItemToResult(prod.name)
-            } else {
-                // the order of alternatives is meaningful, FILO (Last path will be traversed first).
-                for (let i = prod.definition.length - 1; i >= 0; i--) {
-                    let currAlt: any = prod.definition[i]
-                    // named alternatives
-                    if (!isUndefined(currAlt.name)) {
-                        addSingleItemToResult(currAlt.name)
-                    } else {
-                        let newDef = currAlt.definition.concat(drop(currDef))
-                        let currAltPath = {
-                            def: newDef
-                        }
-                        possiblePaths.push(currAltPath)
-                    }
-                }
-            }
-        } else {
-            /* istanbul ignore next */ throw Error("non exhaustive match")
-        }
-    }
     return result
 }

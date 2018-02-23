@@ -7,12 +7,13 @@
 <body>
 
 <script src="../worker_api.js"></script>
+<script src="../options.js"></script>
 
 <script>
     // relative ti thr worker impel file
     initWorker({
         startRule:     "stylesheet",
-        parserConfig:  {outputCst: true},
+        parserConfig:  window.globalOptions.dev,
         importScripts: [
             "../../lib/chevrotain.js",
             "https://unpkg.com/xregexp@3.2.0/xregexp-all.js",

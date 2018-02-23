@@ -86,12 +86,12 @@ function defineRecognizerSpecs(
                     }
 
                     public topRule = this.RULE("topRule", () => {
-                        this.SUBRULE(this.subRule, [6, "a"])
-                        this.SUBRULE1(this.subRule2, [5, "b"])
-                        this.SUBRULE2(this.subRule, [4, "c"])
-                        this.SUBRULE3(this.subRule, [3, "d"])
-                        this.SUBRULE4(this.subRule, [2, "e"])
-                        this.SUBRULE5(this.subRule, [1, "f"])
+                        this.SUBRULE(this.subRule, { ARGS: [6, "a"] })
+                        this.SUBRULE1(this.subRule2, { ARGS: [5, "b"] })
+                        this.SUBRULE2(this.subRule, { ARGS: [4, "c"] })
+                        this.SUBRULE3(this.subRule, { ARGS: [3, "d"] })
+                        this.SUBRULE4(this.subRule, { ARGS: [2, "e"] })
+                        this.SUBRULE5(this.subRule, { ARGS: [1, "f"] })
                         return {
                             numbers: this.numbers,
                             letters: this.letters

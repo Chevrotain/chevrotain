@@ -7,9 +7,9 @@ const toAstEmbedded = require("./step3b_actions_embedded").toAst
 describe("Chevrotain Tutorial", () => {
     context("Step 3a - Actions (semantics) using CST Visitor", () => {
         it("Can convert a simple input to an AST", () => {
-            let inputText =
+            const inputText =
                 "SELECT column1, column2 FROM table2 WHERE column2 > 3"
-            let ast = toAstVisitor(inputText)
+            const ast = toAstVisitor(inputText)
 
             expect(ast).to.deep.equal({
                 type: "SELECT_STMT",
@@ -36,9 +36,9 @@ describe("Chevrotain Tutorial", () => {
 
     context("Step 3a - Actions (semantics) using embedded actions", () => {
         it("Can convert a simple input to an AST", () => {
-            let inputText =
+            const inputText =
                 "SELECT column1, column2 FROM table2 WHERE column2 > 3"
-            let ast = toAstEmbedded(inputText)
+            const ast = toAstEmbedded(inputText)
 
             expect(ast).to.deep.equal({
                 type: "SELECT_STMT",

@@ -32,7 +32,7 @@ class SelectParser extends chevrotain.Parser {
 
     constructor(input) {
         // The "outputCst" flag will cause the parser to create a CST structure on rule invocation
-        super(input, allTokens, {outputCst: true})
+        super(input, allTokens, { outputCst: true })
         
         /* rule definitions... */
         
@@ -236,10 +236,10 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
     
     expression(ctx) {
-        const lhs = this.visit(ctx.atomicExpression[0])
-        // The second [1] atomicExpression is the right hand side
-        const rhs = this.visit(ctx.atomicExpression[1])
+        // Note the usage of the "rhs" and "lhs" labels defined in step 2 in the expression rule.
+        const lhs = this.visit(ctx.lhs[0])
         const operator = this.visit(ctx.relationalOperator)
+        const rhs = this.visit(ctx.rhs[0])
         
         return {
             type: "EXPRESSION", 
@@ -251,7 +251,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     
     // these two visitor methods will return a string.
     atomicExpression(ctx) {
-        if (ctx.Integer[0]) {
+        if (ctx.Integer) {
             return ctx.Integer[0].image
         }
         else {
@@ -260,7 +260,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
     
     relationalOperator(ctx) {
-        if (ctx.GreaterThan[0]) {
+        if (ctx.GreaterThan) {
             return ctx.GreaterThan[0].image
         }
         else {

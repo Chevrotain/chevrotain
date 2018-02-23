@@ -100,21 +100,22 @@ class CalculatorPure extends Parser {
         // The precedence of binary expressions is determined by how far down the Parse Tree
         // The binary expression appears.
         $.RULE("additionExpression", () => {
-            $.SUBRULE($.multiplicationExpression)
+            // using labels can make the CST processing easier
+            $.SUBRULE($.multiplicationExpression, { LABEL: "lhs" })
             $.MANY(() => {
                 // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
                 $.CONSUME(AdditionOperator)
                 //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-                $.SUBRULE2($.multiplicationExpression)
+                $.SUBRULE2($.multiplicationExpression, { LABEL: "rhs" })
             })
         })
 
         $.RULE("multiplicationExpression", () => {
-            $.SUBRULE($.atomicExpression)
+            $.SUBRULE($.atomicExpression, { LABEL: "lhs" })
             $.MANY(() => {
                 $.CONSUME(MultiplicationOperator)
                 //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-                $.SUBRULE2($.atomicExpression)
+                $.SUBRULE2($.atomicExpression, { LABEL: "rhs" })
             })
         })
 
@@ -170,49 +171,57 @@ class CalculatorInterpreter extends BaseCstVisitor {
         return this.visit(ctx.additionExpression[0])
     }
 
+    // Note the usage if the "rhs" and "lhs" labels to increase the readability.
     additionExpression(ctx) {
-        let lhs = this.visit(ctx.multiplicationExpression[0])
-        let result = lhs
-        for (let i = 1; i < ctx.multiplicationExpression.length; i++) {
-            // There is one less operator than operands
-            let operator = ctx.AdditionOperator[i - 1]
-            let rhs = this.visit(ctx.multiplicationExpression[i])
+        let result = this.visit(ctx.lhs[0])
 
-            if (tokenMatcher(operator, Plus)) {
-                result += rhs
-            } else {
-                // Minus
-                result -= rhs
-            }
+        // "rhs" key may be undefined as the grammar defines it as optional (MANY === zero or more).
+        if (ctx.rhs) {
+            ctx.rhs.forEach((rhsOperand, idx) => {
+                // there will be one operator for each rhs operand
+                let rhsValue = this.visit(rhsOperand)
+                let operator = ctx.AdditionOperator[idx]
+
+                if (tokenMatcher(operator, Plus)) {
+                    result += rhsValue
+                } else {
+                    // Minus
+                    result -= rhsValue
+                }
+            })
         }
+
         return result
     }
 
     multiplicationExpression(ctx) {
-        let lhs = this.visit(ctx.atomicExpression[0])
-        let result = lhs
-        for (let i = 1; i < ctx.atomicExpression.length; i++) {
-            // There is one less operator than operands
-            let operator = ctx.MultiplicationOperator[i - 1]
-            let rhs = this.visit(ctx.atomicExpression[i])
+        let result = this.visit(ctx.lhs[0])
 
-            if (tokenMatcher(operator, Multi)) {
-                result *= rhs
-            } else {
-                // Division
-                result /= rhs
-            }
+        // "rhs" key may be undefined as the grammar defines it as optional (MANY === zero or more).
+        if (ctx.rhs) {
+            ctx.rhs.forEach((rhsOperand, idx) => {
+                // there will be one operator for each rhs operand
+                let rhsValue = this.visit(rhsOperand)
+                let operator = ctx.MultiplicationOperator[idx]
+
+                if (tokenMatcher(operator, Multi)) {
+                    result *= rhsValue
+                } else {
+                    // Division
+                    result /= rhsValue
+                }
+            })
         }
+
         return result
     }
 
     atomicExpression(ctx) {
-        if (ctx.parenthesisExpression.length > 0) {
-            // TODO: allow accepting array for less verbose syntax
+        if (ctx.parenthesisExpression) {
             return this.visit(ctx.parenthesisExpression[0])
-        } else if (ctx.NumberLiteral.length > 0) {
+        } else if (ctx.NumberLiteral) {
             return parseInt(ctx.NumberLiteral[0].image, 10)
-        } else if (ctx.powerFunction.length > 0) {
+        } else if (ctx.powerFunction) {
             return this.visit(ctx.powerFunction[0])
         }
     }

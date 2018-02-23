@@ -1,3 +1,22 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+- [See BREAKING_CHANGES.md](https://github.com/SAP/chevrotain/blob/master/BREAKING_CHANGES.md#300)
+
+#### Major Changes
+
+- [Optional Labels for CST Nodes](https://github.com/SAP/chevrotain/issues/668)
+
+- [Performance Improvements for CST Creation](https://github.com/SAP/chevrotain/issues/572)
+
+#### Minor Changes
+
+- The CST creation no longer relies on "new Function()" calls and can thus be used
+  in environments with [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) enabled.
+
+
+
 ## 2.0.2 (2-21-2018)
 
 #### Bug Fixes
@@ -5,11 +24,13 @@
 - [Runtime Error During re-sync Recovery](https://github.com/SAP/chevrotain/issues/668).
 
 
+
 ## 2.0.1 (2-11-2018)
 
 #### Bug Fixes
 
 - Removed redundant dependency.
+
 
 
 ## 2.0.0 (2-11-2018)

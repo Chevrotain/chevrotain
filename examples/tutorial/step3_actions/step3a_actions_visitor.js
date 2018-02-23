@@ -24,15 +24,15 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 
     selectStatement(ctx) {
         // "this.visit" can be used to visit none-terminals and will invoke the correct visit method for the CstNode passed.
-        let select = this.visit(ctx.selectClause)
+        const select = this.visit(ctx.selectClause)
 
         //  "this.visit" can work on either a CstNode or an Array of CstNodes.
         //  If an array is passed (ctx.fromClause is an array) it is equivalent
         //  to passing the first element of that array
-        let from = this.visit(ctx.fromClause)
+        const from = this.visit(ctx.fromClause)
 
         // "whereClause" is optional, "this.visit" will ignore empty arrays (optional)
-        let where = this.visit(ctx.whereClause)
+        const where = this.visit(ctx.whereClause)
 
         return {
             type: "SELECT_STMT",
@@ -45,7 +45,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     selectClause(ctx) {
         // Each Terminal or Non-Terminal in a grammar rule are collected into
         // an array with the same name(key) in the ctx object.
-        let columns = ctx.Identifier.map(identToken => identToken.image)
+        const columns = ctx.Identifier.map(identToken => identToken.image)
 
         return {
             type: "SELECT_CLAUSE",
@@ -54,7 +54,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
 
     fromClause(ctx) {
-        let tableName = ctx.Identifier[0].image
+        const tableName = ctx.Identifier[0].image
 
         return {
             type: "FROM_CLAUSE",
@@ -63,7 +63,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
 
     whereClause(ctx) {
-        let condition = this.visit(ctx.expression)
+        const condition = this.visit(ctx.expression)
 
         return {
             type: "WHERE_CLAUSE",
@@ -72,10 +72,10 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
 
     expression(ctx) {
-        let lhs = this.visit(ctx.atomicExpression[0])
-        // The second [1] atomicExpression is the right hand side
-        let rhs = this.visit(ctx.atomicExpression[1])
-        let operator = this.visit(ctx.relationalOperator)
+        // Note the usage of the "rhs" and "lhs" labels defined in step 2 in the expression rule.
+        const lhs = this.visit(ctx.lhs[0])
+        const operator = this.visit(ctx.relationalOperator)
+        const rhs = this.visit(ctx.rhs[0])
 
         return {
             type: "EXPRESSION",
@@ -87,7 +87,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 
     // these two visitor methods will return a string.
     atomicExpression(ctx) {
-        if (ctx.Integer[0]) {
+        if (ctx.Integer) {
             return ctx.Integer[0].image
         } else {
             return ctx.Identifier[0].image
@@ -95,7 +95,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
 
     relationalOperator(ctx) {
-        if (ctx.GreaterThan[0]) {
+        if (ctx.GreaterThan) {
             return ctx.GreaterThan[0].image
         } else {
             return ctx.LessThan[0].image
@@ -108,13 +108,13 @@ const toAstVisitorInstance = new SQLToAstVisitor()
 
 module.exports = {
     toAst: function(inputText) {
-        let lexResult = selectLexer.lex(inputText)
+        const lexResult = selectLexer.lex(inputText)
 
         // ".input" is a setter which will reset the parser's internal's state.
         parserInstance.input = lexResult.tokens
 
         // Automatic CST created when parsing
-        let cst = parserInstance.selectStatement()
+        const cst = parserInstance.selectStatement()
 
         if (parserInstance.errors.length > 0) {
             throw Error(
@@ -123,7 +123,7 @@ module.exports = {
             )
         }
 
-        let ast = toAstVisitorInstance.visit(cst)
+        const ast = toAstVisitorInstance.visit(cst)
 
         return ast
     }

@@ -1,3 +1,27 @@
+## 3.0.0
+
+- A CST Node's children dictionary no longer contains empty arrays
+  for unmatched terminals and non-terminals. This means that some existence checks
+  conditions in the CST visitor must be refactored, for example:
+  
+  ```javascript
+  class MyVisitor extends SomeBaseVisitor {
+      atomicExpression(ctx) {
+          // BAD - will fail due to "TypeError: Cannot read property '0' of undefined"
+          if (ctx.Integer[0]) {
+              return ctx.Integer[0].image
+          }
+          // GOOD - safe check
+          else if (ctx.Identifier) {
+              // if a property exists it's value is guaranteed to have at least one element.
+              return ctx.Identifier[0].image
+          }
+      }
+  }
+  ```
+
+
+
 ## 2.0.0
 
 - The creation of TokenTypes using the class keyword syntax has been soft deprecated.

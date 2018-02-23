@@ -526,7 +526,7 @@ class ECMAScript5Parser extends Parser {
                         // 'in' is only possible if there was just one VarDec
                         // TODO: when CST output is enabled this check breaks
                         inPossible = numOfVars === 1
-                        $.SUBRULE($.ForHeaderParts, [inPossible])
+                        $.SUBRULE($.ForHeaderParts, { ARGS: [inPossible] })
                     }
                 },
                 {
@@ -535,7 +535,7 @@ class ECMAScript5Parser extends Parser {
                             const headerExp = $.SUBRULE($.ExpressionNoIn)
                             inPossible = this.canInComeAfterExp(headerExp)
                         })
-                        $.SUBRULE2($.ForHeaderParts, [inPossible])
+                        $.SUBRULE2($.ForHeaderParts, { ARGS: [inPossible] })
                     }
                 }
             ])
@@ -789,7 +789,7 @@ class ECMAScript5Parser extends Parser {
         $.RULE("SourceElements", () => {
             $.MANY(() => {
                 // FunctionDeclaration appearing before statement implements [lookahead != {{, function}] in ExpressionStatement
-                // See Functionhttps://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
+                // See https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.4Declaration
                 $.OR([
                     { ALT: () => $.SUBRULE($.FunctionDeclaration) },
                     { ALT: () => $.SUBRULE($.Statement) }

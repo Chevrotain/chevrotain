@@ -7,12 +7,13 @@
 <body>
 
 <script src="../worker_api.js"></script>
+<script src="../options.js"></script>
 
 <script>
     // relative to the worker impel file
     initWorker({
         startRule:     "json",
-        parserConfig:  {outputCst: true},
+        parserConfig:  window.globalOptions.latest,
         importScripts: [
             "https://unpkg.com/chevrotain/lib/chevrotain.js",
             "./json/json_parser.js",

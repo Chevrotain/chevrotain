@@ -7,12 +7,13 @@
 <body>
 
 <script src="../worker_api.js"></script>
+<script src="../options.js"></script>
 
 <script>
     // relative ti thr worker impel file
     initWorker({
         startRule:     "json",
-        parserConfig:  {outputCst: true},
+        parserConfig:  window.globalOptions.dev,
         importScripts: [
             "../../lib/chevrotain.js",
             "./json/json_parser.js",
