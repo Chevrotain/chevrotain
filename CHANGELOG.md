@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 3.0.1 (2-23-2018)
 
 #### Bug Fixes
 
