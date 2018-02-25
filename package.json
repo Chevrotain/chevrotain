@@ -121,7 +121,7 @@
     "tslint": "^5.8.0",
     "typedoc": "0.10.0",
     "typescript": "^2.6.2",
-    "webpack": "^3.10.0",
+    "webpack": "^4.0.0",
     "xregexp": "^4.0.0"
   },
   "typings": "lib/chevrotain.d.ts",
