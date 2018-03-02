@@ -3576,7 +3576,7 @@ export class Parser {
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
     protected LA(howMuch: number): IToken {
-        // TODO: is this optimization (saving tokVectorLength benefits?)
+        // does: is this optimization (saving tokVectorLength benefits?)
         if (
             this.currIdx + howMuch < 0 ||
             this.tokVectorLength <= this.currIdx + howMuch

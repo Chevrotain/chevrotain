@@ -16,5 +16,5 @@ The following examples all implement the same JSON parser using a variety  of im
 
 
 To run all the implementation languages examples's tests:
-* ```npm update``` (only once)
+* ```npm install``` (only once)
 * ```npm test```

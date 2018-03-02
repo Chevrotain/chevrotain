@@ -4,7 +4,7 @@
 
 // Tutorial Step 1:
 // Implementation of A lexer for a simple SELECT statement grammar
-const chevrotain = require("../../../lib/chevrotain")
+const chevrotain = require("chevrotain")
 const Lexer = chevrotain.Lexer
 const createToken = chevrotain.createToken
 

@@ -10,7 +10,7 @@
 
 
 To run the tests for all the tutorial parts:
-* ```npm update``` (only once)
+* ```npm install``` (only once)
 * ```npm test```
 
 Each step also contains a **main.js** which can be easily debugged
