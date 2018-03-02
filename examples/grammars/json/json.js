@@ -50,8 +50,8 @@ class JsonParser extends Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) {
-        super(input, allTokens)
+    constructor(input, config) {
+        super(input, allTokens, config)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -118,18 +118,24 @@ class JsonParser extends Parser {
 // reuse the same parser instance.
 const parser = new JsonParser([])
 
-module.exports = function(text) {
-    const lexResult = JsonLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const value = parser.json()
+module.exports = {
+    jsonTokens: allTokens,
 
-    return {
-        // This is a pure grammar, the value will be undefined until we add embedded actions
-        // or enable automatic CST creation.
-        value: value,
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
+    JsonParser: JsonParser,
+
+    parse: function parse(text) {
+        const lexResult = JsonLexer.tokenize(text)
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens
+        // any top level rule may be used as an entry point
+        const value = parser.json()
+
+        return {
+            // This is a pure grammar, the value will be undefined until we add embedded actions
+            // or enable automatic CST creation.
+            value: value,
+            lexErrors: lexResult.errors,
+            parseErrors: parser.errors
+        }
     }
 }

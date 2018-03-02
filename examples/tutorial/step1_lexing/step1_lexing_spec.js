@@ -1,7 +1,7 @@
 "use strict"
 const expect = require("chai").expect
 const _ = require("lodash")
-const tokenMatcher = require("../../../lib/chevrotain").tokenMatcher
+const tokenMatcher = require("chevrotain").tokenMatcher
 const lex = require("./step1_lexing").lex
 const tokenVocabulary = require("./step1_lexing").tokenVocabulary
 

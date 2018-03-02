@@ -1,6 +1,6 @@
 "use strict"
 
-const chevrotain = require("../../../lib/chevrotain")
+const chevrotain = require("chevrotain")
 
 // ----------------- lexer -----------------
 const createToken = chevrotain.createToken

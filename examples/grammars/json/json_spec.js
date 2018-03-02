@@ -1,12 +1,12 @@
-const assert = require("assert")
-const parseJson = require("./json")
+const { expect } = require("chai")
+const { parse } = require("./json")
 
 describe("The JSON Grammar", () => {
     it("can parse a simple Json without errors", () => {
         const inputText = '{ "arr": [1,2,3], "obj": {"num":666}}'
-        const lexAndParseResult = parseJson(inputText)
+        const parseResult = parse(inputText)
 
-        assert.equal(lexAndParseResult.lexErrors.length, 0)
-        assert.equal(lexAndParseResult.parseErrors.length, 0)
+        expect(parseResult.lexErrors).to.be.empty
+        expect(parseResult.parseErrors).to.be.empty
     })
 })
