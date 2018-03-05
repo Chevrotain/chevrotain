@@ -119,7 +119,7 @@
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
     "tslint": "^5.8.0",
-    "typedoc": "0.10.0",
+    "typedoc": "0.11.0",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0",
     "xregexp": "^4.0.0"
