@@ -165,7 +165,7 @@ class XmlParser extends Parser {
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
 
-        $.document = $.RULE("document", () => {
+        $.RULE("document", () => {
             $.OPTION(() => {
                 $.SUBRULE($.prolog)
             })
@@ -181,7 +181,7 @@ class XmlParser extends Parser {
             })
         })
 
-        $.prolog = $.RULE("prolog", () => {
+        $.RULE("prolog", () => {
             $.CONSUME(XMLDeclOpen)
             $.MANY2(() => {
                 $.SUBRULE($.attribute)
@@ -189,7 +189,7 @@ class XmlParser extends Parser {
             $.CONSUME(SPECIAL_CLOSE)
         })
 
-        $.content = $.RULE("content", () => {
+        $.RULE("content", () => {
             $.OPTION(() => {
                 $.SUBRULE($.chardata)
             })
@@ -209,7 +209,7 @@ class XmlParser extends Parser {
             })
         })
 
-        $.element = $.RULE("element", () => {
+        $.RULE("element", () => {
             $.CONSUME(OPEN)
             $.CONSUME(Name)
             $.MANY(() => {
@@ -234,27 +234,27 @@ class XmlParser extends Parser {
             ])
         })
 
-        $.reference = $.RULE("reference", () => {
+        $.RULE("reference", () => {
             $.OR([
                 { ALT: () => $.CONSUME(EntityRef) },
                 { ALT: () => $.CONSUME(CharRef) }
             ])
         })
 
-        $.attribute = $.RULE("attribute", () => {
+        $.RULE("attribute", () => {
             $.CONSUME(Name)
             $.CONSUME(EQUALS)
             $.CONSUME(STRING)
         })
 
-        $.chardata = $.RULE("chardata", () => {
+        $.RULE("chardata", () => {
             $.OR([
                 { ALT: () => $.CONSUME(TEXT) },
                 { ALT: () => $.CONSUME(SEA_WS) }
             ])
         })
 
-        $.misc = $.RULE("misc", () => {
+        $.RULE("misc", () => {
             $.OR([
                 { ALT: () => $.CONSUME(Comment) },
                 { ALT: () => $.CONSUME(PROCESSING_INSTRUCTION) },
