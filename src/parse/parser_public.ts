@@ -860,46 +860,6 @@ export class Parser {
         )
     }
 
-    protected isBackTracking(): boolean {
-        return !isEmpty(this.isBackTrackingStack)
-    }
-
-    protected getCurrRuleFullName(): string {
-        let shortName = this.getLastExplicitRuleShortName()
-        return this.shortRuleNameToFull.get(shortName)
-    }
-
-    protected shortRuleNameToFullName(shortName: string) {
-        return this.shortRuleNameToFull.get(shortName)
-    }
-
-    protected getHumanReadableRuleStack(): string[] {
-        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
-            return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
-                this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
-            )
-        } else {
-            return map(this.RULE_STACK, currShortName =>
-                this.shortRuleNameToFullName(currShortName)
-            )
-        }
-    }
-
-    protected SAVE_ERROR(error: IRecognitionException): IRecognitionException {
-        if (isRecognitionException(error)) {
-            error.context = {
-                ruleStack: this.getHumanReadableRuleStack(),
-                ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
-            }
-            this._errors.push(error)
-            return error
-        } else {
-            throw Error(
-                "Trying to save an Error which is not a RecognitionException"
-            )
-        }
-    }
-
     /**
      * @param grammarRule - The rule to try and parse in backtracking mode.
      * @param args - argumens to be passed to the grammar rule execution
@@ -931,15 +891,47 @@ export class Parser {
         }
     }
 
-    // Parsing DSL
-    /**
-     * Convenience method equivalent to CONSUME1.
-     * @see CONSUME1
-     */
-    protected CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
-        return this.consumeInternal(tokType, 0, options)
+    protected SAVE_ERROR(error: IRecognitionException): IRecognitionException {
+        if (isRecognitionException(error)) {
+            error.context = {
+                ruleStack: this.getHumanReadableRuleStack(),
+                ruleOccurrenceStack: cloneArr(this.RULE_OCCURRENCE_STACK)
+            }
+            this._errors.push(error)
+            return error
+        } else {
+            throw Error(
+                "Trying to save an Error which is not a RecognitionException"
+            )
+        }
     }
 
+    protected isBackTracking(): boolean {
+        return !isEmpty(this.isBackTrackingStack)
+    }
+
+    protected getCurrRuleFullName(): string {
+        let shortName = this.getLastExplicitRuleShortName()
+        return this.shortRuleNameToFull.get(shortName)
+    }
+
+    protected shortRuleNameToFullName(shortName: string) {
+        return this.shortRuleNameToFull.get(shortName)
+    }
+
+    protected getHumanReadableRuleStack(): string[] {
+        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
+            return map(this.LAST_EXPLICIT_RULE_STACK, currIdx =>
+                this.shortRuleNameToFullName(this.RULE_STACK[currIdx])
+            )
+        } else {
+            return map(this.RULE_STACK, currShortName =>
+                this.shortRuleNameToFullName(currShortName)
+            )
+        }
+    }
+
+    // Parsing DSL
     /**
      *
      * A Parsing DSL method use to consume a single terminal Token.
@@ -964,6 +956,13 @@ export class Parser {
      * @param tokType - The Type of the token to be consumed.
      * @param options - optional properties to modify the behavior of CONSUME.
      */
+    protected CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+        return this.consumeInternal(tokType, 0, options)
+    }
+
+    /**
+     * @see CONSUME
+     */
     protected CONSUME1(
         tokType: TokenType,
         options?: ConsumeMethodOpts
@@ -972,7 +971,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME2(
         tokType: TokenType,
@@ -982,7 +981,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME3(
         tokType: TokenType,
@@ -992,7 +991,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME4(
         tokType: TokenType,
@@ -1002,7 +1001,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME5(
         tokType: TokenType,
@@ -1012,7 +1011,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME6(
         tokType: TokenType,
@@ -1022,7 +1021,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME7(
         tokType: TokenType,
@@ -1032,7 +1031,7 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME8(
         tokType: TokenType,
@@ -1042,24 +1041,13 @@ export class Parser {
     }
 
     /**
-     * @see CONSUME1
+     * @see CONSUME
      */
     protected CONSUME9(
         tokType: TokenType,
         options?: ConsumeMethodOpts
     ): IToken {
         return this.consumeInternal(tokType, 9, options)
-    }
-
-    /**
-     * Convenience method equivalent to SUBRULE1
-     * @see SUBRULE1
-     */
-    protected SUBRULE<T>(
-        ruleToCall: (idx: number) => T,
-        options?: SubruleMethodOpts
-    ): T {
-        return this.subruleInternal(ruleToCall, 0, options)
     }
 
     /**
@@ -1077,8 +1065,18 @@ export class Parser {
      * of the sub rule invocation in its rule.
      *
      * @param {TokenType} ruleToCall - The rule to invoke.
-     * @param {*[]} args - The arguments to pass to the invoked subrule.
+     * @param options - optional properties to modify the behavior of CONSUME.
      * @returns {*} - The result of invoking ruleToCall.
+     */
+    protected SUBRULE<T>(
+        ruleToCall: (idx: number) => T,
+        options?: SubruleMethodOpts
+    ): T {
+        return this.subruleInternal(ruleToCall, 0, options)
+    }
+
+    /**
+     * @see SUBRULE
      */
     protected SUBRULE1<T>(
         ruleToCall: (idx: number) => T,
@@ -1088,7 +1086,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE2<T>(
         ruleToCall: (idx: number) => T,
@@ -1098,7 +1096,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE3<T>(
         ruleToCall: (idx: number) => T,
@@ -1108,7 +1106,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE4<T>(
         ruleToCall: (idx: number) => T,
@@ -1118,7 +1116,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE5<T>(
         ruleToCall: (idx: number) => T,
@@ -1128,7 +1126,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE6<T>(
         ruleToCall: (idx: number) => T,
@@ -1138,7 +1136,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE7<T>(
         ruleToCall: (idx: number) => T,
@@ -1148,7 +1146,7 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE8<T>(
         ruleToCall: (idx: number) => T,
@@ -1158,23 +1156,13 @@ export class Parser {
     }
 
     /**
-     * @see SUBRULE1
+     * @see SUBRULE
      */
     protected SUBRULE9<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 9, options)
-    }
-
-    /**
-     * Convenience method equivalent to OPTION1.
-     * @see OPTION1
-     */
-    protected OPTION<OUT>(
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT {
-        return this.optionInternal(actionORMethodDef, 0)
     }
 
     /**
@@ -1205,6 +1193,15 @@ export class Parser {
      *
      * @returns {OUT}
      */
+    protected OPTION<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT {
+        return this.optionInternal(actionORMethodDef, 0)
+    }
+
+    /**
+     * @see OPTION
+     */
     protected OPTION1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
@@ -1212,7 +1209,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1221,7 +1218,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1230,7 +1227,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1239,7 +1236,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1248,7 +1245,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1257,7 +1254,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1266,7 +1263,7 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1275,20 +1272,12 @@ export class Parser {
     }
 
     /**
-     * @see OPTION1
+     * @see OPTION
      */
     protected OPTION9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 9)
-    }
-
-    /**
-     * Convenience method equivalent to OR1.
-     * @see OR1
-     */
-    protected OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
-        return this.orInternal(altsOrOpts, 0)
     }
 
     /**
@@ -1338,74 +1327,71 @@ export class Parser {
      *
      * @returns {*} - The result of invoking the chosen alternative.
      */
+    protected OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+        return this.orInternal(altsOrOpts, 0)
+    }
+
+    /**
+     * @see OR
+     */
     protected OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 1)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 2)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 3)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 4)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 5)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 6)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 7)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 8)
     }
 
     /**
-     * @see OR1
+     * @see OR
      */
     protected OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 9)
-    }
-
-    /**
-     * Convenience method equivalent to MANY1.
-     * @see MANY1
-     */
-    protected MANY<OUT>(
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(0, actionORMethodDef, [])
     }
 
     /**
@@ -1434,10 +1420,19 @@ export class Parser {
      * As in CONSUME the index in the method name indicates the occurrence
      * of the repetition production in it's top rule.
      *
-     * @param {TokenType} actionORMethodDef - The grammar action to optionally invoke multiple times
+     * @param actionORMethodDef - The grammar action to optionally invoke multiple times
      *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
      * @returns {OUT[]}
+     */
+    protected MANY<OUT>(
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): OUT[] {
+        return this.manyInternal(0, actionORMethodDef, [])
+    }
+
+    /**
+     * @see MANY
      */
     protected MANY1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1446,7 +1441,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1455,7 +1450,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1464,7 +1459,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1473,7 +1468,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1482,7 +1477,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1491,7 +1486,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1500,7 +1495,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
@@ -1509,25 +1504,12 @@ export class Parser {
     }
 
     /**
-     * @see MANY1
+     * @see MANY
      */
     protected MANY9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(9, actionORMethodDef, [])
-    }
-
-    /**
-     * Convenience method equivalent to MANY_SEP1.
-     * @see MANY_SEP1
-     */
-    protected MANY_SEP<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(0, options, {
-            values: [],
-            separators: []
-        })
     }
 
     /**
@@ -1561,6 +1543,18 @@ export class Parser {
      *
      * @return {ISeparatedIterationResult<OUT>}
      */
+    protected MANY_SEP<OUT>(
+        options: ManySepMethodOpts<OUT>
+    ): ISeparatedIterationResult<OUT> {
+        return this.manySepFirstInternal(0, options, {
+            values: [],
+            separators: []
+        })
+    }
+
+    /**
+     * @see MANY_SEP
+     */
     protected MANY_SEP1<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
@@ -1571,7 +1565,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP2<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1583,7 +1577,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP3<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1595,7 +1589,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP4<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1607,7 +1601,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP5<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1619,7 +1613,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP6<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1631,7 +1625,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP7<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1643,7 +1637,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP8<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1655,7 +1649,7 @@ export class Parser {
     }
 
     /**
-     * @see MANY_SEP1
+     * @see MANY_SEP
      */
     protected MANY_SEP9<OUT>(
         options: ManySepMethodOpts<OUT>
@@ -1667,8 +1661,16 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to AT_LEAST_ONE1.
-     * @see AT_LEAST_ONE1
+     * Convenience method, same as MANY but the repetition is of one or more.
+     * failing to match at least one repetition will result in a parsing error and
+     * cause a parsing error.
+     *
+     * @see MANY
+     *
+     * @param actionORMethodDef  - The grammar action to optionally invoke multiple times
+     *                             or an "OPTIONS" object describing the grammar action and optional properties.
+     *
+     * @return {OUT[]}
      */
     protected AT_LEAST_ONE<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1677,16 +1679,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method, same as MANY but the repetition is of one or more.
-     * failing to match at least one repetition will result in a parsing error and
-     * cause a parsing error.
-     *
-     * @see MANY1
-     *
-     * @param actionORMethodDef  - The grammar action to optionally invoke multiple times
-     *                             or an "OPTIONS" object describing the grammar action and optional properties.
-     *
-     * @return {OUT[]}
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1695,7 +1688,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1704,7 +1697,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1713,7 +1706,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1722,7 +1715,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1731,7 +1724,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1740,7 +1733,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1749,7 +1742,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1758,7 +1751,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE1
+     * @see AT_LEAST_ONE
      */
     protected AT_LEAST_ONE9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
@@ -1767,8 +1760,17 @@ export class Parser {
     }
 
     /**
-     * Convenience method equivalent to AT_LEAST_ONE_SEP1.
-     * @see AT_LEAST_ONE1
+     * Convenience method, same as MANY_SEP but the repetition is of one or more.
+     * failing to match at least one repetition will result in a parsing error and
+     * cause the parser to attempt error recovery.
+     *
+     * Note that an additional optional property ERR_MSG can be used to provide custom error messages.
+     *
+     * @see MANY_SEP
+     *
+     * @param options - An object defining the grammar of each iteration and the separator between iterations
+     *
+     * @return {ISeparatedIterationResult<OUT>}
      */
     protected AT_LEAST_ONE_SEP<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1780,17 +1782,7 @@ export class Parser {
     }
 
     /**
-     * Convenience method, same as MANY_SEP but the repetition is of one or more.
-     * failing to match at least one repetition will result in a parsing error and
-     * cause the parser to attempt error recovery.
-     *
-     * Note that an additional optional property ERR_MSG can be used to provide custom error messages.
-     *
-     * @see MANY_SEP1
-     *
-     * @param options - An object defining the grammar of each iteration and the separator between iterations
-     *
-     * @return {ISeparatedIterationResult<OUT>}
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP1<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1802,7 +1794,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP2<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1814,7 +1806,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP3<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1826,7 +1818,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP4<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1838,7 +1830,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP5<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1850,7 +1842,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP6<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1862,7 +1854,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP7<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1874,7 +1866,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP8<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1886,7 +1878,7 @@ export class Parser {
     }
 
     /**
-     * @see AT_LEAST_ONE_SEP1
+     * @see AT_LEAST_ONE_SEP
      */
     protected AT_LEAST_ONE_SEP9<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
@@ -1899,11 +1891,11 @@ export class Parser {
 
     /**
      *
-     * @param {string} name - The name of the rule.
-     * @param {TokenType} implementation - The implementation of the rule.
-     * @param {IRuleConfig} [config] - The rule's optional configuration.
+     * @param name - The name of the rule.
+     * @param implementation - The implementation of the rule.
+     * @param [config] - The rule's optional configuration.
      *
-     * @returns {TokenType} - The parsing rule which is the production implementation wrapped with the parsing logic that handles
+     * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
      */
     protected RULE<T>(
