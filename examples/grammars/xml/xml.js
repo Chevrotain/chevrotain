@@ -115,7 +115,6 @@ const XmlLexerDefinition = {
     defaultMode: "OUTSIDE",
 
     modes: {
-        // the default (initial) mode is "numbers_mode"
         OUTSIDE: [
             Comment,
             CData,
