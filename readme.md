@@ -43,7 +43,8 @@ as any other pure code without requiring any new tools or processes.
          * The DSL is just JavaScript, not an external language.
          * The grammar is directly debuggable as plain JavaScript source.
          * Short feedback loops.
-         * Allows great flexibility for inserting custom Parser actions. 
+         * Allows great flexibility for inserting custom Parser actions.
+      * [Custom APIs][custom_apis].
    
   2.  **Lexer Engine** 
       * Based on Regular Expressions.
@@ -136,3 +137,4 @@ Some interesting samples:
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
 [backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
+[custom_apis]: http://sap.github.io/chevrotain/website/Deep_Dive/custom_apis.html
