@@ -10,6 +10,8 @@
 
 # Chevrotain
 
+[![Join the chat at https://gitter.im/chevrotain-parser/Lobby](https://badges.gitter.im/chevrotain-parser/Lobby.svg)](https://gitter.im/chevrotain-parser/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Introduction
 Chevrotain is a [**very fast**][benchmark] and **feature rich** **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files, 
