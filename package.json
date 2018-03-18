@@ -118,11 +118,14 @@
     "require-from-string": "^2.0.1",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
+    "sinon": "^4.5.0",
+    "sinon-chai": "^3.0.0",
     "tslint": "^5.8.0",
+    "typedoc": "^0.11.1",
     "typescript": "^2.6.2",
     "webpack": "^3.10.0",
     "xregexp": "^4.0.0",
-    "typedoc": "^0.11.1"
+    "@types/sinon-chai": "^2.7.29"
   },
   "typings": "lib/chevrotain.d.ts",
   "prettier": {
@@ -139,5 +142,8 @@
       "lib/test/**.*",
       "test/test.config.js"
     ]
+  },
+  "dependencies": {
+    "regexp-to-ast": "0.2.2"
   }
 }

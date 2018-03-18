@@ -492,6 +492,8 @@ function defineLexerSpecs(
         })
         WhitespaceOrAmp.LINE_BREAKS = true
 
+        const PileOfPoo = createToken({ name: "PileOfPoo", pattern: /💩/ })
+
         describe("The Simple Lexer transformations", () => {
             it("can transform a pattern to one with startOfInput mark ('^') #1 (NO OP)", () => {
                 let orgSource = (<any>BambaTok.PATTERN).source
@@ -521,7 +523,9 @@ function defineLexerSpecs(
                         Whitespace,
                         NewLine
                     ]
-                    let analyzeResult = analyzeTokenTypes(tokenClasses, false)
+                    let analyzeResult = analyzeTokenTypes(tokenClasses, {
+                        useSticky: false
+                    })
 
                     let allPatterns = map(
                         analyzeResult.patternIdxToConfig,
@@ -574,7 +578,9 @@ function defineLexerSpecs(
                         NewLine
                     ]
                     // on newer node.js this will run with the 2nd argument as true.
-                    let analyzeResult = analyzeTokenTypes(tokenClasses, true)
+                    let analyzeResult = analyzeTokenTypes(tokenClasses, {
+                        useSticky: true
+                    })
                     let allPatterns = map(
                         analyzeResult.patternIdxToConfig,
                         currConfig => currConfig.pattern
@@ -649,7 +655,7 @@ function defineLexerSpecs(
                     }),
                     createToken({
                         name: "num",
-                        pattern: /\d+/
+                        pattern: /\d+/u
                     })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
@@ -704,6 +710,25 @@ function defineLexerSpecs(
                 let spacesGroups: any = lexResult.groups.spaces
                 expect(spacesGroups[0].image).to.equal("\t")
             })
+
+            it("can accept start char code hints from the user", () => {
+                const IfOrElse = createToken({
+                    name: "IfOrElse",
+                    pattern: /if|else/,
+                    start_chars_hint: ["i", "e".charCodeAt(0)]
+                })
+                let ifElseLexer = new Lexer([IfOrElse], {
+                    positionTracking: "onlyOffset"
+                })
+
+                let input = "ifelse"
+
+                let lexResult = ifElseLexer.tokenize(input)
+                let tokens: any = lexResult.tokens
+                expect(tokens[0].image).to.equal("if")
+                expect(tokens[1].image).to.equal("else")
+            })
+
             const EndOfInputAnchor = createToken({
                 name: "EndOfInputAnchor",
                 pattern: /BAMBA$/
@@ -1255,6 +1280,20 @@ function defineLexerSpecs(
                 // tslint:enable
             })
 
+            it("can lex a pile of poo", () => {
+                let ifElseLexer = new Lexer(
+                    [If, PileOfPoo, NewLine],
+                    lexerConfig
+                )
+                let input = "if💩"
+                let lexResult = ifElseLexer.tokenize(input)
+
+                expect(lexResult.tokens[0].image).to.equal("if")
+                expect(lexResult.tokens[0].tokenType).to.equal(If)
+                expect(lexResult.tokens[1].image).to.equal("💩")
+                expect(lexResult.tokens[1].tokenType).to.equal(PileOfPoo)
+            })
+
             context("lexer modes", () => {
                 const One = createToken({ name: "One", pattern: "1" })
                 const Two = createToken({ name: "Two", pattern: /2/ })
@@ -1693,6 +1732,132 @@ function defineLexerSpecs(
         })
     }
 }
+
+let skipOnBrowser = describe
+if (typeof window !== "undefined") {
+    skipOnBrowser = <any>describe.skip
+}
+
+skipOnBrowser("debugging and messages and optimizations", () => {
+    let consoleSpy
+
+    beforeEach(function() {
+        // @ts-ignore
+        consoleSpy = sinon.spy(console, "error")
+    })
+
+    afterEach(function() {
+        // @ts-ignore
+        console.error.restore()
+    })
+
+    it("not report unicode flag", () => {
+        const One = createToken({ name: "One", pattern: /1/u })
+        new Lexer([One], { positionTracking: "onlyOffset" })
+        expect(console.error).to.have.not.been.called
+    })
+
+    it("report unicode flag with ensureOptimizations enabled", () => {
+        const One = createToken({ name: "One", pattern: /1/u })
+        expect(
+            () =>
+                new Lexer([One], {
+                    ensureOptimizations: true,
+                    positionTracking: "onlyOffset"
+                })
+        ).to.throw("Lexer Modes: < defaultMode > cannot be optimized.")
+        expect(console.error).to.have.been.called
+        expect(consoleSpy.args[0][0]).to.include(
+            "The regexp unicode flag is not currently supported by the regexp-to-ast library"
+        )
+    })
+
+    it("report custom patterns without 'start_chars_hint'", () => {
+        const One = createToken({
+            name: "One",
+            pattern: (text, offset) => {
+                return /1/.exec(text)
+            }
+        })
+        expect(
+            () =>
+                new Lexer([One], {
+                    ensureOptimizations: true,
+                    positionTracking: "onlyOffset"
+                })
+        ).to.throw("Lexer Modes: < defaultMode > cannot be optimized.")
+        expect(console.error).to.have.been.called
+        expect(consoleSpy.args[0][0]).to.include(
+            "TokenType: <One> is using a custom token pattern without providing <start_chars_hint>"
+        )
+    })
+
+    it("Will report mutually exclusive safeMode and ensureOptimizations flags", () => {
+        const One = createToken({ name: "One", pattern: /1/u })
+        expect(
+            () =>
+                new Lexer([One], {
+                    safeMode: true,
+                    ensureOptimizations: true,
+                    positionTracking: "onlyOffset"
+                })
+        ).to.throw(
+            '"safeMode" and "ensureOptimizations" flags are mutually exclusive.'
+        )
+    })
+
+    it("won't pack first char optimizations array for too large arrays", () => {
+        // without hints we expect the lexer
+        const PileOfPooNoHints = createToken({
+            name: "PileOfPoo",
+            pattern: /💩/
+        })
+        const pooLexerNoHints = new Lexer([PileOfPooNoHints], {
+            positionTracking: "onlyOffset"
+        })
+        expect(
+            keys(
+                (<any>pooLexerNoHints).charCodeToPatternIdxToConfig.defaultMode
+            ).length
+        ).to.equal("💩".charCodeAt(0) + 1)
+
+        const PileOfPoo = createToken({
+            name: "PileOfPoo",
+            pattern: /💩/,
+            start_chars_hint: [100000]
+        })
+        const pooLexer = new Lexer([PileOfPoo], {
+            positionTracking: "onlyOffset"
+        })
+        expect(
+            keys((<any>pooLexer).charCodeToPatternIdxToConfig.defaultMode)
+                .length
+        ).to.equal(1)
+    })
+
+    it("won't optimize with safe mode enabled", () => {
+        const Alpha = createToken({
+            name: "A",
+            pattern: /a/
+        })
+        const alphaLexerSafeMode = new Lexer([Alpha], {
+            positionTracking: "onlyOffset",
+            safeMode: true
+        })
+        expect(
+            (<any>alphaLexerSafeMode).charCodeToPatternIdxToConfig.defaultMode
+        ).to.be.empty
+
+        // compare to safeMode disabled
+        const alphaLexerNoSafeMode = new Lexer([Alpha], {
+            positionTracking: "onlyOffset"
+        })
+        expect(
+            (<any>alphaLexerNoSafeMode).charCodeToPatternIdxToConfig
+                .defaultMode[97][0].tokenType
+        ).to.equal(Alpha)
+    })
+})
 
 function wrapWithCustom(baseExtendToken) {
     return function() {

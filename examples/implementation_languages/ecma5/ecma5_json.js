@@ -24,7 +24,7 @@ var NumberLiteral = createToken({
 })
 var WhiteSpace = createToken({
     name: "WhiteSpace",
-    pattern: /\s+/,
+    pattern: /[ \t\n\r]+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })

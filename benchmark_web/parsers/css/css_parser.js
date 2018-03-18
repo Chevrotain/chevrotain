@@ -30,12 +30,12 @@ var createToken = function(config) {
 FRAGMENT("nl", "\\n|\\r|\\f")
 FRAGMENT("h", "[0-9a-f]")
 FRAGMENT("nonascii", "[\\u0240-\\uffff]")
-FRAGMENT("unicode", "\\{{h}}{1,6}")
+FRAGMENT("unicode", "{{h}}{1,6}")
 FRAGMENT("escape", "{{unicode}}|\\\\[^\\r\\n\\f0-9a-f]")
 FRAGMENT("nmstart", "[_a-zA-Z]|{{nonascii}}|{{escape}}")
 FRAGMENT("nmchar", "[_a-zA-Z0-9-]|{{nonascii}}|{{escape}}")
-FRAGMENT("string1", '\\"([^\\n\\r\\f\\"]|\\{{nl}}|{{escape}})*\\"')
-FRAGMENT("string2", "\\'([^\\n\\r\\f\\']|\\{{nl}}|{{escape}})*\\'")
+FRAGMENT("string1", '\\"([^\\n\\r\\f\\"]|{{nl}}|{{escape}})*\\"')
+FRAGMENT("string2", "\\'([^\\n\\r\\f\\']|{{nl}}|{{escape}})*\\'")
 FRAGMENT("comment", "\\/\\*[^*]*\\*+([^/*][^*]*\\*+)*\\/")
 FRAGMENT("name", "({{nmchar}})+")
 FRAGMENT("url", "([!#\\$%&*-~]|{{nonascii}}|{{escape}})*")
@@ -67,13 +67,13 @@ var Uri = createToken({ name: "Uri", pattern: Lexer.NA })
 var UriString = createToken({
     name: "UriString",
     pattern: MAKE_PATTERN(
-        "url\\((:?{{spaces}}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
+        "url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
     ),
     categories: Uri
 })
 var UriUrl = createToken({
     name: "UriUrl",
-    pattern: MAKE_PATTERN("url\\((:?{{spaces}}})?{{url}}(:?{{spaces}})?\\)"),
+    pattern: MAKE_PATTERN("url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)"),
     categories: Uri
 })
 var Func = createToken({
@@ -81,27 +81,27 @@ var Func = createToken({
     pattern: MAKE_PATTERN("{{ident}}\\(")
 })
 
-var Cdo = createToken({ name: "Cdo", pattern: /<!--/ })
+var Cdo = createToken({ name: "Cdo", pattern: "<!--" })
 // Cdc must be before Minus
-var Cdc = createToken({ name: "Cdc", pattern: /-->/ })
-var Includes = createToken({ name: "Includes", pattern: /~=/ })
-var Dasmatch = createToken({ name: "Dasmatch", pattern: /\|=/ })
-var Exclamation = createToken({ name: "Exclamation", pattern: /!/ })
-var Dot = createToken({ name: "Dot", pattern: /\./ })
-var LCurly = createToken({ name: "LCurly", pattern: /{/ })
-var RCurly = createToken({ name: "RCurly", pattern: /}/ })
-var LSquare = createToken({ name: "LSquare", pattern: /\[/ })
-var RSquare = createToken({ name: "RSquare", pattern: /]/ })
-var LParen = createToken({ name: "LParen", pattern: /\(/ })
-var RParen = createToken({ name: "RParen", pattern: /\)/ })
-var Comma = createToken({ name: "Comma", pattern: /,/ })
-var Colon = createToken({ name: "Colon", pattern: /:/ })
-var SemiColon = createToken({ name: "SemiColon", pattern: /;/ })
-var Equals = createToken({ name: "Equals", pattern: /=/ })
-var Star = createToken({ name: "Star", pattern: /\*/ })
-var Plus = createToken({ name: "Plus", pattern: /\+/ })
-var GreaterThan = createToken({ name: "GreaterThan", pattern: />/ })
-var Slash = createToken({ name: "Slash", pattern: /\// })
+var Cdc = createToken({ name: "Cdc", pattern: "-->" })
+var Includes = createToken({ name: "Includes", pattern: "~=" })
+var Dasmatch = createToken({ name: "Dasmatch", pattern: "|=" })
+var Exclamation = createToken({ name: "Exclamation", pattern: "!" })
+var Dot = createToken({ name: "Dot", pattern: "." })
+var LCurly = createToken({ name: "LCurly", pattern: "{" })
+var RCurly = createToken({ name: "RCurly", pattern: "}" })
+var LSquare = createToken({ name: "LSquare", pattern: "[" })
+var RSquare = createToken({ name: "RSquare", pattern: "]" })
+var LParen = createToken({ name: "LParen", pattern: "(" })
+var RParen = createToken({ name: "RParen", pattern: ")" })
+var Comma = createToken({ name: "Comma", pattern: "," })
+var Colon = createToken({ name: "Colon", pattern: ":" })
+var SemiColon = createToken({ name: "SemiColon", pattern: ";" })
+var Equals = createToken({ name: "Equals", pattern: "=" })
+var Star = createToken({ name: "Star", pattern: "*" })
+var Plus = createToken({ name: "Plus", pattern: "+" })
+var GreaterThan = createToken({ name: "GreaterThan", pattern: ">" })
+var Slash = createToken({ name: "Slash", pattern: "/" })
 
 var StringLiteral = createToken({
     name: "StringLiteral",
