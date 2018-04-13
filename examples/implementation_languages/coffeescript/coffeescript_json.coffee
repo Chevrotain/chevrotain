@@ -11,7 +11,7 @@ Comma = createToken {name: 'Comma', pattern: /,/}
 Colon = createToken {name: 'Colon', pattern: /:/}
 StringLiteral = createToken {name: 'StringLiteral', pattern: /"(:?[^\\"]|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/}
 NumberLiteral = createToken {name: 'NumberLiteral', pattern: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/}
-WhiteSpace = createToken {name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED, line_breaks: true}
+WhiteSpace = createToken {name: 'WhiteSpace', pattern: /[ \t\n\r]+/, group: Lexer.SKIPPED, line_breaks: true}
 
 allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, RSquare, Comma, Colon, True, False, Null]
 JsonLexer = new Lexer allTokens

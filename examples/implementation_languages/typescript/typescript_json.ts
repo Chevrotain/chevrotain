@@ -4,6 +4,7 @@ import {
     Lexer,
     Parser,
     IToken,
+    ILexingError,
     IRecognitionException
 } from "chevrotain"
 
@@ -26,7 +27,7 @@ const NumberLiteral = createToken({
 })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
-    pattern: /\s+/,
+    pattern: /[ \t\n\r]+/,
     group: Lexer.SKIPPED,
     line_breaks: true
 })

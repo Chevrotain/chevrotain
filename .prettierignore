@@ -4,3 +4,5 @@
 /examples/parser/webpack/gen/
 examples/implementation_languages/typescript/typescript_json.js
 examples/implementation_languages/coffeescript/coffeescript_json.js
+
+**/node_modules/

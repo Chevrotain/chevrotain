@@ -1,4 +1,4 @@
-import { has, isObject, isString, isUndefined } from "../utils/utils"
+import { forEach, has, isObject, isString, isUndefined } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
 import { Lexer, TokenType } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
@@ -84,6 +84,28 @@ export interface ITokenConfig {
      * If true and the line_breaks property is not also true this will cause inaccuracies in the Lexer's line / column tracking.
      */
     line_breaks?: boolean
+    /**
+     * Possible starting characters or charCodes of the pattern/
+     * These will be used to optimize the Lexer's performance.
+     *
+     * These are normally automatically computed, however the option to explicitly
+     * specify those can enable optimizations even when the automatic analysis fails.
+     *
+     * e.g:
+     * 1. { start_chars_hint: ["a", "b"] }
+     *    * strings hints should be one character long
+     *
+     * 2. { start_chars_hint: [97, 98] }
+     *    * number hints are the result of running ".charCodeAt(0)"
+     *      on the strings
+     *
+     * 3. { start_chars_hint: [55357] }
+     *    * For unicode characters outside the BMP use the first of their surrogate pairs.
+     *    *  The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
+     *       and D83D is 55357 in decimal.
+     *    * Note that "💩".charCodeAt() === 55357
+     */
+    start_chars_hint?: (string | number)[]
 }
 
 const PARENT = "parent"
@@ -94,6 +116,7 @@ const PUSH_MODE = "push_mode"
 const POP_MODE = "pop_mode"
 const LONGER_ALT = "longer_alt"
 const LINE_BREAKS = "line_breaks"
+const START_CHARS_HINT = "start_chars_hint"
 
 /**
  * @param {ITokenConfig} config - The configuration for
@@ -154,6 +177,10 @@ function createTokenInternal(config: ITokenConfig): TokenType {
 
     if (has(config, LINE_BREAKS)) {
         tokenType.LINE_BREAKS = config[LINE_BREAKS]
+    }
+
+    if (has(config, START_CHARS_HINT)) {
+        tokenType.START_CHARS_HINT = config[START_CHARS_HINT]
     }
 
     return tokenType

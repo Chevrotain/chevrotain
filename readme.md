@@ -13,7 +13,7 @@
 
 ## Introduction
 Chevrotain is a [**very fast**][benchmark] and **feature rich** **Parser Building Toolkit** for **JavaScript**.
-It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files, 
+It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
 to full fledged programing languages.
 
 A more in depth description of Chevrotain can be found in this great article on: [Parsing in JavaScript: Tools and Libraries](https://tomassetti.me/parsing-in-javascript/#chevrotain).
@@ -24,14 +24,14 @@ as any other pure code without requiring any new tools or processes.
 ## TLDR
 * [**Online Playground**](http://sap.github.io/chevrotain/playground/)
 * **[Getting Started Tutorial](http://sap.github.io/chevrotain/website/Tutorial/step1_lexing.html)**
-* [**Performance benchmark**][benchmark] 
+* [**Performance benchmark**][benchmark]
 
 ## Features
   1. **Parsing DSL**.
-      * **LL(k)** grammars support.  
+      * **LL(k)** grammars support.
       * Useable from [JavaScript / TypeScript / CoffeeScript][languages].
       * [**Separation** of grammar and semantics.][separation]
-      * [Customizable][custom_errors] **Error Reporting** with full location information. 
+      * [Customizable][custom_errors] **Error Reporting** with full location information.
       * Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
       * Supports [gates/predicates][gates].
       * [Backtracking][backtracking] support.
@@ -45,8 +45,8 @@ as any other pure code without requiring any new tools or processes.
          * Short feedback loops.
          * Allows great flexibility for inserting custom Parser actions.
       * [Custom APIs][custom_apis].
-   
-  2.  **Lexer Engine** 
+
+  2.  **Lexer Engine**
       * Based on Regular Expressions.
       * Full position information tracking (lines/columns/offsets).
       * Token skipping (whitespace/comments/...).
@@ -54,18 +54,18 @@ as any other pure code without requiring any new tools or processes.
       * [Multiple Lexer Modes][lexer_modes] depending on the context.
       * [Tokens Grouping][lexer_groups].
       * [Custom Token patterns(none RegExp) support](http://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html)
-      * **No code generation** The Lexer does not require any code generation phase. 
+      * **No code generation** The Lexer does not require any code generation phase.
 
   3. [**High Performance**][benchmark].
-  
+
   4. [**Railroad Diagrams Generation**](http://sap.github.io/chevrotain/website/Building_Grammars/generating_syntax_diagrams.html).
 
   5. **Grammar Reflection/Introspection**.
     * The Grammar's structure is known and **exposed** at runtime.
     * Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
-  
+
   6. Well tested with **~100% code coverage**, Unit & Integration tests
-   
+
 ## Installation
 * **npm**: ```npm install chevrotain```
 * **Browser**:
@@ -73,7 +73,7 @@ as any other pure code without requiring any new tools or processes.
   These can also be accessed directly via [UNPKG](https://unpkg.com/) in a script tag.
   - Latest:
     * ```https://unpkg.com/chevrotain/lib/chevrotain.js```
-    * ```https://unpkg.com/chevrotain/lib/chevrotain.min.js``` 
+    * ```https://unpkg.com/chevrotain/lib/chevrotain.min.js```
   - Explicit version number:
     * ```https://unpkg.com/chevrotain@3.0.1/lib/chevrotain.js```
     * ```https://unpkg.com/chevrotain@3.0.1/lib/chevrotain.min.js```
@@ -86,31 +86,32 @@ as any other pure code without requiring any new tools or processes.
 * **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 
 * **[FAQ](http://sap.github.io/chevrotain/website/FAQ.html).**
- 
+
 * **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
 * **[HTML docs](http://sap.github.io/chevrotain/documentation).**
    * [The Parsing DSL Docs](http://sap.github.io/chevrotain/documentation/3_0_1/classes/parser.html#at_least_one).
 
 * **[RoadMap](http://sap.github.io/chevrotain/website/Roadmap.html)**.
-   
-   
+
+
 ## Dependencies
-None.
+There is a single dependency to [regexp-to-ast](https://github.com/bd82/regexp-to-ast) library.
+This dependency is included in the bundled artifacts, for ease of consumption in browsers.
 
 
 ## Compatibility
-Chevrotain should run on any modern JavaScript ES5.1 runtime. 
-* The CI build runs the tests under: 
+Chevrotain should run on any modern JavaScript ES5.1 runtime.
+* The CI build runs the tests under:
   * Node.js (6 / 8 / 9).
   * Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.
-  
+
 * Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
-  
-  
+
+
 ## Contributions
 Contributions are **greatly** appreciated.
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for details
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ## Where used
 Some interesting samples:

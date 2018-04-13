@@ -11,6 +11,8 @@ import {
 import {
     compact,
     contains,
+    PRINT_ERROR,
+    defaults,
     difference,
     filter,
     find,
@@ -20,6 +22,7 @@ import {
     has,
     indexOf,
     isArray,
+    isEmpty,
     isFunction,
     isRegExp,
     isString,
@@ -27,9 +30,11 @@ import {
     keys,
     map,
     mapValues,
+    packArray,
     reduce,
     reject
 } from "../utils/utils"
+import { failedOptimizationPrefixMsg, getStartCodes } from "./reg_exp"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -49,8 +54,10 @@ export interface IPatternConfig {
 
 export interface IAnalyzeResult {
     patternIdxToConfig: IPatternConfig[]
+    charCodeToPatternIdxToConfig: { [charCode: number]: IPatternConfig[] }
     emptyGroups: { [groupName: string]: IToken[] }
     hasCustom: boolean
+    canBeOptimized: boolean
 }
 
 export let SUPPORT_STICKY =
@@ -66,8 +73,18 @@ export function enableSticky() {
 
 export function analyzeTokenTypes(
     tokenTypes: TokenType[],
-    useSticky: boolean = SUPPORT_STICKY
+    options: {
+        ensureOptimizations?: boolean
+        useSticky?: boolean
+        safeMode?: boolean
+    } = {}
 ): IAnalyzeResult {
+    options = defaults(options, {
+        useSticky: SUPPORT_STICKY,
+        debug: false,
+        safeMode: false
+    })
+
     let onlyRelevantTypes = reject(tokenTypes, currType => {
         return currType[PATTERN] === Lexer.NA
     })
@@ -117,7 +134,7 @@ export function analyzeTokenTypes(
                 // without the escaping "\"
                 return regExpSource[1]
             } else {
-                return useSticky
+                return options.useSticky
                     ? addStickyFlag(currPattern)
                     : addStartOfInput(currPattern)
             }
@@ -139,8 +156,7 @@ export function analyzeTokenTypes(
                     "\\$&"
                 )
                 let wrappedRegExp = new RegExp(escapedRegExpString)
-                // TODO: extract the "?" expression, it is duplicated
-                return useSticky
+                return options.useSticky
                     ? addStickyFlag(wrappedRegExp)
                     : addStartOfInput(wrappedRegExp)
             }
@@ -222,10 +238,96 @@ export function analyzeTokenTypes(
         }
     })
 
+    function addToMapOfArrays(map, key, value) {
+        if (map[key] === undefined) {
+            map[key] = []
+        }
+        map[key].push(value)
+    }
+
+    let canBeOptimized = true
+    let charCodeToPatternIdxToConfig = []
+
+    if (!options.safeMode) {
+        charCodeToPatternIdxToConfig = reduce(
+            onlyRelevantTypes,
+            (result, currTokType, idx) => {
+                if (typeof currTokType.PATTERN === "string") {
+                    const key = currTokType.PATTERN.charCodeAt(0)
+                    addToMapOfArrays(result, key, patternIdxToConfig[idx])
+                } else if (isArray(currTokType.START_CHARS_HINT)) {
+                    forEach(currTokType.START_CHARS_HINT, charOrInt => {
+                        const key =
+                            typeof charOrInt === "string"
+                                ? charOrInt.charCodeAt(0)
+                                : charOrInt
+                        addToMapOfArrays(result, key, patternIdxToConfig[idx])
+                    })
+                } else if (isRegExp(currTokType.PATTERN)) {
+                    if (currTokType.PATTERN.unicode) {
+                        canBeOptimized = false
+                        if (options.ensureOptimizations) {
+                            PRINT_ERROR(
+                                `${failedOptimizationPrefixMsg}` +
+                                    `\tUnable to analyze < ${currTokType.PATTERN.toString()} > pattern.\n` +
+                                    "\tThe regexp unicode flag is not currently supported by the regexp-to-ast library.\n" +
+                                    "\tThis will disable the lexer's first char optimizations.\n" +
+                                    "\tFor details See: http://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#UNICODE_OPTIMIZE"
+                            )
+                        }
+                    } else {
+                        const startCodes = getStartCodes(
+                            currTokType.PATTERN,
+                            options.ensureOptimizations
+                        )
+
+                        /* istanbul ignore if */
+                        // start code will only be empty given an empty regExp or failure of regexp-to-ast library
+                        // the first should be a different validation and the second cannot be tested.
+                        if (isEmpty(startCodes)) {
+                            // we cannot understand what codes may start possible matches
+                            // The optimization correctness requires knowing start codes for ALL patterns.
+                            // Not actually sure this is an error, no debug message
+                            canBeOptimized = false
+                        }
+                        forEach(startCodes, code => {
+                            addToMapOfArrays(
+                                result,
+                                code,
+                                patternIdxToConfig[idx]
+                            )
+                        })
+                    }
+                } else {
+                    if (options.ensureOptimizations) {
+                        PRINT_ERROR(
+                            `${failedOptimizationPrefixMsg}` +
+                                `\tTokenType: <${tokenName(
+                                    currTokType
+                                )}> is using a custom token pattern without providing <start_chars_hint> parameter.\n` +
+                                "\tThis will disable the lexer's first char optimizations.\n" +
+                                "\tFor details See: http://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#CUSTOM_OPTIMIZE"
+                        )
+                    }
+                    canBeOptimized = false
+                }
+
+                return result
+            },
+            []
+        )
+    }
+
+    if (canBeOptimized && charCodeToPatternIdxToConfig.length < 65536) {
+        charCodeToPatternIdxToConfig = packArray(charCodeToPatternIdxToConfig)
+    }
+
     return {
         emptyGroups: emptyGroups,
         patternIdxToConfig: patternIdxToConfig,
-        hasCustom: hasCustom
+        charCodeToPatternIdxToConfig: charCodeToPatternIdxToConfig,
+        hasCustom: hasCustom,
+        canBeOptimized: canBeOptimized
     }
 }
 
@@ -334,6 +436,7 @@ export function findInvalidPatterns(
 
 const end_of_input = /[^\\][\$]/
 
+// TODO: this can be done much better if we use regexp-to-ast
 export function findEndOfInputAnchor(
     tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {

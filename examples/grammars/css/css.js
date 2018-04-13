@@ -1,6 +1,3 @@
-// wrapping in UMD to allow code to work both in node.js (the tests/specs)
-// and in the browser (css_diagrams.html)
-
 const XRegExp = require("xregexp")
 const chevrotain = require("chevrotain")
 const { Lexer, Parser } = chevrotain
@@ -35,12 +32,12 @@ const createToken = function() {
 FRAGMENT("nl", "\\n|\\r|\\f")
 FRAGMENT("h", "[0-9a-f]")
 FRAGMENT("nonascii", "[\\u0240-\\uffff]")
-FRAGMENT("unicode", "\\{{h}}{1,6}")
+FRAGMENT("unicode", "{{h}}{1,6}")
 FRAGMENT("escape", "{{unicode}}|\\\\[^\\r\\n\\f0-9a-f]")
 FRAGMENT("nmstart", "[_a-zA-Z]|{{nonascii}}|{{escape}}")
 FRAGMENT("nmchar", "[_a-zA-Z0-9-]|{{nonascii}}|{{escape}}")
-FRAGMENT("string1", '\\"([^\\n\\r\\f\\"]|\\{{nl}}|{{escape}})*\\"')
-FRAGMENT("string2", "\\'([^\\n\\r\\f\\']|\\{{nl}}|{{escape}})*\\'")
+FRAGMENT("string1", '\\"([^\\n\\r\\f\\"]|{{nl}}|{{escape}})*\\"')
+FRAGMENT("string2", "\\'([^\\n\\r\\f\\']|{{nl}}|{{escape}})*\\'")
 FRAGMENT("comment", "\\/\\*[^*]*\\*+([^/*][^*]*\\*+)*\\/")
 FRAGMENT("name", "({{nmchar}})+")
 FRAGMENT("url", "([!#\\$%&*-~]|{{nonascii}}|{{escape}})*")
@@ -72,13 +69,13 @@ const Uri = createToken({ name: "Uri", pattern: Lexer.NA })
 const UriString = createToken({
     name: "UriString",
     pattern: MAKE_PATTERN(
-        "url\\((:?{{spaces}}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
+        "url\\((:?{{spaces}})?({{string1}}|{{string2}})(:?{{spaces}})?\\)"
     ),
     categories: Uri
 })
 const UriUrl = createToken({
     name: "UriUrl",
-    pattern: MAKE_PATTERN("url\\((:?{{spaces}}})?{{url}}(:?{{spaces}})?\\)"),
+    pattern: MAKE_PATTERN("url\\((:?{{spaces}})?{{url}}(:?{{spaces}})?\\)"),
     categories: Uri
 })
 const Func = createToken({

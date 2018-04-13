@@ -1,3 +1,11 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Major Changes
+
+- []()
+
+
+
 ## 3.0.1 (2-23-2018)
 
 #### Bug Fixes
@@ -142,7 +150,7 @@
 
 #### Major Changes
 
-Lexer Performance oriented release. 
+Lexer Performance oriented release.
 10%+ performance boost measured under V8.
 
 - [Lexer Perf boost - .test + lastIndex vs .exec.](https://github.com/SAP/chevrotain/issues/522)
@@ -178,10 +186,10 @@ Lexer Performance oriented release.
     under certain edge case during ambiguity detection, however the vast majority of grammars do not
     require five tokens of lookahead. A smaller default avoids these potential slow downs while still allows
     overriding in unique cases which require a large lookahead.
-    
+
 #### Bug Fixes
 - [Separator DSL methods lookahead issue.](https://github.com/SAP/chevrotain/issues/391)
-    
+
 
 ## 0.28.3 (5-1-2017)
 
@@ -204,7 +212,7 @@ Lexer Performance oriented release.
 
 #### Minor Changes
 - [Major performance boost for CST Creation.](https://github.com/SAP/chevrotain/issues/446)
-  * **50%** speed boost measured on V8 when CST output is enabled. 
+  * **50%** speed boost measured on V8 when CST output is enabled.
 
 
 
@@ -264,8 +272,8 @@ Lexer Performance oriented release.
 #### Minor Changes
 - [Detection of infinite loops caused by grammars with "empty" repetitions.](https://github.com/SAP/chevrotain/pull/410)
   * Thanks @kdex!
-  
-  
+
+
 
 ## 0.25.1 (3-21-2017)
 
@@ -345,7 +353,7 @@ Lexer Performance oriented release.
 #### Breaking Changes
 
 - [More Functional Parsing DSL API.](https://github.com/SAP/chevrotain/issues/324)
-  * This change **broke** a couple of APIS:    
+  * This change **broke** a couple of APIS:
     - "OPTION" now returns the value of the inner grammar implementation or undefined otherwise instead of a boolean.
     - The "*_SEP" methods now return an object made up of two arrays, separators and values instead of a single array of separators.
 
@@ -408,7 +416,7 @@ For older versions of TypeScript use Chevrotain versions <= 0.15.0.
 
 
 
-## 0.15.0 (9-23-2016) 
+## 0.15.0 (9-23-2016)
 
 #### Major Changes
 
@@ -420,20 +428,20 @@ This release is is focused on performance improvements, with **~20%** boost on V
 and potentially **~100%** (double) performance on SpiderMonkey (FireFox 49).
 
 To enjoy the maximum performance boost the new **SimpleLazyTokens** should be used.
-See:**[Token Types Docs](docs/token_types.md)** for additional details. 
+See:**[Token Types Docs](docs/token_types.md)** for additional details.
 
 #### Breaking Changes
 Certain advanced uses cases of [dynamically defined Tokens](https://github.com/SAP/chevrotain/blob/master/examples/parser/dynamic_tokens/dynamic_delimiters.js)
-Will break if some of new lookahead optimizations are enabled. 
+Will break if some of new lookahead optimizations are enabled.
 
 To resolve this a new property **dynamicTokensEnabled** has been defined on the [IParserConfig](http://sap.github.io/chevrotain/documentation/0_15_0/interfaces/iparserconfig.html)
 interface. This configuration property is disabled by default, but can be enabled to support the use case of dynamically defined tokens.
-See the [dynamically defined Tokens](https://github.com/SAP/chevrotain/blob/master/examples/parser/dynamic_tokens/dynamic_delimiters.js) 
-example for details.   
+See the [dynamically defined Tokens](https://github.com/SAP/chevrotain/blob/master/examples/parser/dynamic_tokens/dynamic_delimiters.js)
+example for details.
 
 
 
-## 0.14.0 (9-3-2016) 
+## 0.14.0 (9-3-2016)
 
 #### Breaking Changes
 - [OR DSL method Syntax should be more consistent.](https://github.com/SAP/chevrotain/issues/192)
@@ -443,7 +451,7 @@ example for details.
 
 
 
-## 0.13.4 (9-1-2016) 
+## 0.13.4 (9-1-2016)
 
 #### Minor Changes
 
@@ -451,21 +459,21 @@ example for details.
 
 
 
-## 0.13.3 (8-28-2016) 
+## 0.13.3 (8-28-2016)
 
 #### Bug Fixes
 - [Slow Parser Initialization.](https://github.com/SAP/chevrotain/issues/243)
 
 
 
-## 0.13.2 (8-23-2016) 
+## 0.13.2 (8-23-2016)
 
 #### Bug Fixes
 - [Diagrams with nodejs fail on instanceof check.](https://github.com/SAP/chevrotain/issues/268)
 
 
 
-## 0.13.1 (8-15-2016) 
+## 0.13.1 (8-15-2016)
 
 #### Major Changes
 - [Lexer: Lazy Tokens support.](https://github.com/SAP/chevrotain/issues/258)
@@ -475,26 +483,26 @@ This Release includes a new **performance** feature called **"Lazy Tokens"**.
 These tokens contain less actual state and defer the calculation of their properties
 until needed. Considering most of the time this information is never needed (full position information)
 the overall speed boost can be as much as **10-25%** (depending on the grammar used).
- 
+
 [See "2. Use Lazy Tokens"](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6)
 for more details.
 
 
-## 0.13.0 (8-6-2016) 
+## 0.13.0 (8-6-2016)
 
 #### Major Changes
 - [0.13.0 Performance Optimizations.](https://github.com/SAP/chevrotain/issues/248)
 - [Performance FAQ section docs.](https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6)
 
-This release includes **major performance optimizations and guidelines**. 
+This release includes **major performance optimizations and guidelines**.
 Anywhere from 20% to 100% was measured (on V8) depending on the grammar used.
 Please read the Performance FAQ section, as much of the performance gain is achieved by changing
 the way a Chevrotain parser is initialized which will require code changes (not mandatory)
 in user's code.
-  
-   
 
-## 0.12.1 (8-3-2016) 
+
+
+## 0.12.1 (8-3-2016)
 
 #### Bug Fixes
 - [Diagrams do not work with custom lexers.](https://github.com/SAP/chevrotain/issues/242)
@@ -555,7 +563,7 @@ in user's code.
 ## 0.11.0 (6-7-2016)
 
 - Minor version release as the previous version included a breaking change in a patch version.
- 
+
 #### Minor Changes
 - [Better runtime checks for Invalid Lexer definitions.](https://github.com/SAP/chevrotain/issues/204)
 
@@ -591,7 +599,7 @@ in user's code.
 - [DSL methods with separators should not support predicates.](https://github.com/SAP/chevrotain/issues/191)
 
 - [Move all "parse time" grammar validations to the initialization phase (grammar construction).](https://github.com/SAP/chevrotain/issues/103)
-     
+
 #### Documentation
 - [Example implementing syntactic & semantic content assist.](https://github.com/SAP/chevrotain/issues/194)
 
@@ -623,51 +631,51 @@ so not many changes will be needed (if at all) for most users.
 
 - [Use a config object for RULE DSL method.](https://github.com/SAP/chevrotain/issues/168)
 
-  The [RULE method's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters 
+  The [RULE method's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters
   have been been replaced with a single configuration object of the type [IRuleConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html).
   Therefore any RULE invocation with more than two arguments must be refactored to the new form.
   For example:
-  
+
   ```Typescript
-      // old deprecated form  
+      // old deprecated form
       this.RULE("createStmt", function(){ /* ... */}, function(){ return 666 })
-      
+
       // new form
       this.RULE("createStmt", function(){ /* ... */}, {recoveryValueFunc: function(){ return 666 }})
   ```
-  
+
 - [Remove RULE_NO_RESYNC DSL method.](https://github.com/SAP/chevrotain/issues/172)
 
   The RULE_NO_RESYNC convenience method has been removed.
   All usages of it must be replaced with an equivalent RULE call using the IRuleConfig [resyncEnabled](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
   property.
-  
+
   For example:
   ```javascript
-      // old deprecated form  
+      // old deprecated form
       this.RULE_NO_RESYNC("createStmt", function(){ /* ... */})
-    
+
       // new form
       this.RULE("createStmt", function(){ /* ... */}, {resyncEnabled: false})
    ```
 
-- [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175)    
+- [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175)
 - [Error Recovery / Fault Tolerance abilities should be disabled by default.](https://github.com/SAP/chevrotain/issues/174)
 
    The [Parser constructors's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) third (optional) parameter
    has been been replaced with a single configuration object of the type [IParserConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iparserconfig.html)
    Therefore any Base Parser super invocation which uses the optional parameter must be updated.
-   Additionally The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.  
+   Additionally The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.
    For example:
-   
+
    ```javascript
-   // old deprecated form  
+   // old deprecated form
    function JsonParser(input) {
       // The third argument was used to enable/disable error recovery
       // and was **true** by default.
       Parser.call(this, input, true)
     }
-    
+
     // new form
     function JsonParser(input) {
       // invoke super constructor
@@ -678,7 +686,7 @@ so not many changes will be needed (if at all) for most users.
       );
    }
    ```
-    
+
 
 
 ## 0.7.2 (4-7-2016)
@@ -686,7 +694,7 @@ so not many changes will be needed (if at all) for most users.
 #### Minor Changes
 - [Support Overriding Rule implementations in inheriting grammars.](https://github.com/SAP/chevrotain/issues/169)
 
-#### Documentation 
+#### Documentation
 - [Bring order to the chaos of the examples folder.](https://github.com/SAP/chevrotain/tree/master/examples)
 
 
@@ -736,21 +744,21 @@ so not many changes will be needed (if at all) for most users.
 
   This means that references to "bower_components/chevrotain/**release**/..."  or "node_modules/chevrotain/**bin**/..."
   Will have to be replaced with references to ".../**lib**/...".
-  
+
   [For example - modified diagrams.html](https://github.com/SAP/chevrotain/pull/155/files#diff-c5283f95a0a6408c8016dcaff5abe0fa)
-  
+
   Note that no changes are needed for standard consumption of chevrotain under node.js (**require('chevrotain')**).
-  
+
 
 #### Bug Fixes
-- [Diagrams - Fixed global references to permit UMD loading.](https://github.com/SAP/chevrotain/issues/152) 
+- [Diagrams - Fixed global references to permit UMD loading.](https://github.com/SAP/chevrotain/issues/152)
 
 
 
 ## 0.5.23 (3-17-2016)
 
 #### Bug Fixes
-- [Syntax Diagrams usage highlights issues.](https://github.com/SAP/chevrotain/issues/149) 
+- [Syntax Diagrams usage highlights issues.](https://github.com/SAP/chevrotain/issues/149)
 
 
 
@@ -761,6 +769,6 @@ so not many changes will be needed (if at all) for most users.
 - [Use Token Labels in error messages.](#https://github.com/SAP/chevrotain/issues/146)
 
 #### Bug Fixes
-- [Diagrams template resources were not fully included in bower "package".](https://github.com/SAP/chevrotain/issues/145) 
+- [Diagrams template resources were not fully included in bower "package".](https://github.com/SAP/chevrotain/issues/145)
 
 **Older Releases** changelog is available on [Github Releases.](https://github.com/SAP/chevrotain/releases)

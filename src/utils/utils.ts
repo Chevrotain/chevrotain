@@ -203,13 +203,19 @@ export function reduce<T, A>(
     iterator: (result: A, item, idx?) => A,
     initial: A
 ): A {
-    let vals: T[] = Array.isArray(arrOrObj)
-        ? <Array<T>>arrOrObj
-        : values(arrOrObj)
+    const isArr = Array.isArray(arrOrObj)
+
+    let vals: T[] = isArr ? <Array<T>>arrOrObj : values(arrOrObj)
+    let objKeys = isArr ? [] : keys(arrOrObj)
 
     let accumulator = initial
     for (let i = 0; i < vals.length; i++) {
-        accumulator = iterator.call(null, accumulator, vals[i], i)
+        accumulator = iterator.call(
+            null,
+            accumulator,
+            vals[i],
+            isArr ? i : objKeys[i]
+        )
     }
     return accumulator
 }
@@ -390,4 +396,28 @@ export function NOOP() {}
 
 export function IDENTITY(item) {
     return item
+}
+
+/**
+ * Will return a new packed array with same values.
+ */
+export function packArray<T>(holeyArr: T[]): T[] {
+    const result = []
+    for (let i = 0; i < holeyArr.length; i++) {
+        const orgValue = holeyArr[i]
+        result.push(orgValue !== undefined ? orgValue : undefined)
+    }
+    return result
+}
+
+export function PRINT_ERROR(msg) {
+    if (console && console.error) {
+        console.error(`Error: ${msg}`)
+    }
+}
+
+export function PRINT_WARNNING(msg) {
+    if (console && console.warn) {
+        console.warn(`Error: ${msg}`)
+    }
 }

@@ -11,6 +11,7 @@ import {
 import {
     cloneArr,
     cloneObj,
+    PRINT_ERROR,
     forEach,
     IDENTITY,
     isArray,
@@ -21,7 +22,9 @@ import {
     map,
     merge,
     NOOP,
-    reject
+    reject,
+    filter,
+    reduce
 } from "../utils/utils"
 import { augmentTokenTypes } from "./tokens"
 
@@ -144,19 +147,40 @@ export interface ILexerConfig {
      * In that case we would use /\n|\r|\u2028|\u2029/g
      *
      * Note that it is also possible to supply an optimized RegExp like implementation
-     * as only a subset of the RegExp is needed, @see {ILineTerminatorsRegExp}
+     * as only a subset of the RegExp APIs is needed, @see {ILineTerminatorsTester}
      * for details.
      *
      * keep in mind that for the default pattern: /\n|\r\n?/g an optimized implementation is already built-in.
      * This means the optimization is only relevant for lexers overriding the default pattern.
      */
     lineTerminatorsPattern?: RegExp | ILineTerminatorsTester
+
+    /**
+     * When true this flag will cause the Lexer to throw an Error
+     * When it is unable to perform all of its performance optimizations.
+     *
+     * In addition error messages will be printed to the console with details
+     * how to resolve the optimizations issues.
+     *
+     * Use this flag to guarantee higher lexer performance.
+     * The optimizations can boost the lexer's performance anywhere from 30%
+     * to several multiples depending on the number of TokenTypes used.
+     */
+    ensureOptimizations?: boolean
+
+    /**
+     * Can be used to disable lexer optimizations
+     * If there is a suspicion they are causing incorrect behavior.
+     */
+    safeMode?: boolean
 }
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
     positionTracking: "full",
-    lineTerminatorsPattern: /\n|\r\n?/g
+    lineTerminatorsPattern: /\n|\r\n?/g,
+    ensureOptimizations: false,
+    safeMode: false
 }
 
 Object.freeze(DEFAULT_LEXER_CONFIG)
@@ -169,6 +193,7 @@ export class Lexer {
     public lexerDefinitionErrors: ILexerDefinitionError[] = []
 
     protected patternIdxToConfig: any = {}
+    protected charCodeToPatternIdxToConfig: any = {}
 
     protected modes: string[] = []
     protected defaultMode: string
@@ -178,6 +203,7 @@ export class Lexer {
     private trackStartLines: boolean = true
     private trackEndLines: boolean = true
     private hasCustom: boolean = false
+    private canModeBeOptimized: any = {}
 
     /**
      * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
@@ -289,6 +315,12 @@ export class Lexer {
             this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
         }
 
+        if (config.safeMode && config.ensureOptimizations) {
+            throw Error(
+                '"safeMode" and "ensureOptimizations" flags are mutually exclusive.'
+            )
+        }
+
         this.trackStartLines = /full|onlyStart/i.test(
             this.config.positionTracking
         )
@@ -348,10 +380,17 @@ export class Lexer {
                 // to performing the analysis anyhow...
                 if (isEmpty(this.lexerDefinitionErrors)) {
                     augmentTokenTypes(currModDef)
-                    let currAnalyzeResult = analyzeTokenTypes(currModDef)
+                    let currAnalyzeResult = analyzeTokenTypes(currModDef, {
+                        ensureOptimizations: config.ensureOptimizations,
+                        safeMode: config.safeMode
+                    })
 
                     this.patternIdxToConfig[currModName] =
                         currAnalyzeResult.patternIdxToConfig
+
+                    this.charCodeToPatternIdxToConfig[currModName] =
+                        currAnalyzeResult.charCodeToPatternIdxToConfig
+
                     this.emptyGroups = merge(
                         this.emptyGroups,
                         currAnalyzeResult.emptyGroups
@@ -359,6 +398,9 @@ export class Lexer {
 
                     this.hasCustom =
                         currAnalyzeResult.hasCustom || this.hasCustom
+
+                    this.canModeBeOptimized[currModName] =
+                        currAnalyzeResult.canBeOptimized
                 }
             }
         )
@@ -422,6 +464,27 @@ export class Lexer {
             this.addToken = this.addTokenUsingPush
         } else {
             this.addToken = this.addTokenUsingMemberAccess
+        }
+
+        const unOptimizedModes = reduce(
+            this.canModeBeOptimized,
+            (cannotBeOptimized, canBeOptimized, modeName) => {
+                if (canBeOptimized === false) {
+                    cannotBeOptimized.push(modeName)
+                }
+                return cannotBeOptimized
+            },
+            []
+        )
+
+        if (config.ensureOptimizations && !isEmpty(unOptimizedModes)) {
+            throw Error(
+                `Lexer Modes: < ${unOptimizedModes.join(
+                    ", "
+                )} > cannot be optimized.\n` +
+                    '\t Disable the "ensureOptimizations" lexer config flag to silently ignore this and run the lexer in an un-optimized mode.\n' +
+                    "\t Or inspect the console log for details on how to resolve these issues."
+            )
         }
     }
 
@@ -495,8 +558,14 @@ export class Lexer {
 
         let currModePatternsLength = 0
         let patternIdxToConfig = []
+        let currCharCodeToPatternIdxToConfig = []
 
         let modeStack = []
+
+        const emptyArray = []
+        Object.freeze(emptyArray)
+        let getPossiblePatterns = undefined
+
         let pop_mode = popToken => {
             // TODO: perhaps avoid this error in the edge case there is no more input?
             if (
@@ -527,14 +596,55 @@ export class Lexer {
                 modeStack.pop()
                 let newMode = last(modeStack)
                 patternIdxToConfig = this.patternIdxToConfig[newMode]
+                currCharCodeToPatternIdxToConfig = this
+                    .charCodeToPatternIdxToConfig[newMode]
                 currModePatternsLength = patternIdxToConfig.length
+                const modeCanBeOptimized =
+                    this.canModeBeOptimized[newMode] &&
+                    this.config.safeMode === false
+
+                if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
+                    getPossiblePatterns = function(charCode) {
+                        const possiblePatterns =
+                            currCharCodeToPatternIdxToConfig[charCode]
+                        return possiblePatterns === undefined
+                            ? emptyArray
+                            : possiblePatterns
+                    }
+                } else {
+                    getPossiblePatterns = function() {
+                        return patternIdxToConfig
+                    }
+                }
             }
         }
 
         function push_mode(newMode) {
             modeStack.push(newMode)
+            currCharCodeToPatternIdxToConfig = this
+                .charCodeToPatternIdxToConfig[newMode]
+
             patternIdxToConfig = this.patternIdxToConfig[newMode]
             currModePatternsLength = patternIdxToConfig.length
+
+            currModePatternsLength = patternIdxToConfig.length
+            const modeCanBeOptimized =
+                this.canModeBeOptimized[newMode] &&
+                this.config.safeMode === false
+
+            if (currCharCodeToPatternIdxToConfig && modeCanBeOptimized) {
+                getPossiblePatterns = function(charCode) {
+                    const possiblePatterns =
+                        currCharCodeToPatternIdxToConfig[charCode]
+                    return possiblePatterns === undefined
+                        ? emptyArray
+                        : possiblePatterns
+                }
+            } else {
+                getPossiblePatterns = function() {
+                    return patternIdxToConfig
+                }
+            }
         }
 
         // this pattern seems to avoid a V8 de-optimization, although that de-optimization does not
@@ -545,14 +655,19 @@ export class Lexer {
 
         while (offset < orgLength) {
             matchedImage = null
-            for (i = 0; i < currModePatternsLength; i++) {
-                currConfig = patternIdxToConfig[i]
+
+            let nextCharCode = orgText.charCodeAt(offset)
+            const chosenPatternIdxToConfig = getPossiblePatterns(nextCharCode)
+            let chosenPatternsLength = chosenPatternIdxToConfig.length
+
+            for (i = 0; i < chosenPatternsLength; i++) {
+                currConfig = chosenPatternIdxToConfig[i]
                 let currPattern = currConfig.pattern
 
                 // manually in-lined because > 600 chars won't be in-lined in V8
                 let singleCharCode = currConfig.short
                 if (singleCharCode !== false) {
-                    if (orgText.charCodeAt(offset) === singleCharCode) {
+                    if (nextCharCode === singleCharCode) {
                         // single character string
                         matchedImage = currPattern
                     }
@@ -609,6 +724,7 @@ export class Lexer {
                     break
                 }
             }
+
             // successful match
             if (matchedImage !== null) {
                 // matchedImage = match[0]
@@ -678,7 +794,7 @@ export class Lexer {
                     }
                 }
                 // will be NOOP if no modes present
-                this.handleModes(i, currConfig, pop_mode, push_mode, newToken)
+                this.handleModes(currConfig, pop_mode, push_mode, newToken)
             } else {
                 // error recovery, drop characters until we identify a valid token's start point
                 let errorStartOffset = offset
@@ -751,7 +867,7 @@ export class Lexer {
         }
     }
 
-    private handleModes(i, config, pop_mode, push_mode, newToken) {
+    private handleModes(config, pop_mode, push_mode, newToken) {
         if (config.pop === true) {
             // need to save the PUSH_MODE property as if the mode is popped
             // patternIdxToPopMode is updated to reflect the new mode after popping the stack
