@@ -655,7 +655,7 @@ function defineLexerSpecs(
                     }),
                     createToken({
                         name: "num",
-                        pattern: /\d+/u
+                        pattern: /\d+/
                     })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
