@@ -74,7 +74,7 @@
     <div class="Page__header">
         <h1><a href="FAQ.html">FAQ</a></h1>
                 <span style="float: left; font-size: 10px; color: gray;">
-            Friday, April 13, 2018 10:50 AM        </span>
+            Friday, April 13, 2018 11:59 AM        </span>
                         <span style="float: right; font-size: 10px; color: gray;">
             <a href="https://github.com/SAP/chevrotain/blob/master/docs/03_FAQ.md" target="_blank">Edit on GitHub</a>
         </span>
@@ -230,14 +230,14 @@ Simply override the Parser's <a href="http://sap.github.io/chevrotain/documentat
 to accomplish that.</p>
 </li>
 <li>
-<p><strong>Ensure that the lexer's &quot;first char&quot; optimization is enabled</strong>.</p>
+<p><strong>Ensure that the lexer's optimizations are enabled</strong>.</p>
 <p>The Chevrotain Lexer performs optimizations by filtering the potential token matchs
-using the next [charCode][mdn_char_code] to be consumed.
-To apply this optimization the first possible charCodes for <strong>every</strong> TokenType must be identified.</p>
-<p>Sometimes a TokenType's first charCodes cannot be automatically identified.
-In that case the lexer will <strong>silently</strong> revert to using the unoptimized algorithims.
+using the next <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt" class="external">charCode</a> to be consumed.
 These optimizattions can provide anywhere from a <strong>30% boost</strong> for small lexers
 to <strong>several multipiles</strong> improvment in large Lexers with many TokenTypes.</p>
+<p>To apply this optimization the first possible charCodes for <strong>every</strong> TokenType must be identified.
+Sometimes a TokenType's first charCodes cannot be automatically identified.
+In that case the lexer will <strong>silently</strong> revert to using the unoptimized algorithims.</p>
 <p>It it possible to configure the Lexer <strong>throw</strong> an error
 in case the optimizations cannot be enabled by turning on the
 &quot;ensureOptimizations&quot; flag:</p>
