@@ -1,24 +1,22 @@
 // ----------------- Lexer -----------------
 var Token = chevrotain.Token;
-// https://github.com/SAP/chevrotain/blob/master/docs/faq.md#Q6 (Use Simple Lazy Tokens)
 var createToken = chevrotain.createToken;
 var ChevrotainLexer = chevrotain.Lexer;
 
-// In ES6, custom inheritance implementation (such as the one above) can be replaced with a more simple: "class X extends Y"...
-var True = createToken({name: "True", pattern: /true/});
-var False = createToken({name: "False", pattern: /false/});
-var Null = createToken({name: "Null", pattern: /null/});
-var LCurly = createToken({name: "LCurly", pattern: /{/});
-var RCurly = createToken({name: "RCurly", pattern: /}/});
-var LSquare = createToken({name: "LSquare", pattern: /\[/});
-var RSquare = createToken({name: "RSquare", pattern: /]/});
-var Comma = createToken({name: "Comma", pattern: /,/});
-var Colon = createToken({name: "Colon", pattern: /:/});
+var True = createToken({name: "True", pattern: "true"});
+var False = createToken({name: "False", pattern: "false"});
+var Null = createToken({name: "Null", pattern: "null"});
+var LCurly = createToken({name: "LCurly", pattern: "{"});
+var RCurly = createToken({name: "RCurly", pattern: "}"});
+var LSquare = createToken({name: "LSquare", pattern: "["});
+var RSquare = createToken({name: "RSquare", pattern: "]"});
+var Comma = createToken({name: "Comma", pattern: ","});
+var Colon = createToken({name: "Colon", pattern: ":"});
 
 var stringLiteralPattern = /"(?:[^\\"]|\\(?:[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/
 var StringLiteral = createToken({name: "StringLiteral", pattern: stringLiteralPattern});
 var NumberLiteral = createToken({name: "NumberLiteral", pattern: /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/});
-var WhiteSpace = createToken({name: "WhiteSpace", pattern: /\s+/, group: ChevrotainLexer.SKIPPED});
+var WhiteSpace = createToken({name: "WhiteSpace", pattern: /[ \t\n\r]+/, group: ChevrotainLexer.SKIPPED});
 
 var jsonTokens = [WhiteSpace, StringLiteral, NumberLiteral, Comma, Colon, LCurly, RCurly, LSquare, RSquare, True, False, Null];
 // Tracking only the offset provides a small speed boost.

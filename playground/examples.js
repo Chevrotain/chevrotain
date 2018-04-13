@@ -339,12 +339,12 @@ function cssExample() {
     FRAGMENT('nl', '\\n|\\r|\\f');
     FRAGMENT('h', '[0-9a-f]');
     FRAGMENT('nonascii', '[\\u0240-\\uffff]');
-    FRAGMENT('unicode', '\\{{h}}{1,6}');
+    FRAGMENT('unicode', '{{h}}{1,6}');
     FRAGMENT('escape', '{{unicode}}|\\\\[^\\r\\n\\f0-9a-f]');
     FRAGMENT('nmstart', '[_a-zA-Z]|{{nonascii}}|{{escape}}');
     FRAGMENT('nmchar', '[_a-zA-Z0-9-]|{{nonascii}}|{{escape}}');
-    FRAGMENT('string1', '\\"([^\\n\\r\\f\\"]|\\{{nl}}|{{escape}})*\\"');
-    FRAGMENT('string2', "\\'([^\\n\\r\\f\\']|\\{{nl}}|{{escape}})*\\'");
+    FRAGMENT('string1', '\\"([^\\n\\r\\f\\"]|{{nl}}|{{escape}})*\\"');
+    FRAGMENT('string2', "\\'([^\\n\\r\\f\\']|{{nl}}|{{escape}})*\\'");
     FRAGMENT('comment', '\\/\\*[^*]*\\*+([^/*][^*]*\\*+)*\\/');
     FRAGMENT("name", "({{nmchar}})+");
     FRAGMENT("url", "([!#\\$%&*-~]|{{nonascii}}|{{escape}})*");

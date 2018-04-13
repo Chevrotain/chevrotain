@@ -10,7 +10,7 @@ var grammar = {
 
     "lex": {
         "rules": [
-            ["\\s+", "/* skip whitespace */"],
+            ["[ \\t\\n\\r]+", "/* skip whitespace */"],
             ["\"(?:\\\\[\"bfnrt/\\\\]|\\\\u[a-fA-F0-9]{4}|[^\"\\\\])*\"", "return 'STRING';"],
             ["-?(?:0|[1-9]\\d*)(:?\\.\\d+)?(?:[eE][+-]?\\d+)?", "return 'NUMBER';"],
             [",", "return ','"],
