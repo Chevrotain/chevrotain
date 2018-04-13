@@ -2,7 +2,7 @@
 
 #### Major Changes
 
-- []()
+- [Lexer optimizations using the next charCode in the remaining text.](https://github.com/SAP/chevrotain/issues/679)
 
 
 
