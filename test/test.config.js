@@ -4,5 +4,4 @@ if (typeof global === "object") {
     global.sinon = require("sinon")
 } else if (typeof window === "object") {
     window.expect = chai.expect
-    chai.use("sinon-chai")
 }
