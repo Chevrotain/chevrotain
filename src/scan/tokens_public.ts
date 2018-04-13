@@ -85,7 +85,7 @@ export interface ITokenConfig {
      */
     line_breaks?: boolean
     /**
-     * Possible starting characters or charCodes of the pattern/
+     * Possible starting characters or charCodes of the pattern.
      * These will be used to optimize the Lexer's performance.
      *
      * These are normally automatically computed, however the option to explicitly

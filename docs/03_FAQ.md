@@ -141,16 +141,16 @@ These are highly recommended for each and every parser.
    Simply override the Parser's [reset](http://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#reset) method
    to accomplish that.
 
-2. **Ensure that the lexer's "first char" optimization is enabled**.
+2. **Ensure that the lexer's optimizations are enabled**.
 
    The Chevrotain Lexer performs optimizations by filtering the potential token matchs
-   using the next [charCode][mdn_char_code] to be consumed.
-   To apply this optimization the first possible charCodes for **every** TokenType must be identified.
-
-   Sometimes a TokenType's first charCodes cannot be automatically identified.
-   In that case the lexer will **silently** revert to using the unoptimized algorithims.
+   using the next [charCode](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt) to be consumed.
    These optimizattions can provide anywhere from a **30% boost** for small lexers
    to **several multipiles** improvment in large Lexers with many TokenTypes.
+
+   To apply this optimization the first possible charCodes for **every** TokenType must be identified.
+   Sometimes a TokenType's first charCodes cannot be automatically identified.
+   In that case the lexer will **silently** revert to using the unoptimized algorithims.
 
    It it possible to configure the Lexer **throw** an error
    in case the optimizations cannot be enabled by turning on the
