@@ -1752,13 +1752,15 @@ skipOnBrowser("debugging and messages and optimizations", () => {
     })
 
     it("not report unicode flag", () => {
-        const One = createToken({ name: "One", pattern: /1/u })
+        // using new RegExp() to avoid IE 11 syntax errors
+        const One = createToken({ name: "One", pattern: new RegExp("1", "u") })
         new Lexer([One], { positionTracking: "onlyOffset" })
         expect(console.error).to.have.not.been.called
     })
 
     it("report unicode flag with ensureOptimizations enabled", () => {
-        const One = createToken({ name: "One", pattern: /1/u })
+        // using new RegExp() to avoid IE 11 syntax errors
+        const One = createToken({ name: "One", pattern: new RegExp("1", "u") })
         expect(
             () =>
                 new Lexer([One], {
@@ -1793,7 +1795,8 @@ skipOnBrowser("debugging and messages and optimizations", () => {
     })
 
     it("Will report mutually exclusive safeMode and ensureOptimizations flags", () => {
-        const One = createToken({ name: "One", pattern: /1/u })
+        // using new RegExp() to avoid IE 11 syntax errors
+        const One = createToken({ name: "One", pattern: new RegExp("1", "u") })
         expect(
             () =>
                 new Lexer([One], {
