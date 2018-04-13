@@ -29,10 +29,8 @@ install:
 script:
   - yarn run $NPM_TASK
 deploy:
-  - provider: npm
-    email: shahar.soel@gmail.com
-    api_key:
-      secure: k7juzhofg3lWLolMOIQ6AM0xKYLaRc0MAlGO3sbm2ZFZlGdmXuayHGAD+UL1Vi+KXLfU14fwvIjCpkWc6EWezcFkTG2cxoIC+NpUygQ0z3/E1ylCYM5NU23J+bDtv9xcj5bhNQ/611kHahtIH9DNbY1BbsL0lMH6KwbLDXYUlzk=
+  - provider: script
+    script: bash scripts/deploy.sh
     on:
       tags: true
       all_branches: true
