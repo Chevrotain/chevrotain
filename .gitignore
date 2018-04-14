@@ -25,3 +25,5 @@ package-lock.json
 
 /static
 /package-lock.json
+
+yarn-error.log

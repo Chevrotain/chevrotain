@@ -133,7 +133,7 @@ function defineRecognizerSpecs(
 
             describe("supports EMPTY(...) alternative convenience function", () => {
                 class EmptyAltParser extends Parser {
-                    public getLookAheadCache(): HashTable<Function> {
+                    public getLookAheadCache(): Function[] {
                         return getLookaheadFuncsForClass(this.className)
                     }
 

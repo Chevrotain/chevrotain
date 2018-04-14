@@ -38,10 +38,8 @@ export function setResyncFollowsForClass(
 
 export let CLASS_TO_LOOKAHEAD_FUNCS = new HashTable<HashTable<Function>>()
 
-export function getLookaheadFuncsForClass(
-    className: string
-): HashTable<Function> {
-    return getFromNestedHashTable(className, CLASS_TO_LOOKAHEAD_FUNCS)
+export function getLookaheadFuncsForClass(className: string): Function[] {
+    return getArrFromHashTable(className, CLASS_TO_LOOKAHEAD_FUNCS)
 }
 
 export let CLASS_TO_FIRST_AFTER_REPETITION = new HashTable<
@@ -74,6 +72,15 @@ function getFromNestedHashTable(className: string, hashTable: HashTable<any>) {
     let result = hashTable.get(className)
     if (result === undefined) {
         hashTable.put(className, new HashTable<any>())
+        result = hashTable.get(className)
+    }
+    return result
+}
+
+function getArrFromHashTable(className: string, hashTable: HashTable<any>) {
+    let result = hashTable.get(className)
+    if (result === undefined) {
+        hashTable.put(className, [])
         result = hashTable.get(className)
     }
     return result

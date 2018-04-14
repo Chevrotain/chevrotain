@@ -150,7 +150,7 @@ export function buildAlternativesLookAheadFunc(
          */
         return function(orAlts: IAnyOrAlt<any>[]): number {
             // unfortunately the predicates must be extracted every single time
-            // as they cannot be cached due to keep references to parameters(vars) which are no longer valid.
+            // as they cannot be cached due to references to parameters(vars) which are no longer valid.
             // note that in the common case of no predicates, no cpu time will be wasted on this (see else block)
             let predicates: Predicate[] = map(orAlts, currAlt => currAlt.GATE)
 
@@ -159,7 +159,10 @@ export function buildAlternativesLookAheadFunc(
                 let currNumOfPaths = currAlt.length
 
                 let currPredicate = predicates[t]
-                if (currPredicate && !currPredicate.call(this)) {
+                if (
+                    currPredicate !== undefined &&
+                    currPredicate.call(this) === false
+                ) {
                     // if the predicate does not match there is no point in checking the paths
                     continue
                 }
@@ -206,7 +209,7 @@ export function buildAlternativesLookAheadFunc(
                 })
                 return result
             },
-            {}
+            []
         )
 
         /**
@@ -286,8 +289,9 @@ export function buildSingleAlternativeLookaheadFunction(
                     })
                     return result
                 },
-                {}
+                []
             )
+
             return function(): boolean {
                 let nextToken = this.LA(1)
                 return choiceToAlt[nextToken.tokenTypeIdx] === true

@@ -3252,13 +3252,11 @@ export class Parser {
         occurrence: number
     ): number {
         let currRuleShortName: any = this.getLastExplicitRuleShortName()
-        /* tslint:disable */
         return getKeyForAutomaticLookahead(
             currRuleShortName,
             dslMethodIdx,
             occurrence
         )
-        /* tslint:enable */
     }
 
     private getLookaheadFuncForOr(
@@ -3266,7 +3264,7 @@ export class Parser {
         alts: IAnyOrAlt<any>[]
     ): () => number {
         let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let laFunc = <any>this.classLAFuncs.get(key)
+        let laFunc = <any>this.classLAFuncs[key]
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -3282,7 +3280,7 @@ export class Parser {
                 this.dynamicTokensEnabled,
                 this.lookAheadBuilderForAlternatives
             )
-            this.classLAFuncs.put(key, laFunc)
+            this.classLAFuncs[key] = laFunc
             return laFunc
         } else {
             return laFunc
@@ -3382,7 +3380,7 @@ export class Parser {
         maxLookahead: number,
         prodType
     ): () => boolean {
-        let laFunc = <any>this.classLAFuncs.get(key)
+        let laFunc = <any>this.classLAFuncs[key]
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -3394,7 +3392,7 @@ export class Parser {
                 prodType,
                 this.lookAheadBuilderForOptional
             )
-            this.classLAFuncs.put(key, laFunc)
+            this.classLAFuncs[key] = laFunc
             return laFunc
         } else {
             return laFunc
