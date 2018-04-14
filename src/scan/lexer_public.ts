@@ -164,7 +164,7 @@ export interface ILexerConfig {
      *
      * Use this flag to guarantee higher lexer performance.
      * The optimizations can boost the lexer's performance anywhere from 30%
-     * to several multiples depending on the number of TokenTypes used.
+     * to 100%+ depending on the number of TokenTypes used.
      */
     ensureOptimizations?: boolean
 
