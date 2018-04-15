@@ -187,7 +187,7 @@ Object.freeze(DEFAULT_LEXER_CONFIG)
 
 export class Lexer {
     public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
-        "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
+    "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
 
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors: ILexerDefinitionError[] = []

@@ -1,25 +1,24 @@
-* Previous tutorial step - [Step 2 - Parsing](./step2_parsing.md)
+*   Previous tutorial step - [Step 2 - Parsing](./step2_parsing.md)
 
 # Tutorial Step 3 - Adding Actions using a CST Visitor.
 
-
 ### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3a_actions_visitor.js) for this step <---
 
-
 ### On code samples:
+
 The tutorial uses ES2015+ syntax.
 See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
 
-
 ### Introduction:
+
 In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
 validates the input conforms to the grammar, in other words it is just a recognizer.
 But in most real world use cases the parser will **also** have to output some result/data structure/value.
 
 This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **outside** our grammar:
- * See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html)
 
+*   See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html)
 
 ### Enabling CST output in our parser.
 
@@ -29,7 +28,6 @@ the super constructor.
 
 ```javascript
 class SelectParser extends chevrotain.Parser {
-
     constructor(input) {
         // The "outputCst" flag will cause the parser to create a CST structure on rule invocation
         super(input, allTokens, { outputCst: true })
@@ -54,7 +52,6 @@ function parseInput(text) {
 }
 ```
 
-
 ### Creating a CST Visitor
 
 Each Chevrotain parser **instance** exposes two BaseVisitor classes
@@ -62,7 +59,7 @@ which can be extended to create custom user visitors.
 
 ```javascript
 // BaseVisitor constructors are accessed via a parser instance.
-const parserInstance = new SelectParser([]);
+const parserInstance = new SelectParser([])
 
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()
 
@@ -95,7 +92,6 @@ const myVisitorInstanceWithDefaults = new myCustomVisitorWithDefaults()
 
 In our example we will use the BaseVisitor constructor (**without** defaults )
 
-
 ### Adding some visitor methods
 
 So we now know how to create a CSt visitor.
@@ -122,11 +118,11 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     selectClause(ctx) {
         // Each Terminal or Non-Terminal in a grammar rule are collected into
         // an array with the same name(key) in the ctx object.
-        let columns = ctx.Identifier.map((identToken) => identToken.image)
+        let columns = ctx.Identifier.map(identToken => identToken.image)
 
         return {
-            type    : "SELECT_CLAUSE",
-            columns : columns
+            type: "SELECT_CLAUSE",
+            columns: columns
         }
     }
 }
@@ -144,7 +140,6 @@ And now to the code:
 
 ```javascript
 class SQLToAstVisitor extends BaseSQLVisitor {
-
     constructor() {
         super()
         this.validateVisitor()
@@ -168,10 +163,10 @@ class SQLToAstVisitor extends BaseSQLVisitor {
         let where = this.visit(ctx.whereClause)
 
         return {
-            type         : "SELECT_STMT",
-            selectClause : select,
-            fromClause   : from,
-            whereClause  : where
+            type: "SELECT_STMT",
+            selectClause: select,
+            fromClause: from,
+            whereClause: where
         }
     }
 }
@@ -180,7 +175,6 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 We still have a few grammar rules we need to build visitors for.
 
 ```ANTLR
-
 fromClause
    : "FROM" Identifier
 
@@ -195,14 +189,12 @@ atomicExpression
 
 relationalOperator
    : ">" | "<"
-
 ```
 
 lets implement those as well.
 
 ```javascript
 class SQLToAstVisitor extends BaseSQLVisitor {
-
     constructor() {
         super()
         this.validateVisitor()
@@ -220,8 +212,8 @@ class SQLToAstVisitor extends BaseSQLVisitor {
         const tableName = ctx.Identifier[0].image
 
         return {
-            type    : "FROM_CLAUSE",
-            table : tableName
+            type: "FROM_CLAUSE",
+            table: tableName
         }
     }
 
@@ -232,7 +224,6 @@ class SQLToAstVisitor extends BaseSQLVisitor {
             type: "WHERE_CLAUSE",
             condition: condition
         }
-
     }
 
     expression(ctx) {
@@ -253,8 +244,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     atomicExpression(ctx) {
         if (ctx.Integer) {
             return ctx.Integer[0].image
-        }
-        else {
+        } else {
             return ctx.Identifier[0].image
         }
     }
@@ -262,8 +252,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     relationalOperator(ctx) {
         if (ctx.GreaterThan) {
             return ctx.GreaterThan[0].image
-        }
-        else {
+        } else {
             return ctx.LessThan[0].image
         }
     }
@@ -275,9 +264,8 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 So we know how to create a CST Visitor, but how do we actually use it?
 
 ```javascript
-
 // A new parser instance with CST output enabled.
-const parserInstance = new SelectParser([], {outputCst: true})
+const parserInstance = new SelectParser([], { outputCst: true })
 // Our visitor has no state, so a single instance is sufficient.
 const toAstVisitorInstance = new SQLToAstVisitor()
 
@@ -289,7 +277,10 @@ function toAst(inputText) {
     // Automatic CST created when parsing
     const cst = parserInstance.selectStatement()
     if (parserInstance.errors.length > 0) {
-        throw Error("Sad sad panda, parsing errors detected!\n" + parserInstance.errors[0].message)
+        throw Error(
+            "Sad sad panda, parsing errors detected!\n" +
+                parserInstance.errors[0].message
+        )
     }
 
     // Visit
@@ -299,6 +290,7 @@ function toAst(inputText) {
 ```
 
 #### What is Next?
-* Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3a_actions_visitor.js) of
-  this tutorial step.
-* Next step in the tutorial: [Step 4 - Fault Tolerance](./step4_fault_tolerance.md).
+
+*   Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3a_actions_visitor.js) of
+    this tutorial step.
+*   Next step in the tutorial: [Step 4 - Fault Tolerance](./step4_fault_tolerance.md).

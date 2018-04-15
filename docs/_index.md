@@ -11,8 +11,8 @@ Chevrotain Grammars are **pure code** which can be created/debugged/edited
 as any other pure code without requiring any new tools or processes.
 
 ## TLDR
-* [**Online Playground**](https://sap.github.io/chevrotain/playground/)
-* [**Performance benchmark**][benchmark]
 
+*   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
+*   [**Performance benchmark**][benchmark]
 
 [benchmark]: https://sap.github.io/chevrotain/performance/

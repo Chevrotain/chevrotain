@@ -54,12 +54,12 @@
     "---------- DEV FLOWS --------": "",
     "watch": "tsc -w",
     "unit_tests": "node_modules/.bin/_mocha \"./lib/test/**/*spec.js\"",
-    "format": "prettier --no-editorconfig --write \"**/*.@(ts|js)\"",
+    "format": "prettier --no-editorconfig --write \"**/*.@(ts|js|md)\"",
     "quick_build": "tsc && yarn run bundle",
     "---------- BUILD STEPS --------": "",
     "clean": "rm -rf coverage dev lib",
     "lint": "tslint --project tsconfig.json",
-    "verify_format": "prettier --no-editorconfig --list-different  \"**/*.@(ts|js)\"",
+    "verify_format": "prettier --no-editorconfig --list-different  \"**/*.@(ts|js|md)\"",
     "compile": "tsc",
     "dts": "grunt concat",
     "compile_def": "npm-run-all compile_def_modules compile_def_namespace",
@@ -114,7 +114,7 @@
     "mock-require": "^3.0.1",
     "npm-run-all": "^4.1.2",
     "nyc": "^11.4.1",
-    "prettier": "1.9.2",
+    "prettier": "1.12.0",
     "require-from-string": "^2.0.1",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
@@ -130,8 +130,7 @@
   "typings": "lib/chevrotain.d.ts",
   "prettier": {
     "semi": false,
-    "tab-width": 4,
-    "use-tabs": false
+    "tabWidth": 4
   },
   "nyc": {
     "reporter": [

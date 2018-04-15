@@ -18,23 +18,23 @@ There are a couple ways to solve this using [Uglifyjs's](https://github.com/mish
 This will **guarantee** a Chevrotain grammar will run minified
 but will also increase the size of the minified file.
 
-
 #### Selectively avoid the mangling of the specific's grammar Token names.
 
 This is the **recommended** approach as it will allow the maximum minification.
 
-
 #### Runnable Example
+
 The included [gruntfile.js](./gruntfile.js) implements minification of a sample Chevrotain
 Grammar: [unminified.js][./unminified.js] using both the suggested approaches.
 Additionally [unit tests](./minify_spec.js) are included to validate the minified grammars actually work.
 
 To run the minification and the tests:
 
-* only once:
-  - ```npm install grunt -g``` (only once)
-  - ```cd ..```
-  - ```npm update``` (in **chevrotain/examples/parser** directory)
+*   only once:
 
-* every time:
-  - ```grunt build``` (in **chevrotain/examples/parser/minification** directory)
+    *   `npm install grunt -g` (only once)
+    *   `cd ..`
+    *   `npm update` (in **chevrotain/examples/parser** directory)
+
+*   every time:
+    *   `grunt build` (in **chevrotain/examples/parser/minification** directory)
