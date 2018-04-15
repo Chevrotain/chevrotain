@@ -30,6 +30,7 @@ const examples_test_command = "yarn test"
 
 const INSTALL_LINK = "yarn install && yarn link chevrotain"
 const INSTALL_LINK_TEST = INSTALL_LINK + " && " + examples_test_command
+const UNLINK = " && yarn unlink chevrotain"
 
 const banner = "/*! <%= pkg.name %> - v<%= pkg.version %> */"
 
@@ -51,13 +52,13 @@ module.exports = function(grunt) {
                 options: {
                     cwd: process.cwd() + "/examples/lexer/"
                 },
-                exec: INSTALL_LINK_TEST
+                exec: INSTALL_LINK_TEST + UNLINK
             },
             test_examples_grammars: {
                 options: {
                     cwd: process.cwd() + "/examples/grammars/"
                 },
-                exec: INSTALL_LINK_TEST
+                exec: INSTALL_LINK_TEST + UNLINK
             },
             test_examples_parser: {
                 options: {
@@ -76,25 +77,26 @@ module.exports = function(grunt) {
                     " && " +
                     "cd .." +
                     " && " +
-                    examples_test_command
+                    examples_test_command +
+                    UNLINK
             },
             test_examples_implementation_languages: {
                 options: {
                     cwd: process.cwd() + "/examples/implementation_languages/"
                 },
-                exec: INSTALL_LINK + " && yarn test"
+                exec: INSTALL_LINK + " && yarn test" + UNLINK
             },
             test_examples_tutorial: {
                 options: {
                     cwd: process.cwd() + "/examples/tutorial/"
                 },
-                exec: INSTALL_LINK + " && yarn test"
+                exec: INSTALL_LINK + " && yarn test" + UNLINK
             },
             test_examples_custom_apis: {
                 options: {
                     cwd: process.cwd() + "/examples/custom_apis/"
                 },
-                exec: INSTALL_LINK + " && yarn test"
+                exec: INSTALL_LINK + " && yarn test" + UNLINK
             }
         },
 
