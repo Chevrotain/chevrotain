@@ -4,7 +4,7 @@ See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/exampl
 
 ### Detailed Docs:
 Chevrotain provides Syntactic Content assist Capabilities.
-These can be accessed via the [**computeContentAssist**](http://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#computecontentassist) method.
+These can be accessed via the [**computeContentAssist**](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#computecontentassist) method.
 
 Note that this feature **only** provides syntactic suggestions (meaning next possible token types) **not** semantic suggestions.
 It could be used as a building block in a semantic suggestions provider, but it cannot do this on "its own".
@@ -31,7 +31,7 @@ An order of magnitude slower performance may at first sound like a horrible thin
 Lets put this in perspective for relevant use cases:
 
 * Being an order of magnitude slower also means approximately the same speed as Jison.
-  - Tested on Chrome 54, See: [performance benchmark](http://sap.github.io/chevrotain/performance/).
+  - Tested on Chrome 54, See: [performance benchmark](https://sap.github.io/chevrotain/performance/).
 
 * **Smaller input Size 1**: Content Assist is requested for an offset inside a text, this means that on average only half the text input
   will have to be parsed. Suddenly the problem is halved...
@@ -54,7 +54,7 @@ Lets put this in perspective for relevant use cases:
              is requested inside that small function.
 
              ```javascript
-             
+
              // line 1
              // .
              // .
@@ -68,7 +68,7 @@ Lets put this in perspective for relevant use cases:
              // .
              // .
              // line 1000
-             
+
              ```
 
      There is no need no re-parse the whole file, Instead only the text of that function should be sent
@@ -89,7 +89,7 @@ The problem is that usually the code area where content assist is requested is a
 and is unlikely to able to be successfully parsed or automatically fixed, instead it will probably be skipped (re-synced) entirely.
 
 What this means is that for input areas that are currently being edited (or even written from scratch) by the user
-Embedded actions and error recovery are less useful anyhow. And if as described in the previous section an incremental approach 
+Embedded actions and error recovery are less useful anyhow. And if as described in the previous section an incremental approach
 to using the content assist will also resolve the issue in which the content assist position follows a syntax error.
 
 Example:
@@ -104,16 +104,16 @@ return Math.max(five, six)
 
 1. The first and third statements are syntactically invalid.
 
-2. Error recovery is likely to re-sync to the following statements instead of resolving this with single token insertion / deletion. 
- 
-3. Therefore the results of embedded actions on these statements will not be useful. 
+2. Error recovery is likely to re-sync to the following statements instead of resolving this with single token insertion / deletion.
+
+3. Therefore the results of embedded actions on these statements will not be useful.
 
 4. Content assist is request in the third statement after the "+" operator.
- 
+
 5. If we try to send the whole text to request content assist suggestions until the offset after the "+" operator
    No suggestions will be found due to the syntax error on the first statement.
-   
-6. However if we only send the text of the third statement ("let six = 1 + ") content assist will work successfully.   
+
+6. However if we only send the text of the third statement ("let six = 1 + ") content assist will work successfully.
 
 
 

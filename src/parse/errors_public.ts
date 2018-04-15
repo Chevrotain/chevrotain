@@ -59,7 +59,7 @@ export interface IParserErrorMessageProvider {
      * @param options.actual - The actual sequence of tokens encountered.
      *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the "OR" DSL method.
-     *                                http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ormethodopts.html#err_msg
+     *                                https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/ormethodopts.html#err_msg
      *                                This is that custom message.
      *
      * @param options.ruleName - The rule in which the error occurred.
@@ -83,7 +83,7 @@ export interface IParserErrorMessageProvider {
      *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
      *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the "AT_LEAST_ONE" DSL method.
-     *                                http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/dslmethodoptswitherr.html#err_msg
+     *                                https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/dslmethodoptswitherr.html#err_msg
      *                                This is that custom message.
      *
      * @param options.ruleName - The rule in which the error occurred.
@@ -321,7 +321,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
                   in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
                   position key in the grammar, which is needed by the parsing engine.
                   
-                  For further details see: http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
+                  For further details see: https://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
                   `
 
         // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
@@ -391,7 +391,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
                 options.topLevelRule.name
             }> Rule,\n` +
             `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-            `http://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX ` +
+            `https://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX ` +
             `For farther details.`
 
         return errMsg
@@ -423,7 +423,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
             "1. Refactor your grammar to be LL(K) for the current value of k (by default k=5)\n" +
             "2. Increase the value of K for your grammar by providing a larger 'maxLookahead' value in the parser's config\n" +
             "3. This issue can be ignored (if you know what you are doing...), see" +
-            " http://sap.github.io/chevrotain/documentation/" +
+            " https://sap.github.io/chevrotain/documentation/" +
             docs_version +
             "/interfaces/iparserconfig.html#ignoredissues for more" +
             " details\n"

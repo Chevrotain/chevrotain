@@ -2,7 +2,7 @@ var os = require("os")
 var ifaces = os.networkInterfaces()
 
 var ipAddresses = []
-// based on http://stackoverflow.com/a/8440736
+// based on https://stackoverflow.com/a/8440736
 Object.keys(ifaces).forEach(function(ifname) {
     var alias = 0
 
