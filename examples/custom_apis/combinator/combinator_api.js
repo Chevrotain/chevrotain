@@ -85,7 +85,7 @@ function createParser(name, rules, tokenVocabulary) {
     const resolutionErrors = resolveGrammar({ rules: rules })
 
     // The indices must be unique.
-    // See http://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES
+    // See https://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES
     assignOccurrenceIndices({ rules: rules })
 
     if (!_.isEmpty(resolutionErrors)) {
@@ -117,7 +117,7 @@ function createParser(name, rules, tokenVocabulary) {
     })
     // The IParserConfig is passed to the parserFactory
     // Look for IParserConfig on the htmls docs for additional info
-    // http://sap.github.io/chevrotain/documentation/1_0_1/globals.html
+    // https://sap.github.io/chevrotain/documentation/1_0_1/globals.html
     return parserFactory({ outputCst: true })
 }
 

@@ -858,7 +858,7 @@ function defineRecognizerSpecs(
                 expect(tokenMatcher(parser.SKIP_TOKEN(), EOF))
                 expect(tokenMatcher(parser.SKIP_TOKEN(), EOF))
                 // and we can go on and on and on... this avoid returning null/undefined
-                // see: http://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
+                // see: https://en.wikipedia.org/wiki/Tony_Hoare#Apologies_and_retractions
             })
 
             it("invoking an OPTION will return the inner grammar action's value or undefined", () => {

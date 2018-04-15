@@ -1,7 +1,7 @@
 "use strict"
 
 /*
- * Spec: http://www.ecma-international.org/ecma-262/5.1/#sec-7
+ * Spec: https://www.ecma-international.org/ecma-262/5.1/#sec-7
  * important notes:
  * *  The Tokens class hierarchy in this module is based upon, but does not precisely match the spec's hierarchy.
  *    Instead the hierarchy is meant to provide easy categorization/classification of the tokens for "future phases"
@@ -10,16 +10,16 @@
 
 const { createToken } = require("chevrotain")
 
-// Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.2
+// Link: https://www.ecma-international.org/ecma-262/5.1/#sec-7.2
 const Whitespace = createToken({ name: "Whitespace" })
 
-// Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.3
+// Link: https://www.ecma-international.org/ecma-262/5.1/#sec-7.3
 const LineTerminator = createToken({
     name: "LineTerminator",
     categories: Whitespace
 })
 
-// Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.4
+// Link: https://www.ecma-international.org/ecma-262/5.1/#sec-7.4
 const SingleLineComment = createToken({
     name: "SingleLineComment"
 })
@@ -33,7 +33,7 @@ const MultipleLineComment = createToken({
     name: "MultipleLineComment"
 })
 
-// Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.6
+// Link: https://www.ecma-international.org/ecma-262/5.1/#sec-7.6
 const IdentifierName = createToken({ name: "IdentifierName" })
 
 const AbsAnyKeyword = createToken({
@@ -113,7 +113,7 @@ const GetTok = createToken({ name: "SetTok", categories: Identifier })
 
 // TODO: Missing the future reservedKeywords here.
 
-// Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.7
+// Link: https://www.ecma-international.org/ecma-262/5.1/#sec-7.7
 const AbsPunctuator = createToken({ name: "AbsPunctuator" })
 
 const LCurly = createToken({ name: "LCurly", categories: AbsPunctuator })
@@ -282,7 +282,7 @@ const SlashEq = createToken({
     categories: AbsAssignmentOperator
 })
 
-// Link: http://www.ecma-international.org/ecma-262/5.1/#sec-7.8
+// Link: https://www.ecma-international.org/ecma-262/5.1/#sec-7.8
 const AbsLiteral = createToken({ name: "AbsLiteral" })
 
 const NullTok = createToken({ name: "NullTok", categories: [AbsLiteral] })

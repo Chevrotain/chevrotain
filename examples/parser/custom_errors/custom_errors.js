@@ -2,7 +2,7 @@
  * An example showing how to customize the error messages produced by the parser.
  * This is done by providing a custom "errorMessageProvider" during parser initialization.
  * The detailed API for the IErrorMessageProvider can be found here:
- * http://sap.github.io/chevrotain/documentation/1_0_1/interfaces/ierrormessageprovider.html
+ * https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/ierrormessageprovider.html
  */
 const {
     createToken,

@@ -141,7 +141,7 @@ export interface ILexerConfig {
      * The default is: /\n|\r\n?/g
      *
      * But some grammars have a different definition, for example in ECMAScript:
-     * http://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
+     * https://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
      * U+2028 and U+2029 are also treated as line terminators.
      *
      * In that case we would use /\n|\r|\u2028|\u2029/g

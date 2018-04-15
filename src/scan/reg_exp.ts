@@ -32,7 +32,7 @@ export function getStartCodes(
                         `\tUnable to optimize: < ${regExp.toString()} >\n` +
                         "\tComplement Sets cannot be automatically optimized.\n" +
                         "\tThis will disable the lexer's first char optimizations.\n" +
-                        "\tSee: http://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#COMPLEMENT for details."
+                        "\tSee: https://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#COMPLEMENT for details."
                 )
             }
         } else {
@@ -40,7 +40,7 @@ export function getStartCodes(
             if (ensureOptimizations) {
                 msgSuffix =
                     "\n\tThis will disable the lexer's first char optimizations.\n" +
-                    "\tSee: http://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#REGEXP_PARSING for details."
+                    "\tSee: https://sap.github.io/chevrotain/website/Building_Grammars/resolving_lexer_errors.html#REGEXP_PARSING for details."
             }
             PRINT_ERROR(
                 `${failedOptimizationPrefixMsg}\n` +

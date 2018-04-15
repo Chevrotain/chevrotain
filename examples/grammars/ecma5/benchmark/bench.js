@@ -69,7 +69,7 @@ newSuite("lexer")
 // However, the multiple orders of magnitudes differences in the results cannot be explained by these factors.
 // My guess is that Antlr and peg.js have issues (possibly specific to their ECMA5 grammars with deep expression hierarchies).
 // As the relative differences are drastically different when benchmarking a simple JSON grammar
-// http://sap.github.io/chevrotain/performance/
+// https://sap.github.io/chevrotain/performance/
 newSuite("Versus Generic Parsing Libraries - small input")
     .add("Chevrotain", () => chevParse(smallSample))
     .add("antlr", () => antlrParse(smallSample))

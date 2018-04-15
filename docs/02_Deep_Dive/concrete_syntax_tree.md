@@ -2,7 +2,7 @@
 Chevrotain has the capability to **automatically** create a concrete syntax tree (CST)
 during parsing. A CST is a simple structure which represents the **entire** parse tree.
 It contains information on every token parsed.
- 
+
 The main advantage of using the automatic CST creation is that it enables writing "pure" grammars.
 This means that the semantic actions are **not** embedded into the grammar implementation but are instead
 completely **separated** from it.
@@ -16,18 +16,18 @@ for example: separate logic for compilation and for IDE support.
 There are two major differences.
 1. An Abstract Syntax Tree would not normally contain all the syntactic information.
    This mean the **exact original** text could not be re-constructed from the AST.
-   
+
 2. An Abstract Syntax Tree would not represent the whole syntactic parse tree.
-   It would normally only contain nodes related to specific parse tree nodes, 
+   It would normally only contain nodes related to specific parse tree nodes,
    but not all of those (mostly leaf nodes).
-   
+
 
 ### How to enable CST output?
-   
+
 In the future this capability may be enabled by default.
 Currently this feature must be explicitly enabled by setting the **outputCst** flag.
 
-In the parser [configuration object](http://sap.github.io/chevrotain/documentation/3_1_0/interfaces/iparserconfig.html).
+In the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/iparserconfig.html).
 
 ```JavaScript
 class MyParser extends chevrotain.Parser {
@@ -35,18 +35,18 @@ class MyParser extends chevrotain.Parser {
     constructor(input) {
         super(input, allTokens, { outputCst : true })
     }
-}        
+}
 ```
 
 
 ### The structure of the CST
 
 The structure of the CST is very simple.
-* View it by running the CST creation example in the [**online playground**](http://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
+* View it by running the CST creation example in the [**online playground**](https://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
 
 * Note that the following examples are not runnable nor contain the full information.
 These are just snippets to explain the core concepts.
- 
+
 ```TypeScript
 export type CstElement = IToken | CstNode
 export type CstChildrenDictionary = { [elementName:string]:CstElement[] }
@@ -58,19 +58,19 @@ export interface CstNode {
 
     readonly recoveredNode?:boolean
 }
-``` 
+```
 
 A single CstNode corresponds to a single grammar rule's invocation result.
 
 ```JavaScript
 $.RULE("qualifiedName", () => {
-    
+
 })
 
 input = ""
 
 output = {
-  name: "qualifiedName",  
+  name: "qualifiedName",
   children: {}
 }
 ```
@@ -88,7 +88,7 @@ $.RULE("qualifiedName", () => {
 input = "foo.bar"
 
 output = {
-  name: "qualifiedName",  
+  name: "qualifiedName",
   children: {
       Dot : ["."],
       Identifier : ["foo", "bar"]
@@ -101,21 +101,21 @@ Is the CstNode of the corresponding Grammar Rule (Non-Terminal).
 
 ```JavaScript
 $.RULE("qualifiedName", () => {
-    $.SUBRULE($.singleIdent)      
+    $.SUBRULE($.singleIdent)
 })
 
 $.RULE("singleIdent", () => {
-    $.CONSUME(Identifier)            
+    $.CONSUME(Identifier)
 })
 
 input = "foo"
 
 output = {
-  name: "qualifiedName",  
+  name: "qualifiedName",
   children: {
       singleIdent : [
           {
-            name: "singleIdent",  
+            name: "singleIdent",
             children: {
                Identifier : ["foo"]
             }
@@ -143,7 +143,7 @@ $.RULE("variableStatement", () => {
 input1 = "var x"
 
 output1 = {
-  name: "variableStatement",  
+  name: "variableStatement",
   children: {
       Var : ["var"],
       Identifier : ["x"]
@@ -154,7 +154,7 @@ output1 = {
 input2 = "var x = 5"
 
 output2 = {
-  name: "variableStatement",  
+  name: "variableStatement",
   children: {
       Var : ["var"],
       Identifier : ["x"],
@@ -222,7 +222,7 @@ $.RULE("statements", () => {
 ```
 
 This is the recommended approach in this case as more and more alternations are added the grammar rule
-will become too difficult to understand and maintain due to verbosity.   
+will become too difficult to understand and maintain due to verbosity.
 However, sometimes refactoring out rules is too much, this is where **in-lined** rules arrive to the rescue.
 
 ```JavaScript
@@ -230,7 +230,7 @@ $.RULE("statements", () => {
     $.OR([
         // let x = 5
         {
-         NAME: "$letStatement",   
+         NAME: "$letStatement",
          ALT: () => {
             $.CONSUME(Let)
             $.CONSUME(Identifer)
@@ -239,7 +239,7 @@ $.RULE("statements", () => {
         }},
         // select age from employee where age = 120
         {
-         NAME: "$selectStatement",   
+         NAME: "$selectStatement",
          ALT: () => {
             $.CONSUME(Select)
             $.CONSUME2(Identifer)
@@ -253,7 +253,7 @@ $.RULE("statements", () => {
 
 output = {
   name: "statements",
-  // only one of they keys depending on the actual alternative chosen  
+  // only one of they keys depending on the actual alternative chosen
   children: {
       $letStatement : [/*...*/],
       $$selectStatement : [/*...*/]
@@ -270,14 +270,14 @@ It is equivalent to extraction to a separate grammar rule with two differences:
 Syntax Limitation:
  * The **NAME** property of an in-lined rule must appear as the **first** property
    of the **DSLMethodOpts** object.
-   
+
    ```javascript
    // GOOD
    $.RULE("field", () => {
        $.OPTION({
            NAME:"$modifier",
            DEF: () => {
-               $.CONSUME(Static) 
+               $.CONSUME(Static)
            }
        })
    })
@@ -286,26 +286,26 @@ Syntax Limitation:
    $.RULE("field", () => {
       $.OPTION({
           DEF: () => {
-              $.CONSUME(Static) 
+              $.CONSUME(Static)
           },
           NAME:"$modifier"
       })
    })
    ```
-   
-   
+
+
 ### CST And Error Recovery
 
 CST output is also supported in combination with automatic error recovery.
 This combination is actually stronger than regular error recovery because
-even partially formed CstNodes will be present on the CST output and be marked 
+even partially formed CstNodes will be present on the CST output and be marked
 using the **recoveredNode"** boolean property.
 
 For example given this grammar and assuming the parser re-synced after a token mismatch at
 the "Where" token:
 
 ```JavaScript
-$.RULE("SelectClause", () => {    
+$.RULE("SelectClause", () => {
     $.CONSUME(Select)
     $.CONSUME2(Identifer)
     $.CONSUME(From)
@@ -314,12 +314,12 @@ $.RULE("SelectClause", () => {
     $.SUBRULE($.expression)
 })
 
-// mismatch token due to typo at "wherrrre", parsing halts and re-syncs to upper rule so 
+// mismatch token due to typo at "wherrrre", parsing halts and re-syncs to upper rule so
 // the suffix "wherrrre age > 25" is not parsed.
 input = "select age from persons wherrrre age > 25"
 
 output = {
-  name: "SelectClause",  
+  name: "SelectClause",
   children: {
       Select: ["select"],
       Identifier: ["age, persons"],
@@ -336,9 +336,9 @@ This accessibility of **partial parsing results** means some post-parsing logic
 may be able to perform farther analysis.
 for example: offering auto-fix suggestions or provide better error messages.
 
- 
+
 ### Traversing a CST Structure.
- 
+
 So we now know how to create a CST and it's internal structure.
 But how do we traverse this structure and perform semantic actions?
 Some examples for such semantic actions:
@@ -346,7 +346,7 @@ Some examples for such semantic actions:
  * Running the input text in an interpreter, for example a Calculator's grammar and input can be evaluated to
    a numerical value.
  * Extracting specific pieces of information from the input.
-    
+
 One option would be to "manually" recursively "walk" the output CST structure.
 
 ```javascript
@@ -357,10 +357,10 @@ export function toAst(cst) {
 		case "selectStatement": {
 		    let columnsListCst = children.columnsList[0]
 		    let fromClauseCst = children.fromClause[0]
-		    
+
 		    let columnsListAst = toAst(columnsListCst)
 		    let fromClauseAst = toAst(fromClauseCst)
-		    
+
 		    return {
 		        type: "SelectStatementAst",
 		        columns: columnsListAst,
@@ -392,7 +392,7 @@ This is a valid approach, however it can be somewhat error prone:
 For the impatient, See a full runnable example: [Calculator Grammar with CSTVisitor interpreter](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
 
 Chevrotain provides a CSTVisitor class which can make traversing the CST less error prone.
- 
+
 ```javascript
 
 // The base Visitor Class can be accessed via a Parser **instance**.
@@ -412,7 +412,7 @@ class SqlToAstVisitor extends BaseCstVisitor {
         // this means "this.visit(ctx.columnsList)" is equivalent to "this.visit(ctx.columnsList[0])"
         let columnsListAst = this.visit(ctx.columnsList)
         let fromClauseAst = this.visit(ctx.fromClause)
-        		    
+
         return {
             type: "SelectStatementAst",
         	columns: columnsListAst,
@@ -429,7 +429,7 @@ class SqlToAstVisitor extends BaseCstVisitor {
     fromClause(ctx, inArg) {
         /*...*/
     }
-    
+
     // Visitor methods for in-lined rules are created by appending the in-lined rule name to the parent rule name.
     fromClause$INLINED_NAME(ctx) {
        /*...*/
@@ -437,12 +437,12 @@ class SqlToAstVisitor extends BaseCstVisitor {
 }
 ```
 
-* Each visitor method will be invoked with the respective CSTNode's children as the first argument 
+* Each visitor method will be invoked with the respective CSTNode's children as the first argument
   (called ctx in the above example).
 
 * Recursively visiting None-Terminals can be accomplished by using the **this.visit** method.
   It will invoke the appropriate visit method for the CSTNode argument.
-  
+
 * The **this.visit** method can also be invoked on an array on CSTNodes in that case
   It is equivalent to calling it on the first element of the input array.
 
@@ -455,7 +455,7 @@ class SqlToAstVisitor extends BaseCstVisitor {
 
 
 #### Do we always have to implement all the visit methods?
- 
+
 **No**, sometimes we only need to handle a few specific CST Nodes
 In that case use **getBaseCstVisitorConstructorWithDefaults()** to get the base visitor constructor.
 This base visitor includes a default implementation for all visit methods
@@ -477,7 +477,7 @@ class SqlColumnNamesVisitor extends BaseCstVisitorWithDefaults {
         // collect only the names of the columns
         this.result.push(ctx.Identifier[0].image)
     }
-    
+
     // All other visit methods will be "filled" automatically with the default implementation.
 }
 ```
@@ -495,15 +495,15 @@ versus a pure grammar's runtime (no output) depending on the grammar used.
 Particularly on its level of rules nesting.
 
 This may be substantial yet please consider:
-* Chevrotain is already [very fast](http://sap.github.io/chevrotain/performance/)
+* Chevrotain is already [very fast](https://sap.github.io/chevrotain/performance/)
   So at worst at will degrade to just "fast"...
-  
+
 * This comparison is not fair as a pure grammar that has no output also has very little use...
   The right comparison would be to versus embedding actions that built some alternative CST/AST output structure.
 
 * Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
   would be reduced.
-  
-It is therefore recommended to use the CST creation capabilities  
+
+It is therefore recommended to use the CST creation capabilities
 as its benefits (modularity / ease of maintenance) by far outweigh the costs (potentially reduced performance).
-except in unique edge cases. 
+except in unique edge cases.

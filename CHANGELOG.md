@@ -57,7 +57,7 @@
 
 #### Major Changes
 
-- [Support custom user defined declarative APIs](http://sap.github.io/chevrotain/website/Deep_Dive/custom_apis.html)
+- [Support custom user defined declarative APIs](https://sap.github.io/chevrotain/website/Deep_Dive/custom_apis.html)
 
 #### Minor Changes
 - [Increase DSL methods suffix indices.](https://github.com/SAP/chevrotain/issues/606)
@@ -72,7 +72,7 @@
 
 #### Documentation
 
-- [New Documentation Website.](http://sap.github.io/chevrotain/website/)
+- [New Documentation Website.](https://sap.github.io/chevrotain/website/)
 
 #### Bug Fixes
 
@@ -126,8 +126,8 @@
 #### Breaking Changes
 
 - Removed "extendToken" and "NEXT_TOKEN" deprecated APIs.
-  Use [createToken](http://sap.github.io/chevrotain/documentation/0_32_1/modules/_chevrotain_d_.html#createtoken)
-  and [LA(1)](http://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#la) instead.
+  Use [createToken](https://sap.github.io/chevrotain/documentation/0_32_1/modules/_chevrotain_d_.html#createtoken)
+  and [LA(1)](https://sap.github.io/chevrotain/documentation/0_32_1/classes/_chevrotain_d_.parser.html#la) instead.
 
 #### Minor Changes
 
@@ -434,7 +434,7 @@ See:**[Token Types Docs](docs/token_types.md)** for additional details.
 Certain advanced uses cases of [dynamically defined Tokens](https://github.com/SAP/chevrotain/blob/master/examples/parser/dynamic_tokens/dynamic_delimiters.js)
 Will break if some of new lookahead optimizations are enabled.
 
-To resolve this a new property **dynamicTokensEnabled** has been defined on the [IParserConfig](http://sap.github.io/chevrotain/documentation/0_15_0/interfaces/iparserconfig.html)
+To resolve this a new property **dynamicTokensEnabled** has been defined on the [IParserConfig](https://sap.github.io/chevrotain/documentation/0_15_0/interfaces/iparserconfig.html)
 interface. This configuration property is disabled by default, but can be enabled to support the use case of dynamically defined tokens.
 See the [dynamically defined Tokens](https://github.com/SAP/chevrotain/blob/master/examples/parser/dynamic_tokens/dynamic_delimiters.js)
 example for details.
@@ -631,8 +631,8 @@ so not many changes will be needed (if at all) for most users.
 
 - [Use a config object for RULE DSL method.](https://github.com/SAP/chevrotain/issues/168)
 
-  The [RULE method's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters
-  have been been replaced with a single configuration object of the type [IRuleConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html).
+  The [RULE method's](https://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) optional third and fourth parameters
+  have been been replaced with a single configuration object of the type [IRuleConfig](https://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html).
   Therefore any RULE invocation with more than two arguments must be refactored to the new form.
   For example:
 
@@ -647,7 +647,7 @@ so not many changes will be needed (if at all) for most users.
 - [Remove RULE_NO_RESYNC DSL method.](https://github.com/SAP/chevrotain/issues/172)
 
   The RULE_NO_RESYNC convenience method has been removed.
-  All usages of it must be replaced with an equivalent RULE call using the IRuleConfig [resyncEnabled](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
+  All usages of it must be replaced with an equivalent RULE call using the IRuleConfig [resyncEnabled](https://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iruleconfig.html#resyncenabled)
   property.
 
   For example:
@@ -662,8 +662,8 @@ so not many changes will be needed (if at all) for most users.
 - [Parser Configuration should be done using a "Config" Object instead of constructor parameters.](https://github.com/SAP/chevrotain/issues/175)
 - [Error Recovery / Fault Tolerance abilities should be disabled by default.](https://github.com/SAP/chevrotain/issues/174)
 
-   The [Parser constructors's](http://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) third (optional) parameter
-   has been been replaced with a single configuration object of the type [IParserConfig](http://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iparserconfig.html)
+   The [Parser constructors's](https://sap.github.io/chevrotain/documentation/0_7_2/classes/parser.html#rule) third (optional) parameter
+   has been been replaced with a single configuration object of the type [IParserConfig](https://sap.github.io/chevrotain/documentation/0_8_0/interfaces/iparserconfig.html)
    Therefore any Base Parser super invocation which uses the optional parameter must be updated.
    Additionally The Error recovery functionality is now **disabled** by default, it can be enabled via the parser's configuration.
    For example:

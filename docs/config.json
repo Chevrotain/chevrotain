@@ -20,8 +20,8 @@
     "repo": "SAP/chevrotain",
     "edit_on_github": "SAP/chevrotain/blob/master/docs",
     "links": {
-      "Online Playground" : "http://sap.github.io/chevrotain/playground/",
-      "Performance Benchmark" : "http://sap.github.io/chevrotain/performance/",
+      "Online Playground" : "https://sap.github.io/chevrotain/playground/",
+      "Performance Benchmark" : "https://sap.github.io/chevrotain/performance/",
       "Help/Support/Bugs": "https://github.com/sap/chevrotain/issues",
       "GitHub Repo": "https://github.com/sap/chevrotain"
     }

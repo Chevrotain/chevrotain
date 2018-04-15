@@ -153,7 +153,7 @@
         )
     })()
 
-    // http://stackoverflow.com/questions/8917921/cross-browser-javascript-not-jquery-scroll-to-top-animation
+    // https://stackoverflow.com/questions/8917921/cross-browser-javascript-not-jquery-scroll-to-top-animation
     function scrollToY(scrollTargetY, speed, easing) {
         // scrollTargetY: the target scrollY property of the window
         // speed: time in pixels per second

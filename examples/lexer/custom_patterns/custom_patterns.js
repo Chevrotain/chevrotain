@@ -4,7 +4,7 @@
  * instead of being limited to only using regular expressions.
  *
  * For additional details see the docs:
- * http://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html
+ * https://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html
  */
 const { createToken, Lexer } = require("chevrotain")
 

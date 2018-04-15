@@ -801,7 +801,7 @@ class ECMAScript5Parser extends Parser {
     }
 
     /*
-     * Link http://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
+     * Link https://www.ecma-international.org/ecma-262/5.1/#sec-7.9.1
      * Automatic semicolon insertion implementation.
      * The spec defines the insertion in terms of encountering an "offending"
      * token and then inserting a semicolon under one of three basic rules.
@@ -860,7 +860,7 @@ class ECMAScript5Parser extends Parser {
     // TODO: implement once the parser builds some data structure we can explore.
     // in the case of "for (x in y)" form.
     // the "IN" is only allowed if x is a left hand side expression
-    // http://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.6
+    // https://www.ecma-international.org/ecma-262/5.1/index.html#sec-12.6
     // so this method must verify that the exp parameter fulfills this condition.
     canInComeAfterExp(exp) {
         // TODO: temp implemntatoin, will always allow IN style iteration for now.
