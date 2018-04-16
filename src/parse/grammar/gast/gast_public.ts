@@ -244,7 +244,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
     function convertDefinition(definition: IProduction[]): ISerializedGast[] {
         return map(definition, serializeProduction)
     }
-
+    /* istanbul ignore else */
     if (node instanceof NonTerminal) {
         return <ISerializedNonTerminal>{
             type: "NonTerminal",
@@ -309,14 +309,12 @@ export function serializeProduction(node: IProduction): ISerializedGast {
 
         return serializedTerminal
     } else if (node instanceof Rule) {
-        // IGNORE ABOVE ELSE
         return <ISerializedGastRule>{
             type: "Rule",
             name: node.name,
             definition: convertDefinition(node.definition)
         }
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

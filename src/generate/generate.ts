@@ -134,6 +134,7 @@ export function genSingleAlt(prod: Flat, n: number): string {
 }
 
 function genProd(prod: IProduction, n: number): string {
+    /* istanbul ignore else */
     if (prod instanceof NonTerminal) {
         return genNonTerminal(prod, n)
     } else if (prod instanceof Option) {
@@ -153,7 +154,6 @@ function genProd(prod: IProduction, n: number): string {
     } else if (prod instanceof Flat) {
         return genDefinition(prod.definition, n)
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

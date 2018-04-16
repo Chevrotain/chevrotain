@@ -97,7 +97,6 @@
     "grunt-karma": "~2.0.0",
     "grunt-run": "^0.8.0",
     "if-env": "^1.0.0",
-    "istanbul": "^0.4.5",
     "jsdom": "^11.5.1",
     "jsonfile": "^4.0.0",
     "karma": "~2.0.0",

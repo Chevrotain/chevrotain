@@ -14,6 +14,7 @@ import {
 
 export abstract class GAstVisitor {
     public visit(node: IProduction): any {
+        /* istanbul ignore next */
         if (node instanceof NonTerminal) {
             return this.visitNonTerminal(node)
         } else if (node instanceof Flat) {
@@ -35,7 +36,6 @@ export abstract class GAstVisitor {
         } else if (node instanceof Rule) {
             return this.visitRule(node)
         } else {
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     }

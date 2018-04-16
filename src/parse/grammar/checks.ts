@@ -50,17 +50,14 @@ import {
     Terminal
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
-import {
-    defaultGrammarValidatorErrorProvider,
-    IGrammarValidatorErrorMessageProvider
-} from "../errors_public"
+import { IGrammarValidatorErrorMessageProvider } from "../errors_public"
 
 export function validateGrammar(
     topLevels: Rule[],
     maxLookahead: number,
     tokenTypes: TokenType[],
-    ignoredIssues: IgnoredParserIssues = {},
-    errMsgProvider: IGrammarValidatorErrorMessageProvider = defaultGrammarValidatorErrorProvider,
+    ignoredIssues: IgnoredParserIssues,
+    errMsgProvider: IGrammarValidatorErrorMessageProvider,
     grammarName: string
 ): IParserDefinitionError[] {
     let duplicateErrors: any = utils.map(topLevels, currTopLevel =>
@@ -452,6 +449,7 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     }
     let firstProd = utils.first(definition)
 
+    /* istanbul ignore else */
     if (firstProd instanceof NonTerminal) {
         result.push(firstProd.referencedRule)
     } else if (
@@ -475,7 +473,6 @@ export function getFirstNoneTerminal(definition: IProduction[]): Rule[] {
     } else if (firstProd instanceof Terminal) {
         // nothing to see, move along
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 

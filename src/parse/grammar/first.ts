@@ -9,6 +9,7 @@ import {
 import { isBranchingProd, isOptionalProd, isSequenceProd } from "./gast/gast"
 
 export function first(prod: IProduction): TokenType[] {
+    /* istanbul ignore else */
     if (prod instanceof NonTerminal) {
         // this could in theory cause infinite loops if
         // (1) prod A refs prod B.
@@ -26,7 +27,6 @@ export function first(prod: IProduction): TokenType[] {
     } else if (isBranchingProd(prod)) {
         return firstForBranching(<AbstractProduction>prod)
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

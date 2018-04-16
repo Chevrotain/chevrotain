@@ -73,6 +73,7 @@ export function isBranchingProd(prod: IProduction): boolean {
 }
 
 export function getProductionDslName(prod: IProductionWithOccurrence): string {
+    /* istanbul ignore else */
     if (prod instanceof NonTerminal) {
         return "SUBRULE"
     } else if (prod instanceof Option) {
@@ -90,7 +91,6 @@ export function getProductionDslName(prod: IProductionWithOccurrence): string {
     } else if (prod instanceof Terminal) {
         return "CONSUME"
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

@@ -84,6 +84,7 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
             // copy without name so this will indeed be processed later.
             let nameLessNode
 
+            /* istanbul ignore else */
             if (
                 node instanceof Option ||
                 node instanceof Repetition ||
@@ -104,7 +105,6 @@ export class NamedDSLMethodsCollectorVisitor extends GAstVisitor {
                     separator: node.separator
                 })
             } else {
-                /* istanbul ignore next */
                 throw Error("non exhaustive match")
             }
             let def = [nameLessNode]

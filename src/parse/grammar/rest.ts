@@ -20,7 +20,7 @@ export abstract class RestWalker {
     walk(prod: AbstractProduction, prevRest: any[] = []): void {
         forEach(prod.definition, (subProd: IProduction, index) => {
             let currRest = drop(prod.definition, index + 1)
-
+            /* istanbul ignore else */
             if (subProd instanceof NonTerminal) {
                 this.walkProdRef(subProd, currRest, prevRest)
             } else if (subProd instanceof Terminal) {
@@ -40,7 +40,6 @@ export abstract class RestWalker {
             } else if (subProd instanceof Alternation) {
                 this.walkOr(subProd, currRest, prevRest)
             } else {
-                /* istanbul ignore next */
                 throw Error("non exhaustive match")
             }
         })

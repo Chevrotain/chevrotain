@@ -151,7 +151,6 @@ export function buildProdGast(
     prodRange: IProdRange,
     allRanges: IProdRange[]
 ): IProduction {
-    ;("use strict")
     switch (prodRange.type) {
         case ProdType.AT_LEAST_ONE:
             return buildAtLeastOneProd(prodRange, allRanges)
@@ -173,7 +172,6 @@ export function buildProdGast(
             return buildTerminalProd(prodRange)
         /* istanbul ignore next */
         default:
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
     }
 }

@@ -93,6 +93,7 @@ export function analyzeTokenTypes(
     let allTransformedPatterns = map(onlyRelevantTypes, currType => {
         let currPattern = currType[PATTERN]
 
+        /* istanbul ignore else */
         if (isRegExp(currPattern)) {
             let regExpSource = currPattern.source
             if (
@@ -161,7 +162,6 @@ export function analyzeTokenTypes(
                     : addStartOfInput(wrappedRegExp)
             }
         } else {
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     })
@@ -173,6 +173,7 @@ export function analyzeTokenTypes(
 
     let patternIdxToGroup = map(onlyRelevantTypes, (clazz: any) => {
         let groupName = clazz.GROUP
+        /* istanbul ignore next */
         if (groupName === Lexer.SKIPPED) {
             return undefined
         } else if (isString(groupName)) {
@@ -180,7 +181,6 @@ export function analyzeTokenTypes(
         } else if (isUndefined(groupName)) {
             return false
         } else {
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     })
@@ -692,6 +692,7 @@ export function findUnreachablePatterns(
 }
 
 function testTokenType(str: string, pattern: any): boolean {
+    /* istanbul ignore else */
     if (isRegExp(pattern)) {
         const regExpArray = pattern.exec(str)
         return regExpArray !== null && regExpArray.index === 0
@@ -704,7 +705,6 @@ function testTokenType(str: string, pattern: any): boolean {
     } else if (typeof pattern === "string") {
         return pattern === str
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }
@@ -841,7 +841,6 @@ export function cloneEmptyGroups(emptyGroups: {
         if (isArray(currGroupValue)) {
             clonedResult[currKey] = []
         } else {
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     })
@@ -852,6 +851,7 @@ export function cloneEmptyGroups(emptyGroups: {
 // TODO: refactor to avoid duplication
 export function isCustomPattern(tokenType: any): boolean {
     let pattern = tokenType.PATTERN
+    /* istanbul ignore else */
     if (isRegExp(pattern)) {
         return false
     } else if (isFunction(pattern)) {
@@ -863,7 +863,6 @@ export function isCustomPattern(tokenType: any): boolean {
     } else if (isString(pattern)) {
         return false
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

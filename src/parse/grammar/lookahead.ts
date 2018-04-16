@@ -46,6 +46,7 @@ export enum PROD_TYPE {
 }
 
 export function getProdType(prod: IProduction): PROD_TYPE {
+    /* istanbul ignore else */
     if (prod instanceof Option) {
         return PROD_TYPE.OPTION
     } else if (prod instanceof Repetition) {
@@ -59,7 +60,6 @@ export function getProdType(prod: IProduction): PROD_TYPE {
     } else if (prod instanceof Alternation) {
         return PROD_TYPE.ALTERNATION
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }

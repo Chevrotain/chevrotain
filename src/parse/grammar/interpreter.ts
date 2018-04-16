@@ -285,6 +285,7 @@ export function possiblePathsFrom(
     while (currPath.length < maxLength && i < targetDef.length) {
         let prod = targetDef[i]
 
+        /* istanbul ignore else */
         if (prod instanceof Flat) {
             return getAlternativesForProd(prod.definition)
         } else if (prod instanceof NonTerminal) {
@@ -322,7 +323,6 @@ export function possiblePathsFrom(
         } else if (prod instanceof Terminal) {
             currPath.push(prod.terminalType)
         } else {
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
 
@@ -394,6 +394,7 @@ export function nextPossibleTokensAfter(
         }
 
         let prod = currDef[0]
+        /* istanbul ignore else */
         if (prod === EXIT_NON_TERMINAL) {
             let nextPath = {
                 idx: currIdx,
@@ -403,6 +404,7 @@ export function nextPossibleTokensAfter(
             }
             possiblePaths.push(nextPath)
         } else if (prod instanceof Terminal) {
+            /* istanbul ignore else */
             if (currIdx < tokenVectorLength - 1) {
                 let nextIdx = currIdx + 1
                 let actualToken = tokenVector[nextIdx]
@@ -426,7 +428,6 @@ export function nextPossibleTokensAfter(
                 })
                 foundCompletePath = true
             } else {
-                /* istanbul ignore next */
                 throw Error("non exhaustive match")
             }
         } else if (prod instanceof NonTerminal) {
@@ -585,7 +586,6 @@ export function nextPossibleTokensAfter(
                 )
             )
         } else {
-            /* istanbul ignore next */
             throw Error("non exhaustive match")
         }
     }

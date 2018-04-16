@@ -72,6 +72,7 @@ export function last<T>(arr: T[]): T {
 }
 
 export function forEach(collection: any, iteratorCallback: Function): void {
+    /* istanbul ignore else */
     if (Array.isArray(collection)) {
         for (let i = 0; i < collection.length; i++) {
             iteratorCallback.call(null, collection[i], i)
@@ -84,7 +85,6 @@ export function forEach(collection: any, iteratorCallback: Function): void {
             iteratorCallback.call(null, value, key)
         }
     } else {
-        /* istanbul ignore next */
         throw Error("non exhaustive match")
     }
 }
