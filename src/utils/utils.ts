@@ -411,12 +411,14 @@ export function packArray<T>(holeyArr: T[]): T[] {
 }
 
 export function PRINT_ERROR(msg) {
+    /* istanbul ignore else - can't override global.console in node.js */
     if (console && console.error) {
         console.error(`Error: ${msg}`)
     }
 }
 
 export function PRINT_WARNNING(msg) {
+    /* istanbul ignore else - can't override global.console in node.js*/
     if (console && console.warn) {
         console.warn(`Error: ${msg}`)
     }
