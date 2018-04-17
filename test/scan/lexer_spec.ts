@@ -1409,6 +1409,15 @@ function defineLexerSpecs(
                     ])
                 })
 
+                it("supports lexer error reporting with modes", () => {
+                    let input = "1 LETTERS EXIT_LETTERS +"
+                    let lexResult = ModeLexer.tokenize(input)
+                    expect(lexResult.errors).to.have.lengthOf(1)
+                    expect(lexResult.errors[0].message).to.equal(
+                        "unexpected character: ->+<- at offset: 23, skipped 1 characters."
+                    )
+                })
+
                 it("allows choosing the initial Mode", () => {
                     let input = "A G SIGNS ^"
                     let lexResult = ModeLexer.tokenize(input, "letters")

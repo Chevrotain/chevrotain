@@ -6,6 +6,7 @@ import {
 } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
 import { createTokenInstance } from "../../src/scan/tokens_public"
+import { singleAssignCategoriesToksMap } from "../../src/scan/tokens"
 
 describe("The Chevrotain Tokens namespace", () => {
     context("createToken", () => {
@@ -162,6 +163,12 @@ describe("The Chevrotain Tokens namespace", () => {
                     parent: "oops"
                 })
             ).to.throw("The parent property is no longer supported")
+        })
+
+        it("will not go into infinite loop due to cyclic categories", () => {
+            const A = createToken({ name: "A" })
+            const B = createToken({ name: "B", categories: [A] })
+            singleAssignCategoriesToksMap([A], B)
         })
     })
 })

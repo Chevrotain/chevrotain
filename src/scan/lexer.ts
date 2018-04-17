@@ -77,7 +77,7 @@ export function analyzeTokenTypes(
         ensureOptimizations?: boolean
         useSticky?: boolean
         safeMode?: boolean
-    } = {}
+    }
 ): IAnalyzeResult {
     options = defaults(options, {
         useSticky: SUPPORT_STICKY,

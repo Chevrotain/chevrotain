@@ -11,7 +11,6 @@ import {
 import {
     cloneArr,
     cloneObj,
-    PRINT_ERROR,
     forEach,
     IDENTITY,
     isArray,
@@ -22,9 +21,8 @@ import {
     map,
     merge,
     NOOP,
-    reject,
-    filter,
-    reduce
+    reduce,
+    reject
 } from "../utils/utils"
 import { augmentTokenTypes } from "./tokens"
 
@@ -607,9 +605,11 @@ export class Lexer {
                     getPossiblePatterns = function(charCode) {
                         const possiblePatterns =
                             currCharCodeToPatternIdxToConfig[charCode]
-                        return possiblePatterns === undefined
-                            ? emptyArray
-                            : possiblePatterns
+                        if (possiblePatterns === undefined) {
+                            return emptyArray
+                        } else {
+                            return possiblePatterns
+                        }
                     }
                 } else {
                     getPossiblePatterns = function() {
@@ -636,9 +636,11 @@ export class Lexer {
                 getPossiblePatterns = function(charCode) {
                     const possiblePatterns =
                         currCharCodeToPatternIdxToConfig[charCode]
-                    return possiblePatterns === undefined
-                        ? emptyArray
-                        : possiblePatterns
+                    if (possiblePatterns === undefined) {
+                        return emptyArray
+                    } else {
+                        return possiblePatterns
+                    }
                 }
             } else {
                 getPossiblePatterns = function() {

@@ -128,7 +128,7 @@ export function assignCategoriesMapProp(tokenTypes: TokenType[]): void {
     })
 }
 
-function singleAssignCategoriesToksMap(
+export function singleAssignCategoriesToksMap(
     path: TokenType[],
     nextNode: TokenType
 ): void {
@@ -138,6 +138,7 @@ function singleAssignCategoriesToksMap(
 
     forEach(nextNode.CATEGORIES, nextCategory => {
         const newPath = path.concat(nextNode)
+        // avoids infinite loops due to cyclic categories.
         if (!contains(newPath, nextCategory)) {
             singleAssignCategoriesToksMap(newPath, nextCategory)
         }

@@ -1,4 +1,4 @@
-import { forEach, has, isObject, isString, isUndefined } from "../utils/utils"
+import { has, isObject, isString, isUndefined } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
 import { Lexer, TokenType } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
