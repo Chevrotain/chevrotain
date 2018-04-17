@@ -11,8 +11,9 @@
             if (ctx.Integer[0]) {
                 return ctx.Integer[0].image
             }
+
             // GOOD - safe check
-            else if (ctx.Identifier) {
+            if (ctx.Integer) {
                 // if a property exists it's value is guaranteed to have at least one element.
                 return ctx.Identifier[0].image
             }

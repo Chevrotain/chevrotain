@@ -3,7 +3,7 @@ import {
     IgnoredParserIssues,
     IParserDefinitionError
 } from "../../parser_public"
-import { forEach } from "../../../utils/utils"
+import { defaults, forEach } from "../../../utils/utils"
 import { HashTable } from "../../../lang/lang_extensions"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { TokenType } from "../../../scan/lexer_public"
@@ -29,9 +29,14 @@ export function validateGrammar(options: {
     maxLookahead: number
     tokenTypes: TokenType[]
     grammarName: string
-    errMsgProvider?: IGrammarValidatorErrorMessageProvider
+    errMsgProvider: IGrammarValidatorErrorMessageProvider
     ignoredIssues?: IgnoredParserIssues
 }): IParserDefinitionError[] {
+    options = defaults(options, {
+        errMsgProvider: defaultGrammarValidatorErrorProvider,
+        ignoredIssues: {}
+    })
+
     return orgValidateGrammar(
         options.rules,
         options.maxLookahead,
