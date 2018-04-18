@@ -60,11 +60,11 @@
     "clean": "rm -rf coverage dev lib",
     "lint": "tslint --project tsconfig.json",
     "verify_format": "prettier --no-editorconfig --list-different  \"**/*.@(ts|js|md)\"",
-    "compile": "tsc",
+    "compile": "tsc && node ./scripts/fix_coverage_report.js",
     "dts": "grunt concat",
     "compile_def": "npm-run-all compile_def_modules compile_def_namespace",
     "coverage": "nyc mocha \"./lib/test/**/*spec.js\"",
-    "check_coverage": "nyc check-coverage --lines 100 --statements 100 --functions 100",
+    "check_coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
     "docs": "typedoc lib/chevrotain.d.ts --mode file --out dev/docs --module commonjs --excludeExternals --includeDeclarations --excludePrivate",
     "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",
@@ -112,7 +112,7 @@
     "mocha": "^5.0.0",
     "mock-require": "^3.0.1",
     "npm-run-all": "^4.1.2",
-    "nyc": "^11.4.1",
+    "nyc": "^11.6.0",
     "prettier": "1.12.0",
     "require-from-string": "^2.0.1",
     "requirejs": "2.3.5",
@@ -137,7 +137,7 @@
       "text"
     ],
     "exclude": [
-      "lib/test/**.*",
+      "lib/test/**/*.*",
       "test/test.config.js"
     ]
   },

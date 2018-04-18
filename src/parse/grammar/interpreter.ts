@@ -1,4 +1,3 @@
-/* tslint:disable:no-use-before-declare */
 import { RestWalker } from "./rest"
 import {
     IGrammarPath,
@@ -19,21 +18,19 @@ import { first } from "./first"
 import { TokenType } from "../../scan/lexer_public"
 import { TokenMatcher } from "../parser_public"
 import {
-    Option,
     AbstractProduction,
+    Alternation,
     Flat,
     IProduction,
     NonTerminal,
+    Option,
     Repetition,
     RepetitionMandatory,
     RepetitionMandatoryWithSeparator,
     RepetitionWithSeparator,
     Rule,
-    Terminal,
-    Alternation
+    Terminal
 } from "./gast/gast_public"
-
-/* tslint:enable:no-use-before-declare */
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
     protected possibleTokTypes: TokenType[] = []

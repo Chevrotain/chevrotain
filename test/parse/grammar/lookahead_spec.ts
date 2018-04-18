@@ -496,6 +496,43 @@ context("lookahead specs", () => {
             expect(laFunc.call(identParserMock)).to.equal(false)
         })
 
+        it("can compute the lookahead function for OPTION with categories", () => {
+            const B = createToken({ name: "B" })
+            const C = createToken({ name: "C", categories: [B] })
+
+            let optionRule = new Rule({
+                name: "optionRule",
+                definition: [
+                    new Option({
+                        definition: [
+                            new Terminal({
+                                terminalType: B,
+                                idx: 1
+                            })
+                        ]
+                    })
+                ]
+            })
+
+            let laFunc = buildLookaheadFuncForOptionalProd(
+                1,
+                optionRule,
+                1,
+                false,
+                PROD_TYPE.OPTION,
+                buildSingleAlternativeLookaheadFunction
+            )
+
+            const laMock = {
+                LA(): IToken {
+                    return createRegularToken(C, "c")
+                }
+            }
+
+            // C can match B (2nd alternative) due to its categories definition
+            expect(laFunc.call(laMock)).to.be.true
+        })
+
         it("can compute the lookahead function for the first MANY in ActionDec", () => {
             let identParserMock = new IdentParserMock()
             let commaParserMock = new CommaParserMock()
@@ -532,6 +569,56 @@ context("lookahead specs", () => {
             expect(laFunc.call(keyParserMock)).to.equal(0)
             expect(laFunc.call(entityParserMock)).to.equal(1)
             expect(laFunc.call(colonParserMock)).to.equal(undefined)
+        })
+
+        it("can compute the lookahead function for OR using categories", () => {
+            const A = createToken({ name: "A" })
+            const B = createToken({ name: "B" })
+            const C = createToken({ name: "C", categories: [B] })
+
+            let orRule = new Rule({
+                name: "orRule",
+                definition: [
+                    new Alternation({
+                        definition: [
+                            new Flat({
+                                definition: [
+                                    new Terminal({
+                                        terminalType: A,
+                                        idx: 1
+                                    })
+                                ]
+                            }),
+                            new Flat({
+                                definition: [
+                                    new Terminal({
+                                        terminalType: B,
+                                        idx: 1
+                                    })
+                                ]
+                            })
+                        ]
+                    })
+                ]
+            })
+
+            const laFunc = buildLookaheadFuncForOr(
+                1,
+                orRule,
+                1,
+                false,
+                false,
+                buildAlternativesLookAheadFunc
+            )
+
+            const laMock = {
+                LA(): IToken {
+                    return createRegularToken(C, "c")
+                }
+            }
+
+            // C can match B (2nd alternative) due to its categories definition
+            expect(laFunc.call(laMock)).to.equal(1)
         })
 
         it("can compute the lookahead function for EMPTY OR sample", () => {

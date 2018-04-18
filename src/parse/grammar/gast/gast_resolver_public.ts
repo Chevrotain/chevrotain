@@ -9,19 +9,26 @@ import { resolveGrammar as orgResolveGrammar } from "../resolver"
 import { TokenType } from "../../../scan/lexer_public"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {
+    defaultGrammarResolverErrorProvider,
     defaultGrammarValidatorErrorProvider,
+    IGrammarResolverErrorMessageProvider,
     IGrammarValidatorErrorMessageProvider
 } from "../../errors_public"
 import { DslMethodsCollectorVisitor } from "./gast"
 
 export function resolveGrammar(options: {
     rules: Rule[]
+    errMsgProvider?: IGrammarResolverErrorMessageProvider
 }): IParserDefinitionError[] {
+    options = defaults(options, {
+        errMsgProvider: defaultGrammarResolverErrorProvider
+    })
+
     const topRulesTable = new HashTable<Rule>()
     forEach(options.rules, rule => {
         topRulesTable.put(rule.name, rule)
     })
-    return orgResolveGrammar(topRulesTable)
+    return orgResolveGrammar(topRulesTable, options.errMsgProvider)
 }
 
 export function validateGrammar(options: {
@@ -42,9 +49,7 @@ export function validateGrammar(options: {
         options.maxLookahead,
         options.tokenTypes,
         options.ignoredIssues,
-        options.errMsgProvider
-            ? options.errMsgProvider
-            : defaultGrammarValidatorErrorProvider,
+        options.errMsgProvider,
         options.grammarName
     )
 }
