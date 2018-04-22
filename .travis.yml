@@ -14,7 +14,7 @@ matrix:
     - node_js: "8"
       env: NPM_TASK=ci_full_build
     - node_js: "6"
-      env: NPM_TASK=ci_full_build
+      env: NPM_TASK=ci_full_build REMOVE_VUEPRESS=true
   allow_failures:
     - node_js: "9"
       env: NPM_TASK=ci_browser_tests
@@ -25,6 +25,8 @@ addons:
     packages:
       - g++-4.8
 install:
+  # vuepress requires node.js 8, remove under node.js 6
+  - if [ $REMOVE_VUEPRESS == "true" ]; then yarn remove vuepress; fi
   - yarn
 script:
   - yarn run $NPM_TASK

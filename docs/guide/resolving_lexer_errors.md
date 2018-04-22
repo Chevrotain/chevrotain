@@ -1,4 +1,4 @@
-## Resolving Lexer Errors
+# Resolving Lexer Errors
 
 *   [No LINE_BREAKS Error.](#LINE_BREAKS)
 *   [Unexpected RegExp Anchor Error.](#ANCHORS)
@@ -8,7 +8,7 @@
 *   [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
 *   [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
 
-### <a name="LINE_BREAKS"></a> No LINE_BREAKS Error.
+## No LINE_BREAKS Error
 
 A Chevrotain Lexer will by default track the full position information for each token.
 This includes line and column information.
@@ -58,7 +58,7 @@ To resolve this choose one of the following:
     *   Also note that multi-line tokens such as some types of comments and string literals tokens may contain
         line terminators, if your language includes such tokens they must also be marked with the line_breaks flag.
 
-### <a name="ANCHORS"></a> Unexpected RegExp Anchor Error.
+## Unexpected RegExp Anchor Error
 
 A Token RegExp pattern used in a chevrotain lexer may not use the start/end of input anchors ('$' and '^').
 
@@ -101,7 +101,7 @@ const semVer = createToken({
 })
 ```
 
-### <a name="UNREACHABLE"></a> Token can never be matched.
+## Token can never be matched
 
 This error means that A Token type can never be successfully matched as
 a **previous** Token type in the lexer definition will **always** matched instead.
@@ -156,7 +156,7 @@ const tokensResult = myLexer.tokenize("forward")
 To resolve this second problem see how to prefer the **longest match**
 as demonstrated in the [keywords vs identifiers example][keywords_idents]
 
-### <a name="COMPLEMENT"></a> Complement Sets cannot be automatically optimized.
+## Complement Sets cannot be automatically optimized
 
 The Chevrotain Lexer performs optimizations by filtering the potential token matchs
 using the next [charCode][mdn_char_code] to be consumed.
@@ -202,7 +202,7 @@ Please Note that filling such an array [can take over 1ms][fill_16_bits] on a mo
 So if you are only parsing small inputs and/or starting a new process for each
 parser invocation the added initilization cost may be counter productive.
 
-### <a name="REGEXP_PARSING"></a> Failed parsing < /.../ > Using the regexp-to-ast library.
+## Failed parsing < /.../ > Using the regexp-to-ast library
 
 The Chevrotain Lexer performs optimizations by filtering the potential token matchs
 using the next [charCode][mdn_char_code] to be consumed.
@@ -228,7 +228,7 @@ const Integer = createToken({
 })
 ```
 
-### <a name="UNICODE_OPTIMIZE"></a> The regexp unicode flag is not currently supported by the regexp-to-ast library..
+## The regexp unicode flag is not currently supported by the regexp-to-ast library
 
 The Chevrotain Lexer performs optimizations by filtering the potential token matchs
 using the next [charCode][mdn_char_code] to be consumed.
@@ -266,7 +266,7 @@ createToken({
 })
 ```
 
-### <a name="CUSTOM_OPTIMIZE"></a> TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter.
+## TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter
 
 The Chevrotain Lexer performs optimizations by filtering the potential token matchs
 using the next [charCode][mdn_char_code] to be consumed.
@@ -300,4 +300,4 @@ It will only enable performance optimizations in the lexer.
 [fill_16_bits]: https://jsperf.com/fill-16-bits
 [regexp_to_ast]: https://github.com/bd82/regexp-to-ast
 [unicode_mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicode
-[custom_token_patterns]: https://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html
+[custom_token_patterns]: https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html

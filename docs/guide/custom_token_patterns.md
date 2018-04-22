@@ -1,13 +1,15 @@
-## Custom Token Patterns
+# Custom Token Patterns
+
+### TLDR
 
 See: [**Runnable example**](https://github.com/SAP/chevrotain/blob/master/examples/lexer/custom_patterns/custom_patterns.js) for quick starting.
 
-### Background
+## Background
 
 Normally a Token's pattern is defined using a JavaScript regular expression:
 
-```JavaScript
-let IntegerToken = createToken({name: "IntegerToken", pattern: /\d+/})
+```javascript
+let IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ })
 ```
 
 However in some circumstances the capability to provide a custom pattern matching implementation may be required.
@@ -21,7 +23,7 @@ There are a few use cases in which a custom pattern could be used:
 *   Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:
     *   [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞
 
-### Usage
+## Usage
 
 A custom pattern has a similar API to the API of the [RegExp.prototype.exec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
 function. But with a small constraint.
@@ -32,7 +34,7 @@ function. But with a small constraint.
 The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/icustompattern.html) interface.
 Example:
 
-```JavaScript
+```javascript
 function matchInteger(text, startOffset) {
     let endOffset = startOffset
     let charCode = text.charCodeAt(endOffset)
@@ -64,28 +66,31 @@ createToken({
 
 Using an Object literal with only a single property is still a little verbose so an even more concise syntax is also supported:
 
-```JavaScript
+```javascript
 // pattern is passed the matcher function directly.
 createToken({ name: "IntegerToken", pattern: matchInteger })
 ```
 
-### Using Previous Lexing Context
+## Lexing Context
 
-A custom token matcher has two optional arguments which allows accessing the current result of the tokenizer.
+A custom token matcher has two optional arguments which allows accessing the current lexing context.
+This context can be used to allow or disallow lexing certain Token Types depending
+on the previously lexed tokens.
+
 Lets expand the previous example to only allow lexing integers if the previous token was not an identifier (contrived example).
 
-```JavaScript
+```javascript
 const { tokenMatcher } = require("chevrotain")
 
 function matchInteger(text, offset, matchedTokens, groups) {
-   let lastMatchedToken = _.last(matchedTokens)
+    let lastMatchedToken = _.last(matchedTokens)
 
-   // An Integer may not follow an Identifier
-   if (tokenMatcher(lastMatchedToken, Identifier)) {
-       // No match, must return null to conform with the RegExp.prototype.exec signature
-       return null
-   }
-   // rest of the code from the example above...
+    // An Integer may not follow an Identifier
+    if (tokenMatcher(lastMatchedToken, Identifier)) {
+        // No match, must return null to conform with the RegExp.prototype.exec signature
+        return null
+    }
+    // rest of the code from the example above...
 }
 ```
 

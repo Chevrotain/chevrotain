@@ -27,3 +27,5 @@ package-lock.json
 /package-lock.json
 
 yarn-error.log
+/docs/.vuepress/dist/
+.DS_Store

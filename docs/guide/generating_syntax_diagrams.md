@@ -1,4 +1,4 @@
-## Generating Syntax Diagrams for a grammar.
+# Generating Syntax Diagrams for a grammar.
 
 It is often useful to visually inspect a grammar's syntax diagrams during development
 or for documentation purposes.
@@ -7,17 +7,17 @@ This document contains instructions on how to generate Syntax railroad diagrams 
 grammar using the [railroad-diagrams](https://github.com/tabatkins/railroad-diagrams)
 library by @tabatkins.
 
-### Examples:
+## Examples
 
 *   [JSON Syntax diagrams](https://sap.github.io/chevrotain/diagrams_samples/json.html).
 *   [CSS Syntax diagrams](https://sap.github.io/chevrotain/diagrams_samples/css.html).
 
-### Features:
+## Features
 
 *   Highlight usages and definitions on mouse hover.
 *   Scroll to definition of non-terminal on mouse click.
 
-### Instructions:
+## Instructions
 
 Chevrotain provides an the [**createSyntaxDiagramsCode**](https://sap.github.io/chevrotain/documentation/3_1_0/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
 of syntax diagrams. This html source code can then be used by an end user in either node.js or a browser:
@@ -34,7 +34,7 @@ of syntax diagrams. This html source code can then be used by an end user in eit
 *   [Generating syntax diagrams dynamically into an iframe](https://github.com/SAP/chevrotain/blob/master/examples/parser/diagrams/diagrams_browser.html)
     *   Requires loading **both** Chevrotain and the grammar when running the html.
 
-### Advance Custom Usage
+## Customization
 
 The [logic for generating the HTML](https://github.com/SAP/chevrotain/tree/master/src/diagrams/render_public.ts)
 is quite trivial and the generated code itself is also very simple with a decent separation of concerns.

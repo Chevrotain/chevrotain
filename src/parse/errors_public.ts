@@ -321,7 +321,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
                   in the rule ->${topLevelName}<- has a different occurrence index (0-5), as that combination acts as a unique
                   position key in the grammar, which is needed by the parsing engine.
                   
-                  For further details see: https://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES 
+                  For further details see: https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES 
                   `
 
         // white space trimming time! better to trim afterwards as it allows to use WELL formatted multi line template strings...
@@ -391,7 +391,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
                 options.topLevelRule.name
             }> Rule,\n` +
             `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
-            `https://sap.github.io/chevrotain/website/Building_Grammars/resolving_grammar_errors.html#COMMON_PREFIX ` +
+            `https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
             `For farther details.`
 
         return errMsg

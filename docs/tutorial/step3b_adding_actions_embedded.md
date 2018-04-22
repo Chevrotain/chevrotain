@@ -1,15 +1,10 @@
-*   Previous tutorial step - [Step 2 - Parsing](./step2_parsing.md)
+# Tutorial - Semantics Embedded Actions
 
-# Tutorial Step 3 - Adding Embedded Actions to the Parser.
+### TLDR
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3b_actions_embedded.js) for this step <---
+[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step3_actions/step3b_actions_embedded.js).
 
-### On code samples:
-
-The tutorial uses ES2015+ syntax.
-See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
-
-### Introduction:
+### Introduction
 
 In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
@@ -23,7 +18,9 @@ This can be accomplished using two features of the Parsing DSL:
 *   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#subrule1) will return
     the result of the grammar rule invoked.
 
-### A simple contrived example:
+## Simple Example
+
+Lets inspect a simple contrived example:
 
 ```javascript
 $.RULE("topRule", () => {
@@ -61,9 +58,11 @@ $.RULE("IntegerRule", () => {
 The **decimalRule** and **IntegerRule** both return a javascript number (using parseInt/parseFloat).
 and the **topRule** adds it to the final result.
 
-#### Back To the mini SQL Select grammar:
+## SQL Grammar
 
-For this grammar lets build a more complex data structure (an AST) instead of simply returning a number.
+Lets go back to the mini SQL Select grammar.
+
+For this grammar we will build a more complex data structure (an AST) instead of simply returning a number.
 Our selectStatement rule will now return an object with four properties:
 
 ```javascript
@@ -113,9 +112,3 @@ $.RULE("selectClause", () => {
 
 In the selectClause rule we access the **image** property of the Identifier token returned from **CONSUME**
 and push each of these strings to the **columns** array.
-
-#### What is Next?
-
-*   Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3b_actions_embedded.js) of
-    this tutorial step.
-*   Next step in the tutorial: [Step 4 - Fault Tolerance](./step4_fault_tolerance.md).

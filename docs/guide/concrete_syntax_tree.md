@@ -1,4 +1,4 @@
-## Automatic Concrete Syntax Tree Creation
+# Automatic Concrete Syntax Tree Creation
 
 Chevrotain has the capability to **automatically** create a concrete syntax tree (CST)
 during parsing. A CST is a simple structure which represents the **entire** parse tree.
@@ -12,34 +12,35 @@ This separation of concerns makes the grammar easier to maintain
 and makes it easier to implement different capabilities on the grammar,
 for example: separate logic for compilation and for IDE support.
 
-### Differences between an AST and a CST.
+## AST vs CST
 
 There are two major differences.
 
-1.  An Abstract Syntax Tree would not normally contain all the syntactic information.
-    This mean the **exact original** text could not be re-constructed from the AST.
+1.  An **A**bstract **S**yntax **T**ree would not normally contain all the syntactic information.
+    This mean the **exact original** text can not always be re-constructed from the AST.
 
-2.  An Abstract Syntax Tree would not represent the whole syntactic parse tree.
+2.  An **A**bstract **S**yntax **T**ree would not represent the whole syntactic parse tree.
     It would normally only contain nodes related to specific parse tree nodes,
     but not all of those (mostly leaf nodes).
 
-### How to enable CST output?
+## Enabling
+
+How to enable CST output?
 
 In the future this capability may be enabled by default.
 Currently this feature must be explicitly enabled by setting the **outputCst** flag.
 
 In the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/iparserconfig.html).
 
-```JavaScript
+```javascript
 class MyParser extends chevrotain.Parser {
-
     constructor(input) {
-        super(input, allTokens, { outputCst : true })
+        super(input, allTokens, { outputCst: true })
     }
 }
 ```
 
-### The structure of the CST
+## Structure
 
 The structure of the CST is very simple.
 
@@ -63,23 +64,21 @@ export interface CstNode {
 
 A single CstNode corresponds to a single grammar rule's invocation result.
 
-```JavaScript
-$.RULE("qualifiedName", () => {
-
-})
+```javascript
+$.RULE("qualifiedName", () => {})
 
 input = ""
 
 output = {
-  name: "qualifiedName",
-  children: {}
+    name: "qualifiedName",
+    children: {}
 }
 ```
 
 Each Terminal will appear in the children dictionary using the terminal's name
 as the key and an **array** of IToken as the value.
 
-```JavaScript
+```javascript
 $.RULE("qualifiedName", () => {
     $.CONSUME(Identifier)
     $.CONSUME(Dot)
@@ -89,18 +88,18 @@ $.RULE("qualifiedName", () => {
 input = "foo.bar"
 
 output = {
-  name: "qualifiedName",
-  children: {
-      Dot : ["."],
-      Identifier : ["foo", "bar"]
-  }
+    name: "qualifiedName",
+    children: {
+        Dot: ["."],
+        Identifier: ["foo", "bar"]
+    }
 }
 ```
 
 Non-Terminals are handled similarly to Terminals except each item in the value's array
 Is the CstNode of the corresponding Grammar Rule (Non-Terminal).
 
-```JavaScript
+```javascript
 $.RULE("qualifiedName", () => {
     $.SUBRULE($.singleIdent)
 })
@@ -112,17 +111,17 @@ $.RULE("singleIdent", () => {
 input = "foo"
 
 output = {
-  name: "qualifiedName",
-  children: {
-      singleIdent : [
-          {
-            name: "singleIdent",
-            children: {
-               Identifier : ["foo"]
+    name: "qualifiedName",
+    children: {
+        singleIdent: [
+            {
+                name: "singleIdent",
+                children: {
+                    Identifier: ["foo"]
+                }
             }
-        }
-      ]
-  }
+        ]
+    }
 }
 ```
 
@@ -131,7 +130,7 @@ if they were actually encountered during parsing.
 This means that optional grammar productions may or may not appear in a CST node
 depending on the actual input, e.g:
 
-```JavaScript
+```javascript
 $.RULE("variableStatement", () => {
     $.CONSUME(Var)
     $.CONSUME(Identifier)
@@ -144,50 +143,54 @@ $.RULE("variableStatement", () => {
 input1 = "var x"
 
 output1 = {
-  name: "variableStatement",
-  children: {
-      Var : ["var"],
-      Identifier : ["x"]
-      // no "Equals" or "Integer" keys
-  }
+    name: "variableStatement",
+    children: {
+        Var: ["var"],
+        Identifier: ["x"]
+        // no "Equals" or "Integer" keys
+    }
 }
 
 input2 = "var x = 5"
 
 output2 = {
-  name: "variableStatement",
-  children: {
-      Var : ["var"],
-      Identifier : ["x"],
-      Equals: ["="],
-      Integer: ["5"]
-  }
+    name: "variableStatement",
+    children: {
+        Var: ["var"],
+        Identifier: ["x"],
+        Equals: ["="],
+        Integer: ["5"]
+    }
 }
 ```
 
-### In-Lined Rules
+## In-Lined Rules
 
 So far the CST structure is quite simple, but how would a more complex grammar be handled?
 
-```JavaScript
+```javascript
 $.RULE("statements", () => {
     $.OR([
         // let x = 5
-        {ALT: () => {
-            $.CONSUME(Let)
-            $.CONSUME(Identifer)
-            $.CONSUME(Equals)
-            $.SUBRULE($.expression)
-        }},
+        {
+            ALT: () => {
+                $.CONSUME(Let)
+                $.CONSUME(Identifer)
+                $.CONSUME(Equals)
+                $.SUBRULE($.expression)
+            }
+        },
         // select age from employee where age = 120
-        {ALT: () => {
-            $.CONSUME(Select)
-            $.CONSUME2(Identifer)
-            $.CONSUME(From)
-            $.CONSUME3(Identifer)
-            $.CONSUME(Where)
-            $.SUBRULE($.expression)
-        }}
+        {
+            ALT: () => {
+                $.CONSUME(Select)
+                $.CONSUME2(Identifer)
+                $.CONSUME(From)
+                $.CONSUME3(Identifer)
+                $.CONSUME(Where)
+                $.SUBRULE($.expression)
+            }
+        }
     ])
 })
 ```
@@ -196,14 +199,13 @@ Some of the Terminals and Non-Terminals are used in **both** alternatives.
 It is possible to check for the existence of distinguishing terminals such as the "Let" and "Select".
 But this is not a robust approach.
 
-```javaScript
+```javascript
 let cstResult = parser.qualifiedName()
 
 if (cstResult.children.Let !== undefined) {
     // Let statement
     // do something...
-}
-else if (cstResult.children.Select !== undefined) {
+} else if (cstResult.children.Select !== undefined) {
     // Select statement
     // do something else.
 }
@@ -225,39 +227,45 @@ This is the recommended approach in this case as more and more alternations are 
 will become too difficult to understand and maintain due to verbosity.
 However, sometimes refactoring out rules is too much, this is where **in-lined** rules arrive to the rescue.
 
-```JavaScript
+```javascript
 $.RULE("statements", () => {
     $.OR([
         // let x = 5
         {
-         NAME: "$letStatement",
-         ALT: () => {
-            $.CONSUME(Let)
-            $.CONSUME(Identifer)
-            $.CONSUME(Equals)
-            $.SUBRULE($.expression)
-        }},
+            NAME: "$letStatement",
+            ALT: () => {
+                $.CONSUME(Let)
+                $.CONSUME(Identifer)
+                $.CONSUME(Equals)
+                $.SUBRULE($.expression)
+            }
+        },
         // select age from employee where age = 120
         {
-         NAME: "$selectStatement",
-         ALT: () => {
-            $.CONSUME(Select)
-            $.CONSUME2(Identifer)
-            $.CONSUME(From)
-            $.CONSUME3(Identifer)
-            $.CONSUME(Where)
-            $.SUBRULE($.expression)
-        }}
+            NAME: "$selectStatement",
+            ALT: () => {
+                $.CONSUME(Select)
+                $.CONSUME2(Identifer)
+                $.CONSUME(From)
+                $.CONSUME3(Identifer)
+                $.CONSUME(Where)
+                $.SUBRULE($.expression)
+            }
+        }
     ])
 })
 
 output = {
-  name: "statements",
-  // only one of they keys depending on the actual alternative chosen
-  children: {
-      $letStatement : [/*...*/],
-      $$selectStatement : [/*...*/]
-  }
+    name: "statements",
+    // only one of they keys depending on the actual alternative chosen
+    children: {
+        $letStatement: [
+            /*...*/
+        ],
+        $$selectStatement: [
+            /*...*/
+        ]
+    }
 }
 ```
 
@@ -294,7 +302,7 @@ Syntax Limitation:
     })
     ```
 
-### CST And Error Recovery
+## Fault Tolerance
 
 CST output is also supported in combination with automatic error recovery.
 This combination is actually stronger than regular error recovery because
@@ -304,7 +312,7 @@ using the **recoveredNode"** boolean property.
 For example given this grammar and assuming the parser re-synced after a token mismatch at
 the "Where" token:
 
-```JavaScript
+```javascript
 $.RULE("SelectClause", () => {
     $.CONSUME(Select)
     $.CONSUME2(Identifer)
@@ -319,16 +327,16 @@ $.RULE("SelectClause", () => {
 input = "select age from persons wherrrre age > 25"
 
 output = {
-  name: "SelectClause",
-  children: {
-      Select: ["select"],
-      Identifier: ["age, persons"],
-      From: ["from"],
-      // No "Where" key d,ue to the parse error
-      // No "expression" key due to the parse error
-  },
-  // This marks a recovered node.
-  recoveredNode: true
+    name: "SelectClause",
+    children: {
+        Select: ["select"],
+        Identifier: ["age, persons"],
+        From: ["from"]
+        // No "Where" key d,ue to the parse error
+        // No "expression" key due to the parse error
+    },
+    // This marks a recovered node.
+    recoveredNode: true
 }
 ```
 
@@ -336,7 +344,7 @@ This accessibility of **partial parsing results** means some post-parsing logic
 may be able to perform farther analysis.
 for example: offering auto-fix suggestions or provide better error messages.
 
-### Traversing a CST Structure.
+## Traversing
 
 So we now know how to create a CST and it's internal structure.
 But how do we traverse this structure and perform semantic actions?
@@ -390,7 +398,7 @@ This is a valid approach, however it can be somewhat error prone:
     (Fail slow instead of fail fast...)
 *   In-Lined Rules may cause ambiguities as they should be matched on the fullName property not the name property.
 
-#### A more robust alternative.
+## CST Visitor
 
 For the impatient, See a full runnable example: [Calculator Grammar with CSTVisitor interpreter](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
 
@@ -455,7 +463,7 @@ class SqlToAstVisitor extends BaseCstVisitor {
 
 *   Visitor methods support an optional "IN" parameter.
 
-#### Do we always have to implement all the visit methods?
+### Do we always have to implement all the visit methods?
 
 **No**, sometimes we only need to handle a few specific CST Nodes
 In that case use **getBaseCstVisitorConstructorWithDefaults()** to get the base visitor constructor.
@@ -487,7 +495,7 @@ It is not possible to return values from the visit methods because
 the default implementation does not return any value, only traverses the CST
 thus the chain of returned values will be broken.
 
-### Performance of CST building.
+## Performance
 
 On V8 (Chrome/Node) building the CST was measured at anywhere from 35%-90% of the performance
 versus a pure grammar's runtime (no output) depending on the grammar used.
