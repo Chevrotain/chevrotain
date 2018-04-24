@@ -36,17 +36,17 @@ relationalOperator
    : ">" | "<"
 ```
 
-A Chevrotain Parser analyses an [IToken](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/itoken.html) vector that conforms to some grammar.
-The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#at_least_one), which includes the following methods.
+A Chevrotain Parser analyses an [IToken](https://sap.github.io/chevrotain/documentation/3_2_0/interfaces/itoken.html) vector that conforms to some grammar.
+The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#at_least_one), which includes the following methods.
 
-*   [CONSUME](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#consume1) - 'eat' a Token.
-*   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#subrule1) - reference to another rule.
-*   [OR](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#or1) - Alternation
-*   [OPTION](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#option1) - optional production.
-*   [MANY](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#many1) - repetition zero or more.
-*   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#at_least_one1) - repetition one or more.
-*   [MANY_SEP](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items
-*   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
+*   [CONSUME](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#consume1) - 'eat' a Token.
+*   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#subrule1) - reference to another rule.
+*   [OR](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#or1) - Alternation
+*   [OPTION](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#option1) - optional production.
+*   [MANY](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#many1) - repetition zero or more.
+*   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#at_least_one1) - repetition one or more.
+*   [MANY_SEP](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items
+*   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/3_2_0/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
 
 ## First Rule
 
