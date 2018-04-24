@@ -6,7 +6,7 @@
 
 #### Documentation
 
-*   [New documentation website generated using vuepress.](sap.github.io/chevrotain/docs)
+*   [New documentation website generated using vuepress.](http://sap.github.io/chevrotain/docs/)
 
 ## 3.1.0 (4-13-2018)
 
