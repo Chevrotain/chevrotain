@@ -1,3 +1,15 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+*   [Micro Optimizations.](https://github.com/SAP/chevrotain/commit/41543670d6cb46b151f214bc38285eb144b94fe0)
+
+#### Documentation
+
+*   [New documentation website generated using vuepress.](sap.github.io/chevrotain/docs)
+
+
+
 ## 3.1.0 (4-13-2018)
 
 #### Major Changes
