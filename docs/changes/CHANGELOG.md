@@ -8,8 +8,6 @@
 
 *   [New documentation website generated using vuepress.](sap.github.io/chevrotain/docs)
 
-
-
 ## 3.1.0 (4-13-2018)
 
 #### Major Changes
