@@ -10,17 +10,17 @@ npm install chevrotain
 
 ## Scenario
 
-In This tutorial we will implement a Parser for a simple SQL Select statement language
-That outputs as Abstract Syntax Tree (AST)
+In this tutorial we will implement a parser for a simplified SQL syntax which will contain only SELECT statements.
+The output of the parser will be an Abstract Syntax Tree (AST).
 
 ## Running & Debugging
 
-The code snippets in the tutorial steps are part of a full
-runnable & debugable [example](https://github.com/SAP/chevrotain/tree/master/examples/tutorial).
-It is recommanded to use these sources either as a starting template
-or as runnable example to gain a deeper understanding.
+The code snippets in this tutorial steps are part of a fully
+runnable and debuggable [example](https://github.com/SAP/chevrotain/tree/master/examples/tutorial).
+It is recommended to use these sources either as an initial template
+or as an runnable example in order to gain a deeper understanding.
 
 ## Samples Syntax
 
-The tutorial uses ES2015+ syntax.
-See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
+This tutorial uses ES2015+ syntax.
+See examples of how to use Chevrotain with other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
