@@ -18,7 +18,7 @@ The output of the parser will be an Abstract Syntax Tree (AST).
 The code snippets in this tutorial steps are part of an
 executable and debuggable [example](https://github.com/SAP/chevrotain/tree/master/examples/tutorial).
 It is recommended to use these sources either as an initial template
-or as an exectuable example in order to gain a deeper understanding.
+or as an executable example in order to gain a deeper understanding.
 
 ## Samples Syntax
 
