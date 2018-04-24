@@ -1,15 +1,8 @@
-*   Previous tutorial step - [Step 2 - Parsing](./step2_parsing.md)
+# Tutorial - Semantics CST Visitor
 
-# Tutorial Step 3 - Adding Actions using a CST Visitor.
+[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step3_actions/step3a_actions_visitor.js).
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3a_actions_visitor.js) for this step <---
-
-### On code samples:
-
-The tutorial uses ES2015+ syntax.
-See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
-
-### Introduction:
+## Introduction
 
 In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
@@ -18,11 +11,11 @@ But in most real world use cases the parser will **also** have to output some re
 
 This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **outside** our grammar:
 
-*   See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html)
+*   See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html)
 
-### Enabling CST output in our parser.
+## Enabling CST
 
-First we need to enable CST (Concrete Syntax Tree) creation by our parser.
+First we need to enable the CST (Concrete Syntax Tree) creation in our parser.
 This is easily done by passing the ["outputCst"](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/iparserconfig.html#outputcst) parser options object in
 the super constructor.
 
@@ -42,17 +35,20 @@ class SelectParser extends chevrotain.Parser {
 Note that this is the **only** change needed in the parser.
 The invocation of any grammar rule will now automatically create a CST.
 
-```Javascript
+```javascript
 function parseInput(text) {
-   const lexingResult = SelectLexer.tokenize(text)
-   const parser = new SelectParser(lexingResult.tokens)
+    const lexingResult = SelectLexer.tokenize(text)
+    const parser = new SelectParser(lexingResult.tokens)
 
-   // CST automatically created.
-   const cstOutput = parser.selectStatement()
+    // CST automatically created.
+    const cstOutput = parser.selectStatement()
 }
 ```
 
-### Creating a CST Visitor
+## The CST Visitor
+
+Creating a CST is not enough, we also need to traverse this structure
+and execute our actions (semantics).
 
 Each Chevrotain parser **instance** exposes two BaseVisitor classes
 which can be extended to create custom user visitors.
@@ -92,9 +88,9 @@ const myVisitorInstanceWithDefaults = new myCustomVisitorWithDefaults()
 
 In our example we will use the BaseVisitor constructor (**without** defaults )
 
-### Adding some visitor methods
+## Visitor Methods
 
-So we now know how to create a CSt visitor.
+So we now know how to create a CST visitor.
 But how do we actually make it perform the actions (semantics) we wish?
 For that we must create a **visit method** for each grammar rule.
 
@@ -171,6 +167,8 @@ class SQLToAstVisitor extends BaseSQLVisitor {
     }
 }
 ```
+
+## Full Visitor
 
 We still have a few grammar rules we need to build visitors for.
 
@@ -259,7 +257,7 @@ class SQLToAstVisitor extends BaseSQLVisitor {
 }
 ```
 
-#### Gluing it all together
+#### Usage
 
 So we know how to create a CST Visitor, but how do we actually use it?
 
@@ -288,9 +286,3 @@ function toAst(inputText) {
     return ast
 }
 ```
-
-#### What is Next?
-
-*   Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step3_actions/step3a_actions_visitor.js) of
-    this tutorial step.
-*   Next step in the tutorial: [Step 4 - Fault Tolerance](./step4_fault_tolerance.md).

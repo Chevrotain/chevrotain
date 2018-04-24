@@ -23,7 +23,7 @@ as any other pure code without requiring any new tools or processes.
 ## TLDR
 
 *   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
-*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/website/Tutorial/step1_lexing.html)**
+*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**
 *   [**Performance benchmark**][benchmark]
 
 ## Features
@@ -56,12 +56,12 @@ as any other pure code without requiring any new tools or processes.
     *   Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
     *   [Multiple Lexer Modes][lexer_modes] depending on the context.
     *   [Tokens Grouping][lexer_groups].
-    *   [Custom Token patterns(none RegExp) support](https://sap.github.io/chevrotain/website/Deep_Dive/custom_token_patterns.html)
+    *   [Custom Token patterns(none RegExp) support](https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html)
     *   **No code generation** The Lexer does not require any code generation phase.
 
 3.  [**High Performance**][benchmark].
 
-4.  [**Railroad Diagrams Generation**](https://sap.github.io/chevrotain/website/Building_Grammars/generating_syntax_diagrams.html).
+4.  [**Railroad Diagrams Generation**](https://sap.github.io/chevrotain/docs/guide/generating_syntax_diagrams.html).
 
 5.  **Grammar Reflection/Introspection**.
 
@@ -85,19 +85,17 @@ as any other pure code without requiring any new tools or processes.
 
 ## Documentation & Resources
 
-*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/website/Tutorial/step1_lexing.html)**.
+*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**.
 
 *   **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 
-*   **[FAQ](https://sap.github.io/chevrotain/website/FAQ.html).**
+*   **[FAQ](https://sap.github.io/chevrotain/docs/FAQ.html).**
 
 *   **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
-*   **[HTML docs](https://sap.github.io/chevrotain/documentation).**
+*   **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
 
     *   [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#at_least_one).
-
-*   **[RoadMap](https://sap.github.io/chevrotain/website/Roadmap.html)**.
 
 ## Dependencies
 
@@ -137,7 +135,7 @@ Some interesting samples:
 [grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
 [starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
 [parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
-[content assist]: https://sap.github.io/chevrotain/website/Deep_Dive/syntactic_content_assist.html
+[content assist]: https://sap.github.io/chevrotain/docs/guide/syntactic_content_assist.html
 [separation]: https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
 [custom_errors]: https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
@@ -146,4 +144,4 @@ Some interesting samples:
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
 [backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
-[custom_apis]: https://sap.github.io/chevrotain/website/Deep_Dive/custom_apis.html
+[custom_apis]: https://sap.github.io/chevrotain/docs/guide/custom_apis.html

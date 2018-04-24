@@ -5,7 +5,7 @@ const _ = require("lodash")
 
 const versionPath = path.join(__dirname, "../src/version.ts")
 const packagePath = path.join(__dirname, "../package.json")
-const changeLogPath = path.join(__dirname, "../CHANGELOG.md")
+const changeLogPath = path.join(__dirname, "../docs/changes/CHANGELOG.md")
 
 const docsDirPath = path.join(__dirname, "../docs")
 const docFiles = fs.readdirSync(docsDirPath)
@@ -13,6 +13,10 @@ const docFiles = fs.readdirSync(docsDirPath)
 const docFilesPaths = _.map(docFiles, function(file) {
     return path.join(docsDirPath, file)
 })
+
+function notChangesDocs(path) {
+    return !_.includes(path, "changes/")
+}
 
 const markdownDocsFiles = _.reduce(
     docFilesPaths,
@@ -23,14 +27,17 @@ const markdownDocsFiles = _.reduce(
             const nestedPaths = _.map(nestedFiles, currFile =>
                 path.join(currPath, currFile)
             )
-            const newMarkdowns = _.filter(nestedPaths, currPath =>
-                _.endsWith(currPath, ".md")
+            const newMarkdowns = _.filter(
+                nestedPaths,
+                currPath =>
+                    _.endsWith(currPath, ".md") && notChangesDocs(currPath)
             )
 
             result = result.concat(newMarkdowns)
         } else if (
             fs.lstatSync(currPath).isFile() &&
-            _.endsWith(currPath, ".md")
+            _.endsWith(currPath, ".md") &&
+            notChangesDocs(currPath)
         ) {
             result.push(currPath)
         }

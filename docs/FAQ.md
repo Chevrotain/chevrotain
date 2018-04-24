@@ -1,16 +1,20 @@
-## FAQ
+---
+sidebar: auto
+---
+
+# FAQ
 
 *   [Why should I use a Parsing DSL instead of a Parser Generator?](#VS_GENERATORS)
 *   [What Differentiates Chevrotain from other Parsing Libraries?](#VS_OTHERS)
 *   [Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?](#WHY_ERROR_RECOVERY)
-*   [How do I debug my parser?](#DEBUGGING)
+*   [How do I debug my parser?](##DEBUGGING)
 *   [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](#NUMERICAL_SUFFIXES)
 *   [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
 *   [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
 *   [Why does my parser appear to be stuck during it's initialization?](#STUCK_AMBIGUITY)
 *   [How do I Maximize my parser's performance?](#PERFORMANCE)
 
-### <a name="VS_GENERATORS"></a> Why should I use a Parsing DSL instead of a Parser Generator?
+## Why should I use a Parsing DSL instead of a Parser Generator?
 
 A Parser Generator adds an (unnecessary) level of abstraction between the grammar implementation and the actual parser.
 This is because the grammar is written in a **different** language than the target runtime.
@@ -26,7 +30,7 @@ This is because the grammar is written in a **different** language than the targ
 
 *   No need for a special editor to write the Grammar, just use your favorite JavaScript editor.
 
-### <a name="VS_OTHERS"></a> What Differentiates Chevrotain from other JavaScript Parsing Solutions?
+## What Differentiates Chevrotain from other JavaScript Parsing Solutions?
 
 *   **Performance**: Chevrotain is generally faster (often much more so) than other existing JavaScript Parsing Solutions.
     And can even compete with the performance of hand built parsers.
@@ -34,7 +38,7 @@ This is because the grammar is written in a **different** language than the targ
 
 *   **Error Recovery / Fault Tolerance**: With the exception of Antlr4, other JavaScript Parsing Solutions usually do not have Error Recovery capabilities.
 
-### <a name="WHY_ERROR_RECOVERY"></a> Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?
+## Why are Error Recovery / Fault Tolerant capabilities needed in a Parser?
 
 When building a standard compiler that should only handle completely valid inputs these capabilities are indeed irrelevant.
 But for the use case of building Editor Tools / Language Services the parser must be able to handle partially invalid inputs as well.
@@ -44,12 +48,12 @@ Some examples:
 *   Refactoring should work even if there is a missing comma somewhere.
 *   Autocomplete / Intellisense should work even if there is a syntax error prior to the requested suggestion position.
 
-### <a name="DEBUGGING"></a> How do I debug my parser?
+## How do I debug my parser?
 
 Just add a breakpoint in your favorites IDE and debug, same as you would for any other JavaScript code.
 Chevrotain Grammars are **pure** javascript code. No special handling required.
 
-### <a name="NUMERICAL_SUFFIXES"></a> Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?
+## Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?
 
 Lets look at an example first:
 
@@ -80,14 +84,14 @@ used for many things such as:
 *   Computing an appropriate error message which includes the list of next valid possible tokens.
 *   Performing automatic Error Recovery by figuring out "re-sync" tokens.
 
-### <a name="MINIFIED"></a> Why does Chevrotain not work correctly after I minified my Grammar?
+## Why does Chevrotain not work correctly after I minified my Grammar?
 
 Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive minification options can break Chevrotain grammars.
 
 See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/minification/README.md) for details & workarounds.
 
-### <a name="WEBPACK"></a> Why does Chevrotain not work correctly after I webpacked my Grammar?
+## Why does Chevrotain not work correctly after I webpacked my Grammar?
 
 Chevrotain relies on **Function.name** property and **Function.toString()**.
 This means that certain aggressive webpack 2 optimizations (tree shaking) can break Chevrotain grammars under
@@ -95,7 +99,7 @@ certain conditions.
 
 See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/webpack/README.md) for details & workarounds.
 
-### <a name="STUCK_AMBIGUITY"></a> Why does my parser appear to be stuck during it's initialization?
+## Why does my parser appear to be stuck during it's initialization?
 
 The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives
@@ -105,9 +109,9 @@ and there are many (thousands) of ambiguous paths.
 To resolve this try reducing the maxLookahead and inspect the ambiguity errors to fix
 the grammar ambiguity which is the root cause of the problem.
 
-### <a name="PERFORMANCE"></a> How do I Maximize my parser's performance?
+## How do I Maximize my parser's performance?
 
-#### Major Performance Benefits
+### Major Performance Benefits
 
 These are highly recommended for each and every parser.
 
@@ -158,9 +162,14 @@ These are highly recommended for each and every parser.
     in case the optimizations cannot be enabled by turning on the
     "ensureOptimizations" flag:
 
-    ```javaScript
-      const { Lexer } = require("chevrotain")
-      const myLexer = new Lexer([/* tokens */], { ensureOptimizations : true })
+    ```javascript
+    const { Lexer } = require("chevrotain")
+    const myLexer = new Lexer(
+        [
+            /* tokens */
+        ],
+        { ensureOptimizations: true }
+    )
     ```
 
     With the "ensureOptimizations" flag enabled the Lexer will also print error messages
@@ -175,41 +184,13 @@ These are highly recommended for each and every parser.
     $.RULE("value", () => {
         $.OR([
             // an array with seven alternatives
-            {
-                ALT: () => {
-                    $.CONSUME(StringLiteral)
-                }
-            },
-            {
-                ALT: () => {
-                    $.CONSUME(NumberLiteral)
-                }
-            },
-            {
-                ALT: () => {
-                    $.SUBRULE($.object)
-                }
-            },
-            {
-                ALT: () => {
-                    $.SUBRULE($.array)
-                }
-            },
-            {
-                ALT: () => {
-                    $.CONSUME(True)
-                }
-            },
-            {
-                ALT: () => {
-                    $.CONSUME(False)
-                }
-            },
-            {
-                ALT: () => {
-                    $.CONSUME(Null)
-                }
-            }
+            { ALT: () => $.CONSUME(StringLiteral) },
+            { ALT: () => $.CONSUME(NumberLiteral) },
+            { ALT: () => $.SUBRULE($.object) },
+            { ALT: () => $.SUBRULE($.array) },
+            { ALT: () => $.CONSUME(True) },
+            { ALT: () => $.CONSUME(False) },
+            { ALT: () => $.CONSUME(Null) }
         ])
     })
     ```
@@ -222,41 +203,13 @@ These are highly recommended for each and every parser.
         $.OR(
             $.c1 ||
                 ($.c1 = [
-                    {
-                        ALT: () => {
-                            $.CONSUME(StringLiteral)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(NumberLiteral)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.SUBRULE($.object)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.SUBRULE($.array)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(True)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(False)
-                        }
-                    },
-                    {
-                        ALT: () => {
-                            $.CONSUME(Null)
-                        }
-                    }
+                    { ALT: () => $.CONSUME(StringLiteral) },
+                    { ALT: () => $.CONSUME(NumberLiteral) },
+                    { ALT: () => $.SUBRULE($.object) },
+                    { ALT: () => $.SUBRULE($.array) },
+                    { ALT: () => $.CONSUME(True) },
+                    { ALT: () => $.CONSUME(False) },
+                    { ALT: () => $.CONSUME(Null) }
                 ])
         )
     })
@@ -314,13 +267,15 @@ It is important to note that:
 *   Due to the way Chevrotain is built, the text of the alternatives cannot be completly extracted from the grammar rule
 
     ```javascript
-    let myAlts = [
+    // defined outside the rule
+    const myAlts = [
         {
             ALT: () => {
                 return $.CONSUME(StringLiteral)
             }
         }
     ]
+
     // Won't work
     $.RULE("value", function() {
         // Chevrotain won't be able to analyze this grammar rule as it relies on Function.prototype.toString
@@ -339,7 +294,7 @@ It is important to note that:
     To avoid this, simpliy define these "cache properties" in the constructor.
     See an example in the [ECMAScript5 grammar's constructor](https://github.com/SAP/chevrotain/blob/ac21570b97a8de0d6b91f29979aed8041455cacd/examples/grammars/ecma5/ecma5_parser.js#L37-L43).
 
-#### Minor Performance Benefits
+### Minor Performance Benefits
 
 These are only required if you are trying to squeeze every tiny bit of performance out of your parser.
 

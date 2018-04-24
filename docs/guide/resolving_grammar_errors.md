@@ -1,8 +1,8 @@
-## Resolving Grammar Errors
+# Resolving Grammar Errors
 
 *   [Common Prefix Ambiguities.](#COMMON_PREFIX)
 
-### <a name="COMMON_PREFIX"></a> Common Prefix Ambiguities.
+## Common Prefix Ambiguities
 
 Imagine the following grammar:
 

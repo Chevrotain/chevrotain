@@ -67,9 +67,10 @@
     "check_coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
     "docs": "typedoc lib/chevrotain.d.ts --mode file --out dev/docs --module commonjs --excludeExternals --includeDeclarations --excludePrivate",
+    "website:dev": "vuepress dev docs",
+    "website:build": "vuepress build docs",
     "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",
-    "website": "daux -ddev/website",
-    "upload_website": "yarn run website && node ../chevrotain_docs/scripts/upload_website.js",
+    "upload_website": "yarn run website:build && node ../chevrotain_docs/scripts/upload_website.js",
     "integration_tests": "grunt integration_tests",
     "karma": "grunt browsers_tests",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
@@ -88,6 +89,7 @@
   "devDependencies": {
     "@types/chai": "^4.0.10",
     "@types/mocha": "^5.0.0",
+    "@types/sinon-chai": "^2.7.29",
     "chai": "^4.1.2",
     "coveralls": "^3.0.0",
     "gitty": "^3.6.0",
@@ -122,9 +124,9 @@
     "tslint": "^5.8.0",
     "typedoc": "^0.11.1",
     "typescript": "2.8.1",
+    "vuepress": "^0.7.1",
     "webpack": "^3.10.0",
-    "xregexp": "^4.0.0",
-    "@types/sinon-chai": "^2.7.29"
+    "xregexp": "^4.0.0"
   },
   "typings": "lib/chevrotain.d.ts",
   "prettier": {

@@ -1,12 +1,10 @@
-*   Previous tutorial steps
-    *   [Step 3a - Separated Actions](./step3a_adding_actions_visitor.md).
-    *   [Step 3b - Embedded Actions](./step3b_adding_actions_embedded.md).
+# Tutorial - Fault Tolerant
 
-# Tutorial Step 4 - Fault tolerance and Error recovery.
+### TLDR
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step4_error_recovery) for this step <---
+[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step4_error_recovery).
 
-### Introduction:
+## Introduction
 
 In the previous tutorial steps we have learned how to build a parser for a simple grammar.
 Our parser can handle valid inputs just fine, but what happens if the input is not perfectly valid?
@@ -17,7 +15,7 @@ even for invalid inputs.
 Chevrotain uses several fault tolerance / error recovery heuristics, which generally follow error recovery heuristics
 used in Antlr3.
 
-### In Rule Single Token insertion:
+## Single Token insertion
 
 Happens when:
 
@@ -27,14 +25,14 @@ Happens when:
 
 A Y token will be automatically **inserted** into the token stream.
 
-For example: in a JSON text colons are used between keys and values.
+For example: in a JSON Grammar colons are used between keys and values.
 
 ```javascript
 // GOOD
-{ "key" : 666}
+{ "key" : 666 }
 
 // BAD, missing colon
-{ "key"   666}
+{ "key"   666 }
 ```
 
 If we try parsing the "bad" example, after consuming:
@@ -44,7 +42,7 @@ If we try parsing the "bad" example, after consuming:
 ```
 
 *   We expect a colon token (Y).
-*   We will find a number(666) token (X).
+*   We will find a number(666) token (X) in the remaining text: '666 }'.
 *   After the colon token, a number token is valid.
 
 Therefore the missing colon will be automatically "inserted".
@@ -55,7 +53,7 @@ This heuristic's behavior can be customized by the following methods:
 
 *   [getTokenToInsert](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#gettokentoinsert)
 
-### In Rule Single Token deletion:
+## Single Token deletion:
 
 Happens when:
 
@@ -87,7 +85,9 @@ If we try parsing the "bad" example, after consuming:
 
 Therefore the redundant right brackets "}" will be skipped (deleted) and the parser will consume the number token.
 
-### The following re-sync recovery examples use this sample json like grammar:
+## Re-Sync Recovery
+
+The following re-sync recovery examples use this sample json like grammar:
 
 ```ANTLR
 object
@@ -100,7 +100,7 @@ value
    : object | stringLiteral | number | ...
 ```
 
-### In Rule Repetition Re-Sync recovery:
+## Repetition Re-Sync
 
 Repetition re-sync recovery happens when:
 
@@ -144,9 +144,9 @@ If we try parsing this input example, after consuming:
 
 Note that in such a situation some input would be lost, (the third key), however the fourth key will still be parsed successfully!
 
-### Between Rules Re-Sync recovery:
+## General Re-Sync
 
-Between Rules re-sync recovery happens when the parser encounters a parser error inside a rule which
+General re-sync recovery happens when the parser encounters a parser error inside a rule which
 it cannot recover from in other ways.
 For example:
 
@@ -208,13 +208,18 @@ For the following invalid json input:
 
 *   Thus the next two items will appear be parsed successfully even though they were preceded by a syntax error!
 
-#### Enabling All Recovery mechanisms
+## Enabling
 
-By default fault tolerance and error recovery heuristics are disabled.
+By default fault tolerance and error recovery heuristics are **disabled**.
 They can be enabled by passing a optional **recoveryEnabled** parameter (default true)
 To the parser's constructor [constructor](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#constructor).
 
-#### CST output for re-synced rules:
+Once enabled specific rules may have their re-sync recovery disabled explicitly,
+This is can be done during the definition of the grammar rule [RULE](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#rule).
+The third parameter(**config**) may contain a **resyncEnabled** property that controls whether or not re-sync is enabled for the
+**specific** rule.
+
+## CST Integration
 
 When using [Concrete Syntax Tree](../02_Deep_Dive/concrete_syntax_tree.md) output
 A re-synced will return a CSTNode with the boolean ["recoveredNode"](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/cstnode.html#recoverednode) flag marked as true.
@@ -224,7 +229,7 @@ will be present. This means that code that handles the CST (CST Walker or Visito
 assume certain content is always present on a CstNode. Instead it must be very defensive to avoid runtime
 errors.
 
-#### Embedded Actions (semantics) and the return values of re-synced rules:
+## Embedded Actions Integration
 
 Just being able to continue parsing is not enough, as "someone" probably expects a returned value
 from the sub-rule we have recovered from.
@@ -236,21 +241,15 @@ Customization is done during the definition of the grammar [RULE](https://sap.gi
 The third parameter(**config**) may contain a **recoveryValueFunc** property which is a function that will be invoked to produce the returned value in
 case of re-sync recovery.
 
-#### Disabling Re-Sync Recovery per rule.:
+## Types Of Recovery Strategies
 
-Re-Sync recovery is enabled by default for all rules.
-In some cases it may be appropriate to disable re-sync recovery for a specific rule.
-This is (once again) done during the definition of the grammar [RULE](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#rule).
-The third parameter(**config**) may contain a \*resyncEnabled\*\* property that controls whether or not re-sync is enabled for the
-rule.
+*   Single Token insertion/deletion and repetiton re-sync are "in rule" recovery strategies.
+*   General re-sync Recovery is a "between rules" recovery strategy.
 
-#### Difference between "In-Rule" and "Between Rules" recovery.
+The main difference is that "in-rule" recovery fixes the problem in the scope of a single rule
+without changes to the parser's rule stack and the parser's output will still be valid.
 
-The main difference is that "In-Rule" recovery fixes the problem in the scope of a single rule, while Between Rules recovery will fail at
-least one parsing rule (and perhaps many more). Thus the latter tends to "lose" more of the original input and requires
-additional definitions (what should be returned value of a re-synced rule?).
-
-#### What is Next?
-
-*   Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step4_error_recovery) of
-    this tutorial step.
+But "Between Rules" recovery will fail at least one parsing rule (and perhaps many more).
+Thus the latter tends to "lose" more of the original input, may
+potentially causes invalid output structure (e.g: partial CST structure)
+and require additional definitions (e.g: what should be returned value of a re-synced rule?).

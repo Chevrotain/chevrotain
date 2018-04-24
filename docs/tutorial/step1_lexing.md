@@ -1,17 +1,14 @@
-# Tutorial Step 1 - Building a Lexer.
+# Tutorial - Lexer
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step1_lexing) for this step <---
+### TLDR
 
-### On code samples:
+[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step1_lexing).
 
-The tutorial uses ES2015+ syntax.
-See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
-
-### Introduction:
+## Introduction
 
 In This tutorial we will implement a Lexer for a simple SQL Select statement language:
 
-```SQL
+```sql
 SELECT column1 FROM table2
 SELECT name, age FROM persons WHERE age > 100
 ...
@@ -19,6 +16,9 @@ SELECT name, age FROM persons WHERE age > 100
 
 A Lexer transforms a string input into a [Token](https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/itoken.html) vector.
 Chevrotain has a built in Lexer engine based on Javascript Regular Expressions.
+
+## Our First Token
+
 To use the Chevrotain lexer the Tokens must first be defined.
 Lets examine the definition for a "FROM" Token:
 
@@ -26,20 +26,15 @@ Lets examine the definition for a "FROM" Token:
 const createToken = chevrotain.createToken
 // using createToken API
 const From = createToken({ name: "From", pattern: /FROM/ })
-
-// Using Class syntax
-class From extends Token {}
-// manually creating static fields as those are not yet supported in ES2015
-From.PATTERN = /FROM/
 ```
 
-There is nothing much to it. The pattern/PATTERN property is a RegExp which will be used when splitting up the input string
+There is nothing much to it. The pattern property is a RegExp which will be used when splitting up the input string
 into separate Tokens.
 
 We will use the [**createToken** API](https://sap.github.io/chevrotain/documentation/3_1_0/globals.html#createtoken)
 in the rest of tutorial because ES2015 has no support for static fields.
 
-#### What about a slightly more complex Tokens?
+## More complex Tokens
 
 How can we define Tokens for Identifiers or Integers?
 
@@ -49,7 +44,7 @@ const Identifier = createToken({ name: "Identifier", pattern: /\w+/ })
 const Integer = createToken({ name: "Integer", pattern: /0|[1-9]\d+/ })
 ```
 
-#### What about skipping certain Tokens?
+## Skipping Tokens
 
 The obvious use case in this language (and many others) is **whitespace**. skipping certain Tokens is easily
 accomplished by marking them with the SKIP group.
@@ -66,7 +61,9 @@ const WhiteSpace = createToken({
 *   Note that we used the **line_breaks** property to flag that the WhiteSpace token may contain line terminators.
     This is needed by the lexer to keep track of line and column numbers.
 
-#### Let us define all our nine Tokens:
+## All Our Tokens
+
+Lets examine all the needed Tokens definitions"
 
 ```javascript
 const Identifier = createToken({ name: "Identifier", pattern: /[a-zA-Z]\w*/ })
@@ -104,7 +101,9 @@ const WhiteSpace = createToken({
 })
 ```
 
-#### All right, we have Token definitions, how do we use them to create a Lexer?
+## Creating The Lexer
+
+We now have Token definitions, but how do we create a Lexer from these?
 
 ```javascript
 // note we are placing WhiteSpace first as it is very common thus it will speed up the lexer.
@@ -133,7 +132,7 @@ Note that:
 
 *   The Chevrotain Lexer is **stateless**, thus only a **single one per grammar** should ever be created.
 
-#### But how do we actually use this lexer?
+## Using The Lexer
 
 ```javascript
 let inputText = "SELECT column1 FROM table2"
@@ -145,9 +144,3 @@ The Lexing Result will contain:
 1.  A Token Vector.
 2.  the lexing errors (if any were encountered)
 3.  And other [Token groups](https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js) (if grouping was used)
-
-#### What is Next?
-
-*   Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step1_lexing) of
-    this tutorial step.
-*   Move to the next step: [Step 2 - Parsing](./step2_parsing.md).

@@ -1,22 +1,19 @@
-*   Previous tutorial step - [Step 1 - Lexing](./step1_lexing.md)
+# Tutorial - Parser
 
-# Tutorial Step 2 - Building a Parser.
+### TLDR
 
-### ---> [Source Code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step2_parsing) for this step <---
+[Run and Debug the source code](https://github.com/SAP/chevrotain/tree/master/examples/tutorial/step2_parsing).
 
-### On code samples:
-
-The tutorial uses ES2015+ syntax.
-See examples of using Chevrotain in other [implementation languages](https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages).
-
-### Introduction:
+## Introduction
 
 In this tutorial we will implement a Parser for a simple SQL Select statement language
 introduced in the [previous](./step1_lexing.md) tutorial step.
+Note that this parse will only **recognize** the language and not
+output any data structure (yet).
 
 The grammar for our language:
 
-```ANTLR
+```antlr
 selectStatement
    : selectClause fromClause (whereClause)?
 
@@ -51,7 +48,9 @@ The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/
 *   [MANY_SEP](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items
 *   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/3_1_0/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
 
-#### Let's implement our first grammar rule.
+## First Rule
+
+Let's implement our first grammar rule.
 
 ```javascript
 // selectStatement
@@ -72,7 +71,10 @@ Fairly straight forward translation:
 *   Non-Terminals --> SUBRULE
 *   "?" --> OPTION
 
-#### What is 'this' in this context? where do we write the grammar rules?
+## Structure
+
+*   What is 'this' in this context?
+*   where do we write the grammar rules?
 
 Each grammar rule is a property of a class that extends chevrotain.Parser.
 
@@ -120,7 +122,9 @@ Important to note that:
     This is where much of the 'secret sauce' happens, including creating the inner grammar representation
     and performing static checks on the grammar.
 
-#### Let's look at two more grammar rule, this time with repetition and alternation.
+## More Rules
+
+Let's look at two more grammar rule, this time with repetition and alternation.
 
 ```javascript
 $.RULE("selectClause", () => {
@@ -143,7 +147,9 @@ $.RULE("atomicExpression", () => {
 })
 ```
 
-#### How can the Parser be debugged?
+## Debugging
+
+*   How can the Parser be debugged?
 
 The grammar rules above do not only define the grammar, they are also the code that will be run
 during parsing. This means that you can debug the parser **simply by adding a break
@@ -168,9 +174,11 @@ $.RULE("selectClause", () => {
 There **do not** exist two different representations for the grammar
 and the runnable implementation (for example, grammar file vs generated code in the case of parser generators).
 Again, please note that Chevrotain is **NOT** a parser generator.
-Extra details can be found [in the FAQ](https://sap.github.io/chevrotain/website/FAQ.html#VS_GENERATORS).
+Extra details can be found [in the FAQ](https://sap.github.io/chevrotain/docs/FAQ.html#VS_GENERATORS).
 
-#### But how does it work? (skip if you don't care :) )
+## Under The Hood
+
+*   But how does it work? (skip if you don't care :) )
 
 The code above will be executed as is. Yet we have not implemented a lookahead function to
 choose between the two OR alternatives `( INTEGER | IDENTIFIER)`,
@@ -212,7 +220,9 @@ The same applies for any grammar rule where the parser has a choice,
 and even in some where there is no choice as that same in memory representation of the grammar
 can be used for error messages and fault tolerance as well as deciding which path to take.
 
-#### Let's finish implementing the whole SelectParser:
+## Complete Parser
+
+Let's finish implementing the whole SelectParser:
 
 ```javascript
 const { Parser } = require("chevrotain")
@@ -295,21 +305,23 @@ class SelectParser extends Parser {
     Thus in the `"expression"` rule above, the second appearance of `SUBRULE` with `atomicExpression` parameter has a '2' suffix: `$.SUBRULE2($.atomicExpression)`
 *   Such errors will be detected during self analysis, and will prevent the creation of parser instances with a descriptive error message (fail fast...).
 
-#### But how do we actually use this Parser?
+## Usage
 
-```Javascript
+*   But how do we actually use this Parser?
+
+```javascript
 // ONLY ONCE
-const parser = new SelectParser([]);
+const parser = new SelectParser([])
 
 function parseInput(text) {
-   const lexingResult = SelectLexer.tokenize(text)
-   // "input" is a setter which will reset the parser's state.
-   parser.input = lexingResult.tokens
-   parser.selectStatement()
+    const lexingResult = SelectLexer.tokenize(text)
+    // "input" is a setter which will reset the parser's state.
+    parser.input = lexingResult.tokens
+    parser.selectStatement()
 
-   if (parser.errors.length > 0) {
-      throw new Error("sad sad panda, Parsing errors detected")
-   }
+    if (parser.errors.length > 0) {
+        throw new Error("sad sad panda, Parsing errors detected")
+    }
 }
 
 const inputText = "SELECT column1 FROM table2"
@@ -318,9 +330,3 @@ parseInput(inputText)
 
 *   Note that any of the grammar rules can be invoked as the starting rule.
     There is no 'special' top level entry rule.
-
-#### What is Next?
-
-*   Run & Debug the [source code](https://github.com/SAP/chevrotain/blob/master/examples/tutorial/step2_parsing) of
-    this tutorial step.
-*   Next step in the tutorial: [Step 3 - Grammar Actions](./step3_adding_actions_root.md).

@@ -1,4 +1,4 @@
-## Building Custom Parsing APIs
+# Creating Custom Parsing APIs
 
 Chevrotain can be used as the underlying engine for other parsing libraries.
 
@@ -13,9 +13,9 @@ The general flow is:
 
 Skip to [runnable examples](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/)
 
-### The GAST structure
+## GAST Structure
 
-This structure is made up of the following classes:
+The structure of the GAST is made up of the following classes:
 
 *   [Rule](https://sap.github.io/chevrotain/documentation/3_1_0/classes/rule.html)
 *   [Terminal](https://sap.github.io/chevrotain/documentation/3_1_0/classes/terminal.html)
@@ -90,9 +90,9 @@ Important to note that:
     })
     ```
 
-### Resolving and Validating the GAST structure
+## Grammar Validations
 
-Chevrotain exposes three functions for this purpose:
+Chevrotain exposes three functions for Grammar(GAST) Validation purposes:
 
 1.  [**resolveGrammar**](https://sap.github.io/chevrotain/documentation/3_1_0/globals.html#resolvegrammar)
     NonTerminals are often referenced by their name as cyclic references will make
@@ -119,7 +119,7 @@ Chevrotain exposes three functions for this purpose:
     optionally based on the [default implementation](https://sap.github.io/chevrotain/documentation/3_1_0/globals.html#defaultgrammarvalidatorerrorprovider)
 
 1)  [**assignOccurrenceIndices**](https://sap.github.io/chevrotain/documentation/3_1_0/globals.html#assignoccurrenceindices)
-    Chevrotain has certain constraint on the "shape" of the generated code. The relevant one in this case is the [unique numerical suffixes](https://sap.github.io/chevrotain/website/FAQ.html#NUMERICAL_SUFFIXES) for the DSL methods.
+    Chevrotain has certain constraint on the "shape" of the generated code. The relevant one in this case is the [unique numerical suffixes](https://sap.github.io/chevrotain/docs/FAQ.html#NUMERICAL_SUFFIXES) for the DSL methods.
     The assignOccurrenceIndices function will take care of this requirement by mutating the idx property on the GAST classes accordingly.
 
 ### A Note on Custom Error Messages
@@ -136,7 +136,7 @@ producing better error messages. e.g:
 *   A Parser combinator API may attempt to reconstruct the original text of its API invocations to give better hints
     to assist in locating the original error.
 
-### Code Generation & Execution
+## Code Generation
 
 There are two APIs for code generation and execution.
 
@@ -158,16 +158,16 @@ There are two APIs for code generation and execution.
     useful for example for a combinator style API in which code generation is best
     avoided.
 
-### Runnable Examples
+## Runnable Examples
 
 *   [Combinator Style](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator)
 
 *   Generator Style (TBD)
 
-### Limitations
+## Limitations
 
 The Following features are currently unsupported.
 
-*   **Embedded actions**, which means the only way to get output from the parser is by enabling automatic [Concrete Syntax Tree](https://sap.github.io/chevrotain/website/Deep_Dive/concrete_syntax_tree.html) creation.
+*   **Embedded actions**, which means the only way to get output from the parser is by enabling automatic [Concrete Syntax Tree](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) creation.
 *   [**Gates/Predicates**](https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js).
 *   [**Parameterized Rules**](https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js).
