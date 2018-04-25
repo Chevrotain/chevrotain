@@ -23,7 +23,7 @@ as any other pure code without requiring any new tools or processes.
 ## TLDR
 
 *   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
-*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**
+*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
 *   [**Performance benchmark**][benchmark]
 
 ## Features
