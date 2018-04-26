@@ -1,4 +1,4 @@
-import { RegExpParser, regexpToAstVersion } from "regexp-to-ast"
+import { RegExpParser, VERSION } from "regexp-to-ast"
 import {
     flatten,
     map,
@@ -45,7 +45,7 @@ export function getStartCodes(
             PRINT_ERROR(
                 `${failedOptimizationPrefixMsg}\n` +
                     `\tFailed parsing: < ${regExp.toString()} >\n` +
-                    `\tUsing the regexp-to-ast library version: ${regexpToAstVersion}\n` +
+                    `\tUsing the regexp-to-ast library version: ${VERSION}\n` +
                     "\tPlease open an issue at: https://github.com/bd82/regexp-to-ast/issues" +
                     msgSuffix
             )
