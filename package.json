@@ -67,6 +67,7 @@
     "check_coverage": "nyc check-coverage --lines 100 --branches 100 --statements 100 --functions 100",
     "bundle": "npm-run-all bundle_regular bundle_min bundle_spec",
     "docs": "typedoc lib/chevrotain.d.ts --mode file --out dev/docs --module commonjs --excludeExternals --includeDeclarations --excludePrivate",
+    "docs_new": "typedoc src/api.d.ts --mode file --out dev/docs --module commonjs --excludeExternals --includeDeclarations --excludePrivate",
     "website:dev": "vuepress dev docs",
     "website:build": "vuepress build docs",
     "dead_links": "awesome_bot docs/*.md docs/*/*.md diagrams/*.md examples/*.md examples/*/*.md examples/*/*/*.md readme.md --allow-dupe --allow-redirect --skip-save-results",

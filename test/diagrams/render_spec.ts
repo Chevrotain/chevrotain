@@ -1,4 +1,3 @@
-"use strict"
 import { VERSION } from "../../src/version"
 const createSyntaxDiagramsCode = require("../../src/api")
     .createSyntaxDiagramsCode

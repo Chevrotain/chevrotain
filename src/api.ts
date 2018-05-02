@@ -86,7 +86,6 @@ API.NotAllInputParsedException = NotAllInputParsedException
 API.NoViableAltException = NoViableAltException
 
 // grammar reflection API
-API.gast = {}
 API.Flat = Flat
 API.Repetition = Repetition
 API.RepetitionWithSeparator = RepetitionWithSeparator
