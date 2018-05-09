@@ -53,6 +53,10 @@ describe("the regExp analysis", () => {
             expect(getStartCodes(/\D/)).to.be.empty
         })
 
+        it("Can compute for ignore case", () => {
+            expect(getStartCodes(/w|A/i)).to.deep.equal([119, 87, 65, 97])
+        })
+
         it("will not compute when using complements #2", () => {
             expect(getStartCodes(/[^a-z]/, true)).to.be.empty
         })

@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+*   [Failure Lexing Case Insensetive Patterns.](https://github.com/SAP/chevrotain/issues/708)
+
 ## 3.2.0 (4-24-2018)
 
 #### Minor Changes

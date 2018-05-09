@@ -690,6 +690,21 @@ function defineLexerSpecs(
         })
 
         describe("The Simple Lexer Full flow", () => {
+            it("Can lex case insensitive patterns", () => {
+                const workflow = createToken({
+                    name: "workflow",
+                    pattern: /WORKFLOW/i
+                })
+                const input = "worKFloW"
+                const lexer = new Lexer([workflow], {
+                    positionTracking: "onlyOffset"
+                })
+                let lexResult = lexer.tokenize(input)
+                let tokens: any = lexResult.tokens
+                expect(tokens[0].image).to.equal("worKFloW")
+                expect(tokens[0].tokenType).to.equal(workflow)
+            })
+
             it("can run a simpleLexer without optimizing meta chars", () => {
                 let Tab = createToken({
                     name: "Tab",

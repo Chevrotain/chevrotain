@@ -20,7 +20,12 @@ export function getStartCodes(
 ): number[] {
     try {
         const ast = parser.pattern(regExp.toString())
-        return firstChar(ast.value)
+        let firstChars = firstChar(ast.value)
+        if (ast.flags.ignoreCase) {
+            firstChars = applyIgnoreCase(firstChars)
+        }
+
+        return firstChars
     } catch (e) {
         /* istanbul ignore next */
         // Testing this relies on the regexp-to-ast library having a bug... */
@@ -122,4 +127,21 @@ export function firstChar(ast): number[] {
         default:
             throw Error("non exhaustive match!")
     }
+}
+
+export function applyIgnoreCase(firstChars: number[]): number[] {
+    const firstCharsCase = []
+    forEach(firstChars, charCode => {
+        firstCharsCase.push(charCode)
+
+        const char = String.fromCharCode(charCode)
+        /* istanbul ignore else */
+        if (char.toUpperCase() !== char) {
+            firstCharsCase.push(char.toUpperCase().charCodeAt(0))
+        } else if (char.toLowerCase() !== char) {
+            firstCharsCase.push(char.toLowerCase().charCodeAt(0))
+        }
+    })
+
+    return firstCharsCase
 }
