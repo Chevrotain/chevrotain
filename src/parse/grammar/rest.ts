@@ -3,7 +3,6 @@ import {
     AbstractProduction,
     Alternation,
     Flat,
-    IProduction,
     NonTerminal,
     Option,
     Repetition,
@@ -12,6 +11,7 @@ import {
     RepetitionWithSeparator,
     Terminal
 } from "./gast/gast_public"
+import { IProduction } from "../../../api"
 
 /**
  *  A Grammar Walker that computes the "remaining" grammar "after" a productions in the grammar.

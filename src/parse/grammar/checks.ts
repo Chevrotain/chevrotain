@@ -14,9 +14,7 @@ import {
     values
 } from "../../utils/utils"
 import {
-    IgnoredParserIssues,
     IParserAmbiguousAlternativesDefinitionError,
-    IParserDefinitionError,
     IParserDuplicatesDefinitionError,
     IParserEmptyAlternativeDefinitionError,
     ParserDefinitionErrorType
@@ -31,15 +29,11 @@ import {
     getProdType,
     isStrictPrefixOfPath
 } from "./lookahead"
-import { TokenType } from "../../scan/lexer_public"
 import { NamedDSLMethodsCollectorVisitor } from "../cst/cst"
 import { nextPossibleTokensAfter } from "./interpreter"
 import {
     Alternation,
     Flat,
-    IOptionallyNamedProduction,
-    IProduction,
-    IProductionWithOccurrence,
     NonTerminal,
     Option,
     Repetition,
@@ -50,7 +44,15 @@ import {
     Terminal
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
-import { IGrammarValidatorErrorMessageProvider } from "../errors_public"
+import {
+    IgnoredParserIssues,
+    IGrammarValidatorErrorMessageProvider,
+    IOptionallyNamedProduction,
+    IParserDefinitionError,
+    IProduction,
+    IProductionWithOccurrence,
+    TokenType
+} from "../../../api"
 
 export function validateGrammar(
     topLevels: Rule[],

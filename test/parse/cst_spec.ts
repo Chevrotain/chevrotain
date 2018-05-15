@@ -1,10 +1,10 @@
-import { createToken, IToken } from "../../src/scan/tokens_public"
+import { createToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import { clearCache } from "../../src/parse/cache_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
-import { TokenType } from "../../src/scan/lexer_public"
 import { map } from "../../src/utils/utils"
+import { IToken, TokenType } from "../../api"
 
 function createTokenVector(tokTypes: TokenType[]): any[] {
     return map(tokTypes, curTokType => {
@@ -834,7 +834,7 @@ context("CST", () => {
                     this.CONSUME(D)
                 })
 
-                protected canTokenTypeBeInsertedInRecovery(
+                public canTokenTypeBeInsertedInRecovery(
                     tokType: TokenType
                 ): boolean {
                     // we want to force re-sync recovery
@@ -916,7 +916,7 @@ context("CST", () => {
                     this.CONSUME(D)
                 })
 
-                protected canTokenTypeBeInsertedInRecovery(
+                public canTokenTypeBeInsertedInRecovery(
                     tokType: TokenType
                 ): boolean {
                     // we want to force re-sync recovery

@@ -5,7 +5,7 @@ export declare class Parser {
      * This must be called at the end of a Parser constructor.
      * See: http://sap.github.io/chevrotain/docs/tutorial/step2_parsing.html#under-the-hood
      */
-    protected static performSelfAnalysis(parserInstance: Parser): void
+    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
 
     /**
      * It is recommanded to reuse the same Parser instance
@@ -56,7 +56,7 @@ export declare class Parser {
      *
      * @return a lookahead function that will try to parse the given grammarRule and will return true if succeed.
      */
-    protected BACKTRACK<T>(
+    /* protected */ BACKTRACK<T>(
         grammarRule: (...args: any[]) => T,
         args?: any[]
     ): () => boolean
@@ -92,61 +92,91 @@ export declare class Parser {
      * @param tokType - The Type of the token to be consumed.
      * @param options - optional properties to modify the behavior of CONSUME.
      */
-    protected CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME1(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME1(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME2(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME2(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME3(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME3(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME4(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME4(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME5(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME5(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME6(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME6(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME7(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME7(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME8(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME8(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * @see CONSUME
      * @hidden
      */
-    protected CONSUME9(tokType: TokenType, options?: ConsumeMethodOpts): IToken
+    /* protected */ CONSUME9(
+        tokType: TokenType,
+        options?: ConsumeMethodOpts
+    ): IToken
 
     /**
      * The Parsing DSL Method is used by one rule to call another.
@@ -168,7 +198,7 @@ export declare class Parser {
      * @param options - optional properties to modify the behavior of SUBRULE.
      * @returns The result of invoking ruleToCall.
      */
-    protected SUBRULE<T>(
+    /* protected */ SUBRULE<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -177,7 +207,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE1<T>(
+    /* protected */ SUBRULE1<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -186,7 +216,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE2<T>(
+    /* protected */ SUBRULE2<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -195,7 +225,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE3<T>(
+    /* protected */ SUBRULE3<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -204,7 +234,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE4<T>(
+    /* protected */ SUBRULE4<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -213,7 +243,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE5<T>(
+    /* protected */ SUBRULE5<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -222,7 +252,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE6<T>(
+    /* protected */ SUBRULE6<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -231,7 +261,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE7<T>(
+    /* protected */ SUBRULE7<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -240,7 +270,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE8<T>(
+    /* protected */ SUBRULE8<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -249,7 +279,7 @@ export declare class Parser {
      * @see SUBRULE
      * @hidden
      */
-    protected SUBRULE9<T>(
+    /* protected */ SUBRULE9<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T
@@ -284,7 +314,7 @@ export declare class Parser {
      * @param  actionORMethodDef - The grammar action to optionally invoke once
      *                             or an "OPTIONS" object describing the grammar action and optional properties.
      */
-    protected OPTION<OUT>(
+    /* protected */ OPTION<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -292,7 +322,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION1<OUT>(
+    /* protected */ OPTION1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -300,7 +330,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION2<OUT>(
+    /* protected */ OPTION2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -308,7 +338,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION3<OUT>(
+    /* protected */ OPTION3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -316,7 +346,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION4<OUT>(
+    /* protected */ OPTION4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -324,7 +354,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION5<OUT>(
+    /* protected */ OPTION5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -332,7 +362,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION6<OUT>(
+    /* protected */ OPTION6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -340,7 +370,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION7<OUT>(
+    /* protected */ OPTION7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -348,7 +378,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION8<OUT>(
+    /* protected */ OPTION8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -356,7 +386,7 @@ export declare class Parser {
      * @see OPTION
      * @hidden
      */
-    protected OPTION9<OUT>(
+    /* protected */ OPTION9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT
 
@@ -420,61 +450,61 @@ export declare class Parser {
      *
      * @returns The result of invoking the chosen alternative.
      */
-    protected OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * @see OR
      * @hidden
      */
-    protected OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
+    /* protected */ OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T
 
     /**
      * Parsing DSL method, that indicates a repetition of zero or more.
@@ -510,7 +540,7 @@ export declare class Parser {
      *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
      */
-    protected MANY<OUT>(
+    /* protected */ MANY<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -518,7 +548,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY1<OUT>(
+    /* protected */ MANY1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -526,7 +556,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY2<OUT>(
+    /* protected */ MANY2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -534,7 +564,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY3<OUT>(
+    /* protected */ MANY3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -542,7 +572,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY4<OUT>(
+    /* protected */ MANY4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -550,7 +580,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY5<OUT>(
+    /* protected */ MANY5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -558,7 +588,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY6<OUT>(
+    /* protected */ MANY6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -566,7 +596,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY7<OUT>(
+    /* protected */ MANY7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -574,7 +604,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY8<OUT>(
+    /* protected */ MANY8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -582,7 +612,7 @@ export declare class Parser {
      * @see MANY
      * @hidden
      */
-    protected MANY9<OUT>(
+    /* protected */ MANY9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[]
 
@@ -617,7 +647,7 @@ export declare class Parser {
      * @param options - An object defining the grammar of each iteration and the separator between iterations
      *
      */
-    protected MANY_SEP<OUT>(
+    /* protected */ MANY_SEP<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -625,7 +655,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP1<OUT>(
+    /* protected */ MANY_SEP1<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -633,7 +663,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP2<OUT>(
+    /* protected */ MANY_SEP2<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -641,7 +671,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP3<OUT>(
+    /* protected */ MANY_SEP3<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -649,7 +679,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP4<OUT>(
+    /* protected */ MANY_SEP4<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -657,7 +687,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP5<OUT>(
+    /* protected */ MANY_SEP5<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -665,7 +695,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP6<OUT>(
+    /* protected */ MANY_SEP6<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -673,7 +703,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP7<OUT>(
+    /* protected */ MANY_SEP7<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -681,7 +711,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP8<OUT>(
+    /* protected */ MANY_SEP8<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -689,7 +719,7 @@ export declare class Parser {
      * @see MANY_SEP
      * @hidden
      */
-    protected MANY_SEP9<OUT>(
+    /* protected */ MANY_SEP9<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -705,7 +735,7 @@ export declare class Parser {
      *
      * @return {OUT[]}
      */
-    protected AT_LEAST_ONE<OUT>(
+    /* protected */ AT_LEAST_ONE<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -713,7 +743,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE1<OUT>(
+    /* protected */ AT_LEAST_ONE1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -721,7 +751,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE2<OUT>(
+    /* protected */ AT_LEAST_ONE2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -729,7 +759,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE3<OUT>(
+    /* protected */ AT_LEAST_ONE3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -737,7 +767,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE4<OUT>(
+    /* protected */ AT_LEAST_ONE4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -745,7 +775,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE5<OUT>(
+    /* protected */ AT_LEAST_ONE5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -753,7 +783,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE6<OUT>(
+    /* protected */ AT_LEAST_ONE6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -761,7 +791,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE7<OUT>(
+    /* protected */ AT_LEAST_ONE7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -769,7 +799,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE8<OUT>(
+    /* protected */ AT_LEAST_ONE8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -777,7 +807,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE
      * @hidden
      */
-    protected AT_LEAST_ONE9<OUT>(
+    /* protected */ AT_LEAST_ONE9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[]
 
@@ -794,7 +824,7 @@ export declare class Parser {
      *
      * @return {ISeparatedIterationResult<OUT>}
      */
-    protected AT_LEAST_ONE_SEP<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -802,7 +832,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP1<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP1<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -810,7 +840,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP2<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP2<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -818,7 +848,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP3<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP3<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -826,7 +856,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP4<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP4<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -834,7 +864,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP5<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP5<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -842,7 +872,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP6<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP6<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -850,7 +880,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP7<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP7<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -858,7 +888,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP8<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP8<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -866,7 +896,7 @@ export declare class Parser {
      * @see AT_LEAST_ONE_SEP
      * @hidden
      */
-    protected AT_LEAST_ONE_SEP9<OUT>(
+    /* protected */ AT_LEAST_ONE_SEP9<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT>
 
@@ -879,7 +909,7 @@ export declare class Parser {
      * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
      *                     Parser state / error recovery&reporting/ ...
      */
-    protected RULE<T>(
+    /* protected */ RULE<T>(
         name: string,
         implementation: (...implArgs: any[]) => T,
         config?: IRuleConfig<T>
@@ -890,7 +920,7 @@ export declare class Parser {
      * "extending" grammars to override rules/productions from the super grammar.
      * See [Parser Inheritance Example](https://github.com/SAP/chevrotain/tree/master/examples/parser/inheritance).
      */
-    protected OVERRIDE_RULE<T>(
+    /* protected */ OVERRIDE_RULE<T>(
         name: string,
         impl: (...implArgs: any[]) => T,
         config?: IRuleConfig<T>
@@ -901,7 +931,7 @@ export declare class Parser {
      * Override this if you require special behavior in your grammar.
      * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
      */
-    protected getTokenToInsert(tokType: TokenType): IToken
+    /* protected */ getTokenToInsert(tokType: TokenType): IToken
 
     /**
      * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
@@ -910,17 +940,19 @@ export declare class Parser {
      * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
      * as the max of the cardinality will be greater than the min value (and this is a false error!).
      */
-    protected canTokenTypeBeInsertedInRecovery(tokType: TokenType): boolean
+    /* protected */ canTokenTypeBeInsertedInRecovery(
+        tokType: TokenType
+    ): boolean
 
-    protected getNextPossibleTokenTypes(
+    /* protected */ getNextPossibleTokenTypes(
         grammarPath: ITokenGrammarPath
     ): TokenType[]
 
     input: IToken[]
 
-    protected SKIP_TOKEN(): IToken
+    /* protected */ SKIP_TOKEN(): IToken
 
-    protected LA(howMuch: number): IToken
+    /* protected */ LA(howMuch: number): IToken
 }
 
 export declare enum ParserDefinitionErrorType {
@@ -1109,11 +1141,7 @@ export interface ILineTerminatorsTester {
     lastIndex: number
 }
 
-/**
- * Creates a new TokenType which can then be used
- * to define a Lexer and Parser
- */
-export declare function createToken(config: {
+export interface ITokenConfig {
     name: string
 
     /**
@@ -1214,7 +1242,13 @@ export declare function createToken(config: {
      *    * Note that "💩".charCodeAt(0) === 55357
      */
     start_chars_hint?: (string | number)[]
-}): TokenType
+}
+
+/**
+ * Creates a new TokenType which can then be used
+ * to define a Lexer and Parser
+ */
+export declare function createToken(config: ITokenConfig): TokenType
 
 /**
  * Utility to create Chevrotain IToken "instances"
@@ -1267,7 +1301,7 @@ export declare type CustomPatternMatcherFunc = (
      */
     tokens?: IToken[],
     /**
-     * Previously scanned Groups
+     * Token Groups
      */
     groups?: {
         [groupName: string]: IToken
@@ -1329,6 +1363,47 @@ export declare function tokenName(tokType: TokenType): string
  */
 export declare function tokenLabel(tokType: TokenType): string
 
+/**
+ * A Utility method to check if a token is of the type of the argument Token class.
+ * This utility is needed because Chevrotain tokens support "categories" which means
+ * A TokenType may have multiple categories.
+ *
+ * This means a simple comparison using the {@link IToken.tokenType} property may not suffice.
+ * For example:
+ *
+ * ```
+ *   import { createToken, tokenMatcher, Lexer } from "chevrotain"
+ *
+ *   // An "abstract" Token used only for categorization purposes.
+ *   const NumberTokType = createToken({ name: "NumberTokType", pattern: Lexer.NA })
+ *
+ *   const IntegerTokType = createToken({
+ *     name: "IntegerTokType",
+ *     pattern: /\d+/,
+ *     // Integer "Is A" Number
+ *     categories: [NumberTokType]
+ *   })
+ *
+ *   const DecimalTokType = createToken({
+ *     name: "DecimalTokType",
+ *     pattern: /\d+\.\d+/,
+ *     // Double "Is A" Number
+ *     categories: [NumberTokType]
+ *   })
+ *
+ *   // Will always be false as the tokenType property can only
+ *   // be Integer or Double Token Types as the Number TokenType is "abstract".
+ *   if (myToken.tokenType === NumberTokType) { /* ... *\/ }
+ *
+ *   // Will be true when myToken is of Type Integer or Double.
+ *   // Because the hierarchy defined by the categories is taken into account.
+ *   if (tokenMatcher(myToken, NumberTokType) { /* ... *\/ }
+ * ```
+ *
+ * @returns true iff the token matches the TokenType.
+ */
+export function tokenMatcher(token: IToken, tokType: TokenType): boolean
+
 export declare type MultiModesDefinition = {
     [modeName: string]: TokenType[]
 }
@@ -1355,16 +1430,6 @@ export interface IRuleConfig<T> {
      * Enable/Disable re-sync error recovery for this specific production.
      */
     resyncEnabled?: boolean
-}
-
-export interface AtLeastOneSepMethodOpts<T> extends ManySepMethodOpts<T> {
-    /**
-     *  Short title/classification to what is being matched.
-     *  Will be used in the error message,.
-     *  If none is provided, the error message will include the names of the expected
-     *  Tokens sequences which start the method's inner grammar
-     */
-    ERR_MSG?: string
 }
 
 export interface DSLMethodOpts<T> {
@@ -1737,6 +1802,9 @@ export declare enum LexerDefinitionErrorType {
     UNREACHABLE_PATTERN = 14
 }
 
+/**
+ * Type of End Of File Token.
+ */
 export declare const EOF: TokenType
 
 /**
@@ -1811,9 +1879,11 @@ export interface IRecognitionException {
 }
 
 /**
- * A utililty to detect if an Error is a Chevrotain Parser's runtime exception.
+ * A utility to detect if an Error is a Chevrotain Parser's runtime exception.
  */
 export declare function isRecognitionException(error: Error): boolean
+
+// TODO refactor exceptions constructors to classes
 
 /**
  * An exception of this type will be saved in {@link Parser.errors} when {@link Parser.CONSUME}
@@ -1861,6 +1931,39 @@ export interface IProduction {
 
 export interface IProductionWithOccurrence extends IProduction {
     idx: number
+}
+
+/**
+ * A very basic implementation of a Visitor Pattern
+ * For the Grammar AST structure.
+ *
+ * This may be useful for advanced users who create custom logic on the grammar AST.
+ * For example, custom validations or introspection.
+ */
+export abstract class GAstVisitor {
+    visit(node: IProduction): any
+
+    abstract visitNonTerminal(node: NonTerminal): any
+
+    abstract visitFlat(node: Flat): any
+
+    abstract visitOption(node: Option): any
+
+    abstract visitRepetition(node: Repetition): any
+
+    abstract visitRepetitionMandatory(node: RepetitionMandatory): any
+
+    abstract visitRepetitionMandatoryWithSeparator(
+        node: RepetitionMandatoryWithSeparator
+    ): any
+
+    abstract visitRepetitionWithSeparator(node: RepetitionWithSeparator): any
+
+    abstract visitAlternation(node: Alternation): any
+
+    abstract visitTerminal(node: Terminal): any
+
+    abstract visitRule(node: Rule): any
 }
 
 /**
@@ -2035,29 +2138,6 @@ export declare class Terminal implements IProductionWithOccurrence {
 
 export interface IGASTVisitor {
     visit(prod: IProduction): any
-}
-
-/**
- * A very basic implementation of a Visitor Pattern
- * For the Grammar AST structure.
- *
- * This may be useful for advanced users who create custom logic on the grammar AST.
- * For example, custom validations or introspections.
- */
-export abstract class GAstVisitor implements IGASTVisitor {
-    visit(node: IProduction): any
-    visitNonTerminal(node: NonTerminal): any
-    visitFlat(node: Flat): any
-    visitOption(node: Option): any
-    visitRepetition(node: Repetition): any
-    visitRepetitionMandatory(node: RepetitionMandatory): any
-    visitRepetitionMandatoryWithSeparator(
-        node: RepetitionMandatoryWithSeparator
-    ): any
-    visitRepetitionWithSeparator(node: RepetitionWithSeparator): any
-    visitAlternation(node: Alternation): any
-    visitTerminal(node: Terminal): any
-    visitRule(node: Rule): any
 }
 
 /**
@@ -2272,11 +2352,11 @@ export declare function createSyntaxDiagramsCode(
  *
  * - See detailed docs for [Custom APIs](http://sap.github.io/chevrotain/docs/guide/custom_apis.html).
  */
-export declare function generateParserFactory<T extends Parser>(options: {
+export declare function generateParserFactory(options: {
     name: string
     rules: Rule[]
     tokenVocabulary: TokenVocabulary
-}): (config?: IParserConfig) => T
+}): (config?: IParserConfig) => Parser
 
 /**
  * Generate A Parser's text from a set of Rules.

@@ -1,10 +1,10 @@
-import { createToken, IToken } from "../../src/scan/tokens_public"
+import { createToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
-import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { clearCache } from "../../src/parse/cache_public"
 import { createRegularToken } from "../utils/matchers"
+import { IToken } from "../../api"
 
 function defineLookaheadSpecs(
     contextName,

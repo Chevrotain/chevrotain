@@ -1,11 +1,6 @@
-import { EOF, createToken, IToken } from "../../src/scan/tokens_public"
-import {
-    IMultiModeLexerDefinition,
-    Lexer,
-    TokenType
-} from "../../src/scan/lexer_public"
+import { EOF, createToken } from "../../src/scan/tokens_public"
+import { Lexer } from "../../src/scan/lexer_public"
 import { Parser, EMPTY_ALT } from "../../src/parse/parser_public"
-import { HashTable } from "../../src/lang/lang_extensions"
 import { getLookaheadFuncsForClass } from "../../src/parse/cache"
 import {
     EarlyExitException,
@@ -19,6 +14,7 @@ import {
     augmentTokenTypes
 } from "../../src/scan/tokens"
 import { createRegularToken, setEquality } from "../utils/matchers"
+import { IMultiModeLexerDefinition, IToken, TokenType } from "../../api"
 
 function defineRecognizerSpecs(
     contextName,
@@ -335,9 +331,7 @@ function defineRecognizerSpecs(
                     this.idents.push(this.CONSUME1(IdentTok).image)
                 }
 
-                protected canTokenTypeBeInsertedInRecovery(
-                    tokClass: TokenType
-                ) {
+                public canTokenTypeBeInsertedInRecovery(tokClass: TokenType) {
                     // this parser is meant to test a scenario with re-sync recovery and MANY_SEP --> disable TokenInsertion
                     return false
                 }

@@ -1,4 +1,3 @@
-import { TokenType } from "./lexer_public"
 import {
     cloneArr,
     compact,
@@ -13,6 +12,7 @@ import {
 } from "../utils/utils"
 import { HashTable } from "../lang/lang_extensions"
 import { tokenName } from "./tokens_public"
+import { TokenType } from "../../api"
 
 export function tokenStructuredMatcher(tokInstance, tokConstructor) {
     const instanceType = tokInstance.tokenTypeIdx

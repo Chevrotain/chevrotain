@@ -1,7 +1,7 @@
-import { IToken } from "../../../src/scan/tokens_public"
 import { Parser } from "../../../src/parse/parser_public"
 import { createRegularToken } from "../../utils/matchers"
 import { augmentTokenTypes } from "../../../src/scan/tokens"
+import { IToken } from "../../../api"
 
 describe("The Recognizer's capabilities for overriding grammar productions", () => {
     class PlusTok {

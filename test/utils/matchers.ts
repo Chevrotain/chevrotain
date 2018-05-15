@@ -1,4 +1,4 @@
-import { IToken } from "../../src/scan/tokens_public"
+import { IToken } from "../../api"
 
 export function setEquality(actual: any[], expected: any[]): void {
     expect(actual).to.deep.include.members(expected)

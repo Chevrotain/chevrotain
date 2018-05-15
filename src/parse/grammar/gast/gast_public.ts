@@ -1,28 +1,13 @@
 import { assign, forEach, isRegExp, map } from "../../../utils/utils"
-import { TokenType } from "../../../scan/lexer_public"
-import { validateGrammar as orgValidateGrammar } from "../checks"
 import { tokenLabel, tokenName } from "../../../scan/tokens_public"
-import { resolveGrammar as orgResolveGrammar } from "../resolver"
-import { HashTable } from "../../../lang/lang_extensions"
 import {
-    IgnoredParserIssues,
-    IParserDefinitionError
-} from "../../parser_public"
-
-export interface IGASTVisitor {
-    visit(prod: IProduction)
-}
-export interface IOptionallyNamedProduction {
-    name?: string
-}
-
-export interface IProduction {
-    accept(visitor: IGASTVisitor): void
-}
-
-export interface IProductionWithOccurrence extends IProduction {
-    idx: number
-}
+    IGASTVisitor,
+    IOptionallyNamedProduction,
+    IProduction,
+    IProductionWithOccurrence,
+    ISerializedGast,
+    TokenType
+} from "../../../../api"
 
 export abstract class AbstractProduction implements IProduction {
     constructor(public definition: IProduction[]) {}
@@ -198,22 +183,6 @@ export class Terminal implements IProductionWithOccurrence {
     accept(visitor: IGASTVisitor): void {
         visitor.visit(this)
     }
-}
-
-export interface ISerializedGast {
-    type:
-        | "NonTerminal"
-        | "Flat"
-        | "Option"
-        | "RepetitionMandatory"
-        | "RepetitionMandatoryWithSeparator"
-        | "Repetition"
-        | "RepetitionWithSeparator"
-        | "Alternation"
-        | "Terminal"
-        | "Rule"
-
-    definition?: ISerializedGast[]
 }
 
 export interface ISerializedGastRule extends ISerializedGast {

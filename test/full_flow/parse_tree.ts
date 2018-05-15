@@ -1,6 +1,5 @@
-import { IToken } from "../../src/scan/tokens_public"
 import { compact, isFunction, isUndefined } from "../../src/utils/utils"
-import { TokenType } from "../../src/scan/lexer_public"
+import { IToken, TokenType } from "../../api"
 
 export class ParseTree {
     getImage(): string {

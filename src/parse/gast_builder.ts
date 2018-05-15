@@ -9,14 +9,10 @@ import {
     sortBy,
     uniq
 } from "../utils/utils"
-import { TokenType } from "../scan/lexer_public"
 import {
     AbstractProduction,
     Alternation,
     Flat,
-    IOptionallyNamedProduction,
-    IProduction,
-    IProductionWithOccurrence,
     NonTerminal,
     Option,
     Repetition,
@@ -26,6 +22,12 @@ import {
     Rule,
     Terminal
 } from "./grammar/gast/gast_public"
+import {
+    IOptionallyNamedProduction,
+    IProduction,
+    IProductionWithOccurrence,
+    TokenType
+} from "../../api"
 
 export enum ProdType {
     OPTION,

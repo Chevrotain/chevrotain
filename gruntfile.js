@@ -1,29 +1,6 @@
 const _ = require("lodash")
 
-const PUBLIC_API_DTS_FILES = [
-    "lib/src/scan/tokens_public.d.ts",
-    "lib/src/scan/lexer_public.d.ts",
-    "lib/src/parse/parser_public.d.ts",
-    "lib/src/parse/cst/cst_public.d.ts",
-    "lib/src/parse/errors_public.d.ts",
-    "lib/src/parse/exceptions_public.d.ts",
-    "lib/src/parse/grammar/path_public.d.ts",
-    "lib/src/parse/grammar/gast/gast_public.d.ts",
-    "lib/src/parse/grammar/gast/gast_visitor_public.d.ts",
-    "lib/src/parse/grammar/gast/gast_resolver_public.d.ts",
-    "lib/src/parse/cache_public.d.ts",
-    "lib/src/diagrams/render_public.d.ts",
-    "lib/src/parse/generate/generate_public.d.ts"
-]
-
 const karmaConf = process.env.TRAVIS ? "karma_sauce.conf.js" : "karma.conf.js"
-
-const PUBLIC_API_TS_FILES = _.map(PUBLIC_API_DTS_FILES, function(binDefFile) {
-    return binDefFile.replace("lib/", "").replace(".d", "")
-})
-
-// so typedoc can compile "module.exports" in cache_public
-PUBLIC_API_TS_FILES.push("./node_modules/@types/node/index.d.ts")
 
 const fourSpaces = "    "
 const examples_test_command = "yarn test"
@@ -167,39 +144,6 @@ module.exports = function(grunt) {
                         },
                         "test_integration/integration_tests_main.js"
                     ]
-                }
-            }
-        },
-
-        concat: {
-            release_definitions: {
-                options: {
-                    // TODO: seems like the HashTable class may need to be included in the public API
-                    banner:
-                        banner +
-                        "\n" +
-                        "export as namespace chevrotain;\n" +
-                        "declare class HashTable<V>{}\n",
-
-                    process: function processDefinitions(src, filePath) {
-                        const withOutImports = src.replace(
-                            /import.*;(\n|\r\n)/g,
-                            ""
-                        )
-                        // TODO: investigate why do Typescript definition files include private members.
-                        const withoutPrivate = withOutImports.replace(
-                            /private.*;(\n|\r\n)/g,
-                            ""
-                        )
-
-                        return withoutPrivate
-                    },
-
-                    // extra spaces needed to fix indentation.
-                    separator: grunt.util.linefeed + fourSpaces
-                },
-                files: {
-                    "lib/chevrotain.d.ts": PUBLIC_API_DTS_FILES
                 }
             }
         }

@@ -1,5 +1,5 @@
 import { END_OF_FILE, Parser } from "../../../src/parse/parser_public"
-import { createToken, IToken } from "../../../src/scan/tokens_public"
+import { createToken } from "../../../src/scan/tokens_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -15,7 +15,6 @@ import {
     tokenStructuredMatcher
 } from "../../../src/scan/tokens"
 import { createRegularToken } from "../../utils/matchers"
-import { TokenType } from "../../../src/scan/lexer_public"
 import {
     Alternation,
     Flat,
@@ -28,6 +27,7 @@ import {
     Rule,
     Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
+import { IToken, TokenType } from "../../../api"
 
 const IdentTok = createToken({ name: "IdentTok" })
 const DotTok = createToken({ name: "DotTok" })
@@ -416,7 +416,7 @@ context("lookahead specs", () => {
             super([], [ColonTok])
         }
 
-        protected LA(): IToken {
+        LA(): IToken {
             return createRegularToken(ColonTok, ":")
         }
     }
@@ -426,7 +426,7 @@ context("lookahead specs", () => {
             super([], [IdentTok])
         }
 
-        protected LA(): IToken {
+        LA(): IToken {
             return createRegularToken(IdentTok, "bamba")
         }
     }
@@ -436,7 +436,7 @@ context("lookahead specs", () => {
             super([], [CommaTok])
         }
 
-        protected LA(): IToken {
+        LA(): IToken {
             return createRegularToken(CommaTok, ",")
         }
     }
@@ -446,7 +446,7 @@ context("lookahead specs", () => {
             super([], [EntityTok])
         }
 
-        protected LA(): IToken {
+        LA(): IToken {
             return createRegularToken(EntityTok, ",")
         }
     }
@@ -456,7 +456,7 @@ context("lookahead specs", () => {
             super([], [KeyTok])
         }
 
-        protected LA(): IToken {
+        LA(): IToken {
             return createRegularToken(KeyTok, ",")
         }
     }

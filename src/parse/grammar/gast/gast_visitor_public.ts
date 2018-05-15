@@ -1,7 +1,6 @@
 import {
     Alternation,
     Flat,
-    IProduction,
     NonTerminal,
     Option,
     Repetition,
@@ -11,6 +10,7 @@ import {
     Rule,
     Terminal
 } from "./gast_public"
+import { IProduction } from "../../../../api"
 
 export abstract class GAstVisitor {
     public visit(node: IProduction): any {

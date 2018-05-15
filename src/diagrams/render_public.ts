@@ -1,5 +1,5 @@
 import { VERSION } from "../version"
-import { ISerializedGast } from "../parse/grammar/gast/gast_public"
+import { ISerializedGast } from "../../api"
 
 export function createSyntaxDiagramsCode(
     grammar: ISerializedGast[],
@@ -7,13 +7,7 @@ export function createSyntaxDiagramsCode(
         resourceBase = `https://unpkg.com/chevrotain@${VERSION}/diagrams/`,
         css = `https://unpkg.com/chevrotain@${VERSION}/diagrams/diagrams.css`
     }: {
-        /**
-         * Base Url to load the runtime resources for rendering the diagrams
-         */
         resourceBase?: string
-        /**
-         * Url to load the styleSheet, replace with your own for styling customization.
-         */
         css?: string
     } = {}
 ) {

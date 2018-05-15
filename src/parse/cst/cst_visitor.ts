@@ -1,4 +1,3 @@
-import { CstVisitorConstructor } from "./cst_public"
 import {
     compact,
     contains,
@@ -12,6 +11,7 @@ import {
 } from "../../utils/utils"
 import { defineNameProp, functionName } from "../../lang/lang_extensions"
 import { validTermsPattern } from "../grammar/checks"
+import { ICstVisitor } from "../../../api"
 
 export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
     let childrenNames = keys(ctx)
@@ -39,7 +39,9 @@ export function defaultVisit<IN, OUT>(ctx: any, param: IN): OUT {
 export function createBaseSemanticVisitorConstructor(
     grammarName: string,
     ruleNames: string[]
-): CstVisitorConstructor {
+): {
+    new (...args: any[]): ICstVisitor<any, any>
+} {
     let derivedConstructor: any = function() {}
 
     // can be overwritten according to:
@@ -97,7 +99,9 @@ export function createBaseVisitorConstructorWithDefaults(
     grammarName: string,
     ruleNames: string[],
     baseConstructor: Function
-): CstVisitorConstructor {
+): {
+    new (...args: any[]): ICstVisitor<any, any>
+} {
     let derivedConstructor: any = function() {}
 
     // can be overwritten according to:

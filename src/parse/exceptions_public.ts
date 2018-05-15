@@ -1,36 +1,5 @@
-import { IToken } from "../scan/tokens_public"
 import { contains } from "../utils/utils"
-
-export interface IRecognizerContext {
-    /**
-     * A copy of the parser's rule stack at the "time" the RecognitionException occurred.
-     * This can be used to help debug parsing errors (How did we get here?).
-     */
-    ruleStack: string[]
-
-    /**
-     * A copy of the parser's rule occurrence stack at the "time" the RecognitionException occurred.
-     * This can be used to help debug parsing errors (How did we get here?).
-     */
-    ruleOccurrenceStack: number[]
-}
-
-export interface IRecognitionException {
-    name: string
-    message: string
-    /**
-     * The token which caused the parser error.
-     */
-    token: IToken
-    /**
-     * Additional tokens which have been re-synced in error recovery due to the original error.
-     * This information can be used the calculate the whole text area which has been skipped due to an error.
-     * For example for displaying with a red underline in a text editor.
-     */
-    resyncedTokens: IToken[]
-
-    context: IRecognizerContext
-}
+import { IToken } from "../../api"
 
 const MISMATCHED_TOKEN_EXCEPTION = "MismatchedTokenException"
 const NO_VIABLE_ALT_EXCEPTION = "NoViableAltException"

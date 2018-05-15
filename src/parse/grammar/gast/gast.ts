@@ -3,8 +3,6 @@ import {
     AbstractProduction,
     Alternation,
     Flat,
-    IProduction,
-    IProductionWithOccurrence,
     NonTerminal,
     Option,
     Repetition,
@@ -16,6 +14,7 @@ import {
 } from "./gast_public"
 import { GAstVisitor } from "./gast_visitor_public"
 import { tokenName } from "../../../scan/tokens_public"
+import { IProduction, IProductionWithOccurrence } from "../../../../api"
 
 export function isSequenceProd(prod: IProduction): boolean {
     return (

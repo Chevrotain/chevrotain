@@ -1,12 +1,4 @@
-import { IToken, tokenName } from "../../scan/tokens_public"
-import { CstChildrenDictionary, CstNode } from "./cst_public"
-import {
-    cloneObj,
-    drop,
-    forEach,
-    isEmpty,
-    isUndefined
-} from "../../utils/utils"
+import { forEach, isUndefined } from "../../utils/utils"
 import { HashTable } from "../../lang/lang_extensions"
 import {
     AT_LEAST_ONE_IDX,
@@ -21,18 +13,21 @@ import {
 import {
     Alternation,
     Flat,
-    IOptionallyNamedProduction,
-    IProduction,
-    NonTerminal,
     Option,
     Repetition,
     RepetitionMandatory,
     RepetitionMandatoryWithSeparator,
     RepetitionWithSeparator,
-    Rule,
-    Terminal
+    Rule
 } from "../grammar/gast/gast_public"
 import { GAstVisitor } from "../grammar/gast/gast_visitor_public"
+import {
+    CstChildrenDictionary,
+    CstNode,
+    IOptionallyNamedProduction,
+    IProduction,
+    IToken
+} from "../../../api"
 
 export function addTerminalToCst(
     node: CstNode,

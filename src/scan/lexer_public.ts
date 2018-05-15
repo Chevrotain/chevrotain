@@ -1,4 +1,3 @@
-import { CustomPatternMatcherFunc, IToken } from "./tokens_public"
 import {
     analyzeTokenTypes,
     cloneEmptyGroups,
@@ -25,23 +24,15 @@ import {
     reject
 } from "../utils/utils"
 import { augmentTokenTypes } from "./tokens"
-
-export interface TokenType {
-    GROUP?: string
-    PATTERN?: RegExp | string
-    LABEL?: string
-    LONGER_ALT?: TokenType
-    POP_MODE?: boolean
-    PUSH_MODE?: string
-    LINE_BREAKS?: boolean
-    CATEGORIES?: TokenType[]
-
-    tokenName?: string
-    tokenTypeIdx?: number
-    categoryMatches?: number[]
-    categoryMatchesMap?: { [tokType: number]: boolean }
-    isParent?: boolean
-}
+import {
+    CustomPatternMatcherFunc,
+    ILexerConfig,
+    ILexerDefinitionError,
+    ILexingError,
+    IMultiModeLexerDefinition,
+    IToken,
+    TokenType
+} from "../../api"
 
 export interface ILexingResult {
     tokens: IToken[]
@@ -67,110 +58,8 @@ export enum LexerDefinitionErrorType {
     UNREACHABLE_PATTERN
 }
 
-export interface ILexerDefinitionError {
-    message: string
-    type: LexerDefinitionErrorType
-    tokenTypes?: TokenType[]
-}
-
-export interface ILexingError {
-    offset: number
-    line: number
-    column: number
-    length: number
-    message: string
-}
-
-export type SingleModeLexerDefinition = TokenType[]
-export type MultiModesDefinition = { [modeName: string]: TokenType[] }
-
-export interface IMultiModeLexerDefinition {
-    modes: MultiModesDefinition
-    defaultMode: string
-}
-
 export interface IRegExpExec {
     exec: CustomPatternMatcherFunc
-}
-
-/**
- * A subset of the regExp interface.
- * Needed to compute line/column info by a chevrotain lexer.
- */
-export interface ILineTerminatorsTester {
-    /**
-     * Just like regExp.test
-     */
-    test: (text: string) => boolean
-    /**
-     * Just like the regExp lastIndex with the global flag enabled
-     * It should be updated after every match to point to the offset where the next
-     * match attempt starts.
-     */
-    lastIndex: number
-}
-
-export interface ILexerConfig {
-    /**
-     * An optional flag indicating that lexer definition errors
-     * should not automatically cause an error to be raised.
-     * This can be useful when wishing to indicate lexer errors in another manner
-     * than simply throwing an error (for example in an online playground).
-     */
-    deferDefinitionErrorsHandling?: boolean
-
-    /**
-     * "full" location information means all six combinations of /(end|start)(Line|Column|Offset)/ properties.
-     * "onlyStart" means that only startLine, startColumn and startOffset will be tracked
-     * "onlyOffset" means that only the startOffset will be tracked.
-     *
-     * The less position tracking the faster the Lexer will be and the less memory used.
-     * However the difference is not large (~10% On V8), thus reduced location tracking options should only be used
-     * in edge cases where every last ounce of performance is needed.
-     */
-    positionTracking?: "full" | "onlyStart" | "onlyOffset"
-
-    /**
-     * A regExp defining custom line terminators.
-     * This will be used to calculate the line and column information.
-     *
-     * Note that the regExp should use the global flag, for example: /\n/g
-     *
-     * The default is: /\n|\r\n?/g
-     *
-     * But some grammars have a different definition, for example in ECMAScript:
-     * https://www.ecma-international.org/ecma-262/8.0/index.html#sec-line-terminators
-     * U+2028 and U+2029 are also treated as line terminators.
-     *
-     * In that case we would use /\n|\r|\u2028|\u2029/g
-     *
-     * Note that it is also possible to supply an optimized RegExp like implementation
-     * as only a subset of the RegExp APIs is needed, @see {ILineTerminatorsTester}
-     * for details.
-     *
-     * keep in mind that for the default pattern: /\n|\r\n?/g an optimized implementation is already built-in.
-     * This means the optimization is only relevant for lexers overriding the default pattern.
-     */
-    lineTerminatorsPattern?: RegExp | ILineTerminatorsTester
-
-    /**
-     * When true this flag will cause the Lexer to throw an Error
-     * When it is unable to perform all of its performance optimizations.
-     *
-     * In addition error messages will be printed to the console with details
-     * how to resolve the optimizations issues.
-     *
-     * Use this flag to guarantee higher lexer performance.
-     * The optimizations can boost the lexer's performance anywhere from 30%
-     * to 100%+ depending on the number of TokenTypes used.
-     */
-    ensureOptimizations?: boolean
-
-    /**
-     * Can be used to disable lexer optimizations
-     * If there is a suspicion they are causing incorrect behavior.
-     */
-    safeMode?: boolean
 }
 
 const DEFAULT_LEXER_CONFIG: ILexerConfig = {
@@ -203,96 +92,8 @@ export class Lexer {
     private hasCustom: boolean = false
     private canModeBeOptimized: any = {}
 
-    /**
-     * @param {SingleModeLexerDefinition | IMultiModeLexerDefinition} lexerDefinition -
-     *  Structure composed of constructor functions for the Tokens types this lexer will support.
-     *
-     *  In the case of {SingleModeLexerDefinition} the structure is simply an array of TokenTypes.
-     *  In the case of {IMultiModeLexerDefinition} the structure is an object with two properties:
-     *    1. a "modes" property where each value is an array of TokenTypes.
-     *    2. a "defaultMode" property specifying the initial lexer mode.
-     *
-     *  for example:
-     *  {
-     *     "modes" : {
-     *     "modeX" : [Token1, Token2]
-     *     "modeY" : [Token3, Token4]
-     *     }
-     *
-     *     "defaultMode" : "modeY"
-     *  }
-     *
-     *  A lexer with {MultiModesDefinition} is simply multiple Lexers where only one (mode) can be active at the same time.
-     *  This is useful for lexing languages where there are different lexing rules depending on context.
-     *
-     *  The current lexing mode is selected via a "mode stack".
-     *  The last (peek) value in the stack will be the current mode of the lexer.
-     *
-     *  Each Token Type can define that it will cause the Lexer to (after consuming an "instance" of the Token):
-     *  1. PUSH_MODE : push a new mode to the "mode stack"
-     *  2. POP_MODE  : pop the last mode from the "mode stack"
-     *
-     *  Examples:
-     *       export class Attribute {
-     *          static PATTERN = ...
-     *          static PUSH_MODE = "modeY"
-     *       }
-     *
-     *       export class EndAttribute {
-     *          static PATTERN = ...
-     *          static POP_MODE = true
-     *       }
-     *
-     *  The TokenTypes must be in one of these forms:
-     *
-     *  1. With a PATTERN property that has a RegExp value for tokens to match:
-     *     example: -->class Integer { static PATTERN = /[1-9]\d }<--
-     *
-     *  2. With a PATTERN property that has the value of the var Lexer.NA defined above.
-     *     This is a convenience form used to avoid matching Token classes that only act as categories.
-     *     example: -->class Keyword { static PATTERN = NA }<--
-     *
-     *
-     *   The following RegExp patterns are not supported:
-     *   a. '$' for match at end of input
-     *   b. /b global flag
-     *   c. /m multi-line flag
-     *
-     *   The Lexer will identify the first pattern that matches, Therefor the order of Token Constructors may be significant.
-     *   For example when one pattern may match a prefix of another pattern.
-     *
-     *   Note that there are situations in which we may wish to order the longer pattern after the shorter one.
-     *   For example: keywords vs Identifiers.
-     *   'do'(/do/) and 'donald'(/w+)
-     *
-     *   * If the Identifier pattern appears before the 'do' pattern, both 'do' and 'donald'
-     *     will be lexed as an Identifier.
-     *
-     *   * If the 'do' pattern appears before the Identifier pattern 'do' will be lexed correctly as a keyword.
-     *     however 'donald' will be lexed as TWO separate tokens: keyword 'do' and identifier 'nald'.
-     *
-     *   To resolve this problem, add a static property on the keyword's constructor named: LONGER_ALT
-     *   example:
-     *
-     *       export class Identifier extends Keyword { static PATTERN = /[_a-zA-Z][_a-zA-Z0-9]/ }
-     *       export class Keyword Token {
-     *          static PATTERN = Lexer.NA
-     *          static LONGER_ALT = Identifier
-     *       }
-     *       export class Do extends Keyword { static PATTERN = /do/ }
-     *       export class While extends Keyword { static PATTERN = /while/ }
-     *       export class Return extends Keyword { static PATTERN = /return/ }
-     *
-     *   The lexer will then also attempt to match a (longer) Identifier each time a keyword is matched.
-     *
-     *
-     * @param {ILexerConfig} [config=DEFAULT_LEXER_CONFIG] -
-     *                  The Lexer's configuration @see {ILexerConfig} for details.
-     */
     constructor(
-        protected lexerDefinition:
-            | SingleModeLexerDefinition
-            | IMultiModeLexerDefinition,
+        protected lexerDefinition: TokenType[] | IMultiModeLexerDefinition,
         config: ILexerConfig = DEFAULT_LEXER_CONFIG
     ) {
         if (typeof config === "boolean") {
@@ -331,7 +132,7 @@ export class Lexer {
         if (isArray(lexerDefinition)) {
             actualDefinition = <any>{ modes: {} }
             actualDefinition.modes[DEFAULT_MODE] = cloneArr(
-                <SingleModeLexerDefinition>lexerDefinition
+                <TokenType[]>lexerDefinition
             )
             actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
         } else {
@@ -367,10 +168,7 @@ export class Lexer {
             (currModDef: TokenType[], currModName) => {
                 this.modes.push(currModName)
                 this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-                    validatePatterns(
-                        <SingleModeLexerDefinition>currModDef,
-                        allModeNames
-                    )
+                    validatePatterns(<TokenType[]>currModDef, allModeNames)
                 )
 
                 // If definition errors were encountered, the analysis phase may fail unexpectedly/
@@ -486,17 +284,6 @@ export class Lexer {
         }
     }
 
-    /**
-     * Will lex(Tokenize) a string.
-     * Note that this can be called repeatedly on different strings as this method
-     * does not modify the state of the Lexer.
-     *
-     * @param {string} text - The string to lex
-     * @param {string} [initialMode] - The initial Lexer Mode to start with, by default this will be the first mode in the lexer's
-     *                                 definition. If the lexer has no explicit modes it will be the implicit single 'default_mode' mode.
-     *
-     * @returns {ILexingResult}
-     */
     public tokenize(
         text: string,
         initialMode: string = this.defaultMode

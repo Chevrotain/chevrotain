@@ -1,6 +1,5 @@
-import * as utils from "../utils/utils"
-import { isUndefined } from "../utils/utils"
-import { TokenType } from "../scan/lexer_public"
+import { assign, has, isUndefined, keys, values } from "../utils/utils"
+import { TokenType } from "../../api"
 
 export function classNameFromInstance(instance: any): string {
     return functionName(instance.constructor)
@@ -52,11 +51,11 @@ export class HashTable<V> {
     private _state = {}
 
     keys(): string[] {
-        return utils.keys(this._state)
+        return keys(this._state)
     }
 
     values(): V[] {
-        return <any>utils.values(this._state)
+        return <any>values(this._state)
     }
 
     put(key: string | number, value: V): void {
@@ -64,7 +63,7 @@ export class HashTable<V> {
     }
 
     putAll(other: HashTable<V>): void {
-        this._state = utils.assign(this._state, other._state)
+        this._state = assign(this._state, other._state)
     }
 
     get(key: string): V {
@@ -76,7 +75,7 @@ export class HashTable<V> {
     }
 
     containsKey(key: string): boolean {
-        return utils.has(this._state, key)
+        return has(this._state, key)
     }
 
     clear(): void {
