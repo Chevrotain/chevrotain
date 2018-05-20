@@ -4,6 +4,14 @@
 
 *   [Define APIs separately from the source code](https://github.com/SAP/chevrotain/issues/704).
 
+## 3.2.1 (5-9-2018)
+
+#### Bug Fixes
+
+*   [Failure Lexing Case Insensetive Patterns.](https://github.com/SAP/chevrotain/issues/708)
+
+*   [Version of regexp-to-ast library printed incorrectly.](https://github.com/SAP/chevrotain/commit/3798385c5365cee8156d2d642e864de930c37068)
+
 ## 3.2.0 (4-24-2018)
 
 #### Minor Changes
