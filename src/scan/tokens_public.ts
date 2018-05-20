@@ -1,47 +1,9 @@
 import { has, isObject, isString, isUndefined } from "../utils/utils"
 import { defineNameProp, functionName } from "../lang/lang_extensions"
-import { Lexer, TokenType } from "./lexer_public"
+import { Lexer } from "./lexer_public"
 import { augmentTokenTypes, tokenStructuredMatcher } from "./tokens"
-/**
- *  The type of custom pattern matcher functions.
- *  Matches should only be done on the start of the text.
- *  Note that this is similar to the signature of RegExp.prototype.exec
- *
- *  This should behave as if the regExp match is using a start of input anchor.
- *  So: for example if a custom matcher is implemented for Tokens matching: /\w+/
- *  The implementation of the custom matcher must implement a custom matcher for /^\w+/.
- *
- *  The Optional tokens and groups arguments enable accessing information about
- *  previously identified tokens if necessary.
- *
- *  This can be used for example to lex python like indentation.
- *  see: https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js
- *  for a fuller example
- */
-export type CustomPatternMatcherFunc = (
-    test: string,
-    offset?: number,
-    tokens?: IToken[],
-    groups?: { [groupName: string]: IToken }
-) => RegExpExecArray
+import { IToken, ITokenConfig, TokenType } from "../../api"
 
-/**
- * Interface for custom user provided token pattern matchers.
- */
-export interface ICustomPattern {
-    /**
-     * The custom pattern implementation.
-     * @see CustomPatternMatcherFunc
-     */
-    exec: CustomPatternMatcherFunc
-}
-
-/**
- *  This can be used to improve the quality/readability of error messages or syntax diagrams.
- *
- * @param {TokenType} clazz - A constructor for a Token subclass
- * @returns {string} - The Human readable label for a Token if it exists.
- */
 export function tokenLabel(clazz: TokenType): string {
     if (hasTokenLabel(clazz)) {
         return (<any>clazz).LABEL
@@ -70,44 +32,6 @@ export function tokenName(obj: TokenType | Function): string {
     }
 }
 
-export interface ITokenConfig {
-    name: string
-    categories?: TokenType | TokenType[]
-    label?: string
-    pattern?: RegExp | CustomPatternMatcherFunc | ICustomPattern | string
-    group?: string | any
-    push_mode?: string
-    pop_mode?: boolean
-    longer_alt?: TokenType
-    /**
-     * Can a String matching this token's pattern possibly contain a line terminator?
-     * If true and the line_breaks property is not also true this will cause inaccuracies in the Lexer's line / column tracking.
-     */
-    line_breaks?: boolean
-    /**
-     * Possible starting characters or charCodes of the pattern.
-     * These will be used to optimize the Lexer's performance.
-     *
-     * These are normally automatically computed, however the option to explicitly
-     * specify those can enable optimizations even when the automatic analysis fails.
-     *
-     * e.g:
-     * 1. { start_chars_hint: ["a", "b"] }
-     *    * strings hints should be one character long
-     *
-     * 2. { start_chars_hint: [97, 98] }
-     *    * number hints are the result of running ".charCodeAt(0)"
-     *      on the strings
-     *
-     * 3. { start_chars_hint: [55357] }
-     *    * For unicode characters outside the BMP use the first of their surrogate pairs.
-     *    *  The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
-     *       and D83D is 55357 in decimal.
-     *    * Note that "💩".charCodeAt() === 55357
-     */
-    start_chars_hint?: (string | number)[]
-}
-
 const PARENT = "parent"
 const CATEGORIES = "categories"
 const LABEL = "label"
@@ -118,10 +42,6 @@ const LONGER_ALT = "longer_alt"
 const LINE_BREAKS = "line_breaks"
 const START_CHARS_HINT = "start_chars_hint"
 
-/**
- * @param {ITokenConfig} config - The configuration for
- * @returns {TokenType} - A constructor for the new Token subclass
- */
 export function createToken(config: ITokenConfig): TokenType {
     return createTokenInternal(config)
 }
@@ -186,78 +106,9 @@ function createTokenInternal(config: ITokenConfig): TokenType {
     return tokenType
 }
 
-/**
- *   *
- * Things to note:
- * - "do"  {
- *          startColumn : 1, endColumn: 2,
- *          startOffset: x, endOffset: x +1} --> the range is inclusive to exclusive 1...2 (2 chars long).
- *
- * - "\n"  {startLine : 1, endLine: 1} --> a lineTerminator as the last character does not effect the Token's line numbering.
- *
- * - "'hello\tworld\uBBBB'"  {image: "'hello\tworld\uBBBB'"} --> a Token's image is the "literal" text
- *                                                              (unicode escaping is untouched).
- */
-export interface IToken {
-    /** The textual representation of the Token as it appeared in the text. */
-    image: string
-
-    /** Offset of the first character of the Token. */
-    startOffset: number
-
-    /** Line of the first character of the Token. */
-    startLine?: number
-
-    /** Column of the first character of the Token. */
-    startColumn?: number
-
-    /** Offset of the last character of the Token. */
-    endOffset?: number
-
-    /** Line of the last character of the Token. */
-    endLine?: number
-
-    /** Column of the last character of the Token. */
-    endColumn?: number
-
-    /** this marks if a Token does not really exist and has been inserted "artificially" during parsing in rule error recovery. */
-    isInsertedInRecovery?: boolean
-
-    /** An number index representing the type of the Token use <getTokenConstructor> to get the Token Type from a token "instance"  */
-    tokenTypeIdx?: number
-
-    /**
-     * The actual Token Type of this Token "instance"
-     * This is the same Object returned by the "createToken" API.
-     * This property is very useful for debugging the Lexing and Parsing phases.
-     */
-    tokenType?: TokenType
-}
-
 export const EOF = createToken({ name: "EOF", pattern: Lexer.NA })
 augmentTokenTypes([EOF])
 
-/**
- * Utility to create Chevrotain Token "instances"
- * Note that Chevrotain tokens are not real instances, and thus the instanceOf cannot be used.
- *
- * @param tokType
- * @param image
- * @param startOffset
- * @param endOffset
- * @param startLine
- * @param endLine
- * @param startColumn
- * @param endColumn
- * @returns {{image: string,
- *            startOffset: number,
- *            endOffset: number,
- *            startLine: number,
- *            endLine: number,
- *            startColumn: number,
- *            endColumn: number,
- *            tokenType}}
- */
 export function createTokenInstance(
     tokType: TokenType,
     image: string,
@@ -281,16 +132,6 @@ export function createTokenInstance(
     }
 }
 
-/**
- * A Utility method to check if a token is of the type of the argument Token class.
- * This utility is needed because Chevrotain tokens support "categories" which means
- * A TokenType may have multiple categories, so a TokenType for the "true" literal in JavaScript
- * May be both a Keyword Token and a Literal Token.
- *
- * @param token {IToken}
- * @param tokType {TokenType}
- * @returns {boolean}
- */
 export function tokenMatcher(token: IToken, tokType: TokenType): boolean {
     return tokenStructuredMatcher(token, tokType)
 }

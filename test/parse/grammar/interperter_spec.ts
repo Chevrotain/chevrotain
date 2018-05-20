@@ -1,4 +1,3 @@
-import { ITokenGrammarPath } from "../../../src/parse/grammar/path_public"
 import {
     actionDec,
     actionDecSep,
@@ -28,9 +27,9 @@ import {
     possiblePathsFrom
 } from "../../../src/parse/grammar/interpreter"
 import { createRegularToken, setEquality } from "../../utils/matchers"
-import { createToken, IToken } from "../../../src/scan/tokens_public"
+import { createToken } from "../../../src/scan/tokens_public"
 import { map } from "../../../src/utils/utils"
-import { Lexer, TokenType } from "../../../src/scan/lexer_public"
+import { Lexer } from "../../../src/scan/lexer_public"
 import {
     augmentTokenTypes,
     tokenStructuredMatcher
@@ -48,6 +47,7 @@ import {
     NonTerminal,
     RepetitionMandatoryWithSeparator
 } from "../../../src/parse/grammar/gast/gast_public"
+import { IToken, ITokenGrammarPath, TokenType } from "../../../api"
 
 describe("The Grammar Interpeter namespace", () => {
     describe("The NextAfterTokenWalker", () => {

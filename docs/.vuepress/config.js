@@ -1,5 +1,11 @@
 const _ = require("lodash")
 const vueSlugify = require("vuepress/lib/markdown/slugify")
+const jf = require("jsonfile")
+const path = require("path")
+
+const packagePath = path.join(__dirname, "../../package.json")
+const version = jf.readFileSync(packagePath).version
+const versionWithLowDashs = version.replace(/\./g, "_")
 
 const slugMap = {
     "Common Prefix Ambiguities": "COMMON_PREFIX",
@@ -59,6 +65,10 @@ module.exports = {
             { text: "Home", link: "/" },
             { text: "Tutorial", link: "/tutorial/step0_introduction" },
             { text: "Guide", link: "/guide/introduction" },
+            {
+                text: "APIs",
+                link: `https://sap.github.io/chevrotain/documentation/${versionWithLowDashs}/globals.html`
+            },
             { text: "FAQ", link: "/FAQ" },
             { text: "Changes", link: "/changes/BREAKING_CHANGES" },
             {

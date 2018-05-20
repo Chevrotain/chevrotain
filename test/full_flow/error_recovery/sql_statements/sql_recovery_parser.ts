@@ -6,7 +6,6 @@
  * DELETE (31, "SHAHAR") FROM schema2.Persons
  */
 import { Parser } from "../../../../src/parse/parser_public"
-import { IToken } from "../../../../src/scan/tokens_public"
 import * as allTokens from "./sql_recovery_tokens"
 import {
     INVALID_DDL,
@@ -39,8 +38,9 @@ import {
 } from "./sql_recovery_tokens"
 import { ParseTree } from "../../parse_tree"
 import { augmentTokenTypes } from "../../../../src/scan/tokens"
-import { TokenType } from "../../../../src/scan/lexer_public"
+
 import { createRegularToken } from "../../../utils/matchers"
+import { IToken, TokenType } from "../../../../api"
 
 augmentTokenTypes(<any>allTokens)
 

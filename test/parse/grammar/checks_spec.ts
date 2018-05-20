@@ -14,7 +14,7 @@ import {
     validateRuleName,
     validateTooManyAlts
 } from "../../../src/parse/grammar/checks"
-import { createToken, IToken } from "../../../src/scan/tokens_public"
+import { createToken } from "../../../src/scan/tokens_public"
 import { first, forEach, map } from "../../../src/utils/utils"
 import {
     Alternation,
@@ -27,6 +27,7 @@ import {
     Terminal
 } from "../../../src/parse/grammar/gast/gast_public"
 import { defaultGrammarValidatorErrorProvider } from "../../../src/parse/errors_public"
+import { IToken } from "../../../api"
 
 describe("the grammar validations", () => {
     it("validates every one of the TOP_RULEs in the input", () => {

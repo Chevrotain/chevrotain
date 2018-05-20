@@ -6,7 +6,6 @@ import {
 } from "./cache"
 import {
     EarlyExitException,
-    IRecognitionException,
     isRecognitionException,
     MismatchedTokenException,
     NotAllInputParsedException,
@@ -39,12 +38,7 @@ import {
     values
 } from "../utils/utils"
 import { computeAllProdsFollows } from "./grammar/follow"
-import {
-    createTokenInstance,
-    EOF,
-    IToken,
-    tokenName
-} from "../scan/tokens_public"
+import { createTokenInstance, EOF, tokenName } from "../scan/tokens_public"
 import {
     buildAlternativesLookAheadFunc,
     buildLookaheadFuncForOptionalProd,
@@ -54,7 +48,6 @@ import {
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "./grammar/lookahead"
-import { IMultiModeLexerDefinition, TokenType } from "../scan/lexer_public"
 import { buildTopProduction } from "./gast_builder"
 import {
     AbstractNextTerminalAfterProductionWalker,
@@ -68,16 +61,11 @@ import {
 import { IN } from "./constants"
 import { cloneProduction } from "./grammar/gast/gast"
 import {
-    ISyntacticContentAssistPath,
-    ITokenGrammarPath
-} from "./grammar/path_public"
-import {
     augmentTokenTypes,
     isTokenType,
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
 } from "../scan/tokens"
-import { CstNode, ICstVisitor } from "./cst/cst_public"
 import { addNoneTerminalToCst, addTerminalToCst, analyzeCst } from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
@@ -97,39 +85,40 @@ import {
 } from "./cst/cst_visitor"
 import {
     defaultGrammarValidatorErrorProvider,
-    defaultParserErrorProvider,
-    IParserErrorMessageProvider
+    defaultParserErrorProvider
 } from "./errors_public"
-import {
-    ISerializedGast,
-    Rule,
-    serializeGrammar
-} from "./grammar/gast/gast_public"
+import { Rule, serializeGrammar } from "./grammar/gast/gast_public"
 import {
     resolveGrammar,
     validateGrammar
 } from "./grammar/gast/gast_resolver_public"
-
-export enum ParserDefinitionErrorType {
-    INVALID_RULE_NAME,
-    DUPLICATE_RULE_NAME,
-    INVALID_RULE_OVERRIDE,
-    DUPLICATE_PRODUCTIONS,
-    UNRESOLVED_SUBRULE_REF,
-    LEFT_RECURSION,
-    NONE_LAST_EMPTY_ALT,
-    AMBIGUOUS_ALTS,
-    CONFLICT_TOKENS_RULES_NAMESPACE,
-    INVALID_TOKEN_NAME,
-    INVALID_NESTED_RULE_NAME,
-    DUPLICATE_NESTED_NAME,
-    NO_NON_EMPTY_LOOKAHEAD,
-    AMBIGUOUS_PREFIX_ALTS,
-    TOO_MANY_ALTS
-}
-
-export type IgnoredRuleIssues = { [dslNameAndOccurrence: string]: boolean }
-export type IgnoredParserIssues = { [ruleName: string]: IgnoredRuleIssues }
+import {
+    AtLeastOneSepMethodOpts,
+    ConsumeMethodOpts,
+    CstNode,
+    DSLMethodOpts,
+    DSLMethodOptsWithErr,
+    GrammarAction,
+    IAnyOrAlt,
+    ICstVisitor,
+    IgnoredParserIssues,
+    IOrAltWithGate,
+    IParserConfig,
+    IParserDefinitionError,
+    IParserErrorMessageProvider,
+    IRecognitionException,
+    IRuleConfig,
+    ISeparatedIterationResult,
+    ISerializedGast,
+    ISyntacticContentAssistPath,
+    IToken,
+    ITokenGrammarPath,
+    ManySepMethodOpts,
+    OrMethodOpts,
+    SubruleMethodOpts,
+    TokenType,
+    TokenVocabulary
+} from "../../api"
 
 const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
 export const END_OF_FILE = createTokenInstance(
@@ -148,94 +137,36 @@ export type TokenMatcher = (token: IToken, tokType: TokenType) => boolean
 
 export type lookAheadSequence = TokenType[][]
 
-export interface IParserConfig {
-    /**
-     * Is the error recovery / fault tolerance of the Chevrotain Parser enabled.
-     */
-    recoveryEnabled?: boolean
-
-    /**
-     * Maximum number of tokens the parser will use to choose between alternatives.
-     */
-    maxLookahead?: number
-
-    /**
-     * Used to mark parser definition errors that should be ignored.
-     * For example:
-     *
-     * {
-     *   myCustomRule : {
-     *                   OR3 : true
-     *                  },
-     *
-     *   myOtherRule : {
-     *                  OPTION1 : true,
-     *                  OR4 : true
-     *                 }
-     * }
-     *
-     * Be careful when ignoring errors, they are usually there for a reason :).
-     */
-    ignoredIssues?: IgnoredParserIssues
-
-    /**
-     * Enable This Flag to to support Dynamically defined Tokens.
-     * This will disable performance optimizations which cannot work if the whole Token vocabulary is not known
-     * During Parser initialization.
-     */
-    dynamicTokensEnabled?: boolean
-
-    /**
-     * Enable automatic Concrete Syntax Tree creation
-     * For in-depth docs:
-     * {@link https://github.com/SAP/chevrotain/blob/master/docs/02_Deep_Dive/concrete_syntax_tree.md}
-     */
-    outputCst?: boolean
-
-    /**
-     * A custom error message provider.
-     * Can be used to override the default error messages.
-     * For example:
-     *   - Translating the error messages to a different languages.
-     *   - Changing the formatting
-     *   - Providing special error messages under certain conditions - missing semicolons
-     */
-    errorMessageProvider?: IParserErrorMessageProvider
-}
-
 const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     recoveryEnabled: false,
     maxLookahead: 4,
     ignoredIssues: <any>{},
     dynamicTokensEnabled: false,
-    // TODO: Document this breaking change, can it be mitigated?
-    // TODO: change to true
     outputCst: false,
     errorMessageProvider: defaultParserErrorProvider
 })
-
-export interface IRuleConfig<T> {
-    /**
-     * The function which will be invoked to produce the returned value for a production that have not been
-     * successfully executed and the parser recovered from.
-     */
-    recoveryValueFunc?: () => T
-
-    /**
-     * Enable/Disable re-sync error recovery for this specific production.
-     */
-    resyncEnabled?: boolean
-}
 
 const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
     recoveryValueFunc: () => undefined,
     resyncEnabled: true
 })
 
-export interface IParserDefinitionError {
-    message: string
-    type: ParserDefinitionErrorType
-    ruleName?: string
+export enum ParserDefinitionErrorType {
+    INVALID_RULE_NAME = 0,
+    DUPLICATE_RULE_NAME = 1,
+    INVALID_RULE_OVERRIDE = 2,
+    DUPLICATE_PRODUCTIONS = 3,
+    UNRESOLVED_SUBRULE_REF = 4,
+    LEFT_RECURSION = 5,
+    NONE_LAST_EMPTY_ALT = 6,
+    AMBIGUOUS_ALTS = 7,
+    CONFLICT_TOKENS_RULES_NAMESPACE = 8,
+    INVALID_TOKEN_NAME = 9,
+    INVALID_NESTED_RULE_NAME = 10,
+    DUPLICATE_NESTED_NAME = 11,
+    NO_NON_EMPTY_LOOKAHEAD = 12,
+    AMBIGUOUS_PREFIX_ALTS = 13,
+    TOO_MANY_ALTS = 14
 }
 
 export interface IParserDuplicatesDefinitionError
@@ -262,41 +193,13 @@ export interface IParserUnresolvedRefDefinitionError
     unresolvedRefName: string
 }
 
-// parameters needed to compute the key in the FOLLOW_SET map.
-export interface IFollowKey {
+interface IFollowKey {
     ruleName: string
     idxInCallingRule: number
     inRule: string
 }
 
-/**
- * OR([
- *  {ALT:XXX },
- *  {ALT:YYY },
- *  {ALT:ZZZ }
- * ])
- */
-export interface IOrAlt<T> {
-    NAME?: string
-    ALT: () => T
-}
-
-/**
- * OR([
- *  { GATE:condition1, ALT:XXX },
- *  { GATE:condition2, ALT:YYY },
- *  { GATE:condition3, ALT:ZZZ }
- * ])
- */
-export interface IOrAltWithGate<T> extends IOrAlt<T> {
-    NAME?: string
-    GATE: () => boolean
-    ALT: () => T
-}
-
-export type IAnyOrAlt<T> = IOrAlt<T> | IOrAltWithGate<T>
-
-export interface IParserState {
+interface IParserState {
     errors: IRecognitionException[]
     lexerState: any
     RULE_STACK: string[]
@@ -304,148 +207,8 @@ export interface IParserState {
     LAST_EXPLICIT_RULE_STACK: number[]
 }
 
-export interface DSLMethodOpts<T> {
-    /**
-     * in-lined method name
-     */
-    NAME?: string
-
-    /**
-     * The Grammar to process in this method.
-     */
-    DEF: GrammarAction<T>
-    /**
-     * A semantic constraint on this DSL method
-     * @see https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
-     * For farther details.
-     */
-    GATE?: Predicate
-}
-
-export interface DSLMethodOptsWithErr<T> extends DSLMethodOpts<T> {
-    /**
-     *  Short title/classification to what is being matched.
-     *  Will be used in the error message,.
-     *  If none is provided, the error message will include the names of the expected
-     *  Tokens sequences which start the method's inner grammar
-     */
-    ERR_MSG?: string
-}
-
-export interface OrMethodOpts<T> {
-    NAME?: string
-    /**
-     * The set of alternatives,
-     * See detailed description in @link {Parser.OR1}
-     */
-    DEF: IAnyOrAlt<T>[]
-    /**
-     * A description for the alternatives used in error messages
-     * If none is provided, the error message will include the names of the expected
-     * Tokens sequences which may start each alternative.
-     */
-    ERR_MSG?: string
-}
-
-export interface ManySepMethodOpts<T> {
-    NAME?: string
-    /**
-     * The Grammar to process in each iteration.
-     */
-    DEF: GrammarAction<T>
-    /**
-     * The separator between each iteration.
-     */
-    SEP: TokenType
-}
-
-export interface AtLeastOneSepMethodOpts<T> extends ManySepMethodOpts<T> {
-    /**
-     *  Short title/classification to what is being matched.
-     *  Will be used in the error message,.
-     *  If none is provided, the error message will include the names of the expected
-     *  Tokens sequences which start the method's inner grammar
-     */
-    ERR_MSG?: string
-}
-
-export interface ConsumeMethodOpts {
-    /**
-     *  A custom Error message if the Token could not be consumed.
-     *  This will override any error message provided by the parser's "errorMessageProvider"
-     */
-    ERR_MSG?: string
-
-    /**
-     * A label to be used instead of the TokenType name in the created CST.
-     */
-    LABEL?: string
-}
-
-export interface SubruleMethodOpts {
-    /**
-     * The arguments to parameterized rules, see:
-     * @link https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
-     */
-    ARGS?: any[]
-
-    /**
-     * A label to be used instead of the TokenType name in the created CST.
-     */
-    LABEL?: string
-}
-
 export type Predicate = () => boolean
-export type GrammarAction<OUT> = () => OUT
 
-export type ISeparatedIterationResult<OUT> = {
-    values: OUT[] // The aggregated results of the values returned by each iteration.
-    separators: IToken[] // the separator tokens between the iterations
-}
-
-export type TokenVocabulary =
-    | { [tokenName: string]: TokenType }
-    | TokenType[]
-    | IMultiModeLexerDefinition
-
-/**
- * Convenience used to express an empty alternative in an OR (alternation).
- * can be used to more clearly describe the intent in a case of empty alternation.
- *
- * For example:
- *
- * 1. without using EMPTY_ALT:
- *
- *    this.OR([
- *      {ALT: () => {
- *        this.CONSUME1(OneTok)
- *        return "1"
- *      }},
- *      {ALT: () => {
- *        this.CONSUME1(TwoTok)
- *        return "2"
- *      }},
- *      {ALT: () => { // implicitly empty because there are no invoked grammar rules (OR/MANY/CONSUME...) inside this alternative.
- *        return "666"
- *      }},
- *    ])
- *
- *
- * 2. using EMPTY_ALT:
- *
- *    this.OR([
- *      {ALT: () => {
- *        this.CONSUME1(OneTok)
- *        return "1"
- *      }},
- *      {ALT: () => {
- *        this.CONSUME1(TwoTok)
- *        return "2"
- *      }},
- *      {ALT: EMPTY_ALT("666")}, // explicitly empty, clearer intent
- *    ])
- *
- */
 export function EMPTY_ALT<T>(value: T = undefined): () => T {
     return function() {
         return value
@@ -454,11 +217,6 @@ export function EMPTY_ALT<T>(value: T = undefined): () => T {
 
 let EOF_FOLLOW_KEY: any = {}
 
-/**
- * A Recognizer capable of self analysis to determine it's grammar structure
- * This is used for more advanced features requiring such information.
- * For example: Error Recovery, Automatic lookahead calculation.
- */
 export class Parser {
     static NO_RESYNC: boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
@@ -759,10 +517,6 @@ export class Parser {
         this._errors = newErrors
     }
 
-    /**
-     * Resets the parser state, should be overridden for custom parsers which "carry" additional state.
-     * When overriding, remember to also invoke the super implementation!
-     */
     public reset(): void {
         this.resetLexerState()
 
@@ -823,21 +577,12 @@ export class Parser {
         return cache.getProductionsForClass(this.className)
     }
 
-    // This is more than a convenience method.
-    // It is mostly used to draw the diagrams and having this method present on the parser instance
-    // can avoid certain situations in which the serialization logic would fail due to multiple versions of chevrotain
-    // bundled (due to multiple prototype chains and "instanceof" usage).
     public getSerializedGastProductions(): ISerializedGast[] {
         return serializeGrammar(
             cache.getProductionsForClass(this.className).values()
         )
     }
 
-    /**
-     * @param startRuleName {string}
-     * @param precedingInput {IToken[]} - The token vector up to (not including) the content assist point
-     * @returns {ISyntacticContentAssistPath[]}
-     */
     public computeContentAssist(
         startRuleName: string,
         precedingInput: IToken[]
@@ -860,13 +605,7 @@ export class Parser {
         )
     }
 
-    /**
-     * @param grammarRule - The rule to try and parse in backtracking mode.
-     * @param args - argumens to be passed to the grammar rule execution
-     *
-     * @return {TokenType():boolean} a lookahead function that will try to parse the given grammarRule and will return true if succeed.
-     */
-    protected BACKTRACK<T>(
+    BACKTRACK<T>(
         grammarRule: (...args: any[]) => T,
         args?: any[]
     ): () => boolean {
@@ -932,618 +671,277 @@ export class Parser {
     }
 
     // Parsing DSL
-    /**
-     *
-     * A Parsing DSL method use to consume a single terminal Token.
-     * a Token will be consumed, IFF the next token in the token vector matches <tokType>.
-     * otherwise the parser will attempt to perform error recovery.
-     *
-     * The index in the method name indicates the unique occurrence of a terminal consumption
-     * inside a the top level rule. What this means is that if a terminal appears
-     * more than once in a single rule, each appearance must have a difference index.
-     *
-     * for example:
-     *
-     * function parseQualifiedName() {
-     *    this.CONSUME1(Identifier);
-     *    this.MANY(()=> {
-     *       this.CONSUME1(Dot);
-     *       this.CONSUME2(Identifier); // <-- here we use CONSUME2 because the terminal
-     *    });                           //     'Identifier' has already appeared previously in the
-     *                                  //     the rule 'parseQualifiedName'
-     * }
-     *
-     * @param tokType - The Type of the token to be consumed.
-     * @param options - optional properties to modify the behavior of CONSUME.
-     */
-    protected CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
+    public CONSUME(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 0, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME1(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME1(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 1, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME2(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME2(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 2, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME3(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME3(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 3, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME4(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME4(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 4, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME5(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME5(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 5, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME6(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME6(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 6, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME7(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME7(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 7, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME8(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME8(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 8, options)
     }
 
-    /**
-     * @see CONSUME
-     */
-    protected CONSUME9(
-        tokType: TokenType,
-        options?: ConsumeMethodOpts
-    ): IToken {
+    public CONSUME9(tokType: TokenType, options?: ConsumeMethodOpts): IToken {
         return this.consumeInternal(tokType, 9, options)
     }
 
-    /**
-     * The Parsing DSL Method is used by one rule to call another.
-     *
-     * This may seem redundant as it does not actually do much.
-     * However using it is mandatory for all sub rule invocations.
-     * calling another rule without wrapping in SUBRULE(...)
-     * will cause errors/mistakes in the Recognizer's self analysis,
-     * which will lead to errors in error recovery/automatic lookahead calculation
-     * and any other functionality relying on the Recognizer's self analysis
-     * output.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the sub rule invocation in its rule.
-     *
-     * @param {TokenType} ruleToCall - The rule to invoke.
-     * @param options - optional properties to modify the behavior of CONSUME.
-     * @returns {*} - The result of invoking ruleToCall.
-     */
-    protected SUBRULE<T>(
+    public SUBRULE<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 0, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE1<T>(
+    public SUBRULE1<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 1, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE2<T>(
+    public SUBRULE2<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 2, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE3<T>(
+    public SUBRULE3<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 3, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE4<T>(
+    public SUBRULE4<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 4, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE5<T>(
+    public SUBRULE5<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 5, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE6<T>(
+    public SUBRULE6<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 6, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE7<T>(
+    public SUBRULE7<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 7, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE8<T>(
+    public SUBRULE8<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 8, options)
     }
 
-    /**
-     * @see SUBRULE
-     */
-    protected SUBRULE9<T>(
+    public SUBRULE9<T>(
         ruleToCall: (idx: number) => T,
         options?: SubruleMethodOpts
     ): T {
         return this.subruleInternal(ruleToCall, 9, options)
     }
 
-    /**
-     * Parsing DSL Method that Indicates an Optional production
-     * in EBNF notation: [...].
-     *
-     * Note that there are two syntax forms:
-     * - Passing the grammar action directly:
-     *      this.OPTION(()=> {
-     *        this.CONSUME(Digit)}
-     *      );
-     *
-     * - using an "options" object:
-     *      this.OPTION({
-     *        GATE:predicateFunc,
-     *        DEF: ()=>{
-     *          this.CONSUME(Digit)
-     *        }});
-     *
-     * The optional 'GATE' property in "options" object form can be used to add constraints
-     * to invoking the grammar action.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the optional production in it's top rule.
-     *
-     * @param  actionORMethodDef - The grammar action to optionally invoke once
-     *                             or an "OPTIONS" object describing the grammar action and optional properties.
-     *
-     * @returns {OUT}
-     */
-    protected OPTION<OUT>(
+    public OPTION<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 0)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION1<OUT>(
+    public OPTION1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 1)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION2<OUT>(
+    public OPTION2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 2)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION3<OUT>(
+    public OPTION3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 3)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION4<OUT>(
+    public OPTION4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 4)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION5<OUT>(
+    public OPTION5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 5)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION6<OUT>(
+    public OPTION6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 6)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION7<OUT>(
+    public OPTION7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 7)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION8<OUT>(
+    public OPTION8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 8)
     }
 
-    /**
-     * @see OPTION
-     */
-    protected OPTION9<OUT>(
+    public OPTION9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT {
         return this.optionInternal(actionORMethodDef, 9)
     }
 
-    /**
-     * Parsing DSL method that indicates a choice between a set of alternatives must be made.
-     * This is equivalent to EBNF alternation (A | B | C | D ...)
-     *
-     * There are a couple of syntax forms for the inner alternatives array.
-     *
-     * Passing alternatives array directly:
-     *        this.OR([
-     *           {ALT:()=>{this.CONSUME(One)}},
-     *           {ALT:()=>{this.CONSUME(Two)}},
-     *           {ALT:()=>{this.CONSUME(Three)}}
-     *        ])
-     *
-     * Passing alternative array directly with predicates (GATE).
-     *        this.OR([
-     *           {GATE: predicateFunc1, ALT:()=>{this.CONSUME(One)}},
-     *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Two)}},
-     *           {GATE: predicateFuncX, ALT:()=>{this.CONSUME(Three)}}
-     *        ])
-     *
-     * These syntax forms can also be mixed:
-     *        this.OR([
-     *           {GATE: predicateFunc1, ALT:()=>{this.CONSUME(One)}},
-     *           {ALT:()=>{this.CONSUME(Two)}},
-     *           {ALT:()=>{this.CONSUME(Three)}}
-     *        ])
-     *
-     * Additionally an "options" object may be used:
-     * this.OR({
-     *          DEF:[
-     *            {ALT:()=>{this.CONSUME(One)}},
-     *            {ALT:()=>{this.CONSUME(Two)}},
-     *            {ALT:()=>{this.CONSUME(Three)}}
-     *          ],
-     *          // OPTIONAL property
-     *          ERR_MSG: "A Number"
-     *        })
-     *
-     * The 'predicateFuncX' in the long form can be used to add constraints to choosing the alternative.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the alternation production in it's top rule.
-     *
-     * @param altsOrOpts - A set of alternatives or an "OPTIONS" object describing the alternatives and optional properties.
-     *
-     * @returns {*} - The result of invoking the chosen alternative.
-     */
-    protected OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 0)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR1<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 1)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR2<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 2)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR3<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 3)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR4<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 4)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR5<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 5)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR6<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 6)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR7<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 7)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR8<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 8)
     }
 
-    /**
-     * @see OR
-     */
-    protected OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
+    public OR9<T>(altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>): T {
         return this.orInternal(altsOrOpts, 9)
     }
 
-    /**
-     * Parsing DSL method, that indicates a repetition of zero or more.
-     * This is equivalent to EBNF repetition {...}.
-     *
-     * Note that there are two syntax forms:
-     * - Passing the grammar action directly:
-     *        this.MANY(()=>{
-     *                        this.CONSUME(Comma)
-     *                        this.CONSUME(Digit)
-     *                      })
-     *
-     * - using an "options" object:
-     *        this.MANY({
-     *                   GATE: predicateFunc,
-     *                   DEF: () => {
-     *                          this.CONSUME(Comma)
-     *                          this.CONSUME(Digit)
-     *                        }
-     *                 });
-     *
-     * The optional 'GATE' property in "options" object form can be used to add constraints
-     * to invoking the grammar action.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the repetition production in it's top rule.
-     *
-     * @param actionORMethodDef - The grammar action to optionally invoke multiple times
-     *                             or an "OPTIONS" object describing the grammar action and optional properties.
-     *
-     * @returns {OUT[]}
-     */
-    protected MANY<OUT>(
+    public MANY<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(0, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY1<OUT>(
+    public MANY1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(1, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY2<OUT>(
+    public MANY2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(2, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY3<OUT>(
+    public MANY3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(3, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY4<OUT>(
+    public MANY4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(4, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY5<OUT>(
+    public MANY5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(5, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY6<OUT>(
+    public MANY6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(6, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY7<OUT>(
+    public MANY7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(7, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY8<OUT>(
+    public MANY8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(8, actionORMethodDef, [])
     }
 
-    /**
-     * @see MANY
-     */
-    protected MANY9<OUT>(
+    public MANY9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): OUT[] {
         return this.manyInternal(9, actionORMethodDef, [])
     }
 
-    /**
-     * Parsing DSL method, that indicates a repetition of zero or more with a separator
-     * Token between the repetitions.
-     *
-     * Example:
-     *
-     * this.MANY_SEP({
-     *                  SEP:Comma,
-     *                  DEF: () => {
-     *                         this.CONSUME(Number};
-     *                         ...
-     *                       );
-     *              })
-     *
-     * Note that because this DSL method always requires more than one argument the options object is always required
-     * and it is not possible to use a shorter form like in the MANY DSL method.
-     *
-     * Note that for the purposes of deciding on whether or not another iteration exists
-     * Only a single Token is examined (The separator). Therefore if the grammar being implemented is
-     * so "crazy" to require multiple tokens to identify an item separator please use the more basic DSL methods
-     * to implement it.
-     *
-     * As in CONSUME the index in the method name indicates the occurrence
-     * of the repetition production in it's top rule.
-     *
-     * Note that due to current limitations in the implementation the "SEP" property must appear BEFORE the "DEF" property.
-     *
-     * @param options - An object defining the grammar of each iteration and the separator between iterations
-     *
-     * @return {ISeparatedIterationResult<OUT>}
-     */
-    protected MANY_SEP<OUT>(
+    public MANY_SEP<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(0, options, {
@@ -1552,10 +950,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP1<OUT>(
+    public MANY_SEP1<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(1, options, {
@@ -1564,10 +959,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP2<OUT>(
+    public MANY_SEP2<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(2, options, {
@@ -1576,10 +968,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP3<OUT>(
+    public MANY_SEP3<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(3, options, {
@@ -1588,10 +977,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP4<OUT>(
+    public MANY_SEP4<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(4, options, {
@@ -1600,10 +986,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP5<OUT>(
+    public MANY_SEP5<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(5, options, {
@@ -1612,10 +995,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP6<OUT>(
+    public MANY_SEP6<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(6, options, {
@@ -1624,10 +1004,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP7<OUT>(
+    public MANY_SEP7<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(7, options, {
@@ -1636,10 +1013,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP8<OUT>(
+    public MANY_SEP8<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(8, options, {
@@ -1648,10 +1022,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see MANY_SEP
-     */
-    protected MANY_SEP9<OUT>(
+    public MANY_SEP9<OUT>(
         options: ManySepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.manySepFirstInternal(9, options, {
@@ -1660,119 +1031,67 @@ export class Parser {
         })
     }
 
-    /**
-     * Convenience method, same as MANY but the repetition is of one or more.
-     * failing to match at least one repetition will result in a parsing error and
-     * cause a parsing error.
-     *
-     * @see MANY
-     *
-     * @param actionORMethodDef  - The grammar action to optionally invoke multiple times
-     *                             or an "OPTIONS" object describing the grammar action and optional properties.
-     *
-     * @return {OUT[]}
-     */
-    protected AT_LEAST_ONE<OUT>(
+    public AT_LEAST_ONE<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(0, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE1<OUT>(
+    public AT_LEAST_ONE1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(1, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE2<OUT>(
+    public AT_LEAST_ONE2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(2, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE3<OUT>(
+    public AT_LEAST_ONE3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(3, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE4<OUT>(
+    public AT_LEAST_ONE4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(4, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE5<OUT>(
+    public AT_LEAST_ONE5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(5, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE6<OUT>(
+    public AT_LEAST_ONE6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(6, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE7<OUT>(
+    public AT_LEAST_ONE7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(7, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE8<OUT>(
+    public AT_LEAST_ONE8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(8, actionORMethodDef, [])
     }
 
-    /**
-     * @see AT_LEAST_ONE
-     */
-    protected AT_LEAST_ONE9<OUT>(
+    public AT_LEAST_ONE9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): OUT[] {
         return this.atLeastOneInternal(9, actionORMethodDef, [])
     }
 
-    /**
-     * Convenience method, same as MANY_SEP but the repetition is of one or more.
-     * failing to match at least one repetition will result in a parsing error and
-     * cause the parser to attempt error recovery.
-     *
-     * Note that an additional optional property ERR_MSG can be used to provide custom error messages.
-     *
-     * @see MANY_SEP
-     *
-     * @param options - An object defining the grammar of each iteration and the separator between iterations
-     *
-     * @return {ISeparatedIterationResult<OUT>}
-     */
-    protected AT_LEAST_ONE_SEP<OUT>(
+    public AT_LEAST_ONE_SEP<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(0, options, {
@@ -1781,10 +1100,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP1<OUT>(
+    public AT_LEAST_ONE_SEP1<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(1, options, {
@@ -1793,10 +1109,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP2<OUT>(
+    public AT_LEAST_ONE_SEP2<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(2, options, {
@@ -1805,10 +1118,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP3<OUT>(
+    public AT_LEAST_ONE_SEP3<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(3, options, {
@@ -1817,10 +1127,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP4<OUT>(
+    public AT_LEAST_ONE_SEP4<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(4, options, {
@@ -1829,10 +1136,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP5<OUT>(
+    public AT_LEAST_ONE_SEP5<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(5, options, {
@@ -1841,10 +1145,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP6<OUT>(
+    public AT_LEAST_ONE_SEP6<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(6, options, {
@@ -1853,10 +1154,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP7<OUT>(
+    public AT_LEAST_ONE_SEP7<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(7, options, {
@@ -1865,10 +1163,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP8<OUT>(
+    public AT_LEAST_ONE_SEP8<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(8, options, {
@@ -1877,10 +1172,7 @@ export class Parser {
         })
     }
 
-    /**
-     * @see AT_LEAST_ONE_SEP
-     */
-    protected AT_LEAST_ONE_SEP9<OUT>(
+    public AT_LEAST_ONE_SEP9<OUT>(
         options: AtLeastOneSepMethodOpts<OUT>
     ): ISeparatedIterationResult<OUT> {
         return this.atLeastOneSepFirstInternal(9, options, {
@@ -1889,16 +1181,7 @@ export class Parser {
         })
     }
 
-    /**
-     *
-     * @param name - The name of the rule.
-     * @param implementation - The implementation of the rule.
-     * @param [config] - The rule's optional configuration.
-     *
-     * @returns - The parsing rule which is the production implementation wrapped with the parsing logic that handles
-     *                     Parser state / error recovery&reporting/ ...
-     */
-    protected RULE<T>(
+    public RULE<T>(
         name: string,
         implementation: (...implArgs: any[]) => T,
         // TODO: how to describe the optional return type of CSTNode? T|CstNode is not good because it is not backward
@@ -1949,12 +1232,7 @@ export class Parser {
         return ruleImplementation
     }
 
-    /**
-     * @See RULE
-     * Same as RULE, but should only be used in "extending" grammars to override rules/productions
-     * from the super grammar.
-     */
-    protected OVERRIDE_RULE<T>(
+    public OVERRIDE_RULE<T>(
         name: string,
         impl: (...implArgs: any[]) => T,
         config: IRuleConfig<T> = DEFAULT_RULE_CONFIG
@@ -1992,6 +1270,25 @@ export class Parser {
         }
 
         return this.defineRule(name, impl, config)
+    }
+
+    public getTokenToInsert(tokType: TokenType): IToken {
+        let tokToInsert = createTokenInstance(
+            tokType,
+            "",
+            NaN,
+            NaN,
+            NaN,
+            NaN,
+            NaN,
+            NaN
+        )
+        tokToInsert.isInsertedInRecovery = true
+        return tokToInsert
+    }
+
+    public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
+        return true
     }
 
     protected ruleInvocationStateUpdate(
@@ -2043,37 +1340,6 @@ export class Parser {
         this.cstNestedFinallyStateUpdate()
     }
 
-    /**
-     * Returns an "imaginary" Token to insert when Single Token Insertion is done
-     * Override this if you require special behavior in your grammar.
-     * For example if an IntegerToken is required provide one with the image '0' so it would be valid syntactically.
-     */
-    protected getTokenToInsert(tokType: TokenType): IToken {
-        let tokToInsert = createTokenInstance(
-            tokType,
-            "",
-            NaN,
-            NaN,
-            NaN,
-            NaN,
-            NaN,
-            NaN
-        )
-        tokToInsert.isInsertedInRecovery = true
-        return tokToInsert
-    }
-
-    /**
-     * By default all tokens type may be inserted. This behavior may be overridden in inheriting Recognizers
-     * for example: One may decide that only punctuation tokens may be inserted automatically as they have no additional
-     * semantic value. (A mandatory semicolon has no additional semantic meaning, but an Integer may have additional meaning
-     * depending on its int value and context (Inserting an integer 0 in cardinality: "[1..]" will cause semantic issues
-     * as the max of the cardinality will be greater than the min value (and this is a false error!).
-     */
-    protected canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
-        return true
-    }
-
     protected getCurrentGrammarPath(
         tokType: TokenType,
         tokIdxInRule: number
@@ -2092,7 +1358,7 @@ export class Parser {
 
     // TODO: should this be a member method or a utility? it does not have any state or usage of 'this'...
     // TODO: should this be more explicitly part of the public API?
-    protected getNextPossibleTokenTypes(
+    public getNextPossibleTokenTypes(
         grammarPath: ITokenGrammarPath
     ): TokenType[] {
         let topRuleName = first(grammarPath.ruleStack)
@@ -3554,7 +2820,7 @@ export class Parser {
     }
 
     // skips a token and returns the next token
-    protected SKIP_TOKEN(): IToken {
+    public SKIP_TOKEN(): IToken {
         if (this.currIdx <= this.tokVector.length - 2) {
             this.consumeToken()
             return this.LA(1)
@@ -3565,7 +2831,7 @@ export class Parser {
 
     // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
     // or lexers dependent on parser context.
-    protected LA(howMuch: number): IToken {
+    public LA(howMuch: number): IToken {
         // does: is this optimization (saving tokVectorLength benefits?)
         if (
             this.currIdx + howMuch < 0 ||
@@ -3577,7 +2843,7 @@ export class Parser {
         }
     }
 
-    protected consumeToken() {
+    public consumeToken() {
         this.currIdx++
     }
 

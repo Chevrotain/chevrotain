@@ -1,10 +1,5 @@
 import { RestWalker } from "./rest"
 import {
-    IGrammarPath,
-    ISyntacticContentAssistPath,
-    ITokenGrammarPath
-} from "./path_public"
-import {
     cloneArr,
     drop,
     dropRight,
@@ -13,15 +8,13 @@ import {
     isEmpty,
     last
 } from "../../utils/utils"
-import { IToken, tokenName } from "../../scan/tokens_public"
+import { tokenName } from "../../scan/tokens_public"
 import { first } from "./first"
-import { TokenType } from "../../scan/lexer_public"
 import { TokenMatcher } from "../parser_public"
 import {
     AbstractProduction,
     Alternation,
     Flat,
-    IProduction,
     NonTerminal,
     Option,
     Repetition,
@@ -31,6 +24,14 @@ import {
     Rule,
     Terminal
 } from "./gast/gast_public"
+import {
+    IGrammarPath,
+    IProduction,
+    ISyntacticContentAssistPath,
+    IToken,
+    ITokenGrammarPath,
+    TokenType
+} from "../../../api"
 
 export abstract class AbstractNextPossibleTokensWalker extends RestWalker {
     protected possibleTokTypes: TokenType[] = []

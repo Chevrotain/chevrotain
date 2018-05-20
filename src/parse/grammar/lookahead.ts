@@ -10,13 +10,7 @@ import {
 } from "../../utils/utils"
 import { possiblePathsFrom } from "./interpreter"
 import { RestWalker } from "./rest"
-import {
-    Predicate,
-    IAnyOrAlt,
-    TokenMatcher,
-    lookAheadSequence
-} from "../parser_public"
-import { TokenType } from "../../scan/lexer_public"
+import { Predicate, TokenMatcher, lookAheadSequence } from "../parser_public"
 import {
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
@@ -25,8 +19,6 @@ import {
     AbstractProduction,
     Alternation,
     Flat,
-    IProduction,
-    IProductionWithOccurrence,
     Option,
     Repetition,
     RepetitionMandatory,
@@ -35,6 +27,12 @@ import {
     Rule
 } from "./gast/gast_public"
 import { GAstVisitor } from "./gast/gast_visitor_public"
+import {
+    IAnyOrAlt,
+    IProduction,
+    IProductionWithOccurrence,
+    TokenType
+} from "../../../api"
 
 export enum PROD_TYPE {
     OPTION,

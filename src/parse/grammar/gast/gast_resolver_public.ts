@@ -1,20 +1,22 @@
-import { IProductionWithOccurrence, Rule } from "./gast_public"
-import {
-    IgnoredParserIssues,
-    IParserDefinitionError
-} from "../../parser_public"
+import { Rule } from "./gast_public"
+
 import { defaults, forEach } from "../../../utils/utils"
 import { HashTable } from "../../../lang/lang_extensions"
 import { resolveGrammar as orgResolveGrammar } from "../resolver"
-import { TokenType } from "../../../scan/lexer_public"
 import { validateGrammar as orgValidateGrammar } from "../checks"
 import {
     defaultGrammarResolverErrorProvider,
-    defaultGrammarValidatorErrorProvider,
-    IGrammarResolverErrorMessageProvider,
-    IGrammarValidatorErrorMessageProvider
+    defaultGrammarValidatorErrorProvider
 } from "../../errors_public"
 import { DslMethodsCollectorVisitor } from "./gast"
+import {
+    IgnoredParserIssues,
+    IGrammarResolverErrorMessageProvider,
+    IGrammarValidatorErrorMessageProvider,
+    IParserDefinitionError,
+    IProductionWithOccurrence,
+    TokenType
+} from "../../../../api"
 
 export function resolveGrammar(options: {
     rules: Rule[]

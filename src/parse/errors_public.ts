@@ -1,16 +1,8 @@
-import { TokenType } from "../scan/lexer_public"
-import {
-    hasTokenLabel,
-    IToken,
-    tokenLabel,
-    tokenName
-} from "../scan/tokens_public"
+import { hasTokenLabel, tokenLabel, tokenName } from "../scan/tokens_public"
 import * as utils from "../utils/utils"
 import { first, map, reduce } from "../utils/utils"
 import {
     Alternation,
-    IOptionallyNamedProduction,
-    IProductionWithOccurrence,
     NonTerminal,
     Rule,
     Terminal
@@ -18,90 +10,15 @@ import {
 import { getProductionDslName } from "./grammar/gast/gast"
 import { validNestedRuleName } from "./grammar/checks"
 import { VERSION } from "../version"
+import {
+    IGrammarResolverErrorMessageProvider,
+    IGrammarValidatorErrorMessageProvider,
+    IOptionallyNamedProduction,
+    IParserErrorMessageProvider,
+    IProductionWithOccurrence,
+    TokenType
+} from "../../api"
 
-export interface IParserErrorMessageProvider {
-    /**
-     * Mismatched Token Error happens when the parser attempted to consume a terminal and failed.
-     * It corresponds to a failed "CONSUME(expected)" in Chevrotain DSL terms.
-     *
-     * @param options.expected - The expected Token Type.
-     *
-     * @param options.actual - The actual Token "instance".
-     *
-     * @param options.ruleName - The rule in which the error occurred.
-     */
-    buildMismatchTokenMessage?(options: {
-        expected: TokenType
-        actual: IToken
-        ruleName: string
-    }): string
-
-    /**
-     * A Redundant Input Error happens when the parser has completed parsing but there
-     * is still unprocessed input remaining.
-     *
-     * @param options.firstRedundant - The first unprocessed token "instance".
-     *
-     * @param options.ruleName - The rule in which the error occurred.
-     */
-    buildNotAllInputParsedMessage?(options: {
-        firstRedundant: IToken
-        ruleName: string
-    }): string
-
-    /**
-     * A No Viable Alternative Error happens when the parser cannot detect any valid alternative in an alternation.
-     * It corresponds to a failed "OR" in Chevrotain DSL terms.
-     *
-     * @param options.expectedPathsPerAlt - First level of the array represents each alternative
-     *                           The next two levels represent valid (expected) paths in each alternative.
-     *
-     * @param options.actual - The actual sequence of tokens encountered.
-     *
-     * @param options.customUserDescription - A user may provide custom error message descriptor in the "OR" DSL method.
-     *                                https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/ormethodopts.html#err_msg
-     *                                This is that custom message.
-     *
-     * @param options.ruleName - The rule in which the error occurred.
-     */
-    buildNoViableAltMessage?(options: {
-        expectedPathsPerAlt: TokenType[][][]
-        actual: IToken[]
-        customUserDescription: string
-        ruleName: string
-    }): string
-
-    /**
-     * An Early Exit Error happens when the parser cannot detect the first mandatory iteration of a repetition.
-     * It corresponds to a failed "AT_LEAST_ONE[_SEP]" in Chevrotain DSL terms.
-     *
-     * @param options.expectedIterationPaths - The valid (expected) paths in the first iteration.
-     *
-     * @param options.actual - The actual sequence of tokens encountered.
-     *
-     * @param options.previous - The previous token parsed.
-     *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
-     *
-     * @param options.customUserDescription - A user may provide custom error message descriptor in the "AT_LEAST_ONE" DSL method.
-     *                                https://sap.github.io/chevrotain/documentation/3_1_0/interfaces/dslmethodoptswitherr.html#err_msg
-     *                                This is that custom message.
-     *
-     * @param options.ruleName - The rule in which the error occurred.
-     */
-    buildEarlyExitMessage?(options: {
-        expectedIterationPaths: TokenType[][]
-        actual: IToken[]
-        previous: IToken
-        customUserDescription: string
-        ruleName: string
-    }): string
-}
-
-/**
- * This is the default logic Chevrotain uses to construct error messages.
- * When constructing a custom error message provider it may be used as a reference
- * or reused.
- */
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     buildMismatchTokenMessage({ expected, actual, ruleName }): string {
         let hasLabel = hasTokenLabel(expected)
@@ -190,13 +107,6 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
 
 Object.freeze(defaultParserErrorProvider)
 
-export interface IGrammarResolverErrorMessageProvider {
-    buildRuleNotFoundError(
-        topLevelRule: Rule,
-        undefinedRule: NonTerminal
-    ): string
-}
-
 export const defaultGrammarResolverErrorProvider: IGrammarResolverErrorMessageProvider = {
     buildRuleNotFoundError(
         topLevelRule: Rule,
@@ -211,75 +121,6 @@ export const defaultGrammarResolverErrorProvider: IGrammarResolverErrorMessagePr
             "<-"
         return msg
     }
-}
-
-export interface IGrammarValidatorErrorMessageProvider {
-    buildDuplicateFoundError(
-        topLevelRule: Rule,
-        duplicateProds: IProductionWithOccurrence[]
-    ): string
-
-    buildInvalidNestedRuleNameError(
-        topLevelRule: Rule,
-        nestedProd: IOptionallyNamedProduction
-    ): string
-
-    buildDuplicateNestedRuleNameError(
-        topLevelRule: Rule,
-        nestedProd: IOptionallyNamedProduction[]
-    ): string
-
-    buildNamespaceConflictError(topLevelRule: Rule): string
-
-    buildAlternationPrefixAmbiguityError(options: {
-        topLevelRule: Rule
-        prefixPath: TokenType[]
-        ambiguityIndices: number[]
-        alternation: Alternation
-    }): string
-
-    buildAlternationAmbiguityError(options: {
-        topLevelRule: Rule
-        prefixPath: TokenType[]
-        ambiguityIndices: number[]
-        alternation: Alternation
-    }): string
-
-    buildEmptyRepetitionError(options: {
-        topLevelRule: Rule
-        repetition: IProductionWithOccurrence
-    }): string
-
-    buildTokenNameError(options: {
-        tokenType: TokenType
-        expectedPattern: RegExp
-    })
-
-    buildEmptyAlternationError(options: {
-        topLevelRule: Rule
-        alternation: Alternation
-        emptyChoiceIdx: number
-    })
-
-    buildTooManyAlternativesError(options: {
-        topLevelRule: Rule
-        alternation: Alternation
-    }): string
-
-    buildLeftRecursionError(options: {
-        topLevelRule: Rule
-        leftRecursionPath: Rule[]
-    }): string
-
-    buildInvalidRuleNameError(options: {
-        topLevelRule: Rule
-        expectedPattern: RegExp
-    }): string
-
-    buildDuplicateRuleNameError(options: {
-        topLevelRule: Rule | string
-        grammarName: string
-    }): string
 }
 
 export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessageProvider = {

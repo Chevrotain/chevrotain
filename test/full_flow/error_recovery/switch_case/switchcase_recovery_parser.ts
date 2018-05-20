@@ -44,9 +44,8 @@ import {
     StringTok,
     SwitchTok
 } from "./Switchcase_recovery_tokens"
-import { IToken } from "../../../../src/scan/tokens_public"
 import { assign, contains } from "../../../../src/utils/utils"
-import { TokenType } from "../../../../src/scan/lexer_public"
+import { IToken, TokenType } from "../../../../api"
 
 export interface RetType {
     [caseValue: string]: number

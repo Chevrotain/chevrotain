@@ -1,6 +1,5 @@
 import { forEach, map } from "../utils/utils"
 import { tokenName } from "../scan/tokens_public"
-import { TokenType } from "../scan/lexer_public"
 import {
     RepetitionMandatory,
     Option,
@@ -11,9 +10,9 @@ import {
     NonTerminal,
     Alternation,
     Flat,
-    IProduction,
     Repetition
 } from "../parse/grammar/gast/gast_public"
+import { IProduction, TokenType } from "../../api"
 
 /**
  * Missing features

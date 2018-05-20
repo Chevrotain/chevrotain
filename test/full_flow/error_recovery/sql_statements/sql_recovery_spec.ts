@@ -27,11 +27,12 @@ import {
     IntTok
 } from "./sql_recovery_tokens"
 import { DDLExampleRecoveryParser } from "./sql_recovery_parser"
-import { IToken, tokenMatcher } from "../../../../src/scan/tokens_public"
+import { tokenMatcher } from "../../../../src/scan/tokens_public"
 import { NotAllInputParsedException } from "../../../../src/parse/exceptions_public"
 import { ParseTree } from "../../parse_tree"
 import { flatten } from "../../../../src/utils/utils"
 import { createRegularToken } from "../../../utils/matchers"
+import { IToken } from "../../../../api"
 
 // for side effect if augmenting the Token classes.
 new DDLExampleRecoveryParser([])

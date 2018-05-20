@@ -1,13 +1,5 @@
-import { IToken, tokenName } from "./tokens_public"
-import {
-    ILexerDefinitionError,
-    ILineTerminatorsTester,
-    IMultiModeLexerDefinition,
-    IRegExpExec,
-    Lexer,
-    LexerDefinitionErrorType,
-    TokenType
-} from "./lexer_public"
+import { tokenName } from "./tokens_public"
+import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import {
     compact,
     contains,
@@ -35,6 +27,13 @@ import {
     reject
 } from "../utils/utils"
 import { failedOptimizationPrefixMsg, getStartCodes } from "./reg_exp"
+import {
+    ILexerDefinitionError,
+    ILineTerminatorsTester,
+    IMultiModeLexerDefinition,
+    IToken,
+    TokenType
+} from "../../api"
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"

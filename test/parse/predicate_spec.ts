@@ -1,4 +1,3 @@
-import { IToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
 import {
     EarlyExitException,
@@ -6,6 +5,7 @@ import {
 } from "../../src/parse/exceptions_public"
 import { augmentTokenTypes } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
+import { IToken } from "../../api"
 
 describe("The chevrotain support for custom gates/predicates on DSL production:", () => {
     class A {

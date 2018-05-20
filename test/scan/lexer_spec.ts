@@ -8,11 +8,7 @@ import {
     map
 } from "../../src/utils/utils"
 import { createToken } from "../../src/scan/tokens_public"
-import {
-    IMultiModeLexerDefinition,
-    Lexer,
-    LexerDefinitionErrorType
-} from "../../src/scan/lexer_public"
+import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
 import {
     addStartOfInput,
     analyzeTokenTypes,
@@ -31,6 +27,7 @@ import {
 } from "../../src/scan/lexer"
 import { setEquality } from "../utils/matchers"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
+import { IMultiModeLexerDefinition } from "../../api"
 
 const ORG_SUPPORT_STICKY = SUPPORT_STICKY
 function defineLexerSpecs(

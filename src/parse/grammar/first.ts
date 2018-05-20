@@ -1,12 +1,7 @@
 import { uniq, map, flatten } from "../../utils/utils"
-import { TokenType } from "../../scan/lexer_public"
-import {
-    AbstractProduction,
-    IProduction,
-    NonTerminal,
-    Terminal
-} from "./gast/gast_public"
+import { AbstractProduction, NonTerminal, Terminal } from "./gast/gast_public"
 import { isBranchingProd, isOptionalProd, isSequenceProd } from "./gast/gast"
+import { IProduction, TokenType } from "../../../api"
 
 export function first(prod: IProduction): TokenType[] {
     /* istanbul ignore else */

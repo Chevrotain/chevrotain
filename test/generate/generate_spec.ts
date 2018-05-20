@@ -35,13 +35,13 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genTerminalParser",
             rules,
             tokenVocabulary
         })
 
-        const myParser = parserFactory({})
+        const myParser = <any>parserFactory({})
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -64,13 +64,13 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genNoneTerminalParser",
             rules,
             tokenVocabulary
         })
 
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
         expect(myParser.errors).to.be.empty
@@ -97,13 +97,13 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genOptionParser",
             rules,
             tokenVocabulary
         })
 
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
 
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
@@ -144,12 +144,12 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genOrParser",
             rules,
             tokenVocabulary
         })
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
 
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
@@ -179,12 +179,12 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genManyParser",
             rules,
             tokenVocabulary
         })
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
 
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
@@ -214,12 +214,12 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genAtLeastOneParser",
             rules,
             tokenVocabulary
         })
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
 
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()
@@ -253,12 +253,12 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genManySepParser",
             rules,
             tokenVocabulary
         })
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
 
         myParser.input = []
         myParser.topRule()
@@ -294,12 +294,12 @@ describe("The Code Generation capabilities", () => {
             })
         ]
 
-        const parserFactory = generateParserFactory<any>({
+        const parserFactory = generateParserFactory({
             name: "genAtLeastOneSepParser",
             rules,
             tokenVocabulary
         })
-        const myParser = parserFactory()
+        const myParser = <any>parserFactory()
 
         myParser.input = [createRegularToken(Identifier)]
         myParser.topRule()

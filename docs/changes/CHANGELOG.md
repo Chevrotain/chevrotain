@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Documentation
+
+*   [Define APIs separately from the source code](https://github.com/SAP/chevrotain/issues/704).
+
 ## 3.2.1 (5-9-2018)
 
 #### Bug Fixes
