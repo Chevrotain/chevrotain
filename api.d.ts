@@ -1,3 +1,5 @@
+export as namespace chevrotain
+
 export declare const VERSION: string
 
 export declare class Parser {
