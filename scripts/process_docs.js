@@ -13,5 +13,5 @@ const apiString = fs.readFileSync(apiPath, "utf8").toString()
 
 const fixedApiString = apiString.replace(/\/\* protected \*\//g, "protected")
 
-const apiLibPath = path.resolve(__dirname, "../lib/api.d.ts")
+const apiLibPath = path.resolve(__dirname, "../lib/chevrotain.d.ts")
 fs.writeFileSync(apiLibPath, fixedApiString)
