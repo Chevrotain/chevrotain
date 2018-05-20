@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 3.3.0 (5-20-2018)
 
 #### Documentation
 
