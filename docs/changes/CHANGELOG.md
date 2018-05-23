@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+*   [Detect grammars with none unique names](https://github.com/SAP/chevrotain/issues/715).
+
 ## 3.3.0 (5-20-2018)
 
 #### Documentation

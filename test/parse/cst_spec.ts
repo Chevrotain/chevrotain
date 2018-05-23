@@ -58,7 +58,7 @@ context("CST", () => {
     })
 
     it("Can output a CST with labels", () => {
-        class CstTerminalParser extends Parser {
+        class CstTerminalParser2 extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, ALL_TOKENS, {
                     outputCst: true
@@ -82,7 +82,7 @@ context("CST", () => {
             createRegularToken(B),
             createRegularToken(C)
         ]
-        let parser = new CstTerminalParser(input)
+        let parser = new CstTerminalParser2(input)
         let cst = parser.testRule()
         expect(cst.name).to.equal("testRule")
         expect(cst.children).to.have.keys("myLabel", "B", "myOtherLabel")

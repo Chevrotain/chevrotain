@@ -8,19 +8,22 @@ import { filter, forEach, values } from "../utils/utils"
 import { Rule } from "./grammar/gast/gast_public"
 import { IParserDefinitionError, TokenType } from "../../api"
 
-export let CLASS_TO_DEFINITION_ERRORS = new HashTable<
+export const CLASS_TO_DEFINITION_ERRORS = new HashTable<
     IParserDefinitionError[]
 >()
 
-export let CLASS_TO_SELF_ANALYSIS_DONE = new HashTable<boolean>()
+export const CLASS_TO_SELF_ANALYSIS_DONE = new HashTable<boolean>()
+export const CLASS_TO_CONSTRUCTOR = new HashTable<Function>()
 
-export let CLASS_TO_GRAMMAR_PRODUCTIONS = new HashTable<HashTable<Rule>>()
+export const CLASS_TO_GRAMMAR_PRODUCTIONS = new HashTable<HashTable<Rule>>()
 
 export function getProductionsForClass(className: string): HashTable<Rule> {
     return getFromNestedHashTable(className, CLASS_TO_GRAMMAR_PRODUCTIONS)
 }
 
-export let CLASS_TO_RESYNC_FOLLOW_SETS = new HashTable<HashTable<TokenType[]>>()
+export const CLASS_TO_RESYNC_FOLLOW_SETS = new HashTable<
+    HashTable<TokenType[]>
+>()
 
 export function getResyncFollowsForClass(
     className: string
@@ -35,13 +38,13 @@ export function setResyncFollowsForClass(
     CLASS_TO_RESYNC_FOLLOW_SETS.put(className, followSet)
 }
 
-export let CLASS_TO_LOOKAHEAD_FUNCS = new HashTable<HashTable<Function>>()
+export const CLASS_TO_LOOKAHEAD_FUNCS = new HashTable<HashTable<Function>>()
 
 export function getLookaheadFuncsForClass(className: string): Function[] {
     return getArrFromHashTable(className, CLASS_TO_LOOKAHEAD_FUNCS)
 }
 
-export let CLASS_TO_FIRST_AFTER_REPETITION = new HashTable<
+export const CLASS_TO_FIRST_AFTER_REPETITION = new HashTable<
     HashTable<IFirstAfterRepetition>
 >()
 
@@ -51,7 +54,7 @@ export function getFirstAfterRepForClass(
     return getFromNestedHashTable(className, CLASS_TO_FIRST_AFTER_REPETITION)
 }
 
-export let CLASS_TO_PRODUCTION_OVERRIDEN = new HashTable<HashTable<boolean>>()
+export const CLASS_TO_PRODUCTION_OVERRIDEN = new HashTable<HashTable<boolean>>()
 
 export function getProductionOverriddenForClass(
     className: string
@@ -59,13 +62,9 @@ export function getProductionOverriddenForClass(
     return getFromNestedHashTable(className, CLASS_TO_PRODUCTION_OVERRIDEN)
 }
 
-export const CLASS_TO_CST_DICT_DEF_PER_RULE = new HashTable<
-    HashTable<string[]>
->()
-
-export let CLASS_TO_BASE_CST_VISITOR = new HashTable<Function>()
-export let CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS = new HashTable<Function>()
-export let CLASS_TO_ALL_RULE_NAMES = new HashTable<string[]>()
+export const CLASS_TO_BASE_CST_VISITOR = new HashTable<Function>()
+export const CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS = new HashTable<Function>()
+export const CLASS_TO_ALL_RULE_NAMES = new HashTable<string[]>()
 
 function getFromNestedHashTable(className: string, hashTable: HashTable<any>) {
     let result = hashTable.get(className)
@@ -86,7 +85,7 @@ function getArrFromHashTable(className: string, hashTable: HashTable<any>) {
 }
 
 export function clearCache(): void {
-    let hasTables = filter(
+    const hasTables = filter(
         values(module.exports),
         currHashTable => currHashTable instanceof HashTable
     )
