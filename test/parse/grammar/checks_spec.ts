@@ -846,7 +846,7 @@ describe("The empty alternative detection full flow", () => {
     })
 
     it("will throw an error when an empty alternative is not the last alternative #2", () => {
-        class EmptyAltAmbiguityParser extends Parser {
+        class EmptyAltAmbiguityParser2 extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
                 ;(<any>Parser).performSelfAnalysis(this)
@@ -871,14 +871,14 @@ describe("The empty alternative detection full flow", () => {
                 ])
             })
         }
-        expect(() => new EmptyAltAmbiguityParser()).to.throw(
+        expect(() => new EmptyAltAmbiguityParser2()).to.throw(
             "Ambiguous empty alternative"
         )
-        expect(() => new EmptyAltAmbiguityParser()).to.throw("1")
-        expect(() => new EmptyAltAmbiguityParser()).to.throw(
+        expect(() => new EmptyAltAmbiguityParser2()).to.throw("1")
+        expect(() => new EmptyAltAmbiguityParser2()).to.throw(
             "Only the last alternative may be an empty alternative."
         )
-        expect(() => new EmptyAltAmbiguityParser()).to.not.throw("undefined")
+        expect(() => new EmptyAltAmbiguityParser2()).to.not.throw("undefined")
     })
 })
 

@@ -233,6 +233,7 @@ export class Parser {
 
         parserInstance.selfAnalysisDone = true
         let className = classNameFromInstance(parserInstance)
+        const actualClassConstructor = parserInstance.constructor
 
         // can't test this with nyc tool, instrumentation causes the class name to be not empty.
         /* istanbul ignore if */
@@ -244,6 +245,26 @@ export class Parser {
                 "A Parser's constructor may not be an anonymous Function, it must be a named function\n" +
                     "The constructor's name is used at runtime for performance (caching) purposes."
             )
+        }
+
+        // this information should only be computed once
+        if (!cache.CLASS_TO_CONSTRUCTOR.containsKey(className)) {
+            cache.CLASS_TO_CONSTRUCTOR.put(className, actualClassConstructor)
+        }
+        // Detect multiple Parsers using the same name.
+        // This will mess up the cache logic.
+        else {
+            const expectedClassConstructor = cache.CLASS_TO_CONSTRUCTOR.get(
+                className
+            )
+            if (actualClassConstructor !== expectedClassConstructor) {
+                throw Error(
+                    `None Unique Grammar Name Found: <${className}>\n` +
+                        "\tEvery grammar must have a unique name.\n" +
+                        "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#UNIQUE_NAME\n" +
+                        "\tFor Further details."
+                )
+            }
         }
 
         // this information should only be computed once
@@ -1571,7 +1592,7 @@ export class Parser {
                                     preRuleFullName
                                 )
                             }
-                            // to be handled farther up the call stack
+                            // to be handled Further up the call stack
                             throw e
                         }
                     } else if (isFirstInvokedRule) {
@@ -1581,7 +1602,7 @@ export class Parser {
                         // even if error recovery is disabled
                         return recoveryValueFunc()
                     } else {
-                        // to be handled farther up the call stack
+                        // to be handled Further up the call stack
                         throw e
                     }
                 } else {

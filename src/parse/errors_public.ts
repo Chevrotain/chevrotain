@@ -233,7 +233,7 @@ export const defaultGrammarValidatorErrorProvider: IGrammarValidatorErrorMessage
             }> Rule,\n` +
             `<${pathMsg}> may appears as a prefix path in all these alternatives.\n` +
             `https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#COMMON_PREFIX\n` +
-            `For farther details.`
+            `For Further details.`
 
         return errMsg
     },
