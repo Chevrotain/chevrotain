@@ -73,7 +73,7 @@ export function validateGrammar(
     let ambiguousAltsErrors = []
 
     // left recursion could cause infinite loops in the following validations.
-    // It is safest to first have the user fix the left recursion errors first and only then examine farther issues.
+    // It is safest to first have the user fix the left recursion errors first and only then examine Further issues.
     if (every(leftRecursionErrors, isEmpty)) {
         emptyAltErrors = map(topLevels, currTopRule =>
             validateEmptyOrAlternative(currTopRule, errMsgProvider)

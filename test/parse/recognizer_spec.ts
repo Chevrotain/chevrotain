@@ -947,6 +947,32 @@ function defineRecognizerSpecs(
                 )
             })
 
+            describe("Parser Level Validations", () => {
+                before(() => {
+                    class myNoneUniqueSpecialParser extends Parser {
+                        constructor(input: IToken[] = []) {
+                            super(input, ALL_TOKENS)
+                            Parser.performSelfAnalysis(this)
+                        }
+                    }
+                    // init the first parser
+                    new myNoneUniqueSpecialParser([])
+                })
+
+                it("Will throw an error if multiple different parsers exist with the same name", () => {
+                    class myNoneUniqueSpecialParser extends Parser {
+                        constructor(input: IToken[] = []) {
+                            super(input, ALL_TOKENS)
+                            Parser.performSelfAnalysis(this)
+                        }
+                    }
+
+                    expect(() => new myNoneUniqueSpecialParser()).to.throw(
+                        "None Unique Grammar Name Found"
+                    )
+                })
+            })
+
             it("can be initialized with a vector of Tokens", () => {
                 let parser: any = new Parser([], [PlusTok, MinusTok, IntTok])
                 let tokensMap = (<any>parser).tokensMap
@@ -1006,7 +1032,7 @@ function defineRecognizerSpecs(
             })
 
             it("will not swallow none Recognizer errors when attempting 'in rule error recovery'", () => {
-                class InRuleParser extends Parser {
+                class NotSwallowInRuleParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             recoveryEnabled: true
@@ -1018,7 +1044,7 @@ function defineRecognizerSpecs(
                         this.CONSUME1(DotTok)
                     })
                 }
-                let parser: any = new InRuleParser([
+                let parser: any = new NotSwallowInRuleParser([
                     createTokenInstance(IntTok, "1")
                 ])
                 parser.tryInRuleRecovery = () => {
@@ -1028,7 +1054,7 @@ function defineRecognizerSpecs(
             })
 
             it("will not swallow none Recognizer errors during Token consumption", () => {
-                class InRuleParser extends Parser {
+                class NotSwallowInTokenConsumption extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             recoveryEnabled: true
@@ -1040,7 +1066,7 @@ function defineRecognizerSpecs(
                         this.CONSUME1(DotTok)
                     })
                 }
-                let parser: any = new InRuleParser([
+                let parser: any = new NotSwallowInTokenConsumption([
                     createTokenInstance(IntTok, "1")
                 ])
                 ;(parser as any).consumeInternal = () => {
@@ -1050,7 +1076,7 @@ function defineRecognizerSpecs(
             })
 
             it("will rethrow none Recognizer errors during Token consumption - recovery disabled + nested rule", () => {
-                class InRuleParser extends Parser {
+                class RethrowOtherErrors extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {
                             recoveryEnabled: true
@@ -1075,7 +1101,7 @@ function defineRecognizerSpecs(
                         }
                     )
                 }
-                let parser: any = new InRuleParser([
+                let parser: any = new RethrowOtherErrors([
                     createTokenInstance(IntTok, "1")
                 ])
                 parser.someRule()
@@ -1237,7 +1263,7 @@ function defineRecognizerSpecs(
             })
 
             it("Supports custom error messages for OR", () => {
-                class LabelAltParser extends Parser {
+                class LabelAltParser2 extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
                         ;(Parser as any).performSelfAnalysis(this)
@@ -1262,7 +1288,7 @@ function defineRecognizerSpecs(
                     })
                 }
 
-                let parser = new LabelAltParser([])
+                let parser = new LabelAltParser2([])
                 parser.rule()
                 expect(parser.errors[0]).to.be.an.instanceof(
                     NoViableAltException

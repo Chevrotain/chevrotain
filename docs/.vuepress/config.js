@@ -9,6 +9,7 @@ const versionWithLowDashs = version.replace(/\./g, "_")
 
 const slugMap = {
     "Common Prefix Ambiguities": "COMMON_PREFIX",
+    "None Unique Grammar Name Found": "UNIQUE_GRAMMAR_NAME",
     "No LINE_BREAKS Error": "LINE_BREAKS",
     "Unexpected RegExp Anchor Error": "ANCHORS",
     "Token can never be matched": "UNREACHABLE",
