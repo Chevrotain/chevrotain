@@ -5,7 +5,8 @@
         "target": "ES5",
         "outDir": "lib",
         "sourceMap": true,
-        "declaration": true
+        "declaration": true,
+        "lib": ["es2015", "dom"]
     },
     "include": ["src/**/*.ts", "test/**/*.ts"],
     "exclude": ["node_modules", "examples", "test_integration"]
