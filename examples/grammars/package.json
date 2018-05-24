@@ -14,7 +14,7 @@
         "benchmark": "^2.1.4",
         "chai": "^4.1.2",
         "lodash": "^4.17.4",
-        "mocha": "^3.5.3",
+        "mocha": "5.2.0",
         "ohm-js": "^0.13.1",
         "shift-parser": "^5.2.1",
         "typescript": "^2.4.2",

@@ -35,7 +35,8 @@ const slugMap = {
         "WEBPACK",
     "Why does my parser appear to be stuck during it's initialization?":
         "STUCK_AMBIGUITY",
-    "How do I Maximize my parser's performance?": "PERFORMANCE"
+    "How do I Maximize my parser's performance?": "PERFORMANCE",
+    'Why do my tests fail when using "mocha --watch"?': "MOCHA_WATCH"
 }
 
 const slugMapUsed = _.mapValues(slugMap, () => false)

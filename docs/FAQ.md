@@ -13,6 +13,7 @@ sidebar: auto
 *   [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
 *   [Why does my parser appear to be stuck during it's initialization?](#STUCK_AMBIGUITY)
 *   [How do I Maximize my parser's performance?](#PERFORMANCE)
+*   [Why do my tests fail when using "mocha --watch"?](#MOCHA_WATCH)
 
 ## Why should I use a Parsing DSL instead of a Parser Generator?
 
@@ -358,3 +359,18 @@ These are only required if you are trying to squeeze every tiny bit of performan
         $.CONSUME(RSquare)
     })
     ```
+
+## Why do my tests fail when using "mocha --watch"?
+
+Mocha's watch mode reloads only the user modules in each iteration.
+This will cause Chevrotain to fail because it's cached information will become invalid.
+To resolve this use the [clearCache](https://sap.github.io/chevrotain/documentation/3_3_0/globals.html#clearcache)
+API before your tests execute.
+
+```javascript
+const { clearCache } = require("chevrotain")
+
+before(() => {
+    clearCache()
+})
+```
