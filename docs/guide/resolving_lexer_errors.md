@@ -1,12 +1,12 @@
 # Resolving Lexer Errors
 
-*   [No LINE_BREAKS Error.](#LINE_BREAKS)
-*   [Unexpected RegExp Anchor Error.](#ANCHORS)
-*   [Token Can Never Be Matched.](#UNREACHABLE)
-*   [Complement Sets cannot be automatically optimized.](#COMPLEMENT)
-*   [Failed parsing < /.../ > Using the regexp-to-ast library.](#REGEXP_PARSING)
-*   [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
-*   [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
+-   [No LINE_BREAKS Error.](#LINE_BREAKS)
+-   [Unexpected RegExp Anchor Error.](#ANCHORS)
+-   [Token Can Never Be Matched.](#UNREACHABLE)
+-   [Complement Sets cannot be automatically optimized.](#COMPLEMENT)
+-   [Failed parsing < /.../ > Using the regexp-to-ast library.](#REGEXP_PARSING)
+-   [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
+-   [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
 
 ## No LINE_BREAKS Error
 
@@ -52,10 +52,10 @@ To resolve this choose one of the following:
     const myLexer = new chevrotain.Lexer([myTokens])
     ```
 
-    *   Note that the definition of what constitutes a line terminator is controlled by the
+    -   Note that the definition of what constitutes a line terminator is controlled by the
         [lineTerminatorsPattern][line_terminator_docs] lexer configuration property.
 
-    *   Also note that multi-line tokens such as some types of comments and string literals tokens may contain
+    -   Also note that multi-line tokens such as some types of comments and string literals tokens may contain
         line terminators, if your language includes such tokens they must also be marked with the line_breaks flag.
 
 ## Unexpected RegExp Anchor Error
@@ -127,7 +127,7 @@ const Identifier = createToken({
 const myLexer = new chevrotain.Lexer([Identifier, ForKeyword])
 ```
 
-*   Note that this validation is limited to simple patterns such as keywords
+-   Note that this validation is limited to simple patterns such as keywords
     The more general case of any pattern being a strict subset of a preceding pattern
     will require much more in depth RegExp analysis capabilities.
 

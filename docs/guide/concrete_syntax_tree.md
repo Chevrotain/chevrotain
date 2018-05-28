@@ -44,9 +44,9 @@ class MyParser extends chevrotain.Parser {
 
 The structure of the CST is very simple.
 
-*   View it by running the CST creation example in the [**online playground**](https://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
+-   View it by running the CST creation example in the [**online playground**](https://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output).
 
-*   Note that the following examples are not runnable nor contain the full information.
+-   Note that the following examples are not runnable nor contain the full information.
     These are just snippets to explain the core concepts.
 
 ```TypeScript
@@ -272,12 +272,12 @@ output = {
 Providing a **NAME** property to the DSL methods will create an in-lined rule.
 It is equivalent to extraction to a separate grammar rule with two differences:
 
-*   To avoid naming conflicts in-lined rules **must** start with a dollar($) sign.
-*   In-lined rules do not posses error recovery (re-sync) capabilities as do regular rules.
+-   To avoid naming conflicts in-lined rules **must** start with a dollar($) sign.
+-   In-lined rules do not posses error recovery (re-sync) capabilities as do regular rules.
 
 Syntax Limitation:
 
-*   The **NAME** property of an in-lined rule must appear as the **first** property
+-   The **NAME** property of an in-lined rule must appear as the **first** property
     of the **DSLMethodOpts** object.
 
     ```javascript
@@ -350,10 +350,10 @@ So we now know how to create a CST and it's internal structure.
 But how do we traverse this structure and perform semantic actions?
 Some examples for such semantic actions:
 
-*   Creation of an Abstract Syntax Tree (AST) to be later used in the rest of the compilation pipeline.
-*   Running the input text in an interpreter, for example a Calculator's grammar and input can be evaluated to
+-   Creation of an Abstract Syntax Tree (AST) to be later used in the rest of the compilation pipeline.
+-   Running the input text in an interpreter, for example a Calculator's grammar and input can be evaluated to
     a numerical value.
-*   Extracting specific pieces of information from the input.
+-   Extracting specific pieces of information from the input.
 
 One option would be to "manually" recursively "walk" the output CST structure.
 
@@ -393,10 +393,10 @@ export function toAst(cst) {
 
 This is a valid approach, however it can be somewhat error prone:
 
-*   No validation that the case names match the real names of the CST Nodes.
-*   The validation for missing case handler (default case) depends on attempting to run toAst with invalid input.
+-   No validation that the case names match the real names of the CST Nodes.
+-   The validation for missing case handler (default case) depends on attempting to run toAst with invalid input.
     (Fail slow instead of fail fast...)
-*   In-Lined Rules may cause ambiguities as they should be matched on the fullName property not the name property.
+-   In-Lined Rules may cause ambiguities as they should be matched on the fullName property not the name property.
 
 ## CST Visitor
 
@@ -446,22 +446,22 @@ class SqlToAstVisitor extends BaseCstVisitor {
 }
 ```
 
-*   Each visitor method will be invoked with the respective CSTNode's children as the first argument
+-   Each visitor method will be invoked with the respective CSTNode's children as the first argument
     (called ctx in the above example).
 
-*   Recursively visiting None-Terminals can be accomplished by using the **this.visit** method.
+-   Recursively visiting None-Terminals can be accomplished by using the **this.visit** method.
     It will invoke the appropriate visit method for the CSTNode argument.
 
-*   The **this.visit** method can also be invoked on an array on CSTNodes in that case
+-   The **this.visit** method can also be invoked on an array on CSTNodes in that case
     It is equivalent to calling it on the first element of the input array.
 
-*   Each visit method can return a value which can be used to combine the traversal results.
+-   Each visit method can return a value which can be used to combine the traversal results.
 
-*   The **this.validateVisitor()** method can be used to detect missing or redundant visitor methods.
+-   The **this.validateVisitor()** method can be used to detect missing or redundant visitor methods.
 
-    *   For example due to a refactoring of the grammar or a typo.
+    -   For example due to a refactoring of the grammar or a typo.
 
-*   Visitor methods support an optional "IN" parameter.
+-   Visitor methods support an optional "IN" parameter.
 
 ### Do we always have to implement all the visit methods?
 
@@ -503,13 +503,13 @@ Particularly on its level of rules nesting.
 
 This may be substantial yet please consider:
 
-*   Chevrotain is already [very fast](https://sap.github.io/chevrotain/performance/)
+-   Chevrotain is already [very fast](https://sap.github.io/chevrotain/performance/)
     So at worst at will degrade to just "fast"...
 
-*   This comparison is not fair as a pure grammar that has no output also has very little use...
+-   This comparison is not fair as a pure grammar that has no output also has very little use...
     The right comparison would be to versus embedding actions that built some alternative CST/AST output structure.
 
-*   Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
+-   Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
     would be reduced.
 
 It is therefore recommended to use the CST creation capabilities

@@ -13,12 +13,12 @@ We refer to the logic that computes that result or builds that data structure as
 
 Chevrotain supports two **very different** solutions to this problem:
 
-*   **Separation** of grammar(syntax) and user actions (semantics) using a **CST Visitor**.
+-   **Separation** of grammar(syntax) and user actions (semantics) using a **CST Visitor**.
 
-    *   [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
+    -   [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js)
 
-*   **Embedding** user actions (semantics) inside the grammar rules.
-    *   [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js)
+-   **Embedding** user actions (semantics) inside the grammar rules.
+    -   [Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js)
 
 Before we continue one of the two approaches must be chosen.
 
@@ -35,18 +35,18 @@ The main advantage of embedded actions is their **performance**. Embedded action
 about 50% faster than using a CST Visitor. This may sound like an unbeatable advantage
 but that is not the case:
 
-*   Chevrotain is [so fast](https://sap.github.io/chevrotain/performance/) that even with that performance penalty
+-   Chevrotain is [so fast](https://sap.github.io/chevrotain/performance/) that even with that performance penalty
     it would beat most other parsing solutions and still be close to the performance of an hand built parser.
 
-    *   Tested on Modern V8
+    -   Tested on Modern V8
 
-*   The Parsing step is normally just one step of a larger flow, a large performance penalty in one step
+-   The Parsing step is normally just one step of a larger flow, a large performance penalty in one step
     does not equate to a large performance penalty in the whole flow...
 
 ## Summary
 
-*   It is recommended to use a CST Visitor to separate the semantics(actions) from the syntax(grammar).
-*   Prefer embedding the semantics (actions) in the grammar only in use cases where performance is of utmost concern.
+-   It is recommended to use a CST Visitor to separate the semantics(actions) from the syntax(grammar).
+-   Prefer embedding the semantics (actions) in the grammar only in use cases where performance is of utmost concern.
 
 #### What is Next?
 

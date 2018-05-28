@@ -26,7 +26,7 @@ See some [existing examples][examples] to get started.
 
 Details:
 
-*   An Example **must** include some tests with an **\_spec.js** suffix.
+-   An Example **must** include some tests with an **\_spec.js** suffix.
 
 #### Contributing To Chevrotain's Runtime Source code.
 
@@ -34,10 +34,10 @@ This can be more complex as more in-depth knowledge of chevrotain internals may 
 
 Details:
 
-*   ~100% code coverage is **required**.
-    *   It is possible to disable coverage for specific code, but there must be a very good reason to do so.
-*   Try to maintain the same code style used in the rest of Chevrotain's source code.
-    *   The linting will take care of most of this automatically.
+-   ~100% code coverage is **required**.
+    -   It is possible to disable coverage for specific code, but there must be a very good reason to do so.
+-   Try to maintain the same code style used in the rest of Chevrotain's source code.
+    -   The linting will take care of most of this automatically.
 
 ## Development Environment
 
@@ -46,17 +46,17 @@ Examine the [package.json][package] scripts for all the available tasks:
 
 #### Initial Setup
 
-*   `yarn install`
+-   `yarn install`
 
 #### Some basic dev flows to get started
 
 Chevrotain is written using Typescript, so compilation to javascript is needed.
 
-*   `yarn run compile`
+-   `yarn run compile`
 
 Alternatively during development one would want to recompile on file changes.
 
-*   `yarn run watch`
+-   `yarn run watch`
 
 The compilation result will appear in the **lib** folder.
 
@@ -72,24 +72,24 @@ Chevrotain uses several different types of tests to promote high quality.
 
 The most basic ones are the **mocha unit tests**, which are also the most relevant ones.
 
-*   `yarn run dev_unit_tests`
+-   `yarn run dev_unit_tests`
 
 Additionally **integration tests** are used to test Chevrotain as an end user with the help of **yarn link**
 
-*   `yarn run dev_integration_tests`
+-   `yarn run dev_integration_tests`
 
 And last but not least **browser tests** run the unit tests on multiple browsers using **karma and sauce labs**
 On the central CI and Chrome on a local dev machine.
 
-*   `yarn run dev_browser_tests`
+-   `yarn run dev_browser_tests`
 
 #### Running the central CI flow locally.
 
 This is just another yarn task which performs the whole flow
 including linting / doc generation / d.ts API creation / ...
 
-*   `yarn run ci_full_build`
-    *   Node > 4 is required to pass the coverage checks.
+-   `yarn run ci_full_build`
+    -   Node > 4 is required to pass the coverage checks.
 
 #### Legal
 

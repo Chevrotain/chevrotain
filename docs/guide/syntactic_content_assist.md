@@ -19,13 +19,13 @@ completely unrelated to the normal parsing flow except for using the same intern
 
 This causes several important limitations:
 
-*   **Performance**: The Content assist feature is about x10 times slower than the normal parsing flow.
+-   **Performance**: The Content assist feature is about x10 times slower than the normal parsing flow.
 
-*   No Embedded actions will be performed.
+-   No Embedded actions will be performed.
 
-*   Error Recovery is unsupported
+-   Error Recovery is unsupported
 
-*   Gates / Predicates are unsupported.
+-   Gates / Predicates are unsupported.
 
 These limitations may seem daunting at first, but should not cause great problems in actual practice.
 The following sections will discuss each limitation in details.
@@ -35,28 +35,28 @@ The following sections will discuss each limitation in details.
 An order of magnitude slower performance may at first sound like a horrible thing.
 Lets put this in perspective for relevant use cases:
 
-*   Being an order of magnitude slower also means approximately the same speed as Jison.
+-   Being an order of magnitude slower also means approximately the same speed as Jison.
 
-    *   Tested on Chrome 68, See: [performance benchmark](https://sap.github.io/chevrotain/performance/).
+    -   Tested on Chrome 68, See: [performance benchmark](https://sap.github.io/chevrotain/performance/).
 
-*   **Smaller input Size 1**: Content Assist is requested for an offset inside a text, this means that on average only half the text input
+-   **Smaller input Size 1**: Content Assist is requested for an offset inside a text, this means that on average only half the text input
     will have to be parsed. Suddenly the problem is halved...
 
-*   **Smaller input size 2**: Syntactic Content Assist is requested for a single text input(file), while standard parsing flow may need
+-   **Smaller input size 2**: Syntactic Content Assist is requested for a single text input(file), while standard parsing flow may need
     to handle dozens or hundreds of inputs at once.
 
-*   **Less work**: The ~x10 performance difference was measured when comparing pure grammars without any semantics.
+-   **Less work**: The ~x10 performance difference was measured when comparing pure grammars without any semantics.
     In a **real world** scenario the difference will be smaller as the regular parser will have semantics (CST creation / embedded actions).
     Thoses semantics have their own runtime cost while the content assist parser will **always** remain a pure grammar.
 
-*   **Smart beats fast**: Content Assist is normally used in a code editor. A code editor should be by definition
+-   **Smart beats fast**: Content Assist is normally used in a code editor. A code editor should be by definition
     **incremental** as it does not matter how smart the error recovery is or how fast the parser, re-parsing a whole
     file for every single changed character will simply **not scale**, both from a performance perspective and from the requirement
     of handling partially invalid inputs. What this means is that if a code editor is already (as it should be) incremental.
     It could invoke the call to **computeContentAssist** on a subset of the input as well. This subset could easily
     be **several** orders of magnitudes smaller, thus all performance concerns are resolved.
 
-    *   Example: Imagine a 1,000 lines JavaScript file where a single 10 lines function is being edited and content assist
+    -   Example: Imagine a 1,000 lines JavaScript file where a single 10 lines function is being edited and content assist
         is requested inside that small function.
 
         ```javascript

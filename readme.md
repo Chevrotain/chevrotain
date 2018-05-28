@@ -22,42 +22,42 @@ as any other pure code without requiring any new tools or processes.
 
 ## TLDR
 
-*   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
-*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
-*   [**Performance benchmark**][benchmark]
+-   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
+-   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
+-   [**Performance benchmark**][benchmark]
 
 ## Features
 
 1.  **Parsing DSL**.
 
-    *   **LL(k)** grammars support.
-    *   Useable from [JavaScript / TypeScript / CoffeeScript][languages].
-    *   [**Separation** of grammar and semantics.][separation]
-    *   [Customizable][custom_errors] **Error Reporting** with full location information.
-    *   Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
-    *   Supports [gates/predicates][gates].
-    *   [Backtracking][backtracking] support.
-    *   [Grammar Inheritance.][grammar_inheritance]
-    *   [Multiple starting rules.][starting_rules]
-    *   [Parameterized Rules.][parametrized_rules]
-    *   [Syntactic Content Assist.][content assist]
-    *   **No code generation**.
-        *   The DSL is just JavaScript, not an external language.
-        *   The grammar is directly debuggable as plain JavaScript source.
-        *   Short feedback loops.
-        *   Allows great flexibility for inserting custom Parser actions.
-    *   [Custom APIs][custom_apis].
+    -   **LL(k)** grammars support.
+    -   Useable from [JavaScript / TypeScript / CoffeeScript][languages].
+    -   [**Separation** of grammar and semantics.][separation]
+    -   [Customizable][custom_errors] **Error Reporting** with full location information.
+    -   Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
+    -   Supports [gates/predicates][gates].
+    -   [Backtracking][backtracking] support.
+    -   [Grammar Inheritance.][grammar_inheritance]
+    -   [Multiple starting rules.][starting_rules]
+    -   [Parameterized Rules.][parametrized_rules]
+    -   [Syntactic Content Assist.][content assist]
+    -   **No code generation**.
+        -   The DSL is just JavaScript, not an external language.
+        -   The grammar is directly debuggable as plain JavaScript source.
+        -   Short feedback loops.
+        -   Allows great flexibility for inserting custom Parser actions.
+    -   [Custom APIs][custom_apis].
 
 2.  **Lexer Engine**
 
-    *   Based on Regular Expressions.
-    *   Full position information tracking (lines/columns/offsets).
-    *   Token skipping (whitespace/comments/...).
-    *   Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
-    *   [Multiple Lexer Modes][lexer_modes] depending on the context.
-    *   [Tokens Grouping][lexer_groups].
-    *   [Custom Token patterns(none RegExp) support](https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html)
-    *   **No code generation** The Lexer does not require any code generation phase.
+    -   Based on Regular Expressions.
+    -   Full position information tracking (lines/columns/offsets).
+    -   Token skipping (whitespace/comments/...).
+    -   Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
+    -   [Multiple Lexer Modes][lexer_modes] depending on the context.
+    -   [Tokens Grouping][lexer_groups].
+    -   [Custom Token patterns(none RegExp) support](https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html)
+    -   **No code generation** The Lexer does not require any code generation phase.
 
 3.  [**High Performance**][benchmark].
 
@@ -65,37 +65,37 @@ as any other pure code without requiring any new tools or processes.
 
 5.  **Grammar Reflection/Introspection**.
 
-    *   The Grammar's structure is known and **exposed** at runtime.
-    *   Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
+    -   The Grammar's structure is known and **exposed** at runtime.
+    -   Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
 
 6.  Well tested with **~100% code coverage**, Unit & Integration tests
 
 ## Installation
 
-*   **npm**: `npm install chevrotain`
-*   **Browser**:
+-   **npm**: `npm install chevrotain`
+-   **Browser**:
     The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
     These can also be accessed directly via [UNPKG](https://unpkg.com/) in a script tag.
-    *   Latest:
-        *   `https://unpkg.com/chevrotain/lib/chevrotain.js`
-        *   `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
-    *   Explicit version number:
-        *   `https://unpkg.com/chevrotain@3.3.0/lib/chevrotain.js`
-        *   `https://unpkg.com/chevrotain@3.3.0/lib/chevrotain.min.js`
+    -   Latest:
+        -   `https://unpkg.com/chevrotain/lib/chevrotain.js`
+        -   `https://unpkg.com/chevrotain/lib/chevrotain.min.js`
+    -   Explicit version number:
+        -   `https://unpkg.com/chevrotain@3.3.0/lib/chevrotain.js`
+        -   `https://unpkg.com/chevrotain@3.3.0/lib/chevrotain.min.js`
 
 ## Documentation & Resources
 
-*   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**.
+-   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html)**.
 
-*   **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
+-   **[Sample Grammars](https://github.com/SAP/chevrotain/blob/master/examples/grammars)**.
 
-*   **[FAQ](https://sap.github.io/chevrotain/docs/FAQ.html).**
+-   **[FAQ](https://sap.github.io/chevrotain/docs/FAQ.html).**
 
-*   **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
+-   **[Other Examples](https://github.com/SAP/chevrotain/blob/master/examples)**.
 
-*   **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
+-   **[HTML API docs](https://sap.github.io/chevrotain/documentation).**
 
-    *   [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one).
+    -   [The Parsing DSL Docs](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one).
 
 ## Dependencies
 
@@ -106,12 +106,12 @@ This dependency is included in the bundled artifacts, for ease of consumption in
 
 Chevrotain should run on any modern JavaScript ES5.1 runtime.
 
-*   The CI build runs the tests under:
+-   The CI build runs the tests under:
 
-    *   Node.js (6 / 8 / 10).
-    *   Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.
+    -   Node.js (6 / 8 / 10).
+    -   Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.
 
-*   Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
+-   Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
 
 ## Contributions
 
@@ -122,10 +122,10 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 Some interesting samples:
 
-*   [Metabase BI expression parser][sample_metabase].
-*   [Eve Programing Language][sample_eve].
-*   [BioModelAnalyzer's ChatBot parser][sample_biomodel].
-*   [Bombadil Toml Parser][sample_bombadil]
+-   [Metabase BI expression parser][sample_metabase].
+-   [Eve Programing Language][sample_eve].
+-   [BioModelAnalyzer's ChatBot parser][sample_biomodel].
+-   [Bombadil Toml Parser][sample_bombadil]
 
 [benchmark]: https://sap.github.io/chevrotain/performance/
 [lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js

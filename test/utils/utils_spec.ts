@@ -322,7 +322,7 @@ describe("The Utils functions namespace", () => {
     })
 
     it("exports a groupBy utility", () => {
-        expect(groupBy([1, 2, 3, 4], num => "" + num % 2)).to.deep.equal({
+        expect(groupBy([1, 2, 3, 4], num => "" + (num % 2))).to.deep.equal({
             0: [2, 4],
             1: [1, 3]
         })
@@ -335,7 +335,7 @@ describe("The Utils functions namespace", () => {
     })
 
     it("exports a groupBy utility", () => {
-        expect(groupBy([1, 2, 3, 4], num => "" + num % 2)).to.deep.equal({
+        expect(groupBy([1, 2, 3, 4], num => "" + (num % 2))).to.deep.equal({
             0: [2, 4],
             1: [1, 3]
         })

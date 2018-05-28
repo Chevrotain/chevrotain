@@ -11,7 +11,7 @@ But in most real world use cases the parser will **also** have to output some re
 
 This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **outside** our grammar:
 
-*   See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html)
+-   See in depth documentation of Chevrotain's [CST capabilities](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html)
 
 ## Enabling CST
 

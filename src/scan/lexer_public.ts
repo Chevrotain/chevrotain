@@ -73,8 +73,9 @@ const DEFAULT_LEXER_CONFIG: ILexerConfig = {
 Object.freeze(DEFAULT_LEXER_CONFIG)
 
 export class Lexer {
-    public static SKIPPED = "This marks a skipped Token pattern, this means each token identified by it will" +
-    "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
+    public static SKIPPED =
+        "This marks a skipped Token pattern, this means each token identified by it will" +
+        "be consumed and then thrown into oblivion, this can be used to for example to completely ignore whitespace."
 
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors: ILexerDefinitionError[] = []
@@ -131,16 +132,16 @@ export class Lexer {
         // Convert SingleModeLexerDefinition into a IMultiModeLexerDefinition.
         if (isArray(lexerDefinition)) {
             actualDefinition = <any>{ modes: {} }
-            actualDefinition.modes[DEFAULT_MODE] = cloneArr(
-                <TokenType[]>lexerDefinition
-            )
+            actualDefinition.modes[DEFAULT_MODE] = cloneArr(<TokenType[]>(
+                lexerDefinition
+            ))
             actualDefinition[DEFAULT_MODE] = DEFAULT_MODE
         } else {
             // no conversion needed, input should already be a IMultiModeLexerDefinition
             hasOnlySingleMode = false
-            actualDefinition = cloneObj(
-                <IMultiModeLexerDefinition>lexerDefinition
-            )
+            actualDefinition = cloneObj(<IMultiModeLexerDefinition>(
+                lexerDefinition
+            ))
         }
 
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(

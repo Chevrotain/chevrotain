@@ -7,7 +7,7 @@ The general flow is:
 1.  Creating a GAST (Grammar AST) data structure.
 1.  Resolving and validating the GAST Structure.
 1.  Generating the parser code and executing.
-    *   Can be done "in memory" without writing to file in certain runtime envs.
+    -   Can be done "in memory" without writing to file in certain runtime envs.
 
 ### TLDR
 
@@ -17,16 +17,16 @@ Skip to [runnable examples](https://github.com/SAP/chevrotain/tree/master/exampl
 
 The structure of the GAST is made up of the following classes:
 
-*   [Rule](https://sap.github.io/chevrotain/documentation/3_3_0/classes/rule.html)
-*   [Terminal](https://sap.github.io/chevrotain/documentation/3_3_0/classes/terminal.html)
-*   [NonTerminal](https://sap.github.io/chevrotain/documentation/3_3_0/classes/nonterminal.html)
-*   [Alternation](https://sap.github.io/chevrotain/documentation/3_3_0/classes/alternation.html)
-*   [Option](https://sap.github.io/chevrotain/documentation/3_3_0/classes/option.html)
-*   [Repetition](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetition.html)
-*   [RepetitionWithSeparator](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetitionwithseparator.html)
-*   [RepetitionMandatory](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetitionmandatory.html)
-*   [RepetitionMandatoryWithSeparator](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetitionmandatorywithseparator.html)
-*   [Flat](https://sap.github.io/chevrotain/documentation/3_3_0/classes/flat.html) (sequence)
+-   [Rule](https://sap.github.io/chevrotain/documentation/3_3_0/classes/rule.html)
+-   [Terminal](https://sap.github.io/chevrotain/documentation/3_3_0/classes/terminal.html)
+-   [NonTerminal](https://sap.github.io/chevrotain/documentation/3_3_0/classes/nonterminal.html)
+-   [Alternation](https://sap.github.io/chevrotain/documentation/3_3_0/classes/alternation.html)
+-   [Option](https://sap.github.io/chevrotain/documentation/3_3_0/classes/option.html)
+-   [Repetition](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetition.html)
+-   [RepetitionWithSeparator](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetitionwithseparator.html)
+-   [RepetitionMandatory](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetitionmandatory.html)
+-   [RepetitionMandatoryWithSeparator](https://sap.github.io/chevrotain/documentation/3_3_0/classes/repetitionmandatorywithseparator.html)
+-   [Flat](https://sap.github.io/chevrotain/documentation/3_3_0/classes/flat.html) (sequence)
 
 For example to define a grammar rule for a fully qualified name:
 
@@ -57,7 +57,7 @@ const fqn = new Rule({
 
 Important to note that:
 
-*   By default the definition array for each GAST class acts as a sequence,
+-   By default the definition array for each GAST class acts as a sequence,
     However in the case of Alternation each element in the definition array represents a different
     alternative which should be wrapped in a Flat class.
 
@@ -130,24 +130,24 @@ Note that all custom error message builders receive a GAST instance as input. Wh
 the GAST classes created by the implementor of the custom API can be augmented with additional information to enable
 producing better error messages. e.g:
 
-*   A Parser Generator style API using an EBNF notation in a **separate file**.
+-   A Parser Generator style API using an EBNF notation in a **separate file**.
     may add location (line/column/offset) information to be able to link to locations in the original EBNF styled file.
 
-*   A Parser combinator API may attempt to reconstruct the original text of its API invocations to give better hints
+-   A Parser combinator API may attempt to reconstruct the original text of its API invocations to give better hints
     to assist in locating the original error.
 
 ## Code Generation
 
 There are two APIs for code generation and execution.
 
-*   [**generateParserModule**](https://sap.github.io/chevrotain/documentation/3_3_0/globals.html#generateparsermodule)
+-   [**generateParserModule**](https://sap.github.io/chevrotain/documentation/3_3_0/globals.html#generateparsermodule)
     This will generate the string literal of a [UMD](https://github.com/umdjs/umd) module.
     This UMD pattern is consumable in all standard JS runtimes & module implementations.
     The approach is to generate the string literal and write it to a file for later consumption.
     However for development purposes or under certain runtimes it is possible to skip the file creation
     For example see the [require-from-string](https://github.com/floatdrop/require-from-string)
 
-*   [**generateParserFactory**](https://sap.github.io/chevrotain/documentation/3_3_0/globals.html#generateparserfactory)
+-   [**generateParserFactory**](https://sap.github.io/chevrotain/documentation/3_3_0/globals.html#generateparserfactory)
     This API skips string literal and directly evals (new Function(...)) the code and returns
     a factory that can be used to create Parser instances.
 
@@ -160,14 +160,14 @@ There are two APIs for code generation and execution.
 
 ## Runnable Examples
 
-*   [Combinator Style](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator)
+-   [Combinator Style](https://github.com/SAP/chevrotain/tree/master/examples/custom_apis/combinator)
 
-*   Generator Style (TBD)
+-   Generator Style (TBD)
 
 ## Limitations
 
 The Following features are currently unsupported.
 
-*   **Embedded actions**, which means the only way to get output from the parser is by enabling automatic [Concrete Syntax Tree](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) creation.
-*   [**Gates/Predicates**](https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js).
-*   [**Parameterized Rules**](https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js).
+-   **Embedded actions**, which means the only way to get output from the parser is by enabling automatic [Concrete Syntax Tree](https://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) creation.
+-   [**Gates/Predicates**](https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js).
+-   [**Parameterized Rules**](https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js).

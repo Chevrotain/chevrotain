@@ -58,7 +58,7 @@ const WhiteSpace = createToken({
 })
 ```
 
-*   Note that we used the **line_breaks** property to flag that the WhiteSpace token may contain line terminators.
+-   Note that we used the **line_breaks** property to flag that the WhiteSpace token may contain line terminators.
     This is needed by the lexer to keep track of line and column numbers.
 
 ## All Our Tokens
@@ -125,12 +125,12 @@ let SelectLexer = new Lexer(allTokens)
 
 Note that:
 
-*   The **order** of Token definitions passed to the Lexer is **important**.
+-   The **order** of Token definitions passed to the Lexer is **important**.
     The first PATTERN to match will be chosen not the longest.
 
-    *   See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
+    -   See how to resolve [Keywords vs Identifiers](https://github.com/SAP/chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js)
 
-*   The Chevrotain Lexer is **stateless**, thus only a **single one per grammar** should ever be created.
+-   The Chevrotain Lexer is **stateless**, thus only a **single one per grammar** should ever be created.
 
 ## Using The Lexer
 

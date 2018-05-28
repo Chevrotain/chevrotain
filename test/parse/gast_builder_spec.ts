@@ -511,11 +511,9 @@ describe("The GAst Builder namespace", () => {
     })
 
     it("can build The Gast representation of a literalArray Grammar Rule", () => {
-        let actual = buildTopProduction(
-            literalArrayText,
-            "literalArray",
-            <any>tok
-        )
+        let actual = buildTopProduction(literalArrayText, "literalArray", <any>(
+            tok
+        ))
         expect(actual.name).to.equal("literalArray")
         expect(actual.orgText).to.equal(literalArrayText)
         let def = actual.definition

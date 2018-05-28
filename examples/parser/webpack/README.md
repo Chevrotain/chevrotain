@@ -41,13 +41,13 @@ tree shaking for our chevrotain grammar.
 The source code for the three use cases can be found under the [src](./src) directory
 With a [test](./test/webpack_spec.js) running on the bundled webpack output:
 
-*   [Tokens and Grammar defined in the same file](./src/tokens_and_grammar.js)
-*   [Tokens Defined separately](./src/tokens_only.js)
-*   [Grammar importing tokens using ES6 imports](./src/grammar_only_es6_import.js)
-*   [Grammar importing tokens using commonjs imports](./src/grammar_only_commonjs_require.js)
+-   [Tokens and Grammar defined in the same file](./src/tokens_and_grammar.js)
+-   [Tokens Defined separately](./src/tokens_only.js)
+-   [Grammar importing tokens using ES6 imports](./src/grammar_only_es6_import.js)
+-   [Grammar importing tokens using commonjs imports](./src/grammar_only_commonjs_require.js)
 
 to run this example:
 
-*   npm install
-*   npm run bundle
-*   npm test
+-   npm install
+-   npm run bundle
+-   npm test

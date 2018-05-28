@@ -305,10 +305,8 @@ function buildRepetitionWithSep(
     if (!isUndefined(nestedName)) {
         ;(repetitionInstance as IOptionallyNamedProduction).name = nestedName
     }
-    return <any>buildAbstractProd(
-        repetitionInstance,
-        prodRange.range,
-        allRanges
+    return <any>(
+        buildAbstractProd(repetitionInstance, prodRange.range, allRanges)
     )
 }
 
@@ -511,16 +509,12 @@ export function createOrRanges(text): IProdRange[] {
     return orRanges.concat(orSubPartsRanges)
 }
 
-let findClosingCurly: (start: number, text: string) => number = <any>partial(
-    findClosingOffset,
-    "{",
-    "}"
+let findClosingCurly: (start: number, text: string) => number = <any>(
+    partial(findClosingOffset, "{", "}")
 )
 
-let findClosingParen: (start: number, text: string) => number = <any>partial(
-    findClosingOffset,
-    "(",
-    ")"
+let findClosingParen: (start: number, text: string) => number = <any>(
+    partial(findClosingOffset, "(", ")")
 )
 
 export function createOrPartRanges(orRanges: IProdRange[]): IProdRange[] {

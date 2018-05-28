@@ -30,11 +30,11 @@ Additionally [unit tests](./minify_spec.js) are included to validate the minifie
 
 To run the minification and the tests:
 
-*   only once:
+-   only once:
 
-    *   `npm install grunt -g` (only once)
-    *   `cd ..`
-    *   `npm update` (in **chevrotain/examples/parser** directory)
+    -   `npm install grunt -g` (only once)
+    -   `cd ..`
+    -   `npm update` (in **chevrotain/examples/parser** directory)
 
-*   every time:
-    *   `grunt build` (in **chevrotain/examples/parser/minification** directory)
+-   every time:
+    -   `grunt build` (in **chevrotain/examples/parser/minification** directory)

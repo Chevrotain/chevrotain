@@ -15,20 +15,20 @@ let IntegerToken = createToken({ name: "IntegerToken", pattern: /\d+/ })
 However in some circumstances the capability to provide a custom pattern matching implementation may be required.
 There are a few use cases in which a custom pattern could be used:
 
-*   The token cannot be easily (or at all) defined using pure regular expressions.
+-   The token cannot be easily (or at all) defined using pure regular expressions.
 
-    *   When context on previously lexed tokens is needed.
+    -   When context on previously lexed tokens is needed.
         For example: [Lexing Python like indentation using Chevrotain](https://github.com/SAP/chevrotain/blob/master/examples/lexer/python_indentation/python_indentation.js).
 
-*   Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:
-    *   [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞
+-   Workaround performance issues in specific regExp engines by providing a none regExp matcher implementation:
+    -   [WebKit/Safari multiple orders of magnitude performance degradation for specific regExp patterns](https://bugs.webkit.org/show_bug.cgi?id=152578) 😞
 
 ## Usage
 
 A custom pattern has a similar API to the API of the [RegExp.prototype.exec](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/exec)
 function. But with a small constraint.
 
-*   A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
+-   A custom pattern should behave as though the RegExp [sticky flag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky) has been set.
     This means that attempted matches must begin at the offset argument, **not** at the start of the input.
 
 The basic syntax for supplying a custom pattern is defined by the [ICustomPattern](https://sap.github.io/chevrotain/documentation/3_3_0/interfaces/icustompattern.html) interface.

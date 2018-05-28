@@ -2,7 +2,7 @@
 
 1.  npm run quick_build
 
-*   This will generate chevrotain.js artifact in the lib directory.
+-   This will generate chevrotain.js artifact in the lib directory.
 
 2.  open index.html
 

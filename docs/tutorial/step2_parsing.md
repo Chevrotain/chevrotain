@@ -39,14 +39,14 @@ relationalOperator
 A Chevrotain Parser analyses an [IToken](https://sap.github.io/chevrotain/documentation/3_3_0/interfaces/itoken.html) vector that conforms to some grammar.
 The grammar is defined using the [parsing DSL](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one), which includes the following methods.
 
-*   [CONSUME](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#consume1) - 'eat' a Token.
-*   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#subrule1) - reference to another rule.
-*   [OR](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#or1) - Alternation
-*   [OPTION](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#option1) - optional production.
-*   [MANY](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#many1) - repetition zero or more.
-*   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one1) - repetition one or more.
-*   [MANY_SEP](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items
-*   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
+-   [CONSUME](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#consume1) - 'eat' a Token.
+-   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#subrule1) - reference to another rule.
+-   [OR](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#or1) - Alternation
+-   [OPTION](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#option1) - optional production.
+-   [MANY](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#many1) - repetition zero or more.
+-   [AT_LEAST_ONE](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one1) - repetition one or more.
+-   [MANY_SEP](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#many_sep1) - repetition (zero or more) with a separator between any two items
+-   [AT_LEAST_ONE_SEP](https://sap.github.io/chevrotain/documentation/3_3_0/classes/parser.html#at_least_one_sep1) - repetition (one or more) with a separator between any two items
 
 ## First Rule
 
@@ -68,13 +68,13 @@ $.RULE("selectStatement", () => {
 
 Fairly straight forward translation:
 
-*   Non-Terminals --> SUBRULE
-*   "?" --> OPTION
+-   Non-Terminals --> SUBRULE
+-   "?" --> OPTION
 
 ## Structure
 
-*   What is 'this' in this context?
-*   where do we write the grammar rules?
+-   What is 'this' in this context?
+-   where do we write the grammar rules?
 
 Each grammar rule is a property of a class that extends chevrotain.Parser.
 
@@ -116,9 +116,9 @@ class SelectParser extends Parser {
 
 Important to note that:
 
-*   The **super** invocation has an array of the Tokens as the second parameter.
+-   The **super** invocation has an array of the Tokens as the second parameter.
     This is the same array we used to define the Lexer and it is used to define the Parser's vocabulary.
-*   The static method **Parser.performSelfAnalysis** must be invoked at the end of the constructor.
+-   The static method **Parser.performSelfAnalysis** must be invoked at the end of the constructor.
     This is where much of the 'secret sauce' happens, including creating the inner grammar representation
     and performing static checks on the grammar.
 
@@ -149,7 +149,7 @@ $.RULE("atomicExpression", () => {
 
 ## Debugging
 
-*   How can the Parser be debugged?
+-   How can the Parser be debugged?
 
 The grammar rules above do not only define the grammar, they are also the code that will be run
 during parsing. This means that you can debug the parser **simply by adding a break
@@ -178,7 +178,7 @@ Extra details can be found [in the FAQ](https://sap.github.io/chevrotain/docs/FA
 
 ## Under The Hood
 
-*   But how does it work? (skip if you don't care :) )
+-   But how does it work? (skip if you don't care :) )
 
 The code above will be executed as is. Yet we have not implemented a lookahead function to
 choose between the two OR alternatives `( INTEGER | IDENTIFIER)`,
@@ -187,10 +187,10 @@ So how does it work?
 
 The answer is the 'secret sauce' of Chevrotain:
 
-*   `$.RULE` will both:
-    *   Analyse (using Function.toString) the implementation passed to it and construct a representation of the grammar in memory.
-    *   Wrap the implementation passed to it in logic for running the Parser (fault tolerance/rule stacks/...)
-*   `Parser.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis)
+-   `$.RULE` will both:
+    -   Analyse (using Function.toString) the implementation passed to it and construct a representation of the grammar in memory.
+    -   Wrap the implementation passed to it in logic for running the Parser (fault tolerance/rule stacks/...)
+-   `Parser.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis)
 
 So when the parser needs to choose between the two alternatives:
 
@@ -211,8 +211,8 @@ $.OR([
 
 It is aware of:
 
-*   Where it is (`OR [1] INSIDE_RULE [A] INSIDE_RULE [B] ...`)
-*   What Tokens can come next for each alternative, as it "is aware" of the whole grammar representation.
+-   Where it is (`OR [1] INSIDE_RULE [A] INSIDE_RULE [B] ...`)
+-   What Tokens can come next for each alternative, as it "is aware" of the whole grammar representation.
 
 Thus the parser can dynamically create (and cache) the lookahead function to choose between the two alternatives.
 
@@ -301,13 +301,13 @@ class SelectParser extends Parser {
 }
 ```
 
-*   Note that as a consequence of the parser having to 'know' its position in the grammar during runtime, the Parsing DSL methods need to be distinguishable when appearing in the same rule.
+-   Note that as a consequence of the parser having to 'know' its position in the grammar during runtime, the Parsing DSL methods need to be distinguishable when appearing in the same rule.
     Thus in the `"expression"` rule above, the second appearance of `SUBRULE` with `atomicExpression` parameter has a '2' suffix: `$.SUBRULE2($.atomicExpression)`
-*   Such errors will be detected during self analysis, and will prevent the creation of parser instances with a descriptive error message (fail fast...).
+-   Such errors will be detected during self analysis, and will prevent the creation of parser instances with a descriptive error message (fail fast...).
 
 ## Usage
 
-*   But how do we actually use this Parser?
+-   But how do we actually use this Parser?
 
 ```javascript
 // ONLY ONCE
@@ -328,5 +328,5 @@ const inputText = "SELECT column1 FROM table2"
 parseInput(inputText)
 ```
 
-*   Note that any of the grammar rules can be invoked as the starting rule.
+-   Note that any of the grammar rules can be invoked as the starting rule.
     There is no 'special' top level entry rule.

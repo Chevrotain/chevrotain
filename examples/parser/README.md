@@ -4,5 +4,5 @@ A some simple examples of using the Chevrotain Parser to resolve some common par
 
 To run all the parser examples's tests:
 
-*   `npm install` (only once)
-*   `npm test`
+-   `npm install` (only once)
+-   `npm test`

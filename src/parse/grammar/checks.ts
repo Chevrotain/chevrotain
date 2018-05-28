@@ -131,19 +131,21 @@ export function validateGrammar(
         )
     )
 
-    return <any>utils.flatten(
-        duplicateErrors.concat(
-            tokenNameErrors,
-            nestedRulesNameErrors,
-            nestedRulesDuplicateErrors,
-            emptyRepetitionErrors,
-            leftRecursionErrors,
-            emptyAltErrors,
-            ambiguousAltsErrors,
-            termsNamespaceConflictErrors,
-            tooManyAltsErrors,
-            ruleNameErrors,
-            duplicateRulesError
+    return <any>(
+        utils.flatten(
+            duplicateErrors.concat(
+                tokenNameErrors,
+                nestedRulesNameErrors,
+                nestedRulesDuplicateErrors,
+                emptyRepetitionErrors,
+                leftRecursionErrors,
+                emptyAltErrors,
+                ambiguousAltsErrors,
+                termsNamespaceConflictErrors,
+                tooManyAltsErrors,
+                ruleNameErrors,
+                duplicateRulesError
+            )
         )
     )
 }

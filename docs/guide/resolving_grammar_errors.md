@@ -1,7 +1,7 @@
 # Resolving Grammar Errors
 
-*   [Common Prefix Ambiguities.](#COMMON_PREFIX)
-*   [None Unique Grammar Name Found.](#UNIQUE_GRAMMAR_NAME)
+-   [Common Prefix Ambiguities.](#COMMON_PREFIX)
+-   [None Unique Grammar Name Found.](#UNIQUE_GRAMMAR_NAME)
 
 ## Common Prefix Ambiguities
 
@@ -23,7 +23,7 @@ as alternation matches are attempted **in order**.
 
 There are two ways to resolve this:
 
-*   Reorder the alternatives so that shorter common prefix lookahead
+-   Reorder the alternatives so that shorter common prefix lookahead
     paths appears after the longer ones.
 
     ```antlr
@@ -32,7 +32,7 @@ There are two ways to resolve this:
       "A" "B"
     ```
 
-*   Refactor the grammar to extract common prefixes.
+-   Refactor the grammar to extract common prefixes.
 
     ```antlr
       myRule:

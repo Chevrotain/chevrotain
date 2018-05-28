@@ -238,16 +238,20 @@ export function serializeProduction(node: IProduction): ISerializedGast {
     } else if (node instanceof RepetitionMandatoryWithSeparator) {
         return <ISerializedTerminalWithSeparator>{
             type: "RepetitionMandatoryWithSeparator",
-            separator: <ISerializedTerminal>serializeProduction(
-                new Terminal({ terminalType: node.separator })
+            separator: <ISerializedTerminal>(
+                serializeProduction(
+                    new Terminal({ terminalType: node.separator })
+                )
             ),
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof RepetitionWithSeparator) {
         return <ISerializedTerminalWithSeparator>{
             type: "RepetitionWithSeparator",
-            separator: <ISerializedTerminal>serializeProduction(
-                new Terminal({ terminalType: node.separator })
+            separator: <ISerializedTerminal>(
+                serializeProduction(
+                    new Terminal({ terminalType: node.separator })
+                )
             ),
             definition: convertDefinition(node.definition)
         }
