@@ -199,7 +199,13 @@ function buildTerminalProd(prodRange: IProdRange): Terminal {
     let terminalName = reResult[2]
     let terminalType = terminalNameToConstructor[terminalName]
     if (!terminalType) {
-        throw Error("Terminal Token name: " + terminalName + " not found")
+        throw Error(
+            "Terminal Token name: " +
+                terminalName +
+                " not found\n" +
+                "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#TERMINAL_NAME_NOT_FOUND\n" +
+                "\tFor Further details."
+        )
     }
 
     let newTerminal = new Terminal({

@@ -3,6 +3,7 @@
 #### Minor Changes
 
 -   [Detect grammars with none unique names](https://github.com/SAP/chevrotain/issues/715).
+-   [Better error message for: "Terminal Token name not found"](https://github.com/SAP/chevrotain/issues/656).
 
 ## 3.3.0 (5-20-2018)
 
