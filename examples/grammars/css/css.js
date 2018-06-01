@@ -48,9 +48,9 @@ FRAGMENT("num", "[0-9]+|[0-9]*\\.[0-9]+")
 const Whitespace = createToken({
     name: "Whitespace",
     pattern: MAKE_PATTERN("{{spaces}}"),
-    // the W3C specs are are defined in a whitespace sensitive manner.
-    // This implementation ignores that crazy mess, This means that this grammar may be a superset of the css 2.1 grammar.
-    // Checking for whitespace related errors can be done in a separate process AFTER parsing.
+    // The W3C specs are are defined in a whitespace sensitive manner.
+    // But there is only **one** place where the grammar is truly whitespace sensitive.
+    // So the whitespace sensitivity was implemented via a GATE in the selector rule.
     group: Lexer.SKIPPED,
     line_breaks: true
 })
@@ -428,10 +428,28 @@ class CssParser extends Parser {
         this.RULE("selector", () => {
             $.SUBRULE($.simple_selector)
             $.OPTION(() => {
-                $.OPTION2(() => {
-                    $.SUBRULE($.combinator)
-                })
-                $.SUBRULE($.selector)
+                $.OR([
+                    {
+                        GATE: () => {
+                            const prevToken = $.LA(0)
+                            const nextToken = $.LA(1)
+                            //  This is the only place in CSS where the grammar is whitespace sensitive.
+                            return nextToken.startOffset > prevToken.endOffset
+                        },
+                        ALT: () => {
+                            $.OPTION2(() => {
+                                $.SUBRULE($.combinator)
+                            })
+                            $.SUBRULE($.selector)
+                        }
+                    },
+                    {
+                        ALT: () => {
+                            $.SUBRULE($.combinator)
+                            $.SUBRULE($.selector)
+                        }
+                    }
+                ])
             })
         })
 
