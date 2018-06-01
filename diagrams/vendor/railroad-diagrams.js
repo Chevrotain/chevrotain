@@ -699,11 +699,13 @@
         Path(x, y)
             .right(Diagram.ARC_RADIUS)
             .addTo(this)
-        this.item.format(
-            x + Diagram.ARC_RADIUS,
-            y,
-            this.width - Diagram.ARC_RADIUS * 2
-        ).addTo(this)
+        this.item
+            .format(
+                x + Diagram.ARC_RADIUS,
+                y,
+                this.width - Diagram.ARC_RADIUS * 2
+            )
+            .addTo(this)
         Path(x + this.width - Diagram.ARC_RADIUS, y + this.height)
             .right(Diagram.ARC_RADIUS)
             .addTo(this)
@@ -721,11 +723,13 @@
             .down(distanceFromY - Diagram.ARC_RADIUS * 2)
             .arc("ws")
             .addTo(this)
-        this.rep.format(
-            x + Diagram.ARC_RADIUS,
-            y + distanceFromY,
-            this.width - Diagram.ARC_RADIUS * 2
-        ).addTo(this)
+        this.rep
+            .format(
+                x + Diagram.ARC_RADIUS,
+                y + distanceFromY,
+                this.width - Diagram.ARC_RADIUS * 2
+            )
+            .addTo(this)
         Path(
             x + this.width - Diagram.ARC_RADIUS,
             y + distanceFromY + this.rep.height
