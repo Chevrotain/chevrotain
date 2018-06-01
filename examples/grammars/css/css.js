@@ -255,7 +255,11 @@ class CssParser extends Parser {
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor(input) {
-        super(input, cssTokens)
+        super(input, cssTokens, {
+            ignoredIssues: {
+                selector: { OR: true }
+            }
+        })
 
         const $ = this
 
@@ -445,8 +449,8 @@ class CssParser extends Parser {
                     },
                     {
                         ALT: () => {
-                            $.SUBRULE($.combinator)
-                            $.SUBRULE($.selector)
+                            $.SUBRULE2($.combinator)
+                            $.SUBRULE2($.selector)
                         }
                     }
                 ])
