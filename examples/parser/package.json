@@ -2,11 +2,12 @@
     "name": "chevrotain_examples_parser",
     "version": "0.1.0",
     "scripts": {
-        "test": "grunt --gruntfile minification/gruntfile.js && cd webpack && yarn install && rm -rf node_modules && cd .. && mocha \"!(node_modules)/**/*spec.js\""
+        "test": "grunt --gruntfile minification/gruntfile.js && cd webpack && yarn install && yarn bundle && cd .. && mocha \"!(node_modules)/**/*spec.js\""
     },
     "dependencies": {
         "chevrotain": "*",
-        "lodash": "~3.10.1"
+        "lodash": "~3.10.1",
+        "shx": "^0.2.2"
     },
     "devDependencies": {
         "chai": "^3.5.0",
@@ -14,8 +15,7 @@
         "grunt-cli": "^1.2.0",
         "grunt-contrib-uglify": "^2.0.0",
         "grunt-mocha-istanbul": "^5.0.1",
-        "mocha": "^3.2.0",
-        "webpack": "^1.14.0"
+        "mocha": "^3.2.0"
     },
     "private": true
 }
