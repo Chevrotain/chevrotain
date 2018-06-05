@@ -1,4 +1,4 @@
-import { Token, Lexer, Parser, createToken } from "chevrotain"
+const { Lexer, Parser, createToken } = require("chevrotain")
 
 // ----------------- lexer -----------------
 const LSquare = createToken({ name: "LSquare", pattern: /\[/ })
@@ -12,11 +12,11 @@ const WhiteSpace = createToken({
     line_breaks: true
 })
 
-export const allTokens = [WhiteSpace, LSquare, RSquare, Comma, Integer]
+const allTokens = [WhiteSpace, LSquare, RSquare, Comma, Integer]
 const ArrayLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-class ArrayParserCombined extends Parser {
+class ArrayParser extends Parser {
     constructor(input) {
         super(input, allTokens)
         const $ = this
@@ -43,18 +43,22 @@ class ArrayParserCombined extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new ArrayParserCombined([])
+const parser = new ArrayParser([])
 
-export function parse(text) {
-    const lexResult = ArrayLexer.tokenize(text)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const value = parser.array()
+module.exports = {
+    allTokens: allTokens,
 
-    return {
-        value: value,
-        lexErrors: lexResult.errors,
-        parseErrors: parser.errors
+    parse: function parse(text) {
+        const lexResult = ArrayLexer.tokenize(text)
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens
+        // any top level rule may be used as an entry point
+        const value = parser.array()
+
+        return {
+            value: value,
+            lexErrors: lexResult.errors,
+            parseErrors: parser.errors
+        }
     }
 }
