@@ -18,7 +18,9 @@ module.exports = {
         filename: "chevrotain.js",
         library: "chevrotain",
         libraryTarget: "umd",
-        umdNamedDefine: true
+        umdNamedDefine: true,
+        // https://github.com/webpack/webpack/issues/6784#issuecomment-375941431
+        globalObject: "typeof self !== 'undefined' ? self : this"
     },
     optimization: {
         minimize: false
