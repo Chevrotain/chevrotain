@@ -144,6 +144,6 @@
     ]
   },
   "dependencies": {
-    "regexp-to-ast": "0.2.4"
+    "regexp-to-ast": "0.2.4
   }
 }
