@@ -1,24 +1,31 @@
-const config = (module.exports = {
-    entry: {
-        tokens_and_grammar: "./src/tokens_and_grammar.js",
-        grammar_only_es6: "./src/grammar_only_es6_import.js",
-        grammar_only_commonjs: "./src/grammar_only_commonjs_require.js"
-    },
+const path = require("path")
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin")
+const { allTokens } = require("./src/our_grammar")
 
+// extract the names of the TokenTypes to avoid name mangling them.
+const allTokenNames = allTokens.map(tokenType => tokenType.name)
+
+module.exports = {
+    mode: "production",
+    entry: "./src/our_grammar.js",
     output: {
-        filename: "./gen/[name].bundle.js",
-        libraryTarget: "umd"
+        path: path.resolve(__dirname, "./lib/"),
+        filename: "webpacked.min.js",
+        library: "blah",
+        libraryTarget: "umd",
+        // https://github.com/webpack/webpack/issues/6784#issuecomment-375941431
+        globalObject: "typeof self !== 'undefined' ? self : this"
     },
-
-    module: {
-        loaders: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: "babel-loader"
-            }
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    mangle: {
+                        // Avoid mangling TokenType names.
+                        reserved: allTokenNames
+                    }
+                }
+            })
         ]
-    },
-
-    devtool: "sourcemap"
-})
+    }
+}
