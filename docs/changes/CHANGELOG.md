@@ -4,15 +4,15 @@
 
 -   [Detect grammars with none unique names](https://github.com/SAP/chevrotain/issues/715).
 -   [Better error message for: "Terminal Token name not found"](https://github.com/SAP/chevrotain/issues/656).
--   Updated regexp-to-ast to 0.2.4
+-   Updated regexp-to-ast to 0.2.4.
 
 #### Bug Fixes
 
--   [Fixed UMD bundle to work on ](https://github.com/SAP/chevrotain/commit/cd8951594adc6daca44e6294f7d4e61e908b2773)
+-   [Fixed UMD bundle to work on commonjs](https://github.com/SAP/chevrotain/commit/cd8951594adc6daca44e6294f7d4e61e908b2773).
 
 #### Examples
 
--   [Update WebPack example to webpack 4](https://github.com/SAP/chevrotain/issues/629)
+-   [Update WebPack example to webpack 4](https://github.com/SAP/chevrotain/issues/629).
 
 ## 3.3.0 (5-20-2018)
 
