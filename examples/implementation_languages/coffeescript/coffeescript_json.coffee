@@ -58,7 +58,7 @@ class JsonParserCoffeeScript extends Parser
         {ALT: -> @CONSUME Null}
       ]
 
-    Parser.performSelfAnalysis(@)
+    @.performSelfAnalysis()
 
 # Only init the parser once.
 parser = new JsonParserCoffeeScript

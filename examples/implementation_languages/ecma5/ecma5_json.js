@@ -105,7 +105,7 @@ function JsonParserES5(input) {
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    Parser.performSelfAnalysis(this)
+    this.performSelfAnalysis()
 }
 
 // Using ES5 inheritance must be implemented using prototypes semantics.

@@ -14,7 +14,7 @@ describe("The CSTVisitor", () => {
     class CstTerminalParserReturnVisitor extends Parser {
         constructor(input: IToken[] = []) {
             super(input, ALL_TOKENS, { outputCst: true })
-            ;(<any>Parser).performSelfAnalysis(this)
+            Parser.performSelfAnalysis(this)
         }
 
         public testRule = this.RULE("testRule", () => {

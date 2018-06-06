@@ -41,7 +41,7 @@ function defineRecognizerSpecs(
 
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS, {})
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public topRule = this.RULE("topRule", () => {
@@ -78,7 +78,7 @@ function defineRecognizerSpecs(
 
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public topRule = this.RULE("topRule", () => {
@@ -135,7 +135,7 @@ function defineRecognizerSpecs(
 
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public orRule = this.RULE("orRule", this.parseOrRule)
@@ -195,7 +195,7 @@ function defineRecognizerSpecs(
                 class CategoriesParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [Keyword, Literal], {})
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public keyRule = this.RULE("keyRule", () => {
@@ -228,7 +228,7 @@ function defineRecognizerSpecs(
                     super(input, ALL_TOKENS, {
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public qualifiedName = this.RULE(
@@ -264,7 +264,7 @@ function defineRecognizerSpecs(
                     super(input, ALL_TOKENS, {
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public qualifiedName = this.RULE(
@@ -299,7 +299,7 @@ function defineRecognizerSpecs(
                     super(input, ALL_TOKENS, {
                         recoveryEnabled: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public qualifiedName = this.RULE(
@@ -345,7 +345,7 @@ function defineRecognizerSpecs(
                     super(input, ALL_TOKENS, {
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public qualifiedName = this.RULE(
@@ -382,7 +382,7 @@ function defineRecognizerSpecs(
                     super(input, ALL_TOKENS, {
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public qualifiedName = this.RULE(
@@ -588,7 +588,7 @@ function defineRecognizerSpecs(
                         super(input, allTokens, {
                             recoveryEnabled: true
                         })
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public topRule = this.RULE("topRule", () => {
@@ -620,7 +620,7 @@ function defineRecognizerSpecs(
                 class OrExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public or = this.RULE("or", () => {
@@ -654,7 +654,7 @@ function defineRecognizerSpecs(
                 class OptionExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public option = this.RULE("option", () => {
@@ -679,7 +679,7 @@ function defineRecognizerSpecs(
                 class ManyExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public many = this.RULE("many", () => {
@@ -707,7 +707,7 @@ function defineRecognizerSpecs(
                 class AtLeastOneExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public atLeastOne = this.RULE("atLeastOne", () => {
@@ -738,7 +738,7 @@ function defineRecognizerSpecs(
                 class ManySepExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public manySep = this.RULE("manySep", () => {
@@ -780,7 +780,7 @@ function defineRecognizerSpecs(
                 class AtLeastOneSepExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public atLeastOneSep = this.RULE("atLeastOneSep", () => {
@@ -861,7 +861,7 @@ function defineRecognizerSpecs(
                         input: IToken[] = [createTokenInstance(IntTok, "666")]
                     ) {
                         super(input, ALL_TOKENS)
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public trueOptionRule = this.RULE("trueOptionRule", () => {
@@ -934,7 +934,7 @@ function defineRecognizerSpecs(
                         this.RULE("goodRule", () => {
                             this.CONSUME(IntTok)
                         })
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
 
                         this.RULE("badRule", () => {
                             this.CONSUME(IntTok)
@@ -952,7 +952,7 @@ function defineRecognizerSpecs(
                     class MyNoneUniqueSpecialParser extends Parser {
                         constructor(input: IToken[] = []) {
                             super(input, ALL_TOKENS)
-                            Parser.performSelfAnalysis(this)
+                            this.performSelfAnalysis()
                         }
                     }
                     // init the first parser
@@ -963,7 +963,7 @@ function defineRecognizerSpecs(
                     class MyNoneUniqueSpecialParser extends Parser {
                         constructor(input: IToken[] = []) {
                             super(input, ALL_TOKENS)
-                            Parser.performSelfAnalysis(this)
+                            this.performSelfAnalysis()
                         }
                     }
 
@@ -1037,7 +1037,7 @@ function defineRecognizerSpecs(
                         super(input, ALL_TOKENS, {
                             recoveryEnabled: true
                         })
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public someRule = this.RULE("someRule", () => {
@@ -1059,7 +1059,7 @@ function defineRecognizerSpecs(
                         super(input, ALL_TOKENS, {
                             recoveryEnabled: true
                         })
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public someRule = this.RULE("someRule", () => {
@@ -1081,7 +1081,7 @@ function defineRecognizerSpecs(
                         super(input, ALL_TOKENS, {
                             recoveryEnabled: true
                         })
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public someRule = this.RULE("someRule", () => {
@@ -1111,7 +1111,7 @@ function defineRecognizerSpecs(
                 class LabelTokParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1132,7 +1132,7 @@ function defineRecognizerSpecs(
                 class NoLabelTokParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1160,7 +1160,7 @@ function defineRecognizerSpecs(
                 class CustomConsumeErrorParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [SemiColon])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public myStatement = this.RULE("myStatement", () => {
@@ -1189,7 +1189,7 @@ function defineRecognizerSpecs(
                 class LabelAltParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1227,7 +1227,7 @@ function defineRecognizerSpecs(
                         super(input, [PlusTok, MinusTok], {
                             outputCst: true
                         })
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1266,7 +1266,7 @@ function defineRecognizerSpecs(
                 class LabelAltParser2 extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1303,7 +1303,7 @@ function defineRecognizerSpecs(
                 class NestedRulesParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1348,7 +1348,7 @@ function defineRecognizerSpecs(
                 class ImplicitAtLeastOneErrParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1395,7 +1395,7 @@ function defineRecognizerSpecs(
                 class ExplicitAtLeastOneErrParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1440,7 +1440,7 @@ function defineRecognizerSpecs(
                 class ImplicitAtLeastOneSepErrParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok, IdentTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1493,7 +1493,7 @@ function defineRecognizerSpecs(
                 class SomeParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok, IdentTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1533,7 +1533,7 @@ function defineRecognizerSpecs(
                 class ContentAssistParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok, IdentTok])
-                        ;(Parser as any).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public topRule = this.RULE("topRule", () => {

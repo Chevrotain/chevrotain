@@ -118,7 +118,7 @@
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
         // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     // inheritance as implemented in javascript in the previous decade... :(

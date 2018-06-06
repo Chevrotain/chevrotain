@@ -4,10 +4,15 @@ export declare const VERSION: string
 
 export declare class Parser {
     /**
+     * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
+     */
+    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+
+    /**
      * This must be called at the end of a Parser constructor.
      * See: http://sap.github.io/chevrotain/docs/tutorial/step2_parsing.html#under-the-hood
      */
-    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+    /* protected */ performSelfAnalysis(): void
 
     /**
      * It is recommanded to reuse the same Parser instance

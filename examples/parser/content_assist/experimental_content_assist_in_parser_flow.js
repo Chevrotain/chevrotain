@@ -127,7 +127,7 @@ class SelectParser extends Parser {
             ])
         })
 
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 

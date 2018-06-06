@@ -56,7 +56,7 @@ export class DDLExampleRecoveryParser extends Parser {
         // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined
         //       The typescript compiler places the constructor body last after initializations in the class's body
         //       which is why place the call here meets the criteria.
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     // DOCS: the invocation to RULE(...) is what wraps our parsing implementation method

@@ -98,7 +98,7 @@ class SelectParserVersion1 extends Parser {
             // very important to call this after all the rules have been defined.
             // otherwise the parser may not work correctly as it will lack information
             // derived during the self analysis phase.
-            Parser.performSelfAnalysis(this)
+            this.performSelfAnalysis()
         }
     }
 }
@@ -124,7 +124,7 @@ class SelectParserVersion2 extends SelectParserVersion1 {
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
         // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 
