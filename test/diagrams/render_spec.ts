@@ -22,7 +22,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
     skipOnNode4AndBrowser(
         "Produces valid and executable html text with custom options",
         function(done) {
-            this.timeout(5000)
+            this.timeout(10000)
             const jsdom = require("jsdom")
             const { JSDOM } = jsdom
             const htmlText = createSyntaxDiagramsCode(serializedGrammar, {
@@ -61,7 +61,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
     skipOnNode4AndBrowser("Produces valid and executable html text", function(
         done
     ) {
-        this.timeout(5000)
+        this.timeout(10000)
         const jsdom = require("jsdom")
         const { JSDOM } = jsdom
         let htmlText = createSyntaxDiagramsCode(serializedGrammar)
