@@ -21,10 +21,15 @@ export function isRecognitionException(error: Error) {
     return contains(RECOGNITION_EXCEPTION_NAMES, error.name)
 }
 
-export function MismatchedTokenException(message: string, token: IToken) {
+export function MismatchedTokenException(
+    message: string,
+    token: IToken,
+    previousToken: IToken
+) {
     this.name = MISMATCHED_TOKEN_EXCEPTION
     this.message = message
     this.token = token
+    this.previousToken = previousToken
     this.resyncedTokens = []
 }
 
@@ -32,10 +37,15 @@ export function MismatchedTokenException(message: string, token: IToken) {
 // because the stack trace points to where "new Error" was invoked"
 MismatchedTokenException.prototype = Error.prototype
 
-export function NoViableAltException(message: string, token: IToken) {
+export function NoViableAltException(
+    message: string,
+    token: IToken,
+    previousToken: IToken
+) {
     this.name = NO_VIABLE_ALT_EXCEPTION
     this.message = message
     this.token = token
+    this.previousToken = previousToken
     this.resyncedTokens = []
 }
 

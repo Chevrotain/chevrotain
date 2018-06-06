@@ -20,7 +20,12 @@ import {
 } from "../../api"
 
 export const defaultParserErrorProvider: IParserErrorMessageProvider = {
-    buildMismatchTokenMessage({ expected, actual, ruleName }): string {
+    buildMismatchTokenMessage({
+        expected,
+        actual,
+        previous,
+        ruleName
+    }): string {
         let hasLabel = hasTokenLabel(expected)
         let expectedMsg = hasLabel
             ? `--> ${tokenLabel(expected)} <--`
@@ -40,6 +45,7 @@ export const defaultParserErrorProvider: IParserErrorMessageProvider = {
     buildNoViableAltMessage({
         expectedPathsPerAlt,
         actual,
+        previous,
         customUserDescription,
         ruleName
     }): string {

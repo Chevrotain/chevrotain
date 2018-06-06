@@ -1663,11 +1663,15 @@ export interface IParserErrorMessageProvider {
      *
      * @param options.actual - The actual Token "instance".
      *
+     * @param options.previous - The previous Token "instance".
+     *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
+     *
      * @param options.ruleName - The rule in which the error occurred.
      */
     buildMismatchTokenMessage?(options: {
         expected: TokenType
         actual: IToken
+        previous: IToken
         ruleName: string
     }): string
     /**
@@ -1691,6 +1695,9 @@ export interface IParserErrorMessageProvider {
      *
      * @param options.actual - The actual sequence of tokens encountered.
      *
+     * @param options.previous - The previous Token "instance".
+     *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
+     *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the {@link Parser.AT_LEAST_ONE} DSL method
      *                                        options parameter, this is that custom message.
      *
@@ -1699,6 +1706,7 @@ export interface IParserErrorMessageProvider {
     buildNoViableAltMessage?(options: {
         expectedPathsPerAlt: TokenType[][][]
         actual: IToken[]
+        previous: IToken
         customUserDescription: string
         ruleName: string
     }): string
@@ -1710,7 +1718,7 @@ export interface IParserErrorMessageProvider {
      *
      * @param options.actual - The actual sequence of tokens encountered.
      *
-     * @param options.previous - The previous token parsed.
+     * @param options.previous - The previous Token "instance".
      *                                This is useful if options.actual[0] is of type chevrotain.EOF and you need to know the last token parsed.
      *
      * @param options.customUserDescription - A user may provide custom error message descriptor in the {@link Parser.AT_LEAST_ONE} DSL method
@@ -1893,7 +1901,8 @@ export declare function isRecognitionException(error: Error): boolean
  */
 export declare function MismatchedTokenException(
     message: string,
-    token: IToken
+    token: IToken,
+    previousToken: IToken
 ): void
 
 /**
@@ -1902,7 +1911,8 @@ export declare function MismatchedTokenException(
  */
 export declare function NoViableAltException(
     message: string,
-    token: IToken
+    token: IToken,
+    previousToken: IToken
 ): void
 
 /**
