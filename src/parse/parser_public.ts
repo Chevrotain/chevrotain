@@ -1436,17 +1436,19 @@ export class Parser {
                 consumedToken = nextToken
             } else {
                 let msg
+                let previousToken = this.LA(0)
                 if (options !== undefined && options.ERR_MSG) {
                     msg = options.ERR_MSG
                 } else {
                     msg = this.errorMessageProvider.buildMismatchTokenMessage({
                         expected: tokType,
                         actual: nextToken,
+                        previous: previousToken,
                         ruleName: this.getCurrRuleFullName()
                     })
                 }
                 throw this.SAVE_ERROR(
-                    new MismatchedTokenException(msg, nextToken)
+                    new MismatchedTokenException(msg, nextToken, previousToken)
                 )
             }
         } catch (eFromConsumption) {
@@ -1649,16 +1651,19 @@ export class Parser {
         let currToken = this.LA(1)
 
         let generateErrorMessage = () => {
+            let previousToken = this.LA(0)
             // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
             // the error that would have been thrown
             let msg = this.errorMessageProvider.buildMismatchTokenMessage({
                 expected: expectedTokType,
                 actual: nextTokenWithoutResync,
+                previous: previousToken,
                 ruleName: this.getCurrRuleFullName()
             })
             let error = new MismatchedTokenException(
                 msg,
-                nextTokenWithoutResync
+                nextTokenWithoutResync,
+                this.LA(0)
             )
             // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
             error.resyncedTokens = dropRight(resyncedTokens)
@@ -2650,15 +2655,19 @@ export class Parser {
         for (let i = 1; i < this.maxLookahead; i++) {
             actualTokens.push(this.LA(i))
         }
+        let previousToken = this.LA(0)
 
         let errMsg = this.errorMessageProvider.buildNoViableAltMessage({
             expectedPathsPerAlt: lookAheadPathsPerAlternative,
             actual: actualTokens,
+            previous: previousToken,
             customUserDescription: errMsgTypes,
             ruleName: this.getCurrRuleFullName()
         })
 
-        throw this.SAVE_ERROR(new NoViableAltException(errMsg, this.LA(1)))
+        throw this.SAVE_ERROR(
+            new NoViableAltException(errMsg, this.LA(1), previousToken)
+        )
     }
 
     private getLookaheadFuncFor(

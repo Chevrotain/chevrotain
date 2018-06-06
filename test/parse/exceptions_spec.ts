@@ -26,7 +26,11 @@ describe("Chevrotain's Parsing Exceptions", () => {
         })
 
         it_node("NoViableAltException", () => {
-            let exceptionInstance = new NoViableAltException("", dummyToken)
+            let exceptionInstance = new NoViableAltException(
+                "",
+                dummyToken,
+                dummyToken
+            )
             expect(exceptionInstance.name).to.equal(
                 functionName(exceptionInstance)
             )
@@ -43,7 +47,11 @@ describe("Chevrotain's Parsing Exceptions", () => {
         })
 
         it_node("MismatchedTokenException", () => {
-            let exceptionInstance = new MismatchedTokenException("", dummyToken)
+            let exceptionInstance = new MismatchedTokenException(
+                "",
+                dummyToken,
+                dummyToken
+            )
             expect(exceptionInstance.name).to.equal(
                 functionName(exceptionInstance)
             )

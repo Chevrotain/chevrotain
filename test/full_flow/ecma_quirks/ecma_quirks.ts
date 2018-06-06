@@ -160,12 +160,16 @@ class EcmaScriptQuirksParser extends Parser {
                 image: this.orgText[this.textIdx],
                 startOffset: this.textIdx
             }
+            const previousToken = this.LA(0)
             let msg = this.errorMessageProvider.buildMismatchTokenMessage({
                 expected: tokClass,
                 actual: errorToken,
+                previous: previousToken,
                 ruleName: this.getCurrRuleFullName()
             })
-            throw this.SAVE_ERROR(new MismatchedTokenException(msg, errorToken))
+            throw this.SAVE_ERROR(
+                new MismatchedTokenException(msg, errorToken, previousToken)
+            )
         }
     }
 
