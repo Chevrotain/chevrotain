@@ -221,7 +221,7 @@ The third parameter(**config**) may contain a **resyncEnabled** property that co
 
 ## CST Integration
 
-When using [Concrete Syntax Tree](../02_Deep_Dive/concrete_syntax_tree.md) output
+When using [Concrete Syntax Tree](../guide/concrete_syntax_tree.md) output
 A re-synced will return a CSTNode with the boolean ["recoveredNode"](https://sap.github.io/chevrotain/documentation/3_3_0/interfaces/cstnode.html#recoverednode) flag marked as true.
 Additionally a recovered node **may not** have all its contents (children dictionary) filled
 as only the Terminals and None-Terminals encountered **before** the error which triggered the re-sync

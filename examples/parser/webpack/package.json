@@ -1,5 +1,5 @@
 {
-  "name": "webpack2-chevrotain-example",
+  "name": "webpack-chevrotain-example",
   "version": "1.0.0",
   "devDependencies": {
     "mocha": "^3.2.0",
