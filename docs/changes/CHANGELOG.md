@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [PerformSelfAnalysis can be an instance method.](https://github.com/SAP/chevrotain/issues/737).
+-   [Previous Token Information on Parser Runtime Errors.](https://github.com/SAP/chevrotain/issues/613).
+
+https://github.com/SAP/chevrotain/issues/613
+
+
 ## 3.4.0 (6-6-2018)
 
 #### Minor Changes
