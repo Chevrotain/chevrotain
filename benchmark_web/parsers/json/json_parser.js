@@ -118,7 +118,7 @@ function parser(input, options) {
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
     // derived from the self analysis.
-    ChevrotainParser.performSelfAnalysis(this)
+    this.performSelfAnalysis()
 }
 
 parser.prototype = Object.create(ChevrotainParser.prototype)

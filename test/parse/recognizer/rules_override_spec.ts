@@ -24,7 +24,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
 
                 // performSelfAnalysis should only be invoked once.
                 if (!isInvokedByChildConstructor) {
-                    Parser.performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
             }
 
@@ -45,7 +45,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
         class ChildOverrideParser extends SuperOverrideParser {
             constructor(input: IToken[] = []) {
                 super(input, true)
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             // nestedRule is overridden with a new implementation
@@ -76,7 +76,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
         class InvalidOverrideParser extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, MinusTok])
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             // nothing to override, oops does not exist in any of the super grammars

@@ -227,13 +227,20 @@ export class Parser {
     // needing to display the parser definition errors in some GUI(online playground).
     static DEFER_DEFINITION_ERRORS_HANDLING: boolean = false
 
-    protected static performSelfAnalysis(parserInstance: Parser): void {
+    /**
+     *  @deprecated use the **instance** method with the same name instead
+     */
+    static performSelfAnalysis(parserInstance: Parser): void {
+        parserInstance.performSelfAnalysis()
+    }
+
+    public performSelfAnalysis(): void {
         let definitionErrors = []
         let defErrorsMsgs
 
-        parserInstance.selfAnalysisDone = true
-        let className = classNameFromInstance(parserInstance)
-        const actualClassConstructor = parserInstance.constructor
+        this.selfAnalysisDone = true
+        let className = classNameFromInstance(this)
+        const actualClassConstructor = this.constructor
 
         // can't test this with nyc tool, instrumentation causes the class name to be not empty.
         /* istanbul ignore if */
@@ -271,7 +278,7 @@ export class Parser {
         if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
             cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
 
-            let orgProductions = parserInstance._productions
+            let orgProductions = this._productions
             let clonedProductions = new HashTable<Rule>()
             // clone the grammar productions to support grammar inheritance. requirements:
             // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
@@ -299,9 +306,9 @@ export class Parser {
             if (isEmpty(resolverErrors)) {
                 let validationErrors = validateGrammar({
                     rules: clonedProductions.values(),
-                    maxLookahead: parserInstance.maxLookahead,
-                    tokenTypes: values(parserInstance.tokensMap),
-                    ignoredIssues: parserInstance.ignoredIssues,
+                    maxLookahead: this.maxLookahead,
+                    tokenTypes: values(this.tokensMap),
+                    ignoredIssues: this.ignoredIssues,
                     errMsgProvider: defaultGrammarValidatorErrorProvider,
                     grammarName: className
                 })
@@ -333,7 +340,7 @@ export class Parser {
 
             let cstAnalysisResult = analyzeCst(
                 clonedProductions.values(),
-                parserInstance.fullRuleNameToShort
+                this.fullRuleNameToShort
             )
             cache.CLASS_TO_ALL_RULE_NAMES.put(
                 className,

@@ -20,7 +20,7 @@ const JsonWithCommentsLexer = new Lexer(allTokens)
 class JsonParserWithComments extends JsonParser {
     constructor(input) {
         super(input, { outputCst: true })
-        // Parser.performSelfAnalysis(this)
+        // We did not define any new rules so no need to call performSelfAnalysis
     }
 
     LA(howMuch) {

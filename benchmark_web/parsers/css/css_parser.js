@@ -589,7 +589,7 @@ function parser(input, config) {
     // very important to call this after all the rules have been setup.
     // otherwise the parser may not work correctly as it will lack information
     // derived from the self analysis.
-    chevrotain.Parser.performSelfAnalysis(this)
+    this.performSelfAnalysis()
 }
 
 parser.prototype = Object.create(chevrotain.Parser.prototype)

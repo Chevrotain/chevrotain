@@ -51,7 +51,7 @@ const JsonLexer = new Lexer(allTokens)
 class JsonParserTypeScript extends Parser {
     constructor(input: IToken[]) {
         super(input, allTokens)
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     // In TypeScript the parsing rules are explicitly defined as class instance properties

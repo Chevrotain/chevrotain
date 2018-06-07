@@ -27,7 +27,7 @@ class SelectParser extends chevrotain.Parser {
 
         /* rule definitions... */
 
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 ```

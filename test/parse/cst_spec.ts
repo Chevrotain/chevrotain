@@ -27,7 +27,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -63,7 +63,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -103,7 +103,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -142,7 +142,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -172,7 +172,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -203,7 +203,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -252,7 +252,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public ruleWithOptional = this.RULE("ruleWithOptional", () => {
@@ -304,7 +304,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -338,7 +338,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -377,7 +377,7 @@ context("CST", () => {
                 super(input, ALL_TOKENS, {
                     outputCst: true
                 })
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public testRule = this.RULE("testRule", () => {
@@ -417,7 +417,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public ruleWithOptional = this.RULE("ruleWithOptional", () => {
@@ -482,7 +482,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -525,7 +525,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -570,7 +570,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -607,7 +607,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -678,7 +678,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -717,7 +717,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -757,7 +757,7 @@ context("CST", () => {
                     super(input, ALL_TOKENS, {
                         outputCst: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public testRule = this.RULE("testRule", () => {
@@ -804,7 +804,7 @@ context("CST", () => {
                         outputCst: true,
                         recoveryEnabled: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public root = this.RULE("root", () => {
@@ -882,7 +882,7 @@ context("CST", () => {
                         outputCst: true,
                         recoveryEnabled: true
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public root = this.RULE("root", () => {

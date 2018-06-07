@@ -109,7 +109,7 @@ class SelectParser extends Parser {
             })
         })
 
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 ```
@@ -118,7 +118,7 @@ Important to note that:
 
 -   The **super** invocation has an array of the Tokens as the second parameter.
     This is the same array we used to define the Lexer and it is used to define the Parser's vocabulary.
--   The static method **Parser.performSelfAnalysis** must be invoked at the end of the constructor.
+-   The method **Parser.prototype.performSelfAnalysis** must be invoked at the end of the constructor.
     This is where much of the 'secret sauce' happens, including creating the inner grammar representation
     and performing static checks on the grammar.
 
@@ -190,7 +190,7 @@ The answer is the 'secret sauce' of Chevrotain:
 -   `$.RULE` will both:
     -   Analyse (using Function.toString) the implementation passed to it and construct a representation of the grammar in memory.
     -   Wrap the implementation passed to it in logic for running the Parser (fault tolerance/rule stacks/...)
--   `Parser.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis)
+-   `Parser.prototype.performSelfAnalysis(this)` will finish 'compiling' the grammar representation (name resolution/static analysis)
 
 So when the parser needs to choose between the two alternatives:
 
@@ -296,7 +296,7 @@ class SelectParser extends Parser {
             ])
         })
 
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 ```

@@ -49,7 +49,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public manyOptionsRule = this.RULE(
@@ -140,7 +140,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public manyRule = this.RULE("manyRule", this.parseManyRule)
@@ -285,7 +285,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public manySepRule = this.RULE(
@@ -492,7 +492,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public atLeastOneRule = this.RULE(
@@ -609,7 +609,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public atLeastOneSepRule = this.RULE(
@@ -789,7 +789,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(input, ALL_TOKENS)
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public orRule = this.RULE("orRule", this.parseOrRule, {
@@ -1004,7 +1004,7 @@ function defineLookaheadSpecs(
                 class OrAmbiguityLookAheadParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public ambiguityRule = this.RULE(
@@ -1051,7 +1051,7 @@ function defineLookaheadSpecs(
                 class OrAmbiguityMultiTokenLookAheadParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public ambiguityRule = this.RULE(
@@ -1110,7 +1110,7 @@ function defineLookaheadSpecs(
                             }
                         }
                     })
-                    ;(<any>Parser).performSelfAnalysis(this)
+                    this.performSelfAnalysis()
                 }
 
                 public orRule = this.RULE("orRule", this.parseOrRule, {
@@ -1323,7 +1323,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForOptionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("rule", () => {
@@ -1360,7 +1360,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForManyParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("orRule", () => {
@@ -1410,7 +1410,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForManySepParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("orRule", () => {
@@ -1467,7 +1467,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForOrParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public orRule = this.RULE("orRule", () => {
@@ -1533,7 +1533,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForAtLeastOneParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("orRule", () => {
@@ -1599,7 +1599,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
-                        ;(<any>Parser).performSelfAnalysis(this)
+                        this.performSelfAnalysis()
                     }
 
                     public rule = this.RULE("orRule", () => {

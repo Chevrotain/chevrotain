@@ -104,7 +104,7 @@ class BackTrackingParser extends Parser {
         })
 
         // DOCS: The call to performSelfAnalysis must happen after all the RULEs have been defined.
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 

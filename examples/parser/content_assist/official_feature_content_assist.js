@@ -116,7 +116,7 @@ class StatementsParser extends Parser {
             ])
         })
 
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 }
 

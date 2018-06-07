@@ -11,7 +11,11 @@ const path = require("path")
 const apiPath = path.resolve(__dirname, "../api.d.ts")
 const apiString = fs.readFileSync(apiPath, "utf8").toString()
 
-const fixedApiString = apiString.replace(/\/\* protected \*\//g, "protected")
+let fixedApiString = apiString.replace(/\/\* protected \*\//g, "protected")
+fixedApiString = fixedApiString.replace(
+    /\/\* protected \* static\//g,
+    "protected static"
+)
 
 const apiLibPath = path.resolve(__dirname, "../lib/chevrotain.d.ts")
 fs.writeFileSync(apiLibPath, fixedApiString)

@@ -462,7 +462,7 @@ export class StarTok {
 class ErroneousOccurrenceNumUsageParser1 extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [PlusTok])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public duplicateRef = this.RULE("duplicateRef", () => {
@@ -478,7 +478,7 @@ class ErroneousOccurrenceNumUsageParser1 extends Parser {
 class ErroneousOccurrenceNumUsageParser2 extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [PlusTok])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public duplicateTerminal = this.RULE("duplicateTerminal", () => {
@@ -490,7 +490,7 @@ class ErroneousOccurrenceNumUsageParser2 extends Parser {
 class ErroneousOccurrenceNumUsageParser3 extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [PlusTok, MinusTok])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public duplicateMany = this.RULE("duplicateMany", () => {
@@ -509,7 +509,7 @@ let myOtherToken = createToken({ name: "myOtherToken" })
 class ValidOccurrenceNumUsageParser extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public anonymousTokens = this.RULE("anonymousTokens", () => {
@@ -568,7 +568,7 @@ describe("The duplicate occurrence validations full flow", () => {
 class InvalidRefParser extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public one = this.RULE("one", () => {
@@ -579,7 +579,7 @@ class InvalidRefParser extends Parser {
 class InvalidRefParser2 extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public one = this.RULE("one", () => {
@@ -614,7 +614,7 @@ describe("The reference resolver validation full flow", () => {
 class DuplicateRulesParser extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public one = this.RULE("oops_duplicate", () => {})
@@ -624,7 +624,7 @@ class DuplicateRulesParser extends Parser {
 class InvalidRuleNameParser extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [myToken, myOtherToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public one = this.RULE("שלום", () => {})
@@ -672,7 +672,7 @@ class StarToken {
 class DirectlyLeftRecursive extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [StarToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public A = this.RULE("A", () => {
@@ -683,7 +683,7 @@ class DirectlyLeftRecursive extends Parser {
 class InDirectlyLeftRecursive extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [StarToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public A = this.RULE("A", () => {
@@ -698,7 +698,7 @@ class InDirectlyLeftRecursive extends Parser {
 class ComplexInDirectlyLeftRecursive extends Parser {
     constructor(input: IToken[] = []) {
         super(input, [StarToken])
-        Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     public A = this.RULE("A", () => {
@@ -743,7 +743,7 @@ describe("The empty alternative detection full flow", () => {
         class EmptyAltAmbiguityParser extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
@@ -777,7 +777,7 @@ describe("The empty alternative detection full flow", () => {
         class EmptyAltIndirectAmbiguityParser extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
@@ -815,7 +815,7 @@ describe("The empty alternative detection full flow", () => {
         class AltAmbiguityParserImplicitOccurence extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
@@ -849,7 +849,7 @@ describe("The empty alternative detection full flow", () => {
         class EmptyAltAmbiguityParser2 extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, StarTok])
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public noneLastEmpty = this.RULE("noneLastEmpty", () => {
@@ -887,7 +887,7 @@ describe("The prefix ambiguity detection full flow", () => {
         class PrefixAltAmbiguity extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, MinusTok, StarTok])
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public prefixAltAmbiguity = this.RULE("prefixAltAmbiguity", () => {
@@ -925,7 +925,7 @@ describe("The prefix ambiguity detection full flow", () => {
         class PrefixAltAmbiguity2 extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [PlusTok, MinusTok, StarTok])
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public prefixAltAmbiguity = this.RULE("prefixAltAmbiguity", () => {
@@ -972,7 +972,7 @@ describe("The namespace conflict detection full flow", () => {
         class NameSpaceConflict extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [Bamba, A])
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public Bamba = this.RULE("Bamba", () => {
@@ -995,7 +995,7 @@ describe("The nested rule name validation full flow", () => {
         class NestedNamedInvalid extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [A])
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () => {
@@ -1026,7 +1026,7 @@ describe("The duplicated nested name validation full flow", () => {
         class NestedNamedDuplicate extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [A, B])
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () => {
@@ -1063,7 +1063,7 @@ describe("The invalid token name validation", () => {
         class InvalidTokenName extends Parser {
             constructor(input: IToken[] = []) {
                 super(input, [במבה, A])
-                Parser.performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () => {
@@ -1088,7 +1088,7 @@ describe("The no non-empty lookahead validation", () => {
         class EmptyLookaheadParserAtLeastOne extends EmptyLookaheadParser {
             constructor(input: IToken[] = []) {
                 super(input)
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () =>
@@ -1107,7 +1107,7 @@ describe("The no non-empty lookahead validation", () => {
         class EmptyLookaheadParserAtLeastOneSep extends EmptyLookaheadParser {
             constructor(input: IToken[] = []) {
                 super(input)
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () =>
@@ -1129,7 +1129,7 @@ describe("The no non-empty lookahead validation", () => {
         class EmptyLookaheadParserMany extends EmptyLookaheadParser {
             constructor(input: IToken[] = []) {
                 super(input)
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () =>
@@ -1148,7 +1148,7 @@ describe("The no non-empty lookahead validation", () => {
         class EmptyLookaheadParserManySep extends EmptyLookaheadParser {
             constructor(input: IToken[] = []) {
                 super(input)
-                ;(<any>Parser).performSelfAnalysis(this)
+                this.performSelfAnalysis()
             }
 
             public someRule = this.RULE("someRule", () =>

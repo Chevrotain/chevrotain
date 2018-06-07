@@ -802,7 +802,7 @@ class ECMAScript5Parser extends Parser {
             })
         })
 
-        ECMAScript5Parser.performSelfAnalysis(this)
+        this.performSelfAnalysis()
     }
 
     /*
