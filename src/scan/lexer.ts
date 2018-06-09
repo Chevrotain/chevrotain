@@ -1,3 +1,4 @@
+import { RegExpParser, BaseRegExpVisitor } from "regexp-to-ast"
 import { tokenName } from "./tokens_public"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import {
@@ -34,6 +35,8 @@ import {
     IToken,
     TokenType
 } from "../../api"
+
+const regExpParser = new RegExpParser()
 
 const PATTERN = "PATTERN"
 export const DEFAULT_MODE = "defaultMode"
@@ -435,13 +438,31 @@ export function findInvalidPatterns(
 
 const end_of_input = /[^\\][\$]/
 
-// TODO: this can be done much better if we use regexp-to-ast
 export function findEndOfInputAnchor(
     tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
+    class EndAnchorFinder extends BaseRegExpVisitor {
+        found = false
+
+        visitEndAnchor(node) {
+            this.found = true
+        }
+    }
+
     let invalidRegex = filter(tokenTypes, currType => {
-        let pattern = currType[PATTERN]
-        return end_of_input.test(pattern.source)
+        const pattern = currType[PATTERN]
+
+        try {
+            const regexpAst = regExpParser.pattern(pattern.toString())
+            const endAnchorVisitor = new EndAnchorFinder()
+            endAnchorVisitor.visit(regexpAst)
+
+            return endAnchorVisitor.found
+        } catch (e) {
+            // old behavior in case of runtime exceptions with regexp-to-ast.
+            /* istanbul ignore next - cannot ensure an error in regexp-to-ast*/
+            return end_of_input.test(pattern.source)
+        }
     })
 
     let errors = map(invalidRegex, currType => {
@@ -488,9 +509,27 @@ const start_of_input = /[^\\[][\^]|^\^/
 export function findStartOfInputAnchor(
     tokenTypes: TokenType[]
 ): ILexerDefinitionError[] {
+    class StartAnchorFinder extends BaseRegExpVisitor {
+        found = false
+
+        visitStartAnchor(node) {
+            this.found = true
+        }
+    }
+
     let invalidRegex = filter(tokenTypes, currType => {
-        let pattern = currType[PATTERN]
-        return start_of_input.test(pattern.source)
+        const pattern = currType[PATTERN]
+        try {
+            const regexpAst = regExpParser.pattern(pattern.toString())
+            const startAnchorVisitor = new StartAnchorFinder()
+            startAnchorVisitor.visit(regexpAst)
+
+            return startAnchorVisitor.found
+        } catch (e) {
+            // old behavior in case of runtime exceptions with regexp-to-ast.
+            /* istanbul ignore next - cannot ensure an error in regexp-to-ast*/
+            return start_of_input.test(pattern.source)
+        }
     })
 
     let errors = map(invalidRegex, currType => {
