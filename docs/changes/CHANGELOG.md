@@ -6,7 +6,6 @@
 -   [Previous Token Information on Parser Runtime Errors.](https://github.com/SAP/chevrotain/issues/613).
 -   Updated regexp-to-ast to 0.3.3.
 -   [Lexer Validations now use regexp-to-ast library when appropriate](https://github.com/SAP/chevrotain/issues/710).
-    
 
 ## 3.4.0 (6-6-2018)
 
