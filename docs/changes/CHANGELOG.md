@@ -2,14 +2,11 @@
 
 #### Minor Changes
 
--   Updated regexp-to-ast to 0.3.1.
-
-## X.Y.Z (INSERT_DATE_HERE)
-
-#### Minor Changes
-
 -   [PerformSelfAnalysis can be an instance method.](https://github.com/SAP/chevrotain/issues/737).
 -   [Previous Token Information on Parser Runtime Errors.](https://github.com/SAP/chevrotain/issues/613).
+-   Updated regexp-to-ast to 0.3.3.
+-   Lexer Validations now use regexp-to-ast library when appropriate.
+    This will lead to fewer false positive errors.
 
 ## 3.4.0 (6-6-2018)
 

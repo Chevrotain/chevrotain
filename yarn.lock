@@ -7163,9 +7163,9 @@ regex-not@^1.0.0, regex-not@^1.0.2:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
 
-regexp-to-ast@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/regexp-to-ast/-/regexp-to-ast-0.3.0.tgz#7555cd1b0ee6cb5a7e8ec0014c16969a0eb163a8"
+regexp-to-ast@0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/regexp-to-ast/-/regexp-to-ast-0.3.3.tgz#319f7e8ec4d6dd19ccbcd1812368f73ef84eceba"
 
 regexpu-core@^1.0.0:
   version "1.0.0"
