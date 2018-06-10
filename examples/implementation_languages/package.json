@@ -2,7 +2,7 @@
     "name": "chevrotain_examples_implementation_languages",
     "version": "0.1.0",
     "scripts": {
-        "build_ts": "tsc ./typescript/typescript_json.ts --types ' '",
+        "build_ts": "tsc ./typescript/typescript_json.ts --types \" \"",
         "build_coffee": "coffee -c ./coffeescript/coffeescript_json.coffee",
         "test": "yarn run build_ts && yarn run build_coffee && mocha \"*spec.js\""
     },
