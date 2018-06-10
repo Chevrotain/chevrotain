@@ -19,7 +19,7 @@ library by @tabatkins.
 
 ## Instructions
 
-Chevrotain provides an the [**createSyntaxDiagramsCode**](https://sap.github.io/chevrotain/documentation/3_4_0/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
+Chevrotain provides an the [**createSyntaxDiagramsCode**](https://sap.github.io/chevrotain/documentation/3_5_0/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
 of syntax diagrams. This html source code can then be used by an end user in either node.js or a browser:
 
 1.  By writing it directly to the disk in a pure node.js runtime scenario.

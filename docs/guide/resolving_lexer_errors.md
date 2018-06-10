@@ -292,9 +292,9 @@ const IntegerToken = createToken({
 Providing the "[start_chars_hint][start_chars_hint]" property is **not** mandatory.
 It will only enable performance optimizations in the lexer.
 
-[position_tracking]: https://sap.github.io/chevrotain/documentation/3_4_0/interfaces/ilexerconfig.html#positiontracking
-[line_terminator_docs]: https://sap.github.io/chevrotain/documentation/3_4_0/interfaces/ilexerconfig.html#lineTerminatorsPattern
-[start_chars_hint]: https://sap.github.io/chevrotain/documentation/3_4_0/interfaces/itokenconfig.html#start_chars_hint
+[position_tracking]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/ilexerconfig.html#positiontracking
+[line_terminator_docs]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/ilexerconfig.html#lineTerminatorsPattern
+[start_chars_hint]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/itokenconfig.html#start_chars_hint
 [keywords_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
 [mdn_char_code]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/charCodeAt
 [fill_16_bits]: https://jsperf.com/fill-16-bits
