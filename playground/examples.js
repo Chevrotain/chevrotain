@@ -170,7 +170,7 @@ function jsonExample() {
             // very important to call this after all the rules have been setup.
             // otherwise the parser may not work correctly as it will lack information
             // derived from the self analysis.
-            Parser.performSelfAnalysis(this);
+            this.performSelfAnalysis();
         }
 
     }
@@ -295,7 +295,7 @@ function jsonGrammarOnlyExample() {
             // very important to call this after all the rules have been setup.
             // otherwise the parser may not work correctly as it will lack information
             // derived from the self analysis.
-            Parser.performSelfAnalysis(this);
+            this.performSelfAnalysis();
         }
 
     }
@@ -804,7 +804,7 @@ function cssExample() {
             // very important to call this after all the rules have been setup.
             // otherwise the parser may not work correctly as it will lack information
             // derived from the self analysis.
-            Parser.performSelfAnalysis(this);
+            this.performSelfAnalysis();
         }
     }
 
@@ -961,7 +961,7 @@ function calculatorExample() {
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
         // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this);
+        this.performSelfAnalysis();
     }
 
     // avoids inserting number literals as these have a additional meaning.
@@ -1090,7 +1090,7 @@ function calculatorExampleCst() {
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
         // derived during the self analysis phase.
-        Parser.performSelfAnalysis(this);
+        this.performSelfAnalysis();
     }
 
     CalculatorPure.prototype = Object.create(Parser.prototype);
