@@ -121,7 +121,7 @@
     "require-from-string": "^2.0.1",
     "requirejs": "2.3.5",
     "semver": "^5.4.1",
-    "sinon": "^5.0.1",
+    "sinon": "^6.0.0",
     "sinon-chai": "^3.0.0",
     "tslint": "^5.8.0",
     "typedoc": "^0.11.1",
