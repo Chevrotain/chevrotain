@@ -244,7 +244,7 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
 
 var locateRuleDefinition = _.partial(locateGrammarDefinition, "RULE")
 // TODO: this is not working, need to handle config object pattern.
-var locateTokenDefinition = _.partial(locateGrammarDefinition, "createToken")
+// var locateTokenDefinition = _.partial(locateGrammarDefinition, "createToken")
 
 /**
  * @param {string} dslName - the chevrotain DSL name to look for (CONSUME/SUBRULE normally)
@@ -274,6 +274,25 @@ function locateGrammarDefinition(dslName, paramName, text, positionHelper) {
     return found
 }
 
+
+function locateTokenDefinition(paramName, text, positionHelper) {
+    var patternPrefixGroup = 1
+    var patternRuleNameGroup = 2
+    var soughtPattern = "(createToken\\s*\\(\\s*\\{\\s*name\\s*:\\s*)(['\"]" + paramName + "['\"])"
+    var seekerRegExp = RegExp(soughtPattern, "g")
+
+    var found = []
+    var execResult
+    while ((execResult = seekerRegExp.exec(text))) {
+        var startOffset = execResult.index + execResult[patternPrefixGroup].length
+        var endOffset = startOffset + execResult[patternRuleNameGroup].length
+        var startPos = positionHelper.posFromIndex(startOffset)
+        var endPos = positionHelper.posFromIndex(endOffset)
+        found.push({start: startPos, end: endPos})
+    }
+
+    return found
+}
 
 var locateOr = _.partial(locateGrammarUsage, "OR")
 var locateSubruleRef = _.partial(locateGrammarUsage, "SUBRULE")
