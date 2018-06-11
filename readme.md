@@ -126,6 +126,7 @@ Some interesting samples:
 -   [Eve Programing Language][sample_eve].
 -   [BioModelAnalyzer's ChatBot parser][sample_biomodel].
 -   [Bombadil Toml Parser][sample_bombadil]
+-   [BrightScript Parser][sample_bright]
 
 [benchmark]: https://sap.github.io/chevrotain/performance/
 [lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
@@ -142,6 +143,7 @@ Some interesting samples:
 [sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
 [sample_biomodel]: https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts
 [sample_bombadil]: https://github.com/sgarciac/bombadil/blob/master/src/parser.ts
+[sample_bright]: https://github.com/RokuRoad/bright/blob/master/src/Parser.ts
 [languages]: https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages
 [backtracking]: https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js
 [custom_apis]: https://sap.github.io/chevrotain/docs/guide/custom_apis.html
