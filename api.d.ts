@@ -1313,7 +1313,7 @@ export declare type CustomPatternMatcherFunc = (
     groups?: {
         [groupName: string]: IToken
     }
-) => RegExpExecArray
+) => RegExpExecArray | null
 
 /**
  *  API #2 for [Custom Token Patterns](http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html).
