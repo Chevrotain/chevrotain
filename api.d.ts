@@ -951,6 +951,9 @@ export declare class Parser {
         tokType: TokenType
     ): boolean
 
+    /**
+     * @deprecated - will be removed in the future
+     */
     /* protected */ getNextPossibleTokenTypes(
         grammarPath: ITokenGrammarPath
     ): TokenType[]
