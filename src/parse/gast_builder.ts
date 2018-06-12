@@ -3,6 +3,7 @@ import {
     every,
     filter,
     forEach,
+    map,
     isEmpty,
     isUndefined,
     partial,
@@ -20,13 +21,15 @@ import {
     RepetitionMandatoryWithSeparator,
     RepetitionWithSeparator,
     Rule,
-    Terminal
+    Terminal,
+    ISerializedGastAny
 } from "./grammar/gast/gast_public"
 import {
     IOptionallyNamedProduction,
     IProduction,
     IProductionWithOccurrence,
-    TokenType
+    TokenType,
+    ISerializedGast
 } from "../../api"
 
 export enum ProdType {
@@ -638,5 +641,84 @@ export function findClosingOffset(
         return i + start
     } else {
         throw new Error("INVALID INPUT TEXT, UNTERMINATED PARENTHESIS")
+    }
+}
+
+export function deserializeGrammar(
+    grammar: ISerializedGast[],
+    terminals: ITerminalNameToConstructor
+): IProduction[] {
+    return map(grammar, production =>
+        deserializeProduction(production, terminals)
+    )
+}
+
+export function deserializeProduction(
+    node: ISerializedGastAny,
+    terminals: ITerminalNameToConstructor
+): IProduction {
+    switch (node.type) {
+        case "NonTerminal":
+            return new NonTerminal({
+                nonTerminalName: node.name,
+                idx: node.idx
+            })
+        case "Flat":
+            return new Flat({
+                name: node.name,
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "Option":
+            return new Option({
+                name: node.name,
+                idx: node.idx,
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "RepetitionMandatory":
+            return new RepetitionMandatory({
+                name: node.name,
+                idx: node.idx,
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "RepetitionMandatoryWithSeparator":
+            return new RepetitionMandatoryWithSeparator({
+                name: node.name,
+                idx: node.idx,
+                separator: terminals[node.separator.name],
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "RepetitionWithSeparator":
+            return new RepetitionWithSeparator({
+                name: node.name,
+                idx: node.idx,
+                separator: terminals[node.separator.name],
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "Repetition":
+            return new Repetition({
+                name: node.name,
+                idx: node.idx,
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "Alternation":
+            return new Alternation({
+                name: node.name,
+                idx: node.idx,
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        case "Terminal":
+            return new Terminal({
+                terminalType: terminals[node.name],
+                idx: node.idx
+            })
+        case "Rule":
+            return new Rule({
+                name: node.name,
+                orgText: node.orgText,
+                definition: deserializeGrammar(node.definition, terminals)
+            })
+        /* istanbul ignore next */
+        default:
+            const _never: never = node
     }
 }

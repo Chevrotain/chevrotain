@@ -48,7 +48,7 @@ import {
     getLookaheadPathsForOr,
     PROD_TYPE
 } from "./grammar/lookahead"
-import { buildTopProduction } from "./gast_builder"
+import { buildTopProduction, deserializeGrammar } from "./gast_builder"
 import {
     AbstractNextTerminalAfterProductionWalker,
     NextAfterTokenWalker,
@@ -230,11 +230,14 @@ export class Parser {
     /**
      *  @deprecated use the **instance** method with the same name instead
      */
-    static performSelfAnalysis(parserInstance: Parser): void {
-        parserInstance.performSelfAnalysis()
+    static performSelfAnalysis(
+        parserInstance: Parser,
+        serializedGrammar?: ISerializedGast[]
+    ): void {
+        parserInstance.performSelfAnalysis(serializedGrammar)
     }
 
-    public performSelfAnalysis(): void {
+    public performSelfAnalysis(serializedGrammar?: ISerializedGast[]): void {
         let definitionErrors = []
         let defErrorsMsgs
 
@@ -280,15 +283,25 @@ export class Parser {
 
             let orgProductions = this._productions
             let clonedProductions = new HashTable<Rule>()
-            // clone the grammar productions to support grammar inheritance. requirements:
-            // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
-            // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
-            //    so the myGast variable is used.
-            // 3. If a Production has been overridden references to it in the GAST must also be updated.
-            forEach(orgProductions.keys(), key => {
-                let value = orgProductions.get(key)
-                clonedProductions.put(key, cloneProduction(value))
-            })
+            if (serializedGrammar === undefined || serializedGrammar === null) {
+                // clone the grammar productions to support grammar inheritance. requirements:
+                // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
+                // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
+                //    so the myGast variable is used.
+                // 3. If a Production has been overridden references to it in the GAST must also be updated.
+                forEach(orgProductions.keys(), key => {
+                    let value = orgProductions.get(key)
+                    clonedProductions.put(key, cloneProduction(value))
+                })
+            } else {
+                const rules = deserializeGrammar(
+                    serializedGrammar,
+                    this.tokensMap
+                )
+                forEach(rules, rule => {
+                    clonedProductions.put(rule.name, rule)
+                })
+            }
             cache.getProductionsForClass(className).putAll(clonedProductions)
 
             // assumes this cache has been initialized (in the relevant parser's constructor)
