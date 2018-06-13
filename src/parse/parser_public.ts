@@ -103,7 +103,6 @@ import {
     ICstVisitor,
     IgnoredParserIssues,
     IOrAltWithGate,
-    IPerformSelfAnalysisConfig,
     IParserConfig,
     IParserDefinitionError,
     IParserErrorMessageProvider,
@@ -144,7 +143,8 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     ignoredIssues: <any>{},
     dynamicTokensEnabled: false,
     outputCst: false,
-    errorMessageProvider: defaultParserErrorProvider
+    errorMessageProvider: defaultParserErrorProvider,
+    serializedGrammar: null
 })
 
 const DEFAULT_RULE_CONFIG: IRuleConfig<any> = Object.freeze({
@@ -231,14 +231,11 @@ export class Parser {
     /**
      *  @deprecated use the **instance** method with the same name instead
      */
-    static performSelfAnalysis(
-        parserInstance: Parser,
-        config?: IPerformSelfAnalysisConfig
-    ): void {
-        parserInstance.performSelfAnalysis(config)
+    static performSelfAnalysis(parserInstance: Parser): void {
+        parserInstance.performSelfAnalysis()
     }
 
-    public performSelfAnalysis(config?: IPerformSelfAnalysisConfig): void {
+    public performSelfAnalysis(): void {
         let definitionErrors = []
         let defErrorsMsgs
 
@@ -284,7 +281,7 @@ export class Parser {
 
             let orgProductions = this._productions
             let clonedProductions = new HashTable<Rule>()
-            if (!config || !config.serializedGrammar) {
+            if (!this.serializedGrammar) {
                 // clone the grammar productions to support grammar inheritance. requirements:
                 // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
                 // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
@@ -296,7 +293,7 @@ export class Parser {
                 })
             } else {
                 const rules = deserializeGrammar(
-                    config.serializedGrammar,
+                    this.serializedGrammar,
                     this.tokensMap
                 )
                 forEach(rules, rule => {
@@ -390,6 +387,7 @@ export class Parser {
     protected maxLookahead: number
     protected ignoredIssues: IgnoredParserIssues
     protected outputCst: boolean
+    protected serializedGrammar: ISerializedGast[]
 
     // adapters
     protected errorMessageProvider: IParserErrorMessageProvider
@@ -466,6 +464,10 @@ export class Parser {
             config.errorMessageProvider,
             DEFAULT_PARSER_CONFIG.errorMessageProvider
         )
+
+        this.serializedGrammar = has(config, "serializedGrammar")
+            ? config.serializedGrammar
+            : DEFAULT_PARSER_CONFIG.serializedGrammar
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -1249,7 +1251,7 @@ export class Parser {
         this.definedRulesNames.push(name)
 
         // only build the gast representation once.
-        if (!this._productions.containsKey(name)) {
+        if (!this._productions.containsKey(name) && !this.serializedGrammar) {
             let gastProduction = buildTopProduction(
                 implementation.toString(),
                 name,
