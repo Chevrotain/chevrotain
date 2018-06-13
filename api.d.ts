@@ -1314,7 +1314,7 @@ export declare type CustomPatternMatcherFunc = (
      * Token Groups
      */
     groups?: {
-        [groupName: string]: IToken
+        [groupName: string]: IToken[]
     }
 ) => RegExpExecArray | null
 
