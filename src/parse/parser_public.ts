@@ -103,6 +103,7 @@ import {
     ICstVisitor,
     IgnoredParserIssues,
     IOrAltWithGate,
+    IPerformSelfAnalysisConfig,
     IParserConfig,
     IParserDefinitionError,
     IParserErrorMessageProvider,
@@ -232,12 +233,12 @@ export class Parser {
      */
     static performSelfAnalysis(
         parserInstance: Parser,
-        serializedGrammar?: ISerializedGast[]
+        config?: IPerformSelfAnalysisConfig
     ): void {
-        parserInstance.performSelfAnalysis(serializedGrammar)
+        parserInstance.performSelfAnalysis(config)
     }
 
-    public performSelfAnalysis(serializedGrammar?: ISerializedGast[]): void {
+    public performSelfAnalysis(config?: IPerformSelfAnalysisConfig): void {
         let definitionErrors = []
         let defErrorsMsgs
 
@@ -283,7 +284,7 @@ export class Parser {
 
             let orgProductions = this._productions
             let clonedProductions = new HashTable<Rule>()
-            if (serializedGrammar === undefined || serializedGrammar === null) {
+            if (!config || !config.serializedGrammar) {
                 // clone the grammar productions to support grammar inheritance. requirements:
                 // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
                 // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
@@ -295,7 +296,7 @@ export class Parser {
                 })
             } else {
                 const rules = deserializeGrammar(
-                    serializedGrammar,
+                    config.serializedGrammar,
                     this.tokensMap
                 )
                 forEach(rules, rule => {

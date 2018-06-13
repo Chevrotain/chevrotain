@@ -6,13 +6,18 @@ export declare class Parser {
     /**
      * @deprecated use {@link Parser.performSelfAnalysis} **instance** method instead.
      */
-    /* protected */ static performSelfAnalysis(parserInstance: Parser): void
+    /* protected */ static performSelfAnalysis(
+        parserInstance: Parser,
+        config?: IPerformSelfAnalysisConfig
+    ): void
 
     /**
      * This must be called at the end of a Parser constructor.
      * See: http://sap.github.io/chevrotain/docs/tutorial/step2_parsing.html#under-the-hood
      */
-    /* protected */ performSelfAnalysis(): void
+    /* protected */ performSelfAnalysis(
+        config?: IPerformSelfAnalysisConfig
+    ): void
 
     /**
      * It is recommanded to reuse the same Parser instance
@@ -1592,6 +1597,10 @@ export declare type CstChildrenDictionary = {
 }
 
 export declare type CstElement = IToken | CstNode
+
+export interface IPerformSelfAnalysisConfig {
+    serializedGrammar?: ISerializedGast[]
+}
 
 export interface IParserConfig {
     /**

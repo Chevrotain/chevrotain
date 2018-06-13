@@ -1534,7 +1534,7 @@ function defineRecognizerSpecs(
                 class SerializingParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(input, [PlusTok, MinusTok, IdentTok])
-                        this.performSelfAnalysis(serializedGrammar)
+                        this.performSelfAnalysis({ serializedGrammar })
                     }
 
                     public rule = this.RULE("rule", () => {
