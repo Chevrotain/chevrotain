@@ -1576,12 +1576,12 @@ function defineRecognizerSpecs(
                     })
                 }
                 let parser = new SerializingParser([])
+                const expected = parser.getGAstProductions()
                 serializedGrammar = parser.getSerializedGastProductions()
                 clearCache()
                 let parser1 = new SerializingParser([])
-                expect(parser.getGAstProductions()).to.deep.equal(
-                    parser1.getGAstProductions()
-                )
+                const actual = parser1.getGAstProductions()
+                expect(expected).to.deep.equal(actual)
             })
 
             it("can provide syntactic content assist suggestions", () => {
