@@ -1,4 +1,4 @@
-import { assign, forEach, isRegExp, map } from "../../../utils/utils"
+import { assign, forEach, isRegExp, map, pick } from "../../../utils/utils"
 import { tokenLabel, tokenName } from "../../../scan/tokens_public"
 import {
     IGASTVisitor,
@@ -32,7 +32,7 @@ export class NonTerminal extends AbstractProduction
         idx?: number
     }) {
         super([])
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 
     set definition(definition: IProduction[]) {
@@ -62,7 +62,7 @@ export class Rule extends AbstractProduction {
         orgText?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -73,7 +73,7 @@ export class Flat extends AbstractProduction
     // A named Flat production is used to indicate a Nested Rule in an alternation
     constructor(options: { definition: IProduction[]; name?: string }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -88,7 +88,7 @@ export class Option extends AbstractProduction
         name?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -103,7 +103,7 @@ export class RepetitionMandatory extends AbstractProduction
         name?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -120,7 +120,7 @@ export class RepetitionMandatoryWithSeparator extends AbstractProduction
         name?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -136,7 +136,7 @@ export class Repetition extends AbstractProduction
         name?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -153,7 +153,7 @@ export class RepetitionWithSeparator extends AbstractProduction
         name?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -168,7 +168,7 @@ export class Alternation extends AbstractProduction
         name?: string
     }) {
         super(options.definition)
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 }
 
@@ -177,7 +177,7 @@ export class Terminal implements IProductionWithOccurrence {
     public idx: number = 1
 
     constructor(options: { terminalType: TokenType; idx?: number }) {
-        assign(this, options)
+        assign(this, pick(options, v => v !== undefined))
     }
 
     accept(visitor: IGASTVisitor): void {
@@ -185,16 +185,31 @@ export class Terminal implements IProductionWithOccurrence {
     }
 }
 
+export interface ISerializedBasic extends ISerializedGast {
+    type:
+        | "Flat"
+        | "Option"
+        | "RepetitionMandatory"
+        | "Repetition"
+        | "Alternation"
+    name?: string
+    idx?: number
+}
+
 export interface ISerializedGastRule extends ISerializedGast {
+    type: "Rule"
     name: string
+    orgText: string
 }
 
 export interface ISerializedNonTerminal extends ISerializedGast {
+    type: "NonTerminal"
     name: string
     idx: number
 }
 
 export interface ISerializedTerminal extends ISerializedGast {
+    type: "Terminal"
     name: string
     label?: string
     pattern?: string
@@ -202,8 +217,18 @@ export interface ISerializedTerminal extends ISerializedGast {
 }
 
 export interface ISerializedTerminalWithSeparator extends ISerializedGast {
+    type: "RepetitionMandatoryWithSeparator" | "RepetitionWithSeparator"
+    name: string
+    idx: number
     separator: ISerializedTerminal
 }
+
+export type ISerializedGastAny =
+    | ISerializedBasic
+    | ISerializedGastRule
+    | ISerializedNonTerminal
+    | ISerializedTerminal
+    | ISerializedTerminalWithSeparator
 
 export function serializeGrammar(topRules: Rule[]): ISerializedGast[] {
     return map(topRules, serializeProduction)
@@ -221,23 +246,28 @@ export function serializeProduction(node: IProduction): ISerializedGast {
             idx: node.idx
         }
     } else if (node instanceof Flat) {
-        return {
+        return <ISerializedBasic>{
             type: "Flat",
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof Option) {
-        return {
+        return <ISerializedBasic>{
             type: "Option",
+            idx: node.idx,
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof RepetitionMandatory) {
-        return {
+        return <ISerializedBasic>{
             type: "RepetitionMandatory",
+            name: node.name,
+            idx: node.idx,
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof RepetitionMandatoryWithSeparator) {
         return <ISerializedTerminalWithSeparator>{
             type: "RepetitionMandatoryWithSeparator",
+            name: node.name,
+            idx: node.idx,
             separator: <ISerializedTerminal>(
                 serializeProduction(
                     new Terminal({ terminalType: node.separator })
@@ -248,6 +278,8 @@ export function serializeProduction(node: IProduction): ISerializedGast {
     } else if (node instanceof RepetitionWithSeparator) {
         return <ISerializedTerminalWithSeparator>{
             type: "RepetitionWithSeparator",
+            name: node.name,
+            idx: node.idx,
             separator: <ISerializedTerminal>(
                 serializeProduction(
                     new Terminal({ terminalType: node.separator })
@@ -256,13 +288,17 @@ export function serializeProduction(node: IProduction): ISerializedGast {
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof Repetition) {
-        return {
+        return <ISerializedBasic>{
             type: "Repetition",
+            name: node.name,
+            idx: node.idx,
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof Alternation) {
-        return {
+        return <ISerializedBasic>{
             type: "Alternation",
+            name: node.name,
+            idx: node.idx,
             definition: convertDefinition(node.definition)
         }
     } else if (node instanceof Terminal) {
@@ -285,6 +321,7 @@ export function serializeProduction(node: IProduction): ISerializedGast {
         return <ISerializedGastRule>{
             type: "Rule",
             name: node.name,
+            orgText: node.orgText,
             definition: convertDefinition(node.definition)
         }
     } else {

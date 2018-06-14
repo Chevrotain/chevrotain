@@ -1529,6 +1529,61 @@ function defineRecognizerSpecs(
                 expect(serializedGrammar[1].type).to.equal("Rule")
             })
 
+            it("can use serialized grammar in performSelfAnalysis", () => {
+                let serializedGrammar = null
+                class SerializingParser extends Parser {
+                    constructor(input: IToken[] = []) {
+                        super(input, [PlusTok, MinusTok, IdentTok], {
+                            serializedGrammar
+                        })
+                        this.performSelfAnalysis()
+                    }
+
+                    public rule = this.RULE("rule", () => {
+                        this.AT_LEAST_ONE_SEP({
+                            SEP: IdentTok,
+                            DEF: () => {
+                                this.SUBRULE(this.rule2)
+                            }
+                        })
+                    })
+
+                    public rule2 = this.RULE("rule2", () => {
+                        this.OR([
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(MinusTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                }
+                            }
+                        ])
+                    })
+                    // a rule to exercise certain cases in deserializeGrammar
+                    public rule3 = this.RULE("rule3", () => {
+                        this.AT_LEAST_ONE(() => {
+                            this.CONSUME1(IdentTok)
+                        })
+                        this.MANY_SEP({
+                            SEP: PlusTok,
+                            DEF: () => {
+                                this.CONSUME2(IdentTok)
+                            }
+                        })
+                    })
+                }
+                let parser = new SerializingParser([])
+                const expected = parser.getGAstProductions()
+                serializedGrammar = parser.getSerializedGastProductions()
+                clearCache()
+                let parser1 = new SerializingParser([])
+                const actual = parser1.getGAstProductions()
+                expect(expected).to.deep.equal(actual)
+            })
+
             it("can provide syntactic content assist suggestions", () => {
                 class ContentAssistParser extends Parser {
                     constructor(input: IToken[] = []) {

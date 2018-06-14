@@ -14,7 +14,8 @@ import {
     IProdRange,
     findClosingOffset,
     buildProdGast,
-    buildTopProduction
+    buildTopProduction,
+    deserializeGrammar
 } from "../../src/parse/gast_builder"
 import { setEquality } from "../utils/matchers"
 import { Range } from "../../src/text/range"
@@ -38,7 +39,8 @@ import {
     Repetition,
     RepetitionMandatory,
     RepetitionWithSeparator,
-    Terminal
+    Terminal,
+    serializeGrammar
 } from "../../src/parse/grammar/gast/gast_public"
 
 describe("The GAst Builder namespace", () => {
@@ -624,5 +626,15 @@ describe("The GAst Builder namespace", () => {
             return prodRange.type === ProdType.FLAT
         })
         expect(allOrRanges.length).to.equal(2)
+    })
+
+    it("can serialize and deserialize an elementDefinition Grammar Rule", () => {
+        let expected = [
+            buildTopProduction(typeDefText, "typeDef", <any>tok),
+            buildTopProduction(literalArrayText, "literalArray", <any>tok),
+            buildTopProduction(elementDefText, "elementDef", <any>tok)
+        ]
+        let actual = deserializeGrammar(serializeGrammar(expected), <any>tok)
+        expect(expected).to.deep.equal(actual)
     })
 })
