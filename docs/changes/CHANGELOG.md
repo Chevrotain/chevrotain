@@ -1,3 +1,14 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Ability to de-serialize and serialize the GST instead of rebuilding it using Function.toString](https://github.com/SAP/chevrotain/issues/706).
+
+#### Bug Fixes
+
+-   [Types - fixed groups parameter type in CustomPatternMatcherFunc](https://github.com/SAP/chevrotain/pull/751).
+-   [Types - CustomPatternMatcherFunc return type now allows null value](https://github.com/SAP/chevrotain/pull/746).
+
 ## 3.5.0 (6-10-2018)
 
 #### Minor Changes
