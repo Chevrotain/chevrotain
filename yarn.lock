@@ -813,8 +813,8 @@
     "@types/node" "*"
 
 "@types/sinon-chai@^2.7.29":
-  version "2.7.31"
-  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-2.7.31.tgz#d6cd5369bbf533d31e0bdf1fe55175e998f62757"
+  version "2.7.33"
+  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-2.7.33.tgz#28899cee7246755cdb3a4371af9f5b7e9774edd0"
   dependencies:
     "@types/chai" "*"
     "@types/sinon" "*"
@@ -7163,9 +7163,9 @@ regex-not@^1.0.0, regex-not@^1.0.2:
     extend-shallow "^3.0.2"
     safe-regex "^1.1.0"
 
-regexp-to-ast@0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/regexp-to-ast/-/regexp-to-ast-0.3.3.tgz#319f7e8ec4d6dd19ccbcd1812368f73ef84eceba"
+regexp-to-ast@0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/regexp-to-ast/-/regexp-to-ast-0.3.4.tgz#30f1f6fe93c6dac3dbd43db76f5d15cc0be313c8"
 
 regexpu-core@^1.0.0:
   version "1.0.0"

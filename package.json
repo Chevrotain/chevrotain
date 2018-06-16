@@ -61,6 +61,7 @@
     "lint": "tslint --project tsconfig.json",
     "verify_format": "prettier --no-editorconfig --list-different  \"**/*.@(ts|js|md)\"",
     "compile": "tsc && node ./scripts/fix_coverage_report.js",
+    "compile_watch": "tsc -w && node ./scripts/fix_coverage_report.js",
     "dts": "node scripts/process_docs.js",
     "compile_def": "npm-run-all compile_def_modules compile_def_namespace",
     "coverage": "nyc mocha \"./lib/test/**/*spec.js\"",
@@ -87,7 +88,7 @@
     "release_major": "git fetch && git rebase && node scripts/pre_release_build.js major && yarn run ci_full_build && node scripts/post_release_build.js major && yarn run upload_website && node ../chevrotain_docs/scripts/upload_docs.js"
   },
   "dependencies": {
-    "regexp-to-ast": "0.3.3"
+    "regexp-to-ast": "0.3.4"
   },
   "devDependencies": {
     "@types/chai": "^4.0.10",

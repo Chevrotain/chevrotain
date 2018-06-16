@@ -1,23 +1,31 @@
 # Resolving Lexer Errors
 
--   [No LINE_BREAKS Error.](#LINE_BREAKS)
--   [Unexpected RegExp Anchor Error.](#ANCHORS)
--   [Token Can Never Be Matched.](#UNREACHABLE)
--   [Complement Sets cannot be automatically optimized.](#COMPLEMENT)
--   [Failed parsing < /.../ > Using the regexp-to-ast library.](#REGEXP_PARSING)
--   [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
--   [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
+-   **Warnings**
+    -   [No LINE_BREAKS Found.](#LINE_BREAKS)
+    -   [Unable to identify line terminator usage in pattern.](#IDENTIFY_TERMINATOR)
+    -   [A Custom Token Pattern should specify the <line_breaks> option.](#CUSTOM_LINE_BREAK)
+    -   [Failed parsing < /.../ > Using the regexp-to-ast library.](#REGEXP_PARSING)
+    -   [The regexp unicode flag is not currently supported by the regexp-to-ast library.](#UNICODE_OPTIMIZE)
+    -   [Complement Sets cannot be automatically optimized.](#COMPLEMENT)
 
-## No LINE_BREAKS Error
+*   **Errors**
+    -   [Unexpected RegExp Anchor Error.](#ANCHORS)
+    -   [Token Can Never Be Matched.](#UNREACHABLE)
+    -   [TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter](#CUSTOM_OPTIMIZE)
+    -   [Missing \<lineTerminatorCharacters\> property on the Lexer config.](#MISSING_LINE_TERM_CHARS)
+
+# Warnings
+
+## No LINE_BREAKS Found
 
 A Chevrotain Lexer will by default track the full position information for each token.
 This includes line and column information.
 
 In order to support this the Lexer must be aware of which Tokens may include line terminators.
-This information must be provided by the lexer's author.
+Normally this information can be computed automatically however in some cases Chevrotain needs some hints.
 
-This error means that the Lexer has been defined to track line and column information (perhaps by default).
-Yet not a single one of the Token definitions passed to it was defined as possibly containing line terminators.
+This warning means that the Lexer has been defined to track line and column information (perhaps by default).
+Yet not a single one of the Token definitions passed to it was detected as possibly containing line terminators.
 
 To resolve this choose one of the following:
 
@@ -30,22 +38,17 @@ To resolve this choose one of the following:
     })
     ```
 
-2.  Mark the Tokens which may include a line terminator with a line_breaks flag.
+2.  Mark the Tokens which may include a line terminator with an explicit line_breaks flag.
 
     ```javascript
     const createToken = chevrotain.createToken
 
-    // Using createToken API
     const Whitespace = createToken({
         name: "Whitespace",
         pattern: /\s+/,
+        // This is normally computed automatically...
         line_breaks: true
     })
-
-    // or in ES2015 syntax with static properties
-    class Whitespace extends chevrotain.Token {}
-    Whitespace.PATTERN = /\s+/
-    Whitespace.LINE_BREAKS = true
 
     const myTokens = [IntegerLiteral, StringLiteral, WhiteSpace /*, ... */]
 
@@ -56,7 +59,170 @@ To resolve this choose one of the following:
         [lineTerminatorsPattern][line_terminator_docs] lexer configuration property.
 
     -   Also note that multi-line tokens such as some types of comments and string literals tokens may contain
-        line terminators, if your language includes such tokens they must also be marked with the line_breaks flag.
+        line terminators.
+
+## Unable to identify line terminator usage in pattern
+
+A Chevrotain lexer must be aware which of the Token Types may match a line terminator.
+This is required to compute the correct line and column position information.
+Normally Chevrotain can identify this information automatically using the [regexp-to-ast library][regexp_to_ast],
+however sometimes this logic fails. This is only a **warning** which will cause a small performance
+loss to the lexer and would **not** impact its correctness.
+
+To resolve this warning, **explicitly** specify the line_breaks option in the offending Token Types:
+
+```javascript
+const MyToken = createToken({
+    name: "MyToken",
+    pattern: /abc/,
+    line_breaks: false
+})
+const MultiLineStringLiteral = createToken({
+    name: "MultiLineStringLiteral",
+    pattern: /`[^`]*`/,
+    line_breaks: true
+})
+```
+
+Also please open an issue in the [regexp-to-ast library][regexp_to_ast]
+so the the root problem could be tracked and resolved.
+
+## A Custom Token Pattern should specify the <line_breaks> option
+
+A Chevrotain lexer must be aware which of the Token Types may match a line terminator.
+It is not possible to do so automatically when using [custom token patterns][custom_token_patterns].
+This means it is highly recommended to explicitly provide the line_breaks argument when creating
+a TokenType:
+
+```javascript
+const MyCustomToken = createToken({
+    name: "MyCustomToken",
+    pattern: { exec: matchFunction },
+    line_breaks: false
+})
+const MyCustomMultiLineToken = createToken({
+    name: "MyCustomMultiLineToken",
+    pattern: { exec: matchFunction2 },
+    line_breaks: true
+})
+```
+
+This is only a **warning** which will cause a small performance
+loss to the lexer and would not impact its correctness.
+If no explicit <line_break> option is provided it would be implicitly treated as "true"
+for [custom token patterns][custom_token_patterns].
+
+## Failed parsing < /.../ > Using the regexp-to-ast library
+
+The Chevrotain Lexer performs optimizations by filtering the potential token matches
+using the next [charCode][mdn_char_code] to be consumed.
+To apply this optimization the first possible charCodes for **every** Token Type must be identified.
+
+This analysis is implemented using the [regexp-to-ast][regexp_to_ast] library.
+Which means this **warning** usually indicates a bug in the regexp-to-ast library.
+The impact is only that the optimization described above would become disabled.
+Lexing and Parsing will still work correctly, only slower...
+
+Please open a bug for the [regexp-to-ast][regexp_to_ast] library.
+This issue can be **worked around** by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
+
+```javascript
+const Integer = createToken({
+    name: "Integer",
+    // lets assume that this pattern caused an error in regexp-to-ast
+    pattern: /[1-9]\d*/,
+    // by explicitly providing the first possible characters of this pattern
+    // the analysis by the regexp-to-ast library will be skipped
+    // and the optimization can be enabled.
+    start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+})
+```
+
+## The regexp unicode flag is not currently supported by the regexp-to-ast library
+
+The Chevrotain Lexer performs optimizations by filtering the potential token matchs
+using the next [charCode][mdn_char_code] to be consumed.
+To apply this optimization the first possible charCodes for **every** TokenType must be identified.
+
+This analysis is implemented using the [regexp-to-ast][regexp_to_ast] library.
+This library currently does not support the [unicode regexp flag][unicode_mdn]
+The impact is that the optimization described above would become disabled.
+Lexing and Parsing will still work correctly, just slower...
+
+This issue can be **worked around** by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
+
+```javascript
+// '💩' character
+createToken({
+    name: "PileOfPoo",
+    // \u{xxxxx} 32bit unicode escape can only be used with the /u flag enabled.
+    pattern: /\u{1F4A9}/u,
+    // The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
+    // the start_chars_hint should only be provided the first of the pair.
+    start_chars_hint: [55357]
+})
+```
+
+Another way to **work around** the issue is to define the pattern as a string literal.
+As that kind can be trivially optimized.
+This is naturally only relevant for simple patterns.
+For example:
+
+```javascript
+createToken({
+    name: "LCurley",
+    // note that the pattern is a string literal, not a regExp literal.
+    pattern: "{"
+})
+```
+
+## Complement Sets cannot be automatically optimized
+
+The Chevrotain Lexer performs optimizations by filtering the potential token matchs
+using the next [charCode][mdn_char_code] to be consumed.
+To apply this optimization the first possible charCodes for **every** TokenType must be identified.
+
+When a TokenType pattern uses a regExp complement Set as a potential **first** character
+the optimization is skipped as translating a complement set to a regular set requires too many cpu cycles
+during the Lexer's initialization.
+
+For example an XML Text is defined by **everything** except a closing tag.
+
+```javascript
+const XMLText = createToken({
+    name: "XMLText",
+    pattern: /[^<&]+/
+})
+```
+
+This means that there are **65533** (65535 - 2) possible starting charCodes
+For an XMLText token.
+
+If the use of these optimizations is desired and the startup resources cost is acceptable
+It is possilbe to enable the optimizations by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
+e.g:
+
+```javascript
+const hints = []
+for (let i = 0; i <= 65535; i++) {
+    // 38 is '<' and 60 is '&'
+    if (i !== 38 || i !== 60) {
+        hints.push(i)
+    }
+}
+
+const XMLText = createToken({
+    name: "XMLText",
+    pattern: /[^<&]+/,
+    start_chars_hint: hints
+})
+```
+
+Please Note that filling such an array [can take over 1ms][fill_16_bits] on a modern machine.
+So if you are only parsing small inputs and/or starting a new process for each
+parser invocation the added initilization cost may be counter productive.
+
+# Errors
 
 ## Unexpected RegExp Anchor Error
 
@@ -71,35 +237,12 @@ const Whitespace = createToken({
     // invalid pattern using both anchors
     pattern: /^\d+$/
 })
-```
-
-This will be checked for during the initialization of the lexer.
-Unfortunately, this validation can detect false positives when the anchor characters
-are used in certain regExp contexts, for example:
-
-```javascript
-const createToken = chevrotain.createToken
-
-const semVer = createToken({
-    name: "semVer",
-    // will match semantic versions such as: "1.0.2", "^0.3.9"
-    // inside a character set ([...]) the carat ('^') character does not act as an anchor.
-    // yet it would still cause the validation to fail.
-    pattern: /[~^]?\d+\.\d+\.\d+/
-})
 
 // will throw an error
 new chevrotain.Lexer([semVer])
 ```
 
-It is possible to workaround this problem by simply **escaping** the the offending carat or dollar sign.
-
-```javascript
-const semVer = createToken({
-    name: "semVer",
-    pattern: /[~\^]?\d+\.\d+\.\d+/
-})
-```
+To resolve this simply avoid using anchors in your Token Types patterns.
 
 ## Token can never be matched
 
@@ -156,116 +299,6 @@ const tokensResult = myLexer.tokenize("forward")
 To resolve this second problem see how to prefer the **longest match**
 as demonstrated in the [keywords vs identifiers example][keywords_idents]
 
-## Complement Sets cannot be automatically optimized
-
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
-using the next [charCode][mdn_char_code] to be consumed.
-To apply this optimization the first possible charCodes for **every** TokenType must be identified.
-
-When a TokenType pattern uses a regExp complement Set as a potential **first** character
-the optimization is skipped as translating a complement set to a regular set requires too many cpu cycles
-during the Lexer's initialization.
-
-For example an XML Text is defined by **everything** except a closing tag.
-
-```javascript
-const XMLText = createToken({
-    name: "XMLText",
-    pattern: /[^<&]+/
-})
-```
-
-This means that there are **65533** (65535 - 2) possible starting charCodes
-For an XMLText token.
-
-If the use of these optimizations is desired and the startup resources cost is acceptable
-It is possilbe to enable the optimizations by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
-e.g:
-
-```javascript
-const hints = []
-for (let i = 0; i <= 65535; i++) {
-    // 38 is '<' and 60 is '&'
-    if (i !== 38 || i !== 60) {
-        hints.push(i)
-    }
-}
-
-const XMLText = createToken({
-    name: "XMLText",
-    pattern: /[^<&]+/,
-    start_chars_hint: hints
-})
-```
-
-Please Note that filling such an array [can take over 1ms][fill_16_bits] on a modern machine.
-So if you are only parsing small inputs and/or starting a new process for each
-parser invocation the added initilization cost may be counter productive.
-
-## Failed parsing < /.../ > Using the regexp-to-ast library
-
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
-using the next [charCode][mdn_char_code] to be consumed.
-To apply this optimization the first possible charCodes for **every** TokenType must be identified.
-
-This analysis is implemented using the [regexp-to-ast][regexp_to_ast] library.
-This error usally indicates a bug in the regexp-to-ast library.
-The impact is that the optimization described above would become disabled.
-Lexing and Parsing will still work correctly, only slower...
-
-Please open a bug for the [regexp-to-ast][regexp_to_ast] library.
-This issue can be **worked around** by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
-
-```javascript
-const Integer = createToken({
-    name: "Integer",
-    // lets assume that this pattern caused an error in regexp-to-ast
-    pattern: /[1-9]\d*/,
-    // by explicitly providing the first possible characters of this pattern
-    // the analysis by the regexp-to-ast library will be skipped
-    // and the optimization can be enabled.
-    start_chars_hint: ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-})
-```
-
-## The regexp unicode flag is not currently supported by the regexp-to-ast library
-
-The Chevrotain Lexer performs optimizations by filtering the potential token matchs
-using the next [charCode][mdn_char_code] to be consumed.
-To apply this optimization the first possible charCodes for **every** TokenType must be identified.
-
-This analysis is implemented using the [regexp-to-ast][regexp_to_ast] library.
-This library currently does not support the [unicode regexp flag][unicode_mdn]
-The impact is that the optimization described above would become disabled.
-Lexing and Parsing will still work correctly, just slower...
-
-This issue can be **worked around** by explicitly providing a "[start_chars_hint][start_chars_hint]" property.
-
-```javascript
-// '💩' character
-createToken({
-    name: "PileOfPoo",
-    // \u{xxxxx} 32bit unicode escape can only be used with the /u flag enabled.
-    pattern: /\u{1F4A9}/u,
-    // The '💩' character is represented by surrogate pairs: '\uD83D\uDCA9'
-    // the start_chars_hint should only be provided the first of the pair.
-    start_chars_hint: [55357]
-})
-```
-
-Another way to **work around** the issue is to define the pattern as a string literal.
-As that kind can be trivially optimized.
-This is naturally only relevant for simple patterns.
-For example:
-
-```javascript
-createToken({
-    name: "LCurley",
-    // note that the pattern is a string literal, not a regExp literal.
-    pattern: "{"
-})
-```
-
 ## TokenType <...> is using a custom token pattern without providing <char_start_hint> parameter
 
 The Chevrotain Lexer performs optimizations by filtering the potential token matchs
@@ -292,6 +325,24 @@ const IntegerToken = createToken({
 Providing the "[start_chars_hint][start_chars_hint]" property is **not** mandatory.
 It will only enable performance optimizations in the lexer.
 
+## Missing \<lineTerminatorCharacters\> property on the Lexer config
+
+Chevrotain treats /\n|\r\n?/ as line terminators, but that is insufficient for some grammars
+Therefore it is possible to customize the definition of line terminators using the the [lineTerminatorPattern option][line_terminator_pattern]
+When doing so however it is also necessary to provide the [lineTerminatorCharacters option][line_terminator_characters].
+This causes a bit of duplication and may be simplified in future versions.
+
+Example:
+
+```javascript
+const myLexer = new chevrotain.Lexer([], {
+    // For our lexer only "\n" is a counted as a line terminator
+    lineTerminatorsPattern: /\n/,
+    // Duplicate information, "\n".charCodeAt(0) === 10
+    lineTerminatorCharacters: [10]
+})
+```
+
 [position_tracking]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/ilexerconfig.html#positiontracking
 [line_terminator_docs]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/ilexerconfig.html#lineTerminatorsPattern
 [start_chars_hint]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/itokenconfig.html#start_chars_hint
@@ -301,3 +352,5 @@ It will only enable performance optimizations in the lexer.
 [regexp_to_ast]: https://github.com/bd82/regexp-to-ast
 [unicode_mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/unicode
 [custom_token_patterns]: https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html
+[line_terminator_pattern]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/ilexerconfig.html#lineterminatorspattern
+[line_terminator_characters]: https://sap.github.io/chevrotain/documentation/3_5_0/interfaces/ilexerconfig.html#lineTerminatorCharacters

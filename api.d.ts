@@ -1113,6 +1113,13 @@ export interface ILexerConfig {
     lineTerminatorsPattern?: RegExp | ILineTerminatorsTester
 
     /**
+     * Characters or CharCodes that represent line terminators for this lexer.
+     * This is normally computed automatically by analyzing {@link ILexerConfig.lineTerminatorsPattern}
+     * But when it cannot be accomplished automatically the lexer will raise an error during initialization.
+     */
+    lineTerminatorCharacters?: (number | string)[]
+
+    /**
      * When true this flag will cause the Lexer to throw an Error
      * When it is unable to perform all of its performance optimizations.
      *
@@ -1276,24 +1283,6 @@ export declare function createTokenInstance(
     endColumn: number
 ): IToken
 
-export interface TokenType {
-    GROUP?: string
-    PATTERN?: RegExp | string
-    LABEL?: string
-    LONGER_ALT?: TokenType
-    POP_MODE?: boolean
-    PUSH_MODE?: string
-    LINE_BREAKS?: boolean
-    CATEGORIES?: TokenType[]
-    tokenName?: string
-    tokenTypeIdx?: number
-    categoryMatches?: number[]
-    categoryMatchesMap?: {
-        [tokType: number]: boolean
-    }
-    isParent?: boolean
-}
-
 /**
  *  API #1 [Custom Token Patterns](http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html).
  */
@@ -1317,6 +1306,25 @@ export declare type CustomPatternMatcherFunc = (
         [groupName: string]: IToken[]
     }
 ) => RegExpExecArray | null
+
+export interface TokenType {
+    name: string
+    GROUP?: string
+    PATTERN?: RegExp | string
+    LABEL?: string
+    LONGER_ALT?: TokenType
+    POP_MODE?: boolean
+    PUSH_MODE?: string
+    LINE_BREAKS?: boolean
+    CATEGORIES?: TokenType[]
+    tokenName?: string
+    tokenTypeIdx?: number
+    categoryMatches?: number[]
+    categoryMatchesMap?: {
+        [tokType: number]: boolean
+    }
+    isParent?: boolean
+}
 
 /**
  *  API #2 for [Custom Token Patterns](http://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html).
@@ -1817,7 +1825,9 @@ export declare enum LexerDefinitionErrorType {
     SOI_ANCHOR_FOUND = 11,
     EMPTY_MATCH_PATTERN = 12,
     NO_LINE_BREAKS_FLAGS = 13,
-    UNREACHABLE_PATTERN = 14
+    UNREACHABLE_PATTERN = 14,
+    IDENTIFY_TERMINATOR = 15,
+    CUSTOM_LINE_BREAK = 16
 }
 
 /**

@@ -4,6 +4,7 @@ import {
     DEFAULT_MODE,
     LineTerminatorOptimizedTester,
     performRuntimeChecks,
+    performWarningRuntimeChecks,
     SUPPORT_STICKY,
     validatePatterns
 } from "./lexer"
@@ -20,6 +21,7 @@ import {
     map,
     merge,
     NOOP,
+    PRINT_WARNING,
     reduce,
     reject
 } from "../utils/utils"
@@ -55,7 +57,9 @@ export enum LexerDefinitionErrorType {
     SOI_ANCHOR_FOUND,
     EMPTY_MATCH_PATTERN,
     NO_LINE_BREAKS_FLAGS,
-    UNREACHABLE_PATTERN
+    UNREACHABLE_PATTERN,
+    IDENTIFY_TERMINATOR,
+    CUSTOM_LINE_BREAK
 }
 
 export interface IRegExpExec {
@@ -66,6 +70,7 @@ const DEFAULT_LEXER_CONFIG: ILexerConfig = {
     deferDefinitionErrorsHandling: false,
     positionTracking: "full",
     lineTerminatorsPattern: /\n|\r\n?/g,
+    lineTerminatorCharacters: ["\n", "\r"],
     ensureOptimizations: false,
     safeMode: false
 }
@@ -79,6 +84,7 @@ export class Lexer {
 
     public static NA = /NOT_APPLICABLE/
     public lexerDefinitionErrors: ILexerDefinitionError[] = []
+    public lexerDefinitionWarning: ILexerDefinitionError[] = []
 
     protected patternIdxToConfig: any = {}
     protected charCodeToPatternIdxToConfig: any = {}
@@ -113,6 +119,16 @@ export class Lexer {
         ) {
             // optimized built-in implementation for the defaults definition of lineTerminators
             this.config.lineTerminatorsPattern = LineTerminatorOptimizedTester
+        } else {
+            if (
+                this.config.lineTerminatorCharacters ===
+                DEFAULT_LEXER_CONFIG.lineTerminatorCharacters
+            ) {
+                throw Error(
+                    "Error: Missing <lineTerminatorCharacters> property on the Lexer config.\n" +
+                        "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#MISSING_LINE_TERM_CHARS"
+                )
+            }
         }
 
         if (config.safeMode && config.ensureOptimizations) {
@@ -145,7 +161,19 @@ export class Lexer {
         }
 
         this.lexerDefinitionErrors = this.lexerDefinitionErrors.concat(
-            performRuntimeChecks(actualDefinition, this.trackStartLines)
+            performRuntimeChecks(
+                actualDefinition,
+                this.trackStartLines,
+                this.config.lineTerminatorCharacters
+            )
+        )
+
+        this.lexerDefinitionWarning = this.lexerDefinitionWarning.concat(
+            performWarningRuntimeChecks(
+                actualDefinition,
+                this.trackStartLines,
+                this.config.lineTerminatorCharacters
+            )
         )
 
         // for extra robustness to avoid throwing an none informative error message
@@ -178,6 +206,9 @@ export class Lexer {
                 if (isEmpty(this.lexerDefinitionErrors)) {
                     augmentTokenTypes(currModDef)
                     let currAnalyzeResult = analyzeTokenTypes(currModDef, {
+                        lineTerminatorCharacters: this.config
+                            .lineTerminatorCharacters,
+                        positionTracking: config.positionTracking,
                         ensureOptimizations: config.ensureOptimizations,
                         safeMode: config.safeMode
                     })
@@ -219,6 +250,11 @@ export class Lexer {
                     allErrMessagesString
             )
         }
+
+        // Only print warning if there are no errors, This will avoid pl
+        forEach(this.lexerDefinitionWarning, warningDescriptor => {
+            PRINT_WARNING(warningDescriptor.message)
+        })
 
         // Choose the relevant internal implementations for this specific parser.
         // These implementations should be in-lined by the JavaScript engine

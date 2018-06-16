@@ -417,9 +417,10 @@ export function PRINT_ERROR(msg) {
     }
 }
 
-export function PRINT_WARNNING(msg) {
+export function PRINT_WARNING(msg) {
     /* istanbul ignore else - can't override global.console in node.js*/
     if (console && console.warn) {
-        console.warn(`Error: ${msg}`)
+        // TODO: modify docs accordingly
+        console.warn(`Warning: ${msg}`)
     }
 }
