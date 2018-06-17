@@ -104,7 +104,7 @@ This dependency is included in the bundled artifacts, for ease of consumption in
 
 ## Compatibility
 
-Chevrotain should run on any modern JavaScript ES5.1 runtime.
+Chevrotain runs on any modern JavaScript ES5.1 runtime.
 
 -   The CI build runs the tests under:
 
