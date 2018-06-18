@@ -1,0 +1,30 @@
+[
+  {
+    "type": "Rule",
+    "name": "root",
+    "orgText": "() => {\n            this.CONSUME(Alpha)\n            this.CONSUME(Bravo)\n            this.CONSUME(Charlie)\n        }",
+    "definition": [
+      {
+        "type": "Terminal",
+        "name": "Alpha",
+        "label": "Alpha",
+        "idx": 0,
+        "pattern": "A"
+      },
+      {
+        "type": "Terminal",
+        "name": "Bravo",
+        "label": "Bravo",
+        "idx": 0,
+        "pattern": "B"
+      },
+      {
+        "type": "Terminal",
+        "name": "Charlie",
+        "label": "Charlie",
+        "idx": 0,
+        "pattern": "C"
+      }
+    ]
+  }
+]
