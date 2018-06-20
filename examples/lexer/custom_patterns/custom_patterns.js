@@ -33,7 +33,9 @@ function matchInteger(text, startOffset) {
 // Consult the Docs (linked above) for additional syntax variants.
 const IntegerLiteral = createToken({
     name: "IntegerLiteral",
-    pattern: matchInteger
+    pattern: matchInteger,
+    // custom patterns should explicitly specify the line_breaks option.
+    line_breaks: false
 })
 const Comma = createToken({ name: "Comma", pattern: /,/ })
 const Whitespace = createToken({

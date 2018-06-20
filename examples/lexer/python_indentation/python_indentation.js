@@ -171,8 +171,18 @@ const Newline = createToken({
 })
 
 // define the indentation tokens using custom token patterns
-const Indent = createToken({ name: "Indent", pattern: matchIndent })
-const Outdent = createToken({ name: "Outdent", pattern: matchOutdent })
+const Indent = createToken({
+    name: "Indent",
+    pattern: matchIndent,
+    // custom token patterns should explicitly specify the line_breaks option
+    line_breaks: false
+})
+const Outdent = createToken({
+    name: "Outdent",
+    pattern: matchOutdent,
+    // custom token patterns should explicitly specify the line_breaks option
+    line_breaks: false
+})
 
 const customPatternLexer = new Lexer([
     Newline,
