@@ -52,15 +52,13 @@ const CharRef = createToken({
 
 const SEA_WS = createToken({
     name: "SEA_WS",
-    pattern: /( |\t|\n|\r\n)+/,
-    line_breaks: true
+    pattern: /( |\t|\n|\r\n)+/
 })
 
 const XMLDeclOpen = createToken({
     name: "XMLDeclOpen",
     pattern: /<\?xml[ \t\r\n]/,
-    push_mode: "INSIDE",
-    line_breaks: true
+    push_mode: "INSIDE"
 })
 
 const SLASH_OPEN = createToken({
@@ -76,7 +74,7 @@ const PROCESSING_INSTRUCTION = createToken({
     pattern: MAKE_PATTERN("<\\?{{Name}}.*\\?>")
 })
 
-const TEXT = createToken({ name: "TEXT", pattern: /[^<&]+/, line_breaks: true })
+const TEXT = createToken({ name: "TEXT", pattern: /[^<&]+/ })
 
 const CLOSE = createToken({ name: "CLOSE", pattern: />/, pop_mode: true })
 
@@ -96,8 +94,7 @@ const SLASH = createToken({ name: "SLASH", pattern: /\// })
 
 const STRING = createToken({
     name: "STRING",
-    pattern: /"[^<"]*"|'[^<']*'/,
-    line_breaks: true
+    pattern: /"[^<"]*"|'[^<']*'/
 })
 
 const EQUALS = createToken({ name: "EQUALS", pattern: /=/ })
@@ -107,8 +104,7 @@ const Name = createToken({ name: "Name", pattern: MAKE_PATTERN("{{Name}}") })
 const S = createToken({
     name: "S",
     pattern: /[ \t\r\n]/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const XmlLexerDefinition = {

@@ -8,8 +8,7 @@ const Integer = createToken({ name: "Integer", pattern: /\d+/ })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const allTokens = [WhiteSpace, LSquare, RSquare, Comma, Integer]

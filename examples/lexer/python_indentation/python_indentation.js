@@ -167,8 +167,7 @@ const Spaces = createToken({
 const Newline = createToken({
     name: "Newline",
     pattern: /\n|\r\n?/,
-    group: "nl",
-    line_breaks: true
+    group: "nl"
 })
 
 // define the indentation tokens using custom token patterns

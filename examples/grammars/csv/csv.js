@@ -13,8 +13,7 @@ const Text = createToken({ name: "Text", pattern: /[^,\n\r"]+/ })
 const Comma = createToken({ name: "Comma", pattern: /,/ })
 const NewLine = createToken({
     name: "NewLine",
-    pattern: /\r?\n/,
-    line_breaks: true
+    pattern: /\r?\n/
 })
 const String = createToken({ name: "String", pattern: /"(?:""|[^"])*"/ })
 

@@ -14,8 +14,7 @@ const Whitespace = createToken({
     // the Lexer.SKIPPED group is a special group that will cause the lexer to "ignore"
     // certain Tokens. these tokens are still consumed from the text, they just don't appear in the
     // lexer's output. the is especially useful for ignoring whitespace and in some use cases comments too.
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const Comment = createToken({

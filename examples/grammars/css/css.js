@@ -51,8 +51,7 @@ const Whitespace = createToken({
     // The W3C specs are are defined in a whitespace sensitive manner.
     // But there is only **one** place where the grammar is truly whitespace sensitive.
     // So the whitespace sensitivity was implemented via a GATE in the selector rule.
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const Comment = createToken({

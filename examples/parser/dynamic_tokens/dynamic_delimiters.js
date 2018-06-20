@@ -28,8 +28,7 @@ const NumberLiteral = createToken({ name: "NumberLiteral", pattern: /\d+/ })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const allTokens = [

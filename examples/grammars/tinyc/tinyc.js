@@ -19,8 +19,7 @@ function createToken(options) {
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const If = createToken({ name: "If", pattern: /if/ })

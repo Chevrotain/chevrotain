@@ -63,8 +63,7 @@ const Den = createToken({ name: "Den", pattern: /den/ })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const abstractTokens = [RelationWord]

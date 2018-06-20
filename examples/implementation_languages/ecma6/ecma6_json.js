@@ -26,8 +26,7 @@ const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /[ \t\n\r]+/,
     // ignore whitespace
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 const allTokens = [
