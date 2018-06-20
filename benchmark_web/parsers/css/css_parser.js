@@ -49,17 +49,13 @@ var Whitespace = createToken({
     // the W3C specs are are defined in a whitespace sensitive manner.
     // This implementation ignores that crazy mess, This means that this grammar may be a superset of the css 2.1 grammar.
     // Checking for whitespace related errors can be done in a separate process AFTER parsing.
-    group: Lexer.SKIPPED,
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 var Comment = createToken({
     name: "Comment",
     pattern: /\/\*[^*]*\*+([^/*][^*]*\*+})*\//,
-    group: Lexer.SKIPPED,
-    // note that comments could span multiple lines.
-    // forgetting to enable this flag will cause inaccuracies in the lexer location tracking.
-    line_breaks: true
+    group: Lexer.SKIPPED
 })
 
 // This group has to be defined BEFORE Ident as their prefix is a valid Ident
