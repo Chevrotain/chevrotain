@@ -1,10 +1,9 @@
-import { RegExpParser, BaseRegExpVisitor } from "regexp-to-ast"
+import { BaseRegExpVisitor, RegExpParser } from "regexp-to-ast"
 import { tokenName } from "./tokens_public"
 import { IRegExpExec, Lexer, LexerDefinitionErrorType } from "./lexer_public"
 import {
     compact,
     contains,
-    PRINT_ERROR,
     defaults,
     difference,
     filter,
@@ -24,10 +23,15 @@ import {
     map,
     mapValues,
     packArray,
+    PRINT_ERROR,
     reduce,
     reject
 } from "../utils/utils"
-import { failedOptimizationPrefixMsg, getStartCodes } from "./reg_exp"
+import {
+    canMatchCharCode,
+    failedOptimizationPrefixMsg,
+    getStartCodes
+} from "./reg_exp"
 import {
     ILexerDefinitionError,
     ILineTerminatorsTester,
@@ -76,7 +80,9 @@ export function enableSticky() {
 export function analyzeTokenTypes(
     tokenTypes: TokenType[],
     options: {
+        positionTracking?: "full" | "onlyStart" | "onlyOffset"
         ensureOptimizations?: boolean
+        lineTerminatorCharacters?: (number | string)[]
         useSticky?: boolean
         safeMode?: boolean
     }
@@ -84,7 +90,9 @@ export function analyzeTokenTypes(
     options = defaults(options, {
         useSticky: SUPPORT_STICKY,
         debug: false,
-        safeMode: false
+        safeMode: false,
+        positionTracking: "full",
+        lineTerminatorCharacters: ["\r", "\n"]
     })
 
     let onlyRelevantTypes = reject(tokenTypes, currType => {
@@ -205,10 +213,28 @@ export function analyzeTokenTypes(
         has(clazz, "POP_MODE")
     )
 
-    let patternIdxToCanLineTerminator = map(
-        onlyRelevantTypes,
-        clazz => clazz.LINE_BREAKS === true
+    const lineTerminatorCharCodes = getCharCodes(
+        options.lineTerminatorCharacters
     )
+
+    let patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => false)
+    if (options.positionTracking !== "onlyOffset") {
+        patternIdxToCanLineTerminator = map(onlyRelevantTypes, tokType => {
+            if (has(tokType, "LINE_BREAKS")) {
+                return tokType.LINE_BREAKS
+            } else {
+                if (
+                    checkLineBreaksIssues(tokType, lineTerminatorCharCodes) ===
+                    false
+                ) {
+                    return canMatchCharCode(
+                        lineTerminatorCharCodes,
+                        tokType.PATTERN
+                    )
+                }
+            }
+        })
+    }
 
     let patternIdxToIsCustom = map(onlyRelevantTypes, isCustomPattern)
     let patternIdxToShort = map(allTransformedPatterns, isShortPattern)
@@ -786,7 +812,8 @@ export function addStickyFlag(pattern: RegExp): RegExp {
 
 export function performRuntimeChecks(
     lexerDefinition: IMultiModeLexerDefinition,
-    trackLines: boolean
+    trackLines: boolean,
+    lineTerminatorCharacters: (number | string)[]
 ): ILexerDefinitionError[] {
     let errors = []
 
@@ -842,28 +869,68 @@ export function performRuntimeChecks(
         })
     }
 
-    let allTokenTypes = flatten(
-        mapValues(lexerDefinition.modes, tokTypes => tokTypes)
+    return errors
+}
+
+export function performWarningRuntimeChecks(
+    lexerDefinition: IMultiModeLexerDefinition,
+    trackLines: boolean,
+    lineTerminatorCharacters: (number | string)[]
+): ILexerDefinitionError[] {
+    const warnings = []
+    let hasAnyLineBreak = false
+    const allTokenTypes = compact(
+        flatten(mapValues(lexerDefinition.modes, tokTypes => tokTypes))
     )
-    if (
-        trackLines &&
-        find(
-            allTokenTypes,
-            (currTokType: TokenType) => currTokType.LINE_BREAKS
-        ) === undefined
-    ) {
-        errors.push({
+
+    const concreteTokenTypes = reject(
+        allTokenTypes,
+        currType => currType[PATTERN] === Lexer.NA
+    )
+    const terminatorCharCodes = getCharCodes(lineTerminatorCharacters)
+    if (trackLines) {
+        forEach(concreteTokenTypes, tokType => {
+            const currIssue = checkLineBreaksIssues(
+                tokType,
+                terminatorCharCodes
+            )
+            if (currIssue !== false) {
+                const message = buildLineBreakIssueMessage(tokType, currIssue)
+                const warningDescriptor = {
+                    message,
+                    type: currIssue.issue,
+                    tokenType: tokType
+                }
+                warnings.push(warningDescriptor)
+            } else {
+                // we don't want to attempt to scan if the user explicitly specified the line_breaks option.
+                if (has(tokType, "LINE_BREAKS")) {
+                    if (tokType.LINE_BREAKS === true) {
+                        hasAnyLineBreak = true
+                    }
+                } else {
+                    if (
+                        canMatchCharCode(terminatorCharCodes, tokType.PATTERN)
+                    ) {
+                        hasAnyLineBreak = true
+                    }
+                }
+            }
+        })
+    }
+
+    if (trackLines && !hasAnyLineBreak) {
+        warnings.push({
             message:
-                "No LINE_BREAKS Error:\n" +
+                "Warning: No LINE_BREAKS Found.\n" +
                 "\tThis Lexer has been defined to track line and column information,\n" +
-                "\tyet none of the Token definitions contain a LINE_BREAK flag.\n" +
+                "\tBut none of the Token Types can be identified as matching a line terminator.\n" +
                 "\tSee https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#LINE_BREAKS \n" +
                 "\tfor details.",
             type: LexerDefinitionErrorType.NO_LINE_BREAKS_FLAGS
         })
     }
-
-    return errors
+    return warnings
 }
 
 export function cloneEmptyGroups(emptyGroups: {
@@ -938,4 +1005,84 @@ export const LineTerminatorOptimizedTester: ILineTerminatorsTester = {
     },
 
     lastIndex: 0
+}
+
+function checkLineBreaksIssues(
+    tokType: TokenType,
+    lineTerminatorCharCodes: number[]
+):
+    | {
+          issue:
+              | LexerDefinitionErrorType.IDENTIFY_TERMINATOR
+              | LexerDefinitionErrorType.CUSTOM_LINE_BREAK
+          errMsg?: string
+      }
+    | false {
+    if (has(tokType, "LINE_BREAKS")) {
+        // if the user explicitly declared the line_breaks option we will respect their choice
+        // and assume it is correct.
+        return false
+    } else {
+        /* istanbul ignore else */
+        if (isRegExp(tokType.PATTERN)) {
+            try {
+                canMatchCharCode(lineTerminatorCharCodes, tokType.PATTERN)
+            } catch (e) {
+                /* istanbul ignore next - to test this we would have to mock <canMatchCharCode> to throw an error */
+                return {
+                    issue: LexerDefinitionErrorType.IDENTIFY_TERMINATOR,
+                    errMsg: e.message
+                }
+            }
+            return false
+        } else if (isString(tokType.PATTERN)) {
+            // string literal patterns can always be analyzed to detect line terminator usage
+            return false
+        } else if (isFunction(tokType.PATTERN)) {
+            // custom token types
+            return { issue: LexerDefinitionErrorType.CUSTOM_LINE_BREAK }
+        } else {
+            throw Error("non exhaustive match")
+        }
+    }
+}
+
+export function buildLineBreakIssueMessage(
+    tokType: TokenType,
+    details: {
+        issue:
+            | LexerDefinitionErrorType.IDENTIFY_TERMINATOR
+            | LexerDefinitionErrorType.CUSTOM_LINE_BREAK
+        errMsg?: string
+    }
+): string {
+    /* istanbul ignore else */
+    if (details.issue === LexerDefinitionErrorType.IDENTIFY_TERMINATOR) {
+        return (
+            "Warning: unable to identify line terminator usage in pattern.\n" +
+            `\tThe problem is in the <${tokType.name}> Token Type\n` +
+            `\t Root cause: ${details.errMsg}.\n` +
+            "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#IDENTIFY_TERMINATOR"
+        )
+    } else if (details.issue === LexerDefinitionErrorType.CUSTOM_LINE_BREAK) {
+        return (
+            "Warning: A Custom Token Pattern should specify the <line_breaks> option.\n" +
+            `\tThe problem is in the <${tokType.name}> Token Type\n` +
+            "\tFor details See: https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#CUSTOM_LINE_BREAK"
+        )
+    } else {
+        throw Error("non exhaustive match")
+    }
+}
+
+function getCharCodes(charsOrCodes: (number | string)[]): number[] {
+    const charCodes = map(charsOrCodes, numOrString => {
+        if (isString(numOrString) && numOrString.length > 0) {
+            return numOrString.charCodeAt(0)
+        } else {
+            return numOrString
+        }
+    })
+
+    return charCodes
 }

@@ -1,14 +1,16 @@
-import { RegExpParser, VERSION } from "regexp-to-ast"
+import { RegExpParser, VERSION, BaseRegExpVisitor } from "regexp-to-ast"
 import {
     flatten,
     map,
     forEach,
     contains,
     PRINT_ERROR,
-    PRINT_WARNNING
+    PRINT_WARNING,
+    find,
+    isRegExp
 } from "../utils/utils"
 
-const parser = new RegExpParser()
+const regExpParser = new RegExpParser()
 const complementErrorMessage =
     "Complement Sets are not supported for first char optimization"
 export const failedOptimizationPrefixMsg =
@@ -19,7 +21,7 @@ export function getStartCodes(
     ensureOptimizations = false
 ): number[] {
     try {
-        const ast = parser.pattern(regExp.toString())
+        const ast = regExpParser.pattern(regExp.toString())
         let firstChars = firstChar(ast.value)
         if (ast.flags.ignoreCase) {
             firstChars = applyIgnoreCase(firstChars)
@@ -32,7 +34,7 @@ export function getStartCodes(
         // TODO: only the else branch needs to be ignored, try to fix with newer prettier / tsc
         if (e.message === complementErrorMessage) {
             if (ensureOptimizations) {
-                PRINT_WARNNING(
+                PRINT_WARNING(
                     `${failedOptimizationPrefixMsg}` +
                         `\tUnable to optimize: < ${regExp.toString()} >\n` +
                         "\tComplement Sets cannot be automatically optimized.\n" +
@@ -144,4 +146,70 @@ export function applyIgnoreCase(firstChars: number[]): number[] {
     })
 
     return firstCharsCase
+}
+
+class CharCodeFinder extends BaseRegExpVisitor {
+    found: boolean = false
+    constructor(private targetCharCodes: number[]) {
+        super()
+    }
+
+    visitChildren(node) {
+        // switch lookaheads as they do not actually consume any characters thus
+        // finding a charCode at lookahead context does not mean that regexp can actually contain it in a match.
+        switch (node.type) {
+            case "Lookahead":
+                this.visitLookahead(node)
+                return
+            case "NegativeLookahead":
+                this.visitNegativeLookahead(node)
+                return
+        }
+
+        super.visitChildren(node)
+    }
+
+    visitCharacter(node) {
+        if (contains(this.targetCharCodes, node.value)) {
+            this.found = true
+        }
+    }
+
+    visitSet(node) {
+        if (node.complement) {
+            if (
+                find(node.value, charCode =>
+                    contains(this.targetCharCodes, charCode)
+                ) === undefined
+            ) {
+                this.found = true
+            }
+        } else {
+            if (
+                find(node.value, charCode =>
+                    contains(this.targetCharCodes, charCode)
+                ) !== undefined
+            ) {
+                this.found = true
+            }
+        }
+    }
+}
+
+export function canMatchCharCode(
+    charCodes: number[],
+    pattern: RegExp | string
+) {
+    if (pattern instanceof RegExp) {
+        const ast = regExpParser.pattern(pattern.toString())
+        const charCodeFinder = new CharCodeFinder(charCodes)
+        charCodeFinder.visit(ast)
+        return charCodeFinder.found
+    } else {
+        return (
+            find(<any>pattern, char => {
+                return contains(charCodes, (<string>char).charCodeAt(0))
+            }) !== undefined
+        )
+    }
 }

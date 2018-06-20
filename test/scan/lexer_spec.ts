@@ -12,6 +12,7 @@ import { Lexer, LexerDefinitionErrorType } from "../../src/scan/lexer_public"
 import {
     addStartOfInput,
     analyzeTokenTypes,
+    buildLineBreakIssueMessage,
     disableSticky,
     enableSticky,
     findDuplicatePatterns,
@@ -363,7 +364,7 @@ function defineLexerSpecs(
                     expect(errors).to.be.empty
                 })
 
-                it("will detect identical patterns for different classes", () => {
+                it("will detect identical patterns for different Token Types", () => {
                     let tokenClasses = [DecimalInvalid, IntegerValid]
                     let errors = findDuplicatePatterns(tokenClasses)
                     expect(errors.length).to.equal(1)
@@ -622,12 +623,62 @@ function defineLexerSpecs(
                 let ltCounter = new Lexer([
                     createToken({
                         name: "lt",
-                        pattern: /\s+/,
-                        line_breaks: true
+                        pattern: /\s+/
                     }),
                     createToken({
                         name: "num",
                         pattern: /\d+/
+                    })
+                ])
+                let lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)
+                expect(lastToken.startLine).to.equal(3)
+
+                let lastToken2 = last(
+                    ltCounter.tokenize("\r\r\r1234\r\n1").tokens
+                )
+                expect(lastToken2.startLine).to.equal(5)
+                expect(lastToken2.startColumn).to.equal(1)
+
+                let lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)
+                expect(lastToken3.startLine).to.equal(5)
+            })
+
+            it("can count the number of line terminators in a string - with lookahead", () => {
+                let ltCounter = new Lexer([
+                    createToken({
+                        name: "lt",
+                        pattern: /\s+/
+                    }),
+                    createToken({
+                        name: "num",
+                        // meaningless lookahead for coverage
+                        pattern: /\d+(?=|\n)/
+                    })
+                ])
+                let lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)
+                expect(lastToken.startLine).to.equal(3)
+
+                let lastToken2 = last(
+                    ltCounter.tokenize("\r\r\r1234\r\n1").tokens
+                )
+                expect(lastToken2.startLine).to.equal(5)
+                expect(lastToken2.startColumn).to.equal(1)
+
+                let lastToken3 = last(ltCounter.tokenize("2\r3\n\r4\n5").tokens)
+                expect(lastToken3.startLine).to.equal(5)
+            })
+
+            it("can count the number of line terminators in a string - with negative lookahead", () => {
+                let ltCounter = new Lexer([
+                    createToken({
+                        name: "lt",
+                        pattern: /\s+/
+                    }),
+                    createToken({
+                        name: "num",
+                        // including the newline lookahead to assure it is being ignored
+                        // while figuring out if this pattern can include a line terminator.
+                        pattern: /\d+(?!a\n)/
                     })
                 ])
                 let lastToken = last(ltCounter.tokenize("1\r\n1\r1").tokens)
@@ -659,6 +710,21 @@ function defineLexerSpecs(
                 expect(lastToken.startLine).to.equal(3)
             })
 
+            it("can count the number of line terminators in a string - string literal patterns - implicit <line_breaks> prop", () => {
+                let ltCounter = new Lexer([
+                    createToken({
+                        name: "lt",
+                        pattern: "\n"
+                    }),
+                    createToken({
+                        name: "num",
+                        pattern: /\d+/
+                    })
+                ])
+                let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
+                expect(lastToken.startLine).to.equal(3)
+            })
+
             it("Supports custom Line Terminators", () => {
                 let WS = createToken({
                     name: "WS",
@@ -667,7 +733,36 @@ function defineLexerSpecs(
                     group: Lexer.SKIPPED
                 })
                 let ifElseLexer = new Lexer([WS, If, Else], {
-                    lineTerminatorsPattern: /\u2028/g
+                    lineTerminatorsPattern: /\u2028/g,
+                    lineTerminatorCharacters: ["\u2028"]
+                })
+
+                let input = "if\u2028elseif"
+
+                let lexResult = ifElseLexer.tokenize(input)
+                let tokens: any = lexResult.tokens
+                expect(tokens[0].image).to.equal("if")
+                expect(tokens[0].startLine).to.equal(1)
+                expect(tokens[0].startColumn).to.equal(1)
+                expect(tokens[1].image).to.equal("else")
+                expect(tokens[1].startLine).to.equal(2)
+                expect(tokens[1].startColumn).to.equal(1)
+                expect(tokens[2].image).to.equal("if")
+                expect(tokens[2].startLine).to.equal(2)
+                expect(tokens[2].startColumn).to.equal(5)
+            })
+
+            it("Supports custom Line Terminators with numerical lineTerminatorCharacters", () => {
+                let WS = createToken({
+                    name: "WS",
+                    pattern: /\u2028/,
+                    line_breaks: true,
+                    group: Lexer.SKIPPED
+                })
+                let ifElseLexer = new Lexer([WS, If, Else], {
+                    lineTerminatorsPattern: /\u2028/g,
+                    // "\u2028".charCodeAt(0) === 8232
+                    lineTerminatorCharacters: [8232]
                 })
 
                 let input = "if\u2028elseif"
@@ -873,6 +968,31 @@ function defineLexerSpecs(
 
             // when testing custom patterns the EOI anchor will not exist and thus no error will be thrown
             if (!skipValidationChecks) {
+                // This test must not be performed in custom mode
+                it("can count the number of line terminators in a string - complement <line_breaks> prop", () => {
+                    let ltCounter = new Lexer([
+                        createToken({
+                            name: "lt",
+                            pattern: /[^\d]+/
+                        }),
+                        createToken({
+                            name: "num",
+                            pattern: /\d+/
+                        })
+                    ])
+                    let lastToken = last(ltCounter.tokenize("1\n1\n1").tokens)
+                    expect(lastToken.startLine).to.equal(3)
+                })
+
+                it("can build error message for failing to identify potential line_breaks", () => {
+                    const One = createToken({ name: "One", pattern: "1" })
+                    const actualMsg = buildLineBreakIssueMessage(One, {
+                        issue: LexerDefinitionErrorType.IDENTIFY_TERMINATOR,
+                        errMsg: "oops"
+                    })
+                    expect(actualMsg).to.contain("oops")
+                })
+
                 it("Will throw an error during the creation of a Lexer if the lexer config argument is a boolean", () => {
                     expect(
                         () =>
@@ -890,6 +1010,19 @@ function defineLexerSpecs(
                     )
                 })
 
+                it(
+                    "Will throw an error during the creation of a Lexer if the is using custom " +
+                        "line terminators without specifying the lineTerminatorCharacters",
+                    () => {
+                        expect(
+                            () =>
+                                new Lexer([], { lineTerminatorsPattern: /\n/g })
+                        ).to.throw(
+                            "Error: Missing <lineTerminatorCharacters> property on the Lexer config."
+                        )
+                    }
+                )
+
                 it("Will throw an error during the creation of a Lexer if the Lexer's definition is invalid", () => {
                     expect(
                         () => new Lexer([EndOfInputAnchor, If, Else]),
@@ -905,12 +1038,14 @@ function defineLexerSpecs(
                     expect(
                         () =>
                             new Lexer([EndOfInputAnchor, If, Else], {
+                                positionTracking: "onlyOffset",
                                 deferDefinitionErrorsHandling: true
                             })
                     ).to.not.throw(/Errors detected in definition of Lexer/)
                     expect(
                         () =>
                             new Lexer([EndOfInputAnchor, If, Else], {
+                                positionTracking: "onlyOffset",
                                 deferDefinitionErrorsHandling: true
                             })
                     ).to.not.throw(/EndOfInputAnchor/)
@@ -918,6 +1053,7 @@ function defineLexerSpecs(
                     let lexerWithErrs = new Lexer(
                         [EndOfInputAnchor, If, Else],
                         {
+                            positionTracking: "onlyOffset",
                             deferDefinitionErrorsHandling: true
                         }
                     )
@@ -1687,9 +1823,11 @@ function defineLexerSpecs(
                                 name: "A",
                                 pattern: "A"
                             })
+
                             let B = createToken({
                                 name: "B",
-                                pattern: <any>extraContextValidator
+                                pattern: <any>extraContextValidator,
+                                line_breaks: false
                             })
                             let WS = createToken({
                                 name: "WS",
@@ -1760,16 +1898,20 @@ if (typeof window !== "undefined") {
 }
 
 skipOnBrowser("debugging and messages and optimizations", () => {
-    let consoleSpy
+    let consoleErrorSpy, consoleWarnSpy
 
     beforeEach(function() {
         // @ts-ignore
-        consoleSpy = sinon.spy(console, "error")
+        consoleErrorSpy = sinon.spy(console, "error")
+        // @ts-ignore
+        consoleWarnSpy = sinon.spy(console, "warn")
     })
 
     afterEach(function() {
         // @ts-ignore
         console.error.restore()
+        // @ts-ignore
+        console.warn.restore()
     })
 
     it("not report unicode flag", () => {
@@ -1790,8 +1932,26 @@ skipOnBrowser("debugging and messages and optimizations", () => {
                 })
         ).to.throw("Lexer Modes: < defaultMode > cannot be optimized.")
         expect(console.error).to.have.been.called
-        expect(consoleSpy.args[0][0]).to.include(
+        expect(consoleErrorSpy.args[0][0]).to.include(
             "The regexp unicode flag is not currently supported by the regexp-to-ast library"
+        )
+    })
+
+    it("report warning for not specifying line_breaks with custom tokens", () => {
+        const NewLine = createToken({
+            name: "NewLine",
+            pattern: /(\n|\r|\r\n)/
+        })
+        const Five = createToken({
+            name: "Five",
+            pattern: (text, offset) => {
+                return /5/.exec(text)
+            }
+        })
+        expect(() => new Lexer([Five, NewLine])).to.not.throw()
+        expect(console.warn).to.have.been.called
+        expect(consoleWarnSpy.args[0][0]).to.include(
+            "Warning: A Custom Token Pattern should specify the <line_breaks> option"
         )
     })
 
@@ -1810,7 +1970,7 @@ skipOnBrowser("debugging and messages and optimizations", () => {
                 })
         ).to.throw("Lexer Modes: < defaultMode > cannot be optimized.")
         expect(console.error).to.have.been.called
-        expect(consoleSpy.args[0][0]).to.include(
+        expect(consoleErrorSpy.args[0][0]).to.include(
             "TokenType: <One> is using a custom token pattern without providing <start_chars_hint>"
         )
     })
@@ -1899,6 +2059,8 @@ function wrapWithCustom(baseExtendToken) {
                 let execResult = withStart.exec(text.substring(offset))
                 return execResult
             }
+
+            newToken.LINE_BREAKS = newToken.LINE_BREAKS === true
         }
         return newToken
     }
