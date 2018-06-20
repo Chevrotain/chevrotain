@@ -2,6 +2,7 @@
 
 #### Minor Changes
 
+-   [Simplify Handling of line terminators in Lexers](https://github.com/SAP/chevrotain/issues/709).
 -   [Ability to de-serialize and serialize the GST instead of rebuilding it using Function.toString](https://github.com/SAP/chevrotain/issues/706).
 
 #### Bug Fixes

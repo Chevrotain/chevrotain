@@ -1114,8 +1114,8 @@ export interface ILexerConfig {
 
     /**
      * Characters or CharCodes that represent line terminators for this lexer.
-     * This is normally computed automatically by analyzing {@link ILexerConfig.lineTerminatorsPattern}
-     * But when it cannot be accomplished automatically the lexer will raise an error during initialization.
+     * This always needs to be provided when using a custom {@link ILexerConfig.lineTerminatorsPattern}.
+     * In the future this duplication may be removed or reduced.
      */
     lineTerminatorCharacters?: (number | string)[]
 
