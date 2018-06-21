@@ -1038,7 +1038,7 @@ function checkLineBreaksIssues(
         } else if (isString(tokType.PATTERN)) {
             // string literal patterns can always be analyzed to detect line terminator usage
             return false
-        } else if (isFunction(tokType.PATTERN)) {
+        } else if (isCustomPattern(tokType)) {
             // custom token types
             return { issue: LexerDefinitionErrorType.CUSTOM_LINE_BREAK }
         } else {

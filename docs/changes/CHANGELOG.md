@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [](https://github.com/SAP/chevrotain/issues/759).
+
 ## 3.6.0 (6-21-2018)
 
 #### Minor Changes
