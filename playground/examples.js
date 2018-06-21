@@ -61,8 +61,7 @@ function jsonExample() {
     });
     const WhiteSpace = createToken({
         name: "WhiteSpace", pattern: /\s+/,
-        group: Lexer.SKIPPED,
-        line_breaks: true
+        group: Lexer.SKIPPED
     });
 
 
@@ -206,8 +205,7 @@ function jsonGrammarOnlyExample() {
     const WhiteSpace = createToken({
         name: "WhiteSpace",
         pattern: /\s+/,
-        group: Lexer.SKIPPED,
-        line_breaks: true
+        group: Lexer.SKIPPED
     });
 
     const jsonTokens = [WhiteSpace, NumberLiteral, StringLiteral, RCurly, LCurly,
@@ -355,8 +353,7 @@ function cssExample() {
     const Whitespace = createToken({
         name: 'Whitespace',
         pattern: MAKE_PATTERN('{{spaces}}'),
-        group: Lexer.SKIPPED,
-        line_breaks: true
+        group: Lexer.SKIPPED
     });
     const Comment = createToken({
         name: 'Comment',
@@ -364,8 +361,7 @@ function cssExample() {
         // the W3C specs are are defined in a whitespace sensitive manner.
         // but this grammar is not
         // TODO: there is actually one place in the CSS grammar where whitespace is meaningful.
-        group: Lexer.SKIPPED,
-        line_breaks: true
+        group: Lexer.SKIPPED
     });
 
     // This group has to be defined BEFORE Ident as their prefix is a valid Ident
@@ -845,8 +841,7 @@ function calculatorExample() {
     const WhiteSpace = createToken({
         name: "WhiteSpace",
         pattern: /\s+/,
-        group: Lexer.SKIPPED,
-        line_breaks: true
+        group: Lexer.SKIPPED
     });
 
     // whitespace is normally very common so it is placed first to speed up the lexer
@@ -1021,8 +1016,7 @@ function calculatorExampleCst() {
     const WhiteSpace = createToken({
         name: "WhiteSpace",
         pattern: /\s+/,
-        group: Lexer.SKIPPED,
-        line_breaks: true
+        group: Lexer.SKIPPED
     });
 
     const allTokens = [WhiteSpace, // whitespace is normally very common so it should be placed first to speed up the lexer's performance
