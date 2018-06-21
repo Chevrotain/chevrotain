@@ -1,0 +1,551 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>chevrotain</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">chevrotain</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> chevrotain</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<p><a href="https://gitter.im/chevrotain-parser/Lobby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/chevrotain-parser/Lobby.svg" alt="Join the chat at https://gitter.im/chevrotain-parser/Lobby"></a>
+					<a href="https://www.npmjs.com/package/chevrotain"><img src="https://img.shields.io/npm/v/chevrotain.svg" alt="npm"></a>
+					<a href="https://travis-ci.org/SAP/chevrotain"><img src="https://travis-ci.org/SAP/chevrotain.svg?branch=master" alt="Build Status"></a>
+					<a href="https://coveralls.io/r/SAP/chevrotain?branch=master"><img src="https://coveralls.io/repos/SAP/chevrotain/badge.svg?branch=master" alt="Coverage Status"></a>
+					<a href="https://david-dm.org/SAP/chevrotain"><img src="https://img.shields.io/david/SAP/chevrotain.svg" alt="Dependency status"></a>
+				<a href="https://github.com/prettier/prettier"><img src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" alt="styled with prettier"></a></p>
+				<p><a href="https://saucelabs.com/u/shahars"><img src="https://saucelabs.com/browser-matrix/shahars.svg" alt="Sauce Test Status"></a></p>
+				<h1 id="chevrotain">Chevrotain</h1>
+				<h2 id="introduction">Introduction</h2>
+				<p>Chevrotain is a <a href="https://sap.github.io/chevrotain/performance/"><strong>very fast</strong></a> and <strong>feature rich</strong> <strong>Parser Building Toolkit</strong> for <strong>JavaScript</strong>.
+					It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
+				to full fledged programing languages.</p>
+				<p>A more in depth description of Chevrotain can be found in this great article on: <a href="https://tomassetti.me/parsing-in-javascript/#chevrotain">Parsing in JavaScript: Tools and Libraries</a>.</p>
+				<p>It is important to note that Chevrotain is <strong>NOT</strong> a parser generator. It solves the same kind of problems as a parser generator, just <strong>without any code generation</strong>. Chevrotain Grammars are pure code which can be created/debugged/edited
+				as any other pure code without requiring any new tools or processes.</p>
+				<h2 id="tldr">TLDR</h2>
+				<ul>
+					<li><a href="https://sap.github.io/chevrotain/playground/"><strong>Online Playground</strong></a></li>
+					<li><strong><a href="https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html">Getting Started Tutorial</a></strong></li>
+					<li><a href="https://sap.github.io/chevrotain/performance/"><strong>Performance benchmark</strong></a></li>
+				</ul>
+				<h2 id="features">Features</h2>
+				<ol>
+					<li><p><strong>Parsing DSL</strong>.</p>
+						<ul>
+							<li><strong>LL(k)</strong> grammars support.</li>
+							<li>Useable from <a href="https://github.com/SAP/chevrotain/tree/master/examples/implementation_languages">JavaScript / TypeScript / CoffeeScript</a>.</li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js"><strong>Separation</strong> of grammar and semantics.</a></li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js">Customizable</a> <strong>Error Reporting</strong> with full location information.</li>
+							<li>Strong <strong>Error Recovery/Fault-Tolerance</strong> capabilities based on Antlr3&#39;s algorithms.</li>
+							<li>Supports <a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js">gates/predicates</a>.</li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/backtracking/backtracking.js">Backtracking</a> support.</li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js">Grammar Inheritance.</a></li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js">Multiple starting rules.</a></li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js">Parameterized Rules.</a></li>
+							<li><a href="https://sap.github.io/chevrotain/docs/guide/syntactic_content_assist.html">Syntactic Content Assist.</a></li>
+							<li><strong>No code generation</strong>.<ul>
+									<li>The DSL is just JavaScript, not an external language.</li>
+									<li>The grammar is directly debuggable as plain JavaScript source.</li>
+									<li>Short feedback loops.</li>
+									<li>Allows great flexibility for inserting custom Parser actions.</li>
+								</ul>
+							</li>
+							<li><a href="https://sap.github.io/chevrotain/docs/guide/custom_apis.html">Custom APIs</a>.</li>
+						</ul>
+					</li>
+					<li><p><strong>Lexer Engine</strong></p>
+						<ul>
+							<li>Based on Regular Expressions.</li>
+							<li>Full position information tracking (lines/columns/offsets).</li>
+							<li>Token skipping (whitespace/comments/...).</li>
+							<li>Prioritise longest match (<a href="https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js">Keywords vs Identifiers</a>).</li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js">Multiple Lexer Modes</a> depending on the context.</li>
+							<li><a href="https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js">Tokens Grouping</a>.</li>
+							<li><a href="https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html">Custom Token patterns(none RegExp) support</a></li>
+							<li><strong>No code generation</strong> The Lexer does not require any code generation phase.</li>
+						</ul>
+					</li>
+					<li><p><a href="https://sap.github.io/chevrotain/performance/"><strong>High Performance</strong></a>.</p>
+					</li>
+					<li><p><a href="https://sap.github.io/chevrotain/docs/guide/generating_syntax_diagrams.html"><strong>Railroad Diagrams Generation</strong></a>.</p>
+					</li>
+					<li><p><strong>Grammar Reflection/Introspection</strong>.</p>
+						<ul>
+							<li>The Grammar&#39;s structure is known and <strong>exposed</strong> at runtime.</li>
+							<li>Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.</li>
+						</ul>
+					</li>
+					<li><p>Well tested with <strong>~100% code coverage</strong>, Unit &amp; Integration tests</p>
+					</li>
+				</ol>
+				<h2 id="installation">Installation</h2>
+				<ul>
+					<li><strong>npm</strong>: <code>npm install chevrotain</code></li>
+					<li><strong>Browser</strong>:
+						The npm package contains Chevrotain as concatenated and minified files ready for use in a browser.
+						These can also be accessed directly via <a href="https://unpkg.com/">UNPKG</a> in a script tag.<ul>
+							<li>Latest:<ul>
+									<li><code>https://unpkg.com/chevrotain/lib/chevrotain.js</code></li>
+									<li><code>https://unpkg.com/chevrotain/lib/chevrotain.min.js</code></li>
+								</ul>
+							</li>
+							<li>Explicit version number:<ul>
+									<li><code>https://unpkg.com/chevrotain@3.6.1/lib/chevrotain.js</code></li>
+									<li><code>https://unpkg.com/chevrotain@3.6.1/lib/chevrotain.min.js</code></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<h2 id="documentation-resources">Documentation &amp; Resources</h2>
+				<ul>
+					<li><p><strong><a href="https://sap.github.io/chevrotain/docs/tutorial/step1_lexing.html">Getting Started Tutorial</a></strong>.</p>
+					</li>
+					<li><p><strong><a href="https://github.com/SAP/chevrotain/blob/master/examples/grammars">Sample Grammars</a></strong>.</p>
+					</li>
+					<li><p><strong><a href="https://sap.github.io/chevrotain/docs/FAQ.html">FAQ</a>.</strong></p>
+					</li>
+					<li><p><strong><a href="https://github.com/SAP/chevrotain/blob/master/examples">Other Examples</a></strong>.</p>
+					</li>
+					<li><p><strong><a href="https://sap.github.io/chevrotain/documentation">HTML API docs</a>.</strong></p>
+						<ul>
+							<li><a href="https://sap.github.io/chevrotain/documentation/3_6_1/classes/parser.html#at_least_one">The Parsing DSL Docs</a>.</li>
+						</ul>
+					</li>
+				</ul>
+				<h2 id="dependencies">Dependencies</h2>
+				<p>There is a single dependency to <a href="https://github.com/bd82/regexp-to-ast">regexp-to-ast</a> library.
+				This dependency is included in the bundled artifacts, for ease of consumption in browsers.</p>
+				<h2 id="compatibility">Compatibility</h2>
+				<p>Chevrotain runs on any modern JavaScript ES5.1 runtime.</p>
+				<ul>
+					<li><p>The CI build runs the tests under:</p>
+						<ul>
+							<li>Node.js (6 / 8 / 10).</li>
+							<li>Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.</li>
+						</ul>
+					</li>
+					<li><p>Uses <a href="https://github.com/umdjs/umd">UMD</a> to work with common module loaders (browser global / amd / commonjs).</p>
+					</li>
+				</ul>
+				<h2 id="contributions">Contributions</h2>
+				<p>Contributions are <strong>greatly</strong> appreciated.
+				See <a href="./CONTRIBUTING.md">CONTRIBUTING.md</a> for details.</p>
+				<h2 id="where-used">Where used</h2>
+				<p>Some interesting samples:</p>
+				<ul>
+					<li><a href="https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js">Metabase BI expression parser</a>.</li>
+					<li><a href="https://github.com/witheve/Eve/blob/master/src/parser/parser.ts">Eve Programing Language</a>.</li>
+					<li><a href="https://github.com/Microsoft/BioModelAnalyzer/blob/master/ChatBot/src/NLParser/NLParser.ts">BioModelAnalyzer&#39;s ChatBot parser</a>.</li>
+					<li><a href="https://github.com/sgarciac/bombadil/blob/master/src/parser.ts">Bombadil Toml Parser</a></li>
+					<li><a href="https://github.com/RokuRoad/bright/blob/master/src/Parser.ts">BrightScript Parser</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/lexerdefinitionerrortype.html" class="tsd-kind-icon">Lexer<wbr>Definition<wbr>Error<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/parserdefinitionerrortype.html" class="tsd-kind-icon">Parser<wbr>Definition<wbr>Error<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/alternation.html" class="tsd-kind-icon">Alternation</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/flat.html" class="tsd-kind-icon">Flat</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/gastvisitor.html" class="tsd-kind-icon">GAst<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/lexer.html" class="tsd-kind-icon">Lexer</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/nonterminal.html" class="tsd-kind-icon">Non<wbr>Terminal</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/option.html" class="tsd-kind-icon">Option</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/parser.html" class="tsd-kind-icon">Parser</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/repetition.html" class="tsd-kind-icon">Repetition</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/repetitionmandatory.html" class="tsd-kind-icon">Repetition<wbr>Mandatory</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/repetitionmandatorywithseparator.html" class="tsd-kind-icon">Repetition<wbr>Mandatory<wbr>With<wbr>Separator</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/repetitionwithseparator.html" class="tsd-kind-icon">Repetition<wbr>With<wbr>Separator</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/rule.html" class="tsd-kind-icon">Rule</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/terminal.html" class="tsd-kind-icon">Terminal</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/atleastonesepmethodopts.html" class="tsd-kind-icon">At<wbr>Least<wbr>One<wbr>Sep<wbr>Method<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/consumemethodopts.html" class="tsd-kind-icon">Consume<wbr>Method<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/cstnode.html" class="tsd-kind-icon">Cst<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/dslmethodopts.html" class="tsd-kind-icon">DSLMethod<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/dslmethodoptswitherr.html" class="tsd-kind-icon">DSLMethod<wbr>Opts<wbr>With<wbr>Err</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-not-exported">
+						<a href="interfaces/hashtable.html" class="tsd-kind-icon">Hash<wbr>Table</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icreatesyntaxdiagramsconfig.html" class="tsd-kind-icon">ICreate<wbr>Syntax<wbr>Diagrams<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/icstvisitor.html" class="tsd-kind-icon">ICst<wbr>Visitor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/icustompattern.html" class="tsd-kind-icon">ICustom<wbr>Pattern</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/igastvisitor.html" class="tsd-kind-icon">IGASTVisitor</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/igrammarpath.html" class="tsd-kind-icon">IGrammar<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/igrammarresolvererrormessageprovider.html" class="tsd-kind-icon">IGrammar<wbr>Resolver<wbr>Error<wbr>Message<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/igrammarvalidatorerrormessageprovider.html" class="tsd-kind-icon">IGrammar<wbr>Validator<wbr>Error<wbr>Message<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilexerconfig.html" class="tsd-kind-icon">ILexer<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilexerdefinitionerror.html" class="tsd-kind-icon">ILexer<wbr>Definition<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilexingerror.html" class="tsd-kind-icon">ILexing<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilexingresult.html" class="tsd-kind-icon">ILexing<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilineterminatorstester.html" class="tsd-kind-icon">ILine<wbr>Terminators<wbr>Tester</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/imultimodelexerdefinition.html" class="tsd-kind-icon">IMulti<wbr>Mode<wbr>Lexer<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ioptionallynamedproduction.html" class="tsd-kind-icon">IOptionally<wbr>Named<wbr>Production</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ioralt.html" class="tsd-kind-icon">IOr<wbr>Alt</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ioraltwithgate.html" class="tsd-kind-icon">IOr<wbr>Alt<wbr>With<wbr>Gate</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iparserconfig.html" class="tsd-kind-icon">IParser<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iparserdefinitionerror.html" class="tsd-kind-icon">IParser<wbr>Definition<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iparsererrormessageprovider.html" class="tsd-kind-icon">IParser<wbr>Error<wbr>Message<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iproduction.html" class="tsd-kind-icon">IProduction</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iproductionwithoccurrence.html" class="tsd-kind-icon">IProduction<wbr>With<wbr>Occurrence</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/irecognitionexception.html" class="tsd-kind-icon">IRecognition<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/irecognizercontext.html" class="tsd-kind-icon">IRecognizer<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/iruleconfig.html" class="tsd-kind-icon">IRule<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iserializedgast.html" class="tsd-kind-icon">ISerialized<wbr>Gast</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/isyntacticcontentassistpath.html" class="tsd-kind-icon">ISyntactic<wbr>Content<wbr>Assist<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/itoken.html" class="tsd-kind-icon">IToken</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/itokenconfig.html" class="tsd-kind-icon">IToken<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/itokengrammarpath.html" class="tsd-kind-icon">IToken<wbr>Grammar<wbr>Path</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/manysepmethodopts.html" class="tsd-kind-icon">Many<wbr>Sep<wbr>Method<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
+						<a href="interfaces/ormethodopts.html" class="tsd-kind-icon">Or<wbr>Method<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/subrulemethodopts.html" class="tsd-kind-icon">Subrule<wbr>Method<wbr>Opts</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/tokentype.html" class="tsd-kind-icon">Token<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#cstchildrendictionary" class="tsd-kind-icon">Cst<wbr>Children<wbr>Dictionary</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#cstelement" class="tsd-kind-icon">Cst<wbr>Element</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#custompatternmatcherfunc" class="tsd-kind-icon">Custom<wbr>Pattern<wbr>Matcher<wbr>Func</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#grammaraction" class="tsd-kind-icon">Grammar<wbr>Action</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#ianyoralt" class="tsd-kind-icon">IAny<wbr>OrAlt</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#iseparatediterationresult" class="tsd-kind-icon">ISeparated<wbr>Iteration<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ignoredparserissues" class="tsd-kind-icon">Ignored<wbr>Parser<wbr>Issues</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ignoredruleissues" class="tsd-kind-icon">Ignored<wbr>Rule<wbr>Issues</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#multimodesdefinition" class="tsd-kind-icon">Multi<wbr>Modes<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#tokentypedictionary" class="tsd-kind-icon">Token<wbr>Type<wbr>Dictionary</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#tokenvocabulary" class="tsd-kind-icon">Token<wbr>Vocabulary</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#eof" class="tsd-kind-icon">EOF</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#version" class="tsd-kind-icon">VERSION</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#defaultgrammarresolvererrorprovider" class="tsd-kind-icon">default<wbr>Grammar<wbr>Resolver<wbr>Error<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#defaultgrammarvalidatorerrorprovider" class="tsd-kind-icon">default<wbr>Grammar<wbr>Validator<wbr>Error<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#defaultparsererrorprovider" class="tsd-kind-icon">default<wbr>Parser<wbr>Error<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#empty_alt" class="tsd-kind-icon">EMPTY_<wbr>ALT</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#earlyexitexception" class="tsd-kind-icon">Early<wbr>Exit<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#mismatchedtokenexception" class="tsd-kind-icon">Mismatched<wbr>Token<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#noviablealtexception" class="tsd-kind-icon">No<wbr>Viable<wbr>Alt<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#notallinputparsedexception" class="tsd-kind-icon">Not<wbr>All<wbr>Input<wbr>Parsed<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#assignoccurrenceindices" class="tsd-kind-icon">assign<wbr>Occurrence<wbr>Indices</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#clearcache" class="tsd-kind-icon">clear<wbr>Cache</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createsyntaxdiagramscode" class="tsd-kind-icon">create<wbr>Syntax<wbr>Diagrams<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createtoken" class="tsd-kind-icon">create<wbr>Token</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createtokeninstance" class="tsd-kind-icon">create<wbr>Token<wbr>Instance</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#generateparserfactory" class="tsd-kind-icon">generate<wbr>Parser<wbr>Factory</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#generateparsermodule" class="tsd-kind-icon">generate<wbr>Parser<wbr>Module</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isrecognitionexception" class="tsd-kind-icon">is<wbr>Recognition<wbr>Exception</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#resolvegrammar" class="tsd-kind-icon">resolve<wbr>Grammar</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializegrammar" class="tsd-kind-icon">serialize<wbr>Grammar</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#serializeproduction" class="tsd-kind-icon">serialize<wbr>Production</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tokenlabel" class="tsd-kind-icon">token<wbr>Label</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tokenmatcher" class="tsd-kind-icon">token<wbr>Matcher</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tokenname" class="tsd-kind-icon">token<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#validategrammar" class="tsd-kind-icon">validate<wbr>Grammar</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
