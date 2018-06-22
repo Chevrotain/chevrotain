@@ -2,7 +2,7 @@
 
 #### Bug Fixes
 
--   [](https://github.com/SAP/chevrotain/issues/759).
+-   [Runtime exception when checking custom patterns line break issues](https://github.com/SAP/chevrotain/issues/759).
 
 ## 3.6.0 (6-21-2018)
 
