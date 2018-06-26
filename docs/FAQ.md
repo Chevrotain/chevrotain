@@ -122,15 +122,15 @@ These are highly recommended for each and every parser.
 
     ```javascript
     // reuse the same parser instance.
-    var parser = new JsonParserES5([])
+    const parser = new JsonParser([])
 
     module.exports = function(text) {
-        var lexResult = JsonLexer.tokenize(text)
+        const lexResult = JsonLexer.tokenize(text)
 
         // setting a new input will RESET the parser instance's state.
         parser.input = lexResult.tokens
 
-        var value = parser.json()
+        const value = parser.json()
 
         return {
             value: value,
@@ -140,9 +140,9 @@ These are highly recommended for each and every parser.
     }
     ```
 
-    This will avoid the fixed cost of reinitializing a parser instance.
-    But more importantly this pattern seems to help V8 Engine to avoid de-optimizations.
-    Such a pattern can lead to 15%-100% performance boost on V8 (Node.js/Chrome) depending on the grammar used.
+    Avoiding creating new instances is imperative because Chevrotain lazy evaluates and caches
+    many computations required for its execution, This cache is kept on the instance level
+    So creating a new Parser instance for each input would lose all advantages of this cache.
 
     Note that this means that if your parser "carries" additional state, that state should also be reset.
     Simply override the Parser's [reset](https://sap.github.io/chevrotain/documentation/3_6_1/classes/parser.html#reset) method

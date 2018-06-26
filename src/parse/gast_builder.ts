@@ -309,7 +309,6 @@ function buildRepetitionWithSep(
         separator: separatorType,
         idx: occurrenceIdx
     })
-    repetitionInstance.implicitOccurrenceIndex = isImplicitOccurrenceIdx
     let nestedName = reResult[2]
     if (!isUndefined(nestedName)) {
         ;(repetitionInstance as IOptionallyNamedProduction).name = nestedName

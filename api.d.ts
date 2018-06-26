@@ -2335,10 +2335,9 @@ export interface IParserDefinitionError {
 }
 
 /**
- * Clears the chevrotain internal cache.
- * This should not be used in regular work flows, This is intended for
- * unique use cases for example: online playground where the a parser with the same name is initialized with
- * different implementations multiple times.
+ * @deprecated
+ * This function no longer does anything, Avoid using this function
+ * As it will be removed in future versions.
  */
 export declare function clearCache(): void
 

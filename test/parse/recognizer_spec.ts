@@ -1,14 +1,12 @@
 import { EOF, createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
 import { Parser, EMPTY_ALT } from "../../src/parse/parser_public"
-import { getLookaheadFuncsForClass } from "../../src/parse/cache"
 import {
     EarlyExitException,
     MismatchedTokenException,
     NotAllInputParsedException,
     NoViableAltException
 } from "../../src/parse/exceptions_public"
-import { clearCache } from "../../src/parse/cache_public"
 import {
     tokenStructuredMatcher,
     augmentTokenTypes
@@ -129,10 +127,6 @@ function defineRecognizerSpecs(
 
             describe("supports EMPTY(...) alternative convenience function", () => {
                 class EmptyAltParser extends Parser {
-                    public getLookAheadCache(): Function[] {
-                        return getLookaheadFuncsForClass(this.className)
-                    }
-
                     constructor(input: IToken[] = []) {
                         super(input, ALL_TOKENS)
                         this.performSelfAnalysis()
@@ -958,19 +952,6 @@ function defineRecognizerSpecs(
                     // init the first parser
                     new MyNoneUniqueSpecialParser([])
                 })
-
-                it("Will throw an error if multiple different parsers exist with the same name", () => {
-                    class MyNoneUniqueSpecialParser extends Parser {
-                        constructor(input: IToken[] = []) {
-                            super(input, ALL_TOKENS)
-                            this.performSelfAnalysis()
-                        }
-                    }
-
-                    expect(() => new MyNoneUniqueSpecialParser()).to.throw(
-                        "None Unique Grammar Name Found"
-                    )
-                })
             })
 
             it("can be initialized with a vector of Tokens", () => {
@@ -1578,7 +1559,6 @@ function defineRecognizerSpecs(
                 let parser = new SerializingParser([])
                 const expected = parser.getGAstProductions()
                 serializedGrammar = parser.getSerializedGastProductions()
-                clearCache()
                 let parser1 = new SerializingParser([])
                 const actual = parser1.getGAstProductions()
                 expect(expected).to.deep.equal(actual)
@@ -1653,10 +1633,6 @@ function defineRecognizerSpecs(
                     parser.computeContentAssist("invalid_rule_name", [])
                 ).to.throw("does not exist in this grammar")
             })
-        })
-
-        after(() => {
-            clearCache()
         })
     })
 }

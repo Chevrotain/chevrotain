@@ -9,17 +9,16 @@ const { lt } = require("semver")
 describe("The Chevrotain diagrams rendering APIs", function() {
     const serializedGrammar = new DDLExampleRecoveryParser().getSerializedGastProductions()
 
-    let skipOnNode4AndBrowser = it
+    let skipOnBrowser = it
     if (
         typeof window !== "undefined" ||
-        lt(process.version, "6.0.0") ||
         // This makes the tests run x6 slower.
         process.env.SKIP_JS_DOM
     ) {
-        skipOnNode4AndBrowser = <any>it.skip
+        skipOnBrowser = <any>it.skip
     }
 
-    skipOnNode4AndBrowser(
+    skipOnBrowser(
         "Produces valid and executable html text with custom options",
         function(done) {
             this.timeout(10000)
@@ -58,9 +57,7 @@ describe("The Chevrotain diagrams rendering APIs", function() {
         }
     )
 
-    skipOnNode4AndBrowser("Produces valid and executable html text", function(
-        done
-    ) {
+    skipOnBrowser("Produces valid and executable html text", function(done) {
         this.timeout(10000)
         const jsdom = require("jsdom")
         const { JSDOM } = jsdom

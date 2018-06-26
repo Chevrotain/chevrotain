@@ -1,6 +1,5 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { Parser } from "../../src/parse/parser_public"
-import { clearCache } from "../../src/parse/cache_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { map } from "../../src/utils/utils"
@@ -958,9 +957,5 @@ context("CST", () => {
             expect(tokenStructuredMatcher(second.children.C[0], C)).to.be.true
             expect(tokenStructuredMatcher(second.children.D[0], D)).to.be.true
         })
-    })
-
-    after(() => {
-        clearCache()
     })
 })
