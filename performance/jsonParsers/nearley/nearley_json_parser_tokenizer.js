@@ -1,7 +1,7 @@
-// Generated automatically by nearley
+// Generated automatically by nearley, version 2.13.0
 // http://github.com/Hardmath123/nearley
 (function () {
-function id(x) {return x[0]; }
+function id(x) { return x[0]; }
 
 var LCurly = {test: function(x) {return x.type === "LCurly"; }}
 var RCurly = {test: function(x) {return x.type === "RCurly"; }}
