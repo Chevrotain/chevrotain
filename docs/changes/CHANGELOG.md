@@ -1,3 +1,13 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Remove global cache (state) and use instance level cache instead.](https://github.com/SAP/chevrotain/issues/754).
+
+#### Bug Fixes
+
+-   [`mocha --watch` breaks the parser](https://github.com/SAP/chevrotain/issues/605).
+
 ## 3.6.1 (6-21-2018)
 
 #### Bug Fixes

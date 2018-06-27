@@ -13,7 +13,6 @@ sidebar: auto
 -   [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
 -   [Why does my parser appear to be stuck during it's initialization?](#STUCK_AMBIGUITY)
 -   [How do I Maximize my parser's performance?](#PERFORMANCE)
--   [Why do my tests fail when using "mocha --watch"?](#MOCHA_WATCH)
 
 ## Why should I use a Parsing DSL instead of a Parser Generator?
 
@@ -292,7 +291,7 @@ It is important to note that:
     This may seem innocent but if enough properties are added dynamically to an instance
     its V8 hidden class will change which could cause a severe performance reduction.
 
-    To avoid this, simpliy define these "cache properties" in the constructor.
+    To avoid this, simply define these "cache properties" in the constructor.
     See an example in the [ECMAScript5 grammar's constructor](https://github.com/SAP/chevrotain/blob/ac21570b97a8de0d6b91f29979aed8041455cacd/examples/grammars/ecma5/ecma5_parser.js#L37-L43).
 
 ### Minor Performance Benefits
@@ -359,18 +358,3 @@ These are only required if you are trying to squeeze every tiny bit of performan
         $.CONSUME(RSquare)
     })
     ```
-
-## Why do my tests fail when using "mocha --watch"?
-
-Mocha's watch mode reloads only the user modules in each iteration.
-This will cause Chevrotain to fail because it's cached information will become invalid.
-To resolve this use the [clearCache](https://sap.github.io/chevrotain/documentation/3_6_1/globals.html#clearcache)
-API before your tests execute.
-
-```javascript
-const { clearCache } = require("chevrotain")
-
-before(() => {
-    clearCache()
-})
-```
