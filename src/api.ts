@@ -19,7 +19,6 @@ import {
     NotAllInputParsedException,
     NoViableAltException
 } from "./parse/exceptions_public"
-import { clearCache } from "./parse/cache_public"
 import { VERSION } from "./version"
 import {
     defaultGrammarResolverErrorProvider,
@@ -235,7 +234,14 @@ API.validateGrammar = validateGrammar
 API.defaultGrammarValidatorErrorProvider = defaultGrammarValidatorErrorProvider
 API.assignOccurrenceIndices = assignOccurrenceIndices
 
-API.clearCache = clearCache
+/* istanbul ignore next */
+API.clearCache = function() {
+    console.warn(
+        "The clearCache function was 'soft' removed from the Chevrotain API." +
+            "\n\t It performs no action other than printing this message." +
+            "\n\t Please avoid using it as it will be completely removed in the future"
+    )
+}
 
 API.createSyntaxDiagramsCode = createSyntaxDiagramsCode
 

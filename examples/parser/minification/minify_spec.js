@@ -1,20 +1,7 @@
 var expect = require("chai").expect
 var _ = require("lodash")
 
-function clearJsonCache() {
-    var cacheModule = require("../node_modules/chevrotain/lib/src/parse/cache")
-    _.forEach(cacheModule, function(cacheItem) {
-        delete cacheItem.JsonParser
-    })
-}
-
 describe("Chevrotain minification support", () => {
-    // hack to clean the chevrotain Cache because initializing multiple parsers with
-    // the same name will not work correctly.
-    beforeEach(() => {
-        clearJsonCache()
-    })
-
     it("Cannot be minified without custom compression options", () => {
         expect(() => {
             require("./gen/no_compression.min").parseJson("")

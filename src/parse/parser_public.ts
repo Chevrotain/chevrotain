@@ -1,9 +1,3 @@
-import * as cache from "./cache"
-import {
-    CLASS_TO_ALL_RULE_NAMES,
-    CLASS_TO_BASE_CST_VISITOR,
-    CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS
-} from "./cache"
 import {
     EarlyExitException,
     isRecognitionException,
@@ -51,6 +45,7 @@ import {
 import { buildTopProduction, deserializeGrammar } from "./gast_builder"
 import {
     AbstractNextTerminalAfterProductionWalker,
+    IFirstAfterRepetition,
     NextAfterTokenWalker,
     nextPossibleTokensAfter,
     NextTerminalAfterAtLeastOneSepWalker,
@@ -59,7 +54,6 @@ import {
     NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
 import { IN } from "./constants"
-import { cloneProduction } from "./grammar/gast/gast"
 import {
     augmentTokenTypes,
     isTokenType,
@@ -236,136 +230,63 @@ export class Parser {
     }
 
     public performSelfAnalysis(): void {
-        let definitionErrors = []
         let defErrorsMsgs
 
         this.selfAnalysisDone = true
         let className = classNameFromInstance(this)
-        const actualClassConstructor = this.constructor
 
-        // can't test this with nyc tool, instrumentation causes the class name to be not empty.
-        /* istanbul ignore if */
-        if (className === "") {
-            // just a simple "throw Error" without any fancy "definition error" because the logic below relies on a unique parser name to
-            // save/access those definition errors...
-            /* istanbul ignore next */
-            throw Error(
-                "A Parser's constructor may not be an anonymous Function, it must be a named function\n" +
-                    "The constructor's name is used at runtime for performance (caching) purposes."
+        let productions = this.gastProductionsCache
+        if (this.serializedGrammar) {
+            const rules = deserializeGrammar(
+                this.serializedGrammar,
+                this.tokensMap
             )
-        }
-
-        // this information should only be computed once
-        if (!cache.CLASS_TO_CONSTRUCTOR.containsKey(className)) {
-            cache.CLASS_TO_CONSTRUCTOR.put(className, actualClassConstructor)
-        }
-        // Detect multiple Parsers using the same name.
-        // This will mess up the cache logic.
-        else {
-            const expectedClassConstructor = cache.CLASS_TO_CONSTRUCTOR.get(
-                className
-            )
-            if (actualClassConstructor !== expectedClassConstructor) {
-                throw Error(
-                    `None Unique Grammar Name Found: <${className}>\n` +
-                        "\tEvery grammar must have a unique name.\n" +
-                        "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#UNIQUE_NAME\n" +
-                        "\tFor Further details."
-                )
-            }
-        }
-
-        // this information should only be computed once
-        if (!cache.CLASS_TO_SELF_ANALYSIS_DONE.containsKey(className)) {
-            cache.CLASS_TO_SELF_ANALYSIS_DONE.put(className, true)
-
-            let orgProductions = this._productions
-            let clonedProductions = new HashTable<Rule>()
-            if (!this.serializedGrammar) {
-                // clone the grammar productions to support grammar inheritance. requirements:
-                // 1. We want to avoid rebuilding the grammar every time so a cache for the productions is used.
-                // 2. We need to collect the production from multiple grammars in an inheritance scenario during constructor invocation
-                //    so the myGast variable is used.
-                // 3. If a Production has been overridden references to it in the GAST must also be updated.
-                forEach(orgProductions.keys(), key => {
-                    let value = orgProductions.get(key)
-                    clonedProductions.put(key, cloneProduction(value))
-                })
-            } else {
-                const rules = deserializeGrammar(
-                    this.serializedGrammar,
-                    this.tokensMap
-                )
-                forEach(rules, rule => {
-                    clonedProductions.put(rule.name, rule)
-                })
-            }
-            cache.getProductionsForClass(className).putAll(clonedProductions)
-
-            // assumes this cache has been initialized (in the relevant parser's constructor)
-            // TODO: consider making the self analysis a member method to resolve this.
-            // that way it won't be callable before the constructor has been invoked...
-            definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(className)
-
-            let resolverErrors = resolveGrammar({
-                rules: clonedProductions.values()
+            forEach(rules, rule => {
+                this.gastProductionsCache.put(rule.name, rule)
             })
-            definitionErrors.push.apply(definitionErrors, resolverErrors) // mutability for the win?
-
-            // only perform additional grammar validations IFF no resolving errors have occurred.
-            // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
-            if (isEmpty(resolverErrors)) {
-                let validationErrors = validateGrammar({
-                    rules: clonedProductions.values(),
-                    maxLookahead: this.maxLookahead,
-                    tokenTypes: values(this.tokensMap),
-                    ignoredIssues: this.ignoredIssues,
-                    errMsgProvider: defaultGrammarValidatorErrorProvider,
-                    grammarName: className
-                })
-
-                definitionErrors.push.apply(definitionErrors, validationErrors) // mutability for the win?
-            }
-
-            if (
-                !isEmpty(definitionErrors) &&
-                !Parser.DEFER_DEFINITION_ERRORS_HANDLING
-            ) {
-                defErrorsMsgs = map(
-                    definitionErrors,
-                    defError => defError.message
-                )
-                throw new Error(
-                    `Parser Definition Errors detected:\n ${defErrorsMsgs.join(
-                        "\n-------------------------------\n"
-                    )}`
-                )
-            }
-            if (isEmpty(definitionErrors)) {
-                // this analysis may fail if the grammar is not perfectly valid
-                let allFollows = computeAllProdsFollows(
-                    clonedProductions.values()
-                )
-                cache.setResyncFollowsForClass(className, allFollows)
-            }
-
-            let cstAnalysisResult = analyzeCst(
-                clonedProductions.values(),
-                this.fullRuleNameToShort
-            )
-            cache.CLASS_TO_ALL_RULE_NAMES.put(
-                className,
-                cstAnalysisResult.allRuleNames
-            )
         }
 
-        // reThrow the validation errors each time an erroneous parser is instantiated
+        let resolverErrors = resolveGrammar({
+            rules: productions.values()
+        })
+        this.definitionErrors.push.apply(this.definitionErrors, resolverErrors) // mutability for the win?
+
+        // only perform additional grammar validations IFF no resolving errors have occurred.
+        // as unresolved grammar may lead to unhandled runtime exceptions in the follow up validations.
+        if (isEmpty(resolverErrors)) {
+            let validationErrors = validateGrammar({
+                rules: productions.values(),
+                maxLookahead: this.maxLookahead,
+                tokenTypes: values(this.tokensMap),
+                ignoredIssues: this.ignoredIssues,
+                errMsgProvider: defaultGrammarValidatorErrorProvider,
+                grammarName: className
+            })
+
+            this.definitionErrors.push.apply(
+                this.definitionErrors,
+                validationErrors
+            ) // mutability for the win?
+        }
+
+        if (isEmpty(this.definitionErrors)) {
+            // this analysis may fail if the grammar is not perfectly valid
+            let allFollows = computeAllProdsFollows(productions.values())
+            this.resyncFollows = allFollows
+        }
+
+        let cstAnalysisResult = analyzeCst(
+            productions.values(),
+            this.fullRuleNameToShort
+        )
+        this.allRuleNames = cstAnalysisResult.allRuleNames
+
         if (
-            !isEmpty(cache.CLASS_TO_DEFINITION_ERRORS.get(className)) &&
-            !Parser.DEFER_DEFINITION_ERRORS_HANDLING
+            !Parser.DEFER_DEFINITION_ERRORS_HANDLING &&
+            !isEmpty(this.definitionErrors)
         ) {
             defErrorsMsgs = map(
-                cache.CLASS_TO_DEFINITION_ERRORS.get(className),
+                this.definitionErrors,
                 defError => defError.message
             )
             throw new Error(
@@ -375,6 +296,17 @@ export class Parser {
             )
         }
     }
+
+    // caching
+    protected resyncFollows: HashTable<TokenType[]>
+    protected allRuleNames: string[]
+    protected lookAheadFuncsCache: Function[]
+    protected baseCstVisitorConstructor: Function
+    protected baseCstVisitorWithDefaultsConstructor: Function
+    protected gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
+    protected ProductionOverriddenForClass: HashTable<boolean> = new HashTable<
+        boolean
+    >()
 
     protected _errors: IRecognitionException[] = []
 
@@ -400,9 +332,7 @@ export class Parser {
     protected tokensMap: { [fqn: string]: TokenType } = undefined
 
     private firstAfterRepMap
-    private classLAFuncs
-    private cstDictDefForRule
-    private definitionErrors: IParserDefinitionError[]
+    private definitionErrors: IParserDefinitionError[] = []
     private definedRulesNames: string[] = []
 
     private shortRuleNameToFull = new HashTable<string>()
@@ -418,12 +348,6 @@ export class Parser {
     private tokVector: IToken[]
     private tokVectorLength
     private currIdx: number = -1
-
-    /**
-     * Only used internally for storing productions as they are built for the first time.
-     * The final productions should be accessed from the static cache.
-     */
-    private _productions: HashTable<Rule> = new HashTable<Rule>()
 
     constructor(
         input: IToken[],
@@ -486,20 +410,8 @@ export class Parser {
         }
 
         this.className = classNameFromInstance(this)
-        this.firstAfterRepMap = cache.getFirstAfterRepForClass(this.className)
-        this.classLAFuncs = cache.getLookaheadFuncsForClass(this.className)
-
-        if (!cache.CLASS_TO_DEFINITION_ERRORS.containsKey(this.className)) {
-            this.definitionErrors = []
-            cache.CLASS_TO_DEFINITION_ERRORS.put(
-                this.className,
-                this.definitionErrors
-            )
-        } else {
-            this.definitionErrors = cache.CLASS_TO_DEFINITION_ERRORS.get(
-                this.className
-            )
-        }
+        this.firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
+        this.lookAheadFuncsCache = []
 
         if (isArray(tokenVocabulary)) {
             this.tokensMap = <any>reduce(
@@ -579,61 +491,47 @@ export class Parser {
     public getBaseCstVisitorConstructor(): {
         new (...args: any[]): ICstVisitor<any, any>
     } {
-        let cachedConstructor = CLASS_TO_BASE_CST_VISITOR.get(this.className)
-
-        if (isUndefined(cachedConstructor)) {
-            let allRuleNames = CLASS_TO_ALL_RULE_NAMES.get(this.className)
-            cachedConstructor = createBaseSemanticVisitorConstructor(
+        if (isUndefined(this.baseCstVisitorConstructor)) {
+            const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
                 this.className,
-                allRuleNames
+                this.allRuleNames
             )
-            CLASS_TO_BASE_CST_VISITOR.put(this.className, cachedConstructor)
+            this.baseCstVisitorConstructor = newBaseCstVisitorConstructor
+            return newBaseCstVisitorConstructor
         }
 
-        return <any>cachedConstructor
+        return <any>this.baseCstVisitorConstructor
     }
 
     public getBaseCstVisitorConstructorWithDefaults(): {
         new (...args: any[]): ICstVisitor<any, any>
     } {
-        let cachedConstructor = CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS.get(
-            this.className
-        )
-
-        if (isUndefined(cachedConstructor)) {
-            let allRuleNames = CLASS_TO_ALL_RULE_NAMES.get(this.className)
-            let baseConstructor = this.getBaseCstVisitorConstructor()
-            cachedConstructor = createBaseVisitorConstructorWithDefaults(
+        if (isUndefined(this.baseCstVisitorWithDefaultsConstructor)) {
+            const newConstructor = createBaseVisitorConstructorWithDefaults(
                 this.className,
-                allRuleNames,
-                baseConstructor
+                this.allRuleNames,
+                this.getBaseCstVisitorConstructor()
             )
-            CLASS_TO_BASE_CST_VISITOR_WITH_DEFAULTS.put(
-                this.className,
-                cachedConstructor
-            )
+            this.baseCstVisitorWithDefaultsConstructor = newConstructor
+            return newConstructor
         }
 
-        return <any>cachedConstructor
+        return <any>this.baseCstVisitorWithDefaultsConstructor
     }
 
     public getGAstProductions(): HashTable<Rule> {
-        return cache.getProductionsForClass(this.className)
+        return this.gastProductionsCache
     }
 
     public getSerializedGastProductions(): ISerializedGast[] {
-        return serializeGrammar(
-            cache.getProductionsForClass(this.className).values()
-        )
+        return serializeGrammar(this.gastProductionsCache.values())
     }
 
     public computeContentAssist(
         startRuleName: string,
         precedingInput: IToken[]
     ): ISyntacticContentAssistPath[] {
-        let startRuleGast = cache
-            .getProductionsForClass(this.className)
-            .get(startRuleName)
+        let startRuleGast = this.gastProductionsCache.get(startRuleName)
 
         if (isUndefined(startRuleGast)) {
             throw Error(
@@ -1251,24 +1149,16 @@ export class Parser {
         this.definedRulesNames.push(name)
 
         // only build the gast representation once.
-        if (!this._productions.containsKey(name) && !this.serializedGrammar) {
+        if (
+            !this.gastProductionsCache.containsKey(name) &&
+            !this.serializedGrammar
+        ) {
             let gastProduction = buildTopProduction(
                 implementation.toString(),
                 name,
                 this.tokensMap
             )
-            this._productions.put(name, gastProduction)
-        } else {
-            let parserClassProductions = cache.getProductionsForClass(
-                this.className
-            )
-            let cachedProduction = parserClassProductions.get(name)
-            // in case of duplicate rules the cache will not be filled at this point.
-            if (!isUndefined(cachedProduction)) {
-                // filling up the _productions is always needed to inheriting grammars can access it (as an instance member)
-                // otherwise they will be unaware of productions defined in super grammars.
-                this._productions.put(name, cachedProduction)
-            }
+            this.gastProductionsCache.put(name, gastProduction)
         }
 
         let ruleImplementation = this.defineRule(name, implementation, config)
@@ -1291,27 +1181,14 @@ export class Parser {
         )
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
-        let alreadyOverridden = cache.getProductionOverriddenForClass(
-            this.className
+        this.ProductionOverriddenForClass.put(name, true)
+        // TODO: avoid building the rule when serializing grammars
+        let gastProduction = buildTopProduction(
+            impl.toString(),
+            name,
+            this.tokensMap
         )
-
-        // only build the GAST of an overridden rule once.
-        if (!alreadyOverridden.containsKey(name)) {
-            alreadyOverridden.put(name, true)
-            let gastProduction = buildTopProduction(
-                impl.toString(),
-                name,
-                this.tokensMap
-            )
-            this._productions.put(name, gastProduction)
-        } else {
-            let parserClassProductions = cache.getProductionsForClass(
-                this.className
-            )
-            // filling up the _productions is always needed to inheriting grammars can access it (as an instance member)
-            // otherwise they will be unaware of productions defined in super grammars.
-            this._productions.put(name, parserClassProductions.get(name))
-        }
+        this.gastProductionsCache.put(name, gastProduction)
 
         return this.defineRule(name, impl, config)
     }
@@ -1909,7 +1786,8 @@ export class Parser {
             followKey.idxInCallingRule +
             IN +
             followKey.inRule
-        return cache.getResyncFollowsForClass(this.className).get(followName)
+
+        return this.resyncFollows.get(followName)
     }
 
     // It does not make any sense to include a virtual EOF token in the list of resynced tokens
@@ -2579,7 +2457,7 @@ export class Parser {
         alts: IAnyOrAlt<any>[]
     ): () => number {
         let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let laFunc = <any>this.classLAFuncs[key]
+        let laFunc = <any>this.lookAheadFuncsCache[key]
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2595,7 +2473,7 @@ export class Parser {
                 this.dynamicTokensEnabled,
                 this.lookAheadBuilderForAlternatives
             )
-            this.classLAFuncs[key] = laFunc
+            this.lookAheadFuncsCache[key] = laFunc
             return laFunc
         } else {
             return laFunc
@@ -2699,7 +2577,7 @@ export class Parser {
         maxLookahead: number,
         prodType
     ): () => boolean {
-        let laFunc = <any>this.classLAFuncs[key]
+        let laFunc = <any>this.lookAheadFuncsCache[key]
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2711,7 +2589,7 @@ export class Parser {
                 prodType,
                 this.lookAheadBuilderForOptional
             )
-            this.classLAFuncs[key] = laFunc
+            this.lookAheadFuncsCache[key] = laFunc
             return laFunc
         } else {
             return laFunc
