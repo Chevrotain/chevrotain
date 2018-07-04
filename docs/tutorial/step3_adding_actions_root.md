@@ -5,7 +5,7 @@
 In the [previous](./step2_parsing.md) tutorial step
 we have implemented a parser for a "mini" SQL Select grammar. The current problem is that our parser only
 validates that the input conforms to the grammar. In most real world use cases the parser will also have to output some
-result or data data structure.
+result or data structure.
 
 We refer to the logic that computes that result or builds that data structure as the **Grammar Semantics**.
 
