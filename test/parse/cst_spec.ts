@@ -96,6 +96,38 @@ context("CST", () => {
         ).to.be.true
     })
 
+    it("Can output a CST with labels in recovery", () => {
+        class CstTerminalParser3 extends Parser {
+            constructor(input: IToken[] = []) {
+                super(input, ALL_TOKENS, {
+                    outputCst: true,
+                    recoveryEnabled: true
+                })
+                this.performSelfAnalysis()
+            }
+
+            public testRule = this.RULE("testRule", () => {
+                this.CONSUME(A, { LABEL: "myLabel" })
+                this.CONSUME(B)
+                this.SUBRULE(this.bamba, { LABEL: "myOtherLabel" })
+            })
+
+            public bamba = this.RULE("bamba", () => {
+                this.CONSUME(C)
+            })
+        }
+
+        let input = [createRegularToken(A), createRegularToken(B)]
+        let parser = new CstTerminalParser3(input)
+        let cst = parser.testRule()
+
+        expect(cst.name).to.equal("testRule")
+        expect(cst.children).to.have.keys("myLabel", "B", "myOtherLabel")
+        expect(tokenStructuredMatcher(cst.children.myLabel[0], A)).to.be.true
+        expect(tokenStructuredMatcher(cst.children.B[0], B)).to.be.true
+        expect(cst.children.myOtherLabel[0].name).to.equal("bamba")
+    })
+
     it("Can output a CST for a Terminal - alternations", () => {
         class CstTerminalAlternationParser extends Parser {
             constructor(input: IToken[] = []) {
