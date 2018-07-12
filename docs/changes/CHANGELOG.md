@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Potential Very Slow Lexer Initialization.](https://github.com/SAP/chevrotain/issues/768).
+
 ## 3.7.0 (6-27-2018)
 
 #### Minor Changes
