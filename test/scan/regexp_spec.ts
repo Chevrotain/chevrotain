@@ -1,6 +1,6 @@
 import { createToken } from "../../src/scan/tokens_public"
 import { Lexer } from "../../src/scan/lexer_public"
-import { getStartCodes } from "../../src/scan/reg_exp"
+import { canMatchCharCode, getStartCodes } from "../../src/scan/reg_exp"
 
 describe("The Chevrotain regexp analysis", () => {
     it("Will re-attempt none 'optimized' patterns if the optimization failed", () => {
@@ -45,6 +45,10 @@ describe("the regExp analysis", () => {
             expect(getStartCodes(/^$\b\Ba/)).to.deep.equal([97])
         })
 
+        it("can compute ranges", () => {
+            expect(getStartCodes(/[\n-\r]/)).to.deep.equal([10, 11, 12, 13])
+        })
+
         it("can compute with optional quantifiers", () => {
             expect(getStartCodes(/b*a/)).to.deep.equal([98, 97])
         })
@@ -59,6 +63,32 @@ describe("the regExp analysis", () => {
 
         it("will not compute when using complements #2", () => {
             expect(getStartCodes(/[^a-z]/, true)).to.be.empty
+        })
+    })
+
+    context("can match charCode", () => {
+        it("with simple character valid", () => {
+            expect(canMatchCharCode([10, 13], /\n/)).to.be.true
+        })
+
+        it("with simple character invalid", () => {
+            expect(canMatchCharCode([10, 13], /a/)).to.be.false
+        })
+
+        it("with range valid", () => {
+            expect(canMatchCharCode([13], /[\n-a]/)).to.be.true
+        })
+
+        it("with range invalid", () => {
+            expect(canMatchCharCode([10, 13], /a-z/)).to.be.false
+        })
+
+        it("with range complement valid", () => {
+            expect(canMatchCharCode([13], /[^a]/)).to.be.true
+        })
+
+        it("with range complement invalid", () => {
+            expect(canMatchCharCode([13], /[^\r]/)).to.be.false
         })
     })
 })

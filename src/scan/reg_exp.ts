@@ -6,8 +6,7 @@ import {
     contains,
     PRINT_ERROR,
     PRINT_WARNING,
-    find,
-    isRegExp
+    find
 } from "../utils/utils"
 
 const regExpParser = new RegExpParser()
@@ -102,7 +101,23 @@ export function firstChar(ast): number[] {
                         if (atom.complement === true) {
                             throw Error(complementErrorMessage)
                         }
-                        forEach(atom.value, code => startChars.push(code))
+
+                        // TODO: this may still be slow when there are many codes
+                        forEach(atom.value, code => {
+                            if (typeof code === "number") {
+                                startChars.push(code)
+                            } else {
+                                //range
+                                const range = code
+                                for (
+                                    let rangeCode = range.from;
+                                    rangeCode <= range.to;
+                                    rangeCode++
+                                ) {
+                                    startChars.push(rangeCode)
+                                }
+                            }
+                        })
                         break
                     case "Group":
                         const groupCodes = firstChar(atom.value)
@@ -148,8 +163,27 @@ export function applyIgnoreCase(firstChars: number[]): number[] {
     return firstCharsCase
 }
 
+function findCode(setNode, targetCharCodes) {
+    return find(setNode.value, codeOrRange => {
+        if (typeof codeOrRange === "number") {
+            return contains(targetCharCodes, codeOrRange)
+        } else {
+            // range
+            const range = <any>codeOrRange
+            return (
+                find(
+                    targetCharCodes,
+                    targetCode =>
+                        range.from <= targetCode && targetCode <= range.to
+                ) !== undefined
+            )
+        }
+    })
+}
+
 class CharCodeFinder extends BaseRegExpVisitor {
     found: boolean = false
+
     constructor(private targetCharCodes: number[]) {
         super()
     }
@@ -177,19 +211,11 @@ class CharCodeFinder extends BaseRegExpVisitor {
 
     visitSet(node) {
         if (node.complement) {
-            if (
-                find(node.value, charCode =>
-                    contains(this.targetCharCodes, charCode)
-                ) === undefined
-            ) {
+            if (findCode(node, this.targetCharCodes) === undefined) {
                 this.found = true
             }
         } else {
-            if (
-                find(node.value, charCode =>
-                    contains(this.targetCharCodes, charCode)
-                ) !== undefined
-            ) {
+            if (findCode(node, this.targetCharCodes) !== undefined) {
                 this.found = true
             }
         }

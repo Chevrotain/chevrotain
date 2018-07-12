@@ -88,7 +88,7 @@
     "release_major": "git fetch && git rebase && node scripts/pre_release_build.js major && yarn run ci_full_build && node scripts/post_release_build.js major && yarn run upload_website && node ../chevrotain_docs/scripts/upload_docs.js"
   },
   "dependencies": {
-    "regexp-to-ast": "0.3.4"
+    "regexp-to-ast": "0.3.5"
   },
   "devDependencies": {
     "@types/chai": "^4.0.10",
