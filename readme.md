@@ -32,7 +32,7 @@ as any other pure code without requiring any new tools or processes.
 
     -   **LL(k)** grammars support.
     -   Useable from [JavaScript / TypeScript / CoffeeScript][languages].
-    -   [**Separation** of grammar and semantics.][separation]
+    -   [**Separation** of grammar and semantics][separation].
     -   [Customizable][custom_errors] **Error Reporting** with full location information.
     -   Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
     -   Supports [gates/predicates][gates].
