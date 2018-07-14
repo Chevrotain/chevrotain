@@ -78,13 +78,17 @@ const RCurly = createToken({ name: "RCurly", pattern: "}" })
 // TODO: are keywords reserved?, keywords vs Identifiers?
 const Query = createToken({ name: "Query", pattern: "query" })
 const Mutation = createToken({ name: "Mutation", pattern: "mutation" })
-const Subscription = createToken({ name: "Subscription", pattern: "Subscription" })
+const Subscription = createToken({
+    name: "Subscription",
+    pattern: "Subscription"
+})
 const Fragment = createToken({ name: "Fragment", pattern: "fragment" })
 const On = createToken({ name: "On", pattern: "on" })
 const True = createToken({ name: "True", pattern: "true" })
 const False = createToken({ name: "False", pattern: "false" })
 const Null = createToken({ name: "Null", pattern: "null" })
-
+const Schema = createToken({ name: "Schema", pattern: "schema" })
+const Extend = createToken({ name: "Extend", pattern: "extend" })
 
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
@@ -206,7 +210,7 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
 
             $.OPTION2(() => {
-                $.SUBRULE($.FieldArguments)
+                $.SUBRULE($.arguments, { ARGS: [false] })
             })
 
             $.OPTION3(() => {
@@ -222,7 +226,7 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
         })
 
-        $.RULE("arguments", () => {
+        $.RULE("arguments", isConst => {
             $.CONSUME(LCurly)
             $.AT_LEAST_ONE(() => {
                 $.SUBRULE($.FieldArgument)
@@ -230,24 +234,10 @@ class GraphQLParser extends Parser {
             $.CONSUME(RCurly)
         })
 
-        $.RULE("arguments_const", () => {
-            $.CONSUME(LCurly)
-            $.AT_LEAST_ONE(() => {
-                $.SUBRULE($.FieldArgument)
-            })
-            $.CONSUME(RCurly)
-        })
-
-        $.RULE("argument", () => {
+        $.RULE("argument", isConst => {
             $.CONSUME(Name)
             $.CONSUME(Colon)
-            $.SUBRULE($.Value)
-        })
-
-        $.RULE("argument_const", () => {
-            $.CONSUME(Name)
-            $.CONSUME(Colon)
-            $.SUBRULE($.Value_const)
+            $.SUBRULE($.Value, { ARGS: [isConst] })
         })
 
         $.RULE("FragmentSpread", () => {
@@ -289,18 +279,17 @@ class GraphQLParser extends Parser {
             $.SUBRULE($.NamedType)
         })
 
-        $.RULE("Value", () => {
+        $.RULE("Value", isConst => {
             $.OR([
-                { ALT: () => $.SUBRULE($.Variable) },
+                { GATE: () => !isConst, ALT: () => $.SUBRULE($.Variable) },
                 { ALT: () => $.CONSUME(IntValue) },
                 { ALT: () => $.CONSUME(FloatValue) },
                 { ALT: () => $.CONSUME(StringValue) },
                 { ALT: () => $.SUBRULE($.BooleanValue) },
                 { ALT: () => $.SUBRULE($.NullValue) },
                 { ALT: () => $.SUBRULE($.EnumValue) },
-                { ALT: () => $.SUBRULE($.ListValue) },
-                { ALT: () => $.SUBRULE($.ObjectValue) }
-
+                { ALT: () => $.SUBRULE($.ListValue, { ARGS: [isConst] }) },
+                { ALT: () => $.SUBRULE($.ObjectValue, { ARGS: [isConst] }) }
             ])
         })
 
@@ -320,6 +309,167 @@ class GraphQLParser extends Parser {
             $.CONSUME(name)
         })
 
+        $.RULE("ListValue", isConst => {
+            $.CONSUME(LSquare)
+            $.MANY(() => {
+                $.SUBRULE($.Value, { ARGS: [isConst] })
+            })
+            $.CONSUME(RSquare)
+        })
+
+        $.RULE("ObjectValue", isConst => {
+            $.CONSUME(LCurly)
+            $.MANY(() => {
+                $.SUBRULE($.ObjectField, { ARGS: [isConst] })
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("ObjectField", isConst => {
+            $.CONSUME(Name)
+            $.CONSUME(Colon)
+            $.SUBRULE($.Value, { ARGS: [isConst] })
+        })
+
+        $.RULE("VariableDefinitions", () => {
+            $.CONSUME(LParen)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.VariableDefinition)
+            })
+            $.CONSUME(RParen)
+        })
+
+        $.RULE("VariableDefinition", () => {
+            $.CONSUME(Name)
+            $.CONSUME(Colon)
+            $.SUBRULE($.Type)
+            $.OPTION(() => {
+                $.SUBRULE($.DefaultValue)
+            })
+        })
+
+        $.RULE("Variable", () => {
+            $.CONSUME(Dollar)
+            $.CONSUME(Name)
+        })
+
+        $.RULE("DefaultValue", () => {
+            $.CONSUME(Equals)
+            $.SUBRULE($.Value, { ARGS: [true] })
+        })
+
+        $.RULE("Type", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.NamedType) },
+                { ALT: () => $.SUBRULE($.ListType) }
+            ])
+
+            // NonNullType rule refactored inside the TypeRule
+            // as Its not written in LL(K) form.
+            $.OPTION(() => {
+                $.CONSUME(Exclamation)
+            })
+        })
+
+        $.RULE("NamedType", () => {
+            $.CONSUME(Name)
+        })
+
+        $.RULE("ListType", () => {
+            $.CONSUME(LSquare)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.Type)
+            })
+            $.CONSUME(RSquare)
+        })
+
+        $.RULE("Directives", isConst => {
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.Directive, { ARGS: [isConst] })
+            })
+        })
+
+        $.RULE("Directive", isConst => {
+            $.CONSUME(At)
+            $.CONSUME(Name)
+            $.SUBRULE($.Arguments, { ARGS: [isConst] })
+        })
+
+        $.RULE("TypeSystemDefinition", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.SchemaDefinition) },
+                { ALT: () => $.SUBRULE($.TypeDefinition) },
+                { ALT: () => $.SUBRULE($.DirectiveDefinition) }
+            ])
+        })
+
+        $.RULE("TypeSystemExtension", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.SchemaExtension) },
+                { ALT: () => $.SUBRULE($.TypeExtension) }
+            ])
+        })
+
+        $.RULE("SchemaDefinition", () => {
+            $.CONSUME(Schema)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.OperationTypeDefinition)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("SchemaExtension", () => {
+            let hasDirectives = false
+
+            $.CONSUME(Extend)
+            $.CONSUME(Schema)
+
+            $.OPTION(() => {
+                hasDirectives = $.SUBRULE($.Directives)
+            })
+
+            // Refactored the grammar to be LL(K)
+            // Either "Directives" or "OperationTypeDefinitionList" Type is required
+            $.OR([
+                {
+                    GATE: () => !hasDirectives,
+                    ALT: () => {
+                        $.SUBRULE($.OperationTypeDefinitionList)
+                    }
+                },
+                {
+                    GATE: () => hasDirectives,
+                    ALT: () => {
+                        $.OPTION2(() => {
+                            $.SUBRULE($.OperationTypeDefinitionList)
+                        })
+                    }
+                }
+            ])
+        })
+
+        $.RULE("OperationTypeDefinitionList", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.OperationTypeDefinition)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("OperationTypeDefinition", () => {
+            $.SUBRULE($.OperationType)
+            $.CONSUME(Colon)
+            $.SUBRULE($.NamedType)
+        })
+
+        $.RULE("Description", () => {
+            $.CONSUME(StringValue)
+        })
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
