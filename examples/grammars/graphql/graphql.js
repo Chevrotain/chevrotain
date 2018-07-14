@@ -78,7 +78,13 @@ const RCurly = createToken({ name: "RCurly", pattern: "}" })
 // TODO: are keywords reserved?, keywords vs Identifiers?
 const Query = createToken({ name: "Query", pattern: "query" })
 const Mutation = createToken({ name: "Mutation", pattern: "mutation" })
-const Subscription = createToken({ name: "Mutation", pattern: "Subscription" })
+const Subscription = createToken({ name: "Subscription", pattern: "Subscription" })
+const Fragment = createToken({ name: "Fragment", pattern: "fragment" })
+const On = createToken({ name: "On", pattern: "on" })
+const True = createToken({ name: "True", pattern: "true" })
+const False = createToken({ name: "False", pattern: "false" })
+const Null = createToken({ name: "Null", pattern: "null" })
+
 
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
@@ -200,7 +206,7 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
 
             $.OPTION2(() => {
-                $.SUBRULE($.Arguments)
+                $.SUBRULE($.FieldArguments)
             })
 
             $.OPTION3(() => {
@@ -216,14 +222,104 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
         })
 
-        // TODO: handle "const" argument
-        $.RULE("Arguments", () => {
+        $.RULE("arguments", () => {
             $.CONSUME(LCurly)
             $.AT_LEAST_ONE(() => {
-                $.SUBRULE($.Argument)
+                $.SUBRULE($.FieldArgument)
             })
             $.CONSUME(RCurly)
         })
+
+        $.RULE("arguments_const", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.FieldArgument)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("argument", () => {
+            $.CONSUME(Name)
+            $.CONSUME(Colon)
+            $.SUBRULE($.Value)
+        })
+
+        $.RULE("argument_const", () => {
+            $.CONSUME(Name)
+            $.CONSUME(Colon)
+            $.SUBRULE($.Value_const)
+        })
+
+        $.RULE("FragmentSpread", () => {
+            $.CONSUME(DotDotDot)
+            $.SUBRULE($.FragmentName)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives)
+            })
+        })
+
+        $.RULE("InlineFragment", () => {
+            $.CONSUME(DotDotDot)
+            $.OPTION(() => {
+                $.SUBRULE($.TypeCondition)
+            })
+            $.OPTION2(() => {
+                $.SUBRULE($.Directives)
+            })
+            $.SUBRULE($.SelectionSet)
+        })
+
+        $.RULE("FragmentDefinition", () => {
+            $.CONSUME(Fragment)
+            $.SUBRULE($.FragmentName)
+            $.SUBRULE($.TypeCondition)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives)
+            })
+            $.SUBRULE($.SelectionSet)
+        })
+
+        $.RULE("FragmentName", () => {
+            // TODO: "Name but not on"
+            $.CONSUME(Name)
+        })
+
+        $.RULE("TypeCondition", () => {
+            $.CONSUME(On)
+            $.SUBRULE($.NamedType)
+        })
+
+        $.RULE("Value", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.Variable) },
+                { ALT: () => $.CONSUME(IntValue) },
+                { ALT: () => $.CONSUME(FloatValue) },
+                { ALT: () => $.CONSUME(StringValue) },
+                { ALT: () => $.SUBRULE($.BooleanValue) },
+                { ALT: () => $.SUBRULE($.NullValue) },
+                { ALT: () => $.SUBRULE($.EnumValue) },
+                { ALT: () => $.SUBRULE($.ListValue) },
+                { ALT: () => $.SUBRULE($.ObjectValue) }
+
+            ])
+        })
+
+        $.RULE("BooleanValue", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(True) },
+                { ALT: () => $.CONSUME(False) }
+            ])
+        })
+
+        $.RULE("NullValue", () => {
+            $.CONSUME(Null)
+        })
+
+        $.RULE("EnumValue", () => {
+            // TODO: Name but not "true" or "false" or null
+            $.CONSUME(name)
+        })
+
 
         // very important to call this after all the rules have been defined.
         // otherwise the parser may not work correctly as it will lack information
