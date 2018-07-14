@@ -74,6 +74,12 @@ const LCurly = createToken({ name: "LCurly", pattern: "{" })
 const VerticalLine = createToken({ name: "Vertical Line", pattern: "|" })
 const RCurly = createToken({ name: "RCurly", pattern: "}" })
 
+// keywords
+// TODO: are keywords reserved?, keywords vs Identifiers?
+const Query = createToken({ name: "Query", pattern: "query" })
+const Mutation = createToken({ name: "Mutation", pattern: "mutation" })
+const Subscription = createToken({ name: "Mutation", pattern: "Subscription" })
+
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
 FRAGMENT("IntegerPart", "-?(0|[1-9][0-9]*)")
@@ -104,3 +110,124 @@ const StringValue = createToken({
 })
 
 const GraphQLLexer = new Lexer([LineTerminator])
+
+class GraphQLParser extends Parser {
+    // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
+    // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
+    // invoking RULE(...)
+    // see: https://github.com/jeffmo/es-class-fields-and-static-properties
+    constructor(input, config) {
+        super(input, allTokens, config)
+
+        // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
+        const $ = this
+
+        // the parsing methods
+        $.RULE("Document", () => {
+            $.MANY(() => {
+                $.SUBRULE($.Definition)
+            })
+        })
+
+        $.RULE("definition", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.ExecutableDefinition) },
+                { ALT: () => $.SUBRULE($.TypeSystemDefinition) },
+                { ALT: () => $.SUBRULE($.TypeSystemExtension) }
+            ])
+        })
+
+        $.RULE("ExecutableDefinition", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.OperationDefinition) },
+                { ALT: () => $.SUBRULE($.FragmentDefinition) }
+            ])
+        })
+
+        $.RULE("OperationDefinition", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.SelectionSet) },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.OperationType)
+                        $.OPTION(() => {
+                            $.CONSUME(Name)
+                        })
+
+                        $.OPTION2(() => {
+                            $.SUBRULE($.VariableDefinitions)
+                        })
+
+                        $.OPTION3(() => {
+                            $.SUBRULE($.Directives)
+                        })
+
+                        $.SUBRULE($.SelectionSet)
+                    }
+                }
+            ])
+        })
+
+        $.RULE("OperationType", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(Query) },
+                { ALT: () => $.CONSUME(Mutation) },
+                { ALT: () => $.CONSUME(Subscription) }
+            ])
+        })
+
+        $.RULE("SelectionSet", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.Selection)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("Selection", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.Field) },
+                { ALT: () => $.SUBRULE($.FragmentSpread) },
+                { ALT: () => $.SUBRULE($.InlineFragment) }
+            ])
+        })
+
+        $.RULE("Field", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Alias)
+            })
+
+            $.CONSUME(Name)
+
+            $.OPTION2(() => {
+                $.SUBRULE($.Arguments)
+            })
+
+            $.OPTION3(() => {
+                $.SUBRULE($.Directives)
+            })
+
+            $.OPTION4(() => {
+                $.SUBRULE($.SelectionSet)
+            })
+        })
+
+        $.RULE("Alias", () => {
+            $.CONSUME(Name)
+        })
+
+        // TODO: handle "const" argument
+        $.RULE("Arguments", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.Argument)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        // very important to call this after all the rules have been defined.
+        // otherwise the parser may not work correctly as it will lack information
+        // derived during the self analysis phase.
+        this.performSelfAnalysis()
+    }
+}
