@@ -89,6 +89,7 @@ const False = createToken({ name: "False", pattern: "false" })
 const Null = createToken({ name: "Null", pattern: "null" })
 const Schema = createToken({ name: "Schema", pattern: "schema" })
 const Extend = createToken({ name: "Extend", pattern: "extend" })
+const Scalar = createToken({ name: "Scalar", pattern: "scalar" })
 
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
@@ -415,7 +416,6 @@ class GraphQLParser extends Parser {
             $.OPTION(() => {
                 $.SUBRULE($.Directives, { ARGS: [true] })
             })
-
             $.CONSUME(LCurly)
             $.AT_LEAST_ONE(() => {
                 $.SUBRULE($.OperationTypeDefinition)
@@ -469,6 +469,63 @@ class GraphQLParser extends Parser {
 
         $.RULE("Description", () => {
             $.CONSUME(StringValue)
+        })
+
+        $.RULE("TypeDefinition", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.ScalarTypeDefinition) },
+                { ALT: () => $.SUBRULE($.ObjectTypeDefinition) },
+                { ALT: () => $.SUBRULE($.InterfaceTypeDefinition) },
+                { ALT: () => $.SUBRULE($.UnionTypeDefinition) },
+                { ALT: () => $.SUBRULE($.EnumTypeDefinition) },
+                { ALT: () => $.SUBRULE($.InputObjectTypeDefinition) }
+            ])
+        })
+
+        $.RULE("TypeExtension", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.ScalarTypeExtension) },
+                { ALT: () => $.SUBRULE($.ObjectTypeExtension) },
+                { ALT: () => $.SUBRULE($.InterfaceTypeExtension) },
+                { ALT: () => $.SUBRULE($.UnionTypeExtension) },
+                { ALT: () => $.SUBRULE($.EnumTypeExtension) },
+                { ALT: () => $.SUBRULE($.InputObjectTypeExtension) }
+            ])
+        })
+
+        $.RULE("ScalarTypeDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Scalar)
+            $.CONSUME(Name)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+        })
+
+        $.RULE("ScalarTypeExtension", () => {
+            $.CONSUME(Extend)
+            $.CONSUME(Scalar)
+            $.CONSUME(Name)
+            $.SUBRULE($.Directives, { ARGS: [true] })
+        })
+
+        $.RULE("ObjectTypeDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Type)
+            $.CONSUME(Name)
+            $.OPTION2(() => {
+                $.SUBRULE($.ImplementsInterfaces)
+            })
+            $.OPTION3(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+            $.OPTION4(() => {
+                $.SUBRULE($.FieldsDefinition)
+            })
         })
 
         // very important to call this after all the rules have been defined.
