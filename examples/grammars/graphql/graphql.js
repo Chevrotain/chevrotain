@@ -90,6 +90,9 @@ const Null = createToken({ name: "Null", pattern: "null" })
 const Schema = createToken({ name: "Schema", pattern: "schema" })
 const Extend = createToken({ name: "Extend", pattern: "extend" })
 const Scalar = createToken({ name: "Scalar", pattern: "scalar" })
+const Implements = createToken({ name: "Implements", pattern: "implements" })
+const Interface = createToken({ name: "Interface", pattern: "interface" })
+const Union = createToken({ name: "Union", pattern: "Union" })
 
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
@@ -431,7 +434,7 @@ class GraphQLParser extends Parser {
             $.OR([
                 {
                     ALT: () => {
-                        $.SUBRULE($.Directives)
+                        $.SUBRULE($.Directives, { ARGS: [true] })
                         $.OPTION(() => {
                             $.SUBRULE($.OperationTypeDefinitionList)
                         })
@@ -439,7 +442,7 @@ class GraphQLParser extends Parser {
                 },
                 {
                     ALT: () => {
-                            $.SUBRULE($.OperationTypeDefinitionList)
+                        $.SUBRULE($.OperationTypeDefinitionList)
                     }
                 }
             ])
@@ -528,22 +531,178 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
 
             // refactored the spec grammar be LL(K)
-            $.OR([{ ALT: () => {
+            $.OR([
+                {
+                    ALT: () => {
                         $.SUBRULE($.ImplementsInterfaces)
                         $.OPTION(() => {
-                            $.SUBRULE($.Directives)
+                            $.SUBRULE($.Directives, { ARGS: [true] })
                         })
                         $.OPTION2(() => {
                             $.SUBRULE($.FieldsDefinition)
                         })
-                    } }, { ALT: () => {
-                        $.SUBRULE($.Directives)
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.Directives, { ARGS: [true] })
                         $.OPTION3(() => {
                             $.SUBRULE2($.FieldsDefinition)
                         })
-                    } }, { ALT: () => {
+                    }
+                },
+                {
+                    ALT: () => {
                         $.SUBRULE3($.FieldsDefinition)
-                    } }])
+                    }
+                }
+            ])
+        })
+
+        $.RULE("ImplementsInterfaces", () => {
+            $.CONSUME(Implements)
+            $.OPTION(() => {
+                $.CONSUME(At)
+            })
+            $.SUBRULE($.NamedType)
+            $.MANY(() => {
+                $.CONSUME2(At)
+                $.SUBRULE2($.NamedType)
+            })
+        })
+
+        $.RULE("FieldsDefinition", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.FieldDefinition)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("FieldDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Name)
+            $.OPTION2(() => {
+                $.SUBRULE($.ArgumentsDefinition)
+            })
+            $.CONSUME(Colon)
+            $.SUBRULE($.Type)
+            $.OPTION3(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+        })
+
+        $.RULE("ArgumentsDefinition", () => {
+            $.CONSUME(LParen)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.InputValueDefinition)
+            })
+            $.CONSUME(RParen)
+        })
+
+        $.RULE("InputValueDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Name)
+            $.CONSUME(Colon)
+            $.SUBRULE($.Type)
+            $.OPTION2(() => {
+                $.SUBRULE($.DefaultValue)
+            })
+            $.OPTION3(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+        })
+
+        $.RULE("InterfaceTypeDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Interface)
+            $.CONSUME(Name)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+            $.OPTION2(() => {
+                $.SUBRULE($.FieldsDefinition)
+            })
+        })
+
+        $.RULE("InterfaceTypeExtension", () => {
+            $.CONSUME(Extend)
+            $.CONSUME(Interface)
+            $.CONSUME(Name)
+
+            // Refactored the grammar to be LL(K)
+            $.OR([
+                {
+                    ALT: () => {
+                        $.SUBRULE($.Directives, { ARGS: [true] })
+                        $.OPTION(() => {
+                            $.SUBRULE($.FieldsDefinition)
+                        })
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.FieldsDefinition)
+                    }
+                }
+            ])
+        })
+
+        $.RULE("UnionTypeDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Union)
+            $.CONSUME(Name)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+            $.OPTION2(() => {
+                $.SUBRULE($.UnionMemberTypes)
+            })
+        })
+
+        $.RULE("UnionMemberTypes", () => {
+            $.CONSUME(Equals)
+
+            $.OPTION(() => {
+                $.CONSUME(VerticalLine)
+            })
+            $.SUBRULE($.NamedType)
+
+            $.MANY(() => {
+                $.CONSUME2(VerticalLine)
+                $.SUBRULE2($.NamedType)
+            })
+        })
+
+        $.RULE("UnionTypeExtension", () => {
+            $.CONSUME(Extend)
+            $.CONSUME(Union)
+            $.CONSUME(Name)
+
+            // Refactored the grammar to be LL(K)
+            $.OR([
+                {
+                    ALT: () => {
+                        $.SUBRULE($.Directives, { ARGS: [true] })
+                        $.OPTION(() => {
+                            $.SUBRULE($.UnionMemberTypes)
+                        })
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE($.UnionMemberTypes)
+                    }
+                }
+            ])
         })
 
         // very important to call this after all the rules have been defined.
