@@ -424,35 +424,29 @@ class GraphQLParser extends Parser {
         })
 
         $.RULE("SchemaExtension", () => {
-            let hasDirectives = false
-
             $.CONSUME(Extend)
             $.CONSUME(Schema)
 
-            $.OPTION(() => {
-                hasDirectives = $.SUBRULE($.Directives)
-            })
-
             // Refactored the grammar to be LL(K)
-            // Either "Directives" or "OperationTypeDefinitionList" Type is required
             $.OR([
                 {
-                    GATE: () => !hasDirectives,
                     ALT: () => {
-                        $.SUBRULE($.OperationTypeDefinitionList)
+                        $.SUBRULE($.Directives)
+                        $.OPTION(() => {
+                            $.SUBRULE($.OperationTypeDefinitionList)
+                        })
                     }
                 },
                 {
-                    GATE: () => hasDirectives,
                     ALT: () => {
-                        $.OPTION2(() => {
                             $.SUBRULE($.OperationTypeDefinitionList)
-                        })
                     }
                 }
             ])
         })
 
+        // This rule does not appear in the original spec, its a factoring out
+        // of a the common suffix for "SchemaExtension"
         $.RULE("OperationTypeDefinitionList", () => {
             $.CONSUME(LCurly)
             $.AT_LEAST_ONE(() => {
@@ -526,6 +520,30 @@ class GraphQLParser extends Parser {
             $.OPTION4(() => {
                 $.SUBRULE($.FieldsDefinition)
             })
+        })
+
+        $.RULE("ObjectTypeExtension", () => {
+            $.CONSUME(Extend)
+            $.CONSUME(Type)
+            $.CONSUME(Name)
+
+            // refactored the spec grammar be LL(K)
+            $.OR([{ ALT: () => {
+                        $.SUBRULE($.ImplementsInterfaces)
+                        $.OPTION(() => {
+                            $.SUBRULE($.Directives)
+                        })
+                        $.OPTION2(() => {
+                            $.SUBRULE($.FieldsDefinition)
+                        })
+                    } }, { ALT: () => {
+                        $.SUBRULE($.Directives)
+                        $.OPTION3(() => {
+                            $.SUBRULE2($.FieldsDefinition)
+                        })
+                    } }, { ALT: () => {
+                        $.SUBRULE3($.FieldsDefinition)
+                    } }])
         })
 
         // very important to call this after all the rules have been defined.
