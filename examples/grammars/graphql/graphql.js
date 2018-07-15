@@ -93,6 +93,7 @@ const Scalar = createToken({ name: "Scalar", pattern: "scalar" })
 const Implements = createToken({ name: "Implements", pattern: "implements" })
 const Interface = createToken({ name: "Interface", pattern: "interface" })
 const Union = createToken({ name: "Union", pattern: "Union" })
+const Enum = createToken({ name: "Enum", pattern: "enum" })
 
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
@@ -660,10 +661,10 @@ class GraphQLParser extends Parser {
             })
             $.CONSUME(Union)
             $.CONSUME(Name)
-            $.OPTION(() => {
+            $.OPTION2(() => {
                 $.SUBRULE($.Directives, { ARGS: [true] })
             })
-            $.OPTION2(() => {
+            $.OPTION3(() => {
                 $.SUBRULE($.UnionMemberTypes)
             })
         })
@@ -703,6 +704,38 @@ class GraphQLParser extends Parser {
                     }
                 }
             ])
+        })
+
+        $.RULE("EnumTypeDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(Enum)
+            $.CONSUME(Name)
+            $.OPTION2(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+            $.OPTION3(() => {
+                $.SUBRULE($.EnumValuesDefinition)
+            })
+        })
+
+        $.RULE("EnumValuesDefinition", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.EnumValueDefinition)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("EnumValueDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.SUBRULE($.EnumValue)
+            $.OPTION(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
         })
 
         // very important to call this after all the rules have been defined.
