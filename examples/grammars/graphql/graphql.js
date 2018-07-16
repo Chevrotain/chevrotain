@@ -1,3 +1,16 @@
+/**
+ * GraphQL grammar based on the specifications
+ * http://facebook.github.io/graphql/June2018/#sec-Appendix-Grammar-Summary.Document
+ *
+ * The implementations follows the specs as directly as possible.
+ * This means:
+ * - Same rule names.
+ * - Same Token names.
+ *
+ * Some things had to be refactored, for example to be an LL(K) grammar.
+ * Or to extract repeating code in a rule.
+ * But the refactored code is equivalent.
+ */
 const { Parser, Lexer, createToken: orgCreateToken } = require("chevrotain")
 const XRegExp = require("xregexp")
 
@@ -239,15 +252,18 @@ const StringValue = createToken({
     )
 })
 
-const GraphQLLexer = new Lexer([LineTerminator])
+const GraphQLLexer = new Lexer(allTokens)
 
 class GraphQLParser extends Parser {
     // Unfortunately no support for class fields with initializer in ES2015, only in esNext...
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input, config) {
-        super(input, allTokens, config)
+    constructor(input) {
+        super(input, allTokens, {
+            outputCst: true,
+            recoveryEnabled: true
+        })
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -994,3 +1010,25 @@ class GraphQLParser extends Parser {
 }
 
 const parser = new GraphQLParser([])
+
+module.exports = {
+    GraphQLToken: allTokens,
+
+    GraphQLParser: GraphQLParser,
+
+    parse: function parse(text) {
+        const lexResult = GraphQLLexer.tokenize(text)
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens
+        // any top level rule may be used as an entry point
+        const value = parser.Document()
+
+        return {
+            // This is a pure grammar, the value will be undefined until we add embedded actions
+            // or enable automatic CST creation.
+            value: value,
+            lexErrors: lexResult.errors,
+            parseErrors: parser.errors
+        }
+    }
+}
