@@ -71,7 +71,7 @@ const At = createToken({ name: "At", pattern: "@" })
 const LSquare = createToken({ name: "LSquare", pattern: "[" })
 const RSquare = createToken({ name: "RSquare", pattern: "]" })
 const LCurly = createToken({ name: "LCurly", pattern: "{" })
-const VerticalLine = createToken({ name: "Vertical Line", pattern: "|" })
+const VerticalLine = createToken({ name: "VerticalLine", pattern: "|" })
 const RCurly = createToken({ name: "RCurly", pattern: "}" })
 
 // keywords
@@ -94,6 +94,53 @@ const Implements = createToken({ name: "Implements", pattern: "implements" })
 const Interface = createToken({ name: "Interface", pattern: "interface" })
 const Union = createToken({ name: "Union", pattern: "Union" })
 const Enum = createToken({ name: "Enum", pattern: "enum" })
+const Input = createToken({ name: "Input", pattern: "Input" })
+const DirectiveTok = createToken({ name: "DirectiveTok", pattern: "directive" })
+const TypeTok = createToken({ name: "TypeTok", pattern: "type" })
+
+// TODO: are these really tokens? they are used in "ExecutableDirectiveLocation" and "TypeSystemDirectiveLocation" rules
+const QUERY = createToken({ name: "QUERY", pattern: "QUERY" })
+const MUTATION = createToken({ name: "MUTATION", pattern: "MUTATION" })
+const SUBSCRIPTION = createToken({
+    name: "SUBSCRIPTION",
+    pattern: "SUBSCRIPTION"
+})
+const FIELD = createToken({ name: "FIELD", pattern: "FIELD" })
+const FRAGMENT_DEFINITION = createToken({
+    name: "FRAGMENT_DEFINITION",
+    pattern: "FRAGMENT_DEFINITION"
+})
+const FRAGMENT_SPREAD = createToken({
+    name: "FRAGMENT_SPREAD",
+    pattern: "FRAGMENT_SPREAD"
+})
+const INLINE_FRAGMENT = createToken({
+    name: "INLINE_FRAGMENT",
+    pattern: "INLINE_FRAGMENT"
+})
+const SCHEMA = createToken({ name: "SCHEMA", pattern: "SCHEMA" })
+const SCALAR = createToken({ name: "SCALAR", pattern: "SCALAR" })
+const OBJECT = createToken({ name: "OBJECT", pattern: "OBJECT" })
+const FIELD_DEFINITION = createToken({
+    name: "FIELD_DEFINITION",
+    pattern: "FIELD_DEFINITION"
+})
+const ARGUMENT_DEFINITION = createToken({
+    name: "ARGUMENT_DEFINITION",
+    pattern: "ARGUMENT_DEFINITION"
+})
+const INTERFACE = createToken({ name: "INTERFACE", pattern: "INTERFACE" })
+const UNION = createToken({ name: "UNION", pattern: "UNION" })
+const ENUM = createToken({ name: "ENUM", pattern: "ENUM" })
+const ENUM_VALUE = createToken({ name: "ENUM_VALUE", pattern: "ENUM_VALUE" })
+const INPUT_OBJECT = createToken({
+    name: "INPUT_OBJECT",
+    pattern: "INPUT_OBJECT"
+})
+const INPUT_FIELD_DEFINITION = createToken({
+    name: "INPUT_FIELD_DEFINITION",
+    pattern: "INPUT_FIELD_DEFINITION"
+})
 
 // Token
 const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
@@ -105,7 +152,7 @@ const IntValue = createToken({
     pattern: MAKE_PATTERN("{{IntegerPart}}")
 })
 const FloatValue = createToken({
-    name: "IntValue",
+    name: "FloatValue",
     pattern: MAKE_PATTERN(
         "{{IntegerPart}}{{FractionalPart}}({{ExponentPart}})?|{{IntegerPart}}{{ExponentPart}}"
     )
@@ -144,7 +191,7 @@ class GraphQLParser extends Parser {
             })
         })
 
-        $.RULE("definition", () => {
+        $.RULE("Definition", () => {
             $.OR([
                 { ALT: () => $.SUBRULE($.ExecutableDefinition) },
                 { ALT: () => $.SUBRULE($.TypeSystemDefinition) },
@@ -177,7 +224,7 @@ class GraphQLParser extends Parser {
                             $.SUBRULE($.Directives)
                         })
 
-                        $.SUBRULE($.SelectionSet)
+                        $.SUBRULE2($.SelectionSet)
                     }
                 }
             ])
@@ -215,7 +262,7 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
 
             $.OPTION2(() => {
-                $.SUBRULE($.arguments, { ARGS: [false] })
+                $.SUBRULE($.Arguments, { ARGS: [false] })
             })
 
             $.OPTION3(() => {
@@ -231,15 +278,15 @@ class GraphQLParser extends Parser {
             $.CONSUME(Name)
         })
 
-        $.RULE("arguments", isConst => {
+        $.RULE("Arguments", isConst => {
             $.CONSUME(LCurly)
             $.AT_LEAST_ONE(() => {
-                $.SUBRULE($.FieldArgument)
+                $.SUBRULE($.Argument, { ARGS: [isConst] })
             })
             $.CONSUME(RCurly)
         })
 
-        $.RULE("argument", isConst => {
+        $.RULE("Argument", isConst => {
             $.CONSUME(Name)
             $.CONSUME(Colon)
             $.SUBRULE($.Value, { ARGS: [isConst] })
@@ -311,7 +358,7 @@ class GraphQLParser extends Parser {
 
         $.RULE("EnumValue", () => {
             // TODO: Name but not "true" or "false" or null
-            $.CONSUME(name)
+            $.CONSUME(Name)
         })
 
         $.RULE("ListValue", isConst => {
@@ -443,7 +490,7 @@ class GraphQLParser extends Parser {
                 },
                 {
                     ALT: () => {
-                        $.SUBRULE($.OperationTypeDefinitionList)
+                        $.SUBRULE2($.OperationTypeDefinitionList)
                     }
                 }
             ])
@@ -497,7 +544,7 @@ class GraphQLParser extends Parser {
             })
             $.CONSUME(Scalar)
             $.CONSUME(Name)
-            $.OPTION(() => {
+            $.OPTION2(() => {
                 $.SUBRULE($.Directives, { ARGS: [true] })
             })
         })
@@ -513,7 +560,7 @@ class GraphQLParser extends Parser {
             $.OPTION(() => {
                 $.SUBRULE($.Description)
             })
-            $.CONSUME(Type)
+            $.CONSUME(TypeTok)
             $.CONSUME(Name)
             $.OPTION2(() => {
                 $.SUBRULE($.ImplementsInterfaces)
@@ -528,7 +575,7 @@ class GraphQLParser extends Parser {
 
         $.RULE("ObjectTypeExtension", () => {
             $.CONSUME(Extend)
-            $.CONSUME(Type)
+            $.CONSUME(TypeTok)
             $.CONSUME(Name)
 
             // refactored the spec grammar be LL(K)
@@ -546,7 +593,7 @@ class GraphQLParser extends Parser {
                 },
                 {
                     ALT: () => {
-                        $.SUBRULE($.Directives, { ARGS: [true] })
+                        $.SUBRULE2($.Directives, { ARGS: [true] })
                         $.OPTION3(() => {
                             $.SUBRULE2($.FieldsDefinition)
                         })
@@ -624,10 +671,10 @@ class GraphQLParser extends Parser {
             })
             $.CONSUME(Interface)
             $.CONSUME(Name)
-            $.OPTION(() => {
+            $.OPTION2(() => {
                 $.SUBRULE($.Directives, { ARGS: [true] })
             })
-            $.OPTION2(() => {
+            $.OPTION3(() => {
                 $.SUBRULE($.FieldsDefinition)
             })
         })
@@ -649,7 +696,7 @@ class GraphQLParser extends Parser {
                 },
                 {
                     ALT: () => {
-                        $.SUBRULE($.FieldsDefinition)
+                        $.SUBRULE2($.FieldsDefinition)
                     }
                 }
             ])
@@ -700,7 +747,7 @@ class GraphQLParser extends Parser {
                 },
                 {
                     ALT: () => {
-                        $.SUBRULE($.UnionMemberTypes)
+                        $.SUBRULE2($.UnionMemberTypes)
                     }
                 }
             ])
@@ -733,9 +780,144 @@ class GraphQLParser extends Parser {
                 $.SUBRULE($.Description)
             })
             $.SUBRULE($.EnumValue)
-            $.OPTION(() => {
+            $.OPTION2(() => {
                 $.SUBRULE($.Directives, { ARGS: [true] })
             })
+        })
+
+        $.RULE("EnumTypeExtension", () => {
+            $.CONSUME(Extend)
+            $.CONSUME(Enum)
+            $.CONSUME(Name)
+
+            // Refactored the grammar to be LL(K)
+            $.OR([
+                {
+                    ALT: () => {
+                        $.SUBRULE($.Directives, { ARGS: [true] })
+                        $.OPTION(() => {
+                            $.SUBRULE($.EnumValuesDefinition)
+                        })
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE2($.EnumValuesDefinition)
+                    }
+                }
+            ])
+        })
+
+        $.RULE("InputObjectTypeDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+
+            $.CONSUME(Input)
+            $.CONSUME(Name)
+
+            $.OPTION2(() => {
+                $.SUBRULE($.Directives, { ARGS: [true] })
+            })
+
+            $.OPTION3(() => {
+                $.SUBRULE($.InputFieldsDefinition)
+            })
+        })
+
+        $.RULE("InputFieldsDefinition", () => {
+            $.CONSUME(LCurly)
+            $.AT_LEAST_ONE(() => {
+                $.SUBRULE($.InputValueDefinition)
+            })
+            $.CONSUME(RCurly)
+        })
+
+        $.RULE("InputObjectTypeExtension", () => {
+            $.CONSUME(Extend)
+            $.CONSUME(Input)
+            $.CONSUME(Name)
+
+            // Refactored the grammar to be LL(K)
+            $.OR([
+                {
+                    ALT: () => {
+                        $.SUBRULE($.Directives, { ARGS: [true] })
+                        $.OPTION(() => {
+                            $.SUBRULE($.EnumValuesDefinition)
+                        })
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.SUBRULE2($.InputFieldsDefinition)
+                    }
+                }
+            ])
+        })
+
+        $.RULE("DirectiveDefinition", () => {
+            $.OPTION(() => {
+                $.SUBRULE($.Description)
+            })
+            $.CONSUME(DirectiveTok)
+            $.CONSUME(At)
+            $.CONSUME(Name)
+            $.OPTION2(() => {
+                $.SUBRULE($.ArgumentsDefinition)
+            })
+            $.CONSUME(On)
+
+            $.OPTION3(() => {
+                $.SUBRULE($.DirectiveLocations)
+            })
+        })
+
+        $.RULE("DirectiveLocations", () => {
+            $.OPTION(() => {
+                $.CONSUME(VerticalLine)
+            })
+            $.SUBRULE($.DirectiveLocation)
+
+            $.MANY(() => {
+                $.CONSUME2(VerticalLine)
+                $.SUBRULE2($.DirectiveLocation)
+            })
+        })
+
+        $.RULE("DirectiveLocation", () => {
+            $.OR([
+                { ALT: () => $.SUBRULE($.ExecutableDirectiveLocation) },
+                { ALT: () => $.SUBRULE($.TypeSystemDirectiveLocation) }
+            ])
+        })
+
+        $.RULE("ExecutableDirectiveLocation", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(QUERY) },
+                { ALT: () => $.CONSUME(MUTATION) },
+                { ALT: () => $.CONSUME(SUBSCRIPTION) },
+                { ALT: () => $.CONSUME(FIELD) },
+                { ALT: () => $.CONSUME(FRAGMENT_DEFINITION) },
+                { ALT: () => $.CONSUME(FRAGMENT_SPREAD) },
+                { ALT: () => $.CONSUME(INLINE_FRAGMENT) }
+            ])
+        })
+
+        $.RULE("TypeSystemDirectiveLocation", () => {
+            $.OR([
+                { ALT: () => $.CONSUME(SCHEMA) },
+                { ALT: () => $.CONSUME(SCALAR) },
+                { ALT: () => $.CONSUME(OBJECT) },
+                { ALT: () => $.CONSUME(FIELD_DEFINITION) },
+                { ALT: () => $.CONSUME(ARGUMENT_DEFINITION) },
+                { ALT: () => $.CONSUME(INTERFACE) },
+                { ALT: () => $.CONSUME(UNION) },
+                { ALT: () => $.CONSUME(ENUM) },
+                { ALT: () => $.CONSUME(ENUM_VALUE) },
+                { ALT: () => $.CONSUME(INPUT_OBJECT) },
+                { ALT: () => $.CONSUME(INPUT_FIELD_DEFINITION) }
+            ])
         })
 
         // very important to call this after all the rules have been defined.
@@ -744,3 +926,5 @@ class GraphQLParser extends Parser {
         this.performSelfAnalysis()
     }
 }
+
+const parser = new GraphQLParser([])
