@@ -23,6 +23,44 @@ const createToken = function() {
     allTokens.push(newToken)
     return newToken
 }
+
+const keywordTokens = []
+const createKeywordToken = function(config) {
+    config.longer_alt = Name
+    const newToken = createToken(config)
+    keywordTokens.push(newToken)
+    newToken.CATEGORIES.push(Keyword)
+    return newToken
+}
+
+const createNotToken = function(config) {
+    const newNotTokenCategory = orgCreateToken({
+        name: config.name,
+        pattern: Lexer.NA
+    })
+    const notMatch = config.not
+    const matchingKeywords = keywordTokens.filter(keywordTokType => {
+        let found = false
+        notMatch.forEach(notTokType => {
+            if (notTokType === keywordTokType) {
+                found = true
+            }
+        })
+        return found
+    })
+
+    // All matching keywords now match the category of the NOT token.
+    matchingKeywords.forEach(keywordTokType =>
+        keywordTokType.CATEGORIES.push(newNotTokenCategory)
+    )
+
+    // Name always matches the Not token
+    Name.CATEGORIES.push(newNotTokenCategory)
+
+    allTokens.push(newNotTokenCategory)
+    return newNotTokenCategory
+}
+
 // ----------------- lexer -----------------
 
 // B1 - Ignored-Tokens
@@ -74,76 +112,106 @@ const LCurly = createToken({ name: "LCurly", pattern: "{" })
 const VerticalLine = createToken({ name: "VerticalLine", pattern: "|" })
 const RCurly = createToken({ name: "RCurly", pattern: "}" })
 
-// keywords
-// TODO: are keywords reserved?, keywords vs Identifiers?
-const Query = createToken({ name: "Query", pattern: "query" })
-const Mutation = createToken({ name: "Mutation", pattern: "mutation" })
-const Subscription = createToken({
+// keywords and Name
+// Name must not be placed into the TokenTypeList before any keywords
+// as it can match any keyword, so we use "orgCreateToken"
+const Name = orgCreateToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
+const Keyword = createToken({ name: "Keyword", pattern: Lexer.NA })
+const Query = createKeywordToken({ name: "Query", pattern: "query" })
+const Mutation = createKeywordToken({ name: "Mutation", pattern: "mutation" })
+const Subscription = createKeywordToken({
     name: "Subscription",
     pattern: "Subscription"
 })
-const Fragment = createToken({ name: "Fragment", pattern: "fragment" })
-const On = createToken({ name: "On", pattern: "on" })
-const True = createToken({ name: "True", pattern: "true" })
-const False = createToken({ name: "False", pattern: "false" })
-const Null = createToken({ name: "Null", pattern: "null" })
-const Schema = createToken({ name: "Schema", pattern: "schema" })
-const Extend = createToken({ name: "Extend", pattern: "extend" })
-const Scalar = createToken({ name: "Scalar", pattern: "scalar" })
-const Implements = createToken({ name: "Implements", pattern: "implements" })
-const Interface = createToken({ name: "Interface", pattern: "interface" })
-const Union = createToken({ name: "Union", pattern: "Union" })
-const Enum = createToken({ name: "Enum", pattern: "enum" })
-const Input = createToken({ name: "Input", pattern: "Input" })
-const DirectiveTok = createToken({ name: "DirectiveTok", pattern: "directive" })
-const TypeTok = createToken({ name: "TypeTok", pattern: "type" })
+const Fragment = createKeywordToken({ name: "Fragment", pattern: "fragment" })
+const On = createKeywordToken({ name: "On", pattern: "on" })
+const True = createKeywordToken({ name: "True", pattern: "true" })
+const False = createKeywordToken({ name: "False", pattern: "false" })
+const Null = createKeywordToken({ name: "Null", pattern: "null" })
+const Schema = createKeywordToken({ name: "Schema", pattern: "schema" })
+const Extend = createKeywordToken({ name: "Extend", pattern: "extend" })
+const Scalar = createKeywordToken({ name: "Scalar", pattern: "scalar" })
+const Implements = createKeywordToken({
+    name: "Implements",
+    pattern: "implements"
+})
+const Interface = createKeywordToken({
+    name: "Interface",
+    pattern: "interface"
+})
+const Union = createKeywordToken({ name: "Union", pattern: "Union" })
+const Enum = createKeywordToken({ name: "Enum", pattern: "enum" })
+const Input = createKeywordToken({ name: "Input", pattern: "Input" })
+const DirectiveTok = createKeywordToken({
+    name: "DirectiveTok",
+    pattern: "directive"
+})
+const TypeTok = createKeywordToken({ name: "TypeTok", pattern: "type" })
 
-// TODO: are these really tokens? they are used in "ExecutableDirectiveLocation" and "TypeSystemDirectiveLocation" rules
-const QUERY = createToken({ name: "QUERY", pattern: "QUERY" })
-const MUTATION = createToken({ name: "MUTATION", pattern: "MUTATION" })
-const SUBSCRIPTION = createToken({
+// TODO: are these really tokens/keywords?
+// they are used in "ExecutableDirectiveLocation" and "TypeSystemDirectiveLocation" rules
+// Why are they upper case?
+// Why are they with the names of parsing rules
+const QUERY = createKeywordToken({ name: "QUERY", pattern: "QUERY" })
+const MUTATION = createKeywordToken({ name: "MUTATION", pattern: "MUTATION" })
+const SUBSCRIPTION = createKeywordToken({
     name: "SUBSCRIPTION",
     pattern: "SUBSCRIPTION"
 })
-const FIELD = createToken({ name: "FIELD", pattern: "FIELD" })
-const FRAGMENT_DEFINITION = createToken({
+const FIELD = createKeywordToken({ name: "FIELD", pattern: "FIELD" })
+const FRAGMENT_DEFINITION = createKeywordToken({
     name: "FRAGMENT_DEFINITION",
     pattern: "FRAGMENT_DEFINITION"
 })
-const FRAGMENT_SPREAD = createToken({
+const FRAGMENT_SPREAD = createKeywordToken({
     name: "FRAGMENT_SPREAD",
     pattern: "FRAGMENT_SPREAD"
 })
-const INLINE_FRAGMENT = createToken({
+const INLINE_FRAGMENT = createKeywordToken({
     name: "INLINE_FRAGMENT",
     pattern: "INLINE_FRAGMENT"
 })
-const SCHEMA = createToken({ name: "SCHEMA", pattern: "SCHEMA" })
-const SCALAR = createToken({ name: "SCALAR", pattern: "SCALAR" })
-const OBJECT = createToken({ name: "OBJECT", pattern: "OBJECT" })
-const FIELD_DEFINITION = createToken({
+const SCHEMA = createKeywordToken({ name: "SCHEMA", pattern: "SCHEMA" })
+const SCALAR = createKeywordToken({ name: "SCALAR", pattern: "SCALAR" })
+const OBJECT = createKeywordToken({ name: "OBJECT", pattern: "OBJECT" })
+const FIELD_DEFINITION = createKeywordToken({
     name: "FIELD_DEFINITION",
     pattern: "FIELD_DEFINITION"
 })
-const ARGUMENT_DEFINITION = createToken({
+const ARGUMENT_DEFINITION = createKeywordToken({
     name: "ARGUMENT_DEFINITION",
     pattern: "ARGUMENT_DEFINITION"
 })
-const INTERFACE = createToken({ name: "INTERFACE", pattern: "INTERFACE" })
-const UNION = createToken({ name: "UNION", pattern: "UNION" })
-const ENUM = createToken({ name: "ENUM", pattern: "ENUM" })
-const ENUM_VALUE = createToken({ name: "ENUM_VALUE", pattern: "ENUM_VALUE" })
-const INPUT_OBJECT = createToken({
+const INTERFACE = createKeywordToken({
+    name: "INTERFACE",
+    pattern: "INTERFACE"
+})
+const UNION = createKeywordToken({ name: "UNION", pattern: "UNION" })
+const ENUM = createKeywordToken({ name: "ENUM", pattern: "ENUM" })
+const ENUM_VALUE = createKeywordToken({
+    name: "ENUM_VALUE",
+    pattern: "ENUM_VALUE"
+})
+const INPUT_OBJECT = createKeywordToken({
     name: "INPUT_OBJECT",
     pattern: "INPUT_OBJECT"
 })
-const INPUT_FIELD_DEFINITION = createToken({
+const INPUT_FIELD_DEFINITION = createKeywordToken({
     name: "INPUT_FIELD_DEFINITION",
     pattern: "INPUT_FIELD_DEFINITION"
 })
+const NameButNotOn = createNotToken({
+    name: "NameButNotOn",
+    not: [On]
+})
+const NameButNotTrueOrFalseOrNull = createNotToken({
+    name: "NameButNotTrueOrFalseOrNull",
+    not: [True, False, Null]
+})
 
-// Token
-const Name = createToken({ name: "Name", pattern: /[_A-Za-z][_0-9A-Za-z]*/ })
+// We manually add the general Identifier (Name) AFTER all the keyword token types.
+allTokens.push(Name)
+
 FRAGMENT("IntegerPart", "-?(0|[1-9][0-9]*)")
 FRAGMENT("FractionalPart", "\\.[0-9]+")
 FRAGMENT("ExponentPart", "[eE][+-]?[0-9]+")
@@ -322,8 +390,7 @@ class GraphQLParser extends Parser {
         })
 
         $.RULE("FragmentName", () => {
-            // TODO: "Name but not on"
-            $.CONSUME(Name)
+            $.CONSUME(NameButNotOn)
         })
 
         $.RULE("TypeCondition", () => {
@@ -357,8 +424,7 @@ class GraphQLParser extends Parser {
         })
 
         $.RULE("EnumValue", () => {
-            // TODO: Name but not "true" or "false" or null
-            $.CONSUME(Name)
+            $.CONSUME(NameButNotTrueOrFalseOrNull)
         })
 
         $.RULE("ListValue", isConst => {
