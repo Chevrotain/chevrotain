@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GraphQL Syntax Diagrams</title>
+</head>
+
+<body>
+<!-- https://stackoverflow.com/a/14738668 -->
+<iframe id="innerFrame" src=""
+        style="position:fixed;
+        top:0px;
+        left:0px;
+        bottom:0px;
+        right:0px;
+        width:100%;
+        height:100%;
+        border:none;
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        z-index:999999;">
+</iframe>
+</body>
+
+<!-- Load Latest Version of Chevrotain -->
+<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
+<script src="https://unpkg.com/xregexp/xregexp-all.js"></script>
+<script src="./graphql.js"></script>
+
+<script>
+    // extract the serialized grammar.
+    var parserInstance = new graphQlGrammar.GraphQLParser([])
+    var serialziedGrammar = parserInstance.getSerializedGastProductions()
+
+    // create the HTML Text
+    var htmlText = chevrotain.createSyntaxDiagramsCode(serialziedGrammar)
+    var innerFrame = document.getElementById("innerFrame")
+
+    // Update the iframe src to visually render the diagrams.
+    // https://stackoverflow.com/questions/10418644/creating-an-iframe-with-given-html-dynamically/10419102#10419102
+    innerFrame.src = 'data:text/html;charset=utf-8,' + encodeURI(htmlText);
+
+</script>
+</html>
