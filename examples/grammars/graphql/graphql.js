@@ -105,7 +105,7 @@
 
     const Comment = createToken({
         name: "Comment",
-        pattern: /#[^\n\r]+/,
+        pattern: /#[^\n\r]*/,
         group: Lexer.SKIPPED
     })
 
@@ -263,11 +263,11 @@
         "StringCharacter",
         '(?:[^\\\\"\\n\\r]|\\\\(?:{{EscapedUnicode}}|u{{EscapedCharacter}}))'
     )
-    FRAGMENT("BlockStringCharacter", '[^"]|"(?!"")|\\\\"""')
+    FRAGMENT("BlockStringCharacter", '\\\\"""|[^"]|"(?!"")')
     const StringValue = createToken({
         name: "StringValue",
         pattern: MAKE_PATTERN(
-            '"(?:{{StringCharacter}})*"|"""(?:{{BlockStringCharacter}})*"""'
+            '"""(?:{{BlockStringCharacter}})*"""|"(?:{{StringCharacter}})*"'
         )
     })
 
