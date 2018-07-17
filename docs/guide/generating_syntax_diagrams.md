@@ -19,7 +19,7 @@ library by @tabatkins.
 
 ## Instructions
 
-Chevrotain provides an the [**createSyntaxDiagramsCode**](https://sap.github.io/chevrotain/documentation/3_7_1/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
+Chevrotain provides the [**createSyntaxDiagramsCode**](https://sap.github.io/chevrotain/documentation/3_7_1/globals.html#createsyntaxdiagramscode) API to generate the **html source code**
 of syntax diagrams. This html source code can then be used by an end user in either node.js or a browser:
 
 1.  By writing it directly to the disk in a pure node.js runtime scenario.
@@ -27,12 +27,12 @@ of syntax diagrams. This html source code can then be used by an end user in eit
 
 **Examples:**
 
--   [Generating syntax diagrams to disk](https://github.com/SAP/chevrotain/blob/master/examples/parser/diagrams/gen_diagrams.js)
+-   [Generating syntax diagrams to a file](https://github.com/SAP/chevrotain/blob/master/examples/parser/diagrams/gen_diagrams.js)
 
-    -   Self contained, no need for Chevrotain or the grammar when running the html.
+    -   Self contained, no need for Chevrotain or the grammar when rendering the html.
 
 -   [Generating syntax diagrams dynamically into an iframe](https://github.com/SAP/chevrotain/blob/master/examples/parser/diagrams/diagrams_browser.html)
-    -   Requires loading **both** Chevrotain and the grammar when running the html.
+    -   Requires loading **both** Chevrotain and the grammar (and dependencies!) when rendering the html.
 
 ## Customization
 
