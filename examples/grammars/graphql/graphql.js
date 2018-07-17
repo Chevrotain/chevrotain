@@ -261,8 +261,7 @@ class GraphQLParser extends Parser {
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor(input) {
         super(input, allTokens, {
-            outputCst: true,
-            recoveryEnabled: true
+            outputCst: true
         })
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
@@ -360,14 +359,15 @@ class GraphQLParser extends Parser {
 
         $.RULE("Alias", () => {
             $.CONSUME(Name)
+            $.CONSUME(Colon)
         })
 
         $.RULE("Arguments", isConst => {
-            $.CONSUME(LCurly)
+            $.CONSUME(LParen)
             $.AT_LEAST_ONE(() => {
                 $.SUBRULE($.Argument, { ARGS: [isConst] })
             })
-            $.CONSUME(RCurly)
+            $.CONSUME(RParen)
         })
 
         $.RULE("Argument", isConst => {
@@ -1021,12 +1021,10 @@ module.exports = {
         // setting a new input will RESET the parser instance's state.
         parser.input = lexResult.tokens
         // any top level rule may be used as an entry point
-        const value = parser.Document()
+        const cst = parser.Document()
 
         return {
-            // This is a pure grammar, the value will be undefined until we add embedded actions
-            // or enable automatic CST creation.
-            value: value,
+            value: cst,
             lexErrors: lexResult.errors,
             parseErrors: parser.errors
         }
