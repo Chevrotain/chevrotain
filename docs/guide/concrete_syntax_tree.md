@@ -30,7 +30,7 @@ How to enable CST output?
 In the future this capability may be enabled by default.
 Currently this feature must be explicitly enabled by setting the **outputCst** flag.
 
-In the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_7_1/interfaces/iparserconfig.html).
+In the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_7_2/interfaces/iparserconfig.html).
 
 ```javascript
 class MyParser extends chevrotain.Parser {
