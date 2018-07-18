@@ -1,14 +1,24 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [Performance Regressions under Chrome Canary 69](https://github.com/SAP/chevrotain/issues/783).
+
+#### Examples
+
+-   [GraphQL Grammar Example](https://github.com/SAP/chevrotain/blob/master/examples/grammars/graphql/graphql.js)
+
 ## 3.7.1 (7-12-2018)
 
 #### Bug Fixes
 
--   [Potential Very Slow Lexer Initialization.](https://github.com/SAP/chevrotain/issues/768).
+-   [Potential Very Slow Lexer Initialization](https://github.com/SAP/chevrotain/issues/768).
 
 ## 3.7.0 (6-27-2018)
 
 #### Minor Changes
 
--   [Remove global cache (state) and use instance level cache instead.](https://github.com/SAP/chevrotain/issues/754).
+-   [Remove global cache (state) and use instance level cache instead](https://github.com/SAP/chevrotain/issues/754).
 
 #### Bug Fixes
 

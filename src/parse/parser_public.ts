@@ -298,9 +298,11 @@ export class Parser {
     }
 
     // caching
-    protected resyncFollows: HashTable<TokenType[]>
-    protected allRuleNames: string[]
-    protected lookAheadFuncsCache: Function[]
+    protected resyncFollows: HashTable<TokenType[]> = new HashTable<
+        TokenType[]
+    >()
+    protected allRuleNames: string[] = []
+    protected lookAheadFuncsCache: Function[] = []
     protected baseCstVisitorConstructor: Function
     protected baseCstVisitorWithDefaultsConstructor: Function
     protected gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
@@ -310,28 +312,35 @@ export class Parser {
 
     protected _errors: IRecognitionException[] = []
 
+    // These configuration properties are also assigned in the constructor
+    // This is a little bit of duplication but seems to help with performance regression on V8
+    // Probably due to hidden class changes.
     /**
      * This flag enables or disables error recovery (fault tolerance) of the parser.
      * If this flag is disabled the parser will halt on the first error.
      */
-    protected recoveryEnabled: boolean
-    protected dynamicTokensEnabled: boolean
-    protected maxLookahead: number
-    protected ignoredIssues: IgnoredParserIssues
-    protected outputCst: boolean
-    protected serializedGrammar: ISerializedGast[]
+    protected recoveryEnabled: boolean = DEFAULT_PARSER_CONFIG.recoveryEnabled
+    protected dynamicTokensEnabled: boolean =
+        DEFAULT_PARSER_CONFIG.dynamicTokensEnabled
+    protected maxLookahead: number = DEFAULT_PARSER_CONFIG.maxLookahead
+    protected ignoredIssues: IgnoredParserIssues =
+        DEFAULT_PARSER_CONFIG.ignoredIssues
+    protected outputCst: boolean = DEFAULT_PARSER_CONFIG.outputCst
+    protected serializedGrammar: ISerializedGast[] =
+        DEFAULT_PARSER_CONFIG.serializedGrammar
 
     // adapters
-    protected errorMessageProvider: IParserErrorMessageProvider
+    protected errorMessageProvider: IParserErrorMessageProvider =
+        DEFAULT_PARSER_CONFIG.errorMessageProvider
 
     protected isBackTrackingStack = []
-    protected className: string
+    protected className: string = "Parser"
     protected RULE_STACK: string[] = []
     protected RULE_OCCURRENCE_STACK: number[] = []
     protected CST_STACK: CstNode[] = []
-    protected tokensMap: { [fqn: string]: TokenType } = undefined
+    protected tokensMap: { [fqn: string]: TokenType } = {}
 
-    private firstAfterRepMap
+    private firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
     private definitionErrors: IParserDefinitionError[] = []
     private definedRulesNames: string[] = []
 
@@ -340,13 +349,13 @@ export class Parser {
 
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
     private ruleShortNameIdx = 256
-    private tokenMatcher: TokenMatcher
+    private tokenMatcher: TokenMatcher = tokenStructuredMatcherNoCategories
     private LAST_EXPLICIT_RULE_STACK: number[] = []
     private selfAnalysisDone = false
 
     // lexerState
-    private tokVector: IToken[]
-    private tokVectorLength
+    private tokVector: IToken[] = []
+    private tokVectorLength = 0
     private currIdx: number = -1
 
     constructor(
@@ -410,8 +419,6 @@ export class Parser {
         }
 
         this.className = classNameFromInstance(this)
-        this.firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
-        this.lookAheadFuncsCache = []
 
         if (isArray(tokenVocabulary)) {
             this.tokensMap = <any>reduce(
@@ -1819,7 +1826,7 @@ export class Parser {
         nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
     ) {
         let key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
-        let firstAfterRepInfo = this.firstAfterRepMap.get(key)
+        let firstAfterRepInfo = this.firstAfterRepMap.get(<any>key)
         if (firstAfterRepInfo === undefined) {
             let currRuleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(currRuleName)
