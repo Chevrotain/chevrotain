@@ -346,6 +346,7 @@ export class Parser {
 
     private shortRuleNameToFull = new HashTable<string>()
     private fullRuleNameToShort = new HashTable<number>()
+    private fullRuleNameToLabel = new HashTable<string>()
 
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
     private ruleShortNameIdx = 256
@@ -1304,6 +1305,13 @@ export class Parser {
         idx: number,
         options?: SubruleMethodOpts
     ) {
+        if (options !== undefined && options.LABEL !== undefined) {
+            this.fullRuleNameToLabel.put(
+                (<any>ruleToCall).ruleName,
+                options.LABEL
+            )
+        }
+
         const args = options !== undefined ? options.ARGS : undefined
         const ruleResult = ruleToCall.call(this, idx, args)
 
@@ -1492,13 +1500,18 @@ export class Parser {
                                 let preRuleFullName = this.shortRuleNameToFull.get(
                                     prevRuleShortName
                                 )
+
+                                let ruleName =
+                                    this.fullRuleNameToLabel.get(
+                                        preRuleFullName
+                                    ) || preRuleFullName
                                 let partialCstResult = this.CST_STACK[
                                     this.CST_STACK.length - 1
                                 ]
                                 partialCstResult.recoveredNode = true
                                 this.cstPostNonTerminalRecovery(
                                     partialCstResult,
-                                    preRuleFullName
+                                    ruleName
                                 )
                             }
                             // to be handled Further up the call stack
