@@ -1304,17 +1304,30 @@ export class Parser {
         idx: number,
         options?: SubruleMethodOpts
     ) {
-        const args = options !== undefined ? options.ARGS : undefined
-        const ruleResult = ruleToCall.call(this, idx, args)
+        let ruleResult
+        try {
+            const args = options !== undefined ? options.ARGS : undefined
+            ruleResult = ruleToCall.call(this, idx, args)
+            this.cstPostNonTerminal(
+                ruleResult,
+                options !== undefined && options.LABEL !== undefined
+                    ? options.LABEL
+                    : (<any>ruleToCall).ruleName
+            )
+            return ruleResult
+        } catch (e) {
+            if (isRecognitionException(e) && e.partialCstResult !== undefined) {
+                this.cstPostNonTerminal(
+                    e.partialCstResult,
+                    options !== undefined && options.LABEL !== undefined
+                        ? options.LABEL
+                        : (<any>ruleToCall).ruleName
+                )
 
-        this.cstPostNonTerminal(
-            ruleResult,
-            options !== undefined && options.LABEL !== undefined
-                ? options.LABEL
-                : (<any>ruleToCall).ruleName
-        )
-
-        return ruleResult
+                delete e.partialCstResult
+            }
+            throw e
+        }
     }
 
     /**
@@ -1487,19 +1500,11 @@ export class Parser {
                             }
                         } else {
                             if (this.outputCst) {
-                                // recovery is only for "real" non nested rules
-                                let prevRuleShortName = this.getLastExplicitRuleShortNameNoCst()
-                                let preRuleFullName = this.shortRuleNameToFull.get(
-                                    prevRuleShortName
-                                )
-                                let partialCstResult = this.CST_STACK[
+                                const partialCstResult = this.CST_STACK[
                                     this.CST_STACK.length - 1
                                 ]
                                 partialCstResult.recoveredNode = true
-                                this.cstPostNonTerminalRecovery(
-                                    partialCstResult,
-                                    preRuleFullName
-                                )
+                                e.partialCstResult = partialCstResult
                             }
                             // to be handled Further up the call stack
                             throw e
@@ -2729,18 +2734,6 @@ export class Parser {
     private cstPostNonTerminal(ruleCstResult: CstNode, ruleName: string): void {
         addNoneTerminalToCst(
             this.CST_STACK[this.CST_STACK.length - 1],
-            ruleName,
-            ruleCstResult
-        )
-    }
-
-    private cstPostNonTerminalRecovery(
-        ruleCstResult: CstNode,
-        ruleName: string
-    ): void {
-        // TODO: assumes not first rule, is this assumption always correct?
-        addNoneTerminalToCst(
-            this.CST_STACK[this.CST_STACK.length - 2],
             ruleName,
             ruleCstResult
         )
