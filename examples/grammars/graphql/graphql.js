@@ -135,6 +135,7 @@
     // keywords and Name
     // Name must not be placed into the TokenTypeList before any keywords
     // as it can match any keyword, so we use "orgCreateToken"
+    // TODO: create a NameOrKeyword token
     const Name = orgCreateToken({
         name: "Name",
         pattern: /[_A-Za-z][_0-9A-Za-z]*/
@@ -147,7 +148,7 @@
     })
     const Subscription = createKeywordToken({
         name: "Subscription",
-        pattern: "Subscription"
+        pattern: "subscription"
     })
     const Fragment = createKeywordToken({
         name: "Fragment",
@@ -493,7 +494,7 @@
             })
 
             $.RULE("VariableDefinition", () => {
-                $.CONSUME(Name)
+                $.SUBRULE($.Variable)
                 $.CONSUME(Colon)
                 $.SUBRULE($.Type)
                 $.OPTION(() => {
@@ -545,7 +546,9 @@
             $.RULE("Directive", isConst => {
                 $.CONSUME(At)
                 $.CONSUME(Name)
-                $.SUBRULE($.Arguments, { ARGS: [isConst] })
+                $.OPTION(() => {
+                    $.SUBRULE($.Arguments, { ARGS: [isConst] })
+                })
             })
 
             $.RULE("TypeSystemDefinition", () => {
