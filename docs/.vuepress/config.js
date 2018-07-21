@@ -71,6 +71,7 @@ module.exports = {
         editLinkText: "Edit this page on GitHub",
         nav: [
             { text: "Home", link: "/" },
+            { text: "Features", link: "/features/llk" },
             { text: "Tutorial", link: "/tutorial/step0_introduction" },
             { text: "Guide", link: "/guide/introduction" },
             {
@@ -130,6 +131,16 @@ module.exports = {
                             "Resolving Grammar Errors"
                         ],
                         ["resolving_lexer_errors", "Resolving Lexer Errors"]
+                    ]
+                }
+            ],
+            "/features/": [
+                {
+                    title: "Features",
+                    collapsable: false,
+                    children: [
+                        ["llk", "LL(K) Grammars"],
+                        ["separation", "Separation of Grammar and Semantics"],
                     ]
                 }
             ],
