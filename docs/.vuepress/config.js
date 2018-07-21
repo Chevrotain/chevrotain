@@ -143,7 +143,8 @@ module.exports = {
                         ["separation", "Separation of Grammar and Semantics"],
                         ["fault_tolerance", "Fault Tolerance"],
                         ["custom_errors", "Customizable Error Messages"],
-                        ["gates", "Gates"]
+                        ["gates", "Gates"],
+                        ["backtracking", "Backtracking"]
                     ]
                 }
             ],
