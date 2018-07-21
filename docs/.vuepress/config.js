@@ -140,7 +140,8 @@ module.exports = {
                     collapsable: false,
                     children: [
                         ["llk", "LL(K) Grammars"],
-                        ["separation", "Separation of Grammar and Semantics"]
+                        ["separation", "Separation of Grammar and Semantics"],
+                        ["custom_errors", "Customizable Error Messages"]
                     ]
                 }
             ],
