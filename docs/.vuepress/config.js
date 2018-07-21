@@ -144,6 +144,7 @@ module.exports = {
                         ["fault_tolerance", "Fault Tolerance"],
                         ["custom_errors", "Customizable Error Messages"],
                         ["gates", "Gates"],
+                        ["grammar_inheritance", "Grammar Inheritance"],
                         ["backtracking", "Backtracking"]
                     ]
                 }
