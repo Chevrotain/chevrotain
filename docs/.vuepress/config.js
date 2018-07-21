@@ -74,12 +74,14 @@ module.exports = {
             { text: "Features", link: "/features/llk" },
             { text: "Tutorial", link: "/tutorial/step0_introduction" },
             { text: "Guide", link: "/guide/introduction" },
+
+            { text: "FAQ", link: "/FAQ" },
+            { text: "Changes", link: "/changes/BREAKING_CHANGES" },
+
             {
                 text: "APIs",
                 link: `https://sap.github.io/chevrotain/documentation/${versionWithLowDashs}/globals.html`
             },
-            { text: "FAQ", link: "/FAQ" },
-            { text: "Changes", link: "/changes/BREAKING_CHANGES" },
             {
                 text: "Playground",
                 link: "https://sap.github.io/chevrotain/playground/"
@@ -87,6 +89,10 @@ module.exports = {
             {
                 text: "Benchmark",
                 link: "https://sap.github.io/chevrotain/performance/"
+            },
+            {
+                text: "Chat",
+                link: "https://gitter.im/chevrotain-parser/Lobby"
             }
         ],
         sidebar: {
