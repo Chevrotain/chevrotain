@@ -141,7 +141,9 @@ module.exports = {
                     children: [
                         ["llk", "LL(K) Grammars"],
                         ["separation", "Separation of Grammar and Semantics"],
-                        ["custom_errors", "Customizable Error Messages"]
+                        ["fault_tolerance", "Fault Tolerance"],
+                        ["custom_errors", "Customizable Error Messages"],
+                        ["gates", "Gates"]
                     ]
                 }
             ],
