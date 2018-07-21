@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [CST - Labels of nonTerminals are lost during error recovery](https://github.com/SAP/chevrotain/issues/786).
+
 ## 3.7.2 (7-19-2018)
 
 #### Bug Fixes
