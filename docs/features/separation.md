@@ -8,5 +8,6 @@ This implements the design principle of [Separation of Concerns](https://en.wiki
 which enables **re-use** of the same **pure** grammar for multiple purposes.
 
 See example of two identical mathematical expression grammars:
-- Firstly using [embedded actions](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js) for semantics.
-- Secondly using [Separated semantics](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js) with a CST Visitor.
+
+-   Firstly using [embedded actions](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_embedded_actions.js) for semantics.
+-   Secondly using [Separated semantics](https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js) with a CST Visitor.

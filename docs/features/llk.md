@@ -7,23 +7,24 @@ be a fixed number and known in advance.
 For example given the grammar
 
 ```antlr
-statement: 
-   A B C | 
-   A B D | 
-   A B E 
+statement:
+   A B C |
+   A B D |
+   A B E
 ```
 
 Chevrotain will look **three** tokens ahead to decide between the two alternatives.
 
 But given the following grammar
+
 ```antlr
-statement: 
-   longRule B  | 
-   longRule C  | 
-   longRule D 
-   
+statement:
+   longRule B  |
+   longRule C  |
+   longRule D
+
 longRule:
-   A+  
+   A+
 ```
 
 Chevrotain will throw a an error during the parser initialization in this case.
