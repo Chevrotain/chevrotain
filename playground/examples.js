@@ -213,10 +213,7 @@ function jsonGrammarOnlyExample() {
 
     const JsonLexer = new Lexer(jsonTokens, {
         // Less position info tracked, reduces verbosity of the playground output.
-        positionTracking: "onlyStart",
-        // Adds tokenClassName property to the output for easier debugging in the playground
-        // Do not use this flag in a productive env, as it will hurt performance.
-        debug: true
+        positionTracking: "onlyStart"
     });
 
     // Labels only affect error messages and Diagrams.
@@ -460,9 +457,6 @@ function cssExample() {
     const CssLexer = new Lexer(cssTokens, {
         // Less position info tracked, reduces verbosity of the playground output.
         positionTracking: "onlyStart",
-        // Adds tokenClassName property to the output for easier debugging in the playground
-        // Do not use this flag in a productive env, as it will hurt performance.
-        debug: true
     });
 
     // ----------------- parser -----------------
