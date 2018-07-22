@@ -145,6 +145,7 @@ module.exports = {
                     title: "Features",
                     collapsable: false,
                     children: [
+                        ["blazing_fast", "Blazing Fast"],
                         ["llk", "LL(K) Grammars"],
                         ["separation", "Separation of Grammar and Semantics"],
                         ["easy_debugging", "Easy Debugging"],
