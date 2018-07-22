@@ -152,6 +152,7 @@ module.exports = {
                         ["fault_tolerance", "Fault Tolerance"],
                         ["multiple_start_rules", "Multiple Start Rules"],
                         ["custom_errors", "Customizable Error Messages"],
+                        ["parameterized_rules", "Parameterized Rules"],
                         ["gates", "Gates"],
                         ["grammar_inheritance", "Grammar Inheritance"],
                         ["backtracking", "Backtracking"]
