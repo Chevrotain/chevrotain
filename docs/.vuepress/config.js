@@ -71,7 +71,7 @@ module.exports = {
         editLinkText: "Edit this page on GitHub",
         nav: [
             { text: "Home", link: "/" },
-            { text: "Features", link: "/features/llk" },
+            { text: "Features", link: "/features/blazing_fast" },
             { text: "Tutorial", link: "/tutorial/step0_introduction" },
             { text: "Guide", link: "/guide/introduction" },
 
