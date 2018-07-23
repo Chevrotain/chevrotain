@@ -161,7 +161,10 @@ module.exports = {
                         ["grammar_inheritance", "Grammar Inheritance"],
                         ["backtracking", "Backtracking"],
                         ["syntax_diagrams", "Syntax Diagrams"],
-                        ["regexp", "RegExp Based Lexers"]
+                        ["regexp", "RegExp Based Lexers"],
+                        ["position_tracking", "Position Tracking"],
+                        ["token_skipping", "Token Skipping"],
+                        ["token_grouping", "Token Grouping"]
                     ]
                 }
             ],

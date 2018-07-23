@@ -1,7 +1,8 @@
 # Position Tracking
 
-Chevrotain will track the full token position information by default.
+Chevrotain lexers will track the full token position information by default.
 This means:
+token_skipping
 
 -   start and end offsets.
 -   start and end lines.
