@@ -11,11 +11,11 @@ For example:
 
 ```javascript
 $.RULE("statement", () => {
-      debugger;
-      $.RULE("objectItem", () => {
-        $.CONSUME(StringLiteral)
-        debugger;
-        $.CONSUME(Colon);
-        $.SUBRULE($.value);
-      });
+  debugger;
+  $.RULE("objectItem", () => {
+    $.CONSUME(StringLiteral)
+    debugger;
+    $.CONSUME(Colon);
+    $.SUBRULE($.value);
+  });
 ```

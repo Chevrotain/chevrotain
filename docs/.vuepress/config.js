@@ -154,8 +154,13 @@ module.exports = {
                         ["custom_errors", "Customizable Error Messages"],
                         ["parameterized_rules", "Parameterized Rules"],
                         ["gates", "Gates"],
+                        [
+                            "syntactic_content_assist",
+                            "Syntactic Content Assist"
+                        ],
                         ["grammar_inheritance", "Grammar Inheritance"],
-                        ["backtracking", "Backtracking"]
+                        ["backtracking", "Backtracking"],
+                        ["syntax_diagrams", "Syntax Diagrams"]
                     ]
                 }
             ],
