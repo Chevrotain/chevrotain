@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chevrotain | Automatic Concrete Syntax Tree Creation</title>
+    <meta name="description" content="Parser Building Toolkit for JavaScript">
+    
+    
+    <link rel="preload" href="/chevrotain/docs/assets/css/36.styles.22b6a7cf.css" as="style"><link rel="preload" href="/chevrotain/docs/assets/js/app.ac613730.js" as="script"><link rel="preload" href="/chevrotain/docs/assets/js/14.c788b62e.js" as="script"><link rel="prefetch" href="/chevrotain/docs/assets/js/18.2b59665c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/0.05a112cd.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/1.2cf5fadc.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/2.b46a967e.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/3.2b2c6c84.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/4.63fa835a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/5.98e0a25d.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/6.5bf58213.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/7.3548c93d.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/8.754d7bdd.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/9.be5da4d3.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/10.add6c50c.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/11.1f5b5bc7.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/12.73a768f1.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/13.6bd8b69b.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/15.40d7b363.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/16.0e0a5a14.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/17.24f42fdf.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/19.210036a4.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/20.16361b38.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/21.8cc8846a.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/22.2ae63692.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/23.91472bea.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/24.42af3977.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/25.031d6000.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/26.78a5272b.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/27.7135a0cb.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/28.e75af158.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/29.27f2ece9.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/30.fdc5736f.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/31.0edb9566.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/32.1a53975d.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/33.1470287e.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/34.483e0079.js"><link rel="prefetch" href="/chevrotain/docs/assets/js/35.22ac0451.js">
+    <link rel="stylesheet" href="/chevrotain/docs/assets/css/36.styles.22b6a7cf.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div><a href="/chevrotain/docs/" class="home-link router-link-active"><!----><span class="site-name">
+      Chevrotain
+    </span></a><div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""><!----></div><nav class="nav-links can-hide"><div class="nav-item"><a href="/chevrotain/docs/" class="nav-link">Home</a></div><div class="nav-item"><a href="/chevrotain/docs/features/blazing_fast.html" class="nav-link">Features</a></div><div class="nav-item"><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="nav-link">Tutorial</a></div><div class="nav-item"><a href="/chevrotain/docs/guide/introduction.html" class="nav-link">Guide</a></div><div class="nav-item"><a href="/chevrotain/docs/FAQ.html" class="nav-link">FAQ</a></div><div class="nav-item"><a href="/chevrotain/docs/changes/BREAKING_CHANGES.html" class="nav-link">Changes</a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/documentation/3_7_3/globals.html" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  APIs
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/playground/" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Playground
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/performance/" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Benchmark
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://gitter.im/chevrotain-parser/Lobby" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Chat
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><a href="https://github.com/SAP/chevrotain" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav></div></header><div class="sidebar-mask"></div><div class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/chevrotain/docs/" class="nav-link">Home</a></div><div class="nav-item"><a href="/chevrotain/docs/features/blazing_fast.html" class="nav-link">Features</a></div><div class="nav-item"><a href="/chevrotain/docs/tutorial/step0_introduction.html" class="nav-link">Tutorial</a></div><div class="nav-item"><a href="/chevrotain/docs/guide/introduction.html" class="nav-link">Guide</a></div><div class="nav-item"><a href="/chevrotain/docs/FAQ.html" class="nav-link">FAQ</a></div><div class="nav-item"><a href="/chevrotain/docs/changes/BREAKING_CHANGES.html" class="nav-link">Changes</a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/documentation/3_7_3/globals.html" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  APIs
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/playground/" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Playground
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://sap.github.io/chevrotain/performance/" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Benchmark
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><div class="nav-item"><a href="https://gitter.im/chevrotain-parser/Lobby" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Chat
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div><a href="https://github.com/SAP/chevrotain" target="_blank" rel="noopener noreferrer" class="repo-link">
+    GitHub
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></nav><ul class="sidebar-links"><li><div class="sidebar-group first"><p class="sidebar-heading open"><span>Guide</span><!----></p><ul class="sidebar-group-items"><li><a href="/chevrotain/docs/guide/introduction.html" class="sidebar-link">Introduction</a></li><li><a href="/chevrotain/docs/guide/concrete_syntax_tree.html" class="active sidebar-link">CST</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#ast-vs-cst" class="sidebar-link">AST vs CST</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#enabling" class="sidebar-link">Enabling</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#structure" class="sidebar-link">Structure</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#in-lined-rules" class="sidebar-link">In-Lined Rules</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#fault-tolerance" class="sidebar-link">Fault Tolerance</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#traversing" class="sidebar-link">Traversing</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#cst-visitor" class="sidebar-link">CST Visitor</a></li><li class="sidebar-sub-header"><a href="/chevrotain/docs/guide/concrete_syntax_tree.html#performance" class="sidebar-link">Performance</a></li></ul></li><li><a href="/chevrotain/docs/guide/generating_syntax_diagrams.html" class="sidebar-link">Syntax Diagrams</a></li><li><a href="/chevrotain/docs/guide/custom_token_patterns.html" class="sidebar-link">Custom Token Patterns</a></li><li><a href="/chevrotain/docs/guide/syntactic_content_assist.html" class="sidebar-link">Syntactic Content Assist</a></li><li><a href="/chevrotain/docs/guide/custom_apis.html" class="sidebar-link">Custom APIs</a></li><li><a href="/chevrotain/docs/guide/resolving_grammar_errors.html" class="sidebar-link">Resolving Grammar Errors</a></li><li><a href="/chevrotain/docs/guide/resolving_lexer_errors.html" class="sidebar-link">Resolving Lexer Errors</a></li></ul></div></li></ul></div><div class="page"><div class="content"><h1 id="automatic-concrete-syntax-tree-creation"><a href="#automatic-concrete-syntax-tree-creation" aria-hidden="true" class="header-anchor">#</a> Automatic Concrete Syntax Tree Creation</h1><p>Chevrotain has the capability to <strong>automatically</strong> create a concrete syntax tree (CST)
+during parsing. A CST is a simple structure which represents the <strong>entire</strong> parse tree.
+It contains information on every token parsed.</p><p>The main advantage of using the automatic CST creation is that it enables writing &quot;pure&quot; grammars.
+This means that the semantic actions are <strong>not</strong> embedded into the grammar implementation but are instead
+completely <strong>separated</strong> from it.</p><p>This separation of concerns makes the grammar easier to maintain
+and makes it easier to implement different capabilities on the grammar,
+for example: separate logic for compilation and for IDE support.</p><h2 id="ast-vs-cst"><a href="#ast-vs-cst" aria-hidden="true" class="header-anchor">#</a> AST vs CST</h2><p>There are two major differences.</p><ol><li><p>An <strong>A</strong>bstract <strong>S</strong>yntax <strong>T</strong>ree would not normally contain all the syntactic information.
+This mean the <strong>exact original</strong> text can not always be re-constructed from the AST.</p></li><li><p>An <strong>A</strong>bstract <strong>S</strong>yntax <strong>T</strong>ree would not represent the whole syntactic parse tree.
+It would normally only contain nodes related to specific parse tree nodes,
+but not all of those (mostly leaf nodes).</p></li></ol><h2 id="enabling"><a href="#enabling" aria-hidden="true" class="header-anchor">#</a> Enabling</h2><p>How to enable CST output?</p><p>In the future this capability may be enabled by default.
+Currently this feature must be explicitly enabled by setting the <strong>outputCst</strong> flag.</p><p>In the parser <a href="https://sap.github.io/chevrotain/documentation/3_7_3/interfaces/iparserconfig.html" target="_blank" rel="noopener noreferrer">configuration object<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">class</span> <span class="token class-name">MyParser</span> <span class="token keyword">extends</span> <span class="token class-name">chevrotain<span class="token punctuation">.</span>Parser</span> <span class="token punctuation">{</span>
+    <span class="token function">constructor</span><span class="token punctuation">(</span>input<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span>input<span class="token punctuation">,</span> allTokens<span class="token punctuation">,</span> <span class="token punctuation">{</span> outputCst<span class="token punctuation">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="structure"><a href="#structure" aria-hidden="true" class="header-anchor">#</a> Structure</h2><p>The structure of the CST is very simple.</p><ul><li><p>View it by running the CST creation example in the <a href="https://sap.github.io/chevrotain/playground/?example=JSON%20grammar%20and%20automatic%20CST%20output" target="_blank" rel="noopener noreferrer"><strong>online playground</strong><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>.</p></li><li><p>Note that the following examples are not runnable nor contain the full information.
+These are just snippets to explain the core concepts.</p></li></ul><div class="language-TypeScript extra-class"><pre class="language-typescript"><code><span class="token keyword">export</span> <span class="token keyword">type</span> CstElement <span class="token operator">=</span> IToken <span class="token operator">|</span> CstNode
+<span class="token keyword">export</span> <span class="token keyword">type</span> CstChildrenDictionary <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span>elementName<span class="token punctuation">:</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token punctuation">:</span>CstElement<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">interface</span> <span class="token class-name">CstNode</span> <span class="token punctuation">{</span>
+    readonly name<span class="token punctuation">:</span><span class="token builtin">string</span>
+
+    readonly children<span class="token punctuation">:</span>CstChildrenDictionary
+
+    readonly recoveredNode<span class="token operator">?</span><span class="token punctuation">:</span><span class="token builtin">boolean</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>A single CstNode corresponds to a single grammar rule's invocation result.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;qualifiedName&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+input <span class="token operator">=</span> <span class="token string">&quot;&quot;</span>
+
+output <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;qualifiedName&quot;</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Each Terminal will appear in the children dictionary using the terminal's name
+as the key and an <strong>array</strong> of IToken as the value.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;qualifiedName&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Identifier<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Dot<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME2</span><span class="token punctuation">(</span>Identifier<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+input <span class="token operator">=</span> <span class="token string">&quot;foo.bar&quot;</span>
+
+output <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;qualifiedName&quot;</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        Dot<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;.&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        Identifier<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;foo&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;bar&quot;</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Non-Terminals are handled similarly to Terminals except each item in the value's array
+Is the CstNode of the corresponding Grammar Rule (Non-Terminal).</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;qualifiedName&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>singleIdent<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;singleIdent&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Identifier<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+input <span class="token operator">=</span> <span class="token string">&quot;foo&quot;</span>
+
+output <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;qualifiedName&quot;</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        singleIdent<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">{</span>
+                name<span class="token punctuation">:</span> <span class="token string">&quot;singleIdent&quot;</span><span class="token punctuation">,</span>
+                children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+                    Identifier<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;foo&quot;</span><span class="token punctuation">]</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Note that Terminals and Non-Terminals will only appear in the children object
+if they were actually encountered during parsing.
+This means that optional grammar productions may or may not appear in a CST node
+depending on the actual input, e.g:</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;variableStatement&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Var<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Identifier<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">OPTION</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Equals<span class="token punctuation">)</span>
+        $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Integer<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+input1 <span class="token operator">=</span> <span class="token string">&quot;var x&quot;</span>
+
+output1 <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;variableStatement&quot;</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        Var<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;var&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        Identifier<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;x&quot;</span><span class="token punctuation">]</span>
+        <span class="token comment">// no &quot;Equals&quot; or &quot;Integer&quot; keys</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+input2 <span class="token operator">=</span> <span class="token string">&quot;var x = 5&quot;</span>
+
+output2 <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;variableStatement&quot;</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        Var<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;var&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        Identifier<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;x&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        Equals<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;=&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        Integer<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;5&quot;</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h2 id="in-lined-rules"><a href="#in-lined-rules" aria-hidden="true" class="header-anchor">#</a> In-Lined Rules</h2><p>So far the CST structure is quite simple, but how would a more complex grammar be handled?</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;statements&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">OR</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token comment">// let x = 5</span>
+        <span class="token punctuation">{</span>
+            <span class="token constant">ALT</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Let<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Equals<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token comment">// select age from employee where age = 120</span>
+        <span class="token punctuation">{</span>
+            <span class="token constant">ALT</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Select<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME2</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>From<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME3</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Where<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div><p>Some of the Terminals and Non-Terminals are used in <strong>both</strong> alternatives.
+It is possible to check for the existence of distinguishing terminals such as the &quot;Let&quot; and &quot;Select&quot;.
+But this is not a robust approach.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">let</span> cstResult <span class="token operator">=</span> parser<span class="token punctuation">.</span><span class="token function">qualifiedName</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>cstResult<span class="token punctuation">.</span>children<span class="token punctuation">.</span>Let <span class="token operator">!==</span> undefined<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Let statement</span>
+    <span class="token comment">// do something...</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>cstResult<span class="token punctuation">.</span>children<span class="token punctuation">.</span>Select <span class="token operator">!==</span> undefined<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Select statement</span>
+    <span class="token comment">// do something else.</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Alternatively it is possible to refactor the grammar in such a way that both alternatives
+Would be completely wrapped in their own Non-Terminal rules.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;statements&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">OR</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token punctuation">{</span> <span class="token constant">ALT</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>letStatement<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token punctuation">{</span> <span class="token constant">ALT</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>selectStatement<span class="token punctuation">)</span> <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div><p>This is the recommended approach in this case as more and more alternations are added the grammar rule
+will become too difficult to understand and maintain due to verbosity.
+However, sometimes refactoring out rules is too much, this is where <strong>in-lined</strong> rules arrive to the rescue.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;statements&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">OR</span><span class="token punctuation">(</span><span class="token punctuation">[</span>
+        <span class="token comment">// let x = 5</span>
+        <span class="token punctuation">{</span>
+            <span class="token constant">NAME</span><span class="token punctuation">:</span> <span class="token string">&quot;$letStatement&quot;</span><span class="token punctuation">,</span>
+            <span class="token constant">ALT</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Let<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Equals<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token comment">// select age from employee where age = 120</span>
+        <span class="token punctuation">{</span>
+            <span class="token constant">NAME</span><span class="token punctuation">:</span> <span class="token string">&quot;$selectStatement&quot;</span><span class="token punctuation">,</span>
+            <span class="token constant">ALT</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Select<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME2</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>From<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME3</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Where<span class="token punctuation">)</span>
+                $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+output <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;statements&quot;</span><span class="token punctuation">,</span>
+    <span class="token comment">// only one of they keys depending on the actual alternative chosen</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        $letStatement<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+            <span class="token comment">/*...*/</span>
+        <span class="token punctuation">]</span><span class="token punctuation">,</span>
+        $$selectStatement<span class="token punctuation">:</span> <span class="token punctuation">[</span>
+            <span class="token comment">/*...*/</span>
+        <span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Providing a <strong>NAME</strong> property to the DSL methods will create an in-lined rule.
+It is equivalent to extraction to a separate grammar rule with two differences:</p><ul><li>To avoid naming conflicts in-lined rules <strong>must</strong> start with a dollar($) sign.</li><li>In-lined rules do not posses error recovery (re-sync) capabilities as do regular rules.</li></ul><p>Syntax Limitation:</p><ul><li><p>The <strong>NAME</strong> property of an in-lined rule must appear as the <strong>first</strong> property
+of the <strong>DSLMethodOpts</strong> object.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// GOOD</span>
+$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;field&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">OPTION</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token constant">NAME</span><span class="token punctuation">:</span> <span class="token string">&quot;$modifier&quot;</span><span class="token punctuation">,</span>
+        <span class="token constant">DEF</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Static<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token comment">// Bad - won't work.</span>
+$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;field&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">OPTION</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        <span class="token constant">DEF</span><span class="token punctuation">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Static<span class="token punctuation">)</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span>
+        <span class="token constant">NAME</span><span class="token punctuation">:</span> <span class="token string">&quot;$modifier&quot;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+</code></pre></div></li></ul><h2 id="fault-tolerance"><a href="#fault-tolerance" aria-hidden="true" class="header-anchor">#</a> Fault Tolerance</h2><p>CST output is also supported in combination with automatic error recovery.
+This combination is actually stronger than regular error recovery because
+even partially formed CstNodes will be present on the CST output and be marked
+using the <strong>recoveredNode&quot;</strong> boolean property.</p><p>For example given this grammar and assuming the parser re-synced after a token mismatch at
+the &quot;Where&quot; token:</p><div class="language-javascript extra-class"><pre class="language-javascript"><code>$<span class="token punctuation">.</span><span class="token constant">RULE</span><span class="token punctuation">(</span><span class="token string">&quot;SelectClause&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Select<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME2</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>From<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME3</span><span class="token punctuation">(</span>Identifer<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">CONSUME</span><span class="token punctuation">(</span>Where<span class="token punctuation">)</span>
+    $<span class="token punctuation">.</span><span class="token constant">SUBRULE</span><span class="token punctuation">(</span>$<span class="token punctuation">.</span>expression<span class="token punctuation">)</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+
+<span class="token comment">// mismatch token due to typo at &quot;wherrrre&quot;, parsing halts and re-syncs to upper rule so</span>
+<span class="token comment">// the suffix &quot;wherrrre age &gt; 25&quot; is not parsed.</span>
+input <span class="token operator">=</span> <span class="token string">&quot;select age from persons wherrrre age &gt; 25&quot;</span>
+
+output <span class="token operator">=</span> <span class="token punctuation">{</span>
+    name<span class="token punctuation">:</span> <span class="token string">&quot;SelectClause&quot;</span><span class="token punctuation">,</span>
+    children<span class="token punctuation">:</span> <span class="token punctuation">{</span>
+        Select<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;select&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        Identifier<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;age, persons&quot;</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+        From<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">&quot;from&quot;</span><span class="token punctuation">]</span>
+        <span class="token comment">// No &quot;Where&quot; key d,ue to the parse error</span>
+        <span class="token comment">// No &quot;expression&quot; key due to the parse error</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token comment">// This marks a recovered node.</span>
+    recoveredNode<span class="token punctuation">:</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>This accessibility of <strong>partial parsing results</strong> means some post-parsing logic
+may be able to perform farther analysis.
+for example: offering auto-fix suggestions or provide better error messages.</p><h2 id="traversing"><a href="#traversing" aria-hidden="true" class="header-anchor">#</a> Traversing</h2><p>So we now know how to create a CST and it's internal structure.
+But how do we traverse this structure and perform semantic actions?
+Some examples for such semantic actions:</p><ul><li>Creation of an Abstract Syntax Tree (AST) to be later used in the rest of the compilation pipeline.</li><li>Running the input text in an interpreter, for example a Calculator's grammar and input can be evaluated to
+a numerical value.</li><li>Extracting specific pieces of information from the input.</li></ul><p>One option would be to &quot;manually&quot; recursively &quot;walk&quot; the output CST structure.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// Tree Walker</span>
+<span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">toAst</span><span class="token punctuation">(</span>cst<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> children <span class="token operator">=</span> cst<span class="token punctuation">.</span>children
+    <span class="token keyword">switch</span> <span class="token punctuation">(</span>cst<span class="token punctuation">.</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">case</span> <span class="token string">&quot;selectStatement&quot;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">let</span> columnsListCst <span class="token operator">=</span> children<span class="token punctuation">.</span>columnsList<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+            <span class="token keyword">let</span> fromClauseCst <span class="token operator">=</span> children<span class="token punctuation">.</span>fromClause<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+            <span class="token keyword">let</span> columnsListAst <span class="token operator">=</span> <span class="token function">toAst</span><span class="token punctuation">(</span>columnsListCst<span class="token punctuation">)</span>
+            <span class="token keyword">let</span> fromClauseAst <span class="token operator">=</span> <span class="token function">toAst</span><span class="token punctuation">(</span>fromClauseCst<span class="token punctuation">)</span>
+
+            <span class="token keyword">return</span> <span class="token punctuation">{</span>
+                type<span class="token punctuation">:</span> <span class="token string">&quot;SelectStatementAst&quot;</span><span class="token punctuation">,</span>
+                columns<span class="token punctuation">:</span> columnsListAst<span class="token punctuation">,</span>
+                <span class="token keyword">from</span><span class="token punctuation">:</span> fromClauseAst
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">case</span> <span class="token string">&quot;columnsList&quot;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">let</span> columnName <span class="token operator">=</span> children<span class="token punctuation">.</span>identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
+            <span class="token comment">/*...*/</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">case</span> <span class="token string">&quot;fromClause&quot;</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token comment">/*...*/</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">default</span><span class="token punctuation">:</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">Error</span><span class="token punctuation">(</span>
+                <span class="token template-string"><span class="token string">`CST case handler not implemented for CST node &lt;</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>cst<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&gt;`</span></span>
+            <span class="token punctuation">)</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>This is a valid approach, however it can be somewhat error prone:</p><ul><li>No validation that the case names match the real names of the CST Nodes.</li><li>The validation for missing case handler (default case) depends on attempting to run toAst with invalid input.
+(Fail slow instead of fail fast...)</li><li>In-Lined Rules may cause ambiguities as they should be matched on the fullName property not the name property.</li></ul><h2 id="cst-visitor"><a href="#cst-visitor" aria-hidden="true" class="header-anchor">#</a> CST Visitor</h2><p>For the impatient, See a full runnable example: <a href="https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js" target="_blank" rel="noopener noreferrer">Calculator Grammar with CSTVisitor interpreter<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></p><p>Chevrotain provides a CSTVisitor class which can make traversing the CST less error prone.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// The base Visitor Class can be accessed via a Parser **instance**.</span>
+<span class="token keyword">const</span> BaseCstVisitor <span class="token operator">=</span> myParserInstance<span class="token punctuation">.</span><span class="token function">getBaseCstVisitorConstructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">SqlToAstVisitor</span> <span class="token keyword">extends</span> <span class="token class-name">BaseCstVisitor</span> <span class="token punctuation">{</span>
+    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment">// This helper will detect any missing or redundant methods on this visitor</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">selectStatement</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// ctx.columnsList is an array, while this.visit accepts a CSTNode</span>
+        <span class="token comment">// but if an array is passed to this.visit it will act as though the first element of the array has been passed.</span>
+        <span class="token comment">// this means &quot;this.visit(ctx.columnsList)&quot; is equivalent to &quot;this.visit(ctx.columnsList[0])&quot;</span>
+        <span class="token keyword">let</span> columnsListAst <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>columnsList<span class="token punctuation">)</span>
+        <span class="token keyword">let</span> fromClauseAst <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">visit</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>fromClause<span class="token punctuation">)</span>
+
+        <span class="token keyword">return</span> <span class="token punctuation">{</span>
+            type<span class="token punctuation">:</span> <span class="token string">&quot;SelectStatementAst&quot;</span><span class="token punctuation">,</span>
+            columns<span class="token punctuation">:</span> columnsListAst<span class="token punctuation">,</span>
+            <span class="token keyword">from</span><span class="token punctuation">:</span> fromClauseAst
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">columnsList</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">let</span> columnName <span class="token operator">=</span> ctx<span class="token punctuation">.</span>identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image
+        <span class="token comment">/*...*/</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// Optional &quot;IN&quot; argument</span>
+    <span class="token function">fromClause</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> inArg<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/*...*/</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// Visitor methods for in-lined rules are created by appending the in-lined rule name to the parent rule name.</span>
+    fromClause$<span class="token constant">INLINED_NAME</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">/*...*/</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><ul><li><p>Each visitor method will be invoked with the respective CSTNode's children as the first argument
+(called ctx in the above example).</p></li><li><p>Recursively visiting None-Terminals can be accomplished by using the <strong>this.visit</strong> method.
+It will invoke the appropriate visit method for the CSTNode argument.</p></li><li><p>The <strong>this.visit</strong> method can also be invoked on an array on CSTNodes in that case
+It is equivalent to calling it on the first element of the input array.</p></li><li><p>Each visit method can return a value which can be used to combine the traversal results.</p></li><li><p>The <strong>this.validateVisitor()</strong> method can be used to detect missing or redundant visitor methods.</p><ul><li>For example due to a refactoring of the grammar or a typo.</li></ul></li><li><p>Visitor methods support an optional &quot;IN&quot; parameter.</p></li></ul><h3 id="do-we-always-have-to-implement-all-the-visit-methods"><a href="#do-we-always-have-to-implement-all-the-visit-methods" aria-hidden="true" class="header-anchor">#</a> Do we always have to implement all the visit methods?</h3><p><strong>No</strong>, sometimes we only need to handle a few specific CST Nodes
+In that case use <strong>getBaseCstVisitorConstructorWithDefaults()</strong> to get the base visitor constructor.
+This base visitor includes a default implementation for all visit methods
+which simply invokes <strong>this.visit</strong> on all none terminals in the CSTNode's children.</p><div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// The base Visitor Class can be accessed via a Parser **instance**.</span>
+<span class="token keyword">const</span> BaseCstVisitorWithDefaults <span class="token operator">=</span> myParserInstance<span class="token punctuation">.</span><span class="token function">getBaseCstVisitorConstructorWithDefaults</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">class</span> <span class="token class-name">SqlColumnNamesVisitor</span> <span class="token keyword">extends</span> <span class="token class-name">BaseCstVisitorWithDefaults</span> <span class="token punctuation">{</span>
+    <span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>result <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">validateVisitor</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token function">fromClause</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// collect only the names of the columns</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>result<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span>Identifier<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">.</span>image<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// All other visit methods will be &quot;filled&quot; automatically with the default implementation.</span>
+<span class="token punctuation">}</span>
+</code></pre></div><p>Note that when using a visitor with default visit implementations
+It is not possible to return values from the visit methods because
+the default implementation does not return any value, only traverses the CST
+thus the chain of returned values will be broken.</p><h2 id="performance"><a href="#performance" aria-hidden="true" class="header-anchor">#</a> Performance</h2><p>On V8 (Chrome/Node) building the CST was measured at anywhere from 35%-90% of the performance
+versus a pure grammar's runtime (no output) depending on the grammar used.
+Particularly on its level of rules nesting.</p><p>This may be substantial yet please consider:</p><ul><li><p>Chevrotain is already <a href="https://sap.github.io/chevrotain/performance/" target="_blank" rel="noopener noreferrer">very fast<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>
+So at worst at will degrade to just &quot;fast&quot;...</p></li><li><p>This comparison is not fair as a pure grammar that has no output also has very little use...
+The right comparison would be to versus embedding actions that built some alternative CST/AST output structure.</p></li><li><p>Parsing is usually just one step in a larger flow, so the overall impact even in the slower edge cases
+would be reduced.</p></li></ul><p>It is therefore recommended to use the CST creation capabilities
+as its benefits (modularity / ease of maintenance) by far outweigh the costs (potentially reduced performance).
+except in unique edge cases.</p></div><div class="content edit-link"><a href="https://github.com/SAP/chevrotain/edit/master/docs/guide/concrete_syntax_tree.md" target="_blank" rel="noopener noreferrer">Edit this page on GitHub</a><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><!----></div><div class="content page-nav"><p class="inner"><span class="prev">
+        ← <a href="/chevrotain/docs/guide/introduction.html" class="prev">
+          Introduction
+        </a></span><span class="next"><a href="/chevrotain/docs/guide/generating_syntax_diagrams.html">
+          Syntax Diagrams
+        </a> →
+      </span></p></div></div></div></div>
+    <script src="/chevrotain/docs/assets/js/14.c788b62e.js" defer></script><script src="/chevrotain/docs/assets/js/app.ac613730.js" defer></script>
+  </body>
+</html>
