@@ -36,7 +36,6 @@ const slugMap = {
         "WEBPACK",
     "Why does my parser appear to be stuck during it's initialization?":
         "STUCK_AMBIGUITY",
-    "How do I Maximize my parser's performance?": "PERFORMANCE",
     "Unable to identify line terminator usage in pattern":
         "IDENTIFY_TERMINATOR",
     "A Custom Token Pattern should specify the <line_breaks> option":
@@ -124,6 +123,7 @@ module.exports = {
                     collapsable: false,
                     children: [
                         ["introduction", "Introduction"],
+                        ["performance", "Performance"],
                         ["concrete_syntax_tree", "CST"],
                         ["generating_syntax_diagrams", "Syntax Diagrams"],
                         ["custom_token_patterns", "Custom Token Patterns"],
