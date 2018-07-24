@@ -163,6 +163,7 @@ module.exports = {
                         ["syntax_diagrams", "Syntax Diagrams"],
                         ["regexp", "RegExp Based Lexers"],
                         ["position_tracking", "Position Tracking"],
+                        ["token_alternative_matches", "Token Alternative Matches"],
                         ["token_skipping", "Token Skipping"],
                         ["token_grouping", "Token Grouping"]
                     ]
