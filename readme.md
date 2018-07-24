@@ -11,7 +11,7 @@
 
 ## Introduction
 
-Chevrotain is a [**very fast**][benchmark] and **feature rich** **Parser Building Toolkit** for **JavaScript**.
+Chevrotain is a [**blazing fast**][benchmark] and [**feature rich**](http://sap.github.io/chevrotain/docs/features/blazing_fast.html) **Parser Building Toolkit** for **JavaScript**.
 It can be used to build parsers/compilers/interpreters for various use cases ranging from simple configuration files,
 to full fledged programing languages.
 
@@ -25,50 +25,6 @@ as any other pure code without requiring any new tools or processes.
 -   [**Online Playground**](https://sap.github.io/chevrotain/playground/)
 -   **[Getting Started Tutorial](https://sap.github.io/chevrotain/docs/tutorial/step0_introduction.html)**
 -   [**Performance benchmark**][benchmark]
-
-## Features
-
-1.  **Parsing DSL**.
-
-    -   **LL(k)** grammars support.
-    -   Useable from [JavaScript / TypeScript / CoffeeScript][languages].
-    -   [**Separation** of grammar and semantics][separation].
-    -   [Customizable][custom_errors] **Error Reporting** with full location information.
-    -   Strong **Error Recovery/Fault-Tolerance** capabilities based on Antlr3's algorithms.
-    -   Supports [gates/predicates][gates].
-    -   [Backtracking][backtracking] support.
-    -   [Grammar Inheritance.][grammar_inheritance]
-    -   [Multiple starting rules.][starting_rules]
-    -   [Parameterized Rules.][parametrized_rules]
-    -   [Syntactic Content Assist.][content assist]
-    -   **No code generation**.
-        -   The DSL is just JavaScript, not an external language.
-        -   The grammar is directly debuggable as plain JavaScript source.
-        -   Short feedback loops.
-        -   Allows great flexibility for inserting custom Parser actions.
-    -   [Custom APIs][custom_apis].
-
-2.  **Lexer Engine**
-
-    -   Based on Regular Expressions.
-    -   Full position information tracking (lines/columns/offsets).
-    -   Token skipping (whitespace/comments/...).
-    -   Prioritise longest match ([Keywords vs Identifiers][keywords_vs_idents]).
-    -   [Multiple Lexer Modes][lexer_modes] depending on the context.
-    -   [Tokens Grouping][lexer_groups].
-    -   [Custom Token patterns(none RegExp) support](https://sap.github.io/chevrotain/docs/guide/custom_token_patterns.html)
-    -   **No code generation** The Lexer does not require any code generation phase.
-
-3.  [**High Performance**][benchmark].
-
-4.  [**Railroad Diagrams Generation**](https://sap.github.io/chevrotain/docs/guide/generating_syntax_diagrams.html).
-
-5.  **Grammar Reflection/Introspection**.
-
-    -   The Grammar's structure is known and **exposed** at runtime.
-    -   Can be used to implement advanced features such as dynamically generated syntax diagrams or Syntactic error recovery.
-
-6.  Well tested with **~100% code coverage**, Unit & Integration tests
 
 ## Installation
 
@@ -130,16 +86,6 @@ Some interesting samples:
 -   [BrightScript Parser][sample_bright]
 
 [benchmark]: https://sap.github.io/chevrotain/performance/
-[lexer_modes]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/multi_mode_lexer/multi_mode_lexer.js
-[lexer_groups]: https://github.com/SAP/chevrotain/blob/master/examples/lexer/token_groups/token_groups.js
-[keywords_vs_idents]: https://github.com/SAP/Chevrotain/blob/master/examples/lexer/keywords_vs_identifiers/keywords_vs_identifiers.js
-[gates]: https://github.com/SAP/chevrotain/blob/master/examples/parser/predicate_lookahead/predicate_lookahead.js
-[grammar_inheritance]: https://github.com/SAP/chevrotain/blob/master/examples/parser/versioning/versioning.js
-[starting_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/multi_start_rules/multi_start_rules.js
-[parametrized_rules]: https://github.com/SAP/chevrotain/blob/master/examples/parser/parametrized_rules/parametrized.js
-[content assist]: https://sap.github.io/chevrotain/docs/guide/syntactic_content_assist.html
-[separation]: https://github.com/SAP/chevrotain/blob/master/examples/grammars/calculator/calculator_pure_grammar.js
-[custom_errors]: https://github.com/SAP/chevrotain/blob/master/examples/parser/custom_errors/custom_errors.js
 [sample_metabase]: https://github.com/metabase/metabase/blob/136dfb17954f4e4302b3bf2fee99ff7b7b12fd7c/frontend/src/metabase/lib/expressions/parser.js
 [sample_jhipster]: https://github.com/jhipster/jhipster-core/blob/master/lib/dsl/jdl_parser.js
 [sample_eve]: https://github.com/witheve/Eve/blob/master/src/parser/parser.ts
