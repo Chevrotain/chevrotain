@@ -168,7 +168,8 @@ module.exports = {
                             "Token Alternative Matches"
                         ],
                         ["token_skipping", "Token Skipping"],
-                        ["token_grouping", "Token Grouping"]
+                        ["token_grouping", "Token Grouping"],
+                        ["custom_token_patterns", "Custom Token Patterns"]
                     ]
                 }
             ],
