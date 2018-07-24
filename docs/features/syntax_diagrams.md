@@ -10,5 +10,3 @@ For a quick preview see:
 -   [CSS Syntax diagrams](https://sap.github.io/chevrotain/diagrams_samples/css.html).
 
 And see the [full guide](../guide/generating_syntax_diagrams.md) for further details.
-
-syntax_diagrams
