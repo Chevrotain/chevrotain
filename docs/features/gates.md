@@ -20,4 +20,5 @@ $.RULE("Value", isConst => {
 })
 ```
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/predicate_lookahead).
+See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/predicate_lookahead)
+for further details.

@@ -43,4 +43,5 @@ $.RULE("statement", () => {
 })
 ```
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/backtracking).
+See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/backtracking)
+for further details.

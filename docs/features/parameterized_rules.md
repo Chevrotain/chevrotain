@@ -28,4 +28,5 @@ $.RULE("Value", isConst => {
 })
 ```
 
-See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/parametrized_rules).
+See [executable example](https://github.com/SAP/chevrotain/tree/master/examples/parser/parametrized_rules)
+for further details.
