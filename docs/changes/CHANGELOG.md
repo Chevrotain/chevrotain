@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Bug Fixes
+
+-   [OVERRIDE_RULE bugs](https://github.com/SAP/chevrotain/issues/795).
+
 ## 3.7.3 (7-21-2018)
 
 #### Bug Fixes

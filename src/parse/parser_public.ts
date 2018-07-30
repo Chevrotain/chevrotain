@@ -306,9 +306,6 @@ export class Parser {
     protected baseCstVisitorConstructor: Function
     protected baseCstVisitorWithDefaultsConstructor: Function
     protected gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
-    protected ProductionOverriddenForClass: HashTable<boolean> = new HashTable<
-        boolean
-    >()
 
     protected _errors: IRecognitionException[] = []
 
@@ -1188,16 +1185,19 @@ export class Parser {
         )
         this.definitionErrors.push.apply(this.definitionErrors, ruleErrors) // mutability for the win
 
-        this.ProductionOverriddenForClass.put(name, true)
-        // TODO: avoid building the rule when serializing grammars
-        let gastProduction = buildTopProduction(
-            impl.toString(),
-            name,
-            this.tokensMap
-        )
-        this.gastProductionsCache.put(name, gastProduction)
+        // Avoid constructing the GAST if we have serialized it
+        if (!this.serializedGrammar) {
+            let gastProduction = buildTopProduction(
+                impl.toString(),
+                name,
+                this.tokensMap
+            )
+            this.gastProductionsCache.put(name, gastProduction)
+        }
 
-        return this.defineRule(name, impl, config)
+        let ruleImplementation = this.defineRule(name, impl, config)
+        this[name] = ruleImplementation
+        return ruleImplementation
     }
 
     public getTokenToInsert(tokType: TokenType): IToken {
