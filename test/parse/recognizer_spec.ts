@@ -1543,6 +1543,22 @@ function defineRecognizerSpecs(
                             }
                         ])
                     })
+
+                    // @ts-ignore - To check serialization with overrides
+                    public rule2 = this.OVERRIDE_RULE("rule2", () => {
+                        this.OR([
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(MinusTok)
+                                }
+                            },
+                            {
+                                ALT: () => {
+                                    this.CONSUME1(PlusTok)
+                                }
+                            }
+                        ])
+                    })
                     // a rule to exercise certain cases in deserializeGrammar
                     public rule3 = this.RULE("rule3", () => {
                         this.AT_LEAST_ONE(() => {
