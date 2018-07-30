@@ -13,9 +13,9 @@ result/data structure/value.
 
 This can be accomplished using two features of the Parsing DSL:
 
--   [CONSUME](https://sap.github.io/chevrotain/documentation/3_7_3/classes/parser.html#consume1) will return
-    The [IToken](https://sap.github.io/chevrotain/documentation/3_7_3/interfaces/itoken.html) object consumed.
--   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_7_3/classes/parser.html#subrule1) will return
+-   [CONSUME](https://sap.github.io/chevrotain/documentation/3_7_4/classes/parser.html#consume1) will return
+    The [IToken](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/itoken.html) object consumed.
+-   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_7_4/classes/parser.html#subrule1) will return
     the result of the grammar rule invoked.
 
 ## Simple Example
