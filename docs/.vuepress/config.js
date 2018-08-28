@@ -34,7 +34,7 @@ const slugMap = {
         "MINIFIED",
     "Why does Chevrotain not work correctly after I webpacked my Grammar?":
         "WEBPACK",
-    "Why does my parser appear to be stuck during it's initialization?":
+    "Why does my parser appear to be stuck during its initialization?":
         "STUCK_AMBIGUITY",
     "Unable to identify line terminator usage in pattern":
         "IDENTIFY_TERMINATOR",
