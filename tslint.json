@@ -12,7 +12,7 @@
         "no-var-keyword": true,
         "no-duplicate-variable": true,
         "no-eval": true,
-        "no-string-literal": true,
+        "no-string-literal": false,
         "no-switch-case-fall-through": true,
         "no-unused-expression": false,
         "no-use-before-declare": false,
