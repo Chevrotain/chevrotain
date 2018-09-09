@@ -11,8 +11,8 @@
     },
     "devDependencies": {
         "coffee-script": "^1.11.1",
-        "mocha": "^3.2.0",
-        "typescript": "^2.7.0"
+        "mocha": "^5.2.0",
+        "typescript": "3.0.3"
     },
     "private": true
 }

@@ -5,7 +5,7 @@
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/shahars.svg)](https://saucelabs.com/u/shahars)
+[![Sauce Test Status](https://saucelabs.com/browser-matrix/shahars.svg)](https://saucelabs.com/u/shahars) [![Greenkeeper badge](https://badges.greenkeeper.io/SAP/chevrotain.svg)](https://greenkeeper.io/)
 
 # Chevrotain
 

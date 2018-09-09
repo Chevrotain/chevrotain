@@ -10,7 +10,8 @@ describe("Chevrotain Webpacking support", () => {
         () => {
             const parse = require("../lib/webpacked.min").parse
             const parseResult = parse("[1,2,3]")
-            expect(parseResult.errors).to.be.empty
+            expect(parseResult.lexErrors).to.be.empty
+            expect(parseResult.parseErrors).to.be.empty
         }
     )
 })
