@@ -1,7 +1,6 @@
 # Resolving Grammar Errors
 
 -   [Common Prefix Ambiguities.](#COMMON_PREFIX)
--   [None Unique Grammar Name Found.](#UNIQUE_GRAMMAR_NAME)
 -   [Terminal Token Name Not Found.](#TERMINAL_NAME_NOT_FOUND)
 
 ## Common Prefix Ambiguities
@@ -39,33 +38,6 @@ There are two ways to resolve this:
       myRule:
         "A" "B" ("C")?
     ```
-
-## None Unique Grammar Name Found
-
-Chevrotain uses a grammar's constructor name as a **key**
-for caching the results of heavy computations.
-
-This means that every grammar must have a unique name:
-
-```javascript
-// File1
-// unique name "MyParser"
-class MyParser extends Parser {
-    // ...
-}
-
-// File2
-// another unique name: "MyOtherParser"
-class MyParser extends Parser {
-    // ...
-}
-
-// File3
-// None unique name, "MyParser" is already defined in File1
-class MyParser extends Parser {
-    // ...
-}
-```
 
 ## Terminal Token Name Not Found
 
