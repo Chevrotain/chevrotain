@@ -2396,7 +2396,11 @@ export class Parser {
         const afterIteration = this.getLexerPosition()
 
         if (afterIteration === beforeIteration) {
-            throw Error("Infinite loop detected, TBD: error message docs")
+            throw Error(
+                "Infinite loop detected\n" +
+                    "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#INFINITE_LOOP\n" +
+                    "\tFor Further details."
+            )
         }
 
         return result
