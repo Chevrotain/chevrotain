@@ -10,6 +10,7 @@ const versionWithLowDashs = version.replace(/\./g, "_")
 const slugMap = {
     "Common Prefix Ambiguities": "COMMON_PREFIX",
     "Terminal Token Name Not Found": "TERMINAL_NAME_NOT_FOUND",
+    "Infinite Loop Detected": "INFINITE_LOOP",
     "No LINE_BREAKS Found": "LINE_BREAKS",
     "Unexpected RegExp Anchor Error": "ANCHORS",
     "Token can never be matched": "UNREACHABLE",

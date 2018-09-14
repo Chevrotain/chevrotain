@@ -2043,7 +2043,7 @@ export class Parser {
         if ((<Function>lookAheadFunc).call(this) === true) {
             result.push((<any>action).call(this))
             while ((<Function>lookAheadFunc).call(this) === true) {
-                result.push((<any>action).call(this))
+                result.push(this.doSingleRepetition(action))
             }
         } else {
             throw this.raiseEarlyExitException(
@@ -2132,14 +2132,18 @@ export class Parser {
         if (firstIterationLookaheadFunc.call(this) === true) {
             values.push((<GrammarAction<OUT>>action).call(this))
 
+            //  TODO: Optimization can move this function construction into "attemptInRepetitionRecovery"
+            //  because it is only needed in error recovery scenarios.
             let separatorLookAheadFunc = () => {
                 return this.tokenMatcher(this.LA(1), separator)
             }
+
             // 2nd..nth iterations
             while (this.tokenMatcher(this.LA(1), separator) === true) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
                 separators.push(this.CONSUME(separator))
+                // No need for checking infinite loop here due to consuming the separator.
                 values.push((<GrammarAction<OUT>>action).call(this))
             }
 
@@ -2238,7 +2242,7 @@ export class Parser {
         }
 
         while (lookaheadFunction.call(this)) {
-            result.push(action.call(this))
+            result.push(this.doSingleRepetition(action))
         }
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
@@ -2324,6 +2328,7 @@ export class Parser {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
                 separators.push(this.CONSUME(separator))
+                // No need for checking infinite loop here due to consuming the separator.
                 values.push(action.call(this))
             }
 
@@ -2383,6 +2388,22 @@ export class Parser {
             prodOccurrence,
             nextTerminalAfterWalker
         )
+    }
+
+    private doSingleRepetition(action: Function): any {
+        const beforeIteration = this.getLexerPosition()
+        const result = action.call(this)
+        const afterIteration = this.getLexerPosition()
+
+        if (afterIteration === beforeIteration) {
+            throw Error(
+                "Infinite loop detected\n" +
+                    "\tSee: https://sap.github.io/chevrotain/docs/guide/resolving_grammar_errors.html#INFINITE_LOOP\n" +
+                    "\tFor Further details."
+            )
+        }
+
+        return result
     }
 
     private orInternalNoCst<T>(
@@ -2792,6 +2813,10 @@ export class Parser {
 
     protected moveToTerminatedState(): void {
         this.currIdx = this.tokVector.length - 1
+    }
+
+    protected getLexerPosition(): number {
+        return this.exportLexerState()
     }
 
     protected lookAheadBuilderForOptional(
