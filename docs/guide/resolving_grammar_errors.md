@@ -2,6 +2,7 @@
 
 -   [Common Prefix Ambiguities.](#COMMON_PREFIX)
 -   [Terminal Token Name Not Found.](#TERMINAL_NAME_NOT_FOUND)
+-   [Infinite Loop Detected.](#INFINITE_LOOP)
 
 ## Common Prefix Ambiguities
 
@@ -111,3 +112,55 @@ This parser
     ```
 
     Then the literal form no longer matches the name property...
+
+## Infinite Loop Detected
+
+A repetition must consume at least one token in each iteration.
+Entering an iteration while failing to do so would cause an **infinite loop** because
+the condition to entering the next iteration would still be true while the parser state has
+not been changed. essentially this creates a flow that looks like:
+
+```javascript
+// iteration lookahead condition (always true)
+while (true) {
+    // single iteration grammar
+}
+```
+
+Lets look at a few real examples that can cause this error
+
+```javascript
+$.MANY(() => {
+    return
+    // unreachable code
+    $.CONSUME(Plus)
+})
+```
+
+By returning early in the iteration grammar we prevent the parser from consuming
+The plus token and thus the next time the parser checks if it should enter the iteration
+The condition (nextToken === Plus) would still be true.
+
+```javascript
+$.MANY(() => {
+    // Never wrap Chevrotain grammar in JavaScript control flow constructs.
+    if (condition) {
+        $.CONSUME(Plus)
+    }
+})
+```
+
+This is similar to the previous example as if the condition is false, once
+again the parser will consume nothing in the iteration.
+Modeling conditional grammar paths must be done using Chevrotain grammar constructs
+such as OPTION and/or [GATE](http://sap.github.io/chevrotain/docs/features/gates.html).
+
+For example the above example should be written as:
+
+```javascript
+$.MANY(() => {
+    $.OPTION(() => {
+      $.CONSUME(Plus)
+    )
+})
+```
