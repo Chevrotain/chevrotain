@@ -337,6 +337,7 @@ export class Parser {
     protected CST_STACK: CstNode[] = []
     protected tokensMap: { [fqn: string]: TokenType } = {}
 
+    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
     private lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
     private firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
     private definitionErrors: IParserDefinitionError[] = []
@@ -402,6 +403,7 @@ export class Parser {
 
         // Performance optimization on newer engines that support ES6 Map
         // For larger Maps this is slightly faster than using a plain object (array in our case).
+        /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
         if (isES2015MapSupported()) {
             this.getLaFuncFromCache = this.getLaFuncFromMap
             this.setLaFuncCache = this.setLaFuncCacheUsingMap
@@ -2865,6 +2867,7 @@ export class Parser {
         return this.lookAheadFuncsCache.get(key)
     }
 
+    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
     protected getLaFuncFromObj(key: number): Function {
         return this.lookAheadFuncsCache[key]
     }
@@ -2876,6 +2879,7 @@ export class Parser {
         this.lookAheadFuncsCache.set(key, value)
     }
 
+    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
     protected setLaFuncUsingObj(key: number, value: Function): void {
         this.lookAheadFuncsCache[key] = value
     }
