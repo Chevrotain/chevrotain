@@ -42,8 +42,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
@@ -133,8 +132,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
@@ -278,8 +276,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
@@ -485,8 +482,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
@@ -602,8 +598,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
@@ -782,8 +777,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
@@ -1093,8 +1087,7 @@ function defineLookaheadSpecs(
                     if (isES2015MapSupported()) {
                         // @ts-ignore
                         return this.lookAheadFuncsCache.size
-                    }
-                    else {
+                    } else {
                         // @ts-ignore
                         return Object.keys(this.lookAheadFuncsCache).length
                     }
