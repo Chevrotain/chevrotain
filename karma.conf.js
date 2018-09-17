@@ -8,6 +8,12 @@ module.exports = function(config) {
         // frameworks to use
         frameworks: ["mocha", "chai"],
 
+        client: {
+            mocha: {
+                reporter: "html"
+            }
+        },
+
         files: ["test/test.config.js", "lib/chevrotainSpecs.js"],
 
         // test results reporter to use
