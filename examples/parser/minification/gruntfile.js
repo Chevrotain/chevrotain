@@ -46,7 +46,7 @@ module.exports = function(grunt) {
 
                         // on the command line this is the "reserved" option.
                         //   -r, --reserved                Reserved names to exclude from mangling.
-                        except: jsonTokenNames
+                        reserved: jsonTokenNames
                     }
                 },
                 files: {

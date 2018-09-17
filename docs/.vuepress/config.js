@@ -9,8 +9,8 @@ const versionWithLowDashs = version.replace(/\./g, "_")
 
 const slugMap = {
     "Common Prefix Ambiguities": "COMMON_PREFIX",
-    "None Unique Grammar Name Found": "UNIQUE_GRAMMAR_NAME",
     "Terminal Token Name Not Found": "TERMINAL_NAME_NOT_FOUND",
+    "Infinite Loop Detected": "INFINITE_LOOP",
     "No LINE_BREAKS Found": "LINE_BREAKS",
     "Unexpected RegExp Anchor Error": "ANCHORS",
     "Token can never be matched": "UNREACHABLE",
@@ -34,7 +34,7 @@ const slugMap = {
         "MINIFIED",
     "Why does Chevrotain not work correctly after I webpacked my Grammar?":
         "WEBPACK",
-    "Why does my parser appear to be stuck during it's initialization?":
+    "Why does my parser appear to be stuck during its initialization?":
         "STUCK_AMBIGUITY",
     "Unable to identify line terminator usage in pattern":
         "IDENTIFY_TERMINATOR",
@@ -168,6 +168,7 @@ module.exports = {
                             "Token Alternative Matches"
                         ],
                         ["token_skipping", "Token Skipping"],
+                        ["token_categories", "Token Categories"],
                         ["token_grouping", "Token Grouping"],
                         ["custom_token_patterns", "Custom Token Patterns"],
                         ["lexer_modes", "Lexer Modes"]

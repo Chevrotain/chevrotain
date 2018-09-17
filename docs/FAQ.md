@@ -11,7 +11,7 @@ sidebar: auto
 -   [Why are the unique numerical suffixes (CONSUME1/CONSUME2/...) needed for the DSL Rules?](#NUMERICAL_SUFFIXES)
 -   [Why does Chevrotain not work correctly after I minified my Sources?](#MINIFIED)
 -   [Why does Chevrotain not work correctly after I webpacked my Sources?](#WEBPACK)
--   [Why does my parser appear to be stuck during it's initialization?](#STUCK_AMBIGUITY)
+-   [Why does my parser appear to be stuck during its initialization?](#STUCK_AMBIGUITY)
 
 ## Why should I use a Parsing DSL instead of a Parser Generator?
 
@@ -98,7 +98,7 @@ certain conditions.
 
 See [related documentation](https://github.com/SAP/chevrotain/blob/master/examples/parser/webpack/README.md) for details & workarounds.
 
-## Why does my parser appear to be stuck during it's initialization?
+## Why does my parser appear to be stuck during its initialization?
 
 The first time a Chevrotain parser is initialized additional validations and computations are performed.
 Some of these can take a very long time under certain edge cases. Specifically the detection of ambiguous alternatives

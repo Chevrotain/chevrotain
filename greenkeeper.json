@@ -1,7 +1,16 @@
 {
   "groups": {
     "default": {
-      "packages": ["example/package.json", "package.json"]
+      "packages": [
+        "examples/custom_apis/package.json",
+        "examples/grammars/package.json",
+        "examples/implementation_languages/package.json",
+        "examples/lexer/package.json",
+        "examples/parser/package.json",
+        "examples/parser/webpack/package.json",
+        "examples/tutorial/package.json",
+        "package.json"
+      ]
     }
   }
 }

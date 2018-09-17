@@ -165,7 +165,7 @@ function getContentAssistSuggestions(text, symbolTable) {
             finalSuggestions.push(currTokenType.PATTERN.source)
         } else if (currTokenType === Identifier) {
             // in declarations, should not provide content assist for new symbols (Identifiers)
-            if (_.contains(["enumStmt", "functionStmt"], lastRuleName)) {
+            if (_.includes(["enumStmt", "functionStmt"], lastRuleName)) {
                 // NO-OP
             } else if (lastRuleName === "functionInvocation") {
                 // Inside "functionInvocation" an Identifier is a usage of a symbol
