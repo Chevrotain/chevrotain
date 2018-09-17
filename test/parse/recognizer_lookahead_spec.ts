@@ -3,6 +3,7 @@ import { Parser } from "../../src/parse/parser_public"
 import { tokenStructuredMatcher } from "../../src/scan/tokens"
 import { createRegularToken } from "../utils/matchers"
 import { IToken } from "../../api"
+import { isES2015MapSupported } from "../../src/utils/utils"
 
 function defineLookaheadSpecs(
     contextName,
@@ -37,8 +38,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For OPTION", () => {
             class OptionsImplicitLookAheadParser extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return (<any>this).lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -85,8 +92,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new OptionsImplicitLookAheadParser([])
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can automatically compute lookahead for OPTION1", () => {
@@ -122,8 +128,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For MANY", () => {
             class ManyImplicitLookAheadParser extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return this.lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -187,8 +199,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new ManyImplicitLookAheadParser()
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can automatically compute lookahead for MANY1", () => {
@@ -261,8 +272,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For MANY_SEP", () => {
             class ManySepImplicitLookAheadParser extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return (<any>this).lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -378,8 +395,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new ManySepImplicitLookAheadParser()
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(Object.keys(lookaheadCache).length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can automatically compute lookahead for MANY_SEP1", () => {
@@ -462,8 +478,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE", () => {
             class AtLeastOneImplicitLookAheadParser extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return (<any>this).lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -535,8 +557,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new AtLeastOneImplicitLookAheadParser()
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(Object.keys(lookaheadCache).length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can accept lookahead function param for AT_LEAST_ONE", () => {
@@ -573,8 +594,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For AT_LEAST_ONE_SEP", () => {
             class AtLeastOneSepImplicitLookAheadParser extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return (<any>this).lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -698,8 +725,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new AtLeastOneSepImplicitLookAheadParser()
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(Object.keys(lookaheadCache).length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can accept lookahead function param for AT_LEAST_ONE_SEP", () => {
@@ -747,8 +773,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For OR", () => {
             class OrImplicitLookAheadParser extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return (<any>this).lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -934,8 +966,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new OrImplicitLookAheadParser()
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(Object.keys(lookaheadCache).length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can compute the lookahead automatically for OR", () => {
@@ -1052,8 +1083,14 @@ function defineLookaheadSpecs(
 
         describe("The implicit lookahead calculation functionality of the Recognizer For OR (with IGNORE_AMBIGUITIES)", () => {
             class OrImplicitLookAheadParserIgnoreAmbiguities extends Parser {
-                public getLookAheadCache(): Function[] {
-                    return (<any>this).lookAheadFuncsCache
+                public getLookAheadCacheSize(): number {
+                    if (isES2015MapSupported()) {
+                        // @ts-ignore
+                        return this.lookAheadFuncsCache.size
+                    } else {
+                        // @ts-ignore
+                        return Object.keys(this.lookAheadFuncsCache).length
+                    }
                 }
 
                 constructor(input: IToken[] = []) {
@@ -1243,8 +1280,7 @@ function defineLookaheadSpecs(
 
             it("will cache the generatedLookAhead functions BEFORE (check cache is clean)", () => {
                 let parser = new OrImplicitLookAheadParserIgnoreAmbiguities()
-                let lookaheadCache = parser.getLookAheadCache()
-                expect(lookaheadCache.length).to.equal(0)
+                expect(parser.getLookAheadCacheSize()).to.equal(0)
             })
 
             it("can compute the lookahead automatically for OR", () => {

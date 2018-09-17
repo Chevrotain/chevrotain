@@ -21,6 +21,7 @@ import {
     has,
     isArray,
     isEmpty,
+    isES2015MapSupported,
     isFunction,
     isObject,
     isUndefined,
@@ -302,7 +303,6 @@ export class Parser {
         TokenType[]
     >()
     protected allRuleNames: string[] = []
-    protected lookAheadFuncsCache: Function[] = []
     protected baseCstVisitorConstructor: Function
     protected baseCstVisitorWithDefaultsConstructor: Function
     protected gastProductionsCache: HashTable<Rule> = new HashTable<Rule>()
@@ -337,6 +337,8 @@ export class Parser {
     protected CST_STACK: CstNode[] = []
     protected tokensMap: { [fqn: string]: TokenType } = {}
 
+    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
+    private lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
     private firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
     private definitionErrors: IParserDefinitionError[] = []
     private definedRulesNames: string[] = []
@@ -398,6 +400,17 @@ export class Parser {
         this.serializedGrammar = has(config, "serializedGrammar")
             ? config.serializedGrammar
             : DEFAULT_PARSER_CONFIG.serializedGrammar
+
+        // Performance optimization on newer engines that support ES6 Map
+        // For larger Maps this is slightly faster than using a plain object (array in our case).
+        /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
+        if (isES2015MapSupported()) {
+            this.getLaFuncFromCache = this.getLaFuncFromMap
+            this.setLaFuncCache = this.setLaFuncCacheUsingMap
+        } else {
+            this.getLaFuncFromCache = this.getLaFuncFromObj
+            this.setLaFuncCache = this.setLaFuncUsingObj
+        }
 
         if (!this.outputCst) {
             this.cstInvocationStateUpdate = NOOP
@@ -2490,7 +2503,7 @@ export class Parser {
         alts: IAnyOrAlt<any>[]
     ): () => number {
         let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let laFunc = <any>this.lookAheadFuncsCache[key]
+        let laFunc: any = this.getLaFuncFromCache(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2506,7 +2519,7 @@ export class Parser {
                 this.dynamicTokensEnabled,
                 this.lookAheadBuilderForAlternatives
             )
-            this.lookAheadFuncsCache[key] = laFunc
+            this.setLaFuncCache(key, laFunc)
             return laFunc
         } else {
             return laFunc
@@ -2610,7 +2623,7 @@ export class Parser {
         maxLookahead: number,
         prodType
     ): () => boolean {
-        let laFunc = <any>this.lookAheadFuncsCache[key]
+        let laFunc = <any>this.getLaFuncFromCache(key)
         if (laFunc === undefined) {
             let ruleName = this.getCurrRuleFullName()
             let ruleGrammar = this.getGAstProductions().get(ruleName)
@@ -2622,7 +2635,7 @@ export class Parser {
                 prodType,
                 this.lookAheadBuilderForOptional
             )
-            this.lookAheadFuncsCache[key] = laFunc
+            this.setLaFuncCache(key, laFunc)
             return laFunc
         } else {
             return laFunc
@@ -2843,6 +2856,32 @@ export class Parser {
             tokenMatcher,
             dynamicTokensEnabled
         )
+    }
+
+    /* istanbul ignore next */
+    protected getLaFuncFromCache(key: number): Function {
+        return undefined
+    }
+
+    protected getLaFuncFromMap(key: number): Function {
+        return this.lookAheadFuncsCache.get(key)
+    }
+
+    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
+    protected getLaFuncFromObj(key: number): Function {
+        return this.lookAheadFuncsCache[key]
+    }
+
+    /* istanbul ignore next */
+    protected setLaFuncCache(key: number, value: Function): void {}
+
+    protected setLaFuncCacheUsingMap(key: number, value: Function): void {
+        this.lookAheadFuncsCache.set(key, value)
+    }
+
+    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
+    protected setLaFuncUsingObj(key: number, value: Function): void {
+        this.lookAheadFuncsCache[key] = value
     }
 }
 

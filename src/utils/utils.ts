@@ -424,3 +424,7 @@ export function PRINT_WARNING(msg) {
         console.warn(`Warning: ${msg}`)
     }
 }
+
+export function isES2015MapSupported(): boolean {
+    return typeof Map === "function"
+}

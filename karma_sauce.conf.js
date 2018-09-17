@@ -24,7 +24,7 @@ module.exports = function(config) {
             base: "SauceLabs",
             browserName: "chrome",
             version: "latest",
-            platform: "OS X 10.11"
+            platform: "OS X 10.13"
         },
         SL_InternetExplorer: {
             base: "SauceLabs",
@@ -42,13 +42,13 @@ module.exports = function(config) {
             base: "SauceLabs",
             browserName: "firefox",
             version: "latest",
-            platform: "OS X 10.11"
+            platform: "OS X 10.13"
         },
         SL_SAFARI10: {
             base: "SauceLabs",
             browserName: "safari",
-            platform: "OS X 10.11",
-            version: "10.0"
+            platform: "OS X 10.13",
+            version: "latest"
         }
     }
 
