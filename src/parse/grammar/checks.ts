@@ -71,6 +71,7 @@ export function validateGrammar(
 
     let emptyAltErrors = []
     let ambiguousAltsErrors = []
+    let emptyRepetitionErrors = []
 
     // left recursion could cause infinite loops in the following validations.
     // It is safest to first have the user fix the left recursion errors first and only then examine Further issues.
@@ -85,6 +86,12 @@ export function validateGrammar(
                 ignoredIssues,
                 errMsgProvider
             )
+        )
+
+        emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
+            topLevels,
+            maxLookahead,
+            errMsgProvider
         )
     }
 
@@ -105,12 +112,6 @@ export function validateGrammar(
 
     let nestedRulesDuplicateErrors: any = validateDuplicateNestedRules(
         topLevels,
-        errMsgProvider
-    )
-
-    let emptyRepetitionErrors = validateSomeNonEmptyLookaheadPath(
-        topLevels,
-        maxLookahead,
         errMsgProvider
     )
 

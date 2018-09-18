@@ -706,7 +706,7 @@ class ComplexInDirectlyLeftRecursive extends Parser {
     })
 
     public B = this.RULE("B", () => {
-        this.OPTION(() => {
+        this.MANY(() => {
             this.SUBRULE1(this.A)
         })
         this.CONSUME(StarToken)
