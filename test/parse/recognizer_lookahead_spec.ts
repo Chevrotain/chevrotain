@@ -296,95 +296,77 @@ function defineLookaheadSpecs(
                     let total = ""
                     let separators = []
 
-                    separators = separators.concat(
-                        this.MANY_SEP1({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(OneTok)
-                                total += "1"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP1({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            total += "1"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP2({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(TwoTok)
-                                total += "2"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP2({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(TwoTok)
+                            total += "2"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP3({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(ThreeTok)
-                                total += "3"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP3({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(ThreeTok)
+                            total += "3"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP4({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(FourTok)
-                                total += "4"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP4({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(FourTok)
+                            total += "4"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP5({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(FiveTok)
-                                total += "5"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP5({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(FiveTok)
+                            total += "5"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP6({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(SixTok)
-                                total += "6"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP6({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(SixTok)
+                            total += "6"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP7({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(SevenTok)
-                                total += "7"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP7({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(SevenTok)
+                            total += "7"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP8({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(EightTok)
-                                total += "8"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP8({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(EightTok)
+                            total += "8"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.MANY_SEP9({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(NineTok)
-                                total += "9"
-                            }
-                        }).separators
-                    )
+                    this.MANY_SEP9({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(NineTok)
+                            total += "9"
+                        }
+                    })
 
                     return {
                         total: total,
@@ -467,12 +449,6 @@ function defineLookaheadSpecs(
                 let parser = new ManySepImplicitLookAheadParser(input)
                 let result = parser.manySepRule()
                 expect(result.total).to.equal("113335")
-                expect(result.separators).to.have.length(3)
-                expect(result.separators).to.deep.equal([
-                    createTokenInstance(Comma),
-                    createTokenInstance(Comma),
-                    createTokenInstance(Comma)
-                ])
             })
         })
 
@@ -626,95 +602,77 @@ function defineLookaheadSpecs(
                     let total = ""
                     let separators = []
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP1({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(OneTok)
-                                total += "1"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP1({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(OneTok)
+                            total += "1"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP2({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(TwoTok)
-                                total += "2"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP2({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(TwoTok)
+                            total += "2"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP3({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(ThreeTok)
-                                total += "3"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP3({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(ThreeTok)
+                            total += "3"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP4({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(FourTok)
-                                total += "4"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP4({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(FourTok)
+                            total += "4"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP5({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(FiveTok)
-                                total += "5"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP5({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(FiveTok)
+                            total += "5"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP6({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(SixTok)
-                                total += "6"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP6({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(SixTok)
+                            total += "6"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP7({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(SevenTok)
-                                total += "7"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP7({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(SevenTok)
+                            total += "7"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP8({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(EightTok)
-                                total += "8"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP8({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(EightTok)
+                            total += "8"
+                        }
+                    })
 
-                    separators = separators.concat(
-                        this.AT_LEAST_ONE_SEP9({
-                            SEP: Comma,
-                            DEF: () => {
-                                this.CONSUME1(NineTok)
-                                total += "9"
-                            }
-                        }).separators
-                    )
+                    this.AT_LEAST_ONE_SEP9({
+                        SEP: Comma,
+                        DEF: () => {
+                            this.CONSUME1(NineTok)
+                            total += "9"
+                        }
+                    })
 
                     return {
                         total: total,
@@ -751,12 +709,6 @@ function defineLookaheadSpecs(
                 let parser = new AtLeastOneSepImplicitLookAheadParser(input)
                 let parseResult = parser.atLeastOneSepRule()
                 expect(parseResult.total).to.equal("1223445677789")
-                expect(parseResult.separators).to.deep.equal([
-                    createTokenInstance(Comma),
-                    createTokenInstance(Comma),
-                    createTokenInstance(Comma),
-                    createTokenInstance(Comma)
-                ])
             })
 
             it("will fail when zero occurrences of AT_LEAST_ONE_SEP in input", () => {
