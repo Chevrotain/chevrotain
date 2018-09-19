@@ -842,302 +842,202 @@ export class Parser {
 
     public MANY<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(0, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(0, actionORMethodDef)
     }
 
     public MANY1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(1, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(1, actionORMethodDef)
     }
 
     public MANY2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(2, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(2, actionORMethodDef)
     }
 
     public MANY3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(3, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(3, actionORMethodDef)
     }
 
     public MANY4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(4, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(4, actionORMethodDef)
     }
 
     public MANY5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(5, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(5, actionORMethodDef)
     }
 
     public MANY6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(6, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(6, actionORMethodDef)
     }
 
     public MANY7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(7, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(7, actionORMethodDef)
     }
 
     public MANY8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(8, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(8, actionORMethodDef)
     }
 
     public MANY9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
-    ): OUT[] {
-        return this.manyInternal(9, actionORMethodDef, [])
+    ): void {
+        this.manyInternal(9, actionORMethodDef)
     }
 
-    public MANY_SEP<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(0, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(0, options)
     }
 
-    public MANY_SEP1<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(1, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP1<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(1, options)
     }
 
-    public MANY_SEP2<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(2, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP2<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(2, options)
     }
 
-    public MANY_SEP3<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(3, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP3<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(3, options)
     }
 
-    public MANY_SEP4<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(4, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP4<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(4, options)
     }
 
-    public MANY_SEP5<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(5, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP5<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(5, options)
     }
 
-    public MANY_SEP6<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(6, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP6<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(6, options)
     }
 
-    public MANY_SEP7<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(7, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP7<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(7, options)
     }
 
-    public MANY_SEP8<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(8, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP8<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(8, options)
     }
 
-    public MANY_SEP9<OUT>(
-        options: ManySepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.manySepFirstInternal(9, options, {
-            values: [],
-            separators: []
-        })
+    public MANY_SEP9<OUT>(options: ManySepMethodOpts<OUT>): void {
+        this.manySepFirstInternal(9, options)
     }
 
     public AT_LEAST_ONE<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(0, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(0, actionORMethodDef)
     }
 
     public AT_LEAST_ONE1<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(1, actionORMethodDef, [])
+    ): void {
+        return this.atLeastOneInternal(1, actionORMethodDef)
     }
 
     public AT_LEAST_ONE2<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(2, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(2, actionORMethodDef)
     }
 
     public AT_LEAST_ONE3<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(3, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(3, actionORMethodDef)
     }
 
     public AT_LEAST_ONE4<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(4, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(4, actionORMethodDef)
     }
 
     public AT_LEAST_ONE5<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(5, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(5, actionORMethodDef)
     }
 
     public AT_LEAST_ONE6<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(6, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(6, actionORMethodDef)
     }
 
     public AT_LEAST_ONE7<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(7, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(7, actionORMethodDef)
     }
 
     public AT_LEAST_ONE8<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(8, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(8, actionORMethodDef)
     }
 
     public AT_LEAST_ONE9<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
-    ): OUT[] {
-        return this.atLeastOneInternal(9, actionORMethodDef, [])
+    ): void {
+        this.atLeastOneInternal(9, actionORMethodDef)
     }
 
-    public AT_LEAST_ONE_SEP<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(0, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(0, options)
     }
 
-    public AT_LEAST_ONE_SEP1<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(1, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP1<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(1, options)
     }
 
-    public AT_LEAST_ONE_SEP2<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(2, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP2<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(2, options)
     }
 
-    public AT_LEAST_ONE_SEP3<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(3, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP3<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(3, options)
     }
 
-    public AT_LEAST_ONE_SEP4<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(4, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP4<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(4, options)
     }
 
-    public AT_LEAST_ONE_SEP5<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(5, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP5<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(5, options)
     }
 
-    public AT_LEAST_ONE_SEP6<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(6, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP6<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(6, options)
     }
 
-    public AT_LEAST_ONE_SEP7<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(7, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP7<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(7, options)
     }
 
-    public AT_LEAST_ONE_SEP8<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(8, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP8<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(8, options)
     }
 
-    public AT_LEAST_ONE_SEP9<OUT>(
-        options: AtLeastOneSepMethodOpts<OUT>
-    ): ISeparatedIterationResult<OUT> {
-        return this.atLeastOneSepFirstInternal(9, options, {
-            values: [],
-            separators: []
-        })
+    public AT_LEAST_ONE_SEP9<OUT>(options: AtLeastOneSepMethodOpts<OUT>): void {
+        this.atLeastOneSepFirstInternal(9, options)
     }
 
     public RULE<T>(
@@ -1982,9 +1882,8 @@ export class Parser {
 
     private atLeastOneInternal<OUT>(
         prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
-        result: OUT[]
-    ): OUT[] {
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(
             AT_LEAST_ONE_IDX,
             prodOccurrence
@@ -1997,7 +1896,6 @@ export class Parser {
             return this.atLeastOneInternalLogic(
                 prodOccurrence,
                 actionORMethodDef,
-                result,
                 laKey
             )
         } finally {
@@ -2009,27 +1907,20 @@ export class Parser {
 
     private atLeastOneInternalNoCst<OUT>(
         prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
-        result: OUT[]
-    ): OUT[] {
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
+    ): void {
         let key = this.getKeyForAutomaticLookahead(
             AT_LEAST_ONE_IDX,
             prodOccurrence
         )
-        return this.atLeastOneInternalLogic(
-            prodOccurrence,
-            actionORMethodDef,
-            result,
-            key
-        )
+        this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, key)
     }
 
     private atLeastOneInternalLogic<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
-        result: OUT[],
         key: number
-    ): OUT[] {
+    ): void {
         let lookAheadFunc = this.getLookaheadFuncForAtLeastOne(
             key,
             prodOccurrence
@@ -2054,9 +1945,9 @@ export class Parser {
         }
 
         if ((<Function>lookAheadFunc).call(this) === true) {
-            result.push((<any>action).call(this))
+            ;(<any>action).call(this)
             while ((<Function>lookAheadFunc).call(this) === true) {
-                result.push(this.doSingleRepetition(action))
+                this.doSingleRepetition(action)
             }
         } else {
             throw this.raiseEarlyExitException(
@@ -2073,33 +1964,25 @@ export class Parser {
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         this.attemptInRepetitionRecovery(
             this.atLeastOneInternal,
-            [prodOccurrence, actionORMethodDef, result],
+            [prodOccurrence, actionORMethodDef],
             <any>lookAheadFunc,
             AT_LEAST_ONE_IDX,
             prodOccurrence,
             NextTerminalAfterAtLeastOneWalker
         )
-
-        return result
     }
 
     private atLeastOneSepFirstInternal<OUT>(
         prodOccurrence: number,
-        options: AtLeastOneSepMethodOpts<OUT>,
-        result: ISeparatedIterationResult<OUT>
-    ): ISeparatedIterationResult<OUT> {
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(
             AT_LEAST_ONE_SEP_IDX,
             prodOccurrence
         )
         let nestedName = this.nestedRuleBeforeClause(options, laKey)
         try {
-            return this.atLeastOneSepFirstInternalLogic(
-                prodOccurrence,
-                options,
-                result,
-                laKey
-            )
+            this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey)
         } finally {
             if (nestedName !== undefined) {
                 this.nestedRuleFinallyClause(laKey, nestedName)
@@ -2109,27 +1992,20 @@ export class Parser {
 
     private atLeastOneSepFirstInternalNoCst<OUT>(
         prodOccurrence: number,
-        options: AtLeastOneSepMethodOpts<OUT>,
-        result: ISeparatedIterationResult<OUT>
-    ): ISeparatedIterationResult<OUT> {
+        options: AtLeastOneSepMethodOpts<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(
             AT_LEAST_ONE_SEP_IDX,
             prodOccurrence
         )
-        return this.atLeastOneSepFirstInternalLogic(
-            prodOccurrence,
-            options,
-            result,
-            laKey
-        )
+        this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey)
     }
 
     private atLeastOneSepFirstInternalLogic<OUT>(
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>,
-        result: ISeparatedIterationResult<OUT>,
         key: number
-    ): ISeparatedIterationResult<OUT> {
+    ): void {
         let action = options.DEF
         let separator = options.SEP
 
@@ -2138,12 +2014,9 @@ export class Parser {
             prodOccurrence
         )
 
-        let values = result.values
-        let separators = result.separators
-
         // 1st iteration
         if (firstIterationLookaheadFunc.call(this) === true) {
-            values.push((<GrammarAction<OUT>>action).call(this))
+            ;(<GrammarAction<OUT>>action).call(this)
 
             //  TODO: Optimization can move this function construction into "attemptInRepetitionRecovery"
             //  because it is only needed in error recovery scenarios.
@@ -2155,9 +2028,9 @@ export class Parser {
             while (this.tokenMatcher(this.LA(1), separator) === true) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
-                separators.push(this.CONSUME(separator))
+                this.CONSUME(separator)
                 // No need for checking infinite loop here due to consuming the separator.
-                values.push((<GrammarAction<OUT>>action).call(this))
+                ;(<GrammarAction<OUT>>action).call(this)
             }
 
             // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
@@ -2168,8 +2041,7 @@ export class Parser {
                     separator,
                     separatorLookAheadFunc,
                     action,
-                    NextTerminalAfterAtLeastOneSepWalker,
-                    result
+                    NextTerminalAfterAtLeastOneSepWalker
                 ],
                 separatorLookAheadFunc,
                 AT_LEAST_ONE_SEP_IDX,
@@ -2183,15 +2055,12 @@ export class Parser {
                 options.ERR_MSG
             )
         }
-
-        return result
     }
 
     private manyInternal<OUT>(
         prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        result: OUT[]
-    ): OUT[] {
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
         let nestedName = this.nestedRuleBeforeClause(
             actionORMethodDef as DSLMethodOpts<OUT>,
@@ -2201,7 +2070,6 @@ export class Parser {
             return this.manyInternalLogic(
                 prodOccurrence,
                 actionORMethodDef,
-                result,
                 laKey
             )
         } finally {
@@ -2213,24 +2081,17 @@ export class Parser {
 
     private manyInternalNoCst<OUT>(
         prodOccurrence: number,
-        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        result: OUT[]
-    ): OUT[] {
+        actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(MANY_IDX, prodOccurrence)
-        return this.manyInternalLogic(
-            prodOccurrence,
-            actionORMethodDef,
-            result,
-            laKey
-        )
+        return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey)
     }
 
     private manyInternalLogic<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
-        result: OUT[],
         key: number
-    ): OUT[] {
+    ) {
         let lookaheadFunction = this.getLookaheadFuncForMany(
             key,
             prodOccurrence
@@ -2255,39 +2116,31 @@ export class Parser {
         }
 
         while (lookaheadFunction.call(this)) {
-            result.push(this.doSingleRepetition(action))
+            this.doSingleRepetition(action)
         }
 
         // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
         this.attemptInRepetitionRecovery(
             this.manyInternal,
-            [prodOccurrence, actionORMethodDef, result],
+            [prodOccurrence, actionORMethodDef],
             <any>lookaheadFunction,
             MANY_IDX,
             prodOccurrence,
             NextTerminalAfterManyWalker
         )
-
-        return result
     }
 
     private manySepFirstInternal<OUT>(
         prodOccurrence: number,
-        options: ManySepMethodOpts<OUT>,
-        result: ISeparatedIterationResult<OUT>
-    ): ISeparatedIterationResult<OUT> {
+        options: ManySepMethodOpts<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(
             MANY_SEP_IDX,
             prodOccurrence
         )
         let nestedName = this.nestedRuleBeforeClause(options, laKey)
         try {
-            return this.manySepFirstInternalLogic(
-                prodOccurrence,
-                options,
-                result,
-                laKey
-            )
+            this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
         } finally {
             if (nestedName !== undefined) {
                 this.nestedRuleFinallyClause(laKey, nestedName)
@@ -2297,27 +2150,20 @@ export class Parser {
 
     private manySepFirstInternalNoCst<OUT>(
         prodOccurrence: number,
-        options: ManySepMethodOpts<OUT>,
-        result: ISeparatedIterationResult<OUT>
-    ): ISeparatedIterationResult<OUT> {
+        options: ManySepMethodOpts<OUT>
+    ): void {
         let laKey = this.getKeyForAutomaticLookahead(
             MANY_SEP_IDX,
             prodOccurrence
         )
-        return this.manySepFirstInternalLogic(
-            prodOccurrence,
-            options,
-            result,
-            laKey
-        )
+        this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
     }
 
     private manySepFirstInternalLogic<OUT>(
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>,
-        result: ISeparatedIterationResult<OUT>,
         key: number
-    ): ISeparatedIterationResult<OUT> {
+    ): void {
         let action = options.DEF
         let separator = options.SEP
 
@@ -2325,13 +2171,9 @@ export class Parser {
             key,
             prodOccurrence
         )
-
-        let values = result.values
-        let separators = result.separators
-
         // 1st iteration
         if (firstIterationLaFunc.call(this) === true) {
-            values.push(action.call(this))
+            action.call(this)
 
             let separatorLookAheadFunc = () => {
                 return this.tokenMatcher(this.LA(1), separator)
@@ -2340,9 +2182,9 @@ export class Parser {
             while (this.tokenMatcher(this.LA(1), separator) === true) {
                 // note that this CONSUME will never enter recovery because
                 // the separatorLookAheadFunc checks that the separator really does exist.
-                separators.push(this.CONSUME(separator))
+                this.CONSUME(separator)
                 // No need for checking infinite loop here due to consuming the separator.
-                values.push(action.call(this))
+                action.call(this)
             }
 
             // Performance optimization: "attemptInRepetitionRecovery" will be defined as NOOP unless recovery is enabled
@@ -2353,8 +2195,7 @@ export class Parser {
                     separator,
                     separatorLookAheadFunc,
                     action,
-                    NextTerminalAfterManySepWalker,
-                    result
+                    NextTerminalAfterManySepWalker
                 ],
                 separatorLookAheadFunc,
                 MANY_SEP_IDX,
@@ -2362,7 +2203,6 @@ export class Parser {
                 NextTerminalAfterManySepWalker
             )
         }
-        return result
     }
 
     private repetitionSepSecondInternal<OUT>(
@@ -2370,14 +2210,13 @@ export class Parser {
         separator: TokenType,
         separatorLookAheadFunc: () => boolean,
         action: GrammarAction<OUT>,
-        nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker,
-        result: ISeparatedIterationResult<OUT>
+        nextTerminalAfterWalker: typeof AbstractNextTerminalAfterProductionWalker
     ): void {
         while (separatorLookAheadFunc()) {
             // note that this CONSUME will never enter recovery because
             // the separatorLookAheadFunc checks that the separator really does exist.
-            result.separators.push(this.CONSUME(separator))
-            result.values.push(action.call(this))
+            this.CONSUME(separator)
+            action.call(this)
         }
 
         // we can only arrive to this function after an error
@@ -2393,8 +2232,7 @@ export class Parser {
                 separator,
                 separatorLookAheadFunc,
                 action,
-                nextTerminalAfterWalker,
-                result
+                nextTerminalAfterWalker
             ],
             separatorLookAheadFunc,
             AT_LEAST_ONE_SEP_IDX,
