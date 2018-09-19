@@ -87,7 +87,7 @@ class CalculatorPure extends Parser {
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor(input) {
-        super(input, allTokens, { outputCst: true })
+        super(input, allTokens)
 
         const $ = this
 

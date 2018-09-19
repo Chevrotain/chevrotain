@@ -23,10 +23,7 @@ const CsvLexer = new Lexer(allTokens)
 // Parser
 class CsvParser extends Parser {
     constructor(input) {
-        super(input, allTokens, {
-            // uncomment this to enable automatic CstOutput.
-            // outputCst: true
-        })
+        super(input, allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity
         const $ = this
@@ -81,9 +78,7 @@ module.exports = function(text) {
     const value = parser.csvFile()
 
     return {
-        // This is a pure grammar, the value will be undefined until we add embedded actions
-        // or enable automatic CST creation.
-        value: value,
+        cst: cst,
         lexResult: lexResult,
         parseErrors: parser.errors
     }

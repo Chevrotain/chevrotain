@@ -20,7 +20,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
                 input: IToken[] = [],
                 isInvokedByChildConstructor = false
             ) {
-                super(input, <any>[PlusTok, MinusTok])
+                super(input, <any>[PlusTok, MinusTok], { outputCst: false })
 
                 // performSelfAnalysis should only be invoked once.
                 if (!isInvokedByChildConstructor) {

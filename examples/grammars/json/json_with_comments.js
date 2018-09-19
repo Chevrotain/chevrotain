@@ -62,7 +62,7 @@ module.exports = function(text) {
     const value = parser.json()
 
     return {
-        value: value,
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

@@ -87,7 +87,13 @@ class Calculator extends Parser {
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
     constructor(input) {
-        super(input, allTokens)
+        super(
+            input,
+            allTokens,
+            // by default a CST (Parse Tree) would be constructed
+            // We must disable this feature to use embedded actions.
+            { outputCst: false }
+        )
 
         const $ = this
 

@@ -280,9 +280,7 @@
         // invoking RULE(...)
         // see: https://github.com/jeffmo/es-class-fields-and-static-properties
         constructor(input) {
-            super(input, allTokens, {
-                outputCst: true
-            })
+            super(input, allTokens)
 
             // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
             const $ = this
