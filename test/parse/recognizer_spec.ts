@@ -1109,7 +1109,7 @@ function defineRecognizerSpecs(
             it("Supports custom error messages for OR", () => {
                 class LabelAltParser2 extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super(input, [PlusTok, MinusTok], { outputCst: false })
                         this.performSelfAnalysis()
                     }
 
