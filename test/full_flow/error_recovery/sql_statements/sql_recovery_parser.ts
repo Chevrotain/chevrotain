@@ -51,6 +51,7 @@ export class DDLExampleRecoveryParser extends Parser {
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
         super(input, <any>allTokens, {
+            outputCst: false,
             recoveryEnabled: isRecoveryEnabled
         })
         // DOCS: The call to performSelfAnalysis needs to happen after all the RULEs have been defined

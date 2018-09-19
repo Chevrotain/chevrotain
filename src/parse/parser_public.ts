@@ -137,7 +137,7 @@ const DEFAULT_PARSER_CONFIG: IParserConfig = Object.freeze({
     maxLookahead: 4,
     ignoredIssues: <any>{},
     dynamicTokensEnabled: false,
-    outputCst: false,
+    outputCst: true,
     errorMessageProvider: defaultParserErrorProvider,
     serializedGrammar: null
 })
