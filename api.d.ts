@@ -720,7 +720,6 @@ export declare class Parser {
      * @param actionORMethodDef  - The grammar action to optionally invoke multiple times
      *                             or an "OPTIONS" object describing the grammar action and optional properties.
      *
-     * @return {OUT[]}
      */
     /* protected */ AT_LEAST_ONE(
         actionORMethodDef: GrammarAction<any> | DSLMethodOptsWithErr<any>
