@@ -68,8 +68,8 @@ module.exports = (text) ->
   # setting a new input will RESET the parser instance's state.
   parser.input = lexResult.tokens
   # any top level rule may be used as an entry point
-  value = parser.json()
+  cst = parser.json()
 
-  value: value
+  cst: cst
   lexErrors: lexResult.errors
   parseErrors: parser.errors

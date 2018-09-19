@@ -126,9 +126,7 @@ module.exports = function(text) {
     var value = parser.json()
 
     return {
-        // This is a pure grammar, the value will be undefined until we add embedded actions
-        // or enable automatic CST creation.
-        value: value,
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

@@ -111,11 +111,11 @@ class JsonParserTypeScript extends Parser {
 const parser = new JsonParserTypeScript([])
 
 export function parseJson(text) {
-    let lexResult = JsonLexer.tokenize(text)
+    const lexResult = JsonLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
-    let value = parser.json()
+    const cst = parser.json()
 
     // this would be a TypeScript compilation error because our parser now has a clear API.
     // let value = parser.json_OopsTypo()
@@ -123,7 +123,7 @@ export function parseJson(text) {
     return {
         // This is a pure grammar, the value will be undefined until we add embedded actions
         // or enable automatic CST creation.
-        value: value,
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
