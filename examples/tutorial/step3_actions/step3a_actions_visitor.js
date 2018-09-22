@@ -11,8 +11,8 @@ const selectLexer = require("../step1_lexing/step1_lexing")
 const parser = require("../step2_parsing/step2_parsing")
 const SelectParser = parser.SelectParser
 
-// A new parser instance  with CST output enabled.
-const parserInstance = new SelectParser([], { outputCst: true })
+// A new parser instance with CST output (enabled by default).
+const parserInstance = new SelectParser([])
 // The base visitor class can be accessed via the a parser instance.
 const BaseSQLVisitor = parserInstance.getBaseCstVisitorConstructor()
 

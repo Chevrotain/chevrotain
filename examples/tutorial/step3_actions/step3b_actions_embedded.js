@@ -26,7 +26,12 @@ const Comma = tokenVocabulary.Comma
 // ----------------- parser -----------------
 class SelectParserEmbedded extends Parser {
     constructor(input) {
-        super(input, tokenVocabulary)
+        super(
+            input,
+            tokenVocabulary,
+            // we have to explicitly disable the CST building for embedded actions to work.
+            { outputCst: false }
+        )
         const $ = this
 
         this.selectStatement = $.RULE("selectStatement", () => {

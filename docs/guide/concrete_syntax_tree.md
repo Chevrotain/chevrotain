@@ -27,18 +27,9 @@ There are two major differences.
 
 How to enable CST output?
 
-In the future this capability may be enabled by default.
-Currently this feature must be explicitly enabled by setting the **outputCst** flag.
+This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/iparserconfig.html).
 
-In the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/iparserconfig.html).
-
-```javascript
-class MyParser extends chevrotain.Parser {
-    constructor(input) {
-        super(input, allTokens, { outputCst: true })
-    }
-}
-```
+-   Since 4.0 CST output is **enabled by default**.
 
 ## Structure
 
