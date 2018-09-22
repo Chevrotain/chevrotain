@@ -42,7 +42,6 @@ class BackTrackingParser extends Parser {
             // We have to tell Chevrotain to ignore the ambiguity in the statement rule
             // As Chevrotain is unable to "understand" we are using a GATE to resolve the ambiguity (at design time).
             {
-                outputCst: true,
                 ignoredIssues: {
                     statement: { OR: true }
                 }
