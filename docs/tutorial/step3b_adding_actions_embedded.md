@@ -18,6 +18,27 @@ This can be accomplished using two features of the Parsing DSL:
 -   [SUBRULE](https://sap.github.io/chevrotain/documentation/3_7_4/classes/parser.html#subrule1) will return
     the result of the grammar rule invoked.
 
+### Enabling embedded actions
+
+For embedded actions to work as expected the automatic CST creation must first be disabled.
+The CST creation is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/iparserconfig.html).
+
+```javascript
+class SelectParserEmbedded extends Parser {
+    constructor(input) {
+        super(
+            input,
+            tokenVocabulary,
+            // we have to explicitly disable the CST building for embedded actions to work.
+            { outputCst: false }
+        )
+    }
+}
+```
+
+Failing to disabled the CST creation would cause the Parser to return a CST of the grammar rule
+we invoked instead of of the expected output structure we will be creating (an AST).
+
 ## Simple Example
 
 Lets inspect a simple contrived example:
