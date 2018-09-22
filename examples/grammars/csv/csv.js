@@ -75,7 +75,7 @@ module.exports = function(text) {
     parser.input = lexResult.tokens
 
     // 3. invoke the desired parser rule
-    const value = parser.csvFile()
+    const cst = parser.csvFile()
 
     return {
         cst: cst,

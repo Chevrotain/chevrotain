@@ -126,7 +126,7 @@ module.exports = {
         // setting a new input will RESET the parser instance's state.
         parser.input = lexResult.tokens
         // any top level rule may be used as an entry point
-        const value = parser.json()
+        const cst = parser.json()
 
         return {
             cst: cst,
