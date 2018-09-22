@@ -44,6 +44,7 @@ const allTokens = [
 function DynamicDelimiterParser(input) {
     // invoke super constructor
     Parser.call(this, input, allTokens, {
+        outputCst: false,
         // by default the error recovery / fault tolerance capabilities are disabled
         // use this flag to enable them
         recoveryEnabled: true,
@@ -109,10 +110,10 @@ module.exports = function(text, dynamicDelimiterRegExp) {
     // setting the input will reset the parser's state
     parser.input = lexResult.tokens
     // parse
-    const cst = parser.array()
+    const value = parser.array()
 
     return {
-        cst: cst,
+        value: value,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
