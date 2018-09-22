@@ -123,7 +123,7 @@ module.exports = function(text) {
     parser.input = lexResult.tokens
 
     // any top level rule may be used as an entry point
-    var value = parser.json()
+    var cst = parser.json()
 
     return {
         cst: cst,
