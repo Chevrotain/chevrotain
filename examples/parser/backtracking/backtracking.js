@@ -116,10 +116,10 @@ module.exports = function(text) {
     parser.input = lexResult.tokens
 
     // any top level rule may be used as an entry point
-    const value = parser.statement()
+    const cst = parser.statement()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

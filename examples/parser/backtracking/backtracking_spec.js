@@ -6,19 +6,17 @@ describe("The Backtracking Example", () => {
         const input = "element age : a.b.c.d.e.f = 666;"
         const parseResult = parseSample(input)
         expect(parseResult.parseErrors).to.be.empty
-        expect(parseResult.value.children.withEqualsStatement).to.have.lengthOf(
-            1
-        )
-        expect(parseResult.value.children.withDefaultStatement).to.be.undefined
+        expect(parseResult.cst.children.withEqualsStatement).to.have.lengthOf(1)
+        expect(parseResult.cst.children.withDefaultStatement).to.be.undefined
     })
 
     it("can parse a statement with Default and a very long qualified name", () => {
         const input = "element age : a.b.c.d.e.f default 666;"
         const parseResult = parseSample(input)
         expect(parseResult.parseErrors).to.be.empty
-        expect(parseResult.value.children.withEqualsStatement).to.be.undefined
-        expect(
-            parseResult.value.children.withDefaultStatement
-        ).to.have.lengthOf(1)
+        expect(parseResult.cst.children.withEqualsStatement).to.be.undefined
+        expect(parseResult.cst.children.withDefaultStatement).to.have.lengthOf(
+            1
+        )
     })
 })

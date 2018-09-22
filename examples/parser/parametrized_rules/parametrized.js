@@ -114,10 +114,10 @@ module.exports = function(text, mood) {
     // note that because we are invoking a "start rule" we must provide the arguments as the second parameter.
     // with the first parameter provided the value <1>
     // also note that the arguments are passed as an array
-    const value = parser.topRule(1, [mood])
+    const cst = parser.topRule(1, [mood])
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

@@ -152,10 +152,10 @@ module.exports = function(text, version) {
 
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
-    const value = parser.selectStatement()
+    const cst = parser.selectStatement()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        value: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

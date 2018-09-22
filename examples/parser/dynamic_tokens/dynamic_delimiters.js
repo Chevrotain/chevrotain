@@ -109,10 +109,10 @@ module.exports = function(text, dynamicDelimiterRegExp) {
     // setting the input will reset the parser's state
     parser.input = lexResult.tokens
     // parse
-    const value = parser.array()
+    const cst = parser.array()
 
     return {
-        value: value,
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

@@ -49,10 +49,10 @@ function parse(text) {
     const lexResult = SerializedLexer.tokenize(text)
 
     parser.input = lexResult.tokens
-    const value = parser.root()
+    const cst = parser.root()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }
