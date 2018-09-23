@@ -42,7 +42,6 @@ class BackTrackingParser extends Parser {
             // We have to tell Chevrotain to ignore the ambiguity in the statement rule
             // As Chevrotain is unable to "understand" we are using a GATE to resolve the ambiguity (at design time).
             {
-                outputCst: true,
                 ignoredIssues: {
                     statement: { OR: true }
                 }
@@ -117,10 +116,10 @@ module.exports = function(text) {
     parser.input = lexResult.tokens
 
     // any top level rule may be used as an entry point
-    const value = parser.statement()
+    const cst = parser.statement()
 
     return {
-        value: value, // this is a pure grammar, the value will always be <undefined>
+        cst: cst,
         lexErrors: lexResult.errors,
         parseErrors: parser.errors
     }

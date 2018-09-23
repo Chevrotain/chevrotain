@@ -127,7 +127,7 @@ function parseStartingWithRule(ruleName) {
         // setting a new input will RESET the parser instance's state.
         parser.input = lexResult.tokens
         // just invoke which ever rule you want as the start rule. its all just plain javascript...
-        const value = parser[ruleName]()
+        const cst = parser[ruleName]()
 
         // we are only interested in the errors in this scenario.
         return parser.errors

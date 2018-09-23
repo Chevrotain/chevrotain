@@ -64,7 +64,7 @@ const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksParser extends Parser {
     constructor(input: IToken[]) {
-        super(input, allTokens)
+        super(input, allTokens, { outputCst: false })
         this.performSelfAnalysis()
     }
 

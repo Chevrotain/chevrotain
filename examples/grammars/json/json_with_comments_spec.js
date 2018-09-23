@@ -21,7 +21,7 @@ describe("The JSON Grammar with comments", () => {
         expect(parseResult.lexErrors).to.be.empty
         expect(parseResult.parseErrors).to.be.empty
 
-        const cst = parseResult.value
+        const cst = parseResult.cst
 
         // The top level comment was added to the top level Object CST.
         const topLevelComment = cst.children.object[0].children.Comment[0]

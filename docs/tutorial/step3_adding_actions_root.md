@@ -36,7 +36,7 @@ about 50% faster than using a CST Visitor. This may sound like an unbeatable adv
 but that is not the case:
 
 -   Chevrotain is [so fast](https://sap.github.io/chevrotain/performance/) that even with that performance penalty
-    it would beat most other parsing solutions and still be close to the performance of an hand built parser.
+    it would beat other parsing solutions.
 
     -   Tested on Modern V8
 

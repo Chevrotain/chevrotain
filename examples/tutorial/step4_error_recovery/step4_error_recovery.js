@@ -55,9 +55,7 @@ class JsonParser extends Parser {
     constructor(input) {
         super(input, allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled
-            recoveryEnabled: true,
-            // enable CST Output so we can test the recovery capabilities
-            outputCst: true
+            recoveryEnabled: true
         })
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)

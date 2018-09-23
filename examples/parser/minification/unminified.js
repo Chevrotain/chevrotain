@@ -133,10 +133,10 @@
         var lexResult = JsonLexer.tokenize(text)
 
         parser.input = lexResult.tokens
-        var value = parser.json()
+        var cst = parser.json()
 
         return {
-            value: value, // this is a pure grammar, the value will always be <undefined>
+            cst: cst,
             lexErrors: lexResult.errors,
             parseErrors: parser.errors
         }

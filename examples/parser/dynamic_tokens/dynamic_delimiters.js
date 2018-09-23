@@ -44,6 +44,7 @@ const allTokens = [
 function DynamicDelimiterParser(input) {
     // invoke super constructor
     Parser.call(this, input, allTokens, {
+        outputCst: false,
         // by default the error recovery / fault tolerance capabilities are disabled
         // use this flag to enable them
         recoveryEnabled: true,
