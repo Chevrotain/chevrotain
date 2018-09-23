@@ -358,12 +358,9 @@ export class Parser {
     private currIdx: number = -1
 
     constructor(
-        input: IToken[],
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
-        this.input = input
-
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled")
             ? config.recoveryEnabled

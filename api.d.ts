@@ -15,7 +15,7 @@ export declare class Parser {
     /* protected */ performSelfAnalysis(): void
 
     /**
-     * It is recommanded to reuse the same Parser instance
+     * It is recommended to reuse the same Parser instance
      * by passing an empty array to the input argument
      * and only later setting the input by using the input property.
      * See: http://sap.github.io/chevrotain/docs/FAQ.html#major-performance-benefits
@@ -23,7 +23,6 @@ export declare class Parser {
      * @param tokenVocabulary - A data structure containing all the Tokens used by the Parser.
      */
     constructor(
-        input: IToken[],
         tokenVocabulary: TokenVocabulary,
         config?: IParserConfig
     )

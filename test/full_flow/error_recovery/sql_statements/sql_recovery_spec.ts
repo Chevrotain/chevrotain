@@ -35,7 +35,7 @@ import { createRegularToken } from "../../../utils/matchers"
 import { IToken } from "../../../../api"
 
 // for side effect if augmenting the Token classes.
-new DDLExampleRecoveryParser([])
+new DDLExampleRecoveryParser()
 describe("Error Recovery SQL DDL Example", () => {
     let schemaFQN = [
         createRegularToken(IdentTok, "schema2"),
@@ -81,7 +81,8 @@ describe("Error Recovery SQL DDL Example", () => {
             createRegularToken(SemiColonTok)
         ])
 
-        let parser = new DDLExampleRecoveryParser(input)
+        let parser = new DDLExampleRecoveryParser()
+        parser.input = input
         let ptResult = parser.ddl()
         expect(parser.errors.length).to.equal(0)
         expect(parser.isAtEndOfInput()).to.equal(true)
@@ -125,7 +126,8 @@ describe("Error Recovery SQL DDL Example", () => {
         })
 
         it("can disable single token insertion for a missing semicolon", () => {
-            let parser = new DDLExampleRecoveryParser(input, false)
+            let parser = new DDLExampleRecoveryParser(false)
+            parser.input = input
             let ptResult: any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
@@ -168,7 +170,8 @@ describe("Error Recovery SQL DDL Example", () => {
         })
 
         it("can disable single token deletion for a redundant keyword", () => {
-            let parser = new DDLExampleRecoveryParser(input, false)
+            let parser = new DDLExampleRecoveryParser(false)
+            parser.input = input
             let ptResult: any = parser.ddl()
             expect(parser.errors.length).to.equal(1)
             expect(parser.isAtEndOfInput()).to.equal(true)
@@ -281,7 +284,8 @@ describe("Error Recovery SQL DDL Example", () => {
         })
 
         it("can disable re-sync recovery and only 'lose' part of the input even when re-syncing to two rules 'above'", () => {
-            let parser = new DDLExampleRecoveryParser(input, false)
+            let parser = new DDLExampleRecoveryParser(false)
+            parser.input = input
             let ptResult: any = parser.ddl()
             // one error encountered
             expect(parser.errors.length).to.equal(1)

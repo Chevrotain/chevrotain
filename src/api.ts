@@ -57,7 +57,6 @@ import { TokenType } from "../api"
 
 interface ParserConstructor {
     new (
-        input: defs.IToken[],
         tokenVocabulary: defs.TokenVocabulary,
         config?: defs.IParserConfig
     ): defs.Parser
