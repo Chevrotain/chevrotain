@@ -1,3 +1,79 @@
+## 4.0.0
+
+-   The Parser constructor no longer accepts a token vector as an argument.
+    The "input" **setter** should be used instead, for example:
+
+    ```javascript
+    // Old API
+    class MyOldParser extends Parser {
+        constructor(input, config) {
+            super(input, allTokens, config)
+        }
+    }
+
+    const oldInstance = new MyOldParser(
+        [
+            /* token vector */
+        ],
+        {}
+    )
+
+    // New API
+    class MyNewParser extends Parser {
+        constructor(config) {
+            super(allTokens, config)
+        }
+    }
+
+    const newInstance = new MyNewParser({})
+    newInstance.input = [
+        /* token vector */
+    ]
+    ```
+
+    -   Note that the input **setter** has existed for a while and has been used
+        in the official examples and documentation, therefore it is likely that
+        only the constructor need be modified in existing parsers.
+
+-   Automatic [Concrete Syntax Tree](http://sap.github.io/chevrotain/docs/guide/concrete_syntax_tree.html) output is now enabled by default.
+    This means that parser which rely on **embedded actions** must **explicitly** disable
+    the CST output, for example:
+
+    ```javascript
+    class MyNewParser extends Parser {
+        constructor() {
+            // we have to explicitly disable the CST building for embedded actions to work.
+            super(allTokens, { outputCst: false })
+        }
+    }
+    ```
+
+    -   If a parser already uses CST output no change is needed in 4.0
+
+-   DSL repetitions no longer return any values in **embedded actions** mode:
+
+    -   **MANY** / **AT_LEAST_ONE** no longer return an array of the iteration results.
+        The iterations results should be collected manually instead:
+
+        ```javascript
+        // Before 4.0.0
+        const stmts = $.MANY(() => {
+            return $.SUBRULE(Statement)
+        })
+
+        // After 4.0.0
+        const stmts = []
+        $.MANY(() => {
+            stmts.push($.SUBRULE(Statement))
+        })
+        ```
+
+    -   Similarly **MANY_SEP** / **AT_LEAST_ONE_SEP** also no longer return any results.
+        These used to return both the repetition result array and an array of separators Tokens consumed.
+        It is still possible to manually collect the repetition results, but not the separator tokens.
+
+    -   This change has no effect when using automatic **CST creation**.
+
 ## 3.0.0
 
 -   A CST Node's children dictionary no longer contains empty arrays

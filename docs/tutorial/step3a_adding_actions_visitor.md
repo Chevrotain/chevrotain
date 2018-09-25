@@ -15,24 +15,10 @@ This can be accomplished using a CST (Concrete Syntax Tree) Visitor defined **ou
 
 ## Enabling CST
 
-First we need to enable the CST (Concrete Syntax Tree) creation in our parser.
-This is easily done by passing the ["outputCst"](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/iparserconfig.html#outputcst) parser options object in
-the super constructor.
+This feature is controlled by the **outputCst** flag of the parser [configuration object](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/iparserconfig.html).
 
-```javascript
-class SelectParser extends chevrotain.Parser {
-    constructor() {
-        // The "outputCst" flag will cause the parser to create a CST structure on rule invocation
-        super(allTokens, { outputCst: true })
+-   Since version 4.0, CST output is **enabled by default**.
 
-        /* rule definitions... */
-
-        this.performSelfAnalysis()
-    }
-}
-```
-
-Note that this is the **only** change needed in the parser.
 The invocation of any grammar rule will now automatically create a CST.
 
 ```javascript
