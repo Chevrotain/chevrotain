@@ -30,7 +30,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
         class PredicateOptionParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
-                super(input, ALL_TOKENS, { outputCst: false })
+                super(ALL_TOKENS, { outputCst: false })
+                this.input = input
                 this.performSelfAnalysis()
             }
 
@@ -79,7 +80,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
         class PredicateManyParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
-                super(input, ALL_TOKENS, { outputCst: false })
+                super(ALL_TOKENS, { outputCst: false })
+                this.input = input
                 this.performSelfAnalysis()
             }
 
@@ -129,7 +131,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
         class PredicateAtLeastOneParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
-                super(input, ALL_TOKENS, { outputCst: false })
+                super(ALL_TOKENS, { outputCst: false })
+                this.input = input
                 this.performSelfAnalysis()
             }
 
@@ -191,7 +194,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
 
         class PredicateOrParser extends Parser {
             constructor(input: IToken[] = [], private gate: boolean) {
-                super(input, ALL_TOKENS, { outputCst: false })
+                super(ALL_TOKENS, { outputCst: false })
+                this.input = input
                 this.performSelfAnalysis()
             }
 
@@ -267,7 +271,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         it("predicates in OR", () => {
             class PredicateWithRuleOrParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, { outputCst: false })
+                    super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -300,7 +305,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         it("predicates in OPTION", () => {
             class PredicateWithRuleOptionParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, { outputCst: false })
+                    super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -335,7 +341,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         it("predicates in MANY", () => {
             class PredicateWithRuleManyParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, { outputCst: false })
+                    super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -371,7 +378,8 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
         it("predicates in AT_LEAST_ONE", () => {
             class PredicateWithRuleAtLeastOneParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, { outputCst: false })
+                    super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 

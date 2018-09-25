@@ -13,11 +13,11 @@ const SerializedLexer = new Lexer(allTokens, { positionTracking: "onlyOffset" })
 // ----------------- parser -----------------
 
 class SerializedParser extends Parser {
-    constructor(input, serializedGrammar) {
+    constructor(serializedGrammar) {
         // Invoke super constructor with serialized grammar in parser config.
         // Passing in serialized grammar without passing it into the parser
         // would cause parser to always use a stale grammar.
-        super(input, allTokens, { serializedGrammar: serializedGrammar })
+        super(allTokens, { serializedGrammar: serializedGrammar })
 
         // this.RULE calls will be ignored if a serialized grammar is passed in.
         this.RULE("root", () => {
@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === "production") {
     }
 }
 // pass in serialized grammar to parser instance
-var parser = new SerializedParser([], serializedGrammar)
+var parser = new SerializedParser(serializedGrammar)
 
 function parse(text) {
     const lexResult = SerializedLexer.tokenize(text)

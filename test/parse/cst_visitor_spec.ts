@@ -13,7 +13,7 @@ describe("The CSTVisitor", () => {
 
     class CstTerminalParserReturnVisitor extends Parser {
         constructor(input: IToken[] = []) {
-            super(input, ALL_TOKENS, { outputCst: true })
+            super(ALL_TOKENS, { outputCst: true })
             Parser.performSelfAnalysis(this)
         }
 

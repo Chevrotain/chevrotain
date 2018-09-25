@@ -4,7 +4,7 @@ describe("The Recognizer's Configuration", () => {
     it("default config values - empty config", () => {
         class EmptyConfigParser extends Parser {
             constructor() {
-                super([], [], {})
+                super([], {})
             }
         }
 
@@ -16,7 +16,7 @@ describe("The Recognizer's Configuration", () => {
     it("default config values - no config", () => {
         class NoConfigParser extends Parser {
             constructor() {
-                super([], [])
+                super([])
             }
         }
 

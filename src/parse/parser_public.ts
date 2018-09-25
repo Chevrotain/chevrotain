@@ -358,12 +358,9 @@ export class Parser {
     private currIdx: number = -1
 
     constructor(
-        input: IToken[],
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
-        this.input = input
-
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled")
             ? config.recoveryEnabled
@@ -457,7 +454,7 @@ export class Parser {
             this.tokensMap = cloneObj(tokenVocabulary)
         } else {
             throw new Error(
-                "<tokensDictionary> argument must be An Array of Token constructors" +
+                "<tokensDictionary> argument must be An Array of Token constructors," +
                     " A dictionary of Token constructors or an IMultiModeLexerDefinition"
             )
         }

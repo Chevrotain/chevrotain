@@ -17,8 +17,8 @@ allTokens = [WhiteSpace, NumberLiteral, StringLiteral, LCurly, RCurly, LSquare, 
 JsonLexer = new Lexer allTokens
 
 class JsonParserCoffeeScript extends Parser
-  constructor: (input = []) ->
-    super input, allTokens
+  constructor: () ->
+    super allTokens
 
     @RULE 'json', ->
       @OR [

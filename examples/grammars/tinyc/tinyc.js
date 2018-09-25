@@ -48,8 +48,8 @@ class TinyCParser extends Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -168,7 +168,7 @@ class TinyCParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new TinyCParser([])
+const parser = new TinyCParser()
 
 module.exports = function(text) {
     const lexResult = TinyCLexer.tokenize(text)

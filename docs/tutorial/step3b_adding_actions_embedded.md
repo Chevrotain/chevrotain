@@ -25,9 +25,8 @@ The CST creation is controlled by the **outputCst** flag of the parser [configur
 
 ```javascript
 class SelectParserEmbedded extends Parser {
-    constructor(input) {
+    constructor() {
         super(
-            input,
             tokenVocabulary,
             // we have to explicitly disable the CST building for embedded actions to work.
             { outputCst: false }

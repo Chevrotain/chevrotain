@@ -63,8 +63,8 @@ if (typeof (<any>new RegExp("(?:)")).sticky === "boolean") {
 const ErrorToken = createToken({ name: "ErrorToken" })
 
 class EcmaScriptQuirksParser extends Parser {
-    constructor(input: IToken[]) {
-        super(input, allTokens, { outputCst: false })
+    constructor() {
+        super(allTokens, { outputCst: false })
         this.performSelfAnalysis()
     }
 
@@ -260,7 +260,7 @@ class EcmaScriptQuirksParser extends Parser {
 }
 
 // reuse the same parser instance.
-const parser = new EcmaScriptQuirksParser([])
+const parser = new EcmaScriptQuirksParser()
 
 export function parse(text): any {
     parser.textInput = text

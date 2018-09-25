@@ -47,8 +47,8 @@ function isThree() {
 
 // ----------------- parser -----------------
 class PredicateLookaheadParser extends Parser {
-    constructor(input) {
-        super(input, allTokens, { outputCst: false })
+    constructor() {
+        super(allTokens, { outputCst: false })
 
         const $ = this
 
@@ -92,7 +92,7 @@ class PredicateLookaheadParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new PredicateLookaheadParser([])
+const parser = new PredicateLookaheadParser()
 
 module.exports = {
     parse: function(text) {

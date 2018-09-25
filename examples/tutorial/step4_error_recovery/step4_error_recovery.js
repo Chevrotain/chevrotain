@@ -52,8 +52,8 @@ const JsonLexer = new Lexer(allTokens, {
 // ----------------- parser -----------------
 
 class JsonParser extends Parser {
-    constructor(input) {
-        super(input, allTokens, {
+    constructor() {
+        super(allTokens, {
             // by default the error recovery / fault tolerance capabilities are disabled
             recoveryEnabled: true
         })
@@ -120,7 +120,7 @@ class JsonParser extends Parser {
 }
 
 // reuse the same parser instance.
-const parser = new JsonParser([])
+const parser = new JsonParser()
 
 // ----------------- wrapping it all together -----------------
 module.exports = {

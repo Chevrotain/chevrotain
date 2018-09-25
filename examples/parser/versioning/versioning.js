@@ -35,8 +35,8 @@ const SelectLexer = new Lexer(allTokens)
 // ----------------- parser -----------------
 
 class SelectParserVersion1 extends Parser {
-    constructor(input, isInvokedByChildConstructor = false) {
-        super(input, allTokens)
+    constructor(isInvokedByChildConstructor = false) {
+        super(allTokens)
 
         const $ = this
 
@@ -104,8 +104,8 @@ class SelectParserVersion1 extends Parser {
 
 // V2 extends V1
 class SelectParserVersion2 extends SelectParserVersion1 {
-    constructor(input) {
-        super(input, true)
+    constructor() {
+        super(true)
 
         const $ = this
 
@@ -130,8 +130,8 @@ class SelectParserVersion2 extends SelectParserVersion1 {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instances.
-const version1Parser = new SelectParserVersion1([])
-const version2Parser = new SelectParserVersion2([])
+const version1Parser = new SelectParserVersion1()
+const version2Parser = new SelectParserVersion2()
 
 module.exports = function(text, version) {
     const lexResult = SelectLexer.tokenize(text)

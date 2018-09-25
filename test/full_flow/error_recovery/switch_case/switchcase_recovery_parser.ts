@@ -57,7 +57,7 @@ export class SwitchCaseRecoveryParser extends Parser {
         // DOCS: note the second parameter in the super class. this is the namespace in which the token constructors are defined.
         //       it is mandatory to provide this map to be able to perform self analysis
         //       and allow the framework to "understand" the implemented grammar.
-        super(input, <any>allTokens, {
+        super(<any>allTokens, {
             recoveryEnabled: true,
             outputCst: false
         })

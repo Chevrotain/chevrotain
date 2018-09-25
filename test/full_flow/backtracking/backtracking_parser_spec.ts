@@ -15,7 +15,7 @@ import { createRegularToken } from "../../utils/matchers"
 
 describe("Simple backtracking example", () => {
     // for side effect of augmenting the tokens metadata
-    new BackTrackingParser([])
+    new BackTrackingParser()
 
     // TODO: modify example to use the Chevrotain Lexer to increase readability
     let largeFqnTokenVector = [
@@ -59,7 +59,8 @@ describe("Simple backtracking example", () => {
             createRegularToken(SemiColonTok, ";")
         ])
 
-        let parser = new BackTrackingParser(input)
+        let parser = new BackTrackingParser()
+        parser.input = input
         let result = parser.statement()
 
         expect(parser.errors.length).to.equal(0)
@@ -79,7 +80,8 @@ describe("Simple backtracking example", () => {
             createRegularToken(SemiColonTok, ";")
         ])
 
-        let parser = new BackTrackingParser(input)
+        let parser = new BackTrackingParser()
+        parser.input = input
         let result = parser.statement()
 
         expect(parser.errors.length).to.equal(0)

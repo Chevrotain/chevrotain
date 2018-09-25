@@ -31,8 +31,8 @@ const PhoneticLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class MultiStartParser extends Parser {
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         const $ = this
 
@@ -66,7 +66,7 @@ class MultiStartParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new MultiStartParser([])
+const parser = new MultiStartParser()
 
 function parseStartingWithRule(ruleName) {
     return function(text) {

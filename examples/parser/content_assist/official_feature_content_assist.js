@@ -66,8 +66,8 @@ const StatementsLexer = new Lexer(allTokens)
 
 // A completely normal Chevrotain Parser, no changes needed to use the content assist capabilities.
 class StatementsParser extends Parser {
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         let $ = this
 
@@ -120,7 +120,7 @@ class StatementsParser extends Parser {
 }
 
 // No need for more than one instance.
-const parserInstance = new StatementsParser([])
+const parserInstance = new StatementsParser()
 
 /**
  * @param text {string} - The text content assist is requested immediately afterwards.

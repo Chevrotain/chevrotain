@@ -1708,9 +1708,10 @@ describe("issue 391 - WITH_SEP variants do not take SEP into account in lookahea
 
         class Issue391Parser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, allTokens, {
+                super(allTokens, {
                     maxLookahead: 4
                 })
+                this.input = input
                 this.performSelfAnalysis()
             }
 

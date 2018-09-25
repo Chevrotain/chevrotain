@@ -65,7 +65,7 @@ export function genClass(options: { name: string; rules: Rule[] }): string {
     let result = `
 function ${options.name}(tokenVocabulary, config) {
     // invoke super constructor
-    chevrotain.Parser.call(this, [], tokenVocabulary, config)
+    chevrotain.Parser.call(this, tokenVocabulary, config)
 
     const $ = this
 
@@ -74,7 +74,7 @@ function ${options.name}(tokenVocabulary, config) {
     // very important to call this after all the rules have been defined.
     // otherwise the parser may not work correctly as it will lack information
     // derived during the self analysis phase.
-    chevrotain.Parser.performSelfAnalysis(this)
+    this.performSelfAnalysis(this)
 }
 
 // inheritance as implemented in javascript in the previous decade... :(

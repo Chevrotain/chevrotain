@@ -45,9 +45,9 @@ var allTokens = [
 var JsonLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
-function JsonParserES5(input) {
+function JsonParserES5() {
     // invoke super constructor
-    Parser.call(this, input, allTokens)
+    Parser.call(this, allTokens)
 
     // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
     var $ = this
@@ -114,7 +114,7 @@ JsonParserES5.prototype.constructor = JsonParserES5
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-var parser = new JsonParserES5([])
+var parser = new JsonParserES5()
 
 module.exports = function(text) {
     var lexResult = JsonLexer.tokenize(text)

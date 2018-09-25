@@ -23,9 +23,9 @@ context("CST", () => {
     it("Can output a CST for a flat structure", () => {
         class CstTerminalParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
-                    outputCst: true
-                })
+                super(ALL_TOKENS)
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -59,9 +59,11 @@ context("CST", () => {
     it("Can output a CST with labels", () => {
         class CstTerminalParser2 extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -99,10 +101,11 @@ context("CST", () => {
     it("Can output a CST with labels in recovery", () => {
         class CstTerminalParserWithLabels extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true,
                     recoveryEnabled: true
                 })
+                this.input = input
                 this.performSelfAnalysis()
             }
 
@@ -132,9 +135,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal - alternations", () => {
         class CstTerminalAlternationParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -171,9 +176,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal - alternations - single", () => {
         class CstTerminalAlternationSingleAltParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -201,9 +208,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal with multiple occurrences", () => {
         class CstMultiTerminalParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -232,9 +241,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal with multiple occurrences - iteration", () => {
         class CstMultiTerminalWithManyParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -281,9 +292,11 @@ context("CST", () => {
     context("Can output a CST for an optional terminal", () => {
         class CstOptionalTerminalParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -333,9 +346,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal with multiple occurrences - iteration mandatory", () => {
         class CstMultiTerminalWithAtLeastOneParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -367,9 +382,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal with multiple occurrences - iteration SEP", () => {
         class CstMultiTerminalWithManySepParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -406,9 +423,11 @@ context("CST", () => {
     it("Can output a CST for a Terminal with multiple occurrences - iteration SEP mandatory", () => {
         class CstMultiTerminalWithAtLeastOneSepParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, ALL_TOKENS, {
+                super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -446,9 +465,11 @@ context("CST", () => {
         context("Can output cst when using OPTION", () => {
             class CstOptionalNestedTerminalParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -511,9 +532,11 @@ context("CST", () => {
         it("Can output a CST when using OR with nested named Alternatives", () => {
             class CstAlternationNestedAltParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -554,9 +577,11 @@ context("CST", () => {
         it("Can output a CST when using OR", () => {
             class CstAlternationNestedParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -599,9 +624,11 @@ context("CST", () => {
         it("Can output a CST when using OR - single Alt", () => {
             class CstAlternationNestedAltSingleParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -636,9 +663,11 @@ context("CST", () => {
         it("Can output a CST using Repetitions", () => {
             class CstMultiTerminalWithManyNestedParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -707,9 +736,11 @@ context("CST", () => {
         it("Can output a CST using mandatory Repetitions", () => {
             class CstAtLeastOneNestedParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -746,9 +777,11 @@ context("CST", () => {
         it("Can output a CST using Repetitions with separator", () => {
             class CstNestedRuleWithManySepParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -786,9 +819,11 @@ context("CST", () => {
         it("Can output a CST using Repetitions with separator - mandatory", () => {
             class CstAtLeastOneSepNestedParser extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -832,10 +867,11 @@ context("CST", () => {
         it("re-sync recovery", () => {
             class CstRecoveryParserReSync extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true,
                         recoveryEnabled: true
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -910,10 +946,11 @@ context("CST", () => {
         it("re-sync recovery nested", () => {
             class CstRecoveryParserReSyncNested extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: true,
                         recoveryEnabled: true
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
