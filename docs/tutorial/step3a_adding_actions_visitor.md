@@ -21,9 +21,9 @@ the super constructor.
 
 ```javascript
 class SelectParser extends chevrotain.Parser {
-    constructor(input) {
+    constructor() {
         // The "outputCst" flag will cause the parser to create a CST structure on rule invocation
-        super(input, allTokens, { outputCst: true })
+        super(allTokens, { outputCst: true })
 
         /* rule definitions... */
 

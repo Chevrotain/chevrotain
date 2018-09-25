@@ -93,11 +93,8 @@ const allTokens = [
 ]
 
 class SelectParser extends Parser {
-    /**
-     * @param {IToken[]} input
-     */
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         const $ = this
 
@@ -239,8 +236,8 @@ const allTokens = [
 ]
 
 class SelectParser extends Parser {
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         const $ = this
 
