@@ -3,7 +3,7 @@
 Chevrotain lexers support grouping Tokens Types **separately** from the main token vector in the lexing result.
 This is often useful to **collect** a specific set of Token Types for later processing most commonly to collect comments tokens.
 
-To group a Token Type simply specify the [**group**](https://sap.github.io/chevrotain/documentation/3_7_4/interfaces/itokenconfig.html#group) property in its configuration.
+To group a Token Type simply specify the [**group**](https://sap.github.io/chevrotain/documentation/4_0_0/interfaces/itokenconfig.html#group) property in its configuration.
 For example:
 
 ```javascript
