@@ -1,3 +1,25 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Breaking Changes
+
+-   [BREAKING_CHANGES For V4.0](http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0)
+
+#### Major Changes
+
+-   [Concrete Syntax Tree creation is now enabled by default.](https://github.com/SAP/chevrotain/issues/819)
+
+#### Minor Changes
+
+-   [The Parser's constructor no longer accepts a Token vector as the first argument.](https://github.com/SAP/chevrotain/issues/785)
+-   [Runtime infinite loop detection in iterations.](https://github.com/SAP/chevrotain/issues/625)
+-   Small (~5-10%) performance improvements and optimizations.
+    -   [Use ES6 Maps(if available) for faster lookahead functions caching.](https://github.com/SAP/chevrotain/issues/812)
+    -   [Remove automatic collection of return values for iterations.](https://github.com/SAP/chevrotain/issues/784)
+
+#### Bug Fixes
+
+-   [Stack overflow during grammar analysis.](https://github.com/SAP/chevrotain/pull/816).
+
 ## 3.7.4 (7-30-2018)
 
 #### Bug Fixes
@@ -119,7 +141,7 @@
 
 #### Breaking Changes
 
--   [See BREAKING_CHANGES.md](https://github.com/SAP/chevrotain/blob/master/BREAKING_CHANGES.md#300)
+-   [BREAKING_CHANGES for V3.0](http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_3-0-0)
 
 #### Major Changes
 
@@ -148,7 +170,7 @@
 
 #### Breaking Changes
 
--   [See BREAKING_CHANGES.md](https://github.com/SAP/chevrotain/blob/master/BREAKING_CHANGES.md#200)
+-   [BREAKING_CHANGES for V2.0](http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_2-0-0)
 
 #### Major Changes
 
