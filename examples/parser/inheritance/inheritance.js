@@ -104,9 +104,9 @@ const GermanLexer = new Lexer(germanTokens)
 
 // Extending the base chevrotain Parser class
 class AbstractCommandsParser extends Parser {
-    constructor(input, tokenVocabulary) {
+    constructor(tokenVocabulary) {
         // combining the token vocabularies of parent and child.
-        super(input, abstractTokens.concat(tokenVocabulary))
+        super(abstractTokens.concat(tokenVocabulary))
 
         const $ = this
 
@@ -133,8 +133,8 @@ class AbstractCommandsParser extends Parser {
 }
 
 class EnglishCommandsParser extends AbstractCommandsParser {
-    constructor(input) {
-        super(input, englishTokens)
+    constructor() {
+        super(englishTokens)
 
         const $ = this
 
@@ -162,8 +162,8 @@ class EnglishCommandsParser extends AbstractCommandsParser {
 }
 
 class GermanCommandsParser extends AbstractCommandsParser {
-    constructor(input) {
-        super(input, germanTokens)
+    constructor() {
+        super(germanTokens)
 
         const $ = this
 
@@ -194,8 +194,8 @@ class GermanCommandsParser extends AbstractCommandsParser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instances.
-const englishParser = new EnglishCommandsParser([])
-const germanParser = new GermanCommandsParser([])
+const englishParser = new EnglishCommandsParser()
+const germanParser = new GermanCommandsParser()
 
 module.exports = function(text, language) {
     // lex

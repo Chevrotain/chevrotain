@@ -279,8 +279,8 @@
         // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
         // invoking RULE(...)
         // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-        constructor(input) {
-            super(input, allTokens)
+        constructor() {
+            super(allTokens)
 
             // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
             const $ = this
@@ -1029,7 +1029,7 @@
         }
     }
 
-    const parser = new GraphQLParser([])
+    const parser = new GraphQLParser()
 
     return {
         GraphQLToken: allTokens,

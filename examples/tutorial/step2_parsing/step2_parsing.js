@@ -25,8 +25,8 @@ const Comma = tokenVocabulary.Comma
 class SelectParser extends Parser {
     // A config object as a constructor argument is normally not needed.
     // Our tutorial scenario requires a dynamic configuration to support step3 without duplicating code.
-    constructor(input, config) {
-        super(input, tokenVocabulary, config)
+    constructor(config) {
+        super(tokenVocabulary, config)
 
         // for conciseness
         const $ = this
@@ -91,7 +91,7 @@ class SelectParser extends Parser {
 }
 
 // We only ever need one as the parser internal state is reset for each new input.
-const parserInstance = new SelectParser([])
+const parserInstance = new SelectParser()
 
 module.exports = {
     parserInstance: parserInstance,

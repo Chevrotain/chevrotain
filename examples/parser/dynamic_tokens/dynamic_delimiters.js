@@ -41,9 +41,9 @@ const allTokens = [
 ]
 
 // ----------------- parser -----------------
-function DynamicDelimiterParser(input) {
+function DynamicDelimiterParser() {
     // invoke super constructor
-    Parser.call(this, input, allTokens, {
+    Parser.call(this, allTokens, {
         outputCst: false,
         // by default the error recovery / fault tolerance capabilities are disabled
         // use this flag to enable them
@@ -84,7 +84,7 @@ DynamicDelimiterParser.prototype.constructor = DynamicDelimiterParser
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new DynamicDelimiterParser([])
+const parser = new DynamicDelimiterParser()
 
 module.exports = function(text, dynamicDelimiterRegExp) {
     // make this parameter optional

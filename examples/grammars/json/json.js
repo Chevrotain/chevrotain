@@ -48,8 +48,8 @@ class JsonParser extends Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input, config) {
-        super(input, allTokens, config)
+    constructor(config) {
+        super(allTokens, config)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -114,7 +114,7 @@ class JsonParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new JsonParser([])
+const parser = new JsonParser()
 
 module.exports = {
     jsonTokens: allTokens,

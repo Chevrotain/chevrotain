@@ -48,7 +48,7 @@ const JsonLexer = new Lexer(allTokens)
 // ----------------- parser -----------------
 class JsonParserES6 extends Parser {
     constructor(input) {
-        super(input, allTokens)
+        super(allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -112,7 +112,7 @@ class JsonParserES6 extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new JsonParserES6([])
+const parser = new JsonParserES6()
 
 module.exports = function(text) {
     const lexResult = JsonLexer.tokenize(text)

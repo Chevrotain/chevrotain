@@ -15,7 +15,7 @@ class ECMAScript5Parser extends Parser {
     }
 
     constructor() {
-        super([], tokens, {
+        super(tokens, {
             outputCst: false,
             ignoredIssues: {
                 Statement: { OR: true },

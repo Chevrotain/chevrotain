@@ -18,8 +18,8 @@ const JsonWithCommentsLexer = new Lexer(allTokens)
  * Only overrides private methods to automatically collect comments
  */
 class JsonParserWithComments extends JsonParser {
-    constructor(input) {
-        super(input, { outputCst: true })
+    constructor() {
+        super({ outputCst: true })
         // We did not define any new rules so no need to call performSelfAnalysis
     }
 

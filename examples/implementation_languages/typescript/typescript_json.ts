@@ -48,8 +48,8 @@ const allTokens = [
 const JsonLexer = new Lexer(allTokens)
 
 class JsonParserTypeScript extends Parser {
-    constructor(input: IToken[]) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
         this.performSelfAnalysis()
     }
 
@@ -108,7 +108,7 @@ class JsonParserTypeScript extends Parser {
 }
 
 // reuse the same parser instance.
-const parser = new JsonParserTypeScript([])
+const parser = new JsonParserTypeScript()
 
 export function parseJson(text) {
     const lexResult = JsonLexer.tokenize(text)

@@ -53,9 +53,9 @@
     var JsonLexer = new Lexer(allTokens)
 
     // ----------------- parser -----------------
-    function JsonParser(input) {
+    function JsonParser() {
         // invoke super constructor
-        Parser.call(this, input, allTokens)
+        Parser.call(this, allTokens)
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
         var $ = this
@@ -124,7 +124,7 @@
     // ----------------- wrapping it all together -----------------
 
     // reuse the same parser instance.
-    var parser = new JsonParser([])
+    var parser = new JsonParser()
 
     function parseJson(text) {
         var lexResult = JsonLexer.tokenize(text)

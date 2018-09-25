@@ -17,7 +17,7 @@ const ArrayLexer = new Lexer(allTokens)
 // ----------------- parser -----------------
 class ArrayParser extends Parser {
     constructor(input) {
-        super(input, allTokens)
+        super(allTokens)
         const $ = this
 
         $.RULE("array", () => {
@@ -42,7 +42,7 @@ class ArrayParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new ArrayParser([])
+const parser = new ArrayParser()
 
 module.exports = {
     allTokens: allTokens,

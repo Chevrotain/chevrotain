@@ -58,9 +58,9 @@
 
     // ----------------- parser -----------------
 
-    function JsonParser(input) {
+    function JsonParser() {
         // invoke super constructor
-        Parser.call(this, input, allTokens)
+        Parser.call(this, allTokens)
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
         const $ = this
@@ -129,7 +129,7 @@
     // ----------------- wrapping it all together -----------------
 
     // reuse the same parser instance.
-    const parser = new JsonParser([])
+    const parser = new JsonParser()
 
     return {
         parse: function(text) {

@@ -35,9 +35,8 @@ const allTokens = [
 const backtrackingLexer = new Lexer(allTokens)
 
 class BackTrackingParser extends Parser {
-    constructor(input = []) {
+    constructor() {
         super(
-            input,
             allTokens,
             // We have to tell Chevrotain to ignore the ambiguity in the statement rule
             // As Chevrotain is unable to "understand" we are using a GATE to resolve the ambiguity (at design time).
@@ -107,7 +106,7 @@ class BackTrackingParser extends Parser {
 }
 
 // reuse the same parser instance.
-const parser = new BackTrackingParser([])
+const parser = new BackTrackingParser()
 
 module.exports = function(text) {
     const lexResult = backtrackingLexer.tokenize(text)

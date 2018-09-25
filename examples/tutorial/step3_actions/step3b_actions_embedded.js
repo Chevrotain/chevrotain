@@ -25,9 +25,8 @@ const Comma = tokenVocabulary.Comma
 
 // ----------------- parser -----------------
 class SelectParserEmbedded extends Parser {
-    constructor(input) {
+    constructor() {
         super(
-            input,
             tokenVocabulary,
             // we have to explicitly disable the CST building for embedded actions to work.
             { outputCst: false }
@@ -138,7 +137,7 @@ class SelectParserEmbedded extends Parser {
 }
 
 // We only ever need one as the parser internal state is reset for each new input.
-const parserInstance = new SelectParserEmbedded([])
+const parserInstance = new SelectParserEmbedded()
 
 module.exports = {
     toAst: function(inputText) {

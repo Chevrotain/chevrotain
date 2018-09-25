@@ -56,9 +56,9 @@
 
     // ----------------- parser -----------------
 
-    function JsonParserToMinifiy(input) {
+    function JsonParserToMinifiy() {
         // invoke super constructor
-        Parser.call(this, input, allTokens)
+        Parser.call(this, allTokens)
 
         // not mandatory, using <$> (or any other sign) to reduce verbosity (this. this. this. this. .......)
         var $ = this
@@ -127,7 +127,7 @@
     // ----------------- wrapping it all together -----------------
 
     // reuse the same parser instance.
-    var parser = new JsonParserToMinifiy([])
+    var parser = new JsonParserToMinifiy()
 
     function parseJson(text) {
         var lexResult = JsonLexer.tokenize(text)

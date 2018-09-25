@@ -253,8 +253,8 @@ class CssParser extends Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) {
-        super(input, cssTokens, {
+    constructor() {
+        super(cssTokens, {
             ignoredIssues: {
                 selector: { OR: true }
             }
@@ -615,7 +615,7 @@ class CssParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new CssParser([])
+const parser = new CssParser()
 
 module.exports = {
     parseCss: function(text) {

@@ -47,8 +47,8 @@ const HelloLexer = new Lexer(allTokens)
 
 // ----------------- parser -----------------
 class HelloParser extends Parser {
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         const $ = this
 
@@ -102,7 +102,7 @@ class HelloParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new HelloParser([])
+const parser = new HelloParser()
 
 module.exports = function(text, mood) {
     const lexResult = HelloLexer.tokenize(text)

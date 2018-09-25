@@ -22,8 +22,8 @@ const CsvLexer = new Lexer(allTokens)
 
 // Parser
 class CsvParser extends Parser {
-    constructor(input) {
-        super(input, allTokens)
+    constructor() {
+        super(allTokens)
 
         // not mandatory, using $ (or any other sign) to reduce verbosity
         const $ = this

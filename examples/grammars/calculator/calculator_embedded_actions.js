@@ -86,9 +86,8 @@ class Calculator extends Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) {
+    constructor() {
         super(
-            input,
             allTokens,
             // by default a CST (Parse Tree) would be constructed
             // We must disable this feature to use embedded actions.
@@ -190,7 +189,7 @@ class Calculator extends Parser {
 }
 
 // reuse the same parser instance.
-const parser = new Calculator([])
+const parser = new Calculator()
 
 // wrapping it all together
 module.exports = function(text) {

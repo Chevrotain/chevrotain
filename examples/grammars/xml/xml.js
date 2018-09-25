@@ -148,9 +148,8 @@ class XmlParser extends Parser {
     // so the parsing rules are defined inside the constructor, as each parsing rule must be initialized by
     // invoking RULE(...)
     // see: https://github.com/jeffmo/es-class-fields-and-static-properties
-    constructor(input) {
+    constructor() {
         super(
-            input,
             allTokens,
             // by default the error recovery / fault tolerance capabilities are disabled
             // use this flag to enable them
@@ -267,7 +266,7 @@ class XmlParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new XmlParser([])
+const parser = new XmlParser()
 
 module.exports = function(text) {
     const lexResult = XmlLexer.tokenize(text)

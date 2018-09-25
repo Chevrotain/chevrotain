@@ -60,7 +60,7 @@ const myErrorProvider = {
 // ----------------- parser -----------------
 class CustomErrorsParser extends Parser {
     constructor(input) {
-        super(input, allTokens, {
+        super(allTokens, {
             // passing our custom error message provider
             errorMessageProvider: myErrorProvider
         })
@@ -119,7 +119,7 @@ class CustomErrorsParser extends Parser {
 // ----------------- wrapping it all together -----------------
 
 // reuse the same parser instance.
-const parser = new CustomErrorsParser([])
+const parser = new CustomErrorsParser()
 
 function parseStartingWithRule(ruleName) {
     return function(text) {
