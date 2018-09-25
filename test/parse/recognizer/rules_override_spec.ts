@@ -20,7 +20,8 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
                 input: IToken[] = [],
                 isInvokedByChildConstructor = false
             ) {
-                super(input, <any>[PlusTok, MinusTok], { outputCst: false })
+                super(<any>[PlusTok, MinusTok], { outputCst: false })
+                this.input = input
 
                 // performSelfAnalysis should only be invoked once.
                 if (!isInvokedByChildConstructor) {
@@ -75,7 +76,7 @@ describe("The Recognizer's capabilities for overriding grammar productions", () 
     it("Can not override a rule which does not exist", () => {
         class InvalidOverrideParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(input, [PlusTok, MinusTok])
+                super([PlusTok, MinusTok])
                 this.performSelfAnalysis()
             }
 

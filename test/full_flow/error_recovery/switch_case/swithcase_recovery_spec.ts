@@ -58,7 +58,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(RCurlyTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(0)
         expect(parser.isAtEndOfInput()).to.equal(true)
@@ -104,7 +106,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(RCurlyTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.switchStmt()
         expect(parser.isAtEndOfInput()).to.equal(true)
 
@@ -133,7 +137,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(RCurlyTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.errors[0]).to.be.an.instanceof(EarlyExitException)
@@ -180,7 +186,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(RCurlyTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.isAtEndOfInput()).to.equal(true)
@@ -227,7 +235,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(RCurlyTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.isAtEndOfInput()).to.equal(true)
@@ -277,7 +287,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(RCurlyTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.switchStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.isAtEndOfInput()).to.equal(true)
@@ -298,7 +310,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(SemiColonTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.caseStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)
@@ -316,7 +330,9 @@ describe("Error Recovery switch-case Example", () => {
             createRegularToken(SemiColonTok)
         ]
 
-        let parser = new SwitchCaseRecoveryParser(input)
+        let parser = new SwitchCaseRecoveryParser()
+        parser.input = input
+
         let parseResult = parser.caseStmt()
         expect(parser.errors.length).to.equal(1)
         expect(parser.errors[0]).to.be.an.instanceof(MismatchedTokenException)

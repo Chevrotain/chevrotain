@@ -22,10 +22,7 @@ export declare class Parser {
      *
      * @param tokenVocabulary - A data structure containing all the Tokens used by the Parser.
      */
-    constructor(
-        tokenVocabulary: TokenVocabulary,
-        config?: IParserConfig
-    )
+    constructor(tokenVocabulary: TokenVocabulary, config?: IParserConfig)
 
     errors: IRecognitionException[]
 

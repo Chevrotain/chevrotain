@@ -38,7 +38,8 @@ function defineRecognizerSpecs(
                     private index = 1
 
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, { outputCst: false })
+                        super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -75,7 +76,8 @@ function defineRecognizerSpecs(
                     private letters = ""
 
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, { outputCst: false })
+                        super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -128,7 +130,8 @@ function defineRecognizerSpecs(
             describe("supports EMPTY(...) alternative convenience function", () => {
                 class EmptyAltParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, { outputCst: false })
+                        super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -188,7 +191,8 @@ function defineRecognizerSpecs(
 
                 class CategoriesParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [Keyword, Literal], {})
+                        super([Keyword, Literal], {})
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -219,10 +223,11 @@ function defineRecognizerSpecs(
                     input: IToken[] = [],
                     isErrorRecoveryEnabled = true
                 ) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: false,
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -256,10 +261,11 @@ function defineRecognizerSpecs(
                     input: IToken[] = [],
                     isErrorRecoveryEnabled = true
                 ) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: false,
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -292,10 +298,11 @@ function defineRecognizerSpecs(
 
             class ManySepSubRuleRepetitionRecovery extends Parser {
                 constructor(input: IToken[] = []) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: false,
                         recoveryEnabled: true
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -339,10 +346,11 @@ function defineRecognizerSpecs(
                     input: IToken[] = [],
                     isErrorRecoveryEnabled = true
                 ) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: false,
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -377,10 +385,11 @@ function defineRecognizerSpecs(
                     input: IToken[] = [],
                     isErrorRecoveryEnabled = true
                 ) {
-                    super(input, ALL_TOKENS, {
+                    super(ALL_TOKENS, {
                         outputCst: false,
                         recoveryEnabled: isErrorRecoveryEnabled
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -409,7 +418,7 @@ function defineRecognizerSpecs(
             }
 
             it("can CONSUME tokens with an index specifying the occurrence for the specific token in the current rule", () => {
-                let parser: any = new Parser([], ALL_TOKENS, {
+                let parser: any = new Parser(ALL_TOKENS, {
                     outputCst: false,
                     recoveryEnabled: true
                 })
@@ -585,10 +594,11 @@ function defineRecognizerSpecs(
 
                 class SingleTokenInsertRegular extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, allTokens, {
+                        super(allTokens, {
                             outputCst: false,
                             recoveryEnabled: true
                         })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -620,7 +630,8 @@ function defineRecognizerSpecs(
             it("OR will return the chosen alternative's grammar action's returned value", () => {
                 class OrExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, { outputCst: false })
+                        super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -654,7 +665,8 @@ function defineRecognizerSpecs(
             it("OPTION will return the grammar action value or undefined if the option was not taken", () => {
                 class OptionExpressionParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, { outputCst: false })
+                        super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -678,13 +690,13 @@ function defineRecognizerSpecs(
 
         describe("The BaseRecognizer", () => {
             it("can be initialized without supplying an input vector", () => {
-                let parser = new Parser([], [])
+                let parser = new Parser([])
                 expect(parser.input).to.deep.equal([])
                 expect(parser.input).to.be.an.instanceof(Array)
             })
 
             it("can only SAVE_ERROR for recognition exceptions", () => {
-                let parser: any = new Parser([], [])
+                let parser: any = new Parser([])
                 expect(() =>
                     parser.SAVE_ERROR(new Error("I am some random Error"))
                 ).to.throw(
@@ -694,14 +706,14 @@ function defineRecognizerSpecs(
             })
 
             it("when it runs out of input EOF will be returned", () => {
-                let parser: any = new Parser(
-                    [
-                        createTokenInstance(IntTok, "1"),
-                        createTokenInstance(PlusTok)
-                    ],
-                    [IntTok, PlusTok],
-                    { outputCst: false }
-                )
+                let parser: any = new Parser([IntTok, PlusTok], {
+                    outputCst: false
+                })
+                parser.input = [
+                    createTokenInstance(IntTok, "1"),
+                    createTokenInstance(PlusTok)
+                ]
+
                 parser.CONSUME(IntTok)
                 parser.CONSUME(PlusTok)
                 expect(tokenMatcher(parser.LA(1), EOF))
@@ -717,7 +729,8 @@ function defineRecognizerSpecs(
                     constructor(
                         input: IToken[] = [createTokenInstance(IntTok, "666")]
                     ) {
-                        super(input, ALL_TOKENS, { outputCst: false })
+                        super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -753,7 +766,7 @@ function defineRecognizerSpecs(
             })
 
             it("will return false if a RecognitionException is thrown during backtracking and rethrow any other kind of Exception", () => {
-                let parser: any = new Parser([], [])
+                let parser: any = new Parser([])
                 let backTrackingThrows = parser.BACKTRACK(
                     () => {
                         throw new Error("division by zero, boom")
@@ -786,7 +799,8 @@ function defineRecognizerSpecs(
             it("Will throw an error is performSelfAnalysis is called before all the rules have been defined", () => {
                 class WrongOrderOfSelfAnalysisParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS)
+                        super(ALL_TOKENS)
+                        this.input = input
 
                         this.RULE("goodRule", () => {
                             this.CONSUME(IntTok)
@@ -808,7 +822,9 @@ function defineRecognizerSpecs(
                 before(() => {
                     class MyNoneUniqueSpecialParser extends Parser {
                         constructor(input: IToken[] = []) {
-                            super(input, ALL_TOKENS)
+                            super(ALL_TOKENS)
+                            this.input = input
+
                             this.performSelfAnalysis()
                         }
                     }
@@ -818,7 +834,7 @@ function defineRecognizerSpecs(
             })
 
             it("can be initialized with a vector of Tokens", () => {
-                let parser: any = new Parser([], [PlusTok, MinusTok, IntTok])
+                let parser: any = new Parser([PlusTok, MinusTok, IntTok])
                 let tokensMap = (<any>parser).tokensMap
                 expect(tokensMap.PlusTok).to.equal(PlusTok)
                 expect(tokensMap.MinusTok).to.equal(MinusTok)
@@ -831,7 +847,7 @@ function defineRecognizerSpecs(
                     MinusTok: MinusTok,
                     IntToken: IntTok
                 }
-                let parser: any = new Parser([], {
+                let parser: any = new Parser({
                     PlusTok: PlusTok,
                     MinusTok: MinusTok,
                     IntToken: IntTok
@@ -852,7 +868,7 @@ function defineRecognizerSpecs(
                     },
                     defaultMode: "bisli"
                 }
-                let parser: any = new Parser([], multiModeLexerDef)
+                let parser: any = new Parser(multiModeLexerDef)
                 let tokensMap = (<any>parser).tokensMap
                 // the implementation should clone the dictionary to avoid bugs caused by mutability
                 expect(tokensMap).not.to.equal(multiModeLexerDef)
@@ -863,24 +879,25 @@ function defineRecognizerSpecs(
 
             it("cannot be initialized with other parameters", () => {
                 expect(() => {
-                    return new Parser([], null)
+                    return new Parser(null)
                 }).to.throw()
 
                 expect(() => {
-                    return new Parser([], <any>666)
+                    return new Parser(<any>666)
                 }).to.throw()
 
                 expect(() => {
-                    return new Parser([], <any>"woof woof")
+                    return new Parser(<any>"woof woof")
                 }).to.throw()
             })
 
             it("will not swallow none Recognizer errors when attempting 'in rule error recovery'", () => {
                 class NotSwallowInRuleParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, {
+                        super(ALL_TOKENS, {
                             recoveryEnabled: true
                         })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -900,9 +917,10 @@ function defineRecognizerSpecs(
             it("will not swallow none Recognizer errors during Token consumption", () => {
                 class NotSwallowInTokenConsumption extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, {
+                        super(ALL_TOKENS, {
                             recoveryEnabled: true
                         })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -922,9 +940,11 @@ function defineRecognizerSpecs(
             it("will rethrow none Recognizer errors during Token consumption - recovery disabled + nested rule", () => {
                 class RethrowOtherErrors extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, ALL_TOKENS, {
+                        super(ALL_TOKENS, {
                             recoveryEnabled: true
                         })
+                        this.input = input
+
                         this.performSelfAnalysis()
                     }
 
@@ -954,7 +974,8 @@ function defineRecognizerSpecs(
             it("Will use Token LABELS for mismatch error messages when available", () => {
                 class LabelTokParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super([PlusTok, MinusTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -975,7 +996,8 @@ function defineRecognizerSpecs(
             it("Will not use Token LABELS for mismatch error messages when unavailable", () => {
                 class NoLabelTokParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super([PlusTok, MinusTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1003,7 +1025,8 @@ function defineRecognizerSpecs(
 
                 class CustomConsumeErrorParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [SemiColon])
+                        super([SemiColon])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1032,7 +1055,8 @@ function defineRecognizerSpecs(
             it("Will use Token LABELS for noViableAlt error messages when unavailable", () => {
                 class LabelAltParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super([PlusTok, MinusTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1068,9 +1092,10 @@ function defineRecognizerSpecs(
             it("Will use Token LABELS for noViableAlt error messages when unavailable - nestedRuleNames", () => {
                 class LabelAltParserNested extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok], {
+                        super([PlusTok, MinusTok], {
                             outputCst: true
                         })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1109,7 +1134,8 @@ function defineRecognizerSpecs(
             it("Supports custom error messages for OR", () => {
                 class LabelAltParser2 extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok], { outputCst: false })
+                        super([PlusTok, MinusTok], { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1146,7 +1172,8 @@ function defineRecognizerSpecs(
             it("Will include the ruleStack in a recognition Exception", () => {
                 class NestedRulesParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super([PlusTok, MinusTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1191,7 +1218,8 @@ function defineRecognizerSpecs(
             it("Will build an error message for AT_LEAST_ONE automatically", () => {
                 class ImplicitAtLeastOneErrParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super([PlusTok, MinusTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1238,7 +1266,8 @@ function defineRecognizerSpecs(
             it("supports custom error messages for AT_LEAST_ONE", () => {
                 class ExplicitAtLeastOneErrParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok])
+                        super([PlusTok, MinusTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1283,7 +1312,8 @@ function defineRecognizerSpecs(
             it("Will build an error message for AT_LEAST_ONE_SEP automatically", () => {
                 class ImplicitAtLeastOneSepErrParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok, IdentTok])
+                        super([PlusTok, MinusTok, IdentTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1336,7 +1366,8 @@ function defineRecognizerSpecs(
             it("can serialize a Grammar's Structure", () => {
                 class SomeParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok, IdentTok])
+                        super([PlusTok, MinusTok, IdentTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1377,9 +1408,10 @@ function defineRecognizerSpecs(
                 let serializedGrammar = null
                 class SerializingParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok, IdentTok], {
+                        super([PlusTok, MinusTok, IdentTok], {
                             serializedGrammar
                         })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1446,7 +1478,8 @@ function defineRecognizerSpecs(
             it("can provide syntactic content assist suggestions", () => {
                 class ContentAssistParser extends Parser {
                     constructor(input: IToken[] = []) {
-                        super(input, [PlusTok, MinusTok, IdentTok])
+                        super([PlusTok, MinusTok, IdentTok])
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 

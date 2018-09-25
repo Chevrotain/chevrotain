@@ -413,7 +413,7 @@ describe("getProdType", () => {
 context("lookahead specs", () => {
     class ColonParserMock extends Parser {
         constructor() {
-            super([], [ColonTok])
+            super([ColonTok])
         }
 
         LA(): IToken {
@@ -423,7 +423,7 @@ context("lookahead specs", () => {
 
     class IdentParserMock extends Parser {
         constructor() {
-            super([], [IdentTok])
+            super([IdentTok])
         }
 
         LA(): IToken {
@@ -433,7 +433,7 @@ context("lookahead specs", () => {
 
     class CommaParserMock extends Parser {
         constructor() {
-            super([], [CommaTok])
+            super([CommaTok])
         }
 
         LA(): IToken {
@@ -443,7 +443,7 @@ context("lookahead specs", () => {
 
     class EntityParserMock extends Parser {
         constructor() {
-            super([], [EntityTok])
+            super([EntityTok])
         }
 
         LA(): IToken {
@@ -453,7 +453,7 @@ context("lookahead specs", () => {
 
     class KeyParserMock extends Parser {
         constructor() {
-            super([], [KeyTok])
+            super([KeyTok])
         }
 
         LA(): IToken {

@@ -23,9 +23,9 @@ context("CST", () => {
     it("Can output a CST for a flat structure", () => {
         class CstTerminalParser extends Parser {
             constructor(input: IToken[] = []) {
-                super(ALL_TOKENS, {
-                    outputCst: true
-                })
+                super(ALL_TOKENS)
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -62,6 +62,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -103,6 +105,7 @@ context("CST", () => {
                     outputCst: true,
                     recoveryEnabled: true
                 })
+                this.input = input
                 this.performSelfAnalysis()
             }
 
@@ -135,6 +138,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -174,6 +179,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -204,6 +211,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -235,6 +244,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -284,6 +295,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -336,6 +349,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -370,6 +385,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -409,6 +426,8 @@ context("CST", () => {
                 super(ALL_TOKENS, {
                     outputCst: true
                 })
+                this.input = input
+
                 this.performSelfAnalysis()
             }
 
@@ -449,6 +468,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -514,6 +535,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -557,6 +580,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -602,6 +627,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -639,6 +666,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -710,6 +739,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -749,6 +780,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -789,6 +822,8 @@ context("CST", () => {
                     super(ALL_TOKENS, {
                         outputCst: true
                     })
+                    this.input = input
+
                     this.performSelfAnalysis()
                 }
 
@@ -836,6 +871,7 @@ context("CST", () => {
                         outputCst: true,
                         recoveryEnabled: true
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -914,6 +950,7 @@ context("CST", () => {
                         outputCst: true,
                         recoveryEnabled: true
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 

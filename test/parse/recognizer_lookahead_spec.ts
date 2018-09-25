@@ -50,6 +50,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -140,6 +141,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -284,6 +286,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -466,6 +469,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -582,6 +586,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -737,6 +742,7 @@ function defineLookaheadSpecs(
 
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -945,6 +951,7 @@ function defineLookaheadSpecs(
                 class OrAmbiguityLookAheadParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -992,6 +999,7 @@ function defineLookaheadSpecs(
                 class OrAmbiguityMultiTokenLookAheadParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1058,6 +1066,7 @@ function defineLookaheadSpecs(
                             }
                         }
                     })
+                    this.input = input
                     this.performSelfAnalysis()
                 }
 
@@ -1264,6 +1273,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForOptionParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1301,6 +1311,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForManyParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1351,6 +1362,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForManySepParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1408,6 +1420,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForOrParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1474,6 +1487,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForAtLeastOneParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 
@@ -1540,6 +1554,7 @@ function defineLookaheadSpecs(
                 class MultiTokenLookAheadForAtLeastOneSepParser extends Parser {
                     constructor(input: IToken[] = []) {
                         super(ALL_TOKENS, { outputCst: false })
+                        this.input = input
                         this.performSelfAnalysis()
                     }
 

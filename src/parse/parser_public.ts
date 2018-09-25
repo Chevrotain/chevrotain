@@ -454,7 +454,7 @@ export class Parser {
             this.tokensMap = cloneObj(tokenVocabulary)
         } else {
             throw new Error(
-                "<tokensDictionary> argument must be An Array of Token constructors" +
+                "<tokensDictionary> argument must be An Array of Token constructors," +
                     " A dictionary of Token constructors or an IMultiModeLexerDefinition"
             )
         }
