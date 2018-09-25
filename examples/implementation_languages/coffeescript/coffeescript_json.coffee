@@ -18,7 +18,7 @@ JsonLexer = new Lexer allTokens
 
 class JsonParserCoffeeScript extends Parser
   constructor: () ->
-    super input, allTokens
+    super allTokens
 
     @RULE 'json', ->
       @OR [
