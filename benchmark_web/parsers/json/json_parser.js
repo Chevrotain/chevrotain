@@ -55,8 +55,9 @@ var lexer = new ChevrotainLexer(jsonTokens, {
 // (Do not create a new Parser instance for each new input.)
 var ChevrotainParser = chevrotain.Parser
 
-function parser(input, options) {
-    ChevrotainParser.call(this, input, jsonTokens, options)
+function parser(options) {
+    ChevrotainParser.call(this, jsonTokens, options)
+
     const $ = this
 
     $.RULE("json", function() {

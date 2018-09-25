@@ -18,9 +18,8 @@ class ECMAScript5Parser extends Parser {
         this._orgText = newText
     }
 
-    constructor(input, config) {
+    constructor(config) {
         super(
-            input,
             tokens,
             Object.assign({}, config, {
                 ignoredIssues: {
