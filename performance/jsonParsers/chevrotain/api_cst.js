@@ -9,7 +9,7 @@ function parse(text) {
     // It is recommended to only initialize a Chevrotain Parser once
     // and reset it's state instead of re-initializing it
     if (chevrotainJsonParserInstance === undefined) {
-        chevrotainJsonParserInstance = new ChevrotainJsonParser([], {outputCst:true})
+        chevrotainJsonParserInstance = new ChevrotainJsonParser({outputCst:true})
     }
 
     // setting a new input will RESET the parser instance's state.

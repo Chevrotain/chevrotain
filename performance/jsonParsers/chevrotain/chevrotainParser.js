@@ -29,8 +29,8 @@ var ChevJsonLexer = new ChevrotainLexer(jsonTokens, {positionTracking: "onlyOffs
 // (Do not create a new Parser instance for each new input.)
 var ChevrotainParser = chevrotain.Parser;
 
-function ChevrotainJsonParser(input, options) {
-    ChevrotainParser.call(this, input, jsonTokens, options);
+function ChevrotainJsonParser(options) {
+    ChevrotainParser.call(this, jsonTokens, options);
     const $ = this;
 
     $.RULE("json", function () {
