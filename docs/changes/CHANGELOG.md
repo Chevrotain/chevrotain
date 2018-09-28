@@ -1,4 +1,4 @@
-## X.Y.Z (INSERT_DATE_HERE)
+## 4.1.0 (9-28-2018)
 
 #### Minor Changes
 
