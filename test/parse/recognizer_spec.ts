@@ -441,7 +441,7 @@ function defineRecognizerSpecs(
             })
 
             it("will not perform inRepetition recovery while in backtracking mode", () => {
-                let parser: any = new Parser([], {})
+                let parser: any = new Parser([PlusTok], {})
                 parser.isBackTrackingStack.push(1)
                 expect(
                     parser.shouldInRepetitionRecoveryBeTried(MinusTok, 1)
@@ -689,14 +689,22 @@ function defineRecognizerSpecs(
         })
 
         describe("The BaseRecognizer", () => {
-            it("can be initialized without supplying an input vector", () => {
-                let parser = new Parser([])
-                expect(parser.input).to.deep.equal([])
-                expect(parser.input).to.be.an.instanceof(Array)
+            it("Cannot be initialized with a token vector (pre v4.0 API) ", () => {
+                expect(
+                    () => new Parser([createTokenInstance(PlusTok)])
+                ).to.throw(
+                    "The Parser constructor no longer accepts a token vector as the first argument"
+                )
+            })
+
+            it("Cannot be initialized with an empty Token vocabulary", () => {
+                expect(() => new Parser([])).to.throw(
+                    "A Token Vocabulary cannot be empty"
+                )
             })
 
             it("can only SAVE_ERROR for recognition exceptions", () => {
-                let parser: any = new Parser([])
+                let parser: any = new Parser([IntTok])
                 expect(() =>
                     parser.SAVE_ERROR(new Error("I am some random Error"))
                 ).to.throw(
@@ -766,7 +774,7 @@ function defineRecognizerSpecs(
             })
 
             it("will return false if a RecognitionException is thrown during backtracking and rethrow any other kind of Exception", () => {
-                let parser: any = new Parser([])
+                let parser: any = new Parser([IntTok])
                 let backTrackingThrows = parser.BACKTRACK(
                     () => {
                         throw new Error("division by zero, boom")

@@ -361,6 +361,27 @@ export class Parser {
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
+        if (isArray(tokenVocabulary)) {
+            // This only checks for Token vocabularies provided as arrays.
+            // That is good enough because the main objective is to detect users of pre-V4.0 APIs
+            // rather than all edge cases of empty Token vocabularies.
+            if (isEmpty(tokenVocabulary as any[])) {
+                throw Error(
+                    "A Token Vocabulary cannot be empty.\n" +
+                        "\tNote that the first argument for the parser constructor\n" +
+                        "\tis no longer a Token vector (since v4.0)."
+                )
+            }
+
+            if (typeof (tokenVocabulary as any[])[0].startOffset === "number") {
+                throw Error(
+                    "The Parser constructor no longer accepts a token vector as the first argument.\n" +
+                        "\tSee: http://sap.github.io/chevrotain/docs/changes/BREAKING_CHANGES.html#_4-0-0\n" +
+                        "\tFor Further details."
+                )
+            }
+        }
+
         // configuration
         this.recoveryEnabled = has(config, "recoveryEnabled")
             ? config.recoveryEnabled

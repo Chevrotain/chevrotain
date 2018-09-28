@@ -1,3 +1,9 @@
+## X.Y.Z (INSERT_DATE_HERE)
+
+#### Minor Changes
+
+-   [Runtime check for removed Token vector argument in Parser constructor.](https://github.com/SAP/chevrotain/issues/825)
+
 ## 4.0.0 (9-26-2018)
 
 #### Breaking Changes
