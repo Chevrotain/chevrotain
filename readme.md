@@ -5,7 +5,6 @@
 [![Dependency status](https://img.shields.io/david/SAP/chevrotain.svg)](https://david-dm.org/SAP/chevrotain)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Greenkeeper badge](https://badges.greenkeeper.io/SAP/chevrotain.svg)](https://greenkeeper.io/)
-[![Sauce Test Status](https://saucelabs.com/browser-matrix/shahars.svg)](https://saucelabs.com/u/shahars)
 
 # Chevrotain
 
@@ -61,11 +60,7 @@ This dependency is included in the bundled artifacts, for ease of consumption in
 ## Compatibility
 
 Chevrotain runs on any modern JavaScript ES5.1 runtime.
-
--   The CI build runs the tests under:
-
-    -   Node.js (6 / 8 / 10).
-    -   Latest stable: Chrome, FireFox, Safari, IE Edge and IE 11.
+That includes any modern nodejs version, modern browsers and even IE11.
 
 -   Uses [UMD](https://github.com/umdjs/umd) to work with common module loaders (browser global / amd / commonjs).
 

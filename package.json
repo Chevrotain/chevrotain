@@ -46,7 +46,6 @@
     "scripts": {
         "---------- CI FLOWS --------": "",
         "ci_full_build": "npm-run-all clean lint verify_format compile dts compile_def coverage check_coverage docs bundle integration_tests",
-        "ci_browser_tests": "npm-run-all clean compile bundle karma",
         "ci_full_build_coveralls": "npm-run-all ci_full_build coveralls",
         "dev_unit_tests": "npm-run-all clean compile unit_tests",
         "dev_integration_tests": "npm-run-all clean quick_build dts integration_tests",
