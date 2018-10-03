@@ -17,5 +17,6 @@ fixedApiString = fixedApiString.replace(
     "protected static"
 )
 
-const apiLibPath = path.resolve(__dirname, "../lib/chevrotain.d.ts")
-fs.writeFileSync(apiLibPath, fixedApiString)
+const apiDirPath = path.resolve(__dirname, "../lib")
+fs.ensureDirSync(apiDirPath)
+fs.writeFileSync(apiDirPath + "/chevrotain.d.ts", fixedApiString)

@@ -6,3 +6,4 @@ examples/implementation_languages/typescript/typescript_json.js
 examples/implementation_languages/coffeescript/coffeescript_json.js
 /docs/.vuepress/dist
 **/node_modules/
+/examples/parser/webpack/lib
