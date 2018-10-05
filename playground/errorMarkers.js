@@ -215,29 +215,26 @@ function getParserErrorStartStopPos(parseErr, parserImplText, gAstProductions, p
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_PRODUCTIONS:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
             return locateProduction(parserImplText, ruleText, parseErr.dslName, parseErr.occurrence, positionHelper, parseErr.parameter)
-            break
         case chevrotain.ParserDefinitionErrorType.DUPLICATE_RULE_NAME:
         case chevrotain.ParserDefinitionErrorType.INVALID_RULE_NAME:
             return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
-            break
         case chevrotain.ParserDefinitionErrorType.UNRESOLVED_SUBRULE_REF:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
             //noinspection JSUnresolvedVariable
             return locateSubruleRef(parserImplText, parseErr.unresolvedRefName, positionHelper, ruleText)
-            break
         case chevrotain.ParserDefinitionErrorType.LEFT_RECURSION:
             return locateRuleDefinition(parseErr.ruleName, parserImplText, positionHelper)
-            break
         case chevrotain.ParserDefinitionErrorType.NONE_LAST_EMPTY_ALT:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
             return locateProduction(parserImplText, ruleText, "OR", parseErr.occurrence, positionHelper)
-            break
         case chevrotain.ParserDefinitionErrorType.AMBIGUOUS_ALTS:
             ruleText = gAstProductions.get(parseErr.ruleName).orgText
             return locateProduction(parserImplText, ruleText, "OR", parseErr.occurrence, positionHelper)
-            break
-        default:
-            throw Error("unknown parser error type ->" + parseErr.type + "<-")
+        default: {
+            console.log("unknown parser error type ->" + parseErr.type + "<-")
+            return []
+        }
+
     }
 }
 
