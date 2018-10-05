@@ -83,8 +83,8 @@ function jsonExample() {
     const Parser = chevrotain.Parser;
 
     class JsonParser extends Parser {
-        constructor(input) {
-            super(input, jsonTokens, {recoveryEnabled: true})
+        constructor() {
+            super(jsonTokens, {recoveryEnabled: true, outputCst: false})
 
             const $ = this;
 
@@ -229,20 +229,17 @@ function jsonGrammarOnlyExample() {
     const Parser = chevrotain.Parser;
 
     class JsonParser extends Parser {
-        constructor(input) {
-            super(input, jsonTokens, {
-                recoveryEnabled: true,
-                // This will automatically create a Concrete Syntax Tree
-                // You can inspect this structure in the output window.
-                outputCst: true
+        constructor() {
+            super(jsonTokens, {
+                recoveryEnabled: true
             })
 
             const $ = this;
 
             $.RULE("json", () => {
                 $.OR([
-                    {ALT: () => { $.SUBRULE($.object) }},
-                    {ALT: () => { $.SUBRULE($.array) }}
+                    {ALT: () => $.SUBRULE($.object)},
+                    {ALT: () => $.SUBRULE($.array)}
                 ]);
             });
 
@@ -277,13 +274,13 @@ function jsonGrammarOnlyExample() {
 
             $.RULE("value", () => {
                 $.OR([
-                    {ALT: () => { $.CONSUME(StringLiteral) }},
-                    {ALT: () => { $.CONSUME(NumberLiteral) }},
-                    {ALT: () => { $.SUBRULE($.object) }},
-                    {ALT: () => { $.SUBRULE($.array) }},
-                    {ALT: () => { $.CONSUME(True) }},
-                    {ALT: () => { $.CONSUME(False) }},
-                    {ALT: () => { $.CONSUME(Null); }}
+                    {ALT: () => $.CONSUME(StringLiteral)},
+                    {ALT: () => $.CONSUME(NumberLiteral)},
+                    {ALT: () => $.SUBRULE($.object)},
+                    {ALT: () => $.SUBRULE($.array)},
+                    {ALT: () => $.CONSUME(True)},
+                    {ALT: () => $.CONSUME(False)},
+                    {ALT: () => $.CONSUME(Null)}
                 ]);
             });
 
@@ -463,8 +460,8 @@ function cssExample() {
     const Parser = chevrotain.Parser;
 
     class CssParser extends Parser {
-        constructor(input) {
-            super(input, cssTokens, {
+        constructor() {
+            super(cssTokens, {
                 recoveryEnabled: true,
                 maxLookahead: 3
             });
@@ -501,9 +498,9 @@ function cssExample() {
 
             $.RULE('contents', () => {
                 $.OR([
-                    {ALT: () => { $.SUBRULE($.ruleset)}},
-                    {ALT: () => { $.SUBRULE($.media)}},
-                    {ALT: () => { $.SUBRULE($.page)}}
+                    {ALT: () => $.SUBRULE($.ruleset)},
+                    {ALT: () => $.SUBRULE($.media)},
+                    {ALT: () => $.SUBRULE($.page)}
                 ]);
                 $.SUBRULE3($.cdcCdo)
             })
@@ -512,8 +509,8 @@ function cssExample() {
             $.RULE('cdcCdo', () => {
                 $.MANY(() => {
                     $.OR([
-                        {ALT: () => { $.CONSUME(Cdo)}},
-                        {ALT: () => { $.CONSUME(Cdc)}}
+                        {ALT: () => $.CONSUME(Cdo)},
+                        {ALT: () => $.CONSUME(Cdc)}
                     ]);
                 })
             })
@@ -523,8 +520,8 @@ function cssExample() {
             $.RULE('cssImport', () => {
                 $.CONSUME(ImportSym)
                 $.OR([
-                    {ALT: () => { $.CONSUME(StringLiteral)}},
-                    {ALT: () => { $.CONSUME(Uri)}}
+                    {ALT: () => $.CONSUME(StringLiteral)},
+                    {ALT: () => $.CONSUME(Uri)}
                 ]);
 
                 $.OPTION(() => {
@@ -594,24 +591,24 @@ function cssExample() {
             // '/' S* | ',' S*
             $.RULE('operator', () => {
                 $.OR([
-                    {ALT: () => { $.CONSUME(Slash)}},
-                    {ALT: () => { $.CONSUME(Comma)}}
+                    {ALT: () => $.CONSUME(Slash)},
+                    {ALT: () => $.CONSUME(Comma)}
                 ]);
             });
 
             // '+' S* | '>' S*
             $.RULE('combinator', () => {
                 $.OR([
-                    {ALT: () => { $.CONSUME(Plus)}},
-                    {ALT: () => { $.CONSUME(GreaterThan)}}
+                    {ALT: () => $.CONSUME(Plus)},
+                    {ALT: () => $.CONSUME(GreaterThan)}
                 ]);
             });
 
             // '-' | '+'
             $.RULE('unary_operator', () => {
                 $.OR([
-                    {ALT: () => { $.CONSUME(Minus)}},
-                    {ALT: () => { $.CONSUME(Plus)}}
+                    {ALT: () => $.CONSUME(Minus)},
+                    {ALT: () => $.CONSUME(Plus)}
                 ]);
             });
 
@@ -668,10 +665,10 @@ function cssExample() {
             // [ HASH | class | attrib | pseudo ]+
             $.RULE('simple_selector_suffix', () => {
                 $.OR([
-                    {ALT: () => { $.CONSUME(Hash) }},
-                    {ALT: () => { $.SUBRULE($.class) }},
-                    {ALT: () => { $.SUBRULE($.attrib) }},
-                    {ALT: () => { $.SUBRULE($.pseudo) }}
+                    {ALT: () => $.CONSUME(Hash)},
+                    {ALT: () => $.SUBRULE($.class)},
+                    {ALT: () => $.SUBRULE($.attrib)},
+                    {ALT: () => $.SUBRULE($.pseudo)}
                 ]);
             })
 
@@ -684,8 +681,8 @@ function cssExample() {
             // IDENT | '*'
             $.RULE('element_name', () => {
                 $.OR([
-                    {ALT: () => { $.CONSUME(Ident) }},
-                    {ALT: () => { $.CONSUME(Star) }}
+                    {ALT: () => $.CONSUME(Ident)},
+                    {ALT: () => $.CONSUME(Star)}
                 ]);
             });
 
@@ -696,14 +693,14 @@ function cssExample() {
 
                 this.OPTION(() => {
                     $.OR([
-                        {ALT: () => { $.CONSUME(Equals) }},
-                        {ALT: () => { $.CONSUME(Includes) }},
-                        {ALT: () => { $.CONSUME(Dasmatch) }}
+                        {ALT: () => $.CONSUME(Equals)},
+                        {ALT: () => $.CONSUME(Includes)},
+                        {ALT: () => $.CONSUME(Dasmatch)}
                     ]);
 
                     $.OR2([
-                        {ALT: () => { $.CONSUME2(Ident) }},
-                        {ALT: () => { $.CONSUME(StringLiteral) }}
+                        {ALT: () => $.CONSUME2(Ident)},
+                        {ALT: () => $.CONSUME(StringLiteral)}
                     ]);
                 })
                 $.CONSUME(RSquare)
@@ -763,19 +760,19 @@ function cssExample() {
                 })
 
                 $.OR([
-                    {ALT: () => { $.CONSUME(Num) }},
-                    {ALT: () => { $.CONSUME(Percentage) }},
-                    {ALT: () => { $.CONSUME(Length) }},
-                    {ALT: () => { $.CONSUME(Ems) }},
-                    {ALT: () => { $.CONSUME(Exs) }},
-                    {ALT: () => { $.CONSUME(Angle) }},
-                    {ALT: () => { $.CONSUME(Time) }},
-                    {ALT: () => { $.CONSUME(Freq) }},
-                    {ALT: () => { $.CONSUME(StringLiteral) }},
-                    {ALT: () => { $.CONSUME(Ident) }},
-                    {ALT: () => { $.CONSUME(Uri) }},
-                    {ALT: () => { $.SUBRULE($.hexcolor) }},
-                    {ALT: () => { $.SUBRULE($.cssFunction) }}
+                    {ALT: () => $.CONSUME(Num)},
+                    {ALT: () => $.CONSUME(Percentage)},
+                    {ALT: () => $.CONSUME(Length)},
+                    {ALT: () => $.CONSUME(Ems)},
+                    {ALT: () => $.CONSUME(Exs)},
+                    {ALT: () => $.CONSUME(Angle)},
+                    {ALT: () => $.CONSUME(Time)},
+                    {ALT: () => $.CONSUME(Freq)},
+                    {ALT: () => $.CONSUME(StringLiteral)},
+                    {ALT: () => $.CONSUME(Ident)},
+                    {ALT: () => $.CONSUME(Uri)},
+                    {ALT: () => $.SUBRULE($.hexcolor)},
+                    {ALT: () => $.SUBRULE($.cssFunction)}
                 ]);
             });
 
@@ -789,7 +786,6 @@ function cssExample() {
             $.RULE('hexcolor', () => {
                 $.CONSUME(Hash)
             });
-
 
             // very important to call this after all the rules have been setup.
             // otherwise the parser may not work correctly as it will lack information
@@ -846,122 +842,111 @@ function calculatorExample() {
     const CalculatorLexer = new Lexer(allTokens);
 
 
-    // ----------------- parser -----------------
-    function Calculator(input) {
-        // By default if {recoveryEnabled: true} is not passed in the config object
-        // error recovery / fault tolerance capabilities will be disabled
-        Parser.call(this, input, allTokens);
+    class Calculator extends Parser {
+        constructor() {
+            super(allTokens, {outputCst : false});
 
-        const $ = this;
+            const $ = this;
 
-        this.expression = $.RULE("expression", () => {
-            // uncomment the debugger statement and open dev tools in chrome/firefox
-            // to debug the parsing flow.
-            // debugger;
-            return $.SUBRULE($.additionExpression)
-        });
-
-
-        // Lowest precedence thus it is first in the rule chain
-        // The precedence of binary expressions is determined by
-        // how far down the Parse Tree the binary expression appears.
-        this.additionExpression = $.RULE("additionExpression", () => {
-            let value, op, rhsVal;
-
-            // parsing part
-            value = $.SUBRULE($.multiplicationExpression);
-            $.MANY(() => {
-                // consuming 'AdditionOperator' will consume
-                // either Plus or Minus as they are subclasses of AdditionOperator
-                op = $.CONSUME(AdditionOperator);
-                //  the index "2" in SUBRULE2 is needed to identify the unique
-                // position in the grammar during runtime
-                rhsVal = $.SUBRULE2($.multiplicationExpression);
-
-                // interpreter part
-                // tokenMatcher acts as ECMAScript instanceof operator
-                if (tokenMatcher(op, Plus)) {
-                    value += rhsVal
-                } else { // op "instanceof" Minus
-                    value -= rhsVal
-                }
+            $.RULE("expression", () => {
+                // uncomment the debugger statement and open dev tools in chrome/firefox
+                // to debug the parsing flow.
+                // debugger;
+                return $.SUBRULE($.additionExpression)
             });
 
-            return value
-        });
 
+            // Lowest precedence thus it is first in the rule chain
+            // The precedence of binary expressions is determined by
+            // how far down the Parse Tree the binary expression appears.
+            $.RULE("additionExpression", () => {
+                let value, op, rhsVal;
 
-        this.multiplicationExpression = $.RULE("multiplicationExpression", () => {
-            let value, op, rhsVal;
+                // parsing part
+                value = $.SUBRULE($.multiplicationExpression);
+                $.MANY(() => {
+                    // consuming 'AdditionOperator' will consume
+                    // either Plus or Minus as they are subclasses of AdditionOperator
+                    op = $.CONSUME(AdditionOperator);
+                    //  the index "2" in SUBRULE2 is needed to identify the unique
+                    // position in the grammar during runtime
+                    rhsVal = $.SUBRULE2($.multiplicationExpression);
 
-            // parsing part
-            value = $.SUBRULE($.atomicExpression);
-            $.MANY(() => {
-                op = $.CONSUME(MultiplicationOperator);
-                //  the index "2" in SUBRULE2 is needed to identify the unique
-                // position in the grammar during runtime
-                rhsVal = $.SUBRULE2($.atomicExpression);
+                    // interpreter part
+                    // tokenMatcher acts as ECMAScript instanceof operator
+                    if (tokenMatcher(op, Plus)) {
+                        value += rhsVal
+                    } else { // op "instanceof" Minus
+                        value -= rhsVal
+                    }
+                });
 
-                // interpreter part
-                // tokenMatcher acts as ECMAScript instanceof operator
-                if (tokenMatcher(op, Multi)) {
-                    value *= rhsVal
-                } else { // op instanceof Div
-                    value /= rhsVal
-                }
+                return value
             });
 
-            return value
-        });
+
+            $.RULE("multiplicationExpression", () => {
+                let value, op, rhsVal;
+
+                // parsing part
+                value = $.SUBRULE($.atomicExpression);
+                $.MANY(() => {
+                    op = $.CONSUME(MultiplicationOperator);
+                    //  the index "2" in SUBRULE2 is needed to identify the unique
+                    // position in the grammar during runtime
+                    rhsVal = $.SUBRULE2($.atomicExpression);
+
+                    // interpreter part
+                    // tokenMatcher acts as ECMAScript instanceof operator
+                    if (tokenMatcher(op, Multi)) {
+                        value *= rhsVal
+                    } else { // op instanceof Div
+                        value /= rhsVal
+                    }
+                });
+
+                return value
+            });
 
 
-        this.atomicExpression = $.RULE("atomicExpression", () => $.OR([
-            // parenthesisExpression has the highest precedence and thus it
-            // appears in the "lowest" leaf in the expression ParseTree.
-            {ALT: () => $.SUBRULE($.parenthesisExpression)},
-            {ALT: () => parseInt($.CONSUME(NumberLiteral).image, 10)},
-            {ALT: () => $.SUBRULE($.powerFunction)}
-        ]));
+            $.RULE("atomicExpression", () => $.OR([
+                // parenthesisExpression has the highest precedence and thus it
+                // appears in the "lowest" leaf in the expression ParseTree.
+                {ALT: () => $.SUBRULE($.parenthesisExpression)},
+                {ALT: () => parseInt($.CONSUME(NumberLiteral).image, 10)},
+                {ALT: () => $.SUBRULE($.powerFunction)}
+            ]));
 
 
-        this.parenthesisExpression = $.RULE("parenthesisExpression", () => {
-            let expValue;
+            $.RULE("parenthesisExpression", () => {
+                let expValue;
 
-            $.CONSUME(LParen);
-            expValue = $.SUBRULE($.expression);
-            $.CONSUME(RParen);
+                $.CONSUME(LParen);
+                expValue = $.SUBRULE($.expression);
+                $.CONSUME(RParen);
 
-            return expValue
-        });
+                return expValue
+            });
 
-        $.RULE("powerFunction", () => {
-            let base, exponent;
+            $.RULE("powerFunction", () => {
+                let base, exponent;
 
-            $.CONSUME(PowerFunc);
-            $.CONSUME(LParen);
-            base = $.SUBRULE($.expression);
-            $.CONSUME(Comma);
-            exponent = $.SUBRULE2($.expression);
-            $.CONSUME(RParen);
+                $.CONSUME(PowerFunc);
+                $.CONSUME(LParen);
+                base = $.SUBRULE($.expression);
+                $.CONSUME(Comma);
+                exponent = $.SUBRULE2($.expression);
+                $.CONSUME(RParen);
 
-            return Math.pow(base, exponent)
-        });
+                return Math.pow(base, exponent)
+            });
 
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        this.performSelfAnalysis();
+            // very important to call this after all the rules have been defined.
+            // otherwise the parser may not work correctly as it will lack information
+            // derived during the self analysis phase.
+            this.performSelfAnalysis();
+        }
     }
-
-    // avoids inserting number literals as these have a additional meaning.
-    // and we can never choose the "right meaning".
-    // For example: a Comma has just one meaning, but a Number may be any of:
-    // 1,2,3,...n, 0.4E+3 which value should we used when inserting... ?
-    Calculator.prototype.canTokenTypeBeInsertedInRecovery = tokClass => tokClass !== NumberLiteral;
-
-
-    Calculator.prototype = Object.create(Parser.prototype);
-    Calculator.prototype.constructor = Calculator;
 
     // for the playground to work the returned object must contain these fields
     return {
@@ -1017,73 +1002,70 @@ function calculatorExampleCst() {
         Plus, Minus, Multi, Div, LParen, RParen, NumberLiteral, AdditionOperator, MultiplicationOperator, PowerFunc, Comma];
     const CalculatorLexer = new Lexer(allTokens);
 
-
     // ----------------- parser -----------------
     // Note that this is a Pure grammar, it only describes the grammar
     // Not any actions (semantics) to perform during parsing.
-    function CalculatorPure(input) {
-        Parser.call(this, input, allTokens, {outputCst: true});
+    class CalculatorPure extends Parser {
+        constructor() {
+            super(allTokens);
 
-        const $ = this;
+            const $ = this;
 
-        $.RULE("expression", () => {
-            $.SUBRULE($.additionExpression)
-        });
-
-        //  lowest precedence thus it is first in the rule chain
-        // The precedence of binary expressions is determined by how far down the Parse Tree
-        // The binary expression appears.
-        $.RULE("additionExpression", () => {
-            $.SUBRULE($.multiplicationExpression, {LABEL: "lhs"});
-            $.MANY(() => {
-                // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
-                $.CONSUME(AdditionOperator);
-                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-                $.SUBRULE2($.multiplicationExpression, {LABEL: "rhs"});
+            $.RULE("expression", () => {
+                $.SUBRULE($.additionExpression)
             });
-        });
 
-        $.RULE("multiplicationExpression", () => {
-            $.SUBRULE($.atomicExpression, {LABEL: "lhs"});
-            $.MANY(() => {
-                $.CONSUME(MultiplicationOperator);
-                //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
-                $.SUBRULE2($.atomicExpression, {LABEL: "rhs"});
+            //  lowest precedence thus it is first in the rule chain
+            // The precedence of binary expressions is determined by how far down the Parse Tree
+            // The binary expression appears.
+            $.RULE("additionExpression", () => {
+                $.SUBRULE($.multiplicationExpression, {LABEL: "lhs"});
+                $.MANY(() => {
+                    // consuming 'AdditionOperator' will consume either Plus or Minus as they are subclasses of AdditionOperator
+                    $.CONSUME(AdditionOperator);
+                    //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                    $.SUBRULE2($.multiplicationExpression, {LABEL: "rhs"});
+                });
             });
-        });
 
-        $.RULE("atomicExpression", () => $.OR([
-            // parenthesisExpression has the highest precedence and thus it appears
-            // in the "lowest" leaf in the expression ParseTree.
-            {ALT: () => $.SUBRULE($.parenthesisExpression)},
-            {ALT: () => $.CONSUME(NumberLiteral)},
-            {ALT: () => $.SUBRULE($.powerFunction)}
-        ]));
+            $.RULE("multiplicationExpression", () => {
+                $.SUBRULE($.atomicExpression, {LABEL: "lhs"});
+                $.MANY(() => {
+                    $.CONSUME(MultiplicationOperator);
+                    //  the index "2" in SUBRULE2 is needed to identify the unique position in the grammar during runtime
+                    $.SUBRULE2($.atomicExpression, {LABEL: "rhs"});
+                });
+            });
 
-        $.RULE("parenthesisExpression", () => {
-            $.CONSUME(LParen);
-            $.SUBRULE($.expression);
-            $.CONSUME(RParen);
-        });
+            $.RULE("atomicExpression", () => $.OR([
+                // parenthesisExpression has the highest precedence and thus it appears
+                // in the "lowest" leaf in the expression ParseTree.
+                {ALT: () => $.SUBRULE($.parenthesisExpression)},
+                {ALT: () => $.CONSUME(NumberLiteral)},
+                {ALT: () => $.SUBRULE($.powerFunction)}
+            ]));
 
-        $.RULE("powerFunction", () => {
-            $.CONSUME(PowerFunc);
-            $.CONSUME(LParen);
-            $.SUBRULE($.expression, {LABEL: "base"});
-            $.CONSUME(Comma);
-            $.SUBRULE2($.expression, {LABEL: "exponent"});
-            $.CONSUME(RParen);
-        });
+            $.RULE("parenthesisExpression", () => {
+                $.CONSUME(LParen);
+                $.SUBRULE($.expression);
+                $.CONSUME(RParen);
+            });
 
-        // very important to call this after all the rules have been defined.
-        // otherwise the parser may not work correctly as it will lack information
-        // derived during the self analysis phase.
-        this.performSelfAnalysis();
+            $.RULE("powerFunction", () => {
+                $.CONSUME(PowerFunc);
+                $.CONSUME(LParen);
+                $.SUBRULE($.expression, {LABEL: "base"});
+                $.CONSUME(Comma);
+                $.SUBRULE2($.expression, {LABEL: "exponent"});
+                $.CONSUME(RParen);
+            });
+
+            // very important to call this after all the rules have been defined.
+            // otherwise the parser may not work correctly as it will lack information
+            // derived during the self analysis phase.
+            this.performSelfAnalysis();
+        }
     }
-
-    CalculatorPure.prototype = Object.create(Parser.prototype);
-    CalculatorPure.prototype.constructor = CalculatorPure;
-
 
     // wrapping it all together
     // reuse the same parser instance.
