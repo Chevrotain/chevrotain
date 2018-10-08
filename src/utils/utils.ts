@@ -428,3 +428,11 @@ export function PRINT_WARNING(msg) {
 export function isES2015MapSupported(): boolean {
     return typeof Map === "function"
 }
+
+export function applyMixins(derivedCtor: any, baseCtors: any[]) {
+    baseCtors.forEach(baseCtor => {
+        Object.getOwnPropertyNames(baseCtor.prototype).forEach(name => {
+            derivedCtor.prototype[name] = baseCtor.prototype[name]
+        })
+    })
+}

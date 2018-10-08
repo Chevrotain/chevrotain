@@ -8,13 +8,12 @@ import {
 import { classNameFromInstance, HashTable } from "../lang/lang_extensions"
 import { validateRuleIsOverridden } from "./grammar/checks"
 import {
+    applyMixins,
     cloneArr,
     cloneObj,
     contains,
     defaults,
-    dropRight,
     every,
-    find,
     first,
     flatten,
     forEach,
@@ -54,7 +53,6 @@ import {
     NextTerminalAfterManySepWalker,
     NextTerminalAfterManyWalker
 } from "./grammar/interpreter"
-import { IN } from "./constants"
 import {
     augmentTokenTypes,
     isTokenType,
@@ -103,7 +101,6 @@ import {
     IParserErrorMessageProvider,
     IRecognitionException,
     IRuleConfig,
-    ISeparatedIterationResult,
     ISerializedGast,
     ISyntacticContentAssistPath,
     IToken,
@@ -114,8 +111,13 @@ import {
     TokenType,
     TokenVocabulary
 } from "../../api"
+import {
+    attemptInRepetitionRecovery as enabledAttemptInRepetitionRecovery,
+    IFollowKey,
+    IN_RULE_RECOVERY_EXCEPTION,
+    Recoverable
+} from "./traits/recoverable"
 
-const IN_RULE_RECOVERY_EXCEPTION = "InRuleRecoveryException"
 export const END_OF_FILE = createTokenInstance(
     EOF,
     "",
@@ -189,12 +191,6 @@ export interface IParserUnresolvedRefDefinitionError
     unresolvedRefName: string
 }
 
-interface IFollowKey {
-    ruleName: string
-    idxInCallingRule: number
-    inRule: string
-}
-
 interface IParserState {
     errors: IRecognitionException[]
     lexerState: any
@@ -211,9 +207,7 @@ export function EMPTY_ALT<T>(value: T = undefined): () => T {
     }
 }
 
-let EOF_FOLLOW_KEY: any = {}
-
-export class Parser {
+export class Parser implements Recoverable {
     static NO_RESYNC: boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
     // (normally during the parser's constructor).
@@ -338,24 +332,24 @@ export class Parser {
     protected tokensMap: { [fqn: string]: TokenType } = {}
 
     /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    private lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
-    private firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
-    private definitionErrors: IParserDefinitionError[] = []
-    private definedRulesNames: string[] = []
+    protected lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
+    protected firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
+    protected definitionErrors: IParserDefinitionError[] = []
+    protected definedRulesNames: string[] = []
 
-    private shortRuleNameToFull = new HashTable<string>()
-    private fullRuleNameToShort = new HashTable<number>()
+    protected shortRuleNameToFull = new HashTable<string>()
+    protected fullRuleNameToShort = new HashTable<number>()
 
     // The shortName Index must be coded "after" the first 8bits to enable building unique lookahead keys
-    private ruleShortNameIdx = 256
-    private tokenMatcher: TokenMatcher = tokenStructuredMatcherNoCategories
-    private LAST_EXPLICIT_RULE_STACK: number[] = []
-    private selfAnalysisDone = false
+    protected ruleShortNameIdx = 256
+    protected tokenMatcher: TokenMatcher = tokenStructuredMatcherNoCategories
+    protected LAST_EXPLICIT_RULE_STACK: number[] = []
+    protected selfAnalysisDone = false
 
     // lexerState
-    private tokVector: IToken[] = []
-    private tokVectorLength = 0
-    private currIdx: number = -1
+    protected tokVector: IToken[] = []
+    protected tokVectorLength = 0
+    protected currIdx: number = -1
 
     constructor(
         tokenVocabulary: TokenVocabulary,
@@ -390,8 +384,8 @@ export class Parser {
         // performance optimization, NOOP will be inlined which
         // effectively means that this optional feature does not exist
         // when not used.
-        if (!this.recoveryEnabled) {
-            this.attemptInRepetitionRecovery = NOOP
+        if (this.recoveryEnabled) {
+            this.attemptInRepetitionRecovery = enabledAttemptInRepetitionRecovery
         }
 
         this.dynamicTokensEnabled = has(config, "dynamicTokensEnabled")
@@ -1131,6 +1125,7 @@ export class Parser {
         return ruleImplementation
     }
 
+    // TODO: move to recoverable
     public getTokenToInsert(tokType: TokenType): IToken {
         let tokToInsert = createTokenInstance(
             tokType,
@@ -1146,6 +1141,7 @@ export class Parser {
         return tokToInsert
     }
 
+    // TODO: move to Recoverable
     public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
         return true
     }
@@ -1346,7 +1342,7 @@ export class Parser {
     }
 
     // other functionality
-    private saveRecogState(): IParserState {
+    protected saveRecogState(): IParserState {
         // errors is a getter which will clone the errors array
         let savedErrors = this.errors
         let savedRuleStack = cloneArr(this.RULE_STACK)
@@ -1359,13 +1355,13 @@ export class Parser {
         }
     }
 
-    private reloadRecogState(newState: IParserState) {
+    protected reloadRecogState(newState: IParserState) {
         this.errors = newState.errors
         this.importLexerState(newState.lexerState)
         this.RULE_STACK = newState.RULE_STACK
     }
 
-    private defineRule<T>(
+    protected defineRule<T>(
         ruleName: string,
         impl: (...implArgs: any[]) => T,
         config: IRuleConfig<T>
@@ -1478,282 +1474,105 @@ export class Parser {
         return wrappedGrammarRule
     }
 
-    private tryInRepetitionRecovery(
+    // Error Recovery functionality
+    tryInRepetitionRecovery(
         grammarRule: Function,
         grammarRuleArgs: any[],
         lookAheadFunc: () => boolean,
         expectedTokType: TokenType
     ): void {
-        // TODO: can the resyncTokenType be cached?
-        let reSyncTokType = this.findReSyncTokenType()
-        let savedLexerState = this.exportLexerState()
-        let resyncedTokens = []
-        let passedResyncPoint = false
-
-        let nextTokenWithoutResync = this.LA(1)
-        let currToken = this.LA(1)
-
-        let generateErrorMessage = () => {
-            let previousToken = this.LA(0)
-            // we are preemptively re-syncing before an error has been detected, therefor we must reproduce
-            // the error that would have been thrown
-            let msg = this.errorMessageProvider.buildMismatchTokenMessage({
-                expected: expectedTokType,
-                actual: nextTokenWithoutResync,
-                previous: previousToken,
-                ruleName: this.getCurrRuleFullName()
-            })
-            let error = new MismatchedTokenException(
-                msg,
-                nextTokenWithoutResync,
-                this.LA(0)
-            )
-            // the first token here will be the original cause of the error, this is not part of the resyncedTokens property.
-            error.resyncedTokens = dropRight(resyncedTokens)
-            this.SAVE_ERROR(error)
-        }
-
-        while (!passedResyncPoint) {
-            // re-synced to a point where we can safely exit the repetition/
-            if (this.tokenMatcher(currToken, expectedTokType)) {
-                generateErrorMessage()
-                return // must return here to avoid reverting the inputIdx
-            } else if (lookAheadFunc.call(this)) {
-                // we skipped enough tokens so we can resync right back into another iteration of the repetition grammar rule
-                generateErrorMessage()
-                // recursive invocation in other to support multiple re-syncs in the same top level repetition grammar rule
-                grammarRule.apply(this, grammarRuleArgs)
-                return // must return here to avoid reverting the inputIdx
-            } else if (this.tokenMatcher(currToken, reSyncTokType)) {
-                passedResyncPoint = true
-            } else {
-                currToken = this.SKIP_TOKEN()
-                this.addToResyncTokens(currToken, resyncedTokens)
-            }
-        }
-
-        // we were unable to find a CLOSER point to resync inside the Repetition, reset the state.
-        // The parsing exception we were trying to prevent will happen in the NEXT parsing step. it may be handled by
-        // "between rules" resync recovery later in the flow.
-        this.importLexerState(savedLexerState)
+        // mixed-in
+        return undefined
     }
 
-    private shouldInRepetitionRecoveryBeTried(
+    shouldInRepetitionRecoveryBeTried(
         expectTokAfterLastMatch?: TokenType,
         nextTokIdx?: number
     ): boolean {
-        // arguments to try and perform resync into the next iteration of the many are missing
-        if (expectTokAfterLastMatch === undefined || nextTokIdx === undefined) {
-            return false
-        }
-
-        // no need to recover, next token is what we expect...
-        if (this.tokenMatcher(this.LA(1), expectTokAfterLastMatch)) {
-            return false
-        }
-
-        // error recovery is disabled during backtracking as it can make the parser ignore a valid grammar path
-        // and prefer some backtracking path that includes recovered errors.
-        if (this.isBackTracking()) {
-            return false
-        }
-
-        // if we can perform inRule recovery (single token insertion or deletion) we always prefer that recovery algorithm
-        // because if it works, it makes the least amount of changes to the input stream (greedy algorithm)
-        //noinspection RedundantIfStatementJS
-        if (
-            this.canPerformInRuleRecovery(
-                expectTokAfterLastMatch,
-                this.getFollowsForInRuleRecovery(
-                    expectTokAfterLastMatch,
-                    nextTokIdx
-                )
-            )
-        ) {
-            return false
-        }
-
-        return true
+        // mixed-in
+        return undefined
     }
 
-    // Error Recovery functionality
-    private getFollowsForInRuleRecovery(
+    getFollowsForInRuleRecovery(
         tokType: TokenType,
         tokIdxInRule: number
     ): TokenType[] {
-        let grammarPath = this.getCurrentGrammarPath(tokType, tokIdxInRule)
-        let follows = this.getNextPossibleTokenTypes(grammarPath)
-        return follows
+        // mixed-in
+        return undefined
     }
 
-    private tryInRuleRecovery(
+    tryInRuleRecovery(
         expectedTokType: TokenType,
         follows: TokenType[]
     ): IToken {
-        if (this.canRecoverWithSingleTokenInsertion(expectedTokType, follows)) {
-            let tokToInsert = this.getTokenToInsert(expectedTokType)
-            return tokToInsert
-        }
-
-        if (this.canRecoverWithSingleTokenDeletion(expectedTokType)) {
-            let nextTok = this.SKIP_TOKEN()
-            this.consumeToken()
-            return nextTok
-        }
-
-        throw new InRuleRecoveryException("sad sad panda")
+        // mixed-in
+        return undefined
     }
 
-    private canPerformInRuleRecovery(
+    canPerformInRuleRecovery(
         expectedToken: TokenType,
         follows: TokenType[]
     ): boolean {
-        return (
-            this.canRecoverWithSingleTokenInsertion(expectedToken, follows) ||
-            this.canRecoverWithSingleTokenDeletion(expectedToken)
-        )
+        // mixed-in
+        return undefined
     }
 
-    private canRecoverWithSingleTokenInsertion(
+    canRecoverWithSingleTokenInsertion(
         expectedTokType: TokenType,
         follows: TokenType[]
     ): boolean {
-        if (!this.canTokenTypeBeInsertedInRecovery(expectedTokType)) {
-            return false
-        }
-
-        // must know the possible following tokens to perform single token insertion
-        if (isEmpty(follows)) {
-            return false
-        }
-
-        let mismatchedTok = this.LA(1)
-        let isMisMatchedTokInFollows =
-            find(follows, (possibleFollowsTokType: TokenType) => {
-                return this.tokenMatcher(mismatchedTok, possibleFollowsTokType)
-            }) !== undefined
-
-        return isMisMatchedTokInFollows
+        // mixed-in
+        return undefined
     }
 
-    private canRecoverWithSingleTokenDeletion(
-        expectedTokType: TokenType
-    ): boolean {
-        let isNextTokenWhatIsExpected = this.tokenMatcher(
-            this.LA(2),
-            expectedTokType
-        )
-        return isNextTokenWhatIsExpected
+    canRecoverWithSingleTokenDeletion(expectedTokType: TokenType): boolean {
+        // mixed-in
+        return undefined
     }
 
-    private isInCurrentRuleReSyncSet(tokenTypeIdx: TokenType): boolean {
-        let followKey = this.getCurrFollowKey()
-        let currentRuleReSyncSet = this.getFollowSetFromFollowKey(followKey)
-        return contains(currentRuleReSyncSet, tokenTypeIdx)
+    isInCurrentRuleReSyncSet(tokenTypeIdx: TokenType): boolean {
+        // mixed-in
+        return undefined
     }
 
-    private findReSyncTokenType(): TokenType {
-        let allPossibleReSyncTokTypes = this.flattenFollowSet()
-        // this loop will always terminate as EOF is always in the follow stack and also always (virtually) in the input
-        let nextToken = this.LA(1)
-        let k = 2
-        while (true) {
-            let nextTokenType: any = nextToken.tokenType
-            if (contains(allPossibleReSyncTokTypes, nextTokenType)) {
-                return nextTokenType
-            }
-            nextToken = this.LA(k)
-            k++
-        }
+    findReSyncTokenType(): TokenType {
+        // mixed-in
+        return undefined
     }
 
-    private getCurrFollowKey(): IFollowKey {
-        // the length is at least one as we always add the ruleName to the stack before invoking the rule.
-        if (this.RULE_STACK.length === 1) {
-            return EOF_FOLLOW_KEY
-        }
-
-        let currRuleShortName = this.getLastExplicitRuleShortName()
-        let currRuleIdx = this.getLastExplicitRuleOccurrenceIndex()
-        let prevRuleShortName = this.getPreviousExplicitRuleShortName()
-
-        return {
-            ruleName: this.shortRuleNameToFullName(currRuleShortName),
-            idxInCallingRule: currRuleIdx,
-            inRule: this.shortRuleNameToFullName(prevRuleShortName)
-        }
+    getCurrFollowKey(): IFollowKey {
+        // mixed-in
+        return undefined
     }
 
-    private buildFullFollowKeyStack(): IFollowKey[] {
-        let explicitRuleStack = this.RULE_STACK
-        let explicitOccurrenceStack = this.RULE_OCCURRENCE_STACK
-
-        if (!isEmpty(this.LAST_EXPLICIT_RULE_STACK)) {
-            explicitRuleStack = map(
-                this.LAST_EXPLICIT_RULE_STACK,
-                idx => this.RULE_STACK[idx]
-            )
-            explicitOccurrenceStack = map(
-                this.LAST_EXPLICIT_RULE_STACK,
-                idx => this.RULE_OCCURRENCE_STACK[idx]
-            )
-        }
-
-        // TODO: only iterate over explicit rules here
-        return map(explicitRuleStack, (ruleName, idx) => {
-            if (idx === 0) {
-                return EOF_FOLLOW_KEY
-            }
-            return {
-                ruleName: this.shortRuleNameToFullName(ruleName),
-                idxInCallingRule: explicitOccurrenceStack[idx],
-                inRule: this.shortRuleNameToFullName(explicitRuleStack[idx - 1])
-            }
-        })
+    buildFullFollowKeyStack(): IFollowKey[] {
+        // mixed-in
+        return undefined
     }
 
-    private flattenFollowSet(): TokenType[] {
-        let followStack = map(this.buildFullFollowKeyStack(), currKey => {
-            return this.getFollowSetFromFollowKey(currKey)
-        })
-        return <any>flatten(followStack)
+    flattenFollowSet(): TokenType[] {
+        // mixed-in
+        return undefined
     }
 
-    private getFollowSetFromFollowKey(followKey: IFollowKey): TokenType[] {
-        if (followKey === EOF_FOLLOW_KEY) {
-            return [EOF]
-        }
-
-        let followName =
-            followKey.ruleName +
-            followKey.idxInCallingRule +
-            IN +
-            followKey.inRule
-
-        return this.resyncFollows.get(followName)
+    getFollowSetFromFollowKey(followKey: IFollowKey): TokenType[] {
+        // mixed-in
+        return undefined
     }
 
     // It does not make any sense to include a virtual EOF token in the list of resynced tokens
     // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
-    private addToResyncTokens(token: IToken, resyncTokens: IToken[]): IToken[] {
-        if (!this.tokenMatcher(token, EOF)) {
-            resyncTokens.push(token)
-        }
-        return resyncTokens
+    addToResyncTokens(token: IToken, resyncTokens: IToken[]): IToken[] {
+        // mixed-in
+        return undefined
     }
 
-    private reSyncTo(tokType: TokenType): IToken[] {
-        let resyncedTokens = []
-        let nextTok = this.LA(1)
-        while (this.tokenMatcher(nextTok, tokType) === false) {
-            nextTok = this.SKIP_TOKEN()
-            this.addToResyncTokens(nextTok, resyncedTokens)
-        }
-        // the last token is not part of the error.
-        return dropRight(resyncedTokens)
+    reSyncTo(tokType: TokenType): IToken[] {
+        // mixed-in
+        return undefined
     }
 
-    private attemptInRepetitionRecovery(
+    attemptInRepetitionRecovery(
         prodFunc: Function,
         args: any[],
         lookaheadFunc: () => boolean,
@@ -1761,53 +1580,11 @@ export class Parser {
         prodOccurrence: number,
         nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
     ) {
-        let key = this.getKeyForAutomaticLookahead(dslMethodIdx, prodOccurrence)
-        let firstAfterRepInfo = this.firstAfterRepMap.get(<any>key)
-        if (firstAfterRepInfo === undefined) {
-            let currRuleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(currRuleName)
-            let walker: AbstractNextTerminalAfterProductionWalker = new nextToksWalker(
-                ruleGrammar,
-                prodOccurrence
-            )
-            firstAfterRepInfo = walker.startWalking()
-            this.firstAfterRepMap.put(key, firstAfterRepInfo)
-        }
-
-        let expectTokAfterLastMatch = firstAfterRepInfo.token
-        let nextTokIdx = firstAfterRepInfo.occurrence
-        let isEndOfRule = firstAfterRepInfo.isEndOfRule
-
-        // special edge case of a TOP most repetition after which the input should END.
-        // this will force an attempt for inRule recovery in that scenario.
-        if (
-            this.RULE_STACK.length === 1 &&
-            isEndOfRule &&
-            expectTokAfterLastMatch === undefined
-        ) {
-            expectTokAfterLastMatch = EOF
-            nextTokIdx = 1
-        }
-
-        if (
-            this.shouldInRepetitionRecoveryBeTried(
-                expectTokAfterLastMatch,
-                nextTokIdx
-            )
-        ) {
-            // TODO: performance optimization: instead of passing the original args here, we modify
-            // the args param (or create a new one) and make sure the lookahead func is explicitly provided
-            // to avoid searching the cache for it once more.
-            this.tryInRepetitionRecovery(
-                prodFunc,
-                args,
-                lookaheadFunc,
-                expectTokAfterLastMatch
-            )
-        }
+        // NOOP
+        return undefined
     }
 
-    private cstNestedInvocationStateUpdate(
+    protected cstNestedInvocationStateUpdate(
         nestedName: string,
         shortName: string | number
     ): void {
@@ -1821,7 +1598,7 @@ export class Parser {
         })
     }
 
-    private cstInvocationStateUpdate(
+    protected cstInvocationStateUpdate(
         fullRuleName: string,
         shortName: string | number
     ): void {
@@ -1832,17 +1609,17 @@ export class Parser {
         })
     }
 
-    private cstFinallyStateUpdate(): void {
+    protected cstFinallyStateUpdate(): void {
         this.LAST_EXPLICIT_RULE_STACK.pop()
         this.CST_STACK.pop()
     }
 
-    private cstNestedFinallyStateUpdate(): void {
+    protected cstNestedFinallyStateUpdate(): void {
         this.CST_STACK.pop()
     }
 
     // Implementation of parsing DSL
-    private optionInternal<OUT>(
+    protected optionInternal<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number
     ): OUT {
@@ -1860,7 +1637,7 @@ export class Parser {
         }
     }
 
-    private optionInternalNoCst<OUT>(
+    protected optionInternalNoCst<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number
     ): OUT {
@@ -1868,7 +1645,7 @@ export class Parser {
         return this.optionInternalLogic(actionORMethodDef, occurrence, key)
     }
 
-    private optionInternalLogic<OUT>(
+    protected optionInternalLogic<OUT>(
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         occurrence: number,
         key: number
@@ -1898,7 +1675,7 @@ export class Parser {
         return undefined
     }
 
-    private atLeastOneInternal<OUT>(
+    protected atLeastOneInternal<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
@@ -1923,7 +1700,7 @@ export class Parser {
         }
     }
 
-    private atLeastOneInternalNoCst<OUT>(
+    protected atLeastOneInternalNoCst<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>
     ): void {
@@ -1934,7 +1711,7 @@ export class Parser {
         this.atLeastOneInternalLogic(prodOccurrence, actionORMethodDef, key)
     }
 
-    private atLeastOneInternalLogic<OUT>(
+    protected atLeastOneInternalLogic<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOptsWithErr<OUT>,
         key: number
@@ -1990,7 +1767,7 @@ export class Parser {
         )
     }
 
-    private atLeastOneSepFirstInternal<OUT>(
+    protected atLeastOneSepFirstInternal<OUT>(
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
@@ -2008,7 +1785,7 @@ export class Parser {
         }
     }
 
-    private atLeastOneSepFirstInternalNoCst<OUT>(
+    protected atLeastOneSepFirstInternalNoCst<OUT>(
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>
     ): void {
@@ -2019,7 +1796,7 @@ export class Parser {
         this.atLeastOneSepFirstInternalLogic(prodOccurrence, options, laKey)
     }
 
-    private atLeastOneSepFirstInternalLogic<OUT>(
+    protected atLeastOneSepFirstInternalLogic<OUT>(
         prodOccurrence: number,
         options: AtLeastOneSepMethodOpts<OUT>,
         key: number
@@ -2075,7 +1852,7 @@ export class Parser {
         }
     }
 
-    private manyInternal<OUT>(
+    protected manyInternal<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
@@ -2097,7 +1874,7 @@ export class Parser {
         }
     }
 
-    private manyInternalNoCst<OUT>(
+    protected manyInternalNoCst<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>
     ): void {
@@ -2105,7 +1882,7 @@ export class Parser {
         return this.manyInternalLogic(prodOccurrence, actionORMethodDef, laKey)
     }
 
-    private manyInternalLogic<OUT>(
+    protected manyInternalLogic<OUT>(
         prodOccurrence: number,
         actionORMethodDef: GrammarAction<OUT> | DSLMethodOpts<OUT>,
         key: number
@@ -2148,7 +1925,7 @@ export class Parser {
         )
     }
 
-    private manySepFirstInternal<OUT>(
+    protected manySepFirstInternal<OUT>(
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>
     ): void {
@@ -2166,7 +1943,7 @@ export class Parser {
         }
     }
 
-    private manySepFirstInternalNoCst<OUT>(
+    protected manySepFirstInternalNoCst<OUT>(
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>
     ): void {
@@ -2177,7 +1954,7 @@ export class Parser {
         this.manySepFirstInternalLogic(prodOccurrence, options, laKey)
     }
 
-    private manySepFirstInternalLogic<OUT>(
+    protected manySepFirstInternalLogic<OUT>(
         prodOccurrence: number,
         options: ManySepMethodOpts<OUT>,
         key: number
@@ -2223,7 +2000,7 @@ export class Parser {
         }
     }
 
-    private repetitionSepSecondInternal<OUT>(
+    protected repetitionSepSecondInternal<OUT>(
         prodOccurrence: number,
         separator: TokenType,
         separatorLookAheadFunc: () => boolean,
@@ -2259,7 +2036,7 @@ export class Parser {
         )
     }
 
-    private doSingleRepetition(action: Function): any {
+    protected doSingleRepetition(action: Function): any {
         const beforeIteration = this.getLexerPosition()
         const result = action.call(this)
         const afterIteration = this.getLexerPosition()
@@ -2275,7 +2052,7 @@ export class Parser {
         return result
     }
 
-    private orInternalNoCst<T>(
+    protected orInternalNoCst<T>(
         altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
         occurrence: number
     ): T {
@@ -2294,7 +2071,7 @@ export class Parser {
         )
     }
 
-    private orInternal<T>(
+    protected orInternal<T>(
         altsOrOpts: IAnyOrAlt<T>[] | OrMethodOpts<T>,
         occurrence: number
     ): T {
@@ -2342,7 +2119,7 @@ export class Parser {
     }
 
     // this actually returns a number, but it is always used as a string (object prop key)
-    private getKeyForAutomaticLookahead(
+    protected getKeyForAutomaticLookahead(
         dslMethodIdx: number,
         occurrence: number
     ): number {
@@ -2354,7 +2131,7 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncForOr(
+    protected getLookaheadFuncForOr(
         occurrence: number,
         alts: IAnyOrAlt<any>[]
     ): () => number {
@@ -2383,7 +2160,7 @@ export class Parser {
     }
 
     // Automatic lookahead calculation
-    private getLookaheadFuncForOption(
+    protected getLookaheadFuncForOption(
         key: number,
         occurrence: number
     ): () => boolean {
@@ -2395,7 +2172,7 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncForMany(
+    protected getLookaheadFuncForMany(
         key: number,
         occurrence: number
     ): () => boolean {
@@ -2407,7 +2184,7 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncForManySep(
+    protected getLookaheadFuncForManySep(
         key: number,
         occurrence: number
     ): () => boolean {
@@ -2419,7 +2196,7 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncForAtLeastOne(
+    protected getLookaheadFuncForAtLeastOne(
         key: number,
         occurrence: number
     ): () => boolean {
@@ -2431,7 +2208,7 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncForAtLeastOneSep(
+    protected getLookaheadFuncForAtLeastOneSep(
         key: number,
         occurrence: number
     ): () => boolean {
@@ -2444,7 +2221,10 @@ export class Parser {
     }
 
     // TODO: consider caching the error message computed information
-    private raiseNoAltException(occurrence: number, errMsgTypes: string): void {
+    protected raiseNoAltException(
+        occurrence: number,
+        errMsgTypes: string
+    ): void {
         let ruleName = this.getCurrRuleFullName()
         let ruleGrammar = this.getGAstProductions().get(ruleName)
         // TODO: getLookaheadPathsForOr can be slow for large enough maxLookahead and certain grammars, consider caching ?
@@ -2473,7 +2253,7 @@ export class Parser {
         )
     }
 
-    private getLookaheadFuncFor(
+    protected getLookaheadFuncFor(
         key: number,
         occurrence: number,
         maxLookahead: number,
@@ -2499,7 +2279,7 @@ export class Parser {
     }
 
     // TODO: consider caching the error message computed information
-    private raiseEarlyExitException(
+    protected raiseEarlyExitException(
         occurrence: number,
         prodType: PROD_TYPE,
         userDefinedErrMsg: string
@@ -2530,43 +2310,43 @@ export class Parser {
         )
     }
 
-    private getLastExplicitRuleShortName(): string {
+    protected getLastExplicitRuleShortName(): string {
         let lastExplictIndex = this.LAST_EXPLICIT_RULE_STACK[
             this.LAST_EXPLICIT_RULE_STACK.length - 1
         ]
         return this.RULE_STACK[lastExplictIndex]
     }
 
-    private getLastExplicitRuleShortNameNoCst(): string {
+    protected getLastExplicitRuleShortNameNoCst(): string {
         let ruleStack = this.RULE_STACK
         return ruleStack[ruleStack.length - 1]
     }
 
-    private getPreviousExplicitRuleShortName(): string {
+    protected getPreviousExplicitRuleShortName(): string {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
             this.LAST_EXPLICIT_RULE_STACK.length - 2
         ]
         return this.RULE_STACK[lastExplicitIndex]
     }
 
-    private getPreviousExplicitRuleShortNameNoCst(): string {
+    protected getPreviousExplicitRuleShortNameNoCst(): string {
         let ruleStack = this.RULE_STACK
         return ruleStack[ruleStack.length - 2]
     }
 
-    private getLastExplicitRuleOccurrenceIndex(): number {
+    protected getLastExplicitRuleOccurrenceIndex(): number {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
             this.LAST_EXPLICIT_RULE_STACK.length - 1
         ]
         return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
     }
 
-    private getLastExplicitRuleOccurrenceIndexNoCst(): number {
+    protected getLastExplicitRuleOccurrenceIndexNoCst(): number {
         let occurrenceStack = this.RULE_OCCURRENCE_STACK
         return occurrenceStack[occurrenceStack.length - 1]
     }
 
-    private nestedRuleBeforeClause(
+    protected nestedRuleBeforeClause(
         methodOpts: { NAME?: string },
         laKey: number
     ): string {
@@ -2580,7 +2360,7 @@ export class Parser {
         }
     }
 
-    private nestedAltBeforeClause(
+    protected nestedAltBeforeClause(
         methodOpts: { NAME?: string },
         occurrence: number,
         methodKeyIdx: number,
@@ -2606,7 +2386,7 @@ export class Parser {
         }
     }
 
-    private nestedRuleFinallyClause(laKey: number, nestedName: string): void {
+    protected nestedRuleFinallyClause(laKey: number, nestedName: string): void {
         let cstStack = this.CST_STACK
         let nestedRuleCst = cstStack[cstStack.length - 1]
         this.nestedRuleFinallyStateUpdate()
@@ -2615,13 +2395,16 @@ export class Parser {
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
-    private cstPostTerminal(key: string, consumedToken: IToken): void {
+    protected cstPostTerminal(key: string, consumedToken: IToken): void {
         // TODO: would save the "current rootCST be faster than locating it for each terminal?
         let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
         addTerminalToCst(rootCst, consumedToken, key)
     }
 
-    private cstPostNonTerminal(ruleCstResult: CstNode, ruleName: string): void {
+    protected cstPostNonTerminal(
+        ruleCstResult: CstNode,
+        ruleName: string
+    ): void {
         addNoneTerminalToCst(
             this.CST_STACK[this.CST_STACK.length - 1],
             ruleName,
@@ -2741,9 +2524,4 @@ export class Parser {
     }
 }
 
-function InRuleRecoveryException(message: string) {
-    this.name = IN_RULE_RECOVERY_EXCEPTION
-    this.message = message
-}
-
-InRuleRecoveryException.prototype = Error.prototype
+applyMixins(Parser, [Recoverable])
