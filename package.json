@@ -125,7 +125,7 @@
         "sinon": "^6.0.0",
         "sinon-chai": "^3.0.0",
         "tslint": "^5.8.0",
-        "typedoc": "^0.12.0",
+        "typedoc": "^0.13.0",
         "typescript": "3.0.3",
         "vuepress": "^0.14.2",
         "webpack": "4.17.2",
