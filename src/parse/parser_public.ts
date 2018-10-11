@@ -117,6 +117,9 @@ import {
     IN_RULE_RECOVERY_EXCEPTION,
     Recoverable
 } from "./traits/recoverable"
+import { BaseParser } from "./traits/base_parser"
+import { LooksAhead } from "./traits/looksahead"
+import { TreeBuilder } from "./traits/tree_builder"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -207,7 +210,13 @@ export function EMPTY_ALT<T>(value: T = undefined): () => T {
     }
 }
 
-export class Parser implements Recoverable {
+export class Parser extends BaseParser implements Recoverable {
+    // Recoverable Trait fields
+    protected firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
+    protected resyncFollows: HashTable<TokenType[]> = new HashTable<
+        TokenType[]
+    >()
+
     static NO_RESYNC: boolean = false
     // Set this flag to true if you don't want the Parser to throw error when problems in it's definition are detected.
     // (normally during the parser's constructor).
@@ -293,9 +302,6 @@ export class Parser implements Recoverable {
     }
 
     // caching
-    protected resyncFollows: HashTable<TokenType[]> = new HashTable<
-        TokenType[]
-    >()
     protected allRuleNames: string[] = []
     protected baseCstVisitorConstructor: Function
     protected baseCstVisitorWithDefaultsConstructor: Function
@@ -333,7 +339,6 @@ export class Parser implements Recoverable {
 
     /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
     protected lookAheadFuncsCache: any = isES2015MapSupported() ? new Map() : []
-    protected firstAfterRepMap = new HashTable<IFirstAfterRepetition>()
     protected definitionErrors: IParserDefinitionError[] = []
     protected definedRulesNames: string[] = []
 
@@ -355,6 +360,7 @@ export class Parser implements Recoverable {
         tokenVocabulary: TokenVocabulary,
         config: IParserConfig = DEFAULT_PARSER_CONFIG
     ) {
+        super()
         if (isArray(tokenVocabulary)) {
             // This only checks for Token vocabularies provided as arrays.
             // That is good enough because the main objective is to detect users of pre-V4.0 APIs
@@ -515,37 +521,6 @@ export class Parser implements Recoverable {
 
     public isAtEndOfInput(): boolean {
         return this.tokenMatcher(this.LA(1), EOF)
-    }
-
-    public getBaseCstVisitorConstructor(): {
-        new (...args: any[]): ICstVisitor<any, any>
-    } {
-        if (isUndefined(this.baseCstVisitorConstructor)) {
-            const newBaseCstVisitorConstructor = createBaseSemanticVisitorConstructor(
-                this.className,
-                this.allRuleNames
-            )
-            this.baseCstVisitorConstructor = newBaseCstVisitorConstructor
-            return newBaseCstVisitorConstructor
-        }
-
-        return <any>this.baseCstVisitorConstructor
-    }
-
-    public getBaseCstVisitorConstructorWithDefaults(): {
-        new (...args: any[]): ICstVisitor<any, any>
-    } {
-        if (isUndefined(this.baseCstVisitorWithDefaultsConstructor)) {
-            const newConstructor = createBaseVisitorConstructorWithDefaults(
-                this.className,
-                this.allRuleNames,
-                this.getBaseCstVisitorConstructor()
-            )
-            this.baseCstVisitorWithDefaultsConstructor = newConstructor
-            return newConstructor
-        }
-
-        return <any>this.baseCstVisitorWithDefaultsConstructor
     }
 
     public getGAstProductions(): HashTable<Rule> {
@@ -1125,27 +1100,6 @@ export class Parser implements Recoverable {
         return ruleImplementation
     }
 
-    // TODO: move to recoverable
-    public getTokenToInsert(tokType: TokenType): IToken {
-        let tokToInsert = createTokenInstance(
-            tokType,
-            "",
-            NaN,
-            NaN,
-            NaN,
-            NaN,
-            NaN,
-            NaN
-        )
-        tokToInsert.isInsertedInRecovery = true
-        return tokToInsert
-    }
-
-    // TODO: move to Recoverable
-    public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
-        return true
-    }
-
     protected ruleInvocationStateUpdate(
         shortName: string,
         fullName: string,
@@ -1472,150 +1426,6 @@ export class Parser implements Recoverable {
         let ruleNamePropName = "ruleName"
         wrappedGrammarRule[ruleNamePropName] = ruleName
         return wrappedGrammarRule
-    }
-
-    // Error Recovery functionality
-    tryInRepetitionRecovery(
-        grammarRule: Function,
-        grammarRuleArgs: any[],
-        lookAheadFunc: () => boolean,
-        expectedTokType: TokenType
-    ): void {
-        // mixed-in
-        return undefined
-    }
-
-    shouldInRepetitionRecoveryBeTried(
-        expectTokAfterLastMatch?: TokenType,
-        nextTokIdx?: number
-    ): boolean {
-        // mixed-in
-        return undefined
-    }
-
-    getFollowsForInRuleRecovery(
-        tokType: TokenType,
-        tokIdxInRule: number
-    ): TokenType[] {
-        // mixed-in
-        return undefined
-    }
-
-    tryInRuleRecovery(
-        expectedTokType: TokenType,
-        follows: TokenType[]
-    ): IToken {
-        // mixed-in
-        return undefined
-    }
-
-    canPerformInRuleRecovery(
-        expectedToken: TokenType,
-        follows: TokenType[]
-    ): boolean {
-        // mixed-in
-        return undefined
-    }
-
-    canRecoverWithSingleTokenInsertion(
-        expectedTokType: TokenType,
-        follows: TokenType[]
-    ): boolean {
-        // mixed-in
-        return undefined
-    }
-
-    canRecoverWithSingleTokenDeletion(expectedTokType: TokenType): boolean {
-        // mixed-in
-        return undefined
-    }
-
-    isInCurrentRuleReSyncSet(tokenTypeIdx: TokenType): boolean {
-        // mixed-in
-        return undefined
-    }
-
-    findReSyncTokenType(): TokenType {
-        // mixed-in
-        return undefined
-    }
-
-    getCurrFollowKey(): IFollowKey {
-        // mixed-in
-        return undefined
-    }
-
-    buildFullFollowKeyStack(): IFollowKey[] {
-        // mixed-in
-        return undefined
-    }
-
-    flattenFollowSet(): TokenType[] {
-        // mixed-in
-        return undefined
-    }
-
-    getFollowSetFromFollowKey(followKey: IFollowKey): TokenType[] {
-        // mixed-in
-        return undefined
-    }
-
-    // It does not make any sense to include a virtual EOF token in the list of resynced tokens
-    // as EOF does not really exist and thus does not contain any useful information (line/column numbers)
-    addToResyncTokens(token: IToken, resyncTokens: IToken[]): IToken[] {
-        // mixed-in
-        return undefined
-    }
-
-    reSyncTo(tokType: TokenType): IToken[] {
-        // mixed-in
-        return undefined
-    }
-
-    attemptInRepetitionRecovery(
-        prodFunc: Function,
-        args: any[],
-        lookaheadFunc: () => boolean,
-        dslMethodIdx: number,
-        prodOccurrence: number,
-        nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
-    ) {
-        // NOOP
-        return undefined
-    }
-
-    protected cstNestedInvocationStateUpdate(
-        nestedName: string,
-        shortName: string | number
-    ): void {
-        this.CST_STACK.push({
-            name: nestedName,
-            fullName:
-                this.shortRuleNameToFull.get(
-                    this.getLastExplicitRuleShortName()
-                ) + nestedName,
-            children: {}
-        })
-    }
-
-    protected cstInvocationStateUpdate(
-        fullRuleName: string,
-        shortName: string | number
-    ): void {
-        this.LAST_EXPLICIT_RULE_STACK.push(this.RULE_STACK.length - 1)
-        this.CST_STACK.push({
-            name: fullRuleName,
-            children: {}
-        })
-    }
-
-    protected cstFinallyStateUpdate(): void {
-        this.LAST_EXPLICIT_RULE_STACK.pop()
-        this.CST_STACK.pop()
-    }
-
-    protected cstNestedFinallyStateUpdate(): void {
-        this.CST_STACK.pop()
     }
 
     // Implementation of parsing DSL
@@ -2118,105 +1928,35 @@ export class Parser implements Recoverable {
         }
     }
 
-    // this actually returns a number, but it is always used as a string (object prop key)
-    protected getKeyForAutomaticLookahead(
-        dslMethodIdx: number,
-        occurrence: number
-    ): number {
-        let currRuleShortName: any = this.getLastExplicitRuleShortName()
-        return getKeyForAutomaticLookahead(
-            currRuleShortName,
-            dslMethodIdx,
-            occurrence
-        )
-    }
-
-    protected getLookaheadFuncForOr(
+    // TODO: consider caching the error message computed information
+    protected raiseEarlyExitException(
         occurrence: number,
-        alts: IAnyOrAlt<any>[]
-    ): () => number {
-        let key = this.getKeyForAutomaticLookahead(OR_IDX, occurrence)
-        let laFunc: any = this.getLaFuncFromCache(key)
-        if (laFunc === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
-            // note that hasPredicates is only computed once.
-            let hasPredicates = some(alts, currAlt =>
-                isFunction((<IOrAltWithGate<any>>currAlt).GATE)
-            )
-            laFunc = buildLookaheadFuncForOr(
-                occurrence,
-                ruleGrammar,
-                this.maxLookahead,
-                hasPredicates,
-                this.dynamicTokensEnabled,
-                this.lookAheadBuilderForAlternatives
-            )
-            this.setLaFuncCache(key, laFunc)
-            return laFunc
-        } else {
-            return laFunc
+        prodType: PROD_TYPE,
+        userDefinedErrMsg: string
+    ): void {
+        let ruleName = this.getCurrRuleFullName()
+        let ruleGrammar = this.getGAstProductions().get(ruleName)
+        let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
+            occurrence,
+            ruleGrammar,
+            prodType,
+            this.maxLookahead
+        )
+        let insideProdPaths = lookAheadPathsPerAlternative[0]
+        let actualTokens = []
+        for (let i = 1; i < this.maxLookahead; i++) {
+            actualTokens.push(this.LA(i))
         }
-    }
+        let msg = this.errorMessageProvider.buildEarlyExitMessage({
+            expectedIterationPaths: insideProdPaths,
+            actual: actualTokens,
+            previous: this.LA(0),
+            customUserDescription: userDefinedErrMsg,
+            ruleName: ruleName
+        })
 
-    // Automatic lookahead calculation
-    protected getLookaheadFuncForOption(
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.OPTION
-        )
-    }
-
-    protected getLookaheadFuncForMany(
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION
-        )
-    }
-
-    protected getLookaheadFuncForManySep(
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION_WITH_SEPARATOR
-        )
-    }
-
-    protected getLookaheadFuncForAtLeastOne(
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION_MANDATORY
-        )
-    }
-
-    protected getLookaheadFuncForAtLeastOneSep(
-        key: number,
-        occurrence: number
-    ): () => boolean {
-        return this.getLookaheadFuncFor(
-            key,
-            occurrence,
-            this.maxLookahead,
-            PROD_TYPE.REPETITION_MANDATORY_WITH_SEPARATOR
+        throw this.SAVE_ERROR(
+            new EarlyExitException(msg, this.LA(1), this.LA(0))
         )
     }
 
@@ -2250,63 +1990,6 @@ export class Parser implements Recoverable {
 
         throw this.SAVE_ERROR(
             new NoViableAltException(errMsg, this.LA(1), previousToken)
-        )
-    }
-
-    protected getLookaheadFuncFor(
-        key: number,
-        occurrence: number,
-        maxLookahead: number,
-        prodType
-    ): () => boolean {
-        let laFunc = <any>this.getLaFuncFromCache(key)
-        if (laFunc === undefined) {
-            let ruleName = this.getCurrRuleFullName()
-            let ruleGrammar = this.getGAstProductions().get(ruleName)
-            laFunc = buildLookaheadFuncForOptionalProd(
-                occurrence,
-                ruleGrammar,
-                maxLookahead,
-                this.dynamicTokensEnabled,
-                prodType,
-                this.lookAheadBuilderForOptional
-            )
-            this.setLaFuncCache(key, laFunc)
-            return laFunc
-        } else {
-            return laFunc
-        }
-    }
-
-    // TODO: consider caching the error message computed information
-    protected raiseEarlyExitException(
-        occurrence: number,
-        prodType: PROD_TYPE,
-        userDefinedErrMsg: string
-    ): void {
-        let ruleName = this.getCurrRuleFullName()
-        let ruleGrammar = this.getGAstProductions().get(ruleName)
-        let lookAheadPathsPerAlternative = getLookaheadPathsForOptionalProd(
-            occurrence,
-            ruleGrammar,
-            prodType,
-            this.maxLookahead
-        )
-        let insideProdPaths = lookAheadPathsPerAlternative[0]
-        let actualTokens = []
-        for (let i = 1; i < this.maxLookahead; i++) {
-            actualTokens.push(this.LA(i))
-        }
-        let msg = this.errorMessageProvider.buildEarlyExitMessage({
-            expectedIterationPaths: insideProdPaths,
-            actual: actualTokens,
-            previous: this.LA(0),
-            customUserDescription: userDefinedErrMsg,
-            ruleName: ruleName
-        })
-
-        throw this.SAVE_ERROR(
-            new EarlyExitException(msg, this.LA(1), this.LA(0))
         )
     }
 
@@ -2395,23 +2078,6 @@ export class Parser implements Recoverable {
         addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
     }
 
-    protected cstPostTerminal(key: string, consumedToken: IToken): void {
-        // TODO: would save the "current rootCST be faster than locating it for each terminal?
-        let rootCst = this.CST_STACK[this.CST_STACK.length - 1]
-        addTerminalToCst(rootCst, consumedToken, key)
-    }
-
-    protected cstPostNonTerminal(
-        ruleCstResult: CstNode,
-        ruleName: string
-    ): void {
-        addNoneTerminalToCst(
-            this.CST_STACK[this.CST_STACK.length - 1],
-            ruleName,
-            ruleCstResult
-        )
-    }
-
     // lexer related methods
     public set input(newInput: IToken[]) {
         this.reset()
@@ -2470,58 +2136,6 @@ export class Parser implements Recoverable {
     protected getLexerPosition(): number {
         return this.exportLexerState()
     }
-
-    protected lookAheadBuilderForOptional(
-        alt: lookAheadSequence,
-        tokenMatcher: TokenMatcher,
-        dynamicTokensEnabled: boolean
-    ): () => boolean {
-        return buildSingleAlternativeLookaheadFunction(
-            alt,
-            tokenMatcher,
-            dynamicTokensEnabled
-        )
-    }
-
-    protected lookAheadBuilderForAlternatives(
-        alts: lookAheadSequence[],
-        hasPredicates: boolean,
-        tokenMatcher: TokenMatcher,
-        dynamicTokensEnabled: boolean
-    ): (orAlts?: IAnyOrAlt<any>[]) => number | undefined {
-        return buildAlternativesLookAheadFunc(
-            alts,
-            hasPredicates,
-            tokenMatcher,
-            dynamicTokensEnabled
-        )
-    }
-
-    /* istanbul ignore next */
-    protected getLaFuncFromCache(key: number): Function {
-        return undefined
-    }
-
-    protected getLaFuncFromMap(key: number): Function {
-        return this.lookAheadFuncsCache.get(key)
-    }
-
-    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    protected getLaFuncFromObj(key: number): Function {
-        return this.lookAheadFuncsCache[key]
-    }
-
-    /* istanbul ignore next */
-    protected setLaFuncCache(key: number, value: Function): void {}
-
-    protected setLaFuncCacheUsingMap(key: number, value: Function): void {
-        this.lookAheadFuncsCache.set(key, value)
-    }
-
-    /* istanbul ignore next - Using plain array as dictionary will be tested on older node.js versions and IE11 */
-    protected setLaFuncUsingObj(key: number, value: Function): void {
-        this.lookAheadFuncsCache[key] = value
-    }
 }
 
-applyMixins(Parser, [Recoverable])
+applyMixins(Parser, [Recoverable, LooksAhead, TreeBuilder])

@@ -1,4 +1,4 @@
-import { EOF } from "../../scan/tokens_public"
+import { createTokenInstance, EOF } from "../../scan/tokens_public"
 import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interpreter"
 import { Parser } from "../parser_public"
 import {
@@ -34,6 +34,25 @@ InRuleRecoveryException.prototype = Error.prototype
 // TODO: convert to mixins.html example
 // TODO: "Traceable" , "TreeBuilder"
 export class Recoverable {
+    public getTokenToInsert(tokType: TokenType): IToken {
+        let tokToInsert = createTokenInstance(
+            tokType,
+            "",
+            NaN,
+            NaN,
+            NaN,
+            NaN,
+            NaN,
+            NaN
+        )
+        tokToInsert.isInsertedInRecovery = true
+        return tokToInsert
+    }
+
+    public canTokenTypeBeInsertedInRecovery(tokType: TokenType) {
+        return true
+    }
+
     tryInRepetitionRecovery(
         this: Parser,
         grammarRule: Function,
@@ -235,7 +254,6 @@ export class Recoverable {
         if (this.RULE_STACK.length === 1) {
             return EOF_FOLLOW_KEY
         }
-
         let currRuleShortName = this.getLastExplicitRuleShortName()
         let currRuleIdx = this.getLastExplicitRuleOccurrenceIndex()
         let prevRuleShortName = this.getPreviousExplicitRuleShortName()
@@ -321,6 +339,19 @@ export class Recoverable {
         }
         // the last token is not part of the error.
         return dropRight(resyncedTokens)
+    }
+
+    attemptInRepetitionRecovery(
+        this: Parser,
+        prodFunc: Function,
+        args: any[],
+        lookaheadFunc: () => boolean,
+        dslMethodIdx: number,
+        prodOccurrence: number,
+        nextToksWalker: typeof AbstractNextTerminalAfterProductionWalker
+    ): void {
+        // by default this is a NO-OP
+        // The actual implementation is with the function(not method) below
     }
 }
 

@@ -181,7 +181,7 @@ class EcmaScriptQuirksParser extends Parser {
         this.textIdx = newState
     }
 
-    protected lookAheadBuilderForOptional(
+    lookAheadBuilderForOptional(
         alt: lookAheadSequence,
         tokenMatcher: TokenMatcher,
         dynamicTokensEnabled: boolean
@@ -215,7 +215,7 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    protected lookAheadBuilderForAlternatives(
+    lookAheadBuilderForAlternatives(
         alts: lookAheadSequence[],
         hasPredicates: boolean,
         tokenMatcher: TokenMatcher,
