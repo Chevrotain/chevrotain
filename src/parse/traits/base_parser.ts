@@ -10,6 +10,7 @@ import { AbstractNextTerminalAfterProductionWalker } from "../grammar/interprete
 import { lookAheadSequence, Parser, TokenMatcher } from "../parser_public"
 import { TreeBuilder } from "./tree_builder"
 import { LooksAhead } from "./looksahead"
+import { LexerAdapter } from "./lexer_adapter"
 
 // TODO: verification that the BaseParser ONLY contains methods
 //       from the traits
@@ -20,7 +21,8 @@ import { LooksAhead } from "./looksahead"
  * pattern to implement mixins in TypeScript requires signatures code duplication.
  * - https://www.typescriptlang.org/docs/handbook/mixins.html
  */
-export class BaseParser implements Recoverable, TreeBuilder, LooksAhead {
+export class BaseParser
+    implements Recoverable, TreeBuilder, LooksAhead, LexerAdapter {
     // Recoverable Trait
     addToResyncTokens(token: IToken, resyncTokens: IToken[]): IToken[] {
         return undefined
@@ -152,6 +154,44 @@ export class BaseParser implements Recoverable, TreeBuilder, LooksAhead {
         return undefined
     }
 
+    getLastExplicitRuleOccurrenceIndex():number {
+        return 0;
+    }
+
+    getLastExplicitRuleOccurrenceIndexNoCst():number {
+        return 0;
+    }
+
+    getLastExplicitRuleShortName():string {
+        return "";
+    }
+
+    getLastExplicitRuleShortNameNoCst():string {
+        return "";
+    }
+
+    getPreviousExplicitRuleShortName():string {
+        return "";
+    }
+
+    getPreviousExplicitRuleShortNameNoCst():string {
+        return "";
+    }
+
+    nestedAltBeforeClause(methodOpts:{ NAME?:string },
+                          occurrence:number,
+                          methodKeyIdx:number,
+                          altIdx:number):{ shortName?:number; nestedName?:string } {
+        return undefined;
+    }
+
+    nestedRuleBeforeClause(methodOpts:{ NAME?:string }, laKey:number):string {
+        return "";
+    }
+
+    nestedRuleFinallyClause(laKey:number, nestedName:string):void {
+    }
+
     // LooksAhead Trait
     getKeyForAutomaticLookahead(
         dslMethodIdx: number,
@@ -236,4 +276,33 @@ export class BaseParser implements Recoverable, TreeBuilder, LooksAhead {
     setLaFuncCacheUsingMap(key: number, value: Function): void {}
 
     setLaFuncUsingObj(key: number, value: Function): void {}
+
+    // LexerAdaper
+
+    moveToTerminatedState(): void {}
+
+    resetLexerState(): void {}
+
+    LA(howMuch: number): IToken {
+        return undefined
+    }
+
+    SKIP_TOKEN(): IToken {
+        return undefined
+    }
+
+    consumeToken(): void {}
+
+    exportLexerState(): number {
+        return 0
+    }
+
+    getLexerPosition(): number {
+        return 0
+    }
+
+    importLexerState(newState: number): void {}
+
+    // TODO: this does not get overriden by applyMixins
+    set input(newInput: IToken[]) {}
 }

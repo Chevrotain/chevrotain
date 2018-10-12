@@ -21,23 +21,17 @@ import {
     isArray,
     isEmpty,
     isES2015MapSupported,
-    isFunction,
     isObject,
     isUndefined,
     map,
     NOOP,
     reduce,
-    some,
     uniq,
     values
 } from "../utils/utils"
 import { computeAllProdsFollows } from "./grammar/follow"
 import { createTokenInstance, EOF, tokenName } from "../scan/tokens_public"
 import {
-    buildAlternativesLookAheadFunc,
-    buildLookaheadFuncForOptionalProd,
-    buildLookaheadFuncForOr,
-    buildSingleAlternativeLookaheadFunction,
     getLookaheadPathsForOptionalProd,
     getLookaheadPathsForOr,
     PROD_TYPE
@@ -59,23 +53,17 @@ import {
     tokenStructuredMatcher,
     tokenStructuredMatcherNoCategories
 } from "../scan/tokens"
-import { addNoneTerminalToCst, addTerminalToCst, analyzeCst } from "./cst/cst"
+import { analyzeCst } from "./cst/cst"
 import {
     AT_LEAST_ONE_IDX,
     AT_LEAST_ONE_SEP_IDX,
     BITS_FOR_METHOD_IDX,
     BITS_FOR_OCCURRENCE_IDX,
-    getKeyForAltIndex,
-    getKeyForAutomaticLookahead,
     MANY_IDX,
     MANY_SEP_IDX,
     OPTION_IDX,
     OR_IDX
 } from "./grammar/keys"
-import {
-    createBaseSemanticVisitorConstructor,
-    createBaseVisitorConstructorWithDefaults
-} from "./cst/cst_visitor"
 import {
     defaultGrammarValidatorErrorProvider,
     defaultParserErrorProvider
@@ -93,9 +81,7 @@ import {
     DSLMethodOptsWithErr,
     GrammarAction,
     IAnyOrAlt,
-    ICstVisitor,
     IgnoredParserIssues,
-    IOrAltWithGate,
     IParserConfig,
     IParserDefinitionError,
     IParserErrorMessageProvider,
@@ -113,13 +99,13 @@ import {
 } from "../../api"
 import {
     attemptInRepetitionRecovery as enabledAttemptInRepetitionRecovery,
-    IFollowKey,
     IN_RULE_RECOVERY_EXCEPTION,
     Recoverable
 } from "./traits/recoverable"
 import { BaseParser } from "./traits/base_parser"
 import { LooksAhead } from "./traits/looksahead"
 import { TreeBuilder } from "./traits/tree_builder"
+import { LexerAdapter } from "./traits/lexer_adapter"
 
 export const END_OF_FILE = createTokenInstance(
     EOF,
@@ -423,11 +409,14 @@ export class Parser extends BaseParser implements Recoverable {
         // For larger Maps this is slightly faster than using a plain object (array in our case).
         /* istanbul ignore else - The else branch will be tested on older node.js versions and IE11 */
         if (isES2015MapSupported()) {
-            this.getLaFuncFromCache = this.getLaFuncFromMap
-            this.setLaFuncCache = this.setLaFuncCacheUsingMap
+            // TODO: PARSER.PROTOTYPE?
+            // TODO but prevent inheritance???
+            // TODO: is Object.getPrototypeOf needed???
+            this.getLaFuncFromCache = Object.getPrototypeOf(this).getLaFuncFromMap
+            this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncCacheUsingMap
         } else {
-            this.getLaFuncFromCache = this.getLaFuncFromObj
-            this.setLaFuncCache = this.setLaFuncUsingObj
+            this.getLaFuncFromCache = Object.getPrototypeOf(this).getLaFuncFromObj
+            this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
         }
 
         if (!this.outputCst) {
@@ -435,9 +424,10 @@ export class Parser extends BaseParser implements Recoverable {
             this.cstFinallyStateUpdate = NOOP
             this.cstPostTerminal = NOOP
             this.cstPostNonTerminal = NOOP
-            this.getLastExplicitRuleShortName = this.getLastExplicitRuleShortNameNoCst
-            this.getPreviousExplicitRuleShortName = this.getPreviousExplicitRuleShortNameNoCst
-            this.getLastExplicitRuleOccurrenceIndex = this.getLastExplicitRuleOccurrenceIndexNoCst
+            // TODO: maybe access this._proto?
+            this.getLastExplicitRuleShortName = Object.getPrototypeOf(this).getLastExplicitRuleShortNameNoCst
+            this.getPreviousExplicitRuleShortName = Object.getPrototypeOf(this).getPreviousExplicitRuleShortNameNoCst
+            this.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(this).getLastExplicitRuleOccurrenceIndexNoCst
             this.manyInternal = this.manyInternalNoCst
             this.orInternal = this.orInternalNoCst
             this.optionInternal = this.optionInternalNoCst
@@ -1132,6 +1122,7 @@ export class Parser extends BaseParser implements Recoverable {
         }
     }
 
+    // TODO: extract to cst
     protected nestedRuleInvocationStateUpdate(
         nestedRuleName: string,
         shortNameKey: number
@@ -1992,150 +1983,6 @@ export class Parser extends BaseParser implements Recoverable {
             new NoViableAltException(errMsg, this.LA(1), previousToken)
         )
     }
-
-    protected getLastExplicitRuleShortName(): string {
-        let lastExplictIndex = this.LAST_EXPLICIT_RULE_STACK[
-            this.LAST_EXPLICIT_RULE_STACK.length - 1
-        ]
-        return this.RULE_STACK[lastExplictIndex]
-    }
-
-    protected getLastExplicitRuleShortNameNoCst(): string {
-        let ruleStack = this.RULE_STACK
-        return ruleStack[ruleStack.length - 1]
-    }
-
-    protected getPreviousExplicitRuleShortName(): string {
-        let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-            this.LAST_EXPLICIT_RULE_STACK.length - 2
-        ]
-        return this.RULE_STACK[lastExplicitIndex]
-    }
-
-    protected getPreviousExplicitRuleShortNameNoCst(): string {
-        let ruleStack = this.RULE_STACK
-        return ruleStack[ruleStack.length - 2]
-    }
-
-    protected getLastExplicitRuleOccurrenceIndex(): number {
-        let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-            this.LAST_EXPLICIT_RULE_STACK.length - 1
-        ]
-        return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
-    }
-
-    protected getLastExplicitRuleOccurrenceIndexNoCst(): number {
-        let occurrenceStack = this.RULE_OCCURRENCE_STACK
-        return occurrenceStack[occurrenceStack.length - 1]
-    }
-
-    protected nestedRuleBeforeClause(
-        methodOpts: { NAME?: string },
-        laKey: number
-    ): string {
-        let nestedName
-        if (methodOpts.NAME !== undefined) {
-            nestedName = methodOpts.NAME
-            this.nestedRuleInvocationStateUpdate(nestedName, laKey)
-            return nestedName
-        } else {
-            return undefined
-        }
-    }
-
-    protected nestedAltBeforeClause(
-        methodOpts: { NAME?: string },
-        occurrence: number,
-        methodKeyIdx: number,
-        altIdx: number
-    ): { shortName?: number; nestedName?: string } {
-        let ruleIdx = this.getLastExplicitRuleShortName()
-        let shortName = getKeyForAltIndex(
-            <any>ruleIdx,
-            methodKeyIdx,
-            occurrence,
-            altIdx
-        )
-        let nestedName
-        if (methodOpts.NAME !== undefined) {
-            nestedName = methodOpts.NAME
-            this.nestedRuleInvocationStateUpdate(nestedName, shortName)
-            return {
-                shortName,
-                nestedName
-            }
-        } else {
-            return undefined
-        }
-    }
-
-    protected nestedRuleFinallyClause(laKey: number, nestedName: string): void {
-        let cstStack = this.CST_STACK
-        let nestedRuleCst = cstStack[cstStack.length - 1]
-        this.nestedRuleFinallyStateUpdate()
-        // this return a different result than the previous invocation because "nestedRuleFinallyStateUpdate" pops the cst stack
-        let parentCstNode = cstStack[cstStack.length - 1]
-        addNoneTerminalToCst(parentCstNode, nestedName, nestedRuleCst)
-    }
-
-    // lexer related methods
-    public set input(newInput: IToken[]) {
-        this.reset()
-        this.tokVector = newInput
-        this.tokVectorLength = newInput.length
-    }
-
-    public get input(): IToken[] {
-        return this.tokVector
-    }
-
-    // skips a token and returns the next token
-    public SKIP_TOKEN(): IToken {
-        if (this.currIdx <= this.tokVector.length - 2) {
-            this.consumeToken()
-            return this.LA(1)
-        } else {
-            return END_OF_FILE
-        }
-    }
-
-    // Lexer (accessing Token vector) related methods which can be overridden to implement lazy lexers
-    // or lexers dependent on parser context.
-    public LA(howMuch: number): IToken {
-        // does: is this optimization (saving tokVectorLength benefits?)
-        if (
-            this.currIdx + howMuch < 0 ||
-            this.tokVectorLength <= this.currIdx + howMuch
-        ) {
-            return END_OF_FILE
-        } else {
-            return this.tokVector[this.currIdx + howMuch]
-        }
-    }
-
-    public consumeToken() {
-        this.currIdx++
-    }
-
-    protected exportLexerState(): number {
-        return this.currIdx
-    }
-
-    protected importLexerState(newState: number) {
-        this.currIdx = newState
-    }
-
-    resetLexerState(): void {
-        this.currIdx = -1
-    }
-
-    protected moveToTerminatedState(): void {
-        this.currIdx = this.tokVector.length - 1
-    }
-
-    protected getLexerPosition(): number {
-        return this.exportLexerState()
-    }
 }
 
-applyMixins(Parser, [Recoverable, LooksAhead, TreeBuilder])
+applyMixins(Parser, [Recoverable, LooksAhead, TreeBuilder, LexerAdapter])

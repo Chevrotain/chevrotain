@@ -173,11 +173,11 @@ class EcmaScriptQuirksParser extends Parser {
         }
     }
 
-    protected exportLexerState(): number {
+    exportLexerState(): number {
         return this.textIdx
     }
 
-    protected importLexerState(newState: number) {
+    importLexerState(newState: number) {
         this.textIdx = newState
     }
 
