@@ -302,7 +302,7 @@ describe("The chevrotain support for custom gates/predicates on DSL production:"
             expect(gateOpenInputB).to.equal("b")
         })
 
-        it.only("predicates in OPTION", () => {
+        it("predicates in OPTION", () => {
             class PredicateWithRuleOptionParser extends Parser {
                 constructor(input: IToken[] = []) {
                     super(ALL_TOKENS, { outputCst: false })

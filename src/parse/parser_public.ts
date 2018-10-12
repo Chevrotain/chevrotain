@@ -412,10 +412,16 @@ export class Parser extends BaseParser implements Recoverable {
             // TODO: PARSER.PROTOTYPE?
             // TODO but prevent inheritance???
             // TODO: is Object.getPrototypeOf needed???
-            this.getLaFuncFromCache = Object.getPrototypeOf(this).getLaFuncFromMap
-            this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncCacheUsingMap
+            this.getLaFuncFromCache = Object.getPrototypeOf(
+                this
+            ).getLaFuncFromMap
+            this.setLaFuncCache = Object.getPrototypeOf(
+                this
+            ).setLaFuncCacheUsingMap
         } else {
-            this.getLaFuncFromCache = Object.getPrototypeOf(this).getLaFuncFromObj
+            this.getLaFuncFromCache = Object.getPrototypeOf(
+                this
+            ).getLaFuncFromObj
             this.setLaFuncCache = Object.getPrototypeOf(this).setLaFuncUsingObj
         }
 
@@ -425,9 +431,15 @@ export class Parser extends BaseParser implements Recoverable {
             this.cstPostTerminal = NOOP
             this.cstPostNonTerminal = NOOP
             // TODO: maybe access this._proto?
-            this.getLastExplicitRuleShortName = Object.getPrototypeOf(this).getLastExplicitRuleShortNameNoCst
-            this.getPreviousExplicitRuleShortName = Object.getPrototypeOf(this).getPreviousExplicitRuleShortNameNoCst
-            this.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(this).getLastExplicitRuleOccurrenceIndexNoCst
+            this.getLastExplicitRuleShortName = Object.getPrototypeOf(
+                this
+            ).getLastExplicitRuleShortNameNoCst
+            this.getPreviousExplicitRuleShortName = Object.getPrototypeOf(
+                this
+            ).getPreviousExplicitRuleShortNameNoCst
+            this.getLastExplicitRuleOccurrenceIndex = Object.getPrototypeOf(
+                this
+            ).getLastExplicitRuleOccurrenceIndexNoCst
             this.manyInternal = this.manyInternalNoCst
             this.orInternal = this.orInternalNoCst
             this.optionInternal = this.optionInternalNoCst
@@ -1986,3 +1998,9 @@ export class Parser extends BaseParser implements Recoverable {
 }
 
 applyMixins(Parser, [Recoverable, LooksAhead, TreeBuilder, LexerAdapter])
+// Manually copying the only accessor the traits define.
+const inputDescriptor = Object.getOwnPropertyDescriptor(
+    LexerAdapter.prototype,
+    "input"
+)
+Object.defineProperty(Parser.prototype, "input", inputDescriptor)

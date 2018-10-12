@@ -156,8 +156,8 @@ export class TreeBuilder {
 
     getLastExplicitRuleShortName(this: Parser): string {
         let lastExplictIndex = this.LAST_EXPLICIT_RULE_STACK[
-        this.LAST_EXPLICIT_RULE_STACK.length - 1
-            ]
+            this.LAST_EXPLICIT_RULE_STACK.length - 1
+        ]
         return this.RULE_STACK[lastExplictIndex]
     }
 
@@ -168,8 +168,8 @@ export class TreeBuilder {
 
     getPreviousExplicitRuleShortName(this: Parser): string {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-        this.LAST_EXPLICIT_RULE_STACK.length - 2
-            ]
+            this.LAST_EXPLICIT_RULE_STACK.length - 2
+        ]
         return this.RULE_STACK[lastExplicitIndex]
     }
 
@@ -180,8 +180,8 @@ export class TreeBuilder {
 
     getLastExplicitRuleOccurrenceIndex(this: Parser): number {
         let lastExplicitIndex = this.LAST_EXPLICIT_RULE_STACK[
-        this.LAST_EXPLICIT_RULE_STACK.length - 1
-            ]
+            this.LAST_EXPLICIT_RULE_STACK.length - 1
+        ]
         return this.RULE_OCCURRENCE_STACK[lastExplicitIndex]
     }
 

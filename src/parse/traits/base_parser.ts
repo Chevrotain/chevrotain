@@ -154,43 +154,47 @@ export class BaseParser
         return undefined
     }
 
-    getLastExplicitRuleOccurrenceIndex():number {
-        return 0;
+    getLastExplicitRuleOccurrenceIndex(): number {
+        return 0
     }
 
-    getLastExplicitRuleOccurrenceIndexNoCst():number {
-        return 0;
+    getLastExplicitRuleOccurrenceIndexNoCst(): number {
+        return 0
     }
 
-    getLastExplicitRuleShortName():string {
-        return "";
+    getLastExplicitRuleShortName(): string {
+        return ""
     }
 
-    getLastExplicitRuleShortNameNoCst():string {
-        return "";
+    getLastExplicitRuleShortNameNoCst(): string {
+        return ""
     }
 
-    getPreviousExplicitRuleShortName():string {
-        return "";
+    getPreviousExplicitRuleShortName(): string {
+        return ""
     }
 
-    getPreviousExplicitRuleShortNameNoCst():string {
-        return "";
+    getPreviousExplicitRuleShortNameNoCst(): string {
+        return ""
     }
 
-    nestedAltBeforeClause(methodOpts:{ NAME?:string },
-                          occurrence:number,
-                          methodKeyIdx:number,
-                          altIdx:number):{ shortName?:number; nestedName?:string } {
-        return undefined;
+    nestedAltBeforeClause(
+        methodOpts: { NAME?: string },
+        occurrence: number,
+        methodKeyIdx: number,
+        altIdx: number
+    ): { shortName?: number; nestedName?: string } {
+        return undefined
     }
 
-    nestedRuleBeforeClause(methodOpts:{ NAME?:string }, laKey:number):string {
-        return "";
+    nestedRuleBeforeClause(
+        methodOpts: { NAME?: string },
+        laKey: number
+    ): string {
+        return ""
     }
 
-    nestedRuleFinallyClause(laKey:number, nestedName:string):void {
-    }
+    nestedRuleFinallyClause(laKey: number, nestedName: string): void {}
 
     // LooksAhead Trait
     getKeyForAutomaticLookahead(
